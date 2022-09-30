@@ -25,6 +25,7 @@ namespace OpenNetLinkApp.Services
         public bool m_bFileExaming = false;
         public bool m_bSFMChecking = false;                             // SFM 체크중
         public bool m_bApproveAfterMyCountChecking = false;             // 자신의 사후결재 카운트 조회중 
+        public bool m_bSFMLogOut = false;                               // SFM 체크로 인한 로그아웃 여부
 
         public bool m_bMultiLoginDo = true;                             // 0각서버 로그인타입대로 로그인 진행할지 유무 (true : 각서버별 설정대로 로그인함-사용자가클릭했을때로그인진행, false: 0 번 GroupID 정보대로 1,2번에도 로그인함(추가해야함) )
 
@@ -989,6 +990,16 @@ namespace OpenNetLinkApp.Services
         public bool GetSFMChecking()
         {
             return this.m_bSFMChecking;
+        }
+
+        public void SetSFMLogOut(bool bSFMLogOut)
+        {
+            this.m_bSFMLogOut = bSFMLogOut;
+        }
+
+        public bool GetSFMLogOut()
+        {
+            return this.m_bSFMLogOut;
         }
 
         public void SetApproveAfterMyCountChecking(bool bApproveAfterMyCountChecking)

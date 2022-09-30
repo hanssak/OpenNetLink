@@ -106,8 +106,8 @@
   "bViewSGSideBarUIBadge": true,
   "nClipAfterApproveUseType": 2,
   "bUseOneToMultiLogin": false,
-
-  "bApprDeptSearch": true,
+  "bUseOneByOneLogOut" : false,
+  "bApprDeptSearch": false,
   "bApprLineChkBlock": false,
   "bApprLineLocalSave": true,
 
@@ -129,13 +129,13 @@
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
 
-  "strApproverSearchType": "TREE",
+  "strApproverSearchType": "SEARCH",
   "bUseInputSearchInApproverTree": false,
-  "strReceiverSearchType": "TREE",
+  "strReceiverSearchType": "SEARCH",
   "bUseInputSearchInReceiverTree": false,
-  "strProxySearchType": "TREE",
+  "strProxySearchType": "SEARCH",
   "bUseInputSearchInProxyTree": false,
-  "strSecurityApproverSearchType": "TREE",
+  "strSecurityApproverSearchType": "SEARCH",
   "bUseInputSearchInSecurityApproverTree": false
 
 }

@@ -18,6 +18,7 @@
 
     /// <summary>
     /// 자정 경과 시, 선택된 날짜 기준을 다시 재설정하는 기능 동작 여부 설정
+    /// (false 설정 시, 자정 경과되어도 날짜 자동갱신하지 않음)
     /// <para>Default : true</para>
     /// </summary>
     [Parameter] public bool UseDayInfoRefresh { get; set; } = true;
@@ -81,7 +82,9 @@
             object[] param = { "datepicker3", "datepicker4" };
             jsRuntime.InvokeAsync<object>("initDatePicker", param);
         }
-        pageService.SetDayInfoRefreshEvent(groupId, DayInfoRefreshResult);          //매일 자정 데이터 새로고침
+
+        if (UseDayInfoRefresh)
+            pageService.SetDayInfoRefreshEvent(groupId, DayInfoRefreshResult);          //매일 자정 데이터 새로고침
         base.OnAfterRender(firstRender);
     }
 

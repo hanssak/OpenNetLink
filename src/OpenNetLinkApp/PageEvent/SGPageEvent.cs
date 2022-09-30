@@ -213,7 +213,7 @@ namespace OpenNetLinkApp.PageEvent
     /// <summary>
     /// 대결재 갱신에 따른 로그아웃 Event
     /// </summary>
-    public delegate Task<int> SFMRefreshEvent();
+    public delegate Task<int> SFMRefreshEvent(int groupId);
 
     // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
     //public delegate void GPKICNListRecvEvent(int groupid, PageEventArgs e);

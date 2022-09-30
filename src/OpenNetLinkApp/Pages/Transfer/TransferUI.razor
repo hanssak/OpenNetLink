@@ -634,7 +634,7 @@
         SFMRefreshEvent sfmRefreshEvent = HSCmdCenter.sgPageEvent.GetSFMRefreshEvent();
         if (sfmRefreshEvent != null)
         {
-            int check = await sfmRefreshEvent();
+            int check = await sfmRefreshEvent(groupID);
 
             if (check == 1)
                 return;

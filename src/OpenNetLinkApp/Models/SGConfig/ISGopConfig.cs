@@ -135,6 +135,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileClipApproveUI { get; set; }          // 파일형태로보내는 클립보드 결재UI 나오게할지 유무
 
         public bool bUseOneToMultiLogin { get; set; }          // 1번에 다중망 로그인 기능 사용유무
+        public bool bUseOneByOneLogOut { get; set; }            // 1번에 다중망 로그인할때(bUseOneToMultiLogin = true) 에도 선택한 망만 로그인아웃하도록 할 건지유무
 
         public bool bUseFileExceptionDescCheck { get; }                        // 파일예외신청할때, 신청사유 정보 기입되어 있도록 할지 유무
 

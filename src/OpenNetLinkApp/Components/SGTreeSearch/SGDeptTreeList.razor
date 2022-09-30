@@ -227,20 +227,7 @@
         strDeptPlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       // 부서입력
         strNamePlaceHolder = XmlConf.GetTitle("T_INPUT_NAME");                       // 이름입력
     }
-    @*
-        [JSInvokable("DeptTreeSelect")]
-        public static void ApproverSearchSelect3(string value)
-        {
-        actionAssign.Invoke(value);
 
-        }
-
-        private void AssignApprover(string value)
-        {
-        //        SelectedUserSeq = value;
-        OnSelectedItem.InvokeAsync(value);
-        }
-    *@
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH

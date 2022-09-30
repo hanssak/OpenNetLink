@@ -27,7 +27,6 @@
 <!-- /.Navbar -->
 <!-- Main Sidebar Container -->
 <aside id="left-sidebar" class="main-sidebar sidebar-dark-primary elevation-4" style="z-index:1101;background-image: url('/images/adminlte/slide_bg_1.png');background-position:right bottom; background-size: cover;">
-
     @if (listNetWork != null && listNetWork.Count > 1)
     {
         <!-- Brand Logo -->
@@ -114,7 +113,10 @@
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
         if (sgLoginData == null)
+        {
+            bDlpUse = false;
             return;
+        }
 
         string stPrivacy = sgLoginData.GetTagData("PRIVACYAPPROVE");
         string stDuputyMode = sgLoginData.GetTagData("PRIVACYAPPROVEMOD");
@@ -166,7 +168,10 @@
         string confirmSeq = "NONE";
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
         if (sgLoginData == null)
+        {
+            bDlpUse = false;
             return;
+        }
         HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq, "2", confirmSeq, netSystem);
         bDlpUse = false;    //컨펌팝업 재실행 방지
         ShowMessage("warning", XmlConf.GetErrMsg("E_0030"));
@@ -251,7 +256,7 @@
             if (!sgData)
                 _queDlpNoti.Enqueue(new Tuple<int, SGData>(groupid, e));
 
-            
+
             if (bDlpUse)
                 return;
             //개인정보 검출 시 진행되는 부분
@@ -337,7 +342,7 @@
     public async void DetailSearchResult(int groupId, object[] e)
     {
         SGData data = e[0] as SGData;
-        List<Dictionary<int, string>> listData =  data.GetSvrRecordData("RECORD");
+        List<Dictionary<int, string>> listData = data.GetSvrRecordData("RECORD");
 
         if (listData == null || listData.Count == 0)
             return;
@@ -360,7 +365,7 @@
         lstInfo.Add(stTitle);
 
         List<FileInfoData> mFileData = new List<FileInfoData>();
-        foreach(Dictionary<int, string> dic in listData)
+        foreach (Dictionary<int, string> dic in listData)
         {
             FileInfoData temp = new FileInfoData();
             temp.stDLP = dic[5];
@@ -370,7 +375,7 @@
             temp.strFileType = dic[4];
 
             long tempLong = 0;
-            if(long.TryParse(temp.strFileSize, out tempLong))
+            if (long.TryParse(temp.strFileSize, out tempLong))
             {
                 temp.strFileSize = CsFunction.GetSizeStr(tempLong);
             }

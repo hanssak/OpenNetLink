@@ -67,7 +67,7 @@
                                             }
                                         </div>
                                     </div>
-                                        <!--<button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>-->
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2"> @strTransStatus </th>                         <!--전송상태-->
                                 <td>
@@ -201,13 +201,14 @@
                                             @*@if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpInfoDisplay(groupIDbyParam))*@
                                             <td style="text-align:center; vertical-align: middle">@item.stDLP</td>
                                             <td style="text-align:center; vertical-align: middle">@item.expiredDate</td>
-                                            <td style="text-align:center; vertical-align: middle">@item.isPossibleDownloadCount</td>
                                             @if (item.isPossibleDownload)
                                             {
+                                                <td style="text-align:center; vertical-align: middle">@item.isPossibleDownloadCount</td>
                                                 <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>RequestManualDownload(item))"><i class="far fa-arrow-alt-circle-down"></i></button></td>
                                             }
                                             else
                                             {
+                                                <td style="text-align:center; vertical-align: middle">0</td>
                                                 <td style="text-align:center; vertical-align: middle">-</td>
                                             }
                                             <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
@@ -831,7 +832,7 @@
     }
 
 
-     @*
+    @*
         /// <summary>
         ///
         /// </summary>
@@ -866,19 +867,19 @@
         }
     *@
     @*/// <summary>
-        ///
-        /// </summary>
-        /// <returns></returns>
-        public async Task GetDateTime()
-    {
-        await RetriveDateFromJS();
+            ///
+            /// </summary>
+            /// <returns></returns>
+            public async Task GetDateTime()
+        {
+            await RetriveDateFromJS();
 
-        char sep = '-';
-        string[] splitFrom = strFromDay.Split(sep);
-        curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
-        string[] splitTo = strToDay.Split(sep);
-        curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
-        }*@
+            char sep = '-';
+            string[] splitFrom = strFromDay.Split(sep);
+            curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
+            string[] splitTo = strToDay.Split(sep);
+            curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
+            }*@
 
     /// <summary>
     ///
@@ -1152,7 +1153,7 @@
                     isPossibleDownload = false;
             }
         }
-        int expireDate = Int32.Parse(tData.expiredDate.Replace("-",""));
+        int expireDate = Int32.Parse(tData.expiredDate.Replace("-", ""));
         if (isPossibleDownload)
         {
             if (expireDate > nowDate)
@@ -1381,6 +1382,20 @@
         string sFileName = e.strMsg;
         int per = e.count;
         int type = 0;
+        if (per == -100)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0221");           // 수신 파일 압축해제 및 복호화 도중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            ShowProgress(groupID, 4, 100, sFileName);
+            return;
+        }
+        if (per == -200)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            ShowProgress(groupID, 4, 100, sFileName);
+            return;
+        }
         if (per >= 100)
         {
 
@@ -1472,7 +1487,14 @@
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
-                pageService.SetFilePrevRecving(false);
+                pageService.SetFileRecving(false);
+                await Task.Delay(1000);
+                break;
+            case 4:             // 파일 수신 중 오류
+                identifier = "closeProgressMessage";
+                param = new object[1];
+                param[0] = strID;
+                pageService.SetFileRecving(false);
                 await Task.Delay(1000);
                 break;
             default:
