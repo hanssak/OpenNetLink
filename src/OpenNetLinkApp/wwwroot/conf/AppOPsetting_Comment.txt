@@ -155,7 +155,24 @@ bFileDownloadBeforeReciving : 파일포워드, 송신자가 수신PC에 미수�
 bRecvFolderOpen : 파일 수신후 폴더 열기 사용유무
 bUseAgentTime1aClock : 정책값대로 시간단위 사후결재 정책, 자정에  검색화면 검색날짜 UI / 일일 송순가능수 UI 변경되는거 Server 시간이 아니라 agent 시간기준으로 동작함(true:사용,false:않함) - Test 목적
 
+// 부서별 사용자 조회 방식 설정 기능
+strApproverSearchType :	'파일전송' 화면에서 결재자 선택 시 사용자 조회 방식을 결정 
+						=> "SEARCH" : 입력된 부서명과 사용자명을 기반으로 결과 리스트 표시 (Default)
+						=> "TREE" : 부서 TREE가 추가로 표시되며 부서별로 결과 리스트 표시 (해당 설정 시 bApprDeptSearch 옵션 무효화)
+bUseInputSearchInApproverTree : strApproverSearchType옵션이 "TREE" 일 경우, 부서명과 사용자명을 검색할 수 있는 컨트롤 표시 여부 (true,false)
 
+strReceiverSearchType:	'파일전송' 화면에서 수신자 선택 시 사용자 조회 방식을 결정 
+						=> "SEARCH" : 입력된 부서명과 사용자명을 기반으로 결과 리스트 표시 (Default)
+						=> "TREE" : 부서 TREE가 추가로 표시되며 부서별로 결과 리스트 표시 (해당 설정 시 bApprDeptSearch 옵션 무효화)
+bUseInputSearchInReceiverTree: strReceiverSearchType "TREE" 일 경우, 부서명과 사용자명을 검색할 수 있는 컨트롤 표시 여부 (true,false)
+ 
+strProxySearchType:	'대결재자 관리' 화면에서 대결재자 선택 시 사용자 조회 방식을 결정 
+						=> "SEARCH" : 입력된 부서명과 사용자명을 기반으로 결과 리스트 표시 (Default)
+						=> "TREE" : 부서 TREE가 추가로 표시되며 부서별로 결과 리스트 표시 (해당 설정 시 bApprDeptSearch 옵션 무효화)
+bUseInputSearchInProxyTree: strProxySearchType "TREE" 일 경우, 부서명과 사용자명을 검색할 수 있는 컨트롤 표시 여부 (true,false)
 
-
-
+strSecurityApproverSearchType:	'보안결재자 선택' 화면에서 보안결재자 선택 시 사용자 조회 방식을 결정 
+						=> "SEARCH" : 입력된 부서명과 사용자명을 기반으로 결과 리스트 표시 (Default)
+						=> "TREE" : 부서 TREE가 추가로 표시되며 부서별로 결과 리스트 표시 (해당 설정 시 bApprDeptSearch 옵션 무효화)
+bUseInputSearchInSecurityApproverTree: strSecurityApproverSearchType "TREE" 일 경우, 부서명과 사용자명을 검색할 수 있는 컨트롤 표시 여부 (true,false)
+  
