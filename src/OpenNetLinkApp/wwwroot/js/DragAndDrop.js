@@ -675,7 +675,7 @@ window.openPopUp = (popUpId) => {
         $("#main-nav").css("z-index", 2202);
     }
     else if (popUpId == "HeaderUIApporveAfterAlert" || popUpId == "HeaderUIApporveAfterMyCountAlert") {
-        $("#main-nav").css("z-index", 2202);
+        $("#main-nav").css("z-index", 2203);
     }
     else if (popUpId == "modal-displaylock") {
         $("#left-sidebar").css("z-index", 0);
