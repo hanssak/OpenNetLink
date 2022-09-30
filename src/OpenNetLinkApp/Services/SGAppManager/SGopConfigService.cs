@@ -204,13 +204,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseClipBoardFileTrans(int groupID);
 
         /// <summary>
-        /// 파일포워딩 기능 사용유무
+        /// 1번에 모든망 로그인
         /// </summary>
         /// <param name="groupID"></param>
         /// <returns></returns>
 
         public bool GetUseOneToMultiLogin();
 
+        /// <summary>
+        /// 1번에 모든망 로그인하되 로그아웃은 선택한 망 1개만 진행여부
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseOneToMultiLoginButoneBYoneLogout();
 
         public bool GetUseOneAClockChangeAgentTimer();
 
@@ -804,6 +810,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseFileExceptionDescCheck()
         {
             return AppConfigInfo.bUseFileExceptionDescCheck;
+        }
+
+        public bool GetUseOneToMultiLoginButoneBYoneLogout()
+        {
+            return AppConfigInfo.bUseOneByOneLogOut;
         }
 
         public string GetApproverSearchType()

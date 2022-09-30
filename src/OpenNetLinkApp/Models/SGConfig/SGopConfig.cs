@@ -141,6 +141,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileClipApproveUI { get; set; } = false;          // 파일형태로보내는 클립보드 결재UI 나오게할지 유무
 
         public bool bUseOneToMultiLogin { get; set; } = false;         // 1번에 다중망 로그인 기능 사용유무
+        public bool bUseOneByOneLogOut { get; set; } = false;         // 1번에 다중망 로그인 기능 사용때에도 로그아웃은 선택한 망에서 개별 로그아웃적영
 
         public bool bUseAgentTime1aClock { get; set; } = false;         // 1번에 다중망 로그인 기능 사용유무
 

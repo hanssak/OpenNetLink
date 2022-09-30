@@ -783,7 +783,8 @@
         //pageService.m_nCurViewPageGroupID=0;
 
 
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() && 
+            SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLoginButoneBYoneLogout() == false)
         {
             foreach (ISGNetwork Net in listNetWork)
             {
