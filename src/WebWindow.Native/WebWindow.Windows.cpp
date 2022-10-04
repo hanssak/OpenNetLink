@@ -816,7 +816,7 @@ void WebWindow::SendMessage(AutoString message)
 {
 	_webviewWindow->PostWebMessageAsString(message);
 }
-
+int initExp = 99999999999999;
 // TODO: Call UserNotification on Windows API
 void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI)
 {
@@ -841,7 +841,7 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 
 	imagePath=(LPWSTR)image;
 	//actions.push_back(L"OK");
-	expiration = 0;
+	expiration = initExp++;
 	appName = (LPWSTR)L"OpenNetLink";
 
 	wchar_t ModelID[MAX_PATH] = { 0, };
@@ -883,10 +883,10 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	templ.setAudioOption(audioOption);
 	templ.setAttributionText(attribute);
 	// 5초
-//	templ.setDuration(WinToastTemplate::Duration::Short);	//	약7초
-//	templ.setDuration(WinToastTemplate::Duration::System);	//	약5초
-//	templ.setDuration(WinToastTemplate::Duration::Long);	//	약23초
-
+	//templ.setDuration(WinToastTemplate::Duration::Short);	//	약7초
+	templ.setDuration(WinToastTemplate::Duration::System);	//	약5초
+	//templ.setDuration(WinToastTemplate::Duration::Long);	//	약23초
+	
 	for (auto const& action : actions)
 		templ.addAction(action);
 	if (expiration)
@@ -894,8 +894,16 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	if (withImage)
 		templ.setImagePath(imagePath);
 
-	CustomHandler* handler = new CustomHandler(this);
+	templ.addAction(L"None");
+	templ.setScenario(WinToastTemplate::Scenario::Reminder);
 
+	//if (g_CustomHandler != NULL)
+	//{
+	//	g_CustomHandler->SetNaviURI(navURI != NULL ? navURI : L"");
+	//	std::wcerr << "URI : " << navURI << endl;
+	//}
+	CustomHandler* handler = new CustomHandler(this);
+	
 	if (handler != NULL)
 	{
 		handler->SetNaviURI(navURI != NULL ? navURI : L"");

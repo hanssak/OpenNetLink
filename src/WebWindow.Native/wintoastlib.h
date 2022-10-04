@@ -65,6 +65,7 @@ namespace WinToastLib {
 
     class WinToastTemplate {
     public:
+        enum class Scenario { Default, Alarm, IncomingCall, Reminder };
         enum Duration { System, Short, Long };
         enum AudioOption { Default = 0, Silent, Loop };
         enum TextField { FirstLine = 0, SecondLine, ThirdLine };
@@ -123,6 +124,7 @@ namespace WinToastLib {
         void setAudioOption(_In_ WinToastTemplate::AudioOption audioOption);
         void setDuration(_In_ Duration duration);
         void setExpiration(_In_ INT64 millisecondsFromNow);
+        void setScenario(_In_ Scenario scenario);
         void addAction(_In_ const std::wstring& label);
 
         std::size_t textFieldsCount() const;
@@ -134,6 +136,7 @@ namespace WinToastLib {
         const std::wstring& imagePath() const;
         const std::wstring& audioPath() const;
         const std::wstring& attributionText() const;
+        const std::wstring& scenario() const;
         INT64 expiration() const;
         WinToastTemplateType type() const;
         WinToastTemplate::AudioOption audioOption() const;
@@ -144,6 +147,7 @@ namespace WinToastLib {
         std::wstring                        _imagePath{};
         std::wstring                        _audioPath{};
         std::wstring                        _attributionText{};
+        std::wstring                        _scenario{ L"Default" };
         INT64                               _expiration{0};
         AudioOption                         _audioOption{WinToastTemplate::AudioOption::Default};
         WinToastTemplateType                _type{WinToastTemplateType::Text01};
@@ -198,41 +202,49 @@ namespace WinToastLib {
         void setAppName(_In_ const std::wstring& appName);
 
     protected:
-        struct notify_data
+        struct NotifyData
         {
-			notify_data() : destroyed(false) {}
-            notify_data(ComPtr<IToastNotification> notify_,
-                EventRegistrationToken activatedToken_, 
-                EventRegistrationToken dismissedToken_, 
-                EventRegistrationToken failedToken_) 
-                : notify(notify_)
-                , activatedToken(activatedToken_)
-                , dismissedToken(dismissedToken_)
-                , failedToken(failedToken_)
-                , destroyed(false){}
-            void DestroyEventHandlers()
+            NotifyData() : _setForDeletion(false), _destroyed(false) {}
+            NotifyData(_In_ ComPtr<IToastNotification> notify,
+                _In_ EventRegistrationToken activatedToken,
+                _In_ EventRegistrationToken dismissedToken,
+                _In_ EventRegistrationToken failedToken)
+                : _notify(notify)
+                , _activatedToken(activatedToken)
+                , _dismissedToken(dismissedToken)
+                , _failedToken(failedToken)
+                , _setForDeletion(false)
+                , _destroyed(false)
+            {}
+            // Never call RemoveTokens() in NotifyData's destructor! 
+            // Because it will remove tokens before the notification happens.
+            void RemoveTokens()
             {
-				if (destroyed == false && notify.Get())
+                if (_destroyed == false && _notify.Get())
                 {
-                    notify->remove_Activated(activatedToken);
-                    notify->remove_Dismissed(dismissedToken);
-                    notify->remove_Failed(failedToken);
-                    destroyed = true;
+                    _notify->remove_Activated(_activatedToken);
+                    _notify->remove_Dismissed(_dismissedToken);
+                    _notify->remove_Failed(_failedToken);
+                    _destroyed = true;
                 }
             }
-            ComPtr<IToastNotification> notify;
-            EventRegistrationToken activatedToken;
-            EventRegistrationToken dismissedToken;
-            EventRegistrationToken failedToken;
+            ComPtr<IToastNotification> _notify;
+            bool _setForDeletion;
         private:
-			bool destroyed;
+            EventRegistrationToken _activatedToken;
+            EventRegistrationToken _dismissedToken;
+            EventRegistrationToken _failedToken;
+            bool _destroyed;
         };
         bool											_isInitialized{false};
         bool                                            _hasCoInitialized{false};
         std::wstring                                    _appName{};
         std::wstring                                    _aumi{};
-        std::map<INT64, notify_data>     _buffer{};
+        std::map<INT64, NotifyData>     _buffer{};
 
+        void processForDeletion(_In_ INT64 id);
+        void setForDeletion(_In_ INT64 id);
+        void deletePreviousNotify();
         HRESULT validateShellLinkHelper(_Out_ bool& wasChanged);
         HRESULT createShellLinkHelper();
         HRESULT setImageFieldHelper(_In_ IXmlDocument *xml, _In_ const std::wstring& path);
@@ -241,6 +253,7 @@ namespace WinToastLib {
         HRESULT setTextFieldHelper(_In_ IXmlDocument *xml, _In_ const std::wstring& text, _In_ UINT32 pos);
         HRESULT setAttributionTextFieldHelper(_In_ IXmlDocument *xml, _In_ const std::wstring& text);
         HRESULT addActionHelper(_In_ IXmlDocument *xml, _In_ const std::wstring& action, _In_ const std::wstring& arguments);
+        HRESULT addScenarioHelper(_In_ IXmlDocument* xml, _In_ const std::wstring& scenario);
         HRESULT addDurationHelper(_In_ IXmlDocument *xml, _In_ const std::wstring& duration);
         ComPtr<IToastNotifier> notifier(_In_ bool* succeded) const;
         void setError(_Out_ WinToastError* error, _In_ WinToastError value);

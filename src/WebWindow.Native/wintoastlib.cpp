@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <unordered_map>
 #include <array>
+#include <functional>
 
 #pragma comment(lib,"shlwapi")
 #pragma comment(lib,"user32")
@@ -59,7 +60,7 @@ namespace DllImporter {
     typedef HRESULT(FAR STDAPICALLTYPE *f_PropVariantToString)(_In_ REFPROPVARIANT propvar, _Out_writes_(cch) PWSTR psz, _In_ UINT cch);
     typedef HRESULT(FAR STDAPICALLTYPE *f_RoGetActivationFactory)(_In_ HSTRING activatableClassId, _In_ REFIID iid, _COM_Outptr_ void ** factory);
     typedef HRESULT(FAR STDAPICALLTYPE *f_WindowsCreateStringReference)(_In_reads_opt_(length + 1) PCWSTR sourceString, UINT32 length, _Out_ HSTRING_HEADER * hstringHeader, _Outptr_result_maybenull_ _Result_nullonfailure_ HSTRING * string);
-    typedef PCWSTR(FAR STDAPICALLTYPE *f_WindowsGetStringRawBuffer)(_In_ HSTRING string, _Out_ UINT32 *length);
+    typedef PCWSTR(FAR STDAPICALLTYPE *f_WindowsGetStringRawBuffer)(_In_ HSTRING string, _Out_opt_ UINT32 *length);
     typedef HRESULT(FAR STDAPICALLTYPE *f_WindowsDeleteString)(_In_opt_ HSTRING string);
 
     static f_SetCurrentProcessExplicitAppUserModelID    SetCurrentProcessExplicitAppUserModelID;
@@ -226,7 +227,7 @@ namespace Util {
         return hr;
     }
 
-    inline HRESULT defaultShellLinkPath(const std::wstring& appname, _In_ WCHAR* path, _In_ DWORD nSize = MAX_PATH) {
+    inline HRESULT defaultShellLinkPath(_In_ const std::wstring& appname, _In_ WCHAR* path, _In_ DWORD nSize = MAX_PATH) {
         HRESULT hr = defaultShellLinksDirectory(path, nSize);
         if (SUCCEEDED(hr)) {
             const std::wstring appLink(appname + DEFAULT_LINK_FORMAT);
@@ -238,7 +239,7 @@ namespace Util {
     }
 
 
-    inline PCWSTR AsString(ComPtr<IXmlDocument> &xmlDocument) {
+    inline PCWSTR AsString(_In_ ComPtr<IXmlDocument> &xmlDocument) {
         HSTRING xml;
         ComPtr<IXmlNodeSerializer> ser;
         HRESULT hr = xmlDocument.As<IXmlNodeSerializer>(&ser);
@@ -248,11 +249,11 @@ namespace Util {
         return nullptr;
     }
 
-    inline PCWSTR AsString(HSTRING hstring) {
+    inline PCWSTR AsString(_In_ HSTRING hstring) {
         return DllImporter::WindowsGetStringRawBuffer(hstring, nullptr);
     }
 
-    inline HRESULT setNodeStringValue(const std::wstring& string, IXmlNode *node, IXmlDocument *xml) {
+    inline HRESULT setNodeStringValue(_In_ const std::wstring& string, _Out_opt_ IXmlNode *node, IXmlDocument *xml) {
         ComPtr<IXmlText> textNode;
         HRESULT hr = xml->CreateTextNode( WinToastStringWrapper(string).Get(), &textNode);
         if (SUCCEEDED(hr)) {
@@ -267,11 +268,12 @@ namespace Util {
     }
 
     inline HRESULT setEventHandlers(_In_ IToastNotification* notification, _In_ IWinToastHandler* eventHandler, _In_ INT64 expirationTime,
-        _Out_ EventRegistrationToken& activatedToken, _Out_ EventRegistrationToken& dismissedToken, _Out_ EventRegistrationToken& failedToken) {
+        _Out_ EventRegistrationToken& activatedToken, _Out_ EventRegistrationToken& dismissedToken, _Out_ EventRegistrationToken& failedToken,
+        std::function<void()> processForDeletionFunc) {
         HRESULT hr = notification->add_Activated(
                     Callback < Implements < RuntimeClassFlags<ClassicCom>,
                     ITypedEventHandler<ToastNotification*, IInspectable* >> >(
-                    [eventHandler](IToastNotification* notify, IInspectable* inspectable)
+                    [eventHandler, processForDeletionFunc](IToastNotification* notify, IInspectable* inspectable)
                 {
                     ComPtr<IToastActivatedEventArgs> activatedEventArgs;
                     HRESULT hr = inspectable->QueryInterface(activatedEventArgs.GetAddressOf());
@@ -283,19 +285,21 @@ namespace Util {
                             if (arguments && *arguments) {
                                 eventHandler->toastActivated(static_cast<int>(wcstol(arguments, nullptr, 10)));
                                 DllImporter::WindowsDeleteString(argumentsHandle);
+                                processForDeletionFunc();
                                 return S_OK;
                             }
                             DllImporter::WindowsDeleteString(argumentsHandle);
                         }
                     }
                     eventHandler->toastActivated();
+                    processForDeletionFunc();
                     return S_OK;
                 }).Get(), &activatedToken);
 
         if (SUCCEEDED(hr)) {
             hr = notification->add_Dismissed(Callback < Implements < RuntimeClassFlags<ClassicCom>,
                      ITypedEventHandler<ToastNotification*, ToastDismissedEventArgs* >> >(
-                     [eventHandler, expirationTime](IToastNotification* notify, IToastDismissedEventArgs* e)
+                     [eventHandler, expirationTime, processForDeletionFunc](IToastNotification* notify, IToastDismissedEventArgs* e)
                  {
                      ToastDismissalReason reason;
                      if (SUCCEEDED(e->get_Reason(&reason)))
@@ -304,14 +308,16 @@ namespace Util {
                             reason = ToastDismissalReason_TimedOut;
                          eventHandler->toastDismissed(static_cast<IWinToastHandler::WinToastDismissalReason>(reason));
                      }
+                     processForDeletionFunc();
                      return S_OK;
                  }).Get(), &dismissedToken);
             if (SUCCEEDED(hr)) {
                 hr = notification->add_Failed(Callback < Implements < RuntimeClassFlags<ClassicCom>,
                     ITypedEventHandler<ToastNotification*, ToastFailedEventArgs* >> >(
-                    [eventHandler](IToastNotification* notify, IToastFailedEventArgs* e)
+                    [eventHandler, processForDeletionFunc](IToastNotification* notify, IToastFailedEventArgs* e)
                 {
                     eventHandler->toastFailed();
+                    processForDeletionFunc();
                     return S_OK;
                 }).Get(), &failedToken);
             }
@@ -689,6 +695,10 @@ INT64 WinToast::showToast(_In_ const WinToastTemplate& toast, _In_  IWinToastHan
                                 (toast.duration() == WinToastTemplate::Duration::Short) ? L"short" : L"long");
                         }
 
+                        if (SUCCEEDED(hr)) {
+                            hr = addScenarioHelper(xmlDocument.Get(), toast.scenario());
+                        }
+
                     } else {
                         DEBUG_MSG("Modern features (Actions/Sounds/Attributes) not supported in this os version");
                     }
@@ -708,20 +718,21 @@ INT64 WinToast::showToast(_In_ const WinToastTemplate& toast, _In_  IWinToastHan
 
 								EventRegistrationToken activatedToken, dismissedToken, failedToken;
 
-                                if (SUCCEEDED(hr)) {
-                                    hr = Util::setEventHandlers(notification.Get(), handler, expiration, 
-                                                                activatedToken, dismissedToken, failedToken);
+                                GUID guid;
+                                HRESULT hrGuid = CoCreateGuid(&guid);
+                                id = guid.Data1;
+                                if (SUCCEEDED(hr) && SUCCEEDED(hrGuid)) {
+                                    std::function<void()> processForDeletionFunc = [this, id]()-> void { processForDeletion(id); };
+                                    hr = Util::setEventHandlers(notification.Get(), handler, expiration,
+                                        activatedToken, dismissedToken, failedToken, processForDeletionFunc);
                                     if (FAILED(hr)) {
                                         setError(error, WinToastError::InvalidHandler);
                                     }
                                 }
 
                                 if (SUCCEEDED(hr)) {
-                                    GUID guid;
-                                    hr = CoCreateGuid(&guid);
                                     if (SUCCEEDED(hr)) {
-                                        id = guid.Data1;
-                                        _buffer.emplace(id, notify_data(notification, activatedToken, dismissedToken, failedToken));
+                                        _buffer.emplace(id, NotifyData(notification, activatedToken, dismissedToken, failedToken));
                                         DEBUG_MSG("xml: " << Util::AsString(xmlDocument));
                                         hr = notifier->Show(notification.Get());
                                         if (FAILED(hr)) {
@@ -750,10 +761,39 @@ ComPtr<IToastNotifier> WinToast::notifier(_In_ bool* succeded) const  {
 	return notifier;
 }
 
+void WinToast::processForDeletion(_In_ INT64 id)
+{
+    // delete previous NotifyData which has been setForDeletion = true 
+    deletePreviousNotify();
+
+    // setForDeletion in the next processForDeletion() because it is still in use, so cannot delete.
+    setForDeletion(id);
+}
+
+void WinToast::setForDeletion(_In_ INT64 id)
+{
+    _buffer[id]._setForDeletion = true;
+}
+
+void WinToast::deletePreviousNotify()
+{
+    bool found = false;
+    do
+    {
+        auto it = std::find_if(_buffer.begin(), _buffer.end(), [](const std::pair<const INT64, WinToastLib::WinToast::NotifyData>& data)
+            -> bool { return data.second._setForDeletion; });
+        if (it != _buffer.end())
+        {
+            found = true;
+            it->second.RemoveTokens();
+            _buffer.erase(it);
+        }
+        else
+            found = false;
+    } while (found);
+}
+
 bool WinToast::hideToast(_In_ INT64 id) {
-
-    std::wcerr << L"WinToast hideToast - Call(id:"<< id << L")"<< std::endl;
-
     if (!isInitialized()) {
         DEBUG_MSG("Error when hiding the toast. WinToast is not initialized.");
         return false;
@@ -762,32 +802,27 @@ bool WinToast::hideToast(_In_ INT64 id) {
     if (_buffer.find(id) != _buffer.end()) {
         auto succeded = false;
         auto notify = notifier(&succeded);
-		if (succeded) {
-            auto result = notify->Hide(_buffer[id].notify.Get());
+        if (succeded) {
+            auto result = notify->Hide(_buffer[id]._notify.Get());
+            _buffer[id].RemoveTokens();
             _buffer.erase(id);
             return SUCCEEDED(result);
-		}
-	}
+        }
+    }
     return false;
 }
 
 void WinToast::clear() {
-
-    std::wcerr << L"WinToast Clear - Call!" << std::endl;
-
     auto succeded = false;
     auto notify = notifier(&succeded);
-	if (succeded) {
-		auto end = _buffer.end();
-		for (auto it = _buffer.begin(); it != end; ++it) {
-			notify->Hide(it->second.notify.Get());
-            it->second.DestroyEventHandlers();
-		}
+    if (succeded) {
+        auto end = _buffer.end();
+        for (auto it = _buffer.begin(); it != end; ++it) {
+            notify->Hide(it->second._notify.Get());
+            it->second.RemoveTokens();
+        }
         _buffer.clear();
-
-        std::wcerr << L"WinToast - Clear - succeded!" << std::endl;
-	}
-
+    }
 }
 
 //
@@ -914,6 +949,28 @@ HRESULT WinToast::setImageFieldHelper(_In_ IXmlDocument *xml, _In_ const std::ws
                     if (SUCCEEDED(hr)) {
                         Util::setNodeStringValue(imagePath, editedNode.Get(), xml);
                     }
+                }
+            }
+        }
+    }
+    return hr;
+}
+
+HRESULT WinToast::addScenarioHelper(_In_ IXmlDocument* xml, _In_ const std::wstring& scenario) {
+    ComPtr<IXmlNodeList> nodeList;
+    HRESULT hr = xml->GetElementsByTagName(WinToastStringWrapper(L"toast").Get(), &nodeList);
+    if (SUCCEEDED(hr)) {
+        UINT32 length;
+        hr = nodeList->get_Length(&length);
+        if (SUCCEEDED(hr)) {
+            ComPtr<IXmlNode> toastNode;
+            hr = nodeList->Item(0, &toastNode);
+            if (SUCCEEDED(hr)) {
+                ComPtr<IXmlElement> toastElement;
+                hr = toastNode.As(&toastElement);
+                if (SUCCEEDED(hr)) {
+                    hr = toastElement->SetAttribute(WinToastStringWrapper(L"scenario").Get(),
+                        WinToastStringWrapper(scenario).Get());
                 }
             }
         }
@@ -1113,6 +1170,15 @@ void WinToastTemplate::setDuration(_In_ Duration duration) {
     _duration = duration;
 }
 
+void WinToastLib::WinToastTemplate::setScenario(_In_ Scenario scenario) {
+    switch (scenario) {
+    case Scenario::Default: _scenario = L"Default"; break;
+    case Scenario::Alarm: _scenario = L"Alarm"; break;
+    case Scenario::IncomingCall: _scenario = L"IncomingCall"; break;
+    case Scenario::Reminder: _scenario = L"Reminder"; break;
+    }
+}
+
 void WinToastTemplate::setExpiration(_In_ INT64 millisecondsFromNow) {
     _expiration = millisecondsFromNow;
 }
@@ -1162,6 +1228,10 @@ const std::wstring& WinToastTemplate::audioPath() const {
 
 const std::wstring& WinToastTemplate::attributionText() const {
     return _attributionText;
+}
+
+const std::wstring& WinToastLib::WinToastTemplate::scenario() const {
+    return _scenario;
 }
 
 INT64 WinToastTemplate::expiration() const {
