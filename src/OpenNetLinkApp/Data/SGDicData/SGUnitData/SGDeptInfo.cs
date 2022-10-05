@@ -55,6 +55,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);
             m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
         }
+        /// <summary>
+        /// Tree 컨트롤에 사용하기 위한 List 객체 별도 생성
+        /// </summary>
+        /// <param name="SelectDeptSeq"></param>
+        /// <returns></returns>
         public List<DeptTreeInfo> GetDeptInfoTree(string SelectDeptSeq)// List<DeptInfo> GetDeptInfoTree()
         {
             if (deptTreeInfoValues == null)
@@ -84,9 +89,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if (top.ExistsIntoChildren) //Children에 선택 Dept가 존재하는 경우, Expand
                     top.IsExpanded = true;
             }
-
             return topTree;
-
         }
 
         List<DeptTreeInfo> getChildren(DeptTreeInfo parentDept, string getSelectDeptSeq)
