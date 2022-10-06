@@ -611,7 +611,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         private List<FileAddErr> m_FileAddErrList = new List<FileAddErr>();
 
 
-        public List<string> m_FileAddErrReason = new List<string>();
+        public List<(string reason, string count)> m_FileAddErrReason = new List<(string reason, string count)>();
         public List<string> ListFile = null;
 
         public long m_nTansCurSize = 0;
@@ -670,7 +670,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public void Copy(FileAddManage fileaddManage)
         {
             m_FileAddErrList = new List<FileAddErr>(fileaddManage.m_FileAddErrList);
-            m_FileAddErrReason = new List<string>(fileaddManage.m_FileAddErrReason);
+            m_FileAddErrReason = new List<(string, string)>(fileaddManage.m_FileAddErrReason);
             ListFile = new List<string>(fileaddManage.ListFile);
         }
 
@@ -1745,23 +1745,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="ListReason"></param>
         /// <param name="ListDisaplayErrSource"></param>
         /// <returns></returns>
-        public bool GetReasonAndDisplaySource(out List<string> ListReason, out List<FileAddErr> ListDisaplayErrSource)
+        public bool GetReasonAndDisplaySource(out List<(string reason, string count)> ListReason, out List<FileAddErr> ListDisaplayErrSource)
         {
             m_FileAddErrReason.Clear();
             FileAddErr fileAddErr = new FileAddErr();
             Dictionary<eFileAddErr, int> fileAddErrReason = new Dictionary<eFileAddErr, int>();
 
-            bool hasErr = getReasonAndDisplaySource(m_FileAddErrList, ref fileAddErrReason );
+            bool hasErr = getReasonAndDisplaySource(m_FileAddErrList, ref fileAddErrReason);
 
             string strReason, strCount = "";
             foreach (eFileAddErr err in fileAddErrReason.Keys)
             {
                 strReason = fileAddErr.SetExceptionReason(err);
                 strCount = fileAddErr.GetExceptionCountString(fileAddErrReason[err]);
-                m_FileAddErrReason.Add($"{strReason} : {strCount}");
+                m_FileAddErrReason.Add((strReason, strCount));
             }
             ListReason = m_FileAddErrReason;
-            ListDisaplayErrSource = m_FileAddErrList.FindAll(file=>file.eErrType != eFileAddErr.eFANone || file.HasChildrenErr);
+            ListDisaplayErrSource = m_FileAddErrList.FindAll(file => file.eErrType != eFileAddErr.eFANone || file.HasChildrenErr);
             #region [간소화로 사용안함]
             //string strReason = "";
             //string strCount = "";
