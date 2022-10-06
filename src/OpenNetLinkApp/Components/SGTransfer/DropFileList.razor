@@ -41,27 +41,29 @@
 
         @if (HsStreamList != null && HsStreamList.Count > 0)
         {
-            <table id="example2" class="table table-head-fixed table-hover mb-0" style="font-size: 14px;table-layout: fixed;">
-                <thead>
-                    <tr>
-                        <th style="width:70%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strFileName</th>                 <!--파일명-->
-                    <th width="10%">@strFileSize</th>                 <!--크기-->
-                    <th width="10%">@strFileType</th>                 <!--유형-->
-                        <!--<th width="30%">@strLastModDay</th>-->               <!--수정한 날짜-->
-                </tr>
-                </thead>
-                <tbody>
-                    @foreach (var file in HsStreamList)
-                    {
-                        <tr style="height:20px;">
-                            <td style="width:70%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
-                            <td width="10%">@(file.IsDir? "" : CsFunction.GetSizeStr(file.Length))</td>
-                            <td width="10%">@file.Type</td>
-                            <!--<td width="30%">@file.ModifyTime.ToString("yyyy/MM/dd HH:mm:ss")</td>-->
-                </tr>
-                    }
-                </tbody>
-            </table>
+            <div>
+                <table id="example2" class="table table-head-fixed table-hover mb-0" style="font-size: 14px;table-layout: fixed; line-height:20px;">
+                    <thead>
+                        <tr>
+                            <th style="width:70%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left:5px;">@strFileName</th>                 <!--파일명-->
+                        <th width="10%">@strFileSize</th>                 <!--크기-->
+                        <th width="10%">@strFileType</th>                 <!--유형-->
+                            <!--<th width="30%">@strLastModDay</th>-->               <!--수정한 날짜-->
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var file in HsStreamList)
+                        {
+                            <tr>
+                                <td style="width:70%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left:5px;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
+                                <td width="10%">@(file.IsDir? "" : CsFunction.GetSizeStr(file.Length))</td>
+                                <td width="10%">@file.Type</td>
+                                <!--<td width="30%">@file.ModifyTime.ToString("yyyy/MM/dd HH:mm:ss")</td>-->
+                    </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         }
         else
         {
