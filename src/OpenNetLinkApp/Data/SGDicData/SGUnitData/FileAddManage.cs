@@ -4395,7 +4395,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             }
                             else
                             {
-                                childFile.eErrType = eFileAddErr.eFAZipPW;
+                                currentFile.eErrType = eFileAddErr.eFAZipPW;        //하위 파일이 아닌 검사 대상 자체 ZIP에 암호화된 경우
                                 enErr = eFileAddErr.eFAZipPW;
                                 nCurErrCount++;
                             }
