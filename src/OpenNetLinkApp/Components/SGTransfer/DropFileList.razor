@@ -223,7 +223,7 @@
             return;
         }
 
-        ExamInnerDropFiles(recvlist, false);
+        OnDropFileAdd(recvlist, false);
     }
 
     /// <summary>
@@ -231,7 +231,7 @@
     /// </summary>
     /// <param name="recvList"></param>
     /// <param name="isRMouseAdd"></param>
-    async void ExamInnerDropFiles(List<string> recvList, bool isRMouseAdd)
+    async void OnDropFileAdd(List<string> recvList, bool isRMouseAdd)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -332,18 +332,7 @@
                     hsStream.StartPath = "";
                     hsStream.RelativePath = fInfo.Name;
                     hsStream.Size = fInfo.Length;
-                    //if (GetRegSizeEnable(fileAddManage,hsStream.Size) == false)
-                    //{
-                    //    //if (pageService.GetScrLocking() == false)
-                    //    SGFileExamEvent(100,"");
-                    //    return;
-                    //}
-                    //if (GetDayRegSizeEnable(fileAddManage,hsStream.Size) == false)
-                    //{
-                    //if (pageService.GetScrLocking() == false)
-                    //    SGFileExamEvent(100,"");
-                    //    return;
-                    //}
+                    
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
                         hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
@@ -590,7 +579,6 @@
                             }
 
                             hsStream.IsDir = false;
-
                         }
 
                         hsStream.ModifyTime = item.LastWriteTime;
@@ -995,10 +983,8 @@
             {
                 hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
             }
-
             hsList.Add(hsStream);
         }
-
         return hsList;
     }
     /// <summary>
@@ -1034,7 +1020,6 @@
                 finalList.Add(stFile);
             }
         }
-
         return finalList;
     }
     /// <summary>
@@ -1095,7 +1080,6 @@
 
     public void InitText()
     {
-
         strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                   // 파일명
         strFileSize = XmlConf.GetTitle("T_COMMON_SIZE");                       // 크기
         strFileType = XmlConf.GetTitle("T_COMMON_KIND");                       // 유형
@@ -1118,7 +1102,6 @@
         if (temp == null)
             temp = new List<System.IO.FileInfo>();
         DirectoryInfo di = new DirectoryInfo(sDir);
-
 
         foreach (var item in Directory.GetDirectories(sDir))
         {
@@ -1523,7 +1506,7 @@
                 CLog.Here().Information($"GetExamCheckZip Stop - ClientZipDepth : [{MaxDepth} / {Option}]");
                 return 0;
             }
-
+            
             bool bDenyPasswordZIP = SGAppMgrSvc.OpConfigInfoService.GetUseDenyPasswordZip();
             CLog.Here().Information($"압축(Zip) 파일 passwd 있을때 차단 : [{bDenyPasswordZIP.ToString()}]");
             //bool bDenyPasswordZIP = SGAppMgrSvc.AppConfigInfoService.GetDenyPasswordZIP();
@@ -1546,7 +1529,7 @@
         if (recvList.Count <= 0)
             return;
         //OnDrop(recvList);
-        ExamInnerDropFiles(recvList, true);
+        OnDropFileAdd(recvList, true);
     }
 
     public static void NotifyChange_InDropFileList(FileListEntryImpl[] files)
