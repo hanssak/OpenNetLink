@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <!-- <TargetFramework>netcoreapp3.1</TargetFramework> -->
@@ -60,6 +60,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\OfficeExtractorLibrary\OfficeExtractor\OfficeExtractor.csproj" />
     <ProjectReference Include="..\..\..\openNetLib\HsNetWorkSG\HsNetWorkSG.csproj" />
     <ProjectReference Include="..\WebWindow.Blazor\WebWindow.Blazor.csproj" />
     <ProjectReference Include="..\AgLogManager\AgLogManager.csproj" />

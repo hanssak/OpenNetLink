@@ -19,6 +19,7 @@
 @using OpenNetLinkApp.Pages.PCURL
 @using BlazorInputFile
 @using OpenNetLinkApp.Common
+@using OfficeExtractor
 
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
@@ -795,13 +796,16 @@
 
         Int64 TotalFileSize = dropFile.GetRegListTotalSize();
 
+
+        bool existErr = false;
+        string errLog = "";
         //아래의 코드를 활용하여 Stream 형태로 OLE 체크에 보내 파일 리스트를 보내준다.
         //foreach (HsStream stream in FileList)
         //{
         //    Stream fileStream = stream.stream;
         //    string fileName = stream.FileName;
-        //    string strDest = "C:\\Users\\smkoo\\Desktop\\DRMTEST";
-
+        //    string strDest = "C:\\HANSSAK\\OLETEST";            //고정된 경로 적용 예정 (temp\OLEExtract)
+        //
         //    using (MemoryStream fileMemoryStream = new MemoryStream())
         //    {
         //        if (stream.MemoryType == HsStreamType.MemoryStream)
@@ -814,10 +818,18 @@
         //        {
         //            fileStream.CopyTo(fileMemoryStream);
         //        }
-
-        //        int result = OfficeExtractor.Controller.ExcuteExtractor(fileMemoryStream, fileName, strDest);
+        //
+        //        int result = Controller.ExcuteExtractor(fileMemoryStream, fileName, strDest);
+        //        errLog += result.ToString();
+        //        if (result < 0)
+        //            existErr = true;
+        //
         //    }
         //}
+        //
+        //@*if (existErr)*@
+        //return;
+        //위의 코드를 활용하여 Stream 형태로 OLE 체크에 보내 파일 리스트를 보내준다.
 
         if (strTitle.Equals(""))
         {

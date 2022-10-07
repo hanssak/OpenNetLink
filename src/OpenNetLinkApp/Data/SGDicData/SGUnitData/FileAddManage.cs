@@ -4266,7 +4266,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             // Create Temp Directory 
             DirectoryInfo dirZipBase = new DirectoryInfo(strTempZipPath);
-            Console.WriteLine($"CheckZipFIle : dirZipBase : {dirZipBase.FullName}");
             if (dirZipBase.Exists != true)
             {
                 dirZipBase.Create();
@@ -4362,6 +4361,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return encoding.GetString(data);
             };
 
+            //2022.10.06 BY kYH sharpPress 버전업하며, WriteToDirectory 호출 시 존재하지 않는 폴더는 오류가 발생하여 추가
+            DirectoryInfo dirZipInner = new DirectoryInfo(strBasePath);
+            if (dirZipInner.Exists != true) dirZipInner.Create();
+
             enErr = eFileAddErr.eFANone;
             nCurErrCount = nErrCount;
             try
@@ -4438,7 +4441,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         entry.WriteToDirectory(strBasePath, new ExtractionOptions()
                         {
                             ExtractFullPath = true,
-                            Overwrite = true
+                            Overwrite = true,
                         });
 
                         // Check Changed File Extension 
@@ -4476,7 +4479,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     }
                 }
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
                 if (bZipPasswdCheck == true)
                 {
