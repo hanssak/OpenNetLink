@@ -1,5 +1,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery
+@using Radzen
+@using Radzen.Blazor
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
@@ -21,12 +23,10 @@
                         @*압축파일상세보기 구현안되서 주석처리함 -> 실제로 구현은 되지만 드래그&드롭 시 정확한 파일경로를 알 수 없어 메모리 성능 이슈 발생 인해 주석처리함*@
                         @*<div class=" w-100 mb-3 " style="height:28px;border:0px solid #ddd;">
                             <button type="button" class="btn bg-gradient-secondary" @onclick="ZipExamContentChange"><i class="fas fa-layer-group pr-1"></i>@strZipExam</button>           압축파일 간략보기
-                        </div>*@
+                            </div>*@
 
-
-                        <div class="card-body table-responsive p-0 text-nowrap" style="height:331px; border:0px solid #ddd; background-color:#fff;">
-                            <table class="table table-head-fixed table-bordered table-hover ">
-
+                        <div class="card table-responsive text-nowrap" style="height:160px; border:0px solid #ddd; background-color:#fff; padding:0px 5px 5px 5px">
+                            <table class="table table-head-fixed table-hover ">
                                 <thead>
                                     <tr>
                                         <th>@strFileName</th>                                                                           <!--파일명-->
@@ -37,11 +37,10 @@
                                 <tbody>
                                     @foreach (FileAddErr item in listDenied)
                                     {
-                                        if ((!m_bZipExamDetail) && (item.bSub == true))
-                                            continue;
-                                        <tr class="@(item.bSub == false ? "filezip" : "")">
-                                            <td><i class="@(item.bSub == true ? "fas fa-long-arrow-alt-right mr-2" : "")"></i>@item.FileName</td>
-                                            <td>@item.ExceptionReason</td>
+                                        @*<tr class="@(item.bSub == false ? "filezip" : "")">*@
+                                        <tr>
+                                            <td>@item.FileName</td>
+                                            <td>@((item.eErrType == eFileAddErr.eFANone && item.HasChildrenErr) ? strInnerErrorInfoMsg : item.ExceptionReason)</td>
                                             <td>@item.FilePath</td>
                                         </tr>
                                     }
@@ -51,27 +50,53 @@
 
                     </div>
                     <!--e table -->
-                    <!--s text -->
 
-                    <div class="col-md-12 p-0 mb-3 ">
+                    <div class="card col-md-12 p-0 mb-3" style="height:160px; background-color:#fff;">
+                        <RadzenTree Change="@selectFile" Data="@listDenied" Style="width: 100%;height:100%;overflow:auto">
+                            @*<RadzenTreeLevel TextProperty="FileName" ChildrenProperty="FileAddErr" HasChildren="@((data) => false)" />                                *@
+                            <RadzenTreeLevel HasChildren="@((data) => false)" ChildrenProperty="ChildrenFiles" TextProperty="FileName" Template="DenyTemplate" />
+                        </RadzenTree>
+                    </div>
+
+                    <!--s text -->
+                    @* <div class="col-md-12 p-0 mb-3 ">
 
                         <div class="col-sm-10">
-                            <h6>@strExceptionContent</h6>                                                                                       <!--제외내역-->
-                            <ul class="container-fluid ml-3" style="letter-spacing: 0px !importnat;}">
-                                @foreach (string strReason in listDeniedReason)
-                                {
-                                    if (strReason.Contains("=>"))
-                                    {
-                                        <li class="li_no">@strReason</li>
-                                    }
-                                    else
-                                    {
-                                        <li>@strReason</li>
-                                    }
-                                }
-                            </ul>
+                        <h6>@strExceptionContent</h6>                                                                                       <!--제외내역-->
+                        <ul class="container-fluid ml-3" style="letter-spacing: 0px !importnat;}">
+                        @foreach (string strReason in listDeniedReason)
+                        {
+                        if (strReason.Contains("=>"))
+                        {
+                        <li class="li_no">@strReason</li>
+                        }
+                        else
+                        {
+                        <li>@strReason</li>
+                        }
+                        }
+                        </ul>
                         </div>
 
+                        </div>*@
+                    <div class="card col-md-12 text-nowrap" style="height:100px; background-color:#fff; overflow:auto; padding:0px 5px 5px 5px">
+                        <table class="table table-head-fixed table-hover">
+                            <thead style="background-color:#6A92CC">
+                                <tr>
+                                    <th style="background-color:#6A92CC">@strErrorReasonSummary</th>                                                                           <!--파일명-->
+                                    <th style="background-color:#6A92CC">@strErrorTotalCountSummary</th>                                                                         <!--제외사유-->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ((string, string) item in listDeniedReason)
+                                {
+                                    <tr>
+                                        <td>@item.Item1</td>
+                                        <td>@item.Item2</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
                     <!--e text -->
                 </div>
@@ -89,8 +114,11 @@
 
 @code {
     public List<FileAddErr> listDenied = new List<FileAddErr>();
+
+    @*public List<FileAddErr> listTreeDenied = new List<FileAddErr>();*@
+
     //List<DeniedFile> listDenied = new List<DeniedFile>();
-    public List<string> listDeniedReason = new List<string>();
+    public List<(string reason, string count)> listDeniedReason = new List<(string reason, string count)>();
 
     public string strExceptionList = "";
     public string strZipExam = "";
@@ -100,9 +128,61 @@
     public string strExceptionContent = "";
     public string strOK = "";
     public string strCancel = "";
+    private string strErrorReasonSummary = "";
+    private string strErrorTotalCountSummary = "";
+    private string strInnerErrorInfoMsg = "";
+
+
     ISGSideBarUIService SideBarUISvc;
 
     public bool m_bZipExamDetail = false;
+
+
+    RenderFragment<RadzenTreeItem> DenyTemplate = (context) => builder =>
+    {
+        FileAddErr errInfo = context.Value as FileAddErr;
+
+        builder.OpenComponent<RadzenIcon>(0);
+
+
+        string style = "";
+        if (errInfo.eErrType != eFileAddErr.eFANone)
+        {
+            builder.AddAttribute(1, "Icon", "cancel");
+            style += "color: red;";
+        }
+        else if (errInfo.HasChildrenErr)
+        {
+            builder.AddAttribute(1, "Icon", "info");
+            style += "color: orange;";
+        }
+        else        //정상
+        {
+            builder.AddAttribute(1, "Icon", "check_circle");
+            style += "color: #3967AA;";
+
+        }
+
+        if (errInfo.ChildrenFiles == null || errInfo.ChildrenFiles.Count <= 0)
+            style += "margin-left: 15px;";
+
+        builder.AddAttribute(3, "Style", style);
+        builder.CloseComponent();
+
+        @*builder.AddContent(3, context.Text);*@
+        string htmlString = "<div class=\"p-0 m-0\" style=\"width:100%;\">" +
+                                    "<div class=\"p-0 m-0\" style=\"width:60%;float:left;\">" + context.Text + "</div>"
+                                    +
+                                    "<div class=\"p-0 m-0\" style=\"width:40%;float:right;font-style:italic;color:red\">" + errInfo.ExceptionReason + "</div>"
+                            + "</div>";
+        builder.AddContent(3, (MarkupString)htmlString);
+
+        @*builder.OpenComponent<Radzen>(0);*@
+        @*builder.OpenComponent<RadzenContent>(0);
+            builder.AddAttribute(1, "Style", "color: red");
+            builder.CloseComponent();*@
+    };
+
 
     public void InitText()
     {
@@ -118,6 +198,10 @@
         strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
         strCancel = XmlConf.GetTitle("T_FILE_FOLD");                                // 닫기
         strExceptionList = XmlConf.GetTitle("T_EXCEPTION_FILE_LIST");               // 파일 추가에 제외된 파일 리스트
+
+        strErrorReasonSummary = XmlConf.GetTitle("T_ERROR_REASON_SUMMARY");             //제외사유
+        strErrorTotalCountSummary = XmlConf.GetTitle("T_ERROR_TOTALCOUNT_SUMMARY");     //총 수량
+        strInnerErrorInfoMsg = XmlConf.GetInfoMsg("I_0231");                                    //내부파일 확인
     }
 
     public async Task openPopUp()
@@ -168,14 +252,20 @@
     {
         listDenied.Clear();
         listDenied = new List<FileAddErr>(list);
+
+        @*listTreeDenied = getTreeData(list);*@
+
         StateHasChanged();
     }
-    public void CopyReason(List<string> list)
+
+
+    public void CopyReason(List<(string reason, string count)> list)
     {
         listDeniedReason.Clear();
-        listDeniedReason = new List<string>(list);
+        listDeniedReason = new List<(string, string)>(list);
         StateHasChanged();
     }
+
     public void SendFileAddList()
     {
         if (listDenied.Count <= 0)
@@ -249,37 +339,28 @@
         return;
     }
 
-    public void ZipExamContentChange()
-    {
+    @*    public void ZipExamContentChange()
+        {
         m_bZipExamDetail = !(m_bZipExamDetail);
         if (m_bZipExamDetail)
         {
-            strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_INTERMISSION");                // 압축파일 간략보기
+        strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_INTERMISSION");                // 압축파일 간략보기
         }
         else
-            strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
+        strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
 
         StateHasChanged();
-    }
-    /*
-    public class DeniedFile
+        }*@
+    /// <summary>
+    /// 선택된 부서로 조회
+    /// </summary>
+    /// <param name="args"></param>
+    void selectFile(TreeEventArgs args)
     {
-        public DeniedFile(long fileseq, string name, string reason, string path, bool sub, long pseq)
-        {
-            FileSeq = fileseq;
-            FileName = name;
-            Reason = reason;
-            Path = path;
-            Sub = sub;
-            ParentSeq = pseq;
-        }
+        FileAddErr selectedFile = args.Value as FileAddErr;
 
-        public long FileSeq { get; set; }
-        public string FileName { get; set; }
-        public string Reason { get; set; }
-        public string Path { get; set; }
-        public bool Sub { get; set; }
-        public long ParentSeq { get; set; }
+        Console.WriteLine(selectedFile.ExceptionReason);
     }
-    */
+
+
 }

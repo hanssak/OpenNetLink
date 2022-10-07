@@ -190,6 +190,24 @@ namespace OpenNetLinkApp.Services
             m_DicPageStatusData[groupID].SetFileDragData(hs);
         }
 
+        /// <summary>
+        /// 기존 Stream에서 신규 Stream 항목들 '추가'
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <param name="listHS"></param>
+        public void SetFileAdd(int groupID, List<HsStream> listHS)
+        {
+            if (listHS == null || listHS.Count < 1)
+                return;
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+
+            m_DicPageStatusData[groupID].SetFileDragData(listHS);
+        }
+
         public void FileListClear(int groupID)
         {
             PageStatusData tmpData = null;

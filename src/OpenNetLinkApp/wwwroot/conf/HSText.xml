@@ -4731,7 +4731,19 @@
 		<EN></EN>
 		<CN></CN>
 	</T_INPUT_NAME>
-    
+
+	<T_ERROR_REASON_SUMMARY>
+		<KR>제외사유 종합</KR>
+		<JP></JP>
+		<EN></EN>
+		<CN></CN>
+	</T_ERROR_REASON_SUMMARY>
+	<T_ERROR_TOTALCOUNT_SUMMARY>
+		<KR>총 수량</KR>
+		<JP></JP>
+		<EN></EN>
+		<CN></CN>
+	</T_ERROR_TOTALCOUNT_SUMMARY>
     
     
     <!-- ********************************************* [END] Alarm 설정 (T_ALARM_0000) ******************************************** -->
@@ -6339,8 +6351,15 @@
       <EN></EN>
       <CN></CN>
     </I_0230>
+		
+	<I_0231>
+		<KR>내부파일 확인</KR>
+		<JP></JP>
+		<EN></EN>
+		<CN></CN>
+	</I_0231>
 
-    
+
 		<!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
 	</INFO>

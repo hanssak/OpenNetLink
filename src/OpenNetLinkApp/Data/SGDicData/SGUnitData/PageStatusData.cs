@@ -154,12 +154,25 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             hsStreamList.Clear();
         }
 
+
         public void SetFileDragData(HsStream hs)
         {
             if (hs == null)
                 return;
             hsStreamList.Add(hs);
         }
+
+        /// <summary>
+        /// 기존 Stream에서 신규 Stream 항목들 '추가'
+        /// </summary>
+        /// <param name="listHs"></param>
+        public void SetFileDragData(List<HsStream> listHs)
+        {
+            if (listHs == null || listHs.Count < 1)
+                return;
+            hsStreamList.AddRange(listHs);
+        }
+
         public void SetFileDragListData(List<HsStream> hsList)
         {
             if (hsList == null)

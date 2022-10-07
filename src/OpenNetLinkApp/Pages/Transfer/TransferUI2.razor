@@ -410,7 +410,7 @@
                 break;
                 @*case "결재자 추가 2":
                     await refApproverSelect_TreePopUp.openPopUp();*@
-    break;
+                break;
             case "결재자 추가 3":
                 await refApproverSelect_StepPopUp.openPopUp();
                 break;
@@ -2551,10 +2551,16 @@
             return;
         }
 
-        List<HsStream> folderList = await dropFile.SubDirAddAsync(dirs);
-        List<HsStream> fileList = await dropFile.SubFileAddAsync(files);
-        List<HsStream> finalList = dropFile.ReSortFile(folderList, fileList);
-        await dropFile.UpLoadFile(finalList);
+        //등록을 위한 파일 목록이 모두 정상인 경우만 등록되도록 수정 - 2022.10.05 BY KYH
+        var fileExamResult = await dropFile.SubFileAddAsync(files);
+        bool existErrInExamResult = fileExamResult.Item2;
+        if (!existErrInExamResult)
+        {
+            List<HsStream> folderList = await dropFile.SubDirAddAsync(dirs);
+            List<HsStream> fileList = fileExamResult.Item1;
+            List<HsStream> finalList = dropFile.ReSortFile(folderList, fileList);
+            await dropFile.UpLoadFile(finalList);
+        }
 
         //object[] param = { "fileInput" + nTargetNumber };
         //await JSRuntime.InvokeAsync<string>("hideElement", param);

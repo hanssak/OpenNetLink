@@ -255,7 +255,7 @@
     Transfer_Denied refTransferDenied;
     ReceiverSelect_PopUp refReceiverSelect_PopUp;
     ApproverSelect_PopUp refApproverSelect_PopUp;
-//    ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
+    //    ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
     TransProgress refTransProgress;
 
@@ -1329,7 +1329,7 @@
         @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -1591,7 +1591,7 @@
 
             // Active Menu 강제 설정
             if ((sgSideBar = SideBarUISvc.FindSubMenu(groupID, 0, 0)) == null)
-                return;*@
+            return;*@
 
         if (pageService.GetScrLocking() == true)
             return;
@@ -1639,18 +1639,18 @@
         @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
-        DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now :pageService.GetAfterApprTime(groupID);
-        
+        DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : pageService.GetAfterApprTime(groupID);
+
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
 
-            pageService.SetSvrTime(groupID, dt, sgLoginData);
+        pageService.SetSvrTime(groupID, dt, sgLoginData);
         ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
         if (sgUserData == null)
             return;
@@ -1798,7 +1798,7 @@
         @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -1899,7 +1899,7 @@
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -1930,7 +1930,7 @@
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -2222,20 +2222,20 @@
         // zip_depth login후 못 가져왔으면 정상적으로 가져오도록
         @*if (groupIDbyParam >= 0)
             {
-                int nGroupID = groupIDbyParam;
-                SGLoginData sgLoginData = null;
-                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupID);
-                if (sgLoginData != null && sgLoginData.GetZipDepthInfo(sgLoginData.GetSystemPosition()) == "")
-                {
-                    // CLIENT_ZIP_DEPTH 정보 가져옴
-                    SGQueryExtend sgQueryExtend = null;
-                    sgQueryExtend = new SGQueryExtend();
-                    if (sgQueryExtend != null)
-                    {
-                        string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
-                        HSCmdCenter.SendZipDepthInfo(nGroupID, sgLoginData.GetUserID(), strQuery);
-                    }
-                }
+            int nGroupID = groupIDbyParam;
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupID);
+            if (sgLoginData != null && sgLoginData.GetZipDepthInfo(sgLoginData.GetSystemPosition()) == "")
+            {
+            // CLIENT_ZIP_DEPTH 정보 가져옴
+            SGQueryExtend sgQueryExtend = null;
+            sgQueryExtend = new SGQueryExtend();
+            if (sgQueryExtend != null)
+            {
+            string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+            HSCmdCenter.SendZipDepthInfo(nGroupID, sgLoginData.GetUserID(), strQuery);
+            }
+            }
             }*@
 
 
@@ -2328,11 +2328,16 @@
             return;
         }
 
-        List<HsStream> folderList = await dropFile.SubDirAddAsync(dirs);
-        List<HsStream> fileList = await dropFile.SubFileAddAsync(files);
-        List<HsStream> finalList = dropFile.ReSortFile(folderList, fileList);
-        await dropFile.UpLoadFile(finalList);
-
+        //등록을 위한 파일 목록이 모두 정상인 경우만 등록되도록 수정 - 2022.10.05 BY KYH
+        var fileExamResult = await dropFile.SubFileAddAsync(files);        
+        bool existErrInExamResult = fileExamResult.Item2;
+        if (!existErrInExamResult)
+        {
+            List<HsStream> folderList = await dropFile.SubDirAddAsync(dirs);
+            List<HsStream> fileList = fileExamResult.Item1;
+            List<HsStream> finalList = dropFile.ReSortFile(folderList, fileList);
+            await dropFile.UpLoadFile(finalList);
+        }
         //object[] param = { "fileInput" + nTargetNumber };
         //await JSRuntime.InvokeAsync<string>("hideElement", param);
 
@@ -2428,7 +2433,7 @@
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -2470,7 +2475,7 @@
         @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
