@@ -4280,7 +4280,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 await stStream.CopyToAsync(fileStream);
                 fileStream.Close();
 
-                enRet = ScanZipFile(currentFile, strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, 1, blWhite, strExtInfo, 0,
+                enRet = ScanZipFile(currentFile, strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, nOption, 1, blWhite, strExtInfo, 0,
                     out nTotalErrCount, out strOverMaxDepthInnerZipFile, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, bDenyPasswordZIP);
 
                 // KKW
@@ -4320,6 +4320,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="strZipFile"></param>
         /// <param name="strBasePath"></param>
         /// <param name="nMaxDepth"></param>
+        /// <param name="nBlockOption"></param>
         /// <param name="nCurDepth"></param>
         /// <param name="blWhite"></param>
         /// <param name="strExtInfo"></param>
@@ -4332,7 +4333,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="TotalCount"></param>
         /// <param name="bZipPasswdCheck"></param>
         /// <returns></returns>
-        public eFileAddErr ScanZipFile(FileAddErr currentFile, string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nCurDepth,
+        public eFileAddErr ScanZipFile(FileAddErr currentFile, string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nBlockOption, int nCurDepth,
             bool blWhite, string strExtInfo, int nErrCount, out int nTotalErrCount, out string strOverMaxDepthInnerZipFile, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = true)
         {
             eFileAddErr enErr;
@@ -4458,13 +4459,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                         if (nCurDepth >= nMaxDepth)
                         {
-                            Log.Information("[ScanZipFile] Skip to check zip file[{0}]. MaxDepth[{1}] CurDepth[{2}] Password Zip File[{CurZipFile}] in {OrgZipFile}", nMaxDepth, nCurDepth, Path.GetFileName(strZipFile), strOrgZipFile);
+                            Log.Information($"[ScanZipFile] Skip to check zip file[{Path.GetFileName(strZipFile)}]. MaxDepth[{nMaxDepth}] CurDepth[{nCurDepth}] BlockOption[{nBlockOption}] Remain Zip File[{strZipFile}] in {strOrgZipFile}");
                             strOverMaxDepthZipFile = entry.Key;
 
-                            // kkw 추가
-                            enErr = eFileAddErr.eUnZipInnerLeftZip;
-                            childFile.eErrType = eFileAddErr.eUnZipInnerLeftZip;
-                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
+                            //2022.10.07 BY KYH - CLIENT_ZIP_DEPTH 의 Block 옵션 활용
+                            if (nBlockOption <= 0)
+                            {
+                                // kkw 추가
+                                enErr = eFileAddErr.eUnZipInnerLeftZip;
+                                childFile.eErrType = eFileAddErr.eUnZipInnerLeftZip;
+                                //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
+                            }
                             continue;
                         }
 
@@ -4472,7 +4477,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         int nInnerErrCount = 0;
                         string strCurZip = Path.Combine(strBasePath, entry.Key);
                         string strExtractPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(entry.Key));
-                        eFileAddErr enRet = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, strCurZip, strExtractPath, nMaxDepth, nCurDepth + 1,
+                        eFileAddErr enRet = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, strCurZip, strExtractPath, nMaxDepth, nBlockOption, nCurDepth + 1,
                             blWhite, strExtInfo, nCurErrCount, out nInnerErrCount, out strOverMaxDepthZipFile, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
                         if (enRet != eFileAddErr.eFANone) enErr = enRet;
                         nCurErrCount += nInnerErrCount;
