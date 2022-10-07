@@ -325,7 +325,6 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eURLLIST:                                                  // URL 자동전환 리스트 요청 응답.
-                    // FileMime.conf 요청하는 함수 구현 필요. 추후 개발                     
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
                     {
@@ -604,7 +603,7 @@ namespace OpenNetLinkApp.Services
                         RecvSvrGPKIRegAfterSend(groupId);
                     }
                     break;
-                case eCmdList.ePRIVACYNOTIFY:
+                case eCmdList.ePRIVACYNOTIFY:                                     //개인정보 Noti
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
                     {
@@ -701,6 +700,14 @@ namespace OpenNetLinkApp.Services
 
                     }
                     break;
+                case eCmdList.eUPDATEPOLICY:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        NotiUpdatePolicyEvent updatePolicyEvent = sgPageEvent.GetUpdatePolicyEvent();
+                        if (updatePolicyEvent != null) updatePolicyEvent(groupId);
+                    }
+                    break;
                 default:
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
@@ -742,6 +749,11 @@ namespace OpenNetLinkApp.Services
                     RecvSvrGPKIAfterSend(groupId);
                     break;
                 case 2103:                                                              // filemime.conf
+                    FileMimeRecvEvent fileMimeRecvEvent = sgPageEvent.GetFileMimeRecvEvent();
+                    if(fileMimeRecvEvent != null)
+                    {
+                        fileMimeRecvEvent(groupId);
+                    }
                     break;
 
             }
@@ -866,6 +878,7 @@ namespace OpenNetLinkApp.Services
                     hs = m_DicNetWork[groupId];
                     int hszOpt = sgLoginDataSystemRun.GetHszDefaultDec();
                     hs.SetHszDefault(hszOpt);
+                    hs.SetManualDownLoad(sgLoginDataSystemRun.GetManualDownload());
                 }
                 RequestUrlList(groupId, sgLoginDataSystemRun.GetUserID());
 
@@ -1727,6 +1740,15 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestUserInfoEx(hsNetWork, groupid, strUserID);
+            return -1;
+        }
+
+        public int SendUserInfoCheck(int groupid, string strUserID)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestUserInfoCheck(hsNetWork, groupid, strUserID);
             return -1;
         }
 

@@ -1132,7 +1132,7 @@
         int expireDate = Int32.Parse(tData.expiredDate.Replace("-", ""));
         if (isPossibleDownload)
         {
-            if (expireDate > nowDate)
+            if (expireDate >= nowDate)
                 isPossibleDownload = true;
             else
                 isPossibleDownload = false;

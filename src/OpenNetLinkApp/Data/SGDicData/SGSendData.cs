@@ -44,6 +44,17 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.SendMessage(args);
         }
 
+        public int RequestUserInfoCheck(HsNetWork hsNet, int groupid, string strUserID)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_USERINFOCHECK", dic);
+            return hsNet.SendMessage(args);
+        }
+
         public int RequestApproveLine(HsNetWork hsNet,int groupid, string strUserID)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();

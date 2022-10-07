@@ -894,8 +894,8 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	if (withImage)
 		templ.setImagePath(imagePath);
 
-	templ.addAction(L"None");
-	templ.setScenario(WinToastTemplate::Scenario::Reminder);
+	//templ.addAction(L"None");
+	//templ.setScenario(WinToastTemplate::Scenario::Reminder);
 
 	//if (g_CustomHandler != NULL)
 	//{

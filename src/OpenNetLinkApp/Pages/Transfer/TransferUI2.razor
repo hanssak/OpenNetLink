@@ -19,7 +19,7 @@
 @using OpenNetLinkApp.Pages.PCURL
 @using BlazorInputFile
 @using OfficeExtractor
- 
+
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
@@ -1989,7 +1989,7 @@
     public void SendDayFileInfo()
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
-        int groupID = 0;
+        int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);

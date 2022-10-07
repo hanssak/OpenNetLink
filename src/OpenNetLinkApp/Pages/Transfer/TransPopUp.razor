@@ -636,7 +636,7 @@
         int nowDate = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
         if (m_bNetDownloadable)
         {
-            if (expireDate > nowDate)
+            if (expireDate >= nowDate)
                 m_bNetDownloadable = true;
             else
                 m_bNetDownloadable = false;

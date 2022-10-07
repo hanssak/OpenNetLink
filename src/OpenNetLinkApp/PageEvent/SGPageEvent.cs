@@ -214,10 +214,20 @@ namespace OpenNetLinkApp.PageEvent
     /// 대결재 갱신에 따른 로그아웃 Event
     /// </summary>
     public delegate Task<int> SFMRefreshEvent(int groupId);
+    /// <summary>
+    /// 정책 업데이트 Notify
+    /// </summary>
+    /// <param name="groupId"></param>
+    public delegate void NotiUpdatePolicyEvent(int groupId);
+    /// <summary>
+    /// FileMime 정보 갱신 Event
+    /// </summary>
+    /// <param name="groupId"></param>
+    public delegate void FileMimeRecvEvent(int groupId);
 
     // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
     //public delegate void GPKICNListRecvEvent(int groupid, PageEventArgs e);
-    
+
     //개인정보 NOTIFY Delegate
     public delegate void PrivacyNotiEvent(int groupid, SGData e); 
     // 보안결재자 조회
@@ -391,6 +401,10 @@ namespace OpenNetLinkApp.PageEvent
 
         public SFMRefreshEvent sfmRefreshEvent = null;
 
+        public NotiUpdatePolicyEvent notiUpdatePolicyEvent= null;
+
+        public FileMimeRecvEvent fileMimeRecvEvent = null;
+
         public SGPageEvent()
         {
 
@@ -398,6 +412,16 @@ namespace OpenNetLinkApp.PageEvent
         ~SGPageEvent()
         {
 
+        }
+
+        public FileMimeRecvEvent GetFileMimeRecvEvent()
+        {
+            return fileMimeRecvEvent;
+        }
+
+        public void SetFileMimeRecvEvent(FileMimeRecvEvent e)
+        {
+            fileMimeRecvEvent = e;
         }
 
         public SFMRefreshEvent GetSFMRefreshEvent()
@@ -408,6 +432,16 @@ namespace OpenNetLinkApp.PageEvent
         public void SetSFMRefreshEvent(SFMRefreshEvent e)
         {
             sfmRefreshEvent = e;
+        }
+
+        public NotiUpdatePolicyEvent GetUpdatePolicyEvent()
+        {
+            return notiUpdatePolicyEvent;
+        }
+
+        public void SetUpdatePolicyEvent(NotiUpdatePolicyEvent e)
+        {
+            notiUpdatePolicyEvent = e;
         }
 
         public PageDataRefreshEvent GetPageDataRefreshEvent(Enums.EnumPageView ePageView)

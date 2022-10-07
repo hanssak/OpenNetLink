@@ -53,7 +53,6 @@
     SGAlert refSGAlertApproveAfter;
     SGAlert refSGAlertApproveAfterMyCount;
 
-
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
     ClipBoardData clipPreSelectedData = new ClipBoardData();
@@ -112,6 +111,7 @@
 
         //HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);
         HsCmdCenter.sgPageEvent.SetFileRecvProgressMasterEventAdd(FileRecvProgress);
+
     }
 
     public void Dispose()
@@ -1598,7 +1598,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             clipFilePath = SaveClipboardToFile(clipData, byteArray, eClipType);
 
-            if(clipFilePath == null)
+            if (clipFilePath == null)
                 return;
             _curFileName = clipFilePath;
             _curGroupId = clipData.nGroupId;
@@ -3239,7 +3239,6 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         string strQuery = sgQueryExtend.GetSGNotify(strUserID);
         HsCmdCenter.SendBoardNotiSearch(groupID, strUserID, strQuery);
     }
-
 
     public void BoardNotifyResult(int groupid, PageEventArgs e)
     {
