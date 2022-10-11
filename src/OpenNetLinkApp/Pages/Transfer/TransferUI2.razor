@@ -235,7 +235,7 @@
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
 @*<ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>*@
 <ApproverSelect_StepPopUp @ref="refApproverSelect_StepPopUp"></ApproverSelect_StepPopUp>
-<Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>
+@*<Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>*@
 <TransProgress @ref="refTransProgress" OnCancel="TransCancel"></TransProgress>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 <SGAlert @ref="refSGAlertApproveAfter" OnConfirm="ApproveAfterTransFile" Guid="ApporveAfterAlert"></SGAlert>
@@ -257,7 +257,7 @@
 
     public string stSelectPath { get; set; }
     DropFileList dropFile;
-    Transfer_Denied refTransferDenied;
+    //Transfer_Denied refTransferDenied;
     ReceiverSelect_PopUp refReceiverSelect_PopUp;
     //ReceiverSelect_TreePopUp refReceiverSelect_TreePopUp;
     ApproverSelect_PopUp refApproverSelect_PopUp;
@@ -415,9 +415,9 @@
             case "결재자 추가 3":
                 await refApproverSelect_StepPopUp.openPopUp();
                 break;
-            case "전송제한":
-                await refTransferDenied.openPopUp();
-                break;
+            //case "전송제한":
+            //    await refTransferDenied.openPopUp();
+            //    break;
             case "MESSAGE":
                 //1. 토스트 메시지 사용법
                 //type: success, info, waring, error 2020/07/02 YKH
@@ -826,10 +826,10 @@
         //
         //    }
         //}
-        //
+
         //@*if (existErr)*@
         //return;
-        //위의 코드를 활용하여 Stream 형태로 OLE 체크에 보내 파일 리스트를 보내준다.
+        ////위의 코드를 활용하여 Stream 형태로 OLE 체크에 보내 파일 리스트를 보내준다.
 
         if (strTitle.Equals(""))
         {

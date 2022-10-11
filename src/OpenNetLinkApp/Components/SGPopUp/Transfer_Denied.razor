@@ -137,29 +137,27 @@
 
     public bool m_bZipExamDetail = false;
 
-
     RenderFragment<RadzenTreeItem> DenyTemplate = (context) => builder =>
     {
         FileAddErr errInfo = context.Value as FileAddErr;
 
         builder.OpenComponent<RadzenIcon>(0);
 
-
         string style = "";
         if (errInfo.eErrType != eFileAddErr.eFANone)
         {
             builder.AddAttribute(1, "Icon", "cancel");
-            style += "color: red;";
+            style += "color: #D44867;";
         }
         else if (errInfo.HasChildrenErr)
         {
             builder.AddAttribute(1, "Icon", "info");
-            style += "color: orange;";
+            style += "color: #FFAA54;";
         }
         else        //정상
         {
             builder.AddAttribute(1, "Icon", "check_circle");
-            style += "color: #3967AA;";
+            style += "color: #327AD9;";
 
         }
 
@@ -171,10 +169,10 @@
 
         @*builder.AddContent(3, context.Text);*@
         string htmlString = "<div class=\"p-0 m-0\" style=\"width:100%;\">" +
-                                    "<div class=\"p-0 m-0\" style=\"width:60%;float:left;\">" + context.Text + "</div>"
-                                    +
-                                    "<div class=\"p-0 m-0\" style=\"width:40%;float:right;font-style:italic;color:red\">" + errInfo.ExceptionReason + "</div>"
-                            + "</div>";
+                                            "<div class=\"p-0 m-0\" style=\"width:60%;float:left;\">" + context.Text + "</div>"
+                                            +
+                                            "<div class=\"p-0 m-0\" style=\"width:40%;float:right;font-style:italic;color:#D44867\">" + errInfo.ExceptionReason + "</div>"
+                                    + "</div>";
         builder.AddContent(3, (MarkupString)htmlString);
 
         @*builder.OpenComponent<Radzen>(0);*@
@@ -269,6 +267,10 @@
     public void SendFileAddList()
     {
         if (listDenied.Count <= 0)
+            return;
+
+        //err가 없거나, 하위 파일들에도 err가 없는 경우엔 Return 처리
+        if (!listDenied.Exists(file => file.eErrType != eFileAddErr.eFANone || file.HasChildrenErr))
             return;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
