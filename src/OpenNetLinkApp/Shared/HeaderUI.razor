@@ -1083,67 +1083,62 @@
 
 #if _WINDOWS
 
-        try
-        {
-            if (e.strUrlData != null && e.strUrlData.Length > 0)
-                System.Diagnostics.Process.Start("explorer", e.strUrlData);
-        }
-        catch (Exception ex)
-        {
-            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+     try
+       {
+       if (e.strUrlData != null && e.strUrlData.Length > 0)
+      System.Diagnostics.Process.Start("explorer", e.strUrlData);
+       }
+      catch (Exception ex)
+       {
+       CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
         }
 
 #elif _LINUX
 
 if (e.strUrlData != null && e.strUrlData.Length > 0)
-{
-    string strProcessName = "";
-    int nIdx = 0;
-    for(; nIdx < 2 ; nIdx++)
-    {
-        try
+ {
+        string strProcessName = "";
+        int nIdx = 0;
+       for(; nIdx < 2 ; nIdx++)
         {
-            // Linux OS Type 별로
-            if (nIdx == 0)
-                strProcessName = "x-www-browser";
-            else if (nIdx == 1)
-                strProcessName = "xdg-open";
+       try
+      {
+      // Linux OS Type 별로
+      if (nIdx == 0)
+      strProcessName = "x-www-browser";
+       else if (nIdx == 1)
+      strProcessName = "xdg-open";
 
-            System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
-            break;
+       System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
+       break;
+     }
+       catch (Exception ex)
+       {
+        CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
+        groupid, strProcessName, e.strUrlData, ex.Message);
         }
-        catch (Exception ex)
-        {
-            CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
-            groupid, strProcessName, e.strUrlData, ex.Message);
-        }
-    }
-}
-else
-{
-    CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
-}
+     }
+   }
+   else
+ {
+      CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
+  }
 
 #elif _MACOSX
 
-try
-{
-    if (e.strUrlData != null && e.strUrlData.Length > 0) {
-        System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
-    }
-}
+  try
+   {
+      if (e.strUrlData != null && e.strUrlData.Length > 0) {
+       System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
+       }
+ }
 catch (Exception ex)
 {
-    CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-}
+     CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+    }
 
 #else
-
-
 #endif
-
-
-
     }
 
 
@@ -1240,35 +1235,9 @@ catch (Exception ex)
 
         if (ret >= 0)
         {
-            CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
             string strText = XmlConf.GetInfoMsg("I_0032");                      // 클립보드를 전송하였습니다.
-            if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.UI))
-                ShowMessage("info", strText);
-            OS_NOTI os_noti = OS_NOTI.CLIPBOARD;
-
-            // string strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);
-            string strTitle = "";
-
-            Dictionary<string, SGNetOverData> dicDestSysPos = null;
-            dicDestSysPos = pageService.GetTargetSystemList(clipData.nGroupId);
-
-            if (dicDestSysPos == null || dicDestSysPos.Count < 2)
-                strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);  // 원래 표시하던 방식
-            else
-            {
-                // strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);
-                if (GetClipboardToastTitle(clipData.nGroupId, ref strTitle) == false)   // 3망전송 표시 방식
-                    strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);
-            }
-
-
-            if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
-            {
-                if (HsCmdCenter.GetFileRecvPossible(clipData.nGroupId) == true)
-                    Window.Notification(os_noti, strTitle, strText);
-            }
+            ShowClipboardMessage("info", strText, clipData.nGroupId, OS_NOTI.CLIPBOARD);
             SendDayClipInfo(clipData.nGroupId);
-
             InsertMessage(NOTI_TYPE.USER, clipData.nGroupId, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipSend, "", strText);
         }
 
@@ -1423,7 +1392,7 @@ catch (Exception ex)
             Int64 ClipMaxSize = pageService.GetDayClipMaxSize(nGroupID);
             strMsg = String.Format(strMsg, ClipMaxSize);
             strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("warn", strMsg);
+            ShowClipboardMessage("warn", strMsg, nGroupID, OS_NOTI.CLIPBOARD);
             return -1;
         }
 
@@ -1440,7 +1409,7 @@ catch (Exception ex)
             strMsg = XmlConf.GetErrMsg("E_0101");    // 전송하고자 하는 클립보드의 데이터가 전송 제한을 초과하였습니다./r/n클립보드는 최대 {0}MB까지 전송할 수 있습니다.
             strMsg = String.Format(strMsg, MaxClipSize);
             strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("warn", strMsg);
+            ShowClipboardMessage("warn", strMsg, nGroupID, OS_NOTI.CLIPBOARD);
             return -1;
         }
 
@@ -1469,7 +1438,7 @@ catch (Exception ex)
             int ClipMaxCount = pageService.GetDayClipMaxCount(clipPreSelectedData.nGroupId);
             strMsg = String.Format(strMsg, ClipMaxCount);
             strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("warn", strMsg);
+            ShowClipboardMessage("warn", strMsg, clipPreSelectedData.nGroupId, OS_NOTI.CLIPBOARD);
 
             return;
         }
@@ -1480,7 +1449,7 @@ catch (Exception ex)
             // Native에 할된 Memory 제거
             Window.ClipDataFree(clipPreSelectedData.nGroupId);
             //ShowMessage("info", XmlConf.GetInfoMsg("I_0171"));   // 클립보드 전송이 취소 되었습니다.
-            ShowMessage("warn", XmlConf.GetWarnMsg("W_0260"));   // 클립보드 전송이 취소 되었습니다.
+            ShowClipboardMessage("warn", XmlConf.GetWarnMsg("W_0260"), clipPreSelectedData.nGroupId, OS_NOTI.CLIPBOARD);   // 클립보드 전송이 취소 되었습니다.
 
             // 클립보드 선택전송 중간에 다른 클립보드 전송하려할때, 차단하는거 해제
             Window.SetClipSendFlag(clipPreSelectedData.nGroupId);
@@ -1501,7 +1470,7 @@ catch (Exception ex)
             CLog.Here().Information($"ClipBoard - Send( Empty ClipData Send Failed - UserSelectSend ) : 0kb!");
             // Native에 할된 Memory 제거
             Window.ClipDataFree(clipPreSelectedData.nGroupId);
-            ShowMessage("error", XmlConf.GetErrMsg("E_0244"));   // 빈 클립보드를 보낼 수 없습니다.
+            ShowClipboardMessage("error", XmlConf.GetErrMsg("E_0244"), clipPreSelectedData.nGroupId, OS_NOTI.CLIPBOARD);   // 빈 클립보드를 보낼 수 없습니다.
 
             // 클립보드 선택전송 중간에 다른 클립보드 전송하려할때, 차단하는거 해제
             Window.SetClipSendFlag(clipPreSelectedData.nGroupId);
@@ -1565,13 +1534,13 @@ catch (Exception ex)
 
             strMsg = XmlConf.GetErrMsg("E_0242");           // 현재 오프라인 상태입니다./r/n로그인 및 접속후 사용 가능합니다.
             strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
+            ShowClipboardMessage("error", strMsg, clipData.nGroupId, OS_NOTI.CLIPBOARD);
             return;
         }
 
         //클립보드 결재 옵션이 켜진경우 내용을 파일로 저장하고 파일전송으로 진행한다.
         //Clipboard 실제 전송(HSCmdCenter)  2021/06/08 YKH 클립보드 승인이 켜져 있는 경우는 클립보드 내용을 파일로 남기고 그파일을 전송하는 옵션이 추가됨
-        
+
         //if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId)) // op..json으로 이동
         if (SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId))
         {
@@ -1581,18 +1550,18 @@ catch (Exception ex)
             // 파일전송 권한이 없으면 클립보드도 못보냄, error 메세지와 함께 return;
             @*if (sgLoginData.GetFileTrans() == false)
                 {
-                    CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{clipData.nGroupId}, SendFailed - Msg : Disconnect Status!");
+                CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{clipData.nGroupId}, SendFailed - Msg : Disconnect Status!");
 
-                    // Native에 할된 Memory 제거
-                    Window.ClipDataFree(clipData.nGroupId);
+                // Native에 할된 Memory 제거
+                Window.ClipDataFree(clipData.nGroupId);
 
-                    ShowMessage("error", XmlConf.GetErrMsg("E_0245"));
-                    return;
+                ShowMessage("error", XmlConf.GetErrMsg("E_0245"));
+                return;
                 }*@
 
             clipFilePath = SaveClipboardToFile(clipData, byteArray, eClipType);
 
-            if(clipFilePath == null)
+            if (clipFilePath == null)
                 return;
             _curFileName = clipFilePath;
             _curGroupId = clipData.nGroupId;
@@ -1625,9 +1594,9 @@ catch (Exception ex)
         {
 
             @*if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)    // 선택전송
-                    ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, nClipSize, byteArray);
+                ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, nClipSize, byteArray);
                 else
-                    ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);  // 보통 일반전송*@
+                ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);  // 보통 일반전송*@
 
             // Clipboard Data 실제 전송하는 부분 ( 선택 / 일반 전송 포함 )
             ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, nClipSize, byteArray);
@@ -1639,11 +1608,11 @@ catch (Exception ex)
 
             if (listNetOverPolicy.Count() < 2)
             {
-                // Clipboard Data 실제 전송하는 부분
+            // Clipboard Data 실제 전송하는 부분
                 @*if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)    // 선택전송
-                        ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
+                    ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
                     else
-                        ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);  // 보통 일반전송*@
+                    ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);  // 보통 일반전송*@
 
                 // Clipboard Data 실제 전송하는 부분 ( 선택 / 일반 전송 포함 )
                 ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, nClipSize, byteArray);
@@ -1657,12 +1626,12 @@ catch (Exception ex)
                     if (listNetOverPolicy[nIdx].Length > 0)
                     {
 
-                        // Clipboard Data 실제 전송하는 부분
+                    // Clipboard Data 실제 전송하는 부분
                         @*if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)    // 선택전송
-                                //ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
-                                nTempRet = HsCmdCenter.SendClipboard(clipData.nGroupId, listNetOverPolicy[nIdx], strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
+                            //ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
+                            nTempRet = HsCmdCenter.SendClipboard(clipData.nGroupId, listNetOverPolicy[nIdx], strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
                             else
-                                nTempRet = HsCmdCenter.SendClipboard(clipData.nGroupId, listNetOverPolicy[nIdx], strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);*@
+                            nTempRet = HsCmdCenter.SendClipboard(clipData.nGroupId, listNetOverPolicy[nIdx], strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);*@
 
                         // Clipboard Data 실제 전송하는 부분 ( 선택 / 일반 전송 포함 )
                         ret = HsCmdCenter.SendClipboard(clipData.nGroupId, listNetOverPolicy[nIdx], strUserID, 1, 1, (int)eClipType, nClipSize, byteArray);
@@ -1898,7 +1867,7 @@ catch (Exception ex)
 
             strMsg = XmlConf.GetErrMsg("E_0242");           // 현재 오프라인 상태입니다./r/n로그인 및 접속후 사용 가능합니다.
             strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
+            ShowClipboardMessage("error", strMsg, clipData.nGroupId, OS_NOTI.CLIPBOARD);
             return;
         }
 
@@ -1915,8 +1884,7 @@ catch (Exception ex)
             int ClipMaxCount = pageService.GetDayClipMaxCount(clipData.nGroupId);
             strMsg = String.Format(strMsg, ClipMaxCount);
             strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("warn", strMsg);
-
+            ShowClipboardMessage("warn", strMsg, clipData.nGroupId, OS_NOTI.CLIPBOARD);
             return;
         }
 
@@ -1953,7 +1921,7 @@ catch (Exception ex)
                 CLog.Here().Information($"ClipBoard - Send( Empty ClipData Send Failed ) : 0kb!");
                 // Native에 할된 Memory 제거
                 Window.ClipDataFree(clipData.nGroupId);
-                ShowMessage("error", XmlConf.GetErrMsg("E_0244"));   // 빈 클립보드를 보낼 수 없습니다.
+                ShowClipboardMessage("error", XmlConf.GetErrMsg("E_0244"), clipData.nGroupId, OS_NOTI.CLIPBOARD);   // 빈 클립보드를 보낼 수 없습니다.
                 return;
             }
 
@@ -2046,7 +2014,7 @@ catch (Exception ex)
 
             HsCmdCenter.SendFileTransCancel();
             strMsg = XmlConf.GetErrMsg("E_0239");           // 클립보드 전송 중 오류가 발생되었습니다.
-            ShowMessage("error", strMsg);
+            ShowClipboardMessage("error", strMsg, groupID, OS_NOTI.CLIPBOARD);
             if (FileList.Count > 0)
             {
                 FileList[0].stream.Close();
@@ -2060,7 +2028,7 @@ catch (Exception ex)
         {
             HsCmdCenter.SendFileTransCancel();
             strMsg = XmlConf.GetErrMsg("E_0240");           // 클립보드 압축/암호화 도중 오류가 발생하였습니다.
-            ShowMessage("error", strMsg);
+            ShowClipboardMessage("error", strMsg, groupID, OS_NOTI.CLIPBOARD);
             if (FileList.Count > 0)
             {
                 FileList[0].stream.Close();
@@ -2074,7 +2042,7 @@ catch (Exception ex)
         {
             HsCmdCenter.SendFileTransCancel();
             strMsg = XmlConf.GetErrMsg("E_0239");           // 클립보드 전송 중 오류가 발생되었습니다.
-            ShowMessage("error", strMsg);
+            ShowClipboardMessage("error", strMsg, groupID, OS_NOTI.CLIPBOARD);
             if (FileList.Count > 0)
             {
                 FileList[0].stream.Close();
@@ -2090,7 +2058,7 @@ catch (Exception ex)
             CLog.Here().Information($"HeaderUI - FileTransProgress - GroupID:{groupID} - Progress : {e.count}");
 
             strMsg = XmlConf.GetInfoMsg("I_0032");   // 클립보드를 전송하였습니다.
-            ShowMessage("info", strMsg);
+            ShowClipboardMessage("info", strMsg, groupID, OS_NOTI.CLIPBOARD);
 
             if (FileList.Count > 0)
             {
@@ -2203,9 +2171,9 @@ catch (Exception ex)
         int ret = HsCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strTitle, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
         if (ret == -2)
         {
-            string strMsg = "";
-            strMsg = XmlConf.GetErrMsg("E_0162");
-            ShowMessage("error", strMsg);
+            string strMsg = XmlConf.GetErrMsg("E_0162");
+
+            ShowClipboardMessage("error", strMsg, groupID, OS_NOTI.CLIPBOARD);
             return;
         }
     }
@@ -2377,25 +2345,8 @@ catch (Exception ex)
 
         CLog.Here().Information($"HeaerUI - RecvClipBoardHandler - groupID : {groupID}, To User Message View");
 
-        CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
         string strText = XmlConf.GetInfoMsg("I_0193");                         // 클립보드를 수신받았습니다.
-        if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.UI))
-            ShowMessage("info", strText);
-        OS_NOTI os_noti = OS_NOTI.CLIPBOARD;
-
-        // string strTitle = XmlConf.GetNetworkTitle(groupID);
-        // 단말망 -> 업무망
-        string strFromNet = "";
-        string strToNet = "";
-        XmlConf.GetNetworkTitle(groupID, out strFromNet, out strToNet);
-        string strTitle = strToNet + " → " + strFromNet;
-
-        if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
-        {
-            if (HsCmdCenter.GetFileRecvPossible(groupID) == true)
-                Window.Notification(os_noti, strTitle, strText);
-        }
-
+        ShowClipboardMessage("info", strText, groupID, OS_NOTI.CLIPBOARD);
         InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipRecv, "", strText);
     }
 
@@ -2592,6 +2543,42 @@ catch (Exception ex)
         object[] param = { strType, strSystemName, strMsg };
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
+
+    /// <summary>
+    /// 클립보드 관련 메세지 처리시 호출함수 (공통환경설정에 지정된 알림형식에 따라 OS/UI/OSUI 형식에 맞춰 표시)
+    /// </summary>
+    /// <param name="strType">UI 노티시 표현할 메세지 타입(info, error...)</param>
+    /// <param name="strMsg"></param>
+    /// <param name="nGroupId">3망전송의 Title 표시방식에 사용</param>
+    /// <param name="eOSNoti">OS 노티 시 표현할 아이콘(이미지)</param>
+    private void ShowClipboardMessage(string strType, string strMsg, int nGroupId, OS_NOTI eOSNoti = OS_NOTI.CLIPBOARD)
+    {
+        //클립보드 알람타입 (OS/UI/OSUI)
+        CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
+
+        string title = "";
+        if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.UI))
+            ShowMessage(strType, strMsg);
+
+        Dictionary<string, SGNetOverData> dicDestSysPos = null;
+        dicDestSysPos = pageService.GetTargetSystemList(nGroupId);
+        string strTitle = "";
+
+        if (dicDestSysPos == null || dicDestSysPos.Count < 2)
+            strTitle = XmlConf.GetNetworkTitle(nGroupId);  // 원래 표시하던 방식
+        else
+        {
+            if (GetClipboardToastTitle(nGroupId, ref strTitle) == false)   // 3망전송 표시 방식
+                strTitle = XmlConf.GetNetworkTitle(nGroupId);
+        }
+
+        if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
+        {
+            if (HsCmdCenter.GetFileRecvPossible(nGroupId) == true)
+                Window.Notification(eOSNoti, strTitle, strMsg);
+        }
+    }
+
 
 
     public void RecvServerNoti(int groupID, eCmdList cmd, PageEventArgs e)
@@ -3053,22 +3040,22 @@ catch (Exception ex)
             for (; i < count; i++)
             {
 
-                if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
-                {
+            if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
+            {
 
-                    KeyboardEventArgs eventArgs = new KeyboardEventArgs();
-                    eventArgs.Key = "Enter";
+            KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+            eventArgs.Key = "Enter";
 
-                    //activeMenu = SideBarUISvc.FindSubMenu(listNetWork[i].GroupID, 0, 0);
-                    activeMenu = SideBarUISvc.FindRootMenu(listNetWork[i].GroupID);
-                    if (activeMenu != null)
-                    {
-                        ChangeActiveMenuWrap(eventArgs, activeMenu);
-                        MyNavigationManager.NavigateTo(activeMenu.Path);
-                    }
+            //activeMenu = SideBarUISvc.FindSubMenu(listNetWork[i].GroupID, 0, 0);
+            activeMenu = SideBarUISvc.FindRootMenu(listNetWork[i].GroupID);
+            if (activeMenu != null)
+            {
+            ChangeActiveMenuWrap(eventArgs, activeMenu);
+            MyNavigationManager.NavigateTo(activeMenu.Path);
+            }
 
-                    break;
-                }
+            break;
+            }
 
             }*@
 
@@ -3150,8 +3137,8 @@ catch (Exception ex)
         @*        string strRMouseFilePath = PageStatusData.GetRMFIlePath();
             if (GetGroupIDfromRList(strRMouseFilePath, ref groupID) == false)
             {
-                CLog.Here().Information("RMHeaderNoti-Get Real-GroupID Failed");
-                return;
+            CLog.Here().Information("RMHeaderNoti-Get Real-GroupID Failed");
+            return;
             }
             CLog.Here().Information("RMHeaderNoti-Real-GroupID : {0}", groupID);*@
 
@@ -3209,9 +3196,9 @@ catch (Exception ex)
 
             // groupID에 따라서 다른 Page 부름 - 첨부까지는 됨.
             @*if (groupID== 0)
-                    MyNavigationManager.NavigateTo("/Transfer/0");
+                MyNavigationManager.NavigateTo("/Transfer/0");
                 else
-                    MyNavigationManager.NavigateTo("/Transfer2/1");*@
+                MyNavigationManager.NavigateTo("/Transfer2/1");*@
         }
 
         //string strCurFileSendInfo = pageService.GetCurFileSendInfo(groupID);
@@ -3536,13 +3523,18 @@ catch (Exception ex)
         {
             if (e.strDataType == ((int)FrameType.File).ToString() ||
                 (e.strDataType == null || e.strDataType == "" || e.strDataType == ((int)FrameType.Dir).ToString()))
+            {
                 strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+                ShowMessage("error", strMsg);
+            }
             else if (e.strDataType == ((int)FrameType.CLipTxt).ToString() ||
                 e.strDataType == ((int)FrameType.CLipImg).ToString() ||
                 e.strDataType == ((int)FrameType.CLipObj).ToString())
-                strMsg = XmlConf.GetErrMsg("E_0241");           // 클립보드 수신 중 오류가 발생되었습니다.
+            {
+                strMsg = XmlConf.GetErrMsg("E_0241");          // 클립보드 수신 중 오류가 발생되었습니다.
+                ShowClipboardMessage("error", strMsg, groupID, OS_NOTI.CLIPBOARD);
+            }
 
-            ShowMessage("error", strMsg);
             ShowProgress(groupID, 4, 100, strFromName, strToName, e);
             return;
         }

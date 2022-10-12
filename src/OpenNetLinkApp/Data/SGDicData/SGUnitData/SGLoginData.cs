@@ -352,14 +352,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>true  : 클립보드 전송 가능</returns>
         public bool GetClipboard()
         {
-            string strData = GetTagData("CLIPPOLICYFLAG");
+            string strData = GetTagData("CLIPPOLICYFLAG");      //1: 외부->내부 2: 내부->외부 3: 전체허용 4: 전체금지 5: 부서상속
+
             bool bInner = GetSystemPosition();
             int nClipPolicyFlag = 0;
             if (strData.Equals(""))
                 return false;
             nClipPolicyFlag = Convert.ToInt32(strData);
             bool bResult = false;
-            if (bInner == true)
+            if (bInner == true)                 //내부망일땐 값이 '2'일떄만
             {
                 if (nClipPolicyFlag == 1)
                     bResult = false;
@@ -368,15 +369,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             else
             {
+                                                //외부망일땐 값이 '1'일떄만
+            }
+            {
                 if (nClipPolicyFlag == 1)
                     bResult = true;
                 else if (nClipPolicyFlag == 2)
                     bResult = false;
             }
 
-            if (nClipPolicyFlag == 3)
+            if (nClipPolicyFlag == 3)   //전체허용
                 bResult = true;
-            else if (nClipPolicyFlag == 4)
+            else if (nClipPolicyFlag == 4)  //전체금지
                 bResult = false;
 
             return bResult;
@@ -600,7 +604,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns></returns>
         public bool GetURLRedirect()
         {
-            string strData = GetTagData("URLREDIRECTION");
+            string strData = GetTagData("URLREDIRECTION");      //0: 미사용 1: 내부->외부 2: 외부->내부
             bool bInner = GetSystemPosition();
             int nValue = 0;
             if (!strData.Equals(""))

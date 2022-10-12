@@ -1809,9 +1809,10 @@
             if (sgLoginData == null)
                 continue;
 
-            bool bTmpUseClipBoard = sgLoginData.GetClipboard();
-            bool bTmpUseURLRedirection = sgLoginData.GetURLRedirect();
-            bool bTmpFileSend = sgLoginData.GetFileTrans();
+            
+            bool bTmpUseClipBoard = sgLoginData.GetClipboard();             //클립보드 기능 사용여부
+            bool bTmpUseURLRedirection = sgLoginData.GetURLRedirect();      //리다이렉션 기능 사용여부
+            bool bTmpFileSend = sgLoginData.GetFileTrans();                 //파일전송 사용여부
 
 
             // siteConfig.SetUseClipBoard(i, bTmpUseClipBoard);
