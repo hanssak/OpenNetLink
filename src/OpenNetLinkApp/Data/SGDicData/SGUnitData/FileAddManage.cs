@@ -447,7 +447,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     /// <summary>
     /// 문서파일 내 검출된 OLE 개체
     /// </summary>
-    public class FileOLEObject
+    public class _FileOLEObject
     {
         /// <summary>
         /// 파일명
@@ -471,7 +471,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <summary>
         /// 검출된 OLE 개체 목록
         /// </summary>
-        public List<FileOLEObject> ChildrenFiles { get; set; } = null;
+        public List<_FileOLEObject> ChildrenFiles { get; set; } = null;
 
         /// <summary>
         /// 검출된 OLE 파일 중 등록 불가한 개체가 존재하는 경우
@@ -510,10 +510,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     public class FileAddManage
     {
         private List<FileAddErr> m_FileAddErrList = new List<FileAddErr>();
-        /// <summary>
-        /// 문서파일 내 검출된 OLE 개체 목록
-        /// </summary>
-        private List<FileOLEObject> m_FileAddOleList = new List<FileOLEObject>();
+        ///// <summary>
+        ///// 문서파일 내 검출된 OLE 개체 목록
+        ///// </summary>
+        //private List<FileOLEObject> m_FileAddOleList = new List<FileOLEObject>();
 
         public List<(string reason, string count)> m_FileAddErrReason = new List<(string reason, string count)>();
         public List<string> ListFile = null;
@@ -599,7 +599,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             m_FileAddErrList.Clear();
             m_FileAddErrReason.Clear();
-            m_FileAddOleList.Clear();
         }
         public int GetAddErrCount()
         {
@@ -613,6 +612,34 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             ListOLESource = oleArr.ToList().FindAll(file => file.OLEErrType != eFileAddErr.eFANone || file.HasChildrenErr);
             return ListOLESource.Count;
+        }
+
+        /// <summary>
+        /// OLE 개체 검출 함수 호출 후 반환된 Result Code의 Err 정보
+        /// </summary>
+        /// <param name="BaseResult"></param>
+        /// <returns></returns>
+        public eFileAddErr GetOLEError(int BaseResult)
+        {
+            switch (BaseResult)
+            {
+                case -1:
+                    return eFileAddErr.eOLE_Exception;                          //공통
+                case -2:
+                    return eFileAddErr.eOLE_OEFileIsPasswordProtected;              //암호화 되어 있을때
+                case -3:
+                    return eFileAddErr.eOLE_OEFileTypeNotSupported;               //지원하지 않는 파일형식일때
+                case -4:
+                    return eFileAddErr.eOLE_DirectoryNotFoundException;                   //outfolder 찾을 수 없을때
+                case -5:
+                    return eFileAddErr.eOLE_FileNotFoundException;                   //inputfile 파일을 찾을수 없을때
+                case -6:
+                    return eFileAddErr.eOLE_ArgumentNullException;      //inputfile, outfolder null 일때
+                case -7:
+                    return eFileAddErr.eOLE_OEFileIsCorrupt;               //excel Workbook을 찾을 수 없을때
+                default:
+                    return eFileAddErr.eOLE_UnDefinedError;                       //정의되지 않은 에러                        
+            }
         }
 
         public string SetExceptionReason(eFileAddErr err)
@@ -4669,90 +4696,90 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public async Task<int> CheckOLEObject(HsStream hsStream, FileAddErr currentFile, bool blWhite, string strExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount)
         {
             string strOLEExtractPath = Path.Combine("Temp", "OLEExtract");
-            string strOLEExtractFilePath = Path.Combine(strOLEExtractPath, Path.GetFileNameWithoutExtension(hsStream.FileName));                              //Temp에 Copy된 문서의 OLE 개체를 보관할 폴더
-
-            // Create Temp && Temp/OLEExtract Directory 
-            DirectoryInfo dirOLEObjectBase = new DirectoryInfo(strOLEExtractFilePath);
-            if (!dirOLEObjectBase.Exists)
-                dirOLEObjectBase.Create();
-
-            Log.Information("[CheckOLEObject] DocumentFile[{0}] Ext[White({1})-Info({2})]", Path.GetFileName(hsStream.FileName), blWhite, strExtInfo);
-
-            Stream fileStream = hsStream.stream;
-
-            //Docuement로 OLE 개체 검사 시작
-            using (MemoryStream fileMemoryStream = new MemoryStream())
-            {
-                if (hsStream.MemoryType == HsStreamType.MemoryStream)
-                {
-                    byte[] buf = new byte[fileStream.Length];
-                    await fileStream.ReadAsync(buf, 0, (int)fileStream.Length);
-                    fileMemoryStream.Write(buf);
-                }
-                else if (hsStream.MemoryType == HsStreamType.FileStream)
-                {
-                    fileStream.CopyTo(fileMemoryStream);
-                }
-
-                int result = OfficeExtractor.Controller.ExcuteExtractor(fileMemoryStream, hsStream.FileName, strOLEExtractFilePath);
-
-                FileOLEObject parentDocFile = new FileOLEObject() { FileName = currentFile.FileName, FilePath = currentFile.FilePath };
-                List<FileOLEObject> childOLEFiles = new List<FileOLEObject>();
-                if (result > 0)
-                {
-                    //검출된 OLE 파일 표시
-                    foreach (FileInfo oleObject in dirOLEObjectBase.GetFiles())
-                    {
-                        //검출된 OLE 파일의 black, white 리스트 체크
-                        if (GetRegExtEnable(blWhite, strExtInfo, oleObject.Extension.Substring(1)) == false)
-                        {
-                            parentDocFile.HasChildrenErr = true;
-                            childOLEFiles.Add(new FileOLEObject()
-                            {
-                                FileName = oleObject.Name,
-                                FilePath = oleObject.FullName,
-                                ResultCode = result,
-                                OLEErrType = eFileAddErr.eOLE_Inner_Ext,
-                                OLEErrReason = SetExceptionReason(eFileAddErr.eOLE_Inner_Ext)
-                            });
-                        }
-                        else
-                        {
-                            childOLEFiles.Add(new FileOLEObject()
-                            {
-                                FileName = oleObject.Name,
-                                FilePath = oleObject.FullName,
-                                ResultCode = result,
-                                OLEErrType = eFileAddErr.eFANone
-                            });
-                        }
-                        Console.WriteLine($"OfficeExtractor.Controller.ExcuteExtractor OLE목록 : {oleObject.Name} , {oleObject.FullName}, {result}");
-                    }
-                    parentDocFile.ResultCode = result;
-                    parentDocFile.ChildrenFiles = new List<FileOLEObject>(childOLEFiles);
-                }
-                else if (result < 0)
-                {
-                    //오류 표시
-                    parentDocFile.ResultCode = result;
-                    parentDocFile.OLEErrType = FileOLEObject.GetOLEError(result);
-                    parentDocFile.OLEErrReason = SetExceptionReason(parentDocFile.OLEErrType);
-                    parentDocFile.ChildrenFiles = null;
-                }
-                else { }        //result=0 - 검출된 OLE개체 없음
-                m_FileAddOleList.Add(parentDocFile);
-            }
-
             try
             {
-                Directory.Delete(strOLEExtractPath, true);
+                string strOLEExtractFilePath = Path.Combine(strOLEExtractPath, Path.GetFileNameWithoutExtension(hsStream.FileName));                              //Temp에 Copy된 문서의 OLE 개체를 보관할 폴더
+
+                // Create Temp && Temp/OLEExtract Directory 
+                DirectoryInfo dirOLEObjectBase = new DirectoryInfo(strOLEExtractFilePath);
+                if (!dirOLEObjectBase.Exists)
+                    dirOLEObjectBase.Create();
+
+                Log.Information($"[CheckOLEObject] DocumentFile[{Path.GetFileName(hsStream.FileName)}] Ext[White({blWhite})-Info({strExtInfo})]");
+
+                Stream fileStream = hsStream.stream;
+
+                //Docuement로 OLE 개체 검사 시작
+                using (MemoryStream fileMemoryStream = new MemoryStream())
+                {
+                    if (hsStream.MemoryType == HsStreamType.MemoryStream)
+                    {
+                        byte[] buf = new byte[fileStream.Length];
+                        await fileStream.ReadAsync(buf, 0, (int)fileStream.Length);
+                        fileMemoryStream.Write(buf);
+                    }
+                    else if (hsStream.MemoryType == HsStreamType.FileStream)
+                    {
+                        fileStream.CopyTo(fileMemoryStream);
+                    }
+
+                    int result = OfficeExtractor.Controller.ExcuteExtractor(fileMemoryStream, hsStream.FileName, strOLEExtractFilePath);
+                    Log.Information($"[CheckOLEObject]  ExcuteExtractor DocumentFile[{Path.GetFileName(hsStream.FileName)}] result[{result}]");
+
+                    if (result == 0)        //검출된 OLE 개체 없음
+                        return 0;
+
+                    if (result < 0)      //OLE 개체 검출 중 오류 발생
+                    {
+                        //오류 표시
+                        currentFile.eErrType = GetOLEError(result);
+                        currentFile.ExceptionReason = SetExceptionReason(currentFile.eErrType);
+                        currentFile.ChildrenFiles = null;
+                        return result;
+                    }
+
+                    //OLE 개체 검출 시 개체 Scan 작업
+                    return ScanOLEFile(currentFile, dirOLEObjectBase, blWhite, strExtInfo);
+                }
             }
-            catch (System.Exception err)
+            catch (Exception ex)
             {
-                Log.Warning("[CheckOLEObject] Directory.Delete() " + err.Message + " " + err.GetType().FullName);
+                Log.Error($"[CheckOLEObject] Exception = [{ex.ToString()}]");
             }
-            return 0;
+            finally
+            {
+                try
+                { Directory.Delete(strOLEExtractPath, true); }
+                catch (System.Exception err)
+                { Log.Warning("[CheckOLEObject] Directory.Delete() " + err.Message + " " + err.GetType().FullName); }
+            }
         }
+
+        /// <summary>
+        /// 문서파일의 경우, OLE 개체를 검사하여 개체들 확인
+        /// </summary>
+        /// <param name="parentDocFile"></param>
+        /// <param name="dicOLEObject"></param>
+        /// <param name="blWhite"></param>
+        /// <param name="strExtInfo"></param>
+        int ScanOLEFile(FileAddErr parentDocFile, DirectoryInfo dicOLEObject, bool blWhite, string strExtInfo)
+        {
+            //검출된 OLE 파일 표시
+            foreach (FileInfo oleObject in dicOLEObject.GetFiles())
+            {
+                FileAddErr childFile = parentDocFile.CreateChildren(oleObject.Name, oleObject.FullName, parentDocFile.FileName);
+
+                //검출된 OLE 파일의 black, white 리스트 체크
+                if (GetRegExtEnable(blWhite, strExtInfo, oleObject.Extension.Substring(1)) == false)
+                {
+                    parentDocFile.HasChildrenErr = true;
+                    childFile.eErrType = eFileAddErr.eOLE_Inner_Ext;
+                }
+            }
+
+            return (parentDocFile.HasChildrenErr) ? -1 : 0;
+        }
+
         public void LoadMimeConf(int groupID)
         {
             string strFileName = String.Format("FileMime.{0}.conf", groupID.ToString());
