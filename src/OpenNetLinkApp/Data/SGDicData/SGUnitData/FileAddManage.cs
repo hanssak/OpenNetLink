@@ -605,15 +605,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return m_FileAddErrList.Count;
         }
 
-        public int GetReasonAndDisplayOfOLESource(out List<FileOLEObject> ListOLESource)
-        {
-            FileOLEObject[] oleArr = new FileOLEObject[m_FileAddOleList.Count];
-            m_FileAddOleList.CopyTo(oleArr);
-
-            ListOLESource = oleArr.ToList().FindAll(file => file.OLEErrType != eFileAddErr.eFANone || file.HasChildrenErr);
-            return ListOLESource.Count;
-        }
-
         /// <summary>
         /// OLE 개체 검출 함수 호출 후 반환된 Result Code의 Err 정보
         /// </summary>
@@ -1935,6 +1926,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 m_FileAddErrReason.Add((strReason, strCount));
             }
             ListReason = m_FileAddErrReason;
+
+            //Parent 혹은 Children의 Err를 가진 항목만 필터링 하여 표시
             ListDisaplayErrSource = m_FileAddErrList.FindAll(file => file.eErrType != eFileAddErr.eFANone || file.HasChildrenErr);
             #region [간소화로 사용안함]
             //string strReason = "";
@@ -4733,7 +4726,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     {
                         //오류 표시
                         currentFile.eErrType = GetOLEError(result);
-                        currentFile.ExceptionReason = SetExceptionReason(currentFile.eErrType);
                         currentFile.ChildrenFiles = null;
                         return result;
                     }
@@ -4745,6 +4737,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             catch (Exception ex)
             {
                 Log.Error($"[CheckOLEObject] Exception = [{ex.ToString()}]");
+                return -1;
             }
             finally
             {

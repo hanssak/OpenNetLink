@@ -268,6 +268,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         /// <returns></returns>
         public bool GetUseInputSearchInSecurityApproverTree();
+
+        /// <summary>
+        /// '파일전송' 화면에서 등록시도한 파일목록에 정상파일과 오류파일이 함께 존재할 시 정상 파일에 대한 부분 등록 가능여부(true, false)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUsePartialFileAddInTransfer();
     }
 
 
@@ -855,6 +861,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseInputSearchInSecurityApproverTree()
         {
             return AppConfigInfo.bUseInputSearchInSecurityApproverTree;
+        }
+
+        public bool GetUsePartialFileAddInTransfer()
+        {
+            return AppConfigInfo.bUsePartialFileAddInTransfer;
         }
     }
 }

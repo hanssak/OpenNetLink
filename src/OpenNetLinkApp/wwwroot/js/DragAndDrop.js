@@ -724,7 +724,6 @@ window.closeAllPopup = () => {
     $("#modalReject").modal("hide");
     $("#modalSecureReject").modal("hide");
     $("#Transfer_Denied").modal("hide");
-    $("#Transfer_OLECheck").modal("hide");
     $("#modal-transprogress").modal("hide");
     $("#modal-UpdatePopUp").modal("hide");
     $("#modal-virusreport").modal("hide");
