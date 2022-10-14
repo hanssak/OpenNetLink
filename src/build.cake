@@ -344,6 +344,12 @@ Task("PubDebian")
     DotNetCorePublish("./OpenNetLinkApp", settings);
     DotNetCorePublish("./PreviewUtil", settings);
     DotNetCorePublish("./ContextTransferClient", settings);
+
+   using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe"))
+             {
+		process.WaitForExit();
+		Information("Package linux: Exit code: {0}", process.GetExitCode());
+	}
 });
 
 Task("PkgDebian")
@@ -392,7 +398,12 @@ Task("PubWin10")
     DotNetCorePublish("./OpenNetLinkApp", settings);
     DotNetCorePublish("./PreviewUtil", settings);
     DotNetCorePublish("./ContextTransferClient", settings);
-
+    
+     using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe"))
+     {
+		process.WaitForExit();
+		Information("Package windows: Exit code: {0}", process.GetExitCode());
+     }
 });
 
 Task("PkgWin10")
@@ -406,6 +417,7 @@ Task("PkgWin10")
 
 	System.IO.Directory.CreateDirectory(PackageDirPath);
 	
+            
 	MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
 		Defines = new Dictionary<string, string>{
 			{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
@@ -429,6 +441,12 @@ Task("PubOSX")
 	};
     DotNetCorePublish("./OpenNetLinkApp", settings);
     DotNetCorePublish("./PreviewUtil", settings);
+
+	using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe"))
+             {
+		process.WaitForExit();
+		Information("Package mac: Exit code: {0}", process.GetExitCode());
+	 }
 });
 
 Task("PkgOSX")	
