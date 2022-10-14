@@ -711,7 +711,7 @@
         InitText();
         @*action1 = HandleFileInputChange;
             action2 = HandleFileInputChange;*@
-        //SGFileExamEvent = FileExamResult;
+    //SGFileExamEvent = FileExamResult;
         HSCmdCenter.sgPageEvent.SetFileExamNotiEventAdd(groupID, FileExamResult);
         PageStatusData pageSData = pageService.GetPageStatus(groupID);
         HsStreamList = pageSData.GetFileDragListData();
@@ -824,7 +824,9 @@
             {
                 nExamCount++;
                 per = (nExamCount * 100) / nTotalCount;
+                Console.WriteLine($"SGFileExamEvent 호출 per : {per} / strFileName : {fileInfo.Name} / nExamCount : {nExamCount} => **1 if (bFind == true)");
                 SGFileExamEvent(per, fileInfo.Name);
+
                 continue;
             }
 
@@ -871,6 +873,7 @@
                     existErr = true;
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
+                    Console.WriteLine($"SGFileExamEvent 호출 per : {per} / strFileName : {hsStream.FileName} / nExamCount : {nExamCount} => **2 if (!GetRegExamEnable(fileAddManage, topFile, hsStream, hsStream.Type, false, hsStream.Size))");
                     SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
@@ -890,6 +893,7 @@
                     hsStream.stream = null;
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
+                    Console.WriteLine($"SGFileExamEvent 호출 per : {per} / strFileName : {hsStream.FileName} / nExamCount : {nExamCount} => **3 if (await GetReadRightCheck(fileAddManage, topFile, hsStream) == 0)");
                     SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
@@ -900,6 +904,7 @@
                     hsStream.stream = null;
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
+                    Console.WriteLine($"SGFileExamEvent 호출 per : {per} / strFileName : {hsStream.FileName} / nExamCount : {nExamCount} => **4 if (await GetExamExtChange(fileAddManage, topFile, hsStream) != 0)");
                     SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
@@ -908,6 +913,8 @@
                     per = (nExamCount * 100) / nTotalCount;
                     if (per < 10) //압축해제 시간이 너무 걸려서 멈춰보여서 진행율 임의로 올림
                         per = 10;
+
+                    Console.WriteLine($"SGFileExamEvent 호출 per : {per} / strFileName : {hsStream.FileName} / nExamCount : {nExamCount} => **5 if (hsStream.FileName.ToLower().IndexOf(.zip) > -1)");
                     SGFileExamEvent(per, hsStream.FileName);
                 }
 
@@ -919,6 +926,8 @@
                     per = (nExamCount * 100) / nTotalCount;
                     if (per < 10)
                         per = 10;
+
+                        Console.WriteLine($"SGFileExamEvent 호출 per : {per} / strFileName : {hsStream.FileName} / nExamCount : {nExamCount} => **6 if (await GetExamCheckZip(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)");
                     SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
@@ -934,6 +943,7 @@
                     hsStream.stream = null;
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
+                    Console.WriteLine($"SGFileExamEvent 호출 per : {per} / strFileName : {hsStream.FileName} / nExamCount : {nExamCount} => **7 if (await GetExamCheckOLEObject(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)");
                     SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
@@ -959,6 +969,7 @@
             {
                 nExamCount++;
                 per = (nExamCount * 100) / nTotalCount;
+                Console.WriteLine($"SGFileExamEvent 호출 per : {per} / strFileName : {fileInfo.Name} / nExamCount : {nExamCount} => **9 else");
                 SGFileExamEvent(per, fileInfo.Name);
             }
         }
@@ -1249,6 +1260,7 @@
     /// <param name="strFileName"></param>
     private async void FileExamResult(int per, string strFileName)
     {
+        Console.WriteLine($"SGFileExamEvent 응답 per : {per} / strFileName : {strFileName}");
         if (per < 0)
         {
             await refProgress.closePopUp();
