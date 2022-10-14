@@ -59,40 +59,33 @@
                     </div>
 
                     <!--s text -->
-                    @* <div class="col-md-12 p-0 mb-3 ">
-
-                        <div class="col-sm-10">
-                        <h6>@strExceptionContent</h6>                                                                                       <!--제외내역-->
-                        <ul class="container-fluid ml-3" style="letter-spacing: 0px !importnat;}">
-                        @foreach (string strReason in listDeniedReason)
-                        {
-                        if (strReason.Contains("=>"))
-                        {
-                        <li class="li_no">@strReason</li>
-                        }
-                        else
-                        {
-                        <li>@strReason</li>
-                        }
-                        }
-                        </ul>
-                        </div>
-
-                        </div>*@
                     <div class="card col-md-12 text-nowrap" style="height:100px; background-color:#fff; overflow:auto; padding:0px 5px 5px 5px">
                         <table class="table table-head-fixed table-hover">
-                            <thead style="background-color:#6A92CC">
+                            <thead>
                                 <tr>
-                                    <th style="background-color:#6A92CC">@strErrorReasonSummary</th>                                                                           <!--파일명-->
-                                    <th style="background-color:#6A92CC">@strErrorTotalCountSummary</th>                                                                         <!--제외사유-->
+                                    <th style=" width:40%">@strErrorReasonSummary</th>                                                                           <!--파일명-->
+                                    <th style=" width:10%">@strErrorTotalCountSummary</th>                                                                          <!--제외사유-->
+                                    <th style=" width:40%">@strErrorReasonSummary</th>                                                                     <!--파일명-->
+                                    <th style=" width:10%">@strErrorTotalCountSummary</th>                                                                          <!--제외사유-->
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ((string, string) item in listDeniedReason)
+                                @for (int idx = 0; idx < listDeniedReason.Count; idx += 2)
                                 {
                                     <tr>
-                                        <td>@item.Item1</td>
-                                        <td>@item.Item2</td>
+                                        <td>@listDeniedReason[idx].Item1</td>
+                                        <td>@listDeniedReason[idx].Item2</td>
+
+                                        @if (idx+2 <= listDeniedReason.Count)
+                                        {
+                                            <td>@listDeniedReason[idx+1].Item1</td>
+                                            <td>@listDeniedReason[idx+1].Item2</td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                            <td></td>
+                                        }
                                     </tr>
                                 }
                             </tbody>
@@ -113,6 +106,7 @@
 </div>
 
 @code {
+
     public List<FileAddErr> listDenied = new List<FileAddErr>();
 
     @*public List<FileAddErr> listTreeDenied = new List<FileAddErr>();*@
@@ -137,29 +131,27 @@
 
     public bool m_bZipExamDetail = false;
 
-
     RenderFragment<RadzenTreeItem> DenyTemplate = (context) => builder =>
     {
         FileAddErr errInfo = context.Value as FileAddErr;
 
         builder.OpenComponent<RadzenIcon>(0);
 
-
         string style = "";
         if (errInfo.eErrType != eFileAddErr.eFANone)
         {
             builder.AddAttribute(1, "Icon", "cancel");
-            style += "color: red;";
+            style += "color: #D44867;";
         }
         else if (errInfo.HasChildrenErr)
         {
             builder.AddAttribute(1, "Icon", "info");
-            style += "color: orange;";
+            style += "color: #FFAA54;";
         }
         else        //정상
         {
             builder.AddAttribute(1, "Icon", "check_circle");
-            style += "color: #3967AA;";
+            style += "color: #327AD9;";
 
         }
 
@@ -171,9 +163,9 @@
 
         @*builder.AddContent(3, context.Text);*@
         string htmlString = "<div class=\"p-0 m-0\" style=\"width:100%;\">" +
-                                    "<div class=\"p-0 m-0\" style=\"width:60%;float:left;\">" + context.Text + "</div>"
-                                    +
-                                    "<div class=\"p-0 m-0\" style=\"width:40%;float:right;font-style:italic;color:red\">" + errInfo.ExceptionReason + "</div>"
+                                "<div class=\"p-0 m-0\" style=\"width:60%;float:left;\">" + context.Text + "</div>"
+                                +
+                                "<div class=\"p-0 m-0\" style=\"width:40%;float:right;font-style:italic;color:#D44867\">" + errInfo.ExceptionReason + "</div>"
                             + "</div>";
         builder.AddContent(3, (MarkupString)htmlString);
 
@@ -270,6 +262,10 @@
     {
         if (listDenied.Count <= 0)
             return;
+
+        //err가 없거나, 하위 파일들에도 err가 없는 경우엔 Return 처리
+        if (!listDenied.Exists(file => file.eErrType != eFileAddErr.eFANone || file.HasChildrenErr))
+            return;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -351,6 +347,9 @@
 
         StateHasChanged();
         }*@
+
+
+
     /// <summary>
     /// 선택된 부서로 조회
     /// </summary>

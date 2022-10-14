@@ -4730,22 +4730,92 @@
 		<JP></JP>
 		<EN></EN>
 		<CN></CN>
-	</T_INPUT_NAME>
+	</T_INPUT_NAME>		
+		<T_ERROR_REASON_SUMMARY>
+			<KR>제외사유 종합</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_ERROR_REASON_SUMMARY>
+		<T_ERROR_TOTALCOUNT_SUMMARY>
+			<KR>총 수량</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_ERROR_TOTALCOUNT_SUMMARY>
+		<T_eOLE_Exception>
+			<KR>공통</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eOLE_Exception>
+		<T_eOLE_OEFileIsPasswordProtected>
+			<KR>암호화된 문서</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eOLE_OEFileIsPasswordProtected>
+		<T_eOLE_OEFileTypeNotSupported>
+			<KR>지원하지 않는 파일형식</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eOLE_OEFileTypeNotSupported>
+		<T_eOLE_DirectoryNotFoundException>
+			<KR>Out Folder 경로를 찾을 수 없음</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eOLE_DirectoryNotFoundException>
+		<T_eOLE_FileNotFoundException>
+			<KR>Input File을 찾을 수 없음</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eOLE_FileNotFoundException>
+		<T_eOLE_ArgumentNullException>
+			<KR>Input File/Out File Null 확인</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eOLE_ArgumentNullException>
+		<T_eOLE_OEFileIsCorrupt>
+			<KR>Excel Workbook 항목 찾을 수 없음</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eOLE_OEFileIsCorrupt>
 
-	<T_ERROR_REASON_SUMMARY>
-		<KR>제외사유 종합</KR>
-		<JP></JP>
-		<EN></EN>
-		<CN></CN>
-	</T_ERROR_REASON_SUMMARY>
-	<T_ERROR_TOTALCOUNT_SUMMARY>
-		<KR>총 수량</KR>
-		<JP></JP>
-		<EN></EN>
-		<CN></CN>
-	</T_ERROR_TOTALCOUNT_SUMMARY>
-    
-    
+		<T_eOLE_UnDefinedError>
+			<KR>정의되지 않은 에러</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eOLE_UnDefinedError>
+		<T_eOLE_Inner_Ext>
+			<KR>문서내 OLE 개체의 확장자 제한 파일 포함</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eOLE_Inner_Ext>
+		<T_OLE_CHECK_LIST>
+			<KR>※ 문서파일 내 검출된 OLE 개체 리스트</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_OLE_CHECK_LIST>
+		<T_OLE_OBJECT_COUNT>
+			<KR>검출된 OLE 개체 갯수</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_OLE_OBJECT_COUNT>
+		<T_OLE_CHECK_RESULT>
+			<KR>검출 결과코드</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_OLE_CHECK_RESULT>
     <!-- ********************************************* [END] Alarm 설정 (T_ALARM_0000) ******************************************** -->
 	</TITLE>
 
