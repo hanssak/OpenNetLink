@@ -108,6 +108,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eFA_LONG_PATH_PARENT,                   // 전체경로중 각 단계별 Folder 의 길이 초과(윈:250, 기타:90)
         eFA_LONG_PATH_FILEORPATH,                // 전송되는 파일 및 폴더의 이름 길이초과(윈:250, 기타:90)
 
+
+        /// <summary>
+        /// 문서파일 내 제한된 파일
+        /// </summary>
+        eFAOLE = 80,
         /// <summary>
         /// 문서내 OLE 개체의 확장자 제한 파일 포함
         /// </summary>
