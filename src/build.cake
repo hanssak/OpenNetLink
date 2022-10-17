@@ -442,7 +442,7 @@ Task("PubOSX")
     DotNetCorePublish("./OpenNetLinkApp", settings);
     DotNetCorePublish("./PreviewUtil", settings);
 
-	using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe"))
+	using(var process = StartAndReturnProcess("./HashToolOSX/MD5HashUtility"))
              {
 		process.WaitForExit();
 		Information("Package mac: Exit code: {0}", process.GetExitCode());
