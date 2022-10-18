@@ -35,9 +35,9 @@
                         {
                             <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
                                 <label class="p-1">@strDept</label>                                                       <!--부서-->
-                            <input type="text" class="form-control col-md-4" disabled="@(bEditDeptName==false)" placeholder="부서입력" @bind-value="strCurDept">
+                            <input type="text" class="form-control col-md-4" disabled="@(bEditDeptName==false)" placeholder=@strDeptPlaceHolder @bind-value="strCurDept">
                                 <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
-                            <input type="text" class="form-control col-md-3" placeholder="이름입력" @bind-value="strCurName">
+                            <input type="text" class="form-control col-md-3" placeholder=@strNamePlaceHolder @bind-value="strCurName">
                                 <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>  <!--조회-->
                         </div>
 
@@ -171,6 +171,9 @@
     public string strCurDept = "";
     public string strCurName = "";
     public bool bEditDeptName = true;
+
+    private string strDeptPlaceHolder ="";
+    private string strNamePlaceHolder = "";
 
 
     ISGSideBarUIService SideBarUISvc;
@@ -745,6 +748,9 @@
         strDown = XmlConf.GetTitle("T_ETC_DOWN");                                   // 아래
         strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기
+
+        strDeptPlaceHolder =XmlConf.GetTitle("T_INPUT_DEPT");                       //부서입력
+        strNamePlaceHolder =XmlConf.GetTitle("T_INPUT_DEPT");                       //이름입력
     }
 
 }

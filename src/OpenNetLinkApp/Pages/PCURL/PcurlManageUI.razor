@@ -10,12 +10,12 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">PCURL 관리</h1>
+                <h1 class="m-0 text-dark">@XmlConf.GetTitle("T_COMMON_URLMANAGE")</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
-                    <li class="breadcrumb-item active">PCURL 관리</li>
+                    <li class="breadcrumb-item active">@XmlConf.GetTitle("T_COMMON_URLMANAGE")</li>
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -40,32 +40,32 @@
                                 <col width="10%">
                             </colgroup>
                             <tr>
-                                <th class="p-1 pt-2 float-right">기간</th>
+                                <th class="p-1 pt-2 float-right">@XmlConf.GetTitle("T_COMMON_PERIOD")</th>
                                 <td>
                                     @*<input type="text" class="form-control col-md-5 float-left" id="datepicker" readonly value="2020-06-24" style="color:black;width:46%;">
                                         <span class="float-left col-md-1">-</span>
                                         <input type="text" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26" style="color:black;width:46%;">*@
                                     <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
-                                <th class="p-1  pt-2 float-right"> 승인상태 </th>
+                                <th class="p-1  pt-2 float-right">@(" " + XmlConf.GetTitle("T_COMMON_APPROVESTATUS"))</th>
                                 <td>
                                     <select class="form-control" style="width:100px;">
-                                        <option> 전체</option>
-                                        <option> 승인</option>
-                                        <option> 승인대기</option>
-                                        <option> 반려</option>
-                                        <option> 요청취소</option>
+                                        <option>@(" " + XmlConf.GetTitle("T_COMMON_ALL"))</option>
+                                        <option>@(" " + XmlConf.GetTitle("T_COMMON_APPROVE"))</option>
+                                        <option>@(" " + XmlConf.GetTitle("T_COMMON_APPROVE_WAIT"))</option>
+                                        <option>@(" " + XmlConf.GetTitle("T_COMMON_REJECTION"))</option>
+                                        <option>@(" " + XmlConf.GetTitle("T_COMMON_REQUESTCANCEL"))</option>
                                     </select>
                                 </td>
-                                <th class="p-1  pt-2 float-right"> URL </th>
+                                <th class="p-1  pt-2 float-right">@(" " + XmlConf.GetTitle("T_URL"))</th>
                                 <td colspan="3">
-                                    <input type="text" class="form-control" placeholder="URL을 입력해 주세요.">
+                                    <input type="text" class="form-control" placeholder="@XmlConf.GetTitle("T_INFO_PLEASE_TYPE_URL")">
                                 </td>
                             </tr>
 
                             <tr>
-                                <th class="p-1 pt-3 float-right"> 요청사유 </th>
-                                <td class="pt-2" colspan="5"><input type="text" class="form-control" placeholder="요청사유을 입력해 주세요."></td>
+                                <th class="p-1 pt-3 float-right">@(" "+  XmlConf.GetTitle("T_URL_REQREASON"))</th>
+                                <td class="pt-2" colspan="5"><input type="text" class="form-control" placeholder=@XmlConf.GetWarnMsg("W_0222")></td>
                             </tr>
                         </table>
 
@@ -81,8 +81,8 @@
             <div class="col-md-12">
                 <div class="col-sm-12 text-right">
                     <button type="button" class="btn btn-md btn-black"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
-                    <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-check-circle pr-2"></i>URL신청</button>
-                    <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-list pr-2"></i>URL리스트</button>
+                    <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-check-circle pr-2"></i>@XmlConf.GetTitle("T_PCURL_SUBSTRITION")</button>
+                    <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-list pr-2"></i>@XmlConf.GetTitle("T_PCURL_ALLOWLIST")</button>
                 </div>
             </div>
         </div>
@@ -106,12 +106,12 @@
                                         <!--<th style="text-align:center">
                                             <input class="input" type="checkbox">
                                         </th>-->
-                                        <th style="text-align:center">승인상태</th>
-                                        <th style="text-align:center">요청사유</th>
-                                        <th style="text-align:center">대표 URL</th>
-                                        <th style="text-align:center">승인요청일</th>
-                                        <th style="text-align:center">승인일</th>
-                                        <th style="text-align:center">상세보기</th>
+                                        <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th>
+                                        <th style="text-align:center">@XmlConf.GetTitle("T_URL_REQREASON")</th>
+                                        <th style="text-align:center">@XmlConf.GetTitle("T_URL_HEADURL")</th>
+                                        <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_APPROVEREQDATE")</th>
+                                        <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_APPROVEDATE")</th>
+                                        <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_DETAILVIEW")</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -140,7 +140,7 @@
 
                             <div style="padding-top:1.25rem;">
                                 <div style="float:left;">
-                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">총페이지 : @nViewPageNo/@nTotalPages</div>
+                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">@($"{XmlConf.GetTitle("T_TRANS_TOTALPAGE")} : {nViewPageNo/nTotalPages}")</div>
                                 </div>
                                 <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
                                            NTotalPages="@nTotalPages" NStartPage="@nStartPage"
