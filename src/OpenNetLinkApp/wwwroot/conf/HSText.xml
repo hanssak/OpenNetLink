@@ -4744,61 +4744,50 @@
 			<EN></EN>
 			<CN></CN>
 		</T_ERROR_TOTALCOUNT_SUMMARY>
-		<T_eOLE_Exception>
-			<KR>공통</KR>
-			<JP></JP>
-			<EN></EN>
-			<CN></CN>
-		</T_eOLE_Exception>
-		<T_eOLE_OEFileIsPasswordProtected>
-			<KR>암호화된 문서</KR>
-			<JP></JP>
-			<EN></EN>
-			<CN></CN>
-		</T_eOLE_OEFileIsPasswordProtected>
-		<T_eOLE_OEFileTypeNotSupported>
-			<KR>지원하지 않는 파일형식</KR>
-			<JP></JP>
-			<EN></EN>
-			<CN></CN>
-		</T_eOLE_OEFileTypeNotSupported>
-		<T_eOLE_DirectoryNotFoundException>
-			<KR>Out Folder 경로를 찾을 수 없음</KR>
-			<JP></JP>
-			<EN></EN>
-			<CN></CN>
-		</T_eOLE_DirectoryNotFoundException>
-		<T_eOLE_FileNotFoundException>
-			<KR>Input File을 찾을 수 없음</KR>
-			<JP></JP>
-			<EN></EN>
-			<CN></CN>
-		</T_eOLE_FileNotFoundException>
-		<T_eOLE_ArgumentNullException>
-			<KR>Input File/Out File Null 확인</KR>
-			<JP></JP>
-			<EN></EN>
-			<CN></CN>
-		</T_eOLE_ArgumentNullException>
-		<T_eOLE_OEFileIsCorrupt>
-			<KR>Excel Workbook 항목 찾을 수 없음</KR>
-			<JP></JP>
-			<EN></EN>
-			<CN></CN>
-		</T_eOLE_OEFileIsCorrupt>
 
-		<T_eOLE_UnDefinedError>
-			<KR>정의되지 않은 에러</KR>
+		<T_eOLE_COMMON>
+			<KR>OLE개체 추출 실패</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_eOLE_UnDefinedError>
-		<T_eOLE_Inner_Ext>
-			<KR>문서내 OLE 개체의 확장자 제한 파일 포함</KR>
+		</T_eOLE_COMMON>
+		<T_eOLE_PASSWORD>
+			<KR>문서 비밀번호 설정</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_eOLE_Inner_Ext>
+		</T_eOLE_PASSWORD>
+		<T_eOLE_MIME>
+			<KR>/OLE개체 마임타입</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eOLE_MIME>
+		<T_eOLE_EXTENSION>
+			<KR>OLE개체 확장자 제한</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eOLE_EXTENSION>
+		<T_eOLE_CHANGE>
+			<KR>OLE개체 위변조 제한</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eOLE_CHANGE>
+		<T_eCOMPRESS_EXTENSION>
+			<KR>압축형식 확장자 제한</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eCOMPRESS_EXTENSION>
+		<T_eCOMPRESS_CHANGE>
+			<KR>압축형식 위변조 제한</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eCOMPRESS_CHANGE>
+
 		<T_OLE_CHECK_LIST>
 			<KR>※ 문서파일 내 검출된 OLE 개체 리스트</KR>
 			<JP></JP>

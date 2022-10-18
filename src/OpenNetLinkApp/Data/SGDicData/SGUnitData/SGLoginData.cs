@@ -282,20 +282,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strData;
         }
 
-		/// <summary>
-		/// 현재 내부망에 접속되어 있는지 여부를 문자열로 반환(GetSystemPosition 기반)
-		/// </summary>
-		/// <returns>I or E (내부/외부)</returns>
-		public string GetSysID()
-		{
-			//string strSysID = "I";
-			//int nConnNetWork = GetConnNetwork();
-			//if (nConnNetWork == 0)
-			//	strSysID = "E";
-			string strSysID = (GetSystemPosition()) ? "I" : "E";
-			return strSysID;
-		}
-		/**
+        /// <summary>
+        /// 현재 내부망에 접속되어 있는지 여부를 문자열로 반환(GetSystemPosition 기반)
+        /// </summary>
+        /// <returns>I or E (내부/외부)</returns>
+        public string GetSysID()
+        {
+            //string strSysID = "I";
+            //int nConnNetWork = GetConnNetwork();
+            //if (nConnNetWork == 0)
+            //	strSysID = "E";
+            string strSysID = (GetSystemPosition()) ? "I" : "E";
+            return strSysID;
+        }
+        /**
 		 * @breif Link Check Time 주기를 반환한다.
 		 * @return 초단위
 		 */
@@ -369,7 +369,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             else
             {
-                                                //외부망일땐 값이 '1'일떄만
+                //외부망일땐 값이 '1'일떄만
             }
             {
                 if (nClipPolicyFlag == 1)
@@ -1588,6 +1588,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             nValue = Convert.ToInt32(strData);
             return nValue;
+        }
+
+        /// <summary>
+        /// OLE 개체 검사 시 MIME LIST의 블랙/화이트 여부
+        /// </summary>
+        /// <returns>
+        /// <para>true:White List로 관리</para>
+        /// <para>false:Black List로 관리</para>
+        /// </returns>
+        public bool GetOLECheckMimeType()
+        {
+            string strData = GetTagData("OLECHECKMIMETYPE");
+            return (strData.Equals("W"));
         }
 
         /// <summary>

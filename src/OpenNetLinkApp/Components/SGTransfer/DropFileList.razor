@@ -421,7 +421,7 @@
                     //02. 문서파일 압축해제 후 파일 검사
 
                     //01. 문서파일 내 OLE 개체 검사
-                    if (await GetExamCheckOLEObject(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
+                    if (await GetExamCheckDocument(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
                     {
                         existErr = true;
                         hsStream.stream = null;
@@ -670,7 +670,7 @@
                             //02. 문서파일 압축해제 후 파일 검사
 
                             //01. 문서파일 내 OLE 개체 검사
-                            if (await GetExamCheckOLEObject(fileAddManage, childFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
+                            if (await GetExamCheckDocument(fileAddManage, childFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
                             {
                                 existErr = true;
                                 hsStream.stream = null;
@@ -711,7 +711,7 @@
         InitText();
         @*action1 = HandleFileInputChange;
             action2 = HandleFileInputChange;*@
-    //SGFileExamEvent = FileExamResult;
+        //SGFileExamEvent = FileExamResult;
         HSCmdCenter.sgPageEvent.SetFileExamNotiEventAdd(groupID, FileExamResult);
         PageStatusData pageSData = pageService.GetPageStatus(groupID);
         HsStreamList = pageSData.GetFileDragListData();
@@ -927,7 +927,7 @@
                     if (per < 10)
                         per = 10;
 
-                        Console.WriteLine($"SGFileExamEvent 호출 per : {per} / strFileName : {hsStream.FileName} / nExamCount : {nExamCount} => **6 if (await GetExamCheckZip(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)");
+                    Console.WriteLine($"SGFileExamEvent 호출 per : {per} / strFileName : {hsStream.FileName} / nExamCount : {nExamCount} => **6 if (await GetExamCheckZip(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)");
                     SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
@@ -937,7 +937,7 @@
                 //02. 문서파일 압축해제 후 파일 검사
 
                 //01. 문서파일 내 OLE 개체 검사
-                if (await GetExamCheckOLEObject(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
+                if (await GetExamCheckDocument(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
                 {
                     existErr = true;
                     hsStream.stream = null;
@@ -1437,10 +1437,8 @@
         int dayCountStandard = pageService.GetDayFileMaxCount(groupID);                             //일일 전송가능 횟수 제한
         int dayCountRemain = pageService.GetDayRemainFileCount(groupID);                          //일일 전송가능 잔여 횟수
 
-
         //fileAddErr.SetUseOSmaxPath(SGAppMgrSvc.OpConfigInfoService.GetUseOSMaxFilePath());
         HSCmdCenter.SetUseOSMaxPath(groupID, true);
-
 
         // okb
         fileAddManager.bEmptyFIleNoCheck = SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans();
@@ -1593,7 +1591,7 @@
     /// <param name="ExamCount"></param>
     /// <param name="TotalCount"></param>
     /// <returns></returns>
-    public async Task<int> GetExamCheckOLEObject(FileAddManage fileAddManager, FileAddErr currentFile, HsStream hsStream, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount)
+    public async Task<int> GetExamCheckDocument(FileAddManage fileAddManager, FileAddErr currentFile, HsStream hsStream, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount)
     {
         if (hsStream == null)
             return 0;
@@ -1624,22 +1622,30 @@
             return 0;
             }*@
 
-        //TODO - OLE 내부 파일들에 대한 Filter 항목 확인 필요 (OLE에 대한 별도 정책 필요)
-        bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
-        string strFileExtInfo = sgLoginData.GetFileFilter();
-        if (strFileExtInfo.Equals("") || strFileExtInfo.Equals(";"))
-        {
-            CLog.Here().Information($"No check OLD for EMPTY FILEFILTER(;)");
-            return 0;
-        }
 
         // 확인대상을 판단하는 기준(확장자) 확인 필요
-        List<string> checkExt = new List<string>() { "PPTX", "XLSX", "DOCX" };
+        List<string> checkExt = new List<string>() { "ODT", "DOC", "DOCM", "DOCX", "DOT", "DOTM", "DOTX", "RTF"
+                                                    , "XLS", "XLSB", "XLSM", "XLSX", "XLT", "XLTM", "XLTX", "XLW"
+                                                    , "POT", "PPT", "POTM", "POTX", "PPS", "PPSM", "PPSX", "PPTM", "PPTX"
+                                                    , "HWP", "HWPX"};
+
         if (!checkExt.Exists(ext => ext == strExtType))
             return 0;
 
+
+        //TODO - OLE 내부 파일들에 대한 Filter 항목 확인 필요 (OLE에 대한 별도 정책 필요)
+        bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
+        string strFileExtInfo = sgLoginData.GetFileFilter();
+        bool bOLECheckMimeType = sgLoginData.GetOLECheckMimeType();                 //OLE 개체 검사 시 MIME LIST의 블랙/화이트 여부 (true: White)
+
+        if (strFileExtInfo.Equals("") || strFileExtInfo.Equals(";"))
+        {
+            CLog.Here().Information($"No check OLE for EMPTY FILEFILTER(;)");
+            return 0;
+        }
+
         //bool bDenyPasswordZIP = SGAppMgrSvc.AppConfigInfoService.GetDenyPasswordZIP();
-        if (await fileAddManager.CheckOLEObject(hsStream, currentFile, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount) != 0)
+        if (await fileAddManager.CheckDocumentFile(hsStream, currentFile, bWhite, bOLECheckMimeType, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount) != 0)
             return -1;
 
         return 0;
