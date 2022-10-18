@@ -34,9 +34,9 @@
                         {
                             <div class="d-inline-flex  mb-2 " style="height:28px;">
                                 <label class="p-1">@strDept</label>                                                       <!--부서-->
-                            <input type="text" class="form-control col-md-4" placeholder="부서입력" @bind-value="strCurDept" @onkeyup="HandleKeyEvent">
+                            <input type="text" class="form-control col-md-4" placeholder=@strDeptPlaceHolder @bind-value="strCurDept" @onkeyup="HandleKeyEvent">
                                 <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
-                            <input type="text" class="form-control col-md-3" placeholder="이름입력" @bind-value="strCurName" @onkeyup="HandleKeyEvent">
+                            <input type="text" class="form-control col-md-3" placeholder=@strNamePlaceHolder @bind-value="strCurName" @onkeyup="HandleKeyEvent">
                                 <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>         <!--조회-->
                         </div>
 
@@ -195,6 +195,11 @@
 
     public string strCurDept = "";
     public string strCurName = "";
+
+
+    private string strDeptPlaceHolder = "";
+    private string strNamePlaceHolder = "";
+
     ISGSideBarUIService SideBarUISvc;
     SGSettingsDBProc sgSettingProc;
     ISGSiteConfigService siteConfig;
@@ -477,7 +482,7 @@
         StateHasChanged();
     }
 
-     private void SGDeptTreeList_OnItemDoubleClick(ApproverInfo doubleClickInfo)
+    private void SGDeptTreeList_OnItemDoubleClick(ApproverInfo doubleClickInfo)
     {
         stSelectApprover = doubleClickInfo.UserSeq;
         AddSelectApprover();
@@ -621,7 +626,7 @@
         actionApproverDivSelect = TargetDivSelect;
         actionTargetSelect = SelectTarget;
         approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproverSearchType();
-        useInputInTree  = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproverTree();
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproverTree();
         InitText();
     }
 
@@ -771,5 +776,9 @@
         strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기
         strGroupAdd = XmlConf.GetTitle("T_APPROVE_GROUPADD");                       // 그룹추가
+
+
+        strDeptPlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       //부서입력
+        strNamePlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       //이름입력
     }
 }
