@@ -25,7 +25,7 @@
 
 
 
-    <div class="table-responsive p-1 mb-2" style="height:@(TreeHeight.ToString() + "px");border:1px solid #ddd; background-color:#fff;">
+    <div class="p-1 mb-2" style="height:@(TreeHeight.ToString() + "px");border:1px solid #ddd; background-color:#fff;">
         <RadzenTree Change="@selectDept" Data="@deptTreeInfoValues" Style="width: 98%;height:95%;overflow:auto">
             @*<RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == MyDeptSeq)" Template="DeptTemplate" />*@
             <RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" HasChildren="@((data) => false)" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == strSelectedDeptCode)" Template="DeptTemplate" />
