@@ -48,7 +48,7 @@ namespace OpenNetLinkApp.Common
             [Description("클립보드결재")]
             ClipApproveUI = 3,
             [Description("파일전송 예외처리")]
-            FileException = 4,			
+            FileException = 4,
         }
 
         /// <summary>
@@ -65,6 +65,18 @@ namespace OpenNetLinkApp.Common
             DTM_SCAN = 4,
             [Description("개인정보 검사")]
             PERSONAL_DATA_SCAN = 8,
+        }
+
+        /// <summary>
+        /// 문서파일 첨부파일 검사 타입
+        /// <para>OLEOBJECT_EXTRACT : OLE 개체 검사 (문서 편집기 내)</para>
+        /// </summary>
+        [Flags]
+        public enum DocumentExtractType
+        {
+            NONE = 0,
+            OLEOBJECT_EXTRACT = 1,
+            COMPRESS_EXTRACT = 2,
         }
     }
 }
