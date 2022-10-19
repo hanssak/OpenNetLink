@@ -1486,6 +1486,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
+        /// 서버로부터 수신받은 문서파일 내부 검사유형 정보를 반환한다.
+        /// <para>1 : 압축형식의 첨부파일검사</para>
+        /// <para>2 : OLE개체형식의 검출파일 검사</para>
+        /// <para>3 : 압축형식과 OLE개체형식 모두 검사</para>
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetDocumentExtractType(bool bSystem)
+            => (bSystem) ? GetTagData("I_CLIENT_ZIP_DEPTH") : GetTagData("E_CLIENT_ZIP_DEPTH");
+
+        /// <summary>
         /// value 값을 암호화해서 sgData에 저장
         /// </summary>
         /// <param name="strKey"></param>

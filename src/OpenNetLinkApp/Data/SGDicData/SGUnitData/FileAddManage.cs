@@ -631,22 +631,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="BaseResult"></param>
         /// <returns></returns>
-        public eFileAddErr GetOLEError(int BaseResult)
-        {
-            switch (BaseResult)
+        public eFileAddErr GetOLEError(int BaseResult) =>
+            BaseResult switch
             {
-                case -1: //공통
-                case -3: //지원하지 않는 파일형식일때
-                case -4://outfolder 찾을 수 없을때
-                case -5://inputfile 파일을 찾을수 없을때
-                case -6://inputfile, outfolder null 일때
-                case -7://excel Workbook을 찾을 수 없을때
-                default://정의되지 않은 에러                        
-                    return eFileAddErr.eFADOC_OLE_COMMONE;
-                case -2: //암호화 되어 있을때
-                    return eFileAddErr.eFADOC_OLE_PASSWORD;
-            }
-        }
+                -1 => eFileAddErr.eFADOC_OLE_COMMONE, //공통
+                -2 => eFileAddErr.eFADOC_OLE_PASSWORD,//암호화 되어 있을때
+                -3 => eFileAddErr.eFADOC_OLE_COMMONE,//지원하지 않는 파일형식일때
+                -4 => eFileAddErr.eFADOC_OLE_COMMONE,//outfolder 찾을 수 없을때
+                -5 => eFileAddErr.eFADOC_OLE_COMMONE,//inputfile 파일을 찾을수 없을때
+                -6 => eFileAddErr.eFADOC_OLE_COMMONE,//inputfile, outfolder null 일때
+                -7 => eFileAddErr.eFADOC_OLE_COMMONE,//excel Workbook을 찾을 수 없을때
+                _ => eFileAddErr.eFADOC_OLE_COMMONE  //정의되지 않은 에러
+            };
 
         public string SetExceptionReason(eFileAddErr err)
         {
@@ -1581,8 +1577,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             string strFileReName = strFileRelativePath;
             /*string strFileReName = GetFileRename(true, strFileRelativePath);
-			byte[] temp = Encoding.Default.GetBytes(strFileReName);
-			strFileReName = Encoding.UTF8.GetString(temp);*/
+            byte[] temp = Encoding.Default.GetBytes(strFileReName);
+            strFileReName = Encoding.UTF8.GetString(temp);*/
 
             Log.Logger.Here().Information("FilePath Length - Check(MaxLength:{0}) : filename : {1}(length : {2})", m_nFilePathMax, strFileReName, strFileReName.Length);
             if (strFileReName.Length > m_nFilePathMax)                          // 전체 경로 길이 확인 (90 / 250자)
@@ -1599,8 +1595,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             // 특수문자로 변환전 길이에 대해서 체크
             /*string strFileReName = GetFileRename(true, strFileRelativePath);
-			byte[] temp = Encoding.Default.GetBytes(strFileReName);
-			strFileReName = Encoding.UTF8.GetString(temp);*/
+            byte[] temp = Encoding.Default.GetBytes(strFileReName);
+            strFileReName = Encoding.UTF8.GetString(temp);*/
 
             char sep;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -2299,9 +2295,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             ListFile.Clear();
             string strFilePathList = System.IO.File.ReadAllText(strFilePath);
             /*
-			char sep = (char)'\n';
-			string[] strArray = strFilePathList.Split(sep);
-			*/
+            char sep = (char)'\n';
+            string[] strArray = strFilePathList.Split(sep);
+            */
             string[] strArray = strFilePathList.Split('\n').ToArray();
             int count = 0;
             foreach (var item in strArray)
@@ -4563,10 +4559,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 // KKW
                 /*if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
-				{
-					enRet = eFileAddErr.eUnZipInnerLeftZip;
-					AddDataForInnerZip(nTotalErrCount, strOrgZipFile, strOrgZipFileRelativePath, strOverMaxDepthInnerZipFile, enRet);
-				}*/
+                {
+                    enRet = eFileAddErr.eUnZipInnerLeftZip;
+                    AddDataForInnerZip(nTotalErrCount, strOrgZipFile, strOrgZipFileRelativePath, strOverMaxDepthInnerZipFile, enRet);
+                }*/
 
                 //if (enRet == eFileAddErr.eFAZipPW) AddData(strOrgZipFile, enRet, strOrgZipFileRelativePath);
 
