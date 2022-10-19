@@ -406,6 +406,7 @@
                         SGFileExamEvent(per, hsStream.FileName);
                         continue;
                     }
+
                     if (await GetExamCheckZip(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
                     {
                         existErr = true;
@@ -655,6 +656,7 @@
                                 SGFileExamEvent(per, hsStream.FileName);
                                 continue;
                             }
+
                             if (await GetExamCheckZip(fileAddManage, childFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
                             {
                                 existErr = true;
@@ -1516,6 +1518,9 @@
         if (hsStream == null)
             return 0;
 
+        if (hsStream.Size <= 0)     //0kb 압축파일은 정상적인 해제 처리가 불가하므로 미검사
+            return 0;
+
         string strExtType = hsStream.Type;
         strExtType = strExtType.ToUpper();
 
@@ -1541,7 +1546,6 @@
             CLog.Here().Information($"No check zip depth for EMPTY FILEFILTER(;)");
             return 0;
         }
-
 
         // 아직 지원 안됨 :  || (strExtType.Equals("ZIPX")) || (strExtType.Equals("LZH")) || (strExtType.Equals("TAR")) || (strExtType.Equals("RAR"))
         if ((strExtType.Equals("ZIP")) || (strExtType.Equals("7Z")))
@@ -1594,6 +1598,9 @@
     public async Task<int> GetExamCheckDocument(FileAddManage fileAddManager, FileAddErr currentFile, HsStream hsStream, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount)
     {
         if (hsStream == null)
+            return 0;
+
+        if (hsStream.Size <= 0)     //0kb 문서파일은 정상적인 OLE개체추출 및 압축해제가 불가하므로 미검사
             return 0;
 
         string strExtType = hsStream.Type;

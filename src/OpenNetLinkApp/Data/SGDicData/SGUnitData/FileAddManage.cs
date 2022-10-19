@@ -541,6 +541,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public int m_nTransCurCount = 0;
 
+        /// <summary>
+        /// 0KB 파일 전송 가능 유무
+        /// true :전송 가능
+        /// </summary>
         public bool bEmptyFIleNoCheck = false;
 
         /// <summary>
@@ -3358,7 +3362,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// 파일확장자 위변조 검사 수행 
+        /// 파일확장자 위변조 검사 수행 , 빈파일 체크
         /// <br> </br>stFile : 위변조 검사 대상 파일의 MemoryStream or FileStream 
         /// <br> </br>strExt : 위변조 검사 대상 파일의 확장자 
         /// </summary>
@@ -4418,7 +4422,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             ["video/x-sgi-movie"] = "movie",
             ["video/x-smv"] = "smv",
             ["x-conference/x-cooltalk"] = "ice",
-            ["x-epoc/x-sisx-app"] = "sisx",            
+            ["x-epoc/x-sisx-app"] = "sisx",
         });
 
         /// <summary>
@@ -4527,6 +4531,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strOrgZipFileRelativePath;
             string strOverMaxDepthInnerZipFile;
             string strZipFile;
+
+            ////빈파일 체크 (0kb 허용)
+            //if(hsStream.Size <= 0 && bEmptyFIleNoCheck && )
 
             // Setting Default Value
             stStream = hsStream.stream;
@@ -4813,7 +4820,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             if (usecheckCompress)
             {
-                //scanDocumentFileByCompressObject();
+                //await scanDocumentFileByCompressObject(hsStream, currentFile, isWhite, isOLEMimeTypeWhite, FileFilterExtInfo, usecheckOLE_Mime, usecheckOLE_Extension);
             }
 
 
@@ -4882,6 +4889,179 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 {
                     FileAddErr oleFile = currentFile.CreateChildren(oleObject.Name, oleObject.FullName, currentFile.FileName);
                     Stream oleFileStream = File.OpenRead(oleObject.FullName);
+                    byte[] btFileData = StreamToByteArray(oleFileStream, MaxBufferSize);
+                    string oleFileMime = MimeGuesser.GuessMimeType(btFileData);
+                    string oleFileExtension = oleFile.FileName.Substring(oleFile.FileName.LastIndexOf('.') + 1);
+
+                    // Check Empty File 
+                    // 0kb 파일 Block
+                    if (bEmptyFIleNoCheck == false && oleFileStream.Length <= 0)
+                    {
+                        oleFile.eErrType = eFileAddErr.eFAEMPTY;
+                        currentFile.HasChildrenErr = true;
+                        continue;
+                    }
+
+                    if (useCheckOLEMime)  //기능1
+                    {
+                        //OLE개체의 마임리스트 체크 
+                        if (!IsValidOLEMimeType(oleFileMime, oleObject.Name, isOLEMimeTypeWhite))
+                        {
+                            oleFile.eErrType = eFileAddErr.eFADOC_OLE_MIME;
+                            currentFile.HasChildrenErr = true;
+                            continue;
+                        }
+                    }
+
+                    if (usecheckOLEExtension)   //기능2
+                    {
+                        //기본 확장자 제한 black, white 리스트 체크
+                        if (!GetRegExtEnable(isWhite, FileFilterExtInfo, oleFileExtension))
+                        {
+                            oleFile.eErrType = eFileAddErr.eFADOC_OLE_EXTENSION;
+                            currentFile.HasChildrenErr = true;
+                            continue;
+                        }
+
+                        //위변조 제한, 0KB 체크
+                        if (!IsValidFileExtOfOLEObject(oleFileStream, oleFileExtension))
+                        {
+                            oleFile.eErrType = eFileAddErr.eFADOC_OLE_CHANGE;
+                            currentFile.HasChildrenErr = true;
+                            continue;
+                        }
+                    }
+                }
+                return (currentFile.HasChildrenErr) ? -1 : 0;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[scanDocumentFileByOLEObject] Exception = [{ex.ToString()}]");
+                return -1;
+            }
+            finally
+            {
+
+                //try
+                //{ Directory.Delete(strOLEExtractPath, true); }
+                //catch (System.Exception err)
+                //{ Log.Warning("[scanDocumentFileByOLEObject] Fail Directory.Delete() " + err.Message + " " + err.GetType().FullName); }
+            }
+        }
+
+        /// <summary>
+        /// OLE개체 마임타입 체크
+        /// <para>gOLEMimeTypeMap과 mime 비교</para>
+        /// </summary>
+        /// <param name="mime">해당파일의 MIME</param>
+        /// <param name="fileName">파일명</param>
+        /// <param name="isOLEMimeWhite">OLE개체 검사의 MimeList의 W/B 여부(Tag:OLECHECKMIMETYPE)</param>
+        /// <returns></returns>
+        private bool IsValidOLEMimeType(string mime, string fileName, bool isOLEMimeWhite)
+        {
+            string fileExt = fileName;
+            var ind = fileExt.LastIndexOf('.');
+            if (ind != -1 && fileExt.Length > ind + 1)
+                fileExt = fileName.Substring(ind + 1).ToLower();
+
+            bool existsInMimeList = false;
+            if (gOLEMimeTypeMap.Value.TryGetValue(mime, out string result))
+            {
+                Log.Debug($"IsValidOLEMimeType, Get Extensions[{result}] for Mime[{mime}] (isOLEMimeWhite[{isOLEMimeWhite}])");
+                string[] exts = result.Split(' ');
+                foreach (var ext in exts)
+                {
+                    //OLE 마임리스트에 존재 시 false 처리
+                    if (string.Compare(fileExt, ext) == 0)
+                    {
+                        existsInMimeList = true;
+                        break;
+                    }
+                }
+            }
+            return (isOLEMimeWhite) ? existsInMimeList : !existsInMimeList;
+        }
+
+        /// <summary>
+        /// 압축형식 개체 방식으로 문서 검사
+        /// </summary>
+        /// <param name="hsStream">검사 대상 문서</param>
+        /// <param name="currentFile">검사 대상 문서의 FIleAddErr 객체</param>
+        /// <param name="isWhite">기존 FileFilterType</param>
+        /// <param name="isOLEMimeTypeWhite">OLE개체용 FileFilterType (OLECHECKMIMETYPE)</param>
+        /// <param name="FileFilterExtInfo">기존 FileFilter목록</param>
+        /// <param name="useCheckOLEMime">마임리스트 매칭 검사 여부</param>
+        /// <param name="usecheckOLEExtension">확장자 제한 및 위변조 검사 여부</param>
+        /// <returns></returns>
+        async Task<int> scanDocumentFileByCompressObject(HsStream hsStream, FileAddErr currentFile, bool isWhite, bool isOLEMimeTypeWhite, string FileFilterExtInfo, bool useCheckOLEMime, bool usecheckOLEExtension)
+        {
+            string strCompressExtractPath = Path.Combine("Temp", "Document_CompressExtract");
+
+            try
+            {
+                // Create Temp && Temp/OLEExtract Directory 
+                string strCompressExtractFilePath = Path.Combine(strCompressExtractPath, Path.GetFileNameWithoutExtension(hsStream.FileName));                              //Temp에 Copy된 문서의 압축형식으로 추축된 파일을 보관할 폴더
+                DirectoryInfo dirOLEObjectBase = new DirectoryInfo(strCompressExtractFilePath);
+                if (!dirOLEObjectBase.Exists)
+                    dirOLEObjectBase.Create();
+
+                Stream fileStream = hsStream.stream;
+
+                //Document 압축형식으로 압축해제
+                var opts = new SharpCompress.Readers.ReaderOptions();
+                var encoding = Encoding.Default;
+                byte[] buff = null;
+                //using (FileStream fsSource = new FileStream(hsStream., FileMode.Open, FileAccess.Read))
+                //{
+                BinaryReader br = new BinaryReader(fileStream);
+                long numBytes = 8;
+                buff = br.ReadBytes((int)numBytes);
+
+                //Zip File Foramt : Local File Header 구조 바이트 차트
+                //Signature 4byte / Version 2Byte / Flags 2Byte / => Flags Bit가 서로 다름 Mac의 경우 8 그 이외는 0
+                encoding = (buff[6] == 0x08) ? Encoding.Default : Encoding.GetEncoding(949);
+                //}
+
+                opts.ArchiveEncoding = new SharpCompress.Common.ArchiveEncoding();
+                opts.ArchiveEncoding.CustomDecoder = (data, x, y) =>
+                {
+                    return encoding.GetString(data);
+                };
+
+                //압축형식으로 포함된 파일 검사
+                using (MemoryStream fileMemoryStream = new MemoryStream())
+                {
+                    if (hsStream.MemoryType == HsStreamType.MemoryStream)
+                    {
+                        byte[] buf = new byte[fileStream.Length];
+                        await fileStream.ReadAsync(buf, 0, (int)fileStream.Length);
+                        fileMemoryStream.Write(buf);
+                    }
+                    else if (hsStream.MemoryType == HsStreamType.FileStream)
+                    {
+                        fileStream.CopyTo(fileMemoryStream);
+                    }
+
+                    int result = OfficeExtractor.Controller.ExcuteExtractor(fileMemoryStream, hsStream.FileName, strCompressExtractFilePath);
+                    Log.Information($"[scanDocumentFileByOLEObject]  ExcuteExtractor DocumentFile[{Path.GetFileName(hsStream.FileName)}] result[{result}]");
+
+                    if (result == 0)        //검출된 OLE 개체 없음
+                        return 0;
+
+                    if (result < 0)      //OLE 개체 검출 중 오류 발생
+                    {
+                        //오류 표시
+                        currentFile.eErrType = GetOLEError(result);
+                        currentFile.ChildrenFiles = null;
+                        return result;
+                    }
+                }
+
+                //검출된 OLE 파일 대상 검사
+                foreach (FileInfo oleObject in dirOLEObjectBase.GetFiles())
+                {
+                    FileAddErr oleFile = currentFile.CreateChildren(oleObject.Name, oleObject.FullName, currentFile.FileName);
+                    Stream oleFileStream = File.OpenRead(oleObject.FullName);
 
                     byte[] btFileData = StreamToByteArray(oleFileStream, MaxBufferSize);
                     string oleFileMime = MimeGuesser.GuessMimeType(btFileData);
@@ -4929,46 +5109,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             finally
             {
                 try
-                { Directory.Delete(strOLEExtractPath, true); }
+                { Directory.Delete(strCompressExtractPath, true); }
                 catch (System.Exception err)
                 { Log.Warning("[scanDocumentFileByOLEObject] Fail Directory.Delete() " + err.Message + " " + err.GetType().FullName); }
             }
         }
-
-        /// <summary>
-        /// OLE개체 마임타입 체크
-        /// <para>gOLEMimeTypeMap과 mime 비교</para>
-        /// </summary>
-        /// <param name="mime">해당파일의 MIME</param>
-        /// <param name="fileName">파일명</param>
-        /// <param name="isOLEMimeWhite">OLE개체 검사의 MimeList의 W/B 여부(Tag:OLECHECKMIMETYPE)</param>
-        /// <returns></returns>
-        private bool IsValidOLEMimeType(string mime, string fileName, bool isOLEMimeWhite)
-        {
-            string fileExt = fileName;
-            var ind = fileExt.LastIndexOf('.');
-            if (ind != -1 && fileExt.Length > ind + 1)
-                fileExt = fileName.Substring(ind + 1).ToLower();
-
-            bool existsInMimeList = false;
-            if (gOLEMimeTypeMap.Value.TryGetValue(mime, out string result))
-            {
-                Log.Debug($"IsValidOLEMimeType, Get Extensions[{result}] for Mime[{mime}] (isOLEMimeWhite[{isOLEMimeWhite}])");
-                string[] exts = result.Split(' ');
-                foreach (var ext in exts)
-                {
-                    //OLE 마임리스트에 존재 시 false 처리
-                    if (string.Compare(fileExt, ext) == 0)
-                    {
-                        existsInMimeList = true;
-                        break;
-                    }
-                }
-            }
-            return (isOLEMimeWhite) ? existsInMimeList : !existsInMimeList;
-        }
-
-
         public void LoadMimeConf(int groupID)
         {
             string strFileName = String.Format("FileMime.{0}.conf", groupID.ToString());
