@@ -747,12 +747,18 @@
                     }
                 }
 
-                // CLIENT_ZIP_DEPTH 정보 가져옴
+                // CLIENT_ZIP_DEPTH, CS_EXCEPTION_EXT_REASON_TYPE 
+                // 정보 가져옴
                 SGQueryExtend sgQueryExtend = null;
                 sgQueryExtend = new SGQueryExtend();
                 if (sgQueryExtend != null)
                 {
-                    string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+
+                    string strGetinfoTagName = "";
+                    strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
+                    strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
+
+                    string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
                     HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
                 }
 
