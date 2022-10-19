@@ -344,6 +344,18 @@ SELECT * FROM FUNC_NL_GETAFTERAPPROVEWAITUSERCOUNT('{strUserList}')
         }
 
         /// <summary>
+        /// systemenv 에서 지정한 Tag의 data들을 가져오는 함수
+        /// </summary>
+        /// <returns></returns>
+        public string GetsystemEnvDataS(string strTagNames)
+        {
+            string strQuery = "SELECT CAST(SUBSTRING(SYSTEM_ID, 1, 1)||'_'||TAG AS VARCHAR) TAG, TAG_VALUE FROM TBL_SYSTEM_ENV WHERE SUBSTRING(SYSTEM_ID, 4, 1)='1' AND TAG IN ('||SEARCH_DATA||') ORDER BY SYSTEM_ID DESC";
+            strQuery = strQuery.Replace("'||SEARCH_DATA||'", strTagNames);
+
+            return strQuery;
+        }
+
+        /// <summary>
         /// CLIENT_ZIP_DEPTH 정보 가져오는 Query
         /// </summary>
         /// <returns></returns>
@@ -352,6 +364,8 @@ SELECT * FROM FUNC_NL_GETAFTERAPPROVEWAITUSERCOUNT('{strUserList}')
             string strQuery = "SELECT CAST(SUBSTRING(SYSTEM_ID, 1, 1)||'_'||TAG AS VARCHAR) TAG, TAG_VALUE FROM TBL_SYSTEM_ENV WHERE SUBSTRING(SYSTEM_ID, 4, 1)='1' AND TAG IN ('CLIENT_ZIP_DEPTH') ORDER BY SYSTEM_ID DESC";
             return strQuery;
         }
+
+
         /// <summary>
         /// TRANSFER SEQ를 가지고 개인정보로그를 가져오기
         /// </summary>
