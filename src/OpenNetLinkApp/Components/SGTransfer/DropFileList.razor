@@ -928,8 +928,6 @@
                     per = (nExamCount * 100) / nTotalCount;
                     if (per < 10)
                         per = 10;
-
-                    Console.WriteLine($"SGFileExamEvent 호출 per : {per} / strFileName : {hsStream.FileName} / nExamCount : {nExamCount} => **6 if (await GetExamCheckZip(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)");
                     SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
@@ -945,7 +943,6 @@
                     hsStream.stream = null;
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    Console.WriteLine($"SGFileExamEvent 호출 per : {per} / strFileName : {hsStream.FileName} / nExamCount : {nExamCount} => **7 if (await GetExamCheckOLEObject(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)");
                     SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }

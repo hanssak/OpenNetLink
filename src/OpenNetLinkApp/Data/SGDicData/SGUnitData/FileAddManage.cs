@@ -482,47 +482,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
     }
 
-    /// <summary>
-    /// 문서파일 내 검출된 OLE 개체
-    /// </summary>
-    public class _FileOLEObject
-    {
-        /// <summary>
-        /// 파일명
-        /// </summary>
-        public string FileName { get; set; } = "";
-        /// <summary>
-        /// 파일경로
-        /// </summary>
-        public string FilePath { get; set; } = "";
-
-        /// <summary>
-        /// OLE 검사과정에서 발생한 에러
-        /// </summary>
-        public eFileAddErr OLEErrType = eFileAddErr.eFANone;
-
-        /// <summary>
-        /// OLEErrType 기반으로 한 에러 내용
-        /// </summary>
-        public string OLEErrReason { get; set; } = "";
-
-        /// <summary>
-        /// 검출된 OLE 개체 목록
-        /// </summary>
-        public List<_FileOLEObject> ChildrenFiles { get; set; } = null;
-
-        /// <summary>
-        /// 검출된 OLE 파일 중 등록 불가한 개체가 존재하는 경우
-        /// </summary>
-        public bool HasChildrenErr { get; set; }
-
-        /// <summary>
-        /// ExcuteExtractor 호출하여 반환된 Result 값
-        /// </summary>
-        public int ResultCode { get; set; }
-
-    }
-
     public class FileAddManage
     {
         private List<FileAddErr> m_FileAddErrList = new List<FileAddErr>();
@@ -3359,7 +3318,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// 파일확장자 위변조 검사 수행 , 빈파일 체크
+        /// 파일확장자 위변조 검사 수행
         /// <br> </br>stFile : 위변조 검사 대상 파일의 MemoryStream or FileStream 
         /// <br> </br>strExt : 위변조 검사 대상 파일의 확장자 
         /// </summary>
@@ -4945,10 +4904,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             finally
             {
 
-                //try
-                //{ Directory.Delete(strOLEExtractPath, true); }
-                //catch (System.Exception err)
-                //{ Log.Warning("[scanDocumentFileByOLEObject] Fail Directory.Delete() " + err.Message + " " + err.GetType().FullName); }
+                try
+                { Directory.Delete(strOLEExtractPath, true); }
+                catch (System.Exception err)
+                { Log.Warning("[scanDocumentFileByOLEObject] Fail Directory.Delete() " + err.Message + " " + err.GetType().FullName); }
             }
         }
 

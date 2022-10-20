@@ -352,7 +352,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>true  : 클립보드 전송 가능</returns>
         public bool GetClipboard()
         {
-            string strData = GetTagData("CLIPPOLICYFLAG");      //1: 외부->내부 2: 내부->외부 3: 전체허용 4: 전체금지 5: 부서상속
+            string strData = GetTagData("CLIPPOLICYFLAG");
 
             bool bInner = GetSystemPosition();
             int nClipPolicyFlag = 0;
@@ -360,7 +360,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return false;
             nClipPolicyFlag = Convert.ToInt32(strData);
             bool bResult = false;
-            if (bInner == true)                 //내부망일땐 값이 '2'일떄만
+            if (bInner == true)
             {
                 if (nClipPolicyFlag == 1)
                     bResult = false;
@@ -368,19 +368,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     bResult = true;
             }
             else
-            {
-                //외부망일땐 값이 '1'일떄만
-            }
-            {
+			{
                 if (nClipPolicyFlag == 1)
                     bResult = true;
                 else if (nClipPolicyFlag == 2)
                     bResult = false;
             }
 
-            if (nClipPolicyFlag == 3)   //전체허용
+            if (nClipPolicyFlag == 3)
                 bResult = true;
-            else if (nClipPolicyFlag == 4)  //전체금지
+            else if (nClipPolicyFlag == 4)
                 bResult = false;
 
             return bResult;
