@@ -406,6 +406,7 @@
                         SGFileExamEvent(per, hsStream.FileName);
                         continue;
                     }
+
                     if (await GetExamCheckZip(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
                     {
                         existErr = true;
@@ -421,7 +422,7 @@
                     //02. 문서파일 압축해제 후 파일 검사
 
                     //01. 문서파일 내 OLE 개체 검사
-                    if (await GetExamCheckOLEObject(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
+                    if (await GetExamCheckDocument(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
                     {
                         existErr = true;
                         hsStream.stream = null;
@@ -655,6 +656,7 @@
                                 SGFileExamEvent(per, hsStream.FileName);
                                 continue;
                             }
+
                             if (await GetExamCheckZip(fileAddManage, childFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
                             {
                                 existErr = true;
@@ -670,7 +672,7 @@
                             //02. 문서파일 압축해제 후 파일 검사
 
                             //01. 문서파일 내 OLE 개체 검사
-                            if (await GetExamCheckOLEObject(fileAddManage, childFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
+                            if (await GetExamCheckDocument(fileAddManage, childFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
                             {
                                 existErr = true;
                                 hsStream.stream = null;
@@ -928,7 +930,7 @@
                 //02. 문서파일 압축해제 후 파일 검사
 
                 //01. 문서파일 내 OLE 개체 검사
-                if (await GetExamCheckOLEObject(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
+                if (await GetExamCheckDocument(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
                 {
                     existErr = true;
                     hsStream.stream = null;
@@ -1425,10 +1427,8 @@
         int dayCountStandard = pageService.GetDayFileMaxCount(groupID);                             //일일 전송가능 횟수 제한
         int dayCountRemain = pageService.GetDayRemainFileCount(groupID);                          //일일 전송가능 잔여 횟수
 
-
         //fileAddErr.SetUseOSmaxPath(SGAppMgrSvc.OpConfigInfoService.GetUseOSMaxFilePath());
         HSCmdCenter.SetUseOSMaxPath(groupID, true);
-
 
         // okb
         fileAddManager.bEmptyFIleNoCheck = SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans();
@@ -1506,6 +1506,9 @@
         if (hsStream == null)
             return 0;
 
+        if (hsStream.Size <= 0)     //0kb 압축파일은 정상적인 해제 처리가 불가하므로 미검사
+            return 0;
+
         string strExtType = hsStream.Type;
         strExtType = strExtType.ToUpper();
 
@@ -1531,7 +1534,6 @@
             CLog.Here().Information($"No check zip depth for EMPTY FILEFILTER(;)");
             return 0;
         }
-
 
         // 아직 지원 안됨 :  || (strExtType.Equals("ZIPX")) || (strExtType.Equals("LZH")) || (strExtType.Equals("TAR")) || (strExtType.Equals("RAR"))
         if ((strExtType.Equals("ZIP")) || (strExtType.Equals("7Z")))
@@ -1581,9 +1583,12 @@
     /// <param name="ExamCount"></param>
     /// <param name="TotalCount"></param>
     /// <returns></returns>
-    public async Task<int> GetExamCheckOLEObject(FileAddManage fileAddManager, FileAddErr currentFile, HsStream hsStream, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount)
+    public async Task<int> GetExamCheckDocument(FileAddManage fileAddManager, FileAddErr currentFile, HsStream hsStream, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount)
     {
         if (hsStream == null)
+            return 0;
+
+        if (hsStream.Size <= 0)     //0kb 문서파일은 정상적인 OLE개체추출 및 압축해제가 불가하므로 미검사
             return 0;
 
         string strExtType = hsStream.Type;
@@ -1612,22 +1617,34 @@
             return 0;
             }*@
 
-        //TODO - OLE 내부 파일들에 대한 Filter 항목 확인 필요 (OLE에 대한 별도 정책 필요)
-        bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
-        string strFileExtInfo = sgLoginData.GetFileFilter();
-        if (strFileExtInfo.Equals("") || strFileExtInfo.Equals(";"))
-        {
-            CLog.Here().Information($"No check OLD for EMPTY FILEFILTER(;)");
-            return 0;
-        }
 
         // 확인대상을 판단하는 기준(확장자) 확인 필요
-        List<string> checkExt = new List<string>() { "PPTX", "XLSX", "DOCX" };
+        List<string> checkExt = new List<string>() { "ODT", "DOC", "DOCM", "DOCX", "DOT", "DOTM", "DOTX", "RTF"
+                                            , "XLS", "XLSB", "XLSM", "XLSX", "XLT", "XLTM", "XLTX", "XLW"
+                                            , "POT", "PPT", "POTM", "POTX", "PPS", "PPSM", "PPSX", "PPTM", "PPTX"
+                                            , "HWP", "HWPX"};
+
         if (!checkExt.Exists(ext => ext == strExtType))
             return 0;
 
+
+        //TODO - OLE 내부 파일들에 대한 Filter 항목 확인 필요 (OLE에 대한 별도 정책 필요)
+        bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
+        string strFileExtInfo = sgLoginData.GetFileFilter();
+        string strDocumentExtractType = sgLoginData.GetDocumentExtractType(sgLoginData.GetSystemPosition());        //문서파일 내부 검사유형 (1 : 압축형식의 첨부파일검사 / 2 : OLE개체형식의 검출파일 검사 / 3 : 압축형식&OLE개체형식 모두 검사
+        int docExtractType = 0;
+        int.TryParse(strDocumentExtractType, out docExtractType);
+
+        bool bOLECheckMimeType = sgLoginData.GetOLECheckMimeType();                 //OLE 개체 검사 시 MIME LIST의 블랙/화이트 여부 (true: White)
+
+        if (strFileExtInfo.Equals("") || strFileExtInfo.Equals(";"))
+        {
+            CLog.Here().Information($"No check OLE for EMPTY FILEFILTER(;)");
+            return 0;
+        }
+
         //bool bDenyPasswordZIP = SGAppMgrSvc.AppConfigInfoService.GetDenyPasswordZIP();
-        if (await fileAddManager.CheckOLEObject(hsStream, currentFile, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount) != 0)
+        if (await fileAddManager.CheckDocumentFile(hsStream, currentFile, docExtractType, bWhite, bOLECheckMimeType, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount) != 0)
             return -1;
 
         return 0;

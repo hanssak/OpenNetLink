@@ -282,20 +282,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return strData;
 		}
 
-		/// <summary>
-		/// 현재 내부망에 접속되어 있는지 여부를 문자열로 반환(GetSystemPosition 기반)
-		/// </summary>
-		/// <returns>I or E (내부/외부)</returns>
-		public string GetSysID()
-		{
-			//string strSysID = "I";
-			//int nConnNetWork = GetConnNetwork();
-			//if (nConnNetWork == 0)
-			//	strSysID = "E";
-			string strSysID = (GetSystemPosition()) ? "I" : "E";
-			return strSysID;
-		}
-		/**
+        /// <summary>
+        /// 현재 내부망에 접속되어 있는지 여부를 문자열로 반환(GetSystemPosition 기반)
+        /// </summary>
+        /// <returns>I or E (내부/외부)</returns>
+        public string GetSysID()
+        {
+            //string strSysID = "I";
+            //int nConnNetWork = GetConnNetwork();
+            //if (nConnNetWork == 0)
+            //	strSysID = "E";
+            string strSysID = (GetSystemPosition()) ? "I" : "E";
+            return strSysID;
+        }
+        /**
 		 * @breif Link Check Time 주기를 반환한다.
 		 * @return 초단위
 		 */
@@ -346,38 +346,39 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 
-		/// <summary>
-		/// 클립보드 사용 여부를 반환한다.
-		/// </summary>
-		/// <returns>true  : 클립보드 전송 가능</returns>
-		public bool GetClipboard()
-		{
-			string strData = GetTagData("CLIPPOLICYFLAG");
-			bool bInner = GetSystemPosition();
-			int nClipPolicyFlag = 0;
-			if (strData.Equals(""))
-				return false;
-			nClipPolicyFlag = Convert.ToInt32(strData);
-			bool bResult = false;
-			if (bInner == true)
-			{
-				if (nClipPolicyFlag == 1)
-					bResult = false;
-				else if (nClipPolicyFlag == 2)
-					bResult = true;
-			}
-			else
-			{
-				if (nClipPolicyFlag == 1)
-					bResult = true;
-				else if (nClipPolicyFlag == 2)
-					bResult = false;
-			}
+        /// <summary>
+        /// 클립보드 사용 여부를 반환한다.
+        /// </summary>
+        /// <returns>true  : 클립보드 전송 가능</returns>
+        public bool GetClipboard()
+        {
+            string strData = GetTagData("CLIPPOLICYFLAG");
 
-			if (nClipPolicyFlag == 3)
-				bResult = true;
-			else if (nClipPolicyFlag == 4)
-				bResult = false;
+            bool bInner = GetSystemPosition();
+            int nClipPolicyFlag = 0;
+            if (strData.Equals(""))
+                return false;
+            nClipPolicyFlag = Convert.ToInt32(strData);
+            bool bResult = false;
+            if (bInner == true)
+            {
+                if (nClipPolicyFlag == 1)
+                    bResult = false;
+                else if (nClipPolicyFlag == 2)
+                    bResult = true;
+            }
+            else
+			{
+                if (nClipPolicyFlag == 1)
+                    bResult = true;
+                else if (nClipPolicyFlag == 2)
+                    bResult = false;
+            }
+
+            if (nClipPolicyFlag == 3)
+                bResult = true;
+            else if (nClipPolicyFlag == 4)
+                bResult = false;
 
 			return bResult;
 		}
@@ -1481,15 +1482,26 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return strRet;
 		}
 
-		/// <summary>
-		/// value 값을 암호화해서 sgData에 저장
-		/// </summary>
-		/// <param name="strKey"></param>
-		/// <param name="strValue"></param>
-		public void AddData(string strKey, string strValue)
-		{
-			EncAdd(strKey, strValue);
-		}
+        /// <summary>
+        /// 서버로부터 수신받은 문서파일 내부 검사유형 정보를 반환한다.
+        /// <para>1 : 압축형식의 첨부파일검사</para>
+        /// <para>2 : OLE개체형식의 검출파일 검사</para>
+        /// <para>3 : 압축형식과 OLE개체형식 모두 검사</para>
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetDocumentExtractType(bool bSystem)
+            => (bSystem) ? GetTagData("I_CLIENT_DOCUMENT_EXTRACT_TYPE") : GetTagData("E_CLIENT_DOCUMENT_EXTRACT_TYPE");
+
+        /// <summary>
+        /// value 값을 암호화해서 sgData에 저장
+        /// </summary>
+        /// <param name="strKey"></param>
+        /// <param name="strValue"></param>
+        public void AddData(string strKey, string strValue)
+        {
+            EncAdd(strKey, strValue);
+        }
 
 		/// <summary>
 		/// 패스워드 변경 유무 또는 변경 타입을 반환한다.
@@ -1586,14 +1598,27 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return nValue;
 		}
 
-		/// <summary>
-		/// 3망 정책값을 받아서 상세하게 설정
-		/// </summary>
-		/// <param name="DataNet"></param>
-		/// <returns></returns>
-		public bool SetPolicyDataWithParsing(ref SGNetOverData DataNet)
-		{
-			uint nPolicyVal = 0;
+        /// <summary>
+        /// OLE 개체 검사 시 MIME LIST의 블랙/화이트 여부
+        /// </summary>
+        /// <returns>
+        /// <para>true:White List로 관리</para>
+        /// <para>false:Black List로 관리</para>
+        /// </returns>
+        public bool GetOLECheckMimeType()
+        {
+            string strData = GetTagData("OLECHECKMIMETYPE");
+            return (strData.Equals("W"));
+        }
+
+        /// <summary>
+        /// 3망 정책값을 받아서 상세하게 설정
+        /// </summary>
+        /// <param name="DataNet"></param>
+        /// <returns></returns>
+        public bool SetPolicyDataWithParsing(ref SGNetOverData DataNet)
+        {
+            uint nPolicyVal = 0;
 
 			if (DataNet.strPolicy.Length < 1)
 				return false;

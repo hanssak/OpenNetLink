@@ -302,7 +302,8 @@
             // WebManager에서 값이 표현이 되도록 적당히 변경해서 올림(NetLink에 맞춤)
             if (SGAppMgrSvc.SiteConfigInfoService.GetUseAgentBlockValueChange())
             {
-                if (errType == eFileAddErr.eFAZIP || (errType > eFileAddErr.eFADLPERR && errType != eFileAddErr.eFADAYCOUNTOVER && errType != eFileAddErr.eFADAYSIZEOVER))
+                if (errType == eFileAddErr.eFAZIP 
+                || (errType > eFileAddErr.eFADLPERR && errType != eFileAddErr.eFADAYCOUNTOVER && errType != eFileAddErr.eFADAYSIZEOVER))
                     nType = 4;
             }
 

@@ -56,6 +56,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eFAZipNotPW,        // zip 파일 비번 없을 때
         eFAZipError,        // zip 파일 손상 또는 zip 파일이 아닌경우
         eFAEMPTY,           // 빈파일
+        /// <summary>
+        /// 알수없는파일형식
+        /// </summary>
         eFAUNKNOWN,         // 알수없는파일형식
         eFAEML,             // EML파일과 다른파일을 함께 등록할 경우
         eFAEMPTY_ATTACH,    // 빈파일(첨부파일)
@@ -108,42 +111,77 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eFA_LONG_PATH_PARENT,                   // 전체경로중 각 단계별 Folder 의 길이 초과(윈:250, 기타:90)
         eFA_LONG_PATH_FILEORPATH,                // 전송되는 파일 및 폴더의 이름 길이초과(윈:250, 기타:90)
 
+        #region 문서 파일 검사 오류 목록
         /// <summary>
-        /// 문서내 OLE 개체의 확장자 제한 파일 포함
+        /// OLE 추출 실패
         /// </summary>
-        eOLE_Inner_Ext,
+        eFADOC_OLE_COMMONE = 101,
         /// <summary>
-        /// 공통
+        /// 비밀번호 설정된 문서
         /// </summary>
-        eOLE_Exception,
+        eFADOC_OLE_PASSWORD,
         /// <summary>
-        /// 암호화 되어있을때 
+        /// OLE 검사 결과 -> 마임검사 실패
         /// </summary>
-        eOLE_OEFileIsPasswordProtected,
+        eFADOC_OLE_MIME,
         /// <summary>
-        /// 지원하지 않는 파일형식일때
+        /// OLE 검사 결과 -> 확장자 제한
         /// </summary>
-        eOLE_OEFileTypeNotSupported,
+        eFADOC_OLE_EXTENSION,
         /// <summary>
-        /// outfolder 찾을 수 없을때
+        /// OLE 검사 결과 -> 위변조 제한
         /// </summary>
-        eOLE_DirectoryNotFoundException,
+        eFADOC_OLE_CHANGE,
         /// <summary>
-        /// inputfile 파일을 찾을수 없을때
+        /// 압축형식 검사 결과 -> 확장자 제한
         /// </summary>
-        eOLE_FileNotFoundException,
+        eFADOC_COMPRESS_EXTENSION,
         /// <summary>
-        /// inputfile, outfolder null 일때
+        /// 압축형식 검사 결과 -> 위변조 제한
         /// </summary>
-        eOLE_ArgumentNullException,
-        /// <summary>
-        /// Excel workbook 찾을 수 없을때, 
-        /// </summary>
-        eOLE_OEFileIsCorrupt,
-        /// <summary>
-        /// 정의되지 않은 에러
-        /// </summary>
-        eOLE_UnDefinedError,
+        eFADOC_COMPRESS_CHANGE,
+
+        #endregion
+        ///// <summary>
+        ///// 문서파일 내 제한된 파일
+        ///// </summary>
+        //eFAOLE = 80,
+        ///// <summary>
+        ///// 문서내 OLE 개체의 확장자 제한 파일 포함
+        ///// </summary>
+        //eOLE_Inner_Ext,
+        ///// <summary>
+        ///// 공통
+        ///// </summary>
+        //eOLE_Exception,
+        ///// <summary>
+        ///// 암호화 되어있을때 
+        ///// </summary>
+        //eOLE_OEFileIsPasswordProtected,
+        ///// <summary>
+        ///// 지원하지 않는 파일형식일때
+        ///// </summary>
+        //eOLE_OEFileTypeNotSupported,
+        ///// <summary>
+        ///// outfolder 찾을 수 없을때
+        ///// </summary>
+        //eOLE_DirectoryNotFoundException,
+        ///// <summary>
+        ///// inputfile 파일을 찾을수 없을때
+        ///// </summary>
+        //eOLE_FileNotFoundException,
+        ///// <summary>
+        ///// inputfile, outfolder null 일때
+        ///// </summary>
+        //eOLE_ArgumentNullException,
+        ///// <summary>
+        ///// Excel workbook 찾을 수 없을때, 
+        ///// </summary>
+        //eOLE_OEFileIsCorrupt,
+        ///// <summary>
+        ///// 정의되지 않은 에러
+        ///// </summary>
+        //eOLE_UnDefinedError,
     }
 
     public class FileAddErr
@@ -462,6 +500,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public int m_nTransCurCount = 0;
 
+        /// <summary>
+        /// 0KB 파일 전송 가능 유무
+        /// true :전송 가능
+        /// </summary>
         public bool bEmptyFIleNoCheck = false;
 
         /// <summary>
@@ -496,6 +538,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             ListFile = new List<string>();
             LoadMimeConf(groupID);
+            //서버 적용 시 사용 예정
+            //LoadOLEMimeConf(groupID);
         }
         ~FileAddManage()
         {
@@ -547,28 +591,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="BaseResult"></param>
         /// <returns></returns>
-        public eFileAddErr GetOLEError(int BaseResult)
-        {
-            switch (BaseResult)
+        public eFileAddErr GetOLEError(int BaseResult) =>
+            BaseResult switch
             {
-                case -1:
-                    return eFileAddErr.eOLE_Exception;                          //공통
-                case -2:
-                    return eFileAddErr.eOLE_OEFileIsPasswordProtected;              //암호화 되어 있을때
-                case -3:
-                    return eFileAddErr.eOLE_OEFileTypeNotSupported;               //지원하지 않는 파일형식일때
-                case -4:
-                    return eFileAddErr.eOLE_DirectoryNotFoundException;                   //outfolder 찾을 수 없을때
-                case -5:
-                    return eFileAddErr.eOLE_FileNotFoundException;                   //inputfile 파일을 찾을수 없을때
-                case -6:
-                    return eFileAddErr.eOLE_ArgumentNullException;      //inputfile, outfolder null 일때
-                case -7:
-                    return eFileAddErr.eOLE_OEFileIsCorrupt;               //excel Workbook을 찾을 수 없을때
-                default:
-                    return eFileAddErr.eOLE_UnDefinedError;                       //정의되지 않은 에러                        
-            }
-        }
+                -1 => eFileAddErr.eFADOC_OLE_COMMONE, //공통
+                -2 => eFileAddErr.eFADOC_OLE_PASSWORD,//암호화 되어 있을때
+                -3 => eFileAddErr.eFADOC_OLE_COMMONE,//지원하지 않는 파일형식일때
+                -4 => eFileAddErr.eFADOC_OLE_COMMONE,//outfolder 찾을 수 없을때
+                -5 => eFileAddErr.eFADOC_OLE_COMMONE,//inputfile 파일을 찾을수 없을때
+                -6 => eFileAddErr.eFADOC_OLE_COMMONE,//inputfile, outfolder null 일때
+                -7 => eFileAddErr.eFADOC_OLE_COMMONE,//excel Workbook을 찾을 수 없을때
+                _ => eFileAddErr.eFADOC_OLE_COMMONE  //정의되지 않은 에러
+            };
 
         public string SetExceptionReason(eFileAddErr err)
         {
@@ -757,33 +791,55 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     break;
 
                 #region OLD 관련 에러
-                case eFileAddErr.eOLE_Exception:                                                            // 공통
-                    str = xmlConf.GetTitle("T_eOLE_Exception");
+                case eFileAddErr.eFADOC_OLE_COMMONE:
+                    str = xmlConf.GetTitle("T_eOLE_COMMON");                                                  //OLE개체 추출 실패
                     break;
-                case eFileAddErr.eOLE_OEFileIsPasswordProtected:                                            // 암호화 되어있을때 
-                    str = xmlConf.GetTitle("T_eOLE_OEFileIsPasswordProtected");
+                case eFileAddErr.eFADOC_OLE_PASSWORD:
+                    str = xmlConf.GetTitle("T_eOLE_PASSWORD");                                                  //문서 비밀번호 설정
                     break;
-                case eFileAddErr.eOLE_OEFileTypeNotSupported:                                               // 지원하지 않는 파일형식일때
-                    str = xmlConf.GetTitle("T_eOLE_OEFileTypeNotSupported");
+                case eFileAddErr.eFADOC_OLE_MIME:
+                    str = xmlConf.GetTitle("T_eOLE_MIME");                                                      //OLE개체 마임타입
                     break;
-                case eFileAddErr.eOLE_DirectoryNotFoundException:                                           // outfolder 찾을 수 없을때
-                    str = xmlConf.GetTitle("T_eOLE_DirectoryNotFoundException");
+                case eFileAddErr.eFADOC_OLE_EXTENSION:
+                    str = xmlConf.GetTitle("T_eOLE_EXTENSION");                                                 //OLE개체 확장자 제한
                     break;
-                case eFileAddErr.eOLE_FileNotFoundException:                                                // inputfile 파일을 찾을수 없을때
-                    str = xmlConf.GetTitle("T_eOLE_FileNotFoundException");
+                case eFileAddErr.eFADOC_OLE_CHANGE:
+                    str = xmlConf.GetTitle("T_eOLE_CHANGE");                                                    //OLE개체 위변조 제한
                     break;
-                case eFileAddErr.eOLE_ArgumentNullException:                                                // inputfile, outfolder null 일때
-                    str = xmlConf.GetTitle("T_eOLE_ArgumentNullException");
+                case eFileAddErr.eFADOC_COMPRESS_EXTENSION:
+                    str = xmlConf.GetTitle("T_eCOMPRESS_EXTENSION");                                            //압축형식 확장자 제한
                     break;
-                case eFileAddErr.eOLE_OEFileIsCorrupt:                                                      // Excel workbook 찾을 수 없을때, 
-                    str = xmlConf.GetTitle("T_eOLE_OEFileIsCorrupt");
+                case eFileAddErr.eFADOC_COMPRESS_CHANGE:
+                    str = xmlConf.GetTitle("T_eCOMPRESS_CHANGE");                                               //압축형식 위변조 제한
                     break;
-                case eFileAddErr.eOLE_UnDefinedError:                                                       // 정의되지 않은 에러
-                    str = xmlConf.GetTitle("T_eOLE_UnDefinedError");
-                    break;
-                case eFileAddErr.eOLE_Inner_Ext:                                                            //문서내 OLE 개체의 확장자 제한 파일 포함
-                    str = xmlConf.GetTitle("T_eOLE_Inner_Ext");
-                    break;
+
+                //case eFileAddErr.eOLE_Exception:                                                            // 공통
+                //    str = xmlConf.GetTitle("T_eOLE_Exception");
+                //    break;
+                //case eFileAddErr.eOLE_OEFileIsPasswordProtected:                                            // 암호화 되어있을때 
+                //    str = xmlConf.GetTitle("T_eOLE_OEFileIsPasswordProtected");
+                //    break;
+                //case eFileAddErr.eOLE_OEFileTypeNotSupported:                                               // 지원하지 않는 파일형식일때
+                //    str = xmlConf.GetTitle("T_eOLE_OEFileTypeNotSupported");
+                //    break;
+                //case eFileAddErr.eOLE_DirectoryNotFoundException:                                           // outfolder 찾을 수 없을때
+                //    str = xmlConf.GetTitle("T_eOLE_DirectoryNotFoundException");
+                //    break;
+                //case eFileAddErr.eOLE_FileNotFoundException:                                                // inputfile 파일을 찾을수 없을때
+                //    str = xmlConf.GetTitle("T_eOLE_FileNotFoundException");
+                //    break;
+                //case eFileAddErr.eOLE_ArgumentNullException:                                                // inputfile, outfolder null 일때
+                //    str = xmlConf.GetTitle("T_eOLE_ArgumentNullException");
+                //    break;
+                //case eFileAddErr.eOLE_OEFileIsCorrupt:                                                      // Excel workbook 찾을 수 없을때, 
+                //    str = xmlConf.GetTitle("T_eOLE_OEFileIsCorrupt");
+                //    break;
+                //case eFileAddErr.eOLE_UnDefinedError:                                                       // 정의되지 않은 에러
+                //    str = xmlConf.GetTitle("T_eOLE_UnDefinedError");
+                //    break;
+                //case eFileAddErr.eOLE_Inner_Ext:                                                            //문서내 OLE 개체의 확장자 제한 파일 포함
+                //    str = xmlConf.GetTitle("T_eOLE_Inner_Ext");
+                //    break;
                 #endregion
 
                 default:
@@ -1481,8 +1537,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             string strFileReName = strFileRelativePath;
             /*string strFileReName = GetFileRename(true, strFileRelativePath);
-			byte[] temp = Encoding.Default.GetBytes(strFileReName);
-			strFileReName = Encoding.UTF8.GetString(temp);*/
+            byte[] temp = Encoding.Default.GetBytes(strFileReName);
+            strFileReName = Encoding.UTF8.GetString(temp);*/
 
             Log.Logger.Here().Information("FilePath Length - Check(MaxLength:{0}) : filename : {1}(length : {2})", m_nFilePathMax, strFileReName, strFileReName.Length);
             if (strFileReName.Length > m_nFilePathMax)                          // 전체 경로 길이 확인 (90 / 250자)
@@ -1499,8 +1555,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             // 특수문자로 변환전 길이에 대해서 체크
             /*string strFileReName = GetFileRename(true, strFileRelativePath);
-			byte[] temp = Encoding.Default.GetBytes(strFileReName);
-			strFileReName = Encoding.UTF8.GetString(temp);*/
+            byte[] temp = Encoding.Default.GetBytes(strFileReName);
+            strFileReName = Encoding.UTF8.GetString(temp);*/
 
             char sep;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -2199,9 +2255,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             ListFile.Clear();
             string strFilePathList = System.IO.File.ReadAllText(strFilePath);
             /*
-			char sep = (char)'\n';
-			string[] strArray = strFilePathList.Split(sep);
-			*/
+            char sep = (char)'\n';
+            string[] strArray = strFilePathList.Split(sep);
+            */
             string[] strArray = strFilePathList.Split('\n').ToArray();
             int count = 0;
             foreach (var item in strArray)
@@ -3085,14 +3141,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             try
             {
                 if (String.Compare(strExt, "egg", true) == 0) return IsEGG(btFileData, strExt);
+
                 if (String.Compare(strExt, "doc", true) == 0 || String.Compare(strExt, "docx", true) == 0)
                     return IsWord(btFileData, strExt);
+
                 if (String.Compare(strExt, "xls", true) == 0 || String.Compare(strExt, "xlsx", true) == 0)
                     return IsXls(btFileData, strExt);
+
                 if (String.Compare(strExt, "ppt", true) == 0 || String.Compare(strExt, "pptx", true) == 0)
                     return IsPPT(btFileData, strExt);
+
                 if (String.Compare(strExt, "xps", true) == 0) return IsXPS(btFileData, strExt);
+
                 if (String.Compare(strExt, "hwp", true) == 0) return IsHWP(btFileData, strExt);
+
                 if (String.Compare(strExt, "txt", true) == 0 || String.Compare(strExt, "log", true) == 0 ||
                     String.Compare(strExt, "ini", true) == 0 || String.Compare(strExt, "sql", true) == 0 ||
                     String.Compare(strExt, "conf", true) == 0)
@@ -3256,7 +3318,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// 파일확장자 위변조 검사 수행 
+        /// 파일확장자 위변조 검사 수행
         /// <br> </br>stFile : 위변조 검사 대상 파일의 MemoryStream or FileStream 
         /// <br> </br>strExt : 위변조 검사 대상 파일의 확장자 
         /// </summary>
@@ -3331,6 +3393,50 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (CheckExtForFileByteData(btFileData, strExt) == true) return eFileAddErr.eFANone;
 
             return eFileAddErr.eUnZipInnerExtChange;
+        }
+
+        /// <summary>
+        /// 문서 내 OLE 개체의 파일확장자 위변조 검사 수행 
+        /// <br> </br>stFile : 위변조 검사 대상 파일의 MemoryStream or FileStream 
+        /// <br> </br>strExt : 위변조 검사 대상 파일의 확장자 
+        /// </summary>
+        /// <param name="stFile"></param>
+        /// <param name="strExt"></param>
+        /// <param name="blAllowDRM"></param>
+        /// <returns></returns>
+        public bool IsValidFileExtOfOLEObject(Stream stFile, string strExt, bool blAllowDRM = true)
+        {
+            byte[] btFileData = StreamToByteArray(stFile, MaxBufferSize);
+
+            /* Check DRM File */
+            if (IsDRM(btFileData) == true)
+            {
+                Log.Information($"[IsValidFileExtOnOLEObject] IsDRM - Ext[{strExt}] AllowDrm[{blAllowDRM}]");
+                return (blAllowDRM == true);
+            }
+
+            string strFileMime = MimeGuesser.GuessMimeType(btFileData);
+            Log.Information($"[IsValidFileExtOnOLEObject] FileMime[{strFileMime}] Ext[{strExt}] AllowDrm[{blAllowDRM}]");
+
+            // 0kb			
+            if (bEmptyFIleNoCheck && String.Compare(strFileMime, "application/x-empty") == 0)
+                return true;
+
+            if (String.Compare(strFileMime, "text/plain") == 0)
+                return true;
+
+            if (String.IsNullOrEmpty(strExt) == true)
+            {
+                Log.Information($"[IsValidFileExtOnOLEObject] Extension is Empty - FileMime[{strFileMime}] Ext[{strExt}] AllowDrm[{blAllowDRM}]");
+                return (String.Compare(strFileMime, "application/x-executable") == 0);
+            }
+
+            //OLE 개체의 Mime 체크는 scanOLEMimeType 함수에서 처리
+            //if (IsValidMimeAndExtension(strFileMime, strExt) == true) return eFileAddErr.eFANone;
+
+            strExt = strExt.Replace(".", "");
+            btFileData = StreamToByteArray(stFile, MaxBufferSize2);
+            return (CheckExtForFileByteData(btFileData, strExt) == true);
         }
 
         /// <summary>
@@ -4275,6 +4381,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             ["x-epoc/x-sisx-app"] = "sisx",
         });
 
+        /// <summary>
+        /// OLE개체의 마임타입 리스트
+        /// </summary>
+        private static Lazy<Dictionary<string, string>> gOLEMimeTypeMap = new Lazy<Dictionary<string, string>>(() => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+
         public static bool IsValidMimeAndExtension(string mime, string fileName)
         {
             string fileExt = fileName;
@@ -4303,7 +4414,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="strMime"></param>
         /// <param name="strExt"></param>
-        public void AddOrUpdate(string strMime, string strExt)
+        public void MimeTypeMapAddOrUpdate(string strMime, string strExt)
         {
             if (gMimeTypeMap.Value.TryGetValue(strMime, out string result))
             {
@@ -4312,6 +4423,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             else
             {
                 gMimeTypeMap.Value[strMime] = strExt;
+            }
+        }
+
+        /// <summary>
+        /// OLE 개체의 파일확장자 및 MimeType 정보 등록 및 갱신
+        /// </summary>
+        /// <param name="strMime"></param>
+        /// <param name="strExt"></param>
+        public void OLEMimeTypeMapAddOrUpdate(string strMime, string strExt)
+        {
+            if (gOLEMimeTypeMap.Value.TryGetValue(strMime, out string result))
+            {
+                gOLEMimeTypeMap.Value[strMime] += " " + strExt;
+            }
+            else
+            {
+                gOLEMimeTypeMap.Value[strMime] = strExt;
             }
         }
 
@@ -4388,10 +4516,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 // KKW
                 /*if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
-				{
-					enRet = eFileAddErr.eUnZipInnerLeftZip;
-					AddDataForInnerZip(nTotalErrCount, strOrgZipFile, strOrgZipFileRelativePath, strOverMaxDepthInnerZipFile, enRet);
-				}*/
+                {
+                    enRet = eFileAddErr.eUnZipInnerLeftZip;
+                    AddDataForInnerZip(nTotalErrCount, strOrgZipFile, strOrgZipFileRelativePath, strOverMaxDepthInnerZipFile, enRet);
+                }*/
 
                 //if (enRet == eFileAddErr.eFAZipPW) AddData(strOrgZipFile, enRet, strOrgZipFileRelativePath);
 
@@ -4623,23 +4751,70 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return enErr;
         }
 
-        public async Task<int> CheckOLEObject(HsStream hsStream, FileAddErr currentFile, bool blWhite, string strExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount)
+        public async Task<int> CheckDocumentFile(HsStream hsStream, FileAddErr currentFile, int documentExtractType, bool isWhite, bool isOLEMimeTypeWhite, string FileFilterExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount)
         {
-            string strOLEExtractPath = Path.Combine("Temp", "OLEExtract");
+            string strCompressExtractPath = Path.Combine("Temp", "Document_CompressExtract");   //사용예정
+
+            Log.Information($"[CheckDocumentFile] DocumentFile[{Path.GetFileName(hsStream.FileName)}] Ext[White({isWhite})-Info({FileFilterExtInfo})]");
+
+            bool usecheckOLE = true;
+            bool usecheckOLE_Mime = true;  //기본 OLE 기능 - OLE 검출 함수 호출 여부
+            bool usecheckOLE_Extension = true; //OLE 검사 옵션1 - OLE개체 마임리스트 검사 여부
+
+            bool usecheckCompress = true;
+            bool usecheckCompress_Extension = true;    //OLE 검사 옵션2 - OLE개체 확장자제한,위변조제한 검사 여부
+
+            DocumentExtractType documentExtract = (DocumentExtractType)documentExtractType;
+
+
+            //압축형식 검사 옵션1 - 압축 문서 내 확장자제한,위변조제한 검사 여부
+
+            if (documentExtract.HasFlag(DocumentExtractType.COMPRESS_EXTRACT))
+            {
+                string a = "";
+                //await scanDocumentFileByCompressObject(hsStream, currentFile, isWhite, isOLEMimeTypeWhite, FileFilterExtInfo, usecheckOLE_Mime, usecheckOLE_Extension);
+            }
+
+            if (documentExtract.HasFlag(DocumentExtractType.OLEOBJECT_EXTRACT))
+            {
+                await scanDocumentFileByOLEObject(hsStream, currentFile, isWhite, isOLEMimeTypeWhite, FileFilterExtInfo, usecheckOLE_Mime, usecheckOLE_Extension);
+            }
+
+
+
+
+
+
+            return (currentFile.HasChildrenErr) ? -1 : 0;
+
+        }
+
+        /// <summary>
+        /// OLE 개체 방식으로 문서 검사
+        /// </summary>
+        /// <param name="hsStream">검사 대상 문서</param>
+        /// <param name="currentFile">검사 대상 문서의 FIleAddErr 객체</param>
+        /// <param name="isWhite">기존 FileFilterType</param>
+        /// <param name="isOLEMimeTypeWhite">OLE개체용 FileFilterType (OLECHECKMIMETYPE)</param>
+        /// <param name="FileFilterExtInfo">기존 FileFilter목록</param>
+        /// <param name="useCheckOLEMime">마임리스트 매칭 검사 여부</param>
+        /// <param name="usecheckOLEExtension">확장자 제한 및 위변조 검사 여부</param>
+        /// <returns></returns>
+        async Task<int> scanDocumentFileByOLEObject(HsStream hsStream, FileAddErr currentFile, bool isWhite, bool isOLEMimeTypeWhite, string FileFilterExtInfo, bool useCheckOLEMime, bool usecheckOLEExtension)
+        {
+            string strOLEExtractPath = Path.Combine("Temp", "Document_OLEExtract");
+
             try
             {
-                string strOLEExtractFilePath = Path.Combine(strOLEExtractPath, Path.GetFileNameWithoutExtension(hsStream.FileName));                              //Temp에 Copy된 문서의 OLE 개체를 보관할 폴더
-
                 // Create Temp && Temp/OLEExtract Directory 
+                string strOLEExtractFilePath = Path.Combine(strOLEExtractPath, Path.GetFileNameWithoutExtension(hsStream.FileName));                              //Temp에 Copy된 문서의 OLE 개체를 보관할 폴더
                 DirectoryInfo dirOLEObjectBase = new DirectoryInfo(strOLEExtractFilePath);
                 if (!dirOLEObjectBase.Exists)
                     dirOLEObjectBase.Create();
 
-                Log.Information($"[CheckOLEObject] DocumentFile[{Path.GetFileName(hsStream.FileName)}] Ext[White({blWhite})-Info({strExtInfo})]");
-
                 Stream fileStream = hsStream.stream;
 
-                //Docuement로 OLE 개체 검사 시작
+                //Docuement로 OLE 개체 검사 모듈 실행
                 using (MemoryStream fileMemoryStream = new MemoryStream())
                 {
                     if (hsStream.MemoryType == HsStreamType.MemoryStream)
@@ -4654,7 +4829,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     }
 
                     int result = OfficeExtractor.Controller.ExcuteExtractor(fileMemoryStream, hsStream.FileName, strOLEExtractFilePath);
-                    Log.Information($"[CheckOLEObject]  ExcuteExtractor DocumentFile[{Path.GetFileName(hsStream.FileName)}] result[{result}]");
+                    Log.Information($"[scanDocumentFileByOLEObject]  ExcuteExtractor DocumentFile[{Path.GetFileName(hsStream.FileName)}] result[{result}]");
 
                     if (result == 0)        //검출된 OLE 개체 없음
                         return 0;
@@ -4666,50 +4841,238 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         currentFile.ChildrenFiles = null;
                         return result;
                     }
-
-                    //OLE 개체 검출 시 개체 Scan 작업
-                    return ScanOLEFile(currentFile, dirOLEObjectBase, blWhite, strExtInfo);
                 }
+
+                //검출된 OLE 파일 대상 검사
+                foreach (FileInfo oleObject in dirOLEObjectBase.GetFiles())
+                {
+                    FileAddErr oleFile = currentFile.CreateChildren(oleObject.Name, oleObject.FullName, currentFile.FileName);
+                    Stream oleFileStream = File.OpenRead(oleObject.FullName);
+                    byte[] btFileData = StreamToByteArray(oleFileStream, MaxBufferSize);
+                    string oleFileMime = MimeGuesser.GuessMimeType(btFileData);
+                    string oleFileExtension = oleFile.FileName.Substring(oleFile.FileName.LastIndexOf('.') + 1);
+
+                    // Check Empty File 
+                    // 0kb 파일 Block
+                    if (bEmptyFIleNoCheck == false && oleFileStream.Length <= 0)
+                    {
+                        oleFile.eErrType = eFileAddErr.eFAEMPTY;
+                        currentFile.HasChildrenErr = true;
+                        continue;
+                    }
+
+                    if (useCheckOLEMime)  //기능1
+                    {
+                        //OLE개체의 마임리스트 체크 
+                        if (!IsValidOLEMimeType(oleFileMime, oleObject.Name, isOLEMimeTypeWhite))
+                        {
+                            oleFile.eErrType = eFileAddErr.eFADOC_OLE_MIME;
+                            currentFile.HasChildrenErr = true;
+                            continue;
+                        }
+                    }
+
+                    if (usecheckOLEExtension)   //기능2
+                    {
+                        //기본 확장자 제한 black, white 리스트 체크
+                        if (!GetRegExtEnable(isWhite, FileFilterExtInfo, oleFileExtension))
+                        {
+                            oleFile.eErrType = eFileAddErr.eFADOC_OLE_EXTENSION;
+                            currentFile.HasChildrenErr = true;
+                            continue;
+                        }
+
+                        //위변조 제한, 0KB 체크
+                        if (!IsValidFileExtOfOLEObject(oleFileStream, oleFileExtension))
+                        {
+                            oleFile.eErrType = eFileAddErr.eFADOC_OLE_CHANGE;
+                            currentFile.HasChildrenErr = true;
+                            continue;
+                        }
+                    }
+                }
+                return (currentFile.HasChildrenErr) ? -1 : 0;
             }
             catch (Exception ex)
             {
-                Log.Error($"[CheckOLEObject] Exception = [{ex.ToString()}]");
+                Log.Error($"[scanDocumentFileByOLEObject] Exception = [{ex.ToString()}]");
+                return -1;
+            }
+            finally
+            {
+
+                try
+                { Directory.Delete(strOLEExtractPath, true); }
+                catch (System.Exception err)
+                { Log.Warning("[scanDocumentFileByOLEObject] Fail Directory.Delete() " + err.Message + " " + err.GetType().FullName); }
+            }
+        }
+
+        /// <summary>
+        /// OLE개체 마임타입 체크
+        /// <para>gOLEMimeTypeMap과 mime 비교</para>
+        /// </summary>
+        /// <param name="mime">해당파일의 MIME</param>
+        /// <param name="fileName">파일명</param>
+        /// <param name="isOLEMimeWhite">OLE개체 검사의 MimeList의 W/B 여부(Tag:OLECHECKMIMETYPE)</param>
+        /// <returns></returns>
+        private bool IsValidOLEMimeType(string mime, string fileName, bool isOLEMimeWhite)
+        {
+            string fileExt = fileName;
+            var ind = fileExt.LastIndexOf('.');
+            if (ind != -1 && fileExt.Length > ind + 1)
+                fileExt = fileName.Substring(ind + 1).ToLower();
+
+            bool existsInMimeList = false;
+            if (gOLEMimeTypeMap.Value.TryGetValue(mime, out string result))
+            {
+                Log.Debug($"IsValidOLEMimeType, Get Extensions[{result}] for Mime[{mime}] (isOLEMimeWhite[{isOLEMimeWhite}])");
+                string[] exts = result.Split(' ');
+                foreach (var ext in exts)
+                {
+                    //OLE 마임리스트에 존재 시 false 처리
+                    if (string.Compare(fileExt, ext) == 0)
+                    {
+                        existsInMimeList = true;
+                        break;
+                    }
+                }
+            }
+            return (isOLEMimeWhite) ? existsInMimeList : !existsInMimeList;
+        }
+
+        /// <summary>
+        /// 압축형식 개체 방식으로 문서 검사
+        /// </summary>
+        /// <param name="hsStream">검사 대상 문서</param>
+        /// <param name="currentFile">검사 대상 문서의 FIleAddErr 객체</param>
+        /// <param name="isWhite">기존 FileFilterType</param>
+        /// <param name="isOLEMimeTypeWhite">OLE개체용 FileFilterType (OLECHECKMIMETYPE)</param>
+        /// <param name="FileFilterExtInfo">기존 FileFilter목록</param>
+        /// <param name="useCheckOLEMime">마임리스트 매칭 검사 여부</param>
+        /// <param name="usecheckOLEExtension">확장자 제한 및 위변조 검사 여부</param>
+        /// <returns></returns>
+        async Task<int> scanDocumentFileByCompressObject(HsStream hsStream, FileAddErr currentFile, bool isWhite, bool isOLEMimeTypeWhite, string FileFilterExtInfo, bool useCheckOLEMime, bool usecheckOLEExtension)
+        {
+            string strCompressExtractPath = Path.Combine("Temp", "Document_CompressExtract");
+
+            try
+            {
+                // Create Temp && Temp/OLEExtract Directory 
+                string strCompressExtractFilePath = Path.Combine(strCompressExtractPath, Path.GetFileNameWithoutExtension(hsStream.FileName));                              //Temp에 Copy된 문서의 압축형식으로 추축된 파일을 보관할 폴더
+                DirectoryInfo dirOLEObjectBase = new DirectoryInfo(strCompressExtractFilePath);
+                if (!dirOLEObjectBase.Exists)
+                    dirOLEObjectBase.Create();
+
+                Stream fileStream = hsStream.stream;
+
+                //Document 압축형식으로 압축해제
+                var opts = new SharpCompress.Readers.ReaderOptions();
+                var encoding = Encoding.Default;
+                byte[] buff = null;
+                //using (FileStream fsSource = new FileStream(hsStream., FileMode.Open, FileAccess.Read))
+                //{
+                BinaryReader br = new BinaryReader(fileStream);
+                long numBytes = 8;
+                buff = br.ReadBytes((int)numBytes);
+
+                //Zip File Foramt : Local File Header 구조 바이트 차트
+                //Signature 4byte / Version 2Byte / Flags 2Byte / => Flags Bit가 서로 다름 Mac의 경우 8 그 이외는 0
+                encoding = (buff[6] == 0x08) ? Encoding.Default : Encoding.GetEncoding(949);
+                //}
+
+                opts.ArchiveEncoding = new SharpCompress.Common.ArchiveEncoding();
+                opts.ArchiveEncoding.CustomDecoder = (data, x, y) =>
+                {
+                    return encoding.GetString(data);
+                };
+
+                //압축형식으로 포함된 파일 검사
+                using (MemoryStream fileMemoryStream = new MemoryStream())
+                {
+                    if (hsStream.MemoryType == HsStreamType.MemoryStream)
+                    {
+                        byte[] buf = new byte[fileStream.Length];
+                        await fileStream.ReadAsync(buf, 0, (int)fileStream.Length);
+                        fileMemoryStream.Write(buf);
+                    }
+                    else if (hsStream.MemoryType == HsStreamType.FileStream)
+                    {
+                        fileStream.CopyTo(fileMemoryStream);
+                    }
+
+                    int result = OfficeExtractor.Controller.ExcuteExtractor(fileMemoryStream, hsStream.FileName, strCompressExtractFilePath);
+                    Log.Information($"[scanDocumentFileByOLEObject]  ExcuteExtractor DocumentFile[{Path.GetFileName(hsStream.FileName)}] result[{result}]");
+
+                    if (result == 0)        //검출된 OLE 개체 없음
+                        return 0;
+
+                    if (result < 0)      //OLE 개체 검출 중 오류 발생
+                    {
+                        //오류 표시
+                        currentFile.eErrType = GetOLEError(result);
+                        currentFile.ChildrenFiles = null;
+                        return result;
+                    }
+                }
+
+                //검출된 OLE 파일 대상 검사
+                foreach (FileInfo oleObject in dirOLEObjectBase.GetFiles())
+                {
+                    FileAddErr oleFile = currentFile.CreateChildren(oleObject.Name, oleObject.FullName, currentFile.FileName);
+                    Stream oleFileStream = File.OpenRead(oleObject.FullName);
+
+                    byte[] btFileData = StreamToByteArray(oleFileStream, MaxBufferSize);
+                    string oleFileMime = MimeGuesser.GuessMimeType(btFileData);
+                    string oleFileExtension = oleFile.FileName.Substring(oleFile.FileName.LastIndexOf('.') + 1);
+
+
+                    if (useCheckOLEMime)  //기능1
+                    {
+                        //OLE개체의 마임리스트 체크 
+                        if (!IsValidOLEMimeType(oleFileMime, oleObject.Name, isOLEMimeTypeWhite))
+                        {
+                            oleFile.eErrType = eFileAddErr.eFADOC_OLE_MIME;
+                            currentFile.HasChildrenErr = true;
+                            continue;
+                        }
+                    }
+
+                    if (usecheckOLEExtension)   //기능2
+                    {
+                        //기본 확장자 제한 black, white 리스트 체크
+                        if (!GetRegExtEnable(isWhite, FileFilterExtInfo, oleFileExtension))
+                        {
+                            oleFile.eErrType = eFileAddErr.eFADOC_OLE_EXTENSION;
+                            currentFile.HasChildrenErr = true;
+                            continue;
+                        }
+
+                        //위변조 제한
+                        if (!IsValidFileExtOfOLEObject(oleFileStream, oleFileExtension))
+                        {
+                            oleFile.eErrType = eFileAddErr.eFADOC_OLE_CHANGE;
+                            currentFile.HasChildrenErr = true;
+                            continue;
+                        }
+                    }
+                }
+
+                return (currentFile.HasChildrenErr) ? -1 : 0;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[scanDocumentFileByOLEObject] Exception = [{ex.ToString()}]");
                 return -1;
             }
             finally
             {
                 try
-                { Directory.Delete(strOLEExtractPath, true); }
+                { Directory.Delete(strCompressExtractPath, true); }
                 catch (System.Exception err)
-                { Log.Warning("[CheckOLEObject] Directory.Delete() " + err.Message + " " + err.GetType().FullName); }
+                { Log.Warning("[scanDocumentFileByOLEObject] Fail Directory.Delete() " + err.Message + " " + err.GetType().FullName); }
             }
         }
-
-        /// <summary>
-        /// 문서파일의 경우, OLE 개체를 검사하여 개체들 확인
-        /// </summary>
-        /// <param name="parentDocFile"></param>
-        /// <param name="dicOLEObject"></param>
-        /// <param name="blWhite"></param>
-        /// <param name="strExtInfo"></param>
-        int ScanOLEFile(FileAddErr parentDocFile, DirectoryInfo dicOLEObject, bool blWhite, string strExtInfo)
-        {
-            //검출된 OLE 파일 표시
-            foreach (FileInfo oleObject in dicOLEObject.GetFiles())
-            {
-                FileAddErr childFile = parentDocFile.CreateChildren(oleObject.Name, oleObject.FullName, parentDocFile.FileName);
-
-                //검출된 OLE 파일의 black, white 리스트 체크
-                if (GetRegExtEnable(blWhite, strExtInfo, oleObject.Extension.Substring(1)) == false)
-                {
-                    parentDocFile.HasChildrenErr = true;
-                    childFile.eErrType = eFileAddErr.eOLE_Inner_Ext;
-                }
-            }
-
-            return (parentDocFile.HasChildrenErr) ? -1 : 0;
-        }
-
         public void LoadMimeConf(int groupID)
         {
             string strFileName = String.Format("FileMime.{0}.conf", groupID.ToString());
@@ -4741,12 +5104,52 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     string[] strSplit = strMimeList[i].Split(' ');
                     if (strSplit.Length < 2)
                         continue;
-                    AddOrUpdate(strSplit[0], strSplit[1]);
+                    MimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
                 }
             }
             catch (FileNotFoundException ioEx)
             {
                 Log.Information("LoadMimeConf Exception Msg = [{0}]", ioEx.Message);
+            }
+        }
+
+        public void LoadOLEMimeConf(int groupID)
+        {
+            string strFileName = String.Format("OLEFileMime.{0}.conf", groupID.ToString());
+            strFileName = Path.Combine("wwwroot/conf", strFileName);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                strFileName = strFileName.Replace("/", "\\");
+            }
+            else
+            {
+                strFileName = strFileName.Replace("\\", "/");
+            }
+            try
+            {
+                string strEncMimeInfo = System.IO.File.ReadAllText(strFileName);
+                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                string strMimeInfo = sgRSACrypto.MimeConfDecrypt(strEncMimeInfo);
+
+                if (strMimeInfo.Equals(""))
+                    return;
+
+                if (strMimeInfo[strMimeInfo.Length - 1] == '\n')
+                    strMimeInfo = strMimeInfo.Substring(0, strMimeInfo.Length - 1);
+                string[] strMimeList = strMimeInfo.Split('\n');
+                if (strMimeList.Length <= 1)
+                    return;
+                for (int i = 1; i < strMimeList.Length; i++)
+                {
+                    string[] strSplit = strMimeList[i].Split(' ');
+                    if (strSplit.Length < 2)
+                        continue;
+                    OLEMimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
+                }
+            }
+            catch (FileNotFoundException ioEx)
+            {
+                Log.Information("LoadOLEMimeConf Exception Msg = [{0}]", ioEx.Message);
             }
         }
     }
