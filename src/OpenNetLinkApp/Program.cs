@@ -28,12 +28,7 @@ namespace OpenNetLinkApp
             bool flagMutex;
             System.Threading.Mutex m_hMutex = new System.Threading.Mutex(true, "OpenNetLink", out flagMutex);
 
-//#if DEBUG
-#if (DEBUG || !DEBUG)
-            if (true)
-#else
             if (flagMutex)
-#endif
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
