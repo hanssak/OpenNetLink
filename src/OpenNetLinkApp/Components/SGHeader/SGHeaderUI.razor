@@ -427,10 +427,12 @@
 </ul>
 
 <SGAlert @ref="refSGAlert" Guid="modal-alert-header" OnConfirm="SfmLogOut"></SGAlert>
+<SGAlert @ref="refSGAlertUpdatePolicy" Guid="modal-alert-header-updatepolicy" OnConfirm="UpdatPolicyLogOut"></SGAlert>
 <SGAlert @ref="refAfterApproveChangeAlert" Guid="modal-afterapprovealert-header" OnConfirm="StateHasChanged"></SGAlert>
 @code
 {
     SGAlert refSGAlert;
+    SGAlert refSGAlertUpdatePolicy;
     SGAlert refAfterApproveChangeAlert;
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
@@ -819,6 +821,7 @@
 
                 //activeMenu = SideBarUISvc.FindSubMenu(listNetWork[i].GroupID, 0, 0);
                 activeMenu = SideBarUISvc.FindRootMenu(listNetWork[i].GroupID);
+
                 if (activeMenu != null)
                 {
                     ChangeActiveMenuWrap(eventArgs, activeMenu);
@@ -849,6 +852,13 @@
             LogOut(Convert.ToInt32(arg));
 
         pageService.SetSFMChecking(false);
+    }
+
+    private void UpdatPolicyLogOut(string arg)
+    {
+
+        if (String.IsNullOrEmpty(arg))
+            LogOut(Convert.ToInt32(arg));
     }
 
     private void goToUserInfo()
@@ -1593,6 +1603,8 @@
         listNetWorkData = NetWorkSvc.NetWorkInfo;
         nGroupID = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
         HsCmdCenter.sgPageEvent.SetSFMRefreshEvent(SendUserSFMInfo);
+        HsCmdCenter.sgPageEvent.SetUpdatePolicyEvent(UpdatePolicy);
+        HsCmdCenter.sgPageEvent.SetFileMimeRecvEvent(FileMimeRecvEvent);
         pageService.SetAfterApprCommonNotiEvent(AfterApproveStatusChange); //사후정책 노티
 
         DayTimer = new Timer();
@@ -1735,7 +1747,189 @@
 
         return true;
     }
+    /// <summary>
+    /// 정책 업데이트 노티 발생시 동작
+    /// </summary>
+    /// <param name="groupId"></param>
+    private void UpdatePolicy(int groupId)
+    {
 
+        HsNetWork hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
+
+        if (hsNetWork == null)
+            return;
+
+        ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupId);
+        if (sgUserData == null)
+            return;
+
+        //파일 Mime 정보 갱신 요청
+        hsNetWork.getFileSvrFileMime(hsNetWork.GetFileMimeHash());
+
+        //URL List Data 요청
+        HsCmdCenter.RequestUrlList(groupId, sgUserData.UserId);
+
+        //UserInfo 재요청 - 결재라인 정보, SFM 정보, 시스템 환경설정정보 갱신
+        HsCmdCenter.SendApproveLine(groupId, sgUserData.UserId);
+
+        //UserInfoCheck를 요청하여 사용자의 정보 갱신
+        HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eUSERINFOCHECK, ResultUserInfoCheck);
+        HsCmdCenter.SendUserInfoCheck(groupId, sgUserData.UserId);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
+    public void ResultUserInfoCheck(int groupId, object[] e)
+    {
+        SGData sgData = e[0] as SGData;
+
+        HsNetWork hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
+
+        if (hsNetWork == null)
+            return;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
+        if (sgLoginData == null)
+            return;
+
+        List<string> listReLoginTagName = new List<string>(){
+        "POLICYFLAG", "APPROVEPROXYRIGHT",
+        "APPROVEUSETYPE", "CLIPPOLICYFLAG", "OTP", "MANUALDOWNLOAD"
+    };
+        List<string> listSetTagName = new List<string>(){
+        "FILEFILTER", "FILELIMITSIZE", "FILEFILTERTYPE", "DAYFILETRANSFERLIMITSIZE", "DAYFILETRANSFERLIMITCOUNT", "DAYCLIPBOARDCOUNT",
+        "DAYCLIPBOARDSIZE", "CLIPBOARDSIZE", "MAXFILETRANSFERCOUNT", "AFTERAPPROVE", "DELETECYCLE", "FILEPARTSIZE", "FILEBANDWIDTH",
+        "SCRLOCK","HOLIDAY"
+    };
+
+        //ReLoginTagName 해당하는 데이터가 수정됬을 경우 ReLogin 필요
+        foreach (string str in listReLoginTagName)
+        {
+            if (isChangePolicyReRun(groupId, str, sgLoginData, sgData))
+                return;
+        }
+        //UserinfoCheck에서 받은 정보를 LoginData에 갱신
+        foreach (string str in listSetTagName)
+        {
+            string strValEnc = strValEnc = SGCrypto.AESEncrypt256(sgData.GetSvrRecordTagData(str), hsNetWork.GetBase64Seedkey()).ByteToBase64String().Base64EncodingStr();
+            sgLoginData.SetTagData(str, strValEnc);
+        }
+
+
+        //파일분기사이즈, 파일밴드범위, Link체크
+        Int64 nFilePartSize = sgLoginData.GetFilePartSize();
+        Int64 nFileBandWidth = sgLoginData.GetFileBandWidth();
+        int nLinkCheckTime = sgLoginData.GetLinkCheckTime();
+        nLinkCheckTime = (nLinkCheckTime * 2) / 3;
+        bool bDummy = sgLoginData.GetUseDummyPacket();
+        hsNetWork.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);
+        
+        //pageService에 변경된 내용 갱신
+        DateTime dt = sgLoginData.GetSvrTimeConvert();
+        pageService.SetSvrTime(groupId, dt);
+        bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+        bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
+        pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
+        pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
+
+        bool bAfterCheck = false;
+        if (!bAfterApprEnable)
+            bAfterCheck = false;
+        else
+            bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+
+        pageService.SetAfterApproveCheck(groupId, bAfterCheck);
+        Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
+        int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
+        Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
+        int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
+        pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
+
+        SendDayFileInfo(groupId);
+
+        return;
+
+    }
+    /// <summary>
+    /// 일일파일전송, 클립보드 전송 요청
+    /// </summary>
+    /// <param name="groupId"></param>
+    public void SendDayFileInfo(int groupId)
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        int groupID = groupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HsCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
+    }
+    /// <summary>
+    /// 정책 변경시 로그아웃 처리
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="strTagName"></param>
+    /// <param name="sgLoginData"></param>
+    /// <param name="sgData"></param>
+    /// <returns></returns>
+    private bool isChangePolicyReRun(int groupId, string strTagName, SGLoginData sgLoginData, SGData sgData)
+    {
+        string strDataOrg = sgLoginData.GetTagData(strTagName);
+        string strDataNew = sgData.GetSvrRecordTagData(strTagName);
+
+        if (String.IsNullOrEmpty(strDataOrg) || String.IsNullOrEmpty(strDataNew))
+            return false;
+
+        if (!strDataOrg.Equals(strDataNew))
+        {
+            //로그아웃 화면 보여주기
+            List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+
+            string str = String.Empty;
+            foreach (ISGNetwork netWork in listNetWork)
+            {
+                if (netWork.GroupID == groupId)
+                {
+                    str = netWork.FromName;
+                }
+            }
+            str += xmlConf.GetTitle("T_INFO_UPDATEPOLICY_LOGOUT"); //" 을 정책 업데이트로 로그아웃 하겠습니다.";
+
+            refSGAlertUpdatePolicy.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), str, 1, groupId, groupId.ToString());
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public void FileMimeRecvEvent(int groupId)
+    {
+        PageStatusData statusData = pageService.GetPageStatus(groupId);
+        if (statusData == null)
+            return;
+        if (statusData.fileAddManage == null)
+            return;
+        statusData.fileAddManage.LoadMimeConf(groupId);
+    }
 
     public void AfterApproveStatusChange()
     {

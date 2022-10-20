@@ -55,7 +55,6 @@
     SGAlert refSGAlertApproveAfter;
     SGAlert refSGAlertApproveAfterMyCount;
 
-
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
     ClipBoardData clipPreSelectedData = new ClipBoardData();
@@ -1698,7 +1697,7 @@ catch (Exception ex)
             if (dic[5] != "0")
             {
                 checkLimit = true;
-                message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[5]);
+                message += String.Format(XmlConf.GetWarnMsg("W_0278"), dic[5]);
             }
         }
 
@@ -1744,7 +1743,7 @@ catch (Exception ex)
                 KeyboardEventArgs eventArgs = new KeyboardEventArgs();
                 eventArgs.Key = "Enter";
 
-                ISGSideBarUI activeMenu = SideBarUISvc.FindSubMenu(Convert.ToInt32(arg), "transferApprove");
+                ISGSideBarUI activeMenu = SideBarUISvc.FindSubMenu(Convert.ToInt32(arg), $"/transferApprove/{arg}");
                 ChangeActiveMenuWrap(eventArgs, activeMenu);
                 MyNavigationManager.NavigateTo($"/transferApprove/{arg}");
             }
@@ -1797,7 +1796,7 @@ catch (Exception ex)
                 if (dic[5] != "0")
                 {
                     checkLimit = true;
-                    message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[5]);
+                    message += String.Format(XmlConf.GetWarnMsg("W_0278"), dic[5]);
                 }
             }
 
@@ -2430,7 +2429,7 @@ catch (Exception ex)
 
                 ISGSideBarUI activeMenu = null;
                 string path = navURI.Substring(0, nPos);
-                activeMenu = SideBarUISvc.FindSubMenu(nGroupID, path);
+                activeMenu = SideBarUISvc.FindSubMenu(nGroupID, navURI);
 
                 if (activeMenu != null)
                 {
@@ -2598,45 +2597,48 @@ catch (Exception ex)
                 return;
             }
 
-            if (!pageService.GetSFMChecking())
+            if (!pageService.m_bFileSending && !pageService.m_bFileRecving)
             {
-                SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-                if (sgLoginData == null)
-                    return;
-                ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
-
-                //if (sgLoginData.GetApproveProxyRight() && sgUserData.GetUserApprPos() == 0)
-                //{
-                SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.GetSFMRefreshEvent();
-                if (sfmRefreshEvent != null)
+                if (!pageService.GetSFMChecking())
                 {
-                    sfmRefreshEvent(groupID);
-                }
-                //}
-            }
-            if (siteConfig.GetApproveAfterLimit(groupID))
-            {
-                if (!pageService.GetApproveAfterMyCountChecking())
-                {
-                    pageService.SetApproveAfterMyCountChecking(true);
-                    //사후 결재일때 자신의 사후 결재 카운트 체크
                     SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
                     if (sgLoginData == null)
-                    {
-                        pageService.SetApproveAfterMyCountChecking(false);
                         return;
-                    }
                     ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
-                    if (sgUserData == null)
-                    {
-                        pageService.SetApproveAfterMyCountChecking(false);
-                        return;
-                    }
-                    SGQueryExtend sGQueryExtend = new SGQueryExtend();
-                    string sql = sGQueryExtend.GetApproveAfterCount(sgUserData.UserSeq, Common.Enums.EnumApproveTime.After);
 
-                    HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eAPPROVEAFTERMYCOUNT, ResultApproveAfterMyCount);
-                    HsCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERMYCOUNT, groupID, sgLoginData.GetUserID(), sql);
+                    //if (sgLoginData.GetApproveProxyRight() && sgUserData.GetUserApprPos() == 0)
+                    //{
+                    SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.GetSFMRefreshEvent();
+                    if (sfmRefreshEvent != null)
+                    {
+                        sfmRefreshEvent(groupID);
+                    }
+                    //}
+                }
+                if (siteConfig.GetApproveAfterLimit(groupID))
+                {
+                    if (!pageService.GetApproveAfterMyCountChecking())
+                    {
+                        pageService.SetApproveAfterMyCountChecking(true);
+                        //사후 결재일때 자신의 사후 결재 카운트 체크
+                        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+                        if (sgLoginData == null)
+                        {
+                            pageService.SetApproveAfterMyCountChecking(false);
+                            return;
+                        }
+                        ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
+                        if (sgUserData == null)
+                        {
+                            pageService.SetApproveAfterMyCountChecking(false);
+                            return;
+                        }
+                        SGQueryExtend sGQueryExtend = new SGQueryExtend();
+                        string sql = sGQueryExtend.GetApproveAfterCount(sgUserData.UserSeq, Common.Enums.EnumApproveTime.After);
+
+                        HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eAPPROVEAFTERMYCOUNT, ResultApproveAfterMyCount);
+                        HsCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERMYCOUNT, groupID, sgLoginData.GetUserID(), sql);
+                    }
                 }
             }
             switch (e.strDummy)
@@ -3259,7 +3261,6 @@ catch (Exception ex)
         string strQuery = sgQueryExtend.GetSGNotify(strUserID);
         HsCmdCenter.SendBoardNotiSearch(groupID, strUserID, strQuery);
     }
-
 
     public void BoardNotifyResult(int groupid, PageEventArgs e)
     {

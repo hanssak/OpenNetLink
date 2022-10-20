@@ -770,15 +770,8 @@
     {
 
         int groupID = groupIDbyParam;
-        if (groupIDbyParam.ToString().Length > 0 && path.Length > 0)
-        {
-            // 명확하게 동작하게 하고 적용
-            string strLowPath = path.ToLower();
-            SelectSideBar(strLowPath);
 
-            path += "/";
-            path += groupID.ToString();
-        }
+        path += $"/{groupID}";
 
         string strNavigateUrl = path.ToLower();
 
@@ -790,6 +783,13 @@
             strNavigateUrl += groupID.ToString();
             path = strNavigateUrl;
         }
+
+        KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+        eventArgs.Key = "Enter";
+
+        ISGSideBarUI activeMenu = null;
+        activeMenu = SideBarUISvc.FindSubMenu(groupID, path);
+        ChangeActiveMenuWrap(eventArgs, activeMenu);
 
         MyNavigationManager.NavigateTo(path);
     }
