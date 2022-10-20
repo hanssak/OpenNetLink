@@ -1494,7 +1494,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="bSystem"></param>
         /// <returns></returns>
         public string GetDocumentExtractType(bool bSystem)
-            => (bSystem) ? GetTagData("I_CLIENT_ZIP_DEPTH") : GetTagData("E_CLIENT_ZIP_DEPTH");
+            => (bSystem) ? GetTagData("I_CLIENT_DOCUMENT_EXTRACT_TYPE") : GetTagData("E_CLIENT_DOCUMENT_EXTRACT_TYPE");
 
         /// <summary>
         /// value 값을 암호화해서 sgData에 저장

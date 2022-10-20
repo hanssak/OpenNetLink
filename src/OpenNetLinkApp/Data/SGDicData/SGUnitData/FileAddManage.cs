@@ -579,7 +579,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             ListFile = new List<string>();
             LoadMimeConf(groupID);
-            LoadOLEMimeConf(groupID);
+            //서버 적용 시 사용 예정
+            //LoadOLEMimeConf(groupID);
         }
         ~FileAddManage()
         {
@@ -4794,7 +4795,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return enErr;
         }
 
-        public async Task<int> CheckDocumentFile(HsStream hsStream, FileAddErr currentFile, bool isWhite, bool isOLEMimeTypeWhite, string FileFilterExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount)
+        public async Task<int> CheckDocumentFile(HsStream hsStream, FileAddErr currentFile, int documentExtractType, bool isWhite, bool isOLEMimeTypeWhite, string FileFilterExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount)
         {
             string strCompressExtractPath = Path.Combine("Temp", "Document_CompressExtract");   //사용예정
 
@@ -4807,17 +4808,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             bool usecheckCompress = true;
             bool usecheckCompress_Extension = true;    //OLE 검사 옵션2 - OLE개체 확장자제한,위변조제한 검사 여부
 
+            DocumentExtractType documentExtract = (DocumentExtractType)documentExtractType;
+
+
             //압축형식 검사 옵션1 - 압축 문서 내 확장자제한,위변조제한 검사 여부
 
-            if (usecheckOLE)
+            if (documentExtract.HasFlag(DocumentExtractType.COMPRESS_EXTRACT))
+            {
+                string a = "";
+                //await scanDocumentFileByCompressObject(hsStream, currentFile, isWhite, isOLEMimeTypeWhite, FileFilterExtInfo, usecheckOLE_Mime, usecheckOLE_Extension);
+            }
+
+            if (documentExtract.HasFlag(DocumentExtractType.OLEOBJECT_EXTRACT))
             {
                 await scanDocumentFileByOLEObject(hsStream, currentFile, isWhite, isOLEMimeTypeWhite, FileFilterExtInfo, usecheckOLE_Mime, usecheckOLE_Extension);
             }
 
-            if (usecheckCompress)
-            {
-                //await scanDocumentFileByCompressObject(hsStream, currentFile, isWhite, isOLEMimeTypeWhite, FileFilterExtInfo, usecheckOLE_Mime, usecheckOLE_Extension);
-            }
+
 
 
 
@@ -5186,7 +5193,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             catch (FileNotFoundException ioEx)
             {
-                Log.Information("LoadMimeConf Exception Msg = [{0}]", ioEx.Message);
+                Log.Information("LoadOLEMimeConf Exception Msg = [{0}]", ioEx.Message);
             }
         }
     }

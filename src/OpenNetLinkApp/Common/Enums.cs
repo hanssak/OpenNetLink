@@ -75,8 +75,9 @@ namespace OpenNetLinkApp.Common
         public enum DocumentExtractType
         {
             NONE = 0,
-            OLEOBJECT_EXTRACT = 1,
-            COMPRESS_EXTRACT = 2,
+            COMPRESS_EXTRACT = 1,
+            OLEOBJECT_EXTRACT = 2,
+            
         }
     }
 }
