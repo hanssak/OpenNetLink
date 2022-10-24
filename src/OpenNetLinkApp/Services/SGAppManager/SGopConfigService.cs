@@ -274,6 +274,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         /// <returns></returns>
         public bool GetUsePartialFileAddInTransfer();
+
+
+        public string GetApproveExtSelectType();
+
+        public bool GetUseApproveExt();
+
+        public bool GetUseInputSearchApproveExtTree();
+
     }
 
 
@@ -867,5 +875,22 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bUsePartialFileAddInTransfer;
         }
+		
+		
+        public string GetApproveExtSelectType()
+        {
+            return AppConfigInfo.strApproveExtApproverSearchType;
+        }
+
+        public bool GetUseApproveExt()
+        {
+            return AppConfigInfo.bUseApproveExt;
+        }
+
+        public bool GetUseInputSearchApproveExtTree()
+        {
+            return AppConfigInfo.bUseInputSearchApproveExtTree;
+        }
+
     }
 }

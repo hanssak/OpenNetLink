@@ -233,6 +233,8 @@
 <ReceiverSelect_PopUp @ref="refReceiverSelect_PopUp" OnSelectOK="ReceiverSelectOK"></ReceiverSelect_PopUp>
 @*<ReceiverSelect_TreePopUp @ref="refReceiverSelect_TreePopUp" OnSelectOK="ReceiverSelectOK"></ReceiverSelect_TreePopUp>*@
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
+<ApproveExtApproverSelect_PopUp @ref="refApproveExtApproverSelect_PopUp"></ApproveExtApproverSelect_PopUp>
+
 @*<ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>*@
 <ApproverSelect_StepPopUp @ref="refApproverSelect_StepPopUp"></ApproverSelect_StepPopUp>
 @*<Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>*@
@@ -263,6 +265,9 @@
     ApproverSelect_PopUp refApproverSelect_PopUp;
     //ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
+
+    ApproveExtApproverSelect_PopUp refApproveExtApproverSelect_PopUp;
+
     SGAlert refSGAlertApproveAfter;
     TransProgress refTransProgress;
 
@@ -354,6 +359,11 @@
     List<Dictionary<int, string>> detailData = null;
     int cntSendQuery = 0;   //쿼리 전송 횟수
     int cntRecvQuery = 0;   //쿼리 조회 결과 수신 횟수
+
+
+    // 파일목록 임시 받는 용도
+    List<HsStream> FileList = null;
+
 
     private void PopUpFileSelectOK(List<string> files)
     {
@@ -603,12 +613,28 @@
             await CheckApproveAfterLimit();
         else
         {
-            FileTrans();
-            //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
-            await stopClick();
-        }
+
+	        SGLoginData sgLoginData = null;
+	        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+	        if (sgLoginData == null)
+	            return;
+
+	        if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt())
+	        {
+	            await refApproveExtApproverSelect_PopUp.openPopUp();
+	        }
+	        else
+	        {
+	            FileTrans();
+	            //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+	            await stopClick();
+	        }
+
+    	}
 
     }
+
+
 
     private async Task CheckApprLine()
     {
@@ -781,9 +807,22 @@
         string strUserSeq = sgUserData.UserSeq;
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
 
-        string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
+    string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
+    if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1)
+        stApprLineSeq = "";
+    else if (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false)
+    {
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() &&
+            pageService.GetApproveExtFileTransWithApprove(groupID))
+        {
+            CLog.Here().Information($"FileTrans - NoApprove Policy - ApproveExt - Use Approve FileTrans !!!");
+        }
+        else
+        {
+            CLog.Here().Information($"FileTrans - NoApprove Policy - FileTrans !!!");
             stApprLineSeq = "";
+        }
+    }
 
         // Vip / 전결재자 / 결재미사용 / 사후결재사용시간아님 일때, 사전결재전송 강제
         if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
@@ -791,10 +830,9 @@
 
         // 3중망 상황 상관없이 결재Line 정보는 무조건 보내어, 서버에서 결정하도록 한다.
 
-        List<HsStream> FileList = null;
         FileList = dropFile.GetHsStreamList();
 
-        Int64 TotalFileSize = dropFile.GetRegListTotalSize();
+    //Int64 TotalFileSize = dropFile.GetRegListTotalSize();
 
 
         bool existErr = false;
@@ -830,6 +868,68 @@
         //@*if (existErr)*@
         //return;
         ////위의 코드를 활용하여 Stream 형태로 OLE 체크에 보내 파일 리스트를 보내준다.
+
+
+	int nTransType = 0;
+	if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() &&
+	isFilesNeedApprove())
+	{
+
+		if (pageService.GetApproveExtFileTransWithApprove(groupID) == false)
+		{
+		    // 결재 없는 파일들만 송신 하기로 결정
+		    List<HsStream> tmpFileList = null;
+		    tmpFileList = dropFile.GetHsStreamList();
+
+		    FileList = null;
+		    FileList = new List<HsStream>();
+
+		    foreach (HsStream hs in tmpFileList)
+		    {
+		        if (hs.isNeedApprove == false)
+		        {
+		            FileList.Add(hs);
+		        }
+		    }
+
+		    if (FileList.Count < 1)
+		    {
+		        // 결재없이 송신할 수 있는 파일이 없습니다.
+		        ShowMessage("warning", XmlConf.GetWarnMsg("W_0284"));
+		        return;
+		    }
+
+		}
+
+
+		string strApproveExtPolicy = "";
+		if (sgLoginData != null)
+		{
+		    strApproveExtPolicy = sgLoginData.GetTagDataBySystemEnvName("CS_EXCEPTION_EXT_REASON_TYPE");
+		    string[] strArray = null;
+
+		    if (strApproveExtPolicy.Length > 2)
+		        strArray = strApproveExtPolicy.Split("/");
+
+		    if (strArray != null && strArray.Length > 1 && strArray[0].Length > 0)
+		    {
+		        nTransType = Convert.ToInt32(strArray[0]);
+
+		        if (nTransType == 1)
+		            strTitle = refApproveExtApproverSelect_PopUp.strBindTitle;
+		        else if (nTransType == 2)
+		            strContents = refApproveExtApproverSelect_PopUp.strBindTitle;
+		        else if (nTransType == 3)
+		        {
+		            strTitle = refApproveExtApproverSelect_PopUp.strBindTitle;
+		            strContents = strTitle;
+		        }
+		    }
+		}
+
+	}
+
+
 
         if (strTitle.Equals(""))
         {
@@ -882,12 +982,28 @@
                     stReceiver += info.UserSeq + Sep;
             }
         }
-        int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
-        if (ret == -2)
+
+
+    int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
+
+    // 
+    if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt())
+    {
+        pageService.SetApproveExtFileTransWithApprove(groupID, false);
+    }
+
+    if (ret == -2)
+    {
+
+        long totalSize = 0;
+        foreach(HsStream hs in FileList)
         {
+            totalSize += hs.Size;
+        }
+
             string strModulePath = System.IO.Directory.GetCurrentDirectory();
             string strDriveName = strModulePath.Substring(0, 1);
-            double MFileSize = (double)(TotalFileSize / 1024 / 1024);
+        	double MFileSize = (double)(totalSize / 1024 / 1024);
             if (MFileSize <= 0)
                 MFileSize = 1;
             MFileSize = MFileSize + MFileSize * 0.5;
@@ -899,9 +1015,68 @@
             ShowMessage("error", strMsg);
             refTransProgress.CancelClosePopUp();
             return;
-        }
+    }
+
 
     }
+
+
+/// <summary>
+/// 
+/// </summary>
+/// <returns></returns>
+public bool isFilesNeedApprove()
+{
+
+    int groupID = groupIDbyParam;
+
+    SGLoginData sgLoginData = null;
+    sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+    if (sgLoginData == null)
+        return false;
+
+    ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+    if (sgUserData == null)
+        return false;
+
+
+    // 결재 사용중이지 않을때
+    if (sgLoginData.GetApprove())
+    {
+        CLog.Here().Information($"isFilesNeedApprove (FALSE) : User Policy Use APPROVE!");
+        return false;
+    }
+
+    // 일반.결재자만
+    if (sgUserData.GetUserApprPos() > 1)
+    {
+        CLog.Here().Information($"isFilesNeedApprove (FALSE) : User's ApprPOS is OVER Approver!");
+        return false;
+    }
+
+    // Vip가 아닐때에만
+    if (sgLoginData.IsVipUser())
+    {
+        CLog.Here().Information($"isFilesNeedApprove (FALSE) : User is VIP!");
+        return false;
+    }
+
+
+    List<HsStream> FileList = null;
+    FileList = dropFile.GetHsStreamList();
+
+
+    foreach(HsStream hs in FileList)
+    {
+        if (hs.isNeedApprove)
+        {
+            CLog.Here().Information($"isFilesNeedApprove (TRUE) - File : {hs.FileName}, FileSize : {hs.Size}, File-ModifyTime : {hs.MTime}");
+            return true;
+        }
+    }
+
+    return false;
+}
 
     private async Task CheckApproveAfterLimit()
     {
@@ -950,9 +1125,27 @@
         }
         else
         {
-            FileTrans();
-            //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
-            await stopClick();
+
+	        if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() &&
+	            isFilesNeedApprove())
+	        {
+
+	            refApproveExtApproverSelect_PopUp.FileList = dropFile.GetHsStreamList();
+
+	            // 파일목록이 있는 화면을 갱신해줘야 UI상에 나타남
+	            refApproveExtApproverSelect_PopUp.Refresh();
+
+	            // 파일송신 버튼, 실행
+	            refApproveExtApproverSelect_PopUp.SetFileTransWithApproveEvent(FileTransWithApprover);
+
+	            await refApproveExtApproverSelect_PopUp.openPopUp();
+	        }
+	        else
+	        {
+	            FileTrans();
+	            //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+	            await stopClick();
+	        }
         }
     }
 
@@ -1177,6 +1370,7 @@
             try
             {
                 await dropFile.DataClear();
+            	FileList?.Clear();  // approveExt 결재없는 전송때, List중 결재없는 목록만 별도 생성한것도 정리
                 CLog.Information($"dropFile.DataClear - !");
             }
             catch (Exception err)
@@ -1543,6 +1737,17 @@
     public void SetApprLineChange()
     {
         ApprLine.ApproveLineChange();
+    }
+
+    /// <summary>
+    /// 필수결재 확장자들로 인해 선택한 결재자로 파일 전송을 할때, 사용
+    /// </summary>
+    public void FileTransWithApprover()
+    {
+        FileTrans();
+
+        //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+        stopClick();
     }
 
     private void ReceiverSelectOK(LinkedList<ApproverInfo> list)

@@ -353,8 +353,10 @@
             groupID = sgSideBar.GroupId;
 
         HSCmdCenter.SetApprLineList(groupID, ApproverSelect);
-        InitDeptApprInsert();
-        InitApprLine();
+
+        StateHasChanged();
+        //InitDeptApprInsert();
+        //InitApprLine();
 
     }
     private void RemoveAssignApprover()
@@ -368,8 +370,10 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
         HSCmdCenter.SetApprLineList(groupID, ApproverSelect);
-        InitDeptApprInsert();
-        InitApprLine();
+
+        StateHasChanged();
+        //InitDeptApprInsert();
+        //InitApprLine();
     }
 
     public async Task openPopUp()
@@ -520,7 +524,8 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult); //타부서 조회 결과
+	// 실제 사용안함
+        //HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult); //타부서 조회 결과
 
         if (approverSearchType == "TREE" && refSGDeptTreeList != null)
             refSGDeptTreeList.BindEvent();

@@ -159,6 +159,11 @@ namespace OpenNetLinkApp.Models.SGConfig
         public string strSecurityApproverSearchType { get; set; } = "SEARCH";     //보안결재자 등록 시  부서 표시 방식을 SEARCH/TREE 타입 중 설정 (TREE 옵션일 경우, bApprDeptSearch 옵션 무효화)
         public bool bUseInputSearchInSecurityApproverTree { get; set; } = true; //보안결재자 등록 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
 
+        public string strApproveExtApproverSearchType { get; set; } = "SEARCH";     // 결재필수 확장자 검색됐을때, 결재자 검색방식
+        public bool bUseApproveExt { get; set; } = true;                            // 결재필수 확장자 결재하는 기능 사용유무
+
+        public bool bUseInputSearchApproveExtTree { get; set; } = false;         // 결재필수 확장자, 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+
         public bool bUsePartialFileAddInTransfer { get; set; } = false;         //'파일전송' 화면에서 등록시도한 파일목록에 정상파일과 오류파일이 함께 존재할 시 정상 파일에 대한 부분 등록 가능여부(true, false)
     }
 }

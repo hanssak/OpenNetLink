@@ -13,7 +13,7 @@
 <div class="card-body  p-0" style="height:@(Height.ToString() + "px");">
     @if (UseInputSearch)
     {
-        <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
+        <div class="d-inline-flex  w-100 mb-2 " style="height:29px;">
             <label class="p-1">@strDept</label>                                                       <!--부서-->
             <input type="text" class="form-control col-md-3" @onkeyup="HandleKeyEvent" placeholder="@strDeptPlaceHolder" @bind-value="strInputDept">
             <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->

@@ -215,6 +215,53 @@ namespace OpenNetLinkApp.Common
 
             return value.ToString();
         }
+
+        /// <summary>
+        /// 입력된 확장자가 string 상에 있는지 확인하는 함수(대소문자구분안함) <br></br>
+        /// bFileNameIsOnlyExt - true : 확장자만 입력, false : 파일이름과 함께 입력 <br></br>
+        /// (strFileName에서 확장자만 뽑아낸후에 검색함) <br></br>
+        /// strFileName : 확장자 or 파일이름.확장자 <br></br>
+        /// strExtData : 확장자목록(ex. txt;exe;pptx;zip  )
+        /// </summary>
+        /// <param name="bFileNameIsOnlyExt"></param>
+        /// <param name="strFileName"></param>
+        /// <param name="strExtData"></param>
+        /// <returns></returns>
+        public static bool isFileExtinListStr(bool bFileNameIsOnlyExt, string strFileName, string strExtData)
+        {
+            if (strExtData.Length < 1 || strExtData == ";")
+            {
+                Log.Information($"isFileExtinListStr - false (Wrong ExtList) - strFileName : {strFileName}, Ext List : {strExtData}");
+                return false;
+            }
+                
+            if (strFileName.Length < 1)
+            {
+                Log.Information($"isFileExtinListStr - false (Wrong FileExt) - strFileName : {strFileName}, Ext List : {strExtData}");
+                return false;
+            }             
+            
+            if (bFileNameIsOnlyExt == false)
+            {
+                // strFileName 예서 확장자만 구해서 입력하기
+                int nPos = -1;
+                nPos = strFileName.LastIndexOf(".");
+                if (nPos < 0)
+                    return false;
+
+                strFileName = strFileName.Substring(nPos + 1);
+
+            }
+
+            strFileName = strFileName.ToUpper();
+            strExtData = strExtData.ToUpper();
+
+            if (strExtData.IndexOf(strFileName) >= 0)
+                return true;
+
+            return false;
+        }
+
     }
 
     public class CsSeqFunc

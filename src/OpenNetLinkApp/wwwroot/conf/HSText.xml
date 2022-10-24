@@ -533,13 +533,6 @@
 			<CN>大小</CN>
 		</T_COMMON_SIZE>
 
-		<T_COMMON_SIZE>
-			<KR>크기</KR>
-			<JP>サイズ</JP>
-			<EN>Size</EN>
-			<CN>大小</CN>
-		</T_COMMON_SIZE>
-
 		<T_COMMON_KIND>
 			<KR>유형</KR>
 			<JP>タイプ</JP>
@@ -1290,7 +1283,30 @@
 		</T_COMMON_UNKNOWN>
 
 
-		<!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
+	<T_COMMON_APPROVE_EXT>
+		<KR>결재가 필요한 파일리스트</KR>
+		<JP>...</JP>
+		<EN>...</EN>
+		<CN>...</CN>
+	</T_COMMON_APPROVE_EXT> <!-- KKW -->
+
+	<T_COMMON_REMARK>
+		<KR>비고</KR>
+		<JP>...</JP>
+		<EN>...</EN>
+		<CN>...</CN>
+	</T_COMMON_REMARK> <!-- KKW -->
+
+	<T_COMMON_APPROVE_EXT_ITEM>
+		<KR>결재필요(제한파일)</KR>
+		<JP>...</JP>
+		<EN>...</EN>
+		<CN>...</CN>
+	</T_COMMON_APPROVE_EXT_ITEM>
+
+
+
+    <!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] 메뉴 (T_MENU_0000) ********************************************* -->
 
@@ -4819,6 +4835,56 @@
 			<EN></EN>
 			<CN></CN>
 		</T_OLE_CHECK_RESULT>
+
+		<T_APPROVEEXT_USE_APPROVE>
+			<KR>결재 사용</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPROVEEXT_USE_APPROVE>
+
+		<T_APPROVEEXT_NO_USE>
+			<KR>파일 제외 전송</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPROVEEXT_NO_USE>
+
+		<T_APPROVEEXT_TITLE_1>
+			<KR>※ 리스트의 파일은 결재가 필요합니다. 아래의 </KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPROVEEXT_TITLE_1>
+
+		<T_APPROVEEXT_TITLE_2>
+			<KR>버튼을 선택하시면 해당 파일을 제외하고 전송됩니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPROVEEXT_TITLE_2>    
+
+		<T_APPROVEEXT_TITLE_WHY>
+			<KR>사유</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPROVEEXT_TITLE_WHY>    
+
+		<T_APPROVEEXT_TITLE_WHYDATA>
+			<KR>사유를 입력하십시오.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPROVEEXT_TITLE_WHYDATA> 
+	
+		<T_APPROVEEXT_SELECT_APPROVER>
+			<KR>결재자를 조회하여 선택하십시오.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPROVEEXT_SELECT_APPROVER> 
+	
     <!-- ********************************************* [END] Alarm 설정 (T_ALARM_0000) ******************************************** -->
 	</TITLE>
 
@@ -8368,7 +8434,19 @@
 		</W_0283>
 
 
+	    <W_0284>
+	      <KR>결재없이 송신할 수 있는 파일이 없습니다.</KR>
+	      <JP></JP>
+	      <EN></EN>
+	      <CN></CN>
+	    </W_0284>
 
+	    <W_0285>
+	      <KR>사유를 {0}자이상 입력하십시오.</KR>
+	      <JP></JP>
+	      <EN></EN>
+	      <CN></CN>
+	    </W_0285>
 
 	</WARNING>
 

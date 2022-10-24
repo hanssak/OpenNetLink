@@ -1482,6 +1482,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strRet;
         }
 
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="strTagName"></param>
+		/// <returns></returns>
+		public string GetTagDataBySystemEnvName(string strTagName)
+        {
+			string strRet = "";
+			string strTagRealName = "";
+			strTagRealName = GetSystemPosition() ? "I_" : "E_";
+			strTagRealName += strTagName.ToUpper();
+			strRet = GetTagData(strTagRealName);
+			return strRet;
+		}
+
+
         /// <summary>
         /// 서버로부터 수신받은 문서파일 내부 검사유형 정보를 반환한다.
         /// <para>1 : 압축형식의 첨부파일검사</para>
@@ -1735,7 +1752,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return true;
         }
 
-        /// <summary>
+
+		/// <summary>
+		/// 로그인할때 받은 EXCEPTIONEXT 값을 받음
+		/// </summary>
+		/// <returns></returns>
+		public string GetExceptionExt()
+		{
+			string strData = GetTagData("EXCEPTIONEXT");
+
+			if (strData.Equals(""))
+			{
+				SetTagData("EXCEPTIONEXT", ";".Base64EncodingStr());
+				return ";";
+			}
+
+			if (GetApprove())
+				return ";";
+
+			if (string.Compare(strData, "none", true) == 0)
+				return ";";
+			else
+				return strData;
+		}
+
         /// 
         /// </summary>
         /// <param name="tag"></param>

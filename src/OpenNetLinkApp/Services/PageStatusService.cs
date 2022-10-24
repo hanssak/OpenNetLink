@@ -1159,6 +1159,25 @@ namespace OpenNetLinkApp.Services
             m_DicPageStatusData[groupID].SetDayInfoRefreshEvent(refreshInfo);
         }
 
+        public void SetApproveExtFileTransWithApprove(int groupID, bool bUseApprove)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+
+            m_DicPageStatusData[groupID].SetApproveExtFileTransWithApprove(bUseApprove);
+        }
+        public bool GetApproveExtFileTransWithApprove(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetApproveExtFileTransWithApprove();
+        }
 
     }
 }

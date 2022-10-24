@@ -23,6 +23,7 @@ using Org.BouncyCastle.Math.EC;
 using BlazorInputFile;
 using System.Collections;
 using static OpenNetLinkApp.Common.Enums;
+using OpenNetLinkApp.Common;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -270,6 +271,206 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         //    ParentFileName = strParentFileName;
         //}
 
+        public string GetExceptionCountString(int count)
+        {
+            string str = xmlConf.GetTitle("T_ETC_FAEXCEPTIONCOUNT");                // {0} 개
+            str = String.Format(str, count);
+            return str;
+        }
+
+        public string SetExceptionReason(eFileAddErr err)
+        {
+            string str = "";
+            switch (err)
+            {
+                case eFileAddErr.eFAREG:                                // 등록된 파일
+                    str = xmlConf.GetTitle("T_eFAREG");                 // 이미 등록된 파일
+                    break;
+                case eFileAddErr.eFADRM:                                // DRM
+                    str = xmlConf.GetTitle("T_eFADRM");                 // DRM 편집 권한없음
+                    break;
+                case eFileAddErr.eFADLP:                                // DLP
+                    str = xmlConf.GetTitle("T_eFADLP");                 // 개인정보 포함
+                    break;
+                case eFileAddErr.eFAEXT:                                // 확장자제한
+                    str = xmlConf.GetTitle("T_eFAEXT");                 // 확장자 제한
+                    break;
+                case eFileAddErr.eFAZIP:                                // zip파일내 확장자
+                    str = xmlConf.GetTitle("T_eFAZIP");                 // 압축파일내 제한된 파일
+                    break;
+                case eFileAddErr.eFACHG:                                // 파일변경
+                    str = xmlConf.GetTitle("T_eFACHG");                 // 확장자 변경
+                    break;
+                case eFileAddErr.eFAVIRUS:                              // 바이러스검출
+                    str = xmlConf.GetTitle("T_eFAVIRUS");                 // 바이러스 포함
+                    break;
+                case eFileAddErr.eFAFileSize:                           //  1회 전송가능 파일사이즈
+                    str = xmlConf.GetTitle("T_eFAFileSize");                 // 1회 전송용량 초과
+                    break;
+                case eFileAddErr.eFAFileCount:                           //  1회 전송가능 파일 개수
+                    str = xmlConf.GetTitle("T_eFAFileCount");                 // 1회 전송 파일 개수 초과
+                    break;
+                case eFileAddErr.eFANotFound:                                // 파일 찾기 실패
+                    str = xmlConf.GetTitle("T_eFANotFound");                 // 찾을 수 없음
+                    break;
+                case eFileAddErr.eFAHidden:                                // 숨김파일
+                    str = xmlConf.GetTitle("T_eFAHidden");                 // 숨김 파일
+                    break;
+                case eFileAddErr.eFAZipPW:                                //  zip 파일 비번 있을 때
+                    str = xmlConf.GetTitle("T_eFAZipPW");                 // 암호설정된 압축파일
+                    break;
+                case eFileAddErr.eFAZipNotPW:                                //  zip 파일 비번 없을 때
+                    str = xmlConf.GetTitle("T_eFAZipNotPW");                 // 암호 미설정된 압축파일
+                    break;
+                case eFileAddErr.eFAZipError:                                // zip 파일 손상 또는 zip 파일이 아닌경우
+                    str = xmlConf.GetTitle("T_eFAZipError");                 // 손상된 파일
+                    break;
+                case eFileAddErr.eFAEMPTY:                                // 빈파일
+                    str = xmlConf.GetTitle("T_eFAEMPTY");                 // 빈파일
+                    break;
+                case eFileAddErr.eFAUNKNOWN:                                // 알수없는파일형식
+                    str = xmlConf.GetTitle("T_eFAUNKNOWN");                 // 알수 없는 형식
+                    break;
+                case eFileAddErr.eFAEML:                                // EML파일과 다른파일을 함께 등록할 경우
+                    str = xmlConf.GetTitle("T_eFAEML");                 // EML파일이 아님
+                    break;
+                case eFileAddErr.eFAEMPTY_ATTACH:                                // 빈파일(첨부파일)
+                    str = xmlConf.GetTitle("T_eFAEMPTY_ATTACH");                 // EML파일내 빈파일 포함
+                    break;
+                case eFileAddErr.eFAUNKNOWN_ATTACH:                                // 알수없는파일형식(첨부파일)
+                    str = xmlConf.GetTitle("T_eFAUNKNOWN_ATTACH");                 // EML내 알수 없는 형식의 파일 포함
+                    break;
+                case eFileAddErr.eFACHG_ATTACH:                                // 파일변경(첨부파일)
+                    str = xmlConf.GetTitle("T_eFACHG_ATTACH");                 // EML내 확장자 변경 파일 포함
+                    break;
+
+                case eFileAddErr.eFAEXT_ATTACH:                                // 확장자제한(첨부파일)
+                    str = xmlConf.GetTitle("T_eFAEXT_ATTACH");                 // EML내 확장자 제한 파일 포함
+                    break;
+
+                case eFileAddErr.eFAZIP_ATTACH:                                // zip파일내 확장자(첨부파일)
+                    str = xmlConf.GetTitle("T_eFAZIP_ATTACH");                 // EML내 압축파일의 제한된 파일 포함
+                    break;
+
+                case eFileAddErr.eFAEML_ONLYONE:                                // EML 파일등록 2건이상일때
+                    str = xmlConf.GetTitle("T_eFAEML_ONLYONE");                 // EML은 1건만 가능
+                    break;
+
+                case eFileAddErr.eFAEMLTOPDF_ERROR:                                // EML to PDF 변환오류
+                    str = xmlConf.GetTitle("T_eFAEMLTOPDF_ERROR");                 // EML to PDF 변환오류
+                    break;
+
+                case eFileAddErr.eFAOfficeSizeError:                                // Office > pdf 변환하려는 파일이 설정되크기보다 클 경우
+                    str = xmlConf.GetTitle("T_eFAOfficeSizeError");                 // Office to PDF 변환크기 오류
+                    break;
+
+                case eFileAddErr.eFAOfficeNoinstalled:                                // Office 설치않되어있음. 파일변환기능사용. Office파일 전송하려할 경우
+                    str = xmlConf.GetTitle("T_eFAOfficeNoinstalled");                 // Office  미설치, 변환오류
+                    break;
+
+                case eFileAddErr.eFADLPERR:                                // 개인정보 검출에러
+                    str = xmlConf.GetTitle("T_eFADLPERR");                 // 개인정보 검출 오류
+                    break;
+                case eFileAddErr.eFAUnZipOutOfSpace:                                //UnZip Disk용량부족
+                    str = xmlConf.GetTitle("T_eUNZIP_OUT_OF_SPACE");                 // 압축파일 검사 Disk 용량 부족
+                    break;
+                case eFileAddErr.eFAUnZipLengthOver:                                // UnZip Length Over
+                    str = xmlConf.GetTitle("T_eUNZIP_OUT_OF_LENGTH");                 // 압축파일 내부의 파일 및 경로 길이 초과로 검사실패
+                    break;
+                case eFileAddErr.eFAUnZipCheckStop:                                //UnZip 체크 중단
+                    str = xmlConf.GetTitle("T_eUNZIP_CHECK_STOP");                 // 압축파일 검사취소
+                    break;
+                case eFileAddErr.eFADAYCOUNTOVER:                                // 일일 전송횟수 제한.
+                    /* TODO */
+                    str = xmlConf.GetTitle("T_INFO_ONEDAY_TRANCE_COUNTLIMIT");
+                    //str = "일일 전송횟수 제한";
+                    break;
+                case eFileAddErr.eFADAYSIZEOVER:                                // 일일 전송용량 제한. 
+                    /* TODO */
+                    str = xmlConf.GetTitle("T_INFO_ONEDAY_TRANCE_SIZELIMIT");
+                    //str = "일일 전송사이즈 제한";
+                    break;
+
+                case eFileAddErr.eUnZipInnerZipOpenFail:                                // zip파일 내부의 zip Open 실패 
+                    /* TODO */
+                    str = xmlConf.GetTitle("T_eUNZIP_OPEN_FAIL");
+                    //str = "ZIP 열기 오류";
+                    break;
+
+                case eFileAddErr.eUnZipInnerZipPassword:                                // zip파일에 내부의 zip 비밀번호 사용 중
+                    /* TODO */
+                    str = xmlConf.GetTitle("T_eUnZipInnerZipPassword");
+                    //str = xmlConf.GetTitle("T_eFAZipPW");
+                    break;
+
+                case eFileAddErr.eUnZipInnerExt:                                // zip파일에 내부의 zip 확장자 제한 파일 포함
+                    /* TODO */
+                    str = xmlConf.GetTitle("T_eUnZipInnerExt");
+                    //str = xmlConf.GetTitle("T_eFAEXT");
+                    break;
+
+                case eFileAddErr.eUnZipInnerExtChange:                               // zip파일에 내부의 zip 위변조 파일 포함
+                    /* TODO */
+                    str = xmlConf.GetTitle("T_eUnZipInnerExtChange");
+                    //str = xmlConf.GetTitle("T_eFACHG");
+                    break;
+
+                case eFileAddErr.eUnZipInnerExtUnknown:                                // zip파일에 내부의 zip 알수 없는 파일형식 포함
+                    /* TODO */
+                    str = xmlConf.GetTitle("T_eUnZipInnerExtUnknown");
+                    //str = xmlConf.GetTitle("T_eFAUNKNOWN");
+                    break;
+
+                case eFileAddErr.eUnZipInnerFileEmpty:                                // zip파일에 내부의 zip 비어있는 파일  
+                    /* TODO */
+                    str = xmlConf.GetTitle("T_eUnZipInnerFileEmpty");
+                    //str = xmlConf.GetTitle("T_eFAEMPTY");
+                    break;
+
+                case eFileAddErr.eUnZipInnerLengthOver:                                // zip파일에 내부의 zip Length Over
+                    /* TODO */
+                    //str = xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");					// 파일명 및 폴더명 길이초과(80자)
+                    str = string.Format(xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH_NO_VAL"), m_nFileLengthMax); // 파일명 및 폴더명 길이초과(250자)
+                    break;
+
+                case eFileAddErr.eUnZipInnerLeftZip:                                // zip파일검사 후 남아 있는 zip포함
+                    /* TODO */
+                    str = xmlConf.GetTitle("T_eUNZIP_LEFT_ZIP");                    // ZIP파일 검사후 잔여 ZIP 포함
+                                                                                    //str = "ZIP파일 검사후 잔여 ZIP 포함";
+                    break;
+
+                case eFileAddErr.eUnZipInnerDRM:                                // zip파일에 내부의 DRM 파일
+                    /* TODO */
+                    str = xmlConf.GetTitle("T_eUnZipInnerDRM");                 // T_eUNZIP_INNER_DRMFILE 
+                                                                                //str = "ZIP파일 내부 DRM 파일";
+                    break;
+
+                case eFileAddErr.eFA_LONG_PATH:                                //전송 길이초과
+                                                                               // str = xmlConf.GetTitle("L_eFA_LONG_PATH");                 // 전송 길이초과(90자)
+                    str = string.Format(xmlConf.GetTitle("L_eFA_LONG_PATH_NO_VAL"), m_nFilePathMax);
+                    break;
+
+                case eFileAddErr.eFA_LONG_PATH_PARENT:                                //상위폴더 길이초과
+                                                                                      //str = xmlConf.GetTitle("L_eFA_LONG_PATH_PARENT");                 // 상위폴더명 길이초과(80자)
+                    str = string.Format(xmlConf.GetTitle("L_eFA_LONG_PATH_PARENT_NO_VAL"), m_nFileLengthMax);
+                    break;
+
+                case eFileAddErr.eFA_LONG_PATH_FILEORPATH:                                //파일 및 폴더 길이초과
+                                                                                          //str = xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");                 // 파일명 및 폴더명 길이초과(80자)
+                    str = string.Format(xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH_NO_VAL"), m_nFileLengthMax);
+                    break;
+
+                case eFileAddErr.eFA_FILE_READ_ERROR:                                // 파일 읽기 권한 오류
+                    str = xmlConf.GetTitle("L_eFA_FILE_READ_ERROR");                 // 파일 읽기 권한 오류
+                    break;
+
+                default:
+                    str = "-";
+                    break;
+
+            }
+            return str;
+        }
 
         public string GetFileAddErrContent(string strFileName, eFileAddErr efa, string strFileLimitSize = "1500")
         {
@@ -4473,7 +4674,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="nOption">CLIENT_ZIP_DEPTH의 2번값(0: 1번째 zip depth에 또 zip이 발견되면 차단, 1 : 허용)</param>
         /// <param name="blAllowDRM"> drm 파일 허용유무(true:허용)</param>
         /// <returns></returns>
-        public async Task<int> CheckZipFile(HsStream hsStream, FileAddErr currentFile, bool bDenyPasswordZIP, bool blWhite, string strExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true)
+        public async Task<int> CheckZipFile(HsStream hsStream, FileAddErr currentFile, bool bDenyPasswordZIP, bool blWhite, string strExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true, string strApproveExt = "")
         {
             int nTotalErrCount = 0;
             eFileAddErr enRet;
@@ -4508,6 +4709,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             Log.Information("[CheckZipFile] ZipFile[{0}] Ext[WhiteF({1})-Info({2})] ZipCheck[MaxDepth({3})-BlockOption({4})] AllowDrmF[{5}]",
                  Path.GetFileName(hsStream.FileName), blWhite, strExtInfo, nMaxDepth, nOption, blAllowDRM);
 
+            bool bIsApproveExt = false;
+
             // Zip File Temp쪽에 Copy 및 Scan 
             using (var fileStream = new FileStream(strZipFile, FileMode.Create, FileAccess.Write))
             {
@@ -4515,7 +4718,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 fileStream.Close();
 
                 enRet = ScanZipFile(currentFile, strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, nOption, 1, blWhite, strExtInfo, 0,
-                    out nTotalErrCount, out strOverMaxDepthInnerZipFile, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, bDenyPasswordZIP);
+                    out nTotalErrCount, out strOverMaxDepthInnerZipFile, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, bDenyPasswordZIP);
 
                 // KKW
                 /*if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
@@ -4540,7 +4743,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 
             stStream.Position = 0;
-            if (enRet == eFileAddErr.eFANone && nTotalErrCount == 0) return 0;
+            if (enRet == eFileAddErr.eFANone && nTotalErrCount == 0)
+                return (bIsApproveExt ? 1 : 0);
 
             return -1;
         }
@@ -4568,8 +4772,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="bZipPasswdCheck"></param>
         /// <returns></returns>
         public eFileAddErr ScanZipFile(FileAddErr currentFile, string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nBlockOption, int nCurDepth,
-            bool blWhite, string strExtInfo, int nErrCount, out int nTotalErrCount, out string strOverMaxDepthInnerZipFile, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = true)
+            bool blWhite, string strExtInfo, int nErrCount, out int nTotalErrCount, out string strOverMaxDepthInnerZipFile, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = true)
         {
+            bIsApproveExt = false;
             eFileAddErr enErr;
             string strExt;
             int nCurErrCount;
@@ -4688,6 +4893,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             continue;
                         }
 
+                        // 필수결재 확장자인지 확인
+                        if (strApproveExt.Length > 0)
+                        {
+                            if (CsFunction.isFileExtinListStr(false, strExt, strApproveExt))
+                                bIsApproveExt = true;
+                        }
+
                         // Check Zip File  (압축파일 내 압축파일이 또 존재하는 경우.
                         if ((String.Compare(strExt, ".zip", true) != 0) && (String.Compare(strExt, ".7z", true) != 0)) continue;
 
@@ -4712,7 +4924,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         string strCurZip = Path.Combine(strBasePath, entry.Key);
                         string strExtractPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(entry.Key));
                         eFileAddErr enRet = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, strCurZip, strExtractPath, nMaxDepth, nBlockOption, nCurDepth + 1,
-                            blWhite, strExtInfo, nCurErrCount, out nInnerErrCount, out strOverMaxDepthZipFile, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
+                            blWhite, strExtInfo, nCurErrCount, out nInnerErrCount, out strOverMaxDepthZipFile, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
                         if (enRet != eFileAddErr.eFANone) enErr = enRet;
                         nCurErrCount += nInnerErrCount;
                     }

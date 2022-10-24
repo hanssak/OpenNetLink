@@ -176,6 +176,12 @@ strSecurityApproverSearchType:	'보안결재자 선택' 화면에서 보안결�
 						=> "TREE" : 부서 TREE가 추가로 표시되며 부서별로 결과 리스트 표시 (해당 설정 시 bApprDeptSearch 옵션 무효화)
 bUseInputSearchInSecurityApproverTree: strSecurityApproverSearchType "TREE" 일 경우, 부서명과 사용자명을 검색할 수 있는 컨트롤 표시 여부 (true,false)
 
+ApproveExtApproverSearchType: '필수 결재 기능'에서 결재자 선택하는 방식
+						=> "SEARCH" : 입력된 부서명과 사용자명을 기반으로 결과 리스트 표시 (Default)
+						=> "TREE" : 부서 TREE가 추가로 표시되며 부서별로 결과 리스트 표시 (해당 설정 시 bApprDeptSearch 옵션 무효화)
+bUseApproveExt: 필수 결재 기능 사용유무
+bUseInputSearchApproveExtTree : 필수 결재 기능 에서 "TREE" 일 경우, 부서명과 사용자명을 검색할 수 있는 컨트롤 표시 여부 (true,false)
+
 bUsePartialFileAddInTransfer: '파일전송' 화면에서 등록시도한 파일목록에 정상파일과 오류파일이 함께 존재할 시 정상 파일에 대한 부분 등록 가능여부(true, false)
 						=> true : 오류파일을 제외하고 정상파일만 등록된다.
 						=> false : 목록에 오류파일이 1개 이상 존재하는 경우, 목록이 모두 등록되지 않는다.

@@ -107,7 +107,7 @@
   "nClipAfterApproveUseType": 2,
   "bUseOneToMultiLogin": false,
   "bUseOneByOneLogOut" : false,
-  "bApprDeptSearch": false,
+  "bApprDeptSearch": true,
   "bApprLineChkBlock": false,
   "bApprLineLocalSave": true,
 
@@ -137,6 +137,10 @@
   "bUseInputSearchInProxyTree": false,
   "strSecurityApproverSearchType": "SEARCH",
   "bUseInputSearchInSecurityApproverTree": false,
+
+  "strApproveExtApproverSearchType": "TREE",
+  "bUseInputSearchApproveExtTree": true,  
+  "bUseApproveExt": true
 
   "bUsePartialFileAddInTransfer" : false
 

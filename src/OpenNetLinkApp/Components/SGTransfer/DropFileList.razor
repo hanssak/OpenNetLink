@@ -45,21 +45,32 @@
                 <table id="example2" class="table table-head-fixed table-hover mb-0" style="font-size: 14px;table-layout: fixed; line-height:20px;">
                     <thead>
                         <tr>
-                            <th style="width:70%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left:5px;">@strFileName</th>                 <!--파일명-->
-                        <th width="10%">@strFileSize</th>                 <!--크기-->
-                        <th width="10%">@strFileType</th>                 <!--유형-->
+                            <th style="width:60%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left:5px;">@strFileName</th>                 <!--파일명-->
+                            <th style="text-align:right;vertical-align:middle;width:10%;">@strFileSize</th>                 <!--크기-->
+                            <th style="text-align:center;vertical-align:middle;width:10%;">@strFileType</th>                 <!--유형-->
+
+                            @if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
+                            {
+                                <th style="text-align:center;vertical-align:middle;width:20%;">@XmlConf.GetTitle("T_COMMON_REMARK")</th>
+ <!--비고-->
+                            }
+
                             <!--<th width="30%">@strLastModDay</th>-->               <!--수정한 날짜-->
-                    </tr>
+                        </tr>
                     </thead>
                     <tbody>
                         @foreach (var file in HsStreamList)
                         {
                             <tr>
-                                <td style="width:70%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left:5px;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
-                                <td width="10%">@(file.IsDir? "" : CsFunction.GetSizeStr(file.Length))</td>
-                                <td width="10%">@file.Type</td>
+                                <td style="width:60%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left:5px;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
+                                <td style="text-align:right;vertical-align:middle;width:10%;">@(file.IsDir? "" : CsFunction.GetSizeStr(file.Length))</td>
+                                <td style="text-align:center;vertical-align:middle;width:10%;">@file.Type</td>
+                                @if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
+                                {
+                                    <td style="text-align:center;vertical-align:middle;width:20%;">@(file.isNeedApprove? XmlConf.GetTitle("T_COMMON_APPROVE_EXT_ITEM") : "")</td>
+                                }
                                 <!--<td width="30%">@file.ModifyTime.ToString("yyyy/MM/dd HH:mm:ss")</td>-->
-                    </tr>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -71,7 +82,7 @@
             <p style="font-size:13px;">
                 <br /><br /><br /><br />
                 @((MarkupString)strFileDragInfo)         <!--파일을 이곳으로 드래그 하세요.-->
-        </p>
+            </p>
 
         }
     </div>
@@ -356,6 +367,12 @@
                     hsStream.MTime = strSubDate + strSubTime;
                     hsStream.IsDir = false;
                     hsStream.MemoryType = HsStreamType.FileStream;
+                    hsStream.isNeedApprove = false;
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt())
+                    {
+                        if (CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
+                            hsStream.isNeedApprove = true;
+                    }
 
 
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -407,7 +424,11 @@
                         continue;
                     }
 
-                    if (await GetExamCheckZip(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
+                    int nRet = 0;
+                    nRet = await GetExamCheckZip(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount);
+                    if (nRet == 1)
+                        hsStream.isNeedApprove = true;
+                    else if (nRet != 0)
                     {
                         existErr = true;
                         hsStream.stream = null;
@@ -567,17 +588,24 @@
                         else
                             hsStream.RelativePath = hsStream.RelativePath;
 
+                        hsStream.isNeedApprove = false;
                         if ((hsStream.Type.Equals("Directory")) || (hsStream.Type.Equals("Hidden, Directory")))
                         {
                             hsStream.Size = 0;
                             hsStream.Type = "DIR";
                             hsStream.stream = null;
                             hsStream.MemoryType = HsStreamType.FileStream;
-                            hsStream.IsDir = true;
+                            hsStream.IsDir = true;                            
                         }
                         else
                         {
                             hsStream.Size = item.Length;
+
+                            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt())
+                            {
+                                if (CsFunction.isFileExtinListStr(true, fInfo.Extension, sgLoginData.GetExceptionExt()))
+                                    hsStream.isNeedApprove = true;
+                            }
                         }
 
                         if (hsStream.Type.Equals("Archive"))
@@ -657,7 +685,11 @@
                                 continue;
                             }
 
-                            if (await GetExamCheckZip(fileAddManage, childFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
+                            int nRet = 0;
+                            nRet = await GetExamCheckZip(fileAddManage, childFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount);
+                            if (nRet == 1)
+	                            hsStream.isNeedApprove = true;
+                            else if (nRet != 0)
                             {
                                 existErr = true;
                                 hsStream.stream = null;
@@ -920,7 +952,12 @@
                     SGFileExamEvent(per, hsStream.FileName);
                 }
 
-                if (await GetExamCheckZip(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
+                hsStream.isNeedApprove = false;
+                int nRet = 0;
+                nRet = await GetExamCheckZip(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount);
+                if (nRet == 1)
+                    hsStream.isNeedApprove = true;
+                else if (nRet != 0)
                 {
                     existErr = true;
                     hsStream.stream = null;
@@ -958,6 +995,17 @@
                 {
                     hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
                 }
+
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt())
+                {
+
+                    SGLoginData sgLoginData = null;
+                    sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+
+                    if (sgLoginData != null && CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
+                        hsStream.isNeedApprove = true;
+                }
+
                 listTryHsStream.Add(hsStream);
                 //SetFileAdd(hsStream);
                 nExamCount++;
@@ -1037,6 +1085,15 @@
             hsStream.Size = 0;
             hsStream.MemoryType = HsStreamType.MemoryStream;
             hsStream.stream = null;
+            hsStream.isNeedApprove = false;
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt())
+            {
+                SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+
+                if (sgLoginData != null && CsFunction.isFileExtinListStr(false, fileInfo.Name, sgLoginData.GetExceptionExt()))
+                    hsStream.isNeedApprove = true;
+            }
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -1576,7 +1633,14 @@
             CLog.Here().Information($"압축(Zip) 파일 passwd 있을때 차단 : [{bDenyPasswordZIP.ToString()}]");
             //bool bDenyPasswordZIP = SGAppMgrSvc.AppConfigInfoService.GetDenyPasswordZIP();
 
-            if (await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option) != 0)
+            int nRet = 0;
+            nRet = await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option, true,
+                (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() ? sgLoginData.GetExceptionExt() : "") );
+            // if (await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option) != 0)
+
+            if (nRet == 1)
+                return 1;
+            else if (nRet != 0)
                 return -1;
         }
         return 0;
@@ -1700,6 +1764,63 @@
         RMouseFileAddAction(ListFile);
     }
 
+    /// <summary>
+    /// 필수결재자 기능 UI를 사용해야 되는 상태인지 판단
+    /// </summary>
+    /// <returns></returns>
+    public bool isUserNeedApproveExtUI()
+    {
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return false;
+
+        ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+        if (sgUserData == null)
+            return false;
+
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return false;
+
+
+        // 결재 사용중이지 않을때
+        if (sgLoginData.GetApprove())
+        {
+            CLog.Here().Information($"isFilesNeedApprove (FALSE) : User Policy Use APPROVE!");
+            return false;
+        }
+
+        // 일반.결재자만
+        if (sgUserData.GetUserApprPos() > 1)
+        {
+            CLog.Here().Information($"isFilesNeedApprove (FALSE) : User's ApprPOS is OVER Approver!");
+            return false;
+        }
+
+        // Vip가 아닐때에만
+        if (sgLoginData.IsVipUser())
+        {
+            CLog.Here().Information($"isFilesNeedApprove (FALSE) : User is VIP!");
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="fileaddmanage"></param>
+    /// <param name="nRegSize"></param>
+    /// <returns></returns>
     public bool GetDayRegSizeEnable(FileAddManage fileaddmanage, long nRegSize)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;

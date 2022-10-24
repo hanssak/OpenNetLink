@@ -737,6 +737,7 @@ window.closeAllPopup = () => {
     $("#ApprovePopUp").modal("hide");
     $("#ApproverSelect_PopUp").modal("hide");
     $("#ApproverSelect_StepPopUp").modal("hide");
+    $("#ApproveExtApproverSelect_PopUp").modal("hide");
     $("#ApproverSelect_TreePopUp").modal("hide");
     $("#ReceiverSelect_PopUp").modal("hide");
     $("#TransPopUp").modal("hide");
@@ -972,6 +973,13 @@ window.addMouseDown = (message) => {
             addTrTargetSelection(e.target.parentElement, 6);
             return;
         }
+        else if (e.target.parentElement.getAttribute('name') == "trSelect7") {
+
+            clearTrTargetSelections(true);
+            addTrTargetSelection(e.target.parentElement, 7);
+            return;
+        }
+
         //팝업파일선택
         if (e.target.getAttribute('name') == "popfile") {
             //if the multiple selection modifier is not pressed 
@@ -1178,6 +1186,9 @@ function addTrTargetSelection(item, index) {
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxyTargetSelect2", item.getAttribute('value'));
     else if (index == 6)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverTargetSelect", item.getAttribute('value'));
+    else if (index == 7)
+        DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproveExtTargetSelect", item.getAttribute('value'));    
+
     TrTargetSelections.items.push(item);
 }
 
@@ -1212,7 +1223,7 @@ function addTrSelection(item, index) {
     else if (index == 6)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverSearchSelect", item.getAttribute('value'));
     else if (index == 7)
-        DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverSearchSelect2", item.getAttribute('value'));
+        DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproveExtSearchSelect", item.getAttribute('value'));
     else if (index == 8)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect3", item.getAttribute('value'));
     else if (index == 9)

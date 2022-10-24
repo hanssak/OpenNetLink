@@ -820,6 +820,14 @@ namespace OpenNetLinkApp.PageEvent
             DicDeptApprLineSearchEvent[groupid] = e;
         }
 
+        public DeptApprLineSearchEvent GetDeptApprLineSearchEvent(int groupid)
+        {
+            DeptApprLineSearchEvent e = null;
+            if (DicDeptApprLineSearchEvent.TryGetValue(groupid, out e) == true)
+                e = DicDeptApprLineSearchEvent[groupid];
+            return e;
+        }
+
         public void SetPrivacyNotiEventAdd(int groupid, PrivacyNotiEvent e)
         {
             PrivacyNotiEvent temp = null;
@@ -848,11 +856,12 @@ namespace OpenNetLinkApp.PageEvent
                 DicCommonResult.Remove(groupid);
             DicCommonResult[groupid] = e;
         }
-        public DeptApprLineSearchEvent GetDeptApprLineSearchEvent(int groupid)
+
+        public DeptApprLineReflashEvent GetDeptApprLineReflashEvent(int groupid)
         {
-            DeptApprLineSearchEvent e = null;
-            if (DicDeptApprLineSearchEvent.TryGetValue(groupid, out e) == true)
-                e = DicDeptApprLineSearchEvent[groupid];
+            DeptApprLineReflashEvent e = null;
+            if (DicDeptApprLineReflashEvent.TryGetValue(groupid, out e) == true)
+                e = DicDeptApprLineReflashEvent[groupid];
             return e;
         }
 
@@ -876,14 +885,6 @@ namespace OpenNetLinkApp.PageEvent
             SecurityApproverSearchEvent e = null;
             if (DicSecurityApproverEvent.TryGetValue(groupid, out e) == true)
                 e = DicSecurityApproverEvent[groupid];
-            return e;
-        }
-
-        public DeptApprLineReflashEvent GetDeptApprLineReflashEvent(int groupid)
-        {
-            DeptApprLineReflashEvent e = null;
-            if (DicDeptApprLineReflashEvent.TryGetValue(groupid, out e) == true)
-                e = DicDeptApprLineReflashEvent[groupid];
             return e;
         }
 
