@@ -4858,10 +4858,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     }
 
                     //OLE개체의 마임리스트 체크 
-                    if (IsValidOLEMimeType(oleFileMime, extractFile.Name, isOLEMimeTypeWhite))
+                    isOLEMimeTypeWhite = true;   //서버와 2105 통신 추가 전까지는 White List 로 임시 설정
+                    if (IsValidOLEMimeType(oleFileMime, extractFile.Name, isOLEMimeTypeWhite))      
                     {
-                        oleFile.eErrType = eFileAddErr.eFAEMPTY;
-                        currentFile.HasChildrenErr = true;
+                        oleFile.eErrType = eFileAddErr.eFANone;
                         continue;
                     }
 
@@ -4907,14 +4907,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
                     }
                     #endregion
-
-                    scanDepth -= 1;
+                  
                     //추출 개체가 엑셀인 경우, 차단 전 한번 더 검사 허용
                     if (oleExtension.ToUpper() == "XLSX" || oleExtension.ToUpper() == "XLS")
                     {
                         //추출 개체가 엑셀인 경우, 한번 더 검사 허용
                         HsStream oleHsStream = new HsStream() { stream = oleFileStream, FileName = extractFile.FullName, MemoryType = HsStreamType.FileStream };
-                        int extractResult = await scanDocumentFile(oleHsStream, oleFile, strExtractFilePath, isOLEMimeTypeWhite, isWhite, fileFilterExtInfo, isDocumentWhite, documentFileFilterExtInfo, scanDepth, documentExtractType);
+                        int extractResult = await scanDocumentFile(oleHsStream, oleFile, strExtractFilePath, isOLEMimeTypeWhite, isWhite, fileFilterExtInfo, isDocumentWhite, documentFileFilterExtInfo, (scanDepth-1), documentExtractType);
                         if (extractResult != 0)
                             currentFile.HasChildrenErr = true;
                     }
