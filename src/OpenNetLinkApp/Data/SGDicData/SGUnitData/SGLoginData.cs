@@ -368,7 +368,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     bResult = true;
             }
             else
-			{
+            {
                 if (nClipPolicyFlag == 1)
                     bResult = true;
                 else if (nClipPolicyFlag == 2)
@@ -1501,9 +1501,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         /// <summary>
         /// 서버로부터 수신받은 문서파일 내부 검사유형 정보를 반환한다.
-        /// <para>1 : 압축형식의 첨부파일검사</para>
-        /// <para>2 : OLE개체형식의 검출파일 검사</para>
-        /// <para>3 : 압축형식과 OLE개체형식 모두 검사</para>
+        /// <para>1 : OLE개체형식의 검출파일 검사</para>
+        /// <para>2 : 압축형식의 첨부파일검사</para>
+        /// <para>3 : OLE개체형식과 압축형식 모두 검사</para>
         /// </summary>
         /// <param name="bSystem"></param>
         /// <returns></returns>
@@ -1626,6 +1626,34 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             string strData = GetTagData("OLECHECKMIMETYPE");
             return (strData.Equals("W"));
+        }
+
+        /// <summary>
+        /// 문서형식 검사 시 참고할 확장자 타입
+        /// <para>DOCUMENTFILEFILTERTYPE</para>
+        /// </summary>
+        /// <returns></returns>
+        public bool GetDocumentFileFilterType()
+        {
+            string strData = GetTagData("DOCUMENTFILEFILTERTYPE");
+            if (strData.Equals("W"))
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// 문서형식 검사 시 참고할 확장자명
+        /// <para>DOCUMENTFILEFILTER</para>
+        /// </summary>
+        /// <returns></returns>
+        public string GetDocumentFileFilter()
+        {
+            string strData = GetTagData("DOCUMENTFILEFILTER");
+            if ((strData.Equals("") == true) || (strData.Equals("HS_ALL_FILE") == true))
+                return ";";
+
+            return strData;
         }
 
         /// <summary>
