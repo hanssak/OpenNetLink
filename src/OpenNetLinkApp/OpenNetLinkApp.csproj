@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <!-- <TargetFramework>netcoreapp3.1</TargetFramework> -->
@@ -60,7 +60,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\openNetLib\HsNetWorkSG\HsNetWorkSG.csproj" />
     <ProjectReference Include="..\OfficeExtractorLibrary\OfficeExtractor\OfficeExtractor.csproj" />
     <ProjectReference Include="..\WebWindow.Blazor\WebWindow.Blazor.csproj" />
     <ProjectReference Include="..\AgLogManager\AgLogManager.csproj" />
@@ -1818,6 +1817,12 @@
     <None Include="wwwroot\plugins\raphael\webpack.config.js" />
     <None Include="wwwroot\plugins\toastr\toastr.js.map" />
     <None Include="wwwroot\plugins\toastr\toastr.min.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="HsNetWorkSG">
+      <HintPath>..\..\..\OpenNetLink\src\OpenNetLinkApp\Library\HsNetWorkSG.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 <Target Name="PostBuild" AfterTargets="PostBuildEvent">
