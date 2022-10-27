@@ -4724,7 +4724,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 
             stStream.Position = 0;
-            if (enRet == eFileAddErr.eFANone && nTotalErrCount == 0)
+            if (currentFile.eErrType == eFileAddErr.eFANone && currentFile.HasChildrenErr == false) //if (enRet == eFileAddErr.eFANone && nTotalErrCount == 0)
                 return (bIsApproveExt ? 1 : 0);
 
             return -1;
@@ -4832,6 +4832,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             enErr = eFileAddErr.eUnZipInnerLengthOver;
                             //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, entry.Key, enErr, Path.GetFileName(strZipFile));
                             childFile.eErrType = eFileAddErr.eUnZipInnerLengthOver;
+                            currentFile.HasChildrenErr = true;
+                            nCurErrCount++;
                             continue;
                         }
 
@@ -4844,6 +4846,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         {
                             enErr = eFileAddErr.eUnZipInnerFileEmpty;
                             childFile.eErrType = eFileAddErr.eUnZipInnerFileEmpty;
+                            currentFile.HasChildrenErr = true;
+                            nCurErrCount++;
                             //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
                             continue;
                         }
@@ -4854,6 +4858,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         {
                             enErr = eFileAddErr.eUnZipInnerExt;
                             childFile.eErrType = eFileAddErr.eUnZipInnerExt;
+                            currentFile.HasChildrenErr = true;
+                            nCurErrCount++;
                             //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
                             continue;
                         }
@@ -4870,6 +4876,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         if (enErr != eFileAddErr.eFANone)
                         {
                             childFile.eErrType = enErr;
+                            currentFile.HasChildrenErr = true;
+                            nCurErrCount++;
                             //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
                             continue;
                         }
@@ -4895,6 +4903,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                 // kkw 추가
                                 enErr = eFileAddErr.eUnZipInnerLeftZip;
                                 childFile.eErrType = eFileAddErr.eUnZipInnerLeftZip;
+                                currentFile.HasChildrenErr = true;
+                                nCurErrCount++;
                                 //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
                             }
                             continue;
@@ -4904,9 +4914,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         int nInnerErrCount = 0;
                         string strCurZip = Path.Combine(strBasePath, entry.Key);
                         string strExtractPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(entry.Key));
+
                         eFileAddErr enRet = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, strCurZip, strExtractPath, nMaxDepth, nBlockOption, nCurDepth + 1,
                             blWhite, strExtInfo, nCurErrCount, out nInnerErrCount, out strOverMaxDepthZipFile, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
+
                         if (enRet != eFileAddErr.eFANone) enErr = enRet;
+                        if (childFile.HasChildrenErr) currentFile.HasChildrenErr=true;
                         nCurErrCount += nInnerErrCount;
                     }
                 }
@@ -4920,6 +4933,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     {
                         enErr = eFileAddErr.eUnZipInnerZipPassword;
                         currentFile.eErrType = eFileAddErr.eUnZipInnerZipPassword;
+                        nCurErrCount++;
                         //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(strZipFile), enErr, Path.GetFileName(strZipFile));
                     }
                     else
@@ -5071,7 +5085,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                     //OLE개체의 마임리스트 체크 
                     isOLEMimeTypeWhite = true;   //서버와 2105 통신 추가 전까지는 White List 로 임시 설정
-                    if (IsValidOLEMimeType(oleFileMime, extractFile.Name, isOLEMimeTypeWhite))      
+                    if (IsValidOLEMimeType(oleFileMime, extractFile.Name, isOLEMimeTypeWhite))
                     {
                         oleFile.eErrType = eFileAddErr.eFANone;
                         continue;
@@ -5119,13 +5133,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
                     }
                     #endregion
-                  
+
                     //추출 개체가 엑셀인 경우, 차단 전 한번 더 검사 허용
                     if (oleExtension.ToUpper() == "XLSX" || oleExtension.ToUpper() == "XLS")
                     {
                         //추출 개체가 엑셀인 경우, 한번 더 검사 허용
                         HsStream oleHsStream = new HsStream() { stream = oleFileStream, FileName = extractFile.FullName, MemoryType = HsStreamType.FileStream };
-                        int extractResult = await scanDocumentFile(oleHsStream, oleFile, strExtractFilePath, isOLEMimeTypeWhite, isWhite, fileFilterExtInfo, isDocumentWhite, documentFileFilterExtInfo, (scanDepth-1), documentExtractType);
+                        int extractResult = await scanDocumentFile(oleHsStream, oleFile, strExtractFilePath, isOLEMimeTypeWhite, isWhite, fileFilterExtInfo, isDocumentWhite, documentFileFilterExtInfo, (scanDepth - 1), documentExtractType);
                         if (extractResult != 0)
                             currentFile.HasChildrenErr = true;
                     }
