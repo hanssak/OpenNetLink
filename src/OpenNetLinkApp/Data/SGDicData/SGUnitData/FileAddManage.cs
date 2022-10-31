@@ -117,43 +117,41 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// OLE 추출 실패
         /// <para>101</para>
         /// </summary>
-        eFADOC_OLE_COMMONE = 101,
+        eFADOC_EXTRACT_COMMONE = 101,
         /// <summary>
         /// 비밀번호 설정된 문서
         /// <para>102</para>
         /// </summary>
-        eFADOC_OLE_PASSWORD,
+        eFADOC_EXTRACT_PASSWORD,
+        /// <summary>
+        /// 압축형식으로 고의로 추가한 파일
+        /// </summary>
+        eFADOC_EXTRACT_FILE_ADD_ONPURPOSE,
         /// <summary>
         /// OLE 검사 결과 -> 마임검사 실패
         /// <para>103</para>
         /// </summary>
-        eFADOC_OLE_MIME,
+        eFADOC_EXTRACT_MIME,
         /// <summary>
         /// OLE 검사 결과 -> 확장자 제한
         /// <para>104</para>
         /// </summary>
-        eFADOC_OLE_EXTENSION,
-        /// <summary>
-        /// OLE 검사 결과 -> 위변조 제한
-        /// <para>105</para>
-        /// </summary>
-        eFADOC_OLE_CHANGE,
+        eFADOC_EXTRACT_OLE_EXTENSION,
         /// <summary>
         /// 압축형식 검사 결과 -> 확장자 제한
         /// <para>106</para>
         /// </summary>
-        eFADOC_COMPRESS_EXTENSION,
+        eFADOC_EXTRACT_COMPRESS_EXTENSION,
         /// <summary>
-        /// 압축형식 검사 결과 -> 위변조 제한
+        /// 위변조 제한
         /// <para>107</para>
         /// </summary>
-        eFADOC_COMPRESS_CHANGE,
-
+        eFADOC_EXTRACT_CHANGE,
         /// <summary>
         /// 검출 직후에도 남겨진 파일
         /// <para>120</para>
         /// </summary>
-        eFADOC_OLE_REMAININGFILES = 120,
+        eFADOC_EXTRACT_FILES = 120,
 
         #endregion
     }
@@ -248,200 +246,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             string str = xmlConf.GetTitle("T_ETC_FAEXCEPTIONCOUNT");                // {0} 개
             str = String.Format(str, count);
-            return str;
-        }
-
-        public string SetExceptionReason(eFileAddErr err)
-        {
-            string str = "";
-            switch (err)
-            {
-                case eFileAddErr.eFAREG:                                // 등록된 파일
-                    str = xmlConf.GetTitle("T_eFAREG");                 // 이미 등록된 파일
-                    break;
-                case eFileAddErr.eFADRM:                                // DRM
-                    str = xmlConf.GetTitle("T_eFADRM");                 // DRM 편집 권한없음
-                    break;
-                case eFileAddErr.eFADLP:                                // DLP
-                    str = xmlConf.GetTitle("T_eFADLP");                 // 개인정보 포함
-                    break;
-                case eFileAddErr.eFAEXT:                                // 확장자제한
-                    str = xmlConf.GetTitle("T_eFAEXT");                 // 확장자 제한
-                    break;
-                case eFileAddErr.eFAZIP:                                // zip파일내 확장자
-                    str = xmlConf.GetTitle("T_eFAZIP");                 // 압축파일내 제한된 파일
-                    break;
-                case eFileAddErr.eFACHG:                                // 파일변경
-                    str = xmlConf.GetTitle("T_eFACHG");                 // 확장자 변경
-                    break;
-                case eFileAddErr.eFAVIRUS:                              // 바이러스검출
-                    str = xmlConf.GetTitle("T_eFAVIRUS");                 // 바이러스 포함
-                    break;
-                case eFileAddErr.eFAFileSize:                           //  1회 전송가능 파일사이즈
-                    str = xmlConf.GetTitle("T_eFAFileSize");                 // 1회 전송용량 초과
-                    break;
-                case eFileAddErr.eFAFileCount:                           //  1회 전송가능 파일 개수
-                    str = xmlConf.GetTitle("T_eFAFileCount");                 // 1회 전송 파일 개수 초과
-                    break;
-                case eFileAddErr.eFANotFound:                                // 파일 찾기 실패
-                    str = xmlConf.GetTitle("T_eFANotFound");                 // 찾을 수 없음
-                    break;
-                case eFileAddErr.eFAHidden:                                // 숨김파일
-                    str = xmlConf.GetTitle("T_eFAHidden");                 // 숨김 파일
-                    break;
-                case eFileAddErr.eFAZipPW:                                //  zip 파일 비번 있을 때
-                    str = xmlConf.GetTitle("T_eFAZipPW");                 // 암호설정된 압축파일
-                    break;
-                case eFileAddErr.eFAZipNotPW:                                //  zip 파일 비번 없을 때
-                    str = xmlConf.GetTitle("T_eFAZipNotPW");                 // 암호 미설정된 압축파일
-                    break;
-                case eFileAddErr.eFAZipError:                                // zip 파일 손상 또는 zip 파일이 아닌경우
-                    str = xmlConf.GetTitle("T_eFAZipError");                 // 손상된 파일
-                    break;
-                case eFileAddErr.eFAEMPTY:                                // 빈파일
-                    str = xmlConf.GetTitle("T_eFAEMPTY");                 // 빈파일
-                    break;
-                case eFileAddErr.eFAUNKNOWN:                                // 알수없는파일형식
-                    str = xmlConf.GetTitle("T_eFAUNKNOWN");                 // 알수 없는 형식
-                    break;
-                case eFileAddErr.eFAEML:                                // EML파일과 다른파일을 함께 등록할 경우
-                    str = xmlConf.GetTitle("T_eFAEML");                 // EML파일이 아님
-                    break;
-                case eFileAddErr.eFAEMPTY_ATTACH:                                // 빈파일(첨부파일)
-                    str = xmlConf.GetTitle("T_eFAEMPTY_ATTACH");                 // EML파일내 빈파일 포함
-                    break;
-                case eFileAddErr.eFAUNKNOWN_ATTACH:                                // 알수없는파일형식(첨부파일)
-                    str = xmlConf.GetTitle("T_eFAUNKNOWN_ATTACH");                 // EML내 알수 없는 형식의 파일 포함
-                    break;
-                case eFileAddErr.eFACHG_ATTACH:                                // 파일변경(첨부파일)
-                    str = xmlConf.GetTitle("T_eFACHG_ATTACH");                 // EML내 확장자 변경 파일 포함
-                    break;
-
-                case eFileAddErr.eFAEXT_ATTACH:                                // 확장자제한(첨부파일)
-                    str = xmlConf.GetTitle("T_eFAEXT_ATTACH");                 // EML내 확장자 제한 파일 포함
-                    break;
-
-                case eFileAddErr.eFAZIP_ATTACH:                                // zip파일내 확장자(첨부파일)
-                    str = xmlConf.GetTitle("T_eFAZIP_ATTACH");                 // EML내 압축파일의 제한된 파일 포함
-                    break;
-
-                case eFileAddErr.eFAEML_ONLYONE:                                // EML 파일등록 2건이상일때
-                    str = xmlConf.GetTitle("T_eFAEML_ONLYONE");                 // EML은 1건만 가능
-                    break;
-
-                case eFileAddErr.eFAEMLTOPDF_ERROR:                                // EML to PDF 변환오류
-                    str = xmlConf.GetTitle("T_eFAEMLTOPDF_ERROR");                 // EML to PDF 변환오류
-                    break;
-
-                case eFileAddErr.eFAOfficeSizeError:                                // Office > pdf 변환하려는 파일이 설정되크기보다 클 경우
-                    str = xmlConf.GetTitle("T_eFAOfficeSizeError");                 // Office to PDF 변환크기 오류
-                    break;
-
-                case eFileAddErr.eFAOfficeNoinstalled:                                // Office 설치않되어있음. 파일변환기능사용. Office파일 전송하려할 경우
-                    str = xmlConf.GetTitle("T_eFAOfficeNoinstalled");                 // Office  미설치, 변환오류
-                    break;
-
-                case eFileAddErr.eFADLPERR:                                // 개인정보 검출에러
-                    str = xmlConf.GetTitle("T_eFADLPERR");                 // 개인정보 검출 오류
-                    break;
-                case eFileAddErr.eFAUnZipOutOfSpace:                                //UnZip Disk용량부족
-                    str = xmlConf.GetTitle("T_eUNZIP_OUT_OF_SPACE");                 // 압축파일 검사 Disk 용량 부족
-                    break;
-                case eFileAddErr.eFAUnZipLengthOver:                                // UnZip Length Over
-                    str = xmlConf.GetTitle("T_eUNZIP_OUT_OF_LENGTH");                 // 압축파일 내부의 파일 및 경로 길이 초과로 검사실패
-                    break;
-                case eFileAddErr.eFAUnZipCheckStop:                                //UnZip 체크 중단
-                    str = xmlConf.GetTitle("T_eUNZIP_CHECK_STOP");                 // 압축파일 검사취소
-                    break;
-                case eFileAddErr.eFADAYCOUNTOVER:                                // 일일 전송횟수 제한.
-                    /* TODO */
-                    str = xmlConf.GetTitle("T_INFO_ONEDAY_TRANCE_COUNTLIMIT");
-                    //str = "일일 전송횟수 제한";
-                    break;
-                case eFileAddErr.eFADAYSIZEOVER:                                // 일일 전송용량 제한. 
-                    /* TODO */
-                    str = xmlConf.GetTitle("T_INFO_ONEDAY_TRANCE_SIZELIMIT");
-                    //str = "일일 전송사이즈 제한";
-                    break;
-
-                case eFileAddErr.eUnZipInnerZipOpenFail:                                // zip파일 내부의 zip Open 실패 
-                    /* TODO */
-                    str = xmlConf.GetTitle("T_eUNZIP_OPEN_FAIL");
-                    //str = "ZIP 열기 오류";
-                    break;
-
-                case eFileAddErr.eUnZipInnerZipPassword:                                // zip파일에 내부의 zip 비밀번호 사용 중
-                    /* TODO */
-                    str = xmlConf.GetTitle("T_eUnZipInnerZipPassword");
-                    //str = xmlConf.GetTitle("T_eFAZipPW");
-                    break;
-
-                case eFileAddErr.eUnZipInnerExt:                                // zip파일에 내부의 zip 확장자 제한 파일 포함
-                    /* TODO */
-                    str = xmlConf.GetTitle("T_eUnZipInnerExt");
-                    //str = xmlConf.GetTitle("T_eFAEXT");
-                    break;
-
-                case eFileAddErr.eUnZipInnerExtChange:                               // zip파일에 내부의 zip 위변조 파일 포함
-                    /* TODO */
-                    str = xmlConf.GetTitle("T_eUnZipInnerExtChange");
-                    //str = xmlConf.GetTitle("T_eFACHG");
-                    break;
-
-                case eFileAddErr.eUnZipInnerExtUnknown:                                // zip파일에 내부의 zip 알수 없는 파일형식 포함
-                    /* TODO */
-                    str = xmlConf.GetTitle("T_eUnZipInnerExtUnknown");
-                    //str = xmlConf.GetTitle("T_eFAUNKNOWN");
-                    break;
-
-                case eFileAddErr.eUnZipInnerFileEmpty:                                // zip파일에 내부의 zip 비어있는 파일  
-                    /* TODO */
-                    str = xmlConf.GetTitle("T_eUnZipInnerFileEmpty");
-                    //str = xmlConf.GetTitle("T_eFAEMPTY");
-                    break;
-
-                case eFileAddErr.eUnZipInnerLengthOver:                                // zip파일에 내부의 zip Length Over
-                    /* TODO */
-                    //str = xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");					// 파일명 및 폴더명 길이초과(80자)
-                    str = string.Format(xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH_NO_VAL"), m_nFileLengthMax); // 파일명 및 폴더명 길이초과(250자)
-                    break;
-
-                case eFileAddErr.eUnZipInnerLeftZip:                                // zip파일검사 후 남아 있는 zip포함
-                    /* TODO */
-                    str = xmlConf.GetTitle("T_eUNZIP_LEFT_ZIP");                    // ZIP파일 검사후 잔여 ZIP 포함
-                                                                                    //str = "ZIP파일 검사후 잔여 ZIP 포함";
-                    break;
-
-                case eFileAddErr.eUnZipInnerDRM:                                // zip파일에 내부의 DRM 파일
-                    /* TODO */
-                    str = xmlConf.GetTitle("T_eUnZipInnerDRM");                 // T_eUNZIP_INNER_DRMFILE 
-                                                                                //str = "ZIP파일 내부 DRM 파일";
-                    break;
-
-                case eFileAddErr.eFA_LONG_PATH:                                //전송 길이초과
-                                                                               // str = xmlConf.GetTitle("L_eFA_LONG_PATH");                 // 전송 길이초과(90자)
-                    str = string.Format(xmlConf.GetTitle("L_eFA_LONG_PATH_NO_VAL"), m_nFilePathMax);
-                    break;
-
-                case eFileAddErr.eFA_LONG_PATH_PARENT:                                //상위폴더 길이초과
-                                                                                      //str = xmlConf.GetTitle("L_eFA_LONG_PATH_PARENT");                 // 상위폴더명 길이초과(80자)
-                    str = string.Format(xmlConf.GetTitle("L_eFA_LONG_PATH_PARENT_NO_VAL"), m_nFileLengthMax);
-                    break;
-
-                case eFileAddErr.eFA_LONG_PATH_FILEORPATH:                                //파일 및 폴더 길이초과
-                                                                                          //str = xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");                 // 파일명 및 폴더명 길이초과(80자)
-                    str = string.Format(xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH_NO_VAL"), m_nFileLengthMax);
-                    break;
-
-                case eFileAddErr.eFA_FILE_READ_ERROR:                                // 파일 읽기 권한 오류
-                    str = xmlConf.GetTitle("L_eFA_FILE_READ_ERROR");                 // 파일 읽기 권한 오류
-                    break;
-
-                default:
-                    str = "-";
-                    break;
-
-            }
             return str;
         }
 
@@ -776,15 +580,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public eFileAddErr GetOLEError(int BaseResult) =>
             BaseResult switch
             {
-                -1 => eFileAddErr.eFADOC_OLE_COMMONE, //공통
-                -2 => eFileAddErr.eFADOC_OLE_PASSWORD,//암호화 되어 있을때
-                -3 => eFileAddErr.eFADOC_OLE_COMMONE,//지원하지 않는 파일형식일때
-                -4 => eFileAddErr.eFADOC_OLE_COMMONE,//outfolder 찾을 수 없을때
-                -5 => eFileAddErr.eFADOC_OLE_COMMONE,//inputfile 파일을 찾을수 없을때
-                -6 => eFileAddErr.eFADOC_OLE_COMMONE,//inputfile, outfolder null 일때
-                -7 => eFileAddErr.eFADOC_OLE_COMMONE,//excel Workbook을 찾을 수 없을때
-                -10 => eFileAddErr.eFADOC_COMPRESS_CHANGE, //압축형식의 위변조 파일 발생
-                _ => eFileAddErr.eFADOC_OLE_COMMONE  //정의되지 않은 에러
+                -1 => eFileAddErr.eFADOC_EXTRACT_COMMONE, //공통
+                -2 => eFileAddErr.eFADOC_EXTRACT_PASSWORD,//암호화 되어 있을때
+                -3 => eFileAddErr.eFADOC_EXTRACT_COMMONE,//지원하지 않는 파일형식일때
+                -4 => eFileAddErr.eFADOC_EXTRACT_COMMONE,//outfolder 찾을 수 없을때
+                -5 => eFileAddErr.eFADOC_EXTRACT_COMMONE,//inputfile 파일을 찾을수 없을때
+                -6 => eFileAddErr.eFADOC_EXTRACT_COMMONE,//inputfile, outfolder null 일때
+                -7 => eFileAddErr.eFADOC_EXTRACT_COMMONE,//excel Workbook을 찾을 수 없을때
+                -10 => eFileAddErr.eFADOC_EXTRACT_FILE_ADD_ONPURPOSE, //압축형식의 고의 추가 파일 발생
+                _ => eFileAddErr.eFADOC_EXTRACT_COMMONE  //정의되지 않은 에러
             };
 
         public string SetExceptionReason(eFileAddErr err)
@@ -974,57 +778,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     break;
 
                 #region OLD 관련 에러
-                case eFileAddErr.eFADOC_OLE_COMMONE:
-                    str = xmlConf.GetTitle("T_eOLE_COMMON");                                                  //OLE개체 추출 실패
+                case eFileAddErr.eFADOC_EXTRACT_COMMONE:
+                    str = xmlConf.GetTitle("T_eFADOC_EXTRACT_COMMON");                                                  //OLE개체 추출 실패
                     break;
-                case eFileAddErr.eFADOC_OLE_PASSWORD:
-                    str = xmlConf.GetTitle("T_eOLE_PASSWORD");                                                  //문서 비밀번호 설정
+                case eFileAddErr.eFADOC_EXTRACT_PASSWORD:
+                    str = xmlConf.GetTitle("T_eFADOC_EXTRACT_PASSWORD");                                                  //문서 비밀번호 설정
                     break;
-                case eFileAddErr.eFADOC_OLE_MIME:
-                    str = xmlConf.GetTitle("T_eOLE_MIME");                                                      //OLE개체 마임타입
+                case eFileAddErr.eFADOC_EXTRACT_FILE_ADD_ONPURPOSE:
+                    str = xmlConf.GetTitle("T_eFADOC_EXTRACT_FILE_ADD_ONPURPOSE");                                                  //압축형식으로 고의로 추가한 파일
                     break;
-                case eFileAddErr.eFADOC_OLE_EXTENSION:
-                    str = xmlConf.GetTitle("T_eOLE_EXTENSION");                                                 //OLE개체 확장자 제한
+                case eFileAddErr.eFADOC_EXTRACT_MIME:
+                    str = xmlConf.GetTitle("T_eFADOC_EXTRACT_MIME");                                                      //OLE개체 마임타입
                     break;
-                case eFileAddErr.eFADOC_OLE_CHANGE:
-                    str = xmlConf.GetTitle("T_eOLE_CHANGE");                                                    //OLE개체 위변조 제한
+                case eFileAddErr.eFADOC_EXTRACT_OLE_EXTENSION:
+                    str = xmlConf.GetTitle("T_eFADOC_EXTRACT_OLE_EXTENSION");                                                 //OLE개체 확장자 제한
                     break;
-                case eFileAddErr.eFADOC_COMPRESS_EXTENSION:
-                    str = xmlConf.GetTitle("T_eCOMPRESS_EXTENSION");                                            //압축형식 확장자 제한
+                case eFileAddErr.eFADOC_EXTRACT_COMPRESS_EXTENSION:
+                    str = xmlConf.GetTitle("T_eFADOC_EXTRACT_COMPRESS_EXTENSION");                                            //압축형식 확장자 제한
                     break;
-                case eFileAddErr.eFADOC_COMPRESS_CHANGE:
-                    str = xmlConf.GetTitle("T_eCOMPRESS_CHANGE");                                               //압축형식 위변조 제한
+                case eFileAddErr.eFADOC_EXTRACT_CHANGE:
+                    str = xmlConf.GetTitle("T_eFADOC_EXTRACT_CHANGE");                                               //압축형식 위변조 제한
                     break;
-                case eFileAddErr.eFADOC_OLE_REMAININGFILES:
-                    str = xmlConf.GetTitle("eFADOC_OLE_REMAININGFILES");
+                case eFileAddErr.eFADOC_EXTRACT_FILES:
+                    str = xmlConf.GetTitle("T_eFADOC_EXTRACT_FILES");
                     break;
-                //case eFileAddErr.eOLE_Exception:                                                            // 공통
-                //    str = xmlConf.GetTitle("T_eOLE_Exception");
-                //    break;
-                //case eFileAddErr.eOLE_OEFileIsPasswordProtected:                                            // 암호화 되어있을때 
-                //    str = xmlConf.GetTitle("T_eOLE_OEFileIsPasswordProtected");
-                //    break;
-                //case eFileAddErr.eOLE_OEFileTypeNotSupported:                                               // 지원하지 않는 파일형식일때
-                //    str = xmlConf.GetTitle("T_eOLE_OEFileTypeNotSupported");
-                //    break;
-                //case eFileAddErr.eOLE_DirectoryNotFoundException:                                           // outfolder 찾을 수 없을때
-                //    str = xmlConf.GetTitle("T_eOLE_DirectoryNotFoundException");
-                //    break;
-                //case eFileAddErr.eOLE_FileNotFoundException:                                                // inputfile 파일을 찾을수 없을때
-                //    str = xmlConf.GetTitle("T_eOLE_FileNotFoundException");
-                //    break;
-                //case eFileAddErr.eOLE_ArgumentNullException:                                                // inputfile, outfolder null 일때
-                //    str = xmlConf.GetTitle("T_eOLE_ArgumentNullException");
-                //    break;
-                //case eFileAddErr.eOLE_OEFileIsCorrupt:                                                      // Excel workbook 찾을 수 없을때, 
-                //    str = xmlConf.GetTitle("T_eOLE_OEFileIsCorrupt");
-                //    break;
-                //case eFileAddErr.eOLE_UnDefinedError:                                                       // 정의되지 않은 에러
-                //    str = xmlConf.GetTitle("T_eOLE_UnDefinedError");
-                //    break;
-                //case eFileAddErr.eOLE_Inner_Ext:                                                            //문서내 OLE 개체의 확장자 제한 파일 포함
-                //    str = xmlConf.GetTitle("T_eOLE_Inner_Ext");
-                //    break;
                 #endregion
 
                 default:
@@ -3604,17 +3381,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             Log.Information($"[IsValidFileExtOnOLEObject] FileMime[{strFileMime}] Ext[{strExt}] AllowDrm[{blAllowDRM}]");
 
             // 0kb			
-            if (bEmptyFIleNoCheck && String.Compare(strFileMime, "application/x-empty") == 0)
-                return true;
+            if (bEmptyFIleNoCheck && String.Compare(strFileMime, "application/x-empty") == 0) return true;
 
-            if (String.Compare(strFileMime, "text/plain") == 0)
-                return true;
+            if (String.Compare(strFileMime, "text/plain") == 0) return true;
 
             if (String.IsNullOrEmpty(strExt) == true)
             {
                 Log.Information($"[IsValidFileExtOnOLEObject] Extension is Empty - FileMime[{strFileMime}] Ext[{strExt}] AllowDrm[{blAllowDRM}]");
                 return (String.Compare(strFileMime, "application/x-executable") == 0);
             }
+
+            if (IsValidMimeAndExtension(strFileMime, strExt)) return true;
 
             strExt = strExt.Replace(".", "");
             btFileData = StreamToByteArray(stFile, MaxBufferSize2);
@@ -4568,6 +4345,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         private static Lazy<Dictionary<string, string>> gOLEMimeTypeMap = new Lazy<Dictionary<string, string>>(() => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
 
+        /// <summary>
+        /// 마임리스트 확인
+        /// </summary>
+        /// <param name="mime"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         public static bool IsValidMimeAndExtension(string mime, string fileName)
         {
             string fileExt = fileName;
@@ -4919,7 +4702,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             blWhite, strExtInfo, nCurErrCount, out nInnerErrCount, out strOverMaxDepthZipFile, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
 
                         if (enRet != eFileAddErr.eFANone) enErr = enRet;
-                        if (childFile.HasChildrenErr) currentFile.HasChildrenErr=true;
+                        if (childFile.HasChildrenErr) currentFile.HasChildrenErr = true;
                         nCurErrCount += nInnerErrCount;
                     }
                 }
@@ -4961,7 +4744,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return enErr;
         }
 
-        public async Task<int> CheckDocumentFile(HsStream hsStream, FileAddErr currentFile, int documentExtractType, bool isOLEMimeTypeWhite, bool isWhite, string fileFilterExtInfo, bool isDocumentWhite, string documentFileFilterExtInfo)
+        public async Task<int> CheckDocumentFile(HsStream hsStream, FileAddErr currentFile, string documentExtractType, bool isOLEMimeTypeWhite, bool isWhite, string fileFilterExtInfo, bool isDocumentWhite, string documentFileFilterExtInfo)
         {
             string strDocumentExtractRootPath = Path.Combine("Temp", "Document_Extract");
 
@@ -4984,7 +4767,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             finally
             {
                 try
-                { Directory.Delete(strDocumentExtractRootPath, true); }
+                {
+                    Directory.Delete(strDocumentExtractRootPath, true); 
+                }
                 catch (System.Exception err)
                 { Log.Warning("[CheckDocumentFile] Fail Directory.Delete() " + err.Message + " " + err.GetType().FullName); }
             }
@@ -5004,7 +4789,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="scanDepth">엑셀문서에 한하여, 하위 검사 횟수 (default =1)</param>
         /// <param name="documentExtractType">서버에서 받아온 추출파일 검사 설정값 (1:OLE개체형식 검사 / 2:압축형식 검사 / 3: 모두 검사)</param>
         /// <returns></returns>
-        async Task<int> scanDocumentFile(HsStream hsStream, FileAddErr currentFile, string currentRootPath, bool isOLEMimeTypeWhite, bool isWhite, string fileFilterExtInfo, bool isDocumentWhite, string documentFileFilterExtInfo, int scanDepth, int documentExtractType)
+        async Task<int> scanDocumentFile(HsStream hsStream, FileAddErr currentFile, string currentRootPath, bool isOLEMimeTypeWhite, bool isWhite, string fileFilterExtInfo, bool isDocumentWhite, string documentFileFilterExtInfo, int scanDepth, string documentExtractType)
         {
             string strExtractFilePath = Path.Combine(currentRootPath, Path.GetFileNameWithoutExtension(hsStream.FileName));                              //Temp에 Copy된 문서의 OLE 개체를 보관할 폴더
             DirectoryInfo extractFileDir = new DirectoryInfo(strExtractFilePath);
@@ -5014,6 +4799,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             Stream fileStream = hsStream.stream;
             int extractorResult = 0;
 
+            DocumentExtractType documentExtract = DocumentExtractType.NONE;
+            if (Enum.TryParse(documentExtractType, out documentExtract) == false || documentExtract == DocumentExtractType.NONE)
+                return 0;
 
             //Docuement로 OLE 개체 검사 모듈 실행
             using (MemoryStream fileMemoryStream = new MemoryStream())
@@ -5038,12 +4826,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             if (extractorResult == -10)          //압축형식의 위변조 파일 및 임의 파일 발견
             {
-                currentFile.eErrType = eFileAddErr.eFADOC_COMPRESS_CHANGE;
+                currentFile.eErrType = eFileAddErr.eFADOC_EXTRACT_FILE_ADD_ONPURPOSE;
                 currentFile.HasChildrenErr = true;
                 foreach (FileInfo oleObject in extractFileDir.GetFiles())
                 {
                     FileAddErr oleFile = currentFile.CreateChildren(oleObject.Name, oleObject.FullName, currentFile.FileName);
-                    oleFile.eErrType = eFileAddErr.eFADOC_COMPRESS_CHANGE;
+                    oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_FILE_ADD_ONPURPOSE;
                 }
                 return extractorResult;
             }
@@ -5061,12 +4849,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             {
                 FileAddErr oleFile = currentFile.CreateChildren(extractFile.Name, extractFile.FullName, currentFile.FileName);
                 string oleExtension = extractFile.Extension.Substring(1);
-                DocumentExtractType documentExtract = (DocumentExtractType)documentExtractType;
 
                 //하위 검사 횟수를 모두 소진하여도 개체가 검출된다면 Block
                 if (scanDepth <= 0)
                 {
-                    oleFile.eErrType = eFileAddErr.eFADOC_OLE_REMAININGFILES;
+                    oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_FILES;
                     currentFile.HasChildrenErr = true;
                     continue;
                 }
@@ -5083,56 +4870,42 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         continue;
                     }
 
-                    //OLE개체의 마임리스트 체크 
-                    isOLEMimeTypeWhite = true;   //서버와 2105 통신 추가 전까지는 White List 로 임시 설정
-                    if (IsValidOLEMimeType(oleFileMime, extractFile.Name, isOLEMimeTypeWhite))
+                    //공통 - 문서용 마임리스트
+                    isOLEMimeTypeWhite = false;   //서버와 2105 통신 추가 전까지는 Black List 로 임시 설정
+                    //마임리스트는 필수 체크                                                
+                    if (!IsValidOLEMimeType(oleFileMime, extractFile.Name, isOLEMimeTypeWhite))
                     {
-                        oleFile.eErrType = eFileAddErr.eFANone;
+                        oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_MIME;
+                        currentFile.HasChildrenErr = true;
                         continue;
                     }
 
-                    #region [OLE형식 검사]
-                    if (documentExtract.HasFlag(DocumentExtractType.OLEOBJECT_EXTRACT))
+                    //OLE형식 - 확장자 제한 black, white 리스트 체크 (기본 FileFilter)
+                    if (documentExtract.HasFlag(DocumentExtractType.OLEOBJECT_EXTRACT)
+                        && !GetRegExtEnable(isWhite, fileFilterExtInfo, oleExtension))
                     {
-                        //기본 확장자 제한 black, white 리스트 체크
-                        if (!GetRegExtEnable(isWhite, fileFilterExtInfo, oleExtension))
-                        {
-                            oleFile.eErrType = eFileAddErr.eFADOC_OLE_EXTENSION;
-                            currentFile.HasChildrenErr = true;
-                            continue;
-                        }
-
-                        //위변조 제한, 0KB 체크
-                        if (!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
-                        {
-                            oleFile.eErrType = eFileAddErr.eFADOC_OLE_CHANGE;
-                            currentFile.HasChildrenErr = true;
-                            continue;
-                        }
+                        oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_OLE_EXTENSION;
+                        currentFile.HasChildrenErr = true;
+                        continue;
                     }
-                    #endregion
 
-                    #region [압축형식 검사]
-                    if (documentExtract.HasFlag(DocumentExtractType.COMPRESS_EXTRACT))
+                    //압축형식 - 확장자 제한 검사 (Document FileFilter)
+                    if (documentExtract.HasFlag(DocumentExtractType.COMPRESS_EXTRACT)
+                        && !GetRegExtEnable(isDocumentWhite, documentFileFilterExtInfo, oleExtension))
                     {
-                        //확장자 제한 black, white 리스트 체크
-                        //기본 확장자 제한 black, white 리스트 체크
-                        if (!GetRegExtEnable(isDocumentWhite, documentFileFilterExtInfo, oleExtension))
-                        {
-                            oleFile.eErrType = eFileAddErr.eFADOC_OLE_EXTENSION;
-                            currentFile.HasChildrenErr = true;
-                            continue;
-                        }
+                        oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_COMPRESS_EXTENSION;
+                        currentFile.HasChildrenErr = true;
+                        continue;
 
-                        //위변조 제한, 0KB 체크
-                        if (!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
-                        {
-                            oleFile.eErrType = eFileAddErr.eFADOC_OLE_CHANGE;
-                            currentFile.HasChildrenErr = true;
-                            continue;
-                        }
                     }
-                    #endregion
+
+                    //위변조 제한, 0KB 체크
+                    if (!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
+                    {
+                        oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_CHANGE;
+                        currentFile.HasChildrenErr = true;
+                        continue;
+                    }
 
                     //추출 개체가 엑셀인 경우, 차단 전 한번 더 검사 허용
                     if (oleExtension.ToUpper() == "XLSX" || oleExtension.ToUpper() == "XLS")
@@ -5146,7 +4919,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     else
                     {
                         //엑셀 개체가 아닌 파일이 추출되면 차단.
-                        oleFile.eErrType = eFileAddErr.eFADOC_OLE_REMAININGFILES;
+                        oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_FILES;
                         currentFile.HasChildrenErr = true;
                     }
                 }
