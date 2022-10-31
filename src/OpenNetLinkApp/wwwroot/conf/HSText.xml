@@ -533,6 +533,12 @@
 			<CN>大小</CN>
 		</T_COMMON_SIZE>
 
+		<T_COMMON_SIZE>
+			<KR>크기</KR>
+			<JP>サイズ</JP>
+			<EN>Size</EN>
+			<CN>大小</CN>
+		</T_COMMON_SIZE>
 		<T_COMMON_KIND>
 			<KR>유형</KR>
 			<JP>タイプ</JP>
@@ -1283,30 +1289,32 @@
 		</T_COMMON_UNKNOWN>
 
 
-	<T_COMMON_APPROVE_EXT>
-		<KR>결재가 필요한 파일리스트</KR>
-		<JP>...</JP>
-		<EN>...</EN>
-		<CN>...</CN>
-	</T_COMMON_APPROVE_EXT> <!-- KKW -->
+		<T_COMMON_APPROVE_EXT>
+			<KR>결재가 필요한 파일리스트</KR>
+			<JP>...</JP>
+			<EN>...</EN>
+			<CN>...</CN>
+		</T_COMMON_APPROVE_EXT>
+		<!-- KKW -->
 
-	<T_COMMON_REMARK>
-		<KR>비고</KR>
-		<JP>...</JP>
-		<EN>...</EN>
-		<CN>...</CN>
-	</T_COMMON_REMARK> <!-- KKW -->
+		<T_COMMON_REMARK>
+			<KR>비고</KR>
+			<JP>...</JP>
+			<EN>...</EN>
+			<CN>...</CN>
+		</T_COMMON_REMARK>
+		<!-- KKW -->
 
-	<T_COMMON_APPROVE_EXT_ITEM>
-		<KR>결재필요(제한파일)</KR>
-		<JP>...</JP>
-		<EN>...</EN>
-		<CN>...</CN>
-	</T_COMMON_APPROVE_EXT_ITEM>
+		<T_COMMON_APPROVE_EXT_ITEM>
+			<KR>결재필요(제한파일)</KR>
+			<JP>...</JP>
+			<EN>...</EN>
+			<CN>...</CN>
+		</T_COMMON_APPROVE_EXT_ITEM>
 
 
 
-    <!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
+		<!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] 메뉴 (T_MENU_0000) ********************************************* -->
 
@@ -2772,12 +2780,12 @@
 			<CN></CN>
 		</T_INFO_STARTPROGRAM>
 
-    <T_INFO_UPDATEPOLICY_LOGOUT>
-      <KR>을 정책 업데이트로 인해 로그아웃 하겠습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </T_INFO_UPDATEPOLICY_LOGOUT>
+		<T_INFO_UPDATEPOLICY_LOGOUT>
+			<KR>을 정책 업데이트로 인해 로그아웃 하겠습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_INFO_UPDATEPOLICY_LOGOUT>
 
 		<!-- ********************************************* [END] 환경 정보 화면 (T_INFO_0000) ********************************************* -->
 
@@ -4755,25 +4763,25 @@
 			<CN></CN>
 		</T_POS_SERVER>
 
-    <T_POS_PC>
-      <KR>PC</KR>
-      <JP></JP>
-      <EN>PC</EN>
-      <CN></CN>
-    </T_POS_PC>
+		<T_POS_PC>
+			<KR>PC</KR>
+			<JP></JP>
+			<EN>PC</EN>
+			<CN></CN>
+		</T_POS_PC>
 
-	<T_INPUT_DEPT>
-		<KR>부서입력</KR>
-		<JP></JP>
-		<EN></EN>
-		<CN></CN>
-	</T_INPUT_DEPT>
-	<T_INPUT_NAME>
-		<KR>이름입력</KR>
-		<JP></JP>
-		<EN></EN>
-		<CN></CN>
-	</T_INPUT_NAME>		
+		<T_INPUT_DEPT>
+			<KR>부서입력</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_INPUT_DEPT>
+		<T_INPUT_NAME>
+			<KR>이름입력</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_INPUT_NAME>
 		<T_ERROR_REASON_SUMMARY>
 			<KR>제외사유 종합</KR>
 			<JP></JP>
@@ -4787,75 +4795,55 @@
 			<CN></CN>
 		</T_ERROR_TOTALCOUNT_SUMMARY>
 
-		<T_eOLE_COMMON>
-			<KR>OLE개체 추출 실패</KR>
+		<T_eFADOC_EXTRACT_COMMON>
+			<KR>문서 검사 실패</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_eOLE_COMMON>
-		<T_eOLE_PASSWORD>
+		</T_eFADOC_EXTRACT_COMMON>
+		<T_eFADOC_EXTRACT_PASSWORD>
 			<KR>문서 비밀번호 설정</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_eOLE_PASSWORD>
-		<T_eOLE_MIME>
-			<KR>/OLE개체 마임타입</KR>
+		</T_eFADOC_EXTRACT_PASSWORD>
+		<T_eFADOC_EXTRACT_FILE_ADD_ONPURPOSE>
+			<KR>문서 강제추가 파일 제한</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_eOLE_MIME>
-		<T_eOLE_EXTENSION>
-			<KR>OLE개체 확장자 제한</KR>
+		</T_eFADOC_EXTRACT_FILE_ADD_ONPURPOSE>
+		<T_eFADOC_EXTRACT_MIME>
+			<KR>문서 내 파일의 마임타입 제한</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_eOLE_EXTENSION>
-		<T_eOLE_CHANGE>
-			<KR>OLE개체 위변조 제한</KR>
+		</T_eFADOC_EXTRACT_MIME>
+		<T_eFADOC_EXTRACT_OLE_EXTENSION>
+			<KR>문서 내 파일의 기본 확장자 제한</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_eOLE_CHANGE>
-		<T_eCOMPRESS_EXTENSION>
-			<KR>압축형식 확장자 제한</KR>
+		</T_eFADOC_EXTRACT_OLE_EXTENSION>
+		<T_eFADOC_EXTRACT_COMPRESS_EXTENSION>
+			<KR>문서 내 파일의 개체용 확장자 제한</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_eCOMPRESS_EXTENSION>
-		<T_eCOMPRESS_CHANGE>
-			<KR>압축형식 위변조 제한</KR>
+		</T_eFADOC_EXTRACT_COMPRESS_EXTENSION>
+		<T_eFADOC_EXTRACT_CHANGE>
+			<KR>문서 내 파일 위변조 제한</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_eCOMPRESS_CHANGE>
+		</T_eFADOC_EXTRACT_CHANGE>
 
-		<eFADOC_OLE_REMAININGFILES>
+		<T_eFADOC_EXTRACT_FILES>
 			<KR>문서 내 검출된 파일</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</eFADOC_OLE_REMAININGFILES>
-		
-		<T_OLE_CHECK_LIST>
-			<KR>※ 문서파일 내 검출된 OLE 개체 리스트</KR>
-			<JP></JP>
-			<EN></EN>
-			<CN></CN>
-		</T_OLE_CHECK_LIST>
-		<T_OLE_OBJECT_COUNT>
-			<KR>검출된 OLE 개체 갯수</KR>
-			<JP></JP>
-			<EN></EN>
-			<CN></CN>
-		</T_OLE_OBJECT_COUNT>
-		<T_OLE_CHECK_RESULT>
-			<KR>검출 결과코드</KR>
-			<JP></JP>
-			<EN></EN>
-			<CN></CN>
-		</T_OLE_CHECK_RESULT>
-
+		</T_eFADOC_EXTRACT_FILES>
 		<T_APPROVEEXT_USE_APPROVE>
 			<KR>결재 사용</KR>
 			<JP></JP>
@@ -4882,30 +4870,30 @@
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_APPROVEEXT_TITLE_2>    
+		</T_APPROVEEXT_TITLE_2>
 
 		<T_APPROVEEXT_TITLE_WHY>
 			<KR>사유</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_APPROVEEXT_TITLE_WHY>    
+		</T_APPROVEEXT_TITLE_WHY>
 
 		<T_APPROVEEXT_TITLE_WHYDATA>
 			<KR>사유를 입력하십시오.</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_APPROVEEXT_TITLE_WHYDATA> 
-	
+		</T_APPROVEEXT_TITLE_WHYDATA>
+
 		<T_APPROVEEXT_SELECT_APPROVER>
 			<KR>결재자를 조회하여 선택하십시오.</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_APPROVEEXT_SELECT_APPROVER> 
-	
-    <!-- ********************************************* [END] Alarm 설정 (T_ALARM_0000) ******************************************** -->
+		</T_APPROVEEXT_SELECT_APPROVER>
+
+		<!-- ********************************************* [END] Alarm 설정 (T_ALARM_0000) ******************************************** -->
 	</TITLE>
 
 	<INFO>
@@ -6498,31 +6486,31 @@
 		</I_0228>
 
 
-    <I_0229>
-      <KR>예외처리 신청이 완료되었습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </I_0229>
+		<I_0229>
+			<KR>예외처리 신청이 완료되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0229>
 
-    <I_0230>
-      <KR>예외처리 요청이 취소되었습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </I_0230>
-		
-	<I_0231>
-		<KR>내부파일 확인</KR>
-		<JP></JP>
-		<EN></EN>
-		<CN></CN>
-	</I_0231>
+		<I_0230>
+			<KR>예외처리 요청이 취소되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0230>
+
+		<I_0231>
+			<KR>내부파일 확인</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0231>
 
 
 		<!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
-		</INFO>
+	</INFO>
 
 	<WARNING>
 
@@ -8454,19 +8442,19 @@
 		</W_0283>
 
 
-	    <W_0284>
-	      <KR>결재없이 송신할 수 있는 파일이 없습니다.</KR>
-	      <JP></JP>
-	      <EN></EN>
-	      <CN></CN>
-	    </W_0284>
+		<W_0284>
+			<KR>결재없이 송신할 수 있는 파일이 없습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0284>
 
-	    <W_0285>
-	      <KR>사유를 {0}자이상 입력하십시오.</KR>
-	      <JP></JP>
-	      <EN></EN>
-	      <CN></CN>
-	    </W_0285>
+		<W_0285>
+			<KR>사유를 {0}자이상 입력하십시오.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0285>
 
 	</WARNING>
 

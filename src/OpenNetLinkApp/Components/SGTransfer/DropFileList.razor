@@ -736,22 +736,7 @@
     {
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        HSCmdCenter.sgPageEvent.SetRMouseFileAddEventAdd(groupID, RMouseFileAction);
-        InitText();
-        @*action1 = HandleFileInputChange;
-            action2 = HandleFileInputChange;*@
-        //SGFileExamEvent = FileExamResult;
-        HSCmdCenter.sgPageEvent.SetFileExamNotiEventAdd(groupID, FileExamResult);
-        PageStatusData pageSData = pageService.GetPageStatus(groupID);
-        HsStreamList = pageSData.GetFileDragListData();
-        fileAddManage = pageSData.GetFileAddManage();
-
-        //파일리더 초기화 통합
+      //파일리더 초기화 통합
         _dropReference = fileReaderService.CreateReference(inputTypeFileElement);
         string targets = new string("fileInputTrans");
         _dropReference.SetDragTargetElementAsync(targets);
@@ -1176,10 +1161,23 @@
     //DropZone 클릭방지코드
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
+        //2022.10.28 이동 - 다중망 접속 시 초기화면이 [파일전송] 화면인 경우, 해당 망의 이벤트와 리스트로 재배치
+        HSCmdCenter.sgPageEvent.SetRMouseFileAddEventAdd(groupID, RMouseFileAction);
+        InitText();
+        @*action1 = HandleFileInputChange;
+            action2 = HandleFileInputChange;*@
+        //SGFileExamEvent = FileExamResult;
+        HSCmdCenter.sgPageEvent.SetFileExamNotiEventAdd(groupID, FileExamResult);
+        PageStatusData pageSData = pageService.GetPageStatus(groupID);
+        HsStreamList = pageSData.GetFileDragListData();
+        fileAddManage = pageSData.GetFileAddManage();
+
         base.OnAfterRender(firstRender);
         RMouseFileAddEvent RMouseFileAdd = null;
         RMouseFileAdd = HSCmdCenter.sgPageEvent.GetRMouseFileAddEvent(groupID);
@@ -1703,8 +1701,8 @@
         string strDocumentFileExtInfo = sgLoginData.GetDocumentFileFilter();
 
         string strDocumentExtractType = sgLoginData.GetDocumentExtractType(sgLoginData.GetSystemPosition());        //문서파일 내부 검사유형 ( 1 : OLE개체형식의 검출파일 검사 / 2 : 압축형식의 첨부파일검사 / 3 : 압축형식&OLE개체형식 모두 검사
-        int docExtractType = 0;
-        int.TryParse(strDocumentExtractType, out docExtractType);
+        //int docExtractType = 0;
+        //int.TryParse(strDocumentExtractType, out docExtractType);
 
         bool bOLECheckMimeType = sgLoginData.GetOLECheckMimeType();                 //OLE 개체 검사 시 MIME LIST의 블랙/화이트 여부 (true: White)
 
@@ -1715,7 +1713,7 @@
         }
 
         //bool bDenyPasswordZIP = SGAppMgrSvc.AppConfigInfoService.GetDenyPasswordZIP();
-        if (await fileAddManager.CheckDocumentFile(hsStream, currentFile, docExtractType, bOLECheckMimeType, bWhite, strFileExtInfo, bDocumentWhite, strDocumentFileExtInfo) != 0)
+        if (await fileAddManager.CheckDocumentFile(hsStream, currentFile, strDocumentExtractType, bOLECheckMimeType, bWhite, strFileExtInfo, bDocumentWhite, strDocumentFileExtInfo) != 0)
             return -1;
 
         return 0;
