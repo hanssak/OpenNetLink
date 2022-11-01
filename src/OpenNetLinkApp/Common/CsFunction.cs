@@ -13,6 +13,7 @@ using System.IO;
 using AgLogManager;
 using Serilog;
 using HsNetWorkSG;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace OpenNetLinkApp.Common
 {
@@ -262,6 +263,41 @@ namespace OpenNetLinkApp.Common
             return false;
         }
 
+        public static byte[] ObjectToByteArray(Object obj)
+        {
+            if (obj == null)
+                return null;
+
+            BinaryFormatter bf = new BinaryFormatter();
+            MemoryStream ms = new MemoryStream();
+            bf.Serialize(ms, obj);
+
+            return ms.ToArray();
+        }
+
+        // Convert a byte array to an Object
+        public static object ByteArrayToObject(byte[] arrBytes)
+        {
+            MemoryStream memStream = new MemoryStream();
+            BinaryFormatter binForm = new BinaryFormatter();
+            memStream.Write(arrBytes, 0, arrBytes.Length);
+            memStream.Seek(0, SeekOrigin.Begin);
+            object obj = (object)binForm.Deserialize(memStream);
+
+            return obj;
+        }
+        /// <summary>
+        /// Base64String To UTF8 String
+        /// </summary>
+        /// <param name="strVal"></param>
+        /// <returns></returns>
+        public static string ConvertBase64StringToUTF8(string strVal)
+        {
+            string tempVal = strVal;
+            byte[] temp = Convert.FromBase64String(tempVal);
+            tempVal = Encoding.UTF8.GetString(temp);
+            return tempVal;
+        }
     }
 
     public class CsSeqFunc

@@ -76,10 +76,10 @@
                             <!-- 패스워드 유효기간 -->
                             @if (bShowPasswordUseTime)
                             {
-                                    <tr>
-                                        <th>@XmlConf.GetTitle("T_DASH_PWPERIOD_DATE")</th> <!--패스워드 유효기간 -->
-                                <td>@strPWChgDate</td>
-                                    </tr>
+                                <tr>
+                                    <th>@XmlConf.GetTitle("T_DASH_PWPERIOD_DATE")</th> <!--패스워드 유효기간 -->
+                                    <td>@strPWChgDate</td>
+                                </tr>
                             }
                             <tr>
                                 <th>@XmlConf.GetTitle("T_DASH_APPROVAL_RIGHT")</th> <!--결재권한-->
@@ -117,11 +117,11 @@
                                     <div class="progress progress-sm">
                                         @if (nDayMaxFileSize == 0)
                                         {
-                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="width: 100%;background-color:#f4a925"></div>
+                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="width: 100%;background-color:#f4a925"></div>
                                         }
                                         else
                                         {
-                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #f4a925;width: @((nDayUseFileSize*100/nDayMaxFileSize))%"></div>
+                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #f4a925;width: @((nDayUseFileSize*100/nDayMaxFileSize))%"></div>
                                         }
                                     </div>
                                 </div>
@@ -129,23 +129,23 @@
                             <td style="padding:5px 15px 5px 5px;">
                                 @if (bUseClipBoard)
                                 {
-                                        <div class="progress-group text-left">
-                                            <!-- 클립보드 용량-->
-                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
-                                            <span class="float-right">
-                                                <b>@nDayUseClipSize</b>/@(nDayMaxClipSize==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipSize.ToString())
-                                            </span>
-                                            <div class="progress progress-sm">
+                                    <div class="progress-group text-left">
+                                        <!-- 클립보드 용량-->
+                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
+                                        <span class="float-right">
+                                            <b>@nDayUseClipSize</b>/@(nDayMaxClipSize==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipSize.ToString())
+                                        </span>
+                                        <div class="progress progress-sm">
                                             @if (nDayMaxClipSize == 0)
                                             {
-                                                        <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: @(bUseClipBoard?100:0)%"></div>
+                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: @(bUseClipBoard?100:0)%"></div>
                                             }
                                             else
                                             {
-                                                        <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: @((nDayUseClipSize*100/nDayMaxClipSize))%"></div>
+                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: @((nDayUseClipSize*100/nDayMaxClipSize))%"></div>
                                             }
-                                            </div>
                                         </div>
+                                    </div>
                                 }
                             </td>
                             <td rowspan="2">
@@ -166,11 +166,11 @@
                                     <div class="progress progress-sm">
                                         @if (nDayMaxFileCount == 0)
                                         {
-                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #d36300; width: 100% "></div>
+                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #d36300; width: 100% "></div>
                                         }
                                         else
                                         {
-                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #d36300; width: @((nDayUseFileCount*100/nDayMaxFileCount))%"></div>
+                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #d36300; width: @((nDayUseFileCount*100/nDayMaxFileCount))%"></div>
                                         }
                                     </div>
                                 </div>
@@ -178,23 +178,23 @@
                             <td style="padding: 5px 15px 5px 5px; text-align: center;">
                                 @if (bUseClipBoard)
                                 {
-                                        <div class="progress-group text-left">
-                                            <!-- 클립보드 건수-->
-                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
-                                            <span class="float-right">
-                                                <b>@nDayUseClipCount</b>/@(nDayMaxClipCount==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipCount.ToString())
-                                            </span>
-                                            <div class="progress progress-sm">
+                                    <div class="progress-group text-left">
+                                        <!-- 클립보드 건수-->
+                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
+                                        <span class="float-right">
+                                            <b>@nDayUseClipCount</b>/@(nDayMaxClipCount==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipCount.ToString())
+                                        </span>
+                                        <div class="progress progress-sm">
                                             @if (nDayMaxClipCount == 0)
                                             {
-                                                        <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: @(bUseClipBoard?100:0)%"></div>
+                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: @(bUseClipBoard?100:0)%"></div>
                                             }
                                             else
                                             {
-                                                        <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: @((nDayUseClipCount*100/nDayMaxClipCount))%"></div>
+                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: @((nDayUseClipCount*100/nDayMaxClipCount))%"></div>
                                             }
-                                            </div>
                                         </div>
+                                    </div>
                                 }
                             </td>
                         </tr>
@@ -225,11 +225,11 @@
                                     else
                                         strViewTitle = item.Title;
                                     strViewDate = item.RegDate.Substring(0, 11);
-                                        <tr>
-                                            <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td @onclick="(e=>OpenDetailPopup(item))" style="cursor: pointer; width: 40%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
-                                            <td> @strViewDate</td>
-                                        </tr>
+                                    <tr>
+                                        <td>@((MarkupString)item.getTypeTag())</td>
+                                        <td @onclick="(e=>OpenDetailPopup(item))" style="cursor: pointer; width: 40%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
+                                        <td> @strViewDate</td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -249,11 +249,11 @@
                                     else
                                         strViewTitle = item.Title;
                                     strViewDate = item.RegDate.Substring(0, 11);
-                                        <tr>
-                                            <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td @onclick="(e=>OpenDetailPopup(item))" style="cursor:pointer;width: 40%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
-                                            <td> @strViewDate</td>
-                                        </tr>
+                                    <tr>
+                                        <td>@((MarkupString)item.getTypeTag())</td>
+                                        <td @onclick="(e=>OpenDetailPopup(item))" style="cursor:pointer;width: 40%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
+                                        <td> @strViewDate</td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -273,11 +273,11 @@
                                     else
                                         strViewTitle = item.Title;
                                     strViewDate = item.RegDate.Substring(0, 11);
-                                        <tr>
-                                            <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td @onclick="(e=>OpenDetailPopup(item))" style="cursor: pointer; width: 40%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
-                                            <td> @strViewDate</td>
-                                        </tr>
+                                    <tr>
+                                        <td>@((MarkupString)item.getTypeTag())</td>
+                                        <td @onclick="(e=>OpenDetailPopup(item))" style="cursor: pointer; width: 40%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
+                                        <td> @strViewDate</td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -297,11 +297,11 @@
                                     else
                                         strViewTitle = item.Title;
                                     strViewDate = item.RegDate.Substring(0, 11);
-                                        <tr>
-                                            <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td @onclick="(e=>OpenDetailPopup(item))" style="cursor:pointer;width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
-                                            <td> @strViewDate</td>
-                                        </tr>
+                                    <tr>
+                                        <td>@((MarkupString)item.getTypeTag())</td>
+                                        <td @onclick="(e=>OpenDetailPopup(item))" style="cursor:pointer;width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
+                                        <td> @strViewDate</td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -323,11 +323,11 @@
 
                     @if (GetUseApproveMenu())
                     {
-                            <input type="radio" name="tabs1" id="user1" checked="checked">
+                        <input type="radio" name="tabs1" id="user1" checked="checked">
                     }
                     else
                     {
-                            <input type="radio" name="tabs1" id="user1">
+                        <input type="radio" name="tabs1" id="user1">
                     }
                     <label for="user1" style="width:50%;">@XmlConf.GetTitle("T_DASH_APPROVAL_STATUS")</label>  <!-- 결재 현황 -->
                     <div class="tab p-0">
@@ -344,14 +344,14 @@
                                 </tr>
                                 @foreach (ApproveItem item in approveList)
                                 {
-                                        <tr>
-                                            <td style="width:7%;">@item.dispNo</td>
-                                            <td style="width:10%;">@item.apvType</td>
-                                            <td style="width:10%;">@item.transKind</td>
-                                            <td style="width:14%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.requestorName</td>
-                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                            <td style="width:18%;">@item.reqDate</td>
-                                        </tr>
+                                    <tr>
+                                        <td style="width:7%;">@item.dispNo</td>
+                                        <td style="width:10%;">@item.apvType</td>
+                                        <td style="width:10%;">@item.transKind</td>
+                                        <td style="width:14%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.requestorName</td>
+                                        <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="width:18%;">@item.reqDate</td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -361,11 +361,11 @@
 
                     @if (GetUseApproveMenu())
                     {
-                            <input type="radio" name="tabs1" id="user2">
+                        <input type="radio" name="tabs1" id="user2">
                     }
                     else
                     {
-                            <input type="radio" name="tabs1" id="user2" checked="checked">
+                        <input type="radio" name="tabs1" id="user2" checked="checked">
                     }
 
                     <label for="user2" style="width:50%;">@XmlConf.GetTitle("T_DASH_REQUEST_STATUS")</label>  <!-- 요청 현황 -->
@@ -383,14 +383,14 @@
                                 </tr>
                                 @foreach (transItem item in requestList)
                                 {
-                                        <tr>
-                                            <td style="width:7%;">@item.dispNo</td>
-                                            <td style="width:10%;">@item.apvType</td>
-                                            <td style="width:10%;">@item.transKind</td>
-                                            <td style="width:16%;">@item.approverStatus</td>
-                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                            <td style="width:18%;">@item.reqDate</td>
-                                        </tr>
+                                    <tr>
+                                        <td style="width:7%;">@item.dispNo</td>
+                                        <td style="width:10%;">@item.apvType</td>
+                                        <td style="width:10%;">@item.transKind</td>
+                                        <td style="width:16%;">@item.approverStatus</td>
+                                        <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="width:18%;">@item.reqDate</td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -414,10 +414,10 @@
 
                     @if (bFileTransMenuUse)
                     {
-                            <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transfer"))">
-                                <div class="text-center"><img src="/images/adminlte/quick_01.png"></div>
-                                <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_FILESEND")</font>  <!--파일전송-->
-                    </button>
+                        <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transfer"))">
+                            <div class="text-center"><img src="/images/adminlte/quick_01.png"></div>
+                            <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_FILESEND")</font>  <!--파일전송-->
+                        </button>
                     }
 
                     <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transManage"))">
@@ -427,10 +427,10 @@
 
                     @if (bApprMenuUse)
                     {
-                            <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transferApprove"))">
-                                <div class="text-center"><img src="/images/adminlte/quick_03.png"></div>
-                                <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_APPROVEMANAGE")</font> <!--결재관리-->
-                    </button>
+                        <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transferApprove"))">
+                            <div class="text-center"><img src="/images/adminlte/quick_03.png"></div>
+                            <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_APPROVEMANAGE")</font> <!--결재관리-->
+                        </button>
                     }
 
                     <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/viewConf"))">
@@ -486,6 +486,7 @@
 
 <ViewDetailPopUp @ref="refViewDetail"></ViewDetailPopUp>
 <PublicBoardView @ref="refPublicBoardView"></PublicBoardView>
+<SGAlert @ref="refSGAlertDashBoardContinueFileTrans" Guid="DashBoardContinueFileTransAlert"></SGAlert>
 @code
 {
 
@@ -571,7 +572,7 @@
     public int nDiskFreeSize = 0;
 
     Update_PopUp refUpdate_PopUp;
-
+    SGAlert refSGAlertDashBoardContinueFileTrans;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<Welcome>();
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
@@ -1089,6 +1090,9 @@
             SendDayFileInfo();
 
             StateHasChanged();
+
+            
+            CheckContinueFileUpload();
 
         }
 
@@ -2204,6 +2208,26 @@
                 strAdminPhone = sgAdmin.Phone;
                 strAdminEmail = sgAdmin.Email;
             }
+        }
+    }
+
+    private void CheckContinueFileUpload()
+    {
+        int groupId = groupIDbyParam;
+        ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupId);
+
+        SGReSendData sGReSendData = SQLiteDB.SelectReSendInfo(groupId, sgUserInfo.UserSeq);
+        if (sGReSendData != null)
+        {
+            if (!File.Exists(sGReSendData.HSZNAME))
+            {
+                SQLiteDB.DeleteReSendInfo(sGReSendData.RESENDID);
+                return;
+            }
+
+
+            if (refSGAlertDashBoardContinueFileTrans != null)
+                refSGAlertDashBoardContinueFileTrans.openPopUp(XmlConf.GetTitle("T_DATA_CONTINUE_TRANS"), XmlConf.GetTitle("T_DATA_CONTINUE_FILE_TRANS_INFO"), 1, groupId);
         }
     }
 

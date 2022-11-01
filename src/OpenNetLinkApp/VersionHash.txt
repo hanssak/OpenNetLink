@@ -1,5 +1,5 @@
 
 -- sql에서 등록 / Agent 해시값
 -- 내부망 I, 외부망 E, SQL 쿼리문 실행시 I, E를 변경해 주세요.
-delete from tbl_agent_hash where system_type='I' and version ='OpenNetLink 1.0.0.1:mac';
-insert into tbl_agent_hash values ('I', 'OpenNetLink 1.0.0.1:mac', 'DBB4EF0EF7F88EA7A0339B20500B6B79', to_char(now(), 'YYYYMMDDHH24miss'), '1');
+delete from tbl_agent_hash where system_type='I' and version ='OpenNetLink 1.0.0.1:windows';
+insert into tbl_agent_hash values ('I', 'OpenNetLink 1.0.0.1:windows', 'EE52C3EFFDA1F54D68F5943AE62DC6BC', to_char(now(), 'YYYYMMDDHH24miss'), '1');

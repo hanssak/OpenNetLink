@@ -2311,6 +2311,19 @@ namespace OpenNetLinkApp.Services
             return nRet;
         }
 
+        public int ContinueSendFileTrans(int groupid, Dictionary<string,string> values, string strNetOver3info, string hszFileName, int currentFileSize)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            int nRet = -1;
+            if (hsNetWork != null)
+                nRet = sgSendData.RequestContinueSendFileTrans(hsNetWork, groupid, values, strNetOver3info, hszFileName, currentFileSize);
+
+            if (nRet == -2)
+                SendFileTransCancel();
+            return nRet;
+        }
+
 
         public void SendFileTransCancel()
         {
@@ -2325,7 +2338,15 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendFilePrev(hsNetWork, groupid, strUserID, strTransSeq, strFileName, strFileKey, strFileSeq, strOrgData);
             return -1;
         }
-
+        //파일 이어전송 파일정보 요청
+        public int SendFileUploadInfo(int groupid, string strUserID, string mid, string totalPart, string totalSize)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendFileUploadInfo(hsNetWork, strUserID, mid, totalPart, totalSize);
+            return -1;
+        }
         public int SendEmailDownload(int groupid, string strUserID, string stEmailSeq, string sFileName, string filekey, string fileseq)
         {
             HsNetWork hsNetWork = null;

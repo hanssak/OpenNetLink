@@ -6,7 +6,9 @@ using HsNetWorkSG;
 using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 using System.Threading;
 using System.Runtime.InteropServices;
-
+using OpenNetLinkApp.Data.SGNotify;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace OpenNetLinkApp.Data.SGDicData
 {
@@ -531,6 +533,8 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["FILERECORD"] = "-";
             dic["FORWARDUSERID"] = receiver;
             dic["DATATYPE"] = strDataType;
+            dic["GROUPID"] = groupid.ToString();
+
 
 
             CmdSendParser sendParser = new CmdSendParser();
@@ -562,7 +566,50 @@ namespace OpenNetLinkApp.Data.SGDicData
 
             src = new CancellationTokenSource();
             token = src.Token;
+
             return hsNet.SendMessage(args, FileList, token, null);
+            // return -2;
+        }
+
+        public int RequestContinueSendFileTrans(HsNetWork hsNet, int groupid, Dictionary<string, string> values, string strNetOver3info, string hszFileName, int currentFileSize)
+        {
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            string FILEMD5 = values["FILEMD5"];
+            string FILERECORD = values["FILERECORD"];
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", values);
+            args.MsgRecode["FILEMD5"] = FILEMD5;
+            args.MsgRecode["FILERECORD"] = FILERECORD;
+
+            FileStream fileStream = File.OpenRead(hszFileName);
+
+            // 통신에서 transreq를 보낼때, '/' 문자로 나누어서 망개수 만큼 보냄 
+            if (strNetOver3info.Length > 0)
+            {
+                args.errListParm = new List<string>();
+
+                int nPos = -1;
+                nPos = strNetOver3info.IndexOf("/");
+                if (nPos < 0)
+                    args.errListParm.Add(strNetOver3info);
+                else
+                {
+                    String[] listOneNet = strNetOver3info.Split("/");
+                    if (listOneNet.Count() > 1)
+                    {
+                        int nJdx = 0;
+                        for (; nJdx < listOneNet.Count(); nJdx++)
+                        {
+                            args.errListParm.Add(listOneNet[nJdx]);
+                        }
+                    }
+                }
+            }
+
+            src = new CancellationTokenSource();
+            token = src.Token;
+
+            return hsNet.ContinueSendFile(args, fileStream, token, currentFileSize, null);
             // return -2;
         }
 
@@ -712,6 +759,22 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_FILEPREVIEW", dic);
             return hsNet.SendMessage(args);
         }
+
+        public int RequestSendFileUploadInfo(HsNetWork hsNet, string strUserID, string mid, string totalPart, string totalSize)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["MID"] = mid;
+            dic["TOTALPART"] = totalPart;
+            dic["TOTALSIZE"] = totalSize;
+            
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_FILEUPLOAD_INFO", dic);
+            return hsNet.SendMessage(args);
+        }
+
         public int RequestSendEmailDownload(HsNetWork hsNet, int groupid, string strUserID, string stEmailSeq, string sFileName, string filekey, string fileseq)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();

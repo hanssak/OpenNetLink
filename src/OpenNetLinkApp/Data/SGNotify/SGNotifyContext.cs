@@ -23,6 +23,8 @@ namespace OpenNetLinkApp.Data.SGNotify
         public DbSet<SGAlarmData> Alarms { get; set; }
         public DbSet<SGNotiData> Notis { get; set; }
 
+        public DbSet<SGReSendData> ReSend { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder
@@ -88,6 +90,43 @@ namespace OpenNetLinkApp.Data.SGNotify
                         .Property(c => c.Body).HasColumnType("varchar(4096)").IsRequired();
             modelBuilder.Entity<SGNotiData>()
                         .Property(c => c.Time).HasColumnType("TEXT").HasDefaultValueSql("datetime('now','localtime')").IsRequired();
+            /* TABLE: SGReSendData */
+            modelBuilder.Entity<SGReSendData>()
+                        .ToTable("T_SG_RESEND");
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.RESENDID).IsRequired()
+                        .HasAnnotation("Sqlite:Autoincrement", true)
+                        .ValueGeneratedOnAdd();
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.GROUPID).IsRequired();
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.USERSEQ).IsRequired();
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.CLIENTID).IsRequired();
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.MID).IsRequired();
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.HSZNAME).IsRequired();
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.ISEND).IsRequired();
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.TRANSINFO).IsRequired();
+            modelBuilder.Entity<SGReSendData>()
+                        .HasKey(k => k.RESENDID).HasName("PK_T_SG_RESEND_ID");
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.GROUPID).HasColumnType("INT");
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.USERSEQ).HasColumnType("varchar(512)");
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.CLIENTID).HasColumnType("varchar(512)");
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.MID).HasColumnType("varchar(512)");
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.HSZNAME).HasColumnType("varchar(512)");
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.ISEND).HasColumnType("BOOLEAN");
+            modelBuilder.Entity<SGReSendData>()
+                        .Property(c => c.TRANSINFO).HasColumnType("BLOB");
         }
     }
     /// <summary>
@@ -109,6 +148,119 @@ namespace OpenNetLinkApp.Data.SGNotify
         private static readonly Lazy<SGNtfyDBProc> _instance = new Lazy<SGNtfyDBProc> (() => new SGNtfyDBProc());
         //public static 의 객체반환 함수
         public static SGNtfyDBProc Instance { get { return _instance.Value; } }
+
+        /* Insert to SGReSendInfo */
+        public bool InsertReSendInfo(int groupId, string userSeq, string clientId, string mid, string hszName, object transInfo)
+        {
+            // Create
+            mut.WaitOne();
+            Log.Information("Inserting a ReSendInfo, {userSeq}, {clientId}, {mid}", userSeq, clientId, mid);
+            DBCtx.Add(new SGReSendData
+            {
+                RESENDID = 0,
+                GROUPID = groupId,
+                USERSEQ = userSeq,
+                CLIENTID = clientId,
+                MID = mid,
+                HSZNAME = hszName,
+                ISEND = false,
+                TRANSINFO = transInfo
+            });
+            DBCtx.SaveChanges();
+            mut.ReleaseMutex();
+            return true;
+        }
+        public SGReSendData SelectReSendInfo(int groupId, string userSeq)
+        {
+            mut.WaitOne();
+            SGReSendData reSendData;
+            // Read
+
+            reSendData = DBCtx.ReSend
+                    .Where(x => x.GROUPID == groupId && x.USERSEQ == userSeq && x.ISEND == false)
+                    .OrderByDescending(x => x.RESENDID).FirstOrDefault();
+            
+            Log.Information("Querying for a ReSendInfo");
+            mut.ReleaseMutex();
+            return reSendData;
+        }
+        public SGReSendData SelectReSendInfo(int reSendDataId)
+        {
+            mut.WaitOne();
+            SGReSendData reSendData;
+            // Read
+
+            reSendData = DBCtx.ReSend
+                    .Where(x => x.RESENDID == reSendDataId)
+                    .FirstOrDefault();
+
+            Log.Information("Querying for a ReSendInfo");
+            mut.ReleaseMutex();
+            return reSendData;
+        }
+        public bool UpdateReSendInfo(int groupId, string userSeq, bool isEnd)
+        {
+            mut.WaitOne();
+            SGReSendData reSendData;
+            // Read
+
+            reSendData = DBCtx.ReSend
+                    .Where(x => x.GROUPID== groupId && x.USERSEQ == userSeq && x.ISEND == false)
+                    .OrderByDescending(x => x.RESENDID).FirstOrDefault();
+
+            if (reSendData != null)
+                reSendData.ISEND = isEnd;
+
+            DBCtx.SaveChanges();
+
+            Log.Information("Update ReSendInfo");
+            mut.ReleaseMutex();
+            return true;
+        }
+
+        public bool DeleteReSendInfo(int groupId, string userSeq)
+        {
+            mut.WaitOne();
+            SGReSendData reSendData;
+            // Read
+
+            reSendData = DBCtx.ReSend
+                    .Where(x => x.GROUPID == groupId && x.USERSEQ == userSeq)
+                    .OrderByDescending(x => x.RESENDID).FirstOrDefault();
+
+            if (reSendData != null)
+            {
+                DBCtx.ReSend.Remove(reSendData);
+            }
+
+            DBCtx.SaveChanges();
+
+            Log.Information("Update ReSendInfo");
+            mut.ReleaseMutex();
+            return true;
+        }
+
+        public bool DeleteReSendInfo(int reSendDataId)
+        {
+            mut.WaitOne();
+            SGReSendData reSendData;
+            // Read
+
+            reSendData = DBCtx.ReSend
+                    .Where(x => x.RESENDID == reSendDataId)
+                    .FirstOrDefault();
+
+            if (reSendData != null)
+            {
+                DBCtx.ReSend.Remove(reSendData);
+            }
+
+            DBCtx.SaveChanges();
+
+            Log.Information("Update ReSendInfo");
+            mut.ReleaseMutex();
+            return true;
+        }
 
         /* Insert to SGNotiInfo */
         public bool InsertNotiInfo(NOTI_TYPE type, int groupId, string userSeq, string seq, LSIDEBAR categoryId, string path, string iconImage, string head, string body)

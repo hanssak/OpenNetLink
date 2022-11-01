@@ -269,7 +269,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseOSMaxFilePath { get; set; } = true;                               // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
         public int m_nClipAfterApproveUseType { get; set; } = 0;                                    // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
 
-        public bool m_bUseUserSelectFirstServer { get; set; } = false;                       // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
+        public bool m_bUseUserSelectFirstServer { get; set; } = true;                       // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
 
         //public bool m_bUseNetOverAllsend { get; set; } = false;                              // 3망 연결된 망에 한번에 전부 전송하는 기능 사용유무
 

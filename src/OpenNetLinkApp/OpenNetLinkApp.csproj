@@ -1825,6 +1825,10 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\SGNotify\" />
+  </ItemGroup>
+
 <Target Name="PostBuild" AfterTargets="PostBuildEvent">
      <MakeDir Condition="'$(OS)' == 'Windows_NT'" Directories="$(PublishDir)" />
      <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(ProjectDir)Library\* $(PublishDir)" />
