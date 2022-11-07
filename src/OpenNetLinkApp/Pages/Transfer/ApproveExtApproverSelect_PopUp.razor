@@ -633,21 +633,21 @@
     protected override void OnInitialized()
     {
 
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
         actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
 
-        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproveExtSelectType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchApproveExtTree();
+        approverSearchType = SGAppMgrSvc.SiteConfigInfoService.GetApproveExtSelectType(groupID);
+        useInputInTree = SGAppMgrSvc.SiteConfigInfoService.GetUseInputSearchApproveExtTree(groupID);
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
 
         bEditDeptName = SGAppMgrSvc.OpConfigInfoService.GetUseApprDeptSearch(groupID);
 

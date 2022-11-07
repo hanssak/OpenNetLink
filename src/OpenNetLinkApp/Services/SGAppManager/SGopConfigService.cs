@@ -223,65 +223,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetUseFileExceptionDescCheck();
 
         /// <summary>
-        /// 결재자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
-        /// </summary>
-        /// <returns></returns>
-        public string GetApproverSearchType();
-
-        /// <summary>
-        /// 결재자 관련 팝업 시 직접 입력하여 결재자를 검색할 수 있는 기능 사용 유무 (Input 컨트롤 표시 유무)
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseInputSearchInApproverTree();
-
-        /// <summary>
-        /// 수신자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
-        /// </summary>
-        /// <returns></returns>
-        public string GetReceiverSearchType();
-
-        /// <summary>
-        /// 수신자 관련 팝업 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseInputSearchInReceiverTree();
-
-        /// <summary>
-        /// 대결재등록 시 부서 표시 방식을 SEARCH/TREE 타입 중 설정 (TREE 옵션일 경우, bApprDeptSearch 옵션 무효화)
-        /// </summary>
-        /// <returns></returns>
-        public string GetProxySearchType();
-
-        /// <summary>
-        /// 대결재등록 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseInputSearchInProxyTree();
-
-        /// <summary>
-        /// 보안결재자 등록 시 부서 표시 방식을 SEARCH/TREE 타입 중 설정 (TREE 옵션일 경우, bApprDeptSearch 옵션 무효화)
-        /// </summary>
-        /// <returns></returns>
-        public string GetSecurityApproverSearchType();
-        /// <summary>
-        /// 보안결재자 등록 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseInputSearchInSecurityApproverTree();
-
-        /// <summary>
         /// '파일전송' 화면에서 등록시도한 파일목록에 정상파일과 오류파일이 함께 존재할 시 정상 파일에 대한 부분 등록 가능여부(true, false)
         /// </summary>
         /// <returns></returns>
         public bool GetUsePartialFileAddInTransfer();
-
-
-        public string GetApproveExtSelectType();
-
-        public bool GetUseApproveExt();
-
-        public bool GetUseInputSearchApproveExtTree();
-
     }
 
 
@@ -831,66 +776,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bUseOneByOneLogOut;
         }
 
-        public string GetApproverSearchType()
-        {
-            return AppConfigInfo.strApproverSearchType;
-        }
-
-        public bool GetUseInputSearchInApproverTree()
-        {
-            return AppConfigInfo.bUseInputSearchInApproverTree;
-        }
-
-        public string GetReceiverSearchType()
-        {
-            return AppConfigInfo.strReceiverSearchType;
-        }
-
-        public bool GetUseInputSearchInReceiverTree()
-        {
-            return AppConfigInfo.bUseInputSearchInReceiverTree;
-        }
-
-        public string GetProxySearchType()
-        {
-            return AppConfigInfo.strProxySearchType;
-        }
-
-        public bool GetUseInputSearchInProxyTree()
-        {
-            return AppConfigInfo.bUseInputSearchInProxyTree;
-        }
-
-        public string GetSecurityApproverSearchType()
-        {
-            return AppConfigInfo.strSecurityApproverSearchType;
-        }
-
-        public bool GetUseInputSearchInSecurityApproverTree()
-        {
-            return AppConfigInfo.bUseInputSearchInSecurityApproverTree;
-        }
-
         public bool GetUsePartialFileAddInTransfer()
         {
             return AppConfigInfo.bUsePartialFileAddInTransfer;
         }
-		
-		
-        public string GetApproveExtSelectType()
-        {
-            return AppConfigInfo.strApproveExtApproverSearchType;
-        }
-
-        public bool GetUseApproveExt()
-        {
-            return AppConfigInfo.bUseApproveExt;
-        }
-
-        public bool GetUseInputSearchApproveExtTree()
-        {
-            return AppConfigInfo.bUseInputSearchApproveExtTree;
-        }
-
     }
 }

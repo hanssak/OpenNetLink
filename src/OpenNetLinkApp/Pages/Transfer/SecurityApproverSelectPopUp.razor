@@ -126,6 +126,9 @@
     {
         int groupID = Int32.Parse(lstInfo[0]);
 
+        securityApproverSearchType = siteConfig.GetSecurityApproverSearchType(groupID);
+        useInputInTree = siteConfig.GetUseInputSearchInSecurityApproverTree(groupID);
+
         //대결자 검색
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
@@ -229,8 +232,5 @@
     protected override void OnInitialized()
     {
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        securityApproverSearchType = SGAppMgrSvc.OpConfigInfoService.GetSecurityApproverSearchType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInSecurityApproverTree();
     }
-
 }
