@@ -27,21 +27,44 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string APPR_USERNAME { get; set; }
         public string POSITION { get; set; }
         public string RANK { get; set; }
+
+        public int ORDER { get; set; } //대결재 순서....
         public ApproverInfo(int index, string name, string rank, string deptname, string deptseq, string seq, string apvorder)
         {
-            Name = name;
             Index = index.ToString();
-            Grade = rank;
-            DeptName = deptname;
-            DeptSeq = deptseq;
-            UserSeq = seq;
+
+            if (String.IsNullOrEmpty(name))
+                Name = "-";
+            else
+                Name = name;
+
+            if (String.IsNullOrEmpty(rank))
+                Grade = "-";
+            else
+                Grade = rank;
+
+            if (String.IsNullOrEmpty(deptname))
+                DeptName = "-";
+            else
+                DeptName = deptname;
+
+            if (String.IsNullOrEmpty(deptseq))
+                DeptSeq = "-";
+            else
+                DeptSeq = deptseq;
+
+            if (String.IsNullOrEmpty(seq))
+                UserSeq = "-";
+            else
+                UserSeq = seq;
+
             nApvOrder = Int32.Parse(apvorder);
         }
         public ApproverInfo()
         {
             Index = DeptName = DeptSeq = Grade = Name = UserSeq = "";
         }
-        public ApproverInfo(string index, string deptname, string deptseq, string grade, string name, string userSeq, string apprPos,string dlpApprove)
+        public ApproverInfo(string index, string deptname, string deptseq, string grade, string name, string userSeq, string apprPos, string dlpApprove)
         {
             Index = index;
             DeptName = deptname;
@@ -54,7 +77,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (!dlpApprove.Equals(""))
                 nDlpApprove = Convert.ToInt32(dlpApprove);
         }
-
+        public ApproverInfo(int index, ApproverInfo info)
+        {
+            this.Index = index.ToString();
+            this.Name = info.Name;
+            this.Grade = info.Grade;
+            this.DeptName = info.DeptName;
+            this.DeptSeq = info.DeptSeq;
+            this.UserSeq = info.UserSeq;
+            this.nApvOrder = info.nApvOrder;
+        }
         public bool GetApprover()
         {
             if (nApprPos > 0)
@@ -66,6 +98,33 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (nDlpApprove > 0)
                 return true;
             return false;
+        }
+
+        public ApproverInfo Copy()
+        {
+            ApproverInfo CopyValue = new ApproverInfo()
+            {
+                Index = this.Index,
+                selectIndex = this.selectIndex,
+                DeptName = this.DeptName,
+                DeptSeq = this.DeptSeq,
+                Grade = this.Grade,
+                Name = this.Name,
+                UserSeq = this.UserSeq,
+                nApprPos = this.nApprPos,
+                nDlpApprove = this.nDlpApprove,
+                nApvOrder = this.nApvOrder,
+                STARTDATE = this.STARTDATE,
+                ENDDATE = this.ENDDATE,
+                APPR_TEAMCODE = this.APPR_TEAMCODE,
+                APPR_TEAMNAME = this.APPR_TEAMNAME,
+                APPR_USERID = this.APPR_USERID,
+                APPR_USERNAME = this.APPR_USERNAME,
+                POSITION = this.POSITION,
+                RANK = this.RANK
+            };
+
+            return CopyValue;
         }
     }
     public class SGApprLineData : SGData
@@ -85,6 +144,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             SetSessionKey(hs.GetSeedKey());
             m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);
             m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
+
+            ApproverSelect = GetConvertBaseApprAndLineData();
         }
 
         public void CopyApprLine(LinkedList<ApproverInfo> orgApprInfo)
@@ -98,19 +159,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             listDicdata = GetRecordData("APPROVERECORD");
             return listDicdata;
         }
+
         public List<string> GetBaseApprAndLineName()
         {
             List<string> listApprLine = new List<string>();
             List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
             int nTotalCount = listDicdata.Count;
-            for(int i=0;i<nTotalCount;i++)                              // UI 에서 사용하기 위해 자기 자신을 포함하기 위해 i = 0 부터 시작.                  
+            for (int i = 0; i < nTotalCount; i++)                              // UI 에서 사용하기 위해 자기 자신을 포함하기 위해 i = 0 부터 시작.                  
             {
                 Dictionary<int, string> dic = listDicdata[i];
                 string tmpStr = "";
                 if (dic.TryGetValue(2, out tmpStr) == true)
                 {
                     tmpStr = dic[2];
-                    if(!tmpStr.Equals(""))
+                    if (!tmpStr.Equals(""))
                         listApprLine.Add(tmpStr);
                 }
             }
@@ -171,8 +233,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 }
             }
             return listApprLine;
-        }        
-
+        }
         public List<string> GetBaseApprAndLineRank()
         {
             List<string> listApprLine = new List<string>();
@@ -213,56 +274,61 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public LinkedList<ApproverInfo> GetConvertBaseApprAndLineData()
         {
-            List<string> strListUserName = GetBaseApprAndLineName();                // 결재자 이름 List
-            List<string> strListUserSeq = GetBaseApprAndLineSeq();                  // 결재자 Seq List
-            List<string> strListDeptName = GetBaseApprAndLineDeptName();            // 결재자 부서이름 List
-            List<string> strListDeptSeq = GetBaseApprAndLineDeptSeq();              // 결재자 부서Seq List
-            List<string> strListUserRank = GetBaseApprAndLineRank();                // 결재자 이름 직위 List
+            List<string> listApprLineName = GetBaseApprAndLineName();                // 결재자 이름 List
+            List<string> listApprLineSeq = GetBaseApprAndLineSeq();                  // 결재자 Seq List
+            List<string> listApprLineDeptName = GetBaseApprAndLineDeptName();            // 결재자 부서이름 List
+            List<string> listApprLineDeptSeq = GetBaseApprAndLineDeptSeq();              // 결재자 부서Seq List
+            List<string> listApprLineRank = GetBaseApprAndLineRank();                // 결재자 이름 직위 List
+            List<string> listApprLineOrder = GetBaseApprAndLineOrder();
 
-            if ((strListUserName == null) && (strListUserName.Count <= 0))
+            LinkedList<ApproverInfo> ApproverSelect = new LinkedList<ApproverInfo>();
+
+            if ((listApprLineName == null) && (listApprLineName.Count <= 0))
                 return null;
-
-            ApproverInfo apprInfo = null;
-            for (int i=0; i< strListUserName.Count;i++)
+            if (listApprLineName.Count != listApprLineDeptSeq.Count)
             {
-                apprInfo = new ApproverInfo();
+                int NameCount = listApprLineName.Count;
+                int DeptSeqCount = listApprLineDeptSeq.Count;
+                for (int i = 0; i < NameCount - DeptSeqCount; i++)
+                {
+                    listApprLineDeptSeq.Add("-");
+                }
+            }
 
-                apprInfo.Index = String.Format("{0,3}", i + 1);                     // Index
 
-                if (!(strListUserName[i].Equals("")))                               // 결재자 이름 
-                    apprInfo.Name = strListUserName[i];
+            Dictionary<int, List<string>> checkUserSeqByOrder = new Dictionary<int, List<string>>();
+
+            for (int i = 0; i < listApprLineName.Count; i++)
+            {
+                int order = Convert.ToInt32(listApprLineOrder[i]);
+                if (checkUserSeqByOrder.ContainsKey(order))
+                {
+                    if (checkUserSeqByOrder[order].Contains(listApprLineSeq[i]))
+                        continue;
+                    else
+                    {
+                        checkUserSeqByOrder[order].Add(listApprLineSeq[i]);
+                    }
+                }
                 else
-                    apprInfo.Name = "-";
-
-                if (!(strListUserSeq[i].Equals("")))                               // 결재자 Seq
-                    apprInfo.UserSeq = strListUserSeq[i];
-                else
-                    apprInfo.UserSeq = "-";
-
-                if (!(strListDeptName[i].Equals("")))                               // 부서이름
-                    apprInfo.DeptName = strListDeptName[i];
-                else
-                    apprInfo.DeptName = "-";
-                              
-                if(strListDeptSeq.Count != 0 && (!(strListDeptSeq[i].Equals(""))))                                  // 부서Seq
-                    apprInfo.DeptSeq = strListDeptSeq[i];
-                else
-                    apprInfo.DeptSeq = "-";
-
-                if (!(strListUserRank[i].Equals("")))                               // 직위
-                    apprInfo.Grade = strListUserRank[i];
-                else
-                    apprInfo.Grade = "-";
-
+                {
+                    List<string> list = new List<string>();
+                    list.Add(listApprLineSeq[i]);
+                    checkUserSeqByOrder.Add(order, list);
+                }
+                ApproverInfo apprInfo = new ApproverInfo(i, listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i]);
                 apprInfo.nApprPos = 1;
                 apprInfo.nDlpApprove = 0;
-
                 ApproverSelect.AddLast(apprInfo);
             }
 
             return ApproverSelect;
         }
 
+        /// <summary>
+        /// ApproverSelect
+        /// </summary>
+        /// <returns></returns>
         public LinkedList<ApproverInfo> GetApprAndLineData()
         {
             return ApproverSelect;
@@ -286,6 +352,38 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return apprList;
         }
 
+        public string GetApprCommaSeqString(string strUserSeq)
+        {
+            LinkedList<ApproverInfo> apprLineData = GetApprAndLineData();
+            if ((apprLineData == null) || (apprLineData.Count <= 0))
+                return null;
+
+            string apprLine = String.Empty;
+
+            foreach (ApproverInfo info in apprLineData)
+            {
+                if (info.UserSeq.Equals(strUserSeq))
+                    continue;
+                else
+                {
+                    apprLine += $"{info.UserSeq},";
+                }
+            }
+
+            if (!String.IsNullOrEmpty(apprLine))
+                apprLine = apprLine.Substring(0, apprLine.Length - 1);
+
+            return apprLine;
+
+        }
+
+
+        /// <summary>
+        /// 결재 라인 String으로 반환 ( \u0002, | ) 사용
+        /// </summary>
+        /// <param name="strUserSeq"></param>
+        /// <param name="apprStep"></param>
+        /// <returns></returns>
         public string GetApprAndLineSeqString(string strUserSeq, string apprStep)
         {
             string rtn = string.Empty;
@@ -293,13 +391,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if ((apprLineData == null) || (apprLineData.Count <= 0))
                 return null;
 
+
+            ///이걸하면 변경된 사항이 적용이 안되는데... 왜 하는건지 모르겠음..
             List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
             foreach (ApproverInfo item in apprLineData)
             {
-                for( int i=0; i<listDicdata.Count; i++)
+                for (int i = 0; i < listDicdata.Count; i++)
                 {
                     Dictionary<int, string> dic = listDicdata[i];
-                    if( item.UserSeq == dic[0])
+                    if (item.UserSeq == dic[0])
                     {
                         item.nApvOrder = Int32.Parse(dic[6]);
                         break;
@@ -309,7 +409,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             char Sep = (char)'\u0002';
             char orSep = (char)'|';
-            if(apprLineData != null && apprLineData.Count > 0)
+            if (apprLineData != null && apprLineData.Count > 0)
             {
                 LinkedListNode<ApproverInfo> last = apprLineData.Last;
                 LinkedListNode<ApproverInfo> curNode = apprLineData.First;
@@ -337,21 +437,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             rtn += orSep;
                     }
                 }
-                if(apprStep == "2")
-                { 
+                if (apprStep == "2")
+                {
                     while (true)
                     {
                         if (curNode == null)
                             break;
 
-                        if( curNode.Value.UserSeq.Equals(strUserSeq) )
+                        if (curNode.Value.UserSeq.Equals(strUserSeq))
                         {
                             curNode = curNode.Next;
                             continue;
                         }
                         LinkedListNode<ApproverInfo> next = curNode.Next;
                         rtn += curNode.Value.UserSeq;
-                        if(next != null)
+                        if (next != null)
                         {
                             if (curNode.Value.nApvOrder == next.Value.nApvOrder)
                                 rtn += orSep;
@@ -379,7 +479,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if (strUserSeq.Equals(item.UserSeq))
                     nDisCount++;
             }
-            return apprLineData.Count-nDisCount;
+            return apprLineData.Count - nDisCount;
         }
 
         public void SetApprAndLindData(LinkedList<ApproverInfo> LinkedApprInfo)
@@ -422,7 +522,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return "";
             }
 
-            if(LinkedApprInfo.Count <= 0)
+            if (LinkedApprInfo.Count <= 0)
             {
                 return DeleteApprLineData(strUserSeq, strSaveApprLine);
             }
@@ -468,10 +568,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 
             int index = -1;
-            for(int i=0; i < strOriginApprLine.Length;i++)
+            for (int i = 0; i < strOriginApprLine.Length; i++)
             {
                 string[] strSplit = strOriginApprLine[i].Split(sep);
-                if(strSplit[0].Equals(strUserSeq))
+                if (strSplit[0].Equals(strUserSeq))
                 {
                     index = i;
                     break;
@@ -497,6 +597,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strSaveApprLine;
         }
 
+        /// <summary>
+        /// 해당 데이터를 ApproverSelect 으로 저장
+        /// </summary>
+        /// <param name="strApprLineData"></param>
+        /// <param name="strUserSeq"></param>
+        /// <returns></returns>
         public bool LocalLoadANDApprLineData(string strApprLineData, string strUserSeq)
         {
             LinkedList<ApproverInfo> apprInfo = new LinkedList<ApproverInfo>();
@@ -505,7 +611,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return false;
             }
 
-            if(!strApprLineData.Contains(strUserSeq))
+            if (!strApprLineData.Contains(strUserSeq))
             {
                 return false;
             }
@@ -513,15 +619,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             char sep = (char)':';
             string[] strApprList;
             string[] strApprLineDataList = strApprLineData.Split('\u0002');
-            if(strApprLineDataList.Length==1)
+            if (strApprLineDataList.Length == 1)
             {
                 string[] strSplit = strApprLineData.Split(sep);
-                if(strSplit.Length==1)
+                if (strSplit.Length == 1)
                 {
                     return false;
                 }
 
-                if(!strSplit[0].Equals(strUserSeq))
+                if (!strSplit[0].Equals(strUserSeq))
                 {
                     return false;
                 }
@@ -558,13 +664,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             bool bFind = false;
             string strApprLine = "";
-            for(int i=0;i< strApprLineDataList.Length;i++)
+            for (int i = 0; i < strApprLineDataList.Length; i++)
             {
                 string[] strSplit = strApprLineDataList[i].Split(sep);
                 if (strSplit.Length <= 1)
                     continue;
 
-                if(strSplit[0].Equals(strUserSeq))
+                if (strSplit[0].Equals(strUserSeq))
                 {
                     strApprLine = strSplit[1];
                     bFind = true;
@@ -572,7 +678,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 }
             }
 
-            if(!bFind)
+            if (!bFind)
             {
                 apprInfo = null;
                 return false;
@@ -583,10 +689,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             {
                 return false;
             }
-            
-            for(int i=0;i<strApprList.Length;i++)
+
+            for (int i = 0; i < strApprList.Length; i++)
             {
-                string [] strApprData = strApprList[i].Split('\u0001');
+                string[] strApprData = strApprList[i].Split('\u0001');
                 if (strApprData.Length <= 0)
                     continue;
                 ApproverInfo apprdata = new ApproverInfo();
@@ -598,7 +704,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 apprdata.Index = strApprData[5];
                 if (!strApprData[6].Equals(""))
                     apprdata.nApprPos = Convert.ToInt32(strApprData[6]);
-                if(!strApprData[7].Equals(""))
+                if (!strApprData[7].Equals(""))
                     apprdata.nDlpApprove = Convert.ToInt32(strApprData[7]);
 
                 //DeptSeq가 비어있으면 유효성 검증 넘어가기 위해 "-"로 저장

@@ -578,6 +578,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public bool GetUseGPKILogin(int groupID)
         {
+            if (AppConfigInfo.listUseGpkiLogin == null)
+                return false;
+
             return AppConfigInfo.listUseGpkiLogin[groupID];
         }
 

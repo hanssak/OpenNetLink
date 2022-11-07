@@ -319,6 +319,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             strDownloadCount = dic[12];
             return strDownloadCount;
         }
+        /// <summary>
+        /// 파일 만료일 반환
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetExpiredDate(Dictionary<int, string> dic)
+        {
+            if (dic.ContainsKey(11))
+            {
+                return dic[11];
+            }
+            else
+                return String.Empty;
+        }
         /**
 		 * @breif 개인정보 검출 상태 정보를 반환한다.
 		 * @return 개인정보 검출 상태 (미사용,포함,미포함,검출불가)

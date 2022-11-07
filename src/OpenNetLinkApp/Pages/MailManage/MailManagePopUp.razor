@@ -2,6 +2,8 @@
 @using System.Diagnostics
 @using HsNetWorkSGData
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Common
+
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
@@ -313,23 +315,9 @@
     {
         string rtn = String.Empty;
         long lSize = long.Parse(value);
-        if (lSize > 1024 * 1024 * 1024)
-        {
-            float fsize = lSize / 1024 * 1024 * 1024;
-            rtn = string.Format("{0:0.0}", fsize) + "GB";
-        }
-        else if (lSize > 1024 * 1024)
-        {
-            float fsize = lSize / 1024 * 1024;
-            rtn = string.Format("{0:0.0}", fsize) + "MB";
-        }
-        else if (lSize > 1024)
-        {
-            float fsize = lSize / 1024;
-            rtn = string.Format("{0:0.0}", fsize) + "KB";
-        }
-        else
-            rtn = value + "Byte";
+
+        rtn = CsFunction.GetSizeStr(lSize);
+
         return rtn;
     }
 

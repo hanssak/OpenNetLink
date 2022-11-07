@@ -25,6 +25,15 @@
 	  <RuntimeIdentifier Condition="'$(IsMacOS)' == 'true'">osx-x64</RuntimeIdentifier>
     <StartupObject></StartupObject>
     <ApplicationIcon>SecureGate.ico</ApplicationIcon>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutputPath></OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutputPath></OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,7 +47,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.6" />
-    <PackageReference Include="SharpCompress" Version="0.26.0" />
+    <PackageReference Include="SharpCompress" Version="0.32.2" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
     <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
@@ -51,7 +60,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\openNetLib\HsNetWorkSG\HsNetWorkSG.csproj" />
+    <ProjectReference Include="..\OfficeExtractorLibrary\OfficeExtractor\OfficeExtractor.csproj" />
     <ProjectReference Include="..\WebWindow.Blazor\WebWindow.Blazor.csproj" />
     <ProjectReference Include="..\AgLogManager\AgLogManager.csproj" />
 	  <ProjectReference Include="..\BlazorInputFile\BlazorInputFile.csproj" />
@@ -1812,8 +1821,12 @@
 
   <ItemGroup>
     <Reference Include="HsNetWorkSG">
-      <HintPath>Library\HsNetWorkSG.dll</HintPath>
+      <HintPath>..\..\..\OpenNetLink\src\OpenNetLinkApp\Library\HsNetWorkSG.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\SGNotify\" />
   </ItemGroup>
 
 <Target Name="PostBuild" AfterTargets="PostBuildEvent">

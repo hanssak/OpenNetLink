@@ -48,27 +48,72 @@
                             <tr>
                                 <th class="p-2">@strPeriod</th> <!--기간-->
                                 <td style="width:28%;">
-                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker13" readonly="readonly" value="@strFromDay">
-                                    <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker14" readonly="readonly" value="@strToDay">
+                                    @*  <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker13" readonly="readonly" value="@strFromDay">
+                                        <span class="float-left col-md-1">-</span>
+                                        <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker14" readonly="readonly" value="@strToDay">*@
+                                    <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
                                 <th class="p-2"> @strTransKind </th> <!--전송구분-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransKindValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("TransKind"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransKindValue, str, TransSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2"> @strTransStatus </th>     <!-- 전송상태-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("TransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransStatusValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransStatusValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("TransStatus"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransStatusValue, str, TransSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("TransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransStatusValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2"> @strApprStatus </th>         <!-- 승인상태-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("ApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprStatusValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strApprStatusValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("ApproveStatus"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strApprStatusValue, str, TransSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("ApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprStatusValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                             </tr>
                             <tr>
                                 <th class="p-2"> @strDataTypeStatus </th>         <!-- 데이타타입-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("DataType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDataTypeValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strDataTypeValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("DataType"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDataTypeValue, str, TransSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("DataType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDataTypeValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                             </tr>
                         </table>
@@ -96,36 +141,36 @@
                             <table class="table table-head-fixed table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th style="text-align:center;width:5%;">                                            @*체크박스*@
+                                        <th style="text-align:center; vertical-align:middle;width:5%;">                                            @*체크박스*@
                                             @*<input class="input" type="checkbox">*@
                                         </th>
-                                        <th style="text-align:center;width:7%;">@strApproveKind</th>                        <!--결재종류-->
-                                        <th style="text-align:center;width:7%;">@strTransKind</th>                          <!--전송구분-->
-                                        <th style="text-align:center;width:8%;">@strTransStatus</th>                        <!--전송상태-->
-                                        <th style="text-align:center;width:7%;">@strApprStatus</th>                         <!--승인상태-->
-                                        <th style="text-align:center; width: 7%;">@strDataTypeStatus</th>                   <!--데이터타입-->
-                                        <th style="text-align:center;width:15%;">@strTitle</th>                             <!--제목-->
-                                        <th style="text-align:center;width:14%;">@strFileSendDay</th>                       <!--전송요청일-->
-                                        <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>  <!--개인정보-->
-                                        <th style="text-align:center;width:7%;">@strDetail</th>                             <!--상세보기-->
+                                        <th style="text-align:center; vertical-align:middle;width:7%;">@strApproveKind</th>                        <!--결재종류-->
+                                        <th style="text-align:center; vertical-align:middle;width:7%;">@strTransKind</th>                          <!--전송구분-->
+                                        <th style="text-align:center; vertical-align:middle;width:8%;">@strTransStatus</th>                        <!--전송상태-->
+                                        <th style="text-align:center; vertical-align:middle;width:7%;">@strApprStatus</th>                         <!--승인상태-->
+                                        <th style="text-align:center; vertical-align:middle; width: 7%;">@strDataTypeStatus</th>                   <!--데이터타입-->
+                                        <th style="text-align:center; vertical-align:middle;width:15%;">@strTitle</th>                             <!--제목-->
+                                        <th style="text-align:center; vertical-align:middle;width:14%;">@strFileSendDay</th>                       <!--전송요청일-->
+                                        <th style="text-align:center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>  <!--개인정보-->
+                                        <th style="text-align:center; vertical-align:middle;width:7%;">@strDetail</th>                             <!--상세보기-->
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (transData item in mData)
                                     {
                                         <tr>
-                                            <td style="text-align:center">
+                                            <td style="text-align:center; vertical-align:middle">
                                                 <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
                                             </td>
-                                            <td style="text-align:center">@item.ApvType</td>
-                                            <td style="text-align:center">@item.TransferType</td>
-                                            <td style="text-align:center">@item.TransferStatus</td>
-                                            <td style="text-align:center">@item.ApvStatus</td>
-                                            <td style="text-align:center">@item.DataType</td>
-                                            <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                            <td style="text-align:center">@item.RequestTime</td>
-                                            <td style="text-align:center">@item.stDLP</td>
-                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                            <td style="text-align:center; vertical-align:middle">@item.ApvType</td>
+                                            <td style="text-align:center; vertical-align:middle">@item.TransferType</td>
+                                            <td style="text-align:center; vertical-align:middle">@item.TransferStatus</td>
+                                            <td style="text-align:center; vertical-align:middle">@item.ApvStatus</td>
+                                            <td style="text-align:center; vertical-align:middle">@item.DataType</td>
+                                            <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                            <td style="text-align:center; vertical-align:middle">@item.RequestTime</td>
+                                            <td style="text-align:center; vertical-align:middle">@item.stDLP</td>
+                                            <td style="text-align:center; vertical-align:middle"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                         </tr>
                                     }
                                 </tbody>
@@ -164,6 +209,8 @@
     public int groupIDbyParam { get; set; }
     SGCustomSelect refSGCustomSelect;
     ClipboardManagePopUp refClipboardManagePopUp;
+    PeriodDatePicker refPeriodDatePicker;
+
     public int TotalCount { get; set; }
     public List<transData> mData = new List<transData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -203,8 +250,8 @@
     public string strTransInspect = "";
     public string strTitleInputInfo = "";
 
-    public string strFromDay = "";
-    public string strToDay = "";
+    @*public string strFromDay = "";
+        public string strToDay = "";*@
     //private int m_currentDownloadCount = 0;
 
     ISGSideBarUIService SideBarUISvc;
@@ -275,8 +322,8 @@
     public string strTitleValue = "";
     public string strSystemName = "";
     public string curUserID = "";
-    public string curFromDay = "";
-    public string curToDay = "";
+    @*public string curFromDay = "";
+        public string curToDay = "";*@
     public string curTransKind = "";
     public string curTransStatus = "";
     public string curApprStatus = "";
@@ -339,7 +386,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="updatePageNum"></param>
     private void UpdateInitList(int updatePageNum)
@@ -349,7 +396,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void UpdateData()
     {
@@ -360,7 +407,7 @@
     public List<transData> ListData = new List<transData>();
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="transSeq"></param>
     /// <returns></returns>
@@ -372,7 +419,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="transSeq"></param>
     public void DetailSearch(string transSeq)
@@ -403,7 +450,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -436,7 +483,7 @@
             HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
 
             refClipboardManagePopUp.m_downloadCount = 0; //m_currentDownloadCount;
-            refClipboardManagePopUp.SetBindingData();
+            refClipboardManagePopUp.SetBindingData(tData.DataType);
             OpenDetailPopup(sTransSeq).Wait();
         }
     }
@@ -463,9 +510,9 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        // 조회방식변경
+            // 조회방식변경
         @*HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchResult);           // 조회 데이터 결과.
-        HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCount);           // 조회 데이터 수 결과.*@
+            HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCount);           // 조회 데이터 수 결과.*@
 
         // 전송관리 처럼
         HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
@@ -480,18 +527,19 @@
             dicDestSysPos = pageService.GetTargetSystemList(groupID);
         }
 
-        GetInitDateTime();
+        @*GetInitDateTime();*@
         base.OnInitialized();
-        await TransSearchCount();
+
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            object[] param = { "datepicker13", "datepicker14" };
-            jsRuntime.InvokeAsync<object>("initDatePicker", param);
+            @*   object[] param = { "datepicker13", "datepicker14" };
+                jsRuntime.InvokeAsync<object>("initDatePicker", param);*@
             jsRuntime.InvokeAsync<object>("initPageLeft");
+            await TransSearchCount();
         }
         base.OnAfterRender(firstRender);
     }
@@ -554,7 +602,7 @@
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
-        await GetDateTime();
+        @*await GetDateTime();*@
         curTransKind = GetTransKind();
         curTransStatus = GetTransStatus();
         curApprStatus = GetApprStatus();
@@ -569,6 +617,11 @@
         curTitle = Encoding.UTF8.GetString(temp);
 
         nViewPageNo = 1;
+
+        await refPeriodDatePicker.RetriveDateFromJS();
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
+
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
         string strQueryCount = "";
 
@@ -595,16 +648,18 @@
                 }
             }
 
-            TransferDao2 dao = new TransferDao2();
+            TransferDao dao = new TransferDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
             strQueryCount = dao.TotalCount(param, false);   // 쿼리 데이터 카운트
         }
         else
         {
             TransferDao dao = new TransferDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
             strQueryCount = dao.TotalCount(param, false, strArrClipDataType);   // 쿼리 데이터 카운트
         }
 
-	// 조회방식 변경
+        // 조회방식 변경
         //HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
         HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
     }
@@ -623,6 +678,10 @@
             ShowMessage("error", strMsg);
             return;
         }
+
+        Task.Run(async () => { await refPeriodDatePicker.RetriveDateFromJS(); });
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
 
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, pageNum);
         string strQuery = "";
@@ -653,12 +712,14 @@
 
             }
 
-            TransferDao2 dao = new TransferDao2();
+            TransferDao dao = new TransferDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
             strQuery = dao.List(param, false);   // 쿼리 데이터 리스트
         }
         else
         {
             TransferDao dao = new TransferDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
             strQuery = dao.List(param, false, strArrClipDataType);   // 쿼리 데이터 리스트
         }
 
@@ -666,10 +727,10 @@
         //HSCmdCenter.SendListQuery(groupID, curUserID, strQuery);
         HSCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
     }
+    @*
 
-
-    public void GetInitDateTime()
-    {
+        public void GetInitDateTime()
+        {
         strToDay = DateTime.Now.ToString("yyyy-MM-dd");
         string year = DateTime.Now.ToString("yyyy");
         string month = DateTime.Now.ToString("MM");
@@ -679,22 +740,22 @@
         int nDay = Convert.ToInt32(day);
         System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
         strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
-    }
+        }
 
-    private async Task RetriveDateFromJS()
-    {
+        private async Task RetriveDateFromJS()
+        {
         object[] param = { "datepicker13" };
         string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
         if (vStr != null && vStr.Length > 0)
-            strFromDay = vStr;
+        strFromDay = vStr;
         object[] param2 = { "datepicker14" };
         string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
         if (vStr2 != null && vStr2.Length > 0)
-            strToDay = vStr2;
-    }
+        strToDay = vStr2;
+        }
 
-    public async Task GetDateTime()
-    {
+        public async Task GetDateTime()
+        {
         await RetriveDateFromJS();
 
         char sep = '-';
@@ -702,8 +763,8 @@
         curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
         string[] splitTo = strToDay.Split(sep);
         curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
-    }
-
+        }
+    *@
     /// <summary>
     /// 전송구분 가져오기
     /// </summary>
@@ -847,7 +908,7 @@
 
 
     @*public void SearchCount(int groupId, SGData e)
-    {
+        {
         string result = e.GetSvrRecordTagData("RESULT");
         int count = Int32.Parse(e.GetSvrRecordTagData("COUNT"));  //결과레코드수
         string reason = e.GetSvrRecordTagData("REASON");
@@ -859,29 +920,29 @@
 
         if (result != "0")
         {
-            ShowMessage("error", reason);
-            return;
+        ShowMessage("error", reason);
+        return;
         }
         if (totalCnt <= 0)
         {
-            //ShowMessage("warn", reason);            // 검색결과가 존재하지 않습니다.
-            //if (listData != null) listData.Clear();
-            //SetPageinfo(totalCnt);
-            //StateHasChanged();
-            //return;
+        //ShowMessage("warn", reason);            // 검색결과가 존재하지 않습니다.
+        //if (listData != null) listData.Clear();
+        //SetPageinfo(totalCnt);
+        //StateHasChanged();
+        //return;
 
-            ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
-            ListData.Clear();
+        ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
+        ListData.Clear();
 
-            UpdateList(0);
-            SetPageinfo(totalCnt);
-            StateHasChanged();
-            return;
+        UpdateList(0);
+        SetPageinfo(totalCnt);
+        StateHasChanged();
+        return;
         }
         SetPageinfo(totalCnt);
         //리스트 쿼리 호출
         UpdateData();
-    }*@
+        }*@
 
     private void doSearchList()
     {
@@ -961,7 +1022,7 @@
     }
 
     @*public void SearchResult(int groupId, SGData e)
-    {
+        {
         string result = e.GetTagData("RESULT");
         string reason = e.GetTagData("REASON");
         int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
@@ -969,13 +1030,13 @@
 
         if (result != "0")
         {
-            ShowMessage("error", XmlConf.GetWarnMsg("W_0242"));
-            return;
+        ShowMessage("error", XmlConf.GetWarnMsg("W_0242"));
+        return;
         }
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupId);
         string curUserID = "";
         if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
+        curUserID = sgLoginData.GetUserID();
 
         ListData.Clear();
 
@@ -984,190 +1045,189 @@
         //sgData = (SGTransManageData)e;
 
         if (sgData == null)
-            return;
+        return;
 
         int nCount = listData.Count;
 
         for (int i = 0; i < nCount; i++)
         {
-            Dictionary<int, string> dic = listData[i];
-            if (dic == null)
-                continue;
+        Dictionary<int, string> dic = listData[i];
+        if (dic == null)
+        continue;
 
-            string tmpStr = "";
-            if (dic.TryGetValue(0, out tmpStr) != true)
-            {
-                if (tmpStr.Equals(""))
-                    continue;
-            }
+        string tmpStr = "";
+        if (dic.TryGetValue(0, out tmpStr) != true)
+        {
+        if (tmpStr.Equals(""))
+        continue;
+        }
 
-            clipBoardData tData = new clipBoardData();
-            tData.TransSeq = sgData.GetTransSeq(dic);                   // TransSeq;
-            tData.ApvType = sgData.GetApprKind(dic);                    // 결재종류 (선결/후결)
-            tData.TransType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
-            tData.TransStatus = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
-            tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
+        clipBoardData tData = new clipBoardData();
+        tData.TransSeq = sgData.GetTransSeq(dic);                   // TransSeq;
+        tData.ApvType = sgData.GetApprKind(dic);                    // 결재종류 (선결/후결)
+        tData.TransType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
+        tData.TransStatus = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
+        tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
 
-            //if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-            //    tData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
+        //if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+        //    tData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
 
-            tData.Title = sgData.GetTitle(dic);                         // 제목
-            FileAddManage fileAddManage = new FileAddManage();
-            tData.Title = fileAddManage.GetConvertTitleDesc(false, tData.Title);
-            tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
-            tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
-            tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
-            tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
-            tData.stDLP = sgData.GetDlp(dic);
-            tData.DataType = sgData.GetDataType(dic);   //데이터타입
-            ListData.Add(tData);
+        tData.Title = sgData.GetTitle(dic);                         // 제목
+        FileAddManage fileAddManage = new FileAddManage();
+        tData.Title = fileAddManage.GetConvertTitleDesc(false, tData.Title);
+        tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+        tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
+        tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
+        tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
+        tData.stDLP = sgData.GetDlp(dic);
+        tData.DataType = sgData.GetDataType(dic);   //데이터타입
+        ListData.Add(tData);
         }
 
         UpdateInitList(nViewPageNo);
         StateHasChanged();
-    }*@
+        }*@
 
-    public void SetPageinfo(int nDataCount)
+public void SetPageinfo(int nDataCount)
+{
+    nTotalPages = (int)nDataCount / nPageListCount;
+    if (nDataCount % nPageListCount > 0)
+        nTotalPages++;
+
+    if (nTotalPages <= 0)
+        nTotalPages = 1;
+}
+
+private void ShowMessage(string strType, string strMsg)
+{
+    //type: success, info, waring, error 2020/07/02 YKH
+    string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+    object[] param = { strType, strSystemName, strMsg };
+    jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+}
+
+public transData GetTransListData(string strTransSeq)
+{
+    transData tdata = null;
+    int nCount = ListData.Count;
+    if (nCount <= 0)
+        return tdata;
+
+    for (int i = 0; i < nCount; i++)
     {
-        nTotalPages = (int)nDataCount / nPageListCount;
-        if (nDataCount % nPageListCount > 0)
-            nTotalPages++;
+        transData temp = ListData[i];
+        if (temp.TransSeq.Equals(strTransSeq))
+        {
+            tdata = temp;
+            break;
+        }
+    }
+    return tdata;
+}
 
-        if (nTotalPages <= 0)
-            nTotalPages = 1;
+public class clipBoardData
+{
+
+    public bool bCheckDisable { get; set; }           //체크 가능 불가능
+    public bool bCheck { get; set; }                  //체크 상태
+
+    public string TransSeq { get; set; }
+    public string ApvType { get; set; }
+    public string TransType { get; set; }
+    public string TransStatus { get; set; }
+    public string ApvStatus { get; set; }
+    public string DataType { get; set; }
+    public string Title { get; set; }                   //제목
+    public string RequestTime { get; set; }
+    public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
+    public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
+    public int downloadCount { get; set; }              //다운로드 카운트
+    public string stDLP { get; set; }                   //개인정보 포함여부
+
+
+    public clipBoardData()
+    {
+        bCheckDisable = bCheck = false;
+        TransSeq = ApvType = TransType = TransStatus = ApvStatus = Title = RequestTime = "";
+        //strDestNet = "";
     }
 
-    private void ShowMessage(string strType, string strMsg)
+    public clipBoardData(string seq, string apvtype, string transtype, string transstatus, string apvstatus, string datatype, string title, string requesttime, string strTransStatusCode, string strApprStatusCode, string strDestNetData)
     {
-        //type: success, info, waring, error 2020/07/02 YKH
-        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
-        object[] param = { strType, strSystemName, strMsg };
-        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+        TransSeq = seq;
+        ApvType = apvtype;
+        TransType = transtype;
+        TransStatus = transstatus;
+        ApvStatus = apvstatus;
+        DataType = datatype;
+        Title = title;
+        RequestTime = requesttime;
+        TransStatusCode = strTransStatusCode;
+        ApprStatusCode = strApprStatusCode;
+        // strDestNet = strDestNetData;
     }
+}
 
-    public transData GetTransListData(string strTransSeq)
+private void HomeMove()
+{
+
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+
+    //string strNavigateWithGroupID = "";
+    //if (siteConfig.GetUseDashBoard())
+    //    strNavigateWithGroupID = "/Welcome/";
+    //else
+    //    strNavigateWithGroupID = "/Transfer/";
+
+    //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+    string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+    string strNavigateUrl = strNavigateWithGroupID.ToLower();
+    if (strNavigateUrl.IndexOf("transfer") > 0)
     {
+        strNavigateUrl = pageService.GetFileTransPage(groupID);
+        if (strNavigateUrl != null && strNavigateUrl.Length > 0)
+            strNavigateWithGroupID = strNavigateUrl;
+        else
+            strNavigateWithGroupID = "/Transfer/";
+    }
+    strNavigateWithGroupID += groupID.ToString();
+    MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
+    foreach (var MenuItem in SideBarUISvc.MenuList)
+    {
+        if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
+        {
+            SideBarUISvc.ActiveMenu = MenuItem;
+            break;
+        }
+    }
+}
+
+/// <summary>
+/// TransSeq에 해당하는 transData 를 찾아준다
+/// </summary>
+/// <param name="strTransSeq">TransSeq</param>
+/// <returns>TransData</returns>
+    @*public transData GetTransListData(string strTransSeq)
+        {
         transData tdata = null;
         int nCount = ListData.Count;
         if (nCount <= 0)
-            return tdata;
+        return tdata;
 
         for (int i = 0; i < nCount; i++)
         {
-            transData temp = ListData[i];
-            if (temp.TransSeq.Equals(strTransSeq))
-            {
-                tdata = temp;
-                break;
-            }
+        transData temp = ListData[i];
+        if (temp.TransSeq.Equals(strTransSeq))
+        {
+        tdata = temp;
+        break;
+        }
         }
         return tdata;
-    }
-
-    public class clipBoardData
-    {
-
-        public bool bCheckDisable { get; set; }           //체크 가능 불가능
-        public bool bCheck { get; set; }                  //체크 상태
-
-        public string TransSeq { get; set; }
-        public string ApvType { get; set; }
-        public string TransType { get; set; }
-        public string TransStatus { get; set; }
-        public string ApvStatus { get; set; }
-        public string DataType { get; set; }
-        public string Title { get; set; }                   //제목
-        public string RequestTime { get; set; }
-        public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
-        public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
-        public int downloadCount { get; set; }              //다운로드 카운트
-        public string stDLP { get; set; }                   //개인정보 포함여부
-
-
-        public clipBoardData()
-        {
-            bCheckDisable = bCheck = false;
-            TransSeq = ApvType = TransType = TransStatus = ApvStatus = Title = RequestTime = "";
-            //strDestNet = "";
-        }
-
-        public clipBoardData(string seq, string apvtype, string transtype, string transstatus, string apvstatus, string datatype, string title, string requesttime, string strTransStatusCode, string strApprStatusCode, string strDestNetData)
-        {
-            TransSeq = seq;
-            ApvType = apvtype;
-            TransType = transtype;
-            TransStatus = transstatus;
-            ApvStatus = apvstatus;
-            DataType = datatype;
-            Title = title;
-            RequestTime = requesttime;
-            TransStatusCode = strTransStatusCode;
-            ApprStatusCode = strApprStatusCode;
-            // strDestNet = strDestNetData;
-        }
-    }
-
-    private void HomeMove()
-    {
-
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        //string strNavigateWithGroupID = "";
-        //if (siteConfig.GetUseDashBoard())
-        //    strNavigateWithGroupID = "/Welcome/";
-        //else
-        //    strNavigateWithGroupID = "/Transfer/";
-
-        //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-        //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-        string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
-        string strNavigateUrl = strNavigateWithGroupID.ToLower();
-        if (strNavigateUrl.IndexOf("transfer") > 0)
-        {
-            strNavigateUrl = pageService.GetFileTransPage(groupID);
-            if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                strNavigateWithGroupID = strNavigateUrl;
-            else
-                strNavigateWithGroupID = "/Transfer/";
-        }
-        strNavigateWithGroupID += groupID.ToString();
-        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-
-        foreach (var MenuItem in SideBarUISvc.MenuList)
-        {
-            if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
-            {
-                SideBarUISvc.ActiveMenu = MenuItem;
-                break;
-            }
-        }
-    }
-
-    /// <summary>
-    /// TransSeq에 해당하는 transData 를 찾아준다
-    /// </summary>
-    /// <param name="strTransSeq">TransSeq</param>
-    /// <returns>TransData</returns>
-    @*public transData GetTransListData(string strTransSeq)
-        {
-            transData tdata = null;
-            int nCount = ListData.Count;
-            if (nCount <= 0)
-                return tdata;
-
-            for (int i = 0; i < nCount; i++)
-            {
-                transData temp = ListData[i];
-                if (temp.TransSeq.Equals(strTransSeq))
-                {
-                    tdata = temp;
-                    break;
-                }
-            }
-            return tdata;
         }*@
 
     /// <summary>
@@ -1253,7 +1313,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>

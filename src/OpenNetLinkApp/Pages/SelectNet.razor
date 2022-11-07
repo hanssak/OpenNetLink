@@ -44,7 +44,7 @@
                                     int nTmpGroupID = SGAppMgrSvc.NetworkInfoService.NetWorkInfo[nIdx].GroupID;
                                     <div class="custom-control custom-radio mr-3 row">
                                         <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="@String.Format("customRadio{0}", nIdx)" name="customRadio" checked="@(nSelectedNet==nTmpGroupID)" @onclick="@(e=>SelectNetPos(nTmpGroupID))">
-                                        <label for="@String.Format("customRadio{0}", nIdx)" class="custom-control-label">@(SGAppMgrSvc.NetworkInfoService.NetWorkInfo[nIdx].FromName)</label>
+                                        <label for="@String.Format("customRadio{0}", nIdx)" class="custom-control-label">@(SGAppMgrSvc.NetworkInfoService.NetWorkInfo[nIdx].ToName)</label>
                                     </div>
                                     <p></p>
                                 }

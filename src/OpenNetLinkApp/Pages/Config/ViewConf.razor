@@ -111,7 +111,7 @@
                                                 <td>@strDataDayClipboardMaxSize</td>
                                             </tr>
                                         </table>
-                                        @if (siteConfig.GetViewFileFilter() == true)
+                                        @if (SGAppMgrSvc.OpConfigInfoService.GetViewFileFilter() == true)
                                         {
                                             <div class="table-responsive">
                                                 <div class="title_set"><i class="fas fa-cog mr-1"></i>@strExtLimitInfo</div>                   <!--확장자 제한-->
@@ -312,7 +312,11 @@
         Int64 nTemp64;
 
         // 버전정보
-        strDataVersion = "SecureGate ver 2.01";                                                         // SecureGate ver 2.01
+        string strAppVersion = sgLoginData.GetServClientVersion();
+        int find = strAppVersion.IndexOf(':');
+        strAppVersion = strAppVersion.Substring(0, find);
+
+        strDataVersion = strAppVersion;
         strDataNetWorkPos = sgLoginData.GetServName();                                                  // 내부시스템01 / 외부시스템01
 
         // 한번에 전송 가능한 파일 크기

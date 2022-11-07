@@ -1615,7 +1615,10 @@ window.loadFileReaderService = () => {
           this.GetDragTargetElement = function () {
               var targetElement;
               for (var targetId of this.dragTargetElements) {
-                if((targetElement = document.getElementById(targetId))) return targetElement;
+                  if ((targetElement = document.getElementById(targetId))) {
+                      console.log("targetElement : " + targetElement);
+                      return targetElement;
+                  }
               }
               return null;
           };
@@ -1937,7 +1940,8 @@ window.loadFileReaderService = () => {
               var element = this.GetDragTargetElement();
               var entries = element.webkitEntries;
               
-              if (entries != null) {  
+              if (entries != null) {
+                  console.log("entry Length : " + entries.length);
                   for (var i = 0; i < entries.length; ++i) {
                       if (entries[i].isDirectory) {
                           traverseFileTree(entries[i]);
@@ -1948,6 +1952,7 @@ window.loadFileReaderService = () => {
                       files = element.files;
                       for (var i = 0; i < files.length; i++) {
 
+                          console.log("fileLength : " + files.length);
                           DirSubFiles.paths.push(files[i].name);
                           DirSubFiles.items.push(files[i]);
                           DirSubFiles.use.push("n");

@@ -10,6 +10,7 @@
 @using System.Runtime.InteropServices
 @using System.Net.NetworkInformation
 @using OpenNetLinkApp.Data.SGQuery
+@using System.Threading
 
 @inherits LayoutComponentBase
 @inject HSCmdCenter HSCmdCenter
@@ -99,11 +100,11 @@
 <!-- <PWChange2 @ref="refPWChange"></PWChange2>
 <PWChangeDefaultPW2 @ref="refPWChangeDefaultPW"></PWChangeDefaultPW2> -->
 
-<SGAlert2 @ref="refSGloginDuplicate" OnCancel="SessionAlertCancelpopup" OnConfirm="SessionAlertConfirmpopup"></SGAlert2>
+<SGAlert @ref="refSGloginDuplicate" Guid="modal-alert-popuplogin" OnCancel="SessionAlertCancelpopup" OnConfirm="SessionAlertConfirmpopup"></SGAlert>
 
 @code {
 
-    SGAlert2 refSGloginDuplicate;
+    SGAlert refSGloginDuplicate;
 
     [Parameter]
     public EventCallback<int> goToPage { get; set; }
@@ -262,7 +263,9 @@
             Debug.WriteLine(ex.Message);
         }
 
-        closeUIPopup();
+	// 로그결과 받을때 닫음
+        //closeUIPopup();
+
         @*if (CloseUI)
             closeUIPopup();*@
 
@@ -341,7 +344,8 @@
             if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
             {
                 // ID저장 사용
-                if (siteConfig.GetUseLoginIDSave(nGroupID) == true)
+                //if (siteConfig.GetUseLoginIDSave(nGroupID) == true)   // json으로 설정이동
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID))
                 {
                     string strEncID = "";
                     strEncID = sgSettingProc.GetSettingUID(nGroupID);
@@ -355,10 +359,12 @@
                 }
 
                 // IDPW 자동로그인
-                if (siteConfig.GetUseAutoLogin(nGroupID) == true)
+                // if (siteConfig.GetUseAutoLogin(nGroupID) == true)    // json으로 이동
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
                 {
 
-                    bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(nGroupID);
+                    // siteConfig. json으로 이동
+                    bAutoLoginCheck = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLoginCheck(nGroupID);
 
                     bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(nGroupID);
                     if (bAutoLoginContinue)
@@ -393,10 +399,7 @@
                         StateHasChanged();
                     }
 
-                }
-                /*else
-                {
-                }*/
+                } // if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
 
             } // if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
             else if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
@@ -408,9 +411,9 @@
                     pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                     pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
-#if DEBUG
+    #if DEBUG
                 pw = "HsckAD.com";
-#endif
+    #endif
                 StateHasChanged();
                 await Task.Delay(100);
                 doLogIn();
@@ -418,7 +421,6 @@
             } // if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
 
         }
-
 
         await base.OnAfterRenderAsync(firstRender);
 
@@ -431,7 +433,8 @@
     /// <returns></returns>
     public bool GetInitPWLogin(int groupID)
     {
-        string strInitPW = siteConfig.GetInitPasswordInfo(groupID);
+        // siteConfig. json으로 이동
+        string strInitPW = SGAppMgrSvc.OpConfigInfoService.GetInitPasswordInfo(groupID);
 
         SGRSACrypto sgRSACrypto = new SGRSACrypto();
 
@@ -653,7 +656,8 @@
         if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
         {
 
-            if (siteConfig.GetUseAutoLogin(groupId) == true)
+            //if (siteConfig.GetUseAutoLogin(groupId) == true)  // json으로 설정이동
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
             {
                 if (bAutoLoginCheck)
                 {
@@ -678,7 +682,8 @@
             }
             else
             {
-                if (siteConfig.GetUseLoginIDSave(groupId) == true)
+                //if (siteConfig.GetUseLoginIDSave(groupId) == true)    // json으로 설정이동
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID))
                 {
                     SGRSACrypto sgRSACrypto = new SGRSACrypto();
                     string strEncID = "";
@@ -812,7 +817,16 @@
             */
 
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
-            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
+            SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
+
+            while (true)
+            {
+                sfmData = HSCmdCenter.GetSFMListData(groupId);
+                if (sfmData != null)
+                    break;
+                Thread.Sleep(50);
+            }
+            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
 
 
@@ -839,8 +853,17 @@
             sgQueryExtend = new SGQueryExtend();
             if (sgQueryExtend != null)
             {
-                string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
-                HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
+	    
+		        string strGetinfoTagName = "";
+		        strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
+		        strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
+                strGetinfoTagName += ", 'CLIENT_DOCUMENT_EXTRACT_TYPE'";
+
+		        string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
+		        HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);	    
+	    
+                // string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+                // HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
             }
 
 
@@ -867,15 +890,31 @@
                                     listModKey[(int)HOTKEY_MOD.WINDOW],
                                     chVKey);
                 }
+
+                // clipboard 선택전송기능 사용유무설정
+                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeSelectSend(groupId))
+                    Window.UseClipBoardSelect(groupId);
+
+                // ClipBoard(Type Mixed 일때) Text 우선송신 사용
+                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
+                    Window.UseClipFirstSendType(groupId);
             }
 
 
-            DateTime dt = sgLoginData.GetSvrTimeConvert();
-            pageService.SetSvrTime(groupId, dt);
-            bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
-            bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
-            pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
-            pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
+        DateTime dt =(SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
+        pageService.SetSvrTime(groupId, dt, sgLoginData);
+        bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+        bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
+        pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
+        pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
+
+            bool bAfterCheck = false;
+            if (!bAfterApprEnable)
+                bAfterCheck = false;
+            else
+                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+
+            pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
             Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
             int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
@@ -904,18 +943,31 @@
 
             // 로그인 완료 -
 
+            // 성공했을대에만 닫음
+            closePopUp();
+
         }
         else
         {
             bUIBtnDisable = false;
-            string strPopupMsg = e.strMsg;
+            string strPopupMsg = "";
+            // 다중망일때에는 실패한 망이름 표현
+            if (pageService.m_bIsMultiNetWork)
+            {
+                string strFromNet = "";
+                string strToNet = "";
+                XmlConf.GetNetworkTitle(groupId, out strFromNet, out strToNet);
+                strPopupMsg = $"{strFromNet}<i class=\"fas fa-long-arrow-alt-right p-1\"></i> {strToNet}<br/>";
+            }
+
+            strPopupMsg += e.strMsg;
+
             strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
             ShowLoginFail(strPopupMsg);
             HSCmdCenter.SendLogOut(groupId, "");
             StateHasChanged();
         }
 
-        closePopUp();
 
     }
 
@@ -930,7 +982,5 @@
         object[] param = { "error", XmlConf.GetTitle("T_SYSTEMNAME2"), strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
-
-
 
 }

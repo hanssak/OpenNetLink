@@ -7,6 +7,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using System.Runtime.InteropServices
 @using OpenNetLinkApp.Data.SGQuery
+@using System.Threading
 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
@@ -899,7 +900,16 @@
 
 
             SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupId);
-            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
+            SGData sfmData = HsCmdCenter.GetSFMListData(groupId);
+
+            while (true)
+            {
+                sfmData = HsCmdCenter.GetSFMListData(groupId);
+                if (sfmData != null)
+                    break;
+                Thread.Sleep(50);
+            }
+            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
             ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
             // CLIENT_ZIP_DEPTH 정보 가져옴
@@ -907,8 +917,17 @@
             sgQueryExtend = new SGQueryExtend();
             if (sgQueryExtend != null)
             {
-                string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
-                HsCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
+	    
+		        string strGetinfoTagName = "";
+		        strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
+		        strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
+                strGetinfoTagName += ", 'CLIENT_DOCUMENT_EXTRACT_TYPE'";
+
+		        string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
+		        HsCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);	    
+	    
+                // string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+                // HsCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
             }
 
             bool bUseClipBoard = sgLoginData.GetClipboard();
@@ -934,15 +953,31 @@
                                     listModKey[(int)HOTKEY_MOD.WINDOW],
                                     chVKey);
                 }
+
+                // clipboard 선택전송기능 사용유무설정
+                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeSelectSend(groupId))
+                    Window.UseClipBoardSelect(groupId);
+
+                // ClipBoard(Type Mixed 일때) Text 우선송신 사용
+                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
+                    Window.UseClipFirstSendType(groupId);
             }
 
 
-            DateTime dt = sgLoginData.GetSvrTimeConvert();
-            pageService.SetSvrTime(groupId, dt);
+            DateTime dt =(SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
+            pageService.SetSvrTime(groupId, dt, sgLoginData);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
             pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
             pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
+
+            bool bAfterCheck = false;
+            if (!bAfterApprEnable)
+                bAfterCheck = false;
+            else
+                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+
+            pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
             Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
             int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
@@ -1009,7 +1044,18 @@
         {
 
             bGpkiBtnDisable = false;
-            string strPopupMsg = e.strMsg;
+            string strPopupMsg = "";
+
+            // 다중망일때에는 실패한 망이름 표현
+            if (pageService.m_bIsMultiNetWork)
+            {
+                string strFromNet = "";
+                string strToNet = "";
+                XmlConf.GetNetworkTitle(groupId, out strFromNet, out strToNet);
+                strPopupMsg = $"{strFromNet}<i class=\"fas fa-long-arrow-alt-right p-1\"></i> {strToNet}<br/>";
+            }
+
+            strPopupMsg += e.strMsg;
             strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
             ShowLoginFail(strPopupMsg);
             HsCmdCenter.SendLogOut(groupId, "");

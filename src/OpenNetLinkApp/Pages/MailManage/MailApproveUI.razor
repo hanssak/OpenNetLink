@@ -47,32 +47,88 @@
                             <tr>
                                 <th class="p-2">@XmlConf.GetTitle("T_COMMON_PERIOD");</th>
                                 <td>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker11" readonly="readonly" value="@strFromDay">
-                                    <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker12" readonly="readonly" value="@strToDay">
+                                    @*<input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker11" readonly="readonly" value="@strFromDay">
+                                            <span class="float-left col-md-1">-</span>
+                                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker12" readonly="readonly" value="@strToDay">*@
+                                    <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
                                 <th class="p-2" style="width:70px;"> @XmlConf.GetTitle("T_COMMON_APPROVE_KIND") </th>
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("ApproveKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApproveKind<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strApproveKind
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("ApproveKind"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strApproveKind, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("ApproveKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApproveKind<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2" style="width:70px;">  @XmlConf.GetTitle("T_COMMON_EMAILTRANSKIND") </th> <!--발송구분-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransTypeText<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransTypeText
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("TransType"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransTypeText, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransTypeText<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2" style="width:70px;"> @XmlConf.GetTitle("T_COMMON_PRIVACY") </th>  <!--개인정보-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("DlpValue"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDlpValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strDlpValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("DlpValue"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDlpValue, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("DlpValue"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDlpValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
 
                             </tr>
                             <tr>
                                 <th class="p-2" style="width:70px;"> @XmlConf.GetTitle("T_EMAIL_STATUS") </th>  <!--발송상태-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("MailTransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransFlag<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransFlag
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("MailTransStatus"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransFlag, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("MailTransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransFlag<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2" style="width:70px;"> @XmlConf.GetTitle("T_COMMON_APPROVESTATUS") </th> <!--승인상태-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("MailApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strSearchApproveStatus<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strSearchApproveStatus
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu5">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("MailApproveStatus"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strSearchApproveStatus, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("MailApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strSearchApproveStatus<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2 pt-2"> @XmlConf.GetTitle("T_EMAIL_SENDER") </th>  <!--발신자-->
                                 <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="@XmlConf.GetTitle("T_EMAIL_SENDER")" @bind="strSearchSender" @onkeyup="HandleKeyEvent"></td>
@@ -93,9 +149,6 @@
                         </table>
 
                     </div>
-
-
-
                 </div>
             </div>
         </div>
@@ -146,17 +199,17 @@
                                     {
                                         @foreach (var item in listData)
                                         {
-                                            <tr>
-                                                <td>
+                                                    <tr>
+                                                        <td>
                                                     @if (item[99] == "true")
                                                     {
                                                         @if (item[100] == "true")
                                                         {
-                                                            <input class="input" type="checkbox" checked="checked" @onclick="(e=>CheckStateUpdate(item))">
+                                                                            <input class="input" type="checkbox" checked="checked" @onclick="(e=>CheckStateUpdate(item))">
                                                         }
                                                         else
                                                         {
-                                                            <input class="input" type="checkbox" @onclick="(e=>CheckStateUpdate(item))">
+                                                                            <input class="input" type="checkbox" @onclick="(e=>CheckStateUpdate(item))">
                                                         }
 
                                                     }
@@ -164,27 +217,27 @@
                                                     {
                                                         @if (item[100] == "true")
                                                         {
-                                                            <input class="input" type="checkbox" disabled="disabled" checked="checked" @onclick="(e=>CheckStateUpdate(item))">
+                                                                            <input class="input" type="checkbox" disabled="disabled" checked="checked" @onclick="(e=>CheckStateUpdate(item))">
                                                         }
                                                         else
                                                         {
-                                                            <input class="input" type="checkbox" disabled="disabled" @onclick="(e=>CheckStateUpdate(item))">
+                                                                            <input class="input" type="checkbox" disabled="disabled" @onclick="(e=>CheckStateUpdate(item))">
                                                         }
                                                     }
-                                                </td>
-                                                <td style="text-align:center">@GetApproveKind(item[3])</td>
-                                                <td style="text-align:center">@GetTransKind(item[4])</td>
-                                                <td style="text-align:center">@GetDLPFlag(item[5])</td>
-                                                <!-- <td style="text-align:center">@item[6]</td>  -->
-                                                <td style="text-align:center">@GetTransStatus(item[7])</td>
-                                                <td style="text-align:center">@GetApproveStatus(item[8])</td>
-                                                <td style="text-align:center">@item[9]</td>
-                                                <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item[10]">@item[10]</td>
-                                                <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item[12]">@item[12]</td>
-                                                <td style="text-align:center">@GetDateOnly(item[13])</td>
-                                                <td style="text-align:center">@GetDateOnly(item[14])</td>
-                                                <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e => OpenDetail(item[0], item[2], item[99]))"><i class="fas fa-search"></i></button></td>
-                                            </tr>
+                                                        </td>
+                                                        <td style="text-align:center">@GetApproveKind(item[3])</td>
+                                                        <td style="text-align:center">@GetTransKind(item[4])</td>
+                                                        <td style="text-align:center">@GetDLPFlag(item[5])</td>
+                                                        <!-- <td style="text-align:center">@item[6]</td>  -->
+                                        <td style="text-align:center">@GetTransStatus(item[7])</td>
+                                                        <td style="text-align:center">@GetApproveStatus(item[8])</td>
+                                                        <td style="text-align:center">@item[9]</td>
+                                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item[10]">@item[10]</td>
+                                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item[12]">@item[12]</td>
+                                                        <td style="text-align:center">@GetDateOnly(item[13])</td>
+                                                        <td style="text-align:center">@GetDateOnly(item[14])</td>
+                                                        <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e => OpenDetail(item[0], item[2], item[99]))"><i class="fas fa-search"></i></button></td>
+                                                    </tr>
                                         }
                                     }
                                 </tbody>
@@ -214,7 +267,7 @@
 
 
                         <!--footer test-->
-                        <Footer></Footer>
+                        <Footer @ref=refFooter></Footer>
                         <!--./footer test-->
                         <!-- /.card-footer -->
 
@@ -244,11 +297,14 @@
 
     SGReject refSGReject;
     SGCustomSelect refSGCustomSelect;
-    public string strFromDay = "";
-    public string strToDay = "";
+    Footer refFooter;
+    PeriodDatePicker refPeriodDatePicker;
+
+    @*public string strFromDay = "";
+        public string strToDay = "";*@
     //검색조건 바인딩 변수
-    private string curFromDay;
-    private string curToDay;
+    @*private string curFromDay;
+        private string curToDay;*@
     private string strSearchReceiver;       //검색수신자(user_id)
     private string strSearchTitle;          //제목(title)
     private string strSearchSender;
@@ -573,7 +629,7 @@
     {
         if (e.Key == "Enter")
         {
-            doSearch();
+            Task.Run(async () => { await doSearch(); });
         }
     }
     private async void openCustomSelect(string opt)
@@ -589,8 +645,8 @@
         else if (opt == "MailApproveStatus")
             await refSGCustomSelect.openPopUp(opt, strSearchApproveStatus);
     }
-    public void GetInitDateTime()
-    {
+    @*   public void GetInitDateTime()
+        {
         strToDay = DateTime.Now.ToString("yyyy-MM-dd");
         string year = DateTime.Now.ToString("yyyy");
         string month = DateTime.Now.ToString("MM");
@@ -600,28 +656,28 @@
         int nDay = Convert.ToInt32(day);
         System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
         strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
-    }
-    public async Task GetDateTime()
-    {
+        }
+        public async Task GetDateTime()
+        {
         await RetriveDateFromJS();
         char sep = '-';
         string[] splitFrom = strFromDay.Split(sep);
         curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
         string[] splitTo = strToDay.Split(sep);
         curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
-    }
+        }
 
-    private async Task RetriveDateFromJS()
-    {
+        private async Task RetriveDateFromJS()
+        {
         object[] param = { "datepicker11" };
         string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
         if (vStr != null && vStr.Length > 0)
-            strFromDay = vStr;
+        strFromDay = vStr;
         object[] param2 = { "datepicker12" };
         string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
         if (vStr2 != null && vStr2.Length > 0)
-            strToDay = vStr2;
-    }
+        strToDay = vStr2;
+        }*@
     public void SetPageinfo(int nDataCount)
     {
         nTotalPages = (int)nDataCount / nPageListCount;
@@ -717,7 +773,7 @@
         }
         StateHasChanged();
     }
-    private async void doSearch()
+    private async Task doSearch()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -742,8 +798,18 @@
         mailParam.Sender = strSearchSender;
         mailParam.Receiver = strSearchReceiver;
         mailParam.Title = strSearchTitle;
-        await mailParam.SetSearchStartDate("datepicker11");
-        await mailParam.SetSearchEndDate("datepicker12");
+
+        mailParam.SetTransKindCode(strTransTypeText);
+        mailParam.SetApproveKindCode(strApproveKind);
+        mailParam.SetDlpValueCode(strDlpValue);
+        mailParam.SetTransStatusCode(strTransFlag);
+        mailParam.SetApprStatusCode(strSearchApproveStatus);
+
+        @*await mailParam.SetSearchStartDate("datepicker11");
+            await mailParam.SetSearchEndDate("datepickoer12");*@
+        await refPeriodDatePicker.RetriveDateFromJS();
+        mailParam.SetSearchStartDate(refPeriodDatePicker.FromDateSearchValue);
+        mailParam.SetSearchEndDate(refPeriodDatePicker.ToDateSearchValue);
 
         MailApproveDao dao = new MailApproveDao();
         HSCmdCenter.SendCountQuery(groupID, curUserID, dao.TotalCount(mailParam));
@@ -754,7 +820,7 @@
     private void UpdateList(int pageNumber)
     {
         nViewPageNo = pageNumber + 1;
-        doSearch();
+        Task.Run(async () => { await doSearch(); });
     }
 
     public async Task OpenDetail(string transSeq, string apvseq, string apvenable)
@@ -768,12 +834,9 @@
         mailParam.XmlConf = XmlConf;
         mailParam.jsRuntime = jsRuntime;
 
-        strDlpValue = XmlConf.GetTitle("T_COMMON_ALL");
-        strApproveKind = XmlConf.GetTitle("T_COMMON_ALL");
-        strTransTypeText = XmlConf.GetTitle("T_COMMON_ALL");
-        strTransFlag = XmlConf.GetTitle("T_COMMON_ALL");
-        strSearchApproveStatus = XmlConf.GetTitle("T_COMMON_ALL");
-        GetInitDateTime();
+        InitText();
+
+        @*GetInitDateTime();*@
 
         //Email 배치 승인,반려 요청에 응답 이벤트
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -783,6 +846,16 @@
 
         HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupID, ApproveBatchResult);
         base.OnInitialized();
+    }
+
+    public void InitText()
+    {
+
+        strDlpValue = XmlConf.GetTitle("T_COMMON_ALL");
+        strApproveKind = XmlConf.GetTitle("T_COMMON_ALL");
+        strTransTypeText = XmlConf.GetTitle("T_COMMON_ALL");
+        strTransFlag = XmlConf.GetTitle("T_COMMON_ALL");
+        strSearchApproveStatus = XmlConf.GetTitle("T_COMMON_ALL");
     }
 
     public void ApproveBatchResult(int groupid, SGData e)
@@ -795,18 +868,19 @@
             return;
         }
         ShowMessage("info", reason);
-        doSearch();
+        Task.Run(async () => { await doSearch(); });
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
-            object[] param = { "datepicker11", "datepicker12" };
-            jsRuntime.InvokeAsync<object>("initDatePicker", param);
+            @*object[] param = { "datepicker11", "datepicker12" };
+                jsRuntime.InvokeAsync<object>("initDatePicker", param);*@
             jsRuntime.InvokeAsync<object>("initPageLeft");
-            doSearch();
+            Task.Run(async () => { await doSearch(); });
         }
+        @*pageService.SetDayInfoRefreshEvent(groupIDbyParam, DayInfoRefreshResult);*@
         base.OnAfterRender(firstRender);
     }
 
@@ -832,5 +906,4 @@
         }
 
     }
-
 }

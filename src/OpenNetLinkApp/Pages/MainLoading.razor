@@ -1,5 +1,7 @@
 @page  "/"
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
 @using AgLogManager
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
@@ -33,6 +35,9 @@
 
 @code {
 
+
+    SGSettingsDBProc sgSettingProc;
+
     ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
@@ -57,14 +62,22 @@
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         pageService.listNetWork = NetWorkSvc.NetWorkInfo;
+        sgSettingProc = SGSettingsDBProc.Instance;
 
         if (listNetWork.Count > 1)
             pageService.m_bIsMultiNetWork = true;       // 3망관련 UI 및 동작에 크게 영향줌(다중연결상황으로 파악함. 필요에 따라 설정값변경해서 배포)
+
+        SGSettingData sgSettingData = null;
 
         for (int i = 0; i < listNetWork.Count; i++)
         {
             HSCmdCenter.sgPageEvent.SetSvrEventAdd(listNetWork[i].GroupID, SvrResult);
             pageService.SetLogoutStatus(listNetWork[i].GroupID, true);
+
+            sgSettingData = null;
+            sgSettingData = sgSettingProc.SelectSettingData(listNetWork[i].GroupID);
+            if (sgSettingData == null)
+                sgSettingProc.InsertSettingData(listNetWork[i].GroupID, "", "", "", "", 0);
         }
 
         //HSCmdCenter.sgPageEvent.SetSvrEventAdd(0, SvrResult);
@@ -92,7 +105,7 @@
 
         @*MyNavigationManager.NavigateTo("/fileException");*@
       
-        MyNavigationManager.NavigateTo( (siteConfig.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1) ? "/SelectNet" : "/LogIn");
+        MyNavigationManager.NavigateTo( (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1) ? "/SelectNet" : "/LogIn");
 
     }
 

@@ -11,6 +11,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery
 @using System.Text
+@using System.Diagnostics
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -44,39 +45,81 @@
 
                 <div class="card card-primary card-outline mb-2 ">
                     <div class="card-body">
-
-
                         <table>
                             <tr>
                                 <th class="p-2">@strPeriod</th>                         <!--기간-->
                                 <td style="width:28%;">
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker3" readonly="readonly" value="@strFromDay">
-                                    <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker4" readonly="readonly" value="@strToDay">
+                                    @*<input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker3" readonly="readonly" value="@strFromDay">
+                                        <span class="float-left col-md-1">-</span>
+                                        <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker4" readonly="readonly" value="@strToDay">*@
+                                    <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
                                 <th class="p-2"> @strTransKind </th>                     <!--전송구분-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransKindValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("TransKind"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransKindValue, str, TransSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2"> @strTransStatus </th>                         <!--전송상태-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("TransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransStatusValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransStatusValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("TransStatus"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransStatusValue, str, TransSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("TransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransStatusValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2"> @strApprStatus </th>                             <!--승인상태-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("ApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprStatusValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strApprStatusValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("ApproveStatus"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strApprStatusValue, str, TransSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("ApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprStatusValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                             </tr>
 
                             <tr>
                                 <th class="p-2 pt-2"> @strTitle </th>                                  <!--제목-->
                                 <td class="pt-2" colspan="1"><input type="text" class="form-control col-md-11" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>     <!--제목을 입력하여 주십시요.-->
-
                                 @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                 {
                                     <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                     <td>
-                                        <button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
+                                        <div class="dropdown">
+                                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                @strDestNetWork
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
+                                                @foreach (string str in Common.CsFunction.GetOptionValue("DestNetwork", dicDestSysPos))
+                                                {
+                                                    <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDestNetWork, str, TransSearchCount))">@str</button>
+                                                }
+                                            </div>
+                                        </div>
+                                        <!--<button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>-->
                                     </td>
                                 }
 
@@ -100,39 +143,36 @@
         <!-- list -->
 
         <div class="row">
-
-
-
             <div class="col-md-12">
                 <div class="card card-secondary card-outline" style="height:100%;">
-
-
                     <form class="form-horizontal">
-
                         <div class="card-body  p-0">
                             <table id="table1" class="table table-head-fixed table-bordered table-hover" style="table-layout: fixed;">
                                 <thead>
                                     <tr>
-                                        <th style="text-align:center;width:5%;">
+                                        <th style="text-align:center;width:3%;">
                                             <!--  <input class="input" type="checkbox">  -->
                                         </th>
-                                        <th style="text-align:center;width:7%;">@strApproveKind</th>                         <!--결재종류-->
-                                        <th style="text-align:center;width:7%;">@strTransKind</th>                         <!--전송구분-->
-                                        <th style="text-align:center;width:8%;">@strTransStatus</th>                         <!--전송상태-->
-                                        <th style="text-align:center;width:7%;">@strApprStatus</th>                         <!--승인상태-->
-                                        @if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForward())
+                                        <th style="text-align:center; vertical-align:middle;width:6%;">@strApproveKind</th>                         <!--결재종류-->
+                                        <th style="text-align: center; vertical-align: middle; width: 6%;">@strTransKind</th>                         <!--전송구분-->
+                                        <th style="text-align: center; vertical-align: middle; width: 8%;">@strTransStatus</th>                         <!--전송상태-->
+                                        <th style="text-align: center; vertical-align: middle; width: 7%;">@strApprStatus</th>                         <!--승인상태-->
+                                        @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward())
                                         {
-                                            <th style="text-align: center; width: 7%; ">@strFileForward</th>
+                                            <th style="text-align: center; vertical-align: middle; width: 7%; ">@strFileForward</th>
                                             <!--파일전달-->
                                         }
                                         @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                         {
-                                            <th style="text-align:center;width:8%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                            <th style="text-align: center; vertical-align: middle; width: 8%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                         }
-                                        <th style="text-align:center;width:15%;">@strTitle</th>                               <!--제목-->
-                                        <th style="text-align:center;width:14%;">@strFileSendDay</th>                        <!--전송요청일-->
-                                        <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>                        <!--개인정보-->
-                                        <th style="text-align:center;width:7%;">@strDetail</th>                         <!--상세보기-->
+                                        <th style="text-align:center;vertical-align:middle;width:10%;">@strTitle</th>                               <!--제목-->
+                                        <th style="text-align:center;vertical-align:middle;width:13%;">@strFileSendDay</th>                        <!--전송요청일-->
+                                        <th style="text-align:center;vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>   <!--개인정보-->
+                                        <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_ETC_EXPIRATIONDATE")</th>   <!--파일 만료일-->
+                                        <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_ETC_DOWNPOSSIBLECOUNT")</th>   <!--다운로드 횟수-->
+                                        <th style="text-align:center;vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_TRANS_MANUAL_DOWNLOAD")</th>   <!--다운로드-->
+                                        <th style="text-align:center;vertical-align:middle;width:7%;">@strDetail</th>                         <!--상세보기-->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -142,23 +182,36 @@
                                             <td style="text-align:center">
                                                 <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
                                             </td>
-                                            <td style="text-align:center">@item.ApvType</td>
-                                            <td style="text-align:center">@item.TransferType</td>
-                                            <td style="text-align:center">@item.TransferStatus</td>
-                                            <td style="text-align:center">@item.ApvStatus</td>
-                                            @if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForward())
+                                            <td style="text-align:center; vertical-align: middle">@item.ApvType</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.TransferType</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.TransferStatus</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.ApvStatus</td>
+                                            @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward())
                                             {
-                                                <td style="text-align:center">@item.IsFile</td>
+                                                <td style="text-align:center; vertical-align: middle">@item.IsFile</td>
                                             }
 
                                             @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                             {
-                                                <td style="text-align:center">@item.strDestNet</td>
+                                                <td style="text-align:center; vertical-align: middle">@item.strDestNet</td>
                                             }
-                                            <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                            <td style="text-align:center">@item.RequestTime</td>
-                                            <td style="text-align:center">@item.stDLP</td>
-                                            <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
+                                            <td style="vertical-align:middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.RequestTime</td>
+
+                                            @*@if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpInfoDisplay(groupIDbyParam))*@
+                                            <td style="text-align:center; vertical-align: middle">@item.stDLP</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.expiredDate</td>
+                                            @if (item.isPossibleDownload)
+                                            {
+                                                <td style="text-align:center; vertical-align: middle">@item.isPossibleDownloadCount</td>
+                                                <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>RequestManualDownload(item))"><i class="far fa-arrow-alt-circle-down"></i></button></td>
+                                            }
+                                            else
+                                            {
+                                                <td style="text-align:center; vertical-align: middle">0</td>
+                                                <td style="text-align:center; vertical-align: middle">-</td>
+                                            }
+                                            <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
                                         </tr>
                                     }
                                 </tbody>
@@ -177,7 +230,7 @@
                         </div>
 
                         <!--footer test-->
-                        <Footer></Footer>
+                        <Footer @ref="refFooter"></Footer>
                         <!--./footer test-->
                     </form>
                 </div>
@@ -187,7 +240,7 @@
     </div>
 </section>
 
-<TransPopUp @ref="refTransPopUp"></TransPopUp>
+<TransPopUp @ref="refTransPopUp" OnClose="UpdateData"></TransPopUp>
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
 
 @code {
@@ -221,6 +274,9 @@
 
     SGCustomSelect refSGCustomSelect;
     TransPopUp refTransPopUp;
+    Footer refFooter;
+    PeriodDatePicker refPeriodDatePicker;
+
     public int TotalCount { get; set; }
     public List<transData> mData = new List<transData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -259,14 +315,14 @@
     public string strTransInspect = "";
     public string strTitleInputInfo = "";
 
-    public string strFromDay = "";
-    public string strToDay = "";
+    @*public string strFromDay = "";
+        public string strToDay = "";*@
     private int m_currentDownloadCount = 0;
 
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
-
+    private transData curTransData = null;
     // 목적지 Data
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
     public string strDestNetWork = "";
@@ -326,8 +382,6 @@
     public string strSystemName = "";
 
     public string curUserID = "";
-    public string curFromDay = "";
-    public string curToDay = "";
     public string curTransKind = "";
     public string curTransStatus = "";
     public string curApprStatus = "";
@@ -337,7 +391,7 @@
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="pageNumber"></param>
     private void UpdateList(int pageNumber)
@@ -359,7 +413,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="updatePageNum"></param>
     private void UpdateInitList(int updatePageNum)
@@ -370,7 +424,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void UpdateData()
     {
@@ -382,7 +436,7 @@
     public List<transData> ListData = new List<transData>();
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="strTransSeq"></param>
     /// <returns></returns>
@@ -394,7 +448,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="transSeq"></param>
     /// <param name="downCount"></param>
@@ -427,7 +481,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -462,12 +516,13 @@
             refTransPopUp.m_downloadCount = m_currentDownloadCount;
             refTransPopUp.SetBindingData();
             OpenDetailPopup(sTransSeq).Wait();
+
         }
     }
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="strIsFile"></param>
     /// <returns></returns>
@@ -483,11 +538,12 @@
             return 0;
     }
 
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         InitText();
 
@@ -512,24 +568,34 @@
             dicDestSysPos = pageService.GetTargetSystemList(groupID);
         }
 
-        GetInitDateTime();
+        @*GetInitDateTime();*@
 
         base.OnInitialized();
 
-        await TransSearchCount();
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await TransSearchCount();
+        }
+        base.OnAfterRender(firstRender);
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="firstRender"></param>
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
-            object[] param = { "datepicker3", "datepicker4" };
-            jsRuntime.InvokeAsync<object>("initDatePicker", param);
-            jsRuntime.InvokeAsync<object>("initTransManageUIPosition");
+            @*object[] param = { "datepicker3", "datepicker4" };
+                jsRuntime.InvokeAsync<object>("initDatePicker", param);
+                jsRuntime.InvokeAsync<object>("initTransManageUIPosition");
+            *@
             jsRuntime.InvokeAsync<object>("initPageLeft");
         }
         base.OnAfterRender(firstRender);
@@ -638,7 +704,7 @@
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
-        await GetDateTime();
+        @*await GetDateTime();*@
         curTransKind = GetTransKind();
         curTransStatus = GetTransStatus();
         curApprStatus = GetApprStatus();
@@ -651,6 +717,12 @@
         curTitle = Encoding.UTF8.GetString(temp);
 
         nViewPageNo = 1;
+
+        await refPeriodDatePicker.RetriveDateFromJS();
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
+
+
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
         string strQueryCount = "";
 
@@ -679,19 +751,20 @@
 
             }
 
-            TransferDao2 dao = new TransferDao2();
+            TransferDao dao = new TransferDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
             strQueryCount = dao.TotalCount(param, true);   // 쿼리 데이터 카운트
         }
         else
         {
             TransferDao dao = new TransferDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
             strQueryCount = dao.TotalCount(param, true);   // 쿼리 데이터 카운트
         }
 
         // string str = dao.List(param);                  // 확인용
         HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
     }
-
 
     /// <summary>
     /// 전송관리에서 검색되는 목록을 얻는 Query 실행 결과값 받았을때 List 상태
@@ -711,6 +784,10 @@
             ShowMessage("error", strMsg);
             return;
         }
+
+        Task.Run(async () => { await refPeriodDatePicker.RetriveDateFromJS(); });
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
 
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, pageNum);
         string strQuery = "";
@@ -739,12 +816,14 @@
 
             }
 
-            TransferDao2 dao = new TransferDao2();
+            TransferDao dao = new TransferDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
             strQuery = dao.List(param, true);   // 쿼리 데이터 리스트
         }
         else
         {
             TransferDao dao = new TransferDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
             strQuery = dao.List(param, true);   // 쿼리 데이터 리스트
         }
 
@@ -753,11 +832,12 @@
     }
 
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public void GetInitDateTime()
-    {
+    @*
+        /// <summary>
+        ///
+        /// </summary>
+        public void GetInitDateTime()
+        {
         strToDay = DateTime.Now.ToString("yyyy-MM-dd");
         string year = DateTime.Now.ToString("yyyy");
         string month = DateTime.Now.ToString("MM");
@@ -767,42 +847,42 @@
         int nDay = Convert.ToInt32(day);
         System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
         strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
-    }
+        }*@
 
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    private async Task RetriveDateFromJS()
-    {
+    @*
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        private async Task RetriveDateFromJS()
+        {
         object[] param = { "datepicker3" };
         string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
         if (vStr != null && vStr.Length > 0)
-            strFromDay = vStr;
+        strFromDay = vStr;
         object[] param2 = { "datepicker4" };
         string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
         if (vStr2 != null && vStr2.Length > 0)
-            strToDay = vStr2;
-    }
+        strToDay = vStr2;
+        }
+    *@
+    @*/// <summary>
+            ///
+            /// </summary>
+            /// <returns></returns>
+            public async Task GetDateTime()
+        {
+            await RetriveDateFromJS();
+
+            char sep = '-';
+            string[] splitFrom = strFromDay.Split(sep);
+            curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
+            string[] splitTo = strToDay.Split(sep);
+            curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
+            }*@
 
     /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public async Task GetDateTime()
-    {
-        await RetriveDateFromJS();
-
-        char sep = '-';
-        string[] splitFrom = strFromDay.Split(sep);
-        curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
-        string[] splitTo = strToDay.Split(sep);
-        curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
-    }
-
-    /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
     public string GetTransKind()
@@ -822,7 +902,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
     public string GetTransStatus()
@@ -848,7 +928,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
     public string GetApprStatus()
@@ -899,7 +979,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -920,7 +1000,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -951,7 +1031,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -963,10 +1043,18 @@
             ShowMessage("error", strMsg);
             return;
         }
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupId);
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
         string curUserID = "";
+        int maxDownloadCount = 0;
+        bool isInner = false;
         if (sgLoginData != null)
+        {
             curUserID = sgLoginData.GetUserID();
+            maxDownloadCount = sgLoginData.GetMaxDownCount();
+            isInner = sgLoginData.GetSystemPosition();
+        }
+        else
+            return;
 
 
         ListData.Clear();
@@ -983,6 +1071,7 @@
         TransSearchList = sgData.GetQuerySearchData();
         int nCount = TransSearchList.Count;
 
+        int nowDate = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
         for (int i = 0; i < nCount; i++)
         {
             Dictionary<int, string> dic = TransSearchList[i];
@@ -1017,7 +1106,15 @@
             tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
             tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
             tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
+            tData.expiredDate = sgData.GetExpiredDate(dic);             //파일저장 만료일
             tData.stDLP = sgData.GetDlp(dic);
+            tData.isPossibleDownload = GetIsPossibleDownLoad(tData, isInner, maxDownloadCount, nowDate);
+
+            if (maxDownloadCount - tData.downloadCount < 0)
+                tData.isPossibleDownloadCount = 0;
+            else
+                tData.isPossibleDownloadCount = maxDownloadCount - tData.downloadCount;
+
 
             ListData.Add(tData);
         }
@@ -1026,6 +1123,59 @@
         StateHasChanged();
 
     }
+
+    public bool GetIsPossibleDownLoad(transData tData, bool isInner, int maxDownloadCount, int nowDate)
+    {
+        bool isPossibleDownload = false;
+        //파일 다운로드 가능여부 판단
+        if (!isInner && tData.TransferType == XmlConf.GetTitle("T_COMMON_EXPORT"))
+            isPossibleDownload = true;
+        else if (isInner && tData.TransferType == XmlConf.GetTitle("T_COMMON_IMPORT"))
+            isPossibleDownload = true;
+
+        if (isPossibleDownload)
+        {
+            //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
+            //if (sgAppConfig.GetFileDownloadBeforeReciving())
+            if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForwardDownBeforeRecv())
+            {
+                if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
+                    isPossibleDownload = true;
+                else
+                    isPossibleDownload = false;
+            }
+            else
+            {
+                //수동다운로드 이므로 PC수신완료 건만 다운가능
+                if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
+                    isPossibleDownload = true;
+                else
+                    isPossibleDownload = false;
+            }
+        }
+        int expireDate = Int32.Parse(tData.expiredDate.Replace("-", ""));
+        if (isPossibleDownload)
+        {
+            if (expireDate >= nowDate)
+                isPossibleDownload = true;
+            else
+                isPossibleDownload = false;
+        }
+
+        if (maxDownloadCount == 0)
+            isPossibleDownload = false;
+
+        if (isPossibleDownload)
+        {
+            if (tData.downloadCount < maxDownloadCount)
+                isPossibleDownload = true;
+            else
+                isPossibleDownload = false;
+        }
+
+        return isPossibleDownload;
+    }
+
 
     /// <summary>
     /// 전송관리 검색된 Data 개수로 전체페이지, ViewPage, StartPage 값들을 설정
@@ -1044,7 +1194,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="strType"></param>
     /// <param name="strMsg"></param>
@@ -1124,7 +1274,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="type"></param>
     /// <param name="groupID"></param>
@@ -1173,7 +1323,6 @@
             NotiAfterMsg();
     }
 
-
     /// <summary>
     /// 홈 이동 버튼
     /// </summary>
@@ -1197,6 +1346,194 @@
                 SideBarUISvc.ActiveMenu = MenuItem;
                 break;
             }
+        }
+    }
+
+    private void RequestManualDownload(transData transData)
+    {
+
+        curTransData = transData;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
+        ShowProgress(groupID, 1, 0, "DOWNLOAD");
+        HSCmdCenter.RequestManualDownload(groupID, curUserID, transData.TransSeq);
+        return;
+    }
+
+    public void FileDownloadProgressNoti(int groupID, PageEventArgs e)
+    {
+
+        string strMsg = "";
+        if (e.result != 0)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
+        string sFileName = e.strMsg;
+        int per = e.count;
+        int type = 0;
+        if (per == -100)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0221");           // 수신 파일 압축해제 및 복호화 도중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            ShowProgress(groupID, 4, 100, sFileName);
+            return;
+        }
+        if (per == -200)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            ShowProgress(groupID, 4, 100, sFileName);
+            return;
+        }
+        if (per >= 100)
+        {
+
+            HSCmdCenter.sgPageEvent.ReSetFileRecvProgressEventAdd();
+
+            type = 2;
+            ShowProgress(groupID, type, 100, sFileName);
+            Task.Delay(500);
+            type = 3;                                       // close
+            pageService.SetFileRecving(false);
+
+        }
+        else if ((per > 0) && (per < 100))
+        {
+            type = 2;                                       // update
+            pageService.SetFileRecving(true);
+        }
+        else if (per == 0)
+        {
+            bool bRecving = false;
+            bRecving = HSCmdCenter.GetFileRecving(groupID);
+            if (bRecving == true)
+                return;
+
+            type = 1;                                        // open
+            HSCmdCenter.SetFileRecving(groupID, true);
+        }
+        else
+            return;
+
+        ShowProgress(groupID, type, per, sFileName);
+    }
+
+    /// <summary>
+    /// ProGressBar UI Poopup 및 UI 표현(type : 1 - open , 2 - update ,3 -close)
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="type"></param>
+    /// <param name="per"></param>
+    /// <param name="sFileName"></param>
+    private async void ShowProgress(int groupID, int type, int per, string sFileName)
+    {
+        object[] param = { };
+        string identifier = "";
+        string strID = groupID.ToString();
+        //strID = strFileName;
+        strID = "FILEDOWNLOAD";
+        string strProgress = String.Format("{0}%", per);
+        string strFileRecvInfo = "";
+        if (per == 0)
+        {
+            string strInfoStart = XmlConf.GetInfoMsg("I_0203");                 // 다른 서버에서 파일을 탐색하는 중입니다./r/n잠시만 기다려 주십시요.
+            strInfoStart = strInfoStart.Replace("/r/n", "<br>");
+            strFileRecvInfo = strFileRecvInfo + strInfoStart;
+        }
+        else
+        {
+            strFileRecvInfo = XmlConf.GetWarnMsg("W_0087");                     // 파일 수신중 입니다./r/n잠시만 기다려 주십시오.
+            strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
+        }
+        strFileRecvInfo = strFileRecvInfo + "<br>";
+
+        string strProgressInfo = XmlConf.GetTitle("T_FILERECV_PER");           // 파일 수신 진행률
+        string strProgressInfoStart =
+
+        strFileRecvInfo = strFileRecvInfo + strProgressInfo + " : " + strProgress;
+
+        switch (type)
+        {
+            case 1:
+                string strTitleName = XmlConf.GetTitle("T_TRANS_MANUAL_DOWNLOAD");
+                identifier = "fireProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strTitleName;
+                param[2] = strFileRecvInfo;
+                pageService.SetFileRecving(true);
+                await Task.Delay(100);
+                break;
+            case 2:
+                identifier = "updateProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strFileRecvInfo;
+                param[2] = strProgress;
+                await Task.Delay(500);
+                break;
+            case 3:
+                identifier = "closeProgressMessage";
+                param = new object[1];
+                param[0] = strID;
+                pageService.SetFileRecving(false);
+                await Task.Delay(1000);
+                break;
+            case 4:             // 파일 수신 중 오류
+                identifier = "closeProgressMessage";
+                param = new object[1];
+                param[0] = strID;
+                pageService.SetFileRecving(false);
+                await Task.Delay(1000);
+                break;
+            default:
+                break;
+        }
+        await jsRuntime.InvokeAsync<object>(identifier, param);
+
+        if (type == 3)
+        {
+            if (sFileName.Equals(""))
+                return;
+
+
+            string strRecvDownPath = "";
+            strRecvDownPath = HSCmdCenter.GetDownLoadPath(groupID);
+            if (strRecvDownPath.Equals(""))
+                return;
+
+            ProcessStartInfo pi = new ProcessStartInfo(strRecvDownPath);
+            pi.Arguments = Path.GetFileName(strRecvDownPath);
+            pi.UseShellExecute = true;
+            pi.WorkingDirectory = Path.GetDirectoryName(strRecvDownPath);
+            pi.FileName = strRecvDownPath;
+            pi.Verb = "OPEN";
+            Process.Start(pi);
+
+            curTransData.downloadCount++;
+            SGLoginData sGLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sGLoginData.GetMaxDownCount() - curTransData.downloadCount <= 0)
+            {
+                curTransData.isPossibleDownload = false;
+                curTransData.isPossibleDownloadCount = 0;
+            }
+            else
+            {
+                curTransData.isPossibleDownloadCount = sGLoginData.GetMaxDownCount() - curTransData.downloadCount;
+            }
+
+            StateHasChanged();
         }
     }
 }

@@ -108,6 +108,45 @@ namespace OpenNetLinkApp.Migrations.SGNotify
 
                     b.ToTable("T_SG_NOTI");
                 });
+
+            modelBuilder.Entity("OpenNetLinkApp.Models.SGNotify.SGReSendData", b =>
+                {
+                    b.Property<int>("RESENDID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Sqlite:Autoincrement", true);
+
+                    b.Property<string>("CLIENTID")
+                        .IsRequired()
+                        .HasColumnType("varchar(512)");
+
+                    b.Property<int>("GROUPID")
+                        .HasColumnType("INT");
+
+                    b.Property<string>("HSZNAME")
+                        .IsRequired()
+                        .HasColumnType("varchar(512)");
+
+                    b.Property<bool>("ISEND")
+                        .HasColumnType("BOOLEAN");
+
+                    b.Property<string>("MID")
+                        .IsRequired()
+                        .HasColumnType("varchar(512)");
+
+                    b.Property<object>("TRANSINFO")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("USERSEQ")
+                        .IsRequired()
+                        .HasColumnType("varchar(512)");
+
+                    b.HasKey("RESENDID")
+                        .HasName("PK_T_SG_RESEND_ID");
+
+                    b.ToTable("T_SG_RESEND");
+                });
 #pragma warning restore 612, 618
         }
     }

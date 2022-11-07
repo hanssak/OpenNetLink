@@ -1,0 +1,980 @@
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
+@using OpenNetLinkApp.Components.SGTreeSearch
+@using HsNetWorkSG
+@using OpenNetLinkApp.Common
+
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+@inject PageStatusService pageService
+
+<div class="modal fade" id="ApproveExtApproverSelect_PopUp">
+    <div class="modal-dialog modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-outline pl-3 pr-3">
+                <h5 class="modal-title pt-1 text-bold ">@XmlConf.GetTitle("T_COMMON_APPROVE_EXT")</h5>                             <!--결재가 필요한 파일리스트-->
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="closePopUp">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- content -->
+                <!-- s------------------------------------------------------------------------------------------------------  -->
+
+                <div class="card-body pt-0">
+
+                    <div class="mb-2 text-bold" style="color:#d00303;">
+                        @*@(XmlConf.GetTitle("T_APPROVEEXT_TITLE_1") +" '"+ XmlConf.GetTitle("T_APPROVEEXT_NO_USE") + "'" + XmlConf.GetTitle("T_APPROVEEXT_TITLE_2") )*@
+                        &nbsp;&nbsp;&nbsp;&nbsp;@(XmlConf.GetTitle("T_APPROVEEXT_TITLE_1"))
+                        <button type="button" class="btn btn-xs btn-blue mr-1"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_APPROVEEXT_NO_USE")</button>
+                        @(XmlConf.GetTitle("T_APPROVEEXT_TITLE_2"))
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="card card-secondary card-outline" style="height:100%;">
+                            <form class="form-horizontal">
+                                <div class="card-body  p-0">
+                                    <table id="table1" class="table table-head-fixed table-bordered table-hover" style="display: block; overflow: auto; width: 100%; height: 135px;">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 777px; padding-left: 5px;">@XmlConf.GetTitle("T_COMMON_FILENAME")</th>    <!-- 이름 -->
+                                                <th style="text-align:right;vertical-align:middle;width:15%;">@XmlConf.GetTitle("T_COMMON_SIZE")</th>    <!-- 크기 -->
+                                                <th style="text-align:center;vertical-align:middle;width:15%;">@XmlConf.GetTitle("T_COMMON_KIND")</th>    <!-- 유형 -->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            @if (FileList != null && FileList.Count > 0)
+                                            {
+                                                foreach (HsStream file in FileList)
+                                                {
+                                                    if (file.isNeedApprove)
+                                                    {
+                                                        <tr>
+                                                            <td style="width: 70%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left:5px;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
+                                                            <td style="text-align:right;vertical-align:middle;width:15%;">@(file.IsDir? "" : CsFunction.GetSizeStr(file.Length))</td>
+                                                            <td style="text-align:center;vertical-align:middle;width:15%;">@file.Type</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+
+                    <br>
+
+                    @* 사유정보 입력란 *@
+                    <div class="col-md-12">
+
+                        <div class="form-group row mb-0" style="padding:.45rem;">
+                            <label for="1" class="col-sm-1 col-form-label text-center" style="border:1px solid #c7d6e9;background-color:#eff8ff;">@XmlConf.GetTitle("T_APPROVEEXT_TITLE_WHY")</label>
+                            <div class="col-sm-11 pr-0 pl-0" style="padding:.05rem;">
+                                <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@XmlConf.GetTitle("T_APPROVEEXT_TITLE_WHYDATA")" @bind="strBindTitle" autocomplete="off">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <br>
+
+                    @* 결재자를 조회하여 선택하십시오. 문구*@
+                    <div class="modal-sub-title mb-2 text-bold">
+                        &nbsp;&nbsp;&nbsp;&nbsp;@(XmlConf.GetTitle("T_APPROVEEXT_SELECT_APPROVER"))
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="form-group row mb-0" style="padding:.45rem;">
+                            <!-- bShowApprover -->
+                            <!--s table -->
+                            <div class="box1" style=" width:46%;  float:left;">
+                                @if (approverSearchType == "SEARCH")
+                                {
+                                    <div class="d-inline-flex  w-100 mb-2 " style="height:29px;">
+                                        <label class="p-1">@strDept</label>                                                       <!--부서 : XmlConf.GetTitle("T_INPUT_DEPT") -->
+                                        <input type="text" class="form-control col-md-3" disabled="@(bEditDeptName == false)" placeholder="@strTeamName" @bind-value="strCurDept">
+                                        <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
+                                        <input type="text" class="form-control col-md-3 mr-2" placeholder="@XmlConf.GetTitle("T_INPUT_NAME")" @bind-value="strCurName">
+                                        <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="SearchApprover"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>  <!--조회-->
+                                    </div>
+
+                                    <div class="card-body table-responsive p-0" style="height:120px; border:1px solid #ddd; background-color:#fff;">
+                                        <table class="table table-head-fixed">
+                                            <colgroup>
+                                                <col width="">
+                                                <col width="">
+                                                <col width="">
+                                                <col width="">
+                                            </colgroup>
+                                            <thead>
+                                                <tr>
+                                                    <th style="text-align:center">@strOrder </th>        <!--순번-->
+                                                    <th style="text-align:center">@strDept </th>        <!--부서-->
+                                                    <th style="text-align:center">@strRank </th>        <!--직급-->
+                                                    <th style="text-align:center">@strName </th>        <!--이름-->
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (ApproverInfo item in ApproverSearch)
+                                                {
+                                                    <tr name="trItem7" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq">
+                                                        <td style="text-align:center">@item.Index</td>
+                                                        <td>@item.DeptName</td>
+                                                        <td>@item.Grade</td>
+                                                        <td>@item.Name</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                else    //TREE
+                                {
+                                    <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="@(useInputInTree?180:216)" TreeHeight="@(useInputInTree?70:87)" UserSearchList="@ApproverSearch" OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => SGDeptTreeList_OnItemDoubleClick(item)" />
+                                }
+                            </div>
+                            <!--e table -->
+                            <!--s btn -->
+                            <div class="box2" style=" width:8%; height:148px; float:left;">
+                                <div class="col-md-12 text-center" style="top:@(approverSearchType == "SEARCH" ? 46 : 52)% !important;">
+                                    <button type="button" class="btn bg-gradient-primary mb-3" @onclick="AddSelectApprover"><i class="fas fa-angle-right fa-2x"></i></button>
+                                    <button type="button" class="btn bg-gradient-primary" @onclick="RemoveAssignApprover"><i class="fas fa-angle-left fa-2x"></i></button>
+                                </div>
+                            </div>
+                            <!--e btn -->
+                            <!--s table -->
+                            <div class="box1" style="width:46%;float:left;">
+                                <div class="btn-group w-100 mb-2 ">
+                                    @if (m_step == 0)
+                                    {
+                                        <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToTop"><i class="fas fa-angle-double-up pr-2"></i>@strMostTop</button> <!--맨위-->
+                                        <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToUpper"><i class="fas fa-arrow-up pr-1"></i>@strTop</button> <!--위-->
+                                        <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToLower"><i class="fas fa-arrow-down pr-1"></i>@strDown</button> <!--아래-->
+                                        <button type="button" class="btn bg-gradient-secondary" @onclick="moveToBottom"><i class="fas fa-angle-double-down pr-2"></i>@strMostBottom</button> <!--맨아래-->
+                                    }
+                                    else
+                                    {
+                                        <div style="height:28px;">&nbsp;</div>
+                                    }
+                                </div>
+
+
+                                <div class="card-body table-responsive p-0" style="height:@(approverSearchType == "SEARCH" ? 120 : 159)px; border:1px solid #ddd; background-color:#fff;">
+
+                                    <table class="table table-head-fixed">
+
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align:center">@strOrder </th>            <!--순번-->
+                                                <th style="text-align:center">@strDept </th>            <!--부서-->
+                                                <th style="text-align:center">@strRank </th>            <!--직급-->
+                                                <th style="text-align:center">@strName </th>            <!--이름-->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (ApproverInfo item in ApproverSelect)
+                                            {
+                                                <tr name="trSelect7" draggable="false" data-draggable="tritem" aria-grabbed="@(item.UserSeq == stTargetSelect ? "true" : "false")" value="@item.UserSeq">
+                                                    <td style="text-align:center">@item.Index</td>
+                                                    <td>@item.DeptName</td>
+                                                    <td>@item.Grade</td>
+                                                    <td>@item.Name</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+                            <!--e table -->
+
+                        </div>
+
+                    </div>
+
+                    <!--/. content -->
+
+                </div>
+
+                <!-- e------------------------------------------------------------------------------------------------------  -->
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-md btn-black mr-0" @onclick="SelectUseApprove"><i class="fas fa-file-upload"></i>@XmlConf.GetTitle("T_APPROVEEXT_USE_APPROVE")</button>
+                    <button type="button" class="btn btn-md btn-blue mr-0" @onclick="SelectNoApproveFilesOnlyTrans"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_APPROVEEXT_NO_USE")</button>
+                    <button type="button" class="btn btn-md btn-red mr-0" @onclick="SelectCancel"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_FILE_FOLD")</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+</div>
+
+@code {
+
+    private LinkedList<ApproverInfo> ApproverSearch = new LinkedList<ApproverInfo>();
+    private LinkedList<ApproverInfo> ApproverSelect = new LinkedList<ApproverInfo>();
+    private string stSelectApprover = "";
+    private string stTargetSelect = "";
+    private static Action<string> actionAssign;
+    private static Action<string> actionTargetSelect;
+    private int m_step = 0;
+    private string approverSearchType = "";
+    private bool useInputInTree;
+    private SGDeptTreeList refSGDeptTreeList;
+
+    public string strApproverSearch = "";
+    public string strDept = "";
+    public string strName = "";
+    public string strSearch = "";
+    public string strOrder = "";
+    public string strRank = "";
+    public string strMostTop = "";
+    public string strMostBottom = "";
+    public string strTop = "";
+    public string strDown = "";
+    public string strOK = "";
+    public string strClose = "";
+
+    public string strCurDept = "";
+    public string strCurName = "";
+    public bool bEditDeptName = true;
+
+    public bool bShowApprover = false;
+
+    ISGSideBarUIService SideBarUISvc;
+
+    //ISGHeaderUIService sGHeaderUIService;
+
+    public delegate void ApprSelectChangeEvent();
+
+    public event ApprSelectChangeEvent ApprSelectChange;
+
+
+    public delegate void FileTransEvent();
+
+    public event FileTransEvent eventFileTransWithApprove = null;
+
+
+    //public static bool bLoadBaseLine = false;
+
+    SGSettingsDBProc sgSettingProc;
+
+    ISGSiteConfigService siteConfig;
+
+    public List<HsStream> FileList = null;
+    public string strBindTitle = "";
+    public string strTeamName = "";
+
+
+    public void Refresh()
+    {
+        BindEvent();
+        StateHasChanged();
+    }
+
+    private void moveToTop()
+    {
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.UserSeq == stTargetSelect);
+        if (apvTarget != null)
+        {
+            ApproverSelect.Remove(apvTarget);
+            ApproverSelect.AddFirst(apvTarget);
+        }
+        StateHasChanged();
+    }
+
+    private void moveToUpper()
+    {
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.UserSeq == stTargetSelect);
+
+        if (apvTarget != null)
+        {
+            //현재값으 앞에값을 구하기
+            LinkedListNode<ApproverInfo> current;
+            LinkedListNode<ApproverInfo> next;
+            current = ApproverSelect.First;
+            if (current.Value.UserSeq == stTargetSelect)
+            {
+                return;
+            }
+
+            for (int i = 0; i < ApproverSelect.Count; i++)
+            {
+                next = current.Next;
+                if (next.Value.UserSeq == stTargetSelect)
+                {
+                    ApproverSelect.Remove(apvTarget);
+                    ApproverSelect.AddBefore(current, apvTarget);
+                    break;
+                }
+                else
+                {
+                    current = current.Next;
+                }
+            }
+        }
+        StateHasChanged();
+    }
+
+    private void moveToLower()
+    {
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.UserSeq == stTargetSelect);
+
+        if (apvTarget != null)
+        {
+            //현재값으 앞에값을 구하기
+            LinkedListNode<ApproverInfo> current;
+            LinkedListNode<ApproverInfo> next;
+            LinkedListNode<ApproverInfo> last;
+            current = ApproverSelect.First;
+            last = ApproverSelect.Last;
+            if (last.Value.UserSeq == stTargetSelect)
+            {
+                return;
+            }
+
+            for (int i = 0; i < ApproverSelect.Count; i++)
+            {
+                next = current.Next;
+                if (current.Value.UserSeq == stTargetSelect)
+                {
+                    ApproverSelect.Remove(apvTarget);
+                    ApproverSelect.AddAfter(next, apvTarget);
+                    break;
+                }
+                else
+                {
+                    current = current.Next;
+                }
+            }
+        }
+        StateHasChanged();
+    }
+
+    private void moveToBottom()
+    {
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.UserSeq == stTargetSelect);
+        if (apvTarget != null)
+        {
+            ApproverSelect.Remove(apvTarget);
+            ApproverSelect.AddLast(apvTarget);
+        }
+        StateHasChanged();
+    }
+
+    public bool GetUserSeqExistence(string strUserSeq)
+    {
+        bool bRet = false;
+        foreach (var item in ApproverSelect)
+        {
+            if (strUserSeq.Equals(item.UserSeq))
+            {
+                bRet = true;
+                break;
+            }
+        }
+        return bRet;
+    }
+
+    /// <summary>
+    /// 선택한 결재자의 이름을 UserSeq 값을 기준으로 가져옴
+    /// </summary>
+    /// <param name="strUserSeq"></param>
+    /// <returns></returns>
+    public string GetUserSeqExistenceName(string strUserSeq)
+    {
+        string strName = "";
+        foreach (var item in ApproverSelect)
+        {
+            if (strUserSeq.Equals(item.UserSeq))
+            {
+                strName = item.Name;
+                break;
+            }
+        }
+        return strName;
+    }
+
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+
+    private void SGDeptTreeList_OnItemDoubleClick(ApproverInfo doubleClickInfo)
+    {
+        stSelectApprover = doubleClickInfo.UserSeq;
+        AddSelectApprover();
+    }
+
+    /// <summary>
+    /// stSelectApprover 에 저장된 결재자 정보를 추가해서 HSCmdCenter쪽에 저장, 오른쪽 선택된 결재자List에 나오게 한다.
+    /// </summary>
+    private void AddSelectApprover()
+    {
+        if (stSelectApprover.Length < 1)
+            return;
+
+        ApproverInfo apv = ApproverSearch.FirstOrDefault(x => x.UserSeq == stSelectApprover);
+        if (apv != null)
+        {
+            string strUserSeq = apv.UserSeq;
+            if (GetUserSeqExistence(strUserSeq))
+            {
+                string strName = GetUserSeqExistenceName(strUserSeq);
+                string strMsg = XmlConf.GetWarnMsg("W_0026");   //{0} 사용자는 결재자로 등록되어 있습니다.
+                strMsg = String.Format(strMsg, strName);
+                ShowMessage("warn", strMsg);
+                return;
+            }
+            else
+            {
+                apv.Index = apv.Index.Trim();
+                ApproverSelect.AddLast(apv);
+            }
+
+            //ApproverInfo apvAsign = ApproverSelect.FirstOrDefault(x => x.Index == stSelectApprover);
+            //if (apvAsign == null)
+            //   ApproverSelect.AddLast(apv);
+        }
+
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        HSCmdCenter.SetApprLineList(groupID, ApproverSelect);
+        StateHasChanged();
+        //InitDeptApprInsert();
+        //InitApprLine();
+
+    }
+
+    /// <summary>
+    /// stSelectApprover 에 저장된 결재자 정보를 삭제해서 HSCmdCenter쪽에 저장, 오른쪽 선택된 결재자List에 나오지 않게 한다.
+    /// </summary>
+    private void RemoveAssignApprover()
+    {
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.UserSeq == stTargetSelect);
+        if (apvTarget != null)
+            ApproverSelect.Remove(apvTarget);
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        HSCmdCenter.SetApprLineList(groupID, ApproverSelect);
+
+        StateHasChanged();
+        //InitDeptApprInsert();
+        //InitApprLine();
+    }
+
+    public async Task openPopUp()
+    {
+        object[] param = { "ApproveExtApproverSelect_PopUp" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+
+    /// <summary>
+    /// 결재가 필요없는 파일들만 송신
+    /// </summary>
+    public void SelectNoApproveFilesOnlyTrans()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        pageService.SetApproveExtFileTransWithApprove(groupID, false);
+
+        closePopUp();
+
+        if (eventFileTransWithApprove != null)
+            eventFileTransWithApprove();
+
+    }
+
+
+    /// <summary>
+    /// 선택한 결재자에게 결재받도록 송신
+    /// </summary>
+    public void SelectUseApprove()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        if (ApproverSelect.Count < 1)
+        {
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0076"));
+            return;
+        }
+
+        string strApproveExtPolicy = "";
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+        {
+            strApproveExtPolicy = sgLoginData.GetTagDataBySystemEnvName("CS_EXCEPTION_EXT_REASON_TYPE");
+            string[] strArray = null;
+
+            if (strApproveExtPolicy.Length > 2)
+                strArray = strApproveExtPolicy.Split("/");
+
+            if (strArray != null && strArray.Length > 1 && strArray[1].Length > 0)
+            {
+                int nMinLength = Convert.ToInt32(strArray[1]);
+                if (strBindTitle.Length < nMinLength)
+                {
+                    // 사유를 %d자이상 입력하십시오.
+                    ShowMessage("warning", string.Format(XmlConf.GetWarnMsg("W_0285"), nMinLength));
+                    return;
+                }
+            }
+        }
+
+
+
+        HSCmdCenter.SetApprLineList(groupID, ApproverSelect);
+
+        pageService.SetApproveExtFileTransWithApprove(groupID, true);
+
+        bool bApprLineLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID);     // siteConfig. json으로 이동
+        if (bApprLineLocalSave)
+        {
+            SGSettingData sgSettingData = null;
+            sgSettingData = sgSettingProc.SelectSettingData(groupID);
+            if (sgSettingData == null)
+                sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);
+
+            string strEncSaveApprLine = "";
+            string strApprLine = "";
+            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+            if (sgSettingData != null)
+            {
+                strEncSaveApprLine = sgSettingProc.GetSettingApprLine(groupID);
+                sgRSACrypto.ValueDecrypt(strEncSaveApprLine, out strApprLine);
+            }
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+            if (sgUserData == null)
+                return;
+
+            int step = 0;
+
+            if (sgLoginData != null)
+                step = sgLoginData.GetApproveStep();
+
+            string strUserSeq = sgUserData.GetUserSequence();
+            strApprLine = SGApprLineData.LocalSaveANDApprLineData(ApproverSelect, strUserSeq, strApprLine, step);
+            string strEncApprLine = "";
+            sgRSACrypto.ValueEncrypt(strApprLine, out strEncApprLine);
+            sgSettingProc.SetSettingApprLine(groupID, strEncApprLine);
+        }
+
+        closePopUp();
+
+        if (eventFileTransWithApprove != null)
+            eventFileTransWithApprove();
+
+    }
+
+
+    public void SelectCancel()
+    {
+        closePopUp();
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "ApproveExtApproverSelect_PopUp" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    /// <summary>
+    /// 선택한 결재자정보 파일전송 화면 결재라인에 반영할때 사용(현재 사용할일 없음)
+    /// </summary>
+    /// <param name="apprSelChange"></param>
+    public void SetApprSelectChangeEvent(ApprSelectChangeEvent apprSelChange)
+    {
+        ApprSelectChange = apprSelChange;
+    }
+
+    /// <summary>
+    /// 결재자 선택한 후에 파일전송 실행할 함수 등록
+    /// </summary>
+    /// <param name="fileTransWithApprove"></param>
+    public void SetFileTransWithApproveEvent(FileTransEvent fileTransWithApprove)
+    {
+        eventFileTransWithApprove = fileTransWithApprove;
+    }
+
+    protected override void OnInitialized()
+    {
+
+        actionAssign = AssignApprover;
+        actionTargetSelect = SelectTarget;
+
+        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproveExtSelectType();
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchApproveExtTree();
+        InitText();
+
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        sgSettingProc = SGSettingsDBProc.Instance;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        bEditDeptName = SGAppMgrSvc.OpConfigInfoService.GetUseApprDeptSearch(groupID);
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData != null)
+        {
+            strTeamName = sgUserData.GetTeamName();
+            SetInitDeptName(strTeamName);
+        }
+
+
+        if (pageService.GetLoadApprBaseLine(groupID) == false)
+        {
+            bool bLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID); // siteConfig. json으로 이동
+            if (bLocalSave)
+            {
+                SGSettingData sgSettingData = null;
+                sgSettingData = sgSettingProc.SelectSettingData(groupID);
+                if (sgSettingData == null)
+                {
+                    InitBaseApprLine();
+                }
+                else
+                {
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strEncApprLine = sgSettingProc.GetSettingApprLine(groupID);
+                    string strApprLine = "";
+                    sgRSACrypto.ValueDecrypt(strEncApprLine, out strApprLine);
+
+                    if (sgUserData == null)
+                    {
+                        InitApprLine();
+                        StateHasChanged();
+                        return;
+                    }
+
+                    string strUserSeq = sgUserData.GetUserSequence();
+
+                    SGApprLineData sgApprLineData = null;
+                    sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+                    if (sgApprLineData != null)
+                        sgApprLineData.LocalLoadANDApprLineData(strApprLine, strUserSeq);
+                    InitApprLine();
+                }
+            }
+            else
+            {
+                InitBaseApprLine();
+            }
+            StateHasChanged();
+            pageService.SetLoadApprBaseLine(groupID, true);
+            //bLoadBaseLine = true;
+        }
+        else
+        {
+            //InitApprLine();
+            //ApprSelectChange();
+            StateHasChanged();
+        }
+    }
+
+
+    /// <summary>
+    /// 부서 Tree 나오게 하는데 호출필요
+    /// </summary>
+    public void BindEvent()
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveExtDeptApprLineResult); //자기부서 조회 결과
+
+        if (approverSearchType == "TREE" && refSGDeptTreeList != null)
+            refSGDeptTreeList.BindEvent();
+        else
+            SearchApprover();
+    }
+
+    /// <summary>
+    /// 이미 검색된 결재자 List Data를 UI 의 ApproverSearch 에 다시 가져오는 함수(SGData에 저장해놓은 data로 갱신한다.) <br></br>
+    /// 결재자 조회화면의 왼쪽 결재자리스트를 SgData에 저장된 것으로 다시 갱신한다
+    /// </summary>
+    public void InitDeptApprInsert()
+    {
+        ApproverSearch.Clear();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGDeptApprLineSearchData sgDeptApprLine = null;
+        sgDeptApprLine = (SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
+        if (sgDeptApprLine == null)
+            return;
+
+        LinkedList<ApproverInfo> apprLinkedList = null;
+        apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+        if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
+            return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+
+        int count = 1;
+        foreach (var item in apprLinkedList)
+        {
+            if (strUserSeq.Equals(item.UserSeq))
+                continue;
+            item.Index = String.Format("{0,2}", count.ToString());
+            ApproverSearch.AddLast(item);
+            count++;
+        }
+        StateHasChanged();
+
+    }
+
+    /// <summary>
+    /// 서버에서 받은 기본 결재자 List를 받아서 저장해둠
+    /// </summary>
+    public void InitBaseApprLine()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return;
+
+        LinkedList<ApproverInfo> apprLinkedList = null;
+        apprLinkedList = sgApprLineData.GetConvertBaseApprAndLineData();
+        if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
+            return;
+
+        HSCmdCenter.SetApprLineList(groupID, apprLinkedList);
+        ApproverSelect.Clear();
+        //StateHasChanged();
+    }
+
+    /// <summary>
+    /// 조회된 결재자 목록에서 선택해서 추가한 실재 결재자 목록을 저장한곳에서 다시 불러온다.<br></br>
+    /// 조회/저장/선택된 Select Approve 리스트를 가지고 와서 컨트롤에 세팅<br></br>
+    /// 전역으로 저장된 결재 리스트 세팅
+    /// </summary>
+    public void InitApprLine()
+    {
+        ApproverSelect.Clear();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return;
+
+
+        LinkedList<ApproverInfo> apprLinkedList = null;
+        apprLinkedList = sgApprLineData.GetApprAndLineData();
+        if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
+        {
+            // string strMsg = XmlConf.GetWarnMsg("W_0242");   // 검색 결과가 존재하지 않습니다.
+            // ShowMessage("Info", strMsg);
+            // return;
+
+            InitBaseApprLine();
+            StateHasChanged();
+            //bLoadBaseLine = true;
+            pageService.SetLoadApprBaseLine(groupID, true);
+            return;
+        }
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+        int step = sgLoginData.GetApproveStep();    //결재유형 취득
+        m_step = step;
+
+        int count = 1;
+        foreach (var item in apprLinkedList)
+        {
+            if (strUserSeq.Equals(item.UserSeq))
+                continue;
+
+            if (step == 0) //AND 결재
+            {
+                item.selectIndex = count.ToString();
+                //item.Index = String.Format("{0,2}", count.ToString());
+                item.Index = count.ToString();
+                ApproverSelect.AddLast(item);
+            }
+            else if (step == 1)  //OR결재
+            {
+                item.selectIndex = count.ToString();
+                item.Index = "1";
+                ApproverSelect.AddLast(item);
+            }
+            else
+            {
+                item.selectIndex = count.ToString();
+                ApproverSelect.AddLast(item);   //AND+OR 결재
+            }
+            count++;
+        }
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// 왼쪽 검색하는 곳의 부서이름 설정
+    /// </summary>
+    /// <param name="strDeptName"></param>
+    public void SetInitDeptName(string strDeptName)
+    {
+        strCurDept = strDeptName;
+    }
+
+    /// <summary>
+    /// 결재자 조회 버튼 눌렀을때, Server에 검색요청 Query 전달
+    /// </summary>
+    public void SearchApprover()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strSysID = sgLoginData.GetSysID();
+        string strUserID = sgLoginData.GetUserID();
+        string strUserName = strCurName;
+        string strTeamName = strCurDept;
+
+        //strCurDept = strTeamName;
+        string strTeamCode = "";
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
+        HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+    }
+
+    /// <summary>
+    /// 부서, 이름 조회 결과 List 서버에서 받는 Event
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="e"></param>
+    public void ApproveExtDeptApprLineResult(int groupid, PageEventArgs e)
+    {
+        if (e.result != 0)
+        {
+            ShowMessage("error", e.strMsg);
+            return;
+        }
+
+        InitDeptApprInsert();
+    }
+
+    [JSInvokable("ApproveExtTargetSelect")]
+    public static void ApproveExtTargetSelect(string value) // ApproverTargetSelect
+    {
+        actionTargetSelect.Invoke(value);
+    }
+
+    private void SelectTarget(string value)
+    {
+        stTargetSelect = value;
+        StateHasChanged();
+    }
+
+    [JSInvokable("ApproveExtSearchSelect")]
+    public static void ApproveExtSearchSelect(string value)
+    {
+        actionAssign.Invoke(value);
+    }
+
+    private void AssignApprover(string value)
+    {
+        stSelectApprover = value;
+        StateHasChanged();
+    }
+
+    public void InitText()
+    {
+        strDept = XmlConf.GetTitle("T_COMMON_DEPT");                                // 부서
+        strName = XmlConf.GetTitle("T_COMMON_NAME");                                // 이름
+        strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                            // 조회
+        strOrder = XmlConf.GetTitle("T_COMMON_ORDER");                              // 순번
+        strRank = XmlConf.GetTitle("T_COMMON_RANK");                                // 직급
+        strMostTop = XmlConf.GetTitle("T_ETC_TOP");                                 // 맨위
+        strMostBottom = XmlConf.GetTitle("T_ETC_BOTTOM");                           // 맨아래
+        strTop = XmlConf.GetTitle("T_ETC_UP");                                      // 위
+        strDown = XmlConf.GetTitle("T_ETC_DOWN");                                   // 아래
+        strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
+        strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기
+    }
+
+}

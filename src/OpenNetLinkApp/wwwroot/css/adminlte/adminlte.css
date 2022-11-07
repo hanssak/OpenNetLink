@@ -262,7 +262,6 @@ button,
 input {
   overflow: visible;
 }
-
 button,
 select {
   text-transform: none;
@@ -307,6 +306,10 @@ input[type="month"] {
   -webkit-appearance: listbox;
 }
 
+input[type="text"]:disabled {
+    background: #dddddd;
+    color:black;
+}
 textarea {
   overflow: auto;
   resize: vertical;

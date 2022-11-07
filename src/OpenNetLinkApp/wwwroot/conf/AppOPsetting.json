@@ -1,48 +1,149 @@
 {
-  "LoginType": 0,
-  "bAfterBasicChk": false,
-  "bApprTrayFix": false,
-  "bClipCopyAutoSend": false,
-  "bExitTrayMove": false,
-  "bFileDownloadBeforeReciving": false,
-  "bFileRecvTrayFix": false,
-  "bManualRecvDownChange": false,
-  "bRMouseFileAddAfterTrans": false,
-  "bRecvDownPathChange": true,
-  "bScreenLock": true,
-  "bScreenLockUserChange": true,
-  "bShowAdminInfo": false,
-  "bStartProgramReg": true,
-  "bStartTrayMove": false,
-  "bUseApprWaitNoti": true,
-  "bUseFileCheckException": false,
-  "bUseLogLevel": true,
-  "bUseNetOverAllsend": false,
-  "bUseOverNetwork2": false,
+
   "bUseAppLoginType": false,
+  "LoginType": 0,
+
+  "bUseLogLevel": true,
+
+  "bShowAdminInfo": false,
+
+  "bUseLanguageSet": false,
+
+  "bUseMainPageType": true,
+
+  "bUseStartProgramReg": false,
+
+  "bManualDownFolderChange": false,
+  "bManualRecvDownChange": false,
+
+  "bRFileAutoSend": false,
+  "bRMouseFileAddAfterTrans": false,
+
+  "bShowAfterApprAutoCheck": true,
+  "bAfterBasicChk": false,
+
+  "bFileRecvAlarmRetain": false,
+  "bFileRecvTrayFix": false,
+  "bApprCompleteAlarmRetain": true,
   "bUserApprActionTrayFix": false,
+  "bApprRejectAlarmRetain": false,
   "bUserApprRejectTrayFix": false,
-  "enMainPageType": 0,
-  "listUseGpkiLogin": [
+  "bApprCountAlarmRetain": true,
+  "bApprTrayFix": true,
+  "bUseApprCountAlaram": false,
+  "bUseApprWaitNoti": true,
+
+
+  "bUserIDSave": false,
+  "bAutoLogin": true,
+  "bAutoLoginCheck": true,
+  "bUserPWChange": false,
+
+
+  "bDeputyApprTerminateDel": false,
+  "bDlpInfoDisplay": false,
+  "bEmptyfileTrans": true,
+
+  "strInitPasswd": "1K27SdexltsW0ubSCJgsZw==",
+  "strPWChangeProhibitLimit": "",
+  "nPWChangeApplyCnt": 9,
+
+  "bURLAutoTrans": [
+    true,
     false,
     false
   ],
-  "strForwardUrl": [
-    "http://naver.com",
-    "http://daum.net"
-  ],
-  "bURLAutoTrans": [
-    true,
-    false
-  ],
-  "bURLAutoAfterMsg": [
-    true,
-    true
-  ],
   "strURLAutoAfterBrowser": [
+    "N",
     "N",
     "F"
   ],
+  "bURLAutoAfterMsg": [
+    true,
+    true,
+    true
+  ],
+  "strForwardUrl": [
+    "http:\/\/naver.com",
+    "http:\/\/daum.net",
+    "http:\/\/daum.net"
+  ],
+
+  "bUseClipBoardFileTrans": true,
+  "bUseFileClipManageUI": true,
+  "bUseFileClipApproveUI": true,
+
+  "bScreenLockUserChange": true,
+  "bScreenLock": false,
+
+  "enMainPageType": 0,
   "bNoApproveManageUI": false,
-  "bEmptyfileTrans": true
+  "bRecvDownPathChange": true,
+  "bStartProgramReg": true,
+  "bTitleDescSameChk": false,
+
+  "bUseFileCheckException": true,
+  "bUseNetOverAllsend": false,
+  "listUseGpkiLogin": [
+    false,
+    false,
+    false
+  ],
+  "bClipBoardNoApproveButFileTrans": true,
+  "bUseDenyPasswordZip": true,
+  "bRecvFolderChange": false,
+  "bURLListPolicyRecv": false,
+  "bUseCertSend": false,
+  "bUseEmail": false,
+  "bUseForceUpdate": true,
+  "bUsePCURL": false,
+  "bUsePublicBoard": false,
+  "bUseUserRecvDownPath": false,
+  "bUseUserSelectFirstServer": true,
+  "bViewDlpApproverSelectMyDept": false,
+  "bViewFileFilter": true,
+  "bViewSGHeaderUIAlarmNoriAllDel": true,
+  "bViewSGSideBarUIBadge": true,
+  "nClipAfterApproveUseType": 2,
+  "bUseOneToMultiLogin": false,
+  "bUseOneByOneLogOut" : false,
+  "bApprDeptSearch": true,
+  "bApprLineChkBlock": false,
+  "bApprLineLocalSave": true,
+
+  "nApprStepLimit": 0,
+
+  "bUseClipAlarmType": true,
+  "bUseClipCopyAndSend": false,
+  "bClipCopyAutoSend": false,
+
+  "bUseCloseTrayMove": false,
+  "bExitTrayMove": false,
+
+  "bUseStartTrayMove": false,
+  "bStartTrayMove": false,
+
+  "bUseFileForward": true,
+  "bFileDownloadBeforeReciving": false,
+
+  "bRecvFolderOpen": false,
+  "bUseAgentTime1aClock": false,
+
+  "strApproverSearchType": "SEARCH",
+  "bUseInputSearchInApproverTree": false,
+  "strReceiverSearchType": "SEARCH",
+  "bUseInputSearchInReceiverTree": false,
+  "strProxySearchType": "SEARCH",
+  "bUseInputSearchInProxyTree": false,
+  "strSecurityApproverSearchType": "SEARCH",
+  "bUseInputSearchInSecurityApproverTree": false,
+
+  "strApproveExtApproverSearchType": "TREE",
+  "bUseInputSearchApproveExtTree": true,  
+  "bUseApproveExt": true
+
+  "bUsePartialFileAddInTransfer" : false
+
+  
+
 }

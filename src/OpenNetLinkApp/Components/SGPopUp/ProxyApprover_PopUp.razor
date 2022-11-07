@@ -4,16 +4,17 @@
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using OpenNetLinkApp.Components.SGTreeSearch
 @using HsNetWorkSG
 @using HsNetWorkSGData;
-@using System.Reflection; 
+@using System.Reflection;
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
 
-<div class="modal fade" id="ProxyApprover" data-backdrop="static" data-keyboard="false" style="z-index:9999;">
+<div class="modal fade" id="ProxyApprover" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog" style="width:880px; min-width:950px;">
         <div class="modal-content">
             <div class="modal-header modal-outline pl-3 pr-3">
@@ -24,36 +25,43 @@
             </div>
             <div class="modal-body">
                 <div class="card-body p-0">
-                    <div class="box1" style=" width:36%;  float:left;">
-                        <div class="d-inline-flex  mb-2 " style="height:28px;">
-                            <label class="p-1">@XmlConf.GetTitle("T_COMMON_DEPT")</label>
-                            <input type="text" class="form-control col-md-3" @bind-value="strCurDept" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_DEPT")">
-                            <label class="p-1 pl-2">@XmlConf.GetTitle("T_COMMON_NAME")</label>
-                            <input type="text" class="form-control col-md-3" @bind-value="strCurName" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_NAME")">
-                            <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
-                        </div>
+                    <div class="box1" style=" width:46%;  float:left;">
+                        @if (proxySearchType == "SEARCH")
+                        {
+                            <div class="d-inline-flex  mb-2 " style="height:28px;">
+                                <label class="p-1">@XmlConf.GetTitle("T_COMMON_DEPT")</label>
+                                <input type="text" class="form-control col-md-3" @bind-value="strCurDept" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_DEPT")">
+                                <label class="p-1 pl-2">@XmlConf.GetTitle("T_COMMON_NAME")</label>
+                                <input type="text" class="form-control col-md-3" @bind-value="strCurName" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_NAME")">
+                                <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
+                            </div>
 
-                        <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
-                            <table class="table table-head-fixed">
-                                <thead>
-                                    <tr>
-                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>
-                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>
-                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (ApproverInfo item in ProxySearch)
-                                    {
-                                        <tr name="trItem4" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.Index">
-                                            <td style="text-align:left;">@item.DeptName</td>
-                                            <td style="text-align:center;">@item.Grade</td>
-                                            <td style="text-align:center;">@item.Name</td>
+                            <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
+                                <table class="table table-head-fixed">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>
+                                            <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>
+                                            <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (ApproverInfo item in ProxySearch)
+                                        {
+                                            <tr name="trItem4" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq">
+                                                <td style="text-align:left;">@item.DeptName</td>
+                                                <td style="text-align:center;">@item.Grade</td>
+                                                <td style="text-align:center;">@item.Name</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else        //TREE
+                        {
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="392" TreeHeight="160" UserSearchList="@ProxySearch" OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => SGDeptTreeList_OnItemDoubleClick(item)" />
+                        }
                     </div>
                     <!--e table -->
                     <!--s btn -->
@@ -65,7 +73,7 @@
                     </div>
                     <!--e btn -->
                     <!--s table -->
-                    <div class="box1" style=" width:56%;  float:left;">
+                    <div class="box1" style=" width:46%;  float:left;">
                         <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
                             <label class="p-1">@XmlConf.GetTitle("T_COMMON_PERIOD")</label>
                             <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly="readonly" value="@strFromDay">
@@ -77,23 +85,23 @@
                             <table class="table table-head-fixed">
                                 <thead>
                                     <tr>
+                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_ORDER") </th>
                                         <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>
                                         <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>
                                         <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>
-                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_PERIOD")</th>
-                                        <th style="text-align:center;">@XmlConf.GetTitle("T_ETC_DELETEDATA")</th>
+                                        <!--<th style="text-align:center;">@XmlConf.GetTitle("T_ETC_DELETEDATA")</th>-->
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (ApproverInfo item in ProxySelect)
                                     {
-                                        <tr name="trSelect4" draggable="false" data-draggable="tritem" aria-grabbed="@(item.Index == stTargetSelect ? "true" : "false")" value="@item.Index">
+                                        <tr name="trSelect4" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.ORDER">
+                                            <td style="text-align:center;">@item.ORDER</td>
                                             <td style="text-align:left;">@item.APPR_TEAMNAME</td>
                                             <td style="text-align:center;">@item.RANK</td>
                                             <td style="text-align:center;">@item.APPR_USERNAME</td>
-                                            <td style="text-align:center;">@item.STARTDATE ~ @item.ENDDATE</td>
-                                            <td style="text-align:center;" @onclick="@(e => deleteProxyApprover(item))"><i class="fas fa-times"></i></td>
-                                        </tr>
+                                            <!--<td style="text-align:center;" @onclick="@(e => deleteProxyApprover(item))"><i class="fas fa-times"></i></td>-->
+                                    </tr>
                                     }
                                 </tbody>
                             </table>
@@ -105,7 +113,8 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" @onclick="closePopUp" class="btn bg-gradient-secondary mr-0 pl-5 pr-5"><i class="fas fa-times pr-1"></i>@XmlConf.GetTitle("T_FILE_FOLD")</button>
+                <button @onclick="ConfirmClick" type="button" class="btn btn-md btn-blue-padding1 mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
+                <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -115,7 +124,7 @@
 
 
 @code {
-
+    SGDeptTreeList refSGDeptTreeList;
     ISGSideBarUIService SideBarUISvc;
     SGSettingsDBProc sgSettingProc;
     ISGSiteConfigService siteConfig;
@@ -124,7 +133,7 @@
     public string strCurName = "";
 
     private LinkedList<ApproverInfo> ProxySearch = new LinkedList<ApproverInfo>();   //좌측 검색결과
-    private LinkedList<ApproverInfo> ProxySelect = new LinkedList<ApproverInfo>();
+    private List<ApproverInfo> ProxySelect = new List<ApproverInfo>();
 
     private string stSelectProxy = "";
     private string stTargetSelect = "";
@@ -135,15 +144,15 @@
     public string strFromDay = "";
     public string strToDay = "";
 
-    private int nActionType = -1;  //1:삭제, 2:등록 
+    private int possibleApproverCount = 0;
+
+    private string proxySearchType = "";
+    private bool useInputInTree;
+
+    private int nActionType = -1;  //1:삭제, 2:등록
     private void deleteProxyApprover(ApproverInfo apvInfo)
     {
-        int groupID = SideBarUISvc.ActiveMenu.GroupId;
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null) return;
-        nActionType = 1;
-        HSCmdCenter.sgSendData.RequestInstApproveClear(HSCmdCenter.GetConnectNetWork(groupID), sgLoginData.GetUserID(), apvInfo.APPR_USERID);
-        ProxySelect.Clear();
+        ProxySelect.Remove(apvInfo);
     }
 
     private void HandleKeyEvent(KeyboardEventArgs e)
@@ -188,54 +197,119 @@
         if (vStr2 != null && vStr2.Length > 0)
             strToDay = vStr2;
     }
-    private async void AddSelectApprover()
+
+    private void SGDeptTreeList_OnItemDoubleClick(ApproverInfo doubleClickInfo)
     {
+        stSelectProxy = doubleClickInfo.UserSeq;
+        AddSelectApprover();
+    }
+
+    private void AddSelectApprover()
+    {
+        if (possibleApproverCount == ProxySelect.Count)
+        {
+            ShowMessage("error", XmlConf.GetErrMsg("E_0250"));
+            return;
+        }
+
+
         if (stSelectProxy.Length < 1)
             return;
-        ApproverInfo apv = ProxySearch.FirstOrDefault(x => x.Index == stSelectProxy);
+
+        ApproverInfo apv = ProxySearch.FirstOrDefault(x => x.UserSeq == stSelectProxy);
+
         if (apv != null)
         {
-            if(ProxySelect.Count == 0)
+            ApproverInfo dApv = ProxySelect.FirstOrDefault(x => x.UserSeq == apv.UserSeq);
+            if (dApv != null)
             {
-                ApproverInfo apvAsign = ProxySelect.FirstOrDefault(x => x.Index == stSelectProxy);
-                if (apvAsign == null)
-                {
-                    await RetriveDateFromJS();
-                    nActionType = 2;
-
-                    int groupID = SideBarUISvc.ActiveMenu.GroupId;
-                    if (pageService.GetConnectStatus(groupID) == false)
-                    {
-                        ShowMessage("error", XmlConf.GetErrMsg("E_0218").Replace("/r/n", "<br>"));
-                        return;
-                    }
-                    SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-                    if (sgLoginData == null) return;
-                    SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-                    if (sgUserData == null) return;
-                    HSCmdCenter.sgSendData.RequestInstApproveReg(HSCmdCenter.GetConnectNetWork(groupID), sgLoginData.GetUserID(),
-                    sgUserData.GetTeamCode(), strFromDay, strToDay, apv.APPR_USERID, apv.APPR_TEAMCODE);
-                }
+                ShowMessage("error", XmlConf.GetErrMsg("E_0246"));
+                return;
             }
-            else
+
+            ApproverInfo newApporver = new ApproverInfo();
+            newApporver.APPR_TEAMCODE = apv.DeptSeq;
+            newApporver.APPR_TEAMNAME = apv.DeptName;
+            newApporver.APPR_USERNAME = apv.Name;
+            newApporver.RANK = apv.Grade;
+            newApporver.UserSeq = apv.UserSeq;
+
+            int count = ProxySelect.Count;
+            newApporver.ORDER = ++count;
+
+            ProxySelect.Add(newApporver);
+        }
+        StateHasChanged();
+    }
+
+    private async Task<bool> ModifyApprover()
+    {
+        //if (ProxySelect.Count < 1)
+        //{
+        //    ShowMessage("error", XmlConf.GetErrMsg("E_0249"));
+        //    return false;
+        //}
+        await RetriveDateFromJS();
+
+        DateTime stDate = Convert.ToDateTime(strFromDay);
+        DateTime endDate = Convert.ToDateTime(strToDay);
+
+        if (ProxySelect.Count > 0)
+        {
+            if ((stDate - DateTime.Now).Days < 0)
             {
-                ShowMessage("warning", XmlConf.GetTitle("T_PROXY_OVERWRITE_WARN"));
+                ShowMessage("error", XmlConf.GetErrMsg("E_0247"));
+                return false;
+            }
+            if ((endDate - stDate).Days < 0)
+            {
+                ShowMessage("error", XmlConf.GetErrMsg("E_0248"));
+                return false;
             }
         }
+        //await RetriveDateFromJS();
+        nActionType = 2;
+
+        int groupID = SideBarUISvc.ActiveMenu.GroupId;
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            ShowMessage("error", XmlConf.GetErrMsg("E_0218").Replace("/r/n", "<br>"));
+            return false;
+        }
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null) return false;
+        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null) return false;
+
+        string strQuery = Data.SGQuery.ApproveProxy.GetSFMModify(sgUserData.GetUserSequence(), strFromDay, strToDay, ProxySelect);
+        HSCmdCenter.sgSendData.RequestInstApproveReg(HSCmdCenter.GetConnectNetWork(groupID), sgLoginData.GetUserID(), strQuery);
+
+        return true;
     }
+
     private void RemoveAssignApprover()
     {
-        ApproverInfo apvTarget = ProxySelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        if (String.IsNullOrEmpty(stTargetSelect))
+            return;
+
+        ApproverInfo apvTarget = ProxySelect.FirstOrDefault(x => x.ORDER == Convert.ToInt32(stTargetSelect));
         if (apvTarget != null)
         {
-            deleteProxyApprover(apvTarget);
+            ProxySelect.Remove(apvTarget);
+
+            int i = 1;
+            foreach (ApproverInfo approver in ProxySelect)
+            {
+                approver.ORDER = i++;
+            }
+            //deleteProxyApprover(apvTarget);
         }
     }
 
     public async Task openPopUp()
     {
-        DeptApprLine();
         RequestProxyInfo();
+        RequestPossibleCount();
 
         object[] param = { "ProxyApprover" };
         await jsRuntime.InvokeAsync<object>("openPopUp", param);
@@ -245,6 +319,13 @@
     {
         object[] param = { "ProxyApprover" };
         jsRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    public async Task ConfirmClick()
+    {
+        bool result = await this.ModifyApprover();
+        if (result)
+            this.closePopUp();
     }
 
     public void RequestProxyInfo()
@@ -260,7 +341,45 @@
         SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
         if (sgUserData == null) return;
 
-        int rtn = HSCmdCenter.sgSendData.RequestInstApprove(HSCmdCenter.GetConnectNetWork(groupID), groupID, sgLoginData.GetUserID(), sgUserData.GetTeamCode());
+        string sql = ApproveProxy.GetSFMApprover(sgUserData.GetUserSequence());
+
+        int rtn = HSCmdCenter.SendListQuery(groupID, sgLoginData.GetUserID(), sql);
+    }
+
+    public void RequestPossibleCount()
+    {
+        int groupID = SideBarUISvc.ActiveMenu.GroupId;
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            ShowMessage("error", XmlConf.GetErrMsg("E_0218").Replace("/r/n", "<br>"));
+            return;
+        }
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null) return;
+        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null) return;
+
+        string sql = ApproveProxy.GetSFMDeptCount(sgUserData.GetUserSequence());
+
+        int rtn = HSCmdCenter.SendCountQuery(groupID, sgLoginData.GetUserID(), sql);
+    }
+
+    public void ResultPossibleCount(int groupid, SGData data)
+    {
+        string result = data.GetSvrRecordTagData("RESULT");
+        string reason = data.GetSvrRecordTagData("REASON");
+
+        if (result == "0")
+        {
+            List<Dictionary<int, string>> listCnt = null;
+            listCnt = data.GetSvrRecordData("RECORD");
+            string count = listCnt[0][0];
+            possibleApproverCount = Convert.ToInt32(count);
+        }
+        else
+        {
+            ShowMessage("error", reason);
+        }
     }
 
     public void DeptApprLine()
@@ -293,9 +412,9 @@
         string strTeamName = strCurDept;
         strCurDept = strTeamName;
         string strTeamCode = "";
-        if (strUserName == "" && strTeamName == "")
-            strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
-        //결재자만검색, 모두 검색 구분자 
+        //if (strUserName == "" && strTeamName == "")
+        //    strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
+        //결재자만검색, 모두 검색 구분자
         int nSelectAll = sgLoginData.GetTagValueInteger("APPROVEPROXYRIGHT");
         bool bApproverOnly = true;
         if (nSelectAll == 2)
@@ -315,71 +434,67 @@
         //*****************************************************************
         //기본 결재자 검색
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprSearchResultProxy);
-        //대결자 검색 
-        HSCmdCenter.sgPageEvent.SetProxySearchEvent(groupID, ProxySearchResult);
-        HSCmdCenter.sgPageEvent.SetCommonResultEvent(groupID, ProxyActionResult);
-    }
-
-    public void ProxyActionResult(int groupid, SGData data)
-    {
-        if (nActionType == -1)
-            return;
-
-        if (data.GetBasicTagData("RESULT") == "0")
+        //대결자 검색
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData != null)
         {
-            if(nActionType == 1)
-                ShowMessage("success", XmlConf.GetTitle("T_DELETE_COMPETE"));
-            else
-                ShowMessage("success", XmlConf.GetTitle("T_INSERT_COMPETE"));
-            RequestProxyInfo();
+            strCurDept = sgUserData.GetTeamName();
         }
+
+        HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, ProxySearchResult);
+        HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, ResultPossibleCount);
+
+        if (proxySearchType == "TREE" && refSGDeptTreeList != null)
+            refSGDeptTreeList.BindEvent();
         else
-        {
-            ProxySelect.Clear();
-            string reason = data.GetBasicTagData("REASON");
-            ShowMessage("error", reason);
-        }
-        nActionType = -1;
-        return;
+            DeptApprLine();
     }
 
     public void ProxySearchResult(int groupid, SGData data)
     {
-        ApproverInfo apvTarget = new ApproverInfo();
-        if( data.GetBasicTagData("RESULT") == "0" )
+        if (data.GetBasicTagData("RESULT") == "0")
         {
-            BindClass(apvTarget, data);
-
+            this.BindApproveList(data);
         }
-        ProxySelect.Clear();
-        if(apvTarget.APPR_USERID != null && apvTarget.APPR_USERID.Length > 0)
+        else
         {
-            ProxySelect.AddLast(apvTarget);
-            StateHasChanged();
+            ProxySelect.Clear();
+            this.GetInitDateTime();
         }
+        StateHasChanged();
     }
 
-    public void BindClass(ApproverInfo info, SGData data)
+    public void BindApproveList(SGData data)
     {
-        foreach(KeyValuePair<string, string> item in data.m_DicTagData)
+        List<Dictionary<int, string>> listDicdata = null;
+        listDicdata = data.GetSvrRecordData("RECORD");
+
+        ProxySelect.Clear();
+
+        int i = 1;
+        foreach (Dictionary<int, string> value in listDicdata)
         {
-            //FieldInfo fld = typeof(ApproverInfo).GetField(item.Key);
-            PropertyInfo fid = typeof(ApproverInfo).GetProperty(item.Key);
-            if (fid != null)
-            {
-                if( fid.PropertyType.Name == "String")
-                {
-                    fid.SetValue(info, data.GetBasicTagData(item.Key));
-                }
-                else if(fid.PropertyType.Name == "Int")
-                {
-                    fid.SetValue(info, Int32.Parse(data.GetBasicTagData(item.Key)));
-                }
-                else if(fid.PropertyType.Name == "Long")
-                {
-                    fid.SetValue(info, long.Parse(data.GetBasicTagData(item.Key)));
-                }
-            }
+            ApproverInfo approver = new ApproverInfo();
+            approver.ORDER = i;
+            approver.STARTDATE = value[0];
+            approver.ENDDATE = value[1];
+            approver.APPR_TEAMCODE = value[2];
+            approver.APPR_TEAMNAME = value[3];
+            approver.APPR_USERID = value[4];
+            approver.APPR_USERNAME = value[5];
+            approver.POSITION = value[6];
+            approver.RANK = value[7];
+            approver.UserSeq = value[8];
+            ProxySelect.Add(approver);
+
+            i++;
+        }
+
+        if (listDicdata.Count > 0)
+        {
+            strFromDay = $"{listDicdata[0][0].Substring(0, 4)}-{listDicdata[0][0].Substring(4, 2)}-{listDicdata[0][0].Substring(6, 2)}";
+            strToDay = $"{listDicdata[0][1].Substring(0, 4)}-{listDicdata[0][1].Substring(4, 2)}-{listDicdata[0][1].Substring(6, 2)}";
         }
     }
 
@@ -405,7 +520,6 @@
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
         if (sgUserData == null)
             return;
-
         string strUserSeq = sgUserData.GetUserSequence();
 
         int count = 1;
@@ -414,9 +528,11 @@
             if (strUserSeq.Equals(item.UserSeq))
                 continue;
             item.Index = String.Format("{0,2}", count.ToString());
+            //strCurDept = item.DeptName;
             ProxySearch.AddLast(item);
             count++;
         }
+
         StateHasChanged();
     }
 
@@ -425,7 +541,8 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        GetInitDateTime();
+        proxySearchType = SGAppMgrSvc.OpConfigInfoService.GetProxySearchType();
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInProxyTree();
 
         actionAssign = AssignProxy;
         actionTargetSelect = SelectTarget;

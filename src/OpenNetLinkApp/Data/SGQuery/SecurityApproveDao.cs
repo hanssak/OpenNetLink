@@ -5,7 +5,7 @@ using System.Text;
 namespace OpenNetLinkApp.Data.SGQuery
 {
     /// <summary>
-    /// 보안결재용 클래스 
+    /// 보안결재용 클래스, ApproveDao 로 대체.... 사용안함.....
     /// </summary>
     class SecurityApproveDao
     {

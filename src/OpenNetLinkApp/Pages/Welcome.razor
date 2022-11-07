@@ -11,7 +11,7 @@
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
-@using HsNetWorkSGData
+@*@using HsNetWorkSGData*@
 @using System.Text.Json
 @using System.Runtime.InteropServices;
 @inject XmlConfService XmlConf
@@ -20,6 +20,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HsCmdCenter
 @inject PageStatusService pageService
+@inject WebWindow Window
 @*<div class="content-wrapper" style="background:url('/images/adminlte/main_tbg.png') no-repeat right top #f4f6f9;">*@
 
 <section class="content1" style="padding-top:5px !important;background:url('/images/adminlte/main_tbg.png') no-repeat right top #f4f6f9; ">
@@ -149,8 +150,10 @@
                             </td>
                             <td rowspan="2">
                                 <div class="main_chart">
-                                    <canvas class="pl-3 pt-3" id="myCapacityChart" width="100" height="100"></canvas>
-                                    @*<div class="text-center pr-1">(MB)</div>*@
+                                    <p align="center">
+                                        <canvas class="pt-3" id="myCapacityChart" width="100" height="100"></canvas>
+                                        @*<div class="text-center pr-1">(MB)</div>*@
+                                    </p>
                                 </div>
                             </td>
                         </tr>
@@ -435,10 +438,14 @@
                         <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_CONNTCTINFO_TITLE")</font> <!--접속환경-->
                     </button>
 
-                    <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/netConf"))">
-                        <div class="text-center"><img src="/images/adminlte/quick_05.png"></div>
-                        <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_BASICSET_TITLE")</font> <!--기본설정-->
-                    </button>
+                    @if (GetUseNetConf())
+                    {
+                        <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/netConf"))">
+                            <div class="text-center"><img src="/images/adminlte/quick_05.png"></div>
+                            <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_BASICSET_TITLE")</font> <!--기본설정-->
+                        </button>
+                    }
+
                 </div>
 
 
@@ -479,6 +486,7 @@
 
 <ViewDetailPopUp @ref="refViewDetail"></ViewDetailPopUp>
 <PublicBoardView @ref="refPublicBoardView"></PublicBoardView>
+<SGAlert @ref="refSGAlertDashBoardContinueFileTrans" Guid="DashBoardContinueFileTransAlert"></SGAlert>
 @code
 {
 
@@ -493,6 +501,7 @@
     ISGopConfigService OpConfigSvc;
 
     int nDrawPageGroupID = -1;
+    @*string strCurrentSeedKey = "";*@
 
     // 목적지 Data
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
@@ -563,7 +572,7 @@
     public int nDiskFreeSize = 0;
 
     Update_PopUp refUpdate_PopUp;
-
+    SGAlert refSGAlertDashBoardContinueFileTrans;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<Welcome>();
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
@@ -584,6 +593,19 @@
     private string stShowAdminInfo = "none";
 
     bool bUseClipBoard = false;
+
+    /// <summary>
+    /// 자동로그인 설정 화면 나오게 할지 유무
+    /// </summary>
+    /// <returns></returns>
+    public bool GetUseNetConf()
+    {
+        if (nDrawPageGroupID < 0)
+            return false;
+
+        return (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nDrawPageGroupID));
+    }
+
 
     /// <summary>
     /// 출력될 Text XML에서 가져오기
@@ -685,7 +707,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void InitDBInfo()
     {
@@ -749,15 +771,8 @@
     {
 
         int groupID = groupIDbyParam;
-        if (groupIDbyParam.ToString().Length > 0 && path.Length > 0)
-        {
-            // 명확하게 동작하게 하고 적용
-            string strLowPath = path.ToLower();
-            SelectSideBar(strLowPath);
 
-            path += "/";
-            path += groupID.ToString();
-        }
+        path += $"/{groupID}";
 
         string strNavigateUrl = path.ToLower();
 
@@ -769,6 +784,13 @@
             strNavigateUrl += groupID.ToString();
             path = strNavigateUrl;
         }
+
+        KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+        eventArgs.Key = "Enter";
+
+        ISGSideBarUI activeMenu = null;
+        activeMenu = SideBarUISvc.FindSubMenu(groupID, path);
+        ChangeActiveMenuWrap(eventArgs, activeMenu);
 
         MyNavigationManager.NavigateTo(path);
     }
@@ -792,6 +814,7 @@
             stShowAdminInfo = "block";
         else
             stShowAdminInfo = "none";
+
 
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -906,7 +929,7 @@
             // if (sgLoginData.GetApprove() == true)                        // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
 
             // 3망 정책고려한 결재사용유무 설정 && 설정상 결재관리 UI 사용
-            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI()==false)
+            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
                 if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                     bApprMenuUse = true;
         }
@@ -917,7 +940,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="firstRender"></param>
     /// <returns></returns>
@@ -955,6 +978,8 @@
         object[] param4 = { nDiskTotalSize - nDiskFreeSize, nDiskFreeSize };
         await JSRuntime.InvokeAsync<object>("initCapaChart", param4);
 
+        int groupID = groupIDbyParam;
+
         if (firstRender)
         {
 
@@ -963,14 +988,14 @@
             if (sgSideBar != null)
                 groupID = sgSideBar.GroupId;*/
 
-            int groupID = groupIDbyParam;
+            @*int groupID = groupIDbyParam;*@
 
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
             if (sgLoginData == null)
                 return;
 
-            bUseClipBoard = sgLoginData.GetClipboard();
+
 
             if (ClientPatch(sgLoginData))
             {
@@ -979,7 +1004,7 @@
                 refUpdate_PopUp.SetType(0);
                 //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
 
-                if (siteConfig.GetUseForceUpdate())
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
                 {
                     ClientUpgradeExeEvent clientUpdateExe = null;
                     clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
@@ -993,6 +1018,7 @@
 
                 return;
             }
+
         }
 
         CLog.Here().Information($"Welcome - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
@@ -1000,10 +1026,14 @@
         // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
         if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
-
             nDrawPageGroupID = groupIDbyParam;
+            //strCurrentSeedKey = HsCmdCenter.GetSeedKey(groupIDbyParam);
+            @*int groupID = groupIDbyParam;*@
 
-            int groupID = groupIDbyParam;
+            SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupIDbyParam);
+            if (sgLoginData == null)
+                return;
+            bUseClipBoard = sgLoginData.GetClipboard();
 
             HsCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
             HsCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
@@ -1028,7 +1058,7 @@
             HsCmdCenter.sgPageEvent.SetAlarmNotiAfterDashBoardEventAdd(groupID, AlarmNotiAfter);                // 알람 노티 수신 후 화면 갱신.
 
             HsCmdCenter.SetFileRecvPossible(groupID, true);
-            HsCmdCenter.SetUseUserRecvDownPath(groupID, siteConfig.GetUseUserRecvDownPath(groupID));
+            HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
             SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정
 
             GetNetOverModeData(groupID);
@@ -1061,9 +1091,12 @@
 
             StateHasChanged();
 
+            
+            CheckContinueFileUpload();
+
         }
 
-
+        pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);          //매일 자정 데이터 새로고침
     }
 
     /// <summary>
@@ -1075,7 +1108,7 @@
     {
         ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         string strPath = AppConfigSvc.GetRecvDownPath(groupID);
-        if (siteConfig.GetUseUserRecvDownPath(groupID))
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID))
         {
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -1204,7 +1237,6 @@
     /// <param name="e"></param>
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
-
         CLog.Here().Information($"FileTrans - ### - USED size({e.Size}), count({e.Count}) info recv (groupID : {groupID})! ");
 
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
@@ -1235,7 +1267,6 @@
     /// <param name="e"></param>
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
-
         CLog.Here().Information($"FileTrans - ### - use size recv (groupID : {groupID})! ");
 
         pageService.SetDayUseClip(groupID, e.Size, e.Count);
@@ -2111,7 +2142,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="sgLoginData"></param>
     /// <returns></returns>
@@ -2151,7 +2182,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void InitAdministrator()
     {
@@ -2177,6 +2208,26 @@
                 strAdminPhone = sgAdmin.Phone;
                 strAdminEmail = sgAdmin.Email;
             }
+        }
+    }
+
+    private void CheckContinueFileUpload()
+    {
+        int groupId = groupIDbyParam;
+        ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupId);
+
+        SGReSendData sGReSendData = SQLiteDB.SelectReSendInfo(groupId, sgUserInfo.UserSeq);
+        if (sGReSendData != null)
+        {
+            if (!File.Exists(sGReSendData.HSZNAME))
+            {
+                SQLiteDB.DeleteReSendInfo(sGReSendData.RESENDID);
+                return;
+            }
+
+
+            if (refSGAlertDashBoardContinueFileTrans != null)
+                refSGAlertDashBoardContinueFileTrans.openPopUp(XmlConf.GetTitle("T_DATA_CONTINUE_TRANS"), XmlConf.GetTitle("T_DATA_CONTINUE_FILE_TRANS_INFO"), 1, groupId);
         }
     }
 
@@ -2243,7 +2294,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="navURI"></param>
     public void SelectSideBar(string navURI)
@@ -2266,9 +2317,9 @@
 
                 nGroupID = groupIDbyParam;
 
-                bool bEmailUse = siteConfig.GetUseEmailManageApprove(nGroupID);
-                bool bPCURLUse = siteConfig.GetUsePCURL(nGroupID);
-                bool bClipBoardApprUse = siteConfig.GetUseClipApprove(nGroupID);
+                bool bEmailUse = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(nGroupID);
+                bool bPCURLUse = SGAppMgrSvc.OpConfigInfoService.GetUsePCURL(nGroupID);
+                bool bClipBoardApprUse = SGAppMgrSvc.OpConfigInfoService.GetUseFileClipManageUI(nGroupID);   // GetUseClipApprove(nGroupID);
                 int nParentID = 0;
                 ISGSideBarUI activeMenu = null;
 
@@ -2386,7 +2437,6 @@
 
     }
 
-
     /// <summary>
     /// 결재 Tab UI가 나와야 하는지 유무를 알려줌
     /// </summary>
@@ -2412,6 +2462,20 @@
         }
 
         return false;
+    }
+
+    //welcome board에서 자정 경과 시 '일일 전송' 정보 갱신 by 2022.08.26 KYH
+    /// <summary>
+    /// 매일 자정 데이터 새로고침
+    /// </summary>
+    private void DayInfoRefreshResult()
+    {
+        @*int groupID = groupIDbyParam;
+            HsCmdCenter.RefreshBind(groupID);*@
+        @*
+            StateHasChanged();*@
+
+        SendDayFileInfo();
     }
 
 

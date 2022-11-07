@@ -1,11 +1,26 @@
-
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Components.SGPopUp
+@using System.Security.Cryptography
+@using System.Diagnostics
+@using System.Text
+@using System.Web
+@using HsNetWorkSG
+@using AgLogManager
+@using OpenNetLinkApp.PageEvent
+@using System.Runtime.InteropServices
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
-<div class="modal fade" id="ClipboardApprovePopUp">
+@inject HSCmdCenter HsCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+@inject IJSRuntime jsRuntime
+@inject PageStatusService pageService
+@inject WebWindow window
+<div class="modal fade" id="ClipboardApprovePopUp" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
         <div class="modal-content">
             <div class="modal-header modal-outline">
-                <h5 class="modal-title pt-1 text-bold">클립보드결재 상세보기</h5>
+                <h5 class="modal-title pt-1 text-bold">@strApprDetailTitle</h5> <!--결재상세보기-->
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="closePopUp">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -14,11 +29,9 @@
                 <!-- content -->
 
                 <div class="card-body pt-0">
-                    <div class="modal-sub-title mb-2"> 상세내역 </div>
+                    <div class="modal-sub-title mb-2">@strApprCategory</div> <!--결재내역-->
                     <table class="table table-bordered blue">
                         <colgroup>
-
-
                             <col width="10%">
                             <col width="11%">
                             <col width="10%">
@@ -30,33 +43,31 @@
                         </colgroup>
                         <tbody>
                             <tr>
-                                <th>전송구분 </th>
-                                <td>반출</td>
-                                <th>전송상태</th>
-                                <td>전송대기</td>
-                                <th>파일위치</th>
-                                <td>인터넷PC</td>
-                            </tr>
-                            <tr>
-                                <th>승인구분</th>
-                                <td>후결</td>
-                                <th>승인상태</th>
-                                <td>승인</td>
-                                <th>승인요청일</th>
-                                <td>2020-04-13 16:01:01</td>
+                                <th>@strTransKind </th> <!--전송구분-->
+                                <td style="text-align:center;">@strDataTransKind</td>
+                                <th>@strTransStatus</th>  <!--전송상태-->
+                                <td style="text-align:center;">@strDataTransStatus</td>
+                                <th>@strFilePos</th>  <!--파일위치-->
+                                <td style="text-align:center;">@strDataFilePos</td>
+                                <!--<th>@strReciver</th> -->   <!--수신자-->
+                                <th>@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
+                                <td style="text-align:center;">@stDLP</td>
                             </tr>
 
                             <tr>
-                                <th>제목</th>
-                                <td colspan="5">
-                                    이것은 제목입니다.
-                                </td>
+                                <th>@strApprKind</th>  <!--승인구분-->
+                                <td style="text-align:center;">@(bIsPrivacyApproveDetail?XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE"):strDataApprKind)</td>
+                                @*<td style="text-align:center;">@strDataApprKind</td>*@
+                                <th>@strApprStatus</th>  <!--승인상태-->
+                                <td style="text-align:center;">@strDataApprStatus</td>
+                                <th>@strRequester</th>  <!--승인요청자-->
+                                <td style="text-align:center;">@strDataApprReqUser</td>
+                                <th>@strReqday</th>  <!--승인요청일-->
+                                <td style="text-align:center;">@strDataApprReqDay</td>
                             </tr>
                             <tr>
-                                <th>설명</th>
-                                <td colspan="5">
-                                    이것은 설명입니다.
-                                </td>
+                                <th>@strDataType</th>       <!--데이타 타입-->
+                                <td colspan="7">@strDataDataType</td>
                             </tr>
                         </tbody>
                     </table>
@@ -65,191 +76,134 @@
 
 
                 <div class="card-body pt-0 pb-0">
-                    <div class="modal-sub-title mb-2"> 파일정보 </div>
-
+                    <div class="modal-sub-title mb-2"> @strFileInfo </div>      <!--파일정보-->
                     <div class="col-md-12">
+                        <div class="float-left mt-2">
+                            <i class="fas fa-lightbulb fa-1x"></i>&nbsp;&nbsp;
+                            @strPrevInfo1 &nbsp;&nbsp; @strPrevInfo2
+                        </div>
+                        <!--
                         <div class="float-left mt-2">
                             <i class="fas fa-lightbulb fa-1x"></i>&nbsp;&nbsp;
                             업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
                         </div>
+                        -->
                         <div class="float-right mb-2">
-                            <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;파일미리보기</button>
+                            <button type="button" class="btn btn-info btn-sm" @onclick="requestPreview" disabled="@m_bFilePrevDisable"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@strFilePrev </button>   <!--파일미리보기-->
                         </div>
                     </div>
 
-                    <table class="table table-head-fixed table-bordered table-hover white">
-                        <colgroup>
-                            <col width="80px">
-                            <col width="">
-                            <col width="">
-                            <col width="">
 
-                            <col width="">
-                            <col width="">
-                            <col width="">
-                            <col width="">
-                        </colgroup>
+                    <table class="table table-head-fixed table-bordered table-hover white" style="table-layout: fixed;">
                         <thead>
                             <tr>
-
-                                <th>파일명 </th>
-                                <th>유형 </th>
-                                <th>크기 </th>
-                                <th>바이러스 내역 </th>
-                                <th>바이러스 검사일 </th>
+                                <th style="text-align: center;width: 5%;">선택 </th>
+                                <th style="text-align:center;">@strFileName </th>           <!--파일명-->
+                                <th style="text-align: center; width: 7%;">@strFileType </th>             <!--유형-->
+                                <th style="text-align: center; width: 7%;">@strFileSize </th>             <!--크기-->
+                                <th style="text-align: center;">@strVirusHist </th>         <!--바이러스내역-->
+                                <th style="text-align: center;">@strVirusCheckDate </th>     <!--바이러스검사-->
+                                <th style="text-align: center;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>     <!--개인정보 내역-->
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>dddldldld_du.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1.347 KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>dddldldld_du.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1.347 KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>dddldldld_du.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1.347 KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>dddldldld_du.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1.347 KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>dddldldld_du.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1.347 KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
+                            @foreach (FileInfoData item in mFileData)
+                            {
+                                <tr>
+                                    <td style="text-align:center">
+                                        @if (item.strFileType == "DIR" || item.strFileSize == "0 KB")@*  *@
+                                        {
+                                            <input class="input" type="checkbox" disabled>
+                                        }
+                                        else
+                                        {
+                                            <input class="input" type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))" disabled="@item.bCheckDisable">
+                                        }
+                                    </td>
+                                    <td style="text-align:center;width:30%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.strFileName</td>
+                                    <td style="text-align: center;">@item.strFileType</td>
+                                    <td style="text-align: center;">@item.strFileSize</td>
+                                    <td style="text-align: center;">@item.strVirusHistory</td>
+                                    <td style="text-align: center;">@item.strVirusExamDay</td>
+                                    <td style="text-align: center; width: 20%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.stDLPDesc</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
-
                 </div>
 
-
-
                 <div class="card-body pb-0">
-                    <div class="modal-sub-title mb-2"> 결재 정보 </div>
+                    <div class="modal-sub-title mb-2"> @strApproveInfo </div>              <!--결재자정보-->
                     <table class="table table-bordered blue">
-                        <colgroup>
-                            <col width="10%">
-                            <col width="15%">
-                            <col width="10%">
-                            <col width="15%">
-                            <col width="10%">
-                            <col width="">
-                        </colgroup>
                         <tbody>
                             <tr>
-                                <th>승인자</th>
-                                <td>KS0003 차장</td>
-                                <th>승인상태</th>
-                                <td>승인대기</td>
-                                <th>승인일</th>
-                                <td>2020-04-01 10:13:18</td>
+                                <th>@strApprover</th>                     <!--승인자-->
+                                <td>@strDataLastApprName</td>
+                                <th>@strApproveStatus </th>                   <!--승인상태-->
+                                <td>@strDataLastApprStatus</td>
+                                <th>@strApproveday </th>                     <!--승인일-->
+                                <td>@strDataLastApprDay</td>
                                 <td>
+                                    <div class="col-md-12 float-left">
 
-                                    <div class="col-md-10 float-left pl-0 pr-0">결재내역</div>
-
-                                    <div class="navbar-nav ml-auto txte-right">
-
-                                        <div class="nav-item dropdown show">
-                                            <a class="nav-link p-0" data-toggle="dropdown" href="#" aria-expanded="true">
-                                                <i class="fas fa-list-alt fa-lg"></i>
-                                            </a>
-
-                                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style=" right:0px; height:90px; overflow-y:scroll;">
-                                                <a href="#" class="dropdown-item">
-
-                                                    <div class="media">
-                                                        <div class="media-body">
-                                                            <div class="col-md-4 float-left dropdown-item-title">이란숙</div>
-                                                            <div class="col-md-3 float-left dropdown-item-title">차장</div>
-                                                            <div class="col-md-5 float-left dropdown-item-title">컨설팅지원팀</div>
-                                                        </div>
-                                                    </div>
-
+                                        <div class="navbar-nav ml-auto txte-right">
+                                            <!-- Messages Dropdown Menu -->
+                                            <div class="nav-item dropdown show">
+                                                <a class="nav-link p-0" data-toggle="dropdown" href="#" aria-expanded="true" hidden="@bApprHistHidden">
+                                                    <i class="fas fa-list-alt fa-lg"></i>
+                                                    <span class="pl-1 pr-1">승인이력</span>
                                                 </a>
 
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item">
-
-                                                    <div class="media">
-                                                        <div class="media-body">
-                                                            <div class="col-md-4 float-left dropdown-item-title">문호원</div>
-                                                            <div class="col-md-3 float-left dropdown-item-title">이사</div>
-                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부지원</div>
+                                                <div class="dropdown-menu dropdown-menu-xl dropdown-menu-right" style=" right:0px; height:135px; overflow-y:scroll;">
+                                                    <div class="dropdown-title">
+                                                        <div class="media">
+                                                            <div class="media-body">
+                                                                <div class="col-md-3 float-left dropdown-item-title1">승인자</div>
+                                                                <div class="col-md-2 float-left dropdown-item-title1">상태</div>
+                                                                <div class="col-md-3 float-left dropdown-item-title1">승인일</div>
+                                                                <div class="col-md-2 float-left dropdown-item-title1">반려사유</div>
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    @foreach (ApprHist appritem in apprHList)
+                                                    {
+                                                        <div class="dropdown-divider"></div>
+                                                        <a class="dropdown-item">
+                                                            <div class="media">
+                                                                <div class="media-body">
+                                                                    <div class="col-md-3 float-left dropdown-item-title1">@appritem.strName</div>
+                                                                    <div class="col-md-2 float-left dropdown-item-title1">@appritem.strApprStatus</div>
+                                                                    <div class="col-md-3 float-left dropdown-item-title1">@appritem.strApprDay</div>
+                                                                    <div class="col-md-2 float-left dropdown-item-title1">@appritem.strReason</div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    }
 
-                                                </a>
-
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item">
-
-                                                    <div class="media">
-                                                        <div class="media-body">
-                                                            <div class="col-md-4 float-left dropdown-item-title">김영산</div>
-                                                            <div class="col-md-3 float-left dropdown-item-title">본부장</div>
-                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부장</div>
-                                                        </div>
-                                                    </div>
-
-                                                </a>
-
-
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item">
-
-                                                    <div class="media">
-                                                        <div class="media-body">
-                                                            <div class="col-md-4 float-left dropdown-item-title">김영산</div>
-                                                            <div class="col-md-3 float-left dropdown-item-title">본부장</div>
-                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부장</div>
-                                                        </div>
-                                                    </div>
-
-                                                </a>
-
+                                                </div>
                                             </div>
                                         </div>
-
-
                                     </div>
-
-
                                 </td>
                             </tr>
                             <tr>
-                                <th>반려사유</th>
-                                <td colspan="6">
-                                    파일 포워딩 테스트
+                                <th>@strRejectReason </th>                    <!--반려사유-->
+                                <td colspan="6" style="text-overflow: ellipsis; overflow: hidden;">
+                                    @strDataLastApprRejectReason
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+
+
                 </div>
 
                 <!--/. content -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-md btn-blue"><i class="fas fa-check-circle"></i>@XmlConf.GetTitle("T_COMMON_APPROVE")</button>
-                <button type="button" class="btn btn-md btn-red"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_COMMON_REJECTION")</button>
-                <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_FILE_FOLD")</button>
+                <button type="button" class="btn btn-md btn-blue" disabled="@m_bApprove" @onclick="DetailApprove"><i class="fas fa-check-circle"></i>@strApprove</button>
+                <button type="button" class="btn btn-md btn-red" disabled="@m_bReject" @onclick="DetailReject"><i class="fas fa-times-circle"></i>@strReject</button>
+                <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@strClose</button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -257,16 +211,910 @@
     <!-- /.modal-dialog -->
 </div>
 
-@code {
+<SGDetailReject @ref="refSGDetailReject"></SGDetailReject>
+
+
+
+
+@code
+{
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<ClipboardApprovePopUp>();
+    ISGNetworkService NetWorkSvc;
+    public bool bIsPrivacyApproveDetail = false;
+
+    /// <summary>
+    /// 파일미리보기 요청
+    /// </summary>
+    public void requestPreview()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        string strMsg = "";
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        if (pageService.GetFilePrevRecving() == true)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0248");           // 파일 미리보기 수행 중입니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        if (stSelectedFileNo.Length < 1)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0064");          // 파일보기를 원하시는 대상을 선택 하시기 바랍니다.
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        if (!FilePrevDownExtension(stSelectedFileName))
+        {
+            return;
+        }
+
+        string stYear = DateTime.Now.ToString("yyyy");
+        string stMonth = DateTime.Now.ToString("MM");
+        string stDay = DateTime.Now.ToString("dd");
+
+        string sha1Year = SGBase64Hash(stYear);
+        sha1Year = sha1Year.ToLower().Replace("-", "");
+        string sha1Mon = SGBase64Hash(stMonth);
+        sha1Mon = sha1Mon.ToLower().Replace("-", "");
+        string sha1Day = SGBase64Hash(stDay);
+        sha1Day = sha1Day.ToLower().Replace("-", "");
+        string sha1_Total = SGBase64Hash(sha1Year + sha1Mon + sha1Day);
+        sha1_Total = sha1_Total.ToLower().Replace("-", "");
+
+        int shasum = 0;
+        char[] arrSha = sha1_Total.ToCharArray();
+        for (int i = 0; i < arrSha.Length; i++)
+        {
+            shasum += arrSha[i];
+        }
+        string pathToContentRoot = string.Empty;
+        var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
+        pathToContentRoot = Path.GetDirectoryName(pathToExe);
+        string filepath = String.Empty;
+        filepath = pathToContentRoot + "/wwwroot/conf/postgresql.crt";
+        string stCrt = File.ReadAllText(filepath);
+
+        //CLog.Information("추출전 미리보기 경로:" + stSelectedFileName);
+        stSelectedFileName = Path.GetFileName(stSelectedFileName);
+        //CLog.Information("추출후 미리보기 경로:" + stSelectedFileName);
+
+        FileAddManage fileaddManage = new FileAddManage();
+        stSelectedFileName = fileaddManage.GetFileRename(true, stSelectedFileName);
+
+        int nOffSet = shasum / 128;
+        string stCert = stCrt.Replace("\r", "").Replace("\n", "");
+        string cert_enc_key = stCert.Substring(nOffSet, 128);
+        //CLog.Information("인증서 추출키:" + cert_enc_key);
+        string stBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(cert_enc_key)).Substring(0, 16);
+        //CLog.Information("인증서 추출키 BASE64:" + stBase64);
+
+        string stLawparam = stSelectedSeq + "|" + stSelectedFileNo + "|" + stSelectedFileName + "|" + stSelectedEncKey;
+        string finalData = AESEncrypt256(stLawparam, stBase64);
+        string stParam = HttpUtility.UrlEncode(finalData);
+        OpenPreviewWindow(stParam);
+
+        //stSelectedFileNo = "";
+    }
+
+    private void OpenPreviewWindow(string param)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+
+        string strIP = sgDetailData.GetFilePreviewIP();
+
+#if _WINDOWS
+        // 확인후 적용!
+        string strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+        strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+#else
+ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+startInfo.WindowStyle = ProcessWindowStyle.Normal;
+#endif
+
+        try
+        {
+#if _WINDOWS
+            [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
+            ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
+#else
+// Run the external process & wait for it to finish
+using (Process proc = Process.Start(startInfo))
+{
+    //proc.WaitForExit();
+}
+#endif
+        }
+        catch (Exception e)
+        {
+            CLog.Here().Information("Process.Start - ### 1 - Exception : {0} ", e.Message);
+        }
+    }
+
+    private String AESEncrypt256(String Input, String key)
+    {
+        RijndaelManaged aes = new RijndaelManaged();
+        aes.KeySize = 256;
+        aes.BlockSize = 128;
+        aes.Mode = CipherMode.CBC;
+        aes.Padding = PaddingMode.PKCS7;
+        aes.Key = Encoding.UTF8.GetBytes(key);
+        //aes.IV = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        aes.IV = Encoding.UTF8.GetBytes("weblinkhanssak16");
+
+        var encrypt = aes.CreateEncryptor(aes.Key, aes.IV);
+        byte[] xBuff = null;
+        using (var ms = new MemoryStream())
+        {
+            using (var cs = new CryptoStream(ms, encrypt, CryptoStreamMode.Write))
+            {
+                byte[] xXml = Encoding.UTF8.GetBytes(Input);
+                cs.Write(xXml, 0, xXml.Length);
+            }
+            xBuff = ms.ToArray();
+        }
+        String Output = Convert.ToBase64String(xBuff);
+        return Output;
+    }
+
+
+
+
+
+    public static string SGBase64Hash(string stringToHash)
+    {
+        using (var sha1 = new SHA1Managed())
+        {
+            return BitConverter.ToString(sha1.ComputeHash(Encoding.UTF8.GetBytes(stringToHash)));
+        }
+    }
+
+    public void CheckStateUpdate(FileInfoData item)
+    {
+        int nCount = mFileData.Count;
+        for (int i = 0; i < nCount; i++)
+        {
+            if (mFileData[i].fileNo.Equals(item.fileNo))
+            {
+                if (mFileData[i].bCheck == false)
+                {
+                    mFileData[i].bCheck = true;
+                    stSelectedFileNo = item.fileNo;
+                    stSelectedFileName = item.strFileName;
+                }
+                else
+                {
+                    mFileData[i].bCheck = false;
+                    stSelectedFileNo = "";
+                    stSelectedFileName = "";
+                }
+            }
+            else
+            {
+                mFileData[i].bCheck = false;
+            }
+        }
+        StateHasChanged();
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        strMsg = strMsg.Replace("/r/n", "<br/>");
+        object[] param = { strType, strSystemName, strMsg };
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    public class ApprHist
+    {
+        public string strName = "";                // 이름
+        public string strApprStatus = "";          // 결재상태
+        public string strApprDay = "";             // 승인일
+        public string strReason = "";              // 반려사유
+
+        public ApprHist()
+        {
+            strName = strApprStatus = strApprDay = strReason = "";
+        }
+
+        public ApprHist(string Name, string ApprStatus, string ApprDay, string Reason)
+        {
+            strName = Name;
+            strApprStatus = ApprStatus;
+            strApprDay = ApprDay;
+            strReason = Reason;
+        }
+    }
+    public string strApprDetailTitle = "";
+    public string strApprCategory = "";
+    public string strTransKind = "";
+    public string strTransStatus = "";
+    public string strFilePos = "";
+    public string strReciver = "";
+    public string strApprKind = "";
+    public string strApprStatus = "";
+    public string strRequester = "";
+    public string strReqday = "";
+    public string strFilePrev = "";
+    public string strTitle = "";
+    public string strDesc = "";
+    public string strDataType = "";
+    public string strFileInfo = "";
+    public string strPrevInfo1 = "";
+    public string strPrevInfo2 = "";
+    public string strFileName = "";
+    public string strFileType = "";
+    public string strFileSize = "";
+    public string strFolder = "";
+    public string strVirusHist = "";
+    public string strVirusCheckDate = "";
+    public string strApproveInfo = "";
+    public string strApprove = "";
+    public string strReject = "";
+    public string strApprover = "";
+    public string strApproveStatus = "";
+    public string strApproveday = "";
+    public string strRejectReason = "";
+    public string strClose = "";
+
+    public string strDataTransKind = "";                // 전송구분
+    public string strDataTransStatus = "";              // 전송상태
+    public string strDataFilePos = "";                      // 파일위치
+    public string strDataApprKind = "";             // 승인구분
+    public string strDataApprStatus = "";                       // 승인상태
+    public string strDataApprReqUser = "";                  // 승인요청자
+    public string strDataApprReqDay = "";               // 승인요청일
+    public string strDataTitle = "";                // 제목
+    public string strDataDesc = "";             // 설명
+    public string strDataDataType = "";
+
+    public string strDataLastApprName = "";             // 승인자
+    public string strDataLastApprStatus = "";             // 승인상태
+    public string strDataLastApprDay = "";                  // 승인일
+    public string strDataLastApprRejectReason = "";         // 반려사유
+    public string stSelectedFileNo = "";
+    public string stSelectedSeq = "";
+    public string stSelectedFileName = "";
+    public string stSelectedEncKey = "";
+    public string stDLP = String.Empty;
+
+    public bool m_bApprove;                             // 승인 가능 상태 여부
+    public bool m_bReject;                              // 반려 가능 상태 여부
+    ISGSideBarUIService SideBarUISvc;
+
+    public List<FileInfoData> mFileData = new List<FileInfoData>();
+
+    SGDetailReject refSGDetailReject;
+
+    List<ApprHist> apprHList = new List<ApprHist>();
+    public bool bApprHistHidden = false;
+
+    public bool m_bFilePrevDisable = false;
+
+    public bool m_bFilePrevOpening = false;
+
+    @*    public string strFromServerNetOver = "";        // 3망상황 시작지
+        public string strDestServerNetOver = "";        // 3망상황 목적지*@
+
     public async Task openPopUp(long seq)
     {
+        stSelectedSeq = seq.ToString();
         object[] param = { "ClipboardApprovePopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
     public void closePopUp()
     {
+        if (pageService.GetFilePrevRecving() == true)
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0249");           // 파일 미리보기 수행 중에는 닫을 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
         object[] param = { "ClipboardApprovePopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
+
+
+    protected override void OnInitialized()
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        InitText();
+        HsCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FilePrevProgressNoti);
+    }
+
+
+    public void SetBindingData(string approverName, string apvStatus, string apvTime, string dataType)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+
+        strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
+        strDataTransStatus = sgDetailData.GetTransStatus();                                 // 전송상태
+        strDataDataType = dataType;
+
+        Dictionary<string, SGNetOverData> dicDestSysPos = null;
+        dicDestSysPos = pageService.GetTargetSystemList(groupID);
+        if (dicDestSysPos != null && dicDestSysPos.Count > 1)  // && strFromServerNetOver.Length > 0 && strDestServerNetOver.Length > 0)
+            strDataFilePos = sgDetailData.GetFilePosNetOver(dicDestSysPos); // strFromServerNetOver, strDestServerNetOver); // 파일위치(3망연계상황)
+        else
+            strDataFilePos = sgDetailData.GetFilePos();                                         // 파일위치
+
+        strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
+        strDataApprStatus = sgDetailData.GetApprStatus();                                   // 승인상태
+        strDataApprReqUser = sgDetailData.GetReqUser();                                     // 승인요청자
+        strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
+
+        //strDataTitle = sgDetailData.GetTitle();                                             // 제목
+        //FileAddManage fileAddManage = new FileAddManage();
+        //strDataTitle = fileAddManage.GetConvertTitleDesc(false, strDataTitle);
+        //strDataDesc = sgDetailData.GetDesc();                                              // 설명
+        //strDataDesc = fileAddManage.GetConvertTitleDesc(false, strDataDesc);
+        //stSelectedEncKey = sgDetailData.GetBasicTagData("FILEKEY");
+        stSelectedEncKey = sgDetailData.GetFileKey();
+        stDLP = sgDetailData.GetDLP();
+
+        bool bInner = false;
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            bInner = true;
+
+        bInner = sgLoginData.GetSystemPosition();
+        m_bFilePrevDisable = !(sgDetailData.GetFilePrevEnable(bInner));
+        sgDetailData.GetFileInfo(out mFileData);
+        if (mFileData == null)
+            return;
+
+        for (int i = 0; i < mFileData.Count; i++)
+        {
+            mFileData[i].bCheckDisable = m_bFilePrevDisable;
+            if (mFileData[i].bCheckDisable)
+                mFileData[i].bCheck = false;
+        }
+
+        List<ApproverHist> apprListHist = null;
+        apprListHist = sgDetailData.GetApproverInfoHist();
+
+        if ((apprListHist == null) || (apprListHist.Count <= 1))
+        {
+            bApprHistHidden = true;
+        }
+
+        if ((apprListHist == null) || (apprListHist.Count <= 0))
+        {
+            strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
+        }
+        else
+        {
+            ApproverHist apprHist = null;
+            apprHist = sgDetailData.GetApprLastApproverHistData(apprHist);
+            if (apprHist == null)
+                strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
+            else
+            {
+                //strDataLastApprName = apprHist.m_strApproverName;
+                //strDataLastApprStatus = apprHist.m_strApprStatus;
+                //strDataLastApprDay = apprHist.m_strApprDay;
+
+                strDataLastApprName = approverName;
+                strDataLastApprStatus = apvStatus;
+                strDataLastApprDay = apvTime;
+
+
+                //if ((!strDataLastApprDay.Equals("")) && (!strDataLastApprDay.Equals("-")))
+                //    strDataLastApprDay = sgDetailData.GetConvertDay(strDataLastApprDay);
+                strDataLastApprRejectReason = apprHist.m_strRejectReason;
+
+                if (strDataLastApprRejectReason.Length > 100)
+                    strDataLastApprRejectReason = strDataLastApprRejectReason.Substring(0, 100) + "\n" + strDataLastApprRejectReason.Substring(101);
+            }
+        }
+        m_bApprove = (!sgDetailData.GetApproveEnable());
+        m_bReject = (!sgDetailData.GetRejectEnable());
+
+        //OR 결재 승인상태 교정 시작 2021/06/28 YKH
+        //같은 결재 단계에 여러명이 존재하고 그중 한명이 승인상태라면 승인상태 제외한 나머지는 요청취소로 승인상태문구를 변경해준다.
+        //최종 스탭 결정
+        if (apprListHist != null && apprListHist.Count > 0)
+        {
+            int nMaxStep = 1;
+            foreach (ApproverHist data in apprListHist)
+            {
+                if (nMaxStep > data.m_nApprStep)
+                    nMaxStep = data.m_nApprStep;
+            }
+            //각 스텝별 승인여부 확인
+            for (int i = 1; i <= nMaxStep; i++)
+            {
+                bool bApproveFlag = false;
+                for (int j = 0; j < apprListHist.Count; j++)
+                {
+                    ApproverHist appr = apprListHist[j];
+                    if (appr.m_nApprStep != i)
+                        continue;
+                    if (appr.m_strApprStatus == XmlConf.GetTitle("T_COMMON_APPROVE"))
+                        bApproveFlag = true;
+                }
+                if (bApproveFlag == true)
+                {
+                    for (int j = 0; j < apprListHist.Count; j++)
+                    {
+                        ApproverHist appr = apprListHist[j];
+                        if (appr.m_nApprStep != i)
+                            continue;
+                        if (appr.m_strApprStatus != XmlConf.GetTitle("T_COMMON_APPROVE"))
+                            appr.m_strApprStatus = XmlConf.GetTitle("T_COMMON_WORKCOMPLETE");
+                    }
+                }
+            }
+        }
+        //OR 결재 승인 상태 교정 종료
+
+
+        if (apprListHist != null)
+        {
+            apprHList.Clear();
+            foreach (ApproverHist data in apprListHist)
+            {
+                string sName = data.m_strApproverName;
+                string sApprStatus = data.m_strApprStatus;
+                string sApprDay = data.m_strApprDay;
+                string sRejectReason = data.m_strRejectReason;
+                apprHList.Add(new ApprHist(sName, sApprStatus, sApprDay, sRejectReason));
+            }
+        }
+
+        StateHasChanged();
+    }
+
+
+    public void InitText()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        strApprDetailTitle = XmlConf.GetTitle("T_CLIPBOARD_APPROVE_DETAIL");              // 클립보드 결재 상세보기
+        strApprCategory = XmlConf.GetTitle("T_DETAIL_APPROVE_CATEGORY");        // 결재내역
+        strTransKind = XmlConf.GetTitle("T_COMMON_TRANSKIND");                  // 전송구분
+        strTransStatus = XmlConf.GetTitle("T_TRANS_STATUS");                    // 전송상태
+        strFilePos = XmlConf.GetTitle("T_DETAIL_FILEPOS");                      // 파일위치
+        strReciver = XmlConf.GetTitle("T_ETC_RECIVER");                         // 수신자
+        strApprKind = XmlConf.GetTitle("T_COMMON_APPROVEKIND");                 // 승인구분
+        strApprStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");             // 승인상태
+        strRequester = XmlConf.GetTitle("T_COMMON_REQUESTER");                  // 승인요청자
+        strReqday = XmlConf.GetTitle("T_DETAIL_REQDAY");                        // 승인요청일
+        strDataType = XmlConf.GetTitle("T_DATA_TYPE");                        // 데이타 타입
+        strTitle = XmlConf.GetTitle("T_DETAIL_TITLE");                          // 제목
+        strFileInfo = XmlConf.GetTitle("T_DETAIL_FILEINFO");                    // 파일정보
+        strFilePrev = XmlConf.GetTitle("T_DETAIL_FILEPREVIEW");                 // 파일미리보기
+        strDesc = XmlConf.GetTitle("T_DETAIL_DESC");                            // 설명
+                                                                                //strPrevInfo = XmlConf.GetWarnMsg("W_0077");                             // &nbsp;&nbsp;업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
+        strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                    // 파일명
+        strFileType = XmlConf.GetTitle("T_COMMON_KIND");                        // 유형
+        strFileSize = XmlConf.GetTitle("T_COMMON_SIZE");                        // 크기
+        strFolder = XmlConf.GetTitle("T_COMMON_FOLDER");                        // 폴더
+        strVirusHist = XmlConf.GetTitle("T_DETAIL_VIRUSHIST");                  // 바이러스 내역
+        strVirusCheckDate = XmlConf.GetTitle("T_DETAIL_VIRUSCHECKDATE");        // 바이러스 검사일
+        strApproveInfo = XmlConf.GetTitle("T_DETAIL_APPROVEINFO");              // 결재자정보
+        strApprove = XmlConf.GetTitle("T_COMMON_APPROVE");                      // 승인
+        strReject = XmlConf.GetTitle("T_COMMON_REJECTION");                     // 반려
+        strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                 // 승인자
+        strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");          // 승인상태
+        strApproveday = XmlConf.GetTitle("T_COMMON_APPROVEDATE");               // 승인일
+        strRejectReason = XmlConf.GetTitle("T_APPROVE_APRROVEREASON");          // 반려사유
+        strClose = XmlConf.GetTitle("T_FILE_FOLD");                             // 닫기
+
+        string strConNetwork = "UnKnown";
+        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+        for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
+        {
+            if (listNetWork[nIdx].GroupID == groupID)
+            {
+                strConNetwork = listNetWork[nIdx].FromName;
+                break;
+            }
+        }
+
+        strPrevInfo1 = strConNetwork + XmlConf.GetWarnMsg("W_0237");                            // 업무망에 접속되어 있습니다.
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+
+        if (sgLoginData == null)
+            strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
+        else
+        {
+            bool bInner = sgLoginData.GetSystemPosition();
+            if (bInner)
+                strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
+            else
+                strPrevInfo2 = XmlConf.GetWarnMsg("W_0240");                            // 반입파일만 파일미리보기가 가능합니다.
+        }
+
+    }
+
+
+    public void DetailApprove()
+    {
+        string strMsg = "";
+        if (pageService.GetFilePrevRecving() == true)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0250");           // 파일 미리보기 수행 중에는 승인 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        string strUserID = "";
+        if (sgLoginData != null)
+            strUserID = sgLoginData.GetUserID();
+
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+
+        string strProcID = "A";
+        string strReason = "Approve";
+        string strApproveSeq = sgDetailData.GetApprSeq();
+        string strApprover = "1";
+        string strApproveUserKind = "0";
+
+        HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+
+        closePopUp();
+    }
+    private async Task DetailReject()
+    {
+        string strMsg = "";
+        if (pageService.GetFilePrevRecving() == true)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0251");           // 파일 미리보기 수행 중에는 반려 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        refSGDetailReject.ResetReason();
+        refSGDetailReject.SetGroupID(groupID);
+        refSGDetailReject.SetApprRejectEvent(DetailApproveRejectSend);
+        m_bFilePrevOpening = false;
+        await refSGDetailReject.openPopUp();
+    }
+
+    public void DetailApproveRejectSend(int groupID, string strReason)
+    {
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        string strUserID = "";
+        if (sgLoginData != null)
+            strUserID = sgLoginData.GetUserID();
+
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+
+        string strProcID = "R";
+        string strApproveSeq = sgDetailData.GetApprSeq();
+        string strApprover = "1";
+        string strApproveUserKind = "0";
+
+        HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+        closePopUp();
+    }
+
+    public void FilePrevCancel(string arg)
+    {
+        System.Diagnostics.Debug.WriteLine("Callback FilePrevCancel Cancel Alert");
+        HsCmdCenter.SendFilePrevCancel();
+
+        string strMsg = XmlConf.GetInfoMsg("I_0202");   // 파일 미리보기가 취소되었습니다.
+        ShowMessage("info", strMsg);
+    }
+
+    public bool FilePrevDownExtension(string sFileName)
+    {
+
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return true;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return true;
+
+        // 0kb 인지 확인 및 Msg 처리
+        string strFileSeq = stSelectedFileNo;
+
+        if (sgDetailData.GetFileSizeEmpty(strFileSeq))
+        {
+            ShowMessage("error", XmlConf.GetErrMsg("E_0243"));
+            return false;
+        }
+
+        // 확장자 종류로 Web으로 preview 할지 결정
+        string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp", "log" };
+        string strExtName = Path.GetExtension(sFileName);
+        strExtName = strExtName.Substring(1);
+        if (strExtName.Equals(""))
+            return true;
+
+        strExtName = strExtName.ToLower();
+        bool bFind = false;
+        for (int i = 0; i < strExt.Length; i++)
+        {
+            if (strExt[i].Equals(strExtName))
+            {
+                bFind = true;
+                break;
+            }
+        }
+
+    if (!bFind)
+    {
+        // Web으로 preview 안하는 파일 down해서 띄워줌
+        string strUserID = sgLoginData.GetUserID();
+        string strTransSeq = sgDetailData.GetTransSeq();
+        sFileName = Path.GetFileName(sFileName);
+
+            string strFilePath = Path.Combine("wapprove", sFileName);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                strFilePath = strFilePath.Replace("/", "\\");
+            }
+            else
+            {
+                strFilePath = strFilePath.Replace("\\", "/");
+            }
+
+            if (File.Exists(strFilePath))
+            {
+                if (!IsAccessAble(strFilePath))
+                {
+                    string strMsg = XmlConf.GetWarnMsg("W_0252");   // 해당 파일은 다른 프로그램에 의해 열려 있습니다./r/n열려있는 프로그램을 닫고 다시 시도하여 주십시요.
+                    strMsg = strMsg.Replace("/r/n", "<br>");
+                    ShowMessage("warn", strMsg);
+                    return true;
+                }
+                File.Delete(strFilePath);
+            }
+
+            string strFileKey = sgDetailData.GetFileKey();
+
+            pageService.SetFilePrevRecving(true);
+            ShowProgress(groupID, 1, 0, sFileName);
+            Task.Delay(1000);
+            FileAddManage fileAddManage = new FileAddManage();
+            sFileName = fileAddManage.GetFileRename(true, sFileName);
+            HsCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq, sFileName, strFileKey, strFileSeq, "0");
+        }
+        return bFind;
+    }
+
+    public void FilePrevProgressNoti(int groupID, PageEventArgs e)
+    {
+        string strMsg = "";
+        if (e.result != 0)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
+        string sFileName = e.strMsg;
+        int per = e.count;
+        int type = 0;
+        if (per >= 100)
+        {
+            type = 2;
+            ShowProgress(groupID, type, 100, sFileName);
+            Task.Delay(500);
+            type = 3;                                       // close
+            pageService.SetFilePrevRecving(false);
+        }
+        else if ((per > 0) && (per < 100))
+        {
+            type = 2;                                       // update
+            pageService.SetFilePrevRecving(true);
+        }
+        else
+            return;
+
+        ShowProgress(groupID, type, per, sFileName);
+    }
+
+    // type : 1 - open , 2 - update ,3 -close
+    private async void ShowProgress(int groupID, int type, int per, string sFileName)
+    {
+        object[] param = { };
+        string identifier = "";
+        string strID = groupID.ToString();
+        //strID = strFileName;
+        strID = "FILEPREVIEW";
+        string strProgress = String.Format("{0}%", per);
+        string strFileRecvInfo = "";
+        if (per == 0)
+        {
+            string strInfoStart = XmlConf.GetInfoMsg("I_0203");                 // 다른 서버에서 파일을 탐색하는 중입니다./r/n잠시만 기다려 주십시요.
+            strInfoStart = strInfoStart.Replace("/r/n", "<br>");
+            strFileRecvInfo = strFileRecvInfo + strInfoStart;
+        }
+        else
+        {
+            strFileRecvInfo = XmlConf.GetWarnMsg("W_0087");                     // 파일 수신중 입니다./r/n잠시만 기다려 주십시오.
+            strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
+        }
+        strFileRecvInfo = strFileRecvInfo + "<br>";
+
+        string strProgressInfo = XmlConf.GetTitle("T_FILERECV_PER");           // 파일 수신 진행률
+        string strProgressInfoStart =
+
+        strFileRecvInfo = strFileRecvInfo + strProgressInfo + " : " + strProgress;
+
+        switch (type)
+        {
+            case 1:
+                string strTitleName = XmlConf.GetTitle("T_DETAIL_FILEPREVIEW");
+                identifier = "fireProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strTitleName;
+                param[2] = strFileRecvInfo;
+                pageService.SetFilePrevRecving(true);
+                break;
+            case 2:
+                identifier = "updateProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strFileRecvInfo;
+                param[2] = strProgress;
+                break;
+            case 3:
+                identifier = "closeProgressMessage";
+                param = new object[1];
+                param[0] = strID;
+                pageService.SetFilePrevRecving(false);
+                await Task.Delay(500);
+                break;
+            default:
+                break;
+        }
+        await JSRuntime.InvokeAsync<object>(identifier, param);
+
+        if (type == 3)
+        {
+            if (sFileName.Equals(""))
+                return;
+
+            if (m_bFilePrevOpening)
+                return;
+            else
+                m_bFilePrevOpening = true;
+            string strFilePath = Path.Combine("wapprove", sFileName);
+            string strModulePath = "";
+            strModulePath = System.IO.Directory.GetCurrentDirectory();
+            strFilePath = Path.Combine(strModulePath, strFilePath);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                strFilePath = strFilePath.Replace("/", "\\");
+            }
+            else
+            {
+                strFilePath = strFilePath.Replace("\\", "/");
+            }
+            await Task.Delay(2000);
+
+            ProcessStartInfo pi = new ProcessStartInfo(strFilePath);
+            pi.Arguments = Path.GetFileName(strFilePath);
+            pi.UseShellExecute = true;
+            pi.WorkingDirectory = Path.GetDirectoryName(strFilePath);
+            pi.FileName = strFilePath;
+            pi.Verb = "OPEN";
+            Process.Start(pi);
+            m_bFilePrevOpening = false;
+        }
+    }
+
+    public bool IsAccessAble(string path)
+    {
+        FileStream fs = null;
+        try
+        {
+            fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+        }
+
+        catch (IOException)
+        {
+            //에러가 발생한 이유는 이미 다른 프로세서에서 점유중이거나.
+            //혹은 파일이 존재하지 않기 때문이다.
+            return false;
+        }
+        finally
+        {
+            if (fs != null)
+            {
+                //만약에 파일이 정상적으로 열렸다면 점유중이 아니다.
+                //다시 파일을 닫아줘야 한다.
+                fs.Close();
+            }
+        }
+        return true;
+    }
+
+    public void ReFresh()
+    {
+        StateHasChanged();
+    }
+
 }

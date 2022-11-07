@@ -50,6 +50,10 @@ std::map<HWND, WebWindow*> hwndToWebWindow;
 void* SelfThis = nullptr;
 
 BYTE* g_ptrByte = NULL;		// result
+BYTE* g_ptrExByte = NULL;		// result
+bool g_bDoingSendClipBoard = false;
+
+
 bool _bTrayUse = false;
 
 
@@ -106,6 +110,8 @@ public:
 				((WebWindow*)m_window)->InvokeRequestedNavigateURL(strNavi.c_str());
 			}
 		}
+		//MessageBox(NULL, L"Found", L"Found", MB_OK);
+		//delete this;
 	}
 
 	void toastActivated(int actionIndex) const override {
@@ -119,6 +125,8 @@ public:
 			}
 		}
 		//exit(16 + actionIndex);
+		//MessageBox(NULL, L"Found", L"Found", MB_OK);
+		//delete this;
 	}
 
 	void toastDismissed(WinToastDismissalReason state) const override {
@@ -140,6 +148,8 @@ public:
 			//exit(4);
 			break;
 		}
+		//MessageBox(NULL, L"Found", L"Found", MB_OK);
+		//delete this;
 	}
 
 	void toastFailed() const override {
@@ -408,18 +418,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		return 0;
 	}
-	case WM_DPICHANGED:
-	{
-		RECT* const prcNewWindow = (RECT*)lParam;
-		SetWindowPos(hwnd,
-			NULL,
-			prcNewWindow->left,
-			prcNewWindow->top,
-			prcNewWindow->right - prcNewWindow->left,
-			prcNewWindow->bottom - prcNewWindow->top,
-			SWP_NOZORDER | SWP_NOACTIVATE);
-		break;
-	}
 	case WM_USER_SHOWMESSAGE:
 	{
 		ShowMessageParams* params = (ShowMessageParams*)wParam;
@@ -455,6 +453,19 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			} while ((++item)->text != NULL);
 		}
+		break;
+	}
+	case WM_DPICHANGED:
+	{
+		RECT* const prcNewWindow = (RECT*)lParam;
+		SetWindowPos(hwnd,
+			NULL,
+			prcNewWindow->left,
+			prcNewWindow->top,
+			prcNewWindow->right - prcNewWindow->left,
+			prcNewWindow->bottom - prcNewWindow->top,
+			SWP_NOZORDER | SWP_NOACTIVATE);
+		
 		break;
 	}
 	case WM_SIZE:
@@ -805,7 +816,7 @@ void WebWindow::SendMessage(AutoString message)
 {
 	_webviewWindow->PostWebMessageAsString(message);
 }
-
+int initExp = 99999999999999;
 // TODO: Call UserNotification on Windows API
 void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI)
 {
@@ -830,7 +841,7 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 
 	imagePath=(LPWSTR)image;
 	//actions.push_back(L"OK");
-	expiration = 0;
+	expiration = initExp++;
 	appName = (LPWSTR)L"OpenNetLink";
 
 	wchar_t ModelID[MAX_PATH] = { 0, };
@@ -872,10 +883,10 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	templ.setAudioOption(audioOption);
 	templ.setAttributionText(attribute);
 	// 5초
-//	templ.setDuration(WinToastTemplate::Duration::Short);	//	약7초
-//	templ.setDuration(WinToastTemplate::Duration::System);	//	약5초
-//	templ.setDuration(WinToastTemplate::Duration::Long);	//	약23초
-
+	//templ.setDuration(WinToastTemplate::Duration::Short);	//	약7초
+	templ.setDuration(WinToastTemplate::Duration::System);	//	약5초
+	//templ.setDuration(WinToastTemplate::Duration::Long);	//	약23초
+	
 	for (auto const& action : actions)
 		templ.addAction(action);
 	if (expiration)
@@ -883,13 +894,23 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	if (withImage)
 		templ.setImagePath(imagePath);
 
-	if (g_CustomHandler != NULL)
+	//templ.addAction(L"None");
+	//templ.setScenario(WinToastTemplate::Scenario::Reminder);
+
+	//if (g_CustomHandler != NULL)
+	//{
+	//	g_CustomHandler->SetNaviURI(navURI != NULL ? navURI : L"");
+	//	std::wcerr << "URI : " << navURI << endl;
+	//}
+	CustomHandler* handler = new CustomHandler(this);
+	
+	if (handler != NULL)
 	{
-		g_CustomHandler->SetNaviURI(navURI != NULL ? navURI : L"");		
+		handler->SetNaviURI(navURI != NULL ? navURI : L"");
 		std::wcerr << "URI : " << navURI << endl;
 	}
 
-	if (WinToast::instance()->showToast(templ, g_CustomHandler) < 0) {
+	if (WinToast::instance()->showToast(templ, handler) < 0) {
 		std::wcerr << L"Could not launch your toast notification!";
 		return;
 	}
@@ -1008,6 +1029,29 @@ void WebWindow::OnHotKey(int groupID)
 
 	int Ret = SendClipBoard(groupID);
 }
+
+void WebWindow::ClipTypeSelect(int groupID)
+{
+	m_mapBoolUseClipSelect[groupID] = true;
+}
+
+void WebWindow::ClipFirstSendTypeText(int groupID)
+{
+	m_mapBoolClipSendTextFirst[groupID] = true;
+}
+
+void WebWindow::ClipMemFree(int groupID)
+{
+	WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - ClipMemFree - groupID : %d"), groupID);
+
+	ClipDataBufferClear();
+}
+
+void WebWindow::SetClipBoardSendFlag(int groupID)
+{
+	g_bDoingSendClipBoard = false;
+}
+
 
 char* WidecodeToUtf8(wchar_t* strUnicde, char* chDest)
 {
@@ -1184,118 +1228,254 @@ void WebWindow::WriteLog(int lvl, TCHAR* chFile, int line, TCHAR* chfmt, ...)
 
 }
 
+/// <summary>
+/// 클립보드 Text memory로 복사(utf8) (이전 Mem 초기화함) <br/>
+/// bClearPreMem : 이전 Mem(g_ptrByte) clear 유무 <br/>
+/// bUseExtraMem : 이전 ExMem(g_ptrByte) clear / 사용 유무 <br/>
+/// return : 읽어드린크기
+/// </summary>
+/// <returns></returns>
+size_t WebWindow::SaveTxtDataMem(bool bClearPreMem, bool bClearExPreMem, bool bUseExtraMem)
+{
+
+	// 이전 memory 정리후 동작
+	ClipDataBufferClear(bClearPreMem, bClearExPreMem);
+
+	size_t nTotalLen = 0;
+	HGLOBAL hglb;
+
+	if ((hglb = GetClipboardData(CF_UNICODETEXT)))
+	{
+		wchar_t* wclpstr = (wchar_t*)GlobalLock(hglb);
+		size_t len = wcslen(wclpstr);
+		if (len < 1)
+		{
+			WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - ClipBoard - CF_UNICODETEXT : Empty!"));
+			return -1;
+		}
+
+		len = (len + 2) * sizeof(wchar_t);
+		len *= 2;
+
+		BYTE** ppData = NULL;
+		ppData = bUseExtraMem ? &g_ptrExByte : &g_ptrByte;
+		*ppData = new BYTE[len];
+
+		memset(*ppData, 0x00, len);
+		WidecodeToUtf8(wclpstr, (char*)*ppData);
+		nTotalLen = strlen((char*)*ppData);
+
+		GlobalUnlock(hglb);
+		
+		return nTotalLen;
+	}
+
+	return -1;
+}
+
+/// <summary>
+/// 클립보드 이미지로 저장하는 함수(이전 Mem 초기화함) (return : 읽어드린크기)
+/// </summary>
+/// <returns></returns>
+size_t WebWindow::SaveImageFile(bool bClearPreMem, bool bClearExPreMem, bool bUseExtraMem)
+{
+
+	// 이전 memory 정리
+	ClipDataBufferClear(bClearPreMem, bClearExPreMem);
+
+	size_t nRead = 0;
+	int rCount = 0;
+	size_t nTotalLen = 0;
+	int rSize = 1024 * 64;
+
+	FILE* fd = NULL;
+	errno_t err;
+	struct stat st;
+	HBITMAP hbm;
+
+	hbm = (HBITMAP)GetClipboardData(CF_BITMAP);
+	GlobalLock(hbm);
+	char filePath[512] = { 0, };
+	if (GetClipboardBitmap(hbm, filePath) == false)
+	{
+		GlobalUnlock(hbm);
+		CloseClipboard();
+		return -1;
+	}
+	nTotalLen = GetLoadBitmapSize(filePath);
+	printf("GetLoadBitmapSize after filepath = %s\n", filePath);
+	//nTotalLen = LoadClipboardBitmap(filePath, g_ptrByte);
+	if (nTotalLen < 1)
+	{
+		WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - ClipBoard - CF_BITMAP : Empty!"));
+		GlobalUnlock(hbm);
+		CloseClipboard();
+		return -1;
+	}
+
+	if ((err = fopen_s(&fd, filePath, "rb")) != 0)
+	{
+		MessageBox(_hWnd, L"Clipboard image Load Fail!", L"Error Clipboard Img", MB_OK);
+		GlobalUnlock(hbm);
+		CloseClipboard();
+		return -1;
+	}
+
+	/*g_ptrByte = new BYTE[nTotalLen];
+	printf("result nTotalLen = %zd\n", nTotalLen);
+	memset(g_ptrByte, 0x00, nTotalLen);*/
+
+	BYTE** ppData = NULL;
+	ppData = bUseExtraMem ? &g_ptrExByte : &g_ptrByte;
+	*ppData = new BYTE[nTotalLen];
+	memset(*ppData, 0x00, nTotalLen);
+
+
+	stat(filePath, &st);
+	rCount = (int)(st.st_size / (1024 * 64)) + ((st.st_size % (1024 * 64)) ? 1 : 0);
+	size_t nReadTotalLen = 0;
+	for (int i = 0, len = st.st_size; i < rCount; i++)
+	{
+		if (len > (1024 * 64))
+			rSize = (1024 * 64);
+		else
+			rSize = len;
+		if ((nRead = fread(*ppData + nReadTotalLen, 1, rSize, fd)) <= 0)
+		{
+			fclose(fd);
+			GlobalUnlock(hbm);
+			CloseClipboard();
+			ClipDataBufferClear();
+			return -1;
+		}
+		len -= rSize;
+		nReadTotalLen += nRead;
+
+		//printf("nReadTotalLen : %zd , nRead : %zd\n\n", nReadTotalLen, nRead);
+	}
+	fclose(fd);
+
+	GlobalUnlock(hbm);
+	
+	return nTotalLen;
+}
 
 int WebWindow::SendClipBoard(int groupID)
 {
 
-	WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard - groupID : %d"), groupID);
+	if (g_bDoingSendClipBoard)
+	{
+		WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard(GroupID : %d) - Send is Doing, so Return- "), groupID);
+		return -1;
+	}
 
-	HBITMAP hbm;
+	g_bDoingSendClipBoard = true;
+
+	bool bUseClipSelectSend = false;
+
+	if (m_mapBoolUseClipSelect.find(groupID) != m_mapBoolUseClipSelect.end())
+		bUseClipSelectSend = m_mapBoolUseClipSelect[groupID];
+
+
+	WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard - groupID : %d, ClipSelectSend - Use : %s"), groupID, bUseClipSelectSend?_T("True"): _T("False"));
+
 	HWND hwndDesktop = GetDesktopWindow();
-	HGLOBAL hglb;
 
-	int nClipbard = 0;
-
-	int nType = 0;
-	
+	int nType = 0;	
 	size_t nTotalLen = 0;
-
-	FILE* fd;
-	errno_t err;
-
-	int rSize = 1024 * 64;
-	struct stat st;
-	size_t nRead = 0;
-
-	int rCount = 0; 
-	int len = 0;
-
-	
-	// ClipDataBufferClear();
+	size_t nTotalExLen = 0;
 
 	if (OpenClipboard(hwndDesktop))
 	{
-		if (IsClipboardFormatAvailable(CF_BITMAP) || IsClipboardFormatAvailable(CF_DIB))
+		//bUseClipSelectSend = false;	// Img-Text 선택 전송 기능 강제 Off
+
+		if (bUseClipSelectSend && (IsClipboardFormatAvailable(CF_TEXT) || IsClipboardFormatAvailable(CF_OEMTEXT) || IsClipboardFormatAvailable(CF_UNICODETEXT)))
 		{
-			hbm = (HBITMAP)GetClipboardData(CF_BITMAP);
-			GlobalLock(hbm);
-			char filePath[512];
-			if (GetClipboardBitmap(hbm, filePath) == false)
+			if (IsClipboardFormatAvailable(CF_BITMAP) || IsClipboardFormatAvailable(CF_DIB))
 			{
-				GlobalUnlock(hbm);
-				CloseClipboard();
-				return -1;
-			}
-			nTotalLen = GetLoadBitmapSize(filePath);
-			printf("GetLoadBitmapSize after filepath = %s\n", filePath);
-			//nTotalLen = LoadClipboardBitmap(filePath, g_ptrByte);
-			if (nTotalLen < 0)
-			{
-				GlobalUnlock(hbm);
-				CloseClipboard();
-				return -1;
-			}
 
-			if ((err = fopen_s(&fd, filePath, "rb")) != 0)
-			{
-				MessageBox(_hWnd, L"Clipboard image Load Fail!", L"Error Clipboard Img", MB_OK);
-				GlobalUnlock(hbm);
-				CloseClipboard();
-				return -1;
-			}
+				WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard - groupID : %d, ClipSelectSend - Status(#######)"), groupID);
 
-			g_ptrByte = new BYTE[nTotalLen];
-			printf("result nTotalLen = %zd\n",nTotalLen);
-			memset(g_ptrByte, 0x00, nTotalLen);
-		
-			stat(filePath, &st);
-			rCount = (int)(st.st_size / (1024 * 64)) + ((st.st_size % (1024 * 64)) ? 1 : 0);
-			size_t nReadTotalLen = 0;
-			for (int i = 0, len = st.st_size; i < rCount; i++)
-			{
-				if (len > (1024 * 64))
-					rSize = (1024 * 64);
-				else
-					rSize = len;
-				if ((nRead = fread(g_ptrByte + nReadTotalLen, 1, rSize, fd)) <= 0)
+				if ((nTotalLen = SaveImageFile()) > 0)
 				{
-					fclose(fd);
-					GlobalUnlock(hbm);
-					CloseClipboard();
-					ClipDataBufferClear();
-					return -1;
-				}
-				len -= rSize;
-				nReadTotalLen += nRead;
-
-				//printf("nReadTotalLen : %zd , nRead : %zd\n\n", nReadTotalLen, nRead);
+					nTotalExLen = SaveTxtDataMem(false, true, true);
+					if (nTotalExLen > 0)
+					{
+						WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - ClipBoard - Bitmap - Size : %d, Text - Size : %d"), nTotalLen, nTotalExLen);
+						nType = 3;
+					}
+				}				
 			}
-			fclose(fd);
-
-			GlobalUnlock(hbm);
-			nType = 2;
 		}
-		else if (IsClipboardFormatAvailable(CF_TEXT) || IsClipboardFormatAvailable(CF_OEMTEXT) || IsClipboardFormatAvailable(CF_UNICODETEXT))
+
+		if (nType != 3)	// Img-Text 선택 전송이 아닐때
 		{
-			if ((hglb = GetClipboardData(CF_UNICODETEXT)))
+
+			bool bUseClipTextFirstSend = false;
+			if (m_mapBoolClipSendTextFirst.find(groupID) != m_mapBoolClipSendTextFirst.end())
+				bUseClipTextFirstSend = m_mapBoolClipSendTextFirst[groupID];
+
+
+			if (bUseClipSelectSend)
+				WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard - groupID : %d, ClipSelectSend - NOT Status(#######)"), groupID);
+
+			if (bUseClipTextFirstSend)
 			{
-				wchar_t* wclpstr = (wchar_t*)GlobalLock(hglb);
-				size_t len = (wcslen(wclpstr) + 2) * sizeof(wchar_t);
-				len *= 2;
 
-				g_ptrByte = new BYTE[len];
-				memset(g_ptrByte, 0x00, len);
-				WidecodeToUtf8(wclpstr, (char*)g_ptrByte);
-				nTotalLen=strlen((char*)g_ptrByte);
-				GlobalUnlock(hglb);
-				nType = 1;
+				WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard - groupID : %d, ClipType - Text First"), groupID);
+
+				// Text 먼저전송 설정
+				if (IsClipboardFormatAvailable(CF_TEXT) || IsClipboardFormatAvailable(CF_OEMTEXT) || IsClipboardFormatAvailable(CF_UNICODETEXT))
+				{
+					if ((nTotalLen = SaveTxtDataMem()) > 0)
+					{
+						nType = 1;
+						WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - ClipBoard - Text - Size : %d"), nTotalLen);
+					}
+				}
+				else if (IsClipboardFormatAvailable(CF_BITMAP) || IsClipboardFormatAvailable(CF_DIB))
+				{
+					if ((nTotalLen = SaveImageFile()) > 0)
+					{
+						nType = 2;
+						WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - ClipBoard - Image - Size : %d"), nTotalLen);
+					}
+				}
 			}
-		}
-		else
-		{
-			WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - IsClipboardFormatAvailable - UnKnown - Error : %d"), groupID);
-			return -1;
-		}
+			else
+			{
+
+				WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard - groupID : %d, ClipType - Image First"), groupID);
+
+				// Image 먼저전송 설정 - 기본!
+				if (IsClipboardFormatAvailable(CF_BITMAP) || IsClipboardFormatAvailable(CF_DIB))
+				{
+					if ((nTotalLen = SaveImageFile()) > 0)
+					{
+						nType = 2;
+						WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - ClipBoard - Image - Size : %d"), nTotalLen);
+					}
+				}
+				else if (IsClipboardFormatAvailable(CF_TEXT) || IsClipboardFormatAvailable(CF_OEMTEXT) || IsClipboardFormatAvailable(CF_UNICODETEXT))
+				{
+					if ((nTotalLen = SaveTxtDataMem()) > 0)
+					{
+						nType = 1;
+						WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - ClipBoard - Text - Size : %d"), nTotalLen);
+					}
+				}
+
+			}
+
+			if (nType == 0)
+			{
+				g_bDoingSendClipBoard = false;
+				ClipDataBufferClear();
+				WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - ClipBoard - UnKnown Type - Error : %d"), groupID);				
+				return -1;
+			}
+
+		} // if (nTotalLen < 1)
 
 	}
 	else
@@ -1305,19 +1485,25 @@ int WebWindow::SendClipBoard(int groupID)
 
 	CloseClipboard();
 
-
 	WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard - _clipboardCallback(UI:ClipBoardHandler) : 0x%016X"), _clipboardCallback);
 
 	if (_clipboardCallback != NULL)
 	{
-		_clipboardCallback(groupID, nType, (int)nTotalLen, g_ptrByte);
-	}
-		
+
+		if (nType == 1 || nType == 2)
+			_clipboardCallback(groupID, nType, (int)nTotalLen, g_ptrByte, (int)0, NULL);
+		else if (nType == 3)
+			_clipboardCallback(groupID, nType, (int)nTotalLen, g_ptrByte, (int)nTotalExLen, g_ptrExByte);
+		else
+			_clipboardCallback(groupID, nType, (int)nTotalLen, g_ptrByte, (int)0, NULL);
+
+	}		
+
+	if (nType != 3)
+		g_bDoingSendClipBoard = false;
 
 	return 0;
 }
-
-
 
 bool WebWindow::SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName)
 {
@@ -1451,13 +1637,28 @@ size_t WebWindow::LoadClipboardBitmap(char* filePath, BYTE* pByte)
 	fclose(fd);
 	return nTotalLen;
 }
-void WebWindow::ClipDataBufferClear()
+
+void WebWindow::ClipDataBufferClear(bool bClearPreMem, bool bClearPreExMem)
 {
-	if (g_ptrByte != NULL)
+
+	if (bClearPreMem)
 	{
-		delete[] g_ptrByte;
-		g_ptrByte = NULL;
+		if (g_ptrByte != NULL)
+		{
+			delete[] g_ptrByte;
+			g_ptrByte = NULL;
+		}
 	}
+
+	if (bClearPreExMem)
+	{
+		if (g_ptrExByte != NULL)
+		{
+			delete[] g_ptrExByte;
+			g_ptrExByte = NULL;
+		}
+	}
+
 }
 
 void LoadBitmapTest(char* filepath,void* buffer)
@@ -1481,6 +1682,7 @@ void LoadBitmapTest(char* filepath,void* buffer)
 	fread(buffer, sizeof(char), st.st_size, pFile);
 	fclose(pFile);
 }
+
 void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 {
 	char  filepath[512], workdirpath[512];
@@ -1506,11 +1708,14 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 			CloseClipboard();
 			if (hText != NULL)
 				GlobalFree(hText);
+
+			WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("Recv ClipBoard - groupID : %d - Text-Size : %d"), groupID, nClipSize);
+
 		}
 		else if (nType == 2)
 		{
 
-			WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("Recv ClipBoard - Img-nClipSize : %d"), nClipSize);
+			WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("Recv ClipBoard - groupID : %d - Image-Size : %d"), groupID, nClipSize);
 
 			sprintf_s(workdirpath, ".\\work");
 			CreateDirectoryA(workdirpath, NULL);
@@ -1622,6 +1827,7 @@ bool WebWindow::SaveImage(char* PathName, void* lpBits, int size)
 	*/
 	return true;
 }
+
 void WebWindow::ProgramExit()
 {
 	NTLog(this, Info, "Called : OpenNetLink Exit");

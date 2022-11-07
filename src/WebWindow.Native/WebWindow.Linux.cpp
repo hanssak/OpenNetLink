@@ -678,7 +678,7 @@ request_text_received_func (GtkClipboard     *clipboard,
 			}
 		*/
 
-		((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_TEXT, strlen(result), result);
+		((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_TEXT, strlen(result), result, 0, NULL);
 		if (result) g_free (result);
 	}
 }
@@ -758,7 +758,7 @@ request_image_received_func (GtkClipboard     *clipboard,
 				OBJECT = 3,
 			}
 		*/
-		((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_IMAGE, BufferSize, ImageBuffer);
+		((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_IMAGE, BufferSize, ImageBuffer, 0, NULL);
 		// Just Test : Recv ClipBoard
 		//((WebWindow*)(pstParm->self))->SetClipBoard(D_CLIP_IMAGE, BufferSize, ImageBuffer);
 		g_free(ImageBuffer);
@@ -840,7 +840,7 @@ request_rich_text_received_func (GtkClipboard     *clipboard,
 	// Data Transfer rich text
 	length = gtk_selection_data_get_length (selection_data);
 	// do not needed free result
-	((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_TEXT, length, result);
+	((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_TEXT, length, result, 0, NULL);
 }
 
 /*

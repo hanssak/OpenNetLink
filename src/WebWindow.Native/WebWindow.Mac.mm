@@ -510,6 +510,30 @@ void WebWindow::OnHotKey(int groupID)
     [_appDelegate hotkeyClipBoardWithEvent:NULL object:numGuId];
 }
 
+void WebWindow::ClipTypeSelect(int groupID)
+{
+    NSNumber *numGuId = [NSNumber numberWithInt:groupID];
+    //[_appDelegate hotkeyClipBoardWithEvent:NULL object:numGuId];
+}
+
+void WebWindow::ClipMemFree(int groupID)
+{
+    NSNumber *numGuId = [NSNumber numberWithInt:groupID];
+    //[_appDelegate hotkeyClipBoardWithEvent:NULL object:numGuId];
+}
+
+void WebWindow::ClipFirstSendTypeText(int groupID)
+{
+    NSNumber *numGuId = [NSNumber numberWithInt:groupID];
+    //[_appDelegate hotkeyClipBoardWithEvent:NULL object:numGuId];
+}
+
+void WebWindow::SetClipBoardSendFlag(int groupID)
+{
+    NSNumber *numGuId = [NSNumber numberWithInt:groupID];
+    //[_appDelegate hotkeyClipBoardWithEvent:NULL object:numGuId];
+}
+
 void WebWindow::GenerateHotKey(bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
 {
     [_appDelegate hotkeyGenerate:chVKCode alt:bAlt control:bControl shift:bShift win:bWin];

@@ -4,6 +4,7 @@
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using OpenNetLinkApp.Components.SGTreeSearch
 @using HsNetWorkSG
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
@@ -29,40 +30,45 @@
 
                     <!--s table -->
                     <div class="box1" style=" width:46%;  float:left;">
-                        <div class="d-inline-flex  mb-2 " style="height:28px;">
-                            <label class="p-1">@strDept</label>                                                       <!--부서-->
-                            <input type="text" class="form-control col-md-4" placeholder="부서입력" @bind-value="strCurDept" @onkeyup="HandleKeyEvent">
-                            <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
-                            <input type="text" class="form-control col-md-3" placeholder="이름입력" @bind-value="strCurName" @onkeyup="HandleKeyEvent">
-                            <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>         <!--조회-->
+                        @if (approverSearchType == "SEARCH")
+                        {
+                            <div class="d-inline-flex  mb-2 " style="height:28px;">
+                                <label class="p-1">@strDept</label>                                                       <!--부서-->
+                            <input type="text" class="form-control col-md-4" placeholder=@strDeptPlaceHolder @bind-value="strCurDept" @onkeyup="HandleKeyEvent">
+                                <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
+                            <input type="text" class="form-control col-md-3" placeholder=@strNamePlaceHolder @bind-value="strCurName" @onkeyup="HandleKeyEvent">
+                                <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>         <!--조회-->
                         </div>
 
-                        <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
-                            <table class="table table-head-fixed">
-                                <thead>
-                                    <tr>
-                                        <th style="text-align:center">@strOrder </th>                <!--순번-->
+                            <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
+                                <table class="table table-head-fixed">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:center">@strOrder </th>                <!--순번-->
                                         <th style="text-align:center">@strDept </th>                <!--부서-->
                                         <th style="text-align:center">@strRank </th>                <!--직급-->
                                         <th style="text-align:center">@strName </th>                <!--이름-->
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (ApproverInfo item in ApproverSearch)
-                                    {
-                                        <tr name="trItem3" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.Index">
-                                            <td style="text-align:center">@item.Index</td>
-                                            <td>@item.DeptName</td>
-                                            <td>@item.Grade</td>
-                                            <td>@item.Name</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-
-
-
+                                    </thead>
+                                    <tbody>
+                                        @foreach (ApproverInfo item in ApproverSearch)
+                                        {
+                                            <tr name="trItem3" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq">
+                                                <td style="text-align:center">@item.Index</td>
+                                                <td>@item.DeptName</td>
+                                                <td>@item.Grade</td>
+                                                <td>@item.Name</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else //TREE
+                        {
+                            @*<SGDeptTreeList Height="368" UserSearchList="@ApproverSearch" @bind-SelectedUserSeq="@stSelectApprover" />*@
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="420" TreeHeight="160" UserSearchList="@ApproverSearch" OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => SGDeptTreeList_OnItemDoubleClick(item)" />
+                        }
                     </div>
                     <!--e table -->
                     <!--s btn -->
@@ -118,14 +124,14 @@
                                                 <thead>
                                                     <tr>
                                                         <th style="text-align:center">@strDept </th>     <!--부서-->
-                                                        <th style="text-align:center">@strRank </th>     <!--직급-->
-                                                        <th style="text-align:center">@strName </th>     <!--이름-->
-                                                    </tr>
+                                                    <th style="text-align:center">@strRank </th>     <!--직급-->
+                                                    <th style="text-align:center">@strName </th>     <!--이름-->
+                                                </tr>
                                                 </thead>
                                                 <tbody>
                                                     @foreach (ApproverInfo subitem in item.ApproverSelect)
                                                     {
-                                                        <tr aria-grabbed="@(item.seqGrp == Int32.Parse(CurrentDivSeq) && subitem.Index == CurrentTagetSeq  ? "true" : "false")" name="trSelect3" draggable="false" data-draggable="tritem" value="@subitem.Index">
+                                                        <tr aria-grabbed="@(item.seqGrp == Int32.Parse(CurrentDivSeq) && subitem.UserSeq == CurrentTagetSeq  ? "true" : "false")" name="trSelect3" draggable="false" data-draggable="tritem" value="@subitem.UserSeq">
                                                             <td>@subitem.DeptName</td>
                                                             <td>@subitem.Grade</td>
                                                             <td>@subitem.Name</td>
@@ -163,6 +169,9 @@
     private static Action<string> actionApproverDivSelect;      //결재자 GROUP 선택
     private static Action<string> actionTargetSelect;           //결재자 SEQ
     private static Action<string> actionAssign;                 //조회대상 SEQ
+
+    private SGDeptTreeList refSGDeptTreeList;
+
     public delegate void ApprSelectChangeEvent();               //부모함수 대리함수
     public event ApprSelectChangeEvent ApprSelectChange;
 
@@ -186,9 +195,18 @@
 
     public string strCurDept = "";
     public string strCurName = "";
+
+
+    private string strDeptPlaceHolder = "";
+    private string strNamePlaceHolder = "";
+
     ISGSideBarUIService SideBarUISvc;
     SGSettingsDBProc sgSettingProc;
     ISGSiteConfigService siteConfig;
+
+    private string approverSearchType = "";
+    private bool useInputInTree;
+
 
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
@@ -287,44 +305,21 @@
             return;
         int step = sgLoginData.GetApproveStep();    //결재유형 취득(무조건 AND+OR:2)
 
-        List<string> listApprLineName = null;                      // 결재자 이름
-        List<string> listApprLineRank = null;                      // 결재자 직위
-        List<string> listApprLineDeptName = null;                  // 결재자 부서명
-        List<string> listApprLineDeptSeq = null;                   // 결재자 부서Seq
-        List<string> listApprLineSeq = null;                       // 결재자 Seq
-        List<string> listApprLineOrder = null;                     // 결재자 Order
-
-        listApprLineName = sgApprLineData.GetBaseApprAndLineName();            // 결재자 이름
-        listApprLineRank = sgApprLineData.GetBaseApprAndLineRank();            // 결재자 직위
-        listApprLineDeptName = sgApprLineData.GetBaseApprAndLineDeptName();    // 결재자 부서명
-        listApprLineDeptSeq = sgApprLineData.GetBaseApprAndLineDeptSeq();     // 결재자 부서Seq
-        listApprLineSeq = sgApprLineData.GetBaseApprAndLineSeq();              // 결재자 Seq
-        listApprLineOrder = sgApprLineData.GetBaseApprAndLineOrder();          // 결재자 Order
-
-        if (listApprLineDeptName.Count != listApprLineDeptSeq.Count)
-        {
-            listApprLineDeptSeq = new List<string>();
-            for (int i = 0; i < listApprLineDeptName.Count; i++)
-            {
-                listApprLineDeptSeq.Add("-");
-            }
-        }
-
-        int nApprLineCount = listApprLineName.Count;
-        String apvGrpOrder = "";
+        int apvGrpOrder = -500;
         int apvGrpSeq = 1;
-        for (int i = 0; i < nApprLineCount; i++)
+        int i = 0;
+        foreach (ApproverInfo info in apprLinkedList)
         {
-            if (listApprLineOrder[i] == "-99")
+            if (info.nApvOrder == -99)
                 continue;
-            if (apvGrpOrder != listApprLineOrder[i])
+            if (apvGrpOrder != info.nApvOrder)
             {
                 ApproverGroup tmpGrp = new ApproverGroup();
                 tmpGrp.seqGrp = apvGrpSeq;
                 apvGrpSeq++;
-                apvGrpOrder = listApprLineOrder[i];
+                apvGrpOrder = info.nApvOrder;
                 LinkedList<ApproverInfo> tmpList = new LinkedList<ApproverInfo>();
-                tmpList.AddLast(new ApproverInfo(i, listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i]));
+                tmpList.AddLast(new ApproverInfo(i, info));
                 tmpGrp.ApproverSelect = tmpList;
                 ApvGroup.Add(tmpGrp);
             }
@@ -334,14 +329,16 @@
                 for (int j = 0; j < ApvGroup.Count; j++)
                 {
                     tmpList = ApvGroup[j].ApproverSelect;
-                    if (tmpList.First.Value.nApvOrder == Int32.Parse(listApprLineOrder[i]))
+                    if (tmpList.First.Value.nApvOrder == info.nApvOrder)
                     {
-                        tmpList.AddLast(new ApproverInfo(i, listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i]));
+                        tmpList.AddLast(new ApproverInfo(i, info));
                         break;
                     }
                 }
             }
+            i++;
         }
+
         StateHasChanged();
     }
 
@@ -360,7 +357,7 @@
             return;
 
         LinkedList<ApproverInfo> apprLinkedList = null;
-        apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+        apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();      //유저 조회
         if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
             return;
 
@@ -388,7 +385,7 @@
             return;
 
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
         if (apvAsign != null)
         {
             JSRuntime.InvokeAsync<object>("adjustTargetSelection");
@@ -404,7 +401,7 @@
             return;
 
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
 
         if (apvAsign != null)
         {
@@ -412,7 +409,7 @@
             LinkedListNode<ApproverInfo> current;
             LinkedListNode<ApproverInfo> next;
             current = apvGroup.ApproverSelect.First;
-            if (current.Value.Index == CurrentTagetSeq)
+            if (current.Value.UserSeq == CurrentTagetSeq)
             {
                 return;
             }
@@ -420,7 +417,7 @@
             for (int i = 0; i < apvGroup.ApproverSelect.Count; i++)
             {
                 next = current.Next;
-                if (next.Value.Index == CurrentTagetSeq)
+                if (next.Value.UserSeq == CurrentTagetSeq)
                 {
                     apvGroup.ApproverSelect.Remove(apvAsign);
                     apvGroup.ApproverSelect.AddBefore(current, apvAsign);
@@ -439,7 +436,7 @@
         if (CurrentDivSeq.Length < 1)
             return;
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
 
         if (apvAsign != null)
         {
@@ -449,7 +446,7 @@
             LinkedListNode<ApproverInfo> last;
             current = apvGroup.ApproverSelect.First;
             last = apvGroup.ApproverSelect.Last;
-            if (last.Value.Index == CurrentTagetSeq)
+            if (last.Value.UserSeq == CurrentTagetSeq)
             {
                 return;
             }
@@ -457,7 +454,7 @@
             for (int i = 0; i < apvGroup.ApproverSelect.Count; i++)
             {
                 next = current.Next;
-                if (current.Value.Index == CurrentTagetSeq)
+                if (current.Value.UserSeq == CurrentTagetSeq)
                 {
                     apvGroup.ApproverSelect.Remove(apvAsign);
                     apvGroup.ApproverSelect.AddAfter(next, apvAsign);
@@ -476,7 +473,7 @@
         if (CurrentDivSeq.Length < 1)
             return;
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvTarget = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+        ApproverInfo apvTarget = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
         if (apvTarget != null)
         {
             apvGroup.ApproverSelect.Remove(apvTarget);
@@ -485,12 +482,18 @@
         StateHasChanged();
     }
 
+    private void SGDeptTreeList_OnItemDoubleClick(ApproverInfo doubleClickInfo)
+    {
+        stSelectApprover = doubleClickInfo.UserSeq;
+        AddSelectApprover();
+    }
 
     private void AddSelectApprover()
     {
         if (stSelectApprover.Length < 1 || CurrentDivSeq.Length < 1)
             return;
-        ApproverInfo apv = ApproverSearch.FirstOrDefault(x => x.Index == stSelectApprover);
+
+        ApproverInfo apv = ApproverSearch.FirstOrDefault(x => x.UserSeq == stSelectApprover);
         if (apv != null)
         {
             ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
@@ -521,7 +524,7 @@
     private void RemoveAssignApprover()
     {
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
         if (apvAsign != null)
         {
             apvGroup.ApproverSelect.Remove(apvAsign);
@@ -622,7 +625,8 @@
         actionAssign = AssignApprover;
         actionApproverDivSelect = TargetDivSelect;
         actionTargetSelect = SelectTarget;
-
+        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproverSearchType();
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproverTree();
         InitText();
     }
 
@@ -638,6 +642,9 @@
         //*****************************************************************
         HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResultStep);
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResultStep);
+
+        if (approverSearchType == "TREE" && refSGDeptTreeList != null)
+            refSGDeptTreeList.BindEvent();
     }
 
     public void ApproveChooseResultStep(int groupid, PageEventArgs e)
@@ -691,7 +698,7 @@
         for (int j = 0; j < ApvGroup.Count; j++)
         {
             tmpList = ApvGroup[j].ApproverSelect;
-            foreach(ApproverInfo item in tmpList)
+            foreach (ApproverInfo item in tmpList)
             {
                 item.nApvOrder = j + 1;
                 ApproverSelect.AddLast(item);
@@ -705,7 +712,7 @@
 
         HSCmdCenter.SetApprLineList(groupID, ApproverSelect);
 
-        bool bApprLineLocalSave = siteConfig.GetUseApprLineLocalSave(groupID);
+        bool bApprLineLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID); // siteConfig. json으로 이동
         if (bApprLineLocalSave)
         {
             SGSettingData sgSettingData = null;
@@ -729,7 +736,7 @@
             string strUserSeq = sgUserData.GetUserSequence();
             int step = 0;
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if(sgLoginData != null)
+            if (sgLoginData != null)
                 step = sgLoginData.GetApproveStep();
 
             strApprLine = SGApprLineData.LocalSaveANDApprLineData(ApproverSelect, strUserSeq, strApprLine, step);
@@ -769,5 +776,9 @@
         strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기
         strGroupAdd = XmlConf.GetTitle("T_APPROVE_GROUPADD");                       // 그룹추가
+
+
+        strDeptPlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       //부서입력
+        strNamePlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       //이름입력
     }
 }

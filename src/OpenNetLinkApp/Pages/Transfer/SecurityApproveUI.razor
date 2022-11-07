@@ -59,11 +59,33 @@
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strTransKind </th>               <!--전송구분-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransKindValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("TransKind"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransKindValue, str, ApproveSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveStatus </th>               <!--승인상태-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("ApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprStatusValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strApprStatusValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("ApproveStatus"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strApprStatusValue, str, ApproveSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("ApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprStatusValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
 
                             </tr>
@@ -76,18 +98,18 @@
                                 {
                                     <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                     <td>
-                                        <button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
-                                        <!--<select class="form-control" @bind="_strDestNetWork" style="width:110px;">
-                                            <option> @strTotal</option>                                
-                                        //    @foreach (var item in dicDestSysPos)
-                                            {
-                                                @*@if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)*@
-                                                @if ((pageService.m_bIsMultiNetWork && item.Value.nIdx <= 1) || (pageService.m_bIsMultiNetWork == false && item.Value.strDestSysid.Length > 0 && item.Key.Length > 0))   // && item.Value.nIdx != 0
+                                        <div class="dropdown">
+                                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                @strDestNetWork
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
+                                                @foreach (string str in Common.CsFunction.GetOptionValue("DestNetwork", dicDestSysPos))
                                                 {
-                                                    <option>@item.Key</option>
+                                                    <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDestNetWork, str, ApproveSearchCount))">@str</button>
                                                 }
-                                            }
-                                        </select>-->
+                                            </div>
+                                        </div>
+                                        <!--<button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>-->
                                     </td>
                                 }
                                 <th class="p-2" style="width:80px;"> @strReqApprover </th>             <!--승인요청자-->
@@ -125,45 +147,45 @@
                         <table class="table table-head-fixed table-bordered table-hover" style="table-layout: fixed;">
                             <thead>
                                 <tr>
-                                    <th style="text-align:center;width:5%">
+                                    <th style="text-align:center; vertical-align:middle;width:5%">
                                         <input class="input" type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())">
                                     </th>
-                                    <th style="text-align:center;width:7%">@strApproveKind</th>                             <!--결재종류-->
-                                    <th style="text-align:center;width:7%">@strTransKind</th>                             <!--전송구분-->
-                                    <th style="text-align:center;width:8%">@strReqApprover</th>                            <!--승인요청자-->
-                                    <th style="text-align:center;width:8%">@strApproveStatus</th>                             <!--승인상태-->
+                                    <th style="text-align:center; vertical-align:middle;width:7%">@strApproveKind</th>                             <!--결재종류-->
+                                    <th style="text-align:center; vertical-align:middle;width:7%">@strTransKind</th>                             <!--전송구분-->
+                                    <th style="text-align:center; vertical-align:middle;width:8%">@strReqApprover</th>                            <!--승인요청자-->
+                                    <th style="text-align:center; vertical-align:middle;width:8%">@strApproveStatus</th>                             <!--승인상태-->
                                     <!-- <th style="text-align: center;width:8%">@strFileForward</th> -->                            <!--파일전달-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                     {
-                                        <th style="text-align:center;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                        <th style="text-align:center; vertical-align:middle;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                         <!--목적지-->
                                     }
-                                    <th style="text-align:center;width:15%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
-                                    <th style="text-align:center;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
-                                    <th style="text-align:center;width:14%">@strApproveDay</th>                                  <!--승인일-->
-                                    <th style="text-align:center;width:7%">@strApproveDetail</th>                             <!--상세보기-->
+                                    <th style="text-align:center; vertical-align:middle;width:15%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
+                                    <th style="text-align:center; vertical-align:middle;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
+                                    <th style="text-align:center; vertical-align:middle;width:14%">@strApproveDay</th>                                  <!--승인일-->
+                                    <th style="text-align:center; vertical-align:middle;width:7%">@strApproveDetail</th>                             <!--상세보기-->
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (approveData item in mData)
                                 {
                                     <tr>
-                                        <td style="text-align:center">
+                                        <td style="text-align:center; vertical-align:middle">
                                             <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
                                         </td>
-                                        <td style="text-align:center">@item.ApvType</td>
-                                        <td style="text-align:center">@item.TransferType</td>
-                                        <td style="text-align:center">@item.RequesterName</td>
-                                        <td style="text-align:center">@item.ApvStatus</td>
+                                        <td style="text-align:center; vertical-align:middle">@item.ApvType</td>
+                                        <td style="text-align:center; vertical-align:middle">@item.TransferType</td>
+                                        <td style="text-align:center; vertical-align:middle">@item.RequesterName</td>
+                                        <td style="text-align:center; vertical-align:middle">@item.ApvStatus</td>
                                         <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
                                         @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                         {
-                                            <th style="text-align:center;width:11%;">@item.strDestNet</th>
+                                            <th style="text-align:center; vertical-align:middle;width:11%;">@item.strDestNet</th>
                                         }
-                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                        <td style="text-align: center">@item.RequestTime</td>
-                                        <td style="text-align:center">@item.ApvTime</td>
-                                        <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                        <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="text-align: center; vertical-align:middle">@item.RequestTime</td>
+                                        <td style="text-align:center; vertical-align:middle">@item.ApvTime</td>
+                                        <td style="text-align:center; vertical-align:middle"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                     </tr>
                                 }
                             </tbody>
@@ -216,9 +238,7 @@
 
 <ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
 <SGSecureReject @ref="refSGSecureReject"></SGSecureReject>
-
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
-<ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 
 @code {
 
@@ -254,7 +274,6 @@
     public int groupIDbyParam { get; set; }
 
     ApprovePopUp refApprovePopUp;
-    ProxyApprover_PopUp refProxyApprover_PopUp;
     SGCustomSelect refSGCustomSelect;
 
     public int TotalCount { get; set; }
@@ -481,7 +500,7 @@
 
             HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
 
-            refApprovePopUp.SetBindingData();
+            refApprovePopUp.SetBindingData(tData.ApproverName, tData.ApvStatus, tData.ApvTime);
             OpenDetail(sTransSeq).Wait();
         }
     }
@@ -532,6 +551,9 @@
         HSCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupID, SearchResult);
         HSCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, SearchCount);
         HSCmdCenter.sgPageEvent.SetApprBatchEvent(groupID, ApproveBatchResult);
+
+        // 데이터 리프레쉬 등록
+        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.SecurityApproveUI, UpdateData);
 
         strDestNetWork = strTotal;
 
@@ -634,7 +656,7 @@
                 strApproveSeqs += temp;
             }
         }
-        string strApprover = "0";
+        string strApprover = "1";
         string strApproveUserKind = "0";
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
@@ -692,7 +714,7 @@
                 strApproveSeqs += temp;
             }
         }
-        string strApprover = "0";
+        string strApprover = "1";
         string strApproveUserKind = "0";
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
@@ -800,14 +822,17 @@
 
             }
 
-            SecurityApproveDao2 dao = new SecurityApproveDao2(); // 실제사용
-                                                                 //SecurityApproveDao dao = new SecurityApproveDao();
-            strCountQuery = dao.TotalCount(param);   // 쿼리 데이터 카운트
+            ApproveDao dao = new ApproveDao(); // 실제사용
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
+            param.IsSecurity = true;
+            strCountQuery = dao.TotalCount(param, false, null);   // 쿼리 데이터 카운트
         }
         else
         {
-            SecurityApproveDao dao = new SecurityApproveDao();
-            strCountQuery = dao.TotalCount(param);   // 쿼리 데이터 카운트
+            ApproveDao dao = new ApproveDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
+            param.IsSecurity = true;
+            strCountQuery = dao.TotalCount(param, false, null);   // 쿼리 데이터 카운트
         }
 
 
@@ -869,14 +894,20 @@
 
             }
 
-            SecurityApproveDao2 dao = new SecurityApproveDao2();
-            //SecurityApproveDao dao = new SecurityApproveDao();
-            strQuery = dao.List(param);   // 쿼리 데이터 리스트
+            ApproveDao dao = new ApproveDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
+            param.IsSecurity = true;
+
+
+            strQuery = dao.List(param, false, null);   // 쿼리 데이터 리스트
         }
         else
         {
-            SecurityApproveDao dao = new SecurityApproveDao();
-            strQuery = dao.List(param);   // 쿼리 데이터 리스트
+            ApproveDao dao = new ApproveDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
+            param.IsSecurity = true;
+
+            strQuery = dao.List(param, false, null);   // 쿼리 데이터 리스트
         }
 
         HSCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
@@ -1211,6 +1242,7 @@
         public string TransferType { get; set; }          // 전송 구분 (반출/반입)
         public string TransStatus { get; set; }           // 전송 상태 (전송대기, 전송취소, 전송실패)
         public string RequesterName { get; set; }         // 승인요청자
+        public string ApproverName { get; set; }          // 승인자
         public string ApvStatus { get; set; }             // 결재상태(승인대기/승인/반려)
         public string IsFile { get; set; }                // 파일 전달 유무
         public string strDestNet { get; set; }            // 전송하고자하는 목적지 망이름
@@ -1227,10 +1259,10 @@
         public approveData()
         {
             bCheckDisable = bCheck = false;
-            TransSeq = ApprSeq = ApvType = TransferType = RequesterName = ApvStatus = IsFile = Title = RequestTime = ApvTime = TransStatusCode = ApprStatusCode = ApprTablePos = ApprPossible = ApprStepStatus = strDestNet = "";
+            TransSeq = ApprSeq = ApvType = TransferType = RequesterName = ApproverName = ApvStatus = IsFile = Title = RequestTime = ApvTime = TransStatusCode = ApprStatusCode = ApprTablePos = ApprPossible = ApprStepStatus = strDestNet = "";
         }
         public approveData(bool bChkDisable, bool bChk, string seq, string apprseq, string apvtype, string transfertype, string reqname, string apvstatus, string isfile, string title, string reqtime, string apvtime,
-            string strTransStatusCode, string strApprStatusCode, string strApprTablePos, string strApprPossible, string strApprStepStatus)
+            string strTransStatusCode, string strApprStatusCode, string strApprTablePos, string strApprPossible, string strApprStepStatus, string approverName)
         {
             bCheckDisable = bChkDisable;
             bCheck = bChk;
@@ -1248,6 +1280,7 @@
             ApprTablePos = strApprTablePos;
             ApprPossible = strApprPossible;
             ApprStepStatus = strApprStepStatus;
+            ApproverName = approverName;
         }
     }
 }

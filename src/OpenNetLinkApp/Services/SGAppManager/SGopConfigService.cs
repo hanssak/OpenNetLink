@@ -55,7 +55,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetExitTrayMove();
         bool GetStartTrayMove();
         bool GetStartProgramReg();
-        //bool GetUseScreenLock();
+
         bool GetScreenLock();
         bool GetScreenLockUserChange();
         bool GetUseApprWaitNoti();
@@ -80,10 +80,217 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         /// <returns></returns>
         bool GetEmptyfileTrans();
+
+
+        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
+
+        public bool GetUseLoginIDSave(int groupID);
+        public bool GetUseAutoLogin(int groupID);
+        public bool GetUseAutoLoginCheck(int groupID);
+        public bool GetUseApprLineLocalSave(int groupID);
+
+        public bool GetUseApprLineChkBlock(int groupID);
+        public bool GetUseDlpInfoDisplay(int groupID);
+        public bool GetUseApprDeptSearch(int groupID);
+        public bool GetUseApprTreeSearch(int groupID);
+        public int GetApprStepLimit(int groupID);
+        public bool GetUseDeputyApprTerminateDel(int groupID);
+        public bool GetUseUserPWChange(int groupID);
+        public string GetPWChangeProhibitLimit(int groupID);
+        public int GetPWChangeApplyCnt(int groupID);
+        public bool GetUseURLListPolicyRecv(int groupID);
+        public string GetInitPasswordInfo(int groupID);
+
+        /// <summary>
+        /// 수신 폴더 사용자 변경 여부 가져오기
+        /// </summary>
+        /// <param name="groupID">그룹ID</param>
+        /// <returns>true : 사용자 변경 가능  false : 사용자 변경 불가능</returns>
+        public bool GetUseRecvFolderChange(int groupID);
+
+        /// <summary>
+        /// 로그인 유저별 다운로드 경로 사용 여부 가져오기
+        /// </summary>
+        /// <param name="groupID">그룹ID</param>
+        /// <returns>true : 로그인 유저별 수신경로 사용, false : 로그인 유저별 수신경로 미사용</returns>
+        public bool GetUseUserRecvDownPath(int groupID);
+        public bool GetUseEmailManageApprove(int groupID);
+        public bool GetUsePCURL(int groupID);
+
+        public bool GetUsePublicBoard(int groupID);
+        public bool GetUseCertSend(int groupID);
+        public bool GetUseClipAlarmTypeChange();
+        public bool GetUseMainPageTypeChange();
+        public bool GetUseClipCopyAndSend();
+        public bool GetRFileAutoSend();
+        public bool GetAfterApprAutoCheck();
+        public bool GetRecvFolderOpen();
+        public bool GetManualDownFolderChange();
+        public bool GetFileRecvAlarmRetain();
+        public bool GetApprCountAlarmRetain();
+        public bool GetApprCompleteAlarmRetain();
+        public bool GetApprRejectAlarmRetain();
+        public bool GetUseApprCountAlaram();
+        public bool GetUseCloseTrayMove();
+        public bool GetUseStartTrayMove();
+        public bool GetUseStartProgramReg();
+        public bool GetUseLanguageSet();
+        public bool GetViewFileFilter();
+        public bool GetUseForceUpdate();
+
+        public bool GetViewSGSideBarUIBadge();
+
+        public bool GetViewSGHeaderUIAlarmNoriAllDel();
+
+        public bool GetViewDlpApproverMyDept();
+
+        /// <summary>
+        /// 클립보드 파일전송형태 전송때, 무조건 결재없이  전송되게 함.
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseClipBoardNoApproveButFileTrans();
+
+        /// <summary>
+        /// 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로(개발중...), 1:사전, 2:사후 로 전송되게 적용
+        /// </summary>
+        /// <returns></returns>
+        public int GetClipUseAfterApprove();
+
+        /// <summary>
+        /// 처음 접속 Server(Network) 를 사용자가 선택할 수 있도록 할건지 유무(Network.json 파일에 2개이상있어야 가능)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseSelectFirstConnectNetServer();
+
+        /// <summary>
+        /// 3망전송기능에서 한번에 모든 망에 자료를 송신하는 기능 사용 유무
+        /// </summary>
+        /// <returns></returns>
+        //public bool GetUseNetOverAllsend();
+
+        /// <summary>
+        /// 파일포워드 기능 사용할 것인지 유무
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseFileForward();
+
+
+        /// <summary>
+        /// PassWord 걸린 ZIP 파일에 대해 파일추가 거부하게 할지 유무(true:거부)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseDenyPasswordZip();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseFileClipManageUI(int groupID);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseFileClipApproveUI(int groupID);
+
+        /// <summary>
+        /// ClipBoard를 파일전송 Type으로 전송
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseClipBoardFileTrans(int groupID);
+
+        /// <summary>
+        /// 1번에 모든망 로그인
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+
+        public bool GetUseOneToMultiLogin();
+
+        /// <summary>
+        /// 1번에 모든망 로그인하되 로그아웃은 선택한 망 1개만 진행여부
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseOneToMultiLoginButoneBYoneLogout();
+
+        public bool GetUseOneAClockChangeAgentTimer();
+
+        bool GetUseFileExceptionDescCheck();
+
+        /// <summary>
+        /// 결재자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        /// </summary>
+        /// <returns></returns>
+        public string GetApproverSearchType();
+
+        /// <summary>
+        /// 결재자 관련 팝업 시 직접 입력하여 결재자를 검색할 수 있는 기능 사용 유무 (Input 컨트롤 표시 유무)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInputSearchInApproverTree();
+
+        /// <summary>
+        /// 수신자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        /// </summary>
+        /// <returns></returns>
+        public string GetReceiverSearchType();
+
+        /// <summary>
+        /// 수신자 관련 팝업 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInputSearchInReceiverTree();
+
+        /// <summary>
+        /// 대결재등록 시 부서 표시 방식을 SEARCH/TREE 타입 중 설정 (TREE 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        /// </summary>
+        /// <returns></returns>
+        public string GetProxySearchType();
+
+        /// <summary>
+        /// 대결재등록 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInputSearchInProxyTree();
+
+        /// <summary>
+        /// 보안결재자 등록 시 부서 표시 방식을 SEARCH/TREE 타입 중 설정 (TREE 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        /// </summary>
+        /// <returns></returns>
+        public string GetSecurityApproverSearchType();
+        /// <summary>
+        /// 보안결재자 등록 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInputSearchInSecurityApproverTree();
+
+        /// <summary>
+        /// '파일전송' 화면에서 등록시도한 파일목록에 정상파일과 오류파일이 함께 존재할 시 정상 파일에 대한 부분 등록 가능여부(true, false)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUsePartialFileAddInTransfer();
+
+
+        public string GetApproveExtSelectType();
+
+        public bool GetUseApproveExt();
+
+        public bool GetUseInputSearchApproveExtTree();
+
     }
+
+
     internal class SGopConfigService : ISGopConfigService
     {
         private ISGopConfig _AppConfigInfo;
+        /// <summary>
+        /// AppOPsetting
+        /// </summary>
         public ref ISGopConfig AppConfigInfo => ref _AppConfigInfo;
 
         public SGopConfigService()
@@ -319,6 +526,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public bool GetUseGPKILogin(int groupID)
         {
+            if (AppConfigInfo.listUseGpkiLogin == null)
+                return false;
+
             return AppConfigInfo.listUseGpkiLogin[groupID];
         }
 
@@ -363,6 +573,323 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetEmptyfileTrans()
         {
             return AppConfigInfo.bEmptyfileTrans;
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // siteConfig Code Level에서 동작하던거 AppOPsetting.json 으로 옮겨 온거
+
+        public bool GetUseLoginIDSave(int groupID)
+        {
+            return AppConfigInfo.bUserIDSave;
+        }
+        public bool GetUseAutoLogin(int groupID)
+        {
+            return AppConfigInfo.bAutoLogin;
+        }
+        public bool GetUseAutoLoginCheck(int groupID)
+        {
+            return AppConfigInfo.bAutoLoginCheck;
+        }
+
+        public bool GetUseApprLineLocalSave(int groupID)
+        {
+            return AppConfigInfo.bApprLineLocalSave;
+        }
+
+
+        public bool GetUseTitleDescSameCharCheck(int groupID)
+        {
+            return AppConfigInfo.bTitleDescSameChk;
+        }
+
+        public bool GetUseApprLineChkBlock(int groupID)
+        {
+            return AppConfigInfo.bApprLineChkBlock;
+        }
+        public bool GetUseDlpInfoDisplay(int groupID)
+        {
+            return AppConfigInfo.bDlpInfoDisplay;
+        }
+
+        public bool GetUseApprDeptSearch(int groupID)
+        {
+            return AppConfigInfo.bApprDeptSearch;
+        }
+        public bool GetUseApprTreeSearch(int groupID)
+        {
+
+            return false;
+        }
+        public int GetApprStepLimit(int groupID)
+        {
+            return AppConfigInfo.nApprStepLimit;
+        }
+
+        public bool GetUseDeputyApprTerminateDel(int groupID)
+        {
+            return AppConfigInfo.bDeputyApprTerminateDel;
+        }
+
+        public bool GetUseUserPWChange(int groupID)
+        {
+            return AppConfigInfo.bUserPWChange;
+        }
+
+        public string GetPWChangeProhibitLimit(int groupID)
+        {
+            return AppConfigInfo.strPWChangeProhibitLimit;
+        }
+
+        public int GetPWChangeApplyCnt(int groupID)
+        {
+            return AppConfigInfo.nPWChangeApplyCnt;
+        }
+        public bool GetUseURLListPolicyRecv(int groupID)
+        {
+            return AppConfigInfo.bURLListPolicyRecv;
+        }
+        public string GetInitPasswordInfo(int groupID)
+        {
+            return AppConfigInfo.strInitPasswd;
+        }
+
+        public bool GetUseRecvFolderChange(int groupID)
+        {
+            return AppConfigInfo.bRecvFolderChange;
+        }
+        public bool GetUseUserRecvDownPath(int groupID)
+        {
+            return AppConfigInfo.bUseUserRecvDownPath;
+        }
+        public bool GetUseEmailManageApprove(int groupID)
+        {
+            return AppConfigInfo.bUseEmail;
+        }
+        public bool GetUsePCURL(int groupID)
+        {
+            return AppConfigInfo.bUsePCURL;
+        }
+
+        public bool GetUsePublicBoard(int groupID)
+        {
+            return AppConfigInfo.bUsePublicBoard;
+        }
+
+        public bool GetUseCertSend(int groupID)
+        {
+            return AppConfigInfo.bUseCertSend;
+        }
+
+
+        public bool GetUseClipCopyAndSend()
+        {
+            return AppConfigInfo.bUseClipCopyAndSend;
+        }
+        public bool GetRFileAutoSend()
+        {
+            return AppConfigInfo.bRFileAutoSend;
+        }
+        public bool GetAfterApprAutoCheck()
+        {
+            return AppConfigInfo.bShowAfterApprAutoCheck;
+        }
+        public bool GetRecvFolderOpen()
+        {
+            return AppConfigInfo.bRecvFolderOpen;
+        }
+        public bool GetManualDownFolderChange()
+        {
+            return AppConfigInfo.bManualDownFolderChange;
+        }
+        public bool GetFileRecvAlarmRetain()
+        {
+            return AppConfigInfo.bFileRecvAlarmRetain;
+        }
+        public bool GetApprCountAlarmRetain()
+        {
+            return AppConfigInfo.bApprCountAlarmRetain;
+        }
+        public bool GetApprCompleteAlarmRetain()
+        {
+            return AppConfigInfo.bApprCompleteAlarmRetain;
+        }
+        public bool GetApprRejectAlarmRetain()
+        {
+            return AppConfigInfo.bApprRejectAlarmRetain;
+        }
+        public bool GetUseApprCountAlaram()
+        {
+            return AppConfigInfo.bUseApprCountAlaram;
+        }
+        public bool GetUseCloseTrayMove()
+        {
+            return AppConfigInfo.bUseCloseTrayMove;
+        }
+        public bool GetUseStartTrayMove()
+        {
+            return AppConfigInfo.bUseStartTrayMove;
+        }
+        public bool GetUseStartProgramReg()
+        {
+            return AppConfigInfo.bUseStartProgramReg;
+        }
+        public bool GetUseLanguageSet()
+        {
+            return AppConfigInfo.bUseLanguageSet;
+        }
+
+        public bool GetUseMainPageTypeChange()
+        {
+            return AppConfigInfo.bUseMainPageType;
+        }
+        public bool GetViewFileFilter()
+        {
+            return AppConfigInfo.bViewFileFilter;
+        }
+
+        public bool GetViewSGSideBarUIBadge()
+        {
+            return AppConfigInfo.bViewSGSideBarUIBadge;
+        }
+
+        public bool GetViewSGHeaderUIAlarmNoriAllDel()
+        {
+            return AppConfigInfo.bViewSGHeaderUIAlarmNoriAllDel;
+        }
+        public bool GetUseForceUpdate()
+        {
+            return AppConfigInfo.bUseForceUpdate;
+        }
+
+        public bool GetViewDlpApproverMyDept()
+        {
+            return AppConfigInfo.bViewDlpApproverSelectMyDept;
+        }
+        public bool GetUseClipBoardNoApproveButFileTrans()
+        {
+            return AppConfigInfo.bClipBoardNoApproveButFileTrans;
+        }
+        public int GetClipUseAfterApprove()
+        {
+            return AppConfigInfo.nClipAfterApproveUseType;
+        }
+
+        public bool GetUseSelectFirstConnectNetServer()
+        {
+            return AppConfigInfo.bUseUserSelectFirstServer;
+        }
+
+        public bool GetUseFileForward()
+        {
+            return AppConfigInfo.bUseFileForward;
+        }
+
+
+        public bool GetUseDenyPasswordZip()
+        {
+            return AppConfigInfo.bUseDenyPasswordZip;
+        }
+
+        public bool GetUseFileClipManageUI(int groupID)
+        {
+            return AppConfigInfo.bUseFileClipManageUI;
+        }
+
+        public bool GetUseFileClipApproveUI(int groupID)
+        {
+            return AppConfigInfo.bUseFileClipApproveUI;
+        }
+
+        public bool GetUseClipBoardFileTrans(int groupID)
+        {
+            return AppConfigInfo.bUseClipBoardFileTrans;
+        }
+
+        public bool GetUseClipAlarmTypeChange()
+        {
+            return AppConfigInfo.bUseClipAlarmType;
+        }
+
+        public bool GetUseOneToMultiLogin()
+        {
+            return AppConfigInfo.bUseOneToMultiLogin;
+        }
+
+        public bool GetUseOneAClockChangeAgentTimer()
+        {
+            return AppConfigInfo.bUseAgentTime1aClock;
+        }
+
+        public bool GetUseFileExceptionDescCheck()
+        {
+            return AppConfigInfo.bUseFileExceptionDescCheck;
+        }
+
+        public bool GetUseOneToMultiLoginButoneBYoneLogout()
+        {
+            return AppConfigInfo.bUseOneByOneLogOut;
+        }
+
+        public string GetApproverSearchType()
+        {
+            return AppConfigInfo.strApproverSearchType;
+        }
+
+        public bool GetUseInputSearchInApproverTree()
+        {
+            return AppConfigInfo.bUseInputSearchInApproverTree;
+        }
+
+        public string GetReceiverSearchType()
+        {
+            return AppConfigInfo.strReceiverSearchType;
+        }
+
+        public bool GetUseInputSearchInReceiverTree()
+        {
+            return AppConfigInfo.bUseInputSearchInReceiverTree;
+        }
+
+        public string GetProxySearchType()
+        {
+            return AppConfigInfo.strProxySearchType;
+        }
+
+        public bool GetUseInputSearchInProxyTree()
+        {
+            return AppConfigInfo.bUseInputSearchInProxyTree;
+        }
+
+        public string GetSecurityApproverSearchType()
+        {
+            return AppConfigInfo.strSecurityApproverSearchType;
+        }
+
+        public bool GetUseInputSearchInSecurityApproverTree()
+        {
+            return AppConfigInfo.bUseInputSearchInSecurityApproverTree;
+        }
+
+        public bool GetUsePartialFileAddInTransfer()
+        {
+            return AppConfigInfo.bUsePartialFileAddInTransfer;
+        }
+		
+		
+        public string GetApproveExtSelectType()
+        {
+            return AppConfigInfo.strApproveExtApproverSearchType;
+        }
+
+        public bool GetUseApproveExt()
+        {
+            return AppConfigInfo.bUseApproveExt;
+        }
+
+        public bool GetUseInputSearchApproveExtTree()
+        {
+            return AppConfigInfo.bUseInputSearchApproveExtTree;
         }
 
     }

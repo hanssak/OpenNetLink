@@ -23,23 +23,34 @@ using OpenNetLinkApp.Models.SGConfig;
 using System.Runtime.Serialization.Json;
 using Microsoft.EntityFrameworkCore.Storage;
 
+using System.Collections.Concurrent;
+using System.Threading;
+using System.Threading.Tasks;
+
+
 namespace OpenNetLinkApp.Services
 {
     public class HSCmdCenter
     {
 
-        private Dictionary<int, HsNetWork> m_DicNetWork = new Dictionary<int, HsNetWork>();
+        private ConcurrentDictionary<int, HsNetWork> m_DicNetWork = new ConcurrentDictionary<int, HsNetWork>();
         public SGDicRecvData sgDicRecvData = new SGDicRecvData();
         public SGSendData sgSendData = new SGSendData();
         public SGPageEvent sgPageEvent = new SGPageEvent();
-        public Dictionary<int, bool> m_DicFileRecving = new Dictionary<int, bool>();
-        public Dictionary<int, bool> m_DicFileSending = new Dictionary<int, bool>();
+        public ConcurrentDictionary<int, bool> m_DicFileRecving = new ConcurrentDictionary<int, bool>();
+        public ConcurrentDictionary<int, bool> m_DicFileSending = new ConcurrentDictionary<int, bool>();
         public string m_strCliVersion = "";
         public int m_nNetWorkCount = 0;
+        private bool m_bRecvFileDelThreadDo = false;
+        object nlock = new object();
+
+        object objDataRecv = new object();
+        object objSvrRecv = new object();
+
 
         public HSCmdCenter()
         {
-          
+
         }
 
         ~HSCmdCenter()
@@ -103,7 +114,8 @@ namespace OpenNetLinkApp.Services
             {
                 IPAddress address;
                 string strIP = listNetworks[i].IPAddress;
-                if (IPAddress.TryParse (strIP, out address) == false) {
+                if (IPAddress.TryParse(strIP, out address) == false)
+                {
                     IPAddress[] addresses = Dns.GetHostAddresses(strIP);
                     strIP = addresses[0].ToString();
                 }
@@ -118,9 +130,9 @@ namespace OpenNetLinkApp.Services
                 hsNetwork = new HsNetWork();
                 string strTlsVer = listNetworks[i].TlsVersion;
                 string strDownPath = "";
-                if(RecvDownList != null && RecvDownList.Count > i)
+                if (RecvDownList != null && RecvDownList.Count > i)
                     strDownPath = RecvDownList[i];
-                
+
                 if (strDownPath.Equals(""))
                 {
                     strModulePath = System.IO.Directory.GetCurrentDirectory();
@@ -154,6 +166,8 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
                 hsNetwork.SetGroupID(groupID);
                 hsNetwork.SetFileRecvPossible(false);
+
+                //PageStatusData.RefreshInfoEvent()
 
                 //hsNetwork.SetHszMultiThread(false);
 
@@ -235,6 +249,11 @@ namespace OpenNetLinkApp.Services
             data = sgDicRecvData.GetDetailData(groupid);
             return data;
         }
+        /// <summary>
+        /// 기본 결재라인 데이터 (APPROVEDEFAULT)
+        /// </summary>
+        /// <param name="groupid"></param>
+        /// <returns></returns>
         public SGData GetApprLineData(int groupid)
         {
             SGData data = null;
@@ -262,6 +281,12 @@ namespace OpenNetLinkApp.Services
         {
             SGData data = null;
             data = sgDicRecvData.GetGpkiData(groupid);
+            return data;
+        }
+
+        public SGData GetDeptInfoData(int groupid)
+        {
+            SGData data = sgDicRecvData.GetDeptInfoData(groupid);
             return data;
         }
 
@@ -302,11 +327,17 @@ namespace OpenNetLinkApp.Services
         }
         private void SGDataRecv(int groupId, eCmdList cmd, SGData sgData)
         {
+            //lock (objDataRecv)
+
             HsNetWork hs = null;
             int nRet = 0;
+
             nRet = sgData.GetResult();
             switch (cmd)
             {
+                case eCmdList.eLINKCHK:
+                    SetHoliday(groupId, sgData);
+                    break;
                 case eCmdList.eSEEDKEY:                                                  // SEEDKEY_ACK : seed key 요청 응답
                     break;
 
@@ -319,10 +350,14 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eDEPTINFO:                                                  // 부서정보 조회 요청 응답.
+                    DeptInfoAfterSend(nRet, groupId, sgData);
+                    {
+                        int result = sgData.GetResult();
+                        sgData.GetRecordData("DeptCount");
+                    }
                     break;
 
                 case eCmdList.eURLLIST:                                                  // URL 자동전환 리스트 요청 응답.
-                    // FileMime.conf 요청하는 함수 구현 필요. 추후 개발                     
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
                     {
@@ -484,7 +519,7 @@ namespace OpenNetLinkApp.Services
                     if (hs != null)
                     {
                         UrlServerRecvNotiAfterSend(nRet, groupId, sgData);
-                    }                        
+                    }
                     break;
 
                 case eCmdList.eSUBDATANOTIFY:                                                    // 클립보드 데이터 Recv(서버에서)
@@ -543,7 +578,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eDASHBOARDCOUNT:                                  // 대쉬보드 조회 쿼리 데이터.
-                    DashBoardCountAfterSend(nRet,groupId,sgData);
+                    DashBoardCountAfterSend(nRet, groupId, sgData);
                     break;
 
                 case eCmdList.eDASHBOARDTRANSREQCOUNT:                              // 대쉬보드 전송요청 Count 쿼리
@@ -564,7 +599,7 @@ namespace OpenNetLinkApp.Services
 
                 case eCmdList.ePASSWDCHGDAY:                                        // 패스워드 변경날짜 조회.
                     PasswdChgDayAfterSend(nRet, groupId, sgData);
-                    break;               
+                    break;
 
                 case eCmdList.eBOARDNOTIFYSEARCH:                                   // 공지사항 조회 결과 
                     hs = GetConnectNetWork(groupId);
@@ -601,7 +636,7 @@ namespace OpenNetLinkApp.Services
                         RecvSvrGPKIRegAfterSend(groupId);
                     }
                     break;
-                case eCmdList.ePRIVACYNOTIFY:
+                case eCmdList.ePRIVACYNOTIFY:                                     //개인정보 Noti
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
                     {
@@ -690,18 +725,61 @@ namespace OpenNetLinkApp.Services
                         FileForwardEvent fileforwardEvent = sgPageEvent.GetFileForwardNotifyEventAdd(groupId);
                         if (fileforwardEvent != null) fileforwardEvent(groupId, sgData);
                     }
+                    break;
+                case eCmdList.eHSCKQUERY:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
 
+                    }
+                    break;
+                case eCmdList.eGENERICNOTI:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        GenericNotiType2Event eventData = sgPageEvent.GetGenericNotiType2EventAdd(groupId);
+                        if (eventData != null) eventData(groupId, sgData);
+                    }
+                    break;
+                case eCmdList.eSKIPFILENOTI:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        SkipFileNotiEvent eventData = sgPageEvent.GetSkipFileNotiEventAdd();
+                        if (eventData != null) eventData(groupId, sgData);
+                    }
+                    break;
+                case eCmdList.eUPDATEPOLICY:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        NotiUpdatePolicyEvent updatePolicyEvent = sgPageEvent.GetUpdatePolicyEvent();
+                        if (updatePolicyEvent != null) updatePolicyEvent(groupId);
+                    }
                     break;
                 default:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        CommonQueryReciveEvent queryListEvent = sgPageEvent.GetQueryReciveEvent(groupId, cmd);
+                        object[] obj = new object[] { sgData };
+                        if (queryListEvent != null)
+                        {
+                            queryListEvent(groupId, obj);
+                        }
+
+                    }
                     break;
 
             }
 
-            return;
         }
+
 
         private void SGSvrRecv(int groupId, int cmd, SGData sgData)
         {
+            //lock(objSvrRecv)
+
             SGData tmpData = GetSGSvrData(groupId);
             if (tmpData == null)
                 tmpData = new SGData();
@@ -723,11 +801,17 @@ namespace OpenNetLinkApp.Services
                     RecvSvrGPKIAfterSend(groupId);
                     break;
                 case 2103:                                                              // filemime.conf
+                    FileMimeRecvEvent fileMimeRecvEvent = sgPageEvent.GetFileMimeRecvEvent();
+                    if(fileMimeRecvEvent != null)
+                    {
+                        fileMimeRecvEvent(groupId);
+                    }
                     break;
 
             }
 
             sgDicRecvData.SetSvrData(groupId, tmpData);
+
         }
         public void RecvSvrAfterSend(int groupId, string loginType)
         {
@@ -737,27 +821,34 @@ namespace OpenNetLinkApp.Services
                 svEvent(groupId, loginType);
             }
         }
-                
+
         public void BindAfterSend(int nRet, int groupId, SGData sgData)
         {
             nRet = sgData.GetResult();
             string strMsg = "";
+
+            HsNetWork hs = null;
+            if (m_DicNetWork.TryGetValue(groupId, out hs) == false && nRet == 0)
+            {
+                HsLog.info($"BindAfterSend - BIND Success But - m_DicNetWork.TryGetValue return false");
+                return;
+            }
+
+
             if (nRet == 0)
             {
-                HsNetWork hs = null;
-                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
-                {
-                    hs = m_DicNetWork[groupId];
-                    sgDicRecvData.SetLoginData(hs, groupId, sgData);
-                    SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                    Int64 nFilePartSize = sgLoginBind.GetFilePartSize();
-                    Int64 nFileBandWidth = sgLoginBind.GetFileBandWidth();
-                    int nLinkCheckTime = sgLoginBind.GetLinkCheckTime();
-                    nLinkCheckTime = (nLinkCheckTime * 2) / 3;
-                    bool bDummy = sgLoginBind.GetUseDummyPacket();
-                    hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);
-                    SendUserInfoEx(groupId, sgLoginBind.GetUserID());
-                }
+
+                //hs = m_DicNetWork[groupId];
+                sgDicRecvData.SetLoginData(hs, groupId, sgData);
+                SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                Int64 nFilePartSize = sgLoginBind.GetFilePartSize();
+                Int64 nFileBandWidth = sgLoginBind.GetFileBandWidth();
+                int nLinkCheckTime = sgLoginBind.GetLinkCheckTime();
+                nLinkCheckTime = (nLinkCheckTime * 2) / 3;
+                bool bDummy = sgLoginBind.GetUseDummyPacket();
+                hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);
+                SendUserInfoEx(groupId, sgLoginBind.GetUserID());
+
             }
             else
             {
@@ -778,7 +869,7 @@ namespace OpenNetLinkApp.Services
         {
             ChangePassWDNotiEvent chgPassWDEvent = null;
             chgPassWDEvent = sgPageEvent.GetChgPassWDNotiEvent();
-            if(chgPassWDEvent!=null)
+            if (chgPassWDEvent != null)
             {
                 PageEventArgs args = new PageEventArgs();
                 args.result = nRet;
@@ -787,6 +878,7 @@ namespace OpenNetLinkApp.Services
         }
         public void UserInfoAfterSend(int nRet, int groupId, SGData sgData)
         {
+            SGLoginData sgLoginUserInfo = null;
             if (nRet == 0)
             {
                 HsNetWork hs = null;
@@ -796,8 +888,12 @@ namespace OpenNetLinkApp.Services
                     sgDicRecvData.SetUserData(hs, groupId, sgData);
                 }
             }
-            SGLoginData sgLoginUserInfo = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-            SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
+            sgLoginUserInfo = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+            if (sgLoginUserInfo != null)
+            {
+                SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
+                SendUserSFMInfo(groupId, sgLoginUserInfo.GetUserID());
+            }
         }
 
         public void URLListAfterSend(int nRet, int groupId, SGData sgData)
@@ -810,13 +906,13 @@ namespace OpenNetLinkApp.Services
                 args.result = nRet;
                 // UI 단의 api callback호출
                 urllistEvent(groupId, args);
-            }                
+            }
         }
         public void ApprInstAfterSend(int nRet, int groupId, SGData sgData)
         {
             ProxySearchEvent PSevent = null;
             sgPageEvent.DicProxySearch.TryGetValue(groupId, out PSevent);
-            if( PSevent != null)
+            if (PSevent != null)
                 PSevent(groupId, sgData);
         }
         public void CommonResultAfterSend(int nRet, int groupId, SGData sgData)
@@ -826,6 +922,140 @@ namespace OpenNetLinkApp.Services
             if (CommonEvent != null)
                 CommonEvent(groupId, sgData);
         }
+
+        /// <summary>
+        /// 수신폴더에 있는 파일들을 정해놓은 시간이 지나면 삭제하는 함수(strDeletePath : 수신폴더경로, nDeleteTimeHour : 지난시간)
+        /// </summary>
+        /// <param name="strDeletePath"></param>
+        /// <param name="nDeleteTimeHour"></param>
+        private void DeleteTimeOverFiles(string strDeletePath, int nDeleteTimeHour)
+        {
+
+            if (string.IsNullOrEmpty(strDeletePath))
+                return;
+
+            HsLog.info($"DeleteTimeOverFiles : {strDeletePath}, delete OVer Time : {nDeleteTimeHour}");
+            if (nDeleteTimeHour < 1)
+            {
+                HsLog.info($"DeleteTimeOverFiles - invalid input : {nDeleteTimeHour}");
+                return;
+            }
+
+            String FolderName = strDeletePath;
+
+            // 지정한 Folder 아래있는 파일들만 가져옴
+            System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(FolderName);
+
+            // 내부 파일들 삭제
+            foreach (System.IO.FileInfo File in di.GetFiles())
+            {
+
+                DateTime tmCreate = File.CreationTime;
+                DateTime tmDelete = tmCreate.AddHours(nDeleteTimeHour);
+                DateTime tmCurrent = DateTime.Now;
+
+                HsLog.info($"DeleteTimeOverFiles - File : {File.FullName}, " +
+                    $"CreateTime : {tmCreate.ToString("yyyy/MM/dd HH:mm:ss")}, " +
+                    $"DeleteTime : {tmDelete.ToString("yyyy/MM/dd HH:mm:ss")}, " +
+                    $"CueentTime : {tmCurrent.ToString("yyyy/MM/dd HH:mm:ss")}");
+
+                if ((tmCurrent - tmDelete).TotalSeconds > 0)
+                {
+                    System.IO.File.Delete(File.FullName);
+                    HsLog.info($"DeleteTimeOverFiles - FileDelte! : {File.FullName}");
+                }
+
+            } // foreach (System.IO.FileInfo File in di.GetFiles())
+
+
+            // 내부 Directory 삭제
+            foreach (System.IO.DirectoryInfo Dir in di.GetDirectories())
+            {
+                // Recursive Search
+                DeleteTimeOverFiles(Dir.FullName, nDeleteTimeHour);
+
+                if (Directory.EnumerateFileSystemEntries(Dir.FullName).Any() == false)
+                {
+                    Directory.Delete(Dir.FullName);
+                    HsLog.info($"DeleteTimeOverFiles - Delete Empty Folder : {Dir.FullName}");
+                }
+            }
+
+
+        }
+
+        private void RecvFileDeleteCycleThread(object obj)
+        {
+
+            lock (nlock)
+            {
+                if (m_bRecvFileDelThreadDo)
+                    return;
+
+                m_bRecvFileDelThreadDo = true;
+            }
+
+            Stopwatch sw = new Stopwatch();
+            HsLog.info($"Recv File Delete Cycle - Thread - Do");
+            HSCmdCenter hSCmdCenter = (HSCmdCenter)obj;
+            int nIdx = 0;
+            int[] nArryDeleteTime = new int[hSCmdCenter.m_nNetWorkCount];
+            string strDownPath = "";
+
+            while (true)
+            {
+                // 30초마다 한번씩 삭제 동작 : NetLink 기준
+                Thread.Sleep(30 * 1000);
+
+                // 로그인 상태 / 삭제주기 정책값 확인
+                for (nIdx = 0; nIdx < hSCmdCenter.m_nNetWorkCount; nIdx++)
+                {
+                    nArryDeleteTime[nIdx] = 0;
+                    SGLoginData sgLoginData = null;
+                    bool bIsLogin = false;
+                    sgLoginData = (SGLoginData)hSCmdCenter.GetLoginData(nIdx);
+                    if (sgLoginData != null)
+                    {
+                        PageStatusData tmpData = null;
+                        if (PageStatusService.m_DicPageStatusData.TryGetValue(nIdx, out tmpData))
+                        {
+                            if (PageStatusService.m_DicPageStatusData[nIdx].GetLogoutStatus() == false &&
+                                PageStatusService.m_DicPageStatusData[nIdx].GetConnectStatus() == true)
+                                bIsLogin = true;
+                        }
+                    }
+
+                    if (bIsLogin && sgLoginData != null)
+                    {
+                        nArryDeleteTime[nIdx] = sgLoginData.GetFileRemoveCycle();
+                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DELETECYCLE : {nArryDeleteTime[nIdx]}");
+                    }
+                    else
+                    {
+                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , Logout Status!");
+                    }
+
+
+                }
+
+
+                for (nIdx = 0; nIdx < hSCmdCenter.m_nNetWorkCount; nIdx++)
+                {
+                    if (nArryDeleteTime[nIdx] > 0)
+                    {
+                        // 삭제주기 설정된 값마다 삭제
+                        strDownPath = GetDownLoadPath(nIdx);
+                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DeletePath : {strDownPath}");
+
+
+                        DeleteTimeOverFiles(strDownPath, nArryDeleteTime[nIdx]);
+                    }
+                }
+
+            } // while (true)
+
+        }
+
         public void SystemRunAfterSend(int nRet, int groupId, SGData sgData)
         {
             if (nRet == 0)
@@ -846,8 +1076,15 @@ namespace OpenNetLinkApp.Services
                     hs = m_DicNetWork[groupId];
                     int hszOpt = sgLoginDataSystemRun.GetHszDefaultDec();
                     hs.SetHszDefault(hszOpt);
+                    hs.SetManualDownLoad(sgLoginDataSystemRun.GetManualDownload());
                 }
                 RequestUrlList(groupId, sgLoginDataSystemRun.GetUserID());
+
+
+                // 자동삭제 기능동작
+                Thread tr = null;
+                tr = new Thread(new ParameterizedThreadStart(RecvFileDeleteCycleThread));
+                tr.Start(this);
 
                 LoginEvent LoginResult_Event = null;
                 LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
@@ -860,6 +1097,13 @@ namespace OpenNetLinkApp.Services
                 }
             }
         }
+
+        /// <summary>
+        /// 사용자의 결재정보라인 받은 정보를 SgDicRecvData 에 저장
+        /// </summary>
+        /// <param name="nRet"></param>
+        /// <param name="groupId"></param>
+        /// <param name="sgData"></param>
 
         public void ApprLineAfterSend(int nRet, int groupId, SGData sgData)
         {
@@ -881,7 +1125,7 @@ namespace OpenNetLinkApp.Services
             SGLoginData sgLoginDataApproveDefault = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
             string strTeamCode = sgUserData.GetTeamCode();
             string strUserID = sgLoginDataApproveDefault.GetUserID();
-            SendInstApprove(groupId, strUserID, strTeamCode);
+            //SendInstApprove(groupId, strUserID, strTeamCode);
             SendSystemRunEnv(groupId, strUserID);
         }
 
@@ -898,6 +1142,13 @@ namespace OpenNetLinkApp.Services
                 e.strMsg = strMsg;
                 TransSearchResult_Event(groupId, e);
             }
+        }
+        //LinkCheck에서 Holiday LoginData에 Holiday 셋팅
+        public void SetHoliday(int groupId, SGData sgData)
+        {
+            SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+            if (sgLoginData != null)
+                sgLoginData.SetTagData("HOLIDAY", sgData.GetEncTagData("HOLIDAY"));
         }
 
         public void TransSearchCountAfterSend(int nRet, int groupId, int count)
@@ -1157,7 +1408,7 @@ namespace OpenNetLinkApp.Services
                 recvUrl_Event(groupId, e);
             }
         }
-        
+
 
         public void RMouseFileAddNotiAfterSend(int nRet, int groupId)
         {
@@ -1200,6 +1451,9 @@ namespace OpenNetLinkApp.Services
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
                 e.strMsg = "";
+                e.count = Convert.ToInt32(data.GetBasicTagData("APPROVECOUNT"));
+                e.strDummy = data.GetBasicTagData("APPROVEUSERKIND");
+
                 sNotiEvent(groupId, cmd, e);
             }
         }
@@ -1375,16 +1629,16 @@ namespace OpenNetLinkApp.Services
             }
         }
 
-        public void DashBoardCountAfterSend(int nRet,int groupID, SGData data)
+        public void DashBoardCountAfterSend(int nRet, int groupID, SGData data)
         {
             DashBoardCountEvent dashBoardCount = null;
             dashBoardCount = sgPageEvent.GetDashBoardCountEvent(groupID);
-            if(dashBoardCount!=null)
+            if (dashBoardCount != null)
             {
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
                 e.strMsg = data.GetBasicTagData("RECORD");
-                dashBoardCount(groupID,e);
+                dashBoardCount(groupID, e);
             }
         }
         public void DashBoardTransReqCountAfterSend(int nRet, int groupID, SGData data)
@@ -1444,7 +1698,7 @@ namespace OpenNetLinkApp.Services
         {
             PasswdChgDayEvent passwdChgDay = null;
             passwdChgDay = sgPageEvent.GetPasswdChgDayEvent(groupID);
-            if(passwdChgDay!=null)
+            if (passwdChgDay != null)
             {
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
@@ -1457,14 +1711,32 @@ namespace OpenNetLinkApp.Services
         {
             BoardNotiSearchEvent boardNotiSearch = null;
             boardNotiSearch = sgPageEvent.GetBoardNotiSearchEvent();
-            if(boardNotiSearch!=null)
+            if (boardNotiSearch != null)
             {
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
                 boardNotiSearch(groupID, e);
             }
-        }      
+        }
 
+
+        public void DeptInfoAfterSend(int nRet, int groupId, SGData sgData)
+        {
+            if (nRet == 0)
+            {
+                HsNetWork hs = null;
+                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                {
+                    hs = m_DicNetWork[groupId];
+                    sgDicRecvData.SetDeptInfoData(hs, groupId, sgData);
+                }
+            }
+
+            //결재 조회 화면의 이벤트
+            DeptInfoNotiEvent deptInfoReceiveEvent = sgPageEvent.GetDeptInfoEvent(groupId);
+            if (deptInfoReceiveEvent != null)
+                deptInfoReceiveEvent(groupId);
+        }
         public void SetDetailDataChange(int groupid, SGDetailData sgData)
         {
             HsNetWork hs = null;
@@ -1488,9 +1760,16 @@ namespace OpenNetLinkApp.Services
             bool bTemp = false;
             if (m_DicFileRecving.TryGetValue(groupid, out bTemp) == true)
             {
-                m_DicFileRecving.Remove(groupid);
+                if (m_DicFileRecving.TryRemove(groupid, out bTemp) == false)
+                {
+                    m_DicFileRecving.TryUpdate(groupid, bRecving, !bRecving);
+                    return;
+                }
+                //m_DicFileRecving.Remove(groupid);
             }
-            m_DicFileRecving[groupid] = bRecving;
+
+            m_DicFileRecving.TryAdd(groupid, bRecving);
+            //m_DicFileRecving[groupid] = bRecving;
         }
 
         public bool GetFileSending(int groupid)
@@ -1506,9 +1785,17 @@ namespace OpenNetLinkApp.Services
             bool bTemp = false;
             if (m_DicFileSending.TryGetValue(groupid, out bTemp) == true)
             {
-                m_DicFileSending.Remove(groupid);
+                if (m_DicFileSending.TryRemove(groupid, out bTemp) == false)
+                {
+                    m_DicFileSending.TryUpdate(groupid, bSending, !bSending);
+                    return;
+                }
+                //m_DicFileSending.Remove(groupid);
+                return;
             }
-            m_DicFileSending[groupid] = bSending;
+
+            m_DicFileSending.TryAdd(groupid, bSending);
+            //m_DicFileSending[groupid] = bSending;
         }
 
         /// <summary>
@@ -1517,7 +1804,7 @@ namespace OpenNetLinkApp.Services
         /// <param name="groupid">그룹ID</param>
         /// <param name="strDownPath">다운로드 경로</param>
         /// <returns>0 : 설정성공   -1 : 설정실패</returns>
-        public int SetDownLoadPath(int groupid,string strDownPath)
+        public int SetDownLoadPath(int groupid, string strDownPath)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             int ret = 0;
@@ -1656,7 +1943,7 @@ namespace OpenNetLinkApp.Services
                 hsNetWork.bIgnoreSessionDuplicate = true;
         }
 
-        public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType=0)
+        public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType = 0)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             int ret = 0;
@@ -1690,6 +1977,15 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestUserInfoEx(hsNetWork, groupid, strUserID);
+            return -1;
+        }
+
+        public int SendUserInfoCheck(int groupid, string strUserID)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestUserInfoCheck(hsNetWork, groupid, strUserID);
             return -1;
         }
 
@@ -1862,7 +2158,7 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestManualDownload(hsNetWork, groupid, strUserID, strTransSeq);
             return -1;
         }
-       
+
         public int SendTransListCountQuery(int groupid, string strUserID, string strQuery)
         {
             HsNetWork hsNetWork = null;
@@ -1978,7 +2274,7 @@ namespace OpenNetLinkApp.Services
             if (hsNetWork != null)
                 return sgSendData.RequestSendDeptApprLineSearchQuery(hsNetWork, groupid, strUserID, strQuery);
             return -1;
-        }    
+        }
 
         public int SendSecurityApproverQuery(int groupid, string strUserID, string strQuery)
         {
@@ -2015,6 +2311,19 @@ namespace OpenNetLinkApp.Services
             return nRet;
         }
 
+        public int ContinueSendFileTrans(int groupid, Dictionary<string,string> values, string strNetOver3info, string hszFileName, int currentFileSize)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            int nRet = -1;
+            if (hsNetWork != null)
+                nRet = sgSendData.RequestContinueSendFileTrans(hsNetWork, groupid, values, strNetOver3info, hszFileName, currentFileSize);
+
+            if (nRet == -2)
+                SendFileTransCancel();
+            return nRet;
+        }
+
 
         public void SendFileTransCancel()
         {
@@ -2029,7 +2338,15 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendFilePrev(hsNetWork, groupid, strUserID, strTransSeq, strFileName, strFileKey, strFileSeq, strOrgData);
             return -1;
         }
-
+        //파일 이어전송 파일정보 요청
+        public int SendFileUploadInfo(int groupid, string strUserID, string mid, string totalPart, string totalSize)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendFileUploadInfo(hsNetWork, strUserID, mid, totalPart, totalSize);
+            return -1;
+        }
         public int SendEmailDownload(int groupid, string strUserID, string stEmailSeq, string sFileName, string filekey, string fileseq)
         {
             HsNetWork hsNetWork = null;
@@ -2201,7 +2518,7 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public void SendSVRGPKIRegInfo(int groupid,string strGPKIList)
+        public void SendSVRGPKIRegInfo(int groupid, string strGPKIList)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
@@ -2241,7 +2558,7 @@ namespace OpenNetLinkApp.Services
                 sgSendData.RequestSend_PRIVACY_CONTINUE(hsNetWork, strUserID, transSeq, dlpApprove, privacyConfirmSeq, NetType);
         }
 
-        public void SetPassWord(int groupid,string strNewPassWD)
+        public void SetPassWord(int groupid, string strNewPassWD)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
@@ -2255,6 +2572,7 @@ namespace OpenNetLinkApp.Services
             }
             return;
         }
+
         public void SetCliVersion(string strCliVersion)
         {
             m_strCliVersion = strCliVersion;
@@ -2318,7 +2636,7 @@ namespace OpenNetLinkApp.Services
         public void SetAllFileRecvPossible(bool bFileRecvPossible)
         {
             int count = GetNetWorkCount();
-            for(int i=0;i<count;i++)
+            for (int i = 0; i < count; i++)
             {
                 HsNetWork hsNetWork = null;
                 hsNetWork = GetConnectNetWork(i);
@@ -2386,7 +2704,47 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
+        public SGData GetSFMListData(int groupId)
+        {
+            SGData data = sgDicRecvData.GetSFMListData(groupId);
+            return data;
+        }
+        public int SendUserSFMInfo(int groupId, string userId)
+        {
+            SGUserData userData = (SGUserData)sgDicRecvData.GetUserData(groupId);
+            string strQuery = ApproveProxy.GetSFMApporverRight(userData.GetUserSequence());
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupId);
+            if (hsNetWork != null)
+            {
+                sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eSFMIINFOQUERY, SFMInfoAfterSend);
+                return sgSendData.RequestCommonSendQuery(hsNetWork, eCmdList.eSFMIINFOQUERY, userId, strQuery);
+            }
 
+            return -1;
+        }
+
+        public void SFMInfoAfterSend(int groupId, object[] e)
+        {
+            sgDicRecvData.SetSFMListData(groupId, e[0] as SGData);
+        }
+
+        public int CommonSendQuery(eCmdList eCmd, int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestCommonSendQuery(hsNetWork, eCmd, strUserID, strQuery);
+            return -1;
+        }
+        public int SendGenericNotiType2(int groupid, string strUserID, string strUserName, string strDeptName, string strFileName, string strPreworkType)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.SendGenericNotiType2(hsNetWork, strUserID, strUserName, strDeptName, strFileName, strPreworkType);
+            return -1;
+        }
 
     }
 }

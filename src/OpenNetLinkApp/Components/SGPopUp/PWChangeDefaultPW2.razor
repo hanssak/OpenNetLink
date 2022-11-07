@@ -1,4 +1,4 @@
-﻿@inject IJSRuntime JSRuntime
+@inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
@@ -59,6 +59,10 @@
 </div>
 
 @code {
+
+
+    //사용안합니다~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //PWCHANGEDEFAULTPW와 합침
     [Parameter]
     public EventCallback<int> goToPagePWInitAfter { get; set; }
 
@@ -153,7 +157,7 @@
         }
 
         //정규표현식을 이용한 패스워드 복잡도 체크
-        int MaxLen = siteConfig.GetPWChangeApplyCnt(groupID);
+        int MaxLen = SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID);
 
         if (stNewPW.Length < MaxLen)                         //길이체크
         {
@@ -234,7 +238,7 @@
 
         // 이미 Navigate 되어 있음
         /*string strNavigateWithGroupID = "";
-        if (siteConfig.GetUseDashBoard())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseDashBoard())
             strNavigateWithGroupID = "/Welcome/";
         else
             strNavigateWithGroupID = "/Transfer/";
@@ -249,7 +253,8 @@
 
         if (eLoginProcessType == eLoginType.eLOGINTYPE_GPKI)
         {
-            if (siteConfig.GetUseAutoLogin(groupID) == true)
+            // if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID) == true) // json으로 설정이동
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID))
             {
                 SGRSACrypto sgRSACrypto = new SGRSACrypto();
                 string strEncPW = "";

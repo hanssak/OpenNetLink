@@ -5,22 +5,29 @@ using System.Text;
 using Serilog;
 using Serilog.Events;
 using AgLogManager;
+using System.ComponentModel;
 
 namespace OpenNetLinkApp.Models.SGConfig
 
 {
     public enum CLIPALM_TYPE : int
     {
+        [Description("OS & UI")]
         OSUI = 0,
+        [Description("OS")]
         OS = 1,
+        [Description("UI")]
         UI = 2,
     }
 
     // MoveTo. ISGopConfig.cs
     public enum PAGE_TYPE : int
     {
+        [Description("초기값")]
         NONE = 0,
+        [Description("대시보드")]
         DASHBOARD = 1,
+        [Description("파일전송")]
         TRANSFER = 2
     }
     public enum HOTKEY_MOD: int
