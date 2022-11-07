@@ -2092,8 +2092,6 @@
             if (sgSideBar != null)
             groupID = sgSideBar.GroupId;*@
 
-
-
         int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = null;
@@ -2636,6 +2634,11 @@
 
 
         HsNetWork hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
+
+        if (hsNetWork == null)
+            return;
+        if (!hsNetWork.IsUserBind)
+            return;
 
         long hsNetPartSize = hsNetWork.stCliMem.FilePartSize;
 
