@@ -446,22 +446,22 @@
     protected override void OnInitialized()
     {
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
         actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
 
-        approverSearchType = SGAppMgrSvc.SiteConfigInfoService.GetApproverSearchType(groupID);
-        useInputInTree = SGAppMgrSvc.SiteConfigInfoService.GetUseInputSearchInApproverTree(groupID);
-
+        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproverSearchType();
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproverTree();
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
 
         bEditDeptName = SGAppMgrSvc.OpConfigInfoService.GetUseApprDeptSearch(groupID);
 
@@ -524,10 +524,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        approverSearchType = SGAppMgrSvc.SiteConfigInfoService.GetApproverSearchType(groupID);
-        useInputInTree = SGAppMgrSvc.SiteConfigInfoService.GetUseInputSearchInApproverTree(groupID);
-
-        // 실제 사용안함
+	// 실제 사용안함
         //HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult); //타부서 조회 결과
 
         if (approverSearchType == "TREE" && refSGDeptTreeList != null)

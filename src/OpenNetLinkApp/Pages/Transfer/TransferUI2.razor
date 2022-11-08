@@ -621,7 +621,7 @@
             if (sgLoginData == null)
                 return;
 
-            if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID))
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt())
             {
                 await refApproveExtApproverSelect_PopUp.openPopUp();
             }
@@ -814,7 +814,7 @@
             stApprLineSeq = "";
         else if (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false)
         {
-            if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID) &&
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() &&
                 pageService.GetApproveExtFileTransWithApprove(groupID))
             {
                 CLog.Here().Information($"FileTrans - NoApprove Policy - ApproveExt - Use Approve FileTrans !!!");
@@ -873,7 +873,7 @@
 
 
         int nTransType = 0;
-        if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID) &&
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() &&
         isFilesNeedApprove())
         {
 
@@ -989,7 +989,7 @@
         int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
 
         //
-        if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID))
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt())
         {
             pageService.SetApproveExtFileTransWithApprove(groupID, false);
         }
@@ -1128,7 +1128,7 @@
         else
         {
 
-            if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID) &&
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() &&
                 isFilesNeedApprove())
             {
 
@@ -1610,7 +1610,7 @@
     public async void ApproveChooseResult(int groupid, PageEventArgs e)
     {
 
-        string approvePopupType = siteConfig.GetApproverSearchType(groupIDbyParam);
+        string approvePopupType = OpConfigSvc.GetApproverSearchType();
 
         if (m_apvStep == 0 || m_apvStep == 1)   //and 와 or 결재
         {
@@ -1878,8 +1878,8 @@
 
         pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);
 
-        string approvePopupType = siteConfig.GetApproverSearchType(groupID);
-        string receiverPopupType = siteConfig.GetReceiverSearchType(groupID);
+        string approvePopupType = OpConfigSvc.GetApproverSearchType();
+        string receiverPopupType = OpConfigSvc.GetReceiverSearchType();
 
         @*      if (approvePopupType == "TREE" || receiverPopupType == "TREE")
             {

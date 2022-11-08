@@ -2,8 +2,6 @@
 @page "/pcurlManage/{groupIDbyParam:int}"
 
 @using OpenNetLinkApp.Data.SGQuery
-@using OpenNetLinkApp.Components.SGSearchCondition
-
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject NavigationManager MyNavigationManager
@@ -123,7 +121,7 @@
                                             <!--<td style="text-align:center">
                                                 <input class="input" type="checkbox">
                                             </td>-->
-                                            <td style="text-align:center">@item.ApvStatus</td>
+                                        <td style="text-align:center">@item.ApvStatus</td>
                                             <td style="text-align:center">@item.ReqReason</td>
                                             <td style="text-align:center">@item.URL</td>
                                             <td style="text-align:center">@item.RequestTime</td>

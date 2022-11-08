@@ -9,8 +9,6 @@
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGDomain
-@using OpenNetLinkApp.Components.SGSearchCondition
-
 @inject IJSRuntime jsRuntime
 @inject HSCmdCenter HSCmdCenter
 @inject XmlConfService XmlConf
@@ -489,7 +487,7 @@
         mailParam.UserID = curUserID;
         mailParam.SystemId = systemid;
         @*await mailParam.SetSearchStartDate("datepicker9");
-            await mailParam.SetSearchEndDate("datepicker10");*@
+        await mailParam.SetSearchEndDate("datepicker10");*@
 
         await refPeriodDatePicker.RetriveDateFromJS();
         mailParam.SetSearchStartDate(refPeriodDatePicker.FromDateSearchValue);
