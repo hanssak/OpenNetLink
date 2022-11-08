@@ -29,7 +29,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool m_bUseURLRedirection { get; set; } = true;              // URL 리다이렉션 사용 여부
         public bool m_bUseFileSend { get; set; } = true;                    // 파일 전송 사용 여부
         public bool m_bRecvFolderChange { get; set; } = true;               // 수신 폴더 변경 사용 여부.
-        public bool m_bUseUserRecvDownPath { get; set; } = false;           // 로그인 유저별 다운로드 경로 사용 여부
+        public bool m_bUseUserRecvDownPath { get; set; } = true;           // 로그인 유저별 다운로드 경로 사용 여부
         public bool m_bUseEmail { get; set; } = false;               // 메일 관리/결재 사용 유무.
         public bool m_bUsePCURL { get; set; } = false;                      // PCURL 사용 유무.
         public bool m_bUseClipApprove { get; set; } = false;                // 클립보드 결재 사용 유무
