@@ -1441,9 +1441,6 @@
         bool afterBasicChk = Convert.ToBoolean(changeEventArg.Value);
         CLog.Here().Information($"Check Post Approval Set: [{afterBasicChk}]");
         CtrlSideUISvc.SetAfterBasicChk(afterBasicChk);
-        //[사후결재 컨트롤 갱신] 
-        if (PageStatusData.SAfterApprControlCheckEvent != null)
-            PageStatusData.SAfterApprControlCheckEvent();
     }
 
 

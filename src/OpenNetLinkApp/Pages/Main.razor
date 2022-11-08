@@ -892,13 +892,6 @@
                 bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
                 pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
                 pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
-                 bool bAfterCheck = false;
-                if (!bAfterApprEnable)
-                    bAfterCheck = false;
-                else
-                    bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
-
-                pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
                 Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
                 int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
