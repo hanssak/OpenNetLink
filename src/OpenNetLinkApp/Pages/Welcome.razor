@@ -790,7 +790,10 @@
 
         ISGSideBarUI activeMenu = null;
         activeMenu = SideBarUISvc.FindSubMenu(groupID, path);
-        ChangeActiveMenuWrap(eventArgs, activeMenu);
+        if (activeMenu != null)
+        {
+            ChangeActiveMenuWrap(eventArgs, activeMenu);
+        }
 
         MyNavigationManager.NavigateTo(path);
     }
