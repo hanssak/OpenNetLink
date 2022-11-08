@@ -34,8 +34,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bViewFileFilter { get; set; }                                         // (환경설정) 확장자 제한 화면 표시 유무.
         public bool m_bUseForceUpdate { get; set; }                                         // 넘기는 기능 없이 무조건 업데이트 사용 유무
         public bool m_bUseSFMRight { get; set; }
-        public List<ISGSiteConfig> SiteConfigInfo { get;}       
-        
+        public List<ISGSiteConfig> SiteConfigInfo { get; }
+
         public bool GetUseLoginIDSave(int groupID);
         public bool GetUseAutoLogin(int groupID);
         public bool GetUseAutoLoginCheck(int groupID);
@@ -172,7 +172,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// PassWord 걸린 ZIP 파일에 대해 파일추가 거부하게 할지 유무(true:거부)
         /// </summary>
         /// <returns></returns>
-        public bool GetUseDenyPasswordZip();
+        public bool GetUseDenyPasswordZip(int groupID);
 
         /// <summary>
         /// 
@@ -348,8 +348,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool m_bUseEmailManageApprove { get; set; } = false;                         // Email 관리 및 결재 기능 사용유무
 
-        public bool m_bUseDenyPasswordZip { get; set; } = true;                            // zip password 걸려 있으면 추가안되게 할지 유무(true:추가불가)
-
         public bool m_bUseAgentBlockValueChange { get; set; } = true;                       // tbl_agent_block 에 들어가는 Type 값을 WebManager에서 data를 보여줄 수 있는 형태로 변경(WebManager/NetLink와 맞춤)
 
         public bool m_bUseSFMRight { get; set; } = true;                                    // (파일 전송할 때) 자신이 대결재자로 등록되어 있으면 대결재자의 권한을 따라가는지 여부 true면 따라가고 false면 따라가지 않는다.
@@ -403,7 +401,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_strPWChangeProhibitLimit = "";           // 패스워드 사용금지 문자열 지정.
                 sgSiteConfig.m_nPWChangeApplyCnt = 9;                   // 패스워드 변경 시 허용되는 자리수 지정.
                 sgSiteConfig.m_bURLListPolicyRecv = false;              // URL 리스트 정책 받기 사용 유무
-                sgSiteConfig.m_strInitPasswd = "";
+                sgSiteConfig.m_strInitPasswd = "1K27SdexltsW0ubSCJgsZw=="; // hsck@2301
 
                 sgSiteConfig.m_bUseScreenLock = true;                   // 화면잠금 사용유무 값설정
                 sgSiteConfig.m_bRecvFolderChange = true;                // 수신폴더 변경 사용 여부
@@ -419,42 +417,44 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUseApproveAfterLimit = true;            // 사후결재 결재 Count 제한 사용유무
                 sgSiteConfig.m_bUseClipBoardApproveAfterLimit = true;
 
+                sgSiteConfig.m_bUserIDSave = true;                     //유저 아이디 저장
+                sgSiteConfig.m_bUseScreenLock = true;                  //Screen Lock 설정여부
+
+                sgSiteConfig.m_bRecvFolderChange = true;               // 수신폴더 변경 여부
+                sgSiteConfig.m_bUseUserRecvDownPath = true;            // 로그인 유저별 다운로드 경로 사용 여부
+
+                sgSiteConfig.m_bUseDenyPasswordZip = false;             // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
+
+                sgSiteConfig.m_bUseEmail = true;                        // 이메일 결재 사용 유무
+                sgSiteConfig.m_bUsePCURL = true;                        // PCURL 사용여부
+                sgSiteConfig.m_bUseClipApprove = true;                  //클립보드 결재 사용 유무
+                sgSiteConfig.m_bUsePublicBoard = true;                  // 공지사항 사용 유무.
+                sgSiteConfig.m_bUseCertSend = true;                     // 공인인증서 전송 사용 유무.
+                sgSiteConfig.m_bUseClipBoardFileTrans = true;           // 클립보드 파일형태 전송 사용유무
+
+                sgSiteConfig.m_bUseFileClipManageUI = true;             // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
+                sgSiteConfig.m_bUseFileClipApproveUI = true;            // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
+
+                sgSiteConfig.m_bUseClipTypeSelectSend = true;           // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
+                sgSiteConfig.m_bUseClipTypeTextFirstSend = true;        // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
+
+                //각 화면별 검색 방법 설정
+                sgSiteConfig.strApproverSearchType = "SEARCH";
+                sgSiteConfig.bUseInputSearchInApproverTree = true;
+                sgSiteConfig.strReceiverSearchType = "SEARCH";
+                sgSiteConfig.bUseInputSearchInReceiverTree = true;
+                sgSiteConfig.strProxySearchType = "SEARCH";
+                sgSiteConfig.bUseInputSearchInProxyTree = true;
+                sgSiteConfig.strSecurityApproverSearchType = "SEARCH";
+                sgSiteConfig.bUseInputSearchInSecurityApproverTree = true;
+                sgSiteConfig.strApproveExtApproverSearchType = "SEARCH";        // 결재필수 확장자 검색됐을때, 결재자 검색방식
+                sgSiteConfig.bUseApproveExt = true;                             // 결재필수 확장자 결재하는 기능 사용유무
+                sgSiteConfig.bUseInputSearchApproveExtTree = false;           // 결재필수 확장자, 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+
+
                 SiteConfigInfo.Add(sgSiteConfig);
 
-                SetPWChangeApplyCnt(i, 9);                              // 비밀번호 변경 허용 자리수
-                SetInitPasswordInfo(i, "1K27SdexltsW0ubSCJgsZw==");     // hsck@2301
-                SetUseAutoLogin(i, true);                               // 자동로그인 사용
-                SetUseAutoLoginCheck(i, true);                         // 자동로그인 체크박스 기본 체크
-                SetUseApprLineLocalSave(i, true);                       // 결재라인 로컬저장 기능 사용 
-                SetUseLoginIDSave(i, true);                            // ID history 기능 사용.
-                SetUseScreenLock(i, true);                              // 화면잠금 사용
-                SetUseRecvFolderChange(i, true);                        // 수신 폴더 변경 사용
-                SetUseUserRecvDownPath(i, true);                       // 로그인 유저별 다운로드 경로 사용 여부
-
-                SetUseEmailManageApprove(i, true);                           // 이메일 결재 사용 유무
-                SetUsePCURL(i, true);                                  // PCURL 사용 유무.
-                SetUseClipApprove(i, true);                            // 클립보드 결재 사용 유무.
-                SetUsePublicBoard(i, true);                            // 공지사항 사용 유무.
-                SetUseCertSend(i, true);                               // 공인인증서 전송 사용 유무.
-
-                SetUseClipBoardFileTrans(i, true);                     // 클립보드 파일형태 전송 사용유무
-                SetUseFileClipManageUI(i, true);                       // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
-                SetUseFileClipApproveUI(i, true);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
-
-                SetUseClipTypeSelectSend(i, true);                      // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
-                SetUseClipTypeTextFirstSend(i, true);                   // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
             }
-
-
-            /*SetPWChangeApplyCnt(0, 9);                                // 비밀번호 변경 허용 자리수
-            SetInitPasswordInfo(0, "1K27SdexltsW0ubSCJgsZw==");         // hsck@2301
-            SetUseAutoLogin(0, true);                                   // 자동로그인 사용
-            SetUseAutoLoginCheck(0, true);                              // 자동로그인 체크박스 기본 체크
-            SetUseApprLineLocalSave(0, true);                           // 결재라인 로컬저장 기능 사용 
-            SetUseLoginIDSave(0, true);                                 // ID history 기능 사용.
-
-            SetUseScreenLock(0, true);                                  // 화면잠금 사용
-            SetUseRecvFolderChange(0, true);                            // 수신 폴더 변경 사용*/
 
             SetUseClipAlarmTypeChange(true);                            // 클립보드 알림타입 변경 사용 유무           
             SetUseClipCopyAndSend(false);                               // 클립보드 복사 후 자동 전송 사용 유무
@@ -1170,9 +1170,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return m_bUseFileForwardDownNotRecv;
         }
 
-        public bool GetUseDenyPasswordZip()
+        public bool GetUseDenyPasswordZip(int groupID)
         {
-            return m_bUseDenyPasswordZip;
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseDenyPasswordZip;
+            return false;
         }
 
         public bool GetUseFileClipManageUI(int groupID)
