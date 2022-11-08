@@ -1699,7 +1699,9 @@
         string strFileExtInfo = sgLoginData.GetFileFilter();
         bool bDocumentWhite = sgLoginData.GetDocumentFileFilterType();              // true : white , false : black
         string strDocumentFileExtInfo = sgLoginData.GetDocumentFileFilter();
-
+          if (string.IsNullOrEmpty(strDocumentExtractType))
+            return 0;
+     
         string strDocumentExtractType = sgLoginData.GetDocumentExtractType(sgLoginData.GetSystemPosition());        //문서파일 내부 검사유형 ( 1 : OLE개체형식의 검출파일 검사 / 2 : 압축형식의 첨부파일검사 / 3 : 압축형식&OLE개체형식 모두 검사
         //int docExtractType = 0;
         //int.TryParse(strDocumentExtractType, out docExtractType);
