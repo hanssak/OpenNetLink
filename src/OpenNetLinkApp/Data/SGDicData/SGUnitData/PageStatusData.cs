@@ -76,11 +76,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         // 사후결재 조건 검사 타이머 
         public static AfterApprTimeEvent SNotiEvent;
-
         /// <summary>
         /// HEADER UI 용 노티
         /// </summary>
         public static AfterApprTimeEvent SCommonNotiEvent;
+
+        /// <summary>
+        /// 공통환경설정의 사후결재 컨트롤 체크여부 변경 노티 (공통환경설정 -> 파일전송)
+        /// </summary>
+        public static AfterApprTimeEvent SAfterApprControlCheckEvent;
 
         /// <summary>
         /// 매일 자정시 데이터 새로고침 이벤트
