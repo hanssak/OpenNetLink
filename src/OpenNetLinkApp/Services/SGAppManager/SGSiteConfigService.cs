@@ -151,12 +151,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //public bool GetUseNetOverAllsend();
 
         /// <summary>
-        /// virus / apt 등에 대한 대외처리 신청하는 기능 사용 유무
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseFileCheckException();
-
-        /// <summary>
         /// 파일포워드 기능 사용할 것인지 유무
         /// </summary>
         /// <returns></returns>
@@ -340,11 +334,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         //public bool m_bUseNetOverAllsend { get; set; } = false;                              // 3망 연결된 망에 한번에 전부 전송하는 기능 사용유무
 
-        public bool m_bUseFileCheckException { get; set; } = true;                              // virus / Apt에대한 예외처리 요청 기능 사용유무
+        public bool m_bUseFileForward { get; set; } = false;                                    // 파일포워드 기능 사용유무(site.넷마블)
 
-        public bool m_bUseFileForward { get; set; } = true;                                    // 파일포워드 기능 사용유무(site.넷마블)
-
-        public bool m_bUseFileForwardDownNotRecv { get; set; } = true;                         // 파일 수신되기전에 파일포워드로 다운로드 가능유무
+        public bool m_bUseFileForwardDownNotRecv { get; set; } = false;                         // 파일 수신되기전에 파일포워드로 다운로드 가능유무
 
         public bool m_bUseEmailManageApprove { get; set; } = false;                         // Email 관리 및 결재 기능 사용유무
 
@@ -387,13 +379,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
             {
                 SGSiteConfig sgSiteConfig = new SGSiteConfig();
                 sgSiteConfig.m_bUserIDSave = true;                      // 로그인한 ID 저장 여부
-                sgSiteConfig.m_bAutoLogin = false;                      // 자동로그인 사용 여부.
-                sgSiteConfig.m_bAutoLoginCheck = false;                 // 자동로그인 체크박스 체크여부.
+                sgSiteConfig.m_bAutoLogin = true;                      // 자동로그인 사용 여부.
+                sgSiteConfig.m_bAutoLoginCheck = true;                 // 자동로그인 체크박스 체크여부.
                 sgSiteConfig.m_bApprLineLocalSave = false;              // 결재라인 로컬 저장 여부.
                 sgSiteConfig.m_nZipPWBlock = 0;                         // zip 파일 패스워드 검사 여부 ( 0 : 사용 안함, 1 : 비번 걸려 있을 경우 차단,  2 : 비번이 안걸려 있을 경우 차단 )
                 sgSiteConfig.m_bTitleDescSameChk = false;               // 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부.
                 sgSiteConfig.m_bApprLineChkBlock = true;               // 고정 결재라인 차단 시 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
-                sgSiteConfig.m_bDlpInfoDisplay = false;                 // 전송/결재 관리 리스트에서 개인정보 검출 표시 유무 설정. ( true : 표시, false : 표시 안함 )
+                sgSiteConfig.m_bDlpInfoDisplay = true;                 // 전송/결재 관리 리스트에서 개인정보 검출 표시 유무 설정. ( true : 표시, false : 표시 안함 )
                 sgSiteConfig.m_bApprDeptSearch = true;                  // 결재자 검색 창의 타부서 수정 가능 여부.
                 sgSiteConfig.m_nApprStepLimit = 0;                      // 결재자 Step 제한 설정. ( 0 : 무제한, 그외 양수 제한 Step )
                 sgSiteConfig.m_bDeputyApprTerminateDel = false;         // 설정된 대결재자가 정보를 기한이 만료되면 삭제 할지 여부 ( true : 삭제, false : 삭제 안함)
@@ -401,42 +393,31 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_strPWChangeProhibitLimit = "";           // 패스워드 사용금지 문자열 지정.
                 sgSiteConfig.m_nPWChangeApplyCnt = 9;                   // 패스워드 변경 시 허용되는 자리수 지정.
                 sgSiteConfig.m_bURLListPolicyRecv = false;              // URL 리스트 정책 받기 사용 유무
-                sgSiteConfig.m_strInitPasswd = "1K27SdexltsW0ubSCJgsZw=="; // hsck@2301
+                sgSiteConfig.m_strInitPasswd = "o0mqmxYAyFmC1FDg72829w=="; // 1q2w3e4r!
 
-                sgSiteConfig.m_bUseScreenLock = true;                   // 화면잠금 사용유무 값설정
-                sgSiteConfig.m_bRecvFolderChange = true;                // 수신폴더 변경 사용 여부
-
-                sgSiteConfig.m_bUseEmail = false;                // 이메일 결재 사용 유무
-                sgSiteConfig.m_bUsePCURL = false;                       // PCURL 사용 유무.
-                sgSiteConfig.m_bUseClipApprove = false;                 // 클립보드 결재 사용 유무.
-                sgSiteConfig.m_bUsePublicBoard = false;                 // 공지사항 사용 유무.
-
-                sgSiteConfig.m_bUseFileClipManageUI = false;            // 클립보드 파일형태 전송시 관리 UI
-                sgSiteConfig.m_bUseFileClipApproveUI = false;           // 클립보드 파일형태 전송시 결재 UI
-
-                sgSiteConfig.m_bUseApproveAfterLimit = true;            // 사후결재 결재 Count 제한 사용유무
-                sgSiteConfig.m_bUseClipBoardApproveAfterLimit = true;
+                sgSiteConfig.m_bUseApproveAfterLimit = false;            // 파일 사후결재 결재 Count 제한 사용유무
+                sgSiteConfig.m_bUseClipBoardApproveAfterLimit = false;   // 클립보드 사후결재 결재 Count 제한 사용유무
 
                 sgSiteConfig.m_bUserIDSave = true;                     //유저 아이디 저장
-                sgSiteConfig.m_bUseScreenLock = true;                  //Screen Lock 설정여부
+                sgSiteConfig.m_bUseScreenLock = false;                  //Screen Lock 설정여부
 
                 sgSiteConfig.m_bRecvFolderChange = true;               // 수신폴더 변경 여부
                 sgSiteConfig.m_bUseUserRecvDownPath = true;            // 로그인 유저별 다운로드 경로 사용 여부
 
                 sgSiteConfig.m_bUseDenyPasswordZip = false;             // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
 
-                sgSiteConfig.m_bUseEmail = true;                        // 이메일 결재 사용 유무
-                sgSiteConfig.m_bUsePCURL = true;                        // PCURL 사용여부
-                sgSiteConfig.m_bUseClipApprove = true;                  //클립보드 결재 사용 유무
+                sgSiteConfig.m_bUseEmail = false;                        // 이메일 결재 사용 유무
+                sgSiteConfig.m_bUsePCURL = false;                        // PCURL 사용여부
+                sgSiteConfig.m_bUseClipApprove = false;                  //클립보드 결재 사용 유무
                 sgSiteConfig.m_bUsePublicBoard = true;                  // 공지사항 사용 유무.
-                sgSiteConfig.m_bUseCertSend = true;                     // 공인인증서 전송 사용 유무.
+                sgSiteConfig.m_bUseCertSend = false;                     // 공인인증서 전송 사용 유무.
                 sgSiteConfig.m_bUseClipBoardFileTrans = true;           // 클립보드 파일형태 전송 사용유무
 
-                sgSiteConfig.m_bUseFileClipManageUI = true;             // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
-                sgSiteConfig.m_bUseFileClipApproveUI = true;            // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
+                sgSiteConfig.m_bUseFileClipManageUI = false;             // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
+                sgSiteConfig.m_bUseFileClipApproveUI = false;            // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
 
-                sgSiteConfig.m_bUseClipTypeSelectSend = true;           // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
-                sgSiteConfig.m_bUseClipTypeTextFirstSend = true;        // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
+                sgSiteConfig.m_bUseClipTypeSelectSend = false;           // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
+                sgSiteConfig.m_bUseClipTypeTextFirstSend = false;        // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
 
                 //각 화면별 검색 방법 설정
                 sgSiteConfig.strApproverSearchType = "SEARCH";
@@ -448,8 +429,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.strSecurityApproverSearchType = "SEARCH";
                 sgSiteConfig.bUseInputSearchInSecurityApproverTree = true;
                 sgSiteConfig.strApproveExtApproverSearchType = "SEARCH";        // 결재필수 확장자 검색됐을때, 결재자 검색방식
-                sgSiteConfig.bUseApproveExt = true;                             // 결재필수 확장자 결재하는 기능 사용유무
+                sgSiteConfig.bUseApproveExt = false;                             // 결재필수 확장자 결재하는 기능 사용유무
                 sgSiteConfig.bUseInputSearchApproveExtTree = false;           // 결재필수 확장자, 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+                sgSiteConfig.m_bFileForward = true;                            //수신자 선택 파일 포워드
 
 
                 SiteConfigInfo.Add(sgSiteConfig);
@@ -476,7 +458,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetApprRejectAlarmRetain(false);                            // 승인 반려 알림 유지 사용 여부.
             SetUseApprCountAlaram(true);                                // 승인 대기 알림 사용 여부.
 
-            SetUseCloseTrayMove(true);                                  // 종료 시 트레이 사용 여부.
+            SetUseCloseTrayMove(false);                                  // 종료 시 트레이 사용 여부.
             SetUseStartTrayMove(false);                                 // 프로그램 시작시 트레이 이동 여부.
 
             SetUseStartProgramReg(false);                               // 시작 프로그램 등록 사용 여부.
@@ -489,8 +471,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUseMainPageTypeChange(true);                            // 메인화면 변경 타입 사용 유무
             SetViewFileFilter(true);                                    // (환경설정) 확장자 제한 화면 표시 유무.
             SetUseOSMaxFilePath(true);                                  // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
-
-            /*SetUseEmailManageApprove(0,false);                                     // 이메일 결재 사용 유무.
+            SetUseFileForward(false);                                   // 파일전송기능 사용유무
+            /*SetUseEmailManageApprove(0,false);                        // 이메일 결재 사용 유무.
             SetUsePCURL(0, false);                                      // PCURL 사용 유무.
             SetUseClipApprove(0, false);                                // 클립보드 결재 사용 유무.
             SetUsePublicBoard(0, false);                                // 공지사항 사용 유무.
@@ -1155,14 +1137,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return m_bUseNetOverAllsend;
         }*/
 
-        public bool GetUseFileCheckException()
-        {
-            return m_bUseFileCheckException;
-        }
-
         public bool GetUseFileForward()
         {
             return m_bUseFileForward;
+        }
+
+        public void SetUseFileForward(bool bUse)
+        {
+            m_bUseFileForward = bUse;
         }
 
         public bool GetUseFileForwardDownBeforeRecv()

@@ -30,9 +30,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bExitTrayMove { get; set; } = false;                                    // 종료 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
         public bool bStartTrayMove { get; set; } = false;                                   // 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
         public bool bStartProgramReg { get; set; } = false;                                 // 시작 프로그램 등록 ( true : 시작프로그램 등록, false : 시작프로그램 등록 해제 )
-
-        public bool bScreenLock { get; set; } = true;                                       // 화면잠금 사용 여부.(체크)
-        public bool bScreenLockUserChange { get; set; } = false;                            //스크린 잠금 사용자 임의 변경 가능여부
         public bool bUseApprWaitNoti { get; set; } = true;                                  // 승인대기 알림 사용 여부.(체크)
         public bool bUseLogLevel { get; set; } = false;                                     // 로그 레벨 사용 여부
         public List<bool> listUseGpkiLogin { get; set; } = null;                            // GPKI 로그인 사용 여부
@@ -130,12 +127,6 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseClipAlarmType { get; set; } = true;    // clipboard 송수신 알림 형태 수정가능유무
 
-
-        /// <summary>
-        /// ////////////////////////////////
-        /// </summary>
-
-        public bool bUseDenyPasswordZip { get; set; } = false;         // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
         public bool bUseClipBoardFileTrans { get; set; } = true;         // 파일형태로보내는 클립보드 사용 유무
         public bool bUseFileClipManageUI { get; set; } = true;         // 파일형태로보내는 클립보드 관리UI 나오게할지 유무
         public bool bUseFileClipApproveUI { get; set; } = false;          // 파일형태로보내는 클립보드 결재UI 나오게할지 유무

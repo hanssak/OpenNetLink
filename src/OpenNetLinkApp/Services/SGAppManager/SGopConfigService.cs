@@ -56,8 +56,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetStartTrayMove();
         bool GetStartProgramReg();
 
-        bool GetScreenLock();
-        bool GetScreenLockUserChange();
         bool GetUseApprWaitNoti();
         bool GetUseLogLevel();
         bool GetUseGPKILogin(int groupID);
@@ -169,33 +167,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         /// <returns></returns>
         //public bool GetUseNetOverAllsend();
-
-        /// <summary>
-        /// 파일포워드 기능 사용할 것인지 유무
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseFileForward();
-
-
-        /// <summary>
-        /// PassWord 걸린 ZIP 파일에 대해 파일추가 거부하게 할지 유무(true:거부)
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseDenyPasswordZip();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="groupID"></param>
-        /// <returns></returns>
-        public bool GetUseFileClipManageUI(int groupID);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="groupID"></param>
-        /// <returns></returns>
-        public bool GetUseFileClipApproveUI(int groupID);
 
         /// <summary>
         /// ClipBoard를 파일전송 Type으로 전송
@@ -427,14 +398,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetStartProgramReg()
         {
             return AppConfigInfo.bStartProgramReg;
-        }
-        public bool GetScreenLock()
-        {
-            return AppConfigInfo.bScreenLock;
-        }
-        public bool GetScreenLockUserChange()
-        {
-            return AppConfigInfo.bScreenLockUserChange;
         }
         public bool GetUseApprWaitNoti()
         {
@@ -724,27 +687,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseSelectFirstConnectNetServer()
         {
             return AppConfigInfo.bUseUserSelectFirstServer;
-        }
-
-        public bool GetUseFileForward()
-        {
-            return AppConfigInfo.bUseFileForward;
-        }
-
-
-        public bool GetUseDenyPasswordZip()
-        {
-            return AppConfigInfo.bUseDenyPasswordZip;
-        }
-
-        public bool GetUseFileClipManageUI(int groupID)
-        {
-            return AppConfigInfo.bUseFileClipManageUI;
-        }
-
-        public bool GetUseFileClipApproveUI(int groupID)
-        {
-            return AppConfigInfo.bUseFileClipApproveUI;
         }
 
         public bool GetUseClipBoardFileTrans(int groupID)

@@ -423,7 +423,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetScreenLock(bool screenLock)
         {
-            (OpConfigInfo as SGopConfig).bScreenLock = screenLock;
+            (AppConfigInfo as SGAppConfig).bScreenLock = screenLock;
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }

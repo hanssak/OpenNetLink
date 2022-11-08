@@ -63,22 +63,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetUseLogLevel();
         bool GetUseGPKILogin(int groupID);
 
-        //bool GetUseOverNetwork2();
-        //bool GetUseNetOverAllsend();
-        //bool GetFileForward();
-        //bool GetFileDownloadBeforeReciving();
-        //bool GetEmailApproveUse();
-
-        //bool GetClipboardFileTransUse();
-
-        //bool GetClipboardManageUse();
-
         bool GetShowAdminInfo();
-        //bool GetUseFileCheckException();
-        //bool GetDenyPasswordZIP();
+
         bool GetUseAppLoginType();
         int GetAppLoginType();
-
         int GetUserSelectFirstNet();
     }
     internal class SGAppConfigService : ISGAppConfigService

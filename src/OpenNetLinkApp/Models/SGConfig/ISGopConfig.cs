@@ -33,14 +33,10 @@ namespace OpenNetLinkApp.Models.SGConfig
         bool bStartTrayMove { get; }                                // 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
         bool bStartProgramReg { get; }                              // 시작 프로그램 등록 ( true : 시작프로그램 등록, false : 시작프로그램 등록 해제 )
 
-        bool bScreenLock { get; }                                   // 화면잠금 사용 여부.(체크)
         bool bUseApprWaitNoti { get; }                              // 승인대기 알림 사용 여부.(체크)
         public bool bUseLogLevel { get; set; }                      // 로그 레벨 사용 여부
         public List<bool> listUseGpkiLogin { get; set; }            // GPKI 로그인 사용 여부
 
-
-
-        public bool bScreenLockUserChange { get; set; }             //스크린락 사용자 임의 조작 가능 여부
         public bool bShowAdminInfo { get; set; }                    //대쉬보드에 관리자 정보 표시여부
         public bool bUseAppLoginType { get; set; }                  //사용자 지정 로그인타입 사용 여부
         public int LoginType { get; set; }                          //사용자 지정 로그인타입
@@ -121,18 +117,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public int nClipAfterApproveUseType { get; set; }    // 
         public bool bUseUserSelectFirstServer { get; set; }    // 
 
-        public bool bUseFileForward { get; set; }    // 파일포워드 기능 사용유무
-
         public bool bUseClipAlarmType { get; set; }           // 
 
-        /// <summary>
-        /// ////////////////////////////////
-        /// </summary>
-
-        public bool bUseDenyPasswordZip { get; set; }          // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
         public bool bUseClipBoardFileTrans { get; set; }          // 파일형태로보내는 클립보드 사용 유무
-        public bool bUseFileClipManageUI { get; set; }          // 파일형태로보내는 클립보드 관리UI 나오게할지 유무
-        public bool bUseFileClipApproveUI { get; set; }          // 파일형태로보내는 클립보드 결재UI 나오게할지 유무
 
         public bool bUseOneToMultiLogin { get; set; }          // 1번에 다중망 로그인 기능 사용유무
         public bool bUseOneByOneLogOut { get; set; }            // 1번에 다중망 로그인할때(bUseOneToMultiLogin = true) 에도 선택한 망만 로그인아웃하도록 할 건지유무

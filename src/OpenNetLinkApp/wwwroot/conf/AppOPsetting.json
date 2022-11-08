@@ -1,7 +1,7 @@
 {
 
   "bUseAppLoginType": false,
-  "LoginType": 0,
+  "LoginType": 1,
 
   "bUseLogLevel": true,
 
@@ -20,21 +20,21 @@
   "bRMouseFileAddAfterTrans": false,
 
   "bShowAfterApprAutoCheck": true,
-  "bAfterBasicChk": false,
+  "bAfterBasicChk": true,
 
   "bFileRecvAlarmRetain": false,
   "bFileRecvTrayFix": false,
   "bApprCompleteAlarmRetain": true,
   "bUserApprActionTrayFix": false,
-  "bApprRejectAlarmRetain": false,
+  "bApprRejectAlarmRetain": true,
   "bUserApprRejectTrayFix": false,
   "bApprCountAlarmRetain": true,
-  "bApprTrayFix": true,
+  "bApprTrayFix": false,
   "bUseApprCountAlaram": false,
   "bUseApprWaitNoti": true,
 
 
-  "bUserIDSave": false,
+  "bUserIDSave": true,
   "bAutoLogin": true,
   "bAutoLoginCheck": true,
   "bUserPWChange": false,
@@ -44,7 +44,7 @@
   "bDlpInfoDisplay": false,
   "bEmptyfileTrans": true,
 
-  "strInitPasswd": "1K27SdexltsW0ubSCJgsZw==",
+  "strInitPasswd": "o0mqmxYAyFmC1FDg72829w==",
   "strPWChangeProhibitLimit": "",
   "nPWChangeApplyCnt": 9,
 
@@ -70,11 +70,6 @@
   ],
 
   "bUseClipBoardFileTrans": true,
-  "bUseFileClipManageUI": true,
-  "bUseFileClipApproveUI": true,
-
-  "bScreenLockUserChange": true,
-  "bScreenLock": false,
 
   "enMainPageType": 0,
   "bNoApproveManageUI": false,
@@ -82,7 +77,7 @@
   "bStartProgramReg": true,
   "bTitleDescSameChk": false,
 
-  "bUseFileCheckException": true,
+  "bUseFileCheckException": false,
   "bUseNetOverAllsend": false,
   "listUseGpkiLogin": [
     false,
@@ -106,7 +101,7 @@
   "bViewSGSideBarUIBadge": true,
   "nClipAfterApproveUseType": 2,
   "bUseOneToMultiLogin": false,
-  "bUseOneByOneLogOut" : false,
+  "bUseOneByOneLogOut": false,
   "bApprDeptSearch": true,
   "bApprLineChkBlock": false,
   "bApprLineLocalSave": true,
@@ -123,14 +118,9 @@
   "bUseStartTrayMove": false,
   "bStartTrayMove": false,
 
-  "bUseFileForward": true,
-  "bFileDownloadBeforeReciving": false,
-
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
 
-  "bUsePartialFileAddInTransfer" : false
-
-  
+  "bUsePartialFileAddInTransfer": false
 
 }

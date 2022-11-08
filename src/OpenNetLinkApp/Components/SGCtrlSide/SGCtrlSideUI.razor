@@ -731,7 +731,7 @@
     {
 
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        m_bScreenLockUserChange = OpConfigSvc.GetScreenLockUserChange();
+        m_bScreenLockUserChange = AppConfigSvc.GetScreenLockUserChange();
 
 
         /*SGLoginData sgLoginData = null;
@@ -808,7 +808,7 @@
         }*/
 
 
-        m_bUseScreenLock = SGAppMgrSvc.OpConfigInfoService.GetScreenLock();  // siteConfig.GetUseScreenLock()
+        m_bUseScreenLock = SGAppMgrSvc.AppConfigInfoService.GetScreenLock();  // siteConfig.GetUseScreenLock()
         if (m_bUseScreenLock)
         {
             HsCmdCenter.sgPageEvent.SetScreenTimeInitNotiEvent(ScreenLockTimeInitNoti);
@@ -1150,7 +1150,7 @@
 
     private bool GetScreenLock()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetScreenLock();
+        return SGAppMgrSvc.AppConfigInfoService.GetScreenLock();
     }
 
     private int GetScreenTime()
