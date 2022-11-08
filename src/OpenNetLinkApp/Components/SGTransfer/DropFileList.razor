@@ -46,17 +46,16 @@
                     <thead>
                         <tr>
                             <th style="width:60%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left:5px;">@strFileName</th>                 <!--파일명-->
-                            <th style="text-align:right;vertical-align:middle;width:10%;">@strFileSize</th>                 <!--크기-->
-                            <th style="text-align:center;vertical-align:middle;width:10%;">@strFileType</th>                 <!--유형-->
-
+                        <th style="text-align:right;vertical-align:middle;width:10%;">@strFileSize</th>                 <!--크기-->
+                        <th style="text-align:center;vertical-align:middle;width:10%;">@strFileType</th>                 <!--유형-->
                             @if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
                             {
                                 <th style="text-align:center;vertical-align:middle;width:20%;">@XmlConf.GetTitle("T_COMMON_REMARK")</th>
- <!--비고-->
+                                <!--비고-->
                             }
 
                             <!--<th width="30%">@strLastModDay</th>-->               <!--수정한 날짜-->
-                        </tr>
+                    </tr>
                     </thead>
                     <tbody>
                         @foreach (var file in HsStreamList)
@@ -70,7 +69,7 @@
                                     <td style="text-align:center;vertical-align:middle;width:20%;">@(file.isNeedApprove? XmlConf.GetTitle("T_COMMON_APPROVE_EXT_ITEM") : "")</td>
                                 }
                                 <!--<td width="30%">@file.ModifyTime.ToString("yyyy/MM/dd HH:mm:ss")</td>-->
-                            </tr>
+                    </tr>
                         }
                     </tbody>
                 </table>
@@ -82,7 +81,7 @@
             <p style="font-size:13px;">
                 <br /><br /><br /><br />
                 @((MarkupString)strFileDragInfo)         <!--파일을 이곳으로 드래그 하세요.-->
-            </p>
+        </p>
 
         }
     </div>
@@ -595,7 +594,7 @@
                             hsStream.Type = "DIR";
                             hsStream.stream = null;
                             hsStream.MemoryType = HsStreamType.FileStream;
-                            hsStream.IsDir = true;                            
+                            hsStream.IsDir = true;
                         }
                         else
                         {
@@ -688,7 +687,7 @@
                             int nRet = 0;
                             nRet = await GetExamCheckZip(fileAddManage, childFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount);
                             if (nRet == 1)
-	                            hsStream.isNeedApprove = true;
+                                hsStream.isNeedApprove = true;
                             else if (nRet != 0)
                             {
                                 existErr = true;
@@ -736,7 +735,7 @@
     {
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-      //파일리더 초기화 통합
+        //파일리더 초기화 통합
         _dropReference = fileReaderService.CreateReference(inputTypeFileElement);
         string targets = new string("fileInputTrans");
         _dropReference.SetDragTargetElementAsync(targets);
@@ -1633,7 +1632,7 @@
 
             int nRet = 0;
             nRet = await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option, true,
-                (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() ? sgLoginData.GetExceptionExt() : "") );
+                (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() ? sgLoginData.GetExceptionExt() : ""));
             // if (await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option) != 0)
 
             if (nRet == 1)
@@ -1701,6 +1700,9 @@
         string strDocumentFileExtInfo = sgLoginData.GetDocumentFileFilter();
 
         string strDocumentExtractType = sgLoginData.GetDocumentExtractType(sgLoginData.GetSystemPosition());        //문서파일 내부 검사유형 ( 1 : OLE개체형식의 검출파일 검사 / 2 : 압축형식의 첨부파일검사 / 3 : 압축형식&OLE개체형식 모두 검사
+        if (string.IsNullOrEmpty(strDocumentExtractType))
+            return 0;
+
         //int docExtractType = 0;
         //int.TryParse(strDocumentExtractType, out docExtractType);
 
@@ -1812,7 +1814,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="fileaddmanage"></param>
     /// <param name="nRegSize"></param>
