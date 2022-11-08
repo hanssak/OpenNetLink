@@ -470,6 +470,20 @@ namespace OpenNetLinkApp.Services
             PageStatusData.SCommonNotiEvent = afterApprTime;
         }
 
+        /// <summary>
+        ///  공통환경설정의 사후결재 컨트롤 체크여부 변경 노티 (공통환경설정 -> 파일전송)
+        /// </summary>
+        /// <param name="a"></param>
+        public void SetAfterApprControlCheckEvent(int groupID, AfterApprTimeEvent afterApprControlCheck)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            PageStatusData.SAfterApprControlCheckEvent = afterApprControlCheck;
+        }
+
         public void SetDayFileAndClipMax(int groupID, Int64 fileMaxSize, int fileMaxCount, Int64 clipMaxSize, int clipMaxCount)
         {
             PageStatusData tmpData = null;
