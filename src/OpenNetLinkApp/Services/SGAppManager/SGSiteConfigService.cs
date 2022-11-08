@@ -247,6 +247,60 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseOneAClockChangeAgentTimer();
 
+
+        /// <summary>
+        /// 결재자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        /// </summary>
+        /// <returns></returns>
+        public string GetApproverSearchType(int groupId);
+
+        /// <summary>
+        /// 결재자 관련 팝업 시 직접 입력하여 결재자를 검색할 수 있는 기능 사용 유무 (Input 컨트롤 표시 유무)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInputSearchInApproverTree(int groupId);
+
+        /// <summary>
+        /// 수신자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        /// </summary>
+        /// <returns></returns>
+        public string GetReceiverSearchType(int groupId);
+
+        /// <summary>
+        /// 수신자 관련 팝업 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInputSearchInReceiverTree(int groupId);
+
+        /// <summary>
+        /// 대결재등록 시 부서 표시 방식을 SEARCH/TREE 타입 중 설정 (TREE 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        /// </summary>
+        /// <returns></returns>
+        public string GetProxySearchType(int groupId);
+
+        /// <summary>
+        /// 대결재등록 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInputSearchInProxyTree(int groupId);
+
+        /// <summary>
+        /// 보안결재자 등록 시 부서 표시 방식을 SEARCH/TREE 타입 중 설정 (TREE 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        /// </summary>
+        /// <returns></returns>
+        public string GetSecurityApproverSearchType(int groupId);
+        /// <summary>
+        /// 보안결재자 등록 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInputSearchInSecurityApproverTree(int groupId);
+
+        public string GetApproveExtSelectType(int groupId);
+
+        public bool GetUseApproveExt(int groupId);
+
+        public bool GetUseInputSearchApproveExtTree(int groupId);
+
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -1226,6 +1280,94 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return bUseAgentTime1aClock;
         }
 
+
+        public string GetApproveExtSelectType(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].strApproveExtApproverSearchType;
+            return String.Empty;
+        }
+
+        public bool GetUseApproveExt(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].bUseApproveExt;
+            return false;
+        }
+
+        public bool GetUseInputSearchApproveExtTree(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].bUseInputSearchApproveExtTree;
+            return false;
+        }
+
+        public string GetApproverSearchType(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].strApproverSearchType;
+            return String.Empty;
+        }
+
+        public bool GetUseInputSearchInApproverTree(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].bUseInputSearchInApproverTree;
+            return false;
+        }
+
+        public string GetReceiverSearchType(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].strReceiverSearchType;
+            return String.Empty;
+        }
+
+        public bool GetUseInputSearchInReceiverTree(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].bUseInputSearchInReceiverTree;
+            return false;
+        }
+
+        public string GetProxySearchType(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].strProxySearchType;
+            return String.Empty;
+        }
+
+        public bool GetUseInputSearchInProxyTree(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].bUseInputSearchInProxyTree;
+            return false;
+        }
+
+        public string GetSecurityApproverSearchType(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].strSecurityApproverSearchType;
+            return String.Empty;
+        }
+
+        public bool GetUseInputSearchInSecurityApproverTree(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].bUseInputSearchInSecurityApproverTree;
+            return false;
+        }
 
     }
 }

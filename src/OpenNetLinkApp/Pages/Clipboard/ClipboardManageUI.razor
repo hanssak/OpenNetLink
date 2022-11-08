@@ -10,6 +10,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGDomain
 @using System.Text
+@using OpenNetLinkApp.Components.SGSearchCondition
 
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
@@ -141,7 +142,8 @@
                             <table class="table table-head-fixed table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th style="text-align:center; vertical-align:middle;width:5%;">                                            @*체크박스*@
+                                        <th style="text-align:center; vertical-align:middle;width:5%;">
+                                            @*체크박스*@
                                             @*<input class="input" type="checkbox">*@
                                         </th>
                                         <th style="text-align:center; vertical-align:middle;width:7%;">@strApproveKind</th>                        <!--결재종류-->
@@ -510,7 +512,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-            // 조회방식변경
+        // 조회방식변경
         @*HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchResult);           // 조회 데이터 결과.
             HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCount);           // 조회 데이터 수 결과.*@
 
@@ -1088,129 +1090,129 @@
         StateHasChanged();
         }*@
 
-public void SetPageinfo(int nDataCount)
-{
-    nTotalPages = (int)nDataCount / nPageListCount;
-    if (nDataCount % nPageListCount > 0)
-        nTotalPages++;
+    public void SetPageinfo(int nDataCount)
+    {
+        nTotalPages = (int)nDataCount / nPageListCount;
+        if (nDataCount % nPageListCount > 0)
+            nTotalPages++;
 
-    if (nTotalPages <= 0)
-        nTotalPages = 1;
-}
+        if (nTotalPages <= 0)
+            nTotalPages = 1;
+    }
 
-private void ShowMessage(string strType, string strMsg)
-{
-    //type: success, info, waring, error 2020/07/02 YKH
-    string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
-    object[] param = { strType, strSystemName, strMsg };
-    jsRuntime.InvokeAsync<object>("fireToastMessage", param);
-}
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
 
-public transData GetTransListData(string strTransSeq)
-{
-    transData tdata = null;
-    int nCount = ListData.Count;
-    if (nCount <= 0)
+    public transData GetTransListData(string strTransSeq)
+    {
+        transData tdata = null;
+        int nCount = ListData.Count;
+        if (nCount <= 0)
+            return tdata;
+
+        for (int i = 0; i < nCount; i++)
+        {
+            transData temp = ListData[i];
+            if (temp.TransSeq.Equals(strTransSeq))
+            {
+                tdata = temp;
+                break;
+            }
+        }
         return tdata;
+    }
 
-    for (int i = 0; i < nCount; i++)
+    public class clipBoardData
     {
-        transData temp = ListData[i];
-        if (temp.TransSeq.Equals(strTransSeq))
+
+        public bool bCheckDisable { get; set; }           //체크 가능 불가능
+        public bool bCheck { get; set; }                  //체크 상태
+
+        public string TransSeq { get; set; }
+        public string ApvType { get; set; }
+        public string TransType { get; set; }
+        public string TransStatus { get; set; }
+        public string ApvStatus { get; set; }
+        public string DataType { get; set; }
+        public string Title { get; set; }                   //제목
+        public string RequestTime { get; set; }
+        public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
+        public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
+        public int downloadCount { get; set; }              //다운로드 카운트
+        public string stDLP { get; set; }                   //개인정보 포함여부
+
+
+        public clipBoardData()
         {
-            tdata = temp;
-            break;
+            bCheckDisable = bCheck = false;
+            TransSeq = ApvType = TransType = TransStatus = ApvStatus = Title = RequestTime = "";
+            //strDestNet = "";
+        }
+
+        public clipBoardData(string seq, string apvtype, string transtype, string transstatus, string apvstatus, string datatype, string title, string requesttime, string strTransStatusCode, string strApprStatusCode, string strDestNetData)
+        {
+            TransSeq = seq;
+            ApvType = apvtype;
+            TransType = transtype;
+            TransStatus = transstatus;
+            ApvStatus = apvstatus;
+            DataType = datatype;
+            Title = title;
+            RequestTime = requesttime;
+            TransStatusCode = strTransStatusCode;
+            ApprStatusCode = strApprStatusCode;
+            // strDestNet = strDestNetData;
         }
     }
-    return tdata;
-}
 
-public class clipBoardData
-{
-
-    public bool bCheckDisable { get; set; }           //체크 가능 불가능
-    public bool bCheck { get; set; }                  //체크 상태
-
-    public string TransSeq { get; set; }
-    public string ApvType { get; set; }
-    public string TransType { get; set; }
-    public string TransStatus { get; set; }
-    public string ApvStatus { get; set; }
-    public string DataType { get; set; }
-    public string Title { get; set; }                   //제목
-    public string RequestTime { get; set; }
-    public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
-    public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
-    public int downloadCount { get; set; }              //다운로드 카운트
-    public string stDLP { get; set; }                   //개인정보 포함여부
-
-
-    public clipBoardData()
+    private void HomeMove()
     {
-        bCheckDisable = bCheck = false;
-        TransSeq = ApvType = TransType = TransStatus = ApvStatus = Title = RequestTime = "";
-        //strDestNet = "";
-    }
 
-    public clipBoardData(string seq, string apvtype, string transtype, string transstatus, string apvstatus, string datatype, string title, string requesttime, string strTransStatusCode, string strApprStatusCode, string strDestNetData)
-    {
-        TransSeq = seq;
-        ApvType = apvtype;
-        TransType = transtype;
-        TransStatus = transstatus;
-        ApvStatus = apvstatus;
-        DataType = datatype;
-        Title = title;
-        RequestTime = requesttime;
-        TransStatusCode = strTransStatusCode;
-        ApprStatusCode = strApprStatusCode;
-        // strDestNet = strDestNetData;
-    }
-}
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
 
-private void HomeMove()
-{
+        //string strNavigateWithGroupID = "";
+        //if (siteConfig.GetUseDashBoard())
+        //    strNavigateWithGroupID = "/Welcome/";
+        //else
+        //    strNavigateWithGroupID = "/Transfer/";
 
-    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-    int groupID = 0;
-    if (sgSideBar != null)
-        groupID = sgSideBar.GroupId;
-
-    //string strNavigateWithGroupID = "";
-    //if (siteConfig.GetUseDashBoard())
-    //    strNavigateWithGroupID = "/Welcome/";
-    //else
-    //    strNavigateWithGroupID = "/Transfer/";
-
-    //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-    string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
-    string strNavigateUrl = strNavigateWithGroupID.ToLower();
-    if (strNavigateUrl.IndexOf("transfer") > 0)
-    {
-        strNavigateUrl = pageService.GetFileTransPage(groupID);
-        if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-            strNavigateWithGroupID = strNavigateUrl;
-        else
-            strNavigateWithGroupID = "/Transfer/";
-    }
-    strNavigateWithGroupID += groupID.ToString();
-    MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-
-    foreach (var MenuItem in SideBarUISvc.MenuList)
-    {
-        if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
+        //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+        string strNavigateUrl = strNavigateWithGroupID.ToLower();
+        if (strNavigateUrl.IndexOf("transfer") > 0)
         {
-            SideBarUISvc.ActiveMenu = MenuItem;
-            break;
+            strNavigateUrl = pageService.GetFileTransPage(groupID);
+            if (strNavigateUrl != null && strNavigateUrl.Length > 0)
+                strNavigateWithGroupID = strNavigateUrl;
+            else
+                strNavigateWithGroupID = "/Transfer/";
+        }
+        strNavigateWithGroupID += groupID.ToString();
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
+        foreach (var MenuItem in SideBarUISvc.MenuList)
+        {
+            if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
+            {
+                SideBarUISvc.ActiveMenu = MenuItem;
+                break;
+            }
         }
     }
-}
 
-/// <summary>
-/// TransSeq에 해당하는 transData 를 찾아준다
-/// </summary>
-/// <param name="strTransSeq">TransSeq</param>
-/// <returns>TransData</returns>
+    /// <summary>
+    /// TransSeq에 해당하는 transData 를 찾아준다
+    /// </summary>
+    /// <param name="strTransSeq">TransSeq</param>
+    /// <returns>TransData</returns>
     @*public transData GetTransListData(string strTransSeq)
         {
         transData tdata = null;

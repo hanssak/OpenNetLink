@@ -636,8 +636,6 @@
         actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
 
-        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproveExtSelectType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchApproveExtTree();
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -648,6 +646,9 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
+        approverSearchType = SGAppMgrSvc.SiteConfigInfoService.GetApproveExtSelectType(groupID);
+        useInputInTree = SGAppMgrSvc.SiteConfigInfoService.GetUseInputSearchApproveExtTree(groupID);
 
         bEditDeptName = SGAppMgrSvc.SiteConfigInfoService.GetUseApprDeptSearch(groupID); // OpConfigInfoService
 

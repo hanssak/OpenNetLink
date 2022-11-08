@@ -49,7 +49,7 @@
                             <th style="text-align:right;vertical-align:middle;width:10%;">@strFileSize</th>                 <!--크기-->
                             <th style="text-align:center;vertical-align:middle;width:10%;">@strFileType</th>                 <!--유형-->
 
-                            @if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
+                            @if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(0) && isUserNeedApproveExtUI())
                             {
                                 <th style="text-align:center;vertical-align:middle;width:20%;">@XmlConf.GetTitle("T_COMMON_REMARK")</th>
  <!--비고-->
@@ -65,7 +65,7 @@
                                 <td style="width:60%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left:5px;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
                                 <td style="text-align:right;vertical-align:middle;width:10%;">@(file.IsDir? "" : CsFunction.GetSizeStr(file.Length))</td>
                                 <td style="text-align:center;vertical-align:middle;width:10%;">@file.Type</td>
-                                @if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
+                                @if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(0) && isUserNeedApproveExtUI())
                                 {
                                     <td style="text-align:center;vertical-align:middle;width:20%;">@(file.isNeedApprove? XmlConf.GetTitle("T_COMMON_APPROVE_EXT_ITEM") : "")</td>
                                 }
@@ -368,7 +368,7 @@
                     hsStream.IsDir = false;
                     hsStream.MemoryType = HsStreamType.FileStream;
                     hsStream.isNeedApprove = false;
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt())
+                    if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID))
                     {
                         if (CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
                             hsStream.isNeedApprove = true;
@@ -601,7 +601,7 @@
                         {
                             hsStream.Size = item.Length;
 
-                            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt())
+                            if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID))
                             {
                                 if (CsFunction.isFileExtinListStr(true, fInfo.Extension, sgLoginData.GetExceptionExt()))
                                     hsStream.isNeedApprove = true;
@@ -981,7 +981,7 @@
                     hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
                 }
 
-                if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt())
+                if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID))
                 {
 
                     SGLoginData sgLoginData = null;
@@ -1071,7 +1071,7 @@
             hsStream.MemoryType = HsStreamType.MemoryStream;
             hsStream.stream = null;
             hsStream.isNeedApprove = false;
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt())
+            if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID))
             {
                 SGLoginData sgLoginData = null;
                 sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -1633,7 +1633,7 @@
 
             int nRet = 0;
             nRet = await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option, true,
-                (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() ? sgLoginData.GetExceptionExt() : "") );
+                (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID) ? sgLoginData.GetExceptionExt() : "") );
             // if (await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option) != 0)
 
             if (nRet == 1)

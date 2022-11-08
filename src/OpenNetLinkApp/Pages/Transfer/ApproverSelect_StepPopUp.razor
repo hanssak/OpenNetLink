@@ -625,8 +625,6 @@
         actionAssign = AssignApprover;
         actionApproverDivSelect = TargetDivSelect;
         actionTargetSelect = SelectTarget;
-        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproverSearchType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproverTree();
         InitText();
     }
 
@@ -640,6 +638,10 @@
         //*****************************************************************
         //EventBinding : EventBinding DeptApprLine -> DeptApprLineResult
         //*****************************************************************
+
+        approverSearchType = SGAppMgrSvc.SiteConfigInfoService.GetApproverSearchType(groupID);
+        useInputInTree = SGAppMgrSvc.SiteConfigInfoService.GetUseInputSearchInApproverTree(groupID);
+
         HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResultStep);
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResultStep);
 

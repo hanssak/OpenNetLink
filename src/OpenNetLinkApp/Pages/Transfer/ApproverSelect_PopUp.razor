@@ -449,8 +449,6 @@
         actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
 
-        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproverSearchType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproverTree();
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -462,6 +460,8 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
+        approverSearchType = SGAppMgrSvc.SiteConfigInfoService.GetApproverSearchType(groupID);
+        useInputInTree = SGAppMgrSvc.SiteConfigInfoService.GetUseInputSearchInApproverTree(groupID);
 
         bEditDeptName = SGAppMgrSvc.SiteConfigInfoService.GetUseApprDeptSearch(groupID);
 
@@ -524,7 +524,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-	// 실제 사용안함
+        // 실제 사용안함
         //HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult); //타부서 조회 결과
 
         if (approverSearchType == "TREE" && refSGDeptTreeList != null)

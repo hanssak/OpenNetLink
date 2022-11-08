@@ -151,6 +151,11 @@
 
     public void BindEvent()
     {
+        int groupID = Int32.Parse(lstInfo[0]);
+
+        securityApproverSearchType = SGAppMgrSvc.SiteConfigInfoService.GetSecurityApproverSearchType(groupID);
+        useInputInTree = SGAppMgrSvc.SiteConfigInfoService.GetUseInputSearchInSecurityApproverTree(groupID);
+
         if (securityApproverSearchType == "TREE" && refSGDeptTree != null)
             refSGDeptTree.BindEvent();
 
@@ -229,8 +234,6 @@
     protected override void OnInitialized()
     {
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        securityApproverSearchType = SGAppMgrSvc.OpConfigInfoService.GetSecurityApproverSearchType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInSecurityApproverTree();
     }
 
 }

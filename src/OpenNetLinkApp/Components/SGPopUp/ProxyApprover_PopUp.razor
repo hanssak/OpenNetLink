@@ -442,6 +442,9 @@
             strCurDept = sgUserData.GetTeamName();
         }
 
+        proxySearchType = SGAppMgrSvc.SiteConfigInfoService.GetProxySearchType(groupID);
+        useInputInTree = SGAppMgrSvc.SiteConfigInfoService.GetUseInputSearchInProxyTree(groupID);
+
         HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, ProxySearchResult);
         HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, ResultPossibleCount);
 
@@ -541,8 +544,6 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        proxySearchType = SGAppMgrSvc.OpConfigInfoService.GetProxySearchType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInProxyTree();
 
         actionAssign = AssignProxy;
         actionTargetSelect = SelectTarget;
