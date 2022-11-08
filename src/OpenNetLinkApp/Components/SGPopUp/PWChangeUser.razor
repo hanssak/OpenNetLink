@@ -125,7 +125,7 @@
         }
 
         //정규표현식을 이용한 패스워드 복잡도 체크
-        int MaxLen = SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID);
+        int MaxLen = SGAppMgrSvc.SiteConfigInfoService.GetPWChangeApplyCnt(groupID); // OpConfigInfoService
 
         if (stNewPW.Length < MaxLen)                         //길이체크
         {

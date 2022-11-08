@@ -120,7 +120,7 @@ bViewSGHeaderUIAlarmNoriAllDel : 알람 / 노티 한번에 삭제하는 기능 �
 
 bViewSGSideBarUIBadge : 왼쪽 siteBar에 BadgeUI 나오게할지 여부(true,false) [기능을 사용할때마다 나와서 보통false사용]
 
-nClipAfterApproveUseType : 클립보드 파일전송 형태때, 0:CheckBox 및 사용자 설정 설정대로, 1:사전, 2:사후 로 전송되게 적용(siteConfig)
+nClipAfterApproveUseType : 클립보드 파일전송 형태때, 0:CheckBox 및 사용자 설정 설정대로, 1:사전, 2:사후 로 전송되게 적용
 
 bUseOneToMultiLogin : 1번에 다중망 로그인 기능 사용유무
 bUseOneByOneLogOut : 1번에 다중망 로그인 기능 사용중일때, 로그아웃은 선택한 망에 대해서 1곳만 진행(true)

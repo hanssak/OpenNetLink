@@ -2027,7 +2027,7 @@
     public bool GetRecvDownPathChangeHide(int groupID)
     {
         // siteConfig. json으로 이동
-        return !(SGAppMgrSvc.OpConfigInfoService.GetUseRecvFolderChange(groupID));
+        return !(SGAppMgrSvc.SiteConfigInfoService.GetUseRecvFolderChange(groupID)); // OpConfigInfoService
     }
 
 

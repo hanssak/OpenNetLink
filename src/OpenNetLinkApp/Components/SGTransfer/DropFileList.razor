@@ -1627,7 +1627,7 @@
                 return 0;
             }
 
-            bool bDenyPasswordZIP = SGAppMgrSvc.OpConfigInfoService.GetUseDenyPasswordZip();
+            bool bDenyPasswordZIP = SGAppMgrSvc.SiteConfigInfoService.GetUseDenyPasswordZip(); // OpConfigInfoService
             CLog.Here().Information($"압축(Zip) 파일 passwd 있을때 차단 : [{bDenyPasswordZIP.ToString()}]");
             //bool bDenyPasswordZIP = SGAppMgrSvc.AppConfigInfoService.GetDenyPasswordZIP();
 

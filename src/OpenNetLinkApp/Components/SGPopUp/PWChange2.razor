@@ -166,7 +166,7 @@
 
         //정규표현식을 이용한 패스워드 복잡도 체크
         // siteConfig. json으로 이동
-        int MaxLen = SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID);
+        int MaxLen = SGAppMgrSvc.SiteConfigInfoService.GetPWChangeApplyCnt(groupID); // OpConfigInfoService
         if (stNewPW.Length < MaxLen)                         //길이체크
         {
             strInfoMsg = XmlConf.GetWarnMsg("W_0045");                                              // 비밀번호는 {0}자리 이상 입력해야 합니다.

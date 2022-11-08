@@ -997,7 +997,7 @@
             }
 
 
-            DateTime dt =(SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
+            DateTime dt =(SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
             pageService.SetSvrTime(groupId, dt, sgLoginData);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
@@ -1192,7 +1192,7 @@
 
                 //if (sgLoginData.GetApprove() == true)
                 // 3망 정책고려한 결재사용유무 설정
-                if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false) // 결재관리 UI 않나오는 설정추가
+                if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.SiteConfigInfoService.GetNoApproveManageUI(groupid) == false) // 결재관리 UI 않나오는 설정추가
                     if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                         bApprMenuUse = true;
 
@@ -1217,7 +1217,7 @@
 
             bEmailUse = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(groupid);  // siteConfig. json으로 이동
             bPCURLUse = SGAppMgrSvc.OpConfigInfoService.GetUsePCURL(groupid);
-            bClipBoardApprUse = SGAppMgrSvc.OpConfigInfoService.GetUseFileClipManageUI(groupid);
+            bClipBoardApprUse = SGAppMgrSvc.SiteConfigInfoService.GetUseFileClipManageUI(groupid); // OpConfigInfoService
             bPublicBoard = SGAppMgrSvc.OpConfigInfoService.GetUsePublicBoard(groupid);
             //bPublicBoard = true;
 

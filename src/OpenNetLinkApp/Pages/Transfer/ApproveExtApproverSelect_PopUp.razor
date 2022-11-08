@@ -649,7 +649,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        bEditDeptName = SGAppMgrSvc.OpConfigInfoService.GetUseApprDeptSearch(groupID);
+        bEditDeptName = SGAppMgrSvc.SiteConfigInfoService.GetUseApprDeptSearch(groupID); // OpConfigInfoService
 
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);

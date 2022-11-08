@@ -655,7 +655,7 @@
             //if (sgLoginData.GetApprove() == true)
 
             // 3망 정책고려한 결재사용유무 설정
-            if (pageService.GetUseApproveNetOver(activeMenu.GroupId, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
+            if (pageService.GetUseApproveNetOver(activeMenu.GroupId, sgLoginData) && SGAppMgrSvc.SiteConfigInfoService.GetNoApproveManageUI(activeMenu.GroupId) == false) // OpConfigInfoService
                 if ((sgLoginData.GetApproveProxyRight() && bSFMManageUse) || (sgUserInfo.GetUserApprPos() > 0))
                     bApprMenuUse = true;
 
@@ -680,8 +680,8 @@
         //bUseClipBoardManageUI = siteConfig.GetUseClipApprove(activeMenu.GroupId);
         //bUseClipBoardManageUI = AppConfigSvc.GetClipboardManageUse();
 
-        bUseClipBoardManageUI = SGAppMgrSvc.OpConfigInfoService.GetUseFileClipManageUI(activeMenu.GroupId);
-        bUseClipBoardApproveUI = SGAppMgrSvc.OpConfigInfoService.GetUseFileClipApproveUI(activeMenu.GroupId);
+        bUseClipBoardManageUI = SGAppMgrSvc.SiteConfigInfoService.GetUseFileClipManageUI(activeMenu.GroupId);
+        bUseClipBoardApproveUI = SGAppMgrSvc.SiteConfigInfoService.GetUseFileClipApproveUI(activeMenu.GroupId); // OpConfigInfoService
         bPublicBoard = SGAppMgrSvc.OpConfigInfoService.GetUsePublicBoard(activeMenu.GroupId);
 
 

@@ -208,6 +208,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns></returns>
         public bool GetUseClipBoardFileTrans(int groupID);
 
+
+        public bool GetNoApproveManageUI(int groupID);
+
         /// <summary>
         /// 파일포워딩 기능 사용유무
         /// </summary>
@@ -234,6 +237,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
 
         public bool GetUseOneToMultiLogin();
+
+
+        public bool GetUseAppLoginType(int groupId);
+
+
+        public int GetAppLoginType(int groupId);
+
+
+        public bool GetUseOneAClockChangeAgentTimer();
+
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -269,7 +282,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseOSMaxFilePath { get; set; } = true;                               // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
         public int m_nClipAfterApproveUseType { get; set; } = 0;                                    // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
 
-        public bool m_bUseUserSelectFirstServer { get; set; } = true;                       // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
+        public bool m_bUseUserSelectFirstServer { get; set; } = false;                       // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
 
         //public bool m_bUseNetOverAllsend { get; set; } = false;                              // 3망 연결된 망에 한번에 전부 전송하는 기능 사용유무
 
@@ -288,6 +301,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseSFMRight { get; set; } = true;                                    // (파일 전송할 때) 자신이 대결재자로 등록되어 있으면 대결재자의 권한을 따라가는지 여부 true면 따라가고 false면 따라가지 않는다.
 
         public bool m_bUseSelfSSOlogin { get; set; } = true;                                    // (다중망 로그인할 때) 한곳에 로그인하면, 나머지 망은 전부 로그인 처리하는 동작 사용유무
+
+        public bool bUseAgentTime1aClock { get; set; } = false;         // 사후결재 정책, 자정에  검색화면 검색날짜 UI / 일일 송순가능수 UI 변경되는거 Server 시간이 아니라 agent 시간기준으로 동작(XX:00:00에 동작)
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
@@ -325,7 +340,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bApprLineLocalSave = false;              // 결재라인 로컬 저장 여부.
                 sgSiteConfig.m_nZipPWBlock = 0;                         // zip 파일 패스워드 검사 여부 ( 0 : 사용 안함, 1 : 비번 걸려 있을 경우 차단,  2 : 비번이 안걸려 있을 경우 차단 )
                 sgSiteConfig.m_bTitleDescSameChk = false;               // 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부.
-                sgSiteConfig.m_bApprLineChkBlock = false;               // 고정 결재라인 차단 시 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
+                sgSiteConfig.m_bApprLineChkBlock = true;               // 고정 결재라인 차단 시 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
                 sgSiteConfig.m_bDlpInfoDisplay = false;                 // 전송/결재 관리 리스트에서 개인정보 검출 표시 유무 설정. ( true : 표시, false : 표시 안함 )
                 sgSiteConfig.m_bApprDeptSearch = true;                  // 결재자 검색 창의 타부서 수정 가능 여부.
                 sgSiteConfig.m_nApprStepLimit = 0;                      // 결재자 Step 제한 설정. ( 0 : 무제한, 그외 양수 제한 Step )
@@ -370,7 +385,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 SetUseClipBoardFileTrans(i, true);                     // 클립보드 파일형태 전송 사용유무
                 SetUseFileClipManageUI(i, true);                       // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
-                SetUseFileClipApproveUI(i, false);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
+                SetUseFileClipApproveUI(i, true);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
 
                 SetUseClipTypeSelectSend(i, true);                      // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
                 SetUseClipTypeTextFirstSend(i, true);                   // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
@@ -561,6 +576,25 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bUseClipBoardApproveAfterLimit = bClipBoardApproveAfterLimit;
         }
+
+
+        public bool GetUseAppLoginType(int groupId)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupId < listSiteConfig.Count)
+                return listSiteConfig[groupId].m_bUseAppLoginType;
+            return false;
+        }
+
+        public int GetAppLoginType(int groupId)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupId < listSiteConfig.Count)
+                return listSiteConfig[groupId].m_nLoginType;
+            return 0;
+        }
+
+
         public bool GetUseApprTreeSearch(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
@@ -1130,6 +1164,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 listSiteConfig[groupID].m_bUseClipBoardFileTrans = bUse;
         }
 
+        public bool GetNoApproveManageUI(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bNoApproveManageUI;
+            return false;
+        }
+
+
         public bool GetUseFileForward(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
@@ -1177,5 +1220,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return m_bUseSelfSSOlogin;
         }
+
+        public bool GetUseOneAClockChangeAgentTimer()
+        {
+            return bUseAgentTime1aClock;
+        }
+
+
     }
 }

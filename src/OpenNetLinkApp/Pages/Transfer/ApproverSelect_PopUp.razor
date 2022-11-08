@@ -463,7 +463,7 @@
             groupID = sgSideBar.GroupId;
 
 
-        bEditDeptName = SGAppMgrSvc.OpConfigInfoService.GetUseApprDeptSearch(groupID);
+        bEditDeptName = SGAppMgrSvc.SiteConfigInfoService.GetUseApprDeptSearch(groupID);
 
         if (pageService.GetLoadApprBaseLine(groupID) == false)
         {

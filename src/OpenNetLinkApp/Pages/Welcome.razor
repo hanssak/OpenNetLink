@@ -929,7 +929,7 @@
             // if (sgLoginData.GetApprove() == true)                        // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
 
             // 3망 정책고려한 결재사용유무 설정 && 설정상 결재관리 UI 사용
-            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
+            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.SiteConfigInfoService.GetNoApproveManageUI(groupID) == false)
                 if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                     bApprMenuUse = true;
         }
@@ -2319,7 +2319,7 @@
 
                 bool bEmailUse = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(nGroupID);
                 bool bPCURLUse = SGAppMgrSvc.OpConfigInfoService.GetUsePCURL(nGroupID);
-                bool bClipBoardApprUse = SGAppMgrSvc.OpConfigInfoService.GetUseFileClipManageUI(nGroupID);   // GetUseClipApprove(nGroupID);
+                bool bClipBoardApprUse = SGAppMgrSvc.SiteConfigInfoService.GetUseFileClipManageUI(nGroupID);   // GetUseClipApprove(nGroupID); // OpConfigInfoService
                 int nParentID = 0;
                 ISGSideBarUI activeMenu = null;
 
@@ -2456,7 +2456,7 @@
             // if (sgLoginData.GetApprove() == true)                        // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
 
             // 3망 정책고려한 결재사용유무 설정
-            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
+            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.SiteConfigInfoService.GetNoApproveManageUI(groupID) == false) // OpConfigInfoService
                 if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                     return true;
         }

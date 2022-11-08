@@ -1541,8 +1541,8 @@ catch (Exception ex)
         //클립보드 결재 옵션이 켜진경우 내용을 파일로 저장하고 파일전송으로 진행한다.
         //Clipboard 실제 전송(HSCmdCenter)  2021/06/08 YKH 클립보드 승인이 켜져 있는 경우는 클립보드 내용을 파일로 남기고 그파일을 전송하는 옵션이 추가됨
 
-        //if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId)) // op..json으로 이동
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId))
+        //if (SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId)) // op..json으로 이동
+        if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId))
         {
 
             CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{clipData.nGroupId}, FileTrans Type Send !!!");
@@ -2140,7 +2140,7 @@ catch (Exception ex)
         string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
         if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 ||
             (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) ||
-            SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardNoApproveButFileTrans())
+            SGAppMgrSvc.SiteConfigInfoService.GetUseClipBoardNoApproveButFileTrans()) // OpConfigInfoService
             stApprLineSeq = "";
 
         // 클립보드 파일전송의 사후결재 설정
@@ -2420,7 +2420,7 @@ catch (Exception ex)
                     // if (sgLoginData.GetApprove() == true)   // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
 
                     // 3망 정책고려한 결재사용유무 설정
-                    if (pageService.GetUseApproveNetOver(nGroupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
+                    if (pageService.GetUseApproveNetOver(nGroupID, sgLoginData) && SGAppMgrSvc.SiteConfigInfoService.GetNoApproveManageUI(nGroupID) == false) // OpConfigInfoService
                         if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                             bApprMenuUse = true;
                 }*/
@@ -2591,10 +2591,10 @@ catch (Exception ex)
             if (!bUseApprWaitNoti)
                 return;
 
-            if (SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI())
+            if (SGAppMgrSvc.SiteConfigInfoService.GetNoApproveManageUI(groupID)) // OpConfigInfoService
             {
                 CLog.Here().Information("OS_NOTI.WAIT_APPR - But OpConfig is NoApproveManageUI - No insert Alarm : {0}",
-                    SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI().ToString());
+                    SGAppMgrSvc.SiteConfigInfoService.GetNoApproveManageUI(groupID).ToString()); // OpConfigInfoService
                 return;
             }
 

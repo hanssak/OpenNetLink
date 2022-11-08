@@ -73,7 +73,7 @@
                             }
                         </label>
                     </div>
-                    @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward())
+                    @if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForward())
                     {
                         <div class="card-body clearfix">
                             <label class="line-label border-right pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_FILE_RECEIVER")</label>
@@ -659,7 +659,7 @@
                 {
                     strMsg = XmlConf.GetWarnMsg("W_0076");                   // 결재자를 추가하십시오.
                 }
-                else if (SGAppMgrSvc.OpConfigInfoService.GetUseApprLineChkBlock(groupID))
+                else if (SGAppMgrSvc.SiteConfigInfoService.GetUseApprLineChkBlock(groupID)) // OpConfigInfoService
                 {
                     strMsg = XmlConf.GetWarnMsg("W_0206");                   // 결재자가 설정되어 있지 않습니다./r/n관리자에게 문의하십시오.
                     strMsg = strMsg.Replace("/r/n", "<br>");
@@ -1643,7 +1643,7 @@
 
         int groupID = groupIDbyParam;
 
-        DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : pageService.GetAfterApprTime(groupID);
+        DateTime dt = (SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : pageService.GetAfterApprTime(groupID);
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);

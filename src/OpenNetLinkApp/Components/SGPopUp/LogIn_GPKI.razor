@@ -964,7 +964,7 @@
             }
 
 
-            DateTime dt =(SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
+            DateTime dt =(SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
             pageService.SetSvrTime(groupId, dt, sgLoginData);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);

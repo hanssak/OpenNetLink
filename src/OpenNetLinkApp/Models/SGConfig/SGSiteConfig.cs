@@ -40,7 +40,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool m_bUseDenyPasswordZip { get; set; } = false;         // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
         public bool m_bFileForward { get; set; } = false;               // 파일포워드기능 사용할지 유무
         public bool m_bUseClipBoardFileTrans { get; set; } = true;         // 파일형태로보내는 클립보드 사용 유무
-        public bool m_bUseFileClipManageUI { get; set; } = false;         // 파일형태로보내는 클립보드 관리UI 나오게할지 유무
+        public bool m_bUseFileClipManageUI { get; set; } = true;         // 파일형태로보내는 클립보드 관리UI 나오게할지 유무
         public bool m_bUseFileClipApproveUI { get; set; } = false;          // 파일형태로보내는 클립보드 결재UI 나오게할지 유무
 
         public bool m_bUseClipTypeSelectSend { get; set; } = true;         // 클립보드를 보낼때, 이미지 / Text를 사용자가 선택해서 보내는 기능 사용유무
@@ -51,6 +51,14 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool m_bUseClipBoardApproveAfterLimit { get; set; } = true;       // 클립보드 파일전송시 사후결재 Count 제한 사용유무
 
+
+        public bool m_bUseAppLoginType { get; set; } = false;                   // 사용자 지정 로그인타입 사용 여부
+
+        public int m_nLoginType { get; set; } = 0;                              //사용자 지정 로그인타입 지정
+
+        public bool m_bNoApproveManageUI { get; set; } = false;            // 결재관리 No사용 유무 ( true : 결재관리UI / NoTi 없어짐, false : 기존설정대로사용 )
+
+        //public bool bUseAgentTime1aClock { get; set; } = false;         // 사후결재 정책, 자정에  검색화면 검색날짜 UI / 일일 송순가능수 UI 변경되는거 Server 시간이 아니라 agent 시간기준으로 동작(XX:00:00에 동작)
 
     }
 }
