@@ -786,6 +786,37 @@
     }
 
     /// <summary>
+    /// 수신 다운로드 설정
+    /// </summary>
+    /// <param name="groupID">그룹ID</param>
+    /// <param name="strPath">다운경로</param>
+    public void SetUserIDRecvDownLoad(int groupID)
+    {
+        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        string strPath = AppConfigSvc.GetRecvDownPath(groupID);
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID))
+        {
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+
+            // ISGCtrlSideUIService CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
+
+            if (sgLoginData != null)
+            {
+                //공영홈쇼핑에서 MAC/Window 모두 ID 적용요청하여 사용
+
+                string strAddFolder = "";
+                strAddFolder = sgLoginData.GetUserID();
+
+                strPath = Path.Combine(strPath, strAddFolder);
+                HSCmdCenter.SetDownLoadPath(groupID, strPath);
+                HSCmdCenter.SetBaseDownLoadPath(groupID, strPath);
+                //CtrlSideUISvc.SetRecvDownPath(groupID, strPath);
+            }
+        }
+    }
+
+    /// <summary>
     /// Login 이후 result 처리 진행
     /// </summary>
     /// <param name="groupId"></param>
@@ -830,7 +861,9 @@
             }
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
-
+            
+            HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));
+            SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
 
             Dictionary<string, SGNetOverData> dicSysIdName = null;
             dicSysIdName = new Dictionary<string, SGNetOverData>();
