@@ -1083,59 +1083,59 @@
 
 #if _WINDOWS
 
-     try
-       {
-       if (e.strUrlData != null && e.strUrlData.Length > 0)
-      System.Diagnostics.Process.Start("explorer", e.strUrlData);
-       }
-      catch (Exception ex)
-       {
-       CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+        try
+        {
+            if (e.strUrlData != null && e.strUrlData.Length > 0)
+                System.Diagnostics.Process.Start("explorer", e.strUrlData);
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
         }
 
 #elif _LINUX
 
 if (e.strUrlData != null && e.strUrlData.Length > 0)
- {
-        string strProcessName = "";
-        int nIdx = 0;
-       for(; nIdx < 2 ; nIdx++)
-        {
-       try
-      {
-      // Linux OS Type 별로
-      if (nIdx == 0)
-      strProcessName = "x-www-browser";
-       else if (nIdx == 1)
-      strProcessName = "xdg-open";
+{
+    string strProcessName = "";
+    int nIdx = 0;
+   for(; nIdx < 2 ; nIdx++)
+    {
+   try
+  {
+  // Linux OS Type 별로
+  if (nIdx == 0)
+  strProcessName = "x-www-browser";
+   else if (nIdx == 1)
+  strProcessName = "xdg-open";
 
-       System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
-       break;
-     }
-       catch (Exception ex)
-       {
-        CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
-        groupid, strProcessName, e.strUrlData, ex.Message);
-        }
-     }
-   }
-   else
- {
-      CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
-  }
+   System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
+   break;
+ }
+   catch (Exception ex)
+   {
+    CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
+    groupid, strProcessName, e.strUrlData, ex.Message);
+    }
+ }
+}
+else
+{
+  CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
+}
 
 #elif _MACOSX
 
-  try
-   {
-      if (e.strUrlData != null && e.strUrlData.Length > 0) {
-       System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
-       }
- }
+try
+{
+  if (e.strUrlData != null && e.strUrlData.Length > 0) {
+   System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
+   }
+}
 catch (Exception ex)
 {
-     CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-    }
+ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+}
 
 #else
 #endif
@@ -1608,7 +1608,7 @@ catch (Exception ex)
 
             if (listNetOverPolicy.Count() < 2)
             {
-            // Clipboard Data 실제 전송하는 부분
+                // Clipboard Data 실제 전송하는 부분
                 @*if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)    // 선택전송
                     ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
                     else
@@ -1626,7 +1626,7 @@ catch (Exception ex)
                     if (listNetOverPolicy[nIdx].Length > 0)
                     {
 
-                    // Clipboard Data 실제 전송하는 부분
+                        // Clipboard Data 실제 전송하는 부분
                         @*if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)    // 선택전송
                             //ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
                             nTempRet = HsCmdCenter.SendClipboard(clipData.nGroupId, listNetOverPolicy[nIdx], strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
@@ -2609,6 +2609,12 @@ catch (Exception ex)
 
                     //if (sgLoginData.GetApproveProxyRight() && sgUserData.GetUserApprPos() == 0)
                     //{
+
+                    if (pageService.GetLogoutStatus(groupID))
+                    {
+                        return;
+                    }
+
                     SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.GetSFMRefreshEvent();
                     if (sfmRefreshEvent != null)
                     {
@@ -2630,6 +2636,12 @@ catch (Exception ex)
                         }
                         ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
                         if (sgUserData == null)
+                        {
+                            pageService.SetApproveAfterMyCountChecking(false);
+                            return;
+                        }
+
+                        if (pageService.GetLogoutStatus(groupID))
                         {
                             pageService.SetApproveAfterMyCountChecking(false);
                             return;
