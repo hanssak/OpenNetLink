@@ -128,7 +128,7 @@
                                     // 다중접속일때에는 단일망에만 전달가능
                                     // 단일접속일때에는 3중망에 전달가능
                                     @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx != 0 &&
-                           (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                          (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                     {
 
                                         @if (bAddedClipBoardItem)
@@ -1126,6 +1126,14 @@
                 }
                 str += xmlConf.GetTitle("T_PROXY_USERNAME_LOGOUT"); //" 을 대결재권한 변경으로 로그아웃 하겠습니다.";
 
+                if (pageService.GetLogoutStatus(groupId))
+                {
+                    pageService.SetSFMLogOut(true);
+                    pageService.SetSFMChecking(false);
+                }
+
+
+
                 refSGAlert.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), str, 1, groupId, groupId.ToString());
 
             }
@@ -1954,79 +1962,79 @@
             DateTime dt = pageService.GetAfterApprTime(groupID);
             pageService.SetSvrTime(groupID, dt, sgLoginData);
         *@
-    bool bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
-    if (!dicCurrentAfterChkHide.ContainsKey(groupID))
-    {
-        dicCurrentAfterChkHide.Add(groupID, bAfterApprChkHIde);
-    }
-    else if (dicCurrentAfterChkHide[groupID] == bAfterApprChkHIde)
-    {
-        return;
-    }
-    //공통환경설정의 '사후결재 관리' 부분 화면 표시 여부 갱신
-    CtrlSideEvent ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
-    if (ctrlSideEvent != null)
-        ctrlSideEvent();
-
-    //파일 송수신 중 사후결재 여부가 변경되었다면 메세지 표시
-    if (pageService.GetFileSending() || pageService.GetFileRecving())
-    {
-        string strSystemName = xmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
-        object[] param = { "info", strSystemName, xmlConf.GetInfoMsg("I_0225") };
-        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
-    }
-    else
-    {
-        Task.Run(() => refAfterApproveChangeAlert.openPopUp(xmlConf.GetTitle("T_TRANS_KIND_CHANGE"), xmlConf.GetInfoMsg("I_0225"), 1, groupID));
-    }
-}
-
-
-public void FileInfoSaveEvent(object obj, SGEventArgs e)
-{
-    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-    if (sgSideBar == null)
-        return;
-
-    int groupId = sgSideBar.GroupId;
-
-    ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupId);
-    if (sgUserData == null)
-        return;
-
-    string userSeq = sgUserData.UserSeq;
-    if (Convert.ToBoolean(obj))
-    {
-        string clientId = sgUserData.UserId;
-        string mid = e.MsgRecode["MID"].Base64DecodingStr();
-        string hszName = e.MsgRecode["HSZNAME"];
-
-
-        Dictionary<string, string> tempMsgRecode = new Dictionary<string, string>();
-        foreach (string str in e.MsgRecode.Keys)
+        bool bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
+        if (!dicCurrentAfterChkHide.ContainsKey(groupID))
         {
-            if (str == "CLIENTID")
-            {
-                tempMsgRecode.Add("CLIENTID", sgUserData.UserId);
-            }
-            else if (str == "FILEMD5" || str == "FILERECORD" || str == "HSZNAME")
-            {
-                tempMsgRecode.Add(str, e.MsgRecode[str]);
-            }
-            else
-            {
-                tempMsgRecode.Add(str, e.MsgRecode[str].Base64DecodingStr());
-            }
+            dicCurrentAfterChkHide.Add(groupID, bAfterApprChkHIde);
         }
+        else if (dicCurrentAfterChkHide[groupID] == bAfterApprChkHIde)
+        {
+            return;
+        }
+        //공통환경설정의 '사후결재 관리' 부분 화면 표시 여부 갱신
+        CtrlSideEvent ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
+        if (ctrlSideEvent != null)
+            ctrlSideEvent();
 
-        byte[] collectionByte = CsFunction.ObjectToByteArray(tempMsgRecode);
-
-        SQLiteDB.InsertReSendInfo(groupId, userSeq, clientId, mid, hszName, collectionByte);
+        //파일 송수신 중 사후결재 여부가 변경되었다면 메세지 표시
+        if (pageService.GetFileSending() || pageService.GetFileRecving())
+        {
+            string strSystemName = xmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+            object[] param = { "info", strSystemName, xmlConf.GetInfoMsg("I_0225") };
+            JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+        }
+        else
+        {
+            Task.Run(() => refAfterApproveChangeAlert.openPopUp(xmlConf.GetTitle("T_TRANS_KIND_CHANGE"), xmlConf.GetInfoMsg("I_0225"), 1, groupID));
+        }
     }
-    else
+
+
+    public void FileInfoSaveEvent(object obj, SGEventArgs e)
     {
-        SQLiteDB.DeleteReSendInfo(groupId, userSeq);
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        if (sgSideBar == null)
+            return;
+
+        int groupId = sgSideBar.GroupId;
+
+        ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupId);
+        if (sgUserData == null)
+            return;
+
+        string userSeq = sgUserData.UserSeq;
+        if (Convert.ToBoolean(obj))
+        {
+            string clientId = sgUserData.UserId;
+            string mid = e.MsgRecode["MID"].Base64DecodingStr();
+            string hszName = e.MsgRecode["HSZNAME"];
+
+
+            Dictionary<string, string> tempMsgRecode = new Dictionary<string, string>();
+            foreach (string str in e.MsgRecode.Keys)
+            {
+                if (str == "CLIENTID")
+                {
+                    tempMsgRecode.Add("CLIENTID", sgUserData.UserId);
+                }
+                else if (str == "FILEMD5" || str == "FILERECORD" || str == "HSZNAME")
+                {
+                    tempMsgRecode.Add(str, e.MsgRecode[str]);
+                }
+                else
+                {
+                    tempMsgRecode.Add(str, e.MsgRecode[str].Base64DecodingStr());
+                }
+            }
+
+            byte[] collectionByte = CsFunction.ObjectToByteArray(tempMsgRecode);
+
+            SQLiteDB.InsertReSendInfo(groupId, userSeq, clientId, mid, hszName, collectionByte);
+        }
+        else
+        {
+            SQLiteDB.DeleteReSendInfo(groupId, userSeq);
+        }
     }
-}
 
 }
