@@ -1442,6 +1442,7 @@
 
         pageService.SetAfterApproveCheck(groupID, bAfterCheck);
         pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);   //매시 정각에 1번씨 동작
+        pageService.SetAfterApprControlCheckEvent(groupID, AfterApproveCheckedChange);   //'공통환경설정'의 사후결재 체크 속성(Checked) 상태가 변경될 시 동작
 
         if (groupID > -1)
             pageService.SetCurFileSendInfo(groupID, "/Transfer2/" + groupID.ToString());
@@ -2137,6 +2138,29 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    /// 사후결제 체크상태 변경 (From 공통환경설정)
+    /// </summary>
+    public void AfterApproveCheckedChange()
+    {
+        int groupID = groupIDbyParam;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+        if (sgUserData == null)
+            return;
+
+        if(bAfterApprChkHIde)       //현재 '사후결재 체크'가 표시되지 않으면 별도 컨트롤 하지 않는다.
+            return;
+        
+        bAfterCheck = OpConfigSvc.GetAfterBasicChk();
+        pageService.SetAfterApproveCheck(groupID, bAfterCheck);
+        StateHasChanged();
+    }
     /*
     public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
     {
