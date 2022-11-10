@@ -92,6 +92,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApprLineLocalSave(int groupID);
 
         public bool GetUseApprLineChkBlock(int groupID);
+
         public bool GetUseApprDeptSearch(int groupID);
         public bool GetUseApprTreeSearch(int groupID);
         public bool GetUseUserPWChange(int groupID);
@@ -112,7 +113,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="groupID">그룹ID</param>
         /// <returns>true : 로그인 유저별 수신경로 사용, false : 로그인 유저별 수신경로 미사용</returns>
         public bool GetUseUserRecvDownPath(int groupID);
+
+        public bool GetUseUserRecvDownPathUserName(int groupID);
+        
+
         public bool GetUseEmailManageApprove(int groupID);
+
         public bool GetUsePCURL(int groupID);
 
         public bool GetUsePublicBoard(int groupID);
@@ -346,6 +352,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return true;    // 기본값
         }
 
+        public bool GetUseEmailManageApprove(int nGroupID)
+        {
+            (AppConfigInfo as SGopConfig).blistUseEmail ??= new List<bool>();
+
+            if ((AppConfigInfo as SGopConfig).blistUseEmail.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGopConfig).blistUseEmail[nGroupID];
+
+            return false;    // 기본값
+        }
+
         public bool GetURLAutoAfterMsg(int nGroupID)
         {
             //return AppConfigInfo.bURLAutoAfterMsg;
@@ -545,6 +561,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bApprLineChkBlock;
         }
+
         public bool GetUseApprDeptSearch(int groupID)
         {
             return AppConfigInfo.bApprDeptSearch;
@@ -569,6 +586,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.nPWChangeApplyCnt;
         }
+
         public string GetInitPasswordInfo(int groupID)
         {
             return AppConfigInfo.strInitPasswd;
@@ -582,10 +600,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bUseUserRecvDownPath;
         }
-        public bool GetUseEmailManageApprove(int groupID)
+
+        public bool GetUseUserRecvDownPathUserName(int groupID)
         {
-            return AppConfigInfo.bUseEmail;
+            return AppConfigInfo.bUseUserRecvDownPathUserName;
         }
+
         public bool GetUsePCURL(int groupID)
         {
             return AppConfigInfo.bUsePCURL;

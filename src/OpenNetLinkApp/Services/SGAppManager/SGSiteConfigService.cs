@@ -297,6 +297,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseInputSearchApproveExtTree(int groupId);
 
+
+        public void SetUseAccessAllDrive(int groupID, bool bUseAllDrive);
+
+        public bool GetUseAccessAllDrive(int groupID);
+
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -338,7 +343,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool m_bUseFileCheckException { get; set; } = true;                              // virus / Apt에대한 예외처리 요청 기능 사용유무
 
-        public bool m_bUseFileForward { get; set; } = true;                                    // 파일포워드 기능 사용유무(site.넷마블)
+        public bool m_bFileForward { get; set; } = false;                                    // 파일포워드 기능 사용유무(site.넷마블)
 
         public bool m_bUseFileForwardDownNotRecv { get; set; } = true;                         // 파일 수신되기전에 파일포워드로 다운로드 가능유무
 
@@ -390,31 +395,20 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bTitleDescSameChk = false;               // 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부.
                 sgSiteConfig.m_bApprLineChkBlock = true;               // 고정 결재라인 차단 시 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
                 sgSiteConfig.m_bApprDeptSearch = true;                  // 결재자 검색 창의 타부서 수정 가능 여부.
+                
                 sgSiteConfig.m_bUserPWChange = false;                   // 사용자 패스워드 변경 사용 여부.
                 sgSiteConfig.m_strPWChangeProhibitLimit = "";           // 패스워드 사용금지 문자열 지정.
                 sgSiteConfig.m_nPWChangeApplyCnt = 9;                   // 패스워드 변경 시 허용되는 자리수 지정.
                 sgSiteConfig.m_strInitPasswd = "1K27SdexltsW0ubSCJgsZw=="; // hsck@2301
 
-                sgSiteConfig.m_bUseScreenLock = true;                   // 화면잠금 사용유무 값설정
                 sgSiteConfig.m_bRecvFolderChange = true;                // 수신폴더 변경 사용 여부
-
-                sgSiteConfig.m_bUseEmail = false;                // 이메일 결재 사용 유무
-                sgSiteConfig.m_bUsePCURL = false;                       // PCURL 사용 유무.
-                sgSiteConfig.m_bUseClipApprove = false;                 // 클립보드 결재 사용 유무.
-                sgSiteConfig.m_bUsePublicBoard = false;                 // 공지사항 사용 유무.
-
-                sgSiteConfig.m_bUseFileClipManageUI = false;            // 클립보드 파일형태 전송시 관리 UI
-                sgSiteConfig.m_bUseFileClipApproveUI = false;           // 클립보드 파일형태 전송시 결재 UI
 
                 sgSiteConfig.m_bUseApproveAfterLimit = true;            // 사후결재 결재 Count 제한 사용유무
                 sgSiteConfig.m_bUseClipBoardApproveAfterLimit = true;
 
-                sgSiteConfig.m_bUserIDSave = true;                     //유저 아이디 저장
                 sgSiteConfig.m_bUseScreenLock = true;                  //Screen Lock 설정여부
 
-                sgSiteConfig.m_bRecvFolderChange = true;               // 수신폴더 변경 여부
                 sgSiteConfig.m_bUseUserRecvDownPath = true;            // 로그인 유저별 다운로드 경로 사용 여부
-
                 sgSiteConfig.m_bUseDenyPasswordZip = false;             // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
 
                 sgSiteConfig.m_bUseEmail = true;                        // 이메일 결재 사용 유무
@@ -425,9 +419,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUseClipBoardFileTrans = true;           // 클립보드 파일형태 전송 사용유무
 
                 sgSiteConfig.m_bUseFileClipManageUI = true;             // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
-                sgSiteConfig.m_bUseFileClipApproveUI = true;            // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
+                sgSiteConfig.m_bUseFileClipApproveUI = false;            // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
 
-                sgSiteConfig.m_bUseClipTypeSelectSend = true;           // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
+                sgSiteConfig.m_bUseClipTypeSelectSend = false;           // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
                 sgSiteConfig.m_bUseClipTypeTextFirstSend = true;        // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
 
                 //각 화면별 검색 방법 설정
@@ -442,7 +436,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.strApproveExtApproverSearchType = "SEARCH";        // 결재필수 확장자 검색됐을때, 결재자 검색방식
                 sgSiteConfig.bUseApproveExt = true;                             // 결재필수 확장자 결재하는 기능 사용유무
                 sgSiteConfig.bUseInputSearchApproveExtTree = false;           // 결재필수 확장자, 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
-
+                sgSiteConfig.m_bUseEmail = true;
+                sgSiteConfig.m_bAccessAllDrive = false;
 
                 SiteConfigInfo.Add(sgSiteConfig);
 
@@ -569,6 +564,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bApprLineChkBlock = bApprLineChkBlock;
         }
+
         public bool GetUseApprDeptSearch(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
@@ -680,6 +676,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_nPWChangeApplyCnt = nPWChangeApplyCnt;
         }
+
         public string GetInitPasswordInfo(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
@@ -790,6 +787,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return listSiteConfig[groupID].m_bUseEmail;
             return false;
         }
+
         private void SetUseEmailManageApprove(int groupID, bool bUseEmail)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
@@ -1094,7 +1092,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseFileForward()
         {
-            return m_bUseFileForward;
+            return m_bFileForward;
         }
 
         public bool GetUseFileForwardDownBeforeRecv()
@@ -1301,6 +1299,23 @@ namespace OpenNetLinkApp.Services.SGAppManager
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
                 return listSiteConfig[groupID].bUseInputSearchInSecurityApproverTree;
+            return false;
+        }
+
+
+        public void SetUseAccessAllDrive(int groupID, bool bUseAllDrive)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bAccessAllDrive = bUseAllDrive;
+        }
+
+        public bool GetUseAccessAllDrive(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bAccessAllDrive;
+
             return false;
         }
 

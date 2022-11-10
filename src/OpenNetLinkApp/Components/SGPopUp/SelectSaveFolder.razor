@@ -379,7 +379,16 @@
 
     protected override void OnInitialized()
     {
-        rootDrives = Directory.GetLogicalDrives();
+
+        //rootDrives = Directory.GetLogicalDrives();
+        if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(0)) // ngroupID 중요하지 않음
+            rootDrives = Directory.GetLogicalDrives();
+        else
+        {
+            if (rootDrives == null)
+                rootDrives = new string[1] { "K:\\"};
+        }
+
         stCurrentDrive = rootDrives[0];
         actionPopUpLoadFileList = LoadListFiles;
 

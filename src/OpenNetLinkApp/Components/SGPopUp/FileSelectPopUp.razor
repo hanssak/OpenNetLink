@@ -103,7 +103,7 @@
     [Parameter]
     public EventCallback<List<string>> OnSelectOK { get; set; }
 
-    private string[] drives;
+    private string[] drives = null;
     private string stCurrentDrive = "";
     public string _stCurrentDrive
     {
@@ -123,6 +123,7 @@
     FileTreeCustom refFileTreeCustom;
 
     ISGSideBarUIService SideBarUISvc;
+    public int ngroupID = 0;
 
     private async void selectOK()
     {
@@ -175,7 +176,15 @@
 
     protected override void OnInitialized()
     {
-        drives = Directory.GetLogicalDrives();
+        if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(0))
+            drives = Directory.GetLogicalDrives();
+        else
+        {
+            if (drives == null)
+                drives = new string[3]{"C:\\", "D:\\", "K:\\"};
+        }
+
+        // "C:\\" / "K:\\"
         stCurrentDrive = drives[0];
         actionPopUpLoadFileList = LoadListFiles;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;

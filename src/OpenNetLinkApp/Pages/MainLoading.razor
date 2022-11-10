@@ -78,6 +78,10 @@
             sgSettingData = sgSettingProc.SelectSettingData(listNetWork[i].GroupID);
             if (sgSettingData == null)
                 sgSettingProc.InsertSettingData(listNetWork[i].GroupID, "", "", "", "", 0);
+
+
+            if (String.Compare(listNetWork[i].NetPos, "EX", true) == 0)
+                siteConfig.SetUseAccessAllDrive(listNetWork[i].GroupID, true);
         }
 
         //HSCmdCenter.sgPageEvent.SetSvrEventAdd(0, SvrResult);

@@ -580,25 +580,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.listUseGpkiLogin[groupID];
         }
 
-        /*public bool GetUseNetOverAllsend()
-        {
-            return AppConfigInfo.bUseNetOverAllsend;
-        }*/
-
-        /*public bool GetFileForward()
-        {
-            return AppConfigInfo.bFileForward;
-        }*/
-
-        /*public bool GetFileDownloadBeforeReciving()
-        {
-            return AppConfigInfo.bFileDownloadBeforeReciving;
-        }*/
-        /*public bool GetEmailApproveUse()
-        {
-            return AppConfigInfo.bEmailApproveUse;
-        }*/
-
         /// <summary>
         /// 클립보드 파일전송 Type으로 사용할 건지 유무
         /// </summary>

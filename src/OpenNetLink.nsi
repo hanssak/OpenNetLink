@@ -3629,6 +3629,9 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   File "artifacts\windows\published\zlib.managed.dll"
   */
+
+  SetOutPath "$INSTDIR"
+  File "bin_addon\SecureGateChromiumExtension_v1.1.crx"
   
   ; 단축아이콘 생성
   CreateDirectory "$SMPROGRAMS\OpenNetLink"

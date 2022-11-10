@@ -1489,6 +1489,8 @@
         //CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
         SetAllDownloadPath(groupId, stPath);
     }
+
+
     private async void SetRecvDownPath(int groupId, ChangeEventArgs changeEventArg)
     {
         string recvDownPath = Convert.ToString(changeEventArg.Value);
@@ -1534,6 +1536,8 @@
         //CtrlSideUISvc.SetRecvDownPath(groupId, recvDownPath);
         SetAllDownloadPath(groupId, recvDownPath);
     }
+
+
     private void SetFileRecvFolderOpen(ChangeEventArgs changeEventArg)
     {
         bool fileRecvFolderOpen = Convert.ToBoolean(changeEventArg.Value);

@@ -73,5 +73,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseApproveExt { get; set; }                        // 결재필수 확장자 결재하는 기능 사용유무
 
         public bool bUseInputSearchApproveExtTree { get; set; }         // 결재필수 확장자, 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+
+        public bool m_bAccessAllDrive { get; set; }                     // 모든 Drive에 접근하도록 할지여부
+
     }
 }

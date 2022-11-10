@@ -806,7 +806,16 @@
                 //공영홈쇼핑에서 MAC/Window 모두 ID 적용요청하여 사용
 
                 string strAddFolder = "";
-                strAddFolder = sgLoginData.GetUserID();
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPathUserName(groupID))
+                {
+                    SGUserData sgUserInfo = null;
+                    sgUserInfo = (SGUserData)HSCmdCenter.GetUserData(groupID);
+                    if (sgUserInfo == null)
+                        return;
+                    strAddFolder = sgUserInfo.GetUserName();
+                }
+                else
+                    strAddFolder = sgLoginData.GetUserID();
 
                 strPath = Path.Combine(strPath, strAddFolder);
                 HSCmdCenter.SetDownLoadPath(groupID, strPath);
