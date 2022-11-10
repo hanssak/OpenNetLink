@@ -23,19 +23,19 @@
                 <span aria-hidden="true">&times;</span>
                 </button>-->
             </div>
-            <div class="modal-body-default_up" >
-            <!-- content -->
+            <div class="modal-body-default_up">
+                <!-- content -->
 
                 <div class=" alert_txt ">
                     <label class="mb-1" style="font-size:20px; color:black;">
-                    <i class="fas fa-search pr-2" style="color:#609c00; "></i>Checking for Upadates...
-                    </label>				 
+                        <i class="fas fa-search pr-2" style="color:#609c00; "></i>Checking for Upadates...
+                    </label>
                     <div class="progress progress-sm mb-3 mt-3 " style="position: relative; width: 100%; border-radius: 3px">
                         <div class="progress-bar progress-bar-striped indeterminate" style="width: 100%;  border-radius: 3px"></div>
                     </div>
                 </div>
 
-            <!--/. content -->
+                <!--/. content -->
             </div>
             <div class="modal-footer-default ">
                 <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0 " @onclick="@(OnClosePopUp.InvokeAsync)">취소</button>
@@ -46,7 +46,6 @@
     <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
-
 @code
 {
     [Parameter]
@@ -60,8 +59,8 @@
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
         object[] param2 = { "1000" };
         await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
-        object[] param3 = { "black" };
-        await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
+        //object[] param3 = { "black" };
+        //await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
 
         object[] param4 = { "0" };
         await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param4);
@@ -74,8 +73,8 @@
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
         object[] param2 = { "1024" };
         await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
-        object[] param3 = { "#C2C7D0" };
-        await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
+        //object[] param3 = { "#C2C7D0" };
+        //await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
 
         object[] param5 = { "1101" };
         await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param5);

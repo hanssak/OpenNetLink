@@ -12,7 +12,7 @@
 @using System.Text
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 
-<div class="modal fade" id="modal-selectsavefolder">
+<div class="modal fade" id="modal-selectsavefolder" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline pl-3 pr-3">
@@ -283,8 +283,8 @@
         JSRuntime.InvokeAsync<object>("changeModalBg", param2);
         object[] param3 = { "1024" };
         JSRuntime.InvokeAsync<object>("changeModalZIndex", param3);
-        object[] param4 = { "#C2C7D0" };
-        JSRuntime.InvokeAsync<object>("changeModalFontColor", param4);
+        //object[] param4 = { "#C2C7D0" };
+        //JSRuntime.InvokeAsync<object>("changeModalFontColor", param4);
 
         object[] param5 = { "1101" };
         JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param5);
