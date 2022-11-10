@@ -42,15 +42,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApprLineLocalSave(int groupID);
         public int GetZipPWBlock(int groupID);
         public bool GetUseApprLineChkBlock(int groupID);
-        public bool GetUseDlpInfoDisplay(int groupID);
         public bool GetUseApprDeptSearch(int groupID);
         public bool GetUseApprTreeSearch(int groupID);
-        public int GetApprStepLimit(int groupID);
-        public bool GetUseDeputyApprTerminateDel(int groupID);
         public bool GetUseUserPWChange(int groupID);
         public string GetPWChangeProhibitLimit(int groupID);
         public int GetPWChangeApplyCnt(int groupID);
-        public bool GetUseURLListPolicyRecv(int groupID);
         public string GetInitPasswordInfo(int groupID);
 
         public bool GetUseScreenLock();
@@ -393,14 +389,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_nZipPWBlock = 0;                         // zip 파일 패스워드 검사 여부 ( 0 : 사용 안함, 1 : 비번 걸려 있을 경우 차단,  2 : 비번이 안걸려 있을 경우 차단 )
                 sgSiteConfig.m_bTitleDescSameChk = false;               // 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부.
                 sgSiteConfig.m_bApprLineChkBlock = true;               // 고정 결재라인 차단 시 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
-                sgSiteConfig.m_bDlpInfoDisplay = false;                 // 전송/결재 관리 리스트에서 개인정보 검출 표시 유무 설정. ( true : 표시, false : 표시 안함 )
                 sgSiteConfig.m_bApprDeptSearch = true;                  // 결재자 검색 창의 타부서 수정 가능 여부.
-                sgSiteConfig.m_nApprStepLimit = 0;                      // 결재자 Step 제한 설정. ( 0 : 무제한, 그외 양수 제한 Step )
-                sgSiteConfig.m_bDeputyApprTerminateDel = false;         // 설정된 대결재자가 정보를 기한이 만료되면 삭제 할지 여부 ( true : 삭제, false : 삭제 안함)
                 sgSiteConfig.m_bUserPWChange = false;                   // 사용자 패스워드 변경 사용 여부.
                 sgSiteConfig.m_strPWChangeProhibitLimit = "";           // 패스워드 사용금지 문자열 지정.
                 sgSiteConfig.m_nPWChangeApplyCnt = 9;                   // 패스워드 변경 시 허용되는 자리수 지정.
-                sgSiteConfig.m_bURLListPolicyRecv = false;              // URL 리스트 정책 받기 사용 유무
                 sgSiteConfig.m_strInitPasswd = "1K27SdexltsW0ubSCJgsZw=="; // hsck@2301
 
                 sgSiteConfig.m_bUseScreenLock = true;                   // 화면잠금 사용유무 값설정
@@ -577,20 +569,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bApprLineChkBlock = bApprLineChkBlock;
         }
-        public bool GetUseDlpInfoDisplay(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bDlpInfoDisplay;
-            return false;
-        }
-        private void SetUseDlpInfoDisplay(int groupID, bool bDlpInfoDisplay)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bDlpInfoDisplay = bDlpInfoDisplay;
-        }
-
         public bool GetUseApprDeptSearch(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
@@ -662,32 +640,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bApprTreeSearch = bApprTreeSearch;
         }
-        public int GetApprStepLimit(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_nApprStepLimit;
-            return 0;
-        }
-        private void SetApprStepLimit(int groupID, int nApprStepLimit)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_nApprStepLimit = nApprStepLimit;
-        }
-        public bool GetUseDeputyApprTerminateDel(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bDeputyApprTerminateDel;
-            return false;
-        }
-        private void SetUseDeputyApprTerminateDel(int groupID, bool bDeputyApprTerminateDel)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bDeputyApprTerminateDel = bDeputyApprTerminateDel;
-        }
         public bool GetUseUserPWChange(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
@@ -728,20 +680,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_nPWChangeApplyCnt = nPWChangeApplyCnt;
         }
-        public bool GetUseURLListPolicyRecv(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bURLListPolicyRecv;
-            return false;
-        }
-        private void SetUseURLListPolicyRecv(int groupID, bool bURLListPolicyRecv)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bURLListPolicyRecv = bURLListPolicyRecv;
-        }
-
         public string GetInitPasswordInfo(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
