@@ -1061,8 +1061,10 @@
             HsCmdCenter.sgPageEvent.SetAlarmNotiAfterDashBoardEventAdd(groupID, AlarmNotiAfter);                // 알람 노티 수신 후 화면 갱신.
 
             HsCmdCenter.SetFileRecvPossible(groupID, true);
-            HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
-            SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정
+            
+            // 수신 경로 변경은 기본 Page가 바뀔수 있으므로 Main, PopupLogin 쪽으로 이전
+            @*HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
+            SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정*@
 
             GetNetOverModeData(groupID);
 
@@ -1100,37 +1102,6 @@
         }
 
         pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);          //매일 자정 데이터 새로고침
-    }
-
-    /// <summary>
-    /// 수신 다운로드 설정
-    /// </summary>
-    /// <param name="groupID">그룹ID</param>
-    /// <param name="strPath">다운경로</param>
-    public void SetUserIDRecvDownLoad(int groupID)
-    {
-        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-        string strPath = AppConfigSvc.GetRecvDownPath(groupID);
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID))
-        {
-            SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-
-            // ISGCtrlSideUIService CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
-
-            if (sgLoginData != null)
-            {
-                //공영홈쇼핑에서 MAC/Window 모두 ID 적용요청하여 주석처리
-                ////MAC만 적용(공영홈쇼핑 요청사항) 추후 변경 예정
-                //if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                //    strPath = Path.Combine(strPath, sgLoginData.GetUserID());
-
-                strPath = Path.Combine(strPath, sgLoginData.GetUserID());
-                HsCmdCenter.SetDownLoadPath(groupID, strPath);
-                HsCmdCenter.SetBaseDownLoadPath(groupID, strPath);
-                //CtrlSideUISvc.SetRecvDownPath(groupID, strPath);
-            }
-        }
     }
 
     /// <summary>
