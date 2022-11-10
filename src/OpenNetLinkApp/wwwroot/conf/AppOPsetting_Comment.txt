@@ -55,8 +55,6 @@ bAutoLogin : IDPW 자동로그인 기능 사용유무 ( true : 사용, false : �
 bAutoLoginCheck : IDPW 자동로그인 체크박스 기본 체크되어 있게 설정 ( true : 사용, false : 유지 안함 )
 bUserPWChange : 사용자pw 변경 기능 사용 ( true, false ) [기능X]
 
-bDeputyApprTerminateDel : 설정된 대결재자가 정보를 기한이 만료되면 삭제 할지 여부 ( true : 삭제, false : 삭제 안함) [기능X]
-bDlpInfoDisplay : 전송/결재 관리 리스트에서 개인정보 검출 표시 유무 설정. ( true : 표시, false : 표시 안함 ) [기능X]
 bEmptyfileTrans : 0kb 파일 전송 가능 유무(true, false)
 
 // IDPW - 관련 기타
@@ -96,8 +94,6 @@ bUseDenyPasswordZip : zip 파일에 비번걸려있을때에 차단 (true, false
 
 bRecvFolderChange : 공통환경설정에서 수신폴더 변경가능하게 하는 버튼 show 유무 결정(true, false)
 
-bURLListPolicyRecv : URLRedirection LIST  agent에서보여주는 것 On / Off (true,false) [기능X]
-
 bUseCertSend : 공인인증서 전송기능 사용유무 (true,false) [기능X]
 
 bUseEmail : email 관리 / 결재 UI 나오도록 할지 여부 (true, false)
@@ -130,8 +126,6 @@ bUseOneByOneLogOut : 1번에 다중망 로그인 기능 사용중일때, 로그�
 bApprDeptSearch : 결재자 검색 창의 타부서 수정 가능 여부. ( true, false )
 bApprLineChkBlock : 고정 결재라인 사용할때, 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
 bApprLineLocalSave : 결재라인 로컬 저장 여부  ( true, false )
-nApprStepLimit : 결재자 Step 제한 설정 [기능 X]
-
 
 // 클립보드 - 기타
 bUseClipAlarmType : 공통환경설정에서 클립보드 송수신 알림형식 수정가능 유무 (true,false)
