@@ -46,7 +46,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         bool GetRMouseFileAddAfterTrans();
         bool GetAfterBasicChk();
-        bool GetRecvDownPathChange();
+
         bool GetManualRecvDownChange();
         bool GetFileRecvTrayFix();
         bool GetApprTrayFix();
@@ -388,10 +388,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bAfterBasicChk;
         }
 
-        public bool GetRecvDownPathChange()
-        {
-            return AppConfigInfo.bRecvDownPathChange;
-        }
         public bool GetManualRecvDownChange()
         {
             return AppConfigInfo.bManualRecvDownChange;

@@ -21,7 +21,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         List<string> strURLAutoAfterBrowser { get; }                // URL 자동전환 후 브라우저 창 처리방식 ( C : 닫기, N : 유지, F : 특정 URL 포워딩 )
         bool bRMouseFileAddAfterTrans { get; }                      // 마우스 우클릭 파일 추가 후 자동전송 사용 여부 ( true : 사용, false : 미사용 )
         bool bAfterBasicChk { get; }                                // 사후 결재 체크 기본 사용 유무 ( true : 체크, false : 체크 안함 )
-        bool bRecvDownPathChange { get; }                           // 파일 수신 경로 변경 가능 여부 ( true : 가능, false : 불가능 )
         bool bManualRecvDownChange { get; }                         // 수동다운로드 사용 시 수신 폴더 변경 기능 ( true : 사용, false : 미사용)
 
 

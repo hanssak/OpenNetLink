@@ -770,12 +770,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return listSiteConfig[groupID].m_bRecvFolderChange;
             return false;
         }
-        private void SetUseRecvFolderChange(int groupID, bool bRecvFolderChange)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bRecvFolderChange = bRecvFolderChange;
-        }
         public bool GetUseUserRecvDownPath(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;

@@ -51,7 +51,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetAfterBasicChk(bool afterBasicChk);
         void SetRecvDownPath(int groupId, string recvDownPath);
         void SetFileRecvFolderOpen(bool fileRecvFolderOpen);
-        void SetRecvDownPathChange(bool recvDownPathChange);
         void SetManualRecvDownChange(bool manualRecvDownChange);
         void SetFileRecvTrayFix(bool fileRecvTrayFix);
         void SetApprTrayFix(bool apprTrayFix);
@@ -359,12 +358,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             (AppConfigInfo as SGAppConfig).bFileRecvFolderOpen = fileRecvFolderOpen;
             SaveAppConfigSerialize();
-            NotifyStateChangedCtrlSide();
-        }
-        public void SetRecvDownPathChange(bool recvDownPathChange)
-        {
-            (OpConfigInfo as SGopConfig).bRecvDownPathChange = recvDownPathChange;
-            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetManualRecvDownChange(bool manualRecvDownChange)
