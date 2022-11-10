@@ -21,7 +21,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public List<string> strForwardUrl { get; set; } = null;                             // URL 자동전환 후 브라우저 창 Forward 할 주소 저장 ( F방식일대에만 사용 : 포워딩할 URL )
         public bool bRMouseFileAddAfterTrans { get; set; } = false;                         // 마우스 우클릭 파일 추가 후 자동전송 사용 여부 ( true : 사용, false : 미사용 )
         public bool bAfterBasicChk { get; set; } = false;                                   // 사후 결재 체크 기본 사용 유무 ( true : 체크, false : 체크 안함 )
-        public bool bRecvDownPathChange { get; set; } = true;                               // 파일 수신 경로 변경 가능 여부 ( true : 가능, false : 불가능 )
         public bool bManualRecvDownChange { get; set; } = false;                            // 수동다운로드 사용 시 수신 폴더 변경 기능 ( true : 사용, false : 미사용)
         public bool bFileRecvTrayFix { get; set; } = false;                                 // 파일 수신 알림 트레이 유지 여부 ( true : 유지, false : 유지 안함 )
         public bool bApprTrayFix { get; set; } = false;                                     // 결재자 승인대기 알림 트레이 유지 여부 ( true : 유지, false : 유지 안함 )
@@ -67,20 +66,13 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bApprLineChkBlock { get; set; } = true;                                              // 고정 결재라인 차단 시 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
 
-        public bool bDlpInfoDisplay { get; set; } = false;                                                // 전송/결재 관리 리스트에서 개인정보 검출 표시 유무 설정. ( true : 표시, false : 표시 안함 )
-
         public bool bApprDeptSearch { get; set; } = true;                                   // 결재자 검색 창의 타부서 수정 가능 여부.
-
-        public int nApprStepLimit { get; set; } = 0;                                        // 결재자 Step 제한 설정. ( 0 : 무제한, 그외 양수 제한 Step )
-
-        public bool bDeputyApprTerminateDel { get; set; } = false;         // 설정된 대결재자가 정보를 기한이 만료되면 삭제 할지 여부 ( true : 삭제, false : 삭제 안함)
 
         public bool bUserPWChange { get; set; } = false;                   // 사용자 패스워드 변경 사용 여부.
 
         public string strPWChangeProhibitLimit { get; set; } = "";        // 패스워드 사용금지 문자열 지정.
 
         public int nPWChangeApplyCnt { get; set; } = 9;                   // 패스워드 변경 시 허용되는 자리수 지정.
-        public bool bURLListPolicyRecv { get; set; } = false;             // URL 리스트 정책 받기 사용 유무,
         public string strInitPasswd { get; set; } = "1K27SdexltsW0ubSCJgsZw==";    // 초기 패스워드 정보.(hsck@2301)
 
 

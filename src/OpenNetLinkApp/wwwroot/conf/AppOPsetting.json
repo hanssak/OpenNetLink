@@ -23,14 +23,16 @@
   "bAfterBasicChk": false,
 
   "bFileRecvAlarmRetain": false,
-  "bFileRecvTrayFix": false,
-  "bApprCompleteAlarmRetain": true,
-  "bUserApprActionTrayFix": false,
+  "bApprCountAlarmRetain": false,
+  "bApprCompleteAlarmRetain": false,
   "bApprRejectAlarmRetain": false,
-  "bUserApprRejectTrayFix": false,
-  "bApprCountAlarmRetain": true,
-  "bApprTrayFix": true,
   "bUseApprCountAlaram": false,
+  
+  "bFileRecvTrayFix": false,
+  "bUserApprActionTrayFix": false,
+  "bUserApprRejectTrayFix": false,
+
+  "bApprTrayFix": true,
   "bUseApprWaitNoti": true,
 
 
@@ -39,9 +41,6 @@
   "bAutoLoginCheck": true,
   "bUserPWChange": false,
 
-
-  "bDeputyApprTerminateDel": false,
-  "bDlpInfoDisplay": false,
   "bEmptyfileTrans": true,
 
   "strInitPasswd": "1K27SdexltsW0ubSCJgsZw==",
@@ -78,7 +77,6 @@
 
   "enMainPageType": 0,
   "bNoApproveManageUI": false,
-  "bRecvDownPathChange": true,
   "bStartProgramReg": true,
   "bTitleDescSameChk": false,
 
@@ -91,15 +89,14 @@
   ],
   "bClipBoardNoApproveButFileTrans": true,
   "bUseDenyPasswordZip": true,
-  "bRecvFolderChange": false,
-  "bURLListPolicyRecv": false,
+  "bRecvFolderChange": true,
   "bUseCertSend": false,
   "bUseEmail": false,
   "bUseForceUpdate": true,
   "bUsePCURL": false,
   "bUsePublicBoard": false,
   "bUseUserRecvDownPath": false,
-  "bUseUserSelectFirstServer": true,
+  "bUseUserSelectFirstServer": false,
   "bViewDlpApproverSelectMyDept": false,
   "bViewFileFilter": true,
   "bViewSGHeaderUIAlarmNoriAllDel": true,
@@ -110,8 +107,6 @@
   "bApprDeptSearch": true,
   "bApprLineChkBlock": false,
   "bApprLineLocalSave": true,
-
-  "nApprStepLimit": 0,
 
   "bUseClipAlarmType": true,
   "bUseClipCopyAndSend": false,

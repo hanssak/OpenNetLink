@@ -46,7 +46,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         bool GetRMouseFileAddAfterTrans();
         bool GetAfterBasicChk();
-        bool GetRecvDownPathChange();
+
         bool GetManualRecvDownChange();
         bool GetFileRecvTrayFix();
         bool GetApprTrayFix();
@@ -92,15 +92,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApprLineLocalSave(int groupID);
 
         public bool GetUseApprLineChkBlock(int groupID);
-        public bool GetUseDlpInfoDisplay(int groupID);
         public bool GetUseApprDeptSearch(int groupID);
         public bool GetUseApprTreeSearch(int groupID);
-        public int GetApprStepLimit(int groupID);
-        public bool GetUseDeputyApprTerminateDel(int groupID);
         public bool GetUseUserPWChange(int groupID);
         public string GetPWChangeProhibitLimit(int groupID);
         public int GetPWChangeApplyCnt(int groupID);
-        public bool GetUseURLListPolicyRecv(int groupID);
         public string GetInitPasswordInfo(int groupID);
 
         /// <summary>
@@ -392,10 +388,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bAfterBasicChk;
         }
 
-        public bool GetRecvDownPathChange()
-        {
-            return AppConfigInfo.bRecvDownPathChange;
-        }
         public bool GetManualRecvDownChange()
         {
             return AppConfigInfo.bManualRecvDownChange;
@@ -553,11 +545,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bApprLineChkBlock;
         }
-        public bool GetUseDlpInfoDisplay(int groupID)
-        {
-            return AppConfigInfo.bDlpInfoDisplay;
-        }
-
         public bool GetUseApprDeptSearch(int groupID)
         {
             return AppConfigInfo.bApprDeptSearch;
@@ -566,15 +553,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
 
             return false;
-        }
-        public int GetApprStepLimit(int groupID)
-        {
-            return AppConfigInfo.nApprStepLimit;
-        }
-
-        public bool GetUseDeputyApprTerminateDel(int groupID)
-        {
-            return AppConfigInfo.bDeputyApprTerminateDel;
         }
 
         public bool GetUseUserPWChange(int groupID)
@@ -590,10 +568,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public int GetPWChangeApplyCnt(int groupID)
         {
             return AppConfigInfo.nPWChangeApplyCnt;
-        }
-        public bool GetUseURLListPolicyRecv(int groupID)
-        {
-            return AppConfigInfo.bURLListPolicyRecv;
         }
         public string GetInitPasswordInfo(int groupID)
         {

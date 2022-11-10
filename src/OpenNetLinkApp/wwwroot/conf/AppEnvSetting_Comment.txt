@@ -72,8 +72,6 @@ bAutoLogin : IDPW 자동로그인 기능 사용유무 ( true : 사용, false : �
 bAutoLoginCheck : IDPW 자동로그인 체크박스 기본 체크되어 있게 설정 ( true : 사용, false : 유지 안함 )
 bUserPWChange : 사용자pw 변경 기능 사용 ( true, false ) [기능X] (무슨기능인지 파악 안됨.)
 
-bDeputyApprTerminateDel : 설정된 대결재자가 정보를 기한이 만료되면 삭제 할지 여부 ( true : 삭제, false : 삭제 안함) [기능X]
-bDlpInfoDisplay : 전송/결재 관리 리스트에서 개인정보 검출 표시 유무 설정. ( true : 표시, false : 표시 안함 ) [기능X]
 bEmptyfileTrans : 0kb 파일 전송 가능 유무(true, false)
 
 
@@ -95,7 +93,6 @@ bScreenLock : 화면잠금 사용 여부.(체크박스값) (true, false)
 // 기타
 enMainPageType : 로그인후 메인페이지 (나머지 : DASHBOARD, 2 : TRANSFER)
 bNoApproveManageUI : 모든 기능 결재관리 UI 않나오도록함.(보안결재 제외, true : 결재관리UI 들 안나옴, false : 나옴)
-bRecvDownPathChange : 파일 수신 경로 변경 가능 여부 ( true : 가능, false : 불가능 ) [기능X]
 bStartProgramReg : 시작 프로그램 등록 ( true : 부팅때 OpenNetLink 실행, false : 부팅때 OpenNetLink 실행 등록 해제 ) [기능X]
 bTitleDescSameChk : 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부 [기능X]
 bUseAppLoginType : 사용자 지정 로그인타입 사용 여부 [기능X]
@@ -107,8 +104,6 @@ bManualDownFolderChange": 수동다운로드 일때에 수신 Folder, 받을때�
 bUseDenyPasswordZip : zip 파일에 비번걸려있을때에 차단 (true, false)
 
 bRecvFolderChange : 공통환경설정에서 수신폴더 변경가능하게 하는 버튼 show 유무 결정(true, false)
-
-bURLListPolicyRecv : URLRedirection LIST  agent에서보여주는 것 On / Off (true,false) [기능X]
 
 bUseCertSend : 공인인증서 전송기능 사용유무 (true,false) [기능X]
 
@@ -129,8 +124,6 @@ bViewDlpApproverSelectMyDept : 정보보호 결재자 자기부서 사람만 조
 bViewFileFilter : 환경설정에 확장자 제한 정보 표현여부(true,false)
 
 nPWChangeApplyCnt : 비밀번호 변경때, 최소길이 (기본값:9)
-
-nApprStepLimit : 결재자 Step 제한 설정 [기능 X]
 
 bViewSGHeaderUIAlarmNoriAllDel : 알람 / 노티 한번에 삭제하는 기능 제공유무(true,false)
 
