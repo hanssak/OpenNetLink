@@ -2,8 +2,8 @@
 //AppOPsetting.json 파일에 각 값별 기능
 //////////////////////////////////////////////////////
 
-// agent 지정한 방식으로 login
-bUseAppLoginType : 사용자 지정 로그인타입 사용 여부 ( true, false ) 
+// agent 지정한 방식으로 login(siteConfig)
+bUseAppLoginType : 사용자 지정 로그인타입 사용 여부 ( true, false )
 LoginType : 사용자 지정 로그인타입 지정 (0 = IDPW, 1 = AD, 2 = Ldap, ....)
 
 // 공통환경설정(일부)
@@ -57,7 +57,7 @@ bUserPWChange : 사용자pw 변경 기능 사용 ( true, false ) [기능X]
 
 bEmptyfileTrans : 0kb 파일 전송 가능 유무(true, false)
 
-// IDPW - 관련 기타
+// IDPW - 관련 기타(siteConfig)
 strInitPasswd : 암호화된 초기 PW string
 strPWChangeProhibitLimit : 패스워드 사용금지 문자열 [기능 X]
 nPWChangeApplyCnt : 비밀번호 변경때, 새비번의 최소길이 (기본값:9)
@@ -69,7 +69,7 @@ strURLAutoAfterBrowser :  : URL 자동전환 Type (망별로) (URLLIST에 있는
 bURLAutoAfterMsg : URL 자동전환 후 사용자 알림 메시지 사용 여부(망별로) ( true : 사용, false : 미사용 )
 strForwardUrl : URL 자동전환 후 브라우저 창 Forward 할 주소 저장 ( F방식일대에만 사용 : 포워딩할 URL )
 
-// 클립보드 - 파일형태로 전송
+// 클립보드 - 파일형태로 전송(siteConfig)
 bUseClipBoardFileTrans : 파일형태로 클립보드를 송신할지유무, (true : 파일전송기능으로 클립보드 내용 전달, false : 예전에 실시간 클립보드 전송기능 사용)
 bUseFileClipManageUI : 파일형태로 클립보드 송수신할때, 클립보드 관리 UI를 나오도록할지 유무(true: 클립보드 전송관리UI 있음, false : 없음)
 bUseFileClipApproveUI : 파일형태로 클립보드 송수신할때, 클립보드 결재 UI를 나오도록할지 유무(true: 클립보드 결재관리UI 있음, false : 없음)
@@ -81,18 +81,17 @@ bScreenLock : 화면잠금 사용 여부.(체크박스값) (true, false)
 
 // 기타 (1)
 enMainPageType : 로그인후 메인페이지 (나머지 : DASHBOARD, 2 : TRANSFER)
-bNoApproveManageUI : 모든 기능 결재관리 UI 않나오도록함.(보안결재 제외, true : 결재관리UI 들 안나옴, false : 나옴)
-bRecvDownPathChange : 파일 수신 경로 변경 가능 여부 ( true : 가능, false : 불가능 ) [기능X]
+bNoApproveManageUI : 모든 기능 결재관리 UI 않나오도록함.(보안결재 제외, true : 결재관리UI 들 안나옴, false : 나옴)(siteConfig)
 bStartProgramReg : 시작 프로그램 등록 ( true : 부팅때 OpenNetLink 실행, false : 부팅때 OpenNetLink 실행 등록 해제 ) [기능X]
 bTitleDescSameChk : 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부 [기능X]
 
-bUseFileCheckException : 파일검사 예외 신청 기능 활성화유무 (파일검사 예외 신청 기능 수정개발필요) [기능X]
+bUseFileCheckException : 파일검사 예외 신청 기능 활성화유무 (파일검사 예외 신청 기능 수정개발필요)
 bUseNetOverAllsend : 3망상황에 모든 망에 파일, 클립보드 보내는 기능 활성화(true,false) [기능이상 가능성 높음, Server필요]
 listUseGpkiLogin : GPKI 로그인 사용 여부(망별로 로그인시 사용하는 기능) [기능이상 가능성 높음, Server필요] 
-bClipBoardNoApproveButFileTrans : 클립보드 파일전송으로 보낼때, 권한상관없이 결재없이 송신할수 있도록 설정
-bUseDenyPasswordZip : zip 파일에 비번걸려있을때에 차단 (true, false)
+bClipBoardNoApproveButFileTrans : 클립보드 파일전송으로 보낼때, 권한상관없이 결재없이 송신할수 있도록 설정(siteConfig)
+bUseDenyPasswordZip : zip 파일에 비번걸려있을때에 차단 (true, false)(siteConfig)
 
-bRecvFolderChange : 공통환경설정에서 수신폴더 변경가능하게 하는 버튼 show 유무 결정(true, false)
+bRecvFolderChange : 공통환경설정에서 수신폴더 변경가능하게 하는 버튼 show 유무 결정(true, false)(siteConfig)
 
 bUseCertSend : 공인인증서 전송기능 사용유무 (true,false) [기능X]
 
@@ -123,8 +122,8 @@ bUseOneByOneLogOut : 1번에 다중망 로그인 기능 사용중일때, 로그�
 
 
 // 결재자 및 결재 관련
-bApprDeptSearch : 결재자 검색 창의 타부서 수정 가능 여부. ( true, false )
-bApprLineChkBlock : 고정 결재라인 사용할때, 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
+bApprDeptSearch : 결재자 검색 창의 타부서 수정 가능 여부. ( true, false )(siteConfig)
+bApprLineChkBlock : 고정 결재라인 사용할때, 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )(siteConfig)
 bApprLineLocalSave : 결재라인 로컬 저장 여부  ( true, false )
 
 // 클립보드 - 기타
@@ -141,15 +140,15 @@ bStartTrayMove : 시작 시 트레이 이동 ( true : 트레이 이동, false : 
 
 
 // 파일포워딩 기능
-bUseFileForward : 파일포워드 기능 사용유무(true, false)
+bUseFileForward : 파일포워드 기능 사용유무(true, false)(siteConfig)
 bFileDownloadBeforeReciving : 파일포워드, 송신자가 수신PC에 미수신한 상태에서도 포워드수신자들이 수신다운로드 가능 유무(true, false)
 
 
 // 기타 (2)
 bRecvFolderOpen : 파일 수신후 폴더 열기 사용유무
-bUseAgentTime1aClock : 정책값대로 시간단위 사후결재 정책, 자정에  검색화면 검색날짜 UI / 일일 송순가능수 UI 변경되는거 Server 시간이 아니라 agent 시간기준으로 동작함(true:사용,false:않함) - Test 목적
+bUseAgentTime1aClock : 정책값대로 시간단위 사후결재 정책, 자정에  검색화면 검색날짜 UI / 일일 송순가능수 UI 변경되는거 Server 시간이 아니라 agent 시간기준으로 동작함(true:사용,false:않함) - Test 목적(siteConfig)
 
-// 부서별 사용자 조회 방식 설정 기능
+// 부서별 사용자 조회 방식 설정 기능(siteConfig)
 strApproverSearchType :	'파일전송' 화면에서 결재자 선택 시 사용자 조회 방식을 결정 
 						=> "SEARCH" : 입력된 부서명과 사용자명을 기반으로 결과 리스트 표시 (Default)
 						=> "TREE" : 부서 TREE가 추가로 표시되며 부서별로 결과 리스트 표시 (해당 설정 시 bApprDeptSearch 옵션 무효화)
@@ -173,7 +172,7 @@ bUseInputSearchInSecurityApproverTree: strSecurityApproverSearchType "TREE" 일 
 ApproveExtApproverSearchType: '필수 결재 기능'에서 결재자 선택하는 방식
 						=> "SEARCH" : 입력된 부서명과 사용자명을 기반으로 결과 리스트 표시 (Default)
 						=> "TREE" : 부서 TREE가 추가로 표시되며 부서별로 결과 리스트 표시 (해당 설정 시 bApprDeptSearch 옵션 무효화)
-bUseApproveExt: 필수 결재 기능 사용유무
+bUseApproveExt: 필수 결재 기능 사용유무(siteConfig)
 bUseInputSearchApproveExtTree : 필수 결재 기능 에서 "TREE" 일 경우, 부서명과 사용자명을 검색할 수 있는 컨트롤 표시 여부 (true,false)
 
 bUsePartialFileAddInTransfer: '파일전송' 화면에서 등록시도한 파일목록에 정상파일과 오류파일이 함께 존재할 시 정상 파일에 대한 부분 등록 가능여부(true, false)

@@ -351,7 +351,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetUseApprLineLocalSave(i, true);                       // 결재라인 로컬저장 기능 사용 
                 SetUseLoginIDSave(i, true);                            // ID history 기능 사용.
                 SetUseScreenLock(i, true);                              // 화면잠금 사용
-                SetUseRecvFolderChange(i, true);                        // 수신 폴더 변경 사용
                 SetUseUserRecvDownPath(i, true);                       // 로그인 유저별 다운로드 경로 사용 여부
 
                 SetUseEmailManageApprove(i, true);                           // 이메일 결재 사용 유무
@@ -376,8 +375,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUseApprLineLocalSave(0, true);                           // 결재라인 로컬저장 기능 사용 
             SetUseLoginIDSave(0, true);                                 // ID history 기능 사용.
 
-            SetUseScreenLock(0, true);                                  // 화면잠금 사용
-            SetUseRecvFolderChange(0, true);                            // 수신 폴더 변경 사용*/
+            SetUseScreenLock(0, true);                                  // 화면잠금 사용*/
 
             SetUseClipAlarmTypeChange(true);                            // 클립보드 알림타입 변경 사용 유무           
             SetUseClipCopyAndSend(false);                               // 클립보드 복사 후 자동 전송 사용 유무
@@ -681,12 +679,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 return listSiteConfig[groupID].m_bRecvFolderChange;
             return false;
-        }
-        private void SetUseRecvFolderChange(int groupID, bool bRecvFolderChange)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bRecvFolderChange = bRecvFolderChange;
         }
         public bool GetUseUserRecvDownPath(int groupID)
         {

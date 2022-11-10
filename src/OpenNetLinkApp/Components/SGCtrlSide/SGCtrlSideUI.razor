@@ -1076,11 +1076,6 @@
         return AppConfigSvc.GetFileRecvFolderOpen();
     }
 
-    private bool GetRecvDownPathChange()
-    {
-        return SGAppMgrSvc.OpConfigInfoService.GetRecvDownPathChange();
-    }
-
     private bool GetManualRecvDownChange()
     {
         return SGAppMgrSvc.OpConfigInfoService.GetManualRecvDownChange();
@@ -1545,10 +1540,7 @@
         CLog.Here().Information($"FileRecvFolderOpen Set: [{fileRecvFolderOpen}]");
         CtrlSideUISvc.SetFileRecvFolderOpen(fileRecvFolderOpen);
     }
-    private void SetRecvDownPathChange(bool recvDownPathChange)
-    {
-        CtrlSideUISvc.SetRecvDownPathChange(recvDownPathChange);
-    }
+
     private void SetManualRecvDownChange(ChangeEventArgs changeEventArg)
     {
         bool manualRecvDownChange = Convert.ToBoolean(changeEventArg.Value);
