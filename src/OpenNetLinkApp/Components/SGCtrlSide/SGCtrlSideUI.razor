@@ -679,6 +679,8 @@
 
     private async Task openSaveDirPopup(int Idx, string dir)
     {
+
+        refSelectSaveFolder.nGroupid = Idx;
         await refSelectSaveFolder.openPopUp(Idx, dir);
 
         object[] param2 = { "0" };
@@ -1065,7 +1067,21 @@
 
     private string GetRecvDownPath(int groupId)
     {
-        string DownPath = AppConfigSvc.GetRecvDownPath(groupId);
+
+        string DownPath = "";
+        if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(groupId))
+        {
+            DownPath = AppConfigSvc.GetRecvDownPath(groupId);
+        }
+        else
+        {
+            SGUserData sgUserInfo = null;
+            sgUserInfo = (SGUserData)HsCmdCenter.GetUserData(groupId);
+            if (sgUserInfo == null)
+                return "K:\\사용자\\다운로드"; ;
+
+            DownPath = $@"K:\{sgUserInfo.GetUserName()}\다운로드";
+        }
         DownPath = HsCmdCenter.ConvertRecvDownPath(DownPath);
 
         return DownPath;
@@ -1113,7 +1129,7 @@
 
     private bool GetStartProgramReg()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetStartProgramReg();
+        return SGAppMgrSvc.AppConfigInfoService.GetStartProgramReg();
     }
 
     private string GetLanguage()
@@ -1808,7 +1824,7 @@
             if (sgLoginData == null)
                 continue;
 
-            
+
             bool bTmpUseClipBoard = sgLoginData.GetClipboard();             //클립보드 기능 사용여부
             bool bTmpUseURLRedirection = sgLoginData.GetURLRedirect();      //리다이렉션 기능 사용여부
             bool bTmpFileSend = sgLoginData.GetFileTrans();                 //파일전송 사용여부
@@ -2026,7 +2042,12 @@
     public bool GetRecvDownPathChangeHide(int groupID)
     {
         // siteConfig. json으로 이동
-        return !(SGAppMgrSvc.SiteConfigInfoService.GetUseRecvFolderChange(groupID)); // OpConfigInfoService
+        // return !(SGAppMgrSvc.SiteConfigInfoService.GetUseRecvFolderChange(groupID)); // OpConfigInfoService
+
+        if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(groupID))
+            return false;
+        else
+            return true;
     }
 
 

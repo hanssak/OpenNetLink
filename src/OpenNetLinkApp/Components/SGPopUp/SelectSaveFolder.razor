@@ -125,6 +125,9 @@
 </div>
 
 @code {
+
+    public int nGroupid = 0;
+
     private string stTreeDir = String.Empty;
     IEnumerable<string> entries = null;
     public int dragLabel = 1;
@@ -188,7 +191,7 @@
                 ShowMessage("warn", strMsg);
                 return;
             }
-            else if (stDisplayPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
+            else if (stDisplayPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))) // C:\\Users\\(사용자명)
             {
                 string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
                 ShowMessage("warn", strMsg);
@@ -245,6 +248,9 @@
 
     public async Task openPopUp(int Idx, string dir)
     {
+
+        GetSavedPath();
+
         //CLog.Here().Information($"SelectSaveFolder openPopUp");
         nNetIdx = Idx;
         stOriginPath = dir;
@@ -377,16 +383,16 @@
         //OnSelectPathFromFileTree.InvokeAsync(args); //부모컴포넌트에 이벤트 전달
     }
 
-    protected override void OnInitialized()
-    {
 
+    void GetSavedPath()
+    {
         //rootDrives = Directory.GetLogicalDrives();
-        if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(0)) // ngroupID 중요하지 않음
+        if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(nGroupid)) // ngroupID 중요하지 않음
             rootDrives = Directory.GetLogicalDrives();
         else
         {
             if (rootDrives == null)
-                rootDrives = new string[1] { "K:\\"};
+                rootDrives = new string[1] { "K:\\" };
         }
 
         stCurrentDrive = rootDrives[0];
@@ -411,6 +417,11 @@
             CLog.Here().Information($"drives null or drives.Lentgh : 0");
         }
         stDisplayPath = stTreeDir;
+    }
+
+    protected override void OnInitialized()
+    {
+        GetSavedPath();
     }
 
     public void LoadListFiles(string stPath)

@@ -785,6 +785,33 @@
 
     }
 
+
+    /// <summary>
+    /// 수신 다운로드 사용자이름이 포함된 정해진 경로로 설정
+    /// </summary>
+    /// <param name="groupID"></param>
+    public void SetStaticUserNameRecvDownLoad(int groupID)
+    {
+        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        string strPath = "";
+
+        if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(groupID))
+            strPath = AppConfigSvc.GetRecvDownPath(groupID);
+        else
+        {
+            SGUserData sgUserInfo = null;
+            sgUserInfo = (SGUserData)HSCmdCenter.GetUserData(groupID);
+            if (sgUserInfo == null)
+                return;
+
+            strPath = $@"K:\\{sgUserInfo.GetUserName()}\\다운로드";
+
+        }
+
+        HSCmdCenter.SetDownLoadPath(groupID, strPath);
+        HSCmdCenter.SetBaseDownLoadPath(groupID, strPath);
+    }
+
     /// <summary>
     /// 수신 다운로드 설정
     /// </summary>
@@ -806,16 +833,7 @@
                 //공영홈쇼핑에서 MAC/Window 모두 ID 적용요청하여 사용
 
                 string strAddFolder = "";
-                if (SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPathUserName(groupID))
-                {
-                    SGUserData sgUserInfo = null;
-                    sgUserInfo = (SGUserData)HSCmdCenter.GetUserData(groupID);
-                    if (sgUserInfo == null)
-                        return;
-                    strAddFolder = sgUserInfo.GetUserName();
-                }
-                else
-                    strAddFolder = sgLoginData.GetUserID();
+                strAddFolder = sgLoginData.GetUserID();
 
                 strPath = Path.Combine(strPath, strAddFolder);
                 HSCmdCenter.SetDownLoadPath(groupID, strPath);
@@ -872,7 +890,7 @@
 
             
             HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));
-            SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
+            SetStaticUserNameRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
 
             Dictionary<string, SGNetOverData> dicSysIdName = null;
             dicSysIdName = new Dictionary<string, SGNetOverData>();

@@ -394,4 +394,23 @@ namespace OpenNetLinkApp.Common
 
     }
 
+
+    public class CsLnkFunc
+    {
+        public static bool makeLnkShortCut(string strOrgPath, string strLnkPath)
+        {
+            return false;
+        }
+
+        public static bool makeAgentBootStart(bool bStartReg, string strOrgPath, string strLnkPath)
+        {
+
+
+            return false;
+        }
+
+
+
+    }
+
 }

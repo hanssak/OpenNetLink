@@ -174,20 +174,39 @@
         refFileTreeCustom.changeDrive(stCurrentDrive);
     }
 
-    protected override void OnInitialized()
+
+    void GetSavedPath()
     {
-        if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(0))
-            drives = Directory.GetLogicalDrives();
+
+        if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(ngroupID))
+        {
+            drives = Directory.GetLogicalDrives();            
+        }
         else
         {
             if (drives == null)
+            {
                 drives = new string[3]{"C:\\", "D:\\", "K:\\"};
+            }                
+            else if (drives.Length > 0)
+            {
+                Array.Clear(drives, 0, drives.Length);
+                drives = Array.Empty<string>();
+                drives = new string[3]{"C:\\", "D:\\", "K:\\"};
+            }
+                
         }
 
         // "C:\\" / "K:\\"
         stCurrentDrive = drives[0];
         actionPopUpLoadFileList = LoadListFiles;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+    }
+
+
+    protected override void OnInitialized()
+    {
+        GetSavedPath();
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -204,8 +223,11 @@
         stSelectPath = args.Value as string;
         LoadListFiles(stSelectPath);
     }
+
     public async Task openPopUp()
     {
+        GetSavedPath();
+
         object[] param = { "FileSelectPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
