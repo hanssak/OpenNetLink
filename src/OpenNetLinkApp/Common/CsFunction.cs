@@ -83,6 +83,7 @@ namespace OpenNetLinkApp.Common
             string rtn = "";
             if (Size == 0)
             {
+                Log.Information($@"###################### - GetSizeStr : 0 - ######################");
                 rtn = "0 Byte";
             }
             if (Size > 1024 * 1024 * 1024)

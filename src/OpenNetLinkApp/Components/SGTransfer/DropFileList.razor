@@ -344,6 +344,8 @@
                     hsStream.RelativePath = fInfo.Name;
                     hsStream.Size = fInfo.Length;
 
+                    CLog.Here().Information($@"#### - 파일이름 : {hsStream.FileName}, Type : {hsStream.Type}, 파일크기 : {hsStream.Size} - ####");
+
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
                         hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
@@ -469,6 +471,7 @@
                     if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
                         continue;
 
+                   
                     hsStream = new HsStream();
                     hsStream.FileName = fInfo.Name;
                     hsStream.Size = 0;
@@ -485,6 +488,10 @@
                     string strStartPath = hsStream.StartPath;
                     hsStream.stream = null;
                     hsStream.MemoryType = HsStreamType.FileStream;
+
+                    CLog.Here().Information($@"#### - 파일이름 : {hsStream.FileName}, Type : {hsStream.Type}, 파일크기 : {hsStream.Size} - ####");
+
+
                     if (!hsStream.StartPath.Equals(""))
                     {
                         int index = -1;
@@ -596,6 +603,8 @@
                             hsStream.stream = null;
                             hsStream.MemoryType = HsStreamType.FileStream;
                             hsStream.IsDir = true;
+
+
                         }
                         else
                         {
@@ -716,6 +725,11 @@
                         }
                         //HsStreamList.Add(hsStream);
                         //SetFileAdd(hsStream);
+
+
+                        CLog.Here().Information($@"#### - 파일이름 : {hsStream.FileName}, Type : {hsStream.Type}, 파일크기 : {hsStream.Size} - ####");
+
+
                         listTryHsStream.Add(hsStream);
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
@@ -991,6 +1005,8 @@
                         hsStream.isNeedApprove = true;
                 }
 
+                CLog.Here().Information($@"#### - 파일이름 : {hsStream.FileName}, Type : {hsStream.Type}, 파일크기 : {hsStream.Size} - ####");
+
                 listTryHsStream.Add(hsStream);
                 //SetFileAdd(hsStream);
                 nExamCount++;
@@ -1088,6 +1104,9 @@
             {
                 hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
             }
+
+            CLog.Here().Information($@"#### - 파일이름 : {hsStream.FileName}, Type : {hsStream.Type}, 파일크기 : {hsStream.Size} - ####");
+
             hsList.Add(hsStream);
         }
         return hsList;

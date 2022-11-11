@@ -1679,6 +1679,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                                 : eFileAddErr.eFA_LONG_PATH_FILEORPATH;     //파일 및 폴더명 길이 초과
                 return false;
             }
+            
+            Log.Information($@"###################### - 파일이름 : {hsStream.FileName}, 파일크기 : {hsStream.Size} - ######################");
 
             //빈파일 체크 (0kb 허용)
             bEmpty = (bEmptyFIleNoCheck || GetEmptyEnable(hsStream.Size));//GetRegFileEmptyEnable(hsStream.Size);
