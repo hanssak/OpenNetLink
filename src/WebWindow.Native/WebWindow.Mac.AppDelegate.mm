@@ -2,6 +2,8 @@
 #import "DDHotKeyUtilities.h"
 #import <Carbon/Carbon.h>
 #import <FinderSync/FinderSync.h>
+#import "Tray.h"
+
 
 @implementation MyApplicationDelegate : NSObject
 - (id)init {
@@ -41,23 +43,27 @@
 }
 
 - (BOOL)windowShouldClose:(NSWindow *)sender {
-    NSString *strSocket = @"/var/tmp/testd.sock";
-     
-    NSFileManager *FileManager;
-    FileManager = [NSFileManager defaultManager];
-    if ([FileManager fileExistsAtPath:strSocket] == YES) {
-        [FileManager removeFileAtPath:strSocket handler:nil];
-        NSLog(@"delete file %@", strSocket);
-    }
 
-    NSLog(@"windowShouldClose....");
-	if (_bTrayUse == false)
+    NSLog(@"windowShouldClose....g_bDoExit2TrayUse(1):%s", (g_bDoExit2TrayUse?"Yes":"No"));
+	if (g_bDoExit2TrayUse == false)
 	{
+        NSString *strSocket = @"/var/tmp/testd.sock";
+        NSFileManager *FileManager;
+
+        FileManager = [NSFileManager defaultManager];
+        if ([FileManager fileExistsAtPath:strSocket] == YES) {
+            [FileManager removeFileAtPath:strSocket handler:nil];
+            NSLog(@"delete file %@", strSocket);
+        }
+
+        tray_exit();
+        
    		((WebWindow *)SelfThis)->ProgramExit();
+        
         return true;
 	}
 	else
-	{
+	{   
    		((WebWindow *)SelfThis)->MoveWebWindowToTray();
         return false;
 	}

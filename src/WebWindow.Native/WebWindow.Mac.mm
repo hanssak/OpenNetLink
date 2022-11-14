@@ -34,7 +34,8 @@ void *SelfThis = nullptr;
 
 using namespace std;
 
-bool _bTrayUse = false;
+bool g_bStartTray = true;
+bool g_bDoExit2TrayUse = false;
 static id _appDelegate;
 
 map<NSWindow*, WebWindow*> nsWindowToWebWindow;
@@ -82,8 +83,6 @@ static struct tray defTray = {
     .icon = (char *)TRAY_ICON1,
     .dark_icon = (char *)TRAY_ICON3,
     .menu = (struct tray_menu[]) {
-            {.text = (char *)"About",   .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb, .context = NULL, .submenu = NULL},
-            {.text = (char *)"-",       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL, .submenu = NULL},
             {.text = (char *)"Hide",    .disabled = 0, .checked = 0, .usedCheck = 0, .cb = toggle_show, .context = NULL, .submenu = NULL},
             {.text = (char *)"-",       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL, .submenu = NULL},
             {.text = (char *)"Quit",    .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb, .context = NULL, .submenu = NULL},
@@ -96,8 +95,8 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 {
 	SelfThis = this;
 	_webMessageReceivedCallback = webMessageReceivedCallback;
-	_bTrayUse = false;
-
+	g_bDoExit2TrayUse = false;
+    
     NSRect frame = NSMakeRect(0, 0, WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT);
     NSWindow *window = [[NSWindow alloc]
         initWithContentRect:frame
@@ -178,8 +177,12 @@ void WebWindow::Show()
         AttachWebView();
     }
 
-    NSWindow * window = (NSWindow*)_window;
-    [window makeKeyAndOrderFront:nil];
+    if(!g_bStartTray)
+    {
+        NSWindow * window = (NSWindow*)_window;
+        [window makeKeyAndOrderFront:nil];
+    }
+
 }
 
 void WebWindow::SetTitle(AutoString title)
@@ -253,6 +256,10 @@ void WebWindow::WaitForExit()
 		NTLog(this, Fatal, "Failed to Create Tray\n");
 		return ;
 	}
+
+    if(!g_bStartTray)
+        MoveTrayToWebWindow();
+
     RegisterQuitHotKey();
 	while (tray_loop(1) == 0)
 	{
@@ -330,6 +337,9 @@ void WebWindow::Invoke(ACTION callback)
 
 void WebWindow::ShowMessage(AutoString title, AutoString body, unsigned int type)
 {
+    return;
+
+    // code 검증필요
     NSString* nstitle = [[NSString stringWithUTF8String:title] autorelease];
     NSString* nsbody= [[NSString stringWithUTF8String:body] autorelease];
     NSAlert *alert = [[[NSAlert alloc] init] autorelease];
@@ -739,7 +749,7 @@ void WebWindow::ProgramExit()
 bool WebWindow::GetTrayUse()
 {
 	NTLog(this, Info, "Called : OpenNetLink Tray Status");
-	return _bTrayUse;
+	return g_bDoExit2TrayUse;
 }
 
 void WebWindow::MoveWebWindowToTray()
@@ -847,4 +857,18 @@ void WebWindow::UnRegisterStartProgram()
 	else
 		NTLog(this, Err, "Called : UnRegisterStartProgram, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
 }
+
+void WebWindow::SetTrayUse(bool useTray)
+{
+    g_bDoExit2TrayUse = useTray;
+    NTLog(this, Info, "Called : SetTrayUse(@@@@@@@@@@) : %s", (AutoString)(g_bDoExit2TrayUse ? "Yes": "No") );
+}	
+
+
+void WebWindow::SetTrayStartUse(bool bUseStartTray)
+{
+    g_bStartTray = bUseStartTray; 
+    NTLog(this, Info, "Called : OpenNetLink SetTrayStartUse : %s", (AutoString)bUseStartTray ? "Yes": "No");
+}
+
 #endif
