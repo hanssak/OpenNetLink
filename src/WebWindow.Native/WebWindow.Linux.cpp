@@ -22,7 +22,9 @@ void *SelfThis = nullptr;
 #include "TextEncDetect.h"
 using namespace AutoIt::Common;
 
-bool _bTrayUse = false;
+bool g_bDoExit2TrayUse = false;
+bool g_bStartTray = true;
+
 
 std::mutex invokeLockMutex;
 
@@ -132,7 +134,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 {
 	SelfThis = this;
 	_webMessageReceivedCallback = webMessageReceivedCallback;
-	_bTrayUse = false;
+	g_bDoExit2TrayUse = false;
 
 	// It makes xlib thread safe.
 	// Needed for get_position.
@@ -192,7 +194,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 
 gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self)
 {
-	if (_bTrayUse == false)
+	if (g_bDoExit2TrayUse == false)
 	{
 		NTLog(self, Info, "Called : OpenNetLink Exit");
 		tray_exit();
@@ -267,6 +269,7 @@ void WebWindow::Show()
 		webkit_user_content_manager_register_script_message_handler(contentManager, "webwindowinterop");
 	}
 
+	if (g_bStartTray == false)
 	gtk_widget_show_all(_window);
 
 	/* Enable the developer extras */
@@ -370,6 +373,28 @@ void WebWindow::SetTitle(AutoString title)
 	gtk_window_set_title(GTK_WINDOW(_window), title);
 }
 
+void WebWindow::SetTrayStartUse(bool bUseStartTray)
+{
+	g_bStartTray = bUseStartTray;
+	NTLog(this, Info, "Called : OpenNetLink SetTrayStartUse : %s", (AutoString)bUseStartTray ? "Yes" : "No");
+}
+
+void WebWindow::SetTrayUse(bool useTray)
+{
+    g_bDoExit2TrayUse = useTray;
+    NTLog(this, Info, "Called : SetTrayUse(@@@@@@@@@@) : %s", (AutoString)(g_bDoExit2TrayUse ? "Yes": "No") );
+}	
+
+void WebWindow::ClipTypeSelect(int groupID)
+{
+	
+}
+
+void WebWindow::ClipFirstSendTypeText(int groupID)
+{
+
+}
+
 void WebWindow::WaitForExit()
 {
 	//gtk_main();
@@ -380,6 +405,10 @@ void WebWindow::WaitForExit()
 		NTLog(this, Fatal, "Failed to Create Tray\n");
 		return ;
 	}
+
+	if (!g_bStartTray)
+		MoveTrayToWebWindow();
+
 	while (tray_loop(1) == 0)
 	{
 		// printf("iteration\n");
@@ -1292,7 +1321,7 @@ void WebWindow::ProgramExit()
 bool WebWindow::GetTrayUse()
 {
 	NTLog(this, Info, "Called : OpenNetLink Tray Status");
-	return _bTrayUse;
+	return g_bDoExit2TrayUse;
 }
 
 void WebWindow::MoveWebWindowToTray()

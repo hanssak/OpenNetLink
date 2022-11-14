@@ -202,6 +202,11 @@ extern "C"
 	{
 		instance->SetTrayUse(useTray);
 	}
+	EXPORTED void WebWindow_SetTrayStartUse(WebWindow* instance, bool useTrayStart)
+	{
+		instance->SetTrayStartUse(useTrayStart);
+	}
+
 	EXPORTED bool WebWindow_GetTrayUse(WebWindow* instance)
 	{
 		return instance->GetTrayUse();
