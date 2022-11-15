@@ -44,7 +44,7 @@
                                 // 다중접속일때에는 단일망에만 전달가능
                                 // 단일접속일때에는 3중망에 전달가능
                                 @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0 &&
-                          (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                         (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                 {
 
                                     //@if (itemData.Value.nIdx == 1 && ListModKey.Count > 0)
@@ -57,11 +57,11 @@
                                             @*<input type="checkbox" class="mr-1" checked="@(ListModKey[NetworkInfo.GroupID][Index])"
                                                 @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />*@
                                             <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))"
-                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
+                                                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
                                             <span class="mr-2">@Modifier</span>
                                         }
 
-            // GetDicModVKeyValue
+                                        // GetDicModVKeyValue
                                         // ListVKey[NetworkInfo.GroupID]
                                         <!--<select class="mr-1" value="@GetDicModVKeyValue(NetworkInfo.GroupID)"
                                                     @onchange="eventArgs => { SelectBoxVKeySelected(NetworkInfo.GroupID, eventArgs); }">
@@ -94,7 +94,7 @@
                                         @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
                                         {
                                             <input type="checkbox" class="mr-1" checked="@dicModKeyNetOver[strNetgroupIDidxKey][Index]"
-                   @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, itemData.Value.nIdx, (HOTKEY_MOD)Index, eventArgs); }" />
+                                                   @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, itemData.Value.nIdx, (HOTKEY_MOD)Index, eventArgs); }" />
                                             <span class="mr-2">@Modifier</span>
                                         }
                                         @*<select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
@@ -138,7 +138,7 @@
                                 @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
                                 {
                                     <input type="checkbox" class="mr-1" checked="@dicModKeyNetOver[strNetgroupIDidxKey][Index]"
-                   @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, 0, (HOTKEY_MOD)Index, eventArgs); }" />
+                                           @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, 0, (HOTKEY_MOD)Index, eventArgs); }" />
                                     <span class="mr-2">@Modifier</span>
                                 }
                                 @*<select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
@@ -179,7 +179,7 @@
                                     @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />*@
 
                                 <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))"
-                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
+                                       @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
 
                                 <span class="mr-2">@Modifier</span>
                             }
@@ -360,16 +360,16 @@
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetRMouseFileAddAfterTrans())"
-                   @onchange="eventArgs => { SetRMouseFileAddAfterTrans(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RMOUSEAUTOTRNAS")</span>          <!--마우스 우클릭 자동전송-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetRMouseFileAddAfterTrans(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RMOUSEAUTOTRNAS")</span>          <!--마우스 우클릭 자동전송-->
+                    </div>
+                }
             @if (m_bAfterApprAutoCheck)
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetAfterBasicChk())"
-                   @onchange="eventArgs => { SetAfterBasicChk(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK")</span>                            <!--사후결재 체크-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetAfterBasicChk(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK")</span>                            <!--사후결재 체크-->
+                    </div>
+                }
         </div>
     }
 
@@ -533,12 +533,13 @@
                 <span class="pr-2">@XmlConf.GetTitle("T_LOGLEVEL")</span>                                                                                                        <!--언어-->
                 <!--<select value="@(GetLogLevel())"
                         @onchange="eventArgs => { SetLogLevel(eventArgs); }">
-                    <option value="@LogEventLevel.Verbose">@XmlConf.GetTitle("T_LOGLEVEL_VERBOSE")</option>-->                                                                                             <!--한국어-->
-                    <!--<option value="@LogEventLevel.Debug">@XmlConf.GetTitle("T_LOGLEVEL_DEBUG")</option>-->                                                                                             <!--일본어-->
-                    <!--<option value="@LogEventLevel.Information">@XmlConf.GetTitle("T_LOGLEVEL_INFORMATION")</option>-->                                                                                             <!--중국어-->
-                    <!--<option value="@LogEventLevel.Warning">@XmlConf.GetTitle("T_LOGLEVEL_WARNING")</option>-->                                                                                             <!--영어-->
-                    <!--<option value="@LogEventLevel.Error">@XmlConf.GetTitle("T_LOGLEVEL_ERROR")</option>-->                                                                                             <!--영어-->
-                    <!--<option value="@LogEventLevel.Fatal">@XmlConf.GetTitle("T_LOGLEVEL_FATAL")</option>-->                                                                                             <!--영어-->
+                    <option value="@LogEventLevel.Verbose">@XmlConf.GetTitle("T_LOGLEVEL_VERBOSE")</option>-->
+                <!--한국어-->
+                <!--<option value="@LogEventLevel.Debug">@XmlConf.GetTitle("T_LOGLEVEL_DEBUG")</option>-->                                                                                             <!--일본어-->
+                <!--<option value="@LogEventLevel.Information">@XmlConf.GetTitle("T_LOGLEVEL_INFORMATION")</option>-->                                                                                             <!--중국어-->
+                <!--<option value="@LogEventLevel.Warning">@XmlConf.GetTitle("T_LOGLEVEL_WARNING")</option>-->                                                                                             <!--영어-->
+                <!--<option value="@LogEventLevel.Error">@XmlConf.GetTitle("T_LOGLEVEL_ERROR")</option>-->                                                                                             <!--영어-->
+                <!--<option value="@LogEventLevel.Fatal">@XmlConf.GetTitle("T_LOGLEVEL_FATAL")</option>-->                                                                                             <!--영어-->
                 <!--</select>-->
                 <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu6" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     @GetLogLevel()
@@ -827,6 +828,11 @@
         HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
         HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
         SGAppMgrSvc.SideBarUIService.OnChangeActMenu += CtrlSideUILoginAfter;
+
+        // Windows일때, 자동실행 설정상태면 Lnk 만듬
+        if (GetStartProgramReg() && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            CtrlSideUISvc.SetStartProgramReg(true);
+
     }
 
 
@@ -1113,7 +1119,11 @@
 
     private bool GetStartProgramReg()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetStartProgramReg();
+
+        //return CtrlSideUISvc.GetStartProgramReg();
+
+        // 설정값을 사용하는 방식으로 동작할지는
+        return SGAppMgrSvc.AppConfigInfoService.GetStartProgramReg();
     }
 
     private string GetLanguage()
@@ -1171,7 +1181,7 @@
     private string GetLogLevel()
     {
         string str = String.Empty;
-        switch(AppConfigSvc.GetLogLevel())
+        switch (AppConfigSvc.GetLogLevel())
         {
             case LogEventLevel.Verbose:
                 str = XmlConf.GetTitle("T_LOGLEVEL_VERBOSE");
@@ -1436,7 +1446,7 @@
         bool afterBasicChk = Convert.ToBoolean(changeEventArg.Value);
         CLog.Here().Information($"Check Post Approval Set: [{afterBasicChk}]");
         CtrlSideUISvc.SetAfterBasicChk(afterBasicChk);
-        //[사후결재 컨트롤 갱신] 
+        //[사후결재 컨트롤 갱신]
         if (PageStatusData.SAfterApprControlCheckEvent != null)
             PageStatusData.SAfterApprControlCheckEvent();
     }
@@ -1584,14 +1594,25 @@
         CLog.Here().Information($"StartTrayMove Set: [{startTrayMove}]");
         CtrlSideUISvc.SetStartTrayMove(startTrayMove);
     }
+
     private void SetStartProgramReg(ChangeEventArgs changeEventArg)
     {
         bool startProgramReg = Convert.ToBoolean(changeEventArg.Value);
         CLog.Here().Information($"StartProgramReg Set: [{startProgramReg}]");
-        if (startProgramReg) Window.RegStartProgram();
-        else Window.UnRegStartProgram();
+
+        // Linux, OSx - 실재 등록 동작
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false)
+        {
+            if (startProgramReg)
+                Window.RegStartProgram();
+            else
+                Window.UnRegStartProgram();
+        }
+
+        // Windows, 실재 등록 동작
         CtrlSideUISvc.SetStartProgramReg(startProgramReg);
     }
+
     private void SetLanguage(ChangeEventArgs changeEventArg)
     {
         string language = Convert.ToString(changeEventArg.Value);
@@ -1804,7 +1825,7 @@
             if (sgLoginData == null)
                 continue;
 
-            
+
             bool bTmpUseClipBoard = sgLoginData.GetClipboard();             //클립보드 기능 사용여부
             bool bTmpUseURLRedirection = sgLoginData.GetURLRedirect();      //리다이렉션 기능 사용여부
             bool bTmpFileSend = sgLoginData.GetFileTrans();                 //파일전송 사용여부
