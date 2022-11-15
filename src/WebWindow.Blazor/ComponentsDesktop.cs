@@ -92,17 +92,9 @@ namespace WebWindows.Blazor
                     JsonElement jroot = document.RootElement;
                     bool value = jroot.GetProperty("bStartTrayMove").GetBoolean();
                     WebWindow.SetTrayStartUse(value);
-                }
 
-                //json에서 초기 시작을 startProgramReg 인지 아닌지 판단하여 셋팅
-                //현재는 AppEnvSetting.json에서 가져오는데 추후 AppOpSetting으로 변경시 여기 json 파일 위치도 변경 필요.
-                var envJsonPath = Path.Combine(contentRootAbsolute, "conf", "AppEnvsetting.json");
-                string contentsEnv = System.IO.File.ReadAllText(envJsonPath);
-                using (JsonDocument document = JsonDocument.Parse(contentsEnv))
-                {
-                    JsonElement jroot = document.RootElement;
-                    bool value = jroot.GetProperty("bStartProgramReg").GetBoolean();
-                    if(value)
+                    bool valueReg = jroot.GetProperty("bStartProgramReg").GetBoolean();
+                    if (valueReg)
                         WebWindow.RegStartProgram();
                 }
 
