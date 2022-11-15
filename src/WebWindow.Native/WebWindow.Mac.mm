@@ -798,36 +798,80 @@ void WebWindow::RegisterStartProgram()
 	mypasswd = getpwuid(myuid);
 
 	std::string filePath = std::string(mypasswd->pw_dir) + "/Library/LaunchAgents/com.hanssak.OpenNetLinkApp.plist";
+    //파일의 존재 여부를 체크해서 있으면 작업을 하지 않고 그냥 넘김
+    std::ifstream f(filePath.data());
+    if(f.good())
+    {
+        return;
+    }
+    else
+    {
+        // write File
+        std::ofstream writeFile(filePath.data());
+        if( writeFile.is_open() ){
+            writeFile << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+            writeFile << "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n";
+            writeFile << "<plist version=\"1.0\">\n";
+            writeFile << "<dict>\n";
+            writeFile << "    <key>Label</key>\n";
+            writeFile << "    <string>com.hanssak.OpenNetLinkApp</string>\n";
+            writeFile << "    <key>ProgramArguments</key>\n";
+            writeFile << "    <array>\n";
+            //writeFile << "        <string>/Applications/OpenNetLinkApp.app/Contents/MacOS/OpenNetLinkApp.sh</string>\n";
+            writeFile << "        <string>/usr/bin/open</string>\n";
+            writeFile << "        <string>-a</string>\n";
+            writeFile << "        <string>/Applications/OpenNetLinkApp.app</string>\n";
+            writeFile << "    </array>\n";
+            writeFile << "    <key>ProcessType</key>\n";
+            writeFile << "    <string>Interactive</string>\n";
+            writeFile << "    <key>RunAtLoad</key>\n";
+            writeFile << "    <false/>\n";
+            writeFile << "    <key>KeepAlive</key>\n";
+            writeFile << "    <false/>\n";
+            writeFile << "</dict>\n";
+            writeFile << "</plist>\n";
+            writeFile.close();
+            NTLog(this, Info, "Called : RegisterStartProgram, Success: Create File [%s]", filePath.data());
+        } else {
+            NTLog(this, Err, "Called : RegisterStartProgram, Fail: Create File [%s] Err[%s]", filePath.data(), strerror(errno));
+        }
 
-	// write File
-	std::ofstream writeFile(filePath.data());
-	if( writeFile.is_open() ){
-        writeFile << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-        writeFile << "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n";
-        writeFile << "<plist version=\"1.0\">\n";
-        writeFile << "<dict>\n";
-        writeFile << "    <key>Label</key>\n";
-        writeFile << "    <string>com.hanssak.OpenNetLinkApp</string>\n";
-        writeFile << "    <key>ProgramArguments</key>\n";
-        writeFile << "    <array>\n";
-        writeFile << "        <string>/Applications/OpenNetLinkApp.app/Contents/MacOS/OpenNetLinkApp.sh</string>\n";
-        writeFile << "    </array>\n";
-        writeFile << "    <key>ProcessType</key>\n";
-        writeFile << "    <string>Interactive</string>\n";
-        writeFile << "    <key>RunAtLoad</key>\n";
-        writeFile << "    <true/>\n";
-        writeFile << "    <key>KeepAlive</key>\n";
-        writeFile << "    <false/>\n";
-        writeFile << "</dict>\n";
-        writeFile << "</plist>\n";
-		writeFile.close();
-		NTLog(this, Info, "Called : RegisterStartProgram, Success: Create File [%s]", filePath.data());
-	} else {
-		NTLog(this, Err, "Called : RegisterStartProgram, Fail: Create File [%s] Err[%s]", filePath.data(), strerror(errno));
-	}
+        NSString *theCMD = [@"launchctl load -w " stringByAppendingString:[NSString stringWithUTF8String:filePath.c_str()]];
+        system(theCMD.UTF8String);
 
-    NSString *theCMD = [@"launchctl load -w " stringByAppendingString:[NSString stringWithUTF8String:filePath.c_str()]];
-    system(theCMD.UTF8String);
+        
+        // 먼저 RunAtLoad 를 false로 두고 등록한 다음에 true 변경하여 다시 저장
+        // write File
+        
+        writeFile.open(filePath.data());
+        if( writeFile.is_open() ){
+            writeFile << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+            writeFile << "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n";
+            writeFile << "<plist version=\"1.0\">\n";
+            writeFile << "<dict>\n";
+            writeFile << "    <key>Label</key>\n";
+            writeFile << "    <string>com.hanssak.OpenNetLinkApp</string>\n";
+            writeFile << "    <key>ProgramArguments</key>\n";
+            writeFile << "    <array>\n";
+            //writeFile << "        <string>/Applications/OpenNetLinkApp.app/Contents/MacOS/OpenNetLinkApp.sh</string>\n";
+            writeFile << "        <string>/usr/bin/open</string>\n";
+            writeFile << "        <string>-a</string>\n";
+            writeFile << "        <string>/Applications/OpenNetLinkApp.app</string>\n";
+            writeFile << "    </array>\n";
+            writeFile << "    <key>ProcessType</key>\n";
+            writeFile << "    <string>Interactive</string>\n";
+            writeFile << "    <key>RunAtLoad</key>\n";
+            writeFile << "    <true/>\n";
+            writeFile << "    <key>KeepAlive</key>\n";
+            writeFile << "    <false/>\n";
+            writeFile << "</dict>\n";
+            writeFile << "</plist>\n";
+            writeFile.close();
+            NTLog(this, Info, "Called : RegisterStartProgram, Success: Create File [%s]", filePath.data());
+        } else {
+            NTLog(this, Err, "Called : RegisterStartProgram, Fail: Create File [%s] Err[%s]", filePath.data(), strerror(errno));
+        }
+    }
 }
 
 void WebWindow::UnRegisterStartProgram()
