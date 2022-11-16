@@ -1947,11 +1947,13 @@ void WebWindow::MinimizeWebWindow()
 void WebWindow::RegisterStartProgram()
 {
 	// TODO: Register logic for start program
+	// C# UI Code로 동작함
 }
 
 void WebWindow::UnRegisterStartProgram()
 {
 	// TODO: UnRegister logic for start program
+	// C# Code로 동작함
 }
 
 /// <summary>

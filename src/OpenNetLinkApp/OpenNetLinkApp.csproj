@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <!-- <TargetFramework>netcoreapp3.1</TargetFramework> -->
@@ -1822,6 +1822,9 @@
   <ItemGroup>
     <Reference Include="HsNetWorkSG">
       <HintPath>..\..\..\OpenNetLink\src\OpenNetLinkApp\Library\HsNetWorkSG.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.IWshRuntimeLibrary">
+      <HintPath>Library\Interop.IWshRuntimeLibrary.dll</HintPath>
     </Reference>
   </ItemGroup>
 
