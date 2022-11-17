@@ -1379,12 +1379,16 @@ void WebWindow::RegisterStartProgram()
 		writeFile << "#!/usr/bin/env xdg-open\n";
 		writeFile << "\n";
 		writeFile << "[Desktop Entry]\n";
-		writeFile << "Name=SecureGate\n";
-		writeFile << "Comment=OpenNetLinkApp\n";
+		//writeFile << "Name=SecureGate\n";
+		writeFile << "Name=OpenNetLink\n";
+		writeFile << "Comment=SecureGate\n";
 		writeFile << "GenericName=File Transfer\n";
-		writeFile << "Exec=/bin/sh -c '$HOME/hanssak/OpenNetLinkApp/OpenNetLinkApp.sh'\n";
+		writeFile << "Exec=/opt/hanssak/opennetlink/OpenNetLinkApp.sh\n";
+		
+		//writeFile << "Exec=/bin/sh -c '$HOME/hanssak/OpenNetLinkApp/OpenNetLinkApp.sh'\n";
 		//writeFile << "Exec=/bin/sh -c '/data/CrossPlatformWork/OPEN/OpenNetLink/src/OpenNetLinkApp/bin/Debug/netcoreapp3.1/OpenNetLinkApp.sh'\n";
-		writeFile << "Icon=/usr/share/icons/SecureGate.ico\n";
+		//writeFile << "Icon=/usr/share/icons/SecureGate.ico\n";
+		writeFile << "Icon=/opt/hanssak/opennetlink/wwwroot/SecureGate.ico\n";
 		writeFile << "Type=Application\n";
 		writeFile << "Categories=Utility;\n";
 		writeFile << "Keywords=SecureGate;OpenNetLink;NetLink;\n";
