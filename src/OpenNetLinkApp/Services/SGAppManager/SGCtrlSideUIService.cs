@@ -426,13 +426,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                /*string strAgentPath = CsSystemFunc.GetCurrentProcessName();
-                CsSystemFunc.makeAgentBootStartOSX(startProgramReg, "", "");*/
+                
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                /*string strAgentPath = CsSystemFunc.GetCurrentProcessName();
-                CsSystemFunc.makeAgentBootStartLinux(startProgramReg, "", "");*/
+                
             }
             else
             {

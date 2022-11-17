@@ -54,4 +54,7 @@ else
     fi  
 fi
 
+#설치종료시 프로그램 바로 실행
+open -a /Applications/OpenNetLinkApp.app
+
 exit 0
