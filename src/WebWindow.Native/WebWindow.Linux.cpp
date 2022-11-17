@@ -26,6 +26,9 @@ bool g_bDoExit2TrayUse = false;
 bool g_bStartTray = true;
 bool g_bClipCopyNsend = false;
 
+std::map<int, wstring> mapHotKey;
+
+
 std::mutex invokeLockMutex;
 
 
@@ -1424,9 +1427,64 @@ void WebWindow::SetUseClipCopyNsend(bool bUse)
 	//NTLog(this, Info, "Called : SetUseClipCopyNsend(@@@@@@@@@@) : %s", (AutoString)(bUse ? "Yes" : "No"));
 }
 
+void FreeClipHotKey(int nGroupID)
+{
+	if (mapHotKey.find(nGroupID) == mapHotKey.end())
+	{
+		NTLog(SelfThis, Info, "FreeClipHotKey - nGroupID : %d, ClipHotKey Data Empty!", nGroupID);
+		return;
+	}
+
+	wstring strClipHotKey = mapHotKey[nGroupID];
+	if (strClipHotKey.size() == 5)
+	{
+		wstring strWinKey = strClipHotKey.substr(0, 1);
+		wstring strCtrlKey = strClipHotKey.substr(1, 1);
+		wstring strAltKey = strClipHotKey.substr(2, 1);
+		wstring strShiftKey = strClipHotKey.substr(3, 1);
+		wstring strKeyName = strClipHotKey.substr(4, 1);
+
+		Sleep(100);
+		if (strKeyName.empty() != true)
+			keybd_event((BYTE)strKeyName.data(), 0x98, KEYEVENTF_KEYUP, 0);
+		if (strShiftKey.compare(_T("1")) == 0)
+			keybd_event(VK_SHIFT, 0x9d, KEYEVENTF_KEYUP, 0);
+		if (strCtrlKey.compare(_T("1")) == 0)
+			keybd_event(VK_CONTROL, 0x9d, KEYEVENTF_KEYUP, 0);
+		if (strAltKey.compare(_T("1")) == 0)
+			keybd_event(VK_MENU, 0x9d, KEYEVENTF_KEYUP, 0);
+		if (strWinKey.compare(_T("1")) == 0)
+		{
+			keybd_event(VK_LWIN, 0x9d, KEYEVENTF_KEYUP, 0);
+			keybd_event(VK_RWIN, 0x9d, KEYEVENTF_KEYUP, 0);
+		}
+	}
+	else
+	{
+		NTLog(SelfThis, Info, "FreeClipHotKey - nGroupID : %d, ClipHotKey Data is Wrong(Size Must be 5!) (Data : %s)", nGroupID, (AutoString)strClipHotKey.data());
+	}
+}
+
 void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
 {
+	wstring strTempHotKey = _T("");
 
+	strTempHotKey += (bWin ? _T("1") : _T("0"));
+	strTempHotKey += (bControl ? _T("1") : _T("0"));
+	strTempHotKey += (bAlt ? _T("1") : _T("0"));
+	strTempHotKey += (bShift ? _T("1") : _T("0"));
+	strTempHotKey += chVKCode;
+
+	NTLog(this, Info, "Called - SetNativeClipboardHotKey(###) - GroupID : %d, bAlt : %s, bControl : %s, bShift : %s, bWin : %s, VKCode : %c, nIdx : %d, Sum-Data : %s",
+		groupID,
+		(AutoString)(bAlt ? L"Y" : L"N"),
+		(AutoString)(bControl ? L"Y" : L"N"),
+		(AutoString)(bShift ? L"Y" : L"N"),
+		(AutoString)(bWin ? L"Y" : L"N"),
+		(wchar_t)chVKCode, nIdx,
+		(AutoString)strTempHotKey.data());
+
+	mapHotKey[groupID] = strTempHotKey;
 }
 
 #endif
