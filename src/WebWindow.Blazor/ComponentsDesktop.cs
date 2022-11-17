@@ -96,7 +96,7 @@ namespace WebWindows.Blazor
 
                 //json에서 초기 시작을 startProgramReg 인지 아닌지 판단하여 셋팅
                 //현재는 AppEnvSetting.json에서 가져오는데 추후 AppOpSetting으로 변경시 여기 json 파일 위치도 변경 필요.
-                var envJsonPath = Path.Combine(contentRootAbsolute, "conf", "AppEnvsetting.json");
+                var envJsonPath = Path.Combine(contentRootAbsolute, "conf", "AppEnvSetting.json");
                 string contentsEnv = System.IO.File.ReadAllText(envJsonPath);
                 using (JsonDocument document = JsonDocument.Parse(contentsEnv))
                 {
