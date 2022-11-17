@@ -943,13 +943,12 @@
                 }
             }
 
-
-        DateTime dt =(SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
-        pageService.SetSvrTime(groupId, dt, sgLoginData);
-        bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
-        bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
-        pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
-        pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
+            DateTime dt =(SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
+            pageService.SetSvrTime(groupId, dt, sgLoginData);
+            bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+            bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
+            pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
+            pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
 
             bool bAfterCheck = false;
             if (!bAfterApprEnable)
