@@ -37,7 +37,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns></returns>
         public string GetMainPage();
 
-        bool GetClipAfterSend();
+        bool GetClipCopyAutoSend();
         bool GetURLAutoTrans(int nGroupID);
         bool GetURLAutoAfterMsg(int nGroupID);
         string GetURLAutoAfterBrowser(int nGroupID);
@@ -379,7 +379,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return strPage;
         }
 
-        public bool GetClipAfterSend()
+        public bool GetClipCopyAutoSend()
         {
             return AppConfigInfo.bClipCopyAutoSend;
         }

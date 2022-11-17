@@ -56,7 +56,9 @@ bool g_bDoingSendClipBoard = false;
 
 bool g_bDoExit2TrayUse = false;
 bool g_bStartTray = true;
+bool g_bClipCopyNsend = false;
 
+std::map<int, wstring> mapHotKey;
 
 enum Results {
 	ToastClicked,					// user clicked on the toast
@@ -1398,6 +1400,79 @@ size_t WebWindow::SaveImageFile(bool bClearPreMem, bool bClearExPreMem, bool bUs
 	return nTotalLen;
 }
 
+
+void FreeClipHotKey(int nGroupID)
+{
+
+	/*wstring strClipHotKey = "";
+	if (strClipHotKey.empty() != true)
+	{
+		TCHAR* chToken = wcstok((TCHAR*)strClipHotKey.data(), _T(","));
+
+		stringex strWinKey = _T("N");
+		chToken = wcstok(NULL, _T(","));
+		if (chToken != NULL)
+			strWinKey = chToken;
+
+		stringex strAltKey = _T("N");
+		chToken = wcstok(NULL, _T(","));
+		if (chToken != NULL)
+			strAltKey = chToken;
+
+		stringex strCtrlKey = _T("N");
+		chToken = wcstok(NULL, _T(","));
+		if (chToken != NULL)
+			strCtrlKey = chToken;
+
+		stringex strShiftKey = _T("N");
+		chToken = wcstok(NULL, _T(","));
+		if (chToken != NULL)
+			strShiftKey = chToken;
+
+		stringex strKeyName = _T("");
+		chToken = wcstok(NULL, _T(","));
+		if (chToken != NULL)
+			strKeyName = chToken;
+
+		Sleep(100);
+		if (strKeyName.empty() != true)
+			keybd_event((BYTE)strKeyName.data(), 0x98, KEYEVENTF_KEYUP, 0);
+		if (strShiftKey.CompareNoCase(_T("Y")) == 0 || strShiftKey.compare(_T("1")) == 0)
+			keybd_event(VK_SHIFT, 0x9d, KEYEVENTF_KEYUP, 0);
+		if (strCtrlKey.CompareNoCase(_T("Y")) == 0 || strCtrlKey.compare(_T("1")) == 0)
+			keybd_event(VK_CONTROL, 0x9d, KEYEVENTF_KEYUP, 0);
+		if (strAltKey.CompareNoCase(_T("Y")) == 0 || strAltKey.compare(_T("1")) == 0)
+			keybd_event(VK_MENU, 0x9d, KEYEVENTF_KEYUP, 0);
+		if (strWinKey.CompareNoCase(_T("Y")) == 0 || strWinKey.compare(_T("1")) == 0)
+		{
+			keybd_event(VK_LWIN, 0x9d, KEYEVENTF_KEYUP, 0);
+			keybd_event(VK_RWIN, 0x9d, KEYEVENTF_KEYUP, 0);
+		}
+
+	}*/
+
+}
+
+void AutoCopyClipBoard(int groupID)
+{
+	HWND h_active_wnd = ::GetForegroundWindow();
+	if (h_active_wnd != NULL)
+	{
+		::ShowWindow(h_active_wnd, SW_SHOW);
+		::SetForegroundWindow(h_active_wnd);
+		::SetFocus(h_active_wnd);
+
+		// 필요한지 확인
+		FreeClipHotKey(groupID);
+
+		keybd_event(VK_CONTROL, 0x9d, 0, 0);
+		keybd_event('C', 0x98, 0, 0);
+		keybd_event('C', 0x98, KEYEVENTF_KEYUP, 0);
+		keybd_event(VK_CONTROL, 0x9d, KEYEVENTF_KEYUP, 0);
+		Sleep(300);
+	}
+}
+
 int WebWindow::SendClipBoard(int groupID)
 {
 
@@ -1417,6 +1492,11 @@ int WebWindow::SendClipBoard(int groupID)
 
 	NTLog(SelfThis, Info, "WebWindow::SendClipBoard - groupID : %d, ClipSelectSend - Use : %s", groupID, bUseClipSelectSend ? _T("True") : _T("False"));
 	//WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard - groupID : %d, ClipSelectSend - Use : %s"), groupID, bUseClipSelectSend?_T("True"): _T("False"));
+
+	if (g_bClipCopyNsend)
+	{
+		AutoCopyClipBoard(groupID);
+	}
 
 	HWND hwndDesktop = GetDesktopWindow();
 
@@ -2023,5 +2103,30 @@ void WebWindow::SetTrayUse(bool useTray)
 	//NTLog(this, Info, "Called : SetTrayUse(@@@@@@@@@@) : %s", (AutoString)(g_bDoExit2TrayUse ? "Yes" : "No"));
 }
 
+void WebWindow::SetUseClipCopyNsend(bool bUseCopyNsend)
+{
+	g_bClipCopyNsend = bUseCopyNsend;
+	//NTLog(this, Info, "Called : SetUseClipCopyNsend(################) : %s", (AutoString)(bUseCopyNsend ? "Yes" : "No"));
+}
+
+void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+{
+	wstring strTempHotKey = _T("");
+	strTempHotKey += (bAlt ? _T("1") : _T("0"));
+	strTempHotKey += (bControl ? _T("1") : _T("0"));
+	strTempHotKey += (bShift ? _T("1") : _T("0"));
+	strTempHotKey += (bWin ? _T("1") : _T("0"));
+	strTempHotKey += chVKCode;
+
+	NTLog(this, Info, "Called - SetNativeClipboardHotKey(###) - GroupID : %d, bAlt : %s, bControl : %s, bShift : %s, bWin : %s, VKCode : %c, nIdx : %d", 
+		groupID,
+		(AutoString)(bAlt ? L"Y" : L"N"),
+		(AutoString)(bControl ? L"Y" : L"N"),
+		(AutoString)(bShift ? L"Y" : L"N"),
+		(AutoString)(bWin ? L"Y" : L"N"),
+		(wchar_t)chVKCode, nIdx);
+
+	mapHotKey[groupID] = strTempHotKey;
+}
 
 // End Of File

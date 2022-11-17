@@ -24,7 +24,7 @@ using namespace AutoIt::Common;
 
 bool g_bDoExit2TrayUse = false;
 bool g_bStartTray = true;
-
+bool g_bClipCopyNsend = false;
 
 std::mutex invokeLockMutex;
 
@@ -1417,4 +1417,16 @@ void WebWindow::UnRegisterStartProgram()
 		//NTLog(this, Error, "Called : UnRegisterStartProgram, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
 		NTLog(this, Err, "Called : UnRegisterStartProgram, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
 }
+
+void WebWindow::SetUseClipCopyNsend(bool bUse)
+{
+	g_bClipCopyNsend = bUse;
+	//NTLog(this, Info, "Called : SetUseClipCopyNsend(@@@@@@@@@@) : %s", (AutoString)(bUse ? "Yes" : "No"));
+}
+
+void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+{
+
+}
+
 #endif

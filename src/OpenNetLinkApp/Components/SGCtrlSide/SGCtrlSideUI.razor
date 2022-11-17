@@ -241,7 +241,7 @@
                     <input type="checkbox" class="mr-1" checked="@(GetClipCopyAutoSend())"
                            @onchange="eventArgs => { SetClipCopyAutoSend(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPCOPYANDSEND")</span>                <!--클립보드 복사 후 전송 -->
                     </div>
-                }
+            }
         </div>
     }
 
@@ -648,7 +648,7 @@
 
     public bool m_bUseClipAlarmType = true;                                             // 클립보드 알림 형식 사용 유무
     public bool m_bUseMainPageType = true;                                               // 메인페이지 형식 사용 유무
-    public bool m_bUseClipCopyAndSend = true;                                           // 클립보드 복사 후 전송 사용 유무
+    public bool m_bUseClipCopyAndSend = false;                                           // 클립보드 복사 후 전송 사용 유무
     public bool m_bUseURLRedirectionAlarm = true;                                       // URL 자동전환 알림 사용 유무
     public bool m_bUseURLRedirectionAlarmType = true;                                   // URL 자동전환 알림 타입 선택 사용 유무
     public bool m_bRFileAutoSend = true;                                                // 마우스 우클릭 후 자동전송 사용 유무
@@ -832,6 +832,10 @@
         // Windows일때, 자동실행 설정상태면 Lnk 만듬
         if (GetStartProgramReg() && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             CtrlSideUISvc.SetStartProgramReg(true);
+
+        // 클립보드 자동전송 상태 설정
+        if (GetClipCopyAutoSend())
+            Window.SetUseClipCopyNsend(true);
 
     }
 
@@ -1022,7 +1026,7 @@
 
     private bool GetClipCopyAutoSend()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetClipAfterSend();
+        return SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend();
     }
 
     private bool GetURLAutoTrans(int nGroupID)
@@ -1337,6 +1341,7 @@
         bool clipAfterSend = Convert.ToBoolean(changeEventArg.Value);
         CLog.Here().Information($"SetClipCopyAutoSend Set: [{clipAfterSend}]");
         CtrlSideUISvc.SetClipAfterSend(clipAfterSend);
+        Window.SetUseClipCopyNsend(clipAfterSend);
     }
 
     /// <summary>
