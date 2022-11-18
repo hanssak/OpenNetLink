@@ -746,7 +746,7 @@ window.closeAllPopup = () => {
     $("#modal-virusreport").modal("hide");
     $("#ClipboardApprovePopUp").modal("hide");
     $("#ClipboardManagePopUp").modal("hide");
-    $("#MailApprovePopUp").modal("hide"); modal - transprogress
+    $("#MailApprovePopUp").modal("hide");
     $("#MailManagePopUp").modal("hide");
     $("#PcurlApprovePopUp").modal("hide");
     $("#PcurlManagePopUp").modal("hide");
@@ -771,8 +771,6 @@ window.closeAllPopup = () => {
     $("#ViewDetail_PopUp").modal("hide");
     $("#ClipboardApprovePopUp").modal("hide");
     $("#ClipboardManagePopUp").modal("hide");
-
-
 }
 
 window.initTransferUIPosition = () => {
