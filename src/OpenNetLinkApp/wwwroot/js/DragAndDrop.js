@@ -613,7 +613,7 @@ window.closeProgressMessageOnScreenLock = (id) => {
     $("#downProgressRate").css("width", "1%");
 }
 
-window.ProgressMessage = (id) => {
+window.closeProgressMessage = (id) => {
     /*$("#" + id).parent().parent().find("[type='button']").trigger("click");*/
     $("#left-sidebar").css("z-index", 1101);
     $("#main-nav").css("z-index", 1100);
