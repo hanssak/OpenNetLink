@@ -742,6 +742,21 @@ window.closeAllPopup = () => {
     $("#ReceiverSelect_PopUp").modal("hide");
     $("#TransPopUp").modal("hide");
     $("#modal-selectreceivefolder").modal("hide");
+
+    $("#ZipPreviewPopUp").modal("hide");
+    $("#TransPopUp").modal("hide");
+    $("#SecurityPopUp").modal("hide");
+    $("#SecurityConfirm").modal("hide");
+    $("#SecurityApproverSelectPopUp").modal("hide");
+    $("#ReceiverSelect_PopUp").modal("hide");
+    $("#modal-pcurlavailablelist").modal("hide");
+    $("#modal-pcurlusingregist").modal("hide");
+    $("#PublicBoardView_PopUp").modal("hide");
+    $("#ViewDetail_PopUp").modal("hide");
+    $("#ClipboardApprovePopUp").modal("hide");
+    $("#ClipboardManagePopUp").modal("hide");
+
+
 }
 
 window.initTransferUIPosition = () => {
