@@ -99,7 +99,7 @@
             <div class="col-md-3 pr-0">
                 <div class="card card-navy card-outline card-boder" style="height:65vh;">
 
-                    <FileTree OnSelectPathFromFileTree="changeSelectPath"></FileTree>
+                    <FileTree @ref="refFileTree" OnSelectPathFromFileTree="changeSelectPath"></FileTree>
                     <!-- 파일리스트 -->
                     <div id="divFileList" style="width:100%;height:50%;padding:1px 1px 1px 0px;overflow:auto">
                     </div>
@@ -326,6 +326,8 @@
     /// </summary>
     public bool bHideApprChooseAddBtn = false;
     ApproveLine ApprLine;
+
+    FileTree refFileTree;
 
     /// <summary>
     /// 사후결재 CheckBox Hide 유무(By:서버정책, true : 숨김, false : 보여줌)
@@ -1898,6 +1900,9 @@
         if (firstRender)
         {
             CheckContinueFileUpload();
+
+            if (siteConfig.GetUseAccessAllDrive(groupIDbyParam))
+                refFileTree.bIsOnlyDocAll = false;
         }
 
     }
@@ -2155,9 +2160,9 @@
         if (sgUserData == null)
             return;
 
-        if(bAfterApprChkHIde)       //현재 '사후결재 체크'가 표시되지 않으면 별도 컨트롤 하지 않는다.
+        if (bAfterApprChkHIde)       //현재 '사후결재 체크'가 표시되지 않으면 별도 컨트롤 하지 않는다.
             return;
-        
+
         bAfterCheck = OpConfigSvc.GetAfterBasicChk();
         pageService.SetAfterApproveCheck(groupID, bAfterCheck);
         StateHasChanged();

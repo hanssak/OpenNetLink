@@ -3,6 +3,7 @@
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
 @using AgLogManager
+@using System.Timers
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject HSCmdCenter HSCmdCenter
@@ -28,7 +29,7 @@
         </div>
         <!-- <div class="loading_title" @onclick="goLogIn"> -->
         <div class="loading_title">
-            @XmlConf.GetInfoMsg("I_0212")
+            @XmlConf.GetInfoMsg(bConnectServerTimeOut ? "I_0232" : "I_0212")
         </div>
     </section>
 </div>
@@ -44,6 +45,8 @@
     ISGopConfigService OpConfigSvc;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<MainLoading>(); //PopUpLogIn
 
+    Timer conTimer = new Timer();
+    private bool bConnectServerTimeOut = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -99,6 +102,19 @@
         // Toast 에서 결재관리 메뉴로 넘어가기 위해 저장
         pageService.m_approveMenuArray = new ISGSideBarUI[listNetWork.Count];
         pageService.m_approveMenuArray.Initialize();
+
+        // 30초간 서버에서 응답없으면 메세지 변경
+        conTimer.AutoReset = false;
+        conTimer.Interval = 30*1000;
+        conTimer.Elapsed += new ElapsedEventHandler(dayTimer_Elapsed);
+        conTimer.Start();
+    }
+
+    private void dayTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        CLog.Here().Information($@"{conTimer.Interval/1000} sec after, Server Result Failed !!!");
+        bConnectServerTimeOut = true;
+        StateHasChanged();
     }
 
     private void goLogIn(String loginType)
@@ -128,13 +144,13 @@
         if (siteConfig.GetUseAppLoginType(groupId))
         {
             loginType = SGAppMgrSvc.SiteConfigInfoService.GetAppLoginType(groupId).ToString();
-            if (groupId == 0)
-                goLogIn(loginType);
         }
-        else
-        {
-            if (groupId == 0)
-                goLogIn(loginType);
-        }
+
+        conTimer.Stop();
+
+        if (groupId == 0)
+            goLogIn(loginType);
+
     }
+
 }

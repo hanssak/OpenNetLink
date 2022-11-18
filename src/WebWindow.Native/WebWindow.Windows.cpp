@@ -276,14 +276,14 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
     tray.menu[1] = {(char*)"-",0,0,0,NULL,NULL,NULL};
     tray.menu[2] = {(char*)"Hide",0,0,0,toggle_show,NULL,NULL};
     tray.menu[3] = {(char*)"-",0,0,0,NULL,NULL,NULL};
-    tray.menu[4] = {(char*)"Quit",0,0,0,quit_cb,NULL,NULL};
+    tray.menu[4] = {(char*)TEXT_EXIT,0,0,0,quit_cb,NULL,NULL};
     tray.menu[5] = {NULL,0,0,0,NULL,NULL,NULL};*/
 
 	//tray.menu[0] = { (char*)"About",0,0,0,hello_cb,NULL,NULL };
 	//tray.menu[1] = { (char*)"-",0,0,0,NULL,NULL,NULL };
-	tray.menu[0] = { (char*)"Hide",0,0,0,toggle_show,NULL,NULL };
+	tray.menu[0] = { (char*)TEXT_HIDE,0,0,0,toggle_show,NULL,NULL };
 	tray.menu[1] = { (char*)"-",0,0,0,NULL,NULL,NULL };
-	tray.menu[2] = { (char*)"Quit",0,0,0,quit_cb,NULL,NULL };
+	tray.menu[2] = { (char*)TEXT_EXIT,0,0,0,quit_cb,NULL,NULL };
 	tray.menu[3] = { NULL,0,0,0,NULL,NULL,NULL };
 
 
@@ -326,8 +326,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			struct tray_menu* item = tray.menu;
 			do
 			{
-				if (strcmp(item->text, "Hide") == 0 ||
-					strcmp(item->text, "Show") == 0) {
+				if (strcmp(item->text, TEXT_HIDE) == 0 ||
+					strcmp(item->text, TEXT_SHOW) == 0) {
 					toggle_minimize(item);
 					break;
 				}
@@ -360,7 +360,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				struct tray_menu* item = tray.menu;
 				do
 				{
-					if (strcmp(item->text, "Hide") == 0) {
+					if (strcmp(item->text, TEXT_HIDE) == 0) {
 						toggle_show(item);
 						break;
 					}
@@ -445,8 +445,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			do
 			{
-				if (strcmp(item->text, "Hide") == 0 ||
-					strcmp(item->text, "Show") == 0) {
+				if (strcmp(item->text, TEXT_HIDE) == 0 ||
+					strcmp(item->text, TEXT_SHOW) == 0) {
 					toggle_show_force(item, true);
 					// toggle_minimize(item);
 					break;
@@ -1858,7 +1858,7 @@ void WebWindow::MoveWebWindowToTray()
 	struct tray_menu *item = tray.menu;
 	do
 	{
-		if (strcmp(item->text, "Hide") == 0) {
+		if (strcmp(item->text, TEXT_HIDE) == 0) {
 			toggle_show(item);
 			break;
 		}
@@ -1871,7 +1871,7 @@ void WebWindow::MoveTrayToWebWindow()
 	struct tray_menu* item = tray.menu;
 	do
 	{
-		if (strcmp(item->text, "Show") == 0) {
+		if (strcmp(item->text, TEXT_SHOW) == 0) {
 			toggle_show(item);
 			break;
 		}
@@ -1884,7 +1884,7 @@ void WebWindow::MinimizeWebWindow()
 	struct tray_menu *item = tray.menu;
 	do
 	{
-		if (strcmp(item->text, "Hide") == 0) {
+		if (strcmp(item->text, TEXT_HIDE) == 0) {
 			toggle_minimize(item);
 			break;
 		}

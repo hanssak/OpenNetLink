@@ -1,4 +1,4 @@
-#include "Tray.h"
+﻿#include "Tray.h"
 #include "NativeLog.h"
 
 #if TRAY_APPINDICATOR
@@ -15,17 +15,21 @@ static void hello_cb(struct tray_menu *item);
 static void quit_cb(struct tray_menu *item);
 static void submenu_cb(struct tray_menu *item);
 
+#define TEXT_SHOW	"보이기"
+#define TEXT_HIDE	"숨기기"
+#define TEXT_EXIT	"끝내기"
+
 // Test tray init
 #if defined(TRAY_APPINDICATOR) || defined(TRAY_APPKIT)
 static struct tray tray = {
     .icon 		= (char *)TRAY_ICON1,
     .dark_icon	= (char *)TRAY_ICON3,
     .menu 		= (struct tray_menu[]) {
-          		  {.text = (char *)"About",   .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb,	.context = NULL, .submenu = NULL},
-          		  {.text = (char *)"-",       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, 		.context = NULL, .submenu = NULL},
-          		  {.text = (char *)"Hide",    .disabled = 0, .checked = 0, .usedCheck = 0, .cb = toggle_show, .context = NULL, .submenu = NULL},
+          		  /*{.text = (char *)"About",   .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb,	.context = NULL, .submenu = NULL},
+          		  {.text = (char *)"-",       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, 		.context = NULL, .submenu = NULL},*/
+          		  {.text = (char *)TEXT_HIDE,    .disabled = 0, .checked = 0, .usedCheck = 0, .cb = toggle_show, .context = NULL, .submenu = NULL},
           		  {.text = (char *)"-",       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL,		.context = NULL, .submenu = NULL},
-          		  {.text = (char *)"Quit",    .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb,		.context = NULL, .submenu = NULL},
+          		  {.text = (char *)TEXT_EXIT,    .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb,		.context = NULL, .submenu = NULL},
           		  {.text = NULL,              .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL,		.context = NULL, .submenu = NULL}
     }
 };
@@ -36,7 +40,7 @@ static struct tray tray;
 static void toggle_show(struct tray_menu *item) {
 	if(!item->checked) {
 		NTLog(SelfThis, Info, "Called : OpenNetLink Hide (value: %s)", item->text);
-		item->text = (char*)"Show";
+		item->text = (char*)TEXT_SHOW;
 #if TRAY_APPINDICATOR
 		gtk_widget_hide(_g_window);
 #elif TRAY_APPKIT
@@ -47,7 +51,7 @@ static void toggle_show(struct tray_menu *item) {
 	}
 	else if(item->checked) {
 		NTLog(SelfThis, Info, "Called : OpenNetLink Show (value: %s)", item->text);
-		item->text = (char*)"Hide";
+		item->text = (char*)TEXT_HIDE;
 #if TRAY_APPINDICATOR
 		gtk_widget_show_all(_g_window);
 #elif TRAY_APPKIT
@@ -67,7 +71,7 @@ static void toggle_show_force(struct tray_menu* item, bool bShow)
 
 	if (bShow){
 		NTLog(SelfThis, Info, "Called : OpenNetLink Show (value: %s)", item->text);
-		item->text = (char*)"Hide";
+		item->text = (char*)TEXT_HIDE;
 #if TRAY_APPINDICATOR
 		gtk_widget_show_all(_g_window);
 #elif TRAY_APPKIT
@@ -85,7 +89,7 @@ static void toggle_show_force(struct tray_menu* item, bool bShow)
 	else
 	{
 		NTLog(SelfThis, Info, "Called : OpenNetLink Hide (value: %s)", item->text);
-		item->text = (char*)"Show";
+		item->text = (char*)TEXT_SHOW;
 #if TRAY_APPINDICATOR
 		gtk_widget_hide(_g_window);
 #elif TRAY_APPKIT
@@ -102,11 +106,11 @@ static void toggle_show_force(struct tray_menu* item, bool bShow)
 static void toggle_minimize(struct tray_menu *item) {
 	if(!item->checked) {
 		NTLog(SelfThis, Info, "Called : OpenNetLink Minimize Change State Hide -> Show (value: %s)", item->text);
-		item->text = (char*)"Show";
+		item->text = (char*)TEXT_SHOW;
 	}
 	else if(item->checked) {
 		NTLog(SelfThis, Info, "Called : OpenNetLink Minimize Change State Show -> Hide (value: %s)", item->text);
-		item->text = (char*)"Hide";
+		item->text = (char*)TEXT_HIDE;
 	}
 	item->checked = !item->checked;
 	tray_update(&tray);

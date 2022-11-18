@@ -257,8 +257,8 @@ static void tray_exit() { ((void(*)(id, SEL, id))objc_msgSend)(app, sel_register
 #elif defined(TRAY_WINAPI)
 
 #include <windows.h>
-
 #include <shellapi.h>
+#include "WebWindow.h"
 
 #define WM_TRAY_CALLBACK_MESSAGE (WM_USER + 1)
 #define WC_TRAY_CLASS_NAME L"TRAY"
@@ -269,8 +269,8 @@ static NOTIFYICONDATA nid;
 static HWND hwnd;
 static HMENU hmenu = NULL;
 
-static LRESULT CALLBACK _tray_wnd_proc(HWND hwnd, UINT msg, WPARAM wparam,
-                                       LPARAM lparam) {
+static LRESULT CALLBACK _tray_wnd_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
+{
   switch (msg) {
   case WM_CLOSE:
     DestroyWindow(hwnd);
@@ -401,7 +401,8 @@ static int tray_loop(int blocking) {
   return 0;
 }
 
-static void tray_update(struct tray *tray) {
+static void tray_update(struct tray *tray)
+{
   HMENU prevmenu = hmenu;
   UINT id = ID_TRAY_FIRST;
   hmenu = _tray_menu(tray->menu, &id);
