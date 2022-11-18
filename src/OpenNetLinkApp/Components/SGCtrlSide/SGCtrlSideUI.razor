@@ -1077,10 +1077,12 @@
         {
             SGUserData sgUserInfo = null;
             sgUserInfo = (SGUserData)HsCmdCenter.GetUserData(groupId);
-            if (sgUserInfo == null)
-                return "K:\\사용자\\다운로드"; ;
 
-            DownPath = $@"K:\{sgUserInfo.GetUserName()}\다운로드";
+            if (sgUserInfo == null)
+                return "K:\\개인 폴더\\다운로드";
+            DownPath = $@"K:\개인 폴더\다운로드";
+            //DownPath = $@"K:\{sgUserInfo.GetUserName()}\다운로드";
+
         }
         DownPath = HsCmdCenter.ConvertRecvDownPath(DownPath);
 
@@ -1129,7 +1131,7 @@
 
     private bool GetStartProgramReg()
     {
-        return SGAppMgrSvc.AppConfigInfoService.GetStartProgramReg();
+        return SGAppMgrSvc.OpConfigInfoService.GetStartProgramReg();
     }
 
     private string GetLanguage()

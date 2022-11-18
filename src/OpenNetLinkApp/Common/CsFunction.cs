@@ -410,8 +410,6 @@ namespace OpenNetLinkApp.Common
             return false;
         }
 
-
-
     }
 
 }

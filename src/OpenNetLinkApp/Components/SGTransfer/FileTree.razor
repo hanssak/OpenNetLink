@@ -31,6 +31,10 @@
 
     public bool IsVisible { get; set; }
 
+
+    public bool bIsOnlyDocAll { get; set; } = true;
+    string[] strDrives = new string[] { "C:\\", "D:\\", "K:\\" };
+
     private string stTreeDir = String.Empty;
     private bool m_btoTheTop = false;
 
@@ -50,7 +54,13 @@
         else
         {
             m_btoTheTop = true;
-            entries = Directory.GetLogicalDrives();
+            if (bIsOnlyDocAll)
+            {
+                entries = new string[3] { "C:\\", "D:\\", "K:\\" };
+            }
+            else
+                entries = Directory.GetLogicalDrives();
+
             StateHasChanged();
         }
     }
@@ -114,13 +124,18 @@
         }
 
     }
+
     string GetTextForNode(object data)
     {
         string name = Path.GetFileName((string)data);
         //Console.WriteLine("FileName : " + name);
         if (name == null || name.Length < 1)
         {
-            if ((data as string).Length >= 2) name = data.ToString().Substring(0, 2);
+            if ((data as string).Length >= 2)
+            {
+
+                name = data.ToString().Substring(0, 2);
+            }
         }
         return name;
     }
