@@ -71,7 +71,9 @@ extern void *SelfThis;
 #define WINDOW_MIN_WIDTH 1220
 #define WINDOW_MIN_HEIGHT 750
 
-extern bool _bTrayUse;
+extern bool g_bDoExit2TrayUse;
+extern bool g_bStartTray;
+extern bool g_bClipCopyNsend;
 
 typedef enum enDefineClipType
 {
@@ -217,7 +219,11 @@ public:
 	void SetRequestedNavigateURLCallback(RequestedNavigateURLCallback callback) { _requestedNavigateURLCallback = callback; }
 	void InvokeClipBoard(const int nGroupId, const int nType, const int nLength, const void *pMem, const int nExLength, const void* pExMem) { if (_clipboardCallback) _clipboardCallback(nGroupId, nType, nLength, pMem, nExLength, pExMem); }
 	void InvokeRequestedNavigateURL(AutoString navURI) { if (_requestedNavigateURLCallback) _requestedNavigateURLCallback(navURI); }
-	void SetTrayUse(bool useTray) { _bTrayUse = useTray; }
+	void SetTrayUse(bool useTray);
+	void SetUseClipCopyNsend(bool bUse);
+
+	void SetTrayStartUse(bool bUseStartTray);
+	void SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
 
 #if OS_LINUX
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
@@ -274,6 +280,9 @@ public:
 	void RegisterStartProgram();
 	void UnRegisterStartProgram();
 	bool GetTrayUse();
+
+	///
+	static void SetTrayStatus(bool bSetTextShowNchecked);
 
 };
 

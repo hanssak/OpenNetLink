@@ -34,7 +34,9 @@ void *SelfThis = nullptr;
 
 using namespace std;
 
-bool _bTrayUse = false;
+bool g_bStartTray = true;
+bool g_bDoExit2TrayUse = false;
+bool g_bClipCopyNsend = false;
 static id _appDelegate;
 
 map<NSWindow*, WebWindow*> nsWindowToWebWindow;
@@ -82,8 +84,6 @@ static struct tray defTray = {
     .icon = (char *)TRAY_ICON1,
     .dark_icon = (char *)TRAY_ICON3,
     .menu = (struct tray_menu[]) {
-            {.text = (char *)"About",   .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb, .context = NULL, .submenu = NULL},
-            {.text = (char *)"-",       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL, .submenu = NULL},
             {.text = (char *)"Hide",    .disabled = 0, .checked = 0, .usedCheck = 0, .cb = toggle_show, .context = NULL, .submenu = NULL},
             {.text = (char *)"-",       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL, .submenu = NULL},
             {.text = (char *)"Quit",    .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb, .context = NULL, .submenu = NULL},
@@ -96,8 +96,8 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 {
 	SelfThis = this;
 	_webMessageReceivedCallback = webMessageReceivedCallback;
-	_bTrayUse = false;
-
+	g_bDoExit2TrayUse = false;
+    
     NSRect frame = NSMakeRect(0, 0, WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT);
     NSWindow *window = [[NSWindow alloc]
         initWithContentRect:frame
@@ -178,8 +178,12 @@ void WebWindow::Show()
         AttachWebView();
     }
 
-    NSWindow * window = (NSWindow*)_window;
-    [window makeKeyAndOrderFront:nil];
+    if(!g_bStartTray)
+    {
+        NSWindow * window = (NSWindow*)_window;
+        [window makeKeyAndOrderFront:nil];
+    }
+
 }
 
 void WebWindow::SetTitle(AutoString title)
@@ -253,6 +257,10 @@ void WebWindow::WaitForExit()
 		NTLog(this, Fatal, "Failed to Create Tray\n");
 		return ;
 	}
+
+    if(!g_bStartTray)
+        MoveTrayToWebWindow();
+
     RegisterQuitHotKey();
 	while (tray_loop(1) == 0)
 	{
@@ -330,6 +338,9 @@ void WebWindow::Invoke(ACTION callback)
 
 void WebWindow::ShowMessage(AutoString title, AutoString body, unsigned int type)
 {
+    return;
+
+    // code 검증필요
     NSString* nstitle = [[NSString stringWithUTF8String:title] autorelease];
     NSString* nsbody= [[NSString stringWithUTF8String:body] autorelease];
     NSAlert *alert = [[[NSAlert alloc] init] autorelease];
@@ -739,7 +750,7 @@ void WebWindow::ProgramExit()
 bool WebWindow::GetTrayUse()
 {
 	NTLog(this, Info, "Called : OpenNetLink Tray Status");
-	return _bTrayUse;
+	return g_bDoExit2TrayUse;
 }
 
 void WebWindow::MoveWebWindowToTray()
@@ -798,36 +809,80 @@ void WebWindow::RegisterStartProgram()
 	mypasswd = getpwuid(myuid);
 
 	std::string filePath = std::string(mypasswd->pw_dir) + "/Library/LaunchAgents/com.hanssak.OpenNetLinkApp.plist";
+    //파일의 존재 여부를 체크해서 있으면 작업을 하지 않고 그냥 넘김
+    std::ifstream f(filePath.data());
+    if(f.good())
+    {
+        return;
+    }
+    else
+    {
+        // write File
+        std::ofstream writeFile(filePath.data());
+        if( writeFile.is_open() ){
+            writeFile << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+            writeFile << "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n";
+            writeFile << "<plist version=\"1.0\">\n";
+            writeFile << "<dict>\n";
+            writeFile << "    <key>Label</key>\n";
+            writeFile << "    <string>com.hanssak.OpenNetLinkApp</string>\n";
+            writeFile << "    <key>ProgramArguments</key>\n";
+            writeFile << "    <array>\n";
+            //writeFile << "        <string>/Applications/OpenNetLinkApp.app/Contents/MacOS/OpenNetLinkApp.sh</string>\n";
+            writeFile << "        <string>/usr/bin/open</string>\n";
+            writeFile << "        <string>-a</string>\n";
+            writeFile << "        <string>/Applications/OpenNetLinkApp.app</string>\n";
+            writeFile << "    </array>\n";
+            writeFile << "    <key>ProcessType</key>\n";
+            writeFile << "    <string>Interactive</string>\n";
+            writeFile << "    <key>RunAtLoad</key>\n";
+            writeFile << "    <false/>\n";
+            writeFile << "    <key>KeepAlive</key>\n";
+            writeFile << "    <false/>\n";
+            writeFile << "</dict>\n";
+            writeFile << "</plist>\n";
+            writeFile.close();
+            NTLog(this, Info, "Called : RegisterStartProgram, Success: Create File [%s]", filePath.data());
+        } else {
+            NTLog(this, Err, "Called : RegisterStartProgram, Fail: Create File [%s] Err[%s]", filePath.data(), strerror(errno));
+        }
 
-	// write File
-	std::ofstream writeFile(filePath.data());
-	if( writeFile.is_open() ){
-        writeFile << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-        writeFile << "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n";
-        writeFile << "<plist version=\"1.0\">\n";
-        writeFile << "<dict>\n";
-        writeFile << "    <key>Label</key>\n";
-        writeFile << "    <string>com.hanssak.OpenNetLinkApp</string>\n";
-        writeFile << "    <key>ProgramArguments</key>\n";
-        writeFile << "    <array>\n";
-        writeFile << "        <string>/Applications/OpenNetLinkApp.app/Contents/MacOS/OpenNetLinkApp.sh</string>\n";
-        writeFile << "    </array>\n";
-        writeFile << "    <key>ProcessType</key>\n";
-        writeFile << "    <string>Interactive</string>\n";
-        writeFile << "    <key>RunAtLoad</key>\n";
-        writeFile << "    <true/>\n";
-        writeFile << "    <key>KeepAlive</key>\n";
-        writeFile << "    <false/>\n";
-        writeFile << "</dict>\n";
-        writeFile << "</plist>\n";
-		writeFile.close();
-		NTLog(this, Info, "Called : RegisterStartProgram, Success: Create File [%s]", filePath.data());
-	} else {
-		NTLog(this, Err, "Called : RegisterStartProgram, Fail: Create File [%s] Err[%s]", filePath.data(), strerror(errno));
-	}
+        NSString *theCMD = [@"launchctl load -w " stringByAppendingString:[NSString stringWithUTF8String:filePath.c_str()]];
+        system(theCMD.UTF8String);
 
-    NSString *theCMD = [@"launchctl load -w " stringByAppendingString:[NSString stringWithUTF8String:filePath.c_str()]];
-    system(theCMD.UTF8String);
+        
+        // 먼저 RunAtLoad 를 false로 두고 등록한 다음에 true 변경하여 다시 저장
+        // write File
+        
+        writeFile.open(filePath.data());
+        if( writeFile.is_open() ){
+            writeFile << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+            writeFile << "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n";
+            writeFile << "<plist version=\"1.0\">\n";
+            writeFile << "<dict>\n";
+            writeFile << "    <key>Label</key>\n";
+            writeFile << "    <string>com.hanssak.OpenNetLinkApp</string>\n";
+            writeFile << "    <key>ProgramArguments</key>\n";
+            writeFile << "    <array>\n";
+            //writeFile << "        <string>/Applications/OpenNetLinkApp.app/Contents/MacOS/OpenNetLinkApp.sh</string>\n";
+            writeFile << "        <string>/usr/bin/open</string>\n";
+            writeFile << "        <string>-a</string>\n";
+            writeFile << "        <string>/Applications/OpenNetLinkApp.app</string>\n";
+            writeFile << "    </array>\n";
+            writeFile << "    <key>ProcessType</key>\n";
+            writeFile << "    <string>Interactive</string>\n";
+            writeFile << "    <key>RunAtLoad</key>\n";
+            writeFile << "    <true/>\n";
+            writeFile << "    <key>KeepAlive</key>\n";
+            writeFile << "    <false/>\n";
+            writeFile << "</dict>\n";
+            writeFile << "</plist>\n";
+            writeFile.close();
+            NTLog(this, Info, "Called : RegisterStartProgram, Success: Create File [%s]", filePath.data());
+        } else {
+            NTLog(this, Err, "Called : RegisterStartProgram, Fail: Create File [%s] Err[%s]", filePath.data(), strerror(errno));
+        }
+    }
 }
 
 void WebWindow::UnRegisterStartProgram()
@@ -847,4 +902,29 @@ void WebWindow::UnRegisterStartProgram()
 	else
 		NTLog(this, Err, "Called : UnRegisterStartProgram, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
 }
+
+void WebWindow::SetTrayUse(bool useTray)
+{
+    g_bDoExit2TrayUse = useTray;
+    NTLog(this, Info, "Called : SetTrayUse(@@@@@@@@@@) : %s", (AutoString)(g_bDoExit2TrayUse ? "Yes": "No") );
+}	
+
+
+void WebWindow::SetTrayStartUse(bool bUseStartTray)
+{
+    g_bStartTray = bUseStartTray; 
+    NTLog(this, Info, "Called : OpenNetLink SetTrayStartUse : %s", (AutoString)bUseStartTray ? "Yes": "No");
+}
+
+void WebWindow::SetUseClipCopyNsend(bool bUse)
+{
+	g_bClipCopyNsend = bUse;
+	//NTLog(this, Info, "Called : SetUseClipCopyNsend(@@@@@@@@@@) : %s", (AutoString)(bUse ? "Yes" : "No"));
+}
+
+void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+{
+
+}
+
 #endif

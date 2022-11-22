@@ -82,8 +82,7 @@
             if (sgSettingData == null)
                 sgSettingProc.InsertSettingData(listNetWork[i].GroupID, "", "", "", "", 0);
 
-
-            if (String.Compare(listNetWork[i].NetPos, "EX", true) == 0)
+            if (String.Compare(listNetWork[i].NetPos, "CN", true) != 0)
                 siteConfig.SetUseAccessAllDrive(listNetWork[i].GroupID, true);
         }
 

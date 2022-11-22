@@ -138,6 +138,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions);_CRT_NON_CONFORMING_SWPRINTFS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -158,10 +159,17 @@
     <ClInclude Include="Tray.h" />
     <ClInclude Include="TrayFunc.h" />
     <ClInclude Include="WebWindow.h" />
+    <ClInclude Include="WebWindow.Mac.AppDelegate.h" />
+    <ClInclude Include="WebWindow.Mac.UiDelegate.h" />
+    <ClInclude Include="WebWindow.Mac.UrlSchemeHandler.h" />
     <ClInclude Include="wintoastlib.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="WebWindow.Mac.AppDelegate.mm" />
+    <None Include="WebWindow.Mac.mm" />
+    <None Include="WebWindow.Mac.UiDelegate.mm" />
+    <None Include="WebWindow.Mac.UrlSchemeHandler.m" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\OpenNetLinkApp\wwwroot\SecureGate.ico" />
@@ -178,13 +186,10 @@
     <Error Condition="!Exists('..\..\packages\Microsoft.Windows.ImplementationLibrary.1.0.200519.2\build\native\Microsoft.Windows.ImplementationLibrary.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.ImplementationLibrary.1.0.200519.2\build\native\Microsoft.Windows.ImplementationLibrary.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.Web.WebView2.0.9.538\build\native\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Web.WebView2.0.9.538\build\native\Microsoft.Web.WebView2.targets'))" />
   </Target>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)|$(Platform)'=='Windows_NT|x64'">
-     <Exec Condition="Exists('$(OutDir)\WebWindow.Native.dll')" Command="copy $(OutDir)\WebWindow.Native.dll $(MSBuildProjectDirectory)\..\OpenNetLinkApp\Library"/>
-     <Exec Condition="Exists('$(OutDir)\WebView2Loader.dll')"   Command="copy $(OutDir)\WebView2Loader.dll $(MSBuildProjectDirectory)\..\OpenNetLinkApp\Library"/>
-     
-     <Exec Condition="Exists('$(OutDir)\WebWindow.Native.dll')" Command="copy $(OutDir)\WebWindow.Native.dll $(MSBuildProjectDirectory)\..\OpenNetLinkApp\bin\$(Configuration)\net5.0\win-x64"/>
-     <Exec Condition="Exists('$(OutDir)\WebView2Loader.dll')"   Command="copy $(OutDir)\WebView2Loader.dll $(MSBuildProjectDirectory)\..\OpenNetLinkApp\bin\$(Configuration)\net5.0\win-x64"/>
+    <Exec Condition="Exists('$(OutDir)\WebWindow.Native.dll')" Command="copy $(OutDir)\WebWindow.Native.dll $(MSBuildProjectDirectory)\..\OpenNetLinkApp\Library" />
+    <Exec Condition="Exists('$(OutDir)\WebView2Loader.dll')" Command="copy $(OutDir)\WebView2Loader.dll $(MSBuildProjectDirectory)\..\OpenNetLinkApp\Library" />
+    <Exec Condition="Exists('$(OutDir)\WebWindow.Native.dll')" Command="copy $(OutDir)\WebWindow.Native.dll $(MSBuildProjectDirectory)\..\OpenNetLinkApp\bin\$(Configuration)\net5.0\win-x64" />
+    <Exec Condition="Exists('$(OutDir)\WebView2Loader.dll')" Command="copy $(OutDir)\WebView2Loader.dll $(MSBuildProjectDirectory)\..\OpenNetLinkApp\bin\$(Configuration)\net5.0\win-x64" />
   </Target>
-  
 </Project>

@@ -22,7 +22,12 @@ void *SelfThis = nullptr;
 #include "TextEncDetect.h"
 using namespace AutoIt::Common;
 
-bool _bTrayUse = false;
+bool g_bDoExit2TrayUse = false;
+bool g_bStartTray = true;
+bool g_bClipCopyNsend = false;
+
+std::map<int, wstring> mapHotKey;
+
 
 std::mutex invokeLockMutex;
 
@@ -132,7 +137,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 {
 	SelfThis = this;
 	_webMessageReceivedCallback = webMessageReceivedCallback;
-	_bTrayUse = false;
+	g_bDoExit2TrayUse = false;
 
 	// It makes xlib thread safe.
 	// Needed for get_position.
@@ -192,7 +197,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 
 gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self)
 {
-	if (_bTrayUse == false)
+	if (g_bDoExit2TrayUse == false)
 	{
 		NTLog(self, Info, "Called : OpenNetLink Exit");
 		tray_exit();
@@ -267,6 +272,7 @@ void WebWindow::Show()
 		webkit_user_content_manager_register_script_message_handler(contentManager, "webwindowinterop");
 	}
 
+	if (g_bStartTray == false)
 	gtk_widget_show_all(_window);
 
 	/* Enable the developer extras */
@@ -370,6 +376,28 @@ void WebWindow::SetTitle(AutoString title)
 	gtk_window_set_title(GTK_WINDOW(_window), title);
 }
 
+void WebWindow::SetTrayStartUse(bool bUseStartTray)
+{
+	g_bStartTray = bUseStartTray;
+	NTLog(this, Info, "Called : OpenNetLink SetTrayStartUse : %s", (AutoString)bUseStartTray ? "Yes" : "No");
+}
+
+void WebWindow::SetTrayUse(bool useTray)
+{
+    g_bDoExit2TrayUse = useTray;
+    NTLog(this, Info, "Called : SetTrayUse : %s", (AutoString)(g_bDoExit2TrayUse ? "Yes": "No") );
+}	
+
+void WebWindow::ClipTypeSelect(int groupID)
+{
+	
+}
+
+void WebWindow::ClipFirstSendTypeText(int groupID)
+{
+
+}
+
 void WebWindow::WaitForExit()
 {
 	//gtk_main();
@@ -380,6 +408,10 @@ void WebWindow::WaitForExit()
 		NTLog(this, Fatal, "Failed to Create Tray\n");
 		return ;
 	}
+
+	if (!g_bStartTray)
+		MoveTrayToWebWindow();
+
 	while (tray_loop(1) == 0)
 	{
 		// printf("iteration\n");
@@ -1292,7 +1324,7 @@ void WebWindow::ProgramExit()
 bool WebWindow::GetTrayUse()
 {
 	NTLog(this, Info, "Called : OpenNetLink Tray Status");
-	return _bTrayUse;
+	return g_bDoExit2TrayUse;
 }
 
 void WebWindow::MoveWebWindowToTray()
@@ -1350,12 +1382,16 @@ void WebWindow::RegisterStartProgram()
 		writeFile << "#!/usr/bin/env xdg-open\n";
 		writeFile << "\n";
 		writeFile << "[Desktop Entry]\n";
-		writeFile << "Name=SecureGate\n";
-		writeFile << "Comment=OpenNetLinkApp\n";
+		//writeFile << "Name=SecureGate\n";
+		writeFile << "Name=OpenNetLink\n";
+		writeFile << "Comment=SecureGate\n";
 		writeFile << "GenericName=File Transfer\n";
-		writeFile << "Exec=/bin/sh -c '$HOME/hanssak/OpenNetLinkApp/OpenNetLinkApp.sh'\n";
+		writeFile << "Exec=/opt/hanssak/opennetlink/OpenNetLinkApp.sh\n";
+		
+		//writeFile << "Exec=/bin/sh -c '$HOME/hanssak/OpenNetLinkApp/OpenNetLinkApp.sh'\n";
 		//writeFile << "Exec=/bin/sh -c '/data/CrossPlatformWork/OPEN/OpenNetLink/src/OpenNetLinkApp/bin/Debug/netcoreapp3.1/OpenNetLinkApp.sh'\n";
-		writeFile << "Icon=/usr/share/icons/SecureGate.ico\n";
+		//writeFile << "Icon=/usr/share/icons/SecureGate.ico\n";
+		writeFile << "Icon=/opt/hanssak/opennetlink/wwwroot/SecureGate.ico\n";
 		writeFile << "Type=Application\n";
 		writeFile << "Categories=Utility;\n";
 		writeFile << "Keywords=SecureGate;OpenNetLink;NetLink;\n";
@@ -1384,4 +1420,71 @@ void WebWindow::UnRegisterStartProgram()
 		//NTLog(this, Error, "Called : UnRegisterStartProgram, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
 		NTLog(this, Err, "Called : UnRegisterStartProgram, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
 }
+
+void WebWindow::SetUseClipCopyNsend(bool bUse)
+{
+	g_bClipCopyNsend = bUse;
+	//NTLog(this, Info, "Called : SetUseClipCopyNsend(@@@@@@@@@@) : %s", (AutoString)(bUse ? "Yes" : "No"));
+}
+
+void FreeClipHotKey(int nGroupID)
+{
+	if (mapHotKey.find(nGroupID) == mapHotKey.end())
+	{
+		NTLog(SelfThis, Info, "FreeClipHotKey - nGroupID : %d, ClipHotKey Data Empty!", nGroupID);
+		return;
+	}
+
+	wstring strClipHotKey = mapHotKey[nGroupID];
+	if (strClipHotKey.size() == 5)
+	{
+		wstring strWinKey = strClipHotKey.substr(0, 1);
+		wstring strCtrlKey = strClipHotKey.substr(1, 1);
+		wstring strAltKey = strClipHotKey.substr(2, 1);
+		wstring strShiftKey = strClipHotKey.substr(3, 1);
+		wstring strKeyName = strClipHotKey.substr(4, 1);
+
+		Sleep(100);
+		/*if (strKeyName.empty() != true)
+			keybd_event((BYTE)strKeyName.data(), 0x98, KEYEVENTF_KEYUP, 0);
+		if (strShiftKey.compare(_T("1")) == 0)
+			keybd_event(VK_SHIFT, 0x9d, KEYEVENTF_KEYUP, 0);
+		if (strCtrlKey.compare(_T("1")) == 0)
+			keybd_event(VK_CONTROL, 0x9d, KEYEVENTF_KEYUP, 0);
+		if (strAltKey.compare(_T("1")) == 0)
+			keybd_event(VK_MENU, 0x9d, KEYEVENTF_KEYUP, 0);
+		if (strWinKey.compare(_T("1")) == 0)
+		{
+			keybd_event(VK_LWIN, 0x9d, KEYEVENTF_KEYUP, 0);
+			keybd_event(VK_RWIN, 0x9d, KEYEVENTF_KEYUP, 0);
+		}*/
+	}
+	else
+	{
+		NTLog(SelfThis, Info, "FreeClipHotKey - nGroupID : %d, ClipHotKey Data is Wrong(Size Must be 5!) (Data : %s)", nGroupID, (AutoString)strClipHotKey.data());
+	}
+}
+
+void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+{
+	wstring strTempHotKey = _T("");
+
+	strTempHotKey += (bWin ? _T("1") : _T("0"));
+	strTempHotKey += (bControl ? _T("1") : _T("0"));
+	strTempHotKey += (bAlt ? _T("1") : _T("0"));
+	strTempHotKey += (bShift ? _T("1") : _T("0"));
+	strTempHotKey += chVKCode;
+
+	NTLog(this, Info, "Called - SetNativeClipboardHotKey(###) - GroupID : %d, bAlt : %s, bControl : %s, bShift : %s, bWin : %s, VKCode : %c, nIdx : %d, Sum-Data : %s",
+		groupID,
+		(AutoString)(bAlt ? L"Y" : L"N"),
+		(AutoString)(bControl ? L"Y" : L"N"),
+		(AutoString)(bShift ? L"Y" : L"N"),
+		(AutoString)(bWin ? L"Y" : L"N"),
+		(wchar_t)chVKCode, nIdx,
+		(AutoString)strTempHotKey.data());
+
+	mapHotKey[groupID] = strTempHotKey;
+}
+
 #endif

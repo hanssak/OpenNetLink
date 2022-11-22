@@ -1,5 +1,6 @@
 ﻿#include "Tray.h"
 #include "NativeLog.h"
+#include "WebWindow.h"
 
 #if TRAY_APPINDICATOR
 GtkWidget* _g_window = nullptr;
@@ -52,6 +53,7 @@ static void toggle_show(struct tray_menu *item) {
 	else if(item->checked) {
 		NTLog(SelfThis, Info, "Called : OpenNetLink Show (value: %s)", item->text);
 		item->text = (char*)TEXT_HIDE;
+		g_bStartTray = false;
 #if TRAY_APPINDICATOR
 		gtk_widget_show_all(_g_window);
 #elif TRAY_APPKIT
@@ -72,6 +74,8 @@ static void toggle_show_force(struct tray_menu* item, bool bShow)
 	if (bShow){
 		NTLog(SelfThis, Info, "Called : OpenNetLink Show (value: %s)", item->text);
 		item->text = (char*)TEXT_HIDE;
+		g_bStartTray = false;
+
 #if TRAY_APPINDICATOR
 		gtk_widget_show_all(_g_window);
 #elif TRAY_APPKIT
