@@ -242,7 +242,7 @@
     /// </summary>
     /// <param name="recvList"></param>
     /// <param name="isRMouseAdd"></param>
-    async void OnDropFileAdd(List<string> recvList, bool isRMouseAdd)
+    async Task OnDropFileAdd(List<string> recvList, bool isRMouseAdd)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -1721,7 +1721,7 @@
         return 0;
     }
 
-    public async void RMouseFileAddAction(List<string> recvList)
+    public async Task RMouseFileAddAction(List<string> recvList)
     {
         if (Window.GetTrayUse())
         {
@@ -1733,13 +1733,14 @@
         if (recvList.Count <= 0)
             return;
         //OnDrop(recvList);
-        OnDropFileAdd(recvList, true);
+        await OnDropFileAdd(recvList, true);
     }
 
     public static void NotifyChange_InDropFileList(FileListEntryImpl[] files)
     {
         //action1.Invoke(files, true);
     }
+
     public bool RMFileExist(string strRMFilePath)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
