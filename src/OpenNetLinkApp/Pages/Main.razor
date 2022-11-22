@@ -1194,7 +1194,7 @@
                 CLog.Here().Information($"1 to ALL Login, GroupID : {groupId}, LoginResult Add After(#####) - Current / Total : {dicLoginResult.Count} / {NetWorkSvc.NetWorkInfo.Count} ");
 
                 foreach(var item in dicLoginResult)
-                { 
+                {
                     CLog.Here().Information($"1 to ALL Login, Item Identify(#####) -  GroupID : {item.Key}, LoginResult : {item.Value}");
                 }
 
@@ -1357,6 +1357,7 @@
             // Clipboard 단축키 및 HeaderUI에서 바로 클립보드를 전송할 수 있으므로 사후결재 관련 현재상태값을 로그인후 바로 저장
             SaveAfterApproveCheckBoxStatus(nGroupIDfirst);
 
+            await JSRuntime.InvokeAsync<object>("closeAllPopup");
             //if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
             MyNavigationManager.NavigateTo(strNavigatePathnGroupID);
 
@@ -1774,6 +1775,7 @@
             // Clipboard 단축키 및 HeaderUI에서 바로 클립보드를 전송할 수 있으므로 사후결재 관련 현재상태값을 로그인후 바로 저장
             SaveAfterApproveCheckBoxStatus(groupId);
 
+            await JSRuntime.InvokeAsync<object>("closeAllPopup");
             //if (SGAppMgrSvc.OpConfigInfoService.() == false)
             MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
