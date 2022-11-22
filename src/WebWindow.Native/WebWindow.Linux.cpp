@@ -13,6 +13,12 @@
 #include <iomanip>
 #include <vector>
 #include <iconv.h>
+#include <map>
+
+
+#include <X11/keysym.h> //xproto-devel
+#include <X11/keysymdef.h>
+#include <X11/extensions/XTest.h>
 
 void *SelfThis = nullptr;
 
@@ -26,7 +32,7 @@ bool g_bDoExit2TrayUse = false;
 bool g_bStartTray = true;
 bool g_bClipCopyNsend = false;
 
-std::map<int, wstring> mapHotKey;
+std::map<int, std::wstring> mapHotKey;
 
 
 std::mutex invokeLockMutex;
@@ -734,6 +740,9 @@ request_image_received_func (GtkClipboard     *clipboard,
 		GdkAtom target = gtk_selection_data_get_target (selection_data);
 		if (target == gdk_atom_intern_static_string ("image/png"))
 		{
+
+			NTLog(pstParm->self, Warning, "@@@@@@@@@@@@@ - request_image_received_func - image/png \n");
+
 			strcpy(pstParm->szExt, "jpeg");
 			gtk_clipboard_request_contents (clipboard,
 					gdk_atom_intern_static_string ("image/jpeg"),
@@ -742,6 +751,8 @@ request_image_received_func (GtkClipboard     *clipboard,
 		}
 		else if (target == gdk_atom_intern_static_string ("image/jpeg"))
 		{
+			NTLog(pstParm->self, Warning, "@@@@@@@@@@@@@ - request_image_received_func - image/jpeg \n");
+
 			strcpy(pstParm->szExt, "gif");
 			gtk_clipboard_request_contents (clipboard,
 					gdk_atom_intern_static_string ("image/gif"),
@@ -750,6 +761,8 @@ request_image_received_func (GtkClipboard     *clipboard,
 		}
 		else if (target == gdk_atom_intern_static_string ("image/gif"))
 		{
+			NTLog(pstParm->self, Warning, "@@@@@@@@@@@@@ - request_image_received_func - image/gif \n");
+
 			strcpy(pstParm->szExt, "bmp");
 			gtk_clipboard_request_contents (clipboard,
 					gdk_atom_intern_static_string ("image/bmp"),
@@ -871,6 +884,9 @@ request_rich_text_received_func (GtkClipboard     *clipboard,
 
 	// Data Transfer rich text
 	length = gtk_selection_data_get_length (selection_data);
+
+	NTLog(pstParm->self, Warning, "ClipBoard data(Native-End) To UI, Length : %d, Data : %s", length, result);
+
 	// do not needed free result
 	((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_TEXT, length, result, 0, NULL);
 }
@@ -907,6 +923,7 @@ void ClipBoardReceivedFunc(GtkClipboard *clipboard, GtkSelectionData *selection_
 	 * if we asked for compound_text and didn't get it, try string;
 	 * If we asked for anything else and didn't get it, give up.
 	 */
+
 	if (target == gdk_atom_intern_static_string ("UTF8_STRING"))
 	{
 		gtk_clipboard_request_contents (clipboard,
@@ -1080,6 +1097,9 @@ void TargetCallback(GtkClipboard *clipboard, GdkAtom *atoms, gint n_atoms, gpoin
 	}
 
 	for(i_for = 0; i_for < n_atoms; i_for++) {
+
+		//NTLog(pstParm->self, Info, "KKW - In targetCallback: Atom(%d. %s)\n", i_for, gdk_atom_name(atoms[i_for]));	// clipboard Type에 따른 data 볼대에 사용
+
 		if ((atoms[i_for] == gdk_atom_intern_static_string ("UTF8_STRING")) 
 			|| (atoms[i_for] == gdk_atom_intern_static_string ("COMPOUND_TEXT")) 
 			//|| (atoms[i_for] == gdk_atom_intern_static_string ("STRING")) 
@@ -1136,10 +1156,45 @@ void TargetCallback(GtkClipboard *clipboard, GdkAtom *atoms, gint n_atoms, gpoin
 		}
 		else continue;
 
-		NTLog(pstParm->self, Info, "In targetCallback: Atom(%d. %s)\n", i_for, gdk_atom_name(atoms[i_for]));
+		NTLog(pstParm->self, Info, "In targetCallback(Check Type): Atom(%d. %s)\n", i_for, gdk_atom_name(atoms[i_for]));
 		gtk_clipboard_request_contents (clipboard, atoms[i_for], ClipBoardReceivedFunc, data);
-	}
+
+	} // for(i_for = 0; i_for < n_atoms; i_for++) {
 }
+
+
+
+void AutoCopyClipBoard(int groupID)
+{
+
+ 	NTLog(SelfThis, Info, "AutoCopyClipBoard - Start - nGroupID : %d", groupID);
+
+	Display *dpy = NULL;
+	dpy = XOpenDisplay(NULL);
+
+	if (dpy == NULL)
+		return;
+
+	usleep(1);
+
+	KeyCode xk_c = XKeysymToKeycode(dpy, XK_C);
+	KeyCode xk_control = XKeysymToKeycode(dpy, XK_Control_L);
+
+	XTestFakeKeyEvent(dpy, xk_control, True, 0);
+	XTestFakeKeyEvent(dpy, xk_c, True, 0);
+	XTestFakeKeyEvent(dpy, xk_control, False, 0);
+	XTestFakeKeyEvent(dpy, xk_c, False, 0);
+
+	usleep(1*100);	
+
+	XFlush( dpy );
+	XSync(dpy, 0);
+	XCloseDisplay( dpy );
+
+	NTLog(SelfThis, Info, "AutoCopyClipBoard - End - nGroupID : %d", groupID);
+
+}
+
 
 void ClipBoardKeybinderHandler(const char *keystring, void *user_data)
 {
@@ -1147,11 +1202,17 @@ void ClipBoardKeybinderHandler(const char *keystring, void *user_data)
 	int nGroupId = pstParm->nGroupId;
 
 	NTLog(pstParm->self, Info, "Called ClipBoardKeybinderHandler, \" %s \" with GroupId(%d)", keystring, nGroupId);
+	if (g_bClipCopyNsend)
+	{
+		AutoCopyClipBoard(nGroupId);
+	}
+	
 	GdkDisplay *display = gdk_display_get_default();
-	GtkClipboard *clipboard =
-		gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD);
-		//gtk_clipboard_get_for_display(display, GDK_SELECTION_PRIMARY);
-		//gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+
+	//GtkClipboard *clipboard = gtk_clipboard_get_default(display);
+	GtkClipboard *clipboard = gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD); // GDK_SELECTION_CLIPBOARD : GDK_SELECTION_PRIMARY - kolourPaint 같은곳에 안먹힘
+	//gtk_clipboard_get_for_display(display, GDK_SELECTION_PRIMARY);
+	//gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
 	//gtk_clipboard_request_text(clipboard, ClipBoardHandler, NULL);
   	gtk_clipboard_request_targets (clipboard, TargetCallback, user_data);
 
@@ -1159,6 +1220,9 @@ void ClipBoardKeybinderHandler(const char *keystring, void *user_data)
 		NTLog(pstParm->self, Info, "Saved to ClipBoard Store, Supports clipboard persistence. \" %s \" with GroupId(%d)", keystring, nGroupId);
 		gtk_clipboard_store(clipboard);
 	}
+
+	NTLog(pstParm->self, Info, "ClipBoardKeybinderHandler, Ends - GroupId(%d)", nGroupId);
+
 }
 
 void WebWindow::RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
@@ -1424,40 +1488,39 @@ void WebWindow::UnRegisterStartProgram()
 void WebWindow::SetUseClipCopyNsend(bool bUse)
 {
 	g_bClipCopyNsend = bUse;
-	//NTLog(this, Info, "Called : SetUseClipCopyNsend(@@@@@@@@@@) : %s", (AutoString)(bUse ? "Yes" : "No"));
+	NTLog(this, Info, "Called : SetUseClipCopyNsend(@@@@@@@@@@) : %s", (AutoString)(bUse ? "Yes" : "No"));
 }
 
 void FreeClipHotKey(int nGroupID)
 {
+	// Windows MSPaint
 	if (mapHotKey.find(nGroupID) == mapHotKey.end())
 	{
 		NTLog(SelfThis, Info, "FreeClipHotKey - nGroupID : %d, ClipHotKey Data Empty!", nGroupID);
 		return;
 	}
 
-	wstring strClipHotKey = mapHotKey[nGroupID];
-	if (strClipHotKey.size() == 5)
+	std::wstring strClipHotKey = mapHotKey[nGroupID];
+	if (strClipHotKey.size() >= 5)
 	{
-		wstring strWinKey = strClipHotKey.substr(0, 1);
-		wstring strCtrlKey = strClipHotKey.substr(1, 1);
-		wstring strAltKey = strClipHotKey.substr(2, 1);
-		wstring strShiftKey = strClipHotKey.substr(3, 1);
-		wstring strKeyName = strClipHotKey.substr(4, 1);
-
-		Sleep(100);
-		if (strKeyName.empty() != true)
+		std::wstring strWinKey = strClipHotKey.substr(0, 1);
+		std::wstring strCtrlKey = strClipHotKey.substr(1, 1);
+		std::wstring strAltKey = strClipHotKey.substr(2, 1);
+		std::wstring strShiftKey = strClipHotKey.substr(3, 1);
+		std::wstring strKeyName = strClipHotKey.substr(4, 1);
+		/*if (strKeyName.empty() != true)
 			keybd_event((BYTE)strKeyName.data(), 0x98, KEYEVENTF_KEYUP, 0);
-		if (strShiftKey.compare(_T("1")) == 0)
+		if (strShiftKey.compare(L"1") == 0)
 			keybd_event(VK_SHIFT, 0x9d, KEYEVENTF_KEYUP, 0);
-		if (strCtrlKey.compare(_T("1")) == 0)
+		if (strCtrlKey.compare(L"1") == 0)
 			keybd_event(VK_CONTROL, 0x9d, KEYEVENTF_KEYUP, 0);
-		if (strAltKey.compare(_T("1")) == 0)
+		if (strAltKey.compare(L"1") == 0)
 			keybd_event(VK_MENU, 0x9d, KEYEVENTF_KEYUP, 0);
-		if (strWinKey.compare(_T("1")) == 0)
+		if (strWinKey.compare(L"1") == 0)
 		{
 			keybd_event(VK_LWIN, 0x9d, KEYEVENTF_KEYUP, 0);
 			keybd_event(VK_RWIN, 0x9d, KEYEVENTF_KEYUP, 0);
-		}
+		}*/
 	}
 	else
 	{
@@ -1467,12 +1530,12 @@ void FreeClipHotKey(int nGroupID)
 
 void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
 {
-	wstring strTempHotKey = _T("");
+	std::wstring strTempHotKey = L"";
 
-	strTempHotKey += (bWin ? _T("1") : _T("0"));
-	strTempHotKey += (bControl ? _T("1") : _T("0"));
-	strTempHotKey += (bAlt ? _T("1") : _T("0"));
-	strTempHotKey += (bShift ? _T("1") : _T("0"));
+	strTempHotKey += (bWin ? L"1" : L"0");
+	strTempHotKey += (bControl ? L"1" : L"0");
+	strTempHotKey += (bAlt ? L"1": L"0");
+	strTempHotKey += (bShift ? L"1" : L"0");
 	strTempHotKey += chVKCode;
 
 	NTLog(this, Info, "Called - SetNativeClipboardHotKey(###) - GroupID : %d, bAlt : %s, bControl : %s, bShift : %s, bWin : %s, VKCode : %c, nIdx : %d, Sum-Data : %s",
@@ -1485,6 +1548,48 @@ void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, 
 		(AutoString)strTempHotKey.data());
 
 	mapHotKey[groupID] = strTempHotKey;
+
+}
+
+void WebWindow::ClipMemFree(int groupID)
+{
+	// WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - ClipMemFree - groupID : %d"), groupID);
+	NTLog(this, Info, "WebWindow::ClipMemFree - groupID : %d", groupID);
+	//ClipDataBufferClear();
+}
+
+void WebWindow::SetClipBoardSendFlag(int groupID)
+{
+
+}
+
+/*
+void WebWindow::ClipDataBufferClear(bool bClearPreMem, bool bClearPreExMem)
+{
+
+	if (bClearPreMem)
+	{
+		if (g_ptrByte != NULL)
+		{
+			delete[] g_ptrByte;
+			g_ptrByte = NULL;
+		}
+	}
+
+	if (bClearPreExMem)
+	{
+		if (g_ptrExByte != NULL)
+		{
+			delete[] g_ptrExByte;
+			g_ptrExByte = NULL;
+		}
+	}
+
+}*/
+
+void WebWindow::SetTrayStatus(bool bSetTextShowNchecked)
+{
+
 }
 
 #endif
