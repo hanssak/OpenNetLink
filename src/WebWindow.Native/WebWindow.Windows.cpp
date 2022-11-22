@@ -289,7 +289,6 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 	tray.menu[2] = { (char*)TEXT_EXIT,0,0,0,quit_cb,NULL,NULL };
 	tray.menu[3] = { NULL,0,0,0,NULL,NULL,NULL };
 
-
 	/*
             {.text = "About", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb},
             {.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},

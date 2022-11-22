@@ -14,6 +14,8 @@ using AgLogManager;
 using Serilog;
 using HsNetWorkSG;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.InteropServices;
+using IWshRuntimeLibrary;
 
 namespace OpenNetLinkApp.Common
 {
@@ -324,7 +326,7 @@ namespace OpenNetLinkApp.Common
         {
             long lSize = 0;
 
-            using (FileStream fileStream = File.OpenRead(filePath))
+            using (FileStream fileStream = System.IO.File.OpenRead(filePath))
             {
                 try
                 {
@@ -355,7 +357,7 @@ namespace OpenNetLinkApp.Common
             {
                 using (SHA256 SHA256 = SHA256Managed.Create())
                 {
-                    using (FileStream fileStream = File.OpenRead(filePath))
+                    using (FileStream fileStream = System.IO.File.OpenRead(filePath))
                         return Convert.ToBase64String(SHA256.ComputeHash(fileStream));
                 }
             }
@@ -374,7 +376,7 @@ namespace OpenNetLinkApp.Common
             {
                 using (SHA384 sha384 = SHA384Managed.Create())
                 {
-                    using (FileStream fileStream = File.OpenRead(filePath))
+                    using (FileStream fileStream = System.IO.File.OpenRead(filePath))
                     {
                         byte[] pbyte = null;
                         pbyte = new byte[fileStream.Length];
@@ -395,21 +397,121 @@ namespace OpenNetLinkApp.Common
 
     }
 
+    public class CsSystemFunc
+    {
+
+        public static string GetCurrentProcessName(bool bGetExePath = true)
+        {
+            string strAgentPath = "";
+            string[] strArgumentArry = System.Environment.GetCommandLineArgs();
+            strAgentPath = strArgumentArry[0];
+
+            Log.Information($"GetCurrentProcessName - Before(###) : {strAgentPath}");
+
+            int nIdex = strArgumentArry[0].LastIndexOf(".");
+            if (bGetExePath && nIdex > 0)
+            {
+                strAgentPath = strArgumentArry[0].Substring(0, nIdex);
+                strAgentPath += ".exe";
+            }
+
+            Log.Information($"GetCurrentProcessName - After(###) : {strAgentPath}");
+
+            return strAgentPath;
+        }
+
+        /// <summary>
+        /// 부팅시 자동실행되도록 시작프로그램에 Lnk를 등록/제거하는 기능<br></br>
+        /// bStartReg : 시작프로그램으로 등록시킬지 유무(true:생성,false:삭제)<br></br>
+        /// bUsePublicPath : false만 사용, 공통계정용폴더에 Lnk 생성하려면 관리자권한 필요(Exception발생함)<br></br>
+        /// strOrgPath : EXE의 FullPath 경로<br></br>
+        /// strLnkFIleName : 생성할 Lnk 파일의 FullPath 경로<br></br>
+        /// </summary>
+        /// <param name="bStartReg"></param>
+        /// <param name="bUsePublicPath"></param>
+        /// <param name="strOrgPath"></param>
+        /// <param name="strLnkFIleName"></param>
+        /// <returns></returns>
+        public static bool makeAgentBootStartOSwindow(bool bStartReg,bool bUsePublicPath, string strOrgPath, string strLnkFIleName)
+        {
+            bUsePublicPath = false;
+
+            string strStartDir = Environment.GetFolderPath(bUsePublicPath?Environment.SpecialFolder.CommonStartup:Environment.SpecialFolder.Startup);
+            string LinkFullPath = strStartDir.ToString() + @$"\{strLnkFIleName}"; // OpenNetLink.lnk
+            FileInfo LinkFile = new FileInfo(LinkFullPath);
+            if (LinkFile.Exists)
+            {                
+                if (bStartReg == false)
+                    LinkFile.Delete();
+
+                Log.Information($"makeAgentBootStartOSwindow - Lnk File exist : {LinkFullPath},  {(bStartReg?"Lnk Create Skip!":"Lnk Delete Done!")}");
+                return true;
+            }
+            else
+            {
+                if (bStartReg == false)
+                {
+                    Log.Information($"makeAgentBootStartOSwindow - Lnk File isn't exist(Lnk Delete Skip!) : {LinkFullPath}");
+                    return true;
+                }
+            }
+
+            Log.Information($"makeAgentBootStartOSwindow - WorkingPath(#####) : {Environment.CurrentDirectory}");
+
+            return CsLnkFunc.makeLnkShortCut(strOrgPath, LinkFullPath, "", Environment.CurrentDirectory);
+        }
+
+        public static bool makeAgentBootStartOSX(bool bStartReg, string strOrgPath, string strLnkPath)
+        {
+
+            return false;
+        }
+
+        public static bool makeAgentBootStartLinux(bool bStartReg, string strOrgPath, string strLnkPath)
+        {
+
+            return false;
+        }
+
+
+    }
 
     public class CsLnkFunc
     {
-        public static bool makeLnkShortCut(string strOrgPath, string strLnkPath)
-        {
-            return false;
-        }
-
-        public static bool makeAgentBootStart(bool bStartReg, string strOrgPath, string strLnkPath)
+        public static bool makeLnkShortCut(string strOrgPath, 
+            string strLnkPath, string strIconPath="", string strWorkingPath="", 
+            string Description="", string strArguments="")
         {
 
+            string strErrMsg = "";
+            bool bRet = true;
+            try
+            {
+                // 바로가기 생성
+                WshShell wsh = new WshShell();
+                // IWshShell3 BEforeLink = (IWshShell3)wsh.CreateShortcut(strLnkPath);
+                IWshShortcut Link = (IWshShortcut)wsh.CreateShortcut(strLnkPath); // IWshShortcut
 
-            return false;
+                // 원본 파일의 경로 
+                Link.TargetPath = strOrgPath;
+                Link.WorkingDirectory = strWorkingPath;
+                //Link.IconLocation = strIconPath;  // Exception 발생시킴
+                Link.Description = Description;
+                Link.Arguments = strArguments;
+                Link.Save();
+            }
+            catch (Exception e)
+            {
+                strErrMsg = e.Message;
+                bRet = false;
+            }
+
+            Log.Information(@$"makeAgentBootStart OSwindow - Make Lnk File {(bRet?"SUCCESS":("FAILED+ERRmsg:"+ strErrMsg))} : {strLnkPath}");
+
+            return bRet;
         }
 
     }
+
 
 }

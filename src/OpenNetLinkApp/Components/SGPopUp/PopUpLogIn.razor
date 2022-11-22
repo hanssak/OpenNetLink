@@ -961,6 +961,16 @@
                 // ClipBoard(Type Mixed 일때) Text 우선송신 사용
                 if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
                     Window.UseClipFirstSendType(groupId);
+
+                // 자동전송기능 위해
+                if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend())
+                {
+                    Window.SetNativeClipboardHotKey(groupId, listModKey[(int)HOTKEY_MOD.ALT],
+                                    listModKey[(int)HOTKEY_MOD.CTRL],
+                                    listModKey[(int)HOTKEY_MOD.SHIFT],
+                                    listModKey[(int)HOTKEY_MOD.WINDOW],
+                                    chVKey, 0);
+                }
             }
 
 

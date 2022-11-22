@@ -82,8 +82,8 @@ namespace WebWindows.Blazor
             try
             {
 
-                //json¿¡¼­ ÃÊ±â ½ÃÀÛÀ» tray ÀÎÁö ¾Æ´ÑÁö ÆÇ´ÜÇÏ¿© ¼ÂÆÃ
-                //ÇöÀç´Â AppOpSetting.json¿¡¼­ °¡Á®¿À´Âµ¥ ÃßÈÄ AppEnvSettingÀ¸·Î º¯°æ½Ã ¿©±â json ÆÄÀÏ À§Ä¡µµ º¯°æ ÇÊ¿ä.
+                //jsonì—ì„œ ì´ˆê¸° ì‹œì‘ì„ tray ì¸ì§€ ì•„ë‹Œì§€ íŒë‹¨í•˜ì—¬ ì…‹íŒ…
+                //í˜„ì¬ëŠ” AppOpSetting.jsonì—ì„œ ê°€ì ¸ì˜¤ëŠ”ë° ì¶”í›„ AppEnvSettingìœ¼ë¡œ ë³€ê²½ì‹œ ì—¬ê¸° json íŒŒì¼ ìœ„ì¹˜ë„ ë³€ê²½ í•„ìš”.
                 var contentRootAbsolute = Path.GetDirectoryName(Path.GetFullPath(hostHtmlPath));
                 var opJsonPath = Path.Combine(contentRootAbsolute, "conf", "AppOPsetting.json");
                 string contents = System.IO.File.ReadAllText(opJsonPath);
@@ -94,8 +94,8 @@ namespace WebWindows.Blazor
                     WebWindow.SetTrayStartUse(value);
                 }
 
-                //json¿¡¼­ ÃÊ±â ½ÃÀÛÀ» startProgramReg ÀÎÁö ¾Æ´ÑÁö ÆÇ´ÜÇÏ¿© ¼ÂÆÃ
-                //ÇöÀç´Â AppEnvSetting.json¿¡¼­ °¡Á®¿À´Âµ¥ ÃßÈÄ AppOpSettingÀ¸·Î º¯°æ½Ã ¿©±â json ÆÄÀÏ À§Ä¡µµ º¯°æ ÇÊ¿ä.
+                //jsonì—ì„œ ì´ˆê¸° ì‹œì‘ì„ startProgramReg ì¸ì§€ ì•„ë‹Œì§€ íŒë‹¨í•˜ì—¬ ì…‹íŒ…
+                //í˜„ì¬ëŠ” AppEnvSetting.jsonì—ì„œ ê°€ì ¸ì˜¤ëŠ”ë° ì¶”í›„ AppOpSettingìœ¼ë¡œ ë³€ê²½ì‹œ ì—¬ê¸° json íŒŒì¼ ìœ„ì¹˜ë„ ë³€ê²½ í•„ìš”.
                 var envJsonPath = Path.Combine(contentRootAbsolute, "conf", "AppEnvSetting.json");
                 string contentsEnv = System.IO.File.ReadAllText(envJsonPath);
                 using (JsonDocument document = JsonDocument.Parse(contentsEnv))

@@ -403,11 +403,11 @@ static int tray_loop(int blocking) {
 
 static void tray_update(struct tray *tray)
 {
-  HMENU prevmenu = hmenu;
-  UINT id = ID_TRAY_FIRST;
-  hmenu = _tray_menu(tray->menu, &id);
-  SendMessage(hwnd, WM_INITMENUPOPUP, (WPARAM)hmenu, 0);
-  HICON icon;
+    HMENU prevmenu = hmenu;
+    UINT id = ID_TRAY_FIRST;
+    hmenu = _tray_menu(tray->menu, &id);
+    SendMessage(hwnd, WM_INITMENUPOPUP, (WPARAM)hmenu, 0);
+    HICON icon;
   
   wchar_t wchIcon[MAX_PATH];
   memset(wchIcon, 0x00, sizeof(wchIcon));

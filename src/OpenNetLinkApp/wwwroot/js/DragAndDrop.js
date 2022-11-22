@@ -697,10 +697,16 @@ window.closePopUp = (popUpId) => {
 
 window.closeAllPopup = () => {
     $("#modal-certificate").modal("hide");
+    $("#PopUpSelectClipType").modal("hide");
+    $("#DownloadProgress").modal("hide");
     $("#modal-dropprogress").modal("hide");
     $("#modal-envloading").modal("hide");
+    $("#FileSelectPopUp").modal("hide");
+    $("#FileSelectPopUpForSingleSelect").modal("hide");
     $("#modal-googleotp").modal("hide");
     $("#modal-default").modal("hide");
+    $("#hanssak-otp").modal("hide");
+    $("#modal-displaylock").modal("hide");
     $("#GPKIPopUp").modal("hide");
     $("#modal-mail").modal("hide");
     $("#modal-pcurl").modal("hide");
@@ -708,6 +714,7 @@ window.closeAllPopup = () => {
     $("#MainLogIn").modal("hide");
     $("#modal-offline").modal("hide");
     $("#modal-OTPPopUp").modal("hide");
+    $("PopUpLogIn").modal("hide");
     $("#ProxyApprover").modal("hide");
     $("#modal-pwchange-main").modal("hide");
     $("#modal-pwchange-sidebar").modal("hide");
@@ -717,9 +724,18 @@ window.closeAllPopup = () => {
     $("#modal-selectsavefolder").modal("hide");
     $("#modal-alert-main").modal("hide");
     $("#modal-alert-header").modal("hide");
+    $("#modal-alert-header-updatepolicy").modal("hide");
     $("#modal-afterapprovealert-header").modal("hide");
     $("#modal-alert-popuplogin").modal("hide");
+    $("#ApporveAfterAlert").modal("hide");
+    $("#ContinueFileTrans").modal("hide");
+    $("#DashBoardContinueFileTransAlert").modal("hide");
+    $("#HeaderUIApporveAfterAlert").modal("hide");
+    $("#HeaderUIApporveAfterMyCountAlert").modal("hide");
+    $("#SGBasicSelect").modal("hide");
     $("#modal-capcha").modal("hide");
+    $("#SGConfirm").modal("hide");
+    $("#SGCustomSelect").modal("hide");
     $("#modalDetailReject").modal("hide");
     $("#modal-pdf").modal("hide");
     $("#modalReject").modal("hide");
@@ -742,6 +758,19 @@ window.closeAllPopup = () => {
     $("#ReceiverSelect_PopUp").modal("hide");
     $("#TransPopUp").modal("hide");
     $("#modal-selectreceivefolder").modal("hide");
+
+    $("#ZipPreviewPopUp").modal("hide");
+    $("#TransPopUp").modal("hide");
+    $("#SecurityPopUp").modal("hide");
+    $("#SecurityConfirm").modal("hide");
+    $("#SecurityApproverSelectPopUp").modal("hide");
+    $("#ReceiverSelect_PopUp").modal("hide");
+    $("#modal-pcurlavailablelist").modal("hide");
+    $("#modal-pcurlusingregist").modal("hide");
+    $("#PublicBoardView_PopUp").modal("hide");
+    $("#ViewDetail_PopUp").modal("hide");
+    $("#ClipboardApprovePopUp").modal("hide");
+    $("#ClipboardManagePopUp").modal("hide");
 }
 
 window.initTransferUIPosition = () => {

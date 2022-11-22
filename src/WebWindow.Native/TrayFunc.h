@@ -16,9 +16,9 @@ static void hello_cb(struct tray_menu *item);
 static void quit_cb(struct tray_menu *item);
 static void submenu_cb(struct tray_menu *item);
 
-#define TEXT_SHOW	"보이기"
-#define TEXT_HIDE	"숨기기"
-#define TEXT_EXIT	"끝내기"
+#define TEXT_SHOW	"���̱�"
+#define TEXT_HIDE	"�����"
+#define TEXT_EXIT	"������"
 
 // Test tray init
 #if defined(TRAY_APPINDICATOR) || defined(TRAY_APPKIT)
