@@ -329,7 +329,7 @@
 
             nDrawPageGroupID = nGroupID;
 
-            // bAutoLogin = siteConfig.GetUseAutoLogin(nGroupID);
+            bAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID);
             // bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(nGroupID);
 
             //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
