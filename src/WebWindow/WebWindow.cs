@@ -196,7 +196,10 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetTrayUse(IntPtr instance, bool useTray);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetTrayStartUse(IntPtr instance, bool useTrayStart);
-        
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetUseClipCopyNsend(IntPtr instance, bool bUse);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetNativeClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern bool WebWindow_GetTrayUse(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_MoveWebWindowToTray(IntPtr instance);
@@ -862,6 +865,10 @@ namespace WebWindows
         public void SetTrayUse(bool useTray) => WebWindow_SetTrayUse(_nativeWebWindow, useTray);
 
         public void SetTrayStartUse(bool useTrayStart) => WebWindow_SetTrayStartUse(_nativeWebWindow, useTrayStart);
+
+        public void SetUseClipCopyNsend(bool bUse) => WebWindow_SetUseClipCopyNsend(_nativeWebWindow, bUse);
+
+        public void SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx) => WebWindow_SetNativeClipboardHotKey(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode, nIdx);
 
         public bool GetTrayUse() => WebWindow_GetTrayUse(_nativeWebWindow);
         public void MoveWebWindowToTray() => WebWindow_MoveWebWindowToTray(_nativeWebWindow);

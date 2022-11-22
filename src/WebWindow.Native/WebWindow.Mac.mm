@@ -36,6 +36,7 @@ using namespace std;
 
 bool g_bStartTray = true;
 bool g_bDoExit2TrayUse = false;
+bool g_bClipCopyNsend = false;
 static id _appDelegate;
 
 map<NSWindow*, WebWindow*> nsWindowToWebWindow;
@@ -913,6 +914,17 @@ void WebWindow::SetTrayStartUse(bool bUseStartTray)
 {
     g_bStartTray = bUseStartTray; 
     NTLog(this, Info, "Called : OpenNetLink SetTrayStartUse : %s", (AutoString)bUseStartTray ? "Yes": "No");
+}
+
+void WebWindow::SetUseClipCopyNsend(bool bUse)
+{
+	g_bClipCopyNsend = bUse;
+	//NTLog(this, Info, "Called : SetUseClipCopyNsend(@@@@@@@@@@) : %s", (AutoString)(bUse ? "Yes" : "No"));
+}
+
+void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+{
+
 }
 
 #endif

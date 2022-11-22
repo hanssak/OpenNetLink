@@ -73,7 +73,7 @@ extern void *SelfThis;
 
 extern bool g_bDoExit2TrayUse;
 extern bool g_bStartTray;
-
+extern bool g_bClipCopyNsend;
 
 typedef enum enDefineClipType
 {
@@ -220,9 +220,10 @@ public:
 	void InvokeClipBoard(const int nGroupId, const int nType, const int nLength, const void *pMem, const int nExLength, const void* pExMem) { if (_clipboardCallback) _clipboardCallback(nGroupId, nType, nLength, pMem, nExLength, pExMem); }
 	void InvokeRequestedNavigateURL(AutoString navURI) { if (_requestedNavigateURLCallback) _requestedNavigateURLCallback(navURI); }
 	void SetTrayUse(bool useTray);
+	void SetUseClipCopyNsend(bool bUse);
 
 	void SetTrayStartUse(bool bUseStartTray);
-
+	void SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
 
 #if OS_LINUX
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);

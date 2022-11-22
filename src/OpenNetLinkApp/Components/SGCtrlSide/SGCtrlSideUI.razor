@@ -241,7 +241,7 @@
                     <input type="checkbox" class="mr-1" checked="@(GetClipCopyAutoSend())"
                            @onchange="eventArgs => { SetClipCopyAutoSend(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPCOPYANDSEND")</span>                <!--클립보드 복사 후 전송 -->
                     </div>
-                }
+            }
         </div>
     }
 
@@ -648,7 +648,7 @@
 
     public bool m_bUseClipAlarmType = true;                                             // 클립보드 알림 형식 사용 유무
     public bool m_bUseMainPageType = true;                                               // 메인페이지 형식 사용 유무
-    public bool m_bUseClipCopyAndSend = true;                                           // 클립보드 복사 후 전송 사용 유무
+    public bool m_bUseClipCopyAndSend = false;                                           // 클립보드 복사 후 전송 사용 유무
     public bool m_bUseURLRedirectionAlarm = true;                                       // URL 자동전환 알림 사용 유무
     public bool m_bUseURLRedirectionAlarmType = true;                                   // URL 자동전환 알림 타입 선택 사용 유무
     public bool m_bRFileAutoSend = true;                                                // 마우스 우클릭 후 자동전송 사용 유무
@@ -833,6 +833,10 @@
         if (GetStartProgramReg() && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             CtrlSideUISvc.SetStartProgramReg(true);
 
+        // 클립보드 자동전송 상태 설정
+        if (GetClipCopyAutoSend())
+            Window.SetUseClipCopyNsend(true);
+
     }
 
 
@@ -987,9 +991,11 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    /// <param name="nIdx"></param>
     private void MakeNetOverKeyGroupIdx(int nGroupID, int nIdx)
     {
         strNetgroupIDidxKey = "";
@@ -1022,7 +1028,7 @@
 
     private bool GetClipCopyAutoSend()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetClipAfterSend();
+        return SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend();
     }
 
     private bool GetURLAutoTrans(int nGroupID)
@@ -1211,6 +1217,12 @@
         return SGAppMgrSvc.OpConfigInfoService.GetUseApprWaitNoti();
     }
 
+    /// <summary>
+    /// 단축키 지정한값 OS에 등록하는 함수
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="listModKey"></param>
+    /// <param name="chVKCode"></param>
     private void SetClipBoardHotKey(int groupId, ref List<bool> listModKey, char chVKCode)
     {
         string strHotKey = String.Empty;
@@ -1256,6 +1268,18 @@
                                         listModKey[(int)HOTKEY_MOD.ALT],
                                         listModKey[(int)HOTKEY_MOD.SHIFT],
                                         chVKCode);
+
+        // Native 쪽에 저장해줌
+        if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend())
+        {
+            Window.SetNativeClipboardHotKey(groupId,
+                listModKey[(int)HOTKEY_MOD.ALT],
+                listModKey[(int)HOTKEY_MOD.CTRL],
+                listModKey[(int)HOTKEY_MOD.SHIFT],
+                listModKey[(int)HOTKEY_MOD.WINDOW],
+                chVKCode, 0);
+        }
+
     }
 
     private void SetClipBoardHotKeyNetOver(int groupId, int nIdx, List<bool> listModKey, char chVKCode)
@@ -1305,6 +1329,17 @@
                                         listModKey[(int)HOTKEY_MOD.SHIFT],
                                         chVKCode);
 
+        // Native 쪽에 저장해줌
+        if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend())
+        {
+            Window.SetNativeClipboardHotKey(groupId,
+                listModKey[(int)HOTKEY_MOD.ALT],
+                listModKey[(int)HOTKEY_MOD.CTRL],
+                listModKey[(int)HOTKEY_MOD.SHIFT],
+                listModKey[(int)HOTKEY_MOD.WINDOW],
+                chVKCode, 0);
+        }
+
     }
 
 
@@ -1337,6 +1372,24 @@
         bool clipAfterSend = Convert.ToBoolean(changeEventArg.Value);
         CLog.Here().Information($"SetClipCopyAutoSend Set: [{clipAfterSend}]");
         CtrlSideUISvc.SetClipAfterSend(clipAfterSend);
+        Window.SetUseClipCopyNsend(clipAfterSend);
+
+        if (clipAfterSend)
+        {
+            List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+            for (int i = 0; i < listNetWork.Count; i++)
+            {
+                // List 돌면서 단축키들 Native에 저장
+                List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(listNetWork[i].GroupID);
+                char chVKey = AppConfigSvc.GetClipBoardVKey(listNetWork[i].GroupID);
+
+                Window.SetNativeClipboardHotKey(listNetWork[i].GroupID, listModKey[(int)HOTKEY_MOD.ALT],
+                                listModKey[(int)HOTKEY_MOD.CTRL],
+                                listModKey[(int)HOTKEY_MOD.SHIFT],
+                                listModKey[(int)HOTKEY_MOD.WINDOW],
+                                chVKey, 0);
+            }
+        }
     }
 
     /// <summary>
