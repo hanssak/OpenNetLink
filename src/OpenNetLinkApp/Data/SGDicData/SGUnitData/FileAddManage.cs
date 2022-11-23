@@ -4757,7 +4757,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 int scanDepth = 1;               //OLE개체 검사 하위 범위 (0인 상태에서도 개체 검출 시 Block)
 
                 await scanDocumentFile(hsStream, currentFile, strDocumentExtractRootPath, isOLEMimeTypeWhite, isWhite, fileFilterExtInfo, isDocumentWhite, documentFileFilterExtInfo, scanDepth, documentExtractType);
-                return (currentFile.HasChildrenErr) ? -1 : 0;
+                if (currentFile.eErrType == eFileAddErr.eFANone && currentFile.HasChildrenErr == false)
+                    return 0;
+
+                return -1;
             }
             catch (Exception ex)
             {
@@ -4768,7 +4771,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             {
                 try
                 {
-                    Directory.Delete(strDocumentExtractRootPath, true); 
+                    Directory.Delete(strDocumentExtractRootPath, true);
                 }
                 catch (System.Exception err)
                 { Log.Warning("[CheckDocumentFile] Fail Directory.Delete() " + err.Message + " " + err.GetType().FullName); }
