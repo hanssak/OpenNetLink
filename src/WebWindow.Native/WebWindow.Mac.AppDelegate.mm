@@ -107,12 +107,14 @@
 {
     NSNumber *nsNumbGuId = (NSNumber *)anObject;
     
-    //if(gCopyAndSend == 1)
-    //{
-    //   NSLog(@"Command + C Press!");
-    //   [self hotkeyGenerate:'c' alt:false control:false shift:false win:true];
-    //    usleep(1000000);
-    //}
+
+    //NSLog(@"gCopyAndSend Value : %d", gCopyAndSend);
+    if(gCopyAndSend == 1)
+    {
+       NSLog(@"Command + C Press!");
+       [self hotkeyGenerate:'c' alt:false control:false shift:false win:true];
+        usleep(1000000);
+    }
 
     NSLog(@"Global HotKey Event Callback!, GUID:%d", [nsNumbGuId intValue]);
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -175,13 +177,15 @@
     ((WebWindow*)(SelfThis))->ProgramExit();
 }
 
-//- (void) SetCopyAndSend:(bool)value
-//{
-//    if(value)
-//        gCopyAndSend = 1;
-//    else
-//        gCopyAndSend = 0;
-//}
+- (void) SetCopyAndSend:(bool)value
+{
+    if(value)
+        gCopyAndSend = 1;
+    else
+        gCopyAndSend = 0;
+
+    //NSLog(@"gCopyAndSend Value Change : %d", gCopyAndSend);
+}
 
 - (void) hotkeyGenerate:(char)chVKCode alt:(bool)bAlt control:(bool)bControl shift:(bool)bShift win:(bool)bWin
 {

@@ -925,6 +925,7 @@ void WebWindow::SetTrayStartUse(bool bUseStartTray)
 void WebWindow::SetUseClipCopyNsend(bool bUse)
 {
 	g_bClipCopyNsend = bUse;
+    [_appDelegate SetCopyAndSend:g_bClipCopyNsend];
 	//NTLog(this, Info, "Called : SetUseClipCopyNsend(@@@@@@@@@@) : %s", (AutoString)(bUse ? "Yes" : "No"));
 }
 
