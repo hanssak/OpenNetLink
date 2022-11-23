@@ -338,7 +338,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool m_bUseFileCheckException { get; set; } = true;                              // virus / Apt에대한 예외처리 요청 기능 사용유무
 
-        public bool m_bUseFileForward { get; set; } = true;                                    // 파일포워드 기능 사용유무(site.넷마블)
+        public bool m_bUseFileForward { get; set; } = false;                                    // 파일포워드 기능 사용유무(site.넷마블)
 
         public bool m_bUseFileForwardDownNotRecv { get; set; } = true;                         // 파일 수신되기전에 파일포워드로 다운로드 가능유무
 
@@ -417,25 +417,25 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 sgSiteConfig.m_bUseDenyPasswordZip = false;             // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
 
-                sgSiteConfig.m_bUseEmail = true;                        // 이메일 결재 사용 유무
-                sgSiteConfig.m_bUsePCURL = true;                        // PCURL 사용여부
-                sgSiteConfig.m_bUseClipApprove = true;                  //클립보드 결재 사용 유무
+                sgSiteConfig.m_bUseEmail = false;                        // 이메일 결재 사용 유무
+                sgSiteConfig.m_bUsePCURL = false;                        // PCURL 사용여부
+                sgSiteConfig.m_bUseClipApprove = false;                  //클립보드 결재 사용 유무
                 sgSiteConfig.m_bUsePublicBoard = true;                  // 공지사항 사용 유무.
                 sgSiteConfig.m_bUseCertSend = true;                     // 공인인증서 전송 사용 유무.
-                sgSiteConfig.m_bUseClipBoardFileTrans = true;           // 클립보드 파일형태 전송 사용유무
+                sgSiteConfig.m_bUseClipBoardFileTrans = false;           // 클립보드 파일형태 전송 사용유무
 
-                sgSiteConfig.m_bUseFileClipManageUI = true;             // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
-                sgSiteConfig.m_bUseFileClipApproveUI = true;            // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
+                sgSiteConfig.m_bUseFileClipManageUI = false;             // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
+                sgSiteConfig.m_bUseFileClipApproveUI = false;            // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
 
-                sgSiteConfig.m_bUseClipTypeSelectSend = true;           // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
-                sgSiteConfig.m_bUseClipTypeTextFirstSend = true;        // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
+                sgSiteConfig.m_bUseClipTypeSelectSend = false;           // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
+                sgSiteConfig.m_bUseClipTypeTextFirstSend = false;        // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
 
                 //각 화면별 검색 방법 설정
-                sgSiteConfig.strApproverSearchType = "SEARCH";
+                sgSiteConfig.strApproverSearchType = "TREE";
                 sgSiteConfig.bUseInputSearchInApproverTree = true;
                 sgSiteConfig.strReceiverSearchType = "SEARCH";
                 sgSiteConfig.bUseInputSearchInReceiverTree = true;
-                sgSiteConfig.strProxySearchType = "SEARCH";
+                sgSiteConfig.strProxySearchType = "TREE";   //대결재자 TREE 사용
                 sgSiteConfig.bUseInputSearchInProxyTree = true;
                 sgSiteConfig.strSecurityApproverSearchType = "SEARCH";
                 sgSiteConfig.bUseInputSearchInSecurityApproverTree = true;
