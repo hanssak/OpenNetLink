@@ -329,7 +329,7 @@
 
             nDrawPageGroupID = nGroupID;
 
-            // bAutoLogin = siteConfig.GetUseAutoLogin(nGroupID);
+            bAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID);
             // bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(nGroupID);
 
             //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
@@ -931,15 +931,24 @@
                 // ClipBoard(Type Mixed 일때) Text 우선송신 사용
                 if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
                     Window.UseClipFirstSendType(groupId);
+
+                // 자동전송기능 위해
+                if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend())
+                {
+                    Window.SetNativeClipboardHotKey(groupId, listModKey[(int)HOTKEY_MOD.ALT],
+                                    listModKey[(int)HOTKEY_MOD.CTRL],
+                                    listModKey[(int)HOTKEY_MOD.SHIFT],
+                                    listModKey[(int)HOTKEY_MOD.WINDOW],
+                                    chVKey, 0);
+                }
             }
 
-
-        DateTime dt =(SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
-        pageService.SetSvrTime(groupId, dt, sgLoginData);
-        bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
-        bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
-        pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
-        pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
+            DateTime dt =(SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
+            pageService.SetSvrTime(groupId, dt, sgLoginData);
+            bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+            bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
+            pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
+            pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
 
             bool bAfterCheck = false;
             if (!bAfterApprEnable)
