@@ -36,6 +36,7 @@ using namespace std;
 
 bool g_bStartTray = true;
 bool g_bDoExit2TrayUse = false;
+bool g_bCopyAndSend = true;
 static id _appDelegate;
 
 map<NSWindow*, WebWindow*> nsWindowToWebWindow;
@@ -517,6 +518,7 @@ void WebWindow::SetIconFile(AutoString filename)
 void WebWindow::OnHotKey(int groupID)
 {
     NSNumber *numGuId = [NSNumber numberWithInt:groupID];
+    NSLog(@"OnHotKey Click!!!");
     [_appDelegate hotkeyClipBoardWithEvent:NULL object:numGuId];
 }
 
@@ -914,5 +916,10 @@ void WebWindow::SetTrayStartUse(bool bUseStartTray)
     g_bStartTray = bUseStartTray; 
     NTLog(this, Info, "Called : OpenNetLink SetTrayStartUse : %s", (AutoString)bUseStartTray ? "Yes": "No");
 }
+
+//void WebWindow::SetCopyAndSend(bool bUseCopyAndSend)
+//{
+//    [_appDelegate SetCopyAndSend:bUseCopyAndSend];
+//}
 
 #endif
