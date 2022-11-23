@@ -400,7 +400,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 sgSiteConfig.m_bUseEmail = false;                // 이메일 결재 사용 유무
                 sgSiteConfig.m_bUsePCURL = false;                       // PCURL 사용 유무.
-                sgSiteConfig.m_bUseClipApprove = false;                 // 클립보드 결재 사용 유무.
+                sgSiteConfig.m_bUseClipApprove = true;                 // 클립보드 결재 사용 유무.
                 sgSiteConfig.m_bUsePublicBoard = false;                 // 공지사항 사용 유무.
 
                 sgSiteConfig.m_bUseFileClipManageUI = false;            // 클립보드 파일형태 전송시 관리 UI
@@ -419,13 +419,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 sgSiteConfig.m_bUseEmail = false;                        // 이메일 결재 사용 유무
                 sgSiteConfig.m_bUsePCURL = false;                        // PCURL 사용여부
-                sgSiteConfig.m_bUseClipApprove = false;                  //클립보드 결재 사용 유무
+                sgSiteConfig.m_bUseClipApprove = true;                  //클립보드 결재 사용 유무
                 sgSiteConfig.m_bUsePublicBoard = true;                  // 공지사항 사용 유무.
                 sgSiteConfig.m_bUseCertSend = true;                     // 공인인증서 전송 사용 유무.
-                sgSiteConfig.m_bUseClipBoardFileTrans = false;           // 클립보드 파일형태 전송 사용유무
+                sgSiteConfig.m_bUseClipBoardFileTrans = true;           // 클립보드 파일형태 전송 사용유무
 
-                sgSiteConfig.m_bUseFileClipManageUI = false;             // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
-                sgSiteConfig.m_bUseFileClipApproveUI = false;            // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
+                sgSiteConfig.m_bUseFileClipManageUI = true;             // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
+                sgSiteConfig.m_bUseFileClipApproveUI = true;            // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
 
                 sgSiteConfig.m_bUseClipTypeSelectSend = false;           // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
                 sgSiteConfig.m_bUseClipTypeTextFirstSend = false;        // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
