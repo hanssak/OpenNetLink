@@ -37,8 +37,8 @@
 
 
   "bUserIDSave": false,
-  "bAutoLogin": true,
-  "bAutoLoginCheck": true,
+  "bAutoLogin": false,
+  "bAutoLoginCheck": false,
   "bUserPWChange": false,
 
   "bEmptyfileTrans": true,
@@ -53,7 +53,7 @@
     false
   ],
   "strURLAutoAfterBrowser": [
-    "N",
+    "F",
     "N",
     "F"
   ],
