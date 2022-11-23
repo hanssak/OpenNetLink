@@ -318,7 +318,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseApprCountAlaram { get; set; } = true;                             // 승인대기 알림 사용 유무.
         public bool m_bUseCloseTrayMove { get; set; } = true;                               // 종료 시 트레이 사용 유무.
         public bool m_bUseStartTrayMove { get; set; } = false;                              // 프로그램 시작 시 트레이 이동 사용 유무.
-        public bool m_bUseStartProgramReg { get; set; } = false;                            // 시작 프로그램 등록 사용 유무.
+        public bool m_bUseStartProgramReg { get; set; } = true;                            // 시작 프로그램 등록 사용 유무.
         public bool m_bUseLanguageSet { get; set; } = false;                                // 언어설정 사용 유무.
         public bool m_bUseDashBoard { get; set; } = true;                                   // 대쉬보드 창 사용 유무.
         public bool m_bViewFileFilter { get; set; } = true;                                 // (환경설정) 확장자 제한 화면 표시 유무.

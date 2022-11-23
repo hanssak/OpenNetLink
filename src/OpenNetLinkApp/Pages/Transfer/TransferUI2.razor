@@ -716,10 +716,10 @@
                     //if (strApprLineDeptSeq.Length == 18)    // Dept - seq 일때에만 검색함.
 
                     @*if (CsSeqFunc.isDeptSeq(strApprLineDeptSeq))
-                    {
+                        {
                         SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
                         cntSendQuery++;
-                    }*@
+                        }*@
 
                     // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
                     SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "");
@@ -768,7 +768,7 @@
             if (sgLoginData != null)
                 bApprEdit = sgLoginData.GetApproveAppend();                             //결제자 편집 사용 여부
 
-            string strMsg = XmlConf.GetInfoMsg(bApprEdit?"I_0220":"I_0233");
+            string strMsg = XmlConf.GetInfoMsg(bApprEdit ? "I_0220" : "I_0233");
             //HsLog.info($"결재자 부서정보가 변경되었습니다. (결재자명={strApprLineName})");
             ShowMessage("warn", strMsg);
             return;
@@ -2020,7 +2020,18 @@
         strApproverAdd = XmlConf.GetTitle("T_FILE_APPROVER");                           // 결재자추가
         strFileReg = XmlConf.GetTitle("T_FILE_FILEREG");                                // 파일등록
 
+        int groupID = groupIDbyParam;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null && !String.IsNullOrEmpty(sgLoginData.GetTransferTitle(sgLoginData.GetSystemPosition())))
+            strCurTitle =sgLoginData.GetTransferTitle(sgLoginData.GetSystemPosition());
+        else
         strCurTitle = XmlConf.GetTitle("T_FILE_EMPTYTITLE");                                // 제목을 입력하십시오. (최대 60자)
+
+        if (sgLoginData != null && !String.IsNullOrEmpty(sgLoginData.GetTransferDescription(sgLoginData.GetSystemPosition())))
+            strCurDesc =sgLoginData.GetTransferDescription(sgLoginData.GetSystemPosition());
+        else
         strCurDesc = XmlConf.GetTitle("T_FILE_EMPTYDESC");                                // 설명을 입력하십시오. (최대 80자)
     }
 
@@ -2167,9 +2178,9 @@
         if (sgUserData == null)
             return;
 
-        if(bAfterApprChkHIde)       //현재 '사후결재 체크'가 표시되지 않으면 별도 컨트롤 하지 않는다.
+        if (bAfterApprChkHIde)       //현재 '사후결재 체크'가 표시되지 않으면 별도 컨트롤 하지 않는다.
             return;
-        
+
         bAfterCheck = OpConfigSvc.GetAfterBasicChk();
         pageService.SetAfterApproveCheck(groupID, bAfterCheck);
         StateHasChanged();

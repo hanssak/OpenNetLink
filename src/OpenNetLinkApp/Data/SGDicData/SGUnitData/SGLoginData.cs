@@ -282,20 +282,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strData;
         }
 
-		/// <summary>
-		/// 현재 내부망에 접속되어 있는지 여부를 문자열로 반환(GetSystemPosition 기반)
-		/// </summary>
-		/// <returns>I or E (내부/외부)</returns>
-		public string GetSysID()
-		{
-			//string strSysID = "I";
-			//int nConnNetWork = GetConnNetwork();
-			//if (nConnNetWork == 0)
-			//	strSysID = "E";
-			string strSysID = (GetSystemPosition()) ? "I" : "E";
-			return strSysID;
-		}
-		/**
+        /// <summary>
+        /// 현재 내부망에 접속되어 있는지 여부를 문자열로 반환(GetSystemPosition 기반)
+        /// </summary>
+        /// <returns>I or E (내부/외부)</returns>
+        public string GetSysID()
+        {
+            //string strSysID = "I";
+            //int nConnNetWork = GetConnNetwork();
+            //if (nConnNetWork == 0)
+            //	strSysID = "E";
+            string strSysID = (GetSystemPosition()) ? "I" : "E";
+            return strSysID;
+        }
+        /**
 		 * @breif Link Check Time 주기를 반환한다.
 		 * @return 초단위
 		 */
@@ -1483,20 +1483,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="strTagName"></param>
-		/// <returns></returns>
-		public string GetTagDataBySystemEnvName(string strTagName)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strTagName"></param>
+        /// <returns></returns>
+        public string GetTagDataBySystemEnvName(string strTagName)
         {
-			string strRet = "";
-			string strTagRealName = "";
-			strTagRealName = GetSystemPosition() ? "I_" : "E_";
-			strTagRealName += strTagName.ToUpper();
-			strRet = GetTagData(strTagRealName);
-			return strRet;
-		}
+            string strRet = "";
+            string strTagRealName = "";
+            strTagRealName = GetSystemPosition() ? "I_" : "E_";
+            strTagRealName += strTagName.ToUpper();
+            strRet = GetTagData(strTagRealName);
+            return strRet;
+        }
 
 
         /// <summary>
@@ -1509,6 +1509,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns></returns>
         public string GetDocumentExtractType(bool bSystem)
             => (bSystem) ? GetTagData("I_CLIENT_DOCUMENT_EXTRACT_TYPE") : GetTagData("E_CLIENT_DOCUMENT_EXTRACT_TYPE");
+
+        /// <summary>
+        /// 서버로부터 수신받은 전송 시 제목 comment 정보를 반환한다.
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetTransferTitle(bool bSystem)
+            => (bSystem) ? GetTagData("I_CLIENT_TRANSFER_TITLE") : GetTagData("E_CLIENT_TRANSFER_TITLE");
+
+        /// <summary>
+        /// 서버로부터 수신받은 전송 시 설명 comment 정보를 반환한다.
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetTransferDescription(bool bSystem)
+            => (bSystem) ? GetTagData("I_CLIENT_TRANSFER_DESCRIPTION") : GetTagData("E_CLIENT_TRANSFER_DESCRIPTION");
+
+
 
         /// <summary>
         /// value 값을 암호화해서 sgData에 저장
@@ -1781,28 +1799,28 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
 
-		/// <summary>
-		/// 로그인할때 받은 EXCEPTIONEXT 값을 받음
-		/// </summary>
-		/// <returns></returns>
-		public string GetExceptionExt()
-		{
-			string strData = GetTagData("EXCEPTIONEXT");
+        /// <summary>
+        /// 로그인할때 받은 EXCEPTIONEXT 값을 받음
+        /// </summary>
+        /// <returns></returns>
+        public string GetExceptionExt()
+        {
+            string strData = GetTagData("EXCEPTIONEXT");
 
-			if (strData.Equals(""))
-			{
-				SetTagData("EXCEPTIONEXT", ";".Base64EncodingStr());
-				return ";";
-			}
+            if (strData.Equals(""))
+            {
+                SetTagData("EXCEPTIONEXT", ";".Base64EncodingStr());
+                return ";";
+            }
 
-			if (GetApprove())
-				return ";";
+            if (GetApprove())
+                return ";";
 
-			if (string.Compare(strData, "none", true) == 0)
-				return ";";
-			else
-				return strData;
-		}
+            if (string.Compare(strData, "none", true) == 0)
+                return ";";
+            else
+                return strData;
+        }
 
         /// 
         /// </summary>
