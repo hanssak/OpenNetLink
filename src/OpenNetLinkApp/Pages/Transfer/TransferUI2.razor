@@ -621,8 +621,17 @@
             if (sgLoginData == null)
                 return;
 
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isFilesNeedApprove())
             {
+
+                refApproveExtApproverSelect_PopUp.FileList = dropFile.GetHsStreamList();
+
+                // 파일목록이 있는 화면을 갱신해줘야 UI상에 나타남
+                refApproveExtApproverSelect_PopUp.Refresh();
+
+                // 파일송신 버튼, 실행
+                refApproveExtApproverSelect_PopUp.SetFileTransWithApproveEvent(FileTransWithApprover);
+
                 await refApproveExtApproverSelect_PopUp.openPopUp();
             }
             else
@@ -1037,7 +1046,7 @@
 
 
     /// <summary>
-    ///
+    /// 첨부된 파일들 중에 결재가 필요한 파일이 하나라도 있는지 유무
     /// </summary>
     /// <returns></returns>
     public bool isFilesNeedApprove()
@@ -1093,6 +1102,11 @@
         return false;
     }
 
+
+    /// <summary>
+    /// 사후결재 체크후 파일 전송 진행
+    /// </summary>
+    /// <returns></returns>
     private async Task CheckApproveAfterLimit()
     {
         int groupID = groupIDbyParam;
