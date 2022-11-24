@@ -35,7 +35,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool m_bUseDenyPasswordZip { get; set; } = false;         // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
         public bool m_bFileForward { get; set; } = false;               // 파일포워드기능 사용할지 유무
-        public bool m_bUseClipBoardFileTrans { get; set; } = true;         // 파일형태로보내는 클립보드 사용 유무
+        public bool m_bUseClipBoardFileTrans { get; set; } = false;         // 파일형태로보내는 클립보드 사용 유무
         public bool m_bUseFileClipManageUI { get; set; } = true;         // 파일형태로보내는 클립보드 관리UI 나오게할지 유무
         public bool m_bUseFileClipApproveUI { get; set; } = false;          // 파일형태로보내는 클립보드 결재UI 나오게할지 유무
 
@@ -69,7 +69,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseInputSearchInSecurityApproverTree { get; set; } = true; //보안결재자 등록 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
 
         public string strApproveExtApproverSearchType { get; set; } = "SEARCH";     // 결재필수 확장자 검색됐을때, 결재자 검색방식
-        public bool bUseApproveExt { get; set; } = true;                            // 결재필수 확장자 결재하는 기능 사용유무
+        public bool bUseApproveExt { get; set; } = false;                            // 결재필수 확장자 결재하는 기능 사용유무
 
         public bool bUseInputSearchApproveExtTree { get; set; } = false;         // 결재필수 확장자, 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
     }

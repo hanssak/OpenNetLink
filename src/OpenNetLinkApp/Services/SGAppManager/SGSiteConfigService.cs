@@ -423,7 +423,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUsePublicBoard = true;                  // 공지사항 사용 유무.
                 
                 sgSiteConfig.m_bUseCertSend = true;                     // 공인인증서 전송 사용 유무.
-                sgSiteConfig.m_bUseClipBoardFileTrans = true;           // 클립보드 파일형태 전송 사용유무
+                sgSiteConfig.m_bUseClipBoardFileTrans = false;           // 클립보드 파일형태 전송 사용유무
 
                 sgSiteConfig.m_bUseFileClipManageUI = true;             // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
                 sgSiteConfig.m_bUseFileClipApproveUI = false;            // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
@@ -441,7 +441,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.strSecurityApproverSearchType = "SEARCH";
                 sgSiteConfig.bUseInputSearchInSecurityApproverTree = true;
                 sgSiteConfig.strApproveExtApproverSearchType = "SEARCH";        // 결재필수 확장자 검색됐을때, 결재자 검색방식
-                sgSiteConfig.bUseApproveExt = true;                             // 결재필수 확장자 결재하는 기능 사용유무
+                sgSiteConfig.bUseApproveExt = false;                             // 결재필수 확장자 결재하는 기능 사용유무
                 sgSiteConfig.bUseInputSearchApproveExtTree = false;           // 결재필수 확장자, 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
 
 
