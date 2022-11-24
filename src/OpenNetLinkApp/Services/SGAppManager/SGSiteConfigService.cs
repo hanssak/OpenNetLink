@@ -308,7 +308,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseURLRedirectionAlarm { get; set; } = false;                        // URL 자동전환 알림 사용 유무
         public bool m_bUseURLRedirectionAlarmType { get; set; } = false;                    // URL 자동전환 알림 타입 선택 사용 유무
         public bool m_bRFileAutoSend { get; set; } = false;                                 // 마우스 우클릭 후 자동전송 사용 유무
-        public bool bShowAfterApprAutoCheck { get; set; } = true;                             // 사후결재 기본 체크 사용 유무
+        public bool bShowAfterApprAutoCheck { get; set; } = false;                             // 사후결재 기본 체크 사용 유무
         public bool m_bRecvFolderOpen { get; set; } = true;                                 // 파일 수신 후 폴더 열기 사용 유무
         public bool m_bManualDownFolderChange { get; set; } = false;                        // 수동다운로드로 다운 시 폴더 선택 사용 유무
         public bool m_bFileRecvAlarmRetain { get; set; } = true;                            // 파일 수신 후 알림 유지 사용 유무
@@ -336,7 +336,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         //public bool m_bUseNetOverAllsend { get; set; } = false;                              // 3망 연결된 망에 한번에 전부 전송하는 기능 사용유무
 
-        public bool m_bUseFileCheckException { get; set; } = true;                              // virus / Apt에대한 예외처리 요청 기능 사용유무
+        public bool m_bUseFileCheckException { get; set; } = false;                              // virus / Apt에대한 예외처리 요청 기능 사용유무
 
         public bool m_bUseFileForward { get; set; } = false;                                    // 파일포워드 기능 사용유무(site.넷마블)
 
@@ -406,8 +406,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 //sgSiteConfig.m_bUseFileClipManageUI = false;            // 클립보드 파일형태 전송시 관리 UI
                 //sgSiteConfig.m_bUseFileClipApproveUI = false;           // 클립보드 파일형태 전송시 결재 UI
 
-                sgSiteConfig.m_bUseApproveAfterLimit = true;            // 사후결재 결재 Count 제한 사용유무
-                sgSiteConfig.m_bUseClipBoardApproveAfterLimit = true;
+                sgSiteConfig.m_bUseApproveAfterLimit = false;            // 사후결재 결재 Count 제한 사용유무
+                sgSiteConfig.m_bUseClipBoardApproveAfterLimit = false;   //// 클립보드 파일전송시 사후결재 Count 제한 사용유무
 
                 sgSiteConfig.m_bUserIDSave = true;                     //유저 아이디 저장
                 sgSiteConfig.m_bUseScreenLock = true;                  //Screen Lock 설정여부
@@ -458,7 +458,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUseURLRedirectionAlarmType(true);                        // URL 리다이렉션 알림 타입 선택 사용 여부.
 
             SetRFileAutoSend(true);                                    // 오른쪽 마우스 클릭 후 자동 전송 사용 여부.
-            SetAfterApprAutoCheck(true);                                // 사후결재 기본 체크
+            SetAfterApprAutoCheck(false);                                // 사후결재 기본 체크
 
             SetRecvFolderOpen(true);                                    // 파일 수신 후 폴더 열기 사용 여부.
             SetManualDownFolderChange(false);                           // 수동다운로드 시 폴더 선택 사용 여부.

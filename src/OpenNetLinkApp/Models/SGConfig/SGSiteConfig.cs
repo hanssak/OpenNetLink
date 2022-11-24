@@ -45,7 +45,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool m_bUseApproveAfterLimit { get; set; } = true;             // 파일전송시 사후결재 Count 제한 사용유무
 
-        public bool m_bUseClipBoardApproveAfterLimit { get; set; } = true;       // 클립보드 파일전송시 사후결재 Count 제한 사용유무
+        public bool m_bUseClipBoardApproveAfterLimit { get; set; } = false;       // 클립보드 파일전송시 사후결재 Count 제한 사용유무
 
 
         public bool m_bUseAppLoginType { get; set; } = false;                   // 사용자 지정 로그인타입 사용 여부

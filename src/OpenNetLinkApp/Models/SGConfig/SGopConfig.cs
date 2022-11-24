@@ -114,7 +114,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bViewDlpApproverSelectMyDept { get; set; } = false;   // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
         public bool bClipBoardNoApproveButFileTrans { get; set; } = false;   // 클립보드 파일전송 사용 형태로 결재없이 동작
-        public int nClipAfterApproveUseType { get; set; } = 2;   // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
+        public int nClipAfterApproveUseType { get; set; } = 0;   // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
         public bool bUseUserSelectFirstServer { get; set; } = false;   // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
 
         public bool bUseFileForward { get; set; } = false;   // 파일포워드 기능 사용유무

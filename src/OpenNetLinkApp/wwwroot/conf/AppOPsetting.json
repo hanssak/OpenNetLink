@@ -19,7 +19,7 @@
   "bRFileAutoSend": false,
   "bRMouseFileAddAfterTrans": false,
 
-  "bShowAfterApprAutoCheck": true,
+  "bShowAfterApprAutoCheck": false,
   "bAfterBasicChk": false,
 
   "bFileRecvAlarmRetain": false,
@@ -63,7 +63,7 @@
     true
   ],
   "strForwardUrl": [
-    "file:\/\/\/D:\/Project\/OpenNetLink\/src\/OpenNetLinkApp\/bin\/Debug\/net5.0\/win-x64\/wwwroot\/Web\/WebLinkInfo.html",
+    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
     "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
     "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html"
   ],
@@ -80,7 +80,7 @@
   "bStartProgramReg": true,
   "bTitleDescSameChk": false,
 
-  "bUseFileCheckException": true,
+  "bUseFileCheckException": false,
   "bUseNetOverAllsend": false,
   "listUseGpkiLogin": [
     false,
@@ -100,8 +100,8 @@
   "bViewDlpApproverSelectMyDept": false,
   "bViewFileFilter": true,
   "bViewSGHeaderUIAlarmNoriAllDel": true,
-  "bViewSGSideBarUIBadge": true,
-  "nClipAfterApproveUseType": 2,
+  "bViewSGSideBarUIBadge": false,
+  "nClipAfterApproveUseType": 0,
   "bUseOneToMultiLogin": false,
   "bUseOneByOneLogOut" : false,
   "bApprDeptSearch": true,
