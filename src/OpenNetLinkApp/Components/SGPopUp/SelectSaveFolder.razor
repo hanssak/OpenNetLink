@@ -157,8 +157,10 @@
         _stCurrentDrive = value;
         //StateHasChanged();
     }
+
     public void Confirm()
     {
+
         if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
         {
             string strMsg = String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString());
@@ -166,76 +168,41 @@
             return;
         }
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
         {
-            if (stDisplayPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.Windows)))
-            {
-                string strMsg = String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString());
-                ShowMessage("warn", strMsg);
-                return;
-            }
-
-            else if (stDisplayPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)))
-            {
-                string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-                ShowMessage("warn", strMsg);
-                return;
-
-            }
-            else if (stDisplayPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)))
-            {
-                string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-                ShowMessage("warn", strMsg);
-                return;
-            }
-            else if (stDisplayPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
-            {
-                string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-                ShowMessage("warn", strMsg);
-                return;
-            }
-            else if (stDisplayPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
-            {
-                string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-                ShowMessage("warn", strMsg);
-                return;
-            }
+            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
+            ShowMessage("warn", strMsg);
+            return;
+        }
+        else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
+        {
+            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
+            ShowMessage("warn", strMsg);
+            return;
         }
 
-        else
+        string strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+        if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
         {
-            if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Windows)))
-            {
-                string strMsg = String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString());
-                ShowMessage("warn", strMsg);
-                return;
-            }
+            string strMsg = String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString());
+            ShowMessage("warn", strMsg);
+            return;
+        }
 
-            else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)))
-            {
-                string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-                ShowMessage("warn", strMsg);
-                return;
+        strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
+        {
+            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
+            ShowMessage("warn", strMsg);
+            return;
+        }
 
-            }
-            else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)))
-            {
-                string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-                ShowMessage("warn", strMsg);
-                return;
-            }
-            else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
-            {
-                string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-                ShowMessage("warn", strMsg);
-                return;
-            }
-            else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
-            {
-                string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-                ShowMessage("warn", strMsg);
-                return;
-            }
+        strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+        if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
+        {
+            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
+            ShowMessage("warn", strMsg);
+            return;
         }
 
         //CLog.Here().Information($"SelectSaveFolder Confirm");

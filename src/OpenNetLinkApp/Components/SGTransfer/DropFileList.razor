@@ -368,7 +368,7 @@
                     hsStream.IsDir = false;
                     hsStream.MemoryType = HsStreamType.FileStream;
                     hsStream.isNeedApprove = false;
-                    if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID))
+                    if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID)  && isUserNeedApproveExtUI())
                     {
                         if (CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
                             hsStream.isNeedApprove = true;
@@ -601,7 +601,7 @@
                         {
                             hsStream.Size = item.Length;
 
-                            if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID))
+                            if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID)  && isUserNeedApproveExtUI())
                             {
                                 if (CsFunction.isFileExtinListStr(true, fInfo.Extension, sgLoginData.GetExceptionExt()))
                                     hsStream.isNeedApprove = true;
@@ -981,7 +981,7 @@
                     hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
                 }
 
-                if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID))
+                if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID)  && isUserNeedApproveExtUI())
                 {
 
                     SGLoginData sgLoginData = null;
@@ -1071,7 +1071,7 @@
             hsStream.MemoryType = HsStreamType.MemoryStream;
             hsStream.stream = null;
             hsStream.isNeedApprove = false;
-            if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID))
+            if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID)  && isUserNeedApproveExtUI())
             {
                 SGLoginData sgLoginData = null;
                 sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -1633,7 +1633,7 @@
 
             int nRet = 0;
             nRet = await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option, true,
-                (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID) ? sgLoginData.GetExceptionExt() : "") );
+                ((SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID)  && isUserNeedApproveExtUI()) ? sgLoginData.GetExceptionExt() : "") );
             // if (await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option) != 0)
 
             if (nRet == 1)
