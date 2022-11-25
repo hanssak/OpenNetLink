@@ -322,11 +322,12 @@ FunctionEnd ; end the un.ReMoveAddFileRM
 
 Function .onInit
 
+	SetSilent silent
+	
   ${If} ${IS_PATCH} == 'TRUE'
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
-    
-    SetSilent silent
+        
 
     Banner::show "Calculating important stuff..."
     Banner::getWindow

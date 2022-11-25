@@ -27,7 +27,7 @@
   "bApprCompleteAlarmRetain": false,
   "bApprRejectAlarmRetain": false,
   "bUseApprCountAlaram": false,
-  
+
   "bFileRecvTrayFix": false,
   "bUserApprActionTrayFix": false,
   "bUserApprRejectTrayFix": false,
@@ -37,8 +37,8 @@
 
 
   "bUserIDSave": false,
-  "bAutoLogin": false,
-  "bAutoLoginCheck": false,
+  "bAutoLogin": true,
+  "bAutoLoginCheck": true,
   "bUserPWChange": false,
 
   "bEmptyfileTrans": true,
@@ -103,7 +103,7 @@
   "bViewSGSideBarUIBadge": false,
   "nClipAfterApproveUseType": 0,
   "bUseOneToMultiLogin": false,
-  "bUseOneByOneLogOut" : false,
+  "bUseOneByOneLogOut": false,
   "bApprDeptSearch": true,
   "bApprLineChkBlock": false,
   "bApprLineLocalSave": false,
@@ -115,7 +115,7 @@
   "bUseCloseTrayMove": false,
   "bExitTrayMove": false,
 
-  "bUseStartTrayMove": false,
+  "bUseStartTrayMove": true,
   "bStartTrayMove": true,
 
   "bUseFileForward": true,
@@ -124,8 +124,8 @@
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
 
-  "bUsePartialFileAddInTransfer" : false
+  "bUsePartialFileAddInTransfer": false
 
-  
+
 
 }

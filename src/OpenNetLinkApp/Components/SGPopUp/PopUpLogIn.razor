@@ -67,7 +67,7 @@
                                 </div>
                             }
                             <div class="row">
-                                @if (bAutoLogin && eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
+                                @if (bAutoLogin && (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN ||eLoginUITypeData == eLoginType.eLOGINTYPE_LDAP))
                                 {
                                     <div class="col-12 pt-1 pr-4 text-right ">
                                         <div class="icheck-primary">
@@ -343,7 +343,7 @@
 
 
             // IDPW 로그인
-            if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
+            if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN || eLoginUITypeData ==  eLoginType.eLOGINTYPE_LDAP)
             {
                 // ID저장 사용
                 //if (siteConfig.GetUseLoginIDSave(nGroupID) == true)   // json으로 설정이동
@@ -655,7 +655,7 @@
             sgSettingProc.InsertSettingData(groupId, "", "", "", "", 0);
 
         // IDPW UI 형태일때에만 사용
-        if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
+        if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN || eLoginUITypeData == eLoginType.eLOGINTYPE_LDAP )
         {
 
             //if (siteConfig.GetUseAutoLogin(groupId) == true)  // json으로 설정이동
@@ -996,6 +996,12 @@
         }
         else
         {
+            //트레이사용 시 로그인 실패하게 되면 화면 Show하여 사용자에게 알려주도록 추가
+              if (Window.GetTrayUse())
+              {
+                  Window.MoveTrayToWebWindow();
+              }
+
             bUIBtnDisable = false;
             string strPopupMsg = "";
             // 다중망일때에는 실패한 망이름 표현

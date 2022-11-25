@@ -56,9 +56,9 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUserIDSave { get; set; } = false;                                      // 로그인한 ID 저장 여부
 
-        public bool bAutoLogin { get; set; } = false;                                       // 자동로그인 사용 여부.
+        public bool bAutoLogin { get; set; } = true;                                       // 자동로그인 사용 여부.
 
-        public bool bAutoLoginCheck { get; set; } = false;                                  // 자동로그인 체크박스 체크여부.
+        public bool bAutoLoginCheck { get; set; } = true;                                  // 자동로그인 체크박스 체크여부.
 
         public bool bApprLineLocalSave { get; set; } = false;                               // 결재라인 로컬 저장 여부.
 
@@ -101,7 +101,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bApprRejectAlarmRetain { get; set; } = false;    // 반려 알림 유지 사용 유무
         public bool bUseApprCountAlaram { get; set; } = false;    // 승인대기 알림 사용 유무.
         public bool bUseCloseTrayMove { get; set; } = false;    // 종료 시 트레이 사용 유무.
-        public bool bUseStartTrayMove { get; set; } = false;    // 프로그램 시작 시 트레이 이동 사용 유무.
+        public bool bUseStartTrayMove { get; set; } = true;    // 프로그램 시작 시 트레이 이동 사용 유무.
         public bool bUseStartProgramReg { get; set; } = true;    // 시작 프로그램 등록 사용 유무.
         public bool bUseLanguageSet { get; set; } = false;    // 언어설정 사용 유무.
 

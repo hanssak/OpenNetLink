@@ -300,7 +300,7 @@
                 pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-            pw = "HsckAD.com";
+        pw = "HsckAD.com";
 #endif
 
             ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
@@ -351,13 +351,13 @@
         Task.Delay(1000);
         @*if (id.Length == 0)
             {
-                object[] param2 = { "loginId" };
-                JSRuntime.InvokeAsync<object>("changeFocus", param2);
+            object[] param2 = { "loginId" };
+            JSRuntime.InvokeAsync<object>("changeFocus", param2);
             }
             else
             {
-                object[] param3 = { "loginPw" };
-                JSRuntime.InvokeAsync<object>("changeFocus", param3);
+            object[] param3 = { "loginPw" };
+            JSRuntime.InvokeAsync<object>("changeFocus", param3);
             }*@
     }
 
@@ -403,7 +403,7 @@
             else
             {
 
-                if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
+                if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN || pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_LDAP)
                 {
                     // ID저장
                     // if (siteConfig.GetUseLoginIDSave(groupID) == true)   // json으로 설정이동
@@ -530,6 +530,7 @@
             //HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         }
 
+
         if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
             doADLogin();
 
@@ -553,17 +554,17 @@
 
             if (tmpData != null)
             {
-                int systemID = 1;
-                string sysID = tmpData.GetBasicTagData("SYSTEMID");
-                if (!sysID.Equals(""))
-                    systemID = Convert.ToInt32(sysID);
-                if (systemID == 1)
-                    strConNetwork = XmlConf.GetTitle("T_COMMON_LOGININNER");            // 업무망
-                else
-                    strConNetwork = XmlConf.GetTitle("T_COMMON_LOGINOUTER");            // 인터넷망
+            int systemID = 1;
+            string sysID = tmpData.GetBasicTagData("SYSTEMID");
+            if (!sysID.Equals(""))
+            systemID = Convert.ToInt32(sysID);
+            if (systemID == 1)
+            strConNetwork = XmlConf.GetTitle("T_COMMON_LOGININNER");            // 업무망
+            else
+            strConNetwork = XmlConf.GetTitle("T_COMMON_LOGINOUTER");            // 인터넷망
             }
             else
-                strConNetwork = XmlConf.GetTitle("T_COMMON_LOGININNER");            // 업무망
+            strConNetwork = XmlConf.GetTitle("T_COMMON_LOGININNER");            // 업무망
         *@
 
 
@@ -779,7 +780,7 @@
                     }
                 }
 
-                // CLIENT_ZIP_DEPTH, CS_EXCEPTION_EXT_REASON_TYPE 
+                // CLIENT_ZIP_DEPTH, CS_EXCEPTION_EXT_REASON_TYPE
                 // 정보 가져옴
                 SGQueryExtend sgQueryExtend = null;
                 sgQueryExtend = new SGQueryExtend();
@@ -921,17 +922,17 @@
                     // 자동전송기능 위해
                     if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend())
                     {
-                        Window.SetNativeClipboardHotKey(groupId, 
+                        Window.SetNativeClipboardHotKey(groupId,
                             listModKey[(int)HOTKEY_MOD.ALT],
                             listModKey[(int)HOTKEY_MOD.CTRL],
                             listModKey[(int)HOTKEY_MOD.SHIFT],
                             listModKey[(int)HOTKEY_MOD.WINDOW],
-                            chVKey,0);
+                            chVKey, 0);
                     }
 
                 } // if (bUseClipBoard)
 
-                DateTime dt = (SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now :sgLoginData.GetSvrTimeConvert();
+                DateTime dt = (SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
                 pageService.SetSvrTime(groupId, dt, sgLoginData);
                 bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
                 bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
@@ -1016,12 +1017,12 @@
 
                     //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 시작 2021/07/05 YKH
                     @*if (GetInitPWLogin(groupId) == true)
-                    {
+                        {
                         pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
                         refPWChangeDefaultPW.nGroupID = groupId;
                         await refPWChangeDefaultPW.openPopUp();
                         return;
-                    }*@
+                        }*@
                     //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 종료
 
                     @*if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
@@ -1032,62 +1033,62 @@
 
                     @*if (true)
                         {
-                            // password 강제변경 창
-                            pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                            refPWChange.nGroupID = groupId;
-                            refPWChange.Init();
-                            await refPWChange.openPopUp();
-                            return;
+                        // password 강제변경 창
+                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                        refPWChange.nGroupID = groupId;
+                        refPWChange.Init();
+                        await refPWChange.openPopUp();
+                        return;
                         }
                         else
                         {
 
-                            // password 변경권고 창 띄울지 검사
-                            string strTime = "";
-                            sgSettingData = sgSettingProc.SelectSettingData(groupId);
-                            if (sgSettingData == null)
-                            {
-                                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                                refPWChange.nGroupID = groupId;
-                                refPWChange.Init();
-                                await refPWChange.openPopUp();
-                                return;
-                            }
+                        // password 변경권고 창 띄울지 검사
+                        string strTime = "";
+                        sgSettingData = sgSettingProc.SelectSettingData(groupId);
+                        if (sgSettingData == null)
+                        {
+                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                        refPWChange.nGroupID = groupId;
+                        refPWChange.Init();
+                        await refPWChange.openPopUp();
+                        return;
+                        }
 
-                            strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
-                            if (strTime.Equals(""))
-                            {
-                                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                                refPWChange.nGroupID = groupId;
-                                refPWChange.Init();
-                                await refPWChange.openPopUp();
-                                return;
-                            }
+                        strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
+                        if (strTime.Equals(""))
+                        {
+                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                        refPWChange.nGroupID = groupId;
+                        refPWChange.Init();
+                        await refPWChange.openPopUp();
+                        return;
+                        }
 
-                            SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
-                            string strUserSeq = sgUserData.GetUserSequence();
-                            strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
+                        SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
+                        string strUserSeq = sgUserData.GetUserSequence();
+                        strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
 
-                            if (strTime.Equals(""))
-                            {
-                                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                                refPWChange.nGroupID = groupId;
-                                refPWChange.Init();
-                                await refPWChange.openPopUp();
-                                return;
-                            }
+                        if (strTime.Equals(""))
+                        {
+                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                        refPWChange.nGroupID = groupId;
+                        refPWChange.Init();
+                        await refPWChange.openPopUp();
+                        return;
+                        }
 
-                            DateTime dtLocalTime = DateTime.Parse(strTime);
-                            DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
+                        DateTime dtLocalTime = DateTime.Parse(strTime);
+                        DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
 
-                            if (DateTime.Compare(dtLocalTime, svrDt) < 0)
-                            {
-                                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                                refPWChange.nGroupID = groupId;
-                                refPWChange.Init();
-                                await refPWChange.openPopUp();
-                                return;
-                            }
+                        if (DateTime.Compare(dtLocalTime, svrDt) < 0)
+                        {
+                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                        refPWChange.nGroupID = groupId;
+                        refPWChange.Init();
+                        await refPWChange.openPopUp();
+                        return;
+                        }
 
                         }*@
 
@@ -1158,6 +1159,13 @@
             else
             {
 
+
+                //트레이사용 시 로그인 실패하게 되면 화면 Show하여 사용자에게 알려주도록 추가
+                if (Window.GetTrayUse())
+              {
+                  Window.MoveTrayToWebWindow();
+              }
+
                 //await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
 
                 bLoginBtnDisable = false;
@@ -1195,7 +1203,7 @@
 
                 CLog.Here().Information($"1 to ALL Login, GroupID : {groupId}, LoginResult Add After(#####) - Current / Total : {dicLoginResult.Count} / {NetWorkSvc.NetWorkInfo.Count} ");
 
-                foreach(var item in dicLoginResult)
+                foreach (var item in dicLoginResult)
                 {
                     CLog.Here().Information($"1 to ALL Login, Item Identify(#####) -  GroupID : {item.Key}, LoginResult : {item.Value}");
                 }
@@ -1267,7 +1275,7 @@
                     await refPWChangeDefaultPW.openPopUp();
                     return;
                 }
-                //@ 
+                //@
                 else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
                 {
                 }
@@ -1575,7 +1583,7 @@
             } // if (bUseClipBoard)
 
 
-            DateTime dt = (SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now :sgLoginData.GetSvrTimeConvert();
+            DateTime dt = (SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
             pageService.SetSvrTime(groupId, dt, sgLoginData);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
@@ -1624,7 +1632,7 @@
             if (srcLoc == "GPKI")
                 strNavigatePathWithGroupID = "/GPKI_LogIn/2";    // Register Mode로 실행
                                                                  // IDPW
-            else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
+            else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN ||pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_LDAP )
             {
 
                 // if (siteConfig.GetUseAutoLogin(groupId) == true)
@@ -1666,10 +1674,10 @@
                 //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 시작 2021/07/05 YKH
                 @*if (GetInitPWLogin(groupId) == true)
                     {
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
-                        refPWChangeDefaultPW.nGroupID = groupId;
-                        await refPWChangeDefaultPW.openPopUp();
-                        return;
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
+                    refPWChangeDefaultPW.nGroupID = groupId;
+                    await refPWChangeDefaultPW.openPopUp();
+                    return;
                     }*@
                 //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 종료
 
@@ -2023,7 +2031,7 @@
 
             @*string strRootPath = "/Welcome";
                 if (!siteConfig.GetUseDashBoard())
-                    strRootPath = "/Transfer";*@
+                strRootPath = "/Transfer";*@
 
             // 파일전송화면 이면 저장했던 위치를 찾아서 사용한다. (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
             string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
@@ -2282,34 +2290,34 @@
 
     /*
     public bool ClientPatch(SGLoginData sgLoginData)
-    {
+        {
 
         if (sgLoginData == null)
-            return false;
+        return false;
         bool bUpdate = sgLoginData.GetClientUpgrade();
-        if (!bUpdate)
-            return false;
+            if (!bUpdate)
+        return false;
 
         string strSvrCliVersion = sgLoginData.GetServClientVersion();
         if (strSvrCliVersion.Equals(""))
-            return false;
+        return false;
         strSvrCliVersion = strSvrCliVersion.ToUpper();
 
         string strCliVersion = HSCmdCenter.GetCliVersion();
         if (strCliVersion.Equals(""))
-            return false;
+        return false;
         strCliVersion = strCliVersion.ToUpper();
 
         //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-        {
-            return true;
+            {
+        return true;
         }
-        else
-            return false;
+            else
+    return false;
 
-    }
+        }
     */
 
 }

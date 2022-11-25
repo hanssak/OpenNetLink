@@ -8,8 +8,8 @@ namespace OpenNetLinkApp.Models.SGConfig
     public class SGSiteConfig : ISGSiteConfig
     {
         public bool m_bUserIDSave { get; set; } = false;                    // 로그인한 ID 저장 여부
-        public bool m_bAutoLogin { get; set; } = false;                     // 자동로그인 사용 여부.
-        public bool m_bAutoLoginCheck { get; set; } = false;                // 자동로그인 체크박스 체크여부.
+        public bool m_bAutoLogin { get; set; } = true;                     // 자동로그인 사용 여부.
+        public bool m_bAutoLoginCheck { get; set; } = true;                // 자동로그인 체크박스 체크여부.
         public bool m_bApprLineLocalSave { get; set; } = false;             // 결재라인 로컬 저장 여부.
         public int m_nZipPWBlock { get; set; } = 0;                         // zip 파일 패스워드 검사 여부 ( 0 : 사용 안함, 1 : 비번 걸려 있을 경우 차단,  2 : 비번이 안걸려 있을 경우 차단 )
         public bool m_bTitleDescSameChk { get; set; } = false;              // 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부.
@@ -36,7 +36,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool m_bUseDenyPasswordZip { get; set; } = false;         // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
         public bool m_bFileForward { get; set; } = false;               // 파일포워드기능 사용할지 유무
         public bool m_bUseClipBoardFileTrans { get; set; } = true;         // 파일형태로보내는 클립보드 사용 유무
-        public bool m_bUseFileClipManageUI { get; set; } = true;         // 파일형태로보내는 클립보드 관리UI 나오게할지 유무
+        public bool m_bUseFileClipManageUI { get; set; } = false;         // 파일형태로보내는 클립보드 관리UI 나오게할지 유무
         public bool m_bUseFileClipApproveUI { get; set; } = false;          // 파일형태로보내는 클립보드 결재UI 나오게할지 유무
 
         public bool m_bUseClipTypeSelectSend { get; set; } = true;         // 클립보드를 보낼때, 이미지 / Text를 사용자가 선택해서 보내는 기능 사용유무

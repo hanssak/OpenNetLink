@@ -78,7 +78,7 @@
                             {
                                 <tr>
                                     <th>@XmlConf.GetTitle("T_DASH_PWPERIOD_DATE")</th> <!--패스워드 유효기간 -->
-                                    <td>@strPWChgDate</td>
+                                <td>@strPWChgDate</td>
                                 </tr>
                             }
                             <tr>
@@ -131,7 +131,7 @@
                                 {
                                     <div class="progress-group text-left">
                                         <!-- 클립보드 용량-->
-                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
+                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
                                         <span class="float-right">
                                             <b>@nDayUseClipSize</b>/@(nDayMaxClipSize==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipSize.ToString())
                                         </span>
@@ -180,7 +180,7 @@
                                 {
                                     <div class="progress-group text-left">
                                         <!-- 클립보드 건수-->
-                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
+                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
                                         <span class="float-right">
                                             <b>@nDayUseClipCount</b>/@(nDayMaxClipCount==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipCount.ToString())
                                         </span>
@@ -417,7 +417,7 @@
                         <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transfer"))">
                             <div class="text-center"><img src="/images/adminlte/quick_01.png"></div>
                             <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_FILESEND")</font>  <!--파일전송-->
-                        </button>
+                    </button>
                     }
 
                     <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transManage"))">
@@ -430,7 +430,7 @@
                         <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transferApprove"))">
                             <div class="text-center"><img src="/images/adminlte/quick_03.png"></div>
                             <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_APPROVEMANAGE")</font> <!--결재관리-->
-                        </button>
+                    </button>
                     }
 
                     <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/viewConf"))">
@@ -443,7 +443,7 @@
                         <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/netConf"))">
                             <div class="text-center"><img src="/images/adminlte/quick_05.png"></div>
                             <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_BASICSET_TITLE")</font> <!--기본설정-->
-                        </button>
+                    </button>
                     }
 
                 </div>
@@ -603,7 +603,8 @@
         if (nDrawPageGroupID < 0)
             return false;
 
-        return (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nDrawPageGroupID));
+        return ((pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN || pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_LDAP)
+                    && SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nDrawPageGroupID));
     }
 
 
@@ -1061,10 +1062,10 @@
             HsCmdCenter.sgPageEvent.SetAlarmNotiAfterDashBoardEventAdd(groupID, AlarmNotiAfter);                // 알람 노티 수신 후 화면 갱신.
 
             HsCmdCenter.SetFileRecvPossible(groupID, true);
-            
+
             // 수신 경로 변경은 기본 Page가 바뀔수 있으므로 Main, PopupLogin 쪽으로 이전
             @*HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
-            SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정*@
+                SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정*@
 
             GetNetOverModeData(groupID);
 
@@ -1096,7 +1097,7 @@
 
             StateHasChanged();
 
-            
+
             CheckContinueFileUpload();
 
         }
