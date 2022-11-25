@@ -10,6 +10,9 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
 @inject XmlConfService XmlConf
+@inject ISGAppUpdaterService SGAppUpdaterSvc
+@using HsNetWorkSG
+@using HsNetWorkSGData
 
 <div class="loading_y" translate="no">
     <section>
@@ -101,14 +104,14 @@
 
         // 30초간 서버에서 응답없으면 메세지 변경
         conTimer.AutoReset = false;
-        conTimer.Interval = 30*1000;
+        conTimer.Interval = 30 * 1000;
         conTimer.Elapsed += new ElapsedEventHandler(dayTimer_Elapsed);
         conTimer.Start();
     }
 
     private void dayTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
-        CLog.Here().Information($@"{conTimer.Interval/1000} sec after, Server Result Failed !!!");
+        CLog.Here().Information($@"{conTimer.Interval / 1000} sec after, Server Result Failed !!!");
         bConnectServerTimeOut = true;
         StateHasChanged();
     }
@@ -120,8 +123,8 @@
         pageService.m_nCurViewPageGroupID = 0;
 
         @*MyNavigationManager.NavigateTo("/fileException");*@
-      
-        MyNavigationManager.NavigateTo( (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1) ? "/SelectNet" : "/LogIn");
+
+        MyNavigationManager.NavigateTo((SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1) ? "/SelectNet" : "/LogIn");
 
     }
 
@@ -143,7 +146,22 @@
 
         conTimer.Stop();
 
-	    if (groupId == 0)
-		    goLogIn(loginType);
+        if (groupId == 0)
+        {
+
+            string strRipNport = "";
+
+            HsNetWork hsNetWork = null;
+            hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
+            if (hsNetWork != null)
+            {
+                strRipNport = hsNetWork.GetRealHostInfo();
+            }
+
+            strRipNport += ":3439";
+            SGAppUpdaterSvc.Init(strRipNport, SGAppMgrSvc.VersionConfigInfoService.GetUpdatePlatform());
+            goLogIn(loginType);
+        }
+
     }
 }
