@@ -26,7 +26,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bApprTrayFix { get; set; } = false;                                     // 결재자 승인대기 알림 트레이 유지 여부 ( true : 유지, false : 유지 안함 )
         public bool bUserApprActionTrayFix { get; set; } = false;                           // 사용자 승인완료 알림 트레이 유지 여부 ( true : 유지, false : 유지 안함 )
         public bool bUserApprRejectTrayFix { get; set; } = false;                           // 사용자 반려 알림 트레이 유지 여부 ( true : 유지, false : 유지 안함 )
-        public bool bExitTrayMove { get; set; } = false;                                    // 종료 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
+        public bool bExitTrayMove { get; set; } = true;                                    // 종료 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
         public bool bStartTrayMove { get; set; } = true;                                   // 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
         public bool bStartProgramReg { get; set; } = true;                                 // 시작 프로그램 등록 ( true : 시작프로그램 등록, false : 시작프로그램 등록 해제 )
 
