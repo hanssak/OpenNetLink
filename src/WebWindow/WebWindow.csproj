@@ -59,4 +59,10 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="..\WebWindow.Native\x64\Debug\WebView2Loader.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
