@@ -714,6 +714,7 @@ void WebWindow::AttachWebView()
 	pstrBuffer = _getcwd(strBuffer, _MAX_PATH);
 	strcpy_s(strEdgePath, pstrBuffer);
 	strcat_s(strEdgePath, "\\wwwroot\\edge");
+	//strcat_s(strEdgePath, GetInstallPath().c_str());
 	wchar_t wEdgePath[_MAX_PATH];
 	size_t cn;
 	mbstowcs_s(&cn, wEdgePath, strEdgePath, strlen(strEdgePath) + 1);//Plus null
@@ -723,9 +724,13 @@ void WebWindow::AttachWebView()
 	flag.test_and_set();
 
 	std::wstring Edgepath = L"D:\\file\\edge";
+	std::wstring tempEdgePath = L"D:\\file\\86.0.622.68";
 
 	std::wstring edgeFolderPath = GetInstallPath();
-	//HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(Edgepath.c_str(), nullptr, nullptr,
+
+	wprintf(L"PintF - %s\n", edgeFolderPath.c_str());
+
+	//HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(tempEdgePath.c_str(), nullptr, nullptr,
 	//HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(nullptr, nullptr, nullptr,
 	HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(lpEdgeptr, nullptr, nullptr,
 		Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
