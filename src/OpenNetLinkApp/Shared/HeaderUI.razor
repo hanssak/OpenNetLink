@@ -2143,11 +2143,11 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             stApprLineSeq = "";
 
         // 클립보드 파일전송의 사후결재 설정
-        if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove() == 0)             // checkBox 설정따라 - 사용자선택따라(작업진행중...미완료상태)
+        if (siteConfig.GetClipUseAfterApprove() == 0)             // checkBox 설정따라 - 사용자선택따라(작업진행중...미완료상태)
             bAfterApprove = pageService.GetAfterApproveCheck(groupID);
-        else if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove() == 1)        // 사전
+        else if (siteConfig.GetClipUseAfterApprove() == 1)        // 사전
             bAfterApprove = false;
-        else if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove() == 2)        // 사후
+        else if (siteConfig.GetClipUseAfterApprove() == 2)        // 사후
             bAfterApprove = true;
         else
             bAfterApprove = pageService.GetAfterApproveCheck(groupID);
@@ -2933,10 +2933,10 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
 
         // 추가된 파일리스트 제거하는 동작
-        /*LogOutFileListClearEvent LogOutFileListClearEvent = null;
+        LogOutFileListClearEvent LogOutFileListClearEvent = null;
         LogOutFileListClearEvent = pageService.GetLogOutFileListClearEvent(groupID);
         if (LogOutFileListClearEvent != null)
-            LogOutFileListClearEvent();*/
+            LogOutFileListClearEvent();
 
         CLog.Here().Information($"groupID : {groupID} - Logout CMD Recv from Server, UrlRedirection LogOut State ReSet !!!");
         HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);

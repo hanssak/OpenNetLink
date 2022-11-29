@@ -1790,6 +1790,25 @@
         JSRuntime.InvokeVoidAsync("loadJavaScript");
     }
 
+    public void LogoutClearFileList()
+    {
+        try
+        {
+            if (dropFile.HsStreamList != null && dropFile.HsStreamList.Count > 0)
+            {
+                dropFile.bAsyncData = false; // DropClear() 직접호출하기 위해
+                DropClear();
+                dropFile.RemoveAllFile();
+                CLog.Here().Information($"dropFile.DataClear - !");
+            }
+        }
+        catch (Exception err)
+        {
+            // error
+            CLog.Here().Error($"dropFile.DataClear - error:{err.Source} - Msg : {err.Message}");
+        }
+    }
+
     protected override void OnAfterRender(bool firstRender)
     {
         int groupID = groupIDbyParam;
@@ -1903,6 +1922,9 @@
                     }
                 }
             }
+
+            pageService.SetLogOutFileListClearEvent(groupID, LogoutClearFileList);
+
             StateHasChanged();
         }
 
