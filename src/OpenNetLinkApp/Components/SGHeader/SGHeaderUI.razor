@@ -785,17 +785,31 @@
         int nGroupID = groupId;
         //pageService.m_nCurViewPageGroupID=0;
 
+        LogOutFileListClearEvent LogOutFileListClearEvent = null;
+
 
         if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() &&
             SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLoginButoneBYoneLogout() == false)
         {
             foreach (ISGNetwork Net in listNetWork)
             {
+
+                // 파일추가된 data 제거하는 동작
+                LogOutFileListClearEvent = pageService.GetLogOutFileListClearEvent(Net.GroupID);
+                if (LogOutFileListClearEvent != null)
+                    LogOutFileListClearEvent();
+
                 DoLogOutSetData(Net.GroupID);
             }
         }
         else
         {
+            
+            // 추가된 파일리스트 제거하는 동작
+            LogOutFileListClearEvent = pageService.GetLogOutFileListClearEvent(nGroupID);
+            if (LogOutFileListClearEvent != null)
+                LogOutFileListClearEvent();
+
             DoLogOutSetData(nGroupID);
         }
 
