@@ -2933,10 +2933,10 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
 
         // 추가된 파일리스트 제거하는 동작
-        /*LogOutFileListClearEvent LogOutFileListClearEvent = null;
+        LogOutFileListClearEvent LogOutFileListClearEvent = null;
         LogOutFileListClearEvent = pageService.GetLogOutFileListClearEvent(groupID);
         if (LogOutFileListClearEvent != null)
-            LogOutFileListClearEvent();*/
+            LogOutFileListClearEvent();
 
         CLog.Here().Information($"groupID : {groupID} - Logout CMD Recv from Server, UrlRedirection LogOut State ReSet !!!");
         HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);

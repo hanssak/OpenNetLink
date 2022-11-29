@@ -156,12 +156,21 @@
         fileAddManage.m_nTansCurSize = 0;
         fileAddManage.m_nTransCurCount = 0;
 
-        if (bAsyncData)
+        try
         {
-            await ExtDropClear();
+            if (bAsyncData)
+            {
+                await ExtDropClear();
+            }
+            CLog.Here().Information($"dropFile.DataClear - !");
+        }
+        catch (Exception err)
+        {
+            // error
+            CLog.Here().Error($"DataClear - Exception - error:{err.Source} - Msg : {err.Message}");
         }
 
-        if (HsStreamList.Count > 0)
+        if (HsStreamList != null && HsStreamList.Count > 0)
             HsStreamList.Clear();
 
         StateHasChanged();

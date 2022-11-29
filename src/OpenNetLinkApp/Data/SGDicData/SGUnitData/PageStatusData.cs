@@ -44,7 +44,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     /// </summary>
     public delegate void DayInfoRefreshEvent();
 
-
+    /// <summary>
+    /// 로그아웃때, FileList 제거하는 이벤트
+    /// </summary>
+    public delegate void LogOutFileListClearEvent();
 
     /// <summary>
     /// Group ID 별로 각각 관리
@@ -117,6 +120,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public InitPassWDCHGEvent m_InitPasswdChgEvent;                                // 초기 비밀번호 변경 결과 이벤트
         public DayPassWDCHGEvent m_DayPasswdChgEvent;                                  // 날짜 비밀번호 변경 결과 이벤트
         public UserPassWDCHGEvent m_UserPasswdChgEvent;                                // 사용자에 의한 비밀번호 변경 결과 이벤트
+
+        /// <summary>
+        /// 로그아웃때, 파일리스트 제거하는 event
+        /// </summary>
+        public LogOutFileListClearEvent m_logOutFileListClearEvent = null;
+
 
         public int m_nConnectCount = 0;                                                  // 접속상태 Count (처음 접속인지 재접속인지 여부를 확인)
         public bool m_bConnect = false;                                                   // 접속상태 ( true : 접속 중, false : 오프라인 상태)
@@ -666,6 +675,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             m_UserPasswdChgEvent = userPasswdChgEvent;
         }
+
+
+        public LogOutFileListClearEvent GetLogoutFileListClearEvent()
+        {
+            return m_logOutFileListClearEvent;
+        }
+        public void SetLogoutFileListClearEvent(LogOutFileListClearEvent userPasswdChgEvent)
+        {
+            m_logOutFileListClearEvent = userPasswdChgEvent;
+        }
+
+        
 
         public void SetCurUserPassWD(string strPW)
         {
