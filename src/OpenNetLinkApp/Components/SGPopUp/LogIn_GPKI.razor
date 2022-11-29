@@ -922,6 +922,7 @@
 		        strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
 		        strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
                 strGetinfoTagName += ", 'CLIENT_DOCUMENT_EXTRACT_TYPE'";
+                strGetinfoTagName += ", 'CLIENT_DOCUMENT_MIME_FILTER_TYPE'";
 
 		        string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
 		        HsCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);	    
