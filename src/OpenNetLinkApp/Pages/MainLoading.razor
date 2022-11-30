@@ -87,6 +87,12 @@
 
             if (String.Compare(listNetWork[i].NetPos, "CN", true) != 0)
                 siteConfig.SetUseAccessAllDrive(listNetWork[i].GroupID, true);
+
+            if (String.Compare(listNetWork[i].NetPos, "EX", true) == 0)
+            {
+                siteConfig.SetUseOver1auth(listNetWork[i].GroupID, true);
+
+            }
         }
 
         //HSCmdCenter.sgPageEvent.SetSvrEventAdd(0, SvrResult);

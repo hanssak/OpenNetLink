@@ -302,6 +302,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseAccessAllDrive(int groupID);
 
+        public void SetUseOver1auth(int groupID, bool bUseAuth);
+
+        public bool GetUseOver1auth(int groupID);
+
+
+
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -335,7 +341,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bClipBoardNoApproveButFileTrans { get; set; } = true;                // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
 
         public bool m_bUseOSMaxFilePath { get; set; } = true;                               // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
-        public int m_nClipAfterApproveUseType { get; set; } = 0;                                    // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
+        public int m_nClipAfterApproveUseType { get; set; } = 2;                                    // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
 
         public bool m_bUseUserSelectFirstServer { get; set; } = false;                       // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
 
@@ -395,7 +401,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bTitleDescSameChk = false;               // 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부.
                 sgSiteConfig.m_bApprLineChkBlock = true;               // 고정 결재라인 차단 시 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
                 sgSiteConfig.m_bApprDeptSearch = true;                  // 결재자 검색 창의 타부서 수정 가능 여부.
-                
+
                 sgSiteConfig.m_bUserPWChange = false;                   // 사용자 패스워드 변경 사용 여부.
                 sgSiteConfig.m_strPWChangeProhibitLimit = "";           // 패스워드 사용금지 문자열 지정.
                 sgSiteConfig.m_nPWChangeApplyCnt = 9;                   // 패스워드 변경 시 허용되는 자리수 지정.
@@ -1315,6 +1321,22 @@ namespace OpenNetLinkApp.Services.SGAppManager
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
                 return listSiteConfig[groupID].m_bAccessAllDrive;
+
+            return false;
+        }
+
+        public void SetUseOver1auth(int groupID, bool bUseAuth)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseOver1Auth = bUseAuth;
+        }
+
+        public bool GetUseOver1auth(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID<listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseOver1Auth;
 
             return false;
         }

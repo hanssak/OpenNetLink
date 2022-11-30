@@ -76,5 +76,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool m_bAccessAllDrive { get; set; }                     // 모든 Drive에 접근하도록 할지여부
 
+        public bool m_bUseOver1Auth { get; set; }                     // 1단계 이상 인증 사용
+
     }
 }

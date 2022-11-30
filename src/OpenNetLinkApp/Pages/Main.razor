@@ -224,6 +224,9 @@
     {
         try
         {
+
+            int groupid = pageService.m_nCurViewPageGroupID;
+
             //VAlidation Check  PW_OTP(4), OTP(5)
             if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5)
             {
@@ -265,21 +268,105 @@
             {
                 foreach (ISGNetwork netlist in listNetWork)
                 {
-                    HsLog.info($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
+                    CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
                     HSCmdCenter.Login(netlist.GroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
                 }
             }
             else
             {
-                HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
+
+                if (siteConfig.GetUseOver1auth(groupid))
+                {
+                    string strIP = "";
+                    foreach (ISGNetwork netlist in listNetWork)
+                    {
+                        if (netlist.GroupID == groupid)
+                        {
+                            strIP = netlist.IPAddress;
+                            break;
+                        }
+                    }
+
+                    SessionWebClient web = new SessionWebClient();
+                    string strUrl = @$"https://{strIP}:1300/weblink/CM001_GOTP_IDCHECK.do";
+                    string stRtn = web.Request(strUrl, "id=uglyice");
+                    if (stRtn != null && stRtn.Length > 0 && string.Compare(stRtn, "ok", true) == 0)
+                    {
+                        HSCmdCenter.LoginNotCheckPw(groupid, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
+                        CLog.Here().Information($"doLogIn - IDPW - Web Certificate Done!");
+                    }
+                    else
+                    {
+                        CLog.Here().Information($"doLogIn - IDPW - Web Certificate Failed!");
+                    }
+
+                }
+                else
+                    HSCmdCenter.Login(groupid, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
             }
 
         }
         catch (Exception ex)
         {
-            HsLog.err($"doLogIn - Exception Msg : {ex.Message}");
+            CLog.Here().Error($"doLogIn - Exception Msg : {ex.Message}");
             Debug.WriteLine(ex.Message);
         }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="ngroupid"></param>
+    /// <returns></returns>
+    private bool doADLoginLocalCheck(int ngroupid)
+    {
+        try
+        {
+
+            if (siteConfig.GetUseOver1auth(ngroupid) == false)
+                return false;
+
+            string strPW = "";
+
+            //Linux는 아직 실제값 확인해보지 못함
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                strPW = IPGlobalProperties.GetIPGlobalProperties().DomainName;
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
+
+#if DEBUG
+            strPW = "HsckAD.com";
+#endif
+
+            List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+            if (listNetWork[ngroupid].ADDomain == null || listNetWork[ngroupid].ADDomain.Length < 1)
+            {
+                CLog.Here().Information($"doADLoginLocalCheck - Agent ADDomain Data Empty(groupID : {ngroupid}) - Do IDPW!");
+                return false;
+            }
+
+            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+            //string strEncID = "";
+            //sgRSACrypto?.ValueEn(strPW, out strDescPW);
+            string strDescPW = "";
+            sgRSACrypto?.ValueDecrypt(listNetWork[ngroupid].ADDomain, out strDescPW);
+
+            // hash 값으로 비교하면 대소문자 가려서 비교하게 되므로
+            if (listNetWork.Count > 0 && String.Compare(strPW, strDescPW, true) == 0)
+            {
+                CLog.Here().Information($"doADLoginLocalCheck - DoLogin(groupID : {ngroupid}) - Do!");
+                return true;
+            }
+
+            CLog.Here().Information($"doADLoginLocalCheck - PC Ad Domain : {strPW} - Can't Login AD TYPE(#####), groupID : {ngroupid}");
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"doADLoginLocalCheck - Exception - Msg : {ex.Message}");
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -339,7 +426,7 @@
         }
         catch (Exception ex)
         {
-            HsLog.err($"doADLogin - Exception - Msg : {ex.Message}");
+            CLog.Here().Error($"doADLogin - Exception - Msg : {ex.Message}");
         }
     }
 
@@ -532,6 +619,15 @@
 
         if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
             doADLogin();
+        else if (siteConfig.GetUseOver1auth(groupid))
+        {
+            if (doADLoginLocalCheck(groupid))
+                doADLogin();
+            else
+            {
+                ShowLoginFail("ID/PW 인증을 통해 Login 하셔야 합니다.");
+            }
+        }
 
         if (srcLoc == "Logout" && (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1))
             MyNavigationManager.NavigateTo("/SelectNet");
@@ -1186,6 +1282,17 @@
                 //await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
 
                 bLoginBtnDisable = false;
+
+                //
+                if (groupId == 0)
+                {
+                    List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+                    if (listNetWork.Count > 0 && String.Compare(listNetWork[0].NetPos, "EX", true) == 0)
+                    { 
+
+                    }
+                }
+
                 string strPopupMsg = "";
 
                 // 다중망일때에는 실패한 망이름 표현
@@ -1202,6 +1309,8 @@
                 strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
                 ShowLoginFail(strPopupMsg);
                 HSCmdCenter.SendLogOut(groupId, "");
+
+
                 StateHasChanged();
             }
 
