@@ -156,12 +156,21 @@
         fileAddManage.m_nTansCurSize = 0;
         fileAddManage.m_nTransCurCount = 0;
 
-        if (bAsyncData)
+        try
         {
-            await ExtDropClear();
+            if (bAsyncData)
+            {
+                await ExtDropClear();
+            }
+            CLog.Here().Information($"dropFile.DataClear - !");
+        }
+        catch (Exception err)
+        {
+            // error
+            CLog.Here().Error($"DataClear - Exception - error:{err.Source} - Msg : {err.Message}");
         }
 
-        if (HsStreamList.Count > 0)
+        if (HsStreamList != null && HsStreamList.Count > 0)
             HsStreamList.Clear();
 
         StateHasChanged();
@@ -367,7 +376,7 @@
                     hsStream.IsDir = false;
                     hsStream.MemoryType = HsStreamType.FileStream;
                     hsStream.isNeedApprove = false;
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt()  && isUserNeedApproveExtUI())
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
                     {
                         if (CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
                             hsStream.isNeedApprove = true;
@@ -1632,7 +1641,7 @@
 
             int nRet = 0;
             nRet = await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option, true,
-                ((SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt()  && isUserNeedApproveExtUI()) ? sgLoginData.GetExceptionExt() : ""));
+                ((SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI()) ? sgLoginData.GetExceptionExt() : ""));
             // if (await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option) != 0)
 
             if (nRet == 1)
@@ -1680,42 +1689,21 @@
             return 0;
         }
 
-        @*string strFileExtInfo = sgLoginData.GetFileFilter();
-            if (strFileExtInfo.Equals("") || strFileExtInfo.Equals(";"))
-            {
-            CLog.Here().Information($"No check OLD for EMPTY FILEFILTER(;)");
-            return 0;
-            }*@
-
-
-        // 확인대상을 판단하는 기준(확장자) 확인 필요
+        // 검사가 필요한 확장자(문서) 체크
         if (!fileAddManager.ListCheckableDocumentExtension.Exists(ext => ext == strExtType))
             return 0;
 
+        string strDocumentExtractType = sgLoginData.GetDocumentExtractType(sgLoginData.GetSystemPosition());        //문서파일 내부 검사유형 (0 : 문서 검사 않함. / 1 : 모듈검사 & OLE객체 마임리스트검사 / 2 : 모듈검사 & 위변조 체크 / 3 : 모듈검사 & OLE마임리스트검사 & 위변조체크 )
+        if (string.IsNullOrEmpty(strDocumentExtractType))   //ENV테이블에 해당 항목 없으면 검사X
+            return 0;
 
-        //TODO - OLE 내부 파일들에 대한 Filter 항목 확인 필요 (OLE에 대한 별도 정책 필요)
+        bool bOLECheckMimeType = sgLoginData.GetOLECheckMimeFilterType(sgLoginData.GetSystemPosition());                 //OLE 개체 검사 시 MIME LIST의 블랙/화이트 여부 (true: White)
+
         bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
         string strFileExtInfo = sgLoginData.GetFileFilter();
-        bool bDocumentWhite = sgLoginData.GetDocumentFileFilterType();              // true : white , false : black
-        string strDocumentFileExtInfo = sgLoginData.GetDocumentFileFilter();
-
-        string strDocumentExtractType = sgLoginData.GetDocumentExtractType(sgLoginData.GetSystemPosition());        //문서파일 내부 검사유형 ( 1 : OLE개체형식의 검출파일 검사 / 2 : 압축형식의 첨부파일검사 / 3 : 압축형식&OLE개체형식 모두 검사
-        if (string.IsNullOrEmpty(strDocumentExtractType))
-            return 0;
-
-        //int docExtractType = 0;
-        //int.TryParse(strDocumentExtractType, out docExtractType);
-
-        bool bOLECheckMimeType = sgLoginData.GetOLECheckMimeType();                 //OLE 개체 검사 시 MIME LIST의 블랙/화이트 여부 (true: White)
-
-        if (strFileExtInfo.Equals("") || strFileExtInfo.Equals(";"))
-        {
-            CLog.Here().Information($"No check OLE for EMPTY FILEFILTER(;)");
-            return 0;
-        }
 
         //bool bDenyPasswordZIP = SGAppMgrSvc.AppConfigInfoService.GetDenyPasswordZIP();
-        if (await fileAddManager.CheckDocumentFile(hsStream, currentFile, strDocumentExtractType, bOLECheckMimeType, bWhite, strFileExtInfo, bDocumentWhite, strDocumentFileExtInfo) != 0)
+        if (await fileAddManager.CheckDocumentFile(hsStream, currentFile, strDocumentExtractType, bOLECheckMimeType, bWhite, strFileExtInfo) != 0)
             return -1;
 
         return 0;

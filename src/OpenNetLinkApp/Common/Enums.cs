@@ -75,8 +75,16 @@ namespace OpenNetLinkApp.Common
         public enum DocumentExtractType
         {
             NONE = 0,
+            /// <summary>
+            /// OLE 개체 마임리스트 검사
+            /// </summary>
             OLEOBJECT_EXTRACT = 1,
-            COMPRESS_EXTRACT = 2,
+
+            /// <summary>
+            /// OLE 개체 위변조 검사
+            /// </summary>
+            OLEOBJECT_EXTEXCHANGE_EXTRACT=2,
+            //COMPRESS_EXTRACT = 2,
             
             
         }
