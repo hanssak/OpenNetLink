@@ -1498,17 +1498,31 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return strRet;
 		}
 
-
         /// <summary>
-        /// 서버로부터 수신받은 문서파일 내부 검사유형 정보를 반환한다.
-        /// <para>1 : OLE개체형식의 검출파일 검사</para>
-        /// <para>2 : 압축형식의 첨부파일검사</para>
-        /// <para>3 : OLE개체형식과 압축형식 모두 검사</para>
+        /// 서버 ENV테이블에 설정된 문서파일 내부 검사유형 정보를 반환한다. (서버ENV 테이블에서 GET)
+        /// <br>0 : 문서 검사 안함.</br>
+        /// <br>1 : 모듈검사 AND OLE객체 마임리스트검사.</br>
+        /// <br>2 : 모듈검사 AND  위변조 체크</br>
+        /// <br>3 : 모듈검사 AND OLE마임리스트검사 AND 위변조체크</br>
         /// </summary>
         /// <param name="bSystem"></param>
         /// <returns></returns>
         public string GetDocumentExtractType(bool bSystem)
             => (bSystem) ? GetTagData("I_CLIENT_DOCUMENT_EXTRACT_TYPE") : GetTagData("E_CLIENT_DOCUMENT_EXTRACT_TYPE");
+
+
+        /// <summary>
+        /// OLE 개체 검사 시 OLE MIME LIST의 블랙/화이트 여부 (서버ENV 테이블에서 GET)
+        /// </summary>
+        /// <returns>
+        /// <para>true : White List로 관리</para>
+        /// <para>false : Black List로 관리 (Default)</para>
+        /// </returns>
+        public bool GetOLECheckMimeFilterType(bool bSystem)
+        {
+            string strData= (bSystem) ? GetTagData("I_CLIENT_DOCUMENT_MIME_FILTER_TYPE") : GetTagData("E_CLIENT_DOCUMENT_MIME_FILTER_TYPE");          
+            return (strData.Equals("W"));
+        }
 
         /// <summary>
         /// value 값을 암호화해서 sgData에 저장
@@ -1615,46 +1629,34 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return nValue;
         }
 
-        /// <summary>
-        /// OLE 개체 검사 시 MIME LIST의 블랙/화이트 여부
-        /// </summary>
-        /// <returns>
-        /// <para>true:White List로 관리</para>
-        /// <para>false:Black List로 관리</para>
-        /// </returns>
-        public bool GetOLECheckMimeType()
-        {
-            string strData = GetTagData("OLECHECKMIMETYPE");
-            return (strData.Equals("W"));
-        }
 
-        /// <summary>
-        /// 문서형식 검사 시 참고할 확장자 타입
-        /// <para>DOCUMENTFILEFILTERTYPE</para>
-        /// </summary>
-        /// <returns></returns>
-        public bool GetDocumentFileFilterType()
-        {
-            string strData = GetTagData("DOCUMENTFILEFILTERTYPE");
-            if (strData.Equals("W"))
-                return true;
-            else
-                return false;
-        }
+        ///// <summary>
+        ///// 문서형식 검사 시 참고할 확장자 타입
+        ///// <para>DOCUMENTFILEFILTERTYPE</para>
+        ///// </summary>
+        ///// <returns></returns>
+        //public bool GetDocumentFileFilterType()
+        //{
+        //    string strData = GetTagData("DOCUMENTFILEFILTERTYPE");
+        //    if (strData.Equals("W"))
+        //        return true;
+        //    else
+        //        return false;
+        //}
 
-        /// <summary>
-        /// 문서형식 검사 시 참고할 확장자명
-        /// <para>DOCUMENTFILEFILTER</para>
-        /// </summary>
-        /// <returns></returns>
-        public string GetDocumentFileFilter()
-        {
-            string strData = GetTagData("DOCUMENTFILEFILTER");
-            if ((strData.Equals("") == true) || (strData.Equals("HS_ALL_FILE") == true))
-                return ";";
+        ///// <summary>
+        ///// 문서형식 검사 시 참고할 확장자명
+        ///// <para>DOCUMENTFILEFILTER</para>
+        ///// </summary>
+        ///// <returns></returns>
+        //public string GetDocumentFileFilter()
+        //{
+        //    string strData = GetTagData("DOCUMENTFILEFILTER");
+        //    if ((strData.Equals("") == true) || (strData.Equals("HS_ALL_FILE") == true))
+        //        return ";";
 
-            return strData;
-        }
+        //    return strData;
+        //}
 
         /// <summary>
         /// 3망 정책값을 받아서 상세하게 설정

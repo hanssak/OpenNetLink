@@ -621,8 +621,17 @@
             if (sgLoginData == null)
                 return;
 
-            if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID))
+            if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID) && isFilesNeedApprove())
             {
+
+                refApproveExtApproverSelect_PopUp.FileList = dropFile.GetHsStreamList();
+
+                // 파일목록이 있는 화면을 갱신해줘야 UI상에 나타남
+                refApproveExtApproverSelect_PopUp.Refresh();
+
+                // 파일송신 버튼, 실행
+                refApproveExtApproverSelect_PopUp.SetFileTransWithApproveEvent(FileTransWithApprover);
+
                 await refApproveExtApproverSelect_PopUp.openPopUp();
             }
             else
@@ -695,7 +704,8 @@
                 }
 
             }
-            else if (bApprEdit && (ApprLineCount > 0))
+
+            else if (ApprLineCount > 0)      //
             {
                 string strApprLineUserSeq = "";
                 string strApprLineDeptSeq = "";
@@ -713,13 +723,19 @@
                     //웹매니저에 등록된 최초 결재라인은 유효성 검증에서 제외
                     //if (!strApprLineDeptSeq.Equals("-"))
                     //if (strApprLineDeptSeq.Length == 18)    // Dept - seq 일때에만 검색함.
-                    if (CsSeqFunc.isDeptSeq(strApprLineDeptSeq))
+
+                    @*if (CsSeqFunc.isDeptSeq(strApprLineDeptSeq))
                     {
                         SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
                         cntSendQuery++;
-                    }
+                    }*@
+
+                    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
+                    SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "");
+                    cntSendQuery++;
                 }
             }
+
         }
 
         if (cntSendQuery == 0)
@@ -755,7 +771,13 @@
             cntSendQuery = 0;
             cntRecvQuery = 0;
 
-            string strMsg = XmlConf.GetInfoMsg("I_0220");
+            bool bApprEdit = false;
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+            if (sgLoginData != null)
+                bApprEdit = sgLoginData.GetApproveAppend();                             //결제자 편집 사용 여부
+
+            string strMsg = XmlConf.GetInfoMsg(bApprEdit?"I_0220":"I_0233");
             //HsLog.info($"결재자 부서정보가 변경되었습니다. (결재자명={strApprLineName})");
             ShowMessage("warn", strMsg);
             return;
@@ -1024,7 +1046,7 @@
 
 
     /// <summary>
-    ///
+    /// 첨부된 파일들 중에 결재가 필요한 파일이 하나라도 있는지 유무
     /// </summary>
     /// <returns></returns>
     public bool isFilesNeedApprove()
@@ -1080,6 +1102,11 @@
         return false;
     }
 
+
+    /// <summary>
+    /// 사후결재 체크후 파일 전송 진행
+    /// </summary>
+    /// <returns></returns>
     private async Task CheckApproveAfterLimit()
     {
         int groupID = groupIDbyParam;
@@ -1760,6 +1787,24 @@
         JSRuntime.InvokeVoidAsync("loadJavaScript");
     }
 
+    public void LogoutClearFileList()
+    {
+        try
+        {
+            if (dropFile.HsStreamList != null && dropFile.HsStreamList.Count > 0)
+            {
+                dropFile.bAsyncData = false; // DropClear() 직접호출하기 위해
+                DropClear();
+                dropFile.RemoveAllFile();
+                CLog.Here().Information($"dropFile.DataClear - !");
+            }
+        }
+        catch (Exception err)
+        {
+            // error
+            CLog.Here().Error($"dropFile.DataClear - error:{err.Source} - Msg : {err.Message}");
+        }
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -1874,6 +1919,9 @@
                     }
                 }
             }
+
+            pageService.SetLogOutFileListClearEvent(groupID, LogoutClearFileList);
+
             StateHasChanged();
         }
 

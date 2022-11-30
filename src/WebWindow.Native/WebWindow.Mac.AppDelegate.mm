@@ -2,8 +2,12 @@
 #import "DDHotKeyUtilities.h"
 #import <Carbon/Carbon.h>
 #import <FinderSync/FinderSync.h>
+#import "Tray.h"
+
+
 
 @implementation MyApplicationDelegate : NSObject
+
 - (id)init {
     if (self = [super init]) {
         // allocate and initialize window and stuff here ..
@@ -41,23 +45,27 @@
 }
 
 - (BOOL)windowShouldClose:(NSWindow *)sender {
-    NSString *strSocket = @"/var/tmp/testd.sock";
-     
-    NSFileManager *FileManager;
-    FileManager = [NSFileManager defaultManager];
-    if ([FileManager fileExistsAtPath:strSocket] == YES) {
-        [FileManager removeFileAtPath:strSocket handler:nil];
-        NSLog(@"delete file %@", strSocket);
-    }
 
-    NSLog(@"windowShouldClose....");
-	if (_bTrayUse == false)
+    NSLog(@"windowShouldClose....g_bDoExit2TrayUse(1):%s", (g_bDoExit2TrayUse?"Yes":"No"));
+	if (g_bDoExit2TrayUse == false)
 	{
+        NSString *strSocket = @"/var/tmp/testd.sock";
+        NSFileManager *FileManager;
+
+        FileManager = [NSFileManager defaultManager];
+        if ([FileManager fileExistsAtPath:strSocket] == YES) {
+            [FileManager removeFileAtPath:strSocket handler:nil];
+            NSLog(@"delete file %@", strSocket);
+        }
+
+        tray_exit();
+        
    		((WebWindow *)SelfThis)->ProgramExit();
+        
         return true;
 	}
 	else
-	{
+	{   
    		((WebWindow *)SelfThis)->MoveWebWindowToTray();
         return false;
 	}
@@ -98,9 +106,17 @@
 - (void) hotkeyClipBoardWithEvent:(NSEvent *)hkEvent object:(id)anObject
 {
     NSNumber *nsNumbGuId = (NSNumber *)anObject;
+    
+
+    //NSLog(@"gCopyAndSend Value : %d", gCopyAndSend);
+    if(gCopyAndSend == 1)
+    {
+       NSLog(@"Command + C Press!");
+       [self hotkeyGenerate:'c' alt:false control:false shift:false win:true];
+        usleep(1000000);
+    }
 
     NSLog(@"Global HotKey Event Callback!, GUID:%d", [nsNumbGuId intValue]);
-
     dispatch_async(dispatch_get_main_queue(), ^{
         NSPasteboard *pasteBoard = NSPasteboard.generalPasteboard;
         NSArray *array = [pasteBoard readObjectsForClasses:@[[NSImage class], [NSString class]] options:nil];
@@ -159,6 +175,16 @@
 {
     NSLog(@"Global HotKey Event Quit Callback!");
     ((WebWindow*)(SelfThis))->ProgramExit();
+}
+
+- (void) SetCopyAndSend:(bool)value
+{
+    if(value)
+        gCopyAndSend = 1;
+    else
+        gCopyAndSend = 0;
+
+    //NSLog(@"gCopyAndSend Value Change : %d", gCopyAndSend);
 }
 
 - (void) hotkeyGenerate:(char)chVKCode alt:(bool)bAlt control:(bool)bControl shift:(bool)bShift win:(bool)bWin

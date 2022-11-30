@@ -345,11 +345,12 @@ Task("PubDebian")
     DotNetCorePublish("./PreviewUtil", settings);
     DotNetCorePublish("./ContextTransferClient", settings);
 
-   using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe"))
+	// 필요할때에 추가로 개발예정
+    /*using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe"))
              {
 		process.WaitForExit();
 		Information("Package linux: Exit code: {0}", process.GetExitCode());
-	}
+	}*/
 });
 
 Task("PkgDebian")

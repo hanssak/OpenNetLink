@@ -464,7 +464,6 @@
                             string strPW = "";
                             sgRSACrypto.ValueDecrypt(strEncID, out strID);
                             id = strID;
-
                             // Logout 으로 인해 온 상황에서는 PW를 표시하지 않고, 로그인도하지 않음.
                             if (srcLoc != "Logout")
                             {
@@ -686,6 +685,35 @@
         }
     }
 
+    /// <summary>
+    /// 수신 다운로드 설정
+    /// </summary>
+    /// <param name="groupID">그룹ID</param>
+    /// <param name="strPath">다운경로</param>
+    public void SetUserIDRecvDownLoad(int groupID)
+    {
+        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        string strPath = AppConfigSvc.GetRecvDownPath(groupID);
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID))
+        {
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+
+            // ISGCtrlSideUIService CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
+
+            if (sgLoginData != null)
+            {
+                //공영홈쇼핑에서 MAC/Window 모두 ID 적용요청하여 사용
+                string strAddFolder = "";
+                strAddFolder = sgLoginData.GetUserID();
+
+                strPath = Path.Combine(strPath, strAddFolder);
+                HSCmdCenter.SetDownLoadPath(groupID, strPath);
+                HSCmdCenter.SetBaseDownLoadPath(groupID, strPath);
+                //CtrlSideUISvc.SetRecvDownPath(groupID, strPath);
+            }
+        }
+    }
 
     /// <summary>
     /// 로그인 완료후 호출(한번에 다중망 로그인 가능하도록 수정됨)
@@ -729,6 +757,9 @@
                 }
                 sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
+                HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));
+                SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
+
                 // 3중망 정보 적용
                 dicSysIdName = new Dictionary<string, SGNetOverData>();
 
@@ -758,6 +789,7 @@
                     strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
                     strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
                     strGetinfoTagName += ", 'CLIENT_DOCUMENT_EXTRACT_TYPE'";
+                    strGetinfoTagName += ", 'CLIENT_DOCUMENT_MIME_FILTER_TYPE'";
 
                     string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
                     HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
@@ -884,6 +916,17 @@
                     if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
                         Window.UseClipFirstSendType(groupId);
 
+                    // 자동전송기능 위해
+                    if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend())
+                    {
+                        Window.SetNativeClipboardHotKey(groupId, 
+                            listModKey[(int)HOTKEY_MOD.ALT],
+                            listModKey[(int)HOTKEY_MOD.CTRL],
+                            listModKey[(int)HOTKEY_MOD.SHIFT],
+                            listModKey[(int)HOTKEY_MOD.WINDOW],
+                            chVKey,0);
+                    }
+
                 } // if (bUseClipBoard)
 
                 DateTime dt = (SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now :sgLoginData.GetSvrTimeConvert();
@@ -892,7 +935,7 @@
                 bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
                 pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
                 pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
-                   bool bAfterCheck = false;
+                bool bAfterCheck = false;
                 if (!bAfterApprEnable)
                     bAfterCheck = false;
                 else
@@ -1151,7 +1194,7 @@
                 CLog.Here().Information($"1 to ALL Login, GroupID : {groupId}, LoginResult Add After(#####) - Current / Total : {dicLoginResult.Count} / {NetWorkSvc.NetWorkInfo.Count} ");
 
                 foreach(var item in dicLoginResult)
-                { 
+                {
                     CLog.Here().Information($"1 to ALL Login, Item Identify(#####) -  GroupID : {item.Key}, LoginResult : {item.Value}");
                 }
 
@@ -1314,6 +1357,7 @@
             // Clipboard 단축키 및 HeaderUI에서 바로 클립보드를 전송할 수 있으므로 사후결재 관련 현재상태값을 로그인후 바로 저장
             SaveAfterApproveCheckBoxStatus(nGroupIDfirst);
 
+            await JSRuntime.InvokeAsync<object>("closeAllPopup");
             //if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
             MyNavigationManager.NavigateTo(strNavigatePathnGroupID);
 
@@ -1731,6 +1775,7 @@
             // Clipboard 단축키 및 HeaderUI에서 바로 클립보드를 전송할 수 있으므로 사후결재 관련 현재상태값을 로그인후 바로 저장
             SaveAfterApproveCheckBoxStatus(groupId);
 
+            await JSRuntime.InvokeAsync<object>("closeAllPopup");
             //if (SGAppMgrSvc.OpConfigInfoService.() == false)
             MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 

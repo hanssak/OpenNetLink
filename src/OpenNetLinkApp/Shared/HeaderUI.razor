@@ -89,7 +89,6 @@
 
         GetIpV4Str();
         SetPlatFormInfo();
-        SGAppUpdaterSvc.Init(AppConfigSvc.GetUpdateSvcIP(), VersionConfigSvc.GetUpdatePlatform());
 
         HeaderUISvc.OnChangeHeader += StateHasChanged;
         /* For: Change Header UI State to be rendered according to Sidebar action */
@@ -1097,44 +1096,44 @@
 
 if (e.strUrlData != null && e.strUrlData.Length > 0)
 {
-    string strProcessName = "";
-    int nIdx = 0;
-   for(; nIdx < 2 ; nIdx++)
-    {
-   try
-  {
-  // Linux OS Type 별로
-  if (nIdx == 0)
-  strProcessName = "x-www-browser";
-   else if (nIdx == 1)
-  strProcessName = "xdg-open";
+string strProcessName = "";
+int nIdx = 0;
+for(; nIdx < 2 ; nIdx++)
+{
+try
+{
+// Linux OS Type 별로
+if (nIdx == 0)
+strProcessName = "x-www-browser";
+else if (nIdx == 1)
+strProcessName = "xdg-open";
 
-   System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
-   break;
- }
-   catch (Exception ex)
-   {
-    CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
-    groupid, strProcessName, e.strUrlData, ex.Message);
-    }
- }
+System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
+break;
+}
+catch (Exception ex)
+{
+CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
+groupid, strProcessName, e.strUrlData, ex.Message);
+}
+}
 }
 else
 {
-  CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
+CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
 }
 
 #elif _MACOSX
 
 try
 {
-  if (e.strUrlData != null && e.strUrlData.Length > 0) {
-   System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
-   }
+if (e.strUrlData != null && e.strUrlData.Length > 0) {
+System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
+}
 }
 catch (Exception ex)
 {
- CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
 }
 
 #else
@@ -2144,11 +2143,11 @@ catch (Exception ex)
             stApprLineSeq = "";
 
         // 클립보드 파일전송의 사후결재 설정
-        if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove() == 0)             // checkBox 설정따라 - 사용자선택따라(작업진행중...미완료상태)
+        if (siteConfig.GetClipUseAfterApprove() == 0)             // checkBox 설정따라 - 사용자선택따라(작업진행중...미완료상태)
             bAfterApprove = pageService.GetAfterApproveCheck(groupID);
-        else if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove() == 1)        // 사전
+        else if (siteConfig.GetClipUseAfterApprove() == 1)        // 사전
             bAfterApprove = false;
-        else if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove() == 2)        // 사후
+        else if (siteConfig.GetClipUseAfterApprove() == 2)        // 사후
             bAfterApprove = true;
         else
             bAfterApprove = pageService.GetAfterApproveCheck(groupID);
@@ -2933,10 +2932,11 @@ catch (Exception ex)
         pageService.SetLogoutStatus(groupID, true);
         HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
 
-        @*        HsNetWork hsNetWork = null;
-            hsNetWork = HsCmdCenter.GetConnectNetWork(groupID);
-            if (hsNetWork != null)
-        *@
+        // 추가된 파일리스트 제거하는 동작
+        LogOutFileListClearEvent LogOutFileListClearEvent = null;
+        LogOutFileListClearEvent = pageService.GetLogOutFileListClearEvent(groupID);
+        if (LogOutFileListClearEvent != null)
+            LogOutFileListClearEvent();
 
         CLog.Here().Information($"groupID : {groupID} - Logout CMD Recv from Server, UrlRedirection LogOut State ReSet !!!");
         HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);
@@ -3148,15 +3148,6 @@ catch (Exception ex)
 
         CLog.Here().Information("RMHeaderNoti : {0}", groupID);
 
-        // 우클릭 목록파일 확인
-        @*        string strRMouseFilePath = PageStatusData.GetRMFIlePath();
-            if (GetGroupIDfromRList(strRMouseFilePath, ref groupID) == false)
-            {
-            CLog.Here().Information("RMHeaderNoti-Get Real-GroupID Failed");
-            return;
-            }
-            CLog.Here().Information("RMHeaderNoti-Real-GroupID : {0}", groupID);*@
-
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
@@ -3181,53 +3172,28 @@ catch (Exception ex)
             KeyboardEventArgs eventArgs = new KeyboardEventArgs();
             eventArgs.Key = "Enter";
 
-            ChangeActiveMenuWrap(eventArgs, activeMenu);
+            //우클릭시 현재 엑티브된 화면 체크 Transfer 일 경우 이동하지 않고 파일 추가 이벤트만발생
+            //현재 페이지가 파일전송페이지가 아닐경우 페이지 이동 - Transfer 페이지에서 파일이 로드되면 우클릭해서 첨부되어야할 파일이 있으면 첨부
+            //필요없는 코드 전부 삭제...
+            //파일추가시 확장자 제한 안보이는 문제 해결
 
-            // activeMenu.Path
-            CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}");
-
-
-            AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
-            if (addFileRM_Event != null)
+            if (!activeMenu.Actived)
             {
-                addFileRM_Event(groupID, e);
-
-                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, Add Processed!");
-            }
-
-
-            // 다른화면에서 우클릭 이벤트 발생 시 RClickFileTrans로 이동 - 파일전송 도잉ㄹ GroupID 일때에만 화면이동없음
-            string strWithGroupID = "/" + groupID.ToString();
-            if (MyNavigationManager.Uri.Contains("/Transfer", StringComparison.OrdinalIgnoreCase) &&
-                MyNavigationManager.Uri.Contains(strWithGroupID, StringComparison.OrdinalIgnoreCase))
-            {
-                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, {MyNavigationManager.Uri} Contain '/Transfer' ");
+                ChangeActiveMenuWrap(eventArgs, activeMenu);
+                MyNavigationManager.NavigateTo(activeMenu.Path);
+                Thread.Sleep(1000);
             }
             else
             {
-                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, Uri : {MyNavigationManager.Uri}");
-                MyNavigationManager.NavigateTo("/RCLickFileMid/" + groupID.ToString());  // activeMenu.Path
-            }
-
-            // groupID에 따라서 다른 Page 부름 - 첨부까지는 됨.
-            @*if (groupID== 0)
-                MyNavigationManager.NavigateTo("/Transfer/0");
-                else
-                MyNavigationManager.NavigateTo("/Transfer2/1");*@
-        }
-
-        //string strCurFileSendInfo = pageService.GetCurFileSendInfo(groupID);
-        //MyNavigationManager.NavigateTo(strCurFileSendInfo);
-
-        //아래 주석 내용 2189라인으로 이동 => 하단에서 우클릭 GetAddFile이벤트를 받다 보니 화면이 이동 된 후 파일리스트를 못보여줌
-        /*
-                Task.Delay(1000);
                 AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
                 if (addFileRM_Event != null)
                 {
                     addFileRM_Event(groupID, e);
+
+                    CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, Add Processed!");
                 }
-        */
+            }
+        }
     }
 
     public void SetPlatFormInfo()

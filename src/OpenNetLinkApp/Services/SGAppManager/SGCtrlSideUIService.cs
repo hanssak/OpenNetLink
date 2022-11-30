@@ -15,6 +15,8 @@ using OpenNetLinkApp.Services.SGAppManager;
 using Serilog;
 using Serilog.Events;
 using AgLogManager;
+using System.Runtime.InteropServices;
+using OpenNetLinkApp.Common;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -51,7 +53,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetAfterBasicChk(bool afterBasicChk);
         void SetRecvDownPath(int groupId, string recvDownPath);
         void SetFileRecvFolderOpen(bool fileRecvFolderOpen);
-        void SetRecvDownPathChange(bool recvDownPathChange);
         void SetManualRecvDownChange(bool manualRecvDownChange);
         void SetFileRecvTrayFix(bool fileRecvTrayFix);
         void SetApprTrayFix(bool apprTrayFix);
@@ -361,12 +362,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
-        public void SetRecvDownPathChange(bool recvDownPathChange)
-        {
-            (OpConfigInfo as SGopConfig).bRecvDownPathChange = recvDownPathChange;
-            SaveOpConfigSerialize();
-            NotifyStateChangedCtrlSide();
-        }
         public void SetManualRecvDownChange(bool manualRecvDownChange)
         {
             (OpConfigInfo as SGopConfig).bManualRecvDownChange = manualRecvDownChange;
@@ -409,10 +404,42 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
+
+
+        public void GetStartProgramReg()
+        {
+
+        }
+
+        /// <summary>
+        /// Booting때 실행되도록 등록<br></br>
+        /// startProgramReg : true(등록), false(삭제)
+        /// </summary>
+        /// <param name="startProgramReg"></param>
         public void SetStartProgramReg(bool startProgramReg)
         {
-            (OpConfigInfo as SGopConfig).bStartProgramReg = startProgramReg;
-            SaveOpConfigSerialize();
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                string strAgentPath = CsSystemFunc.GetCurrentProcessName();
+                CsSystemFunc.makeAgentBootStartOSwindow(startProgramReg, false, strAgentPath, "OpenNetLink.lnk"); // startProgramReg
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                
+            }
+            else
+            {
+                Log.Information($"makeAgentBootStart - UnSupported OS Type - OSDescription : {RuntimeInformation.OSDescription}, OSArchitecture : {RuntimeInformation.OSArchitecture}");
+            }
+
+            // 일단 설정값을 운영하는 방식으로 적용
+            (AppConfigInfo as SGAppConfig).bStartProgramReg = startProgramReg;
+            SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetLanguage(string language)

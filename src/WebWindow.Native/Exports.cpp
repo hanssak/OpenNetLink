@@ -202,6 +202,18 @@ extern "C"
 	{
 		instance->SetTrayUse(useTray);
 	}
+	EXPORTED void WebWindow_SetTrayStartUse(WebWindow* instance, bool useTrayStart)
+	{
+		instance->SetTrayStartUse(useTrayStart);
+	}
+	EXPORTED void WebWindow_SetUseClipCopyNsend(WebWindow* instance, bool bUse)
+	{
+		instance->SetUseClipCopyNsend(bUse);
+	}
+	EXPORTED void WebWindow_SetNativeClipboardHotKey(WebWindow* instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+	{
+		instance->SetNativeClipboardHotKey(groupID, bAlt, bControl, bShift, bWin, chVKCode, nIdx);
+	}
 	EXPORTED bool WebWindow_GetTrayUse(WebWindow* instance)
 	{
 		return instance->GetTrayUse();

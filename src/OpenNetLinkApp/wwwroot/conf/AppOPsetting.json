@@ -11,7 +11,7 @@
 
   "bUseMainPageType": true,
 
-  "bUseStartProgramReg": false,
+  "bUseStartProgramReg": true,
 
   "bManualDownFolderChange": false,
   "bManualRecvDownChange": false,
@@ -23,14 +23,16 @@
   "bAfterBasicChk": true,
 
   "bFileRecvAlarmRetain": false,
-  "bFileRecvTrayFix": false,
-  "bApprCompleteAlarmRetain": true,
-  "bUserApprActionTrayFix": false,
-  "bApprRejectAlarmRetain": true,
-  "bUserApprRejectTrayFix": false,
-  "bApprCountAlarmRetain": true,
-  "bApprTrayFix": false,
+  "bApprCountAlarmRetain": false,
+  "bApprCompleteAlarmRetain": false,
+  "bApprRejectAlarmRetain": false,
   "bUseApprCountAlaram": false,
+  
+  "bFileRecvTrayFix": false,
+  "bUserApprActionTrayFix": false,
+  "bUserApprRejectTrayFix": false,
+
+  "bApprTrayFix": true,
   "bUseApprWaitNoti": true,
 
 
@@ -39,9 +41,6 @@
   "bAutoLoginCheck": true,
   "bUserPWChange": false,
 
-
-  "bDeputyApprTerminateDel": false,
-  "bDlpInfoDisplay": false,
   "bEmptyfileTrans": true,
 
   "strInitPasswd": "o0mqmxYAyFmC1FDg72829w==",
@@ -54,8 +53,8 @@
     false
   ],
   "strURLAutoAfterBrowser": [
-    "N",
-    "N",
+    "F",
+    "F",
     "F"
   ],
   "bURLAutoAfterMsg": [
@@ -64,16 +63,15 @@
     true
   ],
   "strForwardUrl": [
-    "http:\/\/naver.com",
-    "http:\/\/daum.net",
-    "http:\/\/daum.net"
+    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
+    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
+    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html"
   ],
 
   "bUseClipBoardFileTrans": true,
 
   "enMainPageType": 0,
   "bNoApproveManageUI": false,
-  "bRecvDownPathChange": true,
   "bStartProgramReg": true,
   "bTitleDescSameChk": false,
 
@@ -86,15 +84,14 @@
   ],
   "bClipBoardNoApproveButFileTrans": true,
   "bUseDenyPasswordZip": true,
-  "bRecvFolderChange": false,
-  "bURLListPolicyRecv": false,
+  "bRecvFolderChange": true,
   "bUseCertSend": false,
   "bUseEmail": false,
   "bUseForceUpdate": true,
   "bUsePCURL": false,
   "bUsePublicBoard": false,
   "bUseUserRecvDownPath": false,
-  "bUseUserSelectFirstServer": true,
+  "bUseUserSelectFirstServer": false,
   "bViewDlpApproverSelectMyDept": false,
   "bViewFileFilter": true,
   "bViewSGHeaderUIAlarmNoriAllDel": true,
@@ -105,8 +102,6 @@
   "bApprDeptSearch": true,
   "bApprLineChkBlock": false,
   "bApprLineLocalSave": true,
-
-  "nApprStepLimit": 0,
 
   "bUseClipAlarmType": true,
   "bUseClipCopyAndSend": false,

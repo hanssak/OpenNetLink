@@ -484,6 +484,26 @@ namespace OpenNetLinkApp.Services
             PageStatusData.SAfterApprControlCheckEvent = afterApprControlCheck;
         }
 
+        public void SetLogOutFileListClearEvent(int groupID, LogOutFileListClearEvent Event)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetLogoutFileListClearEvent(Event);            
+        }
+        public LogOutFileListClearEvent GetLogOutFileListClearEvent(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return null;
+            }
+            return m_DicPageStatusData[groupID].GetLogoutFileListClearEvent();
+        }
+
+
         public void SetDayFileAndClipMax(int groupID, Int64 fileMaxSize, int fileMaxCount, Int64 clipMaxSize, int clipMaxCount)
         {
             PageStatusData tmpData = null;

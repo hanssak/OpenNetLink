@@ -1,5 +1,6 @@
 #include "Tray.h"
 #include "NativeLog.h"
+#include "WebWindow.h"
 
 #if TRAY_APPINDICATOR
 GtkWidget* _g_window = nullptr;
@@ -21,9 +22,9 @@ static struct tray tray = {
     .icon 		= (char *)TRAY_ICON1,
     .dark_icon	= (char *)TRAY_ICON3,
     .menu 		= (struct tray_menu[]) {
-          		  {.text = (char *)"About",   .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb,	.context = NULL, .submenu = NULL},
-          		  {.text = (char *)"-",       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, 		.context = NULL, .submenu = NULL},
-          		  {.text = (char *)"Hide",    .disabled = 0, .checked = 0, .usedCheck = 0, .cb = toggle_show, .context = NULL, .submenu = NULL},
+          		  //{.text = (char *)"About",   .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb,	.context = NULL, .submenu = NULL},
+          		  //{.text = (char *)"-",       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, 		.context = NULL, .submenu = NULL},
+          		  {.text = (char *)"Show",    .disabled = 0, .checked = 1, .usedCheck = 0, .cb = toggle_show, .context = NULL, .submenu = NULL},
           		  {.text = (char *)"-",       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL,		.context = NULL, .submenu = NULL},
           		  {.text = (char *)"Quit",    .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb,		.context = NULL, .submenu = NULL},
           		  {.text = NULL,              .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL,		.context = NULL, .submenu = NULL}
@@ -48,6 +49,7 @@ static void toggle_show(struct tray_menu *item) {
 	else if(item->checked) {
 		NTLog(SelfThis, Info, "Called : OpenNetLink Show (value: %s)", item->text);
 		item->text = (char*)"Hide";
+		g_bStartTray = false;
 #if TRAY_APPINDICATOR
 		gtk_widget_show_all(_g_window);
 #elif TRAY_APPKIT
@@ -68,6 +70,8 @@ static void toggle_show_force(struct tray_menu* item, bool bShow)
 	if (bShow){
 		NTLog(SelfThis, Info, "Called : OpenNetLink Show (value: %s)", item->text);
 		item->text = (char*)"Hide";
+		g_bStartTray = false;
+
 #if TRAY_APPINDICATOR
 		gtk_widget_show_all(_g_window);
 #elif TRAY_APPKIT

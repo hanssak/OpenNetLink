@@ -13,6 +13,12 @@
 #include <iomanip>
 #include <vector>
 #include <iconv.h>
+#include <map>
+
+
+#include <X11/keysym.h> //xproto-devel
+#include <X11/keysymdef.h>
+#include <X11/extensions/XTest.h>
 
 void *SelfThis = nullptr;
 
@@ -22,7 +28,12 @@ void *SelfThis = nullptr;
 #include "TextEncDetect.h"
 using namespace AutoIt::Common;
 
-bool _bTrayUse = false;
+bool g_bDoExit2TrayUse = false;
+bool g_bStartTray = true;
+bool g_bClipCopyNsend = false;
+
+std::map<int, std::wstring> mapHotKey;
+
 
 std::mutex invokeLockMutex;
 
@@ -132,7 +143,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 {
 	SelfThis = this;
 	_webMessageReceivedCallback = webMessageReceivedCallback;
-	_bTrayUse = false;
+	g_bDoExit2TrayUse = false;
 
 	// It makes xlib thread safe.
 	// Needed for get_position.
@@ -192,7 +203,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 
 gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self)
 {
-	if (_bTrayUse == false)
+	if (g_bDoExit2TrayUse == false)
 	{
 		NTLog(self, Info, "Called : OpenNetLink Exit");
 		tray_exit();
@@ -267,6 +278,7 @@ void WebWindow::Show()
 		webkit_user_content_manager_register_script_message_handler(contentManager, "webwindowinterop");
 	}
 
+	if (g_bStartTray == false)
 	gtk_widget_show_all(_window);
 
 	/* Enable the developer extras */
@@ -370,6 +382,28 @@ void WebWindow::SetTitle(AutoString title)
 	gtk_window_set_title(GTK_WINDOW(_window), title);
 }
 
+void WebWindow::SetTrayStartUse(bool bUseStartTray)
+{
+	g_bStartTray = bUseStartTray;
+	NTLog(this, Info, "Called : OpenNetLink SetTrayStartUse : %s", (AutoString)bUseStartTray ? "Yes" : "No");
+}
+
+void WebWindow::SetTrayUse(bool useTray)
+{
+    g_bDoExit2TrayUse = useTray;
+    NTLog(this, Info, "Called : SetTrayUse(@@@@@@@@@@) : %s", (AutoString)(g_bDoExit2TrayUse ? "Yes": "No") );
+}	
+
+void WebWindow::ClipTypeSelect(int groupID)
+{
+	
+}
+
+void WebWindow::ClipFirstSendTypeText(int groupID)
+{
+
+}
+
 void WebWindow::WaitForExit()
 {
 	//gtk_main();
@@ -380,6 +414,10 @@ void WebWindow::WaitForExit()
 		NTLog(this, Fatal, "Failed to Create Tray\n");
 		return ;
 	}
+
+	if (!g_bStartTray)
+		MoveTrayToWebWindow();
+
 	while (tray_loop(1) == 0)
 	{
 		// printf("iteration\n");
@@ -702,6 +740,9 @@ request_image_received_func (GtkClipboard     *clipboard,
 		GdkAtom target = gtk_selection_data_get_target (selection_data);
 		if (target == gdk_atom_intern_static_string ("image/png"))
 		{
+
+			NTLog(pstParm->self, Warning, "@@@@@@@@@@@@@ - request_image_received_func - image/png \n");
+
 			strcpy(pstParm->szExt, "jpeg");
 			gtk_clipboard_request_contents (clipboard,
 					gdk_atom_intern_static_string ("image/jpeg"),
@@ -710,6 +751,8 @@ request_image_received_func (GtkClipboard     *clipboard,
 		}
 		else if (target == gdk_atom_intern_static_string ("image/jpeg"))
 		{
+			NTLog(pstParm->self, Warning, "@@@@@@@@@@@@@ - request_image_received_func - image/jpeg \n");
+
 			strcpy(pstParm->szExt, "gif");
 			gtk_clipboard_request_contents (clipboard,
 					gdk_atom_intern_static_string ("image/gif"),
@@ -718,6 +761,8 @@ request_image_received_func (GtkClipboard     *clipboard,
 		}
 		else if (target == gdk_atom_intern_static_string ("image/gif"))
 		{
+			NTLog(pstParm->self, Warning, "@@@@@@@@@@@@@ - request_image_received_func - image/gif \n");
+
 			strcpy(pstParm->szExt, "bmp");
 			gtk_clipboard_request_contents (clipboard,
 					gdk_atom_intern_static_string ("image/bmp"),
@@ -839,6 +884,9 @@ request_rich_text_received_func (GtkClipboard     *clipboard,
 
 	// Data Transfer rich text
 	length = gtk_selection_data_get_length (selection_data);
+
+	NTLog(pstParm->self, Warning, "ClipBoard data(Native-End) To UI, Length : %d, Data : %s", length, result);
+
 	// do not needed free result
 	((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_TEXT, length, result, 0, NULL);
 }
@@ -875,6 +923,7 @@ void ClipBoardReceivedFunc(GtkClipboard *clipboard, GtkSelectionData *selection_
 	 * if we asked for compound_text and didn't get it, try string;
 	 * If we asked for anything else and didn't get it, give up.
 	 */
+
 	if (target == gdk_atom_intern_static_string ("UTF8_STRING"))
 	{
 		gtk_clipboard_request_contents (clipboard,
@@ -1048,6 +1097,9 @@ void TargetCallback(GtkClipboard *clipboard, GdkAtom *atoms, gint n_atoms, gpoin
 	}
 
 	for(i_for = 0; i_for < n_atoms; i_for++) {
+
+		//NTLog(pstParm->self, Info, "KKW - In targetCallback: Atom(%d. %s)\n", i_for, gdk_atom_name(atoms[i_for]));	// clipboard Type에 따른 data 볼대에 사용
+
 		if ((atoms[i_for] == gdk_atom_intern_static_string ("UTF8_STRING")) 
 			|| (atoms[i_for] == gdk_atom_intern_static_string ("COMPOUND_TEXT")) 
 			//|| (atoms[i_for] == gdk_atom_intern_static_string ("STRING")) 
@@ -1104,10 +1156,45 @@ void TargetCallback(GtkClipboard *clipboard, GdkAtom *atoms, gint n_atoms, gpoin
 		}
 		else continue;
 
-		NTLog(pstParm->self, Info, "In targetCallback: Atom(%d. %s)\n", i_for, gdk_atom_name(atoms[i_for]));
+		NTLog(pstParm->self, Info, "In targetCallback(Check Type): Atom(%d. %s)\n", i_for, gdk_atom_name(atoms[i_for]));
 		gtk_clipboard_request_contents (clipboard, atoms[i_for], ClipBoardReceivedFunc, data);
-	}
+
+	} // for(i_for = 0; i_for < n_atoms; i_for++) {
 }
+
+
+
+void AutoCopyClipBoard(int groupID)
+{
+
+ 	NTLog(SelfThis, Info, "AutoCopyClipBoard - Start - nGroupID : %d", groupID);
+
+	Display *dpy = NULL;
+	dpy = XOpenDisplay(NULL);
+
+	if (dpy == NULL)
+		return;
+
+	usleep(1);
+
+	KeyCode xk_c = XKeysymToKeycode(dpy, XK_C);
+	KeyCode xk_control = XKeysymToKeycode(dpy, XK_Control_L);
+
+	XTestFakeKeyEvent(dpy, xk_control, True, 0);
+	XTestFakeKeyEvent(dpy, xk_c, True, 0);
+	XTestFakeKeyEvent(dpy, xk_control, False, 0);
+	XTestFakeKeyEvent(dpy, xk_c, False, 0);
+
+	usleep(1*100);	
+
+	XFlush( dpy );
+	XSync(dpy, 0);
+	XCloseDisplay( dpy );
+
+	NTLog(SelfThis, Info, "AutoCopyClipBoard - End - nGroupID : %d", groupID);
+
+}
+
 
 void ClipBoardKeybinderHandler(const char *keystring, void *user_data)
 {
@@ -1115,11 +1202,17 @@ void ClipBoardKeybinderHandler(const char *keystring, void *user_data)
 	int nGroupId = pstParm->nGroupId;
 
 	NTLog(pstParm->self, Info, "Called ClipBoardKeybinderHandler, \" %s \" with GroupId(%d)", keystring, nGroupId);
+	if (g_bClipCopyNsend)
+	{
+		AutoCopyClipBoard(nGroupId);
+	}
+	
 	GdkDisplay *display = gdk_display_get_default();
-	GtkClipboard *clipboard =
-		gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD);
-		//gtk_clipboard_get_for_display(display, GDK_SELECTION_PRIMARY);
-		//gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+
+	//GtkClipboard *clipboard = gtk_clipboard_get_default(display);
+	GtkClipboard *clipboard = gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD); // GDK_SELECTION_CLIPBOARD : GDK_SELECTION_PRIMARY - kolourPaint 같은곳에 안먹힘
+	//gtk_clipboard_get_for_display(display, GDK_SELECTION_PRIMARY);
+	//gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
 	//gtk_clipboard_request_text(clipboard, ClipBoardHandler, NULL);
   	gtk_clipboard_request_targets (clipboard, TargetCallback, user_data);
 
@@ -1127,6 +1220,9 @@ void ClipBoardKeybinderHandler(const char *keystring, void *user_data)
 		NTLog(pstParm->self, Info, "Saved to ClipBoard Store, Supports clipboard persistence. \" %s \" with GroupId(%d)", keystring, nGroupId);
 		gtk_clipboard_store(clipboard);
 	}
+
+	NTLog(pstParm->self, Info, "ClipBoardKeybinderHandler, Ends - GroupId(%d)", nGroupId);
+
 }
 
 void WebWindow::RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
@@ -1292,7 +1388,7 @@ void WebWindow::ProgramExit()
 bool WebWindow::GetTrayUse()
 {
 	NTLog(this, Info, "Called : OpenNetLink Tray Status");
-	return _bTrayUse;
+	return g_bDoExit2TrayUse;
 }
 
 void WebWindow::MoveWebWindowToTray()
@@ -1350,12 +1446,16 @@ void WebWindow::RegisterStartProgram()
 		writeFile << "#!/usr/bin/env xdg-open\n";
 		writeFile << "\n";
 		writeFile << "[Desktop Entry]\n";
-		writeFile << "Name=SecureGate\n";
-		writeFile << "Comment=OpenNetLinkApp\n";
+		//writeFile << "Name=SecureGate\n";
+		writeFile << "Name=OpenNetLink\n";
+		writeFile << "Comment=SecureGate\n";
 		writeFile << "GenericName=File Transfer\n";
-		writeFile << "Exec=/bin/sh -c '$HOME/hanssak/OpenNetLinkApp/OpenNetLinkApp.sh'\n";
+		writeFile << "Exec=/opt/hanssak/opennetlink/OpenNetLinkApp.sh\n";
+		
+		//writeFile << "Exec=/bin/sh -c '$HOME/hanssak/OpenNetLinkApp/OpenNetLinkApp.sh'\n";
 		//writeFile << "Exec=/bin/sh -c '/data/CrossPlatformWork/OPEN/OpenNetLink/src/OpenNetLinkApp/bin/Debug/netcoreapp3.1/OpenNetLinkApp.sh'\n";
-		writeFile << "Icon=/usr/share/icons/SecureGate.ico\n";
+		//writeFile << "Icon=/usr/share/icons/SecureGate.ico\n";
+		writeFile << "Icon=/opt/hanssak/opennetlink/wwwroot/SecureGate.ico\n";
 		writeFile << "Type=Application\n";
 		writeFile << "Categories=Utility;\n";
 		writeFile << "Keywords=SecureGate;OpenNetLink;NetLink;\n";
@@ -1384,4 +1484,112 @@ void WebWindow::UnRegisterStartProgram()
 		//NTLog(this, Error, "Called : UnRegisterStartProgram, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
 		NTLog(this, Err, "Called : UnRegisterStartProgram, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
 }
+
+void WebWindow::SetUseClipCopyNsend(bool bUse)
+{
+	g_bClipCopyNsend = bUse;
+	NTLog(this, Info, "Called : SetUseClipCopyNsend(@@@@@@@@@@) : %s", (AutoString)(bUse ? "Yes" : "No"));
+}
+
+void FreeClipHotKey(int nGroupID)
+{
+	// Windows MSPaint
+	if (mapHotKey.find(nGroupID) == mapHotKey.end())
+	{
+		NTLog(SelfThis, Info, "FreeClipHotKey - nGroupID : %d, ClipHotKey Data Empty!", nGroupID);
+		return;
+	}
+
+	std::wstring strClipHotKey = mapHotKey[nGroupID];
+	if (strClipHotKey.size() >= 5)
+	{
+		std::wstring strWinKey = strClipHotKey.substr(0, 1);
+		std::wstring strCtrlKey = strClipHotKey.substr(1, 1);
+		std::wstring strAltKey = strClipHotKey.substr(2, 1);
+		std::wstring strShiftKey = strClipHotKey.substr(3, 1);
+		std::wstring strKeyName = strClipHotKey.substr(4, 1);
+		/*if (strKeyName.empty() != true)
+			keybd_event((BYTE)strKeyName.data(), 0x98, KEYEVENTF_KEYUP, 0);
+		if (strShiftKey.compare(L"1") == 0)
+			keybd_event(VK_SHIFT, 0x9d, KEYEVENTF_KEYUP, 0);
+		if (strCtrlKey.compare(L"1") == 0)
+			keybd_event(VK_CONTROL, 0x9d, KEYEVENTF_KEYUP, 0);
+		if (strAltKey.compare(L"1") == 0)
+			keybd_event(VK_MENU, 0x9d, KEYEVENTF_KEYUP, 0);
+		if (strWinKey.compare(L"1") == 0)
+		{
+			keybd_event(VK_LWIN, 0x9d, KEYEVENTF_KEYUP, 0);
+			keybd_event(VK_RWIN, 0x9d, KEYEVENTF_KEYUP, 0);
+		}*/
+	}
+	else
+	{
+		NTLog(SelfThis, Info, "FreeClipHotKey - nGroupID : %d, ClipHotKey Data is Wrong(Size Must be 5!) (Data : %s)", nGroupID, (AutoString)strClipHotKey.data());
+	}
+}
+
+void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+{
+	std::wstring strTempHotKey = L"";
+
+	strTempHotKey += (bWin ? L"1" : L"0");
+	strTempHotKey += (bControl ? L"1" : L"0");
+	strTempHotKey += (bAlt ? L"1": L"0");
+	strTempHotKey += (bShift ? L"1" : L"0");
+	strTempHotKey += chVKCode;
+
+	NTLog(this, Info, "Called - SetNativeClipboardHotKey(###) - GroupID : %d, bAlt : %s, bControl : %s, bShift : %s, bWin : %s, VKCode : %c, nIdx : %d, Sum-Data : %s",
+		groupID,
+		(AutoString)(bAlt ? L"Y" : L"N"),
+		(AutoString)(bControl ? L"Y" : L"N"),
+		(AutoString)(bShift ? L"Y" : L"N"),
+		(AutoString)(bWin ? L"Y" : L"N"),
+		(wchar_t)chVKCode, nIdx,
+		(AutoString)strTempHotKey.data());
+
+	mapHotKey[groupID] = strTempHotKey;
+
+}
+
+void WebWindow::ClipMemFree(int groupID)
+{
+	// WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - ClipMemFree - groupID : %d"), groupID);
+	NTLog(this, Info, "WebWindow::ClipMemFree - groupID : %d", groupID);
+	//ClipDataBufferClear();
+}
+
+void WebWindow::SetClipBoardSendFlag(int groupID)
+{
+
+}
+
+/*
+void WebWindow::ClipDataBufferClear(bool bClearPreMem, bool bClearPreExMem)
+{
+
+	if (bClearPreMem)
+	{
+		if (g_ptrByte != NULL)
+		{
+			delete[] g_ptrByte;
+			g_ptrByte = NULL;
+		}
+	}
+
+	if (bClearPreExMem)
+	{
+		if (g_ptrExByte != NULL)
+		{
+			delete[] g_ptrExByte;
+			g_ptrExByte = NULL;
+		}
+	}
+
+}*/
+
+void WebWindow::SetTrayStatus(bool bSetTextShowNchecked)
+{
+
+}
+
 #endif

@@ -13,9 +13,9 @@
   "LogLevel": 2,
   "LoginType": 1,
   "RecvDownPath": [
-    "%USERPATH%/Downloads",
-    "%USERPATH%/Downloads",
-    "%USERPATH%/Downloads"
+    "%USERPATH%\\Downloads",
+    "%USERPATH%\\Downloads",
+    "%USERPATH%\\Downloads"
   ],
   "UpdateSvcIP": "218.145.246.25:3439",
   "bAfterBasicChk": true,
@@ -32,7 +32,6 @@
   "bFileRecvTrayFix": false,
   "bManualRecvDownChange": false,
   "bRMouseFileAddAfterTrans": false,
-  "bRecvDownPathChange": true,
   "bScreenLock": false,
   "bScreenLockUserChange": false,
   "bShowAdminInfo": false,
@@ -70,7 +69,7 @@
   ],
   "strLanguage": "KR",
   "strURLAutoAfterBrowser": [
-    "C",
+    "F",
     "F",
     "F"
   ],

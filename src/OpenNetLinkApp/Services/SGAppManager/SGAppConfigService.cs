@@ -43,7 +43,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetAfterBasicChk();
         string GetRecvDownPath(int groupId);
         bool GetFileRecvFolderOpen();
-        bool GetRecvDownPathChange();
         bool GetManualRecvDownChange();
         bool GetFileRecvTrayFix();
         bool GetApprTrayFix();
@@ -466,10 +465,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bFileRecvFolderOpen;
         }
-        public bool GetRecvDownPathChange()
-        {
-            return AppConfigInfo.bRecvDownPathChange;
-        }
+
         public bool GetManualRecvDownChange()
         {
             return AppConfigInfo.bManualRecvDownChange;
