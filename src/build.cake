@@ -382,7 +382,7 @@ Task("PubWin10")
 	{
 		Framework = "net5.0",
 		Configuration = "Release",
-		Runtime = "win10-x64",
+		Runtime = "win-x64",
 		OutputDirectory = $"./artifacts/{AppProps.AppUpdatePlatform}/published"
 	};
 
@@ -417,7 +417,31 @@ Task("PkgWin10")
 	}	
 
 	System.IO.Directory.CreateDirectory(PackageDirPath);
-	
+
+	// window 쪽에 필요없는 파일들 배포전에 제거
+	DeleteFiles("./artifacts/windows/published/*.so");
+	DeleteFiles("./artifacts/windows/published/*.pdb");
+
+	var files = GetFiles("./artifacts/windows/published/*.so.*");
+	foreach(var file in files)
+	{
+		String strSearchFile = (String)file.FullPath;
+		//Information("File: {0}", strSearchFile);
+
+        int nIdex = strSearchFile.LastIndexOf('.');
+        if (nIdex > 0)
+        {
+            String strItem = strSearchFile.Substring(nIdex+1);
+
+            int n=0;
+            bool isNumeric = int.TryParse(strItem, out n);
+            if (isNumeric)
+			{
+				Information("File-Deleted: {0}", strSearchFile);
+				DeleteFile(strSearchFile);
+			}
+        }		
+	}
             
 	MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
 		Defines = new Dictionary<string, string>{

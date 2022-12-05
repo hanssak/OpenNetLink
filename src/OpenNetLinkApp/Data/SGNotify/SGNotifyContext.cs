@@ -469,7 +469,13 @@ namespace OpenNetLinkApp.Data.SGNotify
             mut.ReleaseMutex();
             return true;
         }
-
+        /// <summary>
+        /// 그룹, 유저 아이디를 받아 Alram, Message 삭제
+        /// </summary>
+        /// <param name="nGroupID"></param>
+        /// <param name="strUserSeq"></param>
+        /// <param name="bIsAlarm"></param>
+        /// <returns></returns>
         public bool DeleteAllInfo(int nGroupID, string strUserSeq, bool bIsAlarm)
         {
 
@@ -515,6 +521,102 @@ namespace OpenNetLinkApp.Data.SGNotify
 
             return true;
         }
+        /// <summary>
+        /// Alram Or Message 모든 정보 삭제
+        /// </summary>
+        /// <param name="bIsAlarm"></param>
+        /// <returns></returns>
+        public bool DeleteAllInfo(bool bIsAlarm)
+        {
 
+            try
+            {
+                mut.WaitOne();
+                // Delete
+
+                if (bIsAlarm)
+                {
+                    List<SGAlarmData> AlarmDic = null;
+                    AlarmDic = DBCtx.Alarms.ToList<SGAlarmData>();
+                    if (AlarmDic != null && AlarmDic.Count > 0)
+                    {
+                        DBCtx.Alarms.RemoveRange(AlarmDic);
+                        DBCtx.SaveChanges();
+                    }
+                }
+                else
+                {
+                    List<SGNotiData> NotiDic = null;
+                    NotiDic = DBCtx.Notis.ToList<SGNotiData>();
+                    if (NotiDic != null && NotiDic.Count > 0)
+                    {
+                        DBCtx.Notis.RemoveRange(NotiDic);
+                        DBCtx.SaveChanges();
+                    }
+
+                }
+
+                Log.Information($"Delete the SGAlarmData ALL");
+                mut.ReleaseMutex();
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Delete the SGAlarmData(ERROR:{e.Message}) ALL");
+                return false;
+            }
+
+            return true;
+        }
+        /// <summary>
+        /// 기준 날짜를 받아 그 이전의 Alram Or Message 모두 삭제
+        /// </summary>
+        /// <param name="standardDate"></param>
+        /// <param name="bIsAlarm"></param>
+        /// <returns></returns>
+        public bool DeleteAllInfo(DateTime standardDate, bool bIsAlarm)
+        {
+
+            try
+            {
+                mut.WaitOne();
+                // Delete
+
+                if (bIsAlarm)
+                {
+                    List<SGAlarmData> AlarmDic = null;
+                    AlarmDic = DBCtx.Alarms.
+                        Where(x => x.Time != null && x.Time < standardDate.Date).
+                        ToList<SGAlarmData>();
+                    if (AlarmDic != null && AlarmDic.Count > 0)
+                    {
+                        DBCtx.Alarms.RemoveRange(AlarmDic);
+                        DBCtx.SaveChanges();
+                    }
+                }
+                else
+                {
+                    List<SGNotiData> NotiDic = null;
+                    NotiDic = DBCtx.Notis.
+                        Where(x => x.Time != null && x.Time < standardDate.Date).
+                        ToList<SGNotiData>();
+                    if (NotiDic != null && NotiDic.Count > 0)
+                    {
+                        DBCtx.Notis.RemoveRange(NotiDic);
+                        DBCtx.SaveChanges();
+                    }
+
+                }
+
+                Log.Information($"Delete the Data, StandardDate Before Data");
+                mut.ReleaseMutex();
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Delete the Data(ERROR:{e.Message}) StandardDate Before Data");
+                return false;
+            }
+
+            return true;
+        }
     }
 }

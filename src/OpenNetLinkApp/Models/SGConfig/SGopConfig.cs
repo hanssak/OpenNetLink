@@ -119,6 +119,16 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseClipAlarmType { get; set; } = true;    // clipboard 송수신 알림 형태 수정가능유무
 
+        public bool bUseInitAlarmPerDay { get; set; } = false; // 일일 이전 날짜 알림 자동 삭제
+
+        public bool bUseInitMessagePerDay { get; set; } = false; // 일일 이전 날짜 메세지 자동 삭제
+
+        public bool bVisiblePolicyUpdateButton { get; set; } = false; //정책 업데이트 버튼 보여주기
+        /// <summary>
+        /// ////////////////////////////////
+        /// </summary>
+
+        public bool bUseDenyPasswordZip { get; set; } = false;         // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
         public bool bUseClipBoardFileTrans { get; set; } = true;         // 파일형태로보내는 클립보드 사용 유무
         public bool bUseFileClipManageUI { get; set; } = true;         // 파일형태로보내는 클립보드 관리UI 나오게할지 유무
         public bool bUseFileClipApproveUI { get; set; } = false;          // 파일형태로보내는 클립보드 결재UI 나오게할지 유무

@@ -114,6 +114,17 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseClipAlarmType { get; set; }           // 
 
+        public bool bUseInitAlarmPerDay { get; set; }  // 일일 이전 날짜 알림 자동 삭제
+
+        public bool bUseInitMessagePerDay { get; set; } // 일일 이전 날짜 메세지 자동 삭제
+
+        public bool bVisiblePolicyUpdateButton { get; set; } //정책 업데이트 버튼 보여주기
+
+        /// <summary>
+        /// ////////////////////////////////
+        /// </summary>
+
+        public bool bUseDenyPasswordZip { get; set; }          // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
         public bool bUseClipBoardFileTrans { get; set; }          // 파일형태로보내는 클립보드 사용 유무
 
         public bool bUseOneToMultiLogin { get; set; }          // 1번에 다중망 로그인 기능 사용유무

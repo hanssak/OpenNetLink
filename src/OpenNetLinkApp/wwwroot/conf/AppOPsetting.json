@@ -11,7 +11,7 @@
 
   "bUseMainPageType": true,
 
-  "bUseStartProgramReg": true,
+  "bUseStartProgramReg": false,
 
   "bManualDownFolderChange": false,
   "bManualRecvDownChange": false,
@@ -27,7 +27,7 @@
   "bApprCompleteAlarmRetain": false,
   "bApprRejectAlarmRetain": false,
   "bUseApprCountAlaram": false,
-  
+
   "bFileRecvTrayFix": false,
   "bUserApprActionTrayFix": false,
   "bUserApprRejectTrayFix": false,
@@ -91,7 +91,7 @@
   "bUsePCURL": false,
   "bUsePublicBoard": false,
   "bUseUserRecvDownPath": false,
-  "bUseUserSelectFirstServer": false,
+  "bUseUserSelectFirstServer": true,
   "bViewDlpApproverSelectMyDept": false,
   "bViewFileFilter": true,
   "bViewSGHeaderUIAlarmNoriAllDel": true,
@@ -116,6 +116,11 @@
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
 
-  "bUsePartialFileAddInTransfer": false
+  "bUsePartialFileAddInTransfer": false,
+  "bUseInitAlarmPerDay": false,
+  "bUseInitMessagePerDay": false,
+  "bVisiblePolicyUpdateButton": true
+
+
 
 }
