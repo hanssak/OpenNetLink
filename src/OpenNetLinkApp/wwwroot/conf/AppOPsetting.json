@@ -11,7 +11,7 @@
 
   "bUseMainPageType": true,
 
-  "bUseStartProgramReg": true,
+  "bUseStartProgramReg": false,
 
   "bManualDownFolderChange": false,
   "bManualRecvDownChange": false,
@@ -27,7 +27,7 @@
   "bApprCompleteAlarmRetain": false,
   "bApprRejectAlarmRetain": false,
   "bUseApprCountAlaram": false,
-  
+
   "bFileRecvTrayFix": false,
   "bUserApprActionTrayFix": false,
   "bUserApprRejectTrayFix": false,
@@ -96,14 +96,14 @@
   "bUsePCURL": false,
   "bUsePublicBoard": false,
   "bUseUserRecvDownPath": false,
-  "bUseUserSelectFirstServer": false,
+  "bUseUserSelectFirstServer": true,
   "bViewDlpApproverSelectMyDept": false,
   "bViewFileFilter": true,
   "bViewSGHeaderUIAlarmNoriAllDel": true,
   "bViewSGSideBarUIBadge": true,
   "nClipAfterApproveUseType": 2,
   "bUseOneToMultiLogin": false,
-  "bUseOneByOneLogOut" : false,
+  "bUseOneByOneLogOut": false,
   "bApprDeptSearch": true,
   "bApprLineChkBlock": false,
   "bApprLineLocalSave": true,
@@ -124,21 +124,23 @@
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
 
-  "strApproverSearchType": "SEARCH",
-  "bUseInputSearchInApproverTree": false,
-  "strReceiverSearchType": "SEARCH",
-  "bUseInputSearchInReceiverTree": false,
-  "strProxySearchType": "SEARCH",
-  "bUseInputSearchInProxyTree": false,
-  "strSecurityApproverSearchType": "SEARCH",
-  "bUseInputSearchInSecurityApproverTree": false,
+  "strApproverSearchType": "TREE",
+  "bUseInputSearchInApproverTree": true,
+  "strReceiverSearchType": "TREE",
+  "bUseInputSearchInReceiverTree": true,
+  "strProxySearchType": "TREE",
+  "bUseInputSearchInProxyTree": true,
+  "strSecurityApproverSearchType": "TREE",
+  "bUseInputSearchInSecurityApproverTree": true,
 
   "strApproveExtApproverSearchType": "TREE",
-  "bUseInputSearchApproveExtTree": true,  
+  "bUseInputSearchApproveExtTree": true,
   "bUseApproveExt": false,
 
-  "bUsePartialFileAddInTransfer" : false
+  "bUsePartialFileAddInTransfer": false,
 
-  
+  "bUseInitAlarmPerDay": false,
+  "bUseInitMessagePerDay": false,
+  "bVisiblePolicyUpdateButton": true
 
 }

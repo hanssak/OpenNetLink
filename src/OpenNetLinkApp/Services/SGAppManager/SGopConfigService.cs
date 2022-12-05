@@ -278,6 +278,21 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseInputSearchApproveExtTree();
 
+        /// <summary>
+        /// 알람 초기화 매일 자정마다
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInitAlarmPerDay();
+        /// <summary>
+        /// 메세지 초기화 매일 자정마다
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInitMessagePerDay();
+        /// <summary>
+        /// 정책 수동 업데이트 버튼 보여주는 여부
+        /// </summary>
+        /// <returns></returns>
+        public bool GetVisiblePolicyUpdateButton();
     }
 
 
@@ -849,8 +864,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bUsePartialFileAddInTransfer;
         }
-		
-		
+
+
         public string GetApproveExtSelectType()
         {
             return AppConfigInfo.strApproveExtApproverSearchType;
@@ -866,5 +881,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bUseInputSearchApproveExtTree;
         }
 
+        public bool GetUseInitAlarmPerDay()
+        {
+            return AppConfigInfo.bUseInitAlarmPerDay;
+        }
+
+        public bool GetUseInitMessagePerDay()
+        {
+            return AppConfigInfo.bUseInitMessagePerDay;
+        }
+
+        public bool GetVisiblePolicyUpdateButton()
+        {
+            return AppConfigInfo.bVisiblePolicyUpdateButton;
+        }
     }
 }

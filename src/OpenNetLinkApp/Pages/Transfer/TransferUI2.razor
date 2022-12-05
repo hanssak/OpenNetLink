@@ -1381,6 +1381,14 @@
             await refTransProgress.closePopUp();
             return;
         }
+        if (e.count == -300)
+        {
+            HSCmdCenter.SendFileTransCancel();
+            strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 파일 정보를 읽어 올 수 없습니다.
+            ShowMessage("error", strMsg);
+            await refTransProgress.closePopUp();
+            return;
+        }
 
         if (e.count >= 100)
         {
