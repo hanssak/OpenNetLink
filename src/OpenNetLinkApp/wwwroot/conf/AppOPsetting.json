@@ -124,6 +124,19 @@
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
 
+  "strApproverSearchType": "TREE",
+  "bUseInputSearchInApproverTree": true,
+  "strReceiverSearchType": "TREE",
+  "bUseInputSearchInReceiverTree": true,
+  "strProxySearchType": "TREE",
+  "bUseInputSearchInProxyTree": true,
+  "strSecurityApproverSearchType": "TREE",
+  "bUseInputSearchInSecurityApproverTree": true,
+
+  "strApproveExtApproverSearchType": "TREE",
+  "bUseInputSearchApproveExtTree": true,
+  "bUseApproveExt": false,
+
   "bUsePartialFileAddInTransfer": false,
   "bUseInitAlarmPerDay": false,
   "bUseInitMessagePerDay": false,
