@@ -122,7 +122,11 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseClipAlarmType { get; set; } = true;    // clipboard 송수신 알림 형태 수정가능유무
 
+        public bool bUseInitAlarmPerDay { get; set; } = false; // 일일 이전 날짜 알림 자동 삭제
 
+        public bool bUseInitMessagePerDay { get; set; } = false; // 일일 이전 날짜 메세지 자동 삭제
+
+        public bool bVisiblePolicyUpdateButton { get; set; } = false; //정책 업데이트 버튼 보여주기
         /// <summary>
         /// ////////////////////////////////
         /// </summary>

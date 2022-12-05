@@ -3296,7 +3296,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public async Task<eFileAddErr> IsValidFileExt(Stream stFile, string strExt, bool blAllowDRM = true)
         {
             byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
-
+            //btFileData = (stFile as MemoryStream).ToArray();
             /* Check DRM File */
             if (IsDRM(btFileData) == true)
             {
@@ -4825,9 +4825,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             {
                 if (hsStream.MemoryType == HsStreamType.MemoryStream)
                 {
-                    byte[] buf = new byte[fileStream.Length];
-                    await fileStream.ReadAsync(buf, 0, (int)fileStream.Length);
-                    fileMemoryStream.Write(buf);
+                    int bufferSize = 1024 * 1024;
+                    int readCount = 0;
+                    byte[] buf = new byte[bufferSize];
+                    while (true)
+                    {
+                        Array.Clear(buf, 0, buf.Length);
+                        readCount = await hsStream.stream.ReadAsync(buf);
+
+                        if (readCount > 0)
+                            fileMemoryStream.Write(buf, 0, readCount);
+                        else
+                            break;
+                    }
                 }
                 else if (hsStream.MemoryType == HsStreamType.FileStream)
                 {
@@ -4838,6 +4848,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 extractorResult = OfficeExtractor.Controller.ExcuteExtractor(fileMemoryStream, hsStream.FileName, strExtractFilePath);
                 Log.Information($"[scanDocumentFile]  ExcuteExtractor DocumentFile[{Path.GetFileName(hsStream.FileName)}] extractorResult[{extractorResult}]");
             }
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
 
             if (extractorResult == 0)        //검출된 OLE 개체 없음 (정상처리)
                 return 0;

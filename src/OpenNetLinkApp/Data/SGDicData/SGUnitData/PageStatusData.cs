@@ -38,6 +38,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     public delegate void InitPassWDCHGEvent(int groupID, PageEventArgs e);                           // 초기 비밀번호 변경 결과 이벤트
     public delegate void DayPassWDCHGEvent(int groupID, PageEventArgs e);                            // 날짜 비밀번호 변경 결과 이벤트
     public delegate void UserPassWDCHGEvent(int groupID, PageEventArgs e);                          // 사용자에 의한 비밀번호 변경 결과 이벤트
+    public delegate void DeleteAlramAndMessageEvent();                                  // Alram 과 Message 삭제 이벤트
 
     /// <summary>
     /// 매일 자정 시 데이터 새로고침
@@ -94,6 +95,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// 매일 자정시 데이터 새로고침 이벤트
         /// </summary>
         public static DayInfoRefreshEvent RefreshInfoEvent;
+
+        /// <summary>
+        /// 매일 자정시 알람 또는 메세지 삭제 이벤트
+        /// </summary>
+        public static DeleteAlramAndMessageEvent DeleteAlramAndMessage;
 
         public Int64 DayFileMaxSize = 0;
         public int DayFileMaxCount = 0;
