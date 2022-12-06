@@ -2,13 +2,13 @@
   "NETWORKS": [
     {
       "GROUPID": 0,
-      "FROMNAME": "내부망",
-      "TONAME": "외부망",
-      "IPADDRESS": "218.145.246.25",
+      "FROMNAME": "외부망",
+      "TONAME": "내부망",
+      "IPADDRESS": "10.54.1.75",
       "PORT": 3435,
       "CONNECTTYPE": 1,
       "TLSVERSION": "1.2",
-      "NETPOS": "IN"
+      "NETPOS": "EX"
     }
   ]
 }

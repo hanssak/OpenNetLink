@@ -393,7 +393,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUserIDSave = true;                     //유저 아이디 저장
                 sgSiteConfig.m_bUseScreenLock = false;                  //Screen Lock 설정여부
 
-                sgSiteConfig.m_bRecvFolderChange = true;               // 수신폴더 변경 여부
+                sgSiteConfig.m_bRecvFolderChange = false;               // 수신폴더 변경 여부
                 sgSiteConfig.m_bUseUserRecvDownPath = true;            // 로그인 유저별 다운로드 경로 사용 여부
 
                 sgSiteConfig.m_bUseDenyPasswordZip = false;             // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
@@ -412,15 +412,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUseClipTypeTextFirstSend = false;        // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
 
                 //각 화면별 검색 방법 설정
-                sgSiteConfig.strApproverSearchType = "SEARCH";
+                sgSiteConfig.strApproverSearchType = "TREE";
                 sgSiteConfig.bUseInputSearchInApproverTree = true;
-                sgSiteConfig.strReceiverSearchType = "SEARCH";
+                sgSiteConfig.strReceiverSearchType = "TREE";
                 sgSiteConfig.bUseInputSearchInReceiverTree = true;
-                sgSiteConfig.strProxySearchType = "SEARCH";
+                sgSiteConfig.strProxySearchType = "TREE";
                 sgSiteConfig.bUseInputSearchInProxyTree = true;
-                sgSiteConfig.strSecurityApproverSearchType = "SEARCH";
+                sgSiteConfig.strSecurityApproverSearchType = "TREE";
                 sgSiteConfig.bUseInputSearchInSecurityApproverTree = true;
-                sgSiteConfig.strApproveExtApproverSearchType = "SEARCH";        // 결재필수 확장자 검색됐을때, 결재자 검색방식
+                sgSiteConfig.strApproveExtApproverSearchType = "TREE";        // 결재필수 확장자 검색됐을때, 결재자 검색방식
                 sgSiteConfig.bUseApproveExt = false;                             // 결재필수 확장자 결재하는 기능 사용유무
                 sgSiteConfig.bUseInputSearchApproveExtTree = false;           // 결재필수 확장자, 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
                 sgSiteConfig.m_bFileForward = true;                            //수신자 선택 파일 포워드
@@ -435,8 +435,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             // 현재 : 아래 두 값으로 설정 UI가 나오고 안나오고함 => 서버설정으로 나오도록 수정해야함
             // Footer 쪽도 URLRedirection 사용유무 설정에 따라서 UI 설정되도록 수정
-            SetUseURLRedirectionAlarm(true);                            // URL 리다이렉션 알림 타입 사용 여부.(사용자가 설정가능유무)
-            SetUseURLRedirectionAlarmType(true);                        // URL 리다이렉션 알림 타입 선택 사용 여부.
+            SetUseURLRedirectionAlarm(false);                            // URL 리다이렉션 알림 타입 사용 여부.(사용자가 설정가능유무)
+            SetUseURLRedirectionAlarmType(false);                        // URL 리다이렉션 알림 타입 선택 사용 여부.
 
             SetRFileAutoSend(true);                                    // 오른쪽 마우스 클릭 후 자동 전송 사용 여부.
             SetAfterApprAutoCheck(true);                                // 사후결재 기본 체크

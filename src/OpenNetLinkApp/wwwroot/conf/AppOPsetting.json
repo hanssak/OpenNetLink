@@ -48,7 +48,7 @@
   "nPWChangeApplyCnt": 9,
 
   "bURLAutoTrans": [
-    true,
+    false,
     false,
     false
   ],
@@ -58,9 +58,9 @@
     "F"
   ],
   "bURLAutoAfterMsg": [
-    true,
-    true,
-    true
+    false,
+    false,
+    false
   ],
   "strForwardUrl": [
     "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
@@ -107,8 +107,8 @@
   "bUseClipCopyAndSend": false,
   "bClipCopyAutoSend": false,
 
-  "bUseCloseTrayMove": false,
-  "bExitTrayMove": false,
+  "bUseCloseTrayMove": true,
+  "bExitTrayMove": true,
 
   "bUseStartTrayMove": false,
   "bStartTrayMove": false,
@@ -117,10 +117,7 @@
   "bUseAgentTime1aClock": false,
 
   "bUsePartialFileAddInTransfer": false,
-  "bUseInitAlarmPerDay": false,
-  "bUseInitMessagePerDay": false,
+  "bUseInitAlarmPerDay": true,
+  "bUseInitMessagePerDay": true,
   "bVisiblePolicyUpdateButton": true
-
-
-
 }
