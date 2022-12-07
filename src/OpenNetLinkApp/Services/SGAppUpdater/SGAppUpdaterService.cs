@@ -71,7 +71,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         /// <param name="referenceAssembly">the name of the assembly to use for comparison when checking update versions</param>
         /// <param name="factory">a UI factory to use in place of the default UI</param>
         public SelfSparkleUpdater(string appcastUrl, ISignatureVerifier signatureVerifier, string referenceAssembly, IUIFactory factory)
-                : base(appcastUrl, signatureVerifier, referenceAssembly, factory) {}
+                : base(appcastUrl, signatureVerifier, referenceAssembly, factory) { }
 
         #endregion
 
@@ -103,10 +103,12 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             {
                 if (DoExtensionsMatch(installerExt, ".deb"))
                 {
-                    if (IsDistrubID("TmaxOS")) {
+                    if (IsDistrubID("TmaxOS"))
+                    {
                         return "/system/bin/deb_installer \"" + downloadFilePath + "\"";
                     }
-                    else {
+                    else
+                    {
                         //return "sudo dpkg -i \"" + downloadFilePath + "\"";
                         return "gdebi-gtk \"" + downloadFilePath + "\"";
                     }
@@ -122,7 +124,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         // arg - id: HamoniKR, TmaxOS, Gooroom
         private bool IsDistrubID(string id)
         {
-            if(!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 return false;
             }
@@ -134,7 +136,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 string[] strLsbWords = strLsbLine.Split('=');
                 strLsbDic[strLsbWords[0]] = strLsbWords[1];
             }
-            
+
             LogWriter.PrintMessage("Get lsb-release in DISTRIB_ID : {0}", strLsbDic["DISTRIB_ID"]);
             if (0 == String.Compare(id.ToLower(), strLsbDic["DISTRIB_ID"].ToLower()))
             {
@@ -256,7 +258,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                     {
                         // waiting for finish based on http://blog.joncairns.com/2013/03/wait-for-a-unix-process-to-finish/
                         // use tar to extract
-                        var tarCommand = isMacOS ? $"tar -x -f {downloadFilePath} -C \"{workingDir}\"" 
+                        var tarCommand = isMacOS ? $"tar -x -f {downloadFilePath} -C \"{workingDir}\""
                             : $"tar -xf {downloadFilePath} -C \"{workingDir}\" --overwrite ";
                         var output = $@"
                             {waitForFinish}
@@ -281,7 +283,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                         write.Write(output);
                     }
                     write.Close();
-                    try {
+                    try
+                    {
                         ProcessStartInfo startInfo = new ProcessStartInfo("chmod");
                         startInfo.WindowStyle = ProcessWindowStyle.Normal;
                         startInfo.ArgumentList.Add("755");
@@ -291,7 +294,9 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                         {
                             proc.WaitForExit();
                         }
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         LogWriter.PrintMessage($"Got Exception: execute (chmod) => {e}");
                     }
                 }
@@ -301,7 +306,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             LogWriter.PrintMessage("Going to execute script at path: {0}", batchFilePath);
 
             // init the installer helper
-            if(isWindows)
+            if (isWindows)
             {
                 _installerProcess = new Process
                 {
@@ -378,7 +383,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         public bool PrintDiagnosticToConsole { get; set; }
 
         #endregion
-        
+
         /// <inheritdoc/>
         public virtual void PrintMessage(string message, params object[] arguments)
         {
@@ -418,7 +423,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
         /* To Function Features */
         void Init(string updateSvcIP, string updatePlatform);
-        void CheckUpdatesClick(SGCheckUpdate sgCheckUpdate = null, 
+        void CheckUpdatesClick(SGCheckUpdate sgCheckUpdate = null,
                                 SGAvailableUpdate sgAvailableUpdate = null,
                                 SGDownloadUpdate sgDownloadUpdate = null,
                                 SGFinishedDownload sgFinishedDownload = null,
@@ -432,22 +437,26 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         void CBDownloadCanceled(AppCastItem item, string path);
         void InstallUpdateClick();
         void CBCloseApplication();
-        void UpdateAutomaticallyClick();
+        void DownloadUpdateBackground();
         void CBFullUpdateUpdateDetected(object sender, UpdateDetectedEventArgs e);
         void CBFullUpdateStartedDownloading(AppCastItem item, string path);
         void CBFullUpdateDownloadFileIsReady(AppCastItem item, string downloadPath);
         void CBFullUpdateCloseApplication();
+        /// <summary>
+        /// 별도 팝업 없이 자동 업데이트
+        /// </summary>
+        void CheckUpdateBackgroundDown();
     }
     internal class SGAppUpdaterService : ISGAppUpdaterService
     {
         private Serilog.ILogger CLog => Serilog.Log.ForContext<SGAppUpdaterService>();
-        public SGAppUpdaterService() {}
+        public SGAppUpdaterService() { }
         public void Init(string updateSvcIP, string updatePlatform)
         {
             CLog.Here().Information($"- AppUpdaterService Initializing... : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
             //SparkleInst = new SparkleUpdater($"https://{updateSvcIP}/NetSparkle/files/sample-app/appcast.xml", new DSAChecker(SecurityMode.Strict))
-            SparkleInst = new SelfSparkleUpdater($"https://{updateSvcIP}/updatePlatform/{updatePlatform}/appcast.xml", 
-                                                new Ed25519Checker(SecurityMode.Strict, null, "wwwroot/conf/Sparkling.service")) 
+            SparkleInst = new SelfSparkleUpdater($"https://{updateSvcIP}/updatePlatform/{updatePlatform}/appcast.xml",
+                                                new Ed25519Checker(SecurityMode.Strict, null, "wwwroot/conf/Sparkling.service"))
             {
                 UIFactory = null,
                 AppCastDataDownloader = new WebRequestAppCastDataDownloader(),
@@ -472,14 +481,14 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         public string DownloadPath { get; private set; } = string.Empty;
         public bool IsCancelRequested { get; set; } = false;
         public bool IsCanceled { get; set; } = false;
-        public SGCheckUpdate CheckUpdate { get; private set; } =  null;
+        public SGCheckUpdate CheckUpdate { get; private set; } = null;
         public SGAvailableUpdate AvailableUpdate { get; private set; } = null;
         public SGDownloadUpdate DownloadUpdate { get; private set; } = null;
         public SGFinishedDownload FinishedDownload { get; private set; } = null;
         public SGMessageNotification MessageNotification { get; private set; } = null;
 
         /* To Function Features */
-        public async void CheckUpdatesClick(SGCheckUpdate sgCheckUpdate = null, 
+        public async void CheckUpdatesClick(SGCheckUpdate sgCheckUpdate = null,
                                             SGAvailableUpdate sgAvailableUpdate = null,
                                             SGDownloadUpdate sgDownloadUpdate = null,
                                             SGFinishedDownload sgFinishedDownload = null,
@@ -496,7 +505,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             UpdateInfo = await SparkleInst.CheckForUpdatesQuietly();
             await Task.Delay(1000);
 
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 CheckUpdate?.ClosePopUp();
                 // use _sparkle.CheckForUpdatesQuietly() if you don't want the user to know you are checking for updates!
                 // if you use CheckForUpdatesAtUserRequest() and are using a UI, then handling things yourself is rather silly
@@ -527,14 +537,16 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
         public async void SkipUpdateClick(AppCastItem CurrentItem)
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 CLog.Here().Information($"AppUpdaterService - SkipUpdate : [ {CurrentItem.AppName} {CurrentItem.Version} ]");
                 SparkleInst.Configuration.SetVersionToSkip(CurrentItem.Version);
             });
         }
         public async void DownloadUpdateClick()
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 CLog.Here().Information($"AppUpdaterService - DownloadUpdate : [ Download for Update... ]");
                 AvailableUpdate?.ClosePopUp();
 
@@ -560,21 +572,27 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             // ok, the file is downloading now
         }
 
-        public int LastProgressPercentage  { get; private set; } = 0;
+        public int LastProgressPercentage { get; private set; } = 0;
         public async void CBDownloadMadeProgress(object sender, AppCastItem item, ItemDownloadProgressEventArgs e)
         {
-            await Task.Run(() => {
-                if(LastProgressPercentage != e.ProgressPercentage) {
+            await Task.Run(() =>
+            {
+                if (LastProgressPercentage != e.ProgressPercentage)
+                {
                     LastProgressPercentage = e.ProgressPercentage;
 
                     string DownloadLog = string.Format($"The download made some progress! {e.ProgressPercentage}% done.");
                     SparkleInst.LogWriter.PrintMessage(DownloadLog);
 
-                    if (IsCancelRequested == false) {
+                    if (IsCancelRequested == false)
+                    {
                         string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>The download made some progress! {e.ProgressPercentage}% done.");
                         DownloadUpdate?.UpdateProgress(DownloadInfo, e.ProgressPercentage);
-                    } else {
-                        if (IsCanceled == false) {
+                    }
+                    else
+                    {
+                        if (IsCanceled == false)
+                        {
                             IsCanceled = true;
                             Task.Delay(100);
                             DownloadUpdate?.ClosePopUp();
@@ -586,7 +604,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         public async void CBDownloadError(AppCastItem item, string path, Exception exception)
         {
             // Display in progress when error occured -> DownloadInfo.Text = "We had an error during the download process :( -- " + exception.Message;
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 string DownloadLog = string.Format($"{item.AppName} {item.Version}, We had an error during the download process :( -- {exception.Message}");
                 CLog.Here().Error(DownloadLog);
                 DownloadUpdate?.ClosePopUp();
@@ -597,7 +616,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
         public async void CBStartedDownloading(AppCastItem item, string path)
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 IsCancelRequested = false;
                 IsCanceled = false;
                 string DownloadLog = string.Format($"{item.AppName} {item.Version} Started downloading... : [{path}]");
@@ -609,7 +629,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
         public async void CBFinishedDownloading(AppCastItem item, string path)
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 if (IsCancelRequested == false)
                 {
                     string DownloadLog = string.Format($"{item.AppName} {item.Version} Done downloading! : [{path}]");
@@ -634,7 +655,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                     DownloadUpdate?.UpdateProgress(DownloadInfo, 100);
                     Task.Delay(1000);
 
-                    if (IsCanceled == false) {
+                    if (IsCanceled == false)
+                    {
                         IsCancelRequested = false;
                         IsCanceled = true;
                         DownloadUpdate?.ClosePopUp();
@@ -645,10 +667,12 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
         public async void CBDownloadCanceled(AppCastItem item, string path)
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 CLog.Here().Information($"AppUpdaterService - CBDownloadCanceled : [ {item.AppName} {item.Version} Cancel downloading! : [{path}] ]");
 
-                if (IsCanceled == false) {
+                if (IsCanceled == false)
+                {
                     IsCancelRequested = false;
                     IsCanceled = true;
                     DownloadUpdate?.ClosePopUp();
@@ -657,7 +681,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
         public async void InstallUpdateClick()
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 CLog.Here().Information($"AppUpdaterService - InstallUpdate : [ Install for Update [{DownloadPath}] ]");
                 SparkleInst.CloseApplication += CBCloseApplication;
                 SparkleInst.InstallUpdate(UpdateInfo.Updates.First(), DownloadPath);
@@ -666,31 +691,128 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         public async void CBCloseApplication()
         {
             // System.Windows.Application.Current.Shutdown();
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 int nProcessId = Process.GetCurrentProcess().Id;
                 CLog.Here().Information($"Self Process Exit to Relaunch after Install and Upgrade: self process is kill (PID:{nProcessId})");
                 Process localById = Process.GetProcessById(nProcessId);
                 localById.Kill();
             });
         }
-        public async void UpdateAutomaticallyClick()
+
+        /// <summary>
+        /// 자동 업데이트 
+        /// </summary>
+        public async void CheckUpdateBackgroundDown()
         {
-            await Task.Run(() => {
+            //CheckUpdate = sgCheckUpdate;
+            //AvailableUpdate = sgAvailableUpdate;
+            //DownloadUpdate = sgDownloadUpdate;
+            //FinishedDownload = sgFinishedDownload;
+            //MessageNotification = sgMessageNotification;
+
+            CLog.Here().Information($"AppUpdaterService - CheckUpdatesAutomatically : [ Checking for updates... ]");
+            // CheckUpdate?.OpenPopUp();
+            UpdateInfo = await SparkleInst.CheckForUpdatesQuietly();
+            await Task.Delay(1000);
+
+            await Task.Run(() =>
+            {
+                //   CheckUpdate?.ClosePopUp();
+                // use _sparkle.CheckForUpdatesQuietly() if you don't want the user to know you are checking for updates!
+                // if you use CheckForUpdatesAtUserRequest() and are using a UI, then handling things yourself is rather silly
+                // as it will show a UI for things
+                if (UpdateInfo != null)
+                {
+                    CLog.Here().Information($"AppUpdaterService - Check Update Status : {UpdateInfo.Status.ToString()}");
+                    switch (UpdateInfo.Status)
+                    {
+                        case UpdateStatus.UpdateAvailable:
+                            CLog.Here().Information($"AppUpdaterService - CheckUpdatesAutomatically : [ There's an update available! ]");
+                            InitializeBackgroundUpdate(SparkleInst, UpdateInfo.Updates);
+                            DownloadUpdateBackground();
+                            // AvailableUpdate?.OpenPopUp(SparkleInst, UpdateInfo.Updates);
+                            break;
+                            #region [사용안함]
+                            //case UpdateStatus.UpdateNotAvailable:
+                            //    CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ There's no update available :( ]");
+                            //    // MessageNotification?.OpenPopUp("There's no update available :(");
+                            //    break;
+                            //case UpdateStatus.UserSkipped:
+                            //    CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ The user skipped this update! ]");
+                            //    MessageNotification?.OpenPopUp("The user skipped this update!<br>You have elected to skip this version.");
+                            //    break;
+                            //case UpdateStatus.CouldNotDetermine:
+                            //    CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ We couldn't tell if there was an update... ]");
+                            //    //    MessageNotification?.OpenPopUp("We couldn't tell if there was an update...");
+                            //    break; 
+                            #endregion
+                    }
+                }
+            });
+        }
+
+        /// <summary>
+        /// appcast.xml 파일을 기반으로 new Ver 파일 다운로드
+        /// </summary>
+        /// <param name="sparkle"></param>
+        /// <param name="items"></param>
+        /// <param name="isUpdateAlreadyDownloaded"></param>
+        /// <param name="separatorTemplate"></param>
+        /// <param name="headAddition"></param>
+        private async void InitializeBackgroundUpdate(SparkleUpdater sparkle, List<AppCastItem> items, bool isUpdateAlreadyDownloaded = false,
+                                            string separatorTemplate = "", string headAddition = "")
+        {
+            CLog.Here().Information($"- InitializeBackgroundUpdate...");
+            SelfReleaseNotesGrabber _ReleaseNotesGrabber = null;
+            AppCastItem latestVersion = null;
+            
+            await Task.Run(() =>
+            {
+                _ReleaseNotesGrabber = new SelfReleaseNotesGrabber(separatorTemplate, headAddition, sparkle);
+
+                AppCastItem item = items.FirstOrDefault();              
+                latestVersion = items.OrderByDescending(p => p.Version).FirstOrDefault();
+            });
+
+            CancellationTokenSource _CancellationTokenSource = new CancellationTokenSource();
+            CancellationToken _CancellationToken = _CancellationTokenSource.Token;
+
+            string releaseNotes = await _ReleaseNotesGrabber.DownloadAllReleaseNotes(items, latestVersion, _CancellationToken);
+            CLog.Here().Information($"- InitializeBackgroundUpdate...Done");
+        }
+
+        public async void DownloadUpdateBackground()
+        {
+            await Task.Run(() =>
+            {
                 // RunFullUpdateUpdateStatusLabel.Text = "Checking for update...";
                 CLog.Here().Information($"AppUpdaterService - UpdateAutomatically : [ Checking for updates... ]");
 
                 SparkleInst.UserInteractionMode = UserInteractionMode.DownloadAndInstall;
+                SparkleInst.UpdateDetected -= CBFullUpdateUpdateDetected;
                 SparkleInst.UpdateDetected += CBFullUpdateUpdateDetected;
+
+                SparkleInst.DownloadStarted -= CBFullUpdateStartedDownloading;
                 SparkleInst.DownloadStarted += CBFullUpdateStartedDownloading;
+
+                SparkleInst.DownloadFinished -= CBFullUpdateDownloadFileIsReady;
                 SparkleInst.DownloadFinished += CBFullUpdateDownloadFileIsReady;
+
+                SparkleInst.CloseApplication -= CBFullUpdateCloseApplication;
                 SparkleInst.CloseApplication += CBFullUpdateCloseApplication;
+
+                SparkleInst.DownloadHadError -= CBDownloadError;
+                SparkleInst.DownloadHadError += CBDownloadError;
             });
 
-            await SparkleInst.CheckForUpdatesQuietly();
+
+            await SparkleInst.InitAndBeginDownload(UpdateInfo.Updates.First());
         }
         public async void CBFullUpdateUpdateDetected(object sender, UpdateDetectedEventArgs e)
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 // RunFullUpdateUpdateStatusLabel.Text = "Found update...";
                 string UpdateLog = string.Format($"AppUpdaterService - CBFullUpdateUpdateDetected : [ Found update... ]");
                 SparkleInst.LogWriter.PrintMessage(UpdateLog);
@@ -698,7 +820,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
         public async void CBFullUpdateStartedDownloading(AppCastItem item, string path)
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 // RunFullUpdateUpdateStatusLabel.Text = "Started downloading update...";
                 string DownloadLog = string.Format($"AppUpdaterService - CBFullUpdateStartedDownloading : [{item.AppName} {item.Version} - Started downloading update... [{path}]]");
                 SparkleInst.LogWriter.PrintMessage(DownloadLog);
@@ -706,17 +829,25 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
         public async void CBFullUpdateDownloadFileIsReady(AppCastItem item, string downloadPath)
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 // RunFullUpdateUpdateStatusLabel.Text = "Update is ready...";
                 string DownloadLog = string.Format($"AppUpdaterService - CBFullUpdateDownloadFileIsReady : [{item.AppName} {item.Version} - Update is ready... [{downloadPath}]]");
                 SparkleInst.LogWriter.PrintMessage(DownloadLog);
+
+
+
             });
+
+            // Now Install
+            InstallUpdateClick();
         }
         public async void CBFullUpdateCloseApplication()
         {
             //System.Windows.Application.Current.Shutdown();
             await Task.Delay(2000);
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 // RunFullUpdateUpdateStatusLabel.Text = "Closing application...";
                 int nProcessId = Process.GetCurrentProcess().Id;
                 CLog.Here().Information($"Self Process Exit to Relaunch after Install and Upgrade: self process is kill (PID:{nProcessId})");
