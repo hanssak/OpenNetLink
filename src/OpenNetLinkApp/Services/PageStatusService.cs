@@ -429,6 +429,10 @@ namespace OpenNetLinkApp.Services
                 //매일 자정마다 '일일 전송 가능' 정보 갱신 by 2022.08.
                 if (svrTime.Hour == 0 && PageStatusData.RefreshInfoEvent != null)  //매일 자정마다 실행
                     PageStatusData.RefreshInfoEvent();
+
+                //매일 자정마다 Alram & Message 정보 삭제
+                if (svrTime.Hour == 0 && PageStatusData.DeleteAlramAndMessage != null)  //매일 자정마다 실행
+                    PageStatusData.DeleteAlramAndMessage();
             }
         }
 
@@ -470,6 +474,10 @@ namespace OpenNetLinkApp.Services
             PageStatusData.SCommonNotiEvent = afterApprTime;
         }
 
+        public void SetAlramAndMessageDeleteEvent(DeleteAlramAndMessageEvent deleteEvent)
+        {
+            PageStatusData.DeleteAlramAndMessage = deleteEvent;
+        }
         /// <summary>
         ///  공통환경설정의 사후결재 컨트롤 체크여부 변경 노티 (공통환경설정 -> 파일전송)
         /// </summary>
@@ -483,6 +491,26 @@ namespace OpenNetLinkApp.Services
             }
             PageStatusData.SAfterApprControlCheckEvent = afterApprControlCheck;
         }
+
+        public void SetLogOutFileListClearEvent(int groupID, LogOutFileListClearEvent Event)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetLogoutFileListClearEvent(Event);            
+        }
+        public LogOutFileListClearEvent GetLogOutFileListClearEvent(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return null;
+            }
+            return m_DicPageStatusData[groupID].GetLogoutFileListClearEvent();
+        }
+
 
         public void SetDayFileAndClipMax(int groupID, Int64 fileMaxSize, int fileMaxCount, Int64 clipMaxSize, int clipMaxCount)
         {

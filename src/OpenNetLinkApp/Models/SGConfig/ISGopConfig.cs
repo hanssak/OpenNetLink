@@ -108,6 +108,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bViewSGSideBarUIBadge { get; set; }    // 
         public bool bViewSGHeaderUIAlarmNoriAllDel { get; set; }    // 
         public bool bUseForceUpdate { get; set; }    // 
+        public bool bUseForceBackgroundUpdate { get; set; } //강제 자동 업데이트 (업데이트 버튼 클릭 불필요)
+
 
         public bool bViewDlpApproverSelectMyDept { get; set; }    // 
 
@@ -119,6 +121,12 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileForward { get; set; }    // 파일포워드 기능 사용유무
 
         public bool bUseClipAlarmType { get; set; }           // 
+
+        public bool bUseInitAlarmPerDay { get; set; }  // 일일 이전 날짜 알림 자동 삭제
+
+        public bool bUseInitMessagePerDay { get; set; } // 일일 이전 날짜 메세지 자동 삭제
+
+        public bool bVisiblePolicyUpdateButton { get; set; } //정책 업데이트 버튼 보여주기
 
         /// <summary>
         /// ////////////////////////////////

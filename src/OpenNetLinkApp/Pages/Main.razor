@@ -464,7 +464,6 @@
                             string strPW = "";
                             sgRSACrypto.ValueDecrypt(strEncID, out strID);
                             id = strID;
-
                             // Logout 으로 인해 온 상황에서는 PW를 표시하지 않고, 로그인도하지 않음.
                             if (srcLoc != "Logout")
                             {
@@ -791,6 +790,7 @@
                     strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
                     strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
                     strGetinfoTagName += ", 'CLIENT_DOCUMENT_EXTRACT_TYPE'";
+                    strGetinfoTagName += ", 'CLIENT_DOCUMENT_MIME_FILTER_TYPE'";
                     strGetinfoTagName += ", 'CLIENT_TRANSFER_TITLE'";
                     strGetinfoTagName += ", 'CLIENT_TRANSFER_DESCRIPTION'";
 

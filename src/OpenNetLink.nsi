@@ -327,7 +327,10 @@ Function .onInit
   ${If} ${IS_PATCH} == 'TRUE'
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
-        
+	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db" "$TEMP" 
+	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db" "$TEMP" 
+    
+    
 
     Banner::show "Calculating important stuff..."
     Banner::getWindow
@@ -357,6 +360,8 @@ Function .onInstSuccess
   ${If} ${IS_PATCH} == 'TRUE'
       CopyFiles /SILENT /FILESONLY "$TEMP\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
       CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
+	  CopyFiles /FILESONLY "$TEMP\SGNotifyDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"
+	  CopyFiles /FILESONLY "$TEMP\SGSettingsDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"  
   ${endif}
 
   IfSilent 0 +2
@@ -3630,6 +3635,9 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   File "artifacts\windows\published\zlib.managed.dll"
   */
+
+  SetOutPath "$INSTDIR"
+  File "bin_addon\SecureGateChromiumExtension_v1.1.crx"
   
   ; 단축아이콘 생성
   CreateDirectory "$SMPROGRAMS\OpenNetLink"
@@ -3676,8 +3684,6 @@ Section "MainSection" SEC01
   ${EndIf} ; ${IS_PATCH} == 'TRUE'
 
   
-  ;debug 파일들 삭제
-  Delete "${INSTALLPATH}\*.pdb"
   
 SectionEnd
 

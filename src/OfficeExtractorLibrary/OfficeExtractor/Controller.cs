@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +20,10 @@ namespace OfficeExtractor
                 OfficeExtractor.Extractor extractor = new OfficeExtractor.Extractor();
                 var files = extractor.Extract(strSource, strDest);
                 result = files.Count;
+            }
+            catch (DocumentCorrupt ex)
+            {
+                result = -10;
             }
             catch (PathTooLongException ex)
             {

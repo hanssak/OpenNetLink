@@ -730,6 +730,12 @@
         alarmList.Clear();
         messageList.Clear();
 
+        //이전날짜 데이터 모두 삭제
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseInitAlarmPerDay())
+            SQLiteDB.DeleteAllInfo(DateTime.Now, true);
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseInitMessagePerDay())
+            SQLiteDB.DeleteAllInfo(DateTime.Now, false);
+
         List<SGAlarmData> listAlarmData = null;
         List<SGNotiData> listNotiData = null;
 
@@ -1101,7 +1107,7 @@
             CheckContinueFileUpload();
 
         }
-
+        
         pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);          //매일 자정 데이터 새로고침
     }
 
