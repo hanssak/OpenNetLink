@@ -2063,6 +2063,21 @@
 
         strCurTitle = XmlConf.GetTitle("T_FILE_EMPTYTITLE");                                // 제목을 입력하십시오. (최대 60자)
         strCurDesc = XmlConf.GetTitle("T_FILE_EMPTYDESC");                                // 설명을 입력하십시오. (최대 80자)
+
+
+        int groupID = groupIDbyParam;
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null && !String.IsNullOrEmpty(sgLoginData.GetTransferTitle(sgLoginData.GetSystemPosition())))    // tbl_system_env에 넣어놓은 Title / Desc 가져와서 사용
+            strCurTitle =sgLoginData.GetTransferTitle(sgLoginData.GetSystemPosition());
+        else
+        strCurTitle = XmlConf.GetTitle("T_FILE_EMPTYTITLE");                                // 제목을 입력하십시오. (최대 60자)
+
+        if (sgLoginData != null && !String.IsNullOrEmpty(sgLoginData.GetTransferDescription(sgLoginData.GetSystemPosition())))
+            strCurDesc =sgLoginData.GetTransferDescription(sgLoginData.GetSystemPosition());
+        else
+        strCurDesc = XmlConf.GetTitle("T_FILE_EMPTYDESC");                                // 설명을 입력하십시오. (최대 80자)
+
     }
 
     private void OpenPreviewWindow()

@@ -1510,6 +1510,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetDocumentExtractType(bool bSystem)
             => (bSystem) ? GetTagData("I_CLIENT_DOCUMENT_EXTRACT_TYPE") : GetTagData("E_CLIENT_DOCUMENT_EXTRACT_TYPE");
 
+        /// <summary>
+        /// 서버로부터 수신받은 전송 시 제목 comment 정보를 반환한다.
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetTransferTitle(bool bSystem)
+            => (bSystem) ? GetTagData("I_CLIENT_TRANSFER_TITLE") : GetTagData("E_CLIENT_TRANSFER_TITLE");
+
+        /// <summary>
+        /// 서버로부터 수신받은 전송 시 설명 comment 정보를 반환한다.
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetTransferDescription(bool bSystem)
+            => (bSystem) ? GetTagData("I_CLIENT_TRANSFER_DESCRIPTION") : GetTagData("E_CLIENT_TRANSFER_DESCRIPTION");
+
+
 
         /// <summary>
         /// OLE 개체 검사 시 OLE MIME LIST의 블랙/화이트 여부 (서버ENV 테이블에서 GET)

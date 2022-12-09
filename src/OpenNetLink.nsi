@@ -3699,8 +3699,6 @@ Section "MainSection" SEC01
   ${EndIf} ; ${IS_PATCH} == 'TRUE'
 
   
-  ;debug 파일들 삭제
-  Delete "${INSTALLPATH}\*.pdb"
   
 SectionEnd
 

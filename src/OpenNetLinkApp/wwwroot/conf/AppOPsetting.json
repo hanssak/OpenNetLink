@@ -11,7 +11,7 @@
 
   "bUseMainPageType": true,
 
-  "bUseStartProgramReg": true,
+  "bUseStartProgramReg": false,
 
   "bManualDownFolderChange": false,
   "bManualRecvDownChange": false,
@@ -95,14 +95,14 @@
   "bURLListPolicyRecv": false,
   "bUseCertSend": false,
   "blistUseEmail": [
-    false,
-    false
+    true,
+    true
   ],
   "bUseForceUpdate": true,
   "bUsePCURL": false,
   "bUsePublicBoard": false,
-  "bUseUserRecvDownPath": true,
-  "bUseUserRecvDownPathUserName": true,
+  "bUseUserRecvDownPath": false,
+  "bUseUserRecvDownPathUserName": false,
   "bUseUserSelectFirstServer": false,
   "bViewDlpApproverSelectMyDept": false,
   "bViewFileFilter": true,
@@ -133,7 +133,7 @@
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
 
-  "bUsePartialFileAddInTransfer" : true
+  "bUsePartialFileAddInTransfer" : false
 
   
 

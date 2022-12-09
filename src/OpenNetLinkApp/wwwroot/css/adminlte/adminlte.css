@@ -3291,14 +3291,14 @@ input[type="button"].btn-block {
 }
 
 .dropdown-toggle::after {
-  display: inline-block;
-  margin-left: 0.255em;
-  vertical-align: 0.255em;
-  content: "";
-  border-top: 0.3em solid;
-  border-right: 0.3em solid transparent;
-  border-bottom: 0;
-  border-left: 0.3em solid transparent;
+    display: inline-block;
+    margin-left: 0.255em;
+    vertical-align: 0.255em;
+    content: "";
+    border-top: 0.3em solid;
+    border-right: 0.3em solid transparent;
+    border-bottom: 0;
+    border-left: 0.3em solid transparent;
 }
 
 .dropdown-toggle:empty::after {
@@ -3492,6 +3492,20 @@ input[type="button"].btn-block {
   white-space: nowrap;
   background-color: transparent;
   border: 0;
+}
+
+.dropdown-item-small {
+    display: block;
+    width: 160px;
+    /*padding: 0.25rem 1rem;*/
+    /*padding: 0.25rem 1rem;*/
+    clear: both;
+    font-weight: 400;
+    color: #212529;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
 }
 
 .dropdown-item:hover, .dropdown-item:focus {
@@ -13692,6 +13706,13 @@ body.text-sm .control-sidebar {
   font-size: 0.875rem;
   padding: 0.5rem 1rem;
   text-align: center;
+}
+
+.dropdown-footer-left {
+    display: block;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    text-align: left;
 }
 
 .open:not(.dropup) > .animated-dropdown-menu {

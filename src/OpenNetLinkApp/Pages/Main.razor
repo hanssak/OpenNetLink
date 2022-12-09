@@ -855,6 +855,7 @@
 
             CLog.Here().Information($"LoginResultOnetoAll(#######) - GroupID : {groupId}, Ret : {ret}, LockAsync - START!");
 
+
             if (ret == 0)
             {
 
@@ -913,6 +914,8 @@
                     strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
                     strGetinfoTagName += ", 'CLIENT_DOCUMENT_EXTRACT_TYPE'";
                     strGetinfoTagName += ", 'CLIENT_DOCUMENT_MIME_FILTER_TYPE'";
+                    strGetinfoTagName += ", 'CLIENT_TRANSFER_TITLE'";
+                    strGetinfoTagName += ", 'CLIENT_TRANSFER_DESCRIPTION'";
 
                     string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
                     HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
@@ -1042,7 +1045,7 @@
                     // 자동전송기능 위해
                     if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend())
                     {
-                        Window.SetNativeClipboardHotKey(groupId, 
+                        Window.SetNativeClipboardHotKey(groupId,
                             listModKey[(int)HOTKEY_MOD.ALT],
                             listModKey[(int)HOTKEY_MOD.CTRL],
                             listModKey[(int)HOTKEY_MOD.SHIFT],
@@ -1245,12 +1248,6 @@
                 // Clipboard 단축키 및 HeaderUI에서 바로 클립보드를 전송할 수 있으므로 사후결재 관련 현재상태값을 로그인후 바로 저장
                 SaveAfterApproveCheckBoxStatus(groupId);
 
-                // 임시로 Page 이동못하게 막음(KKW)
-                //if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
-
-                // MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
-
-                //if (AppConfigSvc.GetStartTrayMove())
                 if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
                 {
                     if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
@@ -1282,16 +1279,6 @@
                 //await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
 
                 bLoginBtnDisable = false;
-
-                //
-                if (groupId == 0)
-                {
-                    List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-                    if (listNetWork.Count > 0 && String.Compare(listNetWork[0].NetPos, "EX", true) == 0)
-                    { 
-
-                    }
-                }
 
                 string strPopupMsg = "";
 

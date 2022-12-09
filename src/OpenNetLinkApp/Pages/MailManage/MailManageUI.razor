@@ -10,6 +10,9 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGDomain
 @using OpenNetLinkApp.Components.SGSearchCondition
+@using AgLogManager
+@using Serilog
+@using Serilog.Events
 
 @inject IJSRuntime jsRuntime
 @inject HSCmdCenter HSCmdCenter
@@ -50,66 +53,30 @@
 
                             <tr>
                                 <th class="p-2">@strPeriod</th>
-                                <td>
+                                <td style="width:30%;">
                                     @*<input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker9" readonly="readonly" value="@strFromDay">
-                                        <span class="float-left col-md-1">-</span>
-                                        <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker10" readonly="readonly" value="@strToDay">*@
+            <span class="float-left col-md-1">-</span>
+            <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker10" readonly="readonly" value="@strToDay">*@
                                     <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
-                                <th class="p-2"> @strTransferKind </th>
+
+                                <th class="p-2"> @strApproveKind </th>                     <!--결재종류-->
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            @strTransTypeText
+                                            @strApproveTypeText
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                                            @foreach (string str in Common.CsFunction.GetOptionValue("TransType"))
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("ApproveKind"))
                                             {
-                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransTypeText, str, doSearch))">@str</button>
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strApproveTypeText, str, doSearch))">@str</button>
                                             }
                                         </div>
                                     </div>
-                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransTypeText<i class="fas fa-angle-down pl-2"></i></button>-->
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApproveTypeText<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
-                                <th class="p-2"> @strPersonInfo </th>
-                                <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            @strDlpValue
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
-                                            @foreach (string str in Common.CsFunction.GetOptionValue("DlpValue"))
-                                            {
-                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDlpValue, str, doSearch))">@str</button>
-                                            }
-                                        </div>
-                                    </div>
-                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("DlpValue"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDlpValue<i class="fas fa-angle-down pl-2"></i></button>-->
-                                </td>
-                                <th class="p-2"> @strTransferStatus </th>
-                                <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            @strTransFlag
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
-                                            @foreach (string str in Common.CsFunction.GetOptionValue("MailTransStatus"))
-                                            {
-                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransFlag, str, doSearch))">@str</button>
-                                            }
-                                        </div>
-                                    </div>
-                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("MailTransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransFlag<i class="fas fa-angle-down pl-2"></i></button>-->
-                                </td>
-                            </tr>
 
-                            <tr>
-                                <th class="p-2 pt-2"> @strReceiver </th>
-                                <td class="pt-2" colspan="1"><input type="text" class="form-control" placeholder="@stReceivePlease" @bind="strSearchReceiver" @onkeyup="HandleKeyEvent"></td>
-
-                                <th class="p-2 pt-2"> @strTitle </th>
-                                <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="@stTitlePlease" @bind="strSearchTitle" @onkeyup="HandleKeyEvent"></td>
-                                <th class="p-2"> @strApproveStatus </th>
+                                <th class="p-2"> @strApproveStatus </th>                     <!--승인상태-->
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -124,6 +91,64 @@
                                     </div>
                                     <!--<button type="button" @onclick="@(()=>openCustomSelect("MailApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strSearchApproveStatus<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
+
+                                <th class="p-2"> @strDlpInfo </th>                     <!-- 개인정보 -->
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strDlpValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("DlpValue"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDlpValue, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("DlpValue"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDlpValue<i class="fas fa-angle-down pl-2"></i></button>-->
+                                </td>
+
+                            </tr>
+
+                            <tr>
+                                <th class="p-2 pt-2"> @strReceiver </th> <!-- 수신자 -->
+                                <td class="pt-2" colspan="1"><input type="text" class="form-control  col-md-11" placeholder="@stReceivePlease" @bind="strSearchReceiver" @onkeyup="HandleKeyEvent"></td>
+
+                                <th class="p-2 pt-2"> @strTitle </th> <!-- 제목 -->
+                                <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="@stTitlePlease" @bind="strSearchTitle" @onkeyup="HandleKeyEvent"></td>
+
+                                <th class="p-2"> @strTransferKind </th>                     <!--발송구분-->
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransTypeText
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("TransType"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransTypeText, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransTypeText<i class="fas fa-angle-down pl-2"></i></button>-->
+                                </td>
+
+                                <th class="p-2"> @strTransferStatus </th>                     <!--발송상태-->
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransFlag
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("MailTransStatus"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer-left text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransFlag, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("MailTransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransFlag<i class="fas fa-angle-down pl-2"></i></button>-->
+                                </td>
+
                             </tr>
                         </table>
 
@@ -138,6 +163,7 @@
         <div style="padding-left:30px;" class="row mb-3">
             <div class="col-sm-12 text-right">
                 <button type="button" class="btn btn-md btn-black" @onclick="doSearch"><i class="fas fa-search"></i>@strSearch</button>
+                <button type="button" class="btn btn-md btn-red" @onclick="@TransCancel"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_EMAIL_SENDCANCEL")</button>
             </div>
         </div>
 
@@ -152,26 +178,59 @@
                     <form class="form-horizontal">
 
                         <div class="card-body  p-0">
-                            <table class="table table-head-fixed table-bordered table-hover" style="table-layout: fixed;">
+                            <table id="table1" class="table table-head-fixed table-bordered table-hover" style="table-layout: fixed;">
                                 <thead>
                                     <tr>
-                                        <th style="text-align:center;width:7%;">@strTransferKind</th>
-                                        <th style="text-align:center;width:7%;">@strPersonInfo</th>
-                                        <th style="text-align:center;width:7%;">@strFileAttach</th>
-                                        <th style="text-align:center;width:7%;">@strTransferStatus</th>
-                                        <th style="text-align:center;width:7%;">@strApproveStatus</th>
-                                        <th style="text-align:center;width:15%;">@strReceiver</th>
-                                        <th style="text-align:center">@strTitle</th>
-                                        <th style="text-align:center;width:8%;">@strSendDay</th>
-                                        <th style="text-align:center;width:6%;">@strViewDetail</th>
+                                        <th style="text-align:center;width:3%;">
+                                            <!--  <input class="input" type="checkbox">  -->
+                                        </th>
+                                        <th style="text-align:center; vertical-align:middle;width:6%;">@strApproveKind</th>     <!--결재종류-->
+                                        <th style="text-align:center; vertical-align:middle;width:6%;">@strTransferKind</th>    <!--발송구분-->
+                                        <th style="text-align:center; vertical-align:middle;width:6%;">@strDlpInfo</th>         <!-- 개인정보 -->
+                                        <th style="text-align:center; vertical-align:middle;width:6%;">@strFileAttach</th>      <!-- 파일첨부 -->
+                                        <th style="text-align:center; vertical-align:middle;width:8%;">@strTransferStatus</th>  <!-- 발송상태 -->
+                                        <th style="text-align:center;width:7%;">@strApproveStatus</th>                          <!-- 승인상태 -->
+                                        <th style="text-align:center;width:15%;">@strReceiver</th>                              <!-- 수신자 -->
+                                        <th style="text-align:center">@strTitle</th>                                            <!-- 제목 -->
+                                        <th style="text-align:center;width:8%;">@strSendDay</th>                                <!-- 발신일 -->
+                                        <th style="text-align:center;width:6%;">@strViewDetail</th>                             <!-- 상세보기 -->
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (listData != null)
+                                    @foreach (emailtransData item in mData)
                                     {
-                                        @foreach (var item in listData)
-                                        {
-                                            <tr>
+                                        <tr class="TransSearch">
+                                            <td style="text-align:center">
+                                                <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                            </td>
+
+                                            <td style="text-align:center; vertical-align: middle">@item.ApvType</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.TransferType</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.stDLP</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.IsFile</td>
+
+
+                                            <td style="text-align:center; vertical-align: middle">@item.TransferStatus</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.ApvStatus</td>
+
+                                            <td style="vertical-align:middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.strReceiver</td>
+                                            <td style="vertical-align:middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.RequestTime</td>
+
+                                            @*@if (item.isPossibleDownload)
+                                                {
+                                                    <td style="text-align:center; vertical-align: middle">@item.isPossibleDownloadCount</td>
+                                                    <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>RequestManualDownload(item))"><i class="far fa-arrow-alt-circle-down"></i></button></td>
+                                                }
+                                                else
+                                                {
+                                                    <td style="text-align:center; vertical-align: middle">0</td>
+                                                    <td style="text-align:center; vertical-align: middle">-</td>
+                                                }*@
+
+                                            <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
+
+                                            @*
                                                 <td style="text-align:center">@GetTransTypeText(item[0])</td>
                                                 <td style="text-align:center">@GetDLPFlagText(item[4])</td>
                                                 <td style="text-align:center">@GetAttachFileText(item[5])</td>
@@ -181,8 +240,8 @@
                                                 <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item[9]">@item[9]</td>
                                                 <td style="text-align:center">@GetRequestTime(item[11])</td>
                                                 <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item[1]))"><i class="fas fa-search"></i></button></td>
-                                            </tr>
-                                        }
+                                            *@
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
@@ -222,6 +281,17 @@
 
 @code {
 
+    public string strApproveTypeText = "";
+    public string _strApproveTypeText
+    {
+        get { return strApproveTypeText; }
+        set
+        {
+            strApproveTypeText = value;
+            doSearch();
+        }
+    }
+
     public string strTransTypeText = "";
     public string _strTransTypeText
     {
@@ -245,6 +315,8 @@
             _strTransFlag = stValue;
         else if (stOption == "MailApproveStatus")
             _strSearchApproveStatus = stValue;
+        else if (stOption == "ApproveKind")
+            _strApproveTypeText = stValue;
     }
     SGCustomSelect refSGCustomSelect;
 
@@ -258,6 +330,9 @@
             await refSGCustomSelect.openPopUp(opt, strTransFlag);
         else if (opt == "MailApproveStatus")
             await refSGCustomSelect.openPopUp(opt, strSearchApproveStatus);
+        else if (opt == "ApproveKind")
+            await refSGCustomSelect.openPopUp(opt, strApproveTypeText);
+
     }
 
     [Parameter]
@@ -265,14 +340,27 @@
     private MailParam mailParam = new MailParam();
     //원데이타라고 가정함
     //public List<mailData> ListData = new List<mailData>();  //--> 이거 안쓰고
-    List<Dictionary<int, string>> listData = null;          //DB 데이타 직접 사용하는걸로 수정
+    List<Dictionary<int, string>> listTempData = null;          //DB 데이타 직접 사용하는걸로 수정
 
     MailManagePopUp refMailManagePopUp;
     Footer refFooter;
     PeriodDatePicker refPeriodDatePicker;
 
     public int TotalCount { get; set; }
-    //public List<mailData> mData = new List<mailData>();
+
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<MailManageUI>();
+
+    /// <summary>
+    /// checkBox 등 사용자의 설정 정보가 반영된 LIST data
+    /// </summary>
+    public List<emailtransData> mData = new List<emailtransData>();
+
+    /// <summary>
+    /// 조회해서 받은 원본data data
+    /// </summary>
+    public List<emailtransData> ListData = new List<emailtransData>();
+
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
     private int nViewPageNo = 1;
     private int nTotalPages = 1;
@@ -282,14 +370,20 @@
 
     ISGSideBarUIService SideBarUISvc;
 
+    // 목적지 Data
+    Dictionary<string, SGNetOverData> dicDestSysPos = null;
+    public string strDestNetWork = "";
+
+
     private string strMailManage;           // 메일관리
     private string strMailManageGap;        //메일 관리
     private string strPeriod;               //기간
+
     private string strTransferKind;         //발송구분
     private string strTotal;                //전체
     private string strToInbound;            //반입
     private string strToOutbound;           //반출
-    private string strPersonInfo;           //개인정보
+    private string strDlpInfo;           //개인정보
     private string strToBe;                 //있음
     private string strNotToBe;              //없음
     private string strTransferStatus;       //발송상태
@@ -440,7 +534,112 @@
         }
     }
 
-    public void doSearchList()
+    /// <summary>
+    /// 전송관리에서 검색되는 개수를 얻는 Query 실행
+    /// </summary>
+    /// <returns></returns>
+    @*
+        public async Task TransSearchCount()
+        {
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            string strMsg = "";
+            if (pageService.GetConnectStatus(groupID) == false)
+            {
+                strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+                strMsg = strMsg.Replace("/r/n", "<br>");
+                ShowMessage("error", strMsg);
+                return;
+            }
+            //int groupID = 0;
+
+            SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData != null)
+                curUserID = sgLoginData.GetUserID();
+
+            curTransKind = GetTransKind();
+            curTransStatus = GetTransStatus();
+            curApprStatus = GetApprStatus();
+
+            curTitle = strTitleValue;
+
+            byte[] temp = Encoding.Default.GetBytes(curTitle);
+            curTitle = Encoding.UTF8.GetString(temp);
+
+            nViewPageNo = 1;
+
+            await refPeriodDatePicker.RetriveDateFromJS();
+            string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+            string curToDay = refPeriodDatePicker.ToDateSearchValue;
+
+
+            TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
+            string strQueryCount = "";
+
+            param.Src_system_id = "";
+            param.Dest_system_id = "";
+
+            {
+                TransferDao dao = new TransferDao();
+                param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
+                strQueryCount = dao.TotalCount(param, true);   // 쿼리 데이터 카운트
+            }
+
+            // string str = dao.List(param);                  // 확인용
+            HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
+        }
+    *@
+
+    /// <summary>
+    /// 전송관리에서 검색되는 목록을 얻는 Query 실행 결과값 받았을때 List 상태
+    /// </summary>
+    /// <param name="pageNum">페이지</param>
+    @*
+        public void TransSearchData(int pageNum)
+        {
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            if (pageService.GetConnectStatus(groupID) == false)
+            {
+                string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+                strMsg = strMsg.Replace("/r/n", "<br>");
+                ShowMessage("error", strMsg);
+                return;
+            }
+
+            Task.Run(async () => { await refPeriodDatePicker.RetriveDateFromJS(); });
+            string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+            string curToDay = refPeriodDatePicker.ToDateSearchValue;
+
+            string curUserID = "";
+            if (sgLoginData != null)
+                curUserID = sgLoginData.GetUserID();
+
+            //
+            TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, pageNum);
+            string strQuery = "";
+            param.Src_system_id = "";
+            param.Dest_system_id = "";
+
+            TransferDao dao = new TransferDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
+            strQuery = dao.List(param, true);   // 쿼리 데이터 리스트
+            HSCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
+
+            //MailManageDao dao = new MailManageDao();
+            //string strQueryList = dao.List(mailParam);
+            //HSCmdCenter.SendListQuery(groupID, curUserID, strQueryList);
+
+        }
+    *@
+
+    public void TransSearchData(int pageNum)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -451,28 +650,43 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
-        string systemid = (sgLoginData.GetSystemPosition() == true ? "I" : "E");
-        /*
+        //string systemid = (sgLoginData.GetSystemPosition() == true ? "I" : "E");
+
         mailParam.UserID = curUserID;
-        mailParam.SystemId = systemid;
-        await mailParam.SetSearchStartDate("datepicker9");
-        await mailParam.SetSearchEndDate("datepicker10");
+        //mailParam.SystemId = systemid;
+
+        mailParam.SetSearchStartDate(refPeriodDatePicker.FromDateSearchValue);
+        mailParam.SetSearchEndDate(refPeriodDatePicker.ToDateSearchValue);
+
         mailParam.Receiver = strSearchReceiver;
         mailParam.Title = strSearchTitle;
         mailParam.PageListCount = nPageListCount;
         mailParam.ViewPageNo = nViewPageNo;
-        */
+
         MailManageDao dao = new MailManageDao();
         string strQueryList = dao.List(mailParam);
         HSCmdCenter.SendListQuery(groupID, curUserID, strQueryList);
     }
 
+    /// <summary>
+    /// Count를 Query한후 List를 Query 하는 함수
+    /// </summary>
+    /// <returns></returns>
     public async Task doSearch()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
+        string strMsg = "";
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
 
         //LIST 요청응답
         HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchListResult);
@@ -487,9 +701,12 @@
         string systemid = (sgLoginData.GetSystemPosition() == true ? "I" : "E");
 
         mailParam.UserID = curUserID;
-        mailParam.SystemId = systemid;
-        @*await mailParam.SetSearchStartDate("datepicker9");
-            await mailParam.SetSearchEndDate("datepicker10");*@
+        //mailParam.SystemId = systemid;
+
+        @*
+            await mailParam.SetSearchStartDate("datepicker9");
+            await mailParam.SetSearchEndDate("datepicker10");
+        *@
 
         await refPeriodDatePicker.RetriveDateFromJS();
         mailParam.SetSearchStartDate(refPeriodDatePicker.FromDateSearchValue);
@@ -497,31 +714,19 @@
 
         //TransKInd => sr_type
         mailParam.SetTransKindCode(strTransTypeText);
+        mailParam.ApproveKind = strApproveTypeText;
 
-        //Debug.WriteLine("strFromDay:" + mailParam.SearchStartDate);
-        //Debug.WriteLine("strEndDay:" + mailParam.SearchEndDate);
-        //Debug.WriteLine("strToDay:");
-        //Debug.WriteLine("TransKind:" + strTransKindValue);
-        //Debug.WriteLine("TransKindCode:" + mailParam.GetTransKindCode());
-        //Debug.WriteLine("DlpValue:" + strDlpValue);
-        //Debug.WriteLine("DlpValueCode:" + mailParam.GetDlpValueCode()); //1:있음 0,2,3:없음
-        //Debug.WriteLine("TransStatus:" + strTransFlag);
-        //Debug.WriteLine("TransStatusCode:" + mailParam.GetTransStatusCode());
-        //Debug.WriteLine("strSearchReceiver:" + strSearchReceiver);
         mailParam.ApprStatus = strSearchApproveStatus;
         mailParam.TransStatus = strTransFlag;
         mailParam.DlpValue = strDlpValue;
         mailParam.Receiver = strSearchReceiver;
-        //Debug.WriteLine("strSearchTitle:" + strSearchTitle);
         mailParam.Title = strSearchTitle;
-        //Debug.WriteLine("ApproveStatus:" + mailParam.ApprStatus);
-        //Debug.WriteLine("ApproveStatusCode:" + mailParam.GetApprStatusCode());
 
         MailManageDao dao = new MailManageDao();
         string strQueryCount = dao.TotalCount(mailParam);
-        //Debug.WriteLine(dao.List(mailParam));
         HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
     }
+
 
     private void UpdateList(int pageNumber)
     {
@@ -534,6 +739,105 @@
         await refMailManagePopUp.openPopUp(transSeq);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="transSeq"></param>
+    /// <param name="downCount"></param>
+    public void DetailSearch(string transSeq, int downCount)
+    {
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        HSCmdCenter.sgPageEvent.SetDetailSearchEventAdd(groupID, DetailSearchResult);           // 상세보기 조회 결과
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        string strUserID = sgLoginData.GetUserID();
+
+        HSCmdCenter.SendTransDetail(groupID, strUserID, transSeq);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
+    public void DetailSearchResult(int groupId, PageEventArgs e)
+    {
+        int nRet = e.result;
+        string strMsg = e.strMsg;
+        if (nRet != 0)
+        {
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        // 확인해보고 결정해야됨 - SGDetailData
+        SGemailDetailData sgDetailData = (SGemailDetailData)HSCmdCenter.GetDetailData(groupId);
+        if (sgDetailData == null)
+            return;
+
+        emailtransData tData = null;
+        tData = GetTransListData(strMsg);
+        if (tData != null)
+        {
+            string sTransSeq = tData.TransSeq;
+            string sApprSeq = "";
+            int nDataForwarded = 0; // GetForwarded(tData.IsFile); // 고려해야함
+            bool bTransCancel = !tData.bCheckDisable;
+            bool bApprove = false;
+            bool bReject = false;
+
+            sgDetailData.SetInit(false, sTransSeq, sApprSeq, nDataForwarded, bTransCancel, bApprove, bReject);
+            HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
+
+            // refTransPopUp.m_downloadCount = m_currentDownloadCount;
+            // refTransPopUp.SetBindingData();
+            // OpenDetailPopup(sTransSeq).Wait();
+
+        }
+    }
+
+    /// <summary>
+    /// TransSeq에 해당하는 transData 를 찾아준다
+    /// </summary>
+    /// <param name="strTransSeq">TransSeq</param>
+    /// <returns>TransData</returns>
+    public emailtransData GetTransListData(string strTransSeq)
+    {
+        emailtransData tdata = null;
+        int nCount = ListData.Count;
+        if (nCount <= 0)
+            return tdata;
+
+        for (int i = 0; i < nCount; i++)
+        {
+            emailtransData temp = ListData[i];
+            if (temp.TransSeq.Equals(strTransSeq))
+            {
+                tdata = temp;
+                break;
+            }
+        }
+        return tdata;
+    }
+
+
     public void InitText()
     {
         strMailManage = XmlConf.GetTitle("T_COMMON_EMAILMANAGE");                   // 메일관리
@@ -543,7 +847,7 @@
         strTotal = XmlConf.GetTitle("T_COMMON_ALL");                                //전체
         strToInbound = XmlConf.GetTitle("T_COMMON_IMPORT");                         //반입
         strToOutbound = XmlConf.GetTitle("T_COMMON_EXPORT");                        //반출
-        strPersonInfo = XmlConf.GetTitle("T_COMMON_PRIVACY");                       //개인정보
+        strDlpInfo = XmlConf.GetTitle("T_COMMON_PRIVACY");                       //개인정보
         strToBe = XmlConf.GetTitle("T_COMMON_EXIST");                               //있음
         strNotToBe = XmlConf.GetTitle("T_COMMON_NOTEXIST");                         //없음
         strTransferStatus = XmlConf.GetTitle("T_EMAIL_STATUS");                     //발송상태
@@ -569,10 +873,70 @@
         stReceivePlease = XmlConf.GetTitle("T_EMAIL_RECEIVER_NEEDED");              //수신자를 입력해 주세요.
         stTitlePlease = XmlConf.GetTitle("T_EMAIL_TITLE_NEEDED");                   //제목을 입력해 주세요.
 
+        strApproveTypeText = XmlConf.GetTitle("T_COMMON_ALL");
         strTransTypeText = XmlConf.GetTitle("T_COMMON_ALL");
         strDlpValue = XmlConf.GetTitle("T_COMMON_ALL");
         strTransFlag = XmlConf.GetTitle("T_COMMON_ALL");
         strSearchApproveStatus = XmlConf.GetTitle("T_COMMON_ALL");
+    }
+
+
+    /// <summary>
+    /// List상에 Checked(체크된) 항목들중 제일 마지막 항목을 준다.
+    /// </summary>
+    /// <returns>TransSeq</returns>
+    public string GetCheckTransSeq()
+    {
+        string strTransSeq = "";
+        int nCount = 0; // ListData.Count;
+        for (int i = 0; i < nCount; i++)
+        {
+            emailtransData temp = new emailtransData(); // = ListData[i];
+            if (temp.bCheck)
+            {
+                strTransSeq = temp.TransSeq;
+            }
+        }
+        return strTransSeq;
+    }
+
+    /// <summary>
+    /// 발송취소 명령실행
+    /// </summary>
+    public void TransCancel()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        string strMsg = "";
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        string strTransSeq = GetCheckTransSeq();
+        if (strTransSeq.Equals(""))
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0068"); // 선택된 항목이 없습니다.
+            ShowMessage("info", strMsg);
+            return;
+        }
+
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+        string curTransSeq = "";
+        if (!strTransSeq.Equals(""))
+            curTransSeq = strTransSeq;
+        string curAction = "2";
+        string curReason = "사유";
+
+        HSCmdCenter.SendTransCancel(groupID, curUserID, curTransSeq, curAction, curReason);
     }
 
     protected override void OnInitialized()
@@ -593,6 +957,7 @@
         base.OnInitialized();
 
     }
+
     @*
         public async Task GetDateTime()
         {
@@ -614,7 +979,8 @@
         string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
         if (vStr2 != null && vStr2.Length > 0)
         strToDay = vStr2;
-        }*@
+        }
+    *@
 
     public void SetPageinfo(int nDataCount)
     {
@@ -635,52 +1001,256 @@
         string reason = e.GetSvrRecordTagData("REASON");
         List<Dictionary<int, string>> listCnt = null;
         listCnt = e.GetSvrRecordData("RECORD");
+
+        if (listCnt == null || listCnt.Count < 1 || count <= 0)
+        {
+            CLog.Here().Information("SearchCount - RECORD - empty!");
+
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0286"));            // 검색결과가 존재하지 않습니다.
+            ListData.Clear();
+
+            //UpdateList(0);
+            //SetPageinfo();
+            StateHasChanged();
+
+            return;
+        }
+
         string cnt = "";                        //총 레코드 카운트
         listCnt[0].TryGetValue(0, out cnt);
         int totalCnt = Int32.Parse(cnt);
 
         if (result != "0")
         {
+            CLog.Here().Information($"SearchCountResult - Result : {result}, reason : {reason}");
             ShowMessage("error", reason);
             return;
         }
-        if (count <= 0)
+
+        CLog.Here().Information($"SearchCountResult - COUNT : {totalCnt}, reason : {reason}");
+
+        if (totalCnt <= 0)
         {
             ShowMessage("warn", reason);            // 검색결과가 존재하지 않습니다.
-            if (listData != null) listData.Clear();
+            if (listCnt != null) listCnt.Clear();
             //UpdateList(0);
             SetPageinfo(totalCnt);
             StateHasChanged();
             return;
         }
+
         SetPageinfo(totalCnt);
         //UpdateList(nViewPageNo);
         //리스트 쿼리 호출
-        doSearchList();
+        UpdateData();
     }
+
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="updatePageNum"></param>
+    private void UpdateInitList(int updatePageNum)
+    {
+        nViewPageNo = updatePageNum;
+        mData = ListData.Take(nPageListCount).ToList();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    private void UpdateData()
+    {
+        TransSearchData(nViewPageNo);
+    }
+
 
     public void SearchListResult(int groupId, SGData e)
     {
         string result = e.GetTagData("RESULT");
         string reason = e.GetTagData("REASON");
         int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
-        listData = e.GetSvrRecordData2("RECORD");
+        listTempData = e.GetSvrRecordData2("RECORD");
 
+        if (listTempData == null || listTempData.Count < 1)
+        {
+            CLog.Here().Information("SearchListResult - RECORD - empty!");
+
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0286"));            // 검색결과가 존재하지 않습니다.
+            ListData.Clear();
+            mData.Clear();
+
+            //UpdateList(0);
+            //SetPageinfo();
+            StateHasChanged();
+
+            return;
+        }
+
+        if (result != "0")
+        {
+            CLog.Here().Information($"SearchListResult - Result : {result}, reason : {reason}");
+            ShowMessage("error", reason);
+            return;
+        }
+
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+        string curUserID = "";
+        int maxDownloadCount = 0;
+        bool isInner = false;
+        if (sgLoginData != null)
+        {
+            curUserID = sgLoginData.GetUserID();
+            maxDownloadCount = sgLoginData.GetMaxDownCount();
+            isInner = sgLoginData.GetSystemPosition();
+        }
+        else
+            return;
+
+        ListData.Clear();
+
+        SGeMailTransManageData sgData = new SGeMailTransManageData();
+        sgData.Copy(HSCmdCenter.GetConnectNetWork(groupId), e);
+
+        int nCount = listTempData.Count;
+        int nowDate = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
+
+        for (int i = 0; i < nCount; i++)
+        {
+            Dictionary<int, string> dic = listTempData[i];
+            if (dic == null)
+                continue;
+
+            string tmpStr = "";
+            if (dic.TryGetValue(0, out tmpStr) != true)
+            {
+                if (tmpStr.Equals(""))
+                    continue;
+            }
+
+            emailtransData tData = new emailtransData();
+            tData.bCheck = false;
+            tData.bCheckDisable = !(sgData.GetTransCancelEnableChk(curUserID, dic));
+            tData.TransSeq = sgData.GetTransSeq(dic);                   // TransSeq;
+            tData.ApvType = sgData.GetApprKind(dic);                    // 결재종류 (선결/후결)
+            tData.TransferType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
+            tData.TransferStatus = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
+            tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
+            tData.IsFile = sgData.GetFileForwardKind(dic);              // 파일첨부 유무
+
+
+            if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                tData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
+
+            tData.Title = sgData.GetTitle(dic);                         // 제목
+            FileAddManage fileAddManage = new FileAddManage();
+            tData.Title = fileAddManage.GetConvertTitleDesc(false, tData.Title);
+            tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+            tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
+            tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
+            tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
+            tData.expiredDate = sgData.GetExpiredDate(dic);             //파일저장 만료일
+            tData.stDLP = sgData.GetDlp(dic);
+            tData.isPossibleDownload = GetIsPossibleDownLoad(tData, isInner, maxDownloadCount, nowDate);
+
+            if (maxDownloadCount - tData.downloadCount < 0)
+                tData.isPossibleDownloadCount = 0;
+            else
+                tData.isPossibleDownloadCount = maxDownloadCount - tData.downloadCount;
+
+
+            ListData.Add(tData);
+        }
+
+        UpdateInitList(nViewPageNo);
         StateHasChanged();
     }
 
-    @*   public void GetInitDateTime()
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tData"></param>
+    /// <param name="isInner"></param>
+    /// <param name="maxDownloadCount"></param>
+    /// <param name="nowDate"></param>
+    /// <returns></returns>
+    public bool GetIsPossibleDownLoad(emailtransData tData, bool isInner, int maxDownloadCount, int nowDate)
+    {
+        bool isPossibleDownload = false;
+        //파일 다운로드 가능여부 판단
+        if (!isInner && tData.TransferType == XmlConf.GetTitle("T_COMMON_EXPORT"))
+            isPossibleDownload = true;
+        else if (isInner && tData.TransferType == XmlConf.GetTitle("T_COMMON_IMPORT"))
+            isPossibleDownload = true;
+
+        if (isPossibleDownload)
         {
-        strToDay = DateTime.Now.ToString("yyyy-MM-dd");
-        string year = DateTime.Now.ToString("yyyy");
-        string month = DateTime.Now.ToString("MM");
-        string day = DateTime.Now.ToString("dd");
-        int nYear = Convert.ToInt32(year);
-        int nMonth = Convert.ToInt32(month);
-        int nDay = Convert.ToInt32(day);
-        System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
-        strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
-        }*@
+            //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능            
+@*
+            if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForwardDownBeforeRecv())
+            {
+                if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
+                    isPossibleDownload = true;
+                else
+                    isPossibleDownload = false;
+            }
+            else
+            {
+                //수동다운로드 이므로 PC수신완료 건만 다운가능
+                if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
+                    isPossibleDownload = true;
+                else
+                    isPossibleDownload = false;
+            }
+*@
+
+            //수동다운로드 이므로 PC수신완료 건만 다운가능
+            if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
+                isPossibleDownload = true;
+            else
+                isPossibleDownload = false;
+        }
+
+        int expireDate = Int32.Parse(tData.expiredDate.Replace("-", ""));
+        if (isPossibleDownload)
+        {
+            if (expireDate >= nowDate)
+                isPossibleDownload = true;
+            else
+                isPossibleDownload = false;
+        }
+
+        if (maxDownloadCount == 0)
+            isPossibleDownload = false;
+
+        if (isPossibleDownload)
+        {
+            if (tData.downloadCount < maxDownloadCount)
+                isPossibleDownload = true;
+            else
+                isPossibleDownload = false;
+        }
+
+        return isPossibleDownload;
+    }
+
+
+    @*
+        public void GetInitDateTime()
+        {
+            strToDay = DateTime.Now.ToString("yyyy-MM-dd");
+            string year = DateTime.Now.ToString("yyyy");
+            string month = DateTime.Now.ToString("MM");
+            string day = DateTime.Now.ToString("dd");
+            int nYear = Convert.ToInt32(year);
+            int nMonth = Convert.ToInt32(month);
+            int nDay = Convert.ToInt32(day);
+            System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
+            strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
+        }
+    *@
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -690,14 +1260,40 @@
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
+
+    /// <summary>
+    /// item 항목만 List에서 check 상태를 변경, 나머지는 check 상태 false로 설정
+    /// </summary>
+    /// <param name="item"></param>
+    public void CheckStateUpdate(emailtransData item)
+    {
+        int nCount = ListData.Count;
+        for (int i = 0; i < nCount; i++)
+        {
+            emailtransData temp = ListData[i];
+            if (temp.TransSeq.Equals(item.TransSeq))
+            {
+                temp.bCheck = !temp.bCheck;
+            }
+            else
+                temp.bCheck = false;
+
+            ListData[i] = temp;
+        }
+
+        StateHasChanged();
+    }
+
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
-            @*    object[] param = { "datepicker9", "datepicker10" };
-                jsRuntime.InvokeAsync<object>("initDatePicker", param);*@
+            @*
+                object[] param = { "datepicker9", "datepicker10" };
+                jsRuntime.InvokeAsync<object>("initDatePicker", param);
+            *@
             jsRuntime.InvokeAsync<object>("initPageLeft");
-            Task.Run(async () => { await doSearch(); });
+            //Task.Run(async () => { await doSearch(); });
         }
         base.OnAfterRender(firstRender);
     }
@@ -724,4 +1320,6 @@
             }
         }
     }
+
+
 }

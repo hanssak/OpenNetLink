@@ -8,13 +8,14 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Components.SGSearchCondition
+@using AgLogManager
 
 @inject IJSRuntime jsRuntime
-@inject HSCmdCenter HSCmdCenter
 @inject XmlConfService XmlConf
-@inject NavigationManager MyNavigationManager
+@inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
+@inject NavigationManager MyNavigationManager
 
 <div class="content-header">
     <div class="container-fluid">
@@ -313,6 +314,8 @@
     List<Dictionary<int, string>> listData = null;          //DB 데이타 직접 사용하는걸로 수정
     public bool bAllCheck = false;
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<MailApproveUI>();
 
     public void CheckStateUpdate(Dictionary<int, string> item)
     {
@@ -689,6 +692,7 @@
         if (nTotalPages <= 0)
             nTotalPages = 1;
     }
+
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -696,6 +700,12 @@
         object[] param = { strType, strSystemName, strMsg };
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
+
+    /// <summary>
+    /// 개수검색 Query 결과로 호출되는 event
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void SearchCountResult(int groupId, SGData e)
     {
         string result = e.GetSvrRecordTagData("RESULT");
@@ -703,23 +713,32 @@
         string reason = e.GetSvrRecordTagData("REASON");
         List<Dictionary<int, string>> listCnt = null;
         listCnt = e.GetSvrRecordData("RECORD");
+        if (listCnt == null || listCnt.Count < 1)
+        {
+            CLog.Here().Information("SearchCount - RECORD - empty!");
+            return;
+        }
+
         string cnt = "";                        //총 레코드 카운트
         listCnt[0].TryGetValue(0, out cnt);
         int totalCnt = Int32.Parse(cnt);
 
         if (result != "0")
         {
+            CLog.Here().Information($"SearchCountResult - Result : {result}, reason : {reason}");
             ShowMessage("error", reason);
             return;
         }
-        if (count <= 0)
+        if (totalCnt <= 0)
         {
             ShowMessage("warn", reason);            // 검색결과가 존재하지 않습니다.
-            if (listData != null) listData.Clear();
+            if (listData != null) 
+                listData.Clear();
             SetPageinfo(totalCnt);
             StateHasChanged();
             return;
         }
+
         SetPageinfo(totalCnt);
         //리스트 쿼리 호출
         doSearchList();

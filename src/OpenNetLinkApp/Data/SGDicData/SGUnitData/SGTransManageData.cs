@@ -123,10 +123,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strMsg;
         }
 
-        /**
-		 * @breif 전송구분 정보를 반환한다.
-		 * @return 전송구분 정보(반출/반입)
-		 */
+        /// <summary>
+        /// 전송구분 정보를 반환한다.<br></br>
+        /// return : 전송구분 정보(반출/반입)
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetTransKind(Dictionary<int, string> dic)
         {
             string strTransKind = "";
@@ -155,11 +157,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strTransKind;
         }
 
-
-        /**
-		 * @breif 전송상태 정보를 반환한다.
-		 * @return 전송상태 정보(전송취소,전송대기,수신완료,전송실패,검사중)
-		 */
+        /// <summary>
+        /// 전송상태 정보를 반환한다.<br></br>
+        /// 전송상태 정보(전송취소,전송대기,수신완료,전송실패,검사중)
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetTransStatus(Dictionary<int, string> dic)
         {
             string strTransStatus = "";
@@ -189,11 +192,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strTransStatus;
         }
 
-
-        /**
-		 * @breif 전송상태 원본데이터 정보를 반환한다.
-		 * @return 전송상태 원본데이터(C : 전송취소, W : 전송대기, S : 수신완료, F : 전송실패, V : 검사중)
-		 */
+        /// <summary>
+        /// 전송상태 원본데이터 정보를 반환한다.<br></br>
+        /// return : 전송상태 원본데이터(C : 전송취소, W : 전송대기, S : 수신완료, F : 전송실패, V : 검사중)
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetTransStatusCode(Dictionary<int, string> dic)
         {
             string strTransStatus = "";
@@ -205,11 +209,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strTransStatus;
         }
 
-
-        /**
-		 * @breif 결재상태 정보를 반환한다.
-		 * @return 결재상태 정보(요청취소,승인대기,승인,반려)
-		 */
+        /// <summary>
+        /// 결재상태 정보를 반환한다.<br></br>
+        /// return : 결재상태 정보(요청취소,승인대기,승인,반려)
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetApprStaus(Dictionary<int,string> dic)
         {
             string strTransStatus = "";
@@ -244,10 +249,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             return strApprStatus;
         }
-        /**
-		 * @breif 결재상태 원본 데이터 정보를 반환한다.
-		 * @return 결재상태 원본 데이터(1: 승인대기, 2:승인, 3: 반려)
-		 */
+
+        /// <summary>
+        /// 결재상태 원본 데이터 정보를 반환한다.<br></br>
+        /// 결재상태 원본 데이터(1: 승인대기, 2:승인, 3: 반려)
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetApprStausCode(Dictionary<int, string> dic)
         {
             string strApprStatus = "";
@@ -261,10 +269,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 nIndex = Convert.ToInt32(strApprStatus);
             return strApprStatus;
         }
-        /**
-		 * @breif 사용자가 파일 전송 시 입력한 제목을 반환한다.
-		 * @return 제목
-		 */
+
+        /// <summary>
+        /// 사용자가 파일 전송 시 입력한 제목을 반환한다.<br></br>
+        /// return : 제목
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetTitle(Dictionary<int, string> dic)
         {
             string strTitle = "";
@@ -273,10 +284,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             strTitle = dic[6];
             return strTitle;
         }
-        /**
-		 * @breif 전송요청일 정보를 반환한다.
-		 * @return 전송요청일(type : YYYY-MM-DD hh:mm:ss)
-		 */
+
+        /// <summary>
+        /// 전송요청일 정보를 반환한다.<br></br>
+        /// return : 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetTransReqDay(Dictionary<int, string> dic)
         {
             string strTransReqDay = "";
@@ -294,10 +308,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             strTransReqDay = String.Format("{0}-{1}-{2} {3}:{4}:{5}", strYear, strMonth, strDay, strHour, strMinute, strSecond);
             return strTransReqDay;
         }
-        /**
-		 * @breif 전송요청일 정보를 반환한다.
-		 * @return 전송요청일(type : YYYY-MM-DD hh:mm:ss)
-		 */
+
+        /// <summary>
+        /// 전송요청일 정보를 반환한다.<br></br>
+        /// return : 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetQueryTransReqDay(Dictionary<int, string> dic)
         {
             string strTransReqDay = "";
@@ -307,10 +324,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             strTransReqDay = dic[9];
             return strTransReqDay;
         }
-        /**
-		 * @breif 수신가능한 다운로드 횟수를 반환한다.
-		 * @return 다운로드 횟수
-		 */
+
+        /// <summary>
+        /// 수신가능한 다운로드 횟수를 반환한다.<br></br>
+        /// 다운로드 횟수
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetDownloadCount(Dictionary<int, string> dic)
         {
             string strDownloadCount = "";
@@ -319,6 +339,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             strDownloadCount = dic[12];
             return strDownloadCount;
         }
+
         /// <summary>
         /// 파일 만료일 반환
         /// </summary>
@@ -333,10 +354,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             else
                 return String.Empty;
         }
-        /**
-		 * @breif 개인정보 검출 상태 정보를 반환한다.
-		 * @return 개인정보 검출 상태 (미사용,포함,미포함,검출불가)
-		 */
+
+        /// <summary>
+        /// 개인정보 검출 상태 정보를 반환한다.<br></br>
+        /// return 개인정보 검출 상태 (미사용,포함,미포함,검출불가)
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetDlp(Dictionary<int, string> dic)
         {
             string strDlp = "";
@@ -369,10 +393,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strDlp;
         }
 
-        /**
-		 * @breif 파일 포워딩 전송 구분 정보를 반환한다.
-		 * @return 파일 포워딩 전송 구분 정보 (발송, 수신)
-		 */
+        /// <summary>
+        /// 파일 포워딩 전송 구분 정보를 반환한다.<br></br>
+        /// return : 파일 포워딩 전송 구분 정보 (발송, 수신)
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetFileForwardKind(Dictionary<int, string> dic)
         {
             string strFileForwardKind = "";
@@ -402,11 +428,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strFileForwardKind;
         }
 
-
-        /**
-		 * @breif 송신망 정보를 반환한다.
-		 * @return 송신망 정보
-		 */
+        /// <summary>
+        /// 송신망 정보를 반환한다.<br></br>
+        /// return : 송신망 정보
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetSrcNetworkName(Dictionary<int, string> dic)
         {
 
@@ -419,11 +446,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strSrcNetwork;
         }
 
-
-        /**
-		 * @breif 목적지망 정보를 반환한다.
-		 * @return 목적지망 정보
-		 */
+        /// <summary>
+        /// 목적지망 정보를 반환한다.<br></br>
+        /// return : 목적지망 정보
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <param name="dicDestSysPos"></param>
+        /// <returns></returns>
         public string GetDestNetworkName(Dictionary<int, string> dic, Dictionary<string, SGNetOverData> dicDestSysPos)
         {
             string strDestNetwork = "";
@@ -447,11 +476,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strDestNetwork;
         }
 
-
-        /**
-        * @breif 파일 수신위치 정보를 반환한다.
-        * @return 파일 수신위치(보안웹하드, 업무PC/인터넷PC)
-        */
+        /// <summary>
+        /// 파일 수신위치 정보를 반환한다.<br></br>
+        /// return 파일 수신위치(보안웹하드, 업무PC/인터넷PC)
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetRecvPos(Dictionary<int, string> dic)
         {
             string strRecvPos = "";
@@ -484,10 +514,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strRecvPos;
         }
 
-        /**
-		 * @breif TransSequence 정보를 반환한다.
-		 * @return TransSequence 정보
-		 */
+        /// <summary>
+        /// TransSequence 정보를 반환한다.<br></br>
+        /// return : TransSequence 정보
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetTransSeq(Dictionary<int, string> dic)
         {
             string strTransSeq = "";
@@ -497,10 +529,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strTransSeq;
         }
 
-        /**
-		 * @breif 결재 정보를 반환한다.
-		 * @return 결재 정보(선결,후결)
-		 */
+        /// <summary>
+        /// 결재 정보를 반환한다.<br></br>
+        /// return 결재 정보(선결,후결)
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public string GetApprKind(Dictionary<int, string> dic)
         {
             string strApprKind = "";
@@ -557,10 +591,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strDataType;
         }
 
-        /**
-        * @breif 선택된 리스트 아이템의 전송취소 가능 여부를 판별한다.
-        * @return 전송취소 가능 여부( true : 가능, false : 불가능)
-        */
+        /// <summary>
+        /// 선택된 리스트 아이템의 전송취소 가능 여부를 판별한다.<br></br>
+        /// 전송취소 가능 여부( true : 가능, false : 불가능)
+        /// </summary>
+        /// <param name="strTransStatus"></param>
+        /// <param name="strApprStatus"></param>
+        /// <returns></returns>
         public static bool GetTransCancelEnableChk(string strTransStatus, string strApprStatus)
         {
             if ( (strTransStatus.Equals("W") || strTransStatus.Equals("V")) 
@@ -570,10 +607,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return false;
         }
 
-        /**
-        * @breif 선택된 리스트 아이템의 전송취소 가능 여부를 판별한다.
-        * @return 전송취소 가능 여부( true : 가능, false : 불가능)
-        */
+        /// <summary>
+        /// 선택된 리스트 아이템의 전송취소 가능 여부를 판별한다.<br></br>
+        /// 전송취소 가능 여부( true : 가능, false : 불가능)
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public bool GetTransCancelEnableChk(string userId, Dictionary<int, string> dic)
         {
             //수신자는 전송취소 불가, 발신자만 취소 가능
@@ -597,5 +637,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return true;
             return false;
         }
+
+
     }
 }
