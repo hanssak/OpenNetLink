@@ -719,6 +719,10 @@
                     strApprLineDeptSeq = item.DeptSeq;
                     strApprLineName = item.Name;
 
+                       //사용자 유효성 검사 시, 로그인한 본인은 제외하고 확인한다.
+                    if (strApprLineUserSeq == strUserSeq)
+                        continue;
+
                     //웹매니저에서 등록된 기본결재라인 부서Seq는 "-"로 설정됨
                     //웹매니저에 등록된 최초 결재라인은 유효성 검증에서 제외
                     //if (!strApprLineDeptSeq.Equals("-"))
