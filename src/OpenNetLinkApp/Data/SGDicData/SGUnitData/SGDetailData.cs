@@ -1178,7 +1178,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="ApprHist"></param>
         /// <returns></returns>
-        public ApproverHist GetTransLastApproverHistData(ApproverHist ApprHist)
+        public ApproverHist GetTransLastApproverHistData(ApproverHist ApprHist, int ApproveStep, string DataApprStatusCode)
         {
             List<ApproverHist> approverHist = null;
             approverHist = GetApproverInfoHist();
@@ -1222,6 +1222,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 strPreApprStatus = strCurApprStatus;
             }
+
+            //OR 결재이고, 해당 전송이 전송대기 상태일땐 승인된 승인자를 표시하도록 처리
+            if (ApproveStep == 1 && DataApprStatusCode == "2")    //결재유형 취득
+            {
+                if (approverHist.Exists(appr => appr.m_strApprStatus == "승인"))
+                    ApprHist = approverHist.FindLast(appr => appr.m_strApprStatus == "승인");
+            }
+
             return ApprHist;
         }
 

@@ -325,6 +325,10 @@
         if (sgDetailData == null)
             return;
 
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
         strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
         strDataTransStatus = sgDetailData.GetTransStatus();
 
@@ -353,6 +357,8 @@
         strDLP = sgDetailData.GetDLP(); //개인정보
         strDataDataType = dataType; //데이타 타입
 
+        int DataApproveStep = sgLoginData.GetApproveStep();
+
         sgDetailData.GetFileInfo(out mFileData);
         if (mFileData == null)
             return;
@@ -370,7 +376,7 @@
         else
         {
             ApproverHist apprHist = null;
-            apprHist = sgDetailData.GetTransLastApproverHistData(apprHist);
+            apprHist = sgDetailData.GetTransLastApproverHistData(apprHist, DataApproveStep, strDataApprStatusCode);
             if (apprHist == null)
                 strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
             else

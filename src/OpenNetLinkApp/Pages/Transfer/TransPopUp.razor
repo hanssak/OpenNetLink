@@ -735,6 +735,7 @@
         strDataDesc = sgDetailData.GetDesc();                                              // 설명
         strDataDesc = fileAddManage.GetConvertTitleDesc(false, strDataDesc);
         strDLP = sgDetailData.GetDLP(); //개인정보
+        int DataApproveStep = sgLoginData.GetApproveStep();
 
         //APPROVESTATUS (결재상태) :   1 : 승인대기(결재대기)   2 : 승인(결재완료)    3 : 거부(반려)  값없음 : 전체
         //승인이 되기 전에는 서버로부터 다운로드 불가하므로 다운로드 버튼도 보이지 않게 처리
@@ -762,7 +763,7 @@
         else
         {
             ApproverHist apprHist = null;
-            apprHist = sgDetailData.GetTransLastApproverHistData(apprHist);
+            apprHist = sgDetailData.GetTransLastApproverHistData(apprHist, DataApproveStep, strDataApprStatusCode);
             if (apprHist == null)
                 strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
             else
