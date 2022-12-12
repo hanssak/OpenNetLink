@@ -7,7 +7,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 {
     public class SGSiteConfig : ISGSiteConfig
     {
-        public bool m_bUserIDSave { get; set; } = false;                    // 로그인한 ID 저장 여부
+        public bool m_bUserIDSave { get; set; } = true;                    // 로그인한 ID 저장 여부
         public bool m_bAutoLogin { get; set; } = true;                     // 자동로그인 사용 여부.
         public bool m_bAutoLoginCheck { get; set; } = true;                // 자동로그인 체크박스 체크여부.
         public bool m_bApprLineLocalSave { get; set; } = false;             // 결재라인 로컬 저장 여부.
