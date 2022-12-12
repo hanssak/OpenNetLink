@@ -1187,7 +1187,7 @@
                     //MAC은 현재 MoveTrayToWebWindow 호출 시 화면 프리징되는 현상있으므로, 노티처리
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                         Window.MoveTrayToWebWindow();
-                    else        
+                    else
                         Window.Notification(OS_NOTI.OFFLINE, "로그인", e.strMsg);
                 }
 
@@ -2160,7 +2160,7 @@
                 }
 
                 //대결재관리(5)
-                if (bDeputyApprove && bApprMenuUse)
+                if (bDeputyApprove && bApprMenuUse &&sgUserInfo.GetUserApprPos() > 0)
                 {
                     strNavigatePathWithGroupID = "";    //안씀
                                                         //strNavigatePathWithGroupID += gID.ToString();
@@ -2337,12 +2337,12 @@
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
         {
-        return true;
-            }
-                else
-                    return false;
+            return true;
+                }
+                    else
+                        return false;
 
-                        }
+                            }
     */
 
 }
