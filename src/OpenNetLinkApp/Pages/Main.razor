@@ -457,11 +457,15 @@
                                 bLoginBtnDisable = false;
                                 StateHasChanged();
 
-                                   //트레이사용 시 자동로그인할 정보가 없으면 화면 Show하여 사용자에게 알려주도록 추가
-                                   if (Window.GetTrayUse())
-                                   {
-                                       Window.MoveTrayToWebWindow();
-                                   }
+                                //트레이사용 시 자동로그인할 정보가 없으면 화면 Show하여 사용자에게 알려주도록 추가
+                                if (Window.GetTrayUse())
+                                {
+                                    //MAC은 현재 MoveTrayToWebWindow 호출 시 화면 프리징되는 현상있으므로, 노티처리
+                                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                                        Window.MoveTrayToWebWindow();
+                                    else
+                                        Window.Notification(OS_NOTI.OFFLINE, "로그인", "로그인 정보를 입력해주세요.");
+                                }
 
                                 return;
                             }
@@ -490,7 +494,11 @@
                             //트레이사용 시 자동로그인할 정보가 없으면 화면 Show하여 사용자에게 알려주도록 추가
                             if (Window.GetTrayUse())
                             {
-                                Window.MoveTrayToWebWindow();
+                                //MAC은 현재 MoveTrayToWebWindow 호출 시 화면 프리징되는 현상있으므로, 노티처리
+                                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                                    Window.MoveTrayToWebWindow();
+                                else
+                                    Window.Notification(OS_NOTI.OFFLINE, "로그인", "로그인 정보를 입력해주세요");
                             }
                         }
                     }
@@ -1173,12 +1181,14 @@
             }
             else
             {
-
-
                 //트레이사용 시 로그인 실패하게 되면 화면 Show하여 사용자에게 알려주도록 추가
                 if (Window.GetTrayUse())
                 {
-                    Window.MoveTrayToWebWindow();
+                    //MAC은 현재 MoveTrayToWebWindow 호출 시 화면 프리징되는 현상있으므로, 노티처리
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        Window.MoveTrayToWebWindow();
+                    else        
+                        Window.Notification(OS_NOTI.OFFLINE, "로그인", e.strMsg);
                 }
 
                 //await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
@@ -2327,12 +2337,12 @@
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
         {
-            return true;
-        }
-        else
-            return false;
+        return true;
+            }
+                else
+                    return false;
 
-                }
+                        }
     */
 
 }
