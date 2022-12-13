@@ -352,7 +352,8 @@ Function .onInit
   ${EndIf}
   
   ; OpenNetLink 강제종료
-  ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
+  ;ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
+  nsExec::Exec '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
   
 FunctionEnd
 
@@ -3730,9 +3731,10 @@ Section Uninstall
 
   ; OpenNetLink 강제종료
   ; ExecWait '"$SYSDIR\taskkill.exe" /f /im ContextTransferClient.exe'
-  ExecWait '"$SYSDIR\taskkill.exe" /f /im PreviewUtil.exe'
-  ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
-
+  ;ExecWait '"$SYSDIR\taskkill.exe" /f /im PreviewUtil.exe'
+  ;ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
+  nsExec::Exec '"$SYSDIR\taskkill.exe" /f /im PreviewUtil.exe'
+  nsExec::Exec '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
   ;설치 파일 설정을 로드한다
   Call un.SetConfig
   
