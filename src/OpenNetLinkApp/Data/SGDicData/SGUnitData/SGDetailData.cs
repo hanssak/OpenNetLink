@@ -1175,8 +1175,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         /// <summary>
         /// 전송관리 마지막 결재자 이름/직위를 반환한다.
+        /// <br>OR 결재의 결재완료 건은 승인한 사용자를 '승인자' 타이틀에 표시</br>
         /// </summary>
         /// <param name="ApprHist"></param>
+        /// <param name="ApproveStep">결재유형</param>
+        /// <param name="DataApprStatusCode">해당전송건의 결재상태</param>
         /// <returns></returns>
         public ApproverHist GetTransLastApproverHistData(ApproverHist ApprHist, int ApproveStep, string DataApprStatusCode)
         {
@@ -1223,7 +1226,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 strPreApprStatus = strCurApprStatus;
             }
 
-            //OR 결재이고, 해당 전송이 전송대기 상태일땐 승인된 승인자를 표시하도록 처리
+            //OR 결재이고, 해당 전송의 승인상태가 승인일땐 지정된 결재자 중 마지막이 아닌 승인한 결재자 중 마지막을 표시하도록 처리
             if (ApproveStep == 1 && DataApprStatusCode == "2")    //결재유형 취득
             {
                 if (approverHist.Exists(appr => appr.m_strApprStatus == "승인"))
