@@ -175,7 +175,19 @@
     private void SessionAlertConfirm()
     {
         HSCmdCenter.SetAllowSessionDuplicate(refSGAlert.groupId);
-        doLogIn();
+
+        CLog.Here().Information($"[Main] SessionAlertConfirm - LogInType: {pageService.m_nLoginType.ToString()}");
+
+        ShowMessage("info", XmlConf.GetInfoMsg("I_0236"));
+
+        if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
+        {
+            doADLogin();
+        }
+        else
+        {
+            doLogIn();
+        }
     }
 
     /// <summary>
@@ -1130,12 +1142,6 @@
                 // Clipboard 단축키 및 HeaderUI에서 바로 클립보드를 전송할 수 있으므로 사후결재 관련 현재상태값을 로그인후 바로 저장
                 SaveAfterApproveCheckBoxStatus(groupId);
 
-                // 임시로 Page 이동못하게 막음(KKW)
-                //if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
-
-                // MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
-
-                //if (AppConfigSvc.GetStartTrayMove())
                 if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
                 {
                     if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
