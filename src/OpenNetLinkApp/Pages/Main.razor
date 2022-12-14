@@ -175,7 +175,10 @@
     private void SessionAlertConfirm()
     {
         HSCmdCenter.SetAllowSessionDuplicate(refSGAlert.groupId);
-        doLogIn();
+        if (pageService.m_nLoginType != (int)eLoginType.eLOGINTYPE_AD)
+            doLogIn();
+        else
+            doADLogin();
     }
 
     /// <summary>
@@ -486,7 +489,12 @@
                             await Task.Delay(500);
 
                             if (srcLoc != "Logout")
-                                doLogIn();
+                            {
+                                   if (pageService.m_nLoginType != (int)eLoginType.eLOGINTYPE_AD)
+                                   doLogIn();
+                                   else
+                                   doADLogin();
+                            }
                             StateHasChanged();
                         }
                         else
@@ -2160,7 +2168,7 @@
                 }
 
                 //대결재관리(5)
-                if (bDeputyApprove && bApprMenuUse &&sgUserInfo.GetUserApprPos() > 0)
+                if (bDeputyApprove && bApprMenuUse && sgUserInfo.GetUserApprPos() > 0)
                 {
                     strNavigatePathWithGroupID = "";    //안씀
                                                         //strNavigatePathWithGroupID += gID.ToString();
@@ -2336,13 +2344,13 @@
         //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-        {
-            return true;
-                }
-                    else
-                        return false;
+            {
+                return true;
+                    }
+                        else
+                            return false;
 
-                            }
+                                }
     */
 
 }
