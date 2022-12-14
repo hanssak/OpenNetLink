@@ -265,7 +265,7 @@
             {
                 foreach (ISGNetwork netlist in listNetWork)
                 {
-                    HsLog.info($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
+                    CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
                     HSCmdCenter.Login(netlist.GroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
                 }
             }
@@ -277,7 +277,7 @@
         }
         catch (Exception ex)
         {
-            HsLog.err($"doLogIn - Exception Msg : {ex.Message}");
+            CLog.Here().Error($"doLogIn - Exception Msg : {ex.Message}");
             Debug.WriteLine(ex.Message);
         }
     }
@@ -289,6 +289,11 @@
     {
         try
         {
+
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0235"));
+
+            CLog.Here().Information($"ADLogin - ###### -  Start");
+
             JSRuntime.InvokeAsync<object>("loginCursorChange");
             id = Environment.UserName;
 
@@ -333,13 +338,16 @@
             }
             else
             {
+                CLog.Here().Information($"ADLogin - ###### -  Do");
                 HSCmdCenter.LoginAD(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
             }
+
+            CLog.Here().Information($"ADLogin - ###### -  End");
 
         }
         catch (Exception ex)
         {
-            HsLog.err($"doADLogin - Exception - Msg : {ex.Message}");
+            CLog.Here().Error($"ADLogin - Exception - Msg : {ex.Message}");
         }
     }
 
@@ -1887,6 +1895,13 @@
 
         } // if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
 
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
     private void ShowLoginFail(string strMsg)
