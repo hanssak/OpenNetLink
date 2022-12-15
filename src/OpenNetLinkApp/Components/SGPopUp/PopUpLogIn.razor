@@ -221,7 +221,7 @@
         try
         {
 
-            ShowMessage("info", XmlConf.GetInfoMsg(DoLoginForce? "I_0237" : "I_0238"));
+            ShowMessage("info", XmlConf.GetInfoMsg(DoLoginForce ? "I_0237" : "I_0238"));
 
             HSCmdCenter.sgPageEvent.SetLoginEventAdd(nGroupID, LoginpopUpResult);
             HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(nGroupID, ShowSessionCountPopup);
@@ -287,7 +287,7 @@
             Debug.WriteLine(ex.Message);
         }
 
-	// 로그결과 받을때 닫음
+        // 로그결과 받을때 닫음
         //closeUIPopup();
 
         @*if (CloseUI)
@@ -432,12 +432,12 @@
                 // Mac Test 결과에 따라 변경
                 id = Environment.UserName;
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                    pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
+                    pw = IPGlobalProperties.GetIPGlobalProperties().DomainName.ToLower();
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
-    #if DEBUG
+                    pw = OSxCmdService.GetOSXADConfig("Active Directory Domain").ToLower();
+#if DEBUG
                 pw = "HsckAD.com";
-    #endif
+#endif
                 StateHasChanged();
                 await Task.Delay(100);
                 doLogIn();
@@ -883,7 +883,7 @@
             }
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
-            
+
             HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));
             SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
 
@@ -910,16 +910,16 @@
             sgQueryExtend = new SGQueryExtend();
             if (sgQueryExtend != null)
             {
-	    
-		        string strGetinfoTagName = "";
-		        strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
-		        strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
+
+                string strGetinfoTagName = "";
+                strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
+                strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
                 strGetinfoTagName += ", 'CLIENT_DOCUMENT_EXTRACT_TYPE'";
                 strGetinfoTagName += ", 'CLIENT_DOCUMENT_MIME_FILTER_TYPE'";
 
-		        string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
-		        HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);	    
-	    
+                string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
+                HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
+
                 // string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
                 // HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
             }
@@ -968,7 +968,7 @@
                 }
             }
 
-            DateTime dt =(SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
+            DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
             pageService.SetSvrTime(groupId, dt, sgLoginData);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);

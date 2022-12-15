@@ -312,9 +312,9 @@
             //OSX의 경우 임의로 아래와 같이 처리 추후 objective-c API 찾아볼 예정
             //Linux는 아직 실제값 확인해보지 못함
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
+                pw = IPGlobalProperties.GetIPGlobalProperties().DomainName.ToLower();
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
+                pw = OSxCmdService.GetOSXADConfig("Active Directory Domain").ToLower();
 
 #if DEBUG
             pw = "HsckAD.com";
