@@ -79,7 +79,7 @@
                                     </div>
                                 }
                                 <div class="col-12  pt-2">
-                                    <button class="btn btn-login btn-block btn_blue" @onclick="doLogIn" disabled=@bUIBtnDisable>LOGIN</button>
+                                    <button class="btn btn-login btn-block btn_blue" @onclick="doLogInByBtn" disabled=@bUIBtnDisable>LOGIN</button>
                                 </div>
                                 <div class="col-12 text-center pt-3">Copyright &copy  HANSSAK Corp.  All rights reserved.</div>
 
@@ -176,13 +176,23 @@
         closePopUp();
     }
 
+    private void ShowMessage(string strType, string strMsg)
+    {
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        object[] param = { strType, XmlConf.GetTitle("T_SYSTEMNAME2"), strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
     /// <summary>
     /// 세션중복 로그인 진행 처리
     /// </summary>
     private void SessionAlertConfirmpopup()
     {
         HSCmdCenter.SetAllowSessionDuplicate(refSGloginDuplicate.groupId);
-        doLogIn();
+        CLog.Here().Information($"[PopupLogin] SessionAlertConfirm - LogInType: {refSGloginDuplicate.groupId.ToString()}");
+
+        doLogIn(true);
+
         bUIBtnDisable = false;
     }
 
@@ -196,7 +206,19 @@
         await refSGloginDuplicate.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
     }
 
-    private void doLogIn()
+    /// <summary>
+    /// UI상에 로그인 버튼을 눌러서 로그인할때 호출
+    /// </summary>
+    private void doLogInByBtn()
+    {
+        doLogIn();
+    }
+
+    /// <summary>
+    /// 로그인 Type 상관없이 2번째 망이상에서는 이함수로 Login 진행
+    /// </summary>
+    /// <param name="DoLoginForce"></param>
+    private void doLogIn(bool DoLoginForce = false)
     {
         try
         {
@@ -212,6 +234,8 @@
                 ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
                 return;
             }
+
+            ShowMessage("info", XmlConf.GetInfoMsg(DoLoginForce ? "I_0237" : "I_0238"));
 
             HSCmdCenter.sgPageEvent.SetLoginEventAdd(nGroupID, LoginpopUpResult);
             HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(nGroupID, ShowSessionCountPopup);
@@ -277,7 +301,7 @@
             Debug.WriteLine(ex.Message);
         }
 
-	// 로그결과 받을때 닫음
+        // 로그결과 받을때 닫음
         //closeUIPopup();
 
         @*if (CloseUI)
@@ -910,7 +934,7 @@
             }
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
-            
+
             HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));
             SetStaticUserNameRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
 
@@ -946,9 +970,9 @@
                 strGetinfoTagName += ", 'CLIENT_TRANSFER_TITLE'";
                 strGetinfoTagName += ", 'CLIENT_TRANSFER_DESCRIPTION'";
 
-		        string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
-		        HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);	    
-	    
+                string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
+                HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
+
                 // string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
                 // HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
             }

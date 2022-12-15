@@ -343,11 +343,15 @@ FunctionEnd ; end the un.ReMoveAddFileRM
 
 Function .onInit
 
+	SetSilent silent
+	
   ${If} ${IS_PATCH} == 'TRUE'
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
+	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db" "$TEMP" 
+	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db" "$TEMP" 
     
-    SetSilent silent
+    
 
     Banner::show "Calculating important stuff..."
     Banner::getWindow
@@ -369,7 +373,8 @@ Function .onInit
   ${EndIf}
   
   ; OpenNetLink 강제종료
-  ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
+  ;ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
+  nsExec::Exec '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
   
 FunctionEnd
 
@@ -377,6 +382,8 @@ Function .onInstSuccess
   ${If} ${IS_PATCH} == 'TRUE'
       CopyFiles /SILENT /FILESONLY "$TEMP\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
       CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
+	  CopyFiles /FILESONLY "$TEMP\SGNotifyDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"
+	  CopyFiles /FILESONLY "$TEMP\SGSettingsDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"  
   ${endif}
 
   IfSilent 0 +2
@@ -3745,9 +3752,10 @@ Section Uninstall
 
   ; OpenNetLink 강제종료
   ; ExecWait '"$SYSDIR\taskkill.exe" /f /im ContextTransferClient.exe'
-  ExecWait '"$SYSDIR\taskkill.exe" /f /im PreviewUtil.exe'
-  ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
-
+  ;ExecWait '"$SYSDIR\taskkill.exe" /f /im PreviewUtil.exe'
+  ;ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
+  nsExec::Exec '"$SYSDIR\taskkill.exe" /f /im PreviewUtil.exe'
+  nsExec::Exec '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
   ;설치 파일 설정을 로드한다
   Call un.SetConfig
   

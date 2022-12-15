@@ -141,6 +141,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseLanguageSet();
         public bool GetViewFileFilter();
         public bool GetUseForceUpdate();
+        public bool GetUseForceBackgroundUpdate();
 
         public bool GetViewSGSideBarUIBadge();
 
@@ -230,6 +231,22 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns></returns>
         public bool GetUsePartialFileAddInTransfer();
 
+
+        /// <summary>
+        /// 알람 초기화 매일 자정마다
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInitAlarmPerDay();
+        /// <summary>
+        /// 메세지 초기화 매일 자정마다
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInitMessagePerDay();
+        /// <summary>
+        /// 정책 수동 업데이트 버튼 보여주는 여부
+        /// </summary>
+        /// <returns></returns>
+        public bool GetVisiblePolicyUpdateButton();
     }
 
 
@@ -702,6 +719,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bUseForceUpdate;
         }
 
+        public bool GetUseForceBackgroundUpdate()
+        {
+            return AppConfigInfo.bUseForceBackgroundUpdate;
+        }
+
         public bool GetViewDlpApproverMyDept()
         {
             return AppConfigInfo.bViewDlpApproverSelectMyDept;
@@ -774,6 +796,22 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUsePartialFileAddInTransfer()
         {
             return AppConfigInfo.bUsePartialFileAddInTransfer;
+        }
+
+
+        public bool GetUseInitAlarmPerDay()
+        {
+            return AppConfigInfo.bUseInitAlarmPerDay;
+        }
+
+        public bool GetUseInitMessagePerDay()
+        {
+            return AppConfigInfo.bUseInitMessagePerDay;
+        }
+
+        public bool GetVisiblePolicyUpdateButton()
+        {
+            return AppConfigInfo.bVisiblePolicyUpdateButton;
         }
     }
 }

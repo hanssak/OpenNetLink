@@ -110,7 +110,7 @@
   "bViewSGSideBarUIBadge": false,
   "nClipAfterApproveUseType": 2,
   "bUseOneToMultiLogin": false,
-  "bUseOneByOneLogOut" : false,
+  "bUseOneByOneLogOut": false,
   "bApprDeptSearch": true,
   "bApprLineChkBlock": false,
   "bApprLineLocalSave": true,
@@ -133,8 +133,12 @@
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
 
-  "bUsePartialFileAddInTransfer" : false
+  "bUsePartialFileAddInTransfer": false,
+  "bUseInitAlarmPerDay": false,
+  "bUseInitMessagePerDay": false,
+  "bVisiblePolicyUpdateButton": true,
+  "bUseForceBackgroundUpdate": false
 
-  
+
 
 }
