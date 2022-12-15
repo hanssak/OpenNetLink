@@ -38,7 +38,7 @@
 
         @if (HsStreamList != null && HsStreamList.Count > 0)
         {
-            <div>
+            <div id="testaaa" style="height:max-content;" @onchange="ChangeTest">
                 <table id="example2" class="table table-head-fixed table-hover mb-0" style="font-size: 14px;table-layout: fixed;">
                     <thead>
                         <tr>
@@ -74,6 +74,7 @@
                                 }
                                 <!--<td width="30%">@file.ModifyTime.ToString("yyyy/MM/dd HH:mm:ss")</td>-->
                             </tr>
+
                         }
                     </tbody>
                 </table>
@@ -88,7 +89,7 @@
             </p>
 
         }
-        <input type="file" id="fileInputTrans" style="display:block; top:auto;" onclick="stopClickOpen(event);" multiple="multiple" />
+        <input type="file" id="fileInputTrans" style="display:block;" onclick="stopClickOpen(event);" multiple="multiple" />
     </div>
     <a hidden data-toggle="modal" data-target="modal-dropprogress"></a>
     <a hidden data-toggle="modal" data-target="Transfer_Denied"></a>
@@ -159,6 +160,11 @@
     {
         bAsyncData = false;
         await OnDropClear.InvokeAsync("clear");
+    }
+
+    public void ChangeTest()
+    {
+        int i = 0;
     }
 
     public async Task DataClear()
