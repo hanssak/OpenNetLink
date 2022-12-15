@@ -1,4 +1,4 @@
-ï»¿#include "Tray.h"
+#include "Tray.h"
 #include "NativeLog.h"
 #include "WebWindow.h"
 
@@ -16,9 +16,11 @@ static void hello_cb(struct tray_menu *item);
 static void quit_cb(struct tray_menu *item);
 static void submenu_cb(struct tray_menu *item);
 
-#define TEXT_SHOW	"ï¿½ï¿½ï¿½Ì±ï¿½"
-#define TEXT_HIDE	"ï¿½ï¿½ï¿½ï¿½ï¿½"
-#define TEXT_EXIT	"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
+
+#define TEXT_SHOW	"º¸ÀÌ±â"
+#define TEXT_HIDE		"¼û±â±â"
+#define TEXT_EXIT		"³¡³»±â"
+
 
 // Test tray init
 #if defined(TRAY_APPINDICATOR) || defined(TRAY_APPKIT)

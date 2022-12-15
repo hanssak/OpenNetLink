@@ -171,7 +171,9 @@
     {
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
         //refSGloginDuplicate.closePopUp();
-        initUIdata();
+        //initUIdata();
+
+        closePopUp();
     }
 
     /// <summary>
@@ -198,6 +200,18 @@
     {
         try
         {
+
+            if ((id?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0030"));
+                return;
+            }
+
+            if ((pw?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
+                return;
+            }
 
             HSCmdCenter.sgPageEvent.SetLoginEventAdd(nGroupID, LoginpopUpResult);
             HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(nGroupID, ShowSessionCountPopup);
@@ -241,9 +255,7 @@
                     else
                         tmpLoginType = sgSvrData.GetLoginType();*@
 
-
                 CLog.Here().Information($"PopUPLogin Dologin m_bMultiLoginDo logintype: {tmpLoginType}   group ID : {nGroupID}");
-
 
                 if (tmpLoginType == eLoginType.eLOGINTYPE_AD)
                     HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, (int)tmpLoginType);
@@ -413,9 +425,18 @@
                     pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                     pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
-    #if DEBUG
+
+            #if DEBUG
                 pw = "HsckAD.com";
-    #endif
+            #endif
+                pw = pw.ToLower();
+
+                // PW 암호화해서 Log남김
+                string strCheckData = "";
+                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                sgRSACrypto?.ValueEncrypt(pw, out strCheckData);
+                CLog.Here().Information($"PopupLogin(nGroupID :{nGroupID}) - ADLogin - ###### - PWCheck : {strCheckData}");
+
                 StateHasChanged();
                 await Task.Delay(100);
                 doLogIn();
@@ -920,8 +941,8 @@
 		        string strGetinfoTagName = "";
 		        strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
 		        strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
-                strGetinfoTagName += ", 'CLIENT_DOCUMENT_EXTRACT_TYPE'";
-                strGetinfoTagName += ", 'CLIENT_DOCUMENT_MIME_FILTER_TYPE'";
+                strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
+                strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";
                 strGetinfoTagName += ", 'CLIENT_TRANSFER_TITLE'";
                 strGetinfoTagName += ", 'CLIENT_TRANSFER_DESCRIPTION'";
 

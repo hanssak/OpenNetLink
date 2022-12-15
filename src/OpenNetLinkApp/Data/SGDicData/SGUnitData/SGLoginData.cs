@@ -1508,7 +1508,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="bSystem"></param>
         /// <returns></returns>
         public string GetDocumentExtractType(bool bSystem)
-            => (bSystem) ? GetTagData("I_CLIENT_DOCUMENT_EXTRACT_TYPE") : GetTagData("E_CLIENT_DOCUMENT_EXTRACT_TYPE");
+            => (bSystem) ? GetTagData("I_CLIENT_OLE_EXTRACT") : GetTagData("E_CLIENT_OLE_EXTRACT");
 
         /// <summary>
         /// 서버로부터 수신받은 전송 시 제목 comment 정보를 반환한다.
@@ -1537,7 +1537,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </returns>
         public bool GetOLECheckMimeFilterType(bool bSystem)
         {
-            string strData= (bSystem) ? GetTagData("I_CLIENT_DOCUMENT_MIME_FILTER_TYPE") : GetTagData("E_CLIENT_DOCUMENT_MIME_FILTER_TYPE");          
+            string strData= (bSystem) ? GetTagData("I_CLIENT_OLE_EXTRACT_MTYPE") : GetTagData("E_CLIENT_OLE_EXTRACT_MTYPE");          
             return (strData.Equals("W"));
         }
 

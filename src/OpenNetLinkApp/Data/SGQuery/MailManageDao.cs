@@ -29,7 +29,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("	tranHis.approve_flag as approveFlag,");
 			sb.Append("	CASE WHEN ");
 			sb.Append("	( ");
-			sb.Append("	      SELECT Count(*) -1 as cnt");
+			sb.Append("	      SELECT Count(*) -1 as cnt");   
 			sb.Append("	      FROM   tbl_email_receiver ");
 			sb.Append("	      WHERE  email_seq=tranHis.email_seq ");
 			sb.Append("	      AND    recv_type='0') = 0");
@@ -295,6 +295,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 					sb.Append(" AND tranInfo.dlp_flag in ('0','2') ");
 			}
 			sb.Append(") a");
+
+
+
 			return sb.ToString();
 		}
     }

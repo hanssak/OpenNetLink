@@ -175,7 +175,31 @@
     private void SessionAlertConfirm()
     {
         HSCmdCenter.SetAllowSessionDuplicate(refSGAlert.groupId);
-        doLogIn();
+
+        CLog.Here().Information($"[Main] SessionAlertConfirm - LogInType: {pageService.m_nLoginType.ToString()}");
+
+        ShowMessage("info", XmlConf.GetInfoMsg("I_0236"));
+
+        if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
+        {
+            doADLogin();
+        }
+        else if (siteConfig.GetUseOver1auth(refSGAlert.groupId))
+        {
+            if (doADLoginLocalCheck(refSGAlert.groupId))
+            {
+                doADLogin();
+            }
+            else
+            {
+                doLogIn();
+            }
+        }
+        else
+        {
+            doLogIn();
+        }
+
     }
 
     /// <summary>
@@ -224,6 +248,18 @@
     {
         try
         {
+
+            if ((id?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0030"));
+                return;
+            }
+
+            if ((pw?.Length ?? 0) < 1)
+            {                
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
+                return;
+            }
 
             int groupid = pageService.m_nCurViewPageGroupID;
 
@@ -288,21 +324,47 @@
                     }
 
                     SessionWebClient web = new SessionWebClient();
-                    string strUrl = @$"https://{strIP}:1300/weblink/CM001_GOTP_IDCHECK.do";
-                    string stRtn = web.Request(strUrl, "id=uglyice");
-                    if (stRtn != null && stRtn.Length > 0 && string.Compare(stRtn, "ok", true) == 0)
+                    string strUrl = @$"https://{strIP}:8080/index.jsp";
+                    string strEncID = "";
+                    string strEncPW = "";
+                    SGCrypto crypt = new SGCrypto();
+
+                    crypt.Aes256EncryptIVkey("hsck2301hsck2301", "hsck2301hsck2301hsck2301hsck2301", id, out strEncID);
+                    crypt.Aes256EncryptIVkey("hsck2301hsck2301", "hsck2301hsck2301hsck2301hsck2301", pw, out strEncPW);
+
+                    string strDetailUrl = string.Format($"id={strEncID}&pw={strEncPW}");
+                    string stRtn = web.Request(strUrl, strDetailUrl);
+                    if (stRtn != null && stRtn.Length > 0 && string.Compare(stRtn, "1", true) == 0)
                     {
                         HSCmdCenter.LoginNotCheckPw(groupid, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
                         CLog.Here().Information($"doLogIn - IDPW - Web Certificate Done!");
                     }
                     else
                     {
-                        CLog.Here().Information($"doLogIn - IDPW - Web Certificate Failed!");
+                        string strMsg = "";
+                        if (stRtn == "-1")
+                            strMsg = "WAS 서버에서 ID 정보를 수신받지 못했습니다.";
+                        else if (stRtn == "-2")
+                            strMsg = "WAS 서버에서 PW 정보를 수신받지 못했습니다.";
+                        else if (stRtn == "-3")
+                            strMsg = "사용자 인증 실패 되었습니다.";
+                        else if (stRtn == "-4")
+                            strMsg = "사용자가 존재하지 않습니다.";
+                        else if (stRtn == "-5")
+                            strMsg = "입력한 PW가 틀립니다.";
+                        else if (stRtn == "-6")
+                            strMsg = "내부시스템(서버오류 및 DB 접근 오류 등)에서 오류가 발생되었습니다.";
+                        else
+                            strMsg = "WAS 서버와 사용자 인증 과정 중 알수없는 오류가 발생하였습니다.";
+
+                        CLog.Here().Information($"doLogIn - IDPW - Web Certificate(@@@@@@@@@) Failed : {strMsg}");
                     }
 
                 }
                 else
+                {
                     HSCmdCenter.Login(groupid, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
+                }
             }
 
         }
@@ -376,6 +438,11 @@
     {
         try
         {
+
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0235"));
+
+            CLog.Here().Information($"ADLogin - ###### -  Start");
+
             JSRuntime.InvokeAsync<object>("loginCursorChange");
             id = Environment.UserName;
 
@@ -386,9 +453,18 @@
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
+
+
 #if DEBUG
             pw = "HsckAD.com";
 #endif
+            pw = pw.ToLower();
+
+            // PW 암호화해서 Log남김
+            string strCheckData = "";
+            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+            sgRSACrypto?.ValueEncrypt(pw, out strCheckData);
+            CLog.Here().Information($"ADLogin - ###### - PWCheck : {strCheckData}");
 
             ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";
@@ -420,14 +496,18 @@
             }
             else
             {
+                CLog.Here().Information($"ADLogin - ###### -  Do");
                 HSCmdCenter.LoginAD(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
             }
+
+            CLog.Here().Information($"ADLogin - ###### -  End");
 
         }
         catch (Exception ex)
         {
-            CLog.Here().Error($"doADLogin - Exception - Msg : {ex.Message}");
+            CLog.Here().Error($"ADLogin - Exception - Msg : {ex.Message}");
         }
+
     }
 
     /// <summary>
@@ -616,21 +696,28 @@
             //HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         }
 
-        if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
-            doADLogin();
-        else if (siteConfig.GetUseOver1auth(groupid))
+        // 다중망 로그인에서 로그아웃됐을때에 다시 자동로그인 안되게 처리
+        if (srcLoc != "Logout")
         {
-            if (doADLoginLocalCheck(groupid))
-                doADLogin();
-            else
+            if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
             {
-                ShowLoginFail("ID/PW 인증을 통해 Login 하셔야 합니다.");
+                doADLogin();
+            }
+            else if (siteConfig.GetUseOver1auth(groupid))
+            {
+                if (doADLoginLocalCheck(groupid))
+                {
+                    doADLogin();
+                }
+                else
+                {
+                    ShowLoginFail("ID/PW 인증을 통해 Login 하셔야 합니다.");
+                }
             }
         }
 
         if (srcLoc == "Logout" && (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1))
             MyNavigationManager.NavigateTo("/SelectNet");
-
     }
 
     /// <summary>
@@ -912,8 +999,8 @@
                     string strGetinfoTagName = "";
                     strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
                     strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
-                    strGetinfoTagName += ", 'CLIENT_DOCUMENT_EXTRACT_TYPE'";
-                    strGetinfoTagName += ", 'CLIENT_DOCUMENT_MIME_FILTER_TYPE'";
+                    strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
+                    strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";
                     strGetinfoTagName += ", 'CLIENT_TRANSFER_TITLE'";
                     strGetinfoTagName += ", 'CLIENT_TRANSFER_DESCRIPTION'";
 
@@ -1111,6 +1198,7 @@
                             SGRSACrypto sgRSACrypto = new SGRSACrypto();
                             string strEncID = "";
                             string strEncPW = "";
+
                             if ((!id.Equals("")) & (id != null) & (!pw.Equals("")) & (pw != null))
                             {
                                 sgRSACrypto?.ValueEncrypt(id, out strEncID);
@@ -2010,6 +2098,13 @@
 
         } // if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
 
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
     private void ShowLoginFail(string strMsg)

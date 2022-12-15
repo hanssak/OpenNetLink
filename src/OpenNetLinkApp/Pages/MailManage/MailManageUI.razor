@@ -1031,7 +1031,7 @@
 
         if (totalCnt <= 0)
         {
-            ShowMessage("warn", reason);            // 검색결과가 존재하지 않습니다.
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0286"));            // 검색결과가 존재하지 않습니다.
             if (listCnt != null) listCnt.Clear();
             //UpdateList(0);
             SetPageinfo(totalCnt);
@@ -1087,9 +1087,10 @@
             return;
         }
 
+        CLog.Here().Information($"SearchListResult - Result : {result}, reason : {reason}");
+
         if (result != "0")
-        {
-            CLog.Here().Information($"SearchListResult - Result : {result}, reason : {reason}");
+        {            
             ShowMessage("error", reason);
             return;
         }
