@@ -175,7 +175,19 @@
     private void SessionAlertConfirm()
     {
         HSCmdCenter.SetAllowSessionDuplicate(refSGAlert.groupId);
-        doLogIn();
+
+        CLog.Here().Information($"[Main] SessionAlertConfirm - LogInType: {pageService.m_nLoginType.ToString()}");
+
+        ShowMessage("info", XmlConf.GetInfoMsg("I_0236"));
+
+        if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
+        {
+            doADLogin();
+        }
+        else
+        {
+            doLogIn();
+        }
     }
 
     /// <summary>
@@ -265,7 +277,7 @@
             {
                 foreach (ISGNetwork netlist in listNetWork)
                 {
-                    HsLog.info($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
+                    CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
                     HSCmdCenter.Login(netlist.GroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
                 }
             }
@@ -277,7 +289,7 @@
         }
         catch (Exception ex)
         {
-            HsLog.err($"doLogIn - Exception Msg : {ex.Message}");
+            CLog.Here().Error($"doLogIn - Exception Msg : {ex.Message}");
             Debug.WriteLine(ex.Message);
         }
     }
@@ -289,15 +301,20 @@
     {
         try
         {
+
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0235"));
+
+            CLog.Here().Information($"ADLogin - ###### -  Start");
+
             JSRuntime.InvokeAsync<object>("loginCursorChange");
             id = Environment.UserName;
 
             //OSX의 경우 임의로 아래와 같이 처리 추후 objective-c API 찾아볼 예정
             //Linux는 아직 실제값 확인해보지 못함
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
+                pw = IPGlobalProperties.GetIPGlobalProperties().DomainName.ToLower();
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
+                pw = OSxCmdService.GetOSXADConfig("Active Directory Domain").ToLower();
 
 #if DEBUG
             pw = "HsckAD.com";
@@ -333,13 +350,16 @@
             }
             else
             {
+                CLog.Here().Information($"ADLogin - ###### -  Do");
                 HSCmdCenter.LoginAD(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
             }
+
+            CLog.Here().Information($"ADLogin - ###### -  End");
 
         }
         catch (Exception ex)
         {
-            HsLog.err($"doADLogin - Exception - Msg : {ex.Message}");
+            CLog.Here().Error($"ADLogin - Exception - Msg : {ex.Message}");
         }
     }
 
@@ -1122,12 +1142,6 @@
                 // Clipboard 단축키 및 HeaderUI에서 바로 클립보드를 전송할 수 있으므로 사후결재 관련 현재상태값을 로그인후 바로 저장
                 SaveAfterApproveCheckBoxStatus(groupId);
 
-                // 임시로 Page 이동못하게 막음(KKW)
-                //if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
-
-                // MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
-
-                //if (AppConfigSvc.GetStartTrayMove())
                 if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
                 {
                     if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
@@ -1887,6 +1901,13 @@
 
         } // if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
 
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
     private void ShowLoginFail(string strMsg)
