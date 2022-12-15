@@ -108,6 +108,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bViewSGSideBarUIBadge { get; set; } = false;   // 왼쪽 메뉴들에서 Badge 나오게할지 유무 설정값
         public bool bViewSGHeaderUIAlarmNoriAllDel { get; set; } = true;   // 상단 HeaderUI에서 Alarm, Noti 상에 Badge 전체 삭제 메뉴 나오게할지 유무
         public bool bUseForceUpdate { get; set; } = true;   // 넘기는 기능 없이 무조건 업데이트 사용 유무
+        public bool bUseForceBackgroundUpdate { get; set; } = false; //무조건 업데이트 시 별도 팝업 및 클릭없이 자동 업데이트
 
         public bool bViewDlpApproverSelectMyDept { get; set; } = false;   // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
         public bool bClipBoardNoApproveButFileTrans { get; set; } = false;   // 클립보드 파일전송 사용 형태로 결재없이 동작

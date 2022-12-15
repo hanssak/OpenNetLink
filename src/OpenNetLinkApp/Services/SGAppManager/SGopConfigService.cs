@@ -133,6 +133,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseLanguageSet();
         public bool GetViewFileFilter();
         public bool GetUseForceUpdate();
+        public bool GetUseForceBackgroundUpdate();
 
         public bool GetViewSGSideBarUIBadge();
 
@@ -659,6 +660,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseForceUpdate()
         {
             return AppConfigInfo.bUseForceUpdate;
+        }
+
+        public bool GetUseForceBackgroundUpdate()
+        {
+            return AppConfigInfo.bUseForceBackgroundUpdate;
         }
 
         public bool GetViewDlpApproverMyDept()

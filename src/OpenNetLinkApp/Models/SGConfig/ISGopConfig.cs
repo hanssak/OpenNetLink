@@ -104,6 +104,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bViewSGSideBarUIBadge { get; set; }    // 
         public bool bViewSGHeaderUIAlarmNoriAllDel { get; set; }    // 
         public bool bUseForceUpdate { get; set; }    // 
+        public bool bUseForceBackgroundUpdate { get; set; } //강제 자동 업데이트 (업데이트 버튼 클릭 불필요)
+
 
         public bool bViewDlpApproverSelectMyDept { get; set; }    // 
 
