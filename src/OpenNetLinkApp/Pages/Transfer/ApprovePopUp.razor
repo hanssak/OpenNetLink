@@ -15,7 +15,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IJSRuntime jsRuntime
 @inject PageStatusService pageService
-@inject WebWindow window 
+@inject WebWindow window
 <div class="modal fade" id="ApprovePopUp" data-backdrop="static" data-keyboard="false" style="z-index:5000;">
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
         <div class="modal-content">
@@ -331,27 +331,27 @@
         string strIP = sgDetailData.GetFilePreviewIP();
 
 #if _WINDOWS
-        // 확인후 적용!
-        string strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-        strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+    // 확인후 적용!
+    string strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+    strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
 #else
-    ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
-    startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-    startInfo.WindowStyle = ProcessWindowStyle.Normal;
+        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+        startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+        startInfo.WindowStyle = ProcessWindowStyle.Normal;
 #endif
 
         try
         {
 #if _WINDOWS
-            [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-            static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
-            ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
+    [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
+    ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
 #else
-        // Run the external process & wait for it to finish
-        using (Process proc = Process.Start(startInfo))
-        {
-            //proc.WaitForExit();
-        }
+            // Run the external process & wait for it to finish
+            using (Process proc = Process.Start(startInfo))
+            {
+                //proc.WaitForExit();
+            }
 #endif
         }
         catch (Exception e)
@@ -630,7 +630,14 @@
             ApproverHist apprHist = null;
             apprHist = sgDetailData.GetApprLastApproverHistData(apprHist);
             if (apprHist == null)
-                strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
+            {
+                
+                // strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
+                //대결재자가 결제 상세보기 하였을 경우, 결재 Hist엔 대결재자ID 가 없으므로, search에서 받아온 값으로 표시하도록 수정
+                strDataLastApprName = approverName;
+                strDataLastApprStatus = apvStatus;
+                strDataLastApprDay = apvTime;
+            }
             else
             {
                 //strDataLastApprName = apprHist.m_strApproverName;
