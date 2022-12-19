@@ -61,9 +61,11 @@
                             <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.4rem;">@strSystemName <span class="full_txt">@strConNetwork </span></p>
 
                             <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" @bind="id" tabindex="1" autocomplete="off">
+                          
+                         
                             @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
                             {
-                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" @bind="pw" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
+                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" @bind="pw" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
                             }
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
                             {
@@ -614,8 +616,8 @@
         {
             if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
             {
-                    Window.Notification(OS_NOTI.OFFLINE, "로그아웃", "AD로그아웃 되어 종료합니다.");
-                    Thread.Sleep(2000);
+                Window.Notification(OS_NOTI.OFFLINE, "로그아웃", "AD로그아웃 되어 종료합니다.");
+                Thread.Sleep(2000);
             }
         }
 
@@ -2400,13 +2402,13 @@
         //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-        {
-            return true;
+            {
+        return true;
         }
-        else
-            return false;
+            else
+                return false;
 
-                }
+                    }
     */
 
 }
