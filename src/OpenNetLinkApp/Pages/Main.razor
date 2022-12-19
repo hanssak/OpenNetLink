@@ -175,10 +175,19 @@
     private void SessionAlertConfirm()
     {
         HSCmdCenter.SetAllowSessionDuplicate(refSGAlert.groupId);
-        if (pageService.m_nLoginType != (int)eLoginType.eLOGINTYPE_AD)
-            doLogIn();
-        else
+
+        CLog.Here().Information($"[Main] SessionAlertConfirm - LogInType: {pageService.m_nLoginType.ToString()}");
+
+        ShowMessage("info", XmlConf.GetInfoMsg("I_0236"));
+
+        if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
+        {
             doADLogin();
+        }
+        else
+        {
+            doLogIn();
+        }
     }
 
     /// <summary>
@@ -227,6 +236,19 @@
     {
         try
         {
+
+            if ((id?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0030"));
+                return;
+            }
+
+            if ((pw?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
+                return;
+            }
+
             //VAlidation Check  PW_OTP(4), OTP(5)
             if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5)
             {
@@ -268,7 +290,7 @@
             {
                 foreach (ISGNetwork netlist in listNetWork)
                 {
-                    HsLog.info($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
+                    CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
                     HSCmdCenter.Login(netlist.GroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
                 }
             }
@@ -280,7 +302,7 @@
         }
         catch (Exception ex)
         {
-            HsLog.err($"doLogIn - Exception Msg : {ex.Message}");
+            CLog.Here().Error($"doLogIn - Exception Msg : {ex.Message}");
             Debug.WriteLine(ex.Message);
         }
     }
@@ -292,6 +314,11 @@
     {
         try
         {
+
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0235"));
+
+            CLog.Here().Information($"ADLogin - ###### -  Start");
+
             JSRuntime.InvokeAsync<object>("loginCursorChange");
             id = Environment.UserName;
 
@@ -302,9 +329,18 @@
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
+
+
 #if DEBUG
     pw = "HsckAD.com";
 #endif
+            pw = pw.ToLower();
+
+            // PW 암호화해서 Log남김
+            string strCheckData = "";
+            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+            sgRSACrypto?.ValueEncrypt(pw, out strCheckData);
+            CLog.Here().Information($"ADLogin - ###### - PWCheck : {strCheckData}");
 
             ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";
@@ -336,14 +372,18 @@
             }
             else
             {
+                CLog.Here().Information($"ADLogin - ###### -  Do");
                 HSCmdCenter.LoginAD(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
             }
+
+            CLog.Here().Information($"ADLogin - ###### -  End");
 
         }
         catch (Exception ex)
         {
-            HsLog.err($"doADLogin - Exception - Msg : {ex.Message}");
+            CLog.Here().Error($"ADLogin - Exception - Msg : {ex.Message}");
         }
+
     }
 
     /// <summary>
@@ -564,19 +604,18 @@
             //HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         }
 
-
-
-
-        if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
+        // 다중망 로그인에서 로그아웃됐을때에 다시 자동로그인 안되게 처리
+        if (srcLoc != "Logout")
         {
-            if (srcLoc == "Logout")
-            {
-                Window.Notification(OS_NOTI.OFFLINE, "로그아웃", "AD로그아웃 되어 종료합니다.");
-                Thread.Sleep(2000);
-            }
-            else
-            {
+            if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
                 doADLogin();
+        }
+        else //(srcLoc == "Logout")
+        {
+            if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
+            {
+                    Window.Notification(OS_NOTI.OFFLINE, "로그아웃", "AD로그아웃 되어 종료합니다.");
+                    Thread.Sleep(2000);
             }
         }
 
@@ -836,11 +875,10 @@
                     string strGetinfoTagName = "";
                     strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
                     strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
-                    strGetinfoTagName += ", 'CLIENT_DOCUMENT_EXTRACT_TYPE'";
-                    strGetinfoTagName += ", 'CLIENT_DOCUMENT_MIME_FILTER_TYPE'";
+                    strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
+                    strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";
                     strGetinfoTagName += ", 'CLIENT_TRANSFER_TITLE'";
                     strGetinfoTagName += ", 'CLIENT_TRANSFER_DESCRIPTION'";
-
                     string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
                     HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
                 }
@@ -1172,12 +1210,6 @@
                 // Clipboard 단축키 및 HeaderUI에서 바로 클립보드를 전송할 수 있으므로 사후결재 관련 현재상태값을 로그인후 바로 저장
                 SaveAfterApproveCheckBoxStatus(groupId);
 
-                // 임시로 Page 이동못하게 막음(KKW)
-                //if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
-
-                // MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
-
-                //if (AppConfigSvc.GetStartTrayMove())
                 if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
                 {
                     if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
@@ -1948,6 +1980,13 @@
 
     }
 
+    private void ShowMessage(string strType, string strMsg)
+    {
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
     private void ShowLoginFail(string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -2061,7 +2100,8 @@
                 //if (sgLoginData.GetApprove() == true)
                 // 3망 정책고려한 결재사용유무 설정
                 if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.SiteConfigInfoService.GetNoApproveManageUI(groupid) == false) // 결재관리 UI 않나오는 설정추가
-                    if ((sgLoginData.GetApproveProxyRight() && bSFMManageUse) || (sgUserInfo.GetUserApprPos() > 0))
+                    @*if ((sgLoginData.GetApproveProxyRight() && bSFMManageUse) || (sgUserInfo.GetUserApprPos() > 0))*@
+                    if (sgLoginData.GetApproveProxyRight() || (sgUserInfo.GetUserApprPos() > 0))     //(일반사용자)대결재자 권한을 가지거나, 전결/결재자인 경우 결재관리 표시
                         bApprMenuUse = true;
 
                 //bSecurityApprMenuUse = sgUserData.GetUserPrivacyApprPos();
@@ -2184,7 +2224,7 @@
                 }
 
                 //대결재관리(5)
-                if (bDeputyApprove && bApprMenuUse && sgUserInfo.GetUserApprPos() > 0)
+                if (bDeputyApprove && bApprMenuUse && sgUserInfo.GetUserApprPos() > 0)      //일반사용자는 대결재 관리 사용 불가
                 {
                     strNavigatePathWithGroupID = "";    //안씀
                                                         //strNavigatePathWithGroupID += gID.ToString();
@@ -2360,13 +2400,13 @@
         //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-                {
-                    return true;
-                        }
-                            else
-                                return false;
+        {
+            return true;
+        }
+        else
+            return false;
 
-                                    }
+                }
     */
 
 }
