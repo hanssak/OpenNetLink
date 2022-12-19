@@ -405,7 +405,6 @@
             }
             else
             {
-
                 if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN || pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_LDAP)
                 {
                     // ID저장
@@ -490,10 +489,10 @@
 
                             if (srcLoc != "Logout")
                             {
-                                   if (pageService.m_nLoginType != (int)eLoginType.eLOGINTYPE_AD)
-                                   doLogIn();
-                                   else
-                                   doADLogin();
+                                if (pageService.m_nLoginType != (int)eLoginType.eLOGINTYPE_AD)
+                                    doLogIn();
+                                else
+                                    doADLogin();
                             }
                             StateHasChanged();
                         }
@@ -514,6 +513,11 @@
                 }
                 else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
                 {
+                    if (srcLoc == "Logout")
+                    {
+                        Window.ProgramExit();
+                        return;
+                    }
                 }
 
             }
@@ -561,8 +565,20 @@
         }
 
 
+
+
         if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
-            doADLogin();
+        {
+            if (srcLoc == "Logout")
+            {
+                Window.Notification(OS_NOTI.OFFLINE, "로그아웃", "AD로그아웃 되어 종료합니다.");
+                Thread.Sleep(2000);
+            }
+            else
+            {
+                doADLogin();
+            }
+        }
 
         if (srcLoc == "Logout" && (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1))
             MyNavigationManager.NavigateTo("/SelectNet");
@@ -2344,13 +2360,13 @@
         //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-            {
-                return true;
-                    }
-                        else
-                            return false;
+                {
+                    return true;
+                        }
+                            else
+                                return false;
 
-                                }
+                                    }
     */
 
 }
