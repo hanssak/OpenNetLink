@@ -162,6 +162,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseInputSearchApproveExtTree { get; set; }         // 결재필수 확장자, 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
 
         public bool bUsePartialFileAddInTransfer { get; set; }  //'파일전송' 화면에서 등록시도한 파일목록에 정상파일과 오류파일이 함께 존재할 시 정상 파일에 대한 부분 등록 가능여부(true, false)
+        
+        public bool bUseChkHardSpace { get; set; }         //파일 수신시 디바이스 용량 체크 여부
 
     }
 }
