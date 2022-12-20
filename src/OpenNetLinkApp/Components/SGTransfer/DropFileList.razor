@@ -38,7 +38,7 @@
 
         @if (HsStreamList != null && HsStreamList.Count > 0)
         {
-            <div id="testaaa" style="height:max-content;" @onchange="ChangeTest">
+            <div id="DropzoneTable" style="height:max-content;">
                 <table id="example2" class="table table-head-fixed table-hover mb-0" style="font-size: 14px;table-layout: fixed;">
                     <thead>
                         <tr>
@@ -223,12 +223,6 @@
     {
         item.isCheck = !item.isCheck;
 
-        StateHasChanged();
-    }
-
-    public void CheckStateUpdate()
-    {
-        tempTest = !tempTest;
         StateHasChanged();
     }
 
@@ -813,6 +807,10 @@
         if (!existErr || usePartialFileAdd) SetFileAdd(listTryHsStream);
 
         // Important: Invoke StateHasChanged() to update the page
+
+        // 파일 추가후 화면갱신
+        StateHasChanged();
+        await jsRuntime.InvokeAsync<object>("setDropzoneInputSize");
         StateHasChanged();
     }
 
@@ -1258,6 +1256,9 @@
         //}
         SetFileAdd(fileList);
         StateHasChanged();
+        await jsRuntime.InvokeAsync<object>("setDropzoneInputSize");
+        StateHasChanged();
+
     }
 
     private void RemoveFile(IFileListEntry file)

@@ -486,6 +486,21 @@ window.refreshList = (path) => {
         DotNet.invokeMethodAsync("OpenNetLinkApp", "JSLoadListFiles2", path);
 }
 
+//DropZone의 Height를 조절하여 DragAndDrop이 가능하게 변경
+window.setDropzoneInputSize = () => {
+    var divDropFileHeight = $("#divDropFile").css("height");
+    var divDropFileHeightint = parseInt(divDropFileHeight.replace("px", ""))
+    var divDropzoneTableHeight = $("#DropzoneTable").css("height");
+    var divDropzoneTableHeightint = parseInt(divDropzoneTableHeight.replace("px", ""))
+
+    if (divDropFileHeightint >= divDropzoneTableHeightint) {
+        $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
+    }
+    else {
+        $('#fileInputTrans').css("height", divDropzoneTableHeight);
+    }
+}
+
 window.appendHtml = (id, val) => {
     $('#' + id).html(val);
 }
@@ -602,12 +617,15 @@ window.exitLogIn = () => {
     var dirRightHeight = $("#divRightContent").css("height");
     var divRightUpper = $("#divRightUpperSide").css("height");
     var divRightBottom = $("#divRightBottomSide").css("height");
-    var dirRightWidth = $("#divDropFile").css("width");
     if (divRightUpper != null && divRightBottom != null) {
         var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
         $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
-        //$("#fileInputTrans").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
-        //$("#fileInputTrans").css("width", (parseInt(dirRightWidth.replace("px", "")) - 30) + "px");
+        //Window 사이즈 조절 시 divDropFile Height 도 함께 조절
+        var divInputFileHeight = $("#fileInputTrans").css("height");
+        var divInputFileHeightint = parseInt(divInputFileHeight.replace("px", ""))
+        if (divInputFileHeightint < (parseInt(dirRightHeight.replace("px", "")) - (divRest + 9))) {
+            $("#fileInputTrans").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 9)) + "px");
+        }
     }
 }
 
@@ -865,8 +883,12 @@ window.adJustWindowsize = () => {
         if (divRightUpper != null && divRightBottom != null) {
             var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
             $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
-            //$("#fileInputTrans").css("height", $("#testaaa").css("height"));
-            
+            //Window 사이즈 조절 시 divDropFile Height 도 함께 조절
+            var divInputFileHeight = $("#fileInputTrans").css("height");
+            var divInputFileHeightint = parseInt(divInputFileHeight.replace("px", ""))
+            if (divInputFileHeightint < (parseInt(dirRightHeight.replace("px", "")) - (divRest + 9))) {
+                $("#fileInputTrans").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 9)) + "px");
+            }
         }
     });
 }
