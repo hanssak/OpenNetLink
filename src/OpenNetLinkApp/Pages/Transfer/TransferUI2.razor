@@ -672,7 +672,7 @@
                 int check = await sfmRefreshEvent(groupID);
             }
         }
-
+         
         ISGUserInfo userInfoService = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
         int nApprovePos = userInfoService.GetUserApprPos(); //sgUserData.GetUserApprpos();
         SGApprLineData sgApprLineData = null;
@@ -760,6 +760,7 @@
         SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetUserConfirm(userSeq, deptSeq, false);
         HSCmdCenter.SendDetailQuery(groupID, strUserID, strQuery);
+         CLog.Information($"call GetUserConfirm - {strQuery}");
     }
 
     public void DetailResult(int groupId, SGData e)

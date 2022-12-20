@@ -333,7 +333,7 @@
 #if _WINDOWS
     // 확인후 적용!
     string strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-    strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+        strArguments = "--app=" + strArguments;
 #else
         ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
         startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
@@ -343,6 +343,9 @@
         try
         {
 #if _WINDOWS
+
+
+
     [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
     static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
     ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
@@ -916,7 +919,7 @@
         }
 
         // 확장자 종류로 Web으로 preview 할지 결정
-        string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp", "log" };
+        string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp" };
         string strExtName = Path.GetExtension(sFileName);
         strExtName = strExtName.Substring(1);
         if (strExtName.Equals(""))
