@@ -331,15 +331,20 @@
     {
         System.Diagnostics.Debug.WriteLine(stCurrentDrive);
         Debug.WriteLine(stCurrentDrive);
-        if (Directory.GetDirectories(stCurrentDrive) != null)
+      
+        
+       JSRuntime.InvokeAsync<object>("RadzenTreeCollapse", null);
+
+
+    if (Directory.GetDirectories(stCurrentDrive) != null)
         {
             entries = Directory.EnumerateFileSystemEntries(stCurrentDrive)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
             stDisplayPath = stCurrentDrive;
+
             StateHasChanged();
         }
-
     }
 
     void OnSelectPath(TreeEventArgs args)
@@ -355,6 +360,7 @@
 
     protected override void OnInitialized()
     {
+     
         List<string> drivers = new List<string>();
         //드라이버 목록 중 접근 가능한 드라이버만 표시하도록 수정
         foreach (DriveInfo d in DriveInfo.GetDrives())
@@ -410,7 +416,7 @@
                     sgFile.Add(fileEntry);
                 }
             }*@
-        }
+    }
         catch (Exception ex0)
         {
             CLog.Error("GetParentError:" + ex0.Message);
@@ -528,8 +534,8 @@
             //args.Children.Data = Directory.EnumerateFileSystemEntries(directory)
             //    .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System) ) == 0);
             //IEnumerable<string> iEnumDir = Directory.EnumerateDirectories(directory)
-            //.Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
-
+            //.Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);=
+          
             IEnumerable<string> iEnumDir = Directory.EnumerateFileSystemEntries(directory)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
@@ -575,4 +581,5 @@
         builder.CloseComponent();
         builder.AddContent(3, context.Text);
     };
+
 }
