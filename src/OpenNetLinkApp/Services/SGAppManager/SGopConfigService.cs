@@ -720,6 +720,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bUsePartialFileAddInTransfer;
         }
 
+        public bool GetUseCheckHardSpace()
+        {
+            return AppConfigInfo.bUseChkHardSpace;
+        }
 
         public bool GetUseInitAlarmPerDay()
         {

@@ -221,6 +221,18 @@
         try
         {
 
+            if ((id?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0030"));
+                return;
+            }
+
+            if ((pw?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
+                return;
+            }
+
             ShowMessage("info", XmlConf.GetInfoMsg(DoLoginForce ? "I_0237" : "I_0238"));
 
             HSCmdCenter.sgPageEvent.SetLoginEventAdd(nGroupID, LoginpopUpResult);
@@ -434,12 +446,21 @@
                 // Mac Test 결과에 따라 변경
                 id = Environment.UserName;
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                    pw = IPGlobalProperties.GetIPGlobalProperties().DomainName.ToLower();
+                    pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    pw = OSxCmdService.GetOSXADConfig("Active Directory Domain").ToLower();
-#if DEBUG
+                    pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
+
+            #if DEBUG
                 pw = "HsckAD.com";
-#endif
+            #endif
+                pw = pw.ToLower();
+
+                // PW 암호화해서 Log남김
+                string strCheckData = "";
+                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                sgRSACrypto?.ValueEncrypt(pw, out strCheckData);
+                CLog.Here().Information($"PopupLogin(nGroupID :{nGroupID}) - ADLogin - ###### - PWCheck : {strCheckData}");
+
                 StateHasChanged();
                 await Task.Delay(100);
                 doLogIn();
@@ -916,8 +937,8 @@
                 string strGetinfoTagName = "";
                 strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
                 strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
-                strGetinfoTagName += ", 'CLIENT_DOCUMENT_EXTRACT_TYPE'";
-                strGetinfoTagName += ", 'CLIENT_DOCUMENT_MIME_FILTER_TYPE'";
+                strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
+                strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";
 
                 string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
                 HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
