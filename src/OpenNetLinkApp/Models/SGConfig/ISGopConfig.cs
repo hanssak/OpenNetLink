@@ -145,6 +145,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseAgentTime1aClock { get; set; }          // 사후결재 정책, 자정에  검색화면 검색날짜 UI / 일일 송순가능수 UI 변경되는거 Server 시간이 아니라 agent 시간기준으로 동작(XX:00:00에 동작)
 
         public bool bUsePartialFileAddInTransfer { get; set; }  //'파일전송' 화면에서 등록시도한 파일목록에 정상파일과 오류파일이 함께 존재할 시 정상 파일에 대한 부분 등록 가능여부(true, false)
+        
+        public bool bUseChkHardSpace { get; set; }         //파일 수신시 디바이스 용량 체크 여부
 
     }
 }
