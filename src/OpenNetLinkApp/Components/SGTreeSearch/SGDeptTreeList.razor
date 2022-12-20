@@ -358,12 +358,17 @@
         }
     ;
         string strUserSeq = sgUserData.GetUserSequence();
-
+        string strUserDeptName = sgUserData.GetTeamName();
         int count = 1;
         foreach (var item in apprLinkedList)
         {
             if (strUserSeq.Equals(item.UserSeq))
                 continue;
+
+                
+            //GS 팀코드가 동일한 부서가 아니면 미등록
+            if(item.DeptName != strUserDeptName)
+            continue;
             item.Index = String.Format("{0,2}", count.ToString());
             //strCurDept = item.DeptName;
             UserSearchList.AddLast(item);

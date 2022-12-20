@@ -175,7 +175,17 @@
 
     protected override void OnInitialized()
     {
-        drives = Directory.GetLogicalDrives();
+         List<string> drivers = new List<string>();
+        //드라이버 목록 중 접근 가능한 드라이버만 표시하도록 수정
+        foreach (DriveInfo d in DriveInfo.GetDrives())
+        {
+            if (!d.IsReady)
+                continue;
+
+            drivers.Add(d.Name);
+        }
+
+        drives = drivers.ToArray();//Directory.GetLogicalDrives();
         stCurrentDrive = drives[0];
         actionPopUpLoadFileList = LoadListFiles;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -211,7 +221,8 @@
         sgFile.Clear();
         try
         {
-            if (Directory.GetParent(stPath) != null)
+             //상위 루트로 이동하는 기능 제거
+          @*  if (Directory.GetParent(stPath) != null)
             {
                 string strUpperPath = Directory.GetParent(stPath).FullName;
                 if (strUpperPath != null && strUpperPath.Length > 0)
@@ -224,7 +235,7 @@
                     fileEntry.Type = 3;         //상위디렉토리 버튼
                     sgFile.Add(fileEntry);
                 }
-            }
+            }*@
         }
         catch (Exception ex0)
         {

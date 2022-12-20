@@ -97,6 +97,7 @@
             <div class="modal-footer clearfix pl-4 pr-4 pt-3 pb-3">
                 <div class="col-md-12  p-0">
                     <div class="row  p-0">
+@*
                         <div class="col-md-9 text-left">
                             <table>
                                 <tr>
@@ -112,7 +113,7 @@
                                 </tr>
                             </table>
                         </div>
-
+*@
                         <div class="col-md-3 text-right p-0">
                             <button @onclick="Confirm" type="button" class="btn btn-md btn-blue mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
                             <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
@@ -355,7 +356,6 @@
     protected override void OnInitialized()
     {
         List<string> drivers = new List<string>();
-
         //드라이버 목록 중 접근 가능한 드라이버만 표시하도록 수정
         foreach (DriveInfo d in DriveInfo.GetDrives())
         {

@@ -128,6 +128,7 @@
     ISGSideBarUIService SideBarUISvc;
     SGSettingsDBProc sgSettingProc;
     ISGSiteConfigService siteConfig;
+    ISGUserInfoService sgUserSvr;
 
     public string strCurDept = "";
     public string strCurName = "";
@@ -473,16 +474,23 @@
         List<Dictionary<int, string>> listDicdata = null;
         listDicdata = data.GetSvrRecordData("RECORD");
 
+        int groupID = SideBarUISvc.ActiveMenu.GroupId;
+        ISGUserInfo userInfo = sgUserSvr.GetUserInfo(groupID);
         ProxySelect.Clear();
 
         int i = 1;
         foreach (Dictionary<int, string> value in listDicdata)
         {
+            //GS 팀코드가 동일한 부서가 아니면 미등록
+            if (value[2] != userInfo.DeptName)
+                    continue;
             ApproverInfo approver = new ApproverInfo();
             approver.ORDER = i;
             approver.STARTDATE = value[0];
             approver.ENDDATE = value[1];
             approver.APPR_TEAMCODE = value[2];
+
+
             approver.APPR_TEAMNAME = value[3];
             approver.APPR_USERID = value[4];
             approver.APPR_USERNAME = value[5];
@@ -544,7 +552,7 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-
+        sgUserSvr = SGAppMgrSvc.UserInfoService;
         actionAssign = AssignProxy;
         actionTargetSelect = SelectTarget;
     }
