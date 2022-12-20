@@ -13,7 +13,7 @@
   "LogLevel": 2,
   "LoginType": 1,
   "RecvDownPath": [
-    "\\\\DocuONE\\개인함\\로컬디스크_쓰기_이동",
+    "%USERPATH%\\Downloads",
     "%USERPATH%\\Downloads",
     "%USERPATH%\\Downloads"
   ],
@@ -35,7 +35,7 @@
   "bScreenLock": false,
   "bScreenLockUserChange": false,
   "bShowAdminInfo": false,
-  "bStartProgramReg": true,
+  "bStartProgramReg": false,
   "bStartTrayMove": false,
   "bURLAutoAfterMsg": [
     true,

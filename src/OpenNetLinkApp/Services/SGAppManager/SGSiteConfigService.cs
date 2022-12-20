@@ -393,7 +393,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUserIDSave = true;                     //유저 아이디 저장
                 sgSiteConfig.m_bUseScreenLock = false;                  //Screen Lock 설정여부
 
-                sgSiteConfig.m_bRecvFolderChange = false;               // 수신폴더 변경 여부
+                sgSiteConfig.m_bRecvFolderChange = true;               // 수신폴더 변경 여부
                 sgSiteConfig.m_bUseUserRecvDownPath = true;            // 로그인 유저별 다운로드 경로 사용 여부
 
                 sgSiteConfig.m_bUseDenyPasswordZip = false;             // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
