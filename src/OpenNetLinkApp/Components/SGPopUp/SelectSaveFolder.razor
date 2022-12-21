@@ -220,7 +220,8 @@
 
         object[] param3 = { "0" };
         await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param3);
-
+              
+      await JSRuntime.InvokeAsync<object>("RadzenTreeCollapse", null);
         if (dir != null && dir.Length > 0)
         {
             try
@@ -228,7 +229,10 @@
                  //파일 탐색기를 드라이버를 기반으로 한 트리 타입으로 처리
                 string root = Directory.GetDirectoryRoot(dir);
                 SetCurrentDrive(root);
-                entries = Directory.GetDirectories(root);
+             //   entries = Directory.GetDirectories(root);
+              entries = Directory.EnumerateFileSystemEntries(root)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
                 stTreeDir = dir;
             }
             catch (Exception ex)

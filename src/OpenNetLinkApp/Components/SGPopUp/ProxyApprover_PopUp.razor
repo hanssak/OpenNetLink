@@ -481,9 +481,9 @@
         int i = 1;
         foreach (Dictionary<int, string> value in listDicdata)
         {
-            //GS 팀코드가 동일한 부서가 아니면 미등록
+      @*      //GS 팀코드가 동일한 부서가 아니면 미등록
             if (value[2] != userInfo.DeptName)
-                    continue;
+                    continue;*@
             ApproverInfo approver = new ApproverInfo();
             approver.ORDER = i;
             approver.STARTDATE = value[0];

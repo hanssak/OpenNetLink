@@ -246,7 +246,8 @@
         try
         {
             fList = Directory.EnumerateFileSystemEntries(stPath)
-            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
         }
         catch (UnauthorizedAccessException e)
         {
