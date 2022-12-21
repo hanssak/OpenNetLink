@@ -162,11 +162,6 @@
         await OnDropClear.InvokeAsync("clear");
     }
 
-    public void ChangeTest()
-    {
-        int i = 0;
-    }
-
     public async Task DataClear()
     {
 
@@ -190,6 +185,34 @@
         if (HsStreamList != null && HsStreamList.Count > 0)
             HsStreamList.Clear();
 
+        bAllCheck = false;
+
+        StateHasChanged();
+        await jsRuntime.InvokeAsync<object>("setDropzoneInputSize");
+        StateHasChanged();
+    }
+
+    public async Task DataSelectClear()
+    {
+        await Task.Run(() =>
+        {
+            if (HsStreamList != null && HsStreamList.Count > 0)
+            {
+                for (int i = HsStreamList.Count; i > 0; i--)
+                {
+                    if (HsStreamList[i - 1].isCheck)
+                    {
+                        fileAddManage.m_nTansCurSize = fileAddManage.m_nTansCurSize - HsStreamList[i - 1].Size;
+                        fileAddManage.m_nTransCurCount = fileAddManage.m_nTransCurCount - 1;
+                        HsStreamList.RemoveAt(i - 1);
+                    }
+                }
+            }
+        });
+
+        bAllCheck = false;
+        StateHasChanged();
+        await jsRuntime.InvokeAsync<object>("setDropzoneInputSize");
         StateHasChanged();
     }
 
@@ -1275,6 +1298,11 @@
     public async Task RemoveAllFile()
     {
         await DataClear();
+    }
+
+    public async Task RemoveSelectFile()
+    {
+        await DataSelectClear();
     }
 
     //DropZone 클릭방지코드

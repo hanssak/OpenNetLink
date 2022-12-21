@@ -488,16 +488,24 @@ window.refreshList = (path) => {
 
 //DropZone의 Height를 조절하여 DragAndDrop이 가능하게 변경
 window.setDropzoneInputSize = () => {
+    setDropzonSize();
+}
+function setDropzonSize() {
     var divDropFileHeight = $("#divDropFile").css("height");
-    var divDropFileHeightint = parseInt(divDropFileHeight.replace("px", ""))
+    var divDropFileHeightint = parseInt(divDropFileHeight.replace("px", ""));
     var divDropzoneTableHeight = $("#DropzoneTable").css("height");
-    var divDropzoneTableHeightint = parseInt(divDropzoneTableHeight.replace("px", ""))
+    if (divDropzoneTableHeight != null) {
 
-    if (divDropFileHeightint >= divDropzoneTableHeightint) {
-        $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
+        var divDropzoneTableHeightint = parseInt(divDropzoneTableHeight.replace("px", ""))
+        if (divDropFileHeightint >= divDropzoneTableHeightint) {
+            $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
+        }
+        else {
+            $('#fileInputTrans').css("height", divDropzoneTableHeight);
+        }
     }
     else {
-        $('#fileInputTrans').css("height", divDropzoneTableHeight);
+        $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
     }
 }
 
@@ -621,11 +629,7 @@ window.exitLogIn = () => {
         var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
         $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
         //Window 사이즈 조절 시 divDropFile Height 도 함께 조절
-        var divInputFileHeight = $("#fileInputTrans").css("height");
-        var divInputFileHeightint = parseInt(divInputFileHeight.replace("px", ""))
-        if (divInputFileHeightint < (parseInt(dirRightHeight.replace("px", "")) - (divRest + 9))) {
-            $("#fileInputTrans").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 9)) + "px");
-        }
+        setDropzonSize();
     }
 }
 
@@ -883,12 +887,7 @@ window.adJustWindowsize = () => {
         if (divRightUpper != null && divRightBottom != null) {
             var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
             $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
-            //Window 사이즈 조절 시 divDropFile Height 도 함께 조절
-            var divInputFileHeight = $("#fileInputTrans").css("height");
-            var divInputFileHeightint = parseInt(divInputFileHeight.replace("px", ""))
-            if (divInputFileHeightint < (parseInt(dirRightHeight.replace("px", "")) - (divRest + 9))) {
-                $("#fileInputTrans").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 9)) + "px");
-            }
+            setDropzonSize();
         }
     });
 }
