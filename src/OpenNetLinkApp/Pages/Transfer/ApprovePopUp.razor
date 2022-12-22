@@ -333,7 +333,7 @@
 #if _WINDOWS
     // 확인후 적용!
     string strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-    strArguments = "--app=" + strArguments;
+    strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
 #else
         ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
         startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
@@ -922,7 +922,8 @@
         }
 
         // 확장자 종류로 Web으로 preview 할지 결정
-        string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp" };
+        //GS는 txt파일이 인코딩 방식이 여러개 이므로 txt는 미리보기에서 제외
+        string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "hwp" };
         string strExtName = Path.GetExtension(sFileName);
         strExtName = strExtName.Substring(1);
         if (strExtName.Equals(""))

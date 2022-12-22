@@ -41,7 +41,7 @@ namespace OpenNetLinkApp.Data.SGQuery
         /// </summary>
         /// <param name="strUserSeq">사용자리스트(사용자시퀀스 리스트, 구분자(,))</param>
         /// <param name="strTeamCode">팀코드(부서시퀀스)</param>
-        /// <param name="bApprPos">결재자권한</param>
+        /// <param name="bApprPos">결재자권한 제한</param>
         /// <returns>사용자 정보 조회 쿼리</returns>
         public string GetUserConfirm(string strUserSeq, string strTeamCode, bool bApprPos)
         {
