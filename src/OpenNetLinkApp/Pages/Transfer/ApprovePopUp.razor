@@ -574,6 +574,9 @@
     public async Task openPopUp(long seq)
     {
         stSelectedSeq = seq.ToString();
+        stSelectedFileNo = "";
+        stSelectedFileName = "";
+
         object[] param = { "ApprovePopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -678,7 +681,13 @@
             ApproverHist apprHist = null;
             apprHist = sgDetailData.GetApprLastApproverHistData(apprHist);
             if (apprHist == null)
+            {
                 strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
+                //대결재자가 결제 상세보기 하였을 경우, 결재 Hist엔 대결재자ID 가 없으므로, search에서 받아온 값으로 표시하도록 수정
+                strDataLastApprName = approverName;
+                strDataLastApprStatus = apvStatus;
+                strDataLastApprDay = apvTime;
+            }
             else
             {
                 //strDataLastApprName = apprHist.m_strApproverName;

@@ -57,7 +57,8 @@
                             @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
                             {
                                 <div class="input-group mb-2">
-                                    <input type="password" class="form-control-login" placeholder="Password" @bind="pw" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2">
+                                    //AD 로그인은 PW 사용자 입력 불가 (Readonly)
+                                    <input type="password" class="form-control-login" placeholder="Password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" @bind="pw" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2">
                                 </div>
                             }
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
