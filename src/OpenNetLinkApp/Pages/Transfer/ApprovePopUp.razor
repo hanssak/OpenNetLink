@@ -316,6 +316,54 @@
         //stSelectedFileNo = "";
     }
 
+    /// <summary>
+    /// [적용예정] WebLink 의 미리보기 방식을 이용해서 표시하는 함수
+    /// </summary>
+    public void requestWebLinkPreview()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        string strMsg = "";
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        if (pageService.GetFilePrevRecving() == true)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0248");           // 파일 미리보기 수행 중입니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        if (stSelectedFileNo.Length < 1)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0064");          // 파일보기를 원하시는 대상을 선택 하시기 바랍니다.
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        if (!FilePrevDownExtension(stSelectedFileName))
+        {
+            return;
+        }
+
+        string param = $"transSeq={stSelectedSeq}&fileNo={stSelectedFileNo}&encValue={stSelectedEncKey}";
+        string strArguments = $"https://218.145.246.25/weblink/AP001_Docs_Viewer.do?" + param;
+        strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+
+        [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
+        ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
+
+    }
+
     private void OpenPreviewWindow(string param)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -331,27 +379,27 @@
         string strIP = sgDetailData.GetFilePreviewIP();
 
 #if _WINDOWS
-        // 확인후 적용!
-        string strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-        strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+    // 확인후 적용!
+    string strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+    strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
 #else
-    ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
-    startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-    startInfo.WindowStyle = ProcessWindowStyle.Normal;
+        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+        startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+        startInfo.WindowStyle = ProcessWindowStyle.Normal;
 #endif
 
         try
         {
 #if _WINDOWS
-            [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-            static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
-            ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
+    [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
+    ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
 #else
-        // Run the external process & wait for it to finish
-        using (Process proc = Process.Start(startInfo))
-        {
-            //proc.WaitForExit();
-        }
+            // Run the external process & wait for it to finish
+            using (Process proc = Process.Start(startInfo))
+            {
+                //proc.WaitForExit();
+            }
 #endif
         }
         catch (Exception e)
