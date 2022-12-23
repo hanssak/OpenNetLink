@@ -63,7 +63,8 @@
                             <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" @bind="id" tabindex="1" autocomplete="off">
                             @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
                             {
-                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" @bind="pw" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
+                                //AD 로그인은 PW 사용자 입력 불가 (Readonly)
+                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" @bind="pw" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
                             }
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
                             {
