@@ -1316,6 +1316,51 @@
 
 		<!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
 
+
+		<!-- ********************************************* [START] 메일 (T_MAIL_0000) ********************************************* -->
+
+		<!-- ******************* [START] 메일 (MailTransStatus) ********************** -->
+		
+		<T_MAIL_TRANSWAIT>
+			<KR>발송대기</KR>
+			<JP>転送待機</JP>
+			<EN>Waiting</EN>
+			<CN>等候传输</CN>
+		</T_MAIL_TRANSWAIT>
+
+		<T_MAIL_TRANSCANCLE>
+			<KR>발송취소</KR>
+			<JP>転送取消</JP>
+			<EN>Cancel</EN>
+			<CN>取消传输</CN>
+		</T_MAIL_TRANSCANCLE>
+
+		<T_MAIL_TRANS_SUCCESS>
+			<KR>발송완료</KR>
+			<JP>Success</JP>
+			<EN>Success</EN>
+			<CN>Success</CN>
+		</T_MAIL_TRANS_SUCCESS>
+
+		<T_MAIL_TRANSFRFAILED>
+			<KR>발송실패</KR>
+			<JP>On Transfering</JP>
+			<EN>On Transfering</EN>
+			<CN>On Transfering</CN>
+		</T_MAIL_TRANSFRFAILED>
+
+		<T_MAIL_INSPECT>
+			<KR>검사중</KR>
+			<JP>On Transfering</JP>
+			<EN>On Transfering</EN>
+			<CN>On Transfering</CN>
+		</T_MAIL_INSPECT>		
+		
+		<!-- ******************* [END] 메일 (MailTransStatus) ********************** -->
+
+		<!-- ********************************************* [END] 메일 (T_MAIL_0000) ********************************************* -->
+
+
 		<!-- ********************************************* [START] 메뉴 (T_MENU_0000) ********************************************* -->
 
 		<T_MENU_SYSTEM>
@@ -10285,6 +10330,13 @@
       <CN></CN>
     </E_0253>
 
-	</ERROR>
+    <E_0254>
+      <KR>WAS Server와 원활히 통신하지 못했습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </E_0254>
+
+  </ERROR>
 	<!-- ********************************************* [END] MSG ERROR (E_0000) ********************************************* -->
 </TEXT>

@@ -26,6 +26,7 @@
 @using System.Xml.Linq
 @using OpenNetLinkApp.Common
 @using System.Collections.Concurrent;
+@using System.Text.Json;
 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
@@ -242,6 +243,18 @@
     }
 
     /// <summary>
+    /// ID/PW인증 받기위한
+    /// </summary>
+    /// <param name="strID"></param>
+    /// <param name="strPW"></param>
+    /// <returns></returns>
+    public static string stringIDpwJsonString(string strID, string strPW)
+    {
+        string json = "{\n\"id\":\"" + strID + "\",\n\"pw\":\"" + strPW + "\"\n}";
+        return json;
+    }
+
+    /// <summary>
     /// 로그인 동작( DoLogin )
     /// </summary>
     private void doLogIn()
@@ -256,7 +269,7 @@
             }
 
             if ((pw?.Length ?? 0) < 1)
-            {                
+            {
                 ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
                 return;
             }
@@ -323,41 +336,67 @@
                         }
                     }
 
+                    strIP = "172.16.3.250"; // KKW - 사내TEST
                     SessionWebClient web = new SessionWebClient();
-                    string strUrl = @$"https://{strIP}:8080/index.jsp";
+                    string strUrl = @$"https://{strIP}:1310/v2/sso/db/login";
                     string strEncID = "";
                     string strEncPW = "";
+
                     SGCrypto crypt = new SGCrypto();
+                    // 실제사용
+                    crypt.Aes256EncryptIVkey(id, out strEncID);
+                    crypt.Aes256EncryptIVkey(pw, out strEncPW);
 
-                    crypt.Aes256EncryptIVkey("hsck2301hsck2301", "hsck2301hsck2301hsck2301hsck2301", id, out strEncID);
-                    crypt.Aes256EncryptIVkey("hsck2301hsck2301", "hsck2301hsck2301hsck2301hsck2301", pw, out strEncPW);
+                    string strJsonData = stringIDpwJsonString(strEncID, strEncPW);
+                    string stRtn = "";
+                    stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
+                    if (stRtn == null || (1 > stRtn.Length))
+                    {
+                        ShowLoginFail(XmlConf.GetErrMsg("E_0254"));
+                        return;
+                    }
 
-                    string strDetailUrl = string.Format($"id={strEncID}&pw={strEncPW}");
-                    string stRtn = web.Request(strUrl, strDetailUrl);
-                    if (stRtn != null && stRtn.Length > 0 && string.Compare(stRtn, "1", true) == 0)
+                    int nCode = 0;
+                    string strMsg = "";
+                    string strData = "";
+                    int nData = 0;
+
+                    // json으로 온 Data에서 실제 data 뽑아내는 동작
+                    using (JsonDocument document = JsonDocument.Parse(stRtn))
+                    {
+                        JsonElement jroot = document.RootElement;
+                        nCode = jroot.GetProperty("code").GetInt32();
+                        strMsg = jroot.GetProperty("msg").GetString();
+                        strData = jroot.GetProperty("data").GetString();
+                    }
+
+                    CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
+
+                    if (stRtn != null && stRtn.Length > 0 && strData == "1")
                     {
                         HSCmdCenter.LoginNotCheckPw(groupid, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
                         CLog.Here().Information($"doLogIn - IDPW - Web Certificate Done!");
                     }
                     else
                     {
-                        string strMsg = "";
-                        if (stRtn == "-1")
-                            strMsg = "WAS 서버에서 ID 정보를 수신받지 못했습니다.";
-                        else if (stRtn == "-2")
-                            strMsg = "WAS 서버에서 PW 정보를 수신받지 못했습니다.";
-                        else if (stRtn == "-3")
+                        if (strData == "-1")
+                            strMsg = "ID 정보를 수신받지 못했습니다.";
+                        else if (strData == "-2")
+                            strMsg = "PW 정보를 수신받지 못했습니다.";
+                        else if (strData == "-3")
                             strMsg = "사용자 인증 실패 되었습니다.";
-                        else if (stRtn == "-4")
+                        else if (strData == "-4")
                             strMsg = "사용자가 존재하지 않습니다.";
-                        else if (stRtn == "-5")
+                        else if (strData == "-5")
                             strMsg = "입력한 PW가 틀립니다.";
-                        else if (stRtn == "-6")
+                        else if (strData == "-6")
                             strMsg = "내부시스템(서버오류 및 DB 접근 오류 등)에서 오류가 발생되었습니다.";
                         else
-                            strMsg = "WAS 서버와 사용자 인증 과정 중 알수없는 오류가 발생하였습니다.";
+                            strMsg = "사용자 인증과정 중 알수없는 오류가 발생하였습니다.";
 
                         CLog.Here().Information($"doLogIn - IDPW - Web Certificate(@@@@@@@@@) Failed : {strMsg}");
+                        ShowLoginFail(strMsg);
+                        return;
                     }
 
                 }
@@ -376,7 +415,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="ngroupid"></param>
     /// <returns></returns>
@@ -453,11 +492,10 @@
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
-
-
 #if DEBUG
             pw = "HsckAD.com";
 #endif
+
             pw = pw.ToLower();
 
             // PW 암호화해서 Log남김
@@ -968,7 +1006,7 @@
                 }
                 sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
-                HSCmdCenter.SetUseUserRecvDownPath(groupId, (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(groupId)==false)); // SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId)
+                HSCmdCenter.SetUseUserRecvDownPath(groupId, (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(groupId) == false)); // SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId)
                 SetStaticUserNameRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
 
                 // 3중망 정보 적용
@@ -989,7 +1027,7 @@
                     }
                 }
 
-                // CLIENT_ZIP_DEPTH, CS_EXCEPTION_EXT_REASON_TYPE 
+                // CLIENT_ZIP_DEPTH, CS_EXCEPTION_EXT_REASON_TYPE
                 // 정보 가져옴
                 SGQueryExtend sgQueryExtend = null;
                 sgQueryExtend = new SGQueryExtend();
@@ -1137,12 +1175,12 @@
                             listModKey[(int)HOTKEY_MOD.CTRL],
                             listModKey[(int)HOTKEY_MOD.SHIFT],
                             listModKey[(int)HOTKEY_MOD.WINDOW],
-                            chVKey,0);
+                            chVKey, 0);
                     }
 
                 } // if (bUseClipBoard)
 
-                DateTime dt = (SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now :sgLoginData.GetSvrTimeConvert();
+                DateTime dt = (SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
                 pageService.SetSvrTime(groupId, dt, sgLoginData);
                 bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
                 bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
@@ -1228,12 +1266,12 @@
 
                     //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 시작 2021/07/05 YKH
                     @*if (GetInitPWLogin(groupId) == true)
-                    {
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
-                        refPWChangeDefaultPW.nGroupID = groupId;
-                        await refPWChangeDefaultPW.openPopUp();
-                        return;
-                    }*@
+                        {
+                            pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
+                            refPWChangeDefaultPW.nGroupID = groupId;
+                            await refPWChangeDefaultPW.openPopUp();
+                            return;
+                        }*@
                     //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 종료
 
                     @*if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
@@ -1404,7 +1442,7 @@
 
                 CLog.Here().Information($"1 to ALL Login, GroupID : {groupId}, LoginResult Add After(#####) - Current / Total : {dicLoginResult.Count} / {NetWorkSvc.NetWorkInfo.Count} ");
 
-                foreach(var item in dicLoginResult)
+                foreach (var item in dicLoginResult)
                 {
                     CLog.Here().Information($"1 to ALL Login, Item Identify(#####) -  GroupID : {item.Key}, LoginResult : {item.Value}");
                 }
@@ -1476,7 +1514,7 @@
                     await refPWChangeDefaultPW.openPopUp();
                     return;
                 }
-                //@ 
+                //@
                 else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
                 {
                 }
@@ -1784,7 +1822,7 @@
             } // if (bUseClipBoard)
 
 
-            DateTime dt = (SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now :sgLoginData.GetSvrTimeConvert();
+            DateTime dt = (SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
             pageService.SetSvrTime(groupId, dt, sgLoginData);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
@@ -63,6 +63,43 @@ namespace OpenNetLinkApp.Components.SGPopUp
 
             return responseJSON;
         }
+
+        public String RequestUsePostJson(String url, String postData, string strContentType)
+        {
+
+            string responseJSON = "";
+
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create(url);
+                request.Proxy = null;
+                var data = Encoding.ASCII.GetBytes(postData);
+
+                request.Method = "POST";
+                request.ContentType = strContentType; // "application/x-www-form-urlencoded";
+                request.ContentLength = data.Length;
+                request.CookieContainer = m_cookieContainer;
+
+                TrustAllCert ValCallback = new TrustAllCert();
+                ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(ValCallback.OnValidationCallback);
+
+                using (var stream = request.GetRequestStream())
+                {
+                    stream.Write(data, 0, data.Length);
+                }
+                var response = (HttpWebResponse)request.GetResponse();
+                responseJSON = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+            }
+            catch(Exception ex)
+            {
+                Log.Error(string.Format($"RequestUsePostJson Exception - Msg : {ex.Message}"));
+            }
+
+            return responseJSON;
+        }
+
+
     }
 
     public class TrustAllCert

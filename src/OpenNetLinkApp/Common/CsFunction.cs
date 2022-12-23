@@ -148,9 +148,11 @@ namespace OpenNetLinkApp.Common
             else if (option == "MailTransStatus")
             {
                 values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
-                values.Add(_xmlConfInstance.GetTitle("T_COMMON_TRANSWAIT"));     //전송대기
-                values.Add(_xmlConfInstance.GetTitle("T_COMMON_TRANS_SUCCESS")); //전송완료
-                values.Add(_xmlConfInstance.GetTitle("T_COMMON_TRANSFAIL"));     //전송실패
+                values.Add(_xmlConfInstance.GetTitle("T_MAIL_TRANSWAIT"));          //발송대기
+                values.Add(_xmlConfInstance.GetTitle("T_MAIL_TRANSCANCLE"));        //발송취소
+                values.Add(_xmlConfInstance.GetTitle("T_MAIL_TRANS_SUCCESS"));      //발송완료
+                values.Add(_xmlConfInstance.GetTitle("T_MAIL_TRANSFRFAILED"));      //발송실패
+                values.Add(_xmlConfInstance.GetTitle("T_MAIL_INSPECT"));            //검사중
             }
             else if (option == "ApproveStatus")
             {
@@ -164,8 +166,8 @@ namespace OpenNetLinkApp.Common
             {
                 values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
                 values.Add(_xmlConfInstance.GetTitle("T_COMMON_APPROVE_WAIT"));
-                values.Add(_xmlConfInstance.GetTitle("T_DASH_APPROVE_COMPLETE"));
-                values.Add(_xmlConfInstance.GetTitle("T_DASH_APPROVE_REJECT"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_APPROVE"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_REJECTION"));
             }
             else if (option == "ApproveKind")
             {
@@ -182,8 +184,9 @@ namespace OpenNetLinkApp.Common
             else if (option == "DlpValue")
             {
                 values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
-                values.Add(_xmlConfInstance.GetTitle("T_COMMON_DLP_INCLUSION"));
                 values.Add(_xmlConfInstance.GetTitle("T_COMMON_DLP_NOTINCLUSION"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_DLP_INCLUSION"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_DLP_UNKNOWN"));
             }
             else if (option == "DataType")
             {

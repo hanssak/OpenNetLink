@@ -300,5 +300,28 @@ namespace OpenNetLinkApp.Data.SGQuery
 
 			return sb.ToString();
 		}
-    }
+
+		public string ListDbFunc(MailParam tParam)
+        {
+
+			// FUNC_EMAIL_TRANSFERINFO_OPEN
+			// strQuery += @$"'{tParam.Receiver}', '{tParam.Title}', '0', '{tParam.PageListCount}', '{tParam.ViewPageNo}')";
+
+			string strQuery = @$"SELECT * FROM FUNC_EMAIL_TRANSFERINFO_OPEN('{tParam.UserID}','{tParam.SearchStartDate}','{tParam.SearchEndDate}', ";
+			strQuery += @$"'{tParam.GetApproveKindCode()}', '{tParam.GetTransKindCode()}','{tParam.GetApprStatusCode()}','{tParam.GetTransStatusCode()}', '{tParam.GetDlpValue()}',";
+			strQuery += @$"'{tParam.Receiver}', '{tParam.Title}', '0', '{tParam.PageListCount}', '{tParam.ViewPageNo}')";
+
+			return strQuery;
+
+			/*sb.Append(" ORDER BY a.emailSeq desc");
+			sb.Append(" limit " + tParam.PageListCount + " offset (" + tParam.ViewPageNo + "-1) * " + tParam.PageListCount);
+			return sb.ToString();*/
+		}
+
+		public string TotalCountDbFunc(MailParam tParam)
+        {
+			return "";
+        }
+
+	}
 }
