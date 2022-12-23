@@ -219,13 +219,13 @@
 
                                             @*@if (item.isPossibleDownload)
                                                 {
-                                                    <td style="text-align:center; vertical-align: middle">@item.isPossibleDownloadCount</td>
-                                                    <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>RequestManualDownload(item))"><i class="far fa-arrow-alt-circle-down"></i></button></td>
+                                                <td style="text-align:center; vertical-align: middle">@item.isPossibleDownloadCount</td>
+                                                <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>RequestManualDownload(item))"><i class="far fa-arrow-alt-circle-down"></i></button></td>
                                                 }
                                                 else
                                                 {
-                                                    <td style="text-align:center; vertical-align: middle">0</td>
-                                                    <td style="text-align:center; vertical-align: middle">-</td>
+                                                <td style="text-align:center; vertical-align: middle">0</td>
+                                                <td style="text-align:center; vertical-align: middle">-</td>
                                                 }*@
 
                                             <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
@@ -456,8 +456,8 @@
 
     @*public string strFromDay = "";
         public string strToDay = "";*@
-public string curUserID = "";
-//검색조건 바인딩 변수
+    public string curUserID = "";
+    //검색조건 바인딩 변수
     @*private string curFromDay;
         private string curToDay;*@
     //반입,반출(sr_type)
@@ -587,42 +587,45 @@ public string curUserID = "";
         // 검색조건 꼭 함수를 사용해서 저장해야만 정상적인 Query 가능함
 
         @*string strTmpFrom = "20221019";
-        string strTmpTo = "20221019";
-        mailParam.SetSearchStartDate(strTmpFrom);
-        mailParam.SetSearchEndDate(strTmpTo);*@
+            string strTmpTo = "20221019";
+            mailParam.SetSearchStartDate(strTmpFrom);
+            mailParam.SetSearchEndDate(strTmpTo);*@
 
         //refPeriodDatePicker.RetriveDateFromJS();
 
-        Task.Run(async () => { await refPeriodDatePicker.RetriveDateFromJS(); });
+        Task.Run(async () =>
+        {
+            await refPeriodDatePicker.RetriveDateFromJS();
 
-        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
-        string curToDay = refPeriodDatePicker.ToDateSearchValue;
-        curFromDay = curFromDay.Substring(0, 8);
-        curToDay = curToDay.Substring(0, 8);
+            string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+            string curToDay = refPeriodDatePicker.ToDateSearchValue;
+            curFromDay = curFromDay.Substring(0, 8);
+            curToDay = curToDay.Substring(0, 8);
 
 
-        // 실제사용 - UI상에 설정된 값 안나옴
-        mailParam.SetSearchStartDate(curFromDay);
-        mailParam.SetSearchEndDate(curToDay);
+            // 실제사용 - UI상에 설정된 값 안나옴
+            mailParam.SetSearchStartDate(curFromDay);
+            mailParam.SetSearchEndDate(curToDay);
 
-        mailParam.SetApprKindCode(strApproveTypeText);
-        mailParam.SetTransKindCode(strTransTypeText);
+            mailParam.SetApprKindCode(strApproveTypeText);
+            mailParam.SetTransKindCode(strTransTypeText);
 
-        mailParam.SetApprStatusCode(strSearchApproveStatus);
-        mailParam.SetTransStatusCode(strTransFlag);
+            mailParam.SetApprStatusCode(strSearchApproveStatus);
+            mailParam.SetTransStatusCode(strTransFlag);
 
-        mailParam.SetDlpValue(strDlpValue);
-        mailParam.SetReceiver(strSearchReceiver);
-        mailParam.SetTitle(strSearchTitle);
+            mailParam.SetDlpValue(strDlpValue);
+            mailParam.SetReceiver(strSearchReceiver);
+            mailParam.SetTitle(strSearchTitle);
 
-        mailParam.ViewPageNo = nViewPageNo;
-        mailParam.PageListCount = nPageListCount;
+            mailParam.ViewPageNo = nViewPageNo;
+            mailParam.PageListCount = nPageListCount;
 
-        MailManageDao dao = new MailManageDao();
-        string strQuery = dao.ListDbFunc(mailParam);
-        CLog.Here().Information($"Query-@@@@@@@@@@ : {strQuery}");
+            MailManageDao dao = new MailManageDao();
+            string strQuery = dao.ListDbFunc(mailParam);
+            CLog.Here().Information($"Query-@@@@@@@@@@ : {strQuery}");
 
-        HSCmdCenter.SendListQuery(groupID, curUserID, strQuery);
+            HSCmdCenter.SendListQuery(groupID, curUserID, strQuery);
+        });
     }
 
 
@@ -659,7 +662,7 @@ public string curUserID = "";
         string systemid = (sgLoginData.GetSystemPosition() == true ? "I" : "E");
 
         mailParam.UserID = curUserID;
-        //mailParam.SystemId = systemid;
+            //mailParam.SystemId = systemid;
 
         @*
             await mailParam.SetSearchStartDate("datepicker9");
@@ -672,11 +675,11 @@ public string curUserID = "";
 
         //TransKInd => sr_type
         mailParam.SetTransKindCode(strTransTypeText);
-        @*        
-        mailParam.ApproveKind = strApproveTypeText;
-        mailParam.ApprStatus = strSearchApproveStatus;
-        mailParam.TransStatus = strTransFlag;
-        mailParam.DlpValue = strDlpValue;
+        @*
+            mailParam.ApproveKind = strApproveTypeText;
+            mailParam.ApprStatus = strSearchApproveStatus;
+            mailParam.TransStatus = strTransFlag;
+            mailParam.DlpValue = strDlpValue;
         *@
 
         mailParam.Receiver = strSearchReceiver;
@@ -1027,7 +1030,7 @@ public string curUserID = "";
     ///
     /// </summary>
     /// public async Task doSearch()
-    /// 
+    ///
     public async Task UpdateDataTask()
     {
         TransSearchData(nViewPageNo);
@@ -1170,18 +1173,18 @@ public string curUserID = "";
             @*
                 if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForwardDownBeforeRecv())
                 {
-                    if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
-                        isPossibleDownload = true;
-                    else
-                        isPossibleDownload = false;
+                if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
+                isPossibleDownload = true;
+                else
+                isPossibleDownload = false;
                 }
                 else
                 {
-                    //수동다운로드 이므로 PC수신완료 건만 다운가능
-                    if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
-                        isPossibleDownload = true;
-                    else
-                        isPossibleDownload = false;
+                //수동다운로드 이므로 PC수신완료 건만 다운가능
+                if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
+                isPossibleDownload = true;
+                else
+                isPossibleDownload = false;
                 }
             *@
 
@@ -1219,15 +1222,15 @@ public string curUserID = "";
     @*
         public void GetInitDateTime()
         {
-            strToDay = DateTime.Now.ToString("yyyy-MM-dd");
-            string year = DateTime.Now.ToString("yyyy");
-            string month = DateTime.Now.ToString("MM");
-            string day = DateTime.Now.ToString("dd");
-            int nYear = Convert.ToInt32(year);
-            int nMonth = Convert.ToInt32(month);
-            int nDay = Convert.ToInt32(day);
-            System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
-            strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
+        strToDay = DateTime.Now.ToString("yyyy-MM-dd");
+        string year = DateTime.Now.ToString("yyyy");
+        string month = DateTime.Now.ToString("MM");
+        string day = DateTime.Now.ToString("dd");
+        int nYear = Convert.ToInt32(year);
+        int nMonth = Convert.ToInt32(month);
+        int nDay = Convert.ToInt32(day);
+        System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
+        strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
         }
     *@
 
