@@ -771,7 +771,7 @@
     public async void LoginResultOnetoAll(int groupId, PageEventArgs e)
     {
 
-        await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault"); 
+        await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
         int ret = e.result;
         int nGroupIDfirst = -1;
 
@@ -2052,7 +2052,7 @@
                 // 3망 정책고려한 결재사용유무 설정
                 if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false) // 결재관리 UI 않나오는 설정추가
                     @*if ((sgLoginData.GetApproveProxyRight() && bSFMManageUse) || (sgUserInfo.GetUserApprPos() > 0))*@
-                    if (sgLoginData.GetApproveProxyRight() || (sgUserInfo.GetUserApprPos() > 0))     //(일반사용자)대결재자 권한을 가지거나, 전결/결재자인 경우 결재관리 표시
+                    if (sgLoginData.GetApproveProxyRight() || (sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupid)) > 0))     //(일반사용자)대결재자 권한을 가지거나, 전결/결재자인 경우 결재관리 표시
                         bApprMenuUse = true;
 
                 //bSecurityApprMenuUse = sgUserData.GetUserPrivacyApprPos();
@@ -2069,9 +2069,14 @@
                     bFileTransMenuUse = true;
             }
 
-            @*string strRootPath = "/Welcome";
-                if (!siteConfig.GetUseDashBoard())
-                strRootPath = "/Transfer";*@
+            
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 2074 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Main.razor"
+                                            
 
             // 파일전송화면 이면 저장했던 위치를 찾아서 사용한다. (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
             string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
@@ -2176,7 +2181,7 @@
                 }
 
                 //대결재관리(5)
-                if (bDeputyApprove && bApprMenuUse && sgUserInfo.GetUserApprPos() > 0)      //일반사용자는 대결재 관리 사용 불가
+                if (bDeputyApprove && bApprMenuUse && sgUserInfo.GetUserApprPos(true, siteConfig.GetUseAllProxyAuthority(gID)) > 0)      //일반사용자는 (대결재권한을 가져도) 대결재 관리 사용 불가
                 {
                     strNavigatePathWithGroupID = "";    //안씀
                                                         //strNavigatePathWithGroupID += gID.ToString();
@@ -2353,12 +2358,12 @@
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
         {
-        return true;
-            }
-    else
-        return false;
+            return true;
+        }
+        else
+            return false;
 
-            }
+                }
     */
 
 }

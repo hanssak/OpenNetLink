@@ -496,6 +496,7 @@
 
     ViewDetailPopUp refViewDetail;
     PublicBoardView refPublicBoardView;
+    ISGUserInfoService sgUserSvr;
     ISGSiteConfigService siteConfig;
     ISGVersionConfigService versionConfigSvc;
     ISGopConfigService OpConfigSvc;
@@ -809,6 +810,7 @@
     {
         base.OnInitialized();
 
+        sgUserSvr = SGAppMgrSvc.UserInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
@@ -924,7 +926,7 @@
         SGUserData sgUserData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-
+         ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupID);
 
         if (sgLoginData != null && sgUserData != null)
         {
@@ -939,7 +941,7 @@
 
             // 3망 정책고려한 결재사용유무 설정 && 설정상 결재관리 UI 사용
             if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
-                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
+                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 0))
                     bApprMenuUse = true;
         }
 
@@ -997,7 +999,14 @@
             if (sgSideBar != null)
                 groupID = sgSideBar.GroupId;*/
 
-            @*int groupID = groupIDbyParam;*@
+            
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 1002 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Welcome.razor"
+                                             
 
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -1037,7 +1046,14 @@
         {
             nDrawPageGroupID = groupIDbyParam;
             //strCurrentSeedKey = HsCmdCenter.GetSeedKey(groupIDbyParam);
-            @*int groupID = groupIDbyParam;*@
+            
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 1042 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Welcome.razor"
+                                             
 
             SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupIDbyParam);
             if (sgLoginData == null)
@@ -1069,8 +1085,14 @@
             HsCmdCenter.SetFileRecvPossible(groupID, true);
             
             // 수신 경로 변경은 기본 Page가 바뀔수 있으므로 Main, PopupLogin 쪽으로 이전
-            @*HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
-            SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정*@
+            
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 1075 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Welcome.razor"
+                                                               
 
             GetNetOverModeData(groupID);
 
@@ -2430,6 +2452,7 @@
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
 
+          ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupID);
 
         if (sgLoginData != null && sgUserData != null)
         {
@@ -2437,7 +2460,7 @@
 
             // 3망 정책고려한 결재사용유무 설정
             if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
-                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
+                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 0))
                     return true;
         }
 

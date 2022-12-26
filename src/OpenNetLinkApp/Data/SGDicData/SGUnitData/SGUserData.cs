@@ -36,7 +36,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// 사용자의 결재권한 여부를 반환한다. (return 0 : 일반사용자, 1: 결재권자, 2: 전결자)
+        /// 사용자의 실 결재권한 여부를 반환한다. (return 0 : 일반사용자, 1: 결재권자, 2: 전결자)
+        ///<br>[주의] userInfo Service에 삽입시에만 사용</br> 
+        /// <br>(OpenNetLink의 동작 시 권한은 UserInfo의 GetUserApprPos 사용)</br>
         /// </summary>
         /// <returns></returns>
         public int GetUserApprpos()
@@ -45,6 +47,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             int nApprPos = Convert.ToInt32(strData);
             return nApprPos;
         }
+
         // GetUserApprpos 확장함수로 문자열을 직접 제공한다
         public string GetUserApprposString()
         {

@@ -1082,15 +1082,15 @@
 
 #if _WINDOWS
 
-        try
-        {
-            if (e.strUrlData != null && e.strUrlData.Length > 0)
-                System.Diagnostics.Process.Start("explorer", e.strUrlData);
-        }
-        catch (Exception ex)
-        {
-            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-        }
+    try
+    {
+        if (e.strUrlData != null && e.strUrlData.Length > 0)
+            System.Diagnostics.Process.Start("explorer", e.strUrlData);
+    }
+    catch (Exception ex)
+    {
+        CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+    }
 
 #elif _LINUX
 
@@ -1607,7 +1607,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             if (listNetOverPolicy.Count() < 2)
             {
-                // Clipboard Data 실제 전송하는 부분
+            // Clipboard Data 실제 전송하는 부분
                 @*if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)    // 선택전송
                     ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
                     else
@@ -1625,7 +1625,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     if (listNetOverPolicy[nIdx].Length > 0)
                     {
 
-                        // Clipboard Data 실제 전송하는 부분
+                    // Clipboard Data 실제 전송하는 부분
                         @*if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)    // 선택전송
                             //ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
                             nTempRet = HsCmdCenter.SendClipboard(clipData.nGroupId, listNetOverPolicy[nIdx], strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
@@ -2088,8 +2088,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         if (sgLoginData == null)
             return;
 
-        ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
-        if (sgUserData == null)
+        ISGUserInfo sgUserInfo = UserInfoSvc.GetUserInfo(groupID);
+        if (sgUserInfo == null)
             return;
 
         SGApprLineData sgApprLineData = null;
@@ -2131,13 +2131,13 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         if (strApprStep.Equals("") != true)
             nApprStep = Convert.ToInt32(strApprStep);
 
-        string strUserSeq = sgUserData.UserSeq;
+        string strUserSeq = sgUserInfo.UserSeq;
 
         List<string> ApprLineSeq = null;
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
 
         string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 ||
+        if (sgLoginData.IsVipUser() || sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 1 ||
             (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) ||
             SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardNoApproveButFileTrans())
             stApprLineSeq = "";
@@ -2164,7 +2164,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             strTitle = fileAddManage.GetConvertTitleDesc(true, strTitle);
             strContents = fileAddManage.GetConvertTitleDesc(true, strContents);*@
 
-        //수신자 목록체크(철자틀림)
+    //수신자 목록체크(철자틀림)
         string stReceiver = "";
         string strDestNetOverData = "";
         int ret = HsCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strTitle, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
@@ -2185,8 +2185,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         if (sgLoginData == null)
             return;
 
-        ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
-        if (sgUserData == null)
+        ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+        if (sgUserInfo == null)
             return;
 
         SGApprLineData sgApprLineData = null;
@@ -2210,15 +2210,17 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             nApprStep = Convert.ToInt32(strApprStep);
 
         List<string> ApprLineSeq = null;
-        string strUserSeq = sgUserData.UserSeq;
+        string strUserSeq = sgUserInfo.UserSeq;
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
 
-        string stApprLineSeq = sgApprLineData.GetApprCommaSeqString(strUserSeq);
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
+        int nUserApprPos = sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID));
+
+    string stApprLineSeq = sgApprLineData.GetApprCommaSeqString(strUserSeq);
+        if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
             stApprLineSeq = "";
 
         // Vip / 전결재자 / 결재미사용 / 사후결재사용시간아님 일때, 사전결재전송 강제
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
+        if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
             bAfterApprove = false;
 
         if (!String.IsNullOrEmpty(stApprLineSeq) && bAfterApprove)

@@ -606,6 +606,7 @@
 
         ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(activeMenu.GroupId);
         bool bSFMManageUse = sgUserInfo.UserInfoAdded.IsMySelfSFM;
+        int nUserApprPos = sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(activeMenu.GroupId)); //화면 메뉴를 구성하는 항목의 권한
 
         if (sgLoginData.GetUseOverNetwork2())
         {
@@ -656,7 +657,7 @@
 
             // 3망 정책고려한 결재사용유무 설정
             if (pageService.GetUseApproveNetOver(activeMenu.GroupId, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
-                if ((sgLoginData.GetApproveProxyRight() && bSFMManageUse) || (sgUserInfo.GetUserApprPos() > 0))
+                if ((sgLoginData.GetApproveProxyRight()) || (nUserApprPos > 0))
                     bApprMenuUse = true;
 
             bPCURLUse = sgLoginData.GetPCURLUse();
@@ -773,7 +774,7 @@
                 SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: XmlConf.GetTitle("T_COMMON_EMAILMANAGE_GAP"), icon: "fas fa-envelope", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bEmailUse, strUserSeq: strLoginUserSeq);
 
             // 메일 결재
-            if (sgUserData.GetUserApprpos() == 1)
+            if (nUserApprPos == 1)
             {
                 strNavigatePathWithGroupID = "/mailApprove/";
                 strNavigatePathWithGroupID += gID.ToString();
@@ -796,7 +797,7 @@
                 SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: XmlConf.GetTitle("T_COMMON_URLMANAGE"), icon: "fas fa-globe", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bPCURLUse, strUserSeq: strLoginUserSeq);
 
             // PCURL 결재
-            if (sgUserData.GetUserApprpos() == 1)
+            if (nUserApprPos == 1)
             {
                 strNavigatePathWithGroupID = "/pcurlApprove/";
                 strNavigatePathWithGroupID += gID.ToString();

@@ -230,6 +230,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
 
         public bool GetUseOneToMultiLogin();
+
+        /// <summary>
+        /// 대결재자로서, 원결재자의 모든 권한을 위임받아 사용할지 유무
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseAllProxyAuthority(int groupID);
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -1106,6 +1113,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseOneToMultiLogin()
         {
             return m_bUseSelfSSOlogin;
+        }
+
+        /// <summary>
+        /// 대결재자로서, 원결재자의 모든 권한을 위임받아 사용할지 유무
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseAllProxyAuthority(int groupID)
+        { 
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseAllProxyAuthority;
+            return false;
         }
     }
 }

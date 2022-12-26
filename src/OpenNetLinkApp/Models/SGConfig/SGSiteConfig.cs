@@ -47,6 +47,8 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool m_bUseClipBoardApproveAfterLimit { get; set; } = true;       // 클립보드 파일전송시 사후결재 Count 제한 사용유무
 
+        public bool m_bUseAllProxyAuthority { get; set; } = false;             //대결재자로서, 원결재자의 모든 권한을 위임받아 사용할지 유무
+
 
     }
 }

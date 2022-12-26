@@ -674,7 +674,7 @@
         }
 
         ISGUserInfo userInfoService = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
-        int nApprovePos = userInfoService.GetUserApprPos(); //sgUserData.GetUserApprpos();
+        int nApprovePos = userInfoService.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)); //sgUserData.GetUserApprpos();
         SGApprLineData sgApprLineData = null;
         sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
         if (sgApprLineData == null)
@@ -728,13 +728,16 @@
                     //if (!strApprLineDeptSeq.Equals("-"))
                     //if (strApprLineDeptSeq.Length == 18)    // Dept - seq 일때에만 검색함.
 
-                    @*if (CsSeqFunc.isDeptSeq(strApprLineDeptSeq))
-                    {
-                        SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
-                        cntSendQuery++;
-                    }*@
+                    
 
-                    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 735 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Transfer/TransferUI2.razor"
+                       
+
+    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
                     SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "");
                     cntSendQuery++;
                 }
@@ -836,7 +839,9 @@
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
 
         string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1)
+        int nUserApprPos = sgUserData.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID));
+        
+        if (sgLoginData.IsVipUser() ||nUserApprPos > 1)
             stApprLineSeq = "";
         else if (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false)
         {
@@ -853,7 +858,7 @@
         }
 
         // Vip / 전결재자 / 결재미사용 / 사후결재사용시간아님 일때, 사전결재전송 강제
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
+        if (sgLoginData.IsVipUser() || nUserApprPos> 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
             bAfterApprove = false;
 
         // 3중망 상황 상관없이 결재Line 정보는 무조건 보내어, 서버에서 결정하도록 한다.
@@ -1038,7 +1043,7 @@
         }
 
         // 일반.결재자만
-        if (sgUserData.GetUserApprPos() > 1)
+        if (sgUserData.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID))> 1)
         {
             CLog.Here().Information($"isFilesNeedApprove (FALSE) : User's ApprPOS is OVER Approver!");
             return false;
@@ -1082,8 +1087,8 @@
         if (sgLoginData == null)
             return;
 
-        ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
-        if (sgUserData == null)
+        ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+        if (sgUserInfo == null)
             return;
 
         SGApprLineData sgApprLineData = null;
@@ -1098,15 +1103,17 @@
             nApprStep = Convert.ToInt32(strApprStep);
 
         List<string> ApprLineSeq = null;
-        string strUserSeq = sgUserData.UserSeq;
+        string strUserSeq = sgUserInfo.UserSeq;
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
 
         string stApprLineSeq = sgApprLineData.GetApprCommaSeqString(strUserSeq);
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
+        int nUserApprPos = sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID));
+
+        if (sgLoginData.IsVipUser() ||nUserApprPos> 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
             stApprLineSeq = "";
 
         // Vip / 전결재자 / 결재미사용 / 사후결재사용시간아님 일때, 사전결재전송 강제
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
+        if (sgLoginData.IsVipUser() || nUserApprPos  > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
             bAfterApprove = false;
 
         if (!String.IsNullOrEmpty(stApprLineSeq) && bAfterApprove)
@@ -1466,9 +1473,11 @@
             bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);   //결제 사용 여부 체크
             bApprEdit = sgLoginData.GetApproveAppend();                             //결제자 편집 사용 여부
 
-            ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
-            if (sgUserData == null)
+            ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+            if (sgUserInfo == null)
                 return;
+
+            int nUserApprPos = sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID));
 
             if (!bUseApprove)
                 bHideApprChooseAddBtn = true;
@@ -1477,9 +1486,9 @@
                 if (!bApprEdit)
                     bHideApprChooseAddBtn = true;
 
-                if (sgUserData != null)
+                if (sgUserInfo != null)
                 {
-                    if (sgUserData.GetUserApprPos() > 1)
+                    if (nUserApprPos > 1)
                         bHideApprChooseAddBtn = true;
                 }
 
@@ -1488,7 +1497,7 @@
             if (sgLoginData.IsVipUser() || bUseApprove == false)
                 bHideApprChooseAddBtn = true;
 
-            if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || bAfterApprChkHIde)
+            if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || bAfterApprChkHIde)
             {
                 bAfterApprChkHIde = true;
                 bAfterApprDisable = true;
@@ -1630,30 +1639,14 @@
             await refApproverSelect_StepPopUp.openPopUp();
         }
 
-        @* switch (approvePopupType)
-            {
-            case "SEARCH":
-            if (m_apvStep == 0 || m_apvStep == 1)   //and 와 or 결재
-            {
-            refApproverSelect_PopUp.InitDeptApprInsert();
-            refApproverSelect_PopUp.InitApprLine();
-            OpenSelector1().Wait();
-            }
-            else   //and + or 결재
-            {
-            refApproverSelect_StepPopUp.InitDeptApprInsert();
-            refApproverSelect_StepPopUp.InitApprLine();
-            refApproverSelect_StepPopUp.BindEvent();
-            refApproverSelect_StepPopUp.SetApprSelectChangeEvent(SetApprLineChange);
-            await refApproverSelect_StepPopUp.openPopUp();
-            }
-            break;
-            case "TREE":
-            refApproverSelect_TreePopUp.InitDeptApprInsert();
-            refApproverSelect_TreePopUp.SetApprSelectChangeEvent(SetApprLineChange);
-            await refApproverSelect_TreePopUp.openPopUp();
-            break;
-            }*@
+        
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 1662 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Transfer/TransferUI2.razor"
+               
     }
 
     public async Task ReceiverChooseAdd()
@@ -1679,19 +1672,14 @@
         refReceiverSelect_PopUp.BindEvent();
         await refReceiverSelect_PopUp.openPopUp();
 
-        @*string receiverPopupType = OpConfigSvc.GetReceiverSearchType();
-            switch (receiverPopupType)
-            {
-            case "SEARCH":
-            string strCurTeamName = sgUserData.GetTeamName();
-            refReceiverSelect_PopUp.SetInitDeptName(strCurTeamName);
-            await refReceiverSelect_PopUp.openPopUp();
-            break;
+        
 
-            case "TREE":
-            await refReceiverSelect_TreePopUp.openPopUp();
-            break;
-            }*@
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 1700 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Transfer/TransferUI2.razor"
+               
     }
     /// <summary>
     /// 매일 자정 데이터 새로고침
@@ -1904,14 +1892,14 @@
         string approvePopupType = OpConfigSvc.GetApproverSearchType();
         string receiverPopupType = OpConfigSvc.GetReceiverSearchType();
 
-        @*      if (approvePopupType == "TREE" || receiverPopupType == "TREE")
-            {
-            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        
 
-            //TreePopUp 구성에 사용할 DEPTINFO 요청
-            HSCmdCenter.sgPageEvent.SetDeptInfoEventAdd(groupID, DeptInfoResult);                //부서 트리 정보
-            HSCmdCenter.SendDeptInfo(groupID, sgLoginData.GetUserID());
-            }*@
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 1920 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Transfer/TransferUI2.razor"
+               
 
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         stopClickSync();
@@ -1923,18 +1911,14 @@
 
     }
 
-    @*public void DeptInfoResult(int groupId)
-        {
-        //DEPTINFO 결과값을 Tree PopUp 별로 세팅
-        string approvePopupType = OpConfigSvc.GetApproverSearchType();
-        if (approvePopupType == "TREE")
-        refApproverSelect_TreePopUp.SetDeptTree(groupId);
+    
 
-        string receiverPopupType = OpConfigSvc.GetReceiverSearchType();
-        if (receiverPopupType == "TREE")
-        refReceiverSelect_TreePopUp.SetDeptTree(groupId);
-
-        }*@
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 1943 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Transfer/TransferUI2.razor"
+           
     public void runConfirmAlert(string arg)
     {
         System.Diagnostics.Debug.WriteLine("Callback Confirm Alert");
@@ -2059,11 +2043,14 @@
         if (!fileAddmanage.RMFileExist(strRMouseFilePath))
             return;
 
-        @*        ISGSideBarUI sgSideBar = null;
+        
 
-            // Active Menu 강제 설정
-            if ((sgSideBar = SideBarUISvc.FindSubMenu(groupID, 0, 0)) == null)
-            return;*@
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 2072 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Transfer/TransferUI2.razor"
+                     
 
         if (pageService.GetScrLocking() == true)
             return;
@@ -2075,9 +2062,14 @@
         pageService.m_nCurViewPageGroupID = groupID;
         groupIDbyParam = groupID;
 
-        @*        KeyboardEventArgs eventArgs = new KeyboardEventArgs();
-            eventArgs.Key = "Enter";
-            SideBarUISvc.ChgActiveMenu(eventArgs, sgSideBar);*@
+        
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 2086 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Transfer/TransferUI2.razor"
+                                                               
 
         //        OnInitialized();
 
@@ -2110,10 +2102,14 @@
     /// </summary>
     public void AfterApproveStatusChange()
     {
-        @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupID = 0;
-            if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*@
+        
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 2122 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Transfer/TransferUI2.razor"
+                                          
 
         int groupID = groupIDbyParam;
 
@@ -2149,7 +2145,7 @@
 
 
         // 사후결재
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || bAfterApprChkHIde)
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || bAfterApprChkHIde)
         {
             bAfterApprChkHIde = true;
             bAfterApprDisable = true;
