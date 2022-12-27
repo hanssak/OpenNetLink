@@ -85,7 +85,7 @@
                         <!--
                         <div class="float-left mt-2">
                             <i class="fas fa-lightbulb fa-1x"></i>&nbsp;&nbsp;
-                            업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
+                            업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기 가능합니다.
                         </div>
                         -->
                         <div class="float-right mb-2">
@@ -260,6 +260,86 @@
             return;
         }
 
+        OpenPreviewWindow();
+
+        //stSelectedFileNo = "";
+    }
+
+    private void OpenPreviewWindow()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        string strIP = sgDetailData.GetFilePreviewIP();
+        string param = makeParamOfServerViewer();
+
+#if _WINDOWS
+
+        string strArguments = "";
+
+        if(!SGAppMgrSvc.SiteConfigInfoService.GetUseWebLinkPreviewer(groupID))   
+        {
+             // 확인후 적용!
+             strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+             strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+        }
+        else
+        {
+            //웹링크쪽 뷰어 Param
+            string webLinkURL = SGAppMgrSvc.SiteConfigInfoService.GetWebLinkPreviewerURL(groupID);
+            string webLinkParam = makeViewerParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
+          
+            strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
+            strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+        }
+       
+#else
+
+        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+        startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+        startInfo.WindowStyle = ProcessWindowStyle.Normal;
+#endif
+
+        try
+        {
+#if _WINDOWS
+
+            [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
+            ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
+#else
+
+            // Run the external process & wait for it to finish
+            using (Process proc = Process.Start(startInfo))
+            {
+                //proc.WaitForExit();
+            }
+#endif
+
+        }
+        catch (Exception e)
+        {
+            CLog.Here().Information("Process.Start - ### 1 - Exception : {0} ", e.Message);
+        }
+    }
+
+     /// <summary>
+    /// 기존 서버의 Viewer나 PreviewUtil에서 사용되는 Param 인자값
+    /// </summary>
+    /// <returns></returns>
+    private string makeParamOfServerViewer()
+    {
         string stYear = DateTime.Now.ToString("yyyy");
         string stMonth = DateTime.Now.ToString("MM");
         string stDay = DateTime.Now.ToString("dd");
@@ -303,55 +383,25 @@
         string stLawparam = stSelectedSeq + "|" + stSelectedFileNo + "|" + stSelectedFileName + "|" + stSelectedEncKey;
         string finalData = AESEncrypt256(stLawparam, stBase64);
         string stParam = HttpUtility.UrlEncode(finalData);
-        OpenPreviewWindow(stParam);
 
-        //stSelectedFileNo = "";
+        return stParam;
     }
 
-    private void OpenPreviewWindow(string param)
+    /// <summary>
+    /// WebLink의 Viewer에서 사용되는 인자값
+    /// <br>transSeq={stSelectedSeq}&fileNo={stSelectedFileNo}&encValue={encValue}</br>
+    /// </summary>
+    /// <param name="SystemType"></param>
+    /// <param name="UserID"></param>
+    /// <returns></returns>
+    private string makeViewerParamOfWebLinkViewer(string SystemType, string UserID)
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+        string encOriginal = $"{SystemType}|{UserID}";
+        SGCrypto cr = new SGCrypto();
+        cr.Aes256EncryptIVkey(encOriginal, out string encValue);
 
-        SGDetailData sgDetailData = null;
-        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
-        if (sgDetailData == null)
-            return;
-
-        string strIP = sgDetailData.GetFilePreviewIP();
-
-#if _WINDOWS
-        // 확인후 적용!
-        string strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-        strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
-#else
-ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
-startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-startInfo.WindowStyle = ProcessWindowStyle.Normal;
-#endif
-
-        try
-        {
-#if _WINDOWS
-            [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-            static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
-            ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
-#else
-// Run the external process & wait for it to finish
-using (Process proc = Process.Start(startInfo))
-{
-    //proc.WaitForExit();
-}
-#endif
-        }
-        catch (Exception e)
-        {
-            CLog.Here().Information("Process.Start - ### 1 - Exception : {0} ", e.Message);
-        }
+        return $"transSeq={stSelectedSeq}&fileNo={stSelectedFileNo}&encValue={encValue}";
     }
-
     private String AESEncrypt256(String Input, String key)
     {
         RijndaelManaged aes = new RijndaelManaged();
