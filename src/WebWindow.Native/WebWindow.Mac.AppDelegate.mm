@@ -4,8 +4,6 @@
 #import <FinderSync/FinderSync.h>
 #import "Tray.h"
 
-
-
 @implementation MyApplicationDelegate : NSObject
 
 - (id)init {
@@ -19,21 +17,37 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
     [window makeKeyAndOrderFront:nil];
     [NSApp activateIgnoringOtherApps:YES];
-
+    NSLog(@"applicationDidFinishLaunching");
+    NTLog(SelfThis, Info, "!! ----- aLaucgubg");
     // Show extensions, if FinderUtilities is not approved
-    if (!FIFinderSyncController.isExtensionEnabled) {
-        [FIFinderSyncController showExtensionManagementInterface];
-    }
+    // if (!FIFinderSyncController.isExtensionEnabled) {
+    //    [FIFinderSyncController showExtensionManagementInterface];
+    //}
+
+    //@autoreleasepool {
+    //    while(tray_loop(1))
+    //    {
+
+    //    }
+    //}
+    [NSApp stop:nil];
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
+    NTLog(SelfThis, Info, "!! ----- application shoud terminater after last windowclosed");
     NSLog(@"When last windows Closed");
     return true;
 }
 
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
+    NSLog(@"applicationShouldTerminate");
+    return NSTerminateNow;
+}
+
 - (void)applicationWillTerminate:(NSNotification *)notification {
+    NSLog(@"applicationWillTerminate.......");
+    NTLog(SelfThis, Info, "will terminate");
     NSString *strSocket = @"/var/tmp/testd.sock";
-     
     NSFileManager *FileManager;
     FileManager = [NSFileManager defaultManager];
     if ([FileManager fileExistsAtPath:strSocket] == YES) {
@@ -46,6 +60,8 @@
 
 - (BOOL)windowShouldClose:(NSWindow *)sender {
 
+    NTLog(SelfThis, Info, "!! ----- windowshoudClose");
+    
     NSLog(@"windowShouldClose....g_bDoExit2TrayUse(1):%s", (g_bDoExit2TrayUse?"Yes":"No"));
 	if (g_bDoExit2TrayUse == false)
 	{
@@ -102,6 +118,7 @@
 	((WebWindow*)SelfThis)->InvokeRequestedNavigateURL((AutoString)navURI);
     return ;
 }
+
 
 - (void) hotkeyClipBoardWithEvent:(NSEvent *)hkEvent object:(id)anObject
 {
@@ -179,6 +196,7 @@
 
 - (void) SetCopyAndSend:(bool)value
 {
+    NSLog(@"SetCopyAndSend");
     if(value)
         gCopyAndSend = 1;
     else

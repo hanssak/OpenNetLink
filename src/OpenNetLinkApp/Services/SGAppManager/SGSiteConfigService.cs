@@ -237,6 +237,22 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="groupID"></param>
         /// <returns></returns>
         public bool GetUseAllProxyAuthority(int groupID);
+
+        /// <summary>
+        /// //결재미리보기(파일전송/클립보드) 시 WebLink 뷰어 사용 유무
+        /// <br>사용안할 시, 기존 viewer 주소 사용</br>
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseWebLinkPreviewer(int groupID);
+
+        /// <summary>
+        /// WebLink 미리보기 사용 시 WebLink 주소 ( + AP001_Docs_Viewer.do 사용)
+        /// <br>m_bUseWebLinkPreviewer 가 true일때만 사용함</br>
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public string GetWebLinkPreviewerURL(int groupID);
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -1126,6 +1142,22 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 return listSiteConfig[groupID].m_bUseAllProxyAuthority;
             return false;
+        }
+
+        public bool GetUseWebLinkPreviewer(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseWebLinkPreviewer;
+            return false;
+        }
+
+        public string GetWebLinkPreviewerURL(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_strWebLinkPreviewerURL;
+            return "";
         }
     }
 }
