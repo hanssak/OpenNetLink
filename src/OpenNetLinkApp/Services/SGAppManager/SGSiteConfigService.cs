@@ -362,7 +362,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUseFileClipManageUI = false;            // 클립보드 파일형태 전송시 관리 UI
                 sgSiteConfig.m_bUseFileClipApproveUI = false;           // 클립보드 파일형태 전송시 결재 UI
 
-                sgSiteConfig.m_bUseApproveAfterLimit = true;            // 사후결재 결재 Count 제한 사용유무
+                sgSiteConfig.m_bUseApproveAfterLimit = false;            // 사후결재 결재 Count 제한 사용유무 - Default false 로 변경 2022.12.28
                 sgSiteConfig.m_bUseClipBoardApproveAfterLimit = true;
 
                 SiteConfigInfo.Add(sgSiteConfig);
