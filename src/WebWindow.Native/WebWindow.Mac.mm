@@ -249,8 +249,7 @@ void WebWindow::WaitForExit()
             sleep(1);
         }
     }); // ThrMouseRightClick: Thread Run
-
-    //[NSApp run];
+    [NSApp run];
 	if (tray_init(&tray) < 0)
 	{
 		// printf("failed to create tray\n");
