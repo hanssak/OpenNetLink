@@ -926,7 +926,7 @@
         SGUserData sgUserData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-         ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupID);
+        ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupID);
 
         if (sgLoginData != null && sgUserData != null)
         {
@@ -999,14 +999,14 @@
             if (sgSideBar != null)
                 groupID = sgSideBar.GroupId;*/
 
-            
+
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
 #line 1002 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Welcome.razor"
-                                             
+
 
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -1046,14 +1046,14 @@
         {
             nDrawPageGroupID = groupIDbyParam;
             //strCurrentSeedKey = HsCmdCenter.GetSeedKey(groupIDbyParam);
-            
+
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
 #line 1042 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Welcome.razor"
-                                             
+
 
             SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupIDbyParam);
             if (sgLoginData == null)
@@ -1083,16 +1083,16 @@
             HsCmdCenter.sgPageEvent.SetAlarmNotiAfterDashBoardEventAdd(groupID, AlarmNotiAfter);                // 알람 노티 수신 후 화면 갱신.
 
             HsCmdCenter.SetFileRecvPossible(groupID, true);
-            
+
             // 수신 경로 변경은 기본 Page가 바뀔수 있으므로 Main, PopupLogin 쪽으로 이전
-            
+
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
 #line 1075 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Welcome.razor"
-                                                               
+
 
             GetNetOverModeData(groupID);
 
@@ -1122,13 +1122,15 @@
 
             SendDayFileInfo();
 
+            TransSearchData(1);
+
             StateHasChanged();
 
-            
+
             CheckContinueFileUpload();
 
         }
-        
+
         pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);          //매일 자정 데이터 새로고침
     }
 
@@ -1288,7 +1290,7 @@
             nDayUseClipCount = e.Count;
         }
 
-        TransSearchData(1);
+        //TransSearchData(1);
 
         // Query개수 줄여봄
         // TransSearchCount();
@@ -2452,7 +2454,7 @@
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
 
-          ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupID);
+        ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupID);
 
         if (sgLoginData != null && sgUserData != null)
         {
