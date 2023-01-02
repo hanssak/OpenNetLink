@@ -999,14 +999,7 @@
             if (sgSideBar != null)
                 groupID = sgSideBar.GroupId;*/
 
-
-
-#line default
-#line hidden
-#nullable disable
-#nullable restore
-#line 1002 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Welcome.razor"
-
+            @*int groupID = groupIDbyParam;*@
 
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -1047,13 +1040,7 @@
             nDrawPageGroupID = groupIDbyParam;
             //strCurrentSeedKey = HsCmdCenter.GetSeedKey(groupIDbyParam);
 
-
-#line default
-#line hidden
-#nullable disable
-#nullable restore
-#line 1042 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Welcome.razor"
-
+            @*int groupID = groupIDbyParam;*@
 
             SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupIDbyParam);
             if (sgLoginData == null)
@@ -1085,14 +1072,8 @@
             HsCmdCenter.SetFileRecvPossible(groupID, true);
 
             // 수신 경로 변경은 기본 Page가 바뀔수 있으므로 Main, PopupLogin 쪽으로 이전
-
-
-#line default
-#line hidden
-#nullable disable
-#nullable restore
-#line 1075 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Welcome.razor"
-
+             @*HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
+            SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정*@
 
             GetNetOverModeData(groupID);
 
