@@ -171,6 +171,7 @@
     {
         System.Diagnostics.Debug.WriteLine(stCurrentDrive);
         refFileTreeCustom.changeDrive(stCurrentDrive);
+        LoadListFiles("");  //드라이브 변경 시 우측 SubList초기화
     }
 
     protected override void OnInitialized()
@@ -242,12 +243,15 @@
         //    CLog.Error("GetParentError:" + ex0.Message);
         //}
 
+        if (string.IsNullOrEmpty(stPath))
+            goto append;
+
         IEnumerable<string> fList = null;
         try
         {
             fList = Directory.EnumerateFileSystemEntries(stPath)
-             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
-            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
+            // .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
 
         }
         catch (UnauthorizedAccessException e)
@@ -304,6 +308,7 @@
             CLog.Error("Exception:" + ex3.Message);
         }
 
+    append:
         string listHtml = makeSubFileList();
         object[] param = { "divPopUpFileList", listHtml };
         JSRuntime.InvokeAsync<object>("appendHtml", param);
@@ -312,7 +317,7 @@
 
     public void SetCurrentDrive(string value)
     {
-        //드라이브 변경 시 기존에 Expand된 하위항목들 모두 제거 처리 
+        //드라이브 변경 시 기존에 Expand된 하위항목들 모두 제거 처리
         //(entries 변경되어도 과거 드라이브의 하위가 잔여되는 버그 수정 건)
         if (value != _stCurrentDrive)
             JSRuntime.InvokeAsync<object>("RadzenTreeCollapse", null);
