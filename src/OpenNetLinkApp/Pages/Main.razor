@@ -2069,14 +2069,9 @@
                     bFileTransMenuUse = true;
             }
 
-            
-
-#line default
-#line hidden
-#nullable disable
-#nullable restore
-#line 2074 "D:/Project/OpenNetLink/src/OpenNetLinkApp/Pages/Main.razor"
-                                            
+            @*string strRootPath = "/Welcome";
+                if (!siteConfig.GetUseDashBoard())
+                strRootPath = "/Transfer";*@
 
             // 파일전송화면 이면 저장했던 위치를 찾아서 사용한다. (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
             string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
@@ -2357,13 +2352,13 @@
         //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-        {
-            return true;
+            {
+        return true;
         }
-        else
-            return false;
+            else
+                return false;
 
-                }
+                    }
     */
 
 }
