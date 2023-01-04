@@ -2,6 +2,7 @@
 #import "DDHotKeyUtilities.h"
 #import <Carbon/Carbon.h>
 #import <FinderSync/FinderSync.h>
+#import <Foundation/Foundation.h>
 #import "Tray.h"
 
 @implementation MyApplicationDelegate : NSObject
@@ -124,11 +125,11 @@
     NSNumber *nsNumbGuId = (NSNumber *)anObject;
     if(dicClipTypeSelect == nil)
     {
-        NSLog(@"dic nil!!!");
-        dicClipTypeSelect = [NSMutableDictionary dictionary];
+        //NSLog(@"dic nil!!!");
+        dicClipTypeSelect = [[NSMutableDictionary alloc] init];
     }
-    [dicClipTypeSelect setObject:@true forKey:nsNumbGuId];
-    NSLog(@"dicValue : %@", dicClipTypeSelect);
+    [dicClipTypeSelect setObject:@"1" forKey:nsNumbGuId];
+    //NSLog(@"dicValue : %@", dicClipTypeSelect);
 }
 
 -(void) ClipFirstSendTypeText:(id)anObject
@@ -136,11 +137,11 @@
     NSNumber *nsNumbGuId = (NSNumber *)anObject;
     if(dicClipFirstSendTypeText == nil)
     {
-        NSLog(@"FirstSendTypeDic nil!!!");
-        dicClipFirstSendTypeText = [NSMutableDictionary dictionary];
+        //NSLog(@"FirstSendTypeDic nil!!!");
+        dicClipFirstSendTypeText = [[NSMutableDictionary alloc] init];
     }
-    [dicClipFirstSendTypeText setObject:@true forKey:nsNumbGuId];
-    NSLog(@"dicValue : %@", dicClipFirstSendTypeText);
+    [dicClipFirstSendTypeText setObject:@"1" forKey:nsNumbGuId];
+    //NSLog(@"dicValue : %@", dicClipFirstSendTypeText);
 }
 
 - (void) hotkeyClipBoardWithEvent:(NSEvent *)hkEvent object:(id)anObject
@@ -150,19 +151,19 @@
     //NSLog(@"gCopyAndSend Value : %d", gCopyAndSend);
     if(gCopyAndSend == 1)
     {
-      NSLog(@"Command + C Press!");
+        NSLog(@"Command + C Press!");
        [self hotkeyGenerate:'c' alt:false control:false shift:false win:true];
         usleep(1000000);
     }
 
     if(dicClipTypeSelect == nil)
     {
-        dicClipTypeSelect = [NSMutableDictionary dictionary];
+        dicClipTypeSelect = [[NSMutableDictionary alloc] init];
     }
 
     if(dicClipFirstSendTypeText == nil)
     {
-        dicClipFirstSendTypeText = [NSMutableDictionary dictionary];
+        dicClipFirstSendTypeText = [[NSMutableDictionary alloc] init];
     }
     
 
