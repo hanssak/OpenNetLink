@@ -20,6 +20,7 @@
 @using BlazorInputFile
 @using OpenNetLinkApp.Common
 @using OfficeExtractor
+@using Data.SGDicData.SGAlz;
 
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
@@ -645,6 +646,16 @@
 
     }
 
+    private void AlzTest()
+    {
+        //string source = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)\\Test.alz";
+        //string dest = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)";
+        //string passWord = "1234";
+        //SGUnAlz lib = new SGUnAlz();
+        //int ret = lib.UnAlzExtract(source, dest);
+        //int ret = lib.UnAlzExtract_PassWordDll(source, dest, passWord);
+
+    }
 
 
     private async Task CheckApprLine()
@@ -674,7 +685,7 @@
         }
          
         ISGUserInfo userInfoService = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
-        int nApprovePos = userInfoService.GetUserApprPos(); //sgUserData.GetUserApprpos();
+        int nApprovePos = userInfoService.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)); //sgUserData.GetUserApprpos();
         SGApprLineData sgApprLineData = null;
         sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
         if (sgApprLineData == null)
@@ -719,7 +730,7 @@
                     strApprLineDeptSeq = item.DeptSeq;
                     strApprLineName = item.Name;
 
-                       //사용자 유효성 검사 시, 로그인한 본인은 제외하고 확인한다.
+                    //사용자 유효성 검사 시, 로그인한 본인은 제외하고 확인한다.
                     if (strApprLineUserSeq == strUserSeq)
                         continue;
 
@@ -727,6 +738,7 @@
                     //웹매니저에 등록된 최초 결재라인은 유효성 검증에서 제외
                     //if (!strApprLineDeptSeq.Equals("-"))
                     //if (strApprLineDeptSeq.Length == 18)    // Dept - seq 일때에만 검색함.
+
 
                     @*if (CsSeqFunc.isDeptSeq(strApprLineDeptSeq))
                         {
@@ -837,7 +849,9 @@
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
 
         string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1)
+        int nUserApprPos = sgUserData.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID));
+
+        if (sgLoginData.IsVipUser() || nUserApprPos > 1)
             stApprLineSeq = "";
         else if (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false)
         {
@@ -854,7 +868,7 @@
         }
 
         // Vip / 전결재자 / 결재미사용 / 사후결재사용시간아님 일때, 사전결재전송 강제
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
+        if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
             bAfterApprove = false;
 
         // 3중망 상황 상관없이 결재Line 정보는 무조건 보내어, 서버에서 결정하도록 한다.
@@ -1039,7 +1053,7 @@
         }
 
         // 일반.결재자만
-        if (sgUserData.GetUserApprPos() > 1)
+        if (sgUserData.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 1)
         {
             CLog.Here().Information($"isFilesNeedApprove (FALSE) : User's ApprPOS is OVER Approver!");
             return false;
@@ -1083,8 +1097,8 @@
         if (sgLoginData == null)
             return;
 
-        ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
-        if (sgUserData == null)
+        ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+        if (sgUserInfo == null)
             return;
 
         SGApprLineData sgApprLineData = null;
@@ -1099,15 +1113,17 @@
             nApprStep = Convert.ToInt32(strApprStep);
 
         List<string> ApprLineSeq = null;
-        string strUserSeq = sgUserData.UserSeq;
+        string strUserSeq = sgUserInfo.UserSeq;
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
 
         string stApprLineSeq = sgApprLineData.GetApprCommaSeqString(strUserSeq);
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
+        int nUserApprPos = sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID));
+
+        if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
             stApprLineSeq = "";
 
         // Vip / 전결재자 / 결재미사용 / 사후결재사용시간아님 일때, 사전결재전송 강제
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
+        if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
             bAfterApprove = false;
 
         if (!String.IsNullOrEmpty(stApprLineSeq) && bAfterApprove)
@@ -1467,9 +1483,11 @@
             bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);   //결제 사용 여부 체크
             bApprEdit = sgLoginData.GetApproveAppend();                             //결제자 편집 사용 여부
 
-            ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
-            if (sgUserData == null)
+            ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+            if (sgUserInfo == null)
                 return;
+
+            int nUserApprPos = sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID));
 
             if (!bUseApprove)
                 bHideApprChooseAddBtn = true;
@@ -1478,9 +1496,9 @@
                 if (!bApprEdit)
                     bHideApprChooseAddBtn = true;
 
-                if (sgUserData != null)
+                if (sgUserInfo != null)
                 {
-                    if (sgUserData.GetUserApprPos() > 1)
+                    if (nUserApprPos > 1)
                         bHideApprChooseAddBtn = true;
                 }
 
@@ -1489,7 +1507,7 @@
             if (sgLoginData.IsVipUser() || bUseApprove == false)
                 bHideApprChooseAddBtn = true;
 
-            if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || bAfterApprChkHIde)
+            if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || bAfterApprChkHIde)
             {
                 bAfterApprChkHIde = true;
                 bAfterApprDisable = true;
@@ -1914,6 +1932,7 @@
             HSCmdCenter.SendDeptInfo(groupID, sgLoginData.GetUserID());
             }*@
 
+
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         stopClickSync();
 
@@ -2090,7 +2109,6 @@
         @*        KeyboardEventArgs eventArgs = new KeyboardEventArgs();
             eventArgs.Key = "Enter";
             SideBarUISvc.ChgActiveMenu(eventArgs, sgSideBar);*@
-
         //        OnInitialized();
 
         //OnAfterRenderAsync(true);
@@ -2161,7 +2179,7 @@
 
 
         // 사후결재
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || bAfterApprChkHIde)
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || bAfterApprChkHIde)
         {
             bAfterApprChkHIde = true;
             bAfterApprDisable = true;

@@ -56,12 +56,15 @@ else
     private SGApprover last = null;
     ISGSideBarUIService SideBarUISvc;
     SGSettingsDBProc sgSettingProc;
+    ISGUserInfoService sgUserSvr;
     ISGSiteConfigService siteConfig;
+  
     //결재단계 멤버변수 추가 0:AND 1:OR 2:AND+OR
     int m_step = 0;
 
     protected override void OnInitialized()
     {
+        sgUserSvr = SGAppMgrSvc.UserInfoService;
         sgSettingProc = SGSettingsDBProc.Instance;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -132,21 +135,23 @@ else
         int step = sgLoginData.GetApproveStep();
         m_step = step;
 
-        SGUserData sgUserInfo = null;
-        sgUserInfo = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserInfo == null)
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
             return;
+
+        ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
 
         SGApprLineData sgApprLineData = null;
         sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
         if (sgApprLineData == null)
         {
 
-            string strApprLineName = sgUserInfo.GetUserName();
-            string strApprLineRank = sgUserInfo.GetRank();
-            string strApprLineDeptName = sgUserInfo.GetTeamName();
-            string strApprLineDeptSeq = sgUserInfo.GetTeamCode();
-            string strApprLineSeq = sgUserInfo.GetUserSequence();
+            string strApprLineName = sgUserData.GetUserName();
+            string strApprLineRank = sgUserData.GetRank();
+            string strApprLineDeptName = sgUserData.GetTeamName();
+            string strApprLineDeptSeq = sgUserData.GetTeamCode();
+            string strApprLineSeq = sgUserData.GetUserSequence();
             string strApprLineOrder = "0";
             approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder));
             return;
@@ -172,7 +177,7 @@ else
             return;
         }
 
-        //서버에서 부서Seq를 보내지 않아 일단 이렇게 처리 
+        //서버에서 부서Seq를 보내지 않아 일단 이렇게 처리
         if (listApprLineDeptName.Count != listApprLineDeptSeq.Count)
         {
             listApprLineDeptSeq = new List<string>();
@@ -184,10 +189,10 @@ else
 
         int nApprLineCount = listApprLineName.Count;
         bool bApprUseType = sgLoginData.GetApprove();
-        if ((bApprUseType == false || sgLoginData.IsVipUser() || sgUserInfo.GetUserApprpos() > 1 ) && (nApprLineCount > 0))
+        if ((bApprUseType == false || sgLoginData.IsVipUser() || sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 1) && (nApprLineCount > 0))
             nApprLineCount = 1;
 
-        
+
 
         if ((listApprLineName != null) && (listApprLineRank != null) && (listApprLineDeptName != null) && (listApprLineSeq != null) && (listApprLineOrder != null))
         {
@@ -248,25 +253,28 @@ else
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        SGUserData sgUserInfo = null;
-        sgUserInfo = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserInfo == null)
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
             return;
 
-        string strUserSeq = sgUserInfo.GetUserSequence();
+        string strUserSeq = sgUserData.GetUserSequence();
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
         int step = sgLoginData.GetApproveStep();
+
+      ISGUserInfo sgUserInfo =   sgUserSvr.GetUserInfo(groupID);
+
         m_step = step;
 
-        string strApprLineName = sgUserInfo.GetUserName();
-        string strApprLineRank = sgUserInfo.GetRank();
-        string strApprLineDeptName = sgUserInfo.GetTeamName();
-        string strApprLineDeptSeq = sgUserInfo.GetTeamCode();
-        string strApprLineSeq = sgUserInfo.GetUserSequence();
+        string strApprLineName = sgUserData.GetUserName();
+        string strApprLineRank = sgUserData.GetRank();
+        string strApprLineDeptName = sgUserData.GetTeamName();
+        string strApprLineDeptSeq = sgUserData.GetTeamCode();
+        string strApprLineSeq = sgUserData.GetUserSequence();
         string strApprLineOrder = "0";
         approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder));
 
@@ -281,7 +289,7 @@ else
 
         apprLinkedList = null;
         apprLinkedList = sgApprLineData.GetApprAndLineData();
-        if (apprLinkedList == null || apprLinkedList.Count <= 0 || (sgLoginData.GetApprove() == false || sgLoginData.IsVipUser() || sgUserInfo.GetUserApprpos() > 1 ) )
+        if (apprLinkedList == null || apprLinkedList.Count <= 0 || (sgLoginData.GetApprove() == false || sgLoginData.IsVipUser() || sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 1))
         {
             last = approverList.Last();
             StateHasChanged();
@@ -336,9 +344,9 @@ else
         detailData = e.GetSvrRecordData2("RECORD");
 
         //같은 이름의 부서명이 있을지도 모르기 때문에 결과가 1로 확실한 데이터만 수정 진행
-        if(count == 1)
+        if (count == 1)
         {
-            for(int i = 0; i < approverList.Count; i++)
+            for (int i = 0; i < approverList.Count; i++)
             {
                 detailData[0].TryGetValue(0, out deptSeq);
                 detailData[0].TryGetValue(1, out deptName);

@@ -1129,12 +1129,12 @@
             return;
         }
 
-        if (userInfo.HeaderUserName != headUserName)
+    if (userInfo.HeaderUserName != headUserName)
+    {
+        if (userInfo.GetUserApprPos(true, siteConfig.GetUseAllProxyAuthority(groupId)) < sfmRight)
         {
-            if (userInfo.GetUserApprPos() < sfmRight)
-            {
-                pageService.SetSFMLogOut(true);
-                pageService.SetSFMChecking(false);
+            pageService.SetSFMLogOut(true);
+            pageService.SetSFMChecking(false);
 
                 List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
 
@@ -1148,21 +1148,17 @@
                 }
                 str += xmlConf.GetTitle("T_PROXY_USERNAME_LOGOUT"); //" 을 대결재권한 변경으로 로그아웃 하겠습니다.";
 
-                if (pageService.GetLogoutStatus(groupId))
-                {
-                    pageService.SetSFMLogOut(true);
-                    pageService.SetSFMChecking(false);
-                }
-
-
-
-                refSGAlert.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), str, 1, groupId, groupId.ToString());
-
-            }
-            else
+            if (pageService.GetLogoutStatus(groupId))
             {
-                pageService.SetSFMLogOut(false);
+                pageService.SetSFMLogOut(true);
                 pageService.SetSFMChecking(false);
+            }
+            refSGAlert.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), str, 1, groupId, groupId.ToString());
+        }
+        else
+        {
+            pageService.SetSFMLogOut(false);
+            pageService.SetSFMChecking(false);
 
                 userInfo.UserInfoAdded.IsMySelfSFM = isMySelfSFM;
                 userInfo.HeaderUserName = headUserName;

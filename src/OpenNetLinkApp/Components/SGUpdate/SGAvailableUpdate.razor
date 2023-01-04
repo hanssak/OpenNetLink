@@ -28,10 +28,11 @@
     <div class="modal-dialog modal-default">
         <div class="modal-content">
             <div class="modal-header-default">
-                <div class="modal-title"><i class="fas fa-cog blue-txt mr-2 "></i>소프트웨어 업데이트</div>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"  @onclick="@(async () => ClosePopUp())">
+                <div class="modal-title"><i class="fas fa-cog blue-txt mr-2 "></i>@XmlConf.GetTitle("T_ETC_SOFTWARE_UPDATE")</div>
+           @*[X] 버튼 삭제 ( [나중에하기] 버튼으로 대체)*@
+                @*<button type="button" class="close" data-dismiss="modal" aria-label="Close"  @onclick="@(async () => ClosePopUp())">
                     <span aria-hidden="true">&times;</span>
-                </button>
+                </button>*@
             </div>
             <div class="modal-body-default_up">
                 <!-- content -->
@@ -61,15 +62,15 @@
             </div>
             <div class="modal-footer-default clearfix">
                 <div class="container">
-                    @if (IsSkipVisible)
+                    @*@if (IsSkipVisible)   //'이 버전 넘기기' 처리 시 다른 Client에서도 해당 버전을 받을 수 없기 떄문에 해당 기능 제거
                     {
                         <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-1 float-left" @onclick="@(async () => SkipThisUpdateVersion())">이 버전 넘기기</button>
-                    }
+                    }*@
                     @if (IsRemindMeLaterVisible)
                     {
-                        <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-1 float-right" @onclick="@(async () => RemindMeLater())">나중에하기</button>
+                        <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-1 float-right" @onclick="@(async () => RemindMeLater())">@XmlConf.GetTitle("T_ETC_REMIND_ME_LATER")</button>
                     }
-                    <button type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-1 float-right" @onclick="@(async () => NowDownloadAndUpdate())">지금 다운로드 및 업데이트하기</button>
+                    <button type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-1 float-right" @onclick="@(async () => NowDownloadAndUpdate())">@XmlConf.GetTitle("T_ETC_NOW_DOWNLOAD_AND_UPDATE")</button>
                 </div>
             </div>
         </div>
@@ -102,7 +103,8 @@
     private string _infoText;
 
     private bool _isRemindMeLaterVisible = true;
-    private bool _isSkipVisible = true;
+    //'이 버전 넘기기' 처리 시 다른 Client에서도 해당 버전을 받을 수 없기 떄문에 해당 기능 제거
+    //private bool _isSkipVisible = true;
 
     private UpdateAvailableResult _userResponse = UpdateAvailableResult.None;
     public string _releaseNotes = "";
@@ -126,11 +128,11 @@
         set { _isRemindMeLaterVisible = value; CtrlSideUISvc.EmitNotifyStateChangedCtrlSide(); }
     }
 
-    public bool IsSkipVisible
+    @*public bool IsSkipVisible
     {
         get => _isSkipVisible;
         set { _isSkipVisible = value; CtrlSideUISvc.EmitNotifyStateChangedCtrlSide(); }
-    }
+    }*@
 
     public string ReleaseNotes
     {
@@ -183,13 +185,14 @@
             if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
             {
                 IsRemindMeLaterVisible = false;
-                IsSkipVisible = false;
+                //IsSkipVisible = false;
             }
             else
             {
+                //크리티컬한 업데이인 경우엔, SKIP이나 나중에는 하지 못하도록
                 bool isUserMissingCriticalUpdate = items.Any(x => x.IsCriticalUpdate);
                 IsRemindMeLaterVisible = isUserMissingCriticalUpdate == false;
-                IsSkipVisible = isUserMissingCriticalUpdate == false;
+                //IsSkipVisible = isUserMissingCriticalUpdate == false;
             }
 
             _CancellationTokenSource = new CancellationTokenSource();

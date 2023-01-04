@@ -2177,10 +2177,9 @@ window.loadFileReaderService = () => {
   }());
 window.FileReaderComponent = new FileReaderComponent();
 //# sourceMappingURL=FileReaderComponent.js.map
-
 }
+
 
 window.RadzenTreeCollapse = function () {
     $('.ui-treenode-children').remove();
 }
-

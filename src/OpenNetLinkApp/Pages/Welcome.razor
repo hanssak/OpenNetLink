@@ -496,6 +496,7 @@
 
     ViewDetailPopUp refViewDetail;
     PublicBoardView refPublicBoardView;
+    ISGUserInfoService sgUserSvr;
     ISGSiteConfigService siteConfig;
     ISGVersionConfigService versionConfigSvc;
     ISGopConfigService OpConfigSvc;
@@ -810,6 +811,7 @@
     {
         base.OnInitialized();
 
+        sgUserSvr = SGAppMgrSvc.UserInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
@@ -925,7 +927,7 @@
         SGUserData sgUserData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-
+        ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupID);
 
         if (sgLoginData != null && sgUserData != null)
         {
@@ -940,7 +942,7 @@
 
             // 3망 정책고려한 결재사용유무 설정 && 설정상 결재관리 UI 사용
             if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.SiteConfigInfoService.GetNoApproveManageUI(groupID) == false)
-                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
+                    if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 0))
                     bApprMenuUse = true;
         }
 
@@ -1038,6 +1040,7 @@
         {
             nDrawPageGroupID = groupIDbyParam;
             //strCurrentSeedKey = HsCmdCenter.GetSeedKey(groupIDbyParam);
+
             @*int groupID = groupIDbyParam;*@
 
             SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupIDbyParam);
@@ -1070,8 +1073,8 @@
             HsCmdCenter.SetFileRecvPossible(groupID, true);
 
             // 수신 경로 변경은 기본 Page가 바뀔수 있으므로 Main, PopupLogin 쪽으로 이전
-            @*HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
-                SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정*@
+             @*HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
+            SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정*@
 
             GetNetOverModeData(groupID);
 
@@ -1101,13 +1104,15 @@
 
             SendDayFileInfo();
 
+            TransSearchData(1);
+
             StateHasChanged();
 
 
             CheckContinueFileUpload();
 
         }
-        
+
         pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);          //매일 자정 데이터 새로고침
     }
 
@@ -1267,7 +1272,7 @@
             nDayUseClipCount = e.Count;
         }
 
-        TransSearchData(1);
+        //TransSearchData(1);
 
         // Query개수 줄여봄
         // TransSearchCount();
@@ -2431,6 +2436,7 @@
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
 
+        ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupID);
 
         if (sgLoginData != null && sgUserData != null)
         {
@@ -2438,7 +2444,7 @@
 
             // 3망 정책고려한 결재사용유무 설정
             if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.SiteConfigInfoService.GetNoApproveManageUI(groupID) == false) // OpConfigInfoService
-                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
+                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 0))
                     return true;
         }
 

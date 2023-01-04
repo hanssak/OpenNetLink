@@ -8,7 +8,8 @@
 @using AgLogManager
 
 <div style="width:100%;height:100%;border-bottom:1px solid #ddd; padding:0px;overflow:auto">
-    @*<div @onclick="toUpperTree">
+ 
+@*   <div @onclick="toUpperTree">
         <i class="fas fa-folder align-items-center" style="padding-left:17px;cursor:pointer;"></i>
         <span style="cursor:pointer;width:100px;">&nbsp;..</span>
     </div>*@
@@ -39,8 +40,8 @@
     public void changeDrive(string stDir)
     {
         stTreeDir = stDir;
-        //  entries = Directory.GetDirectories(stTreeDir);
-        entries = Directory.EnumerateFileSystemEntries(stTreeDir)
+        //entries = Directory.GetDirectories(stTreeDir);
+         entries = Directory.EnumerateFileSystemEntries(stTreeDir)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
         StateHasChanged();
@@ -52,11 +53,10 @@
         if (Directory.GetParent(stTreeDir) != null)
         {
             stTreeDir = Directory.GetParent(stTreeDir).FullName;
-            //entries = Directory.GetDirectories(stTreeDir);
+           // entries = Directory.GetDirectories(stTreeDir);
             entries = Directory.EnumerateFileSystemEntries(stTreeDir)
            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
-
             StateHasChanged();
         }
     }
@@ -68,7 +68,7 @@
         string[] drives = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         if (drives != null && drives.Length > 0)
         {
-            string root = Directory.GetDirectoryRoot(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+           string root = Directory.GetDirectoryRoot(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
             entries = Directory.EnumerateFileSystemEntries(root)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
