@@ -1129,7 +1129,7 @@ public void SFMInfoAfterSend(int groupId, object[] e)
 
     if (userInfo.HeaderUserName != headUserName)
     {
-        if (userInfo.GetUserApprPos() < sfmRight)
+        if (userInfo.GetUserApprPos(true, siteConfig.GetUseAllProxyAuthority(groupId)) < sfmRight)
         {
             pageService.SetSFMLogOut(true);
             pageService.SetSFMChecking(false);
@@ -1151,11 +1151,7 @@ public void SFMInfoAfterSend(int groupId, object[] e)
                 pageService.SetSFMLogOut(true);
                 pageService.SetSFMChecking(false);
             }
-
-
-
             refSGAlert.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), str, 1, groupId, groupId.ToString());
-
         }
         else
         {

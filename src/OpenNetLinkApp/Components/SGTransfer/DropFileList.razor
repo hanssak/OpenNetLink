@@ -1821,7 +1821,7 @@ protected override Task OnAfterRenderAsync(bool firstRender)
         }
 
         // 일반.결재자만
-        if (sgUserData.GetUserApprPos() > 1)
+        if (sgUserData.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 1)
         {
             CLog.Here().Information($"isFilesNeedApprove (FALSE) : User's ApprPOS is OVER Approver!");
             return false;

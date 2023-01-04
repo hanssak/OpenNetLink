@@ -235,6 +235,7 @@
     /// </summary>
     public void requestPreview()
     {
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -268,6 +269,88 @@
             return;
         }
 
+        OpenPreviewWindow();
+
+        //stSelectedFileNo = "";
+    }
+
+    private void OpenPreviewWindow()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        string strIP = sgDetailData.GetFilePreviewIP();
+        string param = makeParamOfServerViewer();
+
+#if _WINDOWS
+
+        string strArguments = "";
+
+        if(!SGAppMgrSvc.SiteConfigInfoService.GetUseWebLinkPreviewer(groupID))   
+        {
+          //기존 뷰어 Param
+          strArguments  = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+          strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+        }
+        else
+        {
+          //웹링크쪽 뷰어 Param
+          string webLinkURL = SGAppMgrSvc.SiteConfigInfoService.GetWebLinkPreviewerURL(groupID);
+          string webLinkParam = makeParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
+          
+          strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
+          strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+        }
+
+#else
+
+        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+        startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+        startInfo.WindowStyle = ProcessWindowStyle.Normal;
+#endif
+
+        try
+        {
+
+#if _WINDOWS
+    
+            [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
+            ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
+
+#else
+    
+            // Run the external process & wait for it to finish
+            using (Process proc = Process.Start(startInfo))
+            {
+                //proc.WaitForExit();
+            }
+#endif
+
+        }
+        catch (Exception e)
+        {
+                CLog.Here().Information("Process.Start - ### 1 - Exception : {0} ", e.Message);
+        }
+    }
+
+    /// <summary>
+    /// 기존 서버의 Viewer나 PreviewUtil에서 사용되는 Param 인자값
+    /// </summary>
+    /// <returns></returns>
+    private string makeParamOfServerViewer()
+    {
         string stYear = DateTime.Now.ToString("yyyy");
         string stMonth = DateTime.Now.ToString("MM");
         string stDay = DateTime.Now.ToString("dd");
@@ -311,101 +394,24 @@
         string stLawparam = stSelectedSeq + "|" + stSelectedFileNo + "|" + stSelectedFileName + "|" + stSelectedEncKey;
         string finalData = AESEncrypt256(stLawparam, stBase64);
         string stParam = HttpUtility.UrlEncode(finalData);
-        OpenPreviewWindow(stParam);
 
-        //stSelectedFileNo = "";
+        return stParam;
     }
 
     /// <summary>
-    /// [적용예정] WebLink 의 미리보기 방식을 이용해서 표시하는 함수
+    /// WebLink의 Viewer에서 사용되는 인자값
+    /// <br>transSeq={stSelectedSeq}&fileNo={stSelectedFileNo}&encValue={encValue}</br>
     /// </summary>
-    public void requestWebLinkPreview()
+    /// <param name="SystemType"></param>
+    /// <param name="UserID"></param>
+    /// <returns></returns>
+    private string makeParamOfWebLinkViewer(string SystemType, string UserID)
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-        string strMsg = "";
-        if (pageService.GetConnectStatus(groupID) == false)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
+        string encOriginal = $"{SystemType}|{UserID}";
+        SGCrypto cr = new SGCrypto();
+        cr.Aes256EncryptIVkey(encOriginal, out string encValue);
 
-        if (pageService.GetFilePrevRecving() == true)
-        {
-            strMsg = XmlConf.GetWarnMsg("W_0248");           // 파일 미리보기 수행 중입니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("warn", strMsg);
-            return;
-        }
-
-        if (stSelectedFileNo.Length < 1)
-        {
-            strMsg = XmlConf.GetWarnMsg("W_0064");          // 파일보기를 원하시는 대상을 선택 하시기 바랍니다.
-            ShowMessage("warn", strMsg);
-            return;
-        }
-
-        if (!FilePrevDownExtension(stSelectedFileName))
-        {
-            return;
-        }
-
-        string param = $"transSeq={stSelectedSeq}&fileNo={stSelectedFileNo}&encValue={stSelectedEncKey}";
-        string strArguments = $"https://218.145.246.25/weblink/AP001_Docs_Viewer.do?" + param;
-        strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
-
-        [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
-        ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
-
-    }
-
-    private void OpenPreviewWindow(string param)
-    {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        SGDetailData sgDetailData = null;
-        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
-        if (sgDetailData == null)
-            return;
-
-        string strIP = sgDetailData.GetFilePreviewIP();
-
-#if _WINDOWS
-    // 확인후 적용!
-    string strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-    strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
-#else
-        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
-        startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-        startInfo.WindowStyle = ProcessWindowStyle.Normal;
-#endif
-
-        try
-        {
-#if _WINDOWS
-    [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
-    ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
-#else
-            // Run the external process & wait for it to finish
-            using (Process proc = Process.Start(startInfo))
-            {
-                //proc.WaitForExit();
-            }
-#endif
-        }
-        catch (Exception e)
-        {
-            CLog.Here().Information("Process.Start - ### 1 - Exception : {0} ", e.Message);
-        }
+        return $"transSeq={stSelectedSeq}&fileNo={stSelectedFileNo}&encValue={encValue}";
     }
 
     private String AESEncrypt256(String Input, String key)
@@ -433,10 +439,6 @@
         String Output = Convert.ToBase64String(xBuff);
         return Output;
     }
-
-
-
-
 
     public static string SGBase64Hash(string stringToHash)
     {

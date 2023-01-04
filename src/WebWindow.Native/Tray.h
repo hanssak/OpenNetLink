@@ -125,6 +125,8 @@ static void tray_exit() { loop_result = -1; }
 #include <limits.h>
 #include <availability.h>
 #include <string.h>
+#include <objc/NSObjCRuntime.h>
+#include "NativeLog.h"
 
 static id app;
 static id icon;
@@ -215,7 +217,6 @@ static int tray_init(struct tray *tray) {
     Class original_c = objc_getClass(delegateType);
     Method swizzled_m = class_getInstanceMethod(trayDelegateClass, sel_registerName("menuCallback:"));
     bool didAddMethod = class_addMethod(original_c, sel_registerName("menuCallback:"), method_getImplementation(swizzled_m), method_getTypeEncoding(swizzled_m));
-
     statusBar = ((id(*)(id, SEL))objc_msgSend)((id)objc_getClass("NSStatusBar"),
                           sel_registerName("systemStatusBar"));
 
@@ -242,8 +243,33 @@ static int tray_loop(int blocking) {
                   "kCFRunLoopDefaultMode"), 
                 true);
     if (event) {
+      /*
+      //NSLog(@"isClass %s", object_isClass(event) ? "yes":"no");
+      //NSLog(@"%@", NSStringFromClass([event class]));
+      //NSLog(@"GetClassName %s", NSStringFromClass([event class]));
+      //NSLog(@"%@", event);
+      NSUInteger eventType = ((NSUInteger (*)(id, SEL))objc_msgSend)(event, sel_registerName("type"));
+      switch(eventType)
+      {
+        case 13:
+            if([event subtype] == NSEventSubtypeApplicationActivated) {
+            NSLog(@"%@", event);
+          }
+          break;
+        case 14:
+          if([event subtype] == NSEventSubtypePowerOff) {
+            NSLog(@"%@", event);
+          }
+          break;
+        default:
+          break;  
+      }
+      */
       ((void(*)(id, SEL, id))objc_msgSend)(app, sel_registerName("sendEvent:"), event);
+      //[NSApp updateWindows];
+			//((void (*)(id, SEL))objc_msgSend)(app, sel_registerName("updateWindows"));
     }
+
     return 0;
 }
 
