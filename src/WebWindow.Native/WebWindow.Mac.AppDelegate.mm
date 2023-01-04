@@ -2,6 +2,7 @@
 #import "DDHotKeyUtilities.h"
 #import <Carbon/Carbon.h>
 #import <FinderSync/FinderSync.h>
+#import <Foundation/Foundation.h>
 #import "Tray.h"
 
 @implementation MyApplicationDelegate : NSObject
@@ -119,71 +120,152 @@
     return ;
 }
 
+-(void) ClipTypeSelect:(id)anObject
+{
+    NSNumber *nsNumbGuId = (NSNumber *)anObject;
+    if(dicClipTypeSelect == nil)
+    {
+        //NSLog(@"dic nil!!!");
+        dicClipTypeSelect = [[NSMutableDictionary alloc] init];
+    }
+    [dicClipTypeSelect setObject:@"1" forKey:nsNumbGuId];
+    //NSLog(@"dicValue : %@", dicClipTypeSelect);
+}
+
+-(void) ClipFirstSendTypeText:(id)anObject
+{
+    NSNumber *nsNumbGuId = (NSNumber *)anObject;
+    if(dicClipFirstSendTypeText == nil)
+    {
+        //NSLog(@"FirstSendTypeDic nil!!!");
+        dicClipFirstSendTypeText = [[NSMutableDictionary alloc] init];
+    }
+    [dicClipFirstSendTypeText setObject:@"1" forKey:nsNumbGuId];
+    //NSLog(@"dicValue : %@", dicClipFirstSendTypeText);
+}
 
 - (void) hotkeyClipBoardWithEvent:(NSEvent *)hkEvent object:(id)anObject
 {
     NSNumber *nsNumbGuId = (NSNumber *)anObject;
     
-
     //NSLog(@"gCopyAndSend Value : %d", gCopyAndSend);
     if(gCopyAndSend == 1)
     {
-       NSLog(@"Command + C Press!");
+        NSLog(@"Command + C Press!");
        [self hotkeyGenerate:'c' alt:false control:false shift:false win:true];
         usleep(1000000);
     }
 
+    if(dicClipTypeSelect == nil)
+    {
+        dicClipTypeSelect = [[NSMutableDictionary alloc] init];
+    }
+
+    if(dicClipFirstSendTypeText == nil)
+    {
+        dicClipFirstSendTypeText = [[NSMutableDictionary alloc] init];
+    }
+    
+
     NSLog(@"Global HotKey Event Callback!, GUID:%d", [nsNumbGuId intValue]);
     dispatch_async(dispatch_get_main_queue(), ^{
         NSPasteboard *pasteBoard = NSPasteboard.generalPasteboard;
-        NSArray *array = [pasteBoard readObjectsForClasses:@[[NSImage class], [NSString class]] options:nil];
-        NSImage *img = nil;
-        for (NSInteger i=0; i<array.count; i++) {
-            if ([[array objectAtIndex:i] isKindOfClass:[NSImage class]]) {
-                img = [array objectAtIndex:i];
-                break;
+        BOOL isImage = [pasteBoard canReadObjectForClasses:@[[NSImage class]] options:nil];
+        BOOL isText = [pasteBoard canReadObjectForClasses:@[[NSString class]] options:nil];
+        int nDataType = D_CLIP_TEXT; //초기값 셋팅
+        NSData *pClipData;
+        if(isImage && isText)
+        {
+            if(dicClipTypeSelect == nil || [dicClipTypeSelect objectForKey:nsNumbGuId] == nil)
+            {       
+                if(dicClipFirstSendTypeText == nil || [dicClipFirstSendTypeText objectForKey:nsNumbGuId] == nil)
+                {
+                    nDataType = D_CLIP_IMAGE;
+                }
+                else
+                {
+                    nDataType = D_CLIP_TEXT;
+                }
+            }
+            else
+            {
+                nDataType = D_CLIP_OBJECT;    
             }
         }
-        
-        NSData *pClipData;
-        std::string strClipText;
-        int nDataType = D_CLIP_TEXT;
-        __block BOOL bClipSend=YES;
-
-        if (img != nil) {   // 이미지 복사
-            [img lockFocus];
-            NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, img.size.width, img.size.height)];
-            [img unlockFocus];
-            
-            [img addRepresentation:rep];
-            
-            pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
-            // set image type
+        else if(isImage)
+        {
             nDataType = D_CLIP_IMAGE;
-            NSLog(@"copy image\n");
+        }
+        else if(isText)
+        {
+            nDataType = D_CLIP_TEXT;
         }
         else
         {
-            if(array.count>0)
-            {             // 문자열 복사
+            nDataType = 0;
+        }
+        switch(nDataType)
+        {
+            case D_CLIP_IMAGE :
+            {
+                NSArray *array = [pasteBoard readObjectsForClasses:@[[NSImage class]] options:nil];
+                NSImage *img = [array objectAtIndex:0];
+                [img lockFocus];
+                NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, img.size.width, img.size.height)];
+                [img unlockFocus];
+                
+                [img addRepresentation:rep];
+                //pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
+                pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
+                NSLog(@"copy image\n");
+                ((WebWindow*)(SelfThis))->InvokeClipBoard([nsNumbGuId intValue], nDataType, pClipData.length, (const char*)[pClipData bytes], 0, nullptr); 
+            }
+            break;
+            case D_CLIP_TEXT:
+            {
+                std::string strClipText;
                 NSString *NSClipStr = nil;
+                NSArray *array = [pasteBoard readObjectsForClasses:@[[NSString class]] options:nil];
                 NSClipStr=[array objectAtIndex:0];
                 NSLog(@"copy string\n%@", NSClipStr);
 
                 strClipText = NSClipStr.UTF8String;
-                nDataType = D_CLIP_TEXT;
+                
+                ((WebWindow*)(SelfThis))->InvokeClipBoard([nsNumbGuId intValue], nDataType, strClipText.length(), strClipText.data(),0,nullptr);
             }
-            else
+            break;
+            case D_CLIP_OBJECT:
+            {
+                NSLog(@"image or text, object");                
+                //TEXT IMAGE 둘 다 가능할 때 처리
+                NSArray *array = [pasteBoard readObjectsForClasses:@[[NSImage class]] options:nil];
+                NSImage *img = [array objectAtIndex:0];
+
+                [img lockFocus];
+                NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, img.size.width, img.size.height)];
+                [img unlockFocus];
+                
+                [img addRepresentation:rep];
+                pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
+                NSLog(@"copy image\n");
+
+                std::string strClipText;
+                NSString *NSClipStr = nil;
+                NSArray *arrayEx = [pasteBoard readObjectsForClasses:@[[NSString class]] options:nil];
+                NSClipStr=[arrayEx objectAtIndex:0];
+                NSLog(@"copy string\n%@", NSClipStr);
+
+                strClipText = NSClipStr.UTF8String;
+
+                ((WebWindow*)(SelfThis))->InvokeClipBoard([nsNumbGuId intValue], nDataType, pClipData.length, (const char*)[pClipData bytes], strClipText.length(), strClipText.data()); 
+                //((WebWindow*)(SelfThis))->InvokeClipBoard([nsNumbGuId intValue], D_CLIP_TEXT, 0, nullptr, strClipText.length(), strClipText.data()); 
+            }
+            break;
+            default:
             {
                 NTLog(SelfThis, Warning, "클립보드는 이미지와 텍스트만 전송이 가능합니다. (Not Supported Clipboard Type)");
-                bClipSend=NO;
             }
-        }
-
-        if(bClipSend)
-        {
-            if( nDataType == D_CLIP_TEXT) ((WebWindow*)(SelfThis))->InvokeClipBoard([nsNumbGuId intValue], nDataType, strClipText.length(), strClipText.data(),0,nullptr);
-            else ((WebWindow*)(SelfThis))->InvokeClipBoard([nsNumbGuId intValue], nDataType, pClipData.length, (const char*)[pClipData bytes], 0, nullptr);
+            break;
         }
     });
 }
