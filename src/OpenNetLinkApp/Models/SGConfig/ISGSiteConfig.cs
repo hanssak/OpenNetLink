@@ -55,6 +55,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public string m_strWebLinkPreviewerURL { get; set; }           //WebLink 미리보기 사용 시 WebLink IP또는 도메인 주소 ( + AP001_Docs_Viewer.do 사용)
 
+        public bool m_bUseOver1Auth { get; set; }                     // 1단계 이상 인증 사용
 
     }
 }
