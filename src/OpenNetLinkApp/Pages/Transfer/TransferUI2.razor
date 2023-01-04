@@ -159,6 +159,7 @@
                                                     </td>
                                                 }
                                                 <td>
+                                                    @*<button type="button" class="btn btn-md btn-green" @onclick="AlzTest"><i class="fas fa-share"></i>압축</button>*@
                                                     <button type="button" class="btn btn-md btn-green" @onclick="CheckApprLine"><i class="fas fa-share"></i>@strFileSend</button>
                                                     <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
                                                     <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
@@ -648,12 +649,12 @@
 
     private void AlzTest()
     {
-        //string source = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)\\Test.alz";
+        //string source = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)\\chào.alz";
         //string dest = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)";
         //string passWord = "1234";
         //SGUnAlz lib = new SGUnAlz();
-        //int ret = lib.UnAlzExtract(source, dest);
-        //int ret = lib.UnAlzExtract_PassWordDll(source, dest, passWord);
+        ////int ret = lib.UnAlzExtract(source, dest);
+        //int ret = lib.UnAlzExtract_PassWordWDll(source, dest, passWord);
 
     }
 
