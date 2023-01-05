@@ -1,9 +1,28 @@
-﻿--drop FUNCTION func_email_transferinfo_open(userid varchar, fromdate varchar, todate varchar, apprkind varchar, transkind varchar, approvestatus varchar, transstatus varchar, dlp varchar, reciever varchar, title varchar, network varchar, PageListCount varchar, ViewPageNo varchar);
-CREATE OR REPLACE FUNCTION func_email_transferinfo_open(userid varchar, fromdate varchar, todate varchar, apprkind varchar, transkind varchar, 
-				approvestatus varchar, transstatus varchar, dlp varchar, reciever varchar, title varchar, network varchar, PageListCount varchar, ViewPageNo varchar)
-RETURNS TABLE(EMAIL_SEQ bigint, APPROVEKIND varchar, TRANS_KIND varchar, DLPTYPE varchar, ADDFILE varchar, TRANS_STATUS varchar, APPRSTATUS varchar, RECVUSER varchar, RECVCOUNT bigint,
-		TITLE2 varchar, TRANSDATE varchar, APPROVEUSER varchar, APPROVEDATE varchar) AS
-$BODY$
+-- FUNCTION: public.func_email_transferinfo_open(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying)
+
+-- DROP FUNCTION IF EXISTS public.func_email_transferinfo_open(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying);
+
+CREATE OR REPLACE FUNCTION public.func_email_transferinfo_open(
+	userid character varying,
+	fromdate character varying,
+	todate character varying,
+	apprkind character varying,
+	transkind character varying,
+	approvestatus character varying,
+	transstatus character varying,
+	dlp character varying,
+	reciever character varying,
+	title character varying,
+	network character varying,
+	pagelistcount character varying,
+	viewpageno character varying)
+    RETURNS TABLE(email_seq bigint, approvekind character varying, trans_kind character varying, dlptype character varying, addfile character varying, trans_status character varying, apprstatus character varying, recvuser character varying, recvcount bigint, title2 character varying, transdate character varying, approveuser character varying, approvedate character varying) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
 DECLARE
 	sql varchar;	-- 쿼리
 	recvuser varchar; -- 수신자 검색조검
@@ -52,7 +71,7 @@ begin
 	(
 		SELECT APPROVEKIND, EMAIL_SEQ
 		FROM (
-			SELECT ''0'' AS APPROVEKIND, ''H'' AS POS, A.EMAIL_SEQ
+			SELECT A.APPROVE_KIND AS APPROVEKIND, ''H'' AS POS, A.EMAIL_SEQ
 			FROM TBL_EMAIL_APPROVE_HIS A
 			, TBL_EMAIL_TRANSFER T
 			WHERE A.EMAIL_SEQ=T.EMAIL_SEQ
@@ -84,10 +103,7 @@ begin
 			, CAST (E.DLP_FLAG AS VARCHAR) AS DLP
 			, CAST ((CASE WHEN ( SELECT COUNT(*) FROM TBL_EMAIL_ADD_FILE
 						WHERE EMAIL_SEQ=E.EMAIL_SEQ
-							AND UPPER(FILE_NAME) NOT LIKE ''%.HCDF''
-							AND UPPER(FILE_NAME) NOT LIKE ''%.HDF''
-							AND UPPER(FILE_NAME) NOT LIKE ''%.PCDF''
-							AND UPPER(FILE_NAME)<>''MAIL_TEXT.TXT''
+							AND UPPER(FILE_NAME) NOT LIKE ''%.EML''
 							AND ADD_TYPE=''0''
 						)=0 THEN ''N'' 
 				ELSE ''Y'' END ) 
@@ -98,6 +114,9 @@ begin
 				  WHEN E.TRANS_FLAG = ''4''  THEN ''F''
 				  WHEN E.TRANS_FLAG = ''5''  THEN ''C''
 				  WHEN E.TRANS_FLAG = ''6''  THEN ''V''
+				  	WHEN E.TRANS_FLAG = ''7''  THEN ''S'' 
+				WHEN E.TRANS_FLAG = ''8''  THEN ''F'' 
+				WHEN E.TRANS_FLAG = ''9''  THEN ''W'' 
 				  ELSE ''N'' END) 
 			AS VARCHAR ) AS TRANSSTATUS
 			, CAST (E.APPROVE_FLAG AS VARCHAR) AS APPROVESTATUS
@@ -124,7 +143,6 @@ begin
 	sql:=Replace(sql, '##FROMDATE##', fromdate);
 	sql:=Replace(sql, '##TODATE##', todate);
 	sql:=Replace(sql, '##CONNECTNETWORK##', network);
-
 
 	-- 수신자 조건에 따라서 달라짐
 	IF reciever IS NULL OR reciever =''  THEN
@@ -155,10 +173,9 @@ begin
 		whand:=' AND ';
 	END IF;
 
-
 	-- 전송상태
 	IF transstatus IS NOT NULL AND transstatus!='' THEN
-		sql:=sql||whand||'A.TRANSTATUS='''||transstatus||''''||chr(13);
+		sql:=sql||whand||'A.TRANSSTATUS='''||transstatus||''''||chr(13);
 		whand:=' AND ';
 	END IF;
 
@@ -175,17 +192,17 @@ begin
 		whand:=' AND ';
 	END IF;
 
-	sql:=sql||'ORDER BY A.TRANSDATE limit '||PageListCount||' offset (' || ViewPageNo || '-1) *' || PageListCount;
+	IF PageListCount IS NOT NULL AND PageListCount != '' AND ViewPageNo IS NOT NULL AND ViewPageNo != '' THEN
+		sql:=sql||'ORDER BY A.TRANSDATE DESC LIMIT '|| PageListCount || ' OFFSET (' || ViewPageNo || '-1) *' || PageListCount;
+	END IF;
+	
+--	RAISE NOTICE 'Quantity here is %', sql;  -- Prints 50
 
-	RAISE NOTICE 'Quantity here is %', sql;  -- Prints 50
 
 RETURN QUERY EXECUTE
 	sql;
 end;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-ALTER FUNCTION func_email_detail(bigint)
-  OWNER TO hsck;
+$BODY$;
 
-  
+ALTER FUNCTION public.func_email_transferinfo_open(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying)
+    OWNER TO hsck;

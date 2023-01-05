@@ -64,6 +64,13 @@ namespace OpenNetLinkApp.Components.SGPopUp
             return responseJSON;
         }
 
+        /// <summary>
+        /// HTTPS(SSL-Request) 동작함
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="postData"></param>
+        /// <param name="strContentType"></param>
+        /// <returns></returns>
         public String RequestUsePostJson(String url, String postData, string strContentType)
         {
 

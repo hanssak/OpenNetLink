@@ -119,6 +119,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseEmailManageApprove(int groupID);
 
+        public bool GetUseEmailUIdlpSearch(int groupID);
+
         public bool GetUsePCURL(int groupID);
 
         public bool GetUsePublicBoard(int groupID);
@@ -375,6 +377,21 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             if ((AppConfigInfo as SGopConfig).blistUseEmail.Count >= nGroupID + 1)
                 return (AppConfigInfo as SGopConfig).blistUseEmail[nGroupID];
+
+            return false;    // 기본값
+        }
+
+        /// <summary>
+        /// email에서 DLP 검색기능 사용할지 유무
+        /// </summary>
+        /// <param name="nGroupID"></param>
+        /// <returns></returns>
+        public bool GetUseEmailUIdlpSearch(int nGroupID)
+        {
+            (AppConfigInfo as SGopConfig).blistUserEmailSearchDlp ??= new List<bool>();
+
+            if ((AppConfigInfo as SGopConfig).blistUserEmailSearchDlp.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGopConfig).blistUserEmailSearchDlp[nGroupID];
 
             return false;    // 기본값
         }

@@ -17,9 +17,15 @@ static void quit_cb(struct tray_menu *item);
 static void submenu_cb(struct tray_menu *item);
 
 
-#define TEXT_SHOW	"∫∏¿Ã±‚"
-#define TEXT_HIDE		"º˚±‚±‚"
-#define TEXT_EXIT		"≥°≥ª±‚"
+//char TEXT_SHOW[] = "Î≥¥Ïù¥Í∏∞";
+//char TEXT_HIDE[] = "Ïà®Í∏∞Í∏∞";
+//char TEXT_EXIT[] = "ÎÅùÎÇ¥Í∏∞";
+
+#define TEXT_SHOW		"Show"
+#define TEXT_HIDE		"Hide"
+#define TEXT_EXIT		"Exit"
+
+//char TEXT_SHOW[512] = { 0, };
 
 
 // Test tray init

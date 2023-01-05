@@ -308,7 +308,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			// strQuery += @$"'{tParam.Receiver}', '{tParam.Title}', '0', '{tParam.PageListCount}', '{tParam.ViewPageNo}')";
 
 			string strQuery = @$"SELECT * FROM FUNC_EMAIL_TRANSFERINFO_OPEN('{tParam.UserID}','{tParam.SearchStartDate}','{tParam.SearchEndDate}', ";
-			strQuery += @$"'{tParam.GetApproveKindCode()}', '{tParam.GetTransKindCode()}','{tParam.GetApprStatusCode()}','{tParam.GetTransStatusCode()}', '{tParam.GetDlpValue()}',";
+			strQuery += @$"'{tParam.GetApproveKindCode()}', '{tParam.GetTransKindCode()}','{tParam.GetApprStatusCode()}','{tParam.GetTransStatusCode(false)}', '{tParam.GetDlpValue()}',";
 			strQuery += @$"'{tParam.Receiver}', '{tParam.Title}', '0', '{tParam.PageListCount}', '{tParam.ViewPageNo}')";
 
 			return strQuery;
@@ -320,8 +320,12 @@ namespace OpenNetLinkApp.Data.SGQuery
 
 		public string TotalCountDbFunc(MailParam tParam)
         {
-			return "";
-        }
+			string strQuery = @$"SELECT COUNT(*) FROM FUNC_EMAIL_TRANSFERINFO_OPEN('{tParam.UserID}','{tParam.SearchStartDate}','{tParam.SearchEndDate}', ";
+			strQuery += @$"'{tParam.GetApproveKindCode()}', '{tParam.GetTransKindCode()}','{tParam.GetApprStatusCode()}','{tParam.GetTransStatusCode(false)}', '{tParam.GetDlpValue()}',";
+			strQuery += @$"'{tParam.Receiver}', '{tParam.Title}', '0', '', '')";
+
+			return strQuery;
+		}
 
 	}
 }

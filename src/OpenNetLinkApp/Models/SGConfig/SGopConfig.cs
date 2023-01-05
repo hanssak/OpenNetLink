@@ -83,7 +83,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseUserRecvDownPathUserName { get; set; } = true;           // 로그인 유저별 다운로드 경로 사용때, 사용자ID가 아니라 사용자이름 사용할지 유무
         
 
-        public List<bool> blistUseEmail { get; set; } = null;           // 메일 관리/결재 사용 유무.
+        public List<bool> blistUseEmail { get; set; } = null;               // 메일 관리/결재 사용 유무.
+
+        public List<bool> blistUserEmailSearchDlp { get; set; } = null;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
 
         public bool bUsePCURL { get; set; } = false;                      // PCURL 사용 유무.
 

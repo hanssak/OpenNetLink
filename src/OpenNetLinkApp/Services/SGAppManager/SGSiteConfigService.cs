@@ -410,7 +410,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bRecvFolderChange = true;                // 수신폴더 변경 사용 여부
 
                 sgSiteConfig.m_bUseApproveAfterLimit = true;            // 사후결재 결재 Count 제한 사용유무
-                sgSiteConfig.m_bUseClipBoardApproveAfterLimit = true;
+                sgSiteConfig.m_bUseClipBoardApproveAfterLimit = false;
 
                 sgSiteConfig.m_bUseScreenLock = true;                  //Screen Lock 설정여부
 

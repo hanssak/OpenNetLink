@@ -35,7 +35,7 @@
 
 
   "bUserIDSave": false,
-  "bAutoLogin": true,
+  "bAutoLogin": false,
   "bAutoLoginCheck": true,
   "bUserPWChange": false,
 
@@ -54,8 +54,8 @@
     false
   ],
   "strURLAutoAfterBrowser": [
-    "F",
-    "F",
+    "N",
+    "N",
     "F"
   ],
   "bURLAutoAfterMsg": [
@@ -64,9 +64,9 @@
     true
   ],
   "strForwardUrl": [
-    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
-    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
-    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html"
+    "http:\/\/naver.com",
+    "http:\/\/daum.net",
+    "http:\/\/daum.net"
   ],
 
   "bUseClipBoardFileTrans": true,
@@ -95,8 +95,8 @@
   "bURLListPolicyRecv": false,
   "bUseCertSend": false,
   "blistUseEmail": [
-    true,
-    true
+    false,
+    false
   ],
   "bUseForceUpdate": true,
   "bUsePCURL": false,
@@ -110,7 +110,7 @@
   "bViewSGSideBarUIBadge": false,
   "nClipAfterApproveUseType": 2,
   "bUseOneToMultiLogin": false,
-  "bUseOneByOneLogOut": false,
+  "bUseOneByOneLogOut" : false,
   "bApprDeptSearch": true,
   "bApprLineChkBlock": false,
   "bApprLineLocalSave": true,
@@ -133,12 +133,8 @@
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
 
-  "bUsePartialFileAddInTransfer": false,
-  "bUseInitAlarmPerDay": false,
-  "bUseInitMessagePerDay": false,
-  "bVisiblePolicyUpdateButton": true,
-  "bUseForceBackgroundUpdate": false
+  "bUsePartialFileAddInTransfer" : false
 
-
+  
 
 }

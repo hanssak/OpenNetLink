@@ -530,12 +530,14 @@
                 {
                     HsLog.info($"LoginAD - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
                     HSCmdCenter.LoginAD(netlist.GroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
+                    pageService.SetGroupIDLoginType(netlist.GroupID, eLoginType.eLOGINTYPE_AD);
                 }
             }
             else
             {
                 CLog.Here().Information($"ADLogin - ###### -  Do");
                 HSCmdCenter.LoginAD(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
+                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, eLoginType.eLOGINTYPE_AD);
             }
 
             CLog.Here().Information($"ADLogin - ###### -  End");
@@ -608,7 +610,7 @@
             else
             {
 
-                if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
+                if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && siteConfig.GetUseOver1auth(groupID) == false)
                 {
                     // ID저장
                     // if (siteConfig.GetUseLoginIDSave(groupID) == true)   // json으로 설정이동
@@ -1229,7 +1231,8 @@
                 else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
                 {
 
-                    if (siteConfig.GetUseAutoLogin(groupId) == true)
+                    // if (siteConfig.GetUseAutoLogin(groupId) == true)
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupId) == true)
                     {
                         if (bAutoLoginCheck)
                         {
@@ -1874,7 +1877,6 @@
             else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
             {
 
-                // if (siteConfig.GetUseAutoLogin(groupId) == true)
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupId))
                 {
                     if (bAutoLoginCheck)

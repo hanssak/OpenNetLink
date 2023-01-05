@@ -114,14 +114,10 @@ namespace OpenNetLinkApp.Data.SGDomain
 
         public string GetApproveKindCode()
         {
-            string rtn = "";
             if (ApproveKind == null || ApproveKind.Length == 0)
-                return rtn;
-            if (ApproveKind == XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE")) //선결
-                return "0";
-            if (ApproveKind == XmlConf.GetTitle("T_COMMON_APPROVE_AFTER")) //후결
-                return "1";
-            return rtn;
+                return "";
+
+            return ApproveKind;
         }
 
         public void SetApprKindCode(string value)
@@ -140,12 +136,14 @@ namespace OpenNetLinkApp.Data.SGDomain
         /// <param name="strValue"></param>
         public void SetApprStatusCode(string strValue)
         {
-            if (strValue == XmlConf.GetTitle("T_DASH_APPROVE_COMPLETE")) //승인
+            if (strValue == XmlConf.GetTitle("T_COMMON_APPROVE")) //승인
                 ApprStatus = "2";
             else if (strValue == XmlConf.GetTitle("T_COMMON_APPROVE_WAIT")) //승인대기
                 ApprStatus = "1";
-            else if (strValue == XmlConf.GetTitle("T_DASH_APPROVE_REJECT")) //반려
+            else if (strValue == XmlConf.GetTitle("T_COMMON_REJECTION")) //반려
                 ApprStatus = "3";
+            else
+                ApprStatus = "";
         }
 
         public string GetApprStatusCode()

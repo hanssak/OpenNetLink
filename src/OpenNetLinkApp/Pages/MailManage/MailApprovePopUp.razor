@@ -632,20 +632,23 @@
     private string GetTransStatusString(string value)
     {
         string rtn = String.Empty;
-        switch (value)
+        switch(value)
         {
             case "S":
-                rtn = XmlConf.GetTitle("T_COMMON_TRANS_SUCCESS");
+                rtn = XmlConf.GetTitle("T_MAIL_TRANS_SUCCESS");
                 break;
             case "F":
-                rtn = XmlConf.GetTitle("T_COMMON_TRANSFAIL");
+                rtn = XmlConf.GetTitle("T_MAIL_TRANSFRFAILED");
                 break;
             case "W":
-                rtn = XmlConf.GetTitle("T_COMMON_TRANSWAIT");
+                rtn = XmlConf.GetTitle("T_MAIL_TRANSWAIT");
                 break;
             case "V":
-                rtn = XmlConf.GetTitle("T_COMMON_TRANSCHECKING");
+                rtn = XmlConf.GetTitle("T_MAIL_INSPECT");
                 break;
+	    case "C":
+                rtn = XmlConf.GetTitle("T_MAIL_TRANSCANCLE");
+                break;	    
             default:
                 rtn = "";
                 break;
