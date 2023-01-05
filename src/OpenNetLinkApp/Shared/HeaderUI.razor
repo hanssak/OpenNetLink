@@ -2235,7 +2235,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             {
                 // 사용자가 image 전송 선택
                 // 클립보드 선택전송일때 처음이 Image 두번째가 Text로 올라옴
-                FileName = Path.Combine(dirPath, DateTime.Now.ToString("yyyyMMddHHmsss") + ".png");
+                FileName = Path.Combine(dirPath, DateTime.Now.ToString("yyyyMMddHHmsss") + ".bmp");
                 FileStream fs = new FileStream(FileName, FileMode.CreateNew);
                 BinaryWriter bw = new BinaryWriter(fs);
                 bw.Write(clipData.pMemByte, 0, clipData.nLength);
