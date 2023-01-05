@@ -129,8 +129,10 @@
   "bUseInitMessagePerDay": false,
   "bVisiblePolicyUpdateButton": true,
   "bUseForceBackgroundUpdate": false,
-  "bUseChkHardSpace": true
-
-
-
+  "bUseChkHardSpace": true,  
+  "bUseOver1Auth": [
+    false,
+    false,
+    false
+  ]
 }
