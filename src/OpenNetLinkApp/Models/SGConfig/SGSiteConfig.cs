@@ -49,9 +49,11 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool m_bUseAllProxyAuthority { get; set; } = false;             //대결재자로서, 원결재자의 모든 권한을 위임받아 사용할지 유무
 
-        public bool m_bUseWebLinkPreviewer { get; set; } = true;               //결재미리보기(파일전송/클립보드) 시 WebLink 뷰어 사용 유무
+        public bool m_bUseWebLinkPreviewer { get; set; } = false;               //결재미리보기(파일전송/클립보드) 시 WebLink 뷰어 사용 유무
 
         public string m_strWebLinkPreviewerURL { get; set; } = "218.145.246.25";     //WebLink 미리보기 사용 시 WebLink 주소 ( + AP001_Docs_Viewer.do 사용)
+
+        public bool m_bUseOver1Auth { get; set; } = true;                    // 1단계 이상 인증 사용
 
     }
 }

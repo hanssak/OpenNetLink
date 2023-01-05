@@ -252,6 +252,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         /// <param name="groupID"></param>
         /// <returns></returns>
+        public void SetUseOver1auth(int groupID, bool bUseAuth);
+
+        /// <summary>
+        /// AD 로그인가능하면 AD로그인, 안되면 IDPW 로그인 UI로 변경되는 설정인지 유무
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseOver1auth(int groupID);
+
         public string GetWebLinkPreviewerURL(int groupID);
     }
 
@@ -1159,5 +1168,22 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return listSiteConfig[groupID].m_strWebLinkPreviewerURL;
             return "";
         }
+
+        public void SetUseOver1auth(int groupID, bool bUseAuth)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseOver1Auth = bUseAuth;
+        }
+
+        public bool GetUseOver1auth(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseOver1Auth;
+
+            return false;
+        }
+
     }
 }
