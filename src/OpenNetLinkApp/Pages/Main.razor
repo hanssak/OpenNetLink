@@ -205,7 +205,8 @@
 
     private void keyCheck(KeyboardEventArgs arg)
     {
-        if (arg.Key == "Enter")
+        //Enter 로 인한 로그인은 [로그인] 버튼이 존재하는  AD 외 로그인 타입만 적용토록 변경
+        if (arg.Key == "Enter" && pageService.m_nLoginType != (int)eLoginType.eLOGINTYPE_AD)
             doLogIn();
     }
 
