@@ -22,6 +22,7 @@
 @using OpenNetLinkApp.Pages.Transfer
 @using System.Drawing;
 @using OpenNetLinkApp.Common
+@using Microsoft.Maui.Graphics;
 
 
 @inject ISGAppManagerService SGAppMgrSvc
@@ -2241,20 +2242,28 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 #if _MACOSX
                 try
                 {
-                    using(var ms = new MemoryStream(clipData.pMemByte))
+                    IImage image;
+                    using (var ms = new MemoryStream(clipData.pMemByte))
                     {
-                        System.Drawing.Image image = System.Drawing.Image.FromStream(ms);
-                        Bitmap blank = new Bitmap(image.Width, image.Height);
-                        Graphics g = Graphics.FromImage(blank);
-                        g.Clear(Color.White);
-                        g.DrawImage(image, 0, 0, image.Width, image.Height);
+                        image = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(ms);
 
-                        image.Dispose();
-                        g.Dispose();
+                        //System.Drawing.Image image = System.Drawing.Image.FromStream(ms);
+                        //Bitmap blank = new Bitmap(image.Width, image.Height);
+                        //Graphics g = Graphics.FromImage(blank);
+                        //g.Clear(Color.White);
+                        //g.DrawImage(image, 0, 0, image.Width, image.Height);
 
-                        Bitmap tempImage = new Bitmap(blank);
-                        tempImage.Save(FileName, System.Drawing.Imaging.ImageFormat.Bmp);
+                        //image.Dispose();
+                        //g.Dispose();
+
+                        //Bitmap tempImage = new Bitmap(blank);
+                        //tempImage.Save(FileName, System.Drawing.Imaging.ImageFormat.Bmp);
                     }
+
+                    if(image != null)
+                        {
+
+                        }
                 }
                 catch(Exception ex)
                 {
@@ -2324,11 +2333,11 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     CLog.Here().Error("BMP Convert ERROR : {0}", ex.Message);
                 }
 #else
-                FileStream fs = new FileStream(FileName, FileMode.CreateNew);
-                BinaryWriter bw = new BinaryWriter(fs);
-                bw.Write(clipData.pMemByte, 0, clipData.nLength);
-                bw.Close();
-                fs.Close();
+            FileStream fs = new FileStream(FileName, FileMode.CreateNew);
+            BinaryWriter bw = new BinaryWriter(fs);
+            bw.Write(clipData.pMemByte, 0, clipData.nLength);
+            bw.Close();
+            fs.Close();
 #endif
         }
         else

@@ -39,6 +39,7 @@
   <ItemGroup>
     <!--<PackageReference Include="BlazorInputFile" Version="0.2.0" />-->
     <!--<PackageReference Include="BlazorInputFile" Version="0.2.0" />-->
+    <PackageReference Include="Microsoft.Maui.Graphics" Version="7.0.52" />
     <PackageReference Include="Mime" Version="3.1.0" />
     <PackageReference Include="NetSparkle.New" Version="2.0.0-preview20200906002" />
     <PackageReference Include="Radzen.Blazor" Version="2.10.2" />
@@ -50,7 +51,6 @@
     <PackageReference Include="SharpCompress" Version="0.32.2" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
-    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
     <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
     <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
