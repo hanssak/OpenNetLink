@@ -2238,45 +2238,12 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 FileName = Path.Combine(dirPath, DateTime.Now.ToString("yyyyMMddHHmsss") + ".bmp");
                 if (File.Exists(FileName))
                     return null;
-
-#if _MACOSX
-                try
-                {
-                    IImage image;
-                    using (var ms = new MemoryStream(clipData.pMemByte))
-                    {
-                        image = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(ms);
-
-                        //System.Drawing.Image image = System.Drawing.Image.FromStream(ms);
-                        //Bitmap blank = new Bitmap(image.Width, image.Height);
-                        //Graphics g = Graphics.FromImage(blank);
-                        //g.Clear(Color.White);
-                        //g.DrawImage(image, 0, 0, image.Width, image.Height);
-
-                        //image.Dispose();
-                        //g.Dispose();
-
-                        //Bitmap tempImage = new Bitmap(blank);
-                        //tempImage.Save(FileName, System.Drawing.Imaging.ImageFormat.Bmp);
-                    }
-
-                    if(image != null)
-                        {
-
-                        }
-                }
-                catch(Exception ex)
-                {
-                    CLog.Here().Error("BMP Convert ERROR : {0}", ex.Message);
-                }
-
-#else
                 FileStream fs = new FileStream(FileName, FileMode.CreateNew);
                 BinaryWriter bw = new BinaryWriter(fs);
                 bw.Write(clipData.pMemByte, 0, clipData.nLength);
                 bw.Close();
                 fs.Close();
-#endif
+
             }
             else if (eClipUserSelectType == CLIPTYPE.TEXT)
             {
@@ -2309,36 +2276,12 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             if (File.Exists(FileName))
                 return null;
-
-#if _MACOSX
-                try
-                {
-                    using(var ms = new MemoryStream(clipData.pMemByte))
-                    {
-                        System.Drawing.Image image = System.Drawing.Image.FromStream(ms);
-                        Bitmap blank = new Bitmap(image.Width, image.Height);
-                        Graphics g = Graphics.FromImage(blank);
-                        g.Clear(Color.White);
-                        g.DrawImage(image, 0, 0, image.Width, image.Height);
-
-                        image.Dispose();
-                        g.Dispose();
-
-                        Bitmap tempImage = new Bitmap(blank);
-                        tempImage.Save(FileName, System.Drawing.Imaging.ImageFormat.Bmp);
-                    }
-                }
-                catch(Exception ex)
-                {
-                    CLog.Here().Error("BMP Convert ERROR : {0}", ex.Message);
-                }
-#else
             FileStream fs = new FileStream(FileName, FileMode.CreateNew);
             BinaryWriter bw = new BinaryWriter(fs);
             bw.Write(clipData.pMemByte, 0, clipData.nLength);
             bw.Close();
             fs.Close();
-#endif
+
         }
         else
             return FileName;
@@ -2549,7 +2492,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             MyNavigationManager.NavigateTo(navURI);
     }
 
-    public void LocationChangeHandler(object sender, Point point)
+    public void LocationChangeHandler(object sender, System.Drawing.Point point)
     {
 
     }
