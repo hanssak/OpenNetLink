@@ -189,10 +189,12 @@
         {
             if (doADLoginLocalCheck(refSGAlert.groupId))
             {
+                pageService.SetRealLoginType(refSGAlert.groupId, eLoginType.eLOGINTYPE_AD);
                 doADLogin();
             }
             else
             {
+                pageService.SetRealLoginType(refSGAlert.groupId, eLoginType.eLOGINTYPE_ORIGIN);
                 doLogIn();
             }
         }
@@ -304,13 +306,13 @@
                 {
                     CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
                     HSCmdCenter.Login(netlist.GroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
-                    pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(pageService.m_nCurViewPageGroupID) ? eLoginType.eLOGINTYPE_AD : (eLoginType)pageService.m_nLoginType));
+                    pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(pageService.m_nCurViewPageGroupID) ? pageService.GetRealLoginType(pageService.m_nCurViewPageGroupID) : (eLoginType)pageService.m_nLoginType));
                 }
             }
             else
             {
                 HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
-                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(pageService.m_nCurViewPageGroupID) ? eLoginType.eLOGINTYPE_AD : (eLoginType)pageService.m_nLoginType));
+                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(pageService.m_nCurViewPageGroupID) ? pageService.GetRealLoginType(pageService.m_nCurViewPageGroupID) : (eLoginType)pageService.m_nLoginType));
             }
 
         }
@@ -347,23 +349,26 @@
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-            if (listNetWork[ngroupid].ADDomain == null || listNetWork[ngroupid].ADDomain.Length < 1)
+            if (listNetWork[ngroupid].ADDomain == null || listNetWork[ngroupid].ADDomain.Count < 1)
             {
                 CLog.Here().Information($"doADLoginLocalCheck - Agent ADDomain Data Empty(groupID : {ngroupid}) - Do IDPW!");
                 return false;
             }
 
-            SGRSACrypto sgRSACrypto = new SGRSACrypto();
-            //string strEncID = "";
-            //sgRSACrypto?.ValueEn(strPW, out strDescPW);
-            string strDescPW = "";
-            sgRSACrypto?.ValueDecrypt(listNetWork[ngroupid].ADDomain, out strDescPW);
-
-            // hash 값으로 비교하면 대소문자 가려서 비교하게 되므로
-            if (listNetWork.Count > 0 && String.Compare(strPW, strDescPW, true) == 0)
+            foreach (string strDomain in listNetWork[ngroupid].ADDomain)
             {
-                CLog.Here().Information($"doADLoginLocalCheck - DoLogin(groupID : {ngroupid}) - Do!");
-                return true;
+                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                //string strEncID = "";
+                //sgRSACrypto?.ValueEn(strPW, out strDescPW);
+                string strDescPW = "";
+                sgRSACrypto?.ValueDecrypt(strDomain, out strDescPW);
+
+                // hash 값으로 비교하면 대소문자 가려서 비교하게 되므로
+                if (listNetWork.Count > 0 && String.Compare(strPW, strDescPW, true) == 0)
+                {
+                    CLog.Here().Information($"doADLoginLocalCheck - DoLogin(groupID : {ngroupid}) - Do!");
+                    return true;
+                }
             }
 
             CLog.Here().Information($"doADLoginLocalCheck - PC Ad Domain : {strPW} - Can't Login AD TYPE(#####), groupID : {ngroupid}");
@@ -520,81 +525,7 @@
 
                 if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupID) == false)
                 {
-                    // ID저장
-                    // if (siteConfig.GetUseLoginIDSave(groupID) == true)   // json으로 설정이동
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(groupID))
-                    {
-                        string strEncID = "";
-                        strEncID = sgSettingProc.GetSettingUID(groupID);
-                        if (strEncID == null || strEncID.Equals(""))
-                            return;
-                        string strID = "";
-                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                        sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                        id = strID;
-                        StateHasChanged();
-                    }
-
-                    // IDPW자동로그인
-                    bAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID);      // siteConfig.  json으로 설정이동
-                    if (bAutoLogin)
-                        StateHasChanged();
-
-                    if (bAutoLogin)
-                    {
-                        //NetConf.razor 와 맞추기 위해 아래 코드 제거 2021/06/01 YKH
-                        //bAutoLoginCheck = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLoginCheck(groupID);
-
-                        bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(groupID);
-                        bAutoLoginCheck = bAutoLoginContinue;
-
-                        if (bAutoLoginContinue && srcLoc != "Logout")
-                            bLoginBtnDisable = true;
-
-                        if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLoginCheck(groupID))
-                            bAutoLoginCheck = true;
-
-                        if (bAutoLoginCheck)
-                            StateHasChanged();
-
-                        if (bAutoLoginContinue)
-                        {
-                            bAutoLoginCheck = bAutoLoginContinue;
-                            if (bAutoLoginCheck)
-                                StateHasChanged();
-
-                            string strEncID = "";
-                            string strEncPW = "";
-                            strEncID = sgSettingProc.GetSettingUID(groupID);
-                            strEncPW = sgSettingProc.GetSettingUPW(groupID);
-                            if ((strEncID == null || strEncID.Equals("")) || (strEncPW == null || strEncPW.Equals("")))
-                            {
-                                bLoginBtnDisable = false;
-                                StateHasChanged();
-                                return;
-                            }
-
-                            SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                            string strID = "";
-                            string strPW = "";
-                            sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                            id = strID;
-                            // Logout 으로 인해 온 상황에서는 PW를 표시하지 않고, 로그인도하지 않음.
-                            if (srcLoc != "Logout")
-                            {
-                                sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
-                                pw = strPW;
-                            }
-
-                            StateHasChanged();
-                            await Task.Delay(500);
-
-                            if (srcLoc != "Logout")
-                                doLogIn();
-                            StateHasChanged();
-                        }
-                    }
-
+                    SetIdPwLogin(groupID);
                 }
                 else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
                 {
@@ -605,6 +536,85 @@
         }
         await base.OnAfterRenderAsync(firstRender);
     }
+
+    private async void SetIdPwLogin(int groupID)
+    {
+        // ID저장
+        // if (siteConfig.GetUseLoginIDSave(groupID) == true)   // json으로 설정이동
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(groupID))
+        {
+            string strEncID = "";
+            strEncID = sgSettingProc.GetSettingUID(groupID);
+            if (strEncID == null || strEncID.Equals(""))
+                return;
+            string strID = "";
+            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+            sgRSACrypto.ValueDecrypt(strEncID, out strID);
+            id = strID;
+            StateHasChanged();
+        }
+
+        // IDPW자동로그인
+        bAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID);      // siteConfig.  json으로 설정이동
+        if (bAutoLogin)
+            StateHasChanged();
+
+        if (bAutoLogin)
+        {
+            //NetConf.razor 와 맞추기 위해 아래 코드 제거 2021/06/01 YKH
+            //bAutoLoginCheck = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLoginCheck(groupID);
+
+            bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(groupID);
+            bAutoLoginCheck = bAutoLoginContinue;
+
+            if (bAutoLoginContinue && srcLoc != "Logout")
+                bLoginBtnDisable = true;
+
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLoginCheck(groupID))
+                bAutoLoginCheck = true;
+
+            if (bAutoLoginCheck)
+                StateHasChanged();
+
+            if (bAutoLoginContinue)
+            {
+                bAutoLoginCheck = bAutoLoginContinue;
+                if (bAutoLoginCheck)
+                    StateHasChanged();
+
+                string strEncID = "";
+                string strEncPW = "";
+                strEncID = sgSettingProc.GetSettingUID(groupID);
+                strEncPW = sgSettingProc.GetSettingUPW(groupID);
+                if ((strEncID == null || strEncID.Equals("")) || (strEncPW == null || strEncPW.Equals("")))
+                {
+                    bLoginBtnDisable = false;
+                    StateHasChanged();
+                    return;
+                }
+
+                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                string strID = "";
+                string strPW = "";
+                sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                id = strID;
+                // Logout 으로 인해 온 상황에서는 PW를 표시하지 않고, 로그인도하지 않음.
+                if (srcLoc != "Logout")
+                {
+                    sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
+                    pw = strPW;
+                }
+
+                StateHasChanged();
+                await Task.Delay(500);
+
+                if (srcLoc != "Logout")
+                    doLogIn();
+                StateHasChanged();
+            }
+        }
+    }
+
 
     /// <summary>
     ///
@@ -655,11 +665,14 @@
             {
                 if (doADLoginLocalCheck(groupid))
                 {
+                    pageService.SetRealLoginType(groupid, eLoginType.eLOGINTYPE_AD);
                     doADLogin();
                 }
                 else
                 {
                     ShowLoginFail(XmlConf.GetErrMsg("E_0254")); // "ID/PW 인증을 통해 Login 하셔야 합니다."
+                    pageService.SetRealLoginType(groupid, eLoginType.eLOGINTYPE_ORIGIN);
+                    SetIdPwLogin(groupid);
                 }
             }
         }
@@ -1106,16 +1119,11 @@
                 // GPKI Login
                 if (srcLoc == "GPKI")
                     strNavigatePathWithGroupID = "/GPKI_LogIn/2";    // Register Mode로 실행
-
-                else if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupId))
-                { 
-                    // IDPW로그인설정 회피
-                }
                 // IDPW
-                else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
+                else if ((pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && !SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupId)) || 
+                    (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupId) && pageService.GetRealLoginType(groupId) == eLoginType.eLOGINTYPE_ORIGIN))
                 {
-
-
+                    // AD 로그인 실패 후 ID/PW 로그인했는지 확인
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupId) == true)
                     {
                         if (bAutoLoginCheck)
@@ -1137,9 +1145,7 @@
                         {
                             sgSettingProc.SetSettingAutoLogin(groupId, false);
                         }
-
                     }
-
 
                     if (siteConfig.GetUseLoginIDSave(groupId) == true)
                     {
@@ -1148,86 +1154,6 @@
                         sgRSACrypto.ValueEncrypt(id, out strEncID);
                         sgSettingProc.SetSettingUID(groupId, strEncID);
                     }
-
-
-                    //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 시작 2021/07/05 YKH
-                    @*if (GetInitPWLogin(groupId) == true)
-                        {
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
-                        refPWChangeDefaultPW.nGroupID = groupId;
-                        await refPWChangeDefaultPW.openPopUp();
-                        return;
-                        }*@
-                    //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 종료
-
-                    @*if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
-                        {
-
-                        }
-                        else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)*@
-
-                    @*if (true)
-                        {
-                        // password 강제변경 창
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        refPWChange.nGroupID = groupId;
-                        refPWChange.Init();
-                        await refPWChange.openPopUp();
-                        return;
-                        }
-                        else
-                        {
-
-                        // password 변경권고 창 띄울지 검사
-                        string strTime = "";
-                        sgSettingData = sgSettingProc.SelectSettingData(groupId);
-                        if (sgSettingData == null)
-                        {
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        refPWChange.nGroupID = groupId;
-                        refPWChange.Init();
-                        await refPWChange.openPopUp();
-                        return;
-                        }
-
-                        strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
-                        if (strTime.Equals(""))
-                        {
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        refPWChange.nGroupID = groupId;
-                        refPWChange.Init();
-                        await refPWChange.openPopUp();
-                        return;
-                        }
-
-                        SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
-                        string strUserSeq = sgUserData.GetUserSequence();
-                        strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
-
-                        if (strTime.Equals(""))
-                        {
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        refPWChange.nGroupID = groupId;
-                        refPWChange.Init();
-                        await refPWChange.openPopUp();
-                        return;
-                        }
-
-                        DateTime dtLocalTime = DateTime.Parse(strTime);
-                        DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
-
-                        if (DateTime.Compare(dtLocalTime, svrDt) < 0)
-                        {
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        refPWChange.nGroupID = groupId;
-                        refPWChange.Init();
-                        await refPWChange.openPopUp();
-                        return;
-                        }
-
-                        }*@
-
-
                 }
                 else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
                 {
@@ -1383,7 +1309,8 @@
             sgUserData = (SGUserData)HSCmdCenter.GetUserData(nGroupIDfirst);
             sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupIDfirst);
 
-            if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(nGroupIDfirst) == false)
+            if ((pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && !SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(nGroupIDfirst)) ||
+                    (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(nGroupIDfirst) && pageService.GetRealLoginType(nGroupIDfirst) == eLoginType.eLOGINTYPE_ORIGIN))
             {
 
                 refPWChange.nGroupID = nGroupIDfirst;
@@ -2359,7 +2286,7 @@
                     SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strUserSeq);
 
                 // 기본설정(2)
-                if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && bBasicConf && SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(gID) == false)
+                if (((pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && !SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(gID)) || (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(gID) && pageService.GetRealLoginType(gID) == eLoginType.eLOGINTYPE_ORIGIN)) && bBasicConf)
                 {
                     strNavigatePathWithGroupID = "/netConf/";
                     strNavigatePathWithGroupID += gID.ToString();

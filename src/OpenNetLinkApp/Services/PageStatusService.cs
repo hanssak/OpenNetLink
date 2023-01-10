@@ -1221,5 +1221,24 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetApproveExtFileTransWithApprove();
         }
 
+        public void SetRealLoginType(int groupID, eLoginType realLoginType)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+
+            m_DicPageStatusData[groupID].SetRealLoginType(realLoginType);
+        }
+        public eLoginType GetRealLoginType(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return eLoginType.eLOGINTYPE_AD;
+            }
+            return m_DicPageStatusData[groupID].GetRealLoginType();
+        }
     }
 }
