@@ -6,6 +6,9 @@ window.loginCursorChangeDefault = () => {
     $("#btnLogin").css("cursor", "default");
     $("#btnLoginCancel").css("cursor", "default");
     $("#btnLoginViewBack").css("cursor", "default");
+
+    //로그인 중, PW에 Enter 이벤트 방지 (btnLogin 버튼은 razor에서 따로 관리하므로 설정하지 않음)
+    $("#loginPw").attr("disabled", false);
 }
 
 window.loginCursorChange = () => {
@@ -15,6 +18,10 @@ window.loginCursorChange = () => {
     $("#btnLogin").css("cursor", "wait");
     $("#btnLoginCancel").css("cursor", "wait");
     $("#btnLoginViewBack").css("cursor", "wait");
+
+    //로그인 중, PW에 Enter 이벤트 방지 (btnLogin 버튼은 razor에서 따로 관리하므로 설정하지 않음)
+    $("#loginPw").attr("disabled", true);
+    
 }
 
 window.initCapaChart = (nUse, nRest) => {
