@@ -2241,7 +2241,27 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 bw.Write(clipData.pMemByte, 0, clipData.nLength);
                 bw.Close();
                 fs.Close();
+                
+                if(clipData.nOsType == OSType.MAC)
+                {
+                    try{
+                        System.Drawing.Image image = System.Drawing.Image.FromFile(FileName);
+                        Bitmap blank = new Bitmap(image.Width, image.Height);
+                        Graphics g = Graphics.FromImage(blank);
+                        g.Clear(Color.White);
+                        g.DrawImage(image, 0, 0, image.Width, image.Height);
+                        
+                        image.Dispose();
+                        g.Dispose();
 
+                        Bitmap tempImage = new Bitmap(blank);
+                        tempImage.Save(FileName, System.Drawing.Imaging.ImageFormat.Bmp);
+                    }
+                    catch(Exception ex)
+                    {
+                        ShowMessage("error", ex.Message);
+                    }
+                }
             }
             else if (eClipUserSelectType == CLIPTYPE.TEXT)
             {
@@ -2279,6 +2299,27 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             bw.Write(clipData.pMemByte, 0, clipData.nLength);
             bw.Close();
             fs.Close();
+            if(clipData.nOsType == OSType.MAC)
+            {
+                try
+                {
+                    System.Drawing.Image image = System.Drawing.Image.FromFile(FileName);
+                    Bitmap blank = new Bitmap(image.Width, image.Height);
+                    Graphics g = Graphics.FromImage(blank);
+                    g.Clear(Color.White);
+                    g.DrawImage(image, 0, 0, image.Width, image.Height);
+                        
+                    image.Dispose();
+                    g.Dispose();
+
+                    Bitmap tempImage = new Bitmap(blank);
+                    tempImage.Save(FileName, System.Drawing.Imaging.ImageFormat.Bmp);
+                }
+                catch(Exception ex)
+                {
+                    ShowMessage("error", ex.Message);
+                }
+            }
         }
         else
             return FileName;

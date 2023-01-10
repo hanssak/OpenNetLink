@@ -210,13 +210,14 @@
             {
                 NSArray *array = [pasteBoard readObjectsForClasses:@[[NSImage class]] options:nil];
                 NSImage *img = [array objectAtIndex:0];
-                [img lockFocus];
-                NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, img.size.width, img.size.height)];
-                [img unlockFocus];
+                //[img lockFocus];
+                //NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, img.size.width, img.size.height)];
+                //[img unlockFocus];
                 
-                [img addRepresentation:rep];
+                //[img addRepresentation:rep];
                 //pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
-                pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
+                //pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
+                pClipData = [img TIFFRepresentation];
                 NSLog(@"copy image\n");
                 ((WebWindow*)(SelfThis))->InvokeClipBoard([nsNumbGuId intValue], nDataType, pClipData.length, (const char*)[pClipData bytes], 0, nullptr); 
             }
@@ -241,12 +242,13 @@
                 NSArray *array = [pasteBoard readObjectsForClasses:@[[NSImage class]] options:nil];
                 NSImage *img = [array objectAtIndex:0];
 
-                [img lockFocus];
-                NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, img.size.width, img.size.height)];
-                [img unlockFocus];
+                //[img lockFocus];
+                //NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, img.size.width, img.size.height)];
+                //[img unlockFocus];
                 
-                [img addRepresentation:rep];
-                pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
+                //[img addRepresentation:rep];
+                //pClipData = [rep representationUsingType:NSBitmapImageFileType properties:@{NSImageInterlaced: @NO}];
+                pClipData = [img TIFFRepresentation];
                 NSLog(@"copy image\n");
 
                 std::string strClipText;
