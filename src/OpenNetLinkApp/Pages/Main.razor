@@ -124,10 +124,10 @@
 <SGAlert @ref="refSGAlert" Guid="modal-alert-main" OnCancel="SessionAlertCancel" OnConfirm="SessionAlertConfirm"></SGAlert>
 
 @code {
-        SGAlert refSGAlert;
+    SGAlert refSGAlert;
 
-        [Parameter]
-        public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
+    [Parameter]
+    public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
 
     public string id { get; set; }
     public string pw { get; set; }
@@ -152,6 +152,9 @@
     public bool bAutoLogin = false;
     public bool bAutoLoginCheck = false;
     public bool bLoginBtnDisable;
+
+    public bool bStartedLogin = false;
+
     Dictionary<string, SGNetOverData> dicSysIdName = null;
 
 
@@ -167,6 +170,7 @@
     private void SessionAlertCancel()
     {
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+        bStartedLogin = false;
         refSGAlert.closePopUp();
     }
 
@@ -214,7 +218,13 @@
 
     private void keyCheck(KeyboardEventArgs arg)
     {
-        if (arg.Key == "Enter")
+        if (bStartedLogin)
+        {
+            Console.WriteLine("Stop Enter Key IN!!!!");
+            return;
+        }
+        //Enter 로 인한 로그인은 [로그인] 버튼이 존재하는  AD 외 로그인 타입만 적용토록 변경
+        if (arg.Key == "Enter" && pageService.m_nLoginType != (int)eLoginType.eLOGINTYPE_AD)
             doLogIn();
     }
 
@@ -248,6 +258,8 @@
     {
         try
         {
+            if (bStartedLogin)
+                return;
 
             if ((id?.Length ?? 0) < 1)
             {
@@ -273,6 +285,7 @@
             }
 
             JSRuntime.InvokeAsync<object>("loginCursorChange");
+            bStartedLogin = true;
 
             ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";
@@ -343,7 +356,7 @@
                 strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-            strPW = "HsckAD.com";
+    strPW = "HsckAD.com";
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -390,6 +403,8 @@
             CLog.Here().Information($"ADLogin - ###### -  Start");
 
             JSRuntime.InvokeAsync<object>("loginCursorChange");
+            bStartedLogin = true;
+
             id = Environment.UserName;
 
             //OSX의 경우 임의로 아래와 같이 처리 추후 objective-c API 찾아볼 예정
@@ -402,7 +417,7 @@
 
 
 #if DEBUG
-            pw = "HsckAD.com";
+    pw = "HsckAD.com";
 #endif
             pw = pw.ToLower();
 
@@ -856,6 +871,8 @@
     {
 
         await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+        bStartedLogin = false;
+
         int ret = e.result;
         int nGroupIDfirst = -1;
 
@@ -1108,7 +1125,7 @@
                     strNavigatePathWithGroupID = "/GPKI_LogIn/2";    // Register Mode로 실행
 
                 else if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupId))
-                { 
+                {
                     // IDPW로그인설정 회피
                 }
                 // IDPW
@@ -1511,6 +1528,7 @@
     public async void LoginResult(int groupId, PageEventArgs e)
     {
         await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+        bStartedLogin = false;
         int ret = e.result;
 
         if (ret == 0)
@@ -2442,12 +2460,12 @@
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
             {
-        return true;
-        }
-            else
-                return false;
-
+                return true;
                     }
+                        else
+                            return false;
+
+                                }
     */
 
 }
