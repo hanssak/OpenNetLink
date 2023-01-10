@@ -515,8 +515,7 @@ Task("CreateReleaseNote")
 
 	// Write File
 	using(StreamWriter writer = new StreamWriter(ReleaseNotePath)){
-		writer.WriteLine("# "+Title);
-		writer.WriteLine("");
+		
 
 		if(FileExists(AppProps.ReleaseNoteFile))
 		{
@@ -528,6 +527,8 @@ Task("CreateReleaseNote")
 		}
 		else
 		{
+			writer.WriteLine("# "+Title);
+			writer.WriteLine("");
 			foreach (var tag in AppProps.GitLastTag)
 			{
 				writer.WriteLine(tag.Message);
