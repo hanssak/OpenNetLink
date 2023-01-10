@@ -5,6 +5,7 @@
 #addin nuget:?package=Cake.Json&version=6.0.1
 #addin nuget:?package=Newtonsoft.Json&version=13.0.1
 #addin nuget:?package=Cake.Prompt&version=1.0.15
+#addin nuget:?package=Cake.FileHelpers&version=4.0.0
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -55,10 +56,7 @@ public class AppProperty
 		VersionJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(VersionFile));
 		AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(AppEnvFile));
 		NetworkJobj = JsonAliases.ParseJsonFromFile(Context, new FilePath(NetworkFile));
-		
-
-
-    }
+	}
 
 	public Version PropVersion {
 		get {
@@ -522,14 +520,18 @@ Task("CreateReleaseNote")
 
 		if(FileExists(AppProps.ReleaseNoteFile))
 		{
-
+			foreach(var line in FileReadLines(AppProps.ReleaseNoteFile))
+			{
+				writer.WriteLine(line);
+			}
+			
 		}
 		else
 		{
-		foreach (var tag in AppProps.GitLastTag)
-		{
-			writer.WriteLine(tag.Message);
-		}
+			foreach (var tag in AppProps.GitLastTag)
+			{
+				writer.WriteLine(tag.Message);
+			}
 		}
 	};
 });
