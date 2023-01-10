@@ -103,14 +103,6 @@ namespace WebWindows
         OBJECT = 4,
     }
 
-    public enum OSType : int
-    {
-        NONE = 0,
-        WINDOW = 1,
-        MAC = 2,
-        LINUX = 3
-    }
-
     public struct ClipBoardData // readonly 
     {
         public int nGroupId;
@@ -125,9 +117,7 @@ namespace WebWindows
 
         public readonly byte[] pExMemByte;
 
-        public readonly OSType nOsType;
-
-        public ClipBoardData(int nGroupId, CLIPTYPE nType, int nLength, IntPtr pMem, int nExLength, IntPtr pExMem, OSType osType = OSType.WINDOW)
+        public ClipBoardData(int nGroupId, CLIPTYPE nType, int nLength, IntPtr pMem, int nExLength, IntPtr pExMem)
         {
             this.nGroupId = nGroupId;
             this.nType = nType;
@@ -135,7 +125,6 @@ namespace WebWindows
             this.pMem = pMem;
             this.nExLength = nExLength;
             this.pExMem = pExMem;
-            this.nOsType = osType;
 
             this.pMemByte = new byte[nLength];
             this.pExMemByte = new byte[nExLength];
@@ -154,7 +143,6 @@ namespace WebWindows
             this.pMem = copyData.pMem;
             this.nExLength = copyData.nExLength;
             this.pExMem = copyData.pExMem;
-            this.nOsType = copyData.nOsType;
             this.pMemByte = new Byte[copyData.nLength];
             this.pExMemByte = new Byte[copyData.nExLength];
 
@@ -743,7 +731,7 @@ namespace WebWindows
             }
         }
         // Classify by type and Send Clipboard
-        private void OnClipBoard(int nGroupId, int nType, int nLength, IntPtr pMem, int nExLength, IntPtr pExMem, OSType osType = OSType.WINDOW) => ClipBoardOccured?.Invoke(this, new ClipBoardData(nGroupId, (CLIPTYPE)nType, nLength, pMem, nExLength, pExMem, osType));
+        private void OnClipBoard(int nGroupId, int nType, int nLength, IntPtr pMem, int nExLength, IntPtr pExMem) => ClipBoardOccured?.Invoke(this, new ClipBoardData(nGroupId, (CLIPTYPE)nType, nLength, pMem, nExLength, pExMem));
         public event EventHandler<ClipBoardData> ClipBoardOccured;
 
         private void OnRecvClipBoard(int nGroupId) => RecvClipBoardOccured?.Invoke(this, nGroupId);

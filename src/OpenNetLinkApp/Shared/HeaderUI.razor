@@ -1082,15 +1082,15 @@
 
 #if _WINDOWS
 
-    try
-    {
-        if (e.strUrlData != null && e.strUrlData.Length > 0)
-            System.Diagnostics.Process.Start("explorer", e.strUrlData);
-    }
-    catch (Exception ex)
-    {
-        CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-    }
+        try
+        {
+            if (e.strUrlData != null && e.strUrlData.Length > 0)
+                System.Diagnostics.Process.Start("explorer", e.strUrlData);
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+        }
 
 #elif _LINUX
 
@@ -1587,7 +1587,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 else
                     ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, clipData.pMemByte);
 
-                
+
                 //ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, nClipSize, byteArray);
             }
             else
@@ -1900,7 +1900,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             if (CheckClipBoardSendSize(clipData.nGroupId, nClipSize) < 0)
                 return;
-                
+
             SendClipBoardTry(clipData, eClipType, nClipSize);
         }
 
@@ -2139,7 +2139,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             strTitle = fileAddManage.GetConvertTitleDesc(true, strTitle);
             strContents = fileAddManage.GetConvertTitleDesc(true, strContents);*@
 
-    //수신자 목록체크(철자틀림)
+        //수신자 목록체크(철자틀림)
         string stReceiver = "";
         string strDestNetOverData = "";
         int ret = HsCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strTitle, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
@@ -2190,7 +2190,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         int nUserApprPos = sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID));
 
-    string stApprLineSeq = sgApprLineData.GetApprCommaSeqString(strUserSeq);
+        string stApprLineSeq = sgApprLineData.GetApprCommaSeqString(strUserSeq);
         if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
             stApprLineSeq = "";
 
@@ -2241,27 +2241,27 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 bw.Write(clipData.pMemByte, 0, clipData.nLength);
                 bw.Close();
                 fs.Close();
-                
-                if(clipData.nOsType == OSType.MAC)
-                {
-                    try{
-                        System.Drawing.Image image = System.Drawing.Image.FromFile(FileName);
-                        Bitmap blank = new Bitmap(image.Width, image.Height);
-                        Graphics g = Graphics.FromImage(blank);
-                        g.Clear(Color.White);
-                        g.DrawImage(image, 0, 0, image.Width, image.Height);
-                        
-                        image.Dispose();
-                        g.Dispose();
+#if _MACOSX
 
-                        Bitmap tempImage = new Bitmap(blank);
-                        tempImage.Save(FileName, System.Drawing.Imaging.ImageFormat.Bmp);
-                    }
-                    catch(Exception ex)
-                    {
-                        ShowMessage("error", ex.Message);
-                    }
+                try{
+                    System.Drawing.Image image = System.Drawing.Image.FromFile(FileName);
+                    Bitmap blank = new Bitmap(image.Width, image.Height);
+                    Graphics g = Graphics.FromImage(blank);
+                    g.Clear(Color.White);
+                    g.DrawImage(image, 0, 0, image.Width, image.Height);
+
+                    image.Dispose();
+                    g.Dispose();
+
+                    Bitmap tempImage = new Bitmap(blank);
+                    tempImage.Save(FileName, System.Drawing.Imaging.ImageFormat.Bmp);
                 }
+                catch(Exception ex)
+                {
+                    ShowMessage("error", ex.Message);
+                }
+
+#endif
             }
             else if (eClipUserSelectType == CLIPTYPE.TEXT)
             {
@@ -2299,16 +2299,15 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             bw.Write(clipData.pMemByte, 0, clipData.nLength);
             bw.Close();
             fs.Close();
-            if(clipData.nOsType == OSType.MAC)
-            {
-                try
-                {
+#if _MACOSX
+
+                try{
                     System.Drawing.Image image = System.Drawing.Image.FromFile(FileName);
                     Bitmap blank = new Bitmap(image.Width, image.Height);
                     Graphics g = Graphics.FromImage(blank);
                     g.Clear(Color.White);
                     g.DrawImage(image, 0, 0, image.Width, image.Height);
-                        
+
                     image.Dispose();
                     g.Dispose();
 
@@ -2319,7 +2318,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 {
                     ShowMessage("error", ex.Message);
                 }
-            }
+
+#endif
         }
         else
             return FileName;
