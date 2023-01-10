@@ -21,7 +21,8 @@ var AppProps = new AppProperty(Context,
 								"../", 													// Path of the Git Local Repository
 								"./OpenNetLinkApp/wwwroot/conf/AppVersion.json",		// Version file Path 
 								"./OpenNetLinkApp/wwwroot/conf/AppEnvSetting.json",		// Env file Path of the Application env settings
-								"./OpenNetLinkApp/wwwroot/conf/NetWork.json");			// Network file Path of the Network settings
+								"./OpenNetLinkApp/wwwroot/conf/NetWork.json",			// Network file Path of the Network settings
+								"./openNetLinkApp/ReleaseNote.md");						// Release Note of Patch File
 
 string PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppUpdatePlatform);
 string ReleaseNoteDirPath 	= String.Format("artifacts/installer/{0}/release_note", AppProps.AppUpdatePlatform);
@@ -37,11 +38,12 @@ public class AppProperty
 	public string VersionFile { get; }
 	public string AppEnvFile { get; }
 	public string NetworkFile { get; }
+	public string ReleaseNoteFile {get;}
 	private JObject VersionJObj { get; }
 	private JObject AppEnvJObj { get; }
 	private JObject NetworkJobj { get; }
 	
-    public AppProperty(ICakeContext context, string propsFile, string gitRepoPath, string versionFile, string appEnvFile, string networkFile)
+    public AppProperty(ICakeContext context, string propsFile, string gitRepoPath, string versionFile, string appEnvFile, string networkFile, string releaseNoteFile)
     {
         Context = context;
 		PropsFile = propsFile;
@@ -49,9 +51,13 @@ public class AppProperty
 		VersionFile = versionFile;
 		AppEnvFile = appEnvFile;
 		NetworkFile = networkFile;
+		ReleaseNoteFile = releaseNoteFile;
 		VersionJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(VersionFile));
 		AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(AppEnvFile));
 		NetworkJobj = JsonAliases.ParseJsonFromFile(Context, new FilePath(NetworkFile));
+		
+
+
     }
 
 	public Version PropVersion {
@@ -513,9 +519,17 @@ Task("CreateReleaseNote")
 	using(StreamWriter writer = new StreamWriter(ReleaseNotePath)){
 		writer.WriteLine("# "+Title);
 		writer.WriteLine("");
+
+		if(FileExists(AppProps.ReleaseNoteFile))
+		{
+
+		}
+		else
+		{
 		foreach (var tag in AppProps.GitLastTag)
 		{
 			writer.WriteLine(tag.Message);
+		}
 		}
 	};
 });
