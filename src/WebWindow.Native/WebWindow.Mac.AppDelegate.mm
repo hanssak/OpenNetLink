@@ -128,7 +128,7 @@
         //NSLog(@"dic nil!!!");
         dicClipTypeSelect = [[NSMutableDictionary alloc] init];
     }
-    [dicClipTypeSelect setObject:@"1" forKey:nsNumbGuId];
+    [dicClipTypeSelect setObject:@true forKey:nsNumbGuId];
     //NSLog(@"dicValue : %@", dicClipTypeSelect);
 }
 
@@ -140,7 +140,7 @@
         //NSLog(@"FirstSendTypeDic nil!!!");
         dicClipFirstSendTypeText = [[NSMutableDictionary alloc] init];
     }
-    [dicClipFirstSendTypeText setObject:@"1" forKey:nsNumbGuId];
+    [dicClipFirstSendTypeText setObject:@true forKey:nsNumbGuId];
     //NSLog(@"dicValue : %@", dicClipFirstSendTypeText);
 }
 
@@ -216,7 +216,7 @@
                 
                 //[img addRepresentation:rep];
                 //pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
-                //pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
+
                 pClipData = [img TIFFRepresentation];
                 NSLog(@"copy image\n");
                 ((WebWindow*)(SelfThis))->InvokeClipBoard([nsNumbGuId intValue], nDataType, pClipData.length, (const char*)[pClipData bytes], 0, nullptr); 
@@ -247,7 +247,7 @@
                 //[img unlockFocus];
                 
                 //[img addRepresentation:rep];
-                //pClipData = [rep representationUsingType:NSBitmapImageFileType properties:@{NSImageInterlaced: @NO}];
+                //pClipData = [rep representationUsingType:NSBitmapImageFileTypePNG properties:@{NSImageInterlaced: @NO}];
                 pClipData = [img TIFFRepresentation];
                 NSLog(@"copy image\n");
 

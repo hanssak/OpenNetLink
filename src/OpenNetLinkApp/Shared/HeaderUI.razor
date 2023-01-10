@@ -2228,7 +2228,6 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         string FileName = String.Empty;
         if (Directory.Exists(dirPath) == false) Directory.CreateDirectory(dirPath);
 
-
         if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)
         {
             if (eClipUserSelectType == CLIPTYPE.IMAGE)
@@ -2236,31 +2235,38 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 // 사용자가 image 전송 선택
                 // 클립보드 선택전송일때 처음이 Image 두번째가 Text로 올라옴
                 FileName = Path.Combine(dirPath, DateTime.Now.ToString("yyyyMMddHHmsss") + ".bmp");
+                if (File.Exists(FileName))
+                    return null;
+
+#if _MACOSX
+                try
+                {
+                    using(var ms = new MemoryStream(clipData.pMemByte))
+                    {
+                        System.Drawing.Image image = System.Drawing.Image.FromStream(ms);
+                        Bitmap blank = new Bitmap(image.Width, image.Height);
+                        Graphics g = Graphics.FromImage(blank);
+                        g.Clear(Color.White);
+                        g.DrawImage(image, 0, 0, image.Width, image.Height);
+
+                        image.Dispose();
+                        g.Dispose();
+
+                        Bitmap tempImage = new Bitmap(blank);
+                        tempImage.Save(FileName, System.Drawing.Imaging.ImageFormat.Bmp);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    CLog.Here().Error("BMP Convert ERROR : {0}", ex.Message);
+                }
+
+#else
                 FileStream fs = new FileStream(FileName, FileMode.CreateNew);
                 BinaryWriter bw = new BinaryWriter(fs);
                 bw.Write(clipData.pMemByte, 0, clipData.nLength);
                 bw.Close();
                 fs.Close();
-#if _MACOSX
-
-                try{
-                    System.Drawing.Image image = System.Drawing.Image.FromFile(FileName);
-                    Bitmap blank = new Bitmap(image.Width, image.Height);
-                    Graphics g = Graphics.FromImage(blank);
-                    g.Clear(Color.White);
-                    g.DrawImage(image, 0, 0, image.Width, image.Height);
-
-                    image.Dispose();
-                    g.Dispose();
-
-                    Bitmap tempImage = new Bitmap(blank);
-                    tempImage.Save(FileName, System.Drawing.Imaging.ImageFormat.Bmp);
-                }
-                catch(Exception ex)
-                {
-                    ShowMessage("error", ex.Message);
-                }
-
 #endif
             }
             else if (eClipUserSelectType == CLIPTYPE.TEXT)
@@ -2294,31 +2300,35 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             if (File.Exists(FileName))
                 return null;
-            FileStream fs = new FileStream(FileName, FileMode.CreateNew);
-            BinaryWriter bw = new BinaryWriter(fs);
-            bw.Write(clipData.pMemByte, 0, clipData.nLength);
-            bw.Close();
-            fs.Close();
+
 #if _MACOSX
+                try
+                {
+                    using(var ms = new MemoryStream(clipData.pMemByte))
+                    {
+                        System.Drawing.Image image = System.Drawing.Image.FromStream(ms);
+                        Bitmap blank = new Bitmap(image.Width, image.Height);
+                        Graphics g = Graphics.FromImage(blank);
+                        g.Clear(Color.White);
+                        g.DrawImage(image, 0, 0, image.Width, image.Height);
 
-                try{
-                    System.Drawing.Image image = System.Drawing.Image.FromFile(FileName);
-                    Bitmap blank = new Bitmap(image.Width, image.Height);
-                    Graphics g = Graphics.FromImage(blank);
-                    g.Clear(Color.White);
-                    g.DrawImage(image, 0, 0, image.Width, image.Height);
+                        image.Dispose();
+                        g.Dispose();
 
-                    image.Dispose();
-                    g.Dispose();
-
-                    Bitmap tempImage = new Bitmap(blank);
-                    tempImage.Save(FileName, System.Drawing.Imaging.ImageFormat.Bmp);
+                        Bitmap tempImage = new Bitmap(blank);
+                        tempImage.Save(FileName, System.Drawing.Imaging.ImageFormat.Bmp);
+                    }
                 }
                 catch(Exception ex)
                 {
-                    ShowMessage("error", ex.Message);
+                    CLog.Here().Error("BMP Convert ERROR : {0}", ex.Message);
                 }
-
+#else
+                FileStream fs = new FileStream(FileName, FileMode.CreateNew);
+                BinaryWriter bw = new BinaryWriter(fs);
+                bw.Write(clipData.pMemByte, 0, clipData.nLength);
+                bw.Close();
+                fs.Close();
 #endif
         }
         else
