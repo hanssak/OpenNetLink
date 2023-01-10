@@ -229,6 +229,16 @@ img {border: 0;}
     background-color:#fff;  height:300px; padding:10px 20px; overflow-y:scroll; line-height:25px; font-weight:normal;
 }
 
+.update_list h1,
+.update_list h2,
+.update_list h3,
+.update_list h4,
+.update_list h5,
+.update_list h6,
+.update_list label {
+    color: black;
+}
+
 .li_no {list-style:none !important;}
 
 .border-right {
