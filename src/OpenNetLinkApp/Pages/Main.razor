@@ -213,6 +213,7 @@
     /// <param name="e"></param>
     private async void ShowSessionCountPopup(int groupID, PageEventArgs e)
     {
+        bStartedLogin = false;
         await refSGAlert.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
     }
 
