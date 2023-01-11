@@ -105,10 +105,10 @@
 
 @code {
 
-        SGAlert refSGloginDuplicate;
+    SGAlert refSGloginDuplicate;
 
-        [Parameter]
-        public EventCallback<int> goToPage { get; set; }
+    [Parameter]
+    public EventCallback<int> goToPage { get; set; }
 
     public bool bLoginTryOver1auth = false;
     public bool bAutoLogin = true;                          // 자동로그인 CheckBox 표현 및 사용유무
@@ -338,7 +338,7 @@
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(nGroupID) == false)
                         tempLoginType = sgSvrData.GetLoginType();
                     else
-                        tempLoginType = pageService.GetRealLoginType(nGroupID);
+                        tempLoginType = eLoginUITypeData;
                 }
 
                 CLog.Here().Information($"PopUPLogin Dologin m_bMultiLoginDo logintype: {tempLoginType}   group ID : {nGroupID}");
@@ -351,16 +351,16 @@
             }
             else
             {
-                if(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
+                if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
                 {
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(nGroupID))
                     {
-                        tempLoginType = pageService.GetRealLoginType(nGroupID);
+                        tempLoginType = eLoginUITypeData;
                     }
                     else
                         tempLoginType = eLoginType.eLOGINTYPE_ORIGIN;
 
-                    if(tempLoginType == eLoginType.eLOGINTYPE_AD)
+                    if (tempLoginType == eLoginType.eLOGINTYPE_AD)
                         HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, (int)tempLoginType);
                     else
                         HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, otp, (int)tempLoginType);
@@ -452,6 +452,16 @@
             bAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID);
             // bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(nGroupID);
 
+            SGSvrData sgSvrData = null;
+            sgSvrData = (SGSvrData)HSCmdCenter.GetSGSvrData(nGroupID);
+            if (sgSvrData == null)
+            {
+                eLoginUITypeData = eLoginType.eLOGINTYPE_ORIGIN;
+            }
+            else
+                eLoginUITypeData = sgSvrData.GetLoginType();
+
+
             //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
             //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
             @*if (AppConfigSvc.GetUseAppLoginType())
@@ -463,20 +473,18 @@
                 if (doADLoginLocalCheck(nGroupID))
                 {
                     eLoginUITypeData = eLoginType.eLOGINTYPE_AD;
-                    pageService.SetRealLoginType(nGroupID, eLoginType.eLOGINTYPE_AD);
                 }
                 else
                 {
                     ShowLoginFail(XmlConf.GetErrMsg("E_0254")); // "ID/PW 인증을 통해 Login 하셔야 합니다."
                                                                 //AD 로그인이 안될 경우 ID/PW 로그인
                     eLoginUITypeData = eLoginType.eLOGINTYPE_ORIGIN;
-                    pageService.SetRealLoginType(nGroupID, eLoginType.eLOGINTYPE_ORIGIN);
                     StateHasChanged();
                 }
             }
 
             // IDPW 로그인
-            if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
+            if (eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
             {
                 // ID저장 사용
                 //if (siteConfig.GetUseLoginIDSave(nGroupID) == true)   // json으로 설정이동

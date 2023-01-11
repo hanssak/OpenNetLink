@@ -124,10 +124,10 @@
 <SGAlert @ref="refSGAlert" Guid="modal-alert-main" OnCancel="SessionAlertCancel" OnConfirm="SessionAlertConfirm"></SGAlert>
 
 @code {
-        SGAlert refSGAlert;
+    SGAlert refSGAlert;
 
-        [Parameter]
-        public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
+    [Parameter]
+    public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
 
     public string id { get; set; }
     public string pw { get; set; }
@@ -191,12 +191,10 @@
         {
             if (doADLoginLocalCheck(refSGAlert.groupId))
             {
-                pageService.SetRealLoginType(refSGAlert.groupId, eLoginType.eLOGINTYPE_AD);
                 doADLogin();
             }
             else
             {
-                pageService.SetRealLoginType(refSGAlert.groupId, eLoginType.eLOGINTYPE_ORIGIN);
                 doLogIn();
             }
         }
@@ -254,7 +252,7 @@
     {
         try
         {
-            if (bStartedLogin) 
+            if (bStartedLogin)
                 return;
 
             if ((id?.Length ?? 0) < 1)
@@ -313,13 +311,13 @@
                 {
                     CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
                     HSCmdCenter.Login(netlist.GroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
-                    pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(pageService.m_nCurViewPageGroupID) ? pageService.GetRealLoginType(pageService.m_nCurViewPageGroupID) : (eLoginType)pageService.m_nLoginType));
+                    pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
                 }
             }
             else
             {
                 HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
-                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(pageService.m_nCurViewPageGroupID) ? pageService.GetRealLoginType(pageService.m_nCurViewPageGroupID) : (eLoginType)pageService.m_nLoginType));
+                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
             }
 
         }
@@ -329,7 +327,6 @@
             Debug.WriteLine(ex.Message);
         }
     }
-
     /// <summary>
     ///
     /// </summary>
@@ -388,7 +385,6 @@
 
         return false;
     }
-
     /// <summary>
     ///
     /// </summary>
@@ -471,7 +467,6 @@
         }
 
     }
-
     /// <summary>
     ///
     /// </summary>
@@ -534,7 +529,7 @@
 
                 if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupID) == false)
                 {
-                    SetIdPwLogin(groupID);
+                    //SetIdPwLogin(groupID);
                 }
                 else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
                 {
@@ -624,7 +619,6 @@
         }
     }
 
-
     /// <summary>
     ///
     /// </summary>
@@ -674,13 +668,11 @@
             {
                 if (doADLoginLocalCheck(groupid))
                 {
-                    pageService.SetRealLoginType(groupid, eLoginType.eLOGINTYPE_AD);
                     doADLogin();
                 }
                 else
                 {
                     ShowLoginFail(XmlConf.GetErrMsg("E_0254")); // "ID/PW 인증을 통해 Login 하셔야 합니다."
-                    pageService.SetRealLoginType(groupid, eLoginType.eLOGINTYPE_ORIGIN);
                     SetIdPwLogin(groupid);
                 }
             }
@@ -720,7 +712,7 @@
         *@
 
 
-    // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
+        // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
         {
@@ -1128,11 +1120,12 @@
                     // GPKI Login
                     if (srcLoc == "GPKI")
                         strNavigatePathWithGroupID = "/GPKI_LogIn/2";    // Register Mode로 실행
-                    // IDPW
-                    else if ((pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && !SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupId)) || 
-                        (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupId) && pageService.GetRealLoginType(groupId) == eLoginType.eLOGINTYPE_ORIGIN))
+                    else if (pageService.GetGroupIDLoginType(groupId) == eLoginType.eLOGINTYPE_AD)
                     {
-                        // AD 로그인 실패 후 ID/PW 로그인했는지 확인
+
+                    }
+                    else // ID/PW 
+                    {
                         if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupId) == true)
                         {
                             if (bAutoLoginCheck)
@@ -1163,10 +1156,6 @@
                             sgRSACrypto.ValueEncrypt(id, out strEncID);
                             sgSettingProc.SetSettingUID(groupId, strEncID);
                         }
-                    }
-                    else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
-                    {
-
                     }
 
                     if (srcLoc != "GPKI")
@@ -1318,8 +1307,7 @@
                 sgUserData = (SGUserData)HSCmdCenter.GetUserData(nGroupIDfirst);
                 sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupIDfirst);
 
-                if ((pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && !SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(nGroupIDfirst)) ||
-                        (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(nGroupIDfirst) && pageService.GetRealLoginType(nGroupIDfirst) == eLoginType.eLOGINTYPE_ORIGIN))
+                if (pageService.GetGroupIDLoginType(groupId) == eLoginType.eLOGINTYPE_ORIGIN)
                 {
 
                     refPWChange.nGroupID = nGroupIDfirst;
@@ -2310,7 +2298,7 @@
                     SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strUserSeq);
 
                 // 기본설정(2)
-                if (((pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && !SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(gID)) || (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(gID) && pageService.GetRealLoginType(gID) == eLoginType.eLOGINTYPE_ORIGIN)) && bBasicConf)
+                if (pageService.GetGroupIDLoginType(gID) != eLoginType.eLOGINTYPE_AD && bBasicConf)
                 {
                     strNavigatePathWithGroupID = "/netConf/";
                     strNavigatePathWithGroupID += gID.ToString();
