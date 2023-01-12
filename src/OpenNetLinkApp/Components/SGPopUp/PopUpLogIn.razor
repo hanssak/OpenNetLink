@@ -54,14 +54,14 @@
                             <div class="input-group mb-2">
                                 <input type="text" class="form-control-login" placeholder="ID" @bind="id" disabled=@bUIBtnDisable tabindex="1">
                             </div>
-                            @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
+                            @if (eLoginUITypeData != eLoginType.eLOGINTYPE_OTP) //OTP PW 필요없음
                             {
                                 <div class="input-group mb-2">
                                     @*AD 로그인은 PW 사용자 입력 불가 (Readonly)*@
-                                    <input type="password" class="form-control-login" placeholder="Password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" @bind="pw" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2">
+                                    <input type="password" class="form-control-login" placeholder="Password" readonly="@(eLoginUITypeData== eLoginType.eLOGINTYPE_AD)" @bind="pw" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2">
                                 </div>
                             }
-                            @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
+                            @if (eLoginUITypeData == eLoginType.eLOGINTYPE_PW_OTP || eLoginUITypeData == eLoginType.eLOGINTYPE_OTP) //PW_OTP(4), OTP(5)
                             {
                                 <div class="input-group mb-2">
                                     <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" @bind="otp" @onkeyup="keyCheck" tabindex="3" autocomplete="off">
@@ -319,67 +319,12 @@
                 return;
             HSCmdCenter.SetCliVersion(strCurCliVersion);
 
-            eLoginType tempLoginType = eLoginType.eLOGINTYPE_ORIGIN;
+            pageService.SetGroupIDLoginType(nGroupID, eLoginUITypeData);
 
-            if (pageService.m_bMultiLoginDo)
-            {
-                SGSvrData sgSvrData = null;
-                sgSvrData = (SGSvrData)HSCmdCenter.GetSGSvrData(nGroupID);
-                if (sgSvrData == null)
-                    return;
-
-                //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
-                //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
-                // if (AppConfigSvc.GetUseAppLoginType())
-                if (SGAppMgrSvc.OpConfigInfoService.GetUseAppLoginType())
-                    tempLoginType = (eLoginType)SGAppMgrSvc.OpConfigInfoService.GetAppLoginType();
-                else
-                {
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(nGroupID) == false)
-                        tempLoginType = sgSvrData.GetLoginType();
-                    else
-                        tempLoginType = eLoginUITypeData;
-                }
-
-                CLog.Here().Information($"PopUPLogin Dologin m_bMultiLoginDo logintype: {tempLoginType}   group ID : {nGroupID}");
-                pageService.SetGroupIDLoginType(nGroupID, tempLoginType);
-
-                if (tempLoginType == eLoginType.eLOGINTYPE_AD)
-                    HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, (int)tempLoginType);
-                else
-                    HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, otp, (int)tempLoginType);
-            }
+            if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
+                HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginUITypeData);
             else
-            {
-                if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
-                {
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(nGroupID))
-                    {
-                        tempLoginType = eLoginUITypeData;
-                    }
-                    else
-                        tempLoginType = eLoginType.eLOGINTYPE_ORIGIN;
-
-                    if (tempLoginType == eLoginType.eLOGINTYPE_AD)
-                        HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, (int)tempLoginType);
-                    else
-                        HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, otp, (int)tempLoginType);
-
-                    pageService.SetGroupIDLoginType(nGroupID, tempLoginType);
-                }
-                else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
-                {
-                    HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType); // (int)eLoginUITypeData
-                    pageService.SetGroupIDLoginType(nGroupID, (eLoginType)pageService.m_nLoginType);
-                }
-                else
-                {
-                    HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType); // (int)eLoginUITypeData
-                    pageService.SetGroupIDLoginType(nGroupID, (eLoginType)pageService.m_nLoginType);
-                }
-
-
-            }
+                HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginUITypeData);
 
         }
         catch (Exception ex)
@@ -452,35 +397,44 @@
             bAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID);
             // bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(nGroupID);
 
-            SGSvrData sgSvrData = null;
-            sgSvrData = (SGSvrData)HSCmdCenter.GetSGSvrData(nGroupID);
-            if (sgSvrData == null)
+            if (pageService.m_bMultiLoginDo)
             {
-                eLoginUITypeData = eLoginType.eLOGINTYPE_ORIGIN;
+                SGSvrData sgSvrData = null;
+                sgSvrData = (SGSvrData)HSCmdCenter.GetSGSvrData(nGroupID);
+                if (sgSvrData == null)
+                {
+                    eLoginUITypeData = (eLoginType)pageService.m_nLoginType;
+                }
+                else
+                    eLoginUITypeData = sgSvrData.GetLoginType();
             }
             else
-                eLoginUITypeData = sgSvrData.GetLoginType();
+                eLoginUITypeData = (eLoginType)pageService.m_nLoginType;
 
 
             //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
             //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
-            @*if (AppConfigSvc.GetUseAppLoginType())
-                eLoginUITypeData = (eLoginType)AppConfigSvc.GetAppLoginType();*@
             if (SGAppMgrSvc.OpConfigInfoService.GetUseAppLoginType())
                 eLoginUITypeData = (eLoginType)SGAppMgrSvc.OpConfigInfoService.GetAppLoginType();
-            else if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(nGroupID))
+
+            if(eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
             {
-                if (doADLoginLocalCheck(nGroupID))
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(nGroupID))
                 {
-                    eLoginUITypeData = eLoginType.eLOGINTYPE_AD;
+                    if (doADLoginLocalCheck(nGroupID))
+                    {
+                        eLoginUITypeData = eLoginType.eLOGINTYPE_AD;
+                    }
+                    else
+                    {
+                        ShowLoginFail(XmlConf.GetErrMsg("E_0254")); // "ID/PW 인증을 통해 Login 하셔야 합니다."
+                                                                    //AD 로그인이 안될 경우 ID/PW 로그인
+                        eLoginUITypeData = eLoginType.eLOGINTYPE_ORIGIN;
+                        StateHasChanged();
+                    }
                 }
                 else
-                {
-                    ShowLoginFail(XmlConf.GetErrMsg("E_0254")); // "ID/PW 인증을 통해 Login 하셔야 합니다."
-                                                                //AD 로그인이 안될 경우 ID/PW 로그인
-                    eLoginUITypeData = eLoginType.eLOGINTYPE_ORIGIN;
-                    StateHasChanged();
-                }
+                    eLoginUITypeData = eLoginType.eLOGINTYPE_AD;
             }
 
             // IDPW 로그인
@@ -802,7 +756,7 @@
             sgSettingProc.InsertSettingData(groupId, "", "", "", "", 0);
 
         // IDPW UI 형태일때에만 사용
-        if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
+        if (eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
         {
 
             //if (siteConfig.GetUseAutoLogin(groupId) == true)  // json으로 설정이동
@@ -842,83 +796,92 @@
                 }
             }
 
-            pw = "";
-            bAutoLoginCheck = false;
-
-            if (GetInitPWLogin(groupId) == true)
+            //암호 체크는 ID/PW일 경우에만 해당
+            if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
             {
-                pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
-                eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
-                goToPage.InvokeAsync((int)eLoginUITypeData);
-                closePopUp();
-                return false;
+                if (GetInitPWLogin(groupId) == true)
+                {
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
+                    eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
+                    goToPage.InvokeAsync((int)eLoginUITypeData);
+                    closePopUp();
+                    return false;
+                }
+
+                pw = "";
+                bAutoLoginCheck = false;
+
+                if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
+                {
+                    eResultIdPwAfterJob = eIDPWresultJob.eNone;
+                    //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+                    Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                    goToPage.InvokeAsync((int)eLoginUITypeData);
+                    return true;
+                }
+                else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
+                {
+                    eResultIdPwAfterJob = eIDPWresultJob.eEnforced;
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    goToPage.InvokeAsync((int)eLoginUITypeData);
+                    closePopUp();
+                    return false;
+                }
+
+                string strTime = "";
+                //SGSettingData sgSettingData = null;
+                sgSettingData = sgSettingProc.SelectSettingData(groupId);
+                if (sgSettingData == null)
+                {
+                    eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    goToPage.InvokeAsync((int)eLoginUITypeData);
+                    closePopUp();
+                    return false;
+                }
+
+                strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
+                if (strTime.Equals(""))
+                {
+                    eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    goToPage.InvokeAsync((int)eLoginUITypeData);
+                    closePopUp();
+                    return false;
+                }
+
+                SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
+                string strUserSeq = sgUserData.GetUserSequence();
+                strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
+                if (strTime.Equals(""))
+                {
+                    eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    goToPage.InvokeAsync((int)eLoginUITypeData);
+                    closePopUp();
+                    return false;
+                }
+
+                DateTime dtLocalTime = DateTime.Parse(strTime);
+                DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
+
+                if (DateTime.Compare(dtLocalTime, svrDt) < 0)
+                {
+                    eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    goToPage.InvokeAsync((int)eLoginUITypeData);
+                    closePopUp();
+                    return false;
+                }
             }
-
-            if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
+            else
             {
-                eResultIdPwAfterJob = eIDPWresultJob.eNone;
-                //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
-                Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-                goToPage.InvokeAsync((int)eLoginUITypeData);
-                return true;
-            }
-            else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
-            {
-                eResultIdPwAfterJob = eIDPWresultJob.eEnforced;
-                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                goToPage.InvokeAsync((int)eLoginUITypeData);
-                closePopUp();
-                return false;
-            }
-
-            string strTime = "";
-            //SGSettingData sgSettingData = null;
-            sgSettingData = sgSettingProc.SelectSettingData(groupId);
-            if (sgSettingData == null)
-            {
-                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                goToPage.InvokeAsync((int)eLoginUITypeData);
-                closePopUp();
-                return false;
-            }
-
-            strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
-            if (strTime.Equals(""))
-            {
-                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                goToPage.InvokeAsync((int)eLoginUITypeData);
-                closePopUp();
-                return false;
-            }
-
-            SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
-            string strUserSeq = sgUserData.GetUserSequence();
-            strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
-            if (strTime.Equals(""))
-            {
-                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                goToPage.InvokeAsync((int)eLoginUITypeData);
-                closePopUp();
-                return false;
-            }
-
-            DateTime dtLocalTime = DateTime.Parse(strTime);
-            DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
-
-            if (DateTime.Compare(dtLocalTime, svrDt) < 0)
-            {
-                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                goToPage.InvokeAsync((int)eLoginUITypeData);
-                closePopUp();
-                return false;
+                pw = "";
+                bAutoLoginCheck = false;
             }
 
         }
-        else if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
+        else
         {
 
         }

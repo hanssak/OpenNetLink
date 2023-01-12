@@ -185,18 +185,20 @@
 
         if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
         {
-            doADLogin();
-        }
-        else if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(refSGAlert.groupId))
-        {
-            if (doADLoginLocalCheck(refSGAlert.groupId))
+            if(SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(refSGAlert.groupId))
             {
-                doADLogin();
+                if (doADLoginLocalCheck(refSGAlert.groupId))
+                {
+                    doADLogin();
+                }
+                else
+                {
+                    pageService.m_nLoginType = (int)eLoginType.eLOGINTYPE_ORIGIN;
+                    doLogIn();
+                }
             }
             else
-            {
-                doLogIn();
-            }
+                doADLogin();
         }
         else
         {
@@ -526,13 +528,13 @@
             }
             else
             {
+                if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
+                {
 
-                if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupID) == false)
-                {
-                    //SetIdPwLogin(groupID);
                 }
-                else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
+                else
                 {
+                    SetIdPwLogin(groupID);
                 }
 
             }
@@ -662,19 +664,21 @@
         {
             if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
             {
-                doADLogin();
-            }
-            else if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupid))
-            {
-                if (doADLoginLocalCheck(groupid))
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupid))
                 {
-                    doADLogin();
+                    if (doADLoginLocalCheck(groupid))
+                    {
+                        doADLogin();
+                    }
+                    else
+                    {
+                        ShowLoginFail(XmlConf.GetErrMsg("E_0254")); // "ID/PW 인증을 통해 Login 하셔야 합니다."
+                        pageService.m_nLoginType = (int)eLoginType.eLOGINTYPE_ORIGIN;
+                        SetIdPwLogin(groupid);
+                    }
                 }
                 else
-                {
-                    ShowLoginFail(XmlConf.GetErrMsg("E_0254")); // "ID/PW 인증을 통해 Login 하셔야 합니다."
-                    SetIdPwLogin(groupid);
-                }
+                    doADLogin();
             }
         }
 
