@@ -1295,40 +1295,18 @@ namespace OpenNetLinkApp.PageEvent
             ctrlSideEvent = ctrlSideNoti;
         }
 
-        /// <summary>
-        /// 노티로 Update 버전 확인 발생
-        /// </summary>
-        /// <returns></returns>
         public ClientUpgradeEvent GetClientUpgradeNotiEvent()
         {
             return ClientUpdate;
         }
-        /// <summary>
-        /// 노티로 Update 버전 확인 발생
-        /// </summary>
-        /// <param name="updateNoti"></param>
         public void SetClientUpgradeNotiEvent(ClientUpgradeEvent updateNoti)
         {
             ClientUpdate = updateNoti;
         }
-
-        /// <summary>
-        /// 첫 화면에서 BIND의 패치버전 비교 시 발생
-        /// <br>Update Popup에서 처리 시 발생</br>
-        /// <br> 목적지 : SGCtrkSideUI 쪽 Update 버전 확인</br>
-        /// </summary>
-        /// <returns></returns>
         public ClientUpgradeExeEvent GetClientUpgradeExeNotiEvent()
         {
             return ClientUpgreadeExe;
         }
-
-        /// <summary>
-        /// 첫 화면에서 BIND의 패치버전 비교 시 발생
-        /// <br>Update Popup에서 처리 시 발생</br>
-        /// <br> 목적지 : SGCtrkSideUI 쪽 Update 버전 확인</br>
-        /// </summary>
-        /// <param name="updateNoti"></param>
         public void SetClientUpgradeExeNotiEvent(ClientUpgradeExeEvent updateNoti)
         {
             ClientUpgreadeExe = updateNoti;

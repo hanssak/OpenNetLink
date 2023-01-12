@@ -287,7 +287,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseLanguageSet { get; set; } = false;                                // 언어설정 사용 유무.
         public bool m_bUseDashBoard { get; set; } = true;                                   // 대쉬보드 창 사용 유무.
         public bool m_bViewFileFilter { get; set; } = true;                                 // (환경설정) 확장자 제한 화면 표시 유무.
-        public bool m_bUseForceUpdate { get; set; } = false;                                 // 넘기는 기능 없이 무조건 업데이트 사용 유무
+        public bool m_bUseForceUpdate { get; set; } = true;                                 // 넘기는 기능 없이 무조건 업데이트 사용 유무
         public bool m_bViewSGSideBarUIBadge { get; set; } = false;                          // 왼쪽 메뉴들에서 Badge 나오게할지 유무 설정값
         public bool m_bViewSGHeaderUIAlarmNoriAllDel { get; set; } = true;                  // 상단 HeaderUI에서 Alarm, Noti 상에 Badge 전체 삭제 메뉴 나오게할지 유무
         public bool m_bViewDropFileAddError { get; set; } = false;                          // 파일추가때, 5GB 이상 파일 추가되면 최대추가 파일크기가 5GB라고 UI가 나오는거 사용안함(false)
