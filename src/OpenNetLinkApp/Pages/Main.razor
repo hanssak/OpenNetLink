@@ -1318,67 +1318,71 @@
                     refPWChange.Init();
 
                     //@ 초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거 시작 2021/07/05 YKH
-                    if (GetInitPWLogin(groupId))
+                    //패스워드 변경 유무에 따라 패스워드 체크 가능 여부 확인
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId))
                     {
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
-                        refPWChangeDefaultPW.nGroupID = groupId;
-                        await refPWChangeDefaultPW.openPopUp();
-                        return;
-                    }
-                    //@
-                    else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
-                    {
-                    }
-                    else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
-                    {
-                        // password 강제변경 창
-                        pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
-                        await refPWChange.openPopUp();
-                        return;
-                    }
-                    else
-                    {
-
-                        // password 변경권고 창 띄울지 검사
-                        string strTime = "";
-                        SGSettingData sgSettingData = null;
-                        sgSettingData = sgSettingProc.SelectSettingData(nGroupIDfirst);
-                        if (sgSettingData == null)
+                        if (GetInitPWLogin(groupId))
                         {
+                            pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
+                            refPWChangeDefaultPW.nGroupID = groupId;
+                            await refPWChangeDefaultPW.openPopUp();
+                            return;
+                        }
+                        //@
+                        else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
+                        {
+                        }
+                        else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
+                        {
+                            // password 강제변경 창
                             pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
                             await refPWChange.openPopUp();
                             return;
                         }
-
-                        strTime = sgSettingProc.GetSettingDelayDspPw(nGroupIDfirst);
-                        if (strTime.Equals(""))
+                        else
                         {
-                            pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
-                            await refPWChange.openPopUp();
-                            return;
+
+                            // password 변경권고 창 띄울지 검사
+                            string strTime = "";
+                            SGSettingData sgSettingData = null;
+                            sgSettingData = sgSettingProc.SelectSettingData(nGroupIDfirst);
+                            if (sgSettingData == null)
+                            {
+                                pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
+                                await refPWChange.openPopUp();
+                                return;
+                            }
+
+                            strTime = sgSettingProc.GetSettingDelayDspPw(nGroupIDfirst);
+                            if (strTime.Equals(""))
+                            {
+                                pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
+                                await refPWChange.openPopUp();
+                                return;
+                            }
+
+                            SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
+                            string strUserSeq = sgUserData.GetUserSequence();
+                            strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
+
+                            if (strTime.Equals(""))
+                            {
+                                pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
+                                await refPWChange.openPopUp();
+                                return;
+                            }
+
+                            DateTime dtLocalTime = DateTime.Parse(strTime);
+                            DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
+
+                            if (DateTime.Compare(dtLocalTime, svrDt) < 0)
+                            {
+                                pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
+                                await refPWChange.openPopUp();
+                                return;
+                            }
+
                         }
-
-                        SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
-                        string strUserSeq = sgUserData.GetUserSequence();
-                        strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
-
-                        if (strTime.Equals(""))
-                        {
-                            pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
-                            await refPWChange.openPopUp();
-                            return;
-                        }
-
-                        DateTime dtLocalTime = DateTime.Parse(strTime);
-                        DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
-
-                        if (DateTime.Compare(dtLocalTime, svrDt) < 0)
-                        {
-                            pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
-                            await refPWChange.openPopUp();
-                            return;
-                        }
-
                     }
 
 
