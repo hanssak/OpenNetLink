@@ -1630,6 +1630,11 @@ namespace OpenNetLinkApp.Services
             }
         }
 
+        /// <summary>
+        /// 노티로 Update 버전 확인
+        /// </summary>
+        /// <param name="nRet"></param>
+        /// <param name="data"></param>
         public void UpgradeNotiAfterSend(int nRet, SGData data)
         {
             ClientUpgradeEvent clipUpdate = sgPageEvent.GetClientUpgradeNotiEvent();

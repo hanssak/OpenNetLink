@@ -3,17 +3,6 @@
     {
       "GROUPID": 0,
       "FROMNAME": "VDI망",
-      "TONAME": "개인정보존",
-      "IPADDRESS": "218.145.246.25",
-      "PORT": 3435,
-      "CONNECTTYPE": 1,
-      "TLSVERSION": "1.2",
-      "NETPOS": "CN",
-      "ADDomain": [ "IpIeACsMrMfzCyTt9WRFUQ==", "NqIY8C7M1BOp3iNZ1tqUhA==" ]
-    },
-    {
-      "GROUPID": 1,
-      "FROMNAME": "VDI망",
       "TONAME": "공공존",
       "IPADDRESS": "218.145.246.27",
       "PORT": 3435,
@@ -23,7 +12,7 @@
       "ADDomain": [ "NqIY8C7M1BOp3iNZ1tqUhA==" ]
     },
     {
-      "GROUPID": 2,
+      "GROUPID": 1,
       "FROMNAME": "VDI망",
       "TONAME": "금융존",
       "IPADDRESS": "192.168.1.253",
