@@ -39,10 +39,9 @@
   "bUserIDSave": false,
   "bAutoLogin": true,
   "bAutoLoginCheck": true,
-  "bUserPWChange": false,
-
   "bEmptyfileTrans": true,
 
+  "bUserPWChange": true,
   "strInitPasswd": "1K27SdexltsW0ubSCJgsZw==",
   "strPWChangeProhibitLimit": "",
   "nPWChangeApplyCnt": 9,
@@ -129,7 +128,7 @@
   "bUseInitMessagePerDay": false,
   "bVisiblePolicyUpdateButton": true,
   "bUseForceBackgroundUpdate": false,
-  "bUseChkHardSpace": true,  
+  "bUseChkHardSpace": true,
   "bUseOver1Auth": [
     false,
     false,

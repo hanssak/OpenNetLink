@@ -1220,6 +1220,5 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetApproveExtFileTransWithApprove();
         }
-
     }
 }

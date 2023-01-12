@@ -851,7 +851,7 @@
         eLoginType tmpLoginType = pageService.GetGroupIDLoginType(gID);
 
         // 기본설정
-        if (tmpLoginType == eLoginType.eLOGINTYPE_ORIGIN && SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(gID) && siteConfig.GetUseOver1auth(gID) == false)
+        if (tmpLoginType == eLoginType.eLOGINTYPE_ORIGIN && SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(gID))
         {
             strNavigatePathWithGroupID = "/netConf/";
             strNavigatePathWithGroupID += gID.ToString();

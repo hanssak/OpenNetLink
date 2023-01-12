@@ -128,7 +128,7 @@
         //NSLog(@"dic nil!!!");
         dicClipTypeSelect = [[NSMutableDictionary alloc] init];
     }
-    [dicClipTypeSelect setObject:@"1" forKey:nsNumbGuId];
+    [dicClipTypeSelect setObject:@true forKey:nsNumbGuId];
     //NSLog(@"dicValue : %@", dicClipTypeSelect);
 }
 
@@ -140,7 +140,7 @@
         //NSLog(@"FirstSendTypeDic nil!!!");
         dicClipFirstSendTypeText = [[NSMutableDictionary alloc] init];
     }
-    [dicClipFirstSendTypeText setObject:@"1" forKey:nsNumbGuId];
+    [dicClipFirstSendTypeText setObject:@true forKey:nsNumbGuId];
     //NSLog(@"dicValue : %@", dicClipFirstSendTypeText);
 }
 
@@ -210,13 +210,26 @@
             {
                 NSArray *array = [pasteBoard readObjectsForClasses:@[[NSImage class]] options:nil];
                 NSImage *img = [array objectAtIndex:0];
-                [img lockFocus];
-                NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, img.size.width, img.size.height)];
-                [img unlockFocus];
-                
-                [img addRepresentation:rep];
-                //pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
-                pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
+
+                //배경색을 White로 하고 다시 그림
+                NSSize imageSize = [img size];
+                NSImage* background = [[NSImage alloc] initWithSize:imageSize];
+
+                [background lockFocus];
+                [[NSColor whiteColor] setFill];
+
+                [NSBezierPath fillRect:NSMakeRect(0, 0, imageSize.width, imageSize.height)];
+                [background unlockFocus];
+
+                NSImage *newImage = [[NSImage alloc] initWithSize:imageSize];
+                [newImage lockFocus];
+                CGRect newImageRect = CGRectZero;
+                newImageRect.size = [newImage size];
+                [background drawInRect:newImageRect];
+                [img drawInRect:newImageRect];
+                [newImage unlockFocus];
+
+                pClipData = [newImage TIFFRepresentation];
                 NSLog(@"copy image\n");
                 ((WebWindow*)(SelfThis))->InvokeClipBoard([nsNumbGuId intValue], nDataType, pClipData.length, (const char*)[pClipData bytes], 0, nullptr); 
             }
@@ -240,13 +253,25 @@
                 //TEXT IMAGE 둘 다 가능할 때 처리
                 NSArray *array = [pasteBoard readObjectsForClasses:@[[NSImage class]] options:nil];
                 NSImage *img = [array objectAtIndex:0];
+                //배경색을 White로 하고 다시 그림
+                NSSize imageSize = [img size];
+                NSImage* background = [[NSImage alloc] initWithSize:imageSize];
 
-                [img lockFocus];
-                NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, img.size.width, img.size.height)];
-                [img unlockFocus];
-                
-                [img addRepresentation:rep];
-                pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
+                [background lockFocus];
+                [[NSColor whiteColor] setFill];
+
+                [NSBezierPath fillRect:NSMakeRect(0, 0, imageSize.width, imageSize.height)];
+                [background unlockFocus];
+
+                NSImage *newImage = [[NSImage alloc] initWithSize:imageSize];
+                [newImage lockFocus];
+                CGRect newImageRect = CGRectZero;
+                newImageRect.size = [newImage size];
+                [background drawInRect:newImageRect];
+                [img drawInRect:newImageRect];
+                [newImage unlockFocus];
+
+                pClipData = [newImage TIFFRepresentation];
                 NSLog(@"copy image\n");
 
                 std::string strClipText;

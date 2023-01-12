@@ -1082,15 +1082,15 @@
 
 #if _WINDOWS
 
-    try
-    {
-        if (e.strUrlData != null && e.strUrlData.Length > 0)
-            System.Diagnostics.Process.Start("explorer", e.strUrlData);
-    }
-    catch (Exception ex)
-    {
-        CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-    }
+        try
+        {
+            if (e.strUrlData != null && e.strUrlData.Length > 0)
+                System.Diagnostics.Process.Start("explorer", e.strUrlData);
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+        }
 
 #elif _LINUX
 
@@ -1587,7 +1587,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 else
                     ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, clipData.pMemByte);
 
-                
+
                 //ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, nClipSize, byteArray);
             }
             else
@@ -1900,7 +1900,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             if (CheckClipBoardSendSize(clipData.nGroupId, nClipSize) < 0)
                 return;
-                
+
             SendClipBoardTry(clipData, eClipType, nClipSize);
         }
 
@@ -2139,7 +2139,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             strTitle = fileAddManage.GetConvertTitleDesc(true, strTitle);
             strContents = fileAddManage.GetConvertTitleDesc(true, strContents);*@
 
-    //수신자 목록체크(철자틀림)
+        //수신자 목록체크(철자틀림)
         string stReceiver = "";
         string strDestNetOverData = "";
         int ret = HsCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strTitle, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
@@ -2190,7 +2190,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         int nUserApprPos = sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID));
 
-    string stApprLineSeq = sgApprLineData.GetApprCommaSeqString(strUserSeq);
+        string stApprLineSeq = sgApprLineData.GetApprCommaSeqString(strUserSeq);
         if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
             stApprLineSeq = "";
 
@@ -2228,14 +2228,15 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         string FileName = String.Empty;
         if (Directory.Exists(dirPath) == false) Directory.CreateDirectory(dirPath);
 
-
         if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)
         {
             if (eClipUserSelectType == CLIPTYPE.IMAGE)
             {
                 // 사용자가 image 전송 선택
                 // 클립보드 선택전송일때 처음이 Image 두번째가 Text로 올라옴
-                FileName = Path.Combine(dirPath, DateTime.Now.ToString("yyyyMMddHHmsss") + ".png");
+                FileName = Path.Combine(dirPath, DateTime.Now.ToString("yyyyMMddHHmsss") + ".bmp");
+                if (File.Exists(FileName))
+                    return null;
                 FileStream fs = new FileStream(FileName, FileMode.CreateNew);
                 BinaryWriter bw = new BinaryWriter(fs);
                 bw.Write(clipData.pMemByte, 0, clipData.nLength);
@@ -2279,6 +2280,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             bw.Write(clipData.pMemByte, 0, clipData.nLength);
             bw.Close();
             fs.Close();
+
         }
         else
             return FileName;
@@ -2489,7 +2491,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             MyNavigationManager.NavigateTo(navURI);
     }
 
-    public void LocationChangeHandler(object sender, Point point)
+    public void LocationChangeHandler(object sender, System.Drawing.Point point)
     {
 
     }
