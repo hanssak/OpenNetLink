@@ -165,5 +165,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         
         public bool bUseChkHardSpace { get; set; }         //파일 수신시 디바이스 용량 체크 여부
 
+        public bool bUseLoginAfterTray { get; set; }  //로그인 후 Tray 아이콘으로 이동
+
     }
 }

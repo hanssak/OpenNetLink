@@ -167,5 +167,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public List<bool> bUseOver1Auth { get; set; } = null;                    // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
 
+        public bool bUseLoginAfterTray { get; set; }  //로그인 후 Tray 아이콘으로 이동
+
     }
 }

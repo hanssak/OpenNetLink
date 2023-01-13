@@ -272,6 +272,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns></returns>
         public bool GetUsePartialFileAddInTransfer();
 
+        public bool GetUseLoginAfterTray();
 
         public string GetApproveExtSelectType();
 
@@ -882,6 +883,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseCheckHardSpace()
         {
             return AppConfigInfo.bUseChkHardSpace;
+        }
+
+        public bool GetUseLoginAfterTray()
+        {
+            return AppConfigInfo.bUseLoginAfterTray;
         }
 
         public string GetApproveExtSelectType()

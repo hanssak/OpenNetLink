@@ -186,7 +186,7 @@
 
         if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
         {
-            if(SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(refSGAlert.groupId))
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(refSGAlert.groupId))
             {
                 if (doADLoginLocalCheck(refSGAlert.groupId))
                 {
@@ -890,7 +890,7 @@
 
                     SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
 
-                    pageService.ConnectCountAdd(groupId);
+                    //pageService.ConnectCountAdd(groupId);
                     pageService.SetConnectStatus(groupId, true);
                     pageService.SetLogoutStatus(groupId, false);
 
@@ -1129,7 +1129,7 @@
                     {
 
                     }
-                    else // ID/PW 
+                    else // ID/PW
                     {
                         if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupId) == true)
                         {
@@ -1188,23 +1188,6 @@
 
                     // Clipboard 단축키 및 HeaderUI에서 바로 클립보드를 전송할 수 있으므로 사후결재 관련 현재상태값을 로그인후 바로 저장
                     SaveAfterApproveCheckBoxStatus(groupId);
-
-                    if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
-                    {
-                        if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
-                        {
-                            string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                            string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
-                            Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
-                            Window.MoveWebWindowToTray();
-                        }
-                        else
-                            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-                    }
-                    else
-                    {
-                        Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-                    }
 
                     CtrlSideEvent ctrlSideEvent = null;
                     ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
@@ -1430,6 +1413,25 @@
                 MoveSiderBarFocusTogroupid(nGroupIDfirst);
 
                 CLog.Here().Information($"LoginResultOnetoAll - IDPW Check - GroupID : {groupId}, Saved-GroupID : {nGroupIDfirst}, Ret : {ret}, END!");
+
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray()) //(SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
+                {
+                    if (pageService.GetConnectCount(nGroupIDfirst) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
+                    {
+                        string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                        string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
+                        Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                        Window.MoveWebWindowToTray();
+                    }
+                    else
+                        Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                }
+                else
+                {
+                    Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                }
+
+                pageService.ConnectCountAdd(nGroupIDfirst);
 
             } // if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && nGroupIDfirst > -1 && groupId == nGroupIDfirst)
         }
@@ -1859,7 +1861,7 @@
             MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
             //if (AppConfigSvc.GetStartTrayMove())
-            if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray())
             {
                 if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                 {
