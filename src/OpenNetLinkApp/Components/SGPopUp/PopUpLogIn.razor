@@ -68,7 +68,7 @@
                                 </div>
                             }
                             <div class="row">
-                                @if (nGroupID > -1 && bAutoLogin && eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
+                                @if (nGroupID > -1 && bAutoLogin && eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
                                 {
                                     <div class="col-12 pt-1 pr-4 text-right ">
                                         <div class="icheck-primary">
@@ -172,6 +172,7 @@
     private void SessionAlertCancelpopup()
     {
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+        bUIBtnDisable = false;
         //refSGloginDuplicate.closePopUp();
         initUIdata();
     }
