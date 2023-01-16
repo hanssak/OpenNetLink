@@ -42,7 +42,7 @@
   "bEmptyfileTrans": true,
 
   "bUserPWChange": true,
-  "strInitPasswd": "1K27SdexltsW0ubSCJgsZw==",
+  "strInitPasswd": "XcLIVyZobkjsRoJWbe1rLg==",
   "strPWChangeProhibitLimit": "",
   "nPWChangeApplyCnt": 9,
 
@@ -69,17 +69,17 @@
 
   "bUseClipBoardFileTrans": true,
   "bUseFileClipManageUI": true,
-  "bUseFileClipApproveUI": true,
+  "bUseFileClipApproveUI": false,
 
   "bScreenLockUserChange": true,
-  "bScreenLock": false,
+  "bScreenLock": true,
 
   "enMainPageType": 0,
   "bNoApproveManageUI": false,
   "bStartProgramReg": true,
   "bTitleDescSameChk": false,
 
-  "bUseFileCheckException": true,
+  "bUseFileCheckException": false,
   "bUseNetOverAllsend": false,
   "listUseGpkiLogin": [
     false,
@@ -111,10 +111,10 @@
   "bUseClipCopyAndSend": false,
   "bClipCopyAutoSend": false,
 
-  "bUseCloseTrayMove": false,
-  "bExitTrayMove": false,
+  "bUseCloseTrayMove": true,
+  "bExitTrayMove": true,
 
-  "bUseStartTrayMove": false,
+  "bUseStartTrayMove": true,
   "bStartTrayMove": false,
 
   "bUseFileForward": true,
@@ -134,5 +134,5 @@
     false,
     false
   ],
-  "bUseLoginAfterTray" : false
+  "bUseLoginAfterTray": false
 }

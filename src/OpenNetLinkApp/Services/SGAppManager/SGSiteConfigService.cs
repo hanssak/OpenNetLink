@@ -425,7 +425,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUserPWChange = false;                   // 사용자 패스워드 변경 사용 여부.
                 sgSiteConfig.m_strPWChangeProhibitLimit = "";           // 패스워드 사용금지 문자열 지정.
                 sgSiteConfig.m_nPWChangeApplyCnt = 9;                   // 패스워드 변경 시 허용되는 자리수 지정.
-                sgSiteConfig.m_strInitPasswd = "1K27SdexltsW0ubSCJgsZw=="; // hsck@2301
+                sgSiteConfig.m_strInitPasswd = "XcLIVyZobkjsRoJWbe1rLg=="; // hsck@2301
 
                 sgSiteConfig.m_bUseScreenLock = true;                   // 화면잠금 사용유무 값설정
                 sgSiteConfig.m_bRecvFolderChange = true;                // 수신폴더 변경 사용 여부
@@ -457,7 +457,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUseClipBoardFileTrans = true;           // 클립보드 파일형태 전송 사용유무
 
                 sgSiteConfig.m_bUseFileClipManageUI = true;             // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
-                sgSiteConfig.m_bUseFileClipApproveUI = true;            // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
+                sgSiteConfig.m_bUseFileClipApproveUI = false;            // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
 
                 sgSiteConfig.m_bUseClipTypeSelectSend = true;           // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
                 sgSiteConfig.m_bUseClipTypeTextFirstSend = true;        // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
