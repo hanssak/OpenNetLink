@@ -378,7 +378,7 @@
                 MoveSiderBarFocusTogroupid();
 
                 //if (groupID ==0 && AppConfigSvc.GetStartTrayMove())
-                if (groupID == 0 && SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
+                if (groupID == 0 && SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray())
                 {
                     if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
                     {
@@ -443,7 +443,7 @@
             MyNavigationManager.NavigateTo(strNavigateWithGroupID);
             MoveSiderBarFocusTogroupid();
             //if (AppConfigSvc.GetStartTrayMove())
-            if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray())
             {
                 if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
                 {
@@ -550,7 +550,7 @@
         //Main에서 Tray일 경우 페이지 이동
         if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
-            if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray())
             {
                 if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
                 {
