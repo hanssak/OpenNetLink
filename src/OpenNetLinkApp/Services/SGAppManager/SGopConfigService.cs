@@ -225,6 +225,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns></returns>
         public bool GetUsePartialFileAddInTransfer();
 
+        public bool GetUseLoginAfterTray();
+
+        public string GetApproveExtSelectType();
+
+        public bool GetUseApproveExt();
+
+        public bool GetUseInputSearchApproveExtTree();
 
         /// <summary>
         /// 알람 초기화 매일 자정마다
@@ -789,6 +796,26 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseCheckHardSpace()
         {
             return AppConfigInfo.bUseChkHardSpace;
+        }
+
+        public bool GetUseLoginAfterTray()
+        {
+            return AppConfigInfo.bUseLoginAfterTray;
+        }
+
+        public string GetApproveExtSelectType()
+        {
+            return AppConfigInfo.strApproveExtApproverSearchType;
+        }
+
+        public bool GetUseApproveExt()
+        {
+            return AppConfigInfo.bUseApproveExt;
+        }
+
+        public bool GetUseInputSearchApproveExtTree()
+        {
+            return AppConfigInfo.bUseInputSearchApproveExtTree;
         }
 
         public bool GetUseInitAlarmPerDay()
