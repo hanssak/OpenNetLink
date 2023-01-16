@@ -815,7 +815,7 @@ namespace OpenNetLinkApp.Services
                     break;
                 case 2103:                                                              // filemime.conf
                     FileMimeRecvEvent fileMimeRecvEvent = sgPageEvent.GetFileMimeRecvEvent();
-                    if(fileMimeRecvEvent != null)
+                    if (fileMimeRecvEvent != null)
                     {
                         fileMimeRecvEvent(groupId);
                     }
@@ -1811,6 +1811,35 @@ namespace OpenNetLinkApp.Services
             //m_DicFileSending[groupid] = bSending;
         }
 
+
+        /// <summary>
+        /// 다중망 시점으로 모든 연결망 중 파일 송신중인 것이 존재하는 지 확인
+        /// </summary>
+        /// <returns></returns>
+        public bool GetFileSending()
+        {
+            bool isSending = false;
+            foreach (int key in m_DicFileSending.Keys)
+            {
+                isSending = isSending || m_DicFileSending[key];
+            }
+            return isSending;
+        }
+
+        /// <summary>
+        /// 다중망 시점으로 모든 연결망 중 파일 수신중인 것이 존재하는 지 확인
+        /// </summary>
+        /// <returns></returns>
+        public bool GetFileRecving()
+        {
+            bool isRecving = false;
+            foreach (int key in m_DicFileRecving.Keys)
+            {
+                isRecving = isRecving || m_DicFileRecving[key];
+            }
+            return isRecving;
+        }
+
         /// <summary>
         /// 다운로드 경로 설정하기
         /// </summary>
@@ -2324,7 +2353,7 @@ namespace OpenNetLinkApp.Services
             return nRet;
         }
 
-        public int ContinueSendFileTrans(int groupid, Dictionary<string,string> values, string strNetOver3info, string hszFileName, int currentFileSize)
+        public int ContinueSendFileTrans(int groupid, Dictionary<string, string> values, string strNetOver3info, string hszFileName, int currentFileSize)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);

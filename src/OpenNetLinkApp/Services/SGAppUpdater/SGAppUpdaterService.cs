@@ -36,6 +36,8 @@ using OpenNetLinkApp.Components.SGUpdate;
 
 namespace OpenNetLinkApp.Services.SGAppUpdater
 {
+    /// <summary>업데이트 패치 버전 설치 직전 화면 노티</summary>
+    public delegate void StartPatchNotiHandler(string version);
     /// <summary>
     /// Class to communicate with a sparkle-based appcast to download
     /// and install updates to an application
@@ -421,8 +423,10 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         bool IsCancelRequested { get; set; }
         bool IsCanceled { get; set; }
 
+        // HSCmdCenter _HSCmdCenter { get; set; }
+
         /* To Function Features */
-        void Init(string updateSvcIP, string updatePlatform);
+        void Init(string updateSvcIP, string updatePlatform, HSCmdCenter hSCmdCenter);
         void CheckUpdatesClick(SGCheckUpdate sgCheckUpdate = null,
                                 SGAvailableUpdate sgAvailableUpdate = null,
                                 SGDownloadUpdate sgDownloadUpdate = null,
@@ -442,16 +446,18 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         void CBFullUpdateStartedDownloading(AppCastItem item, string path);
         void CBFullUpdateDownloadFileIsReady(AppCastItem item, string downloadPath);
         void CBFullUpdateCloseApplication();
-        /// <summary>
-        /// 별도 팝업 없이 자동 업데이트
-        /// </summary>
+
+        /// <summary>별도 팝업 없이 자동 업데이트</summary>
         void CheckUpdateBackgroundDown();
+        /// <summary>패치파일 업데이트 알림</summary>
+        void SetStartPatchNotiEventAdd(StartPatchNotiHandler e);
     }
+
     internal class SGAppUpdaterService : ISGAppUpdaterService
     {
         private Serilog.ILogger CLog => Serilog.Log.ForContext<SGAppUpdaterService>();
         public SGAppUpdaterService() { }
-        public void Init(string updateSvcIP, string updatePlatform)
+        public void Init(string updateSvcIP, string updatePlatform, HSCmdCenter hSCmdCenter)
         {
             CLog.Here().Information($"- AppUpdaterService Initializing... : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
             //SparkleInst = new SparkleUpdater($"https://{updateSvcIP}/NetSparkle/files/sample-app/appcast.xml", new DSAChecker(SecurityMode.Strict))
@@ -467,6 +473,9 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             SparkleInst.SecurityProtocolType = System.Net.SecurityProtocolType.Tls12;
             (SparkleInst.AppCastDataDownloader as WebRequestAppCastDataDownloader).TrustEverySSLConnection = true;
             SparkleInst.LogWriter = new SGAppUpdaterLogWriter();
+
+            //파일 송수신 상태를 알기 위해 참조
+            _HSCmdCenter = hSCmdCenter;
 
             CLog.Here().Information($"- AppUpdaterService Initializing...Done : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
         }
@@ -486,6 +495,12 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         public SGDownloadUpdate DownloadUpdate { get; private set; } = null;
         public SGFinishedDownload FinishedDownload { get; private set; } = null;
         public SGMessageNotification MessageNotification { get; private set; } = null;
+        private HSCmdCenter _HSCmdCenter { get; set; } = null;
+
+        /// <summary>HeaderUI에 패치 설치를 알립니다. </summary>
+        StartPatchNotiHandler StartPatchNotiEvent { get; set; } = null;
+        /// <summary>패치파일 업데이트 알림</summary>
+        public void SetStartPatchNotiEventAdd(StartPatchNotiHandler e) => StartPatchNotiEvent = e;
 
         /* To Function Features */
         public async void CheckUpdatesClick(SGCheckUpdate sgCheckUpdate = null,
@@ -573,6 +588,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
 
         public int LastProgressPercentage { get; private set; } = 0;
+
+
         public async void CBDownloadMadeProgress(object sender, AppCastItem item, ItemDownloadProgressEventArgs e)
         {
             await Task.Run(() =>
@@ -681,6 +698,25 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
         public async void InstallUpdateClick()
         {
+            //파일 송/수신 중일땐 업데이트 Skip
+            if (_HSCmdCenter.GetFileRecving())
+            {
+                CLog.Here().Information($"AppUpdaterService - InstallUpdate Skip : File Recving");
+                return;
+            }
+
+            if (_HSCmdCenter.GetFileSending())
+            {
+                CLog.Here().Information($"AppUpdaterService - InstallUpdate Skip : File Sending");
+                return;
+            }
+
+            string patchVersion = UpdateInfo.Updates.First().Version;
+            StartPatchNotiEvent(patchVersion);
+
+            //5초  noti 표시 후 업데이트 진행
+            await Task.Delay(5000);
+
             await Task.Run(() =>
             {
                 CLog.Here().Information($"AppUpdaterService - InstallUpdate : [ Install for Update [{DownloadPath}] ]");
@@ -712,6 +748,20 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             //MessageNotification = sgMessageNotification;
 
             CLog.Here().Information($"AppUpdaterService - CheckUpdatesAutomatically : [ Checking for updates... ]");
+
+            //파일 송/수신 중일땐 업데이트 Skip
+            if (_HSCmdCenter.GetFileRecving())
+            {
+                CLog.Here().Information($"AppUpdaterService - CheckUpdatesAutomatically Skip : File Recving");
+                return;
+            }
+
+            if (_HSCmdCenter.GetFileSending())
+            {
+                CLog.Here().Information($"AppUpdaterService - CheckUpdatesAutomatically Skip : File Sending");
+                return;
+            }
+
             // CheckUpdate?.OpenPopUp();
             UpdateInfo = await SparkleInst.CheckForUpdatesQuietly();
             await Task.Delay(1000);
@@ -766,12 +816,12 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             CLog.Here().Information($"- InitializeBackgroundUpdate...");
             SelfReleaseNotesGrabber _ReleaseNotesGrabber = null;
             AppCastItem latestVersion = null;
-            
+
             await Task.Run(() =>
             {
                 _ReleaseNotesGrabber = new SelfReleaseNotesGrabber(separatorTemplate, headAddition, sparkle);
 
-                AppCastItem item = items.FirstOrDefault();              
+                AppCastItem item = items.FirstOrDefault();
                 latestVersion = items.OrderByDescending(p => p.Version).FirstOrDefault();
             });
 
@@ -789,7 +839,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 // RunFullUpdateUpdateStatusLabel.Text = "Checking for update...";
                 CLog.Here().Information($"AppUpdaterService - UpdateAutomatically : [ Checking for updates... ]");
 
-                SparkleInst.UserInteractionMode = UserInteractionMode.DownloadAndInstall;
+                //자동으로 프로그램이 종료되는 걸 방지하기 위해, DownloadAndInstall 모드 OFF
+                //SparkleInst.UserInteractionMode = UserInteractionMode.DownloadAndInstall;
                 SparkleInst.UpdateDetected -= CBFullUpdateUpdateDetected;
                 SparkleInst.UpdateDetected += CBFullUpdateUpdateDetected;
 
