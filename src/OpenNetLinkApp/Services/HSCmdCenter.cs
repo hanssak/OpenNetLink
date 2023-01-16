@@ -1821,6 +1821,7 @@ namespace OpenNetLinkApp.Services
             bool isSending = false;
             foreach (int key in m_DicFileSending.Keys)
             {
+                Console.WriteLine($"GetFileSending - [{key} / {m_DicFileSending[key]}]");
                 isSending = isSending || m_DicFileSending[key];
             }
             return isSending;
@@ -1835,6 +1836,7 @@ namespace OpenNetLinkApp.Services
             bool isRecving = false;
             foreach (int key in m_DicFileRecving.Keys)
             {
+                Console.WriteLine($"GetFileRecving - [{key} / {m_DicFileRecving[key]}]");
                 isRecving = isRecving || m_DicFileRecving[key];
             }
             return isRecving;

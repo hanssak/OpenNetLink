@@ -38,6 +38,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 {
     /// <summary>업데이트 패치 버전 설치 직전 화면 노티</summary>
     public delegate void StartPatchNotiHandler(string version);
+
     /// <summary>
     /// Class to communicate with a sparkle-based appcast to download
     /// and install updates to an application
@@ -451,6 +452,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         void CheckUpdateBackgroundDown();
         /// <summary>패치파일 업데이트 알림</summary>
         void SetStartPatchNotiEventAdd(StartPatchNotiHandler e);
+        bool isAvaiableUpdateStart { get; set; }
     }
 
     internal class SGAppUpdaterService : ISGAppUpdaterService
@@ -502,6 +504,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         /// <summary>패치파일 업데이트 알림</summary>
         public void SetStartPatchNotiEventAdd(StartPatchNotiHandler e) => StartPatchNotiEvent = e;
 
+        public bool isAlreadyUpdateStart { get; private set; } = false;
+
         /* To Function Features */
         public async void CheckUpdatesClick(SGCheckUpdate sgCheckUpdate = null,
                                             SGAvailableUpdate sgAvailableUpdate = null,
@@ -509,6 +513,14 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                                             SGFinishedDownload sgFinishedDownload = null,
                                             SGMessageNotification sgMessageNotification = null)
         {
+
+            if (!isAlreadyUpdateStart)
+            {
+                CLog.Here().Information($"AppUpdaterService - CheckUpdates :이미 업데이트가 진행중입니다. :( ]");
+                MessageNotification?.OpenPopUp("이미 업데이트가 진행중입니다. :(");
+                return;
+            }
+
             CheckUpdate = sgCheckUpdate;
             AvailableUpdate = sgAvailableUpdate;
             DownloadUpdate = sgDownloadUpdate;
@@ -560,6 +572,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
         public async void DownloadUpdateClick()
         {
+            isAlreadyUpdateStart = true;
             await Task.Run(() =>
             {
                 CLog.Here().Information($"AppUpdaterService - DownloadUpdate : [ Download for Update... ]");
@@ -665,6 +678,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 }
                 else
                 {
+                    isAlreadyUpdateStart = false;
+
                     string DownloadLog = string.Format($"{item.AppName} {item.Version} Force Cancel downloading! : [{path}]");
                     SparkleInst.LogWriter.PrintMessage(DownloadLog);
 
@@ -698,17 +713,28 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
         public async void InstallUpdateClick()
         {
-            //파일 송/수신 중일땐 업데이트 Skip
+            //파일 송/수신 중일땐 업데이트 대기 후 처리
             if (_HSCmdCenter.GetFileRecving())
             {
-                CLog.Here().Information($"AppUpdaterService - InstallUpdate Skip : File Recving");
-                return;
+                while (true)
+                {
+                    if (!_HSCmdCenter.GetFileRecving())
+                        break;
+                    CLog.Here().Information($"AppUpdaterService - InstallUpdate Wait : File Recving");
+                    Thread.Sleep(2000);
+                }
             }
 
             if (_HSCmdCenter.GetFileSending())
             {
-                CLog.Here().Information($"AppUpdaterService - InstallUpdate Skip : File Sending");
-                return;
+                while (true)
+                {
+                    if (!_HSCmdCenter.GetFileSending())
+                        break;
+
+                    CLog.Here().Information($"AppUpdaterService - InstallUpdate Wait : File Sending");
+                    Thread.Sleep(2000);
+                }
             }
 
             string patchVersion = UpdateInfo.Updates.First().Version;
@@ -752,14 +778,25 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             //파일 송/수신 중일땐 업데이트 Skip
             if (_HSCmdCenter.GetFileRecving())
             {
-                CLog.Here().Information($"AppUpdaterService - CheckUpdatesAutomatically Skip : File Recving");
-                return;
+                while (true)
+                {
+                    if (!_HSCmdCenter.GetFileRecving())
+                        break;
+                    CLog.Here().Information($"AppUpdaterService - CheckUpdatesAutomatically Wait : File Recving");
+                    Thread.Sleep(2000);
+                }
             }
 
             if (_HSCmdCenter.GetFileSending())
             {
-                CLog.Here().Information($"AppUpdaterService - CheckUpdatesAutomatically Skip : File Sending");
-                return;
+                while (true)
+                {
+                    if (!_HSCmdCenter.GetFileSending())
+                        break;
+
+                    CLog.Here().Information($"AppUpdaterService - CheckUpdatesAutomatically Wait : File Sending");
+                    Thread.Sleep(2000);
+                }
             }
 
             // CheckUpdate?.OpenPopUp();
