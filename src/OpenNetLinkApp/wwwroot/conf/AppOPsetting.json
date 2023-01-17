@@ -1,138 +1,113 @@
 {
-
-  "bUseAppLoginType": false,
   "LoginType": 0,
-
-  "bUseLogLevel": true,
-
-  "bShowAdminInfo": false,
-
-  "bUseLanguageSet": false,
-
-  "bUseMainPageType": true,
-
-  "bUseStartProgramReg": false,
-
-  "bManualDownFolderChange": false,
-  "bManualRecvDownChange": false,
-
-  "bRFileAutoSend": false,
-  "bRMouseFileAddAfterTrans": false,
-
-  "bShowAfterApprAutoCheck": true,
   "bAfterBasicChk": false,
-
-  "bFileRecvAlarmRetain": false,
-  "bApprCountAlarmRetain": false,
   "bApprCompleteAlarmRetain": false,
+  "bApprCountAlarmRetain": false,
+  "bApprDeptSearch": true,
+  "bApprLineChkBlock": false,
+  "bApprLineLocalSave": true,
   "bApprRejectAlarmRetain": false,
-  "bUseApprCountAlaram": false,
-
-  "bFileRecvTrayFix": false,
-  "bUserApprActionTrayFix": false,
-  "bUserApprRejectTrayFix": false,
-
   "bApprTrayFix": true,
-  "bUseApprWaitNoti": true,
-
-
-  "bUserIDSave": false,
   "bAutoLogin": true,
   "bAutoLoginCheck": true,
+  "bClipBoardNoApproveButFileTrans": true,
+  "bClipCopyAutoSend": false,
   "bEmptyfileTrans": true,
-
-  "bUserPWChange": true,
-  "strInitPasswd": "XcLIVyZobkjsRoJWbe1rLg==",
-  "strPWChangeProhibitLimit": "",
-  "nPWChangeApplyCnt": 9,
-
-  "bURLAutoTrans": [
-    true,
-    false,
-    false
-  ],
-  "strURLAutoAfterBrowser": [
-    "F",
-    "F",
-    "F"
-  ],
+  "bExitTrayMove": true,
+  "bFileDownloadBeforeReciving": false,
+  "bFileRecvAlarmRetain": false,
+  "bFileRecvTrayFix": false,
+  "bManualDownFolderChange": false,
+  "bManualRecvDownChange": false,
+  "bNoApproveManageUI": false,
+  "bRFileAutoSend": false,
+  "bRMouseFileAddAfterTrans": false,
+  "bRecvFolderChange": true,
+  "bRecvFolderOpen": false,
+  "bScreenLock": false,
+  "bScreenLockUserChange": true,
+  "bShowAdminInfo": false,
+  "bShowAfterApprAutoCheck": true,
+  "bStartProgramReg": true,
+  "bStartTrayMove": false,
+  "bTitleDescSameChk": false,
   "bURLAutoAfterMsg": [
     true,
     true,
     true
   ],
-  "strForwardUrl": [
-    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
-    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
-    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html"
-  ],
-
-  "bUseClipBoardFileTrans": true,
-  "bUseFileClipManageUI": true,
-  "bUseFileClipApproveUI": false,
-
-  "bScreenLockUserChange": true,
-  "bScreenLock": true,
-
-  "enMainPageType": 0,
-  "bNoApproveManageUI": false,
-  "bStartProgramReg": true,
-  "bTitleDescSameChk": false,
-
-  "bUseFileCheckException": false,
-  "bUseNetOverAllsend": false,
-  "listUseGpkiLogin": [
-    false,
+  "bURLAutoTrans": [
+    true,
     false,
     false
   ],
-  "bClipBoardNoApproveButFileTrans": true,
-  "bUseDenyPasswordZip": true,
-  "bRecvFolderChange": true,
-  "bUseCertSend": false,
-  "bUseEmail": false,
-  "bUseForceUpdate": true,
-  "bUsePCURL": false,
-  "bUsePublicBoard": false,
-  "bUseUserRecvDownPath": false,
-  "bUseUserSelectFirstServer": true,
-  "bViewDlpApproverSelectMyDept": false,
-  "bViewFileFilter": true,
-  "bViewSGHeaderUIAlarmNoriAllDel": true,
-  "bViewSGSideBarUIBadge": true,
-  "nClipAfterApproveUseType": 2,
-  "bUseOneToMultiLogin": false,
-  "bUseOneByOneLogOut": false,
-  "bApprDeptSearch": true,
-  "bApprLineChkBlock": false,
-  "bApprLineLocalSave": true,
-
-  "bUseClipAlarmType": true,
-  "bUseClipCopyAndSend": false,
-  "bClipCopyAutoSend": false,
-
-  "bUseCloseTrayMove": true,
-  "bExitTrayMove": true,
-
-  "bUseStartTrayMove": true,
-  "bStartTrayMove": false,
-
-  "bUseFileForward": true,
-  "bFileDownloadBeforeReciving": false,
-
-  "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
-
-  "bUsePartialFileAddInTransfer": false,
+  "bUseAppLoginType": false,
+  "bUseApprCountAlaram": false,
+  "bUseApprWaitNoti": true,
+  "bUseCertSend": false,
+  "bUseChkHardSpace": true,
+  "bUseClipAlarmType": true,
+  "bUseClipBoardFileTrans": true,
+  "bUseClipCopyAndSend": false,
+  "bUseCloseTrayMove": true,
+  "bUseDenyPasswordZip": true,
+  "bUseEmail": false,
+  "bUseFileCheckException": false,
+  "bUseFileClipApproveUI": false,
+  "bUseFileClipManageUI": true,
+  "bUseFileExceptionDescCheck": true,
+  "bUseFileForward": true,
+  "bUseForceBackgroundUpdate": false,
+  "bUseForceUpdate": true,
   "bUseInitAlarmPerDay": false,
   "bUseInitMessagePerDay": false,
-  "bVisiblePolicyUpdateButton": true,
-  "bUseForceBackgroundUpdate": false,
-  "bUseChkHardSpace": true,
+  "bUseLanguageSet": false,
+  "bUseLogLevel": true,
+  "bUseLoginAfterTray": false,
+  "bUseMainPageType": true,
+  "bUseNetOverAllsend": false,
+  "bUseOneByOneLogOut": false,
+  "bUseOneToMultiLogin": false,
   "bUseOver1Auth": [
     false,
     false,
     false
   ],
-  "bUseLoginAfterTray": false
+  "bUsePCURL": false,
+  "bUsePartialFileAddInTransfer": false,
+  "bUsePublicBoard": false,
+  "bUseStartProgramReg": false,
+  "bUseStartTrayMove": true,
+  "bUseUserRecvDownPath": false,
+  "bUseUserSelectFirstServer": true,
+  "bUserApprActionTrayFix": false,
+  "bUserApprRejectTrayFix": false,
+  "bUserIDSave": false,
+  "bUserPWChange": true,
+  "bViewDlpApproverSelectMyDept": false,
+  "bViewFileFilter": true,
+  "bViewSGHeaderUIAlarmNoriAllDel": true,
+  "bViewSGSideBarUIBadge": true,
+  "bVisiblePolicyUpdateButton": true,
+  "enMainPageType": 0,
+  "listUseGpkiLogin": [
+    false,
+    false,
+    false
+  ],
+  "nClipAfterApproveUseType": 2,
+  "nPWChangeApplyCnt": 9,
+  "strForwardUrl": [
+    "file:\/Applications\/OpenNetLinkApp.app\/Contents\/MacOS\/wwwroot\/Web\/WebLinkInfo.html",
+    "file:\/Applications\/OpenNetLinkApp.app\/Contents\/MacOS\/wwwroot\/Web\/WebLinkInfo.html",
+    "file:\/Applications\/OpenNetLinkApp.app\/Contents\/MacOS\/wwwroot\/Web\/WebLinkInfo.html"
+  ],
+  "strInitPasswd": "XcLIVyZobkjsRoJWbe1rLg==",
+  "strPWChangeProhibitLimit": "",
+  "strURLAutoAfterBrowser": [
+    "F",
+    "F",
+    "F"
+  ]
 }
