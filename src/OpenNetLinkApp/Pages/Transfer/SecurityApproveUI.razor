@@ -237,7 +237,7 @@
 <!-- /S. file content -->
 
 <ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
-<SGSecureReject @ref="refSGSecureReject"></SGSecureReject>
+<SGReject @ref="refSGSecureReject" Guid="modalSecureReject"></SGReject>
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
 
 @code {
@@ -390,7 +390,7 @@
 
     public bool bAllCheck = false;
 
-    SGSecureReject refSGSecureReject = new SGSecureReject();
+    SGReject refSGSecureReject;
 
     private void UpdateList(int pageNumber)
     {
@@ -615,7 +615,8 @@
         strApprKindValue = strTotal;
         strApprStatusValue = strTotal;
     }
-    public void ApproveAction()
+
+    public async Task ApproveAction()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -639,14 +640,46 @@
             return;
         }
 
+        if (!SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason())
+        {
 
+            SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+            string strUserID = "";
+            if (sgLoginData != null)
+                strUserID = sgLoginData.GetUserID();
+
+            string strProcID = "A";
+            string strReason = "Approve";
+            string strApproveSeqs = "";
+            for (int i = 0; i < ListData.Count; i++)
+            {
+                if (ListData[i].bCheck == true)
+                {
+                    string temp = (ListData[i].ApprSeq + '\u0002');
+                    strApproveSeqs += temp;
+                }
+            }
+            string strApprover = "1";
+            string strApproveUserKind = "0";
+
+            HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+        }
+        else
+        {
+            refSGSecureReject.ResetReason(Common.Enums.EnumApproveType.Approve);
+            refSGSecureReject.SetGroupID(groupID);
+            refSGSecureReject.SetApprRejectEvent(ApproveSend);
+            await refSGSecureReject.openPopUp();
+        }
+    }
+
+    public void ApproveSend(int groupID, string strReason)
+    {
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
-
         string strProcID = "A";
-        string strReason = "Approve";
         string strApproveSeqs = "";
         for (int i = 0; i < ListData.Count; i++)
         {
@@ -692,7 +725,7 @@
         }
 
 
-        refSGSecureReject.ResetReason();
+        refSGSecureReject.ResetReason(Common.Enums.EnumApproveType.Reject);
         refSGSecureReject.SetGroupID(groupID);
         refSGSecureReject.SetApprRejectEvent(ApproveRejectSend);
         await refSGSecureReject.openPopUp();

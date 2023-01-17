@@ -47,8 +47,8 @@
                                 <th class="p-2" style="width:50px;">@strPeriod</th>                     <!--기간-->
                                 <td style="width:25%;">
                                     @*<input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker5" readonly="readonly" value=@strFromDay>
-                                            <span class="float-left col-md-1">-</span>
-                                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker6" readonly="readonly" value=@strToDay>*@
+                                        <span class="float-left col-md-1">-</span>
+                                        <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker6" readonly="readonly" value=@strToDay>*@
                                     <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveKind </th>               <!--결재종류-->
@@ -158,7 +158,8 @@
                                     <th style="text-align: center; vertical-align: middle; width: 8%">@strReqApprover</th>                            <!--승인요청자-->
                                     @if (approveTypesfm == 2)
                                     {
-                                        <th style="text-align: center; vertical-align: middle; width: 8%">@strApprover</th>                            <!--승인자-->
+                                        <th style="text-align: center; vertical-align: middle; width: 8%">@strApprover</th>
+ <!--승인자-->
                                     }
                                     <th style="text-align: center; vertical-align: middle; width: 8%">@strApproveStatus</th>                             <!--승인상태-->
                                     <!-- <th style="text-align: center;width:8%">@strFileForward</th> -->                            <!--파일전달-->
@@ -177,29 +178,30 @@
                             <tbody>
                                 @foreach (SGApproveData item in mData)
                                 {
-                                <tr>
-                                    <td style="text-align: center; vertical-align: middle">
-                                        <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                    </td>
-                                    <td style="text-align: center; vertical-align: middle">@item.ApvType</td>
-                                    <td style="text-align: center; vertical-align: middle">@item.TransferType</td>
-                                    <td style="text-align: center; vertical-align: middle">@item.RequesterName</td>
-                                    @if (approveTypesfm == 2)
-                                    {
-                                        <td style="text-align: center; vertical-align: middle">@item.ApproverName</td>  <!--승인자 이름-->
-                                    }
-                                    <td style="text-align: center; vertical-align: middle">@item.ApvStatus</td>
-                                    <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
-                                    @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                                    {
-                                        <th style="text-align: center; vertical-align: middle; width: 11%;">@item.strDestNet</th>
-                                    }
-                                    <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                    <td style="text-align: center; vertical-align: middle">@item.RequestTime</td>
-                                    <td style="text-align: center; vertical-align: middle">@item.ApvTime</td>
-                                    <td style="text-align: center; vertical-align: middle">@item.stDLP</td>
-                                    <td style="text-align: center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                </tr>
+                                    <tr>
+                                        <td style="text-align: center; vertical-align: middle">
+                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        </td>
+                                        <td style="text-align: center; vertical-align: middle">@item.ApvType</td>
+                                        <td style="text-align: center; vertical-align: middle">@item.TransferType</td>
+                                        <td style="text-align: center; vertical-align: middle">@item.RequesterName</td>
+                                        @if (approveTypesfm == 2)
+                                        {
+                                            <td style="text-align: center; vertical-align: middle">@item.ApproverName</td>
+ <!--승인자 이름-->
+                                        }
+                                        <td style="text-align: center; vertical-align: middle">@item.ApvStatus</td>
+                                        <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
+                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                        {
+                                            <th style="text-align: center; vertical-align: middle; width: 11%;">@item.strDestNet</th>
+                                        }
+                                        <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="text-align: center; vertical-align: middle">@item.RequestTime</td>
+                                        <td style="text-align: center; vertical-align: middle">@item.ApvTime</td>
+                                        <td style="text-align: center; vertical-align: middle">@item.stDLP</td>
+                                        <td style="text-align: center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -232,7 +234,7 @@
 
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
 <ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
-<SGReject @ref="refSGReject"></SGReject>
+<SGReject @ref="refSGReject" Guid="modalReject"></SGReject>
 
 @code {
 
@@ -603,7 +605,7 @@
         strApprStatusValue = strTotal;
     }
 
-    public void ApproveAction()
+    public async Task ApproveAction()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -627,27 +629,37 @@
             return;
         }
 
-
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        string strUserID = "";
-        if (sgLoginData != null)
-            strUserID = sgLoginData.GetUserID();
-
-        string strProcID = "A";
-        string strReason = "Approve";
-        string strApproveSeqs = "";
-        for (int i = 0; i < ListData.Count; i++)
+        if (!SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason())
         {
-            if (ListData[i].bCheck == true)
-            {
-                string temp = (ListData[i].ApprSeq + '\u0002');
-                strApproveSeqs += temp;
-            }
-        }
-        string strApprover = "1";
-        string strApproveUserKind = "0";
 
-        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+            SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+            string strUserID = "";
+            if (sgLoginData != null)
+                strUserID = sgLoginData.GetUserID();
+
+            string strProcID = "A";
+            string strReason = "Approve";
+            string strApproveSeqs = "";
+            for (int i = 0; i < ListData.Count; i++)
+            {
+                if (ListData[i].bCheck == true)
+                {
+                    string temp = (ListData[i].ApprSeq + '\u0002');
+                    strApproveSeqs += temp;
+                }
+            }
+            string strApprover = "1";
+            string strApproveUserKind = "0";
+
+            HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+        }
+        else
+        {
+            refSGReject.ResetReason(Common.Enums.EnumApproveType.Approve);
+            refSGReject.SetGroupID(groupID);
+            refSGReject.SetApprRejectEvent(ApproveSend);
+            await refSGReject.openPopUp();
+        }
     }
 
     private async Task ApproveReject()
@@ -679,7 +691,7 @@
             return;
         }
 
-        refSGReject.ResetReason();
+        refSGReject.ResetReason(Common.Enums.EnumApproveType.Reject);
         refSGReject.SetGroupID(groupID);
         refSGReject.SetApprRejectEvent(ApproveRejectSend);
         await refSGReject.openPopUp();
@@ -706,6 +718,29 @@
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
     }
+
+    public void ApproveSend(int groupID, string strReason)
+    {
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        string strUserID = "";
+        if (sgLoginData != null)
+            strUserID = sgLoginData.GetUserID();
+        string strProcID = "A";
+        string strApproveSeqs = "";
+        for (int i = 0; i < ListData.Count; i++)
+        {
+            if (ListData[i].bCheck == true)
+            {
+                string temp = (ListData[i].ApprSeq + '\u0002');
+                strApproveSeqs += temp;
+            }
+        }
+        string strApprover = "1";
+        string strApproveUserKind = "0";
+
+        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+    }
+
     public string GetCheckApprSeq()
     {
         string strApprSeq = "";

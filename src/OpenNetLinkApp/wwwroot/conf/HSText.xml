@@ -2010,12 +2010,19 @@
 
 		<!-- ********************************************* [START] 결재 관리 화면 (T_APPROVE_0000) ********************************************* -->
 
-		<T_APPROVE_APRROVEREASON>
+		<T_APPROVE_REJECTREASON>
 			<KR>반려사유</KR>
 			<JP>返戻理由</JP>
 			<EN>Companion reasons</EN>
 			<CN>驳回理由</CN>
-		</T_APPROVE_APRROVEREASON>
+		</T_APPROVE_REJECTREASON>
+
+    <T_APPROVE_APPROVE_REJECT_REASON>
+      <KR>승인/반려사유</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </T_APPROVE_APPROVE_REJECT_REASON>
 
 		<T_APPROVE_DETAIL>
 			<KR>결재 상세보기</KR>
@@ -8545,6 +8552,13 @@
 			<EN></EN>
 			<CN></CN>
 		</W_0285>
+
+    <W_0286>
+      <KR>승인/반려사유를 입력해주십시오.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </W_0286>
 
 	</WARNING>
 
