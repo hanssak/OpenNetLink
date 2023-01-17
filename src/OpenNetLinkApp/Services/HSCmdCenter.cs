@@ -587,7 +587,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eCLIENTVERSION:                                                       // 업데이트 노티.
-                    UpgradeNotiAfterSend(nRet, sgData);
+                    UpgradeNotiAfterSend(nRet, groupId, sgData);
                     break;
 
                 case eCmdList.eDASHBOARDCOUNT:                                  // 대쉬보드 조회 쿼리 데이터.
@@ -1630,7 +1630,7 @@ namespace OpenNetLinkApp.Services
             }
         }
 
-        public void UpgradeNotiAfterSend(int nRet, SGData data)
+        public void UpgradeNotiAfterSend(int nRet, int groupId, SGData data)
         {
             ClientUpgradeEvent clipUpdate = sgPageEvent.GetClientUpgradeNotiEvent();
             if (clipUpdate != null)
@@ -1638,7 +1638,7 @@ namespace OpenNetLinkApp.Services
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
                 e.strMsg = data.GetBasicTagData("CLIVERSION");
-                clipUpdate(e);
+                clipUpdate(groupId, e);
             }
         }
 

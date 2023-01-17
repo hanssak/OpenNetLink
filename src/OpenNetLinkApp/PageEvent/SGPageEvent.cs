@@ -177,9 +177,9 @@ namespace OpenNetLinkApp.PageEvent
     // 로그인 후 오른쪽 사이드바 환경설정 노티
     public delegate void CtrlSideEvent();
     // 업데이트 노티
-    public delegate void ClientUpgradeEvent(PageEventArgs e);
+    public delegate void ClientUpgradeEvent(int groupid, PageEventArgs e);
     // 업데이트 실행
-    public delegate void ClientUpgradeExeEvent();
+    public delegate void ClientUpgradeExeEvent(int gouprid);
     // 대쉬보드 조회 카운트 노티.
     public delegate void DashBoardCountEvent(int groupid, PageEventArgs e);
     // 대쉬보드 전송요청 카운트 노티.
@@ -1295,18 +1295,38 @@ namespace OpenNetLinkApp.PageEvent
             ctrlSideEvent = ctrlSideNoti;
         }
 
+        /// <summary>
+        /// 노티로 Update 버전 확인 발생
+        /// </summary>
+        /// <returns></returns>
         public ClientUpgradeEvent GetClientUpgradeNotiEvent()
         {
             return ClientUpdate;
         }
+        /// <summary>
+        /// 노티로 Update 버전 확인 발생
+        /// </summary>
+        /// <param name="updateNoti"></param>
         public void SetClientUpgradeNotiEvent(ClientUpgradeEvent updateNoti)
         {
             ClientUpdate = updateNoti;
         }
+        /// <summary>
+        /// 첫 화면에서 BIND의 패치버전 비교 시 발생
+        /// <br>Update Popup에서 처리 시 발생</br>
+        /// <br> 목적지 : SGCtrkSideUI 쪽 Update 버전 확인</br>
+        /// </summary>
+        /// <returns></returns>
         public ClientUpgradeExeEvent GetClientUpgradeExeNotiEvent()
         {
             return ClientUpgreadeExe;
         }
+        /// <summary>
+        /// 첫 화면에서 BIND의 패치버전 비교 시 발생
+        /// <br>Update Popup에서 처리 시 발생</br>
+        /// <br> 목적지 : SGCtrkSideUI 쪽 Update 버전 확인</br>
+        /// </summary>
+        /// <returns></returns>
         public void SetClientUpgradeExeNotiEvent(ClientUpgradeExeEvent updateNoti)
         {
             ClientUpgreadeExe = updateNoti;

@@ -32,7 +32,8 @@ using OpenNetLinkApp.Models.SGUserInfo;
 using OpenNetLinkApp.Models.SGNetwork;
 using OpenNetLinkApp.Models.SGConfig;
 using OpenNetLinkApp.Components.SGUpdate;
-
+using System.Collections.Concurrent;
+using static OpenNetLinkApp.Common.Enums;
 
 namespace OpenNetLinkApp.Services.SGAppUpdater
 {
@@ -428,7 +429,9 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
         /* To Function Features */
         void Init(string updateSvcIP, string updatePlatform, HSCmdCenter hSCmdCenter);
-        void CheckUpdatesClick(SGCheckUpdate sgCheckUpdate = null,
+        /// <summary>공통환경설정에 [업데이트 확인] 버튼 클릭</summary>
+        void CheckUpdatesClick(int groupId,
+                                SGCheckUpdate sgCheckUpdate = null,
                                 SGAvailableUpdate sgAvailableUpdate = null,
                                 SGDownloadUpdate sgDownloadUpdate = null,
                                 SGFinishedDownload sgFinishedDownload = null,
@@ -442,21 +445,43 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         void CBDownloadCanceled(AppCastItem item, string path);
         void InstallUpdateClick();
         void CBCloseApplication();
-        void DownloadUpdateBackground();
+        void DownloadUpdateBackground(int groupId);
         void CBFullUpdateUpdateDetected(object sender, UpdateDetectedEventArgs e);
         void CBFullUpdateStartedDownloading(AppCastItem item, string path);
         void CBFullUpdateDownloadFileIsReady(AppCastItem item, string downloadPath);
         void CBFullUpdateCloseApplication();
 
         /// <summary>별도 팝업 없이 자동 업데이트</summary>
-        void CheckUpdateBackgroundDown();
+        void CheckUpdateBackgroundDown(int groupId);
         /// <summary>패치파일 업데이트 알림</summary>
         void SetStartPatchNotiEventAdd(StartPatchNotiHandler e);
-        bool isAvaiableUpdateStart { get; set; }
+
+        /// <summary>업데이트 진행 상태 세팅</summary>
+        void SetUpdateStatus(UpdateStatusType InProgress);
+
+        /// <summary>업데이트 관리 정보 초기화</br></summary>
+        void SetInitUpdateStatus();
+
+        /// <summary>해당 Groupid의 현재 업데이트 진행 상태</summary>
+        UpdateStatusType GetUpdateStatus();
+
+        /// <summary>해당 상태를 가진 GroupID 반환</summary>
+        //List<(int groupId, UpdateStatusType updateStatus)> GetUpdateStatusIDs(UpdateStatusType status);
+
+        /// <summary>현재 업데이트 진행 중인 GroupID 관리 정보 반환</summary>
+        (UpdateStatusType, int) GetNowUpdateInfo();
+
+        void SetStartUpdateInfo(UpdateStatusType status, int groupId);
     }
 
     internal class SGAppUpdaterService : ISGAppUpdaterService
     {
+        /// <summary>
+        /// 현재 업데이트 중인 GroupID 관리 (업데이트 중복 시도 방지)
+        /// </summary>
+        (UpdateStatusType status, int groupId) nowUpdateInfo = (UpdateStatusType.NONE, -1);
+        //ConcurrentDictionary<int, UpdateStatusType> m_DicGroupIDUpdateStatus = new ConcurrentDictionary<int, UpdateStatusType>();
+
         private Serilog.ILogger CLog => Serilog.Log.ForContext<SGAppUpdaterService>();
         public SGAppUpdaterService() { }
         public void Init(string updateSvcIP, string updatePlatform, HSCmdCenter hSCmdCenter)
@@ -504,23 +529,17 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         /// <summary>패치파일 업데이트 알림</summary>
         public void SetStartPatchNotiEventAdd(StartPatchNotiHandler e) => StartPatchNotiEvent = e;
 
-        public bool isAlreadyUpdateStart { get; private set; } = false;
 
         /* To Function Features */
-        public async void CheckUpdatesClick(SGCheckUpdate sgCheckUpdate = null,
+        /// <summary>공통환경설정에 [업데이트 확인] 버튼 클릭</summary>
+        public async void CheckUpdatesClick(int groupId,
+                                            SGCheckUpdate sgCheckUpdate = null,
                                             SGAvailableUpdate sgAvailableUpdate = null,
                                             SGDownloadUpdate sgDownloadUpdate = null,
                                             SGFinishedDownload sgFinishedDownload = null,
                                             SGMessageNotification sgMessageNotification = null)
         {
-
-            if (!isAlreadyUpdateStart)
-            {
-                CLog.Here().Information($"AppUpdaterService - CheckUpdates :이미 업데이트가 진행중입니다. :( ]");
-                MessageNotification?.OpenPopUp("이미 업데이트가 진행중입니다. :(");
-                return;
-            }
-
+            SetStartUpdateInfo(UpdateStatusType.CHECKING, groupId);
             CheckUpdate = sgCheckUpdate;
             AvailableUpdate = sgAvailableUpdate;
             DownloadUpdate = sgDownloadUpdate;
@@ -544,19 +563,22 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                     {
                         case UpdateStatus.UpdateAvailable:
                             CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ There's an update available! ]");
-                            AvailableUpdate?.OpenPopUp(SparkleInst, UpdateInfo.Updates);
+                            AvailableUpdate?.OpenPopUp(groupId, SparkleInst, UpdateInfo.Updates);
                             break;
                         case UpdateStatus.UpdateNotAvailable:
                             CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ There's no update available :( ]");
                             MessageNotification?.OpenPopUp("There's no update available :(");
+                            SetInitUpdateStatus();
                             break;
                         case UpdateStatus.UserSkipped:
                             CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ The user skipped this update! ]");
                             MessageNotification?.OpenPopUp("The user skipped this update!<br>You have elected to skip this version.");
+                            SetInitUpdateStatus();
                             break;
                         case UpdateStatus.CouldNotDetermine:
                             CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ We couldn't tell if there was an update... ]");
                             MessageNotification?.OpenPopUp("We couldn't tell if there was an update...");
+                            SetInitUpdateStatus();
                             break;
                     }
                 }
@@ -572,7 +594,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
         public async void DownloadUpdateClick()
         {
-            isAlreadyUpdateStart = true;
+            SetUpdateStatus(UpdateStatusType.DOWNLOADING);
             await Task.Run(() =>
             {
                 CLog.Here().Information($"AppUpdaterService - DownloadUpdate : [ Download for Update... ]");
@@ -621,6 +643,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                     }
                     else
                     {
+                        SetInitUpdateStatus();
                         if (IsCanceled == false)
                         {
                             IsCanceled = true;
@@ -636,18 +659,25 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             // Display in progress when error occured -> DownloadInfo.Text = "We had an error during the download process :( -- " + exception.Message;
             await Task.Run(() =>
             {
+                SetInitUpdateStatus();
+
                 string DownloadLog = string.Format($"{item.AppName} {item.Version}, We had an error during the download process :( -- {exception.Message}");
                 CLog.Here().Error(DownloadLog);
                 DownloadUpdate?.ClosePopUp();
                 File.Delete(path);
                 IsCancelRequested = false;
                 IsCanceled = false;
+
             });
         }
         public async void CBStartedDownloading(AppCastItem item, string path)
         {
             await Task.Run(() =>
             {
+                //다운상태에 있던 GroupId 사용
+                List<(int, UpdateStatusType)> currentGroupID = GetUpdateStatusIDs(UpdateStatusType.DOWNLOADING);
+                int groupId = (currentGroupID.Count > 0) ? currentGroupID[0].Item1 : 0;
+
                 IsCancelRequested = false;
                 IsCanceled = false;
                 string DownloadLog = string.Format($"{item.AppName} {item.Version} Started downloading... : [{path}]");
@@ -663,6 +693,10 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             {
                 if (IsCancelRequested == false)
                 {
+                    //다운상태에 있던 GroupId 사용
+                    List<(int, UpdateStatusType)> currentGroupID = GetUpdateStatusIDs(UpdateStatusType.DOWNLOADING);
+                    int groupId = (currentGroupID.Count > 0) ? currentGroupID[0].Item1 : 0;
+
                     string DownloadLog = string.Format($"{item.AppName} {item.Version} Done downloading! : [{path}]");
                     string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>Done downloading!");
 
@@ -678,7 +712,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 }
                 else
                 {
-                    isAlreadyUpdateStart = false;
+                    SetInitUpdateStatus();
 
                     string DownloadLog = string.Format($"{item.AppName} {item.Version} Force Cancel downloading! : [{path}]");
                     SparkleInst.LogWriter.PrintMessage(DownloadLog);
@@ -702,6 +736,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             await Task.Run(() =>
             {
                 CLog.Here().Information($"AppUpdaterService - CBDownloadCanceled : [ {item.AppName} {item.Version} Cancel downloading! : [{path}] ]");
+                SetInitUpdateStatus();
 
                 if (IsCanceled == false)
                 {
@@ -765,8 +800,9 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         /// <summary>
         /// 자동 업데이트 
         /// </summary>
-        public async void CheckUpdateBackgroundDown()
+        public async void CheckUpdateBackgroundDown(int groupId)
         {
+            SetStartUpdateInfo(UpdateStatusType.CHECKING, groupId);
             //CheckUpdate = sgCheckUpdate;
             //AvailableUpdate = sgAvailableUpdate;
             //DownloadUpdate = sgDownloadUpdate;
@@ -820,20 +856,23 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                             DownloadUpdateBackground();
                             // AvailableUpdate?.OpenPopUp(SparkleInst, UpdateInfo.Updates);
                             break;
-                            #region [사용안함]
-                            //case UpdateStatus.UpdateNotAvailable:
-                            //    CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ There's no update available :( ]");
-                            //    // MessageNotification?.OpenPopUp("There's no update available :(");
-                            //    break;
-                            //case UpdateStatus.UserSkipped:
-                            //    CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ The user skipped this update! ]");
-                            //    MessageNotification?.OpenPopUp("The user skipped this update!<br>You have elected to skip this version.");
-                            //    break;
-                            //case UpdateStatus.CouldNotDetermine:
-                            //    CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ We couldn't tell if there was an update... ]");
-                            //    //    MessageNotification?.OpenPopUp("We couldn't tell if there was an update...");
-                            //    break; 
-                            #endregion
+                        #region [사용안함]
+                        //case UpdateStatus.UpdateNotAvailable:
+                        //    CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ There's no update available :( ]");
+                        //    // MessageNotification?.OpenPopUp("There's no update available :(");
+                        //    break;
+                        //case UpdateStatus.UserSkipped:
+                        //    CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ The user skipped this update! ]");
+                        //    MessageNotification?.OpenPopUp("The user skipped this update!<br>You have elected to skip this version.");
+                        //    break;
+                        //case UpdateStatus.CouldNotDetermine:
+                        //    CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ We couldn't tell if there was an update... ]");
+                        //    //    MessageNotification?.OpenPopUp("We couldn't tell if there was an update...");
+                        //    break; 
+                        #endregion
+                        default:
+                            SetUpdateStatus(groupId, false);
+                            break;
                     }
                 }
             });
@@ -869,8 +908,9 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             CLog.Here().Information($"- InitializeBackgroundUpdate...Done");
         }
 
-        public async void DownloadUpdateBackground()
+        public async void DownloadUpdateBackground(int groupId)
         {
+            SetUpdateStatus(groupId, UpdateStatusType.DOWNLOADING);
             await Task.Run(() =>
             {
                 // RunFullUpdateUpdateStatusLabel.Text = "Checking for update...";
@@ -933,6 +973,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         public async void CBFullUpdateCloseApplication()
         {
             //System.Windows.Application.Current.Shutdown();
+            SetUpdateStatus(currentGroupId, false);
             await Task.Delay(2000);
             await Task.Run(() =>
             {
@@ -943,5 +984,61 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 localById.Kill();
             });
         }
+
+        /// <summary>
+        /// 해당 Groupid의 현재 업데이트 진행 상태
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="InProgress"></param>
+        public void SetUpdateStatus(UpdateStatusType InProgress)
+        {
+            if (nowUpdateInfo.groupId <= -1)
+                CLog.Here().Error($"AppUpdaterService - SetUpdateStatus : There is no nowUpdateInfo");
+            else
+            {
+                CLog.Here().Information($"AppUpdaterService - SetUpdateStatus : GroupID[{nowUpdateInfo.groupId}] UpdateStatue[{InProgress.ToString()}]");
+                nowUpdateInfo.status = InProgress;
+
+            }
+        }
+
+        public void SetStartUpdateInfo(UpdateStatusType status, int groupId)
+        {
+            CLog.Here().Information($"AppUpdaterService - SetStartUpdateInfo : GroupID[{groupId}] UpdateStatue[{status.ToString()}]");
+            nowUpdateInfo.status = status;
+            nowUpdateInfo.groupId = groupId;
+        }
+
+        /// <summary>
+        /// 업데이트 관리 정보 초기화
+        /// </summary>
+        public void SetInitUpdateStatus()
+        {
+            CLog.Here().Information($"AppUpdaterService - SetInitUpdateStatus");
+            //m_DicGroupIDUpdateStatus.Clear();
+            
+            nowUpdateInfo.status = UpdateStatusType.NONE;
+            nowUpdateInfo.groupId = -1;
+        }
+
+        /// <summary>
+        /// 현재 업데이트 진행 중인 GroupID 관리 정보 반환
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        public (UpdateStatusType, int) GetNowUpdateInfo() => nowUpdateInfo;
+         //   (m_DicGroupIDUpdateStatus.Count > 0) ? m_DicGroupIDUpdateStatus : null;
+
+        
+
+        ///// <summary>
+        ///// 해당 상태를 가진 GroupID 반환
+        ///// </summary>
+        ///// <param name="status"></param>
+        ///// <returns></returns>
+        //public List<(int groupId, UpdateStatusType updateStatus)> GetUpdateStatusIDs(UpdateStatusType status) => m_DicGroupIDUpdateStatus.Where(grp => grp.Value == status).Select(grp => (grp.Key, grp.Value)).ToList();
+
+
+
     }
 }

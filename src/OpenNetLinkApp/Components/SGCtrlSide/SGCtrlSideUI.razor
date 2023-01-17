@@ -1,6 +1,7 @@
 @using System
 @using System.Collections.Generic
 @using System.Linq
+@using OpenNetLinkApp.Common
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
@@ -559,7 +560,7 @@
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_UPDATE")</div>                                                                                                       <!--업데이트-->
     <div class="ml-2 mb-5 updates">
         <ul class="mb-1  w-100 ">
-            <li><a class="update" @onclick="@(async () => CheckUpdatesClick())" data-toggle="modal" data-target="#modal-checkupdate" style="cursor: pointer;">@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
+            <li><a class="update" @onclick="@(async () => CheckUpdatesClick(SGAppMgrSvc.SideBarUIService.ActiveMenu?.GroupId))" data-toggle="modal" data-target="#modal-checkupdate" style="cursor: pointer;">@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_LASTUPDATE") :  @(GetLastUpdated())</li> <!--마지막 업데이트-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_SOFTWARE_VERSION") :  OpenNetLink @(GetSWVersion())+@(GetSWCommitId())</li> <!--소프트웨어버전-->
         </ul>
@@ -2073,7 +2074,7 @@
                         @*ListModKey.Insert(NetworkInfo.GroupID, bList);
                             ListVKey.Insert(NetworkInfo.GroupID, chData);*@
 
-                    }
+    }
 
 
 
@@ -2113,11 +2114,11 @@
     }
     */
 
-    public async void CheckUpdatesClick()
+    public async void CheckUpdatesClick(int groupId)
     {
         await Task.Run(() =>
         {
-            AppUpdaterSvc.CheckUpdatesClick(refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
+            AppUpdaterSvc.CheckUpdatesClick(groupId, refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
         });
     }
 
@@ -2125,7 +2126,7 @@
     {
         refSGCheckUpdate.OpenPopUp();
     }
-
+    
     public void CloseCheckUpdate()
     {
         refSGCheckUpdate.ClosePopUp();
@@ -2168,20 +2169,25 @@
         refSGMessageNotification.ClosePopUp();
     }
 
-    public async void clientUpgradeExe()
+    /// <summary>
+    /// 
+    /// </summary>
+    public async void clientUpgradeExe(int groupId)
     {
+        AppUpdaterSvc.SetUpdateStatus(groupId, Enums.UpdateStatusType.CHECKING);
+
         if (SGAppMgrSvc.OpConfigInfoService.GetUseForceBackgroundUpdate())
         {
             await Task.Run(() =>
             {
-                AppUpdaterSvc.CheckUpdateBackgroundDown();
+                AppUpdaterSvc.CheckUpdateBackgroundDown(groupId);
             });
         }
         else
         {
             await Task.Run(() =>
             {
-                CheckUpdatesClick();
+                CheckUpdatesClick(groupId);
                 JSRuntime.InvokeAsync<object>("OpenControlSide");
             });
         }

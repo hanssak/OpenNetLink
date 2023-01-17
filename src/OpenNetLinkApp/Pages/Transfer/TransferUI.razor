@@ -1392,11 +1392,11 @@
                         ClientUpgradeExeEvent clientUpdateExe = null;
                         clientUpdateExe = HSCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
                         if (clientUpdateExe != null)
-                            clientUpdateExe();
+                            clientUpdateExe(groupID);
                     }
                     else
                     {
-                        await refUpdate_PopUp.openPopUp();
+                        await refUpdate_PopUp.openPopUp(groupID);
                     }
 
                     return;
