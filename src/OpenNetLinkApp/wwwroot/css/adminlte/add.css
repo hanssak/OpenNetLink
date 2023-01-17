@@ -701,11 +701,11 @@ a.cont1:hover {
     color: #fff;
     padding: .3rem 1rem;
 }
-    .btn-blue-padding1:hover, .btn-blue-padding1.active, .btn-blue-padding1:focus {
-        border-color: #24738d;
-        color: #fff;
-        background-color: #24738d;
-    }
+.btn-blue-padding1:hover, .btn-blue-padding1.active, .btn-blue-padding1:focus {
+    border-color: #24738d;
+    color: #fff;
+    background-color: #24738d;
+}
 
 .btn-green {
   background-color: #68a411;
@@ -729,6 +729,20 @@ a.cont1:hover {
   color: #fff;
   background-color:#8a243b;
 }
+
+.btn-gray {
+    background-color: #9c9c9c;
+    border-color: #9c9c9c;
+    color: #fff;
+    padding: .3rem 1rem;
+}
+
+.btn-gray:hover, .btn-gray.active, .btn-gray:focus {
+    border-color: #575757;
+    color: #fff;
+    background-color: #575757;
+}
+
 
 .btn-navy {
   background-color: #285490;

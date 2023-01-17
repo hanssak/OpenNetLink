@@ -79,7 +79,7 @@ typedef enum enDefineClipType
 {
 	D_CLIP_TEXT 	= 1,
 	D_CLIP_IMAGE 	= 2,
-	D_CLIP_OBJECT 	= 3
+	D_CLIP_OBJECT 	= 3 //Image Or Text 둘다 가능
 } D_CLIP_TYPE;
 
 //

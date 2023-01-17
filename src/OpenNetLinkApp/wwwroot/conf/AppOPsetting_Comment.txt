@@ -188,3 +188,7 @@ bUseInitMessagePerDay : 현 시점을 기준(날짜)으로 이전 메세지 삭�
 bVisiblePolicyUpdateButton : SGHeaderUI 에서 정책업데이트 버튼 보여주는 여부
 						=> true : 보여준다
 						=> false : 보여주지 않는다.
+bUseChkHardSpace : 파일 수신시 디바이스 용량 체크 여부
+
+bUseOver1Auth : AD로그인 실패시, IDPW 로그인시도할수 있게 Login UI 설정 및 동작(자동로그인X)
+

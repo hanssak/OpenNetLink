@@ -93,7 +93,7 @@
                                 </td>
 
 
-                                @if (bUseDlpSearchView)
+                                @if (bUseDlpDataView)
                                 {
                                     <th class="p-2"> @strDlpInfo </th> <!-- 개인정보 -->
                                     <td>
@@ -191,7 +191,7 @@
                                         <th style="text-align:center; vertical-align:middle;width:6%;">@strApproveKind</th>     <!--결재종류-->
                                         <th style="text-align:center; vertical-align:middle;width:6%;">@strTransferKind</th>    <!--발송구분-->
 
-                                        @if (bUseDlpSearchView)
+                                        @if (bUseDlpDataView)
                                         {
                                             <th style="text-align:center; vertical-align:middle;width:6%;">@strDlpInfo</th>     <!-- 개인정보 -->
                                         }
@@ -215,8 +215,8 @@
                                             <td style="text-align:center; vertical-align: middle">@item.ApvType</td>
                                             <td style="text-align:center; vertical-align: middle">@item.TransferType</td>
 
-                                            @if (bUseDlpSearchView)
-                                            { 
+                                            @if (bUseDlpDataView)
+                                            {
                                                 <td style="text-align:center; vertical-align: middle">@item.stDLP</td>
                                             }
 
@@ -360,7 +360,7 @@
 
     ISGSideBarUIService SideBarUISvc;
 
-    public bool bUseDlpSearchView = true;
+    public bool bUseDlpDataView = true;
     private string strEmailTranSeq = "";    // 상세보기에서 transSeq 값임시저장용도
 
     // 목적지 Data
@@ -924,7 +924,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        bUseDlpSearchView = SGAppMgrSvc.OpConfigInfoService.GetUseEmailUIdlpSearch(groupIDbyParam);
+        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
 
         base.OnInitialized();
 
@@ -1104,7 +1104,7 @@
         }
 
         // 추가작업
-        refMailManagePopUp.bUseDlpSearchView = bUseDlpSearchView;
+        refMailManagePopUp.bUseDlpDataView = bUseDlpDataView;
         refMailManagePopUp.DetailResult(groupId, e);
         Task.Run(async () => { await refMailManagePopUp.openPopUp(strEmailTranSeq); });
 

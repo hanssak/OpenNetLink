@@ -133,19 +133,33 @@
                     <table class="table table-head-fixed table-bordered table-hover white">
                         <thead>
                             <tr>
-                                <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>              <!-- 개인정보-->
+
+                                @if (bUseDlpDataView)
+                                {
+                                    <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>
+                                    <!-- 개인정보-->
+                                }
+
                                 <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_FILENAME") </th>               <!-- 파일명-->
                                 <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_KIND") </th>                    <!-- 유형-->
                                 <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_SIZE") </th>                    <!-- 크기-->
                                 <th style="text-align:center;">@XmlConf.GetTitle("T_DETAIL_VIRUSHIST") </th>            <!-- 바이러스내역-->
-                                <th style="text-align:center;width:8%;">@XmlConf.GetTitle("T_COMMON_DETAILVIEW")</th>
+
+                                @if (bApproveEnable)
+                                {
+                                    <th style="text-align:center;width:8%;">@XmlConf.GetTitle("T_COMMON_DETAILVIEW")</th>
+                                }
+
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (emailFile file in fileList)
                             {
                                 <tr>
-                                    <td style="text-align:center;">@file.fileDLP</td>
+                                    @if (bUseDlpDataView)
+                                    {
+                                        <td style="text-align:center;">@file.fileDLP</td>
+                                    }
                                     <td>@file.fileName</td>
                                     <td style="text-align:center;">@file.fileKind</td>
                                     <td style="text-align:center;">@file.fileSize</td>
@@ -167,6 +181,8 @@
                 @if (bApproveEnable)
                 {
                     <button type="button" class="btn btn-md btn-blue" @onclick="DetailApprove"><i class="fas fa-check-circle"></i>@XmlConf.GetTitle("T_COMMON_APPROVE")</button>
+
+                    // KKW - 수정해야됨(사후결재 일때, 반려못할때에는 btn-gray 로 표시
                     <button type="button" class="btn btn-md btn-red" @onclick="DetailReject"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_COMMON_REJECTION")</button>
                 }
                 <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_FILE_FOLD")</button>
@@ -201,6 +217,8 @@
     List<emailFile> fileList = new List<emailFile>();
     ISGSideBarUIService SideBarUISvc;
     public bool m_bFilePrevOpening = false;
+
+    public bool bUseDlpDataView = true;
 
     private void attachDownload(string fileseq, string filekey, string filename)
     {
@@ -646,9 +664,9 @@
             case "V":
                 rtn = XmlConf.GetTitle("T_MAIL_INSPECT");
                 break;
-	    case "C":
+            case "C":
                 rtn = XmlConf.GetTitle("T_MAIL_TRANSCANCLE");
-                break;	    
+                break;
             default:
                 rtn = "";
                 break;

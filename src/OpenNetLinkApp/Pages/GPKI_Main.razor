@@ -1185,15 +1185,16 @@
             SGUserData sgUserData = null;
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(i);
             sgUserData = (SGUserData)HsCmdCenter.GetUserData(i);
+             ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupid);
 
-            if ((sgLoginData != null) && (sgUserData != null))
+             if ((sgLoginData != null) && (sgUserData != null))
             {
                 bFileTransMenuUse = sgLoginData.GetFileTrans();
 
                 //if (sgLoginData.GetApprove() == true)
                 // 3망 정책고려한 결재사용유무 설정
                 if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.SiteConfigInfoService.GetNoApproveManageUI(groupid) == false) // 결재관리 UI 않나오는 설정추가
-                    if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
+                        if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupid)) > 0))
                         bApprMenuUse = true;
 
                 bSecurityApprMenuUse = sgUserData.GetUserPrivacyApprPos();

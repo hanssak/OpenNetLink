@@ -85,7 +85,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public List<bool> blistUseEmail { get; set; } = null;               // 메일 관리/결재 사용 유무.
 
-        public List<bool> blistUserEmailSearchDlp { get; set; } = null;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
+        public List<bool> blistUiDlpShow { get; set; } = null;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
 
         public bool bUsePCURL { get; set; } = false;                      // PCURL 사용 유무.
 
@@ -153,5 +153,10 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileExceptionDescCheck { get; set; } = true;                           // 파일 예외신청 설명정보 필수 기업여부
 
         public bool bUsePartialFileAddInTransfer { get; set; } = false;         //'파일전송' 화면에서 등록시도한 파일목록에 정상파일과 오류파일이 함께 존재할 시 정상 파일에 대한 부분 등록 가능여부(true, false)
+
+        public bool bUseChkHardSpace { get; set; } = false;                      //파일수신시 디바이스 용량 체크 여부
+
+        public List<bool> bUseOver1Auth { get; set; } = null;                    // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
+
     }
 }

@@ -249,8 +249,7 @@ void WebWindow::WaitForExit()
             sleep(1);
         }
     }); // ThrMouseRightClick: Thread Run
-
-    //[NSApp run];
+    [NSApp run];
 	if (tray_init(&tray) < 0)
 	{
 		// printf("failed to create tray\n");
@@ -525,7 +524,7 @@ void WebWindow::OnHotKey(int groupID)
 void WebWindow::ClipTypeSelect(int groupID)
 {
     NSNumber *numGuId = [NSNumber numberWithInt:groupID];
-    //[_appDelegate hotkeyClipBoardWithEvent:NULL object:numGuId];
+    [_appDelegate ClipTypeSelect:numGuId];
 }
 
 void WebWindow::ClipMemFree(int groupID)
@@ -537,7 +536,7 @@ void WebWindow::ClipMemFree(int groupID)
 void WebWindow::ClipFirstSendTypeText(int groupID)
 {
     NSNumber *numGuId = [NSNumber numberWithInt:groupID];
-    //[_appDelegate hotkeyClipBoardWithEvent:NULL object:numGuId];
+    [_appDelegate ClipFirstSendTypeText:numGuId];
 }
 
 void WebWindow::SetClipBoardSendFlag(int groupID)

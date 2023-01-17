@@ -34,8 +34,14 @@
                                 <td style="text-align:center;">@strDataTransStatus</td>
                                 <th>@strFilePos </th>                                                       <!--파일위치-->
                                 <td style="text-align:center;">@strDataFilePos</td>
-                                <th>@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>                                              <!--개인정보-->
-                                <td style="text-align:center;">@strDLP</td>
+
+                                @if (bUseDlpDataView)
+                                {
+                                    <th>@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>
+                                    <!--개인정보-->
+                                    <td style="text-align:center;">@strDLP</td>
+                                }
+
                             </tr>
 
                             <tr>
@@ -177,7 +183,12 @@
                                 <th style="text-align:center;">@strFileType </th>                   <!--유형-->
                                 <th style="text-align:center;">@strFileSize </th>                   <!--크기-->
                                 <th style="text-align:center;width:15%;">@strVirusHistory </th>     <!--바이러스내역-->
-                                <th style="text-align:center;width:15%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>     <!--개인정보 내역-->
+
+                                @if (bUseDlpDataView)
+                                { 
+                                    <th style="text-align:center;width:15%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>     <!--개인정보 내역-->
+                                }
+
                             </tr>
                         </thead>
                         <tbody>
@@ -190,7 +201,12 @@
                                         <td style="text-align:center;">@item.strFileType</td>
                                         <td style="text-align:center;">@item.strFileSize</td>
                                         <td style="text-align:center;">@item.strVirusHistory</td>
-                                        <td style="text-align:center;">@item.stDLPDesc</td>
+
+                                        @if (bUseDlpDataView)
+                                        { 
+                                            <td style="text-align:center;">@item.stDLPDesc</td>
+                                        }
+
                                     </tr>
                                 }
                             }
@@ -298,6 +314,8 @@
             strReason = Reason;
         }
     }
+
+    public bool bUseDlpDataView = true;
 
     public string strTransDetailTitle = "";
     public string strArrpHistory = "";
@@ -621,6 +639,12 @@
         sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
 
         InitText();
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
     }
 
     public void SetBindingData()

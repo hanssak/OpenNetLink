@@ -35,7 +35,7 @@
 
 
   "bUserIDSave": false,
-  "bAutoLogin": false,
+  "bAutoLogin": true,
   "bAutoLoginCheck": true,
   "bUserPWChange": false,
 
@@ -95,7 +95,7 @@
   "bURLListPolicyRecv": false,
   "bUseCertSend": false,
   "blistUseEmail": [
-    false,
+    true,
     false
   ],
   "bUseForceUpdate": true,
@@ -133,8 +133,20 @@
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
 
-  "bUsePartialFileAddInTransfer" : false
-
-  
-
+  "bUsePartialFileAddInTransfer": false,
+  "bUseInitAlarmPerDay": false,
+  "bUseInitMessagePerDay": false,
+  "bVisiblePolicyUpdateButton": true,
+  "bUseForceBackgroundUpdate": false,
+  "bUseChkHardSpace": true,  
+  "bUseOver1Auth": [
+    false,
+    false,
+    false
+  ],
+  "blistUiDlpShow": [
+    false,
+    false,
+    false
+  ]  
 }

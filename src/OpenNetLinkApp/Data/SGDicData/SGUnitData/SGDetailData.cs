@@ -1036,7 +1036,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// 결재 이력 정보를 반환한다
         /// </summary>
         /// <returns></returns>
-        public List<ApproverHist> GetApproverInfoHist()
+        public List<ApproverHist> GetApproverInfoHist(bool bApproveUseReason = false)
         {
             List<ApproverHist> approverHist = new List<ApproverHist>();
             ApproverHist tmpApprover;

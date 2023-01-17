@@ -36,9 +36,9 @@
                                 @*<select style="width:200px;" @bind="_stCurrentDrive">
                                     @foreach (string item in rootDrives)
                                     {
-                                        <option value="@item">@item</option>
+                                    <option value="@item">@item</option>
                                     }
-                                </select>*@
+                                    </select>*@
                                 <div class="dropdown">
                                     <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:200px; text-align:left">
                                         @_stCurrentDrive
@@ -52,8 +52,8 @@
                                 </div>
                             </div>
                             @*<div class="col-md-12" style="letter-spacing:.3px !important; ">
-                                    <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
-                                    @stDisplayPath
+                                <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
+                                @stDisplayPath
                                 </div>*@
                         </div>
                     </div>
@@ -72,9 +72,12 @@
                                             <div class="col-md-12">
                                                 <div class="card-body table-responsive" style="height:300px; border:1px solid #c6ceda; background-color:#fff;overflow:hidden;padding:0 0 0 0;overflow:auto">
 
-                                                    <div @onclick="toUpperTree">
+
+                                                    @*
+                                                        //상위 루트로 이동하는 기능 제거
+                                                        <div @onclick="toUpperTree">
                                                         <i class="fas fa-folder align-items-center" style="padding-left:17px;cursor:pointer;"></i><span style="cursor:pointer;">&nbsp;..</span>
-                                                    </div>
+                                                        </div>*@
                                                     <div>
                                                         <RadzenTree Change="@OnSelectPath" Data="@entries" Expand="@LoadFiles" Style="width: 100%;height:100%;overflow:auto">
                                                             <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
@@ -225,11 +228,21 @@
         object[] param3 = { "0" };
         await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param3);
 
+        //드라이브 변경 시 기존에 Expand된 하위항목들 모두 제거 처리
+        //(entries 변경되어도 과거 드라이브의 하위가 잔여되는 버그 수정 건)
+        await JSRuntime.InvokeAsync<object>("RadzenTreeCollapse", null);
+
         if (dir != null && dir.Length > 0)
         {
             try
             {
-                entries = Directory.GetDirectories(dir);
+                //파일 탐색기를 드라이버를 기반으로 한 트리 타입으로 처리
+                string root = Directory.GetDirectoryRoot(dir);
+                SetCurrentDrive(root);
+                //   entries = Directory.GetDirectories(root);
+                entries = Directory.EnumerateFileSystemEntries(root)
+              .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+              .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
                 stTreeDir = dir;
             }
             catch (Exception ex)
@@ -297,7 +310,10 @@
         string stMsgComplete = XmlConf.GetTitle("T_COMMON_FOLDER_CREATE_COMPLETE");
         ShowMessage("success", stMsgComplete);
 
-        entries = Directory.GetDirectories(stDisplayPath);
+        //파일 탐색기를 드라이버를 기반으로 한 트리 타입으로 처리
+        string root = Directory.GetDirectoryRoot(stDisplayPath);
+        entries = Directory.GetDirectories(root);
+        //entries = Directory.GetDirectories(stDisplayPath);
         StateHasChanged();
     }
 
@@ -327,8 +343,10 @@
 
     private void changeDrive()
     {
-        System.Diagnostics.Debug.WriteLine(stCurrentDrive);
-        Debug.WriteLine(stCurrentDrive);
+        //드라이브 변경 시 기존에 Expand된 하위항목들 모두 제거 처리
+        //(entries 변경되어도 과거 드라이브의 하위가 잔여되는 버그 수정 건)
+        JSRuntime.InvokeAsync<object>("RadzenTreeCollapse", null);
+
         if (Directory.GetDirectories(stCurrentDrive) != null)
         {
             entries = Directory.EnumerateFileSystemEntries(stCurrentDrive)
@@ -394,27 +412,29 @@
     public void LoadListFiles(string stPath)
     {
         sgFile.Clear();
-        try
-        {
-            if (Directory.GetParent(stPath) != null)
-            {
-                string strUpperPath = Directory.GetParent(stPath).FullName;
-                if (strUpperPath != null && strUpperPath.Length > 0)
-                {
-                    SGFileInfo fileEntry = new SGFileInfo();
-                    fileEntry.Name = "..";
-                    fileEntry.Size = 0;
-                    fileEntry.Path = strUpperPath;
-                    fileEntry.Ext = "";
-                    fileEntry.Type = 3;         //상위디렉토리 버튼
-                    sgFile.Add(fileEntry);
-                }
-            }
-        }
-        catch (Exception ex0)
-        {
-            CLog.Error("GetParentError:" + ex0.Message);
-        }
+
+        //전체 트리 방식이므로, 상위 루트로 이동하는 기능 제거
+        //try
+        //{
+        //    if (Directory.GetParent(stPath) != null)
+        //    {
+        //        string strUpperPath = Directory.GetParent(stPath).FullName;
+        //        if (strUpperPath != null && strUpperPath.Length > 0)
+        //        {
+        //            SGFileInfo fileEntry = new SGFileInfo();
+        //            fileEntry.Name = "..";
+        //            fileEntry.Size = 0;
+        //            fileEntry.Path = strUpperPath;
+        //            fileEntry.Ext = "";
+        //            fileEntry.Type = 3;         //상위디렉토리 버튼
+        //            sgFile.Add(fileEntry);
+        //        }
+        //    }
+        //}
+        //catch (Exception ex0)
+        //{
+        //    CLog.Error("GetParentError:" + ex0.Message);
+        //}
 
         IEnumerable<string> fList = null;
         try

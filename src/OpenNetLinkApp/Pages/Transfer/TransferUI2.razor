@@ -20,6 +20,7 @@
 @using BlazorInputFile
 @using OpenNetLinkApp.Common
 @using OfficeExtractor
+@using Data.SGDicData.SGAlz;
 
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
@@ -136,13 +137,31 @@
                                     <div class="form-check">
                                         <table>
                                             <tr>
-                                                <td>
-                                                    <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e => GetAfterChk())" hidden="@bAfterApprChkHIde" disabled="@bAfterApprDisable">
-                                                </td>
-                                                <td>
-                                                    <label class="form-check-label" for="exampleCheck2">@strAfterApprove</label>
-                                                </td>
-                                            </tr>
+
+                                                @* // - site요청으로 Radio로 변경
+        <td>
+            <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e => GetAfterChk())" hidden="@bAfterApprChkHIde" disabled="@bAfterApprDisable">
+        </td>
+        <td>
+            <label class="form-check-label" for="exampleCheck2">@strAfterApprove</label>
+        </td>*@
+
+                                                @if (bAfterApprChkHIde == false)
+                                                {
+                                                    <td>
+                                                        <div class="custom-control custom-radio mr-3 ">
+                                                            <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="customRadio1" name="customRadio" checked="@(!bAfterCheck)" disabled="@bAfterApprDisable" @onclick="(e => ReSetAfterChk())">
+                                                            <label for="customRadio1" class="custom-control-label pt-1">@XmlConf.GetTitle("T_FILE_APPROVEBEFORE")</label>                            <!--사전결재-->
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="custom-control custom-radio">
+                                                            <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="@bAfterCheck" disabled="@bAfterApprDisable" @onclick="(e => SetAfterChk())">
+                                                            <label for="customRadio2" class="custom-control-label pt-1">@XmlConf.GetTitle("T_FILE_APPROVEAFTERPROC")</label>                            <!--사후결재-->
+                                                        </div>
+                                                    </td>
+                                                }
+                                                </tr>
                                         </table>
                                     </div>
                                 </div>
@@ -158,6 +177,7 @@
                                                     </td>
                                                 }
                                                 <td>
+                                                    @*<button type="button" class="btn btn-md btn-green" @onclick="AlzTest"><i class="fas fa-share"></i>압축</button>*@
                                                     <button type="button" class="btn btn-md btn-green" @onclick="CheckApprLine"><i class="fas fa-share"></i>@strFileSend</button>
                                                     <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
                                                     <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
@@ -648,6 +668,16 @@
 
     }
 
+    private void AlzTest()
+    {
+        //string source = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)\\chào.alz";
+        //string dest = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)";
+        //string passWord = "1234";
+        //SGUnAlz lib = new SGUnAlz();
+        ////int ret = lib.UnAlzExtract(source, dest);
+        //int ret = lib.UnAlzExtract_PassWordWDll(source, dest, passWord);
+
+    }
 
 
     private async Task CheckApprLine()
@@ -677,7 +707,7 @@
         }
 
         ISGUserInfo userInfoService = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
-        int nApprovePos = userInfoService.GetUserApprPos(); //sgUserData.GetUserApprpos();
+        int nApprovePos = userInfoService.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)); //sgUserData.GetUserApprpos();
         SGApprLineData sgApprLineData = null;
         sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
         if (sgApprLineData == null)
@@ -722,7 +752,7 @@
                     strApprLineDeptSeq = item.DeptSeq;
                     strApprLineName = item.Name;
 
-                       //사용자 유효성 검사 시, 로그인한 본인은 제외하고 확인한다.
+                    //사용자 유효성 검사 시, 로그인한 본인은 제외하고 확인한다.
                     if (strApprLineUserSeq == strUserSeq)
                         continue;
 
@@ -731,11 +761,12 @@
                     //if (!strApprLineDeptSeq.Equals("-"))
                     //if (strApprLineDeptSeq.Length == 18)    // Dept - seq 일때에만 검색함.
 
+
                     @*if (CsSeqFunc.isDeptSeq(strApprLineDeptSeq))
-                    {
+                        {
                         SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
                         cntSendQuery++;
-                    }*@
+                        }*@
 
                     // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
                     SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "");
@@ -784,7 +815,7 @@
             if (sgLoginData != null)
                 bApprEdit = sgLoginData.GetApproveAppend();                             //결제자 편집 사용 여부
 
-            string strMsg = XmlConf.GetInfoMsg(bApprEdit?"I_0220":"I_0233");
+            string strMsg = XmlConf.GetInfoMsg(bApprEdit ? "I_0220" : "I_0233");
             //HsLog.info($"결재자 부서정보가 변경되었습니다. (결재자명={strApprLineName})");
             ShowMessage("warn", strMsg);
             return;
@@ -839,7 +870,9 @@
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
 
         string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1)
+        int nUserApprPos = sgUserData.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID));
+
+        if (sgLoginData.IsVipUser() || nUserApprPos > 1)
             stApprLineSeq = "";
         else if (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false)
         {
@@ -856,7 +889,7 @@
         }
 
         // Vip / 전결재자 / 결재미사용 / 사후결재사용시간아님 일때, 사전결재전송 강제
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
+        if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
             bAfterApprove = false;
 
         // 3중망 상황 상관없이 결재Line 정보는 무조건 보내어, 서버에서 결정하도록 한다.
@@ -1041,7 +1074,7 @@
         }
 
         // 일반.결재자만
-        if (sgUserData.GetUserApprPos() > 1)
+        if (sgUserData.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 1)
         {
             CLog.Here().Information($"isFilesNeedApprove (FALSE) : User's ApprPOS is OVER Approver!");
             return false;
@@ -1085,8 +1118,8 @@
         if (sgLoginData == null)
             return;
 
-        ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
-        if (sgUserData == null)
+        ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+        if (sgUserInfo == null)
             return;
 
         SGApprLineData sgApprLineData = null;
@@ -1101,15 +1134,17 @@
             nApprStep = Convert.ToInt32(strApprStep);
 
         List<string> ApprLineSeq = null;
-        string strUserSeq = sgUserData.UserSeq;
+        string strUserSeq = sgUserInfo.UserSeq;
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
 
         string stApprLineSeq = sgApprLineData.GetApprCommaSeqString(strUserSeq);
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
+        int nUserApprPos = sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID));
+
+        if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
             stApprLineSeq = "";
 
         // Vip / 전결재자 / 결재미사용 / 사후결재사용시간아님 일때, 사전결재전송 강제
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
+        if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
             bAfterApprove = false;
 
         if (!String.IsNullOrEmpty(stApprLineSeq) && bAfterApprove)
@@ -1469,9 +1504,11 @@
             bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);   //결제 사용 여부 체크
             bApprEdit = sgLoginData.GetApproveAppend();                             //결제자 편집 사용 여부
 
-            ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
-            if (sgUserData == null)
+            ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+            if (sgUserInfo == null)
                 return;
+
+            int nUserApprPos = sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID));
 
             if (!bUseApprove)
                 bHideApprChooseAddBtn = true;
@@ -1480,9 +1517,9 @@
                 if (!bApprEdit)
                     bHideApprChooseAddBtn = true;
 
-                if (sgUserData != null)
+                if (sgUserInfo != null)
                 {
-                    if (sgUserData.GetUserApprPos() > 1)
+                    if (nUserApprPos > 1)
                         bHideApprChooseAddBtn = true;
                 }
 
@@ -1491,7 +1528,7 @@
             if (sgLoginData.IsVipUser() || bUseApprove == false)
                 bHideApprChooseAddBtn = true;
 
-            if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || bAfterApprChkHIde)
+            if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || bAfterApprChkHIde)
             {
                 bAfterApprChkHIde = true;
                 bAfterApprDisable = true;
@@ -1565,6 +1602,36 @@
 
         StateHasChanged();
     }
+
+
+    /// <summary>
+    /// 사후결재 사용으로 체크
+    /// </summary>
+    public void SetAfterChk()
+    {
+        bAfterCheck = true;
+
+        int groupID = groupIDbyParam;
+        if (groupID > -1)
+            pageService.SetAfterApproveCheck(groupID, bAfterCheck);
+
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// 사전결재 사용으로 체크
+    /// </summary>
+    public void ReSetAfterChk()
+    {
+        bAfterCheck = false;
+
+        int groupID = groupIDbyParam;
+        if (groupID > -1)
+            pageService.SetAfterApproveCheck(groupID, bAfterCheck);
+
+        StateHasChanged();
+    }
+
 
     //ApproveChooseAdd => ApproveChooseResult
     public void ApproveChooseAdd()
@@ -1916,6 +1983,7 @@
             HSCmdCenter.SendDeptInfo(groupID, sgLoginData.GetUserID());
             }*@
 
+
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         stopClickSync();
 
@@ -2099,7 +2167,6 @@
         @*        KeyboardEventArgs eventArgs = new KeyboardEventArgs();
             eventArgs.Key = "Enter";
             SideBarUISvc.ChgActiveMenu(eventArgs, sgSideBar);*@
-
         //        OnInitialized();
 
         //OnAfterRenderAsync(true);
@@ -2170,7 +2237,7 @@
 
 
         // 사후결재
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || bAfterApprChkHIde)
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || bAfterApprChkHIde)
         {
             bAfterApprChkHIde = true;
             bAfterApprDisable = true;

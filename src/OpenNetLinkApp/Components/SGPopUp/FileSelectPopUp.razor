@@ -32,9 +32,9 @@
                                 @*<select style="width:200px;" @bind="_stCurrentDrive">
                                     @foreach (string item in drives)
                                     {
-                                        <option value="@item">@item</option>
+                                    <option value="@item">@item</option>
                                     }
-                                </select>*@
+                                    </select>*@
                                 <div class="dropdown">
                                     <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:200px; text-align:left">
                                         @_stCurrentDrive
@@ -147,20 +147,20 @@
             @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
                 int groupID = 0;
                 if (sgSideBar != null)
-                    groupID = sgSideBar.GroupId;
+                groupID = sgSideBar.GroupId;
 
                 SGLoginData sgLoginData = null;
                 sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
                 if (sgLoginData != null && sgLoginData.GetZipDepthInfo(sgLoginData.GetSystemPosition()) == "")
                 {
-                    // CLIENT_ZIP_DEPTH 정보 가져옴
-                    SGQueryExtend sgQueryExtend = null;
-                    sgQueryExtend = new SGQueryExtend();
-                    if (sgQueryExtend != null)
-                    {
-                        string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
-                        HSCmdCenter.SendZipDepthInfo(groupID, sgLoginData.GetUserID(), strQuery);
-                    }
+                // CLIENT_ZIP_DEPTH 정보 가져옴
+                SGQueryExtend sgQueryExtend = null;
+                sgQueryExtend = new SGQueryExtend();
+                if (sgQueryExtend != null)
+                {
+                string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+                HSCmdCenter.SendZipDepthInfo(groupID, sgLoginData.GetUserID(), strQuery);
+                }
                 }*@
 
             await OnSelectOK.InvokeAsync(lstFiles); //부모컴포넌트에 이벤트 전달
@@ -172,6 +172,7 @@
     {
         System.Diagnostics.Debug.WriteLine(stCurrentDrive);
         refFileTreeCustom.changeDrive(stCurrentDrive);
+        LoadListFiles("");  //드라이브 변경 시 우측 SubList초기화
     }
 
 
@@ -240,33 +241,39 @@
     public void LoadListFiles(string stPath)
     {
         sgFile.Clear();
-        try
-        {
-            if (Directory.GetParent(stPath) != null)
-            {
-                string strUpperPath = Directory.GetParent(stPath).FullName;
-                if (strUpperPath != null && strUpperPath.Length > 0)
-                {
-                    SGFileInfo fileEntry = new SGFileInfo();
-                    fileEntry.Name = "..";
-                    fileEntry.Size = 0;
-                    fileEntry.Path = strUpperPath;
-                    fileEntry.Ext = "";
-                    fileEntry.Type = 3;         //상위디렉토리 버튼
-                    sgFile.Add(fileEntry);
-                }
-            }
-        }
-        catch (Exception ex0)
-        {
-            CLog.Error("GetParentError:" + ex0.Message);
-        }
+        //상위 루트로 이동하는 기능 제거
+        //try
+        //{
+        //    if (Directory.GetParent(stPath) != null)
+        //    {
+        //        string strUpperPath = Directory.GetParent(stPath).FullName;
+        //        if (strUpperPath != null && strUpperPath.Length > 0)
+        //        {
+        //            SGFileInfo fileEntry = new SGFileInfo();
+        //            fileEntry.Name = "..";
+        //            fileEntry.Size = 0;
+        //            fileEntry.Path = strUpperPath;
+        //            fileEntry.Ext = "";
+        //            fileEntry.Type = 3;         //상위디렉토리 버튼
+        //            sgFile.Add(fileEntry);
+        //        }
+        //    }
+        //}
+        //catch (Exception ex0)
+        //{
+        //    CLog.Error("GetParentError:" + ex0.Message);
+        //}
+
+        if (string.IsNullOrEmpty(stPath))
+            goto append;
 
         IEnumerable<string> fList = null;
         try
         {
             fList = Directory.EnumerateFileSystemEntries(stPath)
-            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
+             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
+            // .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+
         }
         catch (UnauthorizedAccessException e)
         {
@@ -322,6 +329,7 @@
             CLog.Error("Exception:" + ex3.Message);
         }
 
+    append:
         string listHtml = makeSubFileList();
         object[] param = { "divPopUpFileList", listHtml };
         JSRuntime.InvokeAsync<object>("appendHtml", param);
@@ -330,6 +338,11 @@
 
     public void SetCurrentDrive(string value)
     {
+        //드라이브 변경 시 기존에 Expand된 하위항목들 모두 제거 처리
+        //(entries 변경되어도 과거 드라이브의 하위가 잔여되는 버그 수정 건)
+        if (value != _stCurrentDrive)
+            JSRuntime.InvokeAsync<object>("RadzenTreeCollapse", null);
+
         _stCurrentDrive = value;
         //StateHasChanged();
     }

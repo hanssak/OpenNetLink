@@ -1485,7 +1485,7 @@ int WebWindow::SendClipBoard(int groupID)
 	if (m_mapBoolUseClipSelect.find(groupID) != m_mapBoolUseClipSelect.end())
 		bUseClipSelectSend = m_mapBoolUseClipSelect[groupID];
 
-	NTLog(SelfThis, Info, "WebWindow::SendClipBoard - groupID : %d, ClipSelectSend - Use : %s", groupID, bUseClipSelectSend ? _T("True") : _T("False"));
+	NTLog(SelfThis, Info, "WebWindow::SendClipBoard - groupID : %d, ClipSelectSend - Use : %s", groupID, bUseClipSelectSend ? "True" : "False");
 	//WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard - groupID : %d, ClipSelectSend - Use : %s"), groupID, bUseClipSelectSend?_T("True"): _T("False"));
 
 	if (g_bClipCopyNsend)
@@ -1591,6 +1591,8 @@ int WebWindow::SendClipBoard(int groupID)
 
 			if (nType == 0)
 			{
+
+				CloseClipboard();
 				g_bDoingSendClipBoard = false;
 				ClipDataBufferClear();
 				NTLog(SelfThis, Info, "WebWindow::SendClipBoard - UnKnown Type - Error : %d", groupID);

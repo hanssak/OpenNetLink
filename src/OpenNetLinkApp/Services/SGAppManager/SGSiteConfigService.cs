@@ -298,16 +298,42 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseInputSearchApproveExtTree(int groupId);
 
 
+        /// <summary>
+        /// 대결재자로서, 원결재자의 모든 권한을 위임받아 사용할지 유무
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseAllProxyAuthority(int groupID);
+
+        /// <summary>
+        /// //결재미리보기(파일전송/클립보드) 시 WebLink 뷰어 사용 유무
+        /// <br>사용안할 시, 기존 viewer 주소 사용</br>
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseWebLinkPreviewer(int groupID);
+
+        /// <summary>
+        /// WebLink 미리보기 사용 시 WebLink 주소 ( + AP001_Docs_Viewer.do 사용)
+        /// <br>m_bUseWebLinkPreviewer 가 true일때만 사용함</br>
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public void SetUseOver1auth(int groupID, bool bUseAuth);
+
+        /// <summary>
+        /// AD 로그인가능하면 AD로그인, 안되면 IDPW 로그인 UI로 변경되는 설정인지 유무
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseOver1auth(int groupID);
+
+
         public void SetUseAccessAllDrive(int groupID, bool bUseAllDrive);
 
         public bool GetUseAccessAllDrive(int groupID);
 
-        public void SetUseOver1auth(int groupID, bool bUseAuth);
-
-        public bool GetUseOver1auth(int groupID);
-
-
-
+        public string GetWebLinkPreviewerURL(int groupID);
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -341,7 +367,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bClipBoardNoApproveButFileTrans { get; set; } = true;                // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
 
         public bool m_bUseOSMaxFilePath { get; set; } = true;                               // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
-        public int m_nClipAfterApproveUseType { get; set; } = 2;                                    // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
+        public int m_nClipAfterApproveUseType { get; set; } = 1;                                    // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
 
         public bool m_bUseUserSelectFirstServer { get; set; } = false;                       // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
 
@@ -1309,20 +1335,33 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
 
 
-        public void SetUseAccessAllDrive(int groupID, bool bUseAllDrive)
-        {
+        /// <summary>
+        /// 대결재자로서, 원결재자의 모든 권한을 위임받아 사용할지 유무
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseAllProxyAuthority(int groupID)
+        { 
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bAccessAllDrive = bUseAllDrive;
+                return listSiteConfig[groupID].m_bUseAllProxyAuthority;
+            return false;
         }
 
-        public bool GetUseAccessAllDrive(int groupID)
+        public bool GetUseWebLinkPreviewer(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bAccessAllDrive;
-
+                return listSiteConfig[groupID].m_bUseWebLinkPreviewer;
             return false;
+        }
+
+        public string GetWebLinkPreviewerURL(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_strWebLinkPreviewerURL;
+            return "";
         }
 
         public void SetUseOver1auth(int groupID, bool bUseAuth)
@@ -1335,8 +1374,24 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseOver1auth(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID<listSiteConfig.Count)
+            if (groupID < listSiteConfig.Count)
                 return listSiteConfig[groupID].m_bUseOver1Auth;
+
+            return false;
+        }
+
+        public void SetUseAccessAllDrive(int groupID, bool bUseAllDrive)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bAccessAllDrive = bUseAllDrive;
+        }
+
+        public bool GetUseAccessAllDrive(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bAccessAllDrive;
 
             return false;
         }

@@ -112,8 +112,8 @@
                     <table class="table table-head-fixed table-bordered table-hover white">
                         <thead>
                             <tr>
-                                @if (bUseDlpSearchView)
-                                { 
+                                @if (bUseDlpDataView)
+                                {
                                     <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>              <!-- 개인정보-->
                                 }
                                 <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_FILENAME") </th>               <!-- 파일명-->
@@ -126,7 +126,7 @@
                             @for(int j=0; j< fileList.Count; j++)
                             {
                                 <tr>
-                                    @if (bUseDlpSearchView)
+                                    @if (bUseDlpDataView)
                                     {
                                         <td style="text-align:center;">@fileList[j].fileDLP</td>
                                     }
@@ -176,7 +176,9 @@
     List<emalApprover> apvList = new List<emalApprover>();
     List<emailFile> fileList = new List<emailFile>();
 
-    public bool bUseDlpSearchView = true;
+    ISGSideBarUIService SideBarUISvc;
+
+    public bool bUseDlpDataView = true;
 
     private void emailTransCancel()
     {
@@ -410,6 +412,18 @@
         else if( value == "1")
             rtn = XmlConf.GetTitle("T_COMMON_EXPORT");
         return rtn;
+    }
+
+    protected override void OnInitialized()
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
     }
 
     private void CancelResult(int groupId, SGData e)

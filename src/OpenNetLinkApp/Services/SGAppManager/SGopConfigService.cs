@@ -119,7 +119,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseEmailManageApprove(int groupID);
 
-        public bool GetUseEmailUIdlpSearch(int groupID);
+        public bool GetUseUIdlpData(int groupID);
 
         public bool GetUsePCURL(int groupID);
 
@@ -249,6 +249,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         /// <returns></returns>
         public bool GetVisiblePolicyUpdateButton();
+
+        /// <summary>
+        /// AD로그인 실패시, IDPW 로그인시도할수 있게 Login UI 설정 및 동작
+        /// </summary>
+        /// <param name="nGroupID"></param>
+        /// <returns></returns>
+        public bool GetUseOver1auth(int nGroupID);
+
     }
 
 
@@ -386,12 +394,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         /// <param name="nGroupID"></param>
         /// <returns></returns>
-        public bool GetUseEmailUIdlpSearch(int nGroupID)
+        public bool GetUseUIdlpData(int nGroupID)
         {
-            (AppConfigInfo as SGopConfig).blistUserEmailSearchDlp ??= new List<bool>();
+            (AppConfigInfo as SGopConfig).blistUiDlpShow ??= new List<bool>();
 
-            if ((AppConfigInfo as SGopConfig).blistUserEmailSearchDlp.Count >= nGroupID + 1)
-                return (AppConfigInfo as SGopConfig).blistUserEmailSearchDlp[nGroupID];
+            if ((AppConfigInfo as SGopConfig).blistUiDlpShow.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGopConfig).blistUiDlpShow[nGroupID];
 
             return false;    // 기본값
         }
@@ -815,6 +823,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bUsePartialFileAddInTransfer;
         }
 
+        public bool GetUseCheckHardSpace()
+        {
+            return AppConfigInfo.bUseChkHardSpace;
+        }
 
         public bool GetUseInitAlarmPerDay()
         {
@@ -830,5 +842,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bVisiblePolicyUpdateButton;
         }
+
+        public bool GetUseOver1auth(int nGroupID)
+        {
+            (AppConfigInfo as SGopConfig).bUseOver1Auth ??= new List<bool>();
+
+            if ((AppConfigInfo as SGopConfig).bUseOver1Auth.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGopConfig).bUseOver1Auth[nGroupID];
+
+            return false;    // 기본값
+        }
+
     }
 }

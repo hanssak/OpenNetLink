@@ -140,7 +140,9 @@
                     <!--<button type="button" class="btn btn-md btn-navy" @onclick="OpenProxyApprover"><i class="fas fa-user-plus"></i>@XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE")</button>-->
                     <button type="button" class="btn btn-md btn-black" @onclick="@ApproveSearchCount"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
                     <button type="button" class="btn btn-md btn-blue" @onclick="ApproveAction"><i class="fas fa-check-circle"></i>@strBtnApprove</button>
+
                     <button type="button" class="btn btn-md btn-red" @onclick="ApproveReject"><i class="fas fa-times-circle"></i>@strBtnReject</button>
+
                 </div>
             </div>
         </div>
@@ -162,19 +164,25 @@
                                     @if (approveTypesfm == 2)
                                     {
                                         <th style="text-align: center; vertical-align:middle;width:8%">@strApprover</th>
- <!--승인자-->
+                                        <!--승인자-->
                                     }
                                     <th style="text-align: center; vertical-align:middle;width:8%">@strApproveStatus</th>                             <!--승인상태-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                     {
                                         <th style="text-align:center; vertical-align:middle;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
- <!--목적지-->
+                                        <!--목적지-->
                                     }
                                     <th style="text-align: center; vertical-align:middle;width:8%">@strDataType</th>                            <!--데이타타입-->
                                     <th style="text-align: center; vertical-align:middle;width:14%">@strTitle</th>                            <!--제목-->
                                     <th style="text-align: center; vertical-align:middle;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
                                     <th style="text-align: center; vertical-align:middle;width:14%">@strApproveDay</th>                                  <!--승인일-->
-                                    <th style="text-align: center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>                        <!--개인정보-->
+
+                                    @if (bUseDlpDataView)
+                                    {
+                                        <th style="text-align: center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
+                                        <!--개인정보-->
+                                    }
+
                                     <th style="text-align: center; vertical-align:middle;width:7%">@strApproveDetail</th>                             <!--상세보기-->
                                 </tr>
                             </thead>
@@ -203,7 +211,12 @@
                                     <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                     <td style="text-align: center; vertical-align:middle">@item.RequestTime</td>
                                     <td style="text-align: center; vertical-align:middle">@item.ApvTime</td>
-                                    <td style="text-align: center; vertical-align:middle">@item.stDLP</td>
+
+                                    @if (bUseDlpDataView)
+                                    {
+                                        <td style="text-align: center; vertical-align:middle">@item.stDLP</td>
+                                    }
+
                                     <td style="text-align: center; vertical-align:middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                 </tr>
                                 }
@@ -281,6 +294,8 @@
     public string menuMode { get; set; }
     [Parameter]
     public int groupIDbyParam { get; set; }
+
+    bool bUseDlpDataView = true;
 
     ClipboardApprovePopUp refApprovePopUp;
     SGCustomSelect refSGCustomSelect;
@@ -455,6 +470,7 @@
     {
         Console.WriteLine("Open Detail Start" + transSeq);
         long ltransSeq = Convert.ToInt64(transSeq);
+        refApprovePopUp.bUseDlpDataView = bUseDlpDataView;
         await refApprovePopUp.openPopUp(ltransSeq);
     }
 
@@ -567,6 +583,8 @@
         }
 
         approveTypesfm = sgLoginData.GetApproveTypeSFM();
+
+        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
 
         @*GetInitDateTime(out strFromDay, out strToDay);*@
 

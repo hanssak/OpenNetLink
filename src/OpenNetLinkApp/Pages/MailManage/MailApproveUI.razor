@@ -51,8 +51,8 @@
                                 <th class="p-2">@XmlConf.GetTitle("T_COMMON_PERIOD");</th>
                                 <td>
                                     @*<input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker11" readonly="readonly" value="@strFromDay">
-                                        <span class="float-left col-md-1">-</span>
-                                        <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker12" readonly="readonly" value="@strToDay">*@
+            <span class="float-left col-md-1">-</span>
+            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker12" readonly="readonly" value="@strToDay">*@
                                     <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
                                 <th class="p-2" style="width:70px;"> @XmlConf.GetTitle("T_COMMON_APPROVE_KIND") </th>
@@ -85,21 +85,26 @@
                                     </div>
                                     <!--<button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransTypeText<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
-                                <th class="p-2" style="width:70px;"> @XmlConf.GetTitle("T_COMMON_PRIVACY") </th>  <!--개인정보-->
-                                <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            @strDlpValue
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
-                                            @foreach (string str in Common.CsFunction.GetOptionValue("DlpValue"))
-                                            {
-                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDlpValue, str, doSearch))">@str</button>
-                                            }
+
+                                @if (bUseDlpDataView)
+                                {
+                                    <th class="p-2" style="width:70px;"> @XmlConf.GetTitle("T_COMMON_PRIVACY") </th>
+                                    <!--개인정보-->
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                @strDlpValue
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                                                @foreach (string str in Common.CsFunction.GetOptionValue("DlpValue"))
+                                                {
+                                                    <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDlpValue, str, doSearch))">@str</button>
+                                                }
+                                            </div>
                                         </div>
-                                    </div>
-                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("DlpValue"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDlpValue<i class="fas fa-angle-down pl-2"></i></button>-->
-                                </td>
+                                        <!--<button type="button" @onclick="@(()=>openCustomSelect("DlpValue"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDlpValue<i class="fas fa-angle-down pl-2"></i></button>-->
+                                    </td>
+                                }
 
                             </tr>
                             <tr>
@@ -185,7 +190,13 @@
                                         </th>
                                         <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_APPROVE_KIND")</th>     <!--결재종류-->
                                         <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_EMAILTRANSKIND")</th>     <!--발송구분-->
-                                        <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>     <!--개인정보-->
+
+                                        @if (bUseDlpDataView)
+                                        {
+                                            <!--개인정보-->
+                                            <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
+                                        }
+
                                         <!--<th style="text-align:center">@XmlConf.GetTitle("T_EMAIL_ATTACHFILE")</th> -->    <!--파일첨부-->
                                         <th style="text-align:center">@XmlConf.GetTitle("T_EMAIL_STATUS")</th>     <!--발송상태-->
                                         <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th>     <!--승인상태-->
@@ -230,7 +241,12 @@
                                                 </td>
                                                 <td style="text-align:center">@GetApproveKind(item[3])</td>
                                                 <td style="text-align:center">@GetTransKind(item[4])</td>
-                                                <td style="text-align:center">@GetDLPFlag(item[5])</td>
+
+                                                @if (bUseDlpDataView)
+                                                { 
+                                                    <td style="text-align:center">@GetDLPFlag(item[5])</td>
+                                                }
+
                                                 <!-- <td style="text-align:center">@item[6]</td>  -->
                                                 <td style="text-align:center">@GetTransStatus(item[7])</td>
                                                 <td style="text-align:center">@GetApproveStatus(item[8])</td>
@@ -303,7 +319,7 @@
     Footer refFooter;
     PeriodDatePicker refPeriodDatePicker;
 
-    public bool bUseDlpSearchView = true;
+    public bool bUseDlpDataView = true;
 
     @*public string strFromDay = "";
         public string strToDay = "";*@
@@ -848,8 +864,10 @@
 
     public async Task OpenDetail(string transSeq, string apvseq, string apvenable)
     {
+        refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
         await refMailApprovePopUp.openPopUp(transSeq, apvseq, apvenable);
     }
+
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -866,6 +884,8 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
+        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
 
         HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupID, ApproveBatchResult);
         base.OnInitialized();

@@ -170,7 +170,12 @@
                                         }
                                         <th style="text-align:center;vertical-align:middle;width:10%;">@strTitle</th>                               <!--제목-->
                                         <th style="text-align:center;vertical-align:middle;width:13%;">@strFileSendDay</th>                        <!--전송요청일-->
-                                        <th style="text-align:center;vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>   <!--개인정보-->
+
+                                        @if (bUseDlpDataView)
+                                        {
+                                            <th style="text-align:center;vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>  <!--개인정보-->
+                                        }
+
                                         <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_ETC_EXPIRATIONDATE")</th>   <!--파일 만료일-->
                                         <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_ETC_DOWNPOSSIBLECOUNT")</th>   <!--다운로드 횟수-->
                                         <th style="text-align:center;vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_TRANS_MANUAL_DOWNLOAD")</th>   <!--다운로드-->
@@ -200,7 +205,11 @@
                                             <td style="vertical-align:middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                             <td style="text-align:center; vertical-align: middle">@item.RequestTime</td>
 
-                                            <td style="text-align:center; vertical-align: middle">@item.stDLP</td>
+                                            @if (bUseDlpDataView)
+                                            { 
+                                                <td style="text-align:center; vertical-align: middle">@item.stDLP</td>
+                                            }
+
                                             <td style="text-align:center; vertical-align: middle">@item.expiredDate</td>
                                             @if (item.isPossibleDownload)
                                             {
@@ -272,6 +281,8 @@
 
     [Parameter]
     public int groupIDbyParam { get; set; }
+
+    public bool bUseDlpDataView = true;
 
     SGCustomSelect refSGCustomSelect;
     TransPopUp refTransPopUp;
@@ -445,6 +456,7 @@
     {
         Console.WriteLine("Open Detail Start" + strTransSeq);
         long ltransSeq = Convert.ToInt64(strTransSeq);
+        refTransPopUp.bUseDlpDataView = bUseDlpDataView;
         await refTransPopUp.openPopUp(ltransSeq);
     }
 
@@ -568,6 +580,8 @@
         {
             dicDestSysPos = pageService.GetTargetSystemList(groupID);
         }
+
+        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
 
         @*GetInitDateTime();*@
 

@@ -4105,6 +4105,20 @@
 			<CN></CN>
 		</T_ETC_PROGRESS_RATE>
 
+		<T_ETC_NOW_DOWNLOAD_AND_UPDATE>
+			<KR>지금 다운로드 및 업데이트하기</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_ETC_NOW_DOWNLOAD_AND_UPDATE>
+
+		<T_ETC_REMIND_ME_LATER>
+			<KR>나중에하기</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_ETC_REMIND_ME_LATER>
+		
 		<T_ETC_UPDATE_NOW>
 			<KR>업데이트 실행</KR>
 			<JP></JP>
@@ -4112,6 +4126,20 @@
 			<CN></CN>
 		</T_ETC_UPDATE_NOW>
 
+		<T_ETC_COMPLETE_DOWNLOAD>
+			<KR>다운로드가 완료되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_ETC_COMPLETE_DOWNLOAD>
+
+		<T_ETC_INSTALL_AND_RELAUNCH>
+			<KR>인스톨 후 재실행</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_ETC_INSTALL_AND_RELAUNCH>
+		
 		<T_ETC_LOGOUT>
 			<KR>로그아웃</KR>
 			<JP></JP>
@@ -10331,11 +10359,22 @@
     </E_0253>
 
     <E_0254>
-      <KR>WAS Server와 원활히 통신하지 못했습니다.</KR>
+      <KR>ID/PW 인증을 통해 Login 하셔야 합니다.</KR>
       <JP></JP>
       <EN></EN>
       <CN></CN>
     </E_0254>
+
+    <E_0255>
+      <KR>WAS Server와 원활히 통신하지 못했습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </E_0255>
+
+
+
+
 
   </ERROR>
 	<!-- ********************************************* [END] MSG ERROR (E_0000) ********************************************* -->

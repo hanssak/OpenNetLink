@@ -1,4 +1,4 @@
-#include "Tray.h"
+﻿#include "Tray.h"
 #include "NativeLog.h"
 #include "WebWindow.h"
 
@@ -21,9 +21,9 @@ static void submenu_cb(struct tray_menu *item);
 //char TEXT_HIDE[] = "숨기기";
 //char TEXT_EXIT[] = "끝내기";
 
-#define TEXT_SHOW		"Show"
-#define TEXT_HIDE		"Hide"
-#define TEXT_EXIT		"Exit"
+#define TEXT_SHOW	"보이기"	// Show
+#define TEXT_HIDE	"숨기기"	// Hide
+#define TEXT_EXIT	"끝내기"	// Exit
 
 //char TEXT_SHOW[512] = { 0, };
 
