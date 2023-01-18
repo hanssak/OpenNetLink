@@ -94,7 +94,6 @@
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGAvailableUpdate>();
 
-    private int popUpGroupID;
     private SparkleUpdater Sparkle { get; set; } = null;
     private List<AppCastItem> Updates { get; set; } = null;
     private bool IsDownloaded { get; set; } = false;
@@ -133,7 +132,7 @@
         set { _isRemindMeLaterVisible = value; CtrlSideUISvc.EmitNotifyStateChangedCtrlSide(); }
     }
 
-    public bool IsCloseVisble
+    public bool IsCloseVisible
     {
         get => _isCloseVisible;
         set{ _isCloseVisible = value; CtrlSideUISvc.EmitNotifyStateChangedCtrlSide(); }
@@ -196,14 +195,14 @@
             if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
             {
                 IsRemindMeLaterVisible = false;
-                IsCloseVisble = false;
+                IsCloseVisible = false;
                 //IsSkipVisible = false;
             }
             else
             {
                 //크리티컬한 업데이인 경우엔, SKIP이나 나중에는 하지 못하도록
                 bool isUserMissingCriticalUpdate = items.Any(x => x.IsCriticalUpdate);
-                IsRemindMeLaterVisible = isUserMissingCriticalUpdate = IsCloseVisble == false;
+                IsRemindMeLaterVisible = isUserMissingCriticalUpdate = IsCloseVisible == false;
                 //IsSkipVisible = isUserMissingCriticalUpdate == false;
             }
 
@@ -228,11 +227,9 @@
         CLog.Here().Information($"- LoadReleaseNotes...Done");
     }
 
-    public async void OpenPopUp(int groupId, SparkleUpdater sparkle, List<AppCastItem> updates, bool isDownloaded = false)
+    public async void OpenPopUp(SparkleUpdater sparkle, List<AppCastItem> updates, bool isDownloaded = false)
     {
         CLog.Here().Information($"- OpenAvailableUpdate");
-
-        popUpGroupID = groupId;
 
         Sparkle = sparkle;
         Updates = updates;
@@ -308,7 +305,7 @@
         await Task.Run(() =>
         {
             // Now Download and Install
-            AppUpdaterSvc.DownloadUpdateClick(popUpGroupID);
+            AppUpdaterSvc.DownloadUpdateClick();
         });
     }
 }

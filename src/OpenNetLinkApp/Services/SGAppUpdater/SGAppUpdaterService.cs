@@ -462,16 +462,10 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         /// <summary>업데이트 관리 정보 초기화</br></summary>
         void SetInitUpdateStatus();
 
-        /// <summary>해당 Groupid의 현재 업데이트 진행 상태</summary>
-        UpdateStatusType GetUpdateStatus();
-
-        /// <summary>해당 상태를 가진 GroupID 반환</summary>
-        //List<(int groupId, UpdateStatusType updateStatus)> GetUpdateStatusIDs(UpdateStatusType status);
+        void SetStartUpdateInfo(UpdateStatusType status, int groupId);
 
         /// <summary>현재 업데이트 진행 중인 GroupID 관리 정보 반환</summary>
         (UpdateStatusType, int) GetNowUpdateInfo();
-
-        void SetStartUpdateInfo(UpdateStatusType status, int groupId);
     }
 
     internal class SGAppUpdaterService : ISGAppUpdaterService
@@ -563,7 +557,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                     {
                         case UpdateStatus.UpdateAvailable:
                             CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ There's an update available! ]");
-                            AvailableUpdate?.OpenPopUp(groupId, SparkleInst, UpdateInfo.Updates);
+                            AvailableUpdate?.OpenPopUp(SparkleInst, UpdateInfo.Updates);
                             break;
                         case UpdateStatus.UpdateNotAvailable:
                             CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ There's no update available :( ]");
@@ -674,10 +668,6 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         {
             await Task.Run(() =>
             {
-                //다운상태에 있던 GroupId 사용
-                List<(int, UpdateStatusType)> currentGroupID = GetUpdateStatusIDs(UpdateStatusType.DOWNLOADING);
-                int groupId = (currentGroupID.Count > 0) ? currentGroupID[0].Item1 : 0;
-
                 IsCancelRequested = false;
                 IsCanceled = false;
                 string DownloadLog = string.Format($"{item.AppName} {item.Version} Started downloading... : [{path}]");
@@ -693,10 +683,6 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             {
                 if (IsCancelRequested == false)
                 {
-                    //다운상태에 있던 GroupId 사용
-                    List<(int, UpdateStatusType)> currentGroupID = GetUpdateStatusIDs(UpdateStatusType.DOWNLOADING);
-                    int groupId = (currentGroupID.Count > 0) ? currentGroupID[0].Item1 : 0;
-
                     string DownloadLog = string.Format($"{item.AppName} {item.Version} Done downloading! : [{path}]");
                     string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>Done downloading!");
 
@@ -748,6 +734,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
         public async void InstallUpdateClick()
         {
+            SetUpdateStatus(UpdateStatusType.INSTALLING);
             //파일 송/수신 중일땐 업데이트 대기 후 처리
             if (_HSCmdCenter.GetFileRecving())
             {
@@ -787,6 +774,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
         public async void CBCloseApplication()
         {
+            SetInitUpdateStatus();
             // System.Windows.Application.Current.Shutdown();
             await Task.Run(() =>
             {
@@ -853,7 +841,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                         case UpdateStatus.UpdateAvailable:
                             CLog.Here().Information($"AppUpdaterService - CheckUpdatesAutomatically : [ There's an update available! ]");
                             InitializeBackgroundUpdate(SparkleInst, UpdateInfo.Updates);
-                            DownloadUpdateBackground();
+                            DownloadUpdateBackground(groupId);
                             // AvailableUpdate?.OpenPopUp(SparkleInst, UpdateInfo.Updates);
                             break;
                         #region [사용안함]
@@ -871,7 +859,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                         //    break; 
                         #endregion
                         default:
-                            SetUpdateStatus(groupId, false);
+                            SetInitUpdateStatus();
                             break;
                     }
                 }
@@ -910,7 +898,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
         public async void DownloadUpdateBackground(int groupId)
         {
-            SetUpdateStatus(groupId, UpdateStatusType.DOWNLOADING);
+            SetUpdateStatus(UpdateStatusType.DOWNLOADING);
             await Task.Run(() =>
             {
                 // RunFullUpdateUpdateStatusLabel.Text = "Checking for update...";
@@ -973,7 +961,6 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         public async void CBFullUpdateCloseApplication()
         {
             //System.Windows.Application.Current.Shutdown();
-            SetUpdateStatus(currentGroupId, false);
             await Task.Delay(2000);
             await Task.Run(() =>
             {
@@ -998,7 +985,6 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             {
                 CLog.Here().Information($"AppUpdaterService - SetUpdateStatus : GroupID[{nowUpdateInfo.groupId}] UpdateStatue[{InProgress.ToString()}]");
                 nowUpdateInfo.status = InProgress;
-
             }
         }
 
@@ -1027,18 +1013,5 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         /// <param name="groupId"></param>
         /// <returns></returns>
         public (UpdateStatusType, int) GetNowUpdateInfo() => nowUpdateInfo;
-         //   (m_DicGroupIDUpdateStatus.Count > 0) ? m_DicGroupIDUpdateStatus : null;
-
-        
-
-        ///// <summary>
-        ///// 해당 상태를 가진 GroupID 반환
-        ///// </summary>
-        ///// <param name="status"></param>
-        ///// <returns></returns>
-        //public List<(int groupId, UpdateStatusType updateStatus)> GetUpdateStatusIDs(UpdateStatusType status) => m_DicGroupIDUpdateStatus.Where(grp => grp.Value == status).Select(grp => (grp.Key, grp.Value)).ToList();
-
-
-
     }
 }
