@@ -39,6 +39,7 @@
 <SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
 <SGAlert @ref="refSGAlertApproveAfter" OnConfirm="ApproveAfterTransFile" Guid="HeaderUIApporveAfterAlert"></SGAlert>
 <SGAlert @ref="refSGAlertApproveAfterMyCount" OnConfirm="ApproveAfterPageMove" OnCancel="ApproveAfterCancel" Guid="HeaderUIApporveAfterMyCountAlert"></SGAlert>
+<SGAlert @ref="refSGAlertUpdateStart" Guid="HeaderUIUpdateStartAlert"></SGAlert>
 
 @code
 {
@@ -54,6 +55,7 @@
     ClipBoardTypeSelect refClipBoardTypeSelect;
     SGAlert refSGAlertApproveAfter;
     SGAlert refSGAlertApproveAfterMyCount;
+    SGAlert refSGAlertUpdateStart;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
 
@@ -86,6 +88,8 @@
         OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
         VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+
+        SGAppUpdaterSvc.SetStartPatchNotiEventAdd(StartPatchNoti);
 
         GetIpV4Str();
         SetPlatFormInfo();
@@ -1082,15 +1086,15 @@
 
 #if _WINDOWS
 
-        try
-        {
-            if (e.strUrlData != null && e.strUrlData.Length > 0)
-                System.Diagnostics.Process.Start("explorer", e.strUrlData);
-        }
-        catch (Exception ex)
-        {
-            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-        }
+    try
+    {
+    if (e.strUrlData != null && e.strUrlData.Length > 0)
+        System.Diagnostics.Process.Start("explorer", e.strUrlData);
+    }
+    catch (Exception ex)
+    {
+    CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+    }
 
 #elif _LINUX
 
@@ -2716,6 +2720,15 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         InsertAlarm(groupID, sidebar, eAType, "", strMsg);
         if (HsCmdCenter.GetFileRecvPossible(groupID) == true)
             Window.Notification(os_noti, strTitle, strMsg);
+    }
+
+    void StartPatchNoti(string newVersion)
+    {
+        string patchTitle = XmlConf.GetInfoMsg("I_0239");   //패치 업데이트 시작
+        string patchMsg = string.Format(XmlConf.GetInfoMsg("I_0240"), newVersion); //잠시 후 OpenNetLink 업데이트가 진행됩니다. (version {0})
+
+        Task.Run(async () => { await refSGAlertUpdateStart.openPopUp(patchTitle, patchMsg, 0, 0); });
+        Window.Notification(OS_NOTI.NOTICE, patchTitle, patchMsg);
     }
 
 

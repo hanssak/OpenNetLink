@@ -15,6 +15,7 @@ var sitename = Argument("sitename", "hanssak");
 var configuration = Argument("configuration", "Release");
 var setNetwork = Argument<bool>("setNetwork", true);
 var isPatch = Argument<bool>("isPatch", false);
+var isLightPatch = Argument<bool>("isLightPatch", false);
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
 var customName = "NONE";
 var AppProps = new AppProperty(Context, 
@@ -426,6 +427,19 @@ Task("PkgWin10")
 	DeleteFiles("./artifacts/windows/published/*.so");
 	DeleteFiles("./artifacts/windows/published/*.pdb");
 
+	//Light Patch 버전일 땐, edge 폴더 배포전에 제거
+	if(isPatch.ToString().ToUpper().Equals("TRUE"))
+	{
+		if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
+		{
+			if(DirectoryExists("./artifacts/windows/published/wwwroot/edge")) 
+			{
+				DeleteDirectory("./artifacts/windows/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
+			}
+		}
+	}
+	Information("5");
+	
 	var files = GetFiles("./artifacts/windows/published/*.so.*");
 	foreach(var file in files)
 	{
@@ -451,6 +465,7 @@ Task("PkgWin10")
 		Defines = new Dictionary<string, string>{
 			{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
 			{"IS_PATCH", isPatch.ToString().ToUpper()},
+			{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
 			{"NETWORK_FLAG", networkFlag.ToUpper()},
 			{"CUSTOM_NAME", customName.ToUpper()}			
 		}
