@@ -48,6 +48,9 @@
     public string m_strUpdateInfo2 = "";
     public string m_strSvrVersion = "";
 
+    //해당 POPUP 처리한 Groupid
+    private int popUpGroupID;
+
     public delegate void LoginUpdateEvent();
     public LoginUpdateEvent LoginUpdate;
     public delegate void NotiUpdateEvent();
@@ -83,8 +86,9 @@
     {
         InitText();
     }
-    public async Task openPopUp()
+    public async Task openPopUp(int groupId)
     {
+        popUpGroupID = groupId;
         object[] param = { "modal-UpdateNotiPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -98,7 +102,7 @@
         ClientUpgradeExeEvent clientUpdateExe = null;
         clientUpdateExe = HSCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
         if (clientUpdateExe != null)
-            clientUpdateExe();
+            clientUpdateExe(popUpGroupID);
         //if (type == 0)
         //    LoginUpdate();
         //else if (type == 1)

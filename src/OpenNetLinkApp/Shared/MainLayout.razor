@@ -295,7 +295,12 @@
 
     }
 
-    public async void UpdateNoti(PageEventArgs e)
+    /// <summary>
+    /// (Only) 서버 노티 발생 시 처리
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
+    public async void UpdateNoti(int groupID, PageEventArgs e)
     {
         string strSvrCliVersion = e.strMsg;
         if (strSvrCliVersion.Equals(""))
@@ -309,14 +314,22 @@
         }
 
         strSvrCliVersion = strSvrCliVersion.ToUpper();
-        CLog.Here().Information("UpdateNoti Server Client Version {0}", strSvrCliVersion);
+        CLog.Here().Information($"groupID : {groupID} - UpdateNoti Server Client Version {strSvrCliVersion}");
         strCliVersion = strCliVersion.ToUpper();
 
-        CLog.Here().Information("MainLayOut Server Client Version {0}", strSvrCliVersion);
-        CLog.Here().Information("MainLayOut Local Client Version {0}", strCliVersion);
+        CLog.Here().Information($"groupID : {groupID} - MainLayOut Server Client Version {strSvrCliVersion}");
+        CLog.Here().Information($"groupID : {groupID} - MainLayOut Local Client Version {strCliVersion}");
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
         {
+            //업데이트  진행중이면 SKIP 하도록 처리 (KYH)
+            (Enums.UpdateStatusType status, int groupId) nowUpdateInfo = AppUpdaterSvc.GetNowUpdateInfo();
+            if (nowUpdateInfo.status != Enums.UpdateStatusType.NONE && nowUpdateInfo.groupId > -1)
+            {
+                CLog.Here().Information($"nowUpdateInfo.groupId : {groupID} - Update Already Started By GroupID[{nowUpdateInfo.groupId}] / Status[{nowUpdateInfo.status.ToString()}]");
+                return;
+            }
+
             string strSvrVersion = e.strMsg;
             refUpdate_NotiPopUp.SetVersionText(strSvrCliVersion);
             refUpdate_NotiPopUp.SetType(1);
@@ -327,11 +340,11 @@
                 ClientUpgradeExeEvent clientUpdateExe = null;
                 clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
                 if (clientUpdateExe != null)
-                    clientUpdateExe();
+                    clientUpdateExe(groupID);
             }
             else
             {
-                await refUpdate_NotiPopUp.openPopUp();
+                await refUpdate_NotiPopUp.openPopUp(groupID);
             }
             //OpenDownloadUpdate();
         }

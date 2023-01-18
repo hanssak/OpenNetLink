@@ -15,7 +15,10 @@
                 </div>
             </div>
             <div class="modal-footer1">
-                <button type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right" @onclick="Confirm">@strOk</button>
+                @if (mode != 0)
+                {
+                    <button type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right" @onclick="Confirm">@strOk</button>
+                }
                 @if (mode == 2)
                 {
                     <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right" @onclick="Cancel">@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
@@ -60,7 +63,7 @@
     /// </summary>
     /// <param name="tle"></param>
     /// <param name="msg"></param>
-    /// <param name="md"></param>
+    /// <param name="md">0: none / 1:confirm / 2: confirm && cancel </param>
     /// <param name="gid"></param>
     /// <param name="argument">전달인자</param>
     /// <param name="okMsg">확인 버튼 문구</param>

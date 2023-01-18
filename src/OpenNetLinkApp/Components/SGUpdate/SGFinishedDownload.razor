@@ -43,7 +43,7 @@
             </div>
             <div class="modal-footer-default ">
                 <button type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-0 " @onclick="@(async () => InstallAndRelaunch())">@XmlConf.GetTitle("T_ETC_INSTALL_AND_RELAUNCH")</button>
-                <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0 " @onclick="@(OnClosePopUp.InvokeAsync)">@XmlConf.GetTitle("T_FILE_FOLD")</button>
+                <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0 " @onclick="@(async () => UpdateDownloadButNotInstall())">@XmlConf.GetTitle("T_FILE_FOLD")</button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -115,6 +115,17 @@
         {
             // Now Install
             AppUpdaterSvc.InstallUpdateClick();
+        });
+    }
+
+    private async void UpdateDownloadButNotInstall()
+    {
+        CLog.Here().Information($"- UpdateDownloadButNotInstall");
+        AppUpdaterSvc.SetInitUpdateStatus();
+
+        await Task.Run(() =>
+        {
+            OnClosePopUp.InvokeAsync(null);
         });
     }
 }
