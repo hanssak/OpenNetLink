@@ -1086,15 +1086,15 @@
 
 #if _WINDOWS
 
-    try
-    {
-    if (e.strUrlData != null && e.strUrlData.Length > 0)
-        System.Diagnostics.Process.Start("explorer", e.strUrlData);
-    }
-    catch (Exception ex)
-    {
-    CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-    }
+        try
+        {
+            if (e.strUrlData != null && e.strUrlData.Length > 0)
+                System.Diagnostics.Process.Start("explorer", e.strUrlData);
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+        }
 
 #elif _LINUX
 
@@ -1709,7 +1709,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             ISGSideBarUI sgSideBarUI = SGAppMgrSvc.SideBarUIService.ActiveMenu;
             if (sgSideBarUI.Path.Contains("transferApprove") && sgSideBarUI.GroupId.ToString() == arg)
             {
-                PageDataRefreshEvent pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
+                PageDataRefreshEvent pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUIAfter);
                 if (pgRefreshEvent != null)
                     pgRefreshEvent();
             }
@@ -1720,7 +1720,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
                 ISGSideBarUI activeMenu = SideBarUISvc.FindSubMenu(Convert.ToInt32(arg), $"/transferApprove/{arg}");
                 ChangeActiveMenuWrap(eventArgs, activeMenu);
-                MyNavigationManager.NavigateTo($"/transferApprove/{arg}");
+                MyNavigationManager.NavigateTo($"/transferApprove/{arg}/1");
             }
 
             pageService.SetApproveAfterMyCountChecking(false);

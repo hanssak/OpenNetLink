@@ -49,6 +49,8 @@ namespace OpenNetLinkApp.Common
             ClipApproveUI = 3,
             [Description("파일전송 예외처리")]
             FileException = 4,
+            [Description("일반결재 사후")]
+            ApproveUIAfter = 5
         }
         /// <summary>
         /// 승인/반려
