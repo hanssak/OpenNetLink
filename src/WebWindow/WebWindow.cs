@@ -113,18 +113,49 @@ namespace WebWindows
         public readonly int nExLength;
         public readonly IntPtr pExMem;
 
+        public readonly byte[] pMemByte;
+
+        public readonly byte[] pExMemByte;
+
         public ClipBoardData(int nGroupId, CLIPTYPE nType, int nLength, IntPtr pMem, int nExLength, IntPtr pExMem)
         {
             this.nGroupId = nGroupId;
             this.nType = nType;
             this.nLength = nLength;
             this.pMem = pMem;
-
             this.nExLength = nExLength;
             this.pExMem = pExMem;
+
+            this.pMemByte = new byte[nLength];
+            this.pExMemByte = new byte[nExLength];
+
+            if(nLength > 0)
+                Marshal.Copy(pMem, pMemByte, 0, nLength);
+            if(nExLength > 0)
+                Marshal.Copy(pExMem, pExMemByte, 0, nExLength);
         }
 
+        public ClipBoardData(ClipBoardData copyData)
+        {
+            this.nGroupId = copyData.nGroupId;
+            this.nType = copyData.nType;
+            this.nLength = copyData.nLength;
+            this.pMem = copyData.pMem;
+            this.nExLength = copyData.nExLength;
+            this.pExMem = copyData.pExMem;
+            this.pMemByte = new Byte[copyData.nLength];
+            this.pExMemByte = new Byte[copyData.nExLength];
 
+            if(copyData.nLength > 0 )
+            {
+                Marshal.Copy(copyData.pMem, this.pMemByte, 0, copyData.nLength);
+            }
+
+            if(copyData.nExLength > 0)
+            {
+                Marshal.Copy(copyData.pExMem, this.pExMemByte, 0, copyData.nExLength);
+            }
+        }
     }
 
 

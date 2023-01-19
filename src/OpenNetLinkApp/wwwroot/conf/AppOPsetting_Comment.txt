@@ -53,8 +53,7 @@ bUseApprWaitNoti : 승인대기 알림설정 설정값(true, false)
 bUserIDSave : 로그인하는 사용자ID만 저장하는 option 사용유무( true / false )
 bAutoLogin : IDPW 자동로그인 기능 사용유무 ( true : 사용, false : 유지 안함 )
 bAutoLoginCheck : IDPW 자동로그인 체크박스 기본 체크되어 있게 설정 ( true : 사용, false : 유지 안함 )
-bUserPWChange : 사용자pw 변경 기능 사용 ( true, false ) [기능X]
-
+bUserPWChange : 사용자pw 변경 기능 사용, PW 검증기능 동시 사용 ( true, false ) ( true, false )
 bEmptyfileTrans : 0kb 파일 전송 가능 유무(true, false)
 
 // IDPW - 관련 기타(siteConfig)
@@ -188,3 +187,7 @@ bVisiblePolicyUpdateButton : SGHeaderUI 에서 정책업데이트 버튼 보여�
 						=> true : 보여준다
 						=> false : 보여주지 않는다.
 bUseChkHardSpace : 파일 수신시 디바이스 용량 체크 여부
+
+bUseOver1Auth : AD로그인 실패시, IDPW 로그인시도할수 있게 Login UI 설정 및 동작(자동로그인X)
+
+bUseLoginAfterTray : 로그인 후 Tray로 이동, bStartTrayMove 이 옵션과 혼동해서 사용 금지, 로그인 후 Tray 로 이동과 프로그램 시작시 Tray로 이동

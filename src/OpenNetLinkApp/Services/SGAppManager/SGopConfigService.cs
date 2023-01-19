@@ -225,6 +225,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns></returns>
         public bool GetUsePartialFileAddInTransfer();
 
+        public bool GetUseLoginAfterTray();
 
         /// <summary>
         /// 알람 초기화 매일 자정마다
@@ -241,6 +242,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         /// <returns></returns>
         public bool GetVisiblePolicyUpdateButton();
+
+        /// <summary>
+        /// AD로그인 실패시, IDPW 로그인시도할수 있게 Login UI 설정 및 동작
+        /// </summary>
+        /// <param name="nGroupID"></param>
+        /// <returns></returns>
+        public bool GetUseOver1auth(int nGroupID);
+
     }
 
 
@@ -783,6 +792,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bUseChkHardSpace;
         }
 
+        public bool GetUseLoginAfterTray()
+        {
+            return AppConfigInfo.bUseLoginAfterTray;
+        }
+
         public bool GetUseInitAlarmPerDay()
         {
             return AppConfigInfo.bUseInitAlarmPerDay;
@@ -797,5 +811,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bVisiblePolicyUpdateButton;
         }
+
+        public bool GetUseOver1auth(int nGroupID)
+        {
+            (AppConfigInfo as SGopConfig).bUseOver1Auth ??= new List<bool>();
+
+            if ((AppConfigInfo as SGopConfig).bUseOver1Auth.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGopConfig).bUseOver1Auth[nGroupID];
+
+            return false;    // 기본값
+        }
+
     }
 }

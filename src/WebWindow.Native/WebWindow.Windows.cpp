@@ -1589,6 +1589,7 @@ int WebWindow::SendClipBoard(int groupID)
 
 			if (nType == 0)
 			{
+				CloseClipboard();
 				g_bDoingSendClipBoard = false;
 				ClipDataBufferClear();
 				NTLog(SelfThis, Info, "WebWindow::SendClipBoard - UnKnown Type - Error : %d", groupID);

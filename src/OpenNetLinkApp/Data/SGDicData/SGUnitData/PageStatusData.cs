@@ -67,7 +67,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         // 필수결재 기능 사용UI 떴을때, 사용자가 결재로 파일전송 요청했는지 유무
         bool m_bApproveExtTransFileWithApprove = false;
 
-
         //타이머관련 변수는 PageStatusService로 이동
         //public Timer timer = null;
         //public static DateTime svrTime;

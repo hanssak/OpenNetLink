@@ -15,6 +15,6 @@ namespace OpenNetLinkApp.Models.SGNetwork
         public string TlsVersion { get; set; }
         public string ClientVersion { get; set; }
         public string NetPos { get; set; }
-        public string ADDomain { get; set; }
+        public List<string> ADDomain { get; set; }
     }
 }

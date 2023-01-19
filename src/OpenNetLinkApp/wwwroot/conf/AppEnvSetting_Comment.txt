@@ -70,8 +70,7 @@ bUseApprWaitNoti : 승인대기 알림설정 설정값(true, false)
 bUserIDSave : 로그인하는 사용자ID만 저장하는 option 사용유무( true / false )
 bAutoLogin : IDPW 자동로그인 기능 사용유무 ( true : 사용, false : 유지 안함 )
 bAutoLoginCheck : IDPW 자동로그인 체크박스 기본 체크되어 있게 설정 ( true : 사용, false : 유지 안함 )
-bUserPWChange : 사용자pw 변경 기능 사용 ( true, false ) [기능X] (무슨기능인지 파악 안됨.)
-
+bUserPWChange : 사용자pw 변경 기능 사용, PW 검증기능 동시 사용 ( true, false )
 bEmptyfileTrans : 0kb 파일 전송 가능 유무(true, false)
 
 
