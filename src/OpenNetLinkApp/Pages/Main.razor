@@ -170,6 +170,11 @@
     {
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
         refSGAlert.closePopUp();
+        
+        //GS는 내부망VDI가 여러개 보유하고 있기 때문에, 로그인 중복 발생 가능성이 있으며,
+        //취소 시 프로그램 종료하여 로그인 화면에 머물지 않도록 방지
+        if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
+        Window.ProgramExit();
     }
 
     /// <summary>
