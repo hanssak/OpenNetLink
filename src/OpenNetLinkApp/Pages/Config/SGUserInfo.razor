@@ -53,9 +53,8 @@
                                         <td>
                                             @(GetUserInfo()?.UserName) &nbsp;&nbsp;&nbsp;
                                             @if (pageService.GetGroupIDLoginType(groupIDbyParam) != eLoginType.eLOGINTYPE_AD && SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupIDbyParam))
-                                            {
-                                                //GS리테일의 경우, Agnet에서 '비밀번호 변경' 항목은 보이지 않도록 변경
-                                                @*<button type="button" class="btn bg-gradient-secondary btn-xs col-md-3" @onclick="openPWChangePopUp">@XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</button>*@
+                                            {                                                
+                                                <button type="button" class="btn bg-gradient-secondary btn-xs col-md-3" @onclick="openPWChangePopUp">@XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</button>
                                             }
                                         </td>
                                         <!-- <td rowspan="4" class="p-0 text-center align-middle">
