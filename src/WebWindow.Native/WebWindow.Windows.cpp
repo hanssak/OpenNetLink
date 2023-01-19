@@ -2057,10 +2057,10 @@ void WebWindow::SetTrayStartUse(bool bUseStartTray)
 		struct tray_menu* item = tray.menu;
 		do
 		{
-			if (strcmp(item->text, "Hide") == 0 ||
-				strcmp(item->text, "Show") == 0)
+			if (strcmp(item->text, TEXT_HIDE) == 0 ||
+				strcmp(item->text, TEXT_SHOW) == 0)
 			{
-				item->text = (char*)(g_bStartTray?"Show":"Hide");
+				item->text = (char*)(g_bStartTray? TEXT_SHOW : TEXT_HIDE);
 				item->checked = g_bStartTray;
 				tray_update(&tray);
 				break;
@@ -2081,10 +2081,10 @@ void WebWindow::SetTrayStatus(bool bSetTextShowNchecked)
 	struct tray_menu* item = tray.menu;
 	do
 	{
-		if (strcmp(item->text, "Hide") == 0 ||
-			strcmp(item->text, "Show") == 0)
+		if (strcmp(item->text, TEXT_HIDE) == 0 ||
+			strcmp(item->text, TEXT_SHOW) == 0)
 		{
-			item->text = (char*)(bSetTextShowNchecked ?"Show":"Hide");
+			item->text = (char*)(bSetTextShowNchecked ? TEXT_SHOW : TEXT_HIDE);
 			item->checked = bSetTextShowNchecked;
 			tray_update(&tray);
 			break;

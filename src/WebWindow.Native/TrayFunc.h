@@ -25,8 +25,6 @@ static void submenu_cb(struct tray_menu *item);
 #define TEXT_HIDE	"숨기기"	// Hide
 #define TEXT_EXIT	"끝내기"	// Exit
 
-//char TEXT_SHOW[512] = { 0, };
-
 
 // Test tray init
 #if defined(TRAY_APPINDICATOR) || defined(TRAY_APPKIT)

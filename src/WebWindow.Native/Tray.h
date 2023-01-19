@@ -359,8 +359,12 @@ static HMENU _tray_menu(struct tray_menu *m, UINT *id) {
       item.wID = *id;
 
       wchar_t wText[1024] = { 0, };
-      MultiByteToWideChar(CP_ACP, 0, m->text, -1, wText, sizeof(wText));
-      //MultiByteToWideChar(CP_UTF8, 0, m->text, strlen(m->text), wText, 1024-1);
+
+#ifdef DEBUG
+      MultiByteToWideChar(CP_ACP, 0, m->text, strlen(m->text), wText, sizeof(wText));
+#else
+      MultiByteToWideChar(CP_UTF8, 0, m->text, strlen(m->text), wText, 1024 - 1);
+#endif
 
       item.dwTypeData = wText;
       //item.dwTypeData = m->text;
