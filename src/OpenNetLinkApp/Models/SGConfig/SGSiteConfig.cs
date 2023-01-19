@@ -78,6 +78,6 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseInputSearchApproveExtTree { get; set; } = false;         // 결재필수 확장자, 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
 
-        public bool m_bUseOver1Auth { get; set; } = true;                    // 1단계 이상 인증 사용
+        public bool m_bUseOver1Auth { get; set; } = false;                    // 1단계 이상 인증 사용
     }
 }
