@@ -402,6 +402,18 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         }
     }
 
+    internal class AppUpdaterManager
+    {
+        AppUpdaterManager() { }
+        public int GroupId;
+        /* To Manage Updater, NetSparkle Instance */
+        public SparkleUpdater SparkleInst = null;
+
+        /* To Save the gathered Update Info */
+        public UpdateInfo UpdateInfo = null;
+        public AppUpdaterManager(int groupId) => GroupId = groupId;
+    }
+
     public interface ISGAppUpdaterService
     {
         /* To Manage Updater, NetSparkle Instance */
@@ -428,7 +440,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         // HSCmdCenter _HSCmdCenter { get; set; }
 
         /* To Function Features */
-        void Init(string updateSvcIP, string updatePlatform, HSCmdCenter hSCmdCenter);
+        void Init(int groupID, string updateSvcIP, string updatePlatform, HSCmdCenter hSCmdCenter);
         /// <summary>공통환경설정에 [업데이트 확인] 버튼 클릭</summary>
         void CheckUpdatesClick(int groupId,
                                 SGCheckUpdate sgCheckUpdate = null,
@@ -478,12 +490,14 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
         private Serilog.ILogger CLog => Serilog.Log.ForContext<SGAppUpdaterService>();
         public SGAppUpdaterService() { }
-        public void Init(string updateSvcIP, string updatePlatform, HSCmdCenter hSCmdCenter)
+        public void Init(int groupID, string updateSvcIP, string updatePlatform, HSCmdCenter hSCmdCenter)
         {
-            CLog.Here().Information($"- AppUpdaterService Initializing... : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
+            CLog.Here().Information($"- AppUpdaterService (groupID:{groupID}) Initializing... : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
             //SparkleInst = new SparkleUpdater($"https://{updateSvcIP}/NetSparkle/files/sample-app/appcast.xml", new DSAChecker(SecurityMode.Strict))
-            SparkleInst = new SelfSparkleUpdater($"https://{updateSvcIP}/updatePlatform/{updatePlatform}/appcast.xml",
-                                                new Ed25519Checker(SecurityMode.Strict, null, "wwwroot/conf/Sparkling.service"))
+
+            AppUpdaterManager updaterManager = new AppUpdaterManager(groupID);
+            updaterManager.SparkleInst = new SelfSparkleUpdater($"https://{updateSvcIP}/updatePlatform/{updatePlatform}/appcast.xml",
+                                                  new Ed25519Checker(SecurityMode.Strict, null, "wwwroot/conf/Sparkling.service"))
             {
                 UIFactory = null,
                 AppCastDataDownloader = new WebRequestAppCastDataDownloader(),
@@ -491,21 +505,26 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             };
 
             // TLS 1.2 required by GitHub (https://developer.github.com/changes/2018-02-01-weak-crypto-removal-notice/)
-            SparkleInst.SecurityProtocolType = System.Net.SecurityProtocolType.Tls12;
-            (SparkleInst.AppCastDataDownloader as WebRequestAppCastDataDownloader).TrustEverySSLConnection = true;
-            SparkleInst.LogWriter = new SGAppUpdaterLogWriter();
+            updaterManager.SparkleInst.SecurityProtocolType = System.Net.SecurityProtocolType.Tls12;
+            (updaterManager.SparkleInst.AppCastDataDownloader as WebRequestAppCastDataDownloader).TrustEverySSLConnection = true;
+            updaterManager.SparkleInst.LogWriter = new SGAppUpdaterLogWriter();
+
+            SparkleManager.AddOrUpdate(groupID, updaterManager, (key, value) => value = updaterManager);
 
             //파일 송수신 상태를 알기 위해 참조
-            _HSCmdCenter = hSCmdCenter;
+            if (_HSCmdCenter == null) _HSCmdCenter = hSCmdCenter;
 
             CLog.Here().Information($"- AppUpdaterService Initializing...Done : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
         }
 
         /* To Manage Updater, NetSparkle Instance */
-        public SparkleUpdater SparkleInst { get; private set; } = null;
+        public ConcurrentDictionary<int, AppUpdaterManager> SparkleManager { get; private set; } = new ConcurrentDictionary<int, AppUpdaterManager>();
 
-        /* To Save the gathered Update Info */
-        public UpdateInfo UpdateInfo { get; private set; } = null;
+        ///* To Save the gathered Update Info */
+        //public ConcurrentDictionary<int, UpdateInfo> UpdateInfo { get; private set; } = new ConcurrentDictionary<int, UpdateInfo>();
+
+        //To Check FileSending / FileRecving
+        private HSCmdCenter _HSCmdCenter { get; set; } = null;
 
         /* To Save Downloaded Package File */
         public string DownloadPath { get; private set; } = string.Empty;
@@ -516,7 +535,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         public SGDownloadUpdate DownloadUpdate { get; private set; } = null;
         public SGFinishedDownload FinishedDownload { get; private set; } = null;
         public SGMessageNotification MessageNotification { get; private set; } = null;
-        private HSCmdCenter _HSCmdCenter { get; set; } = null;
+
 
         /// <summary>HeaderUI에 패치 설치를 알립니다. </summary>
         StartPatchNotiHandler StartPatchNotiEvent { get; set; } = null;
@@ -533,6 +552,13 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                                             SGFinishedDownload sgFinishedDownload = null,
                                             SGMessageNotification sgMessageNotification = null)
         {
+            AppUpdaterManager updaterManager = getUpdateManager(groupId);
+            if (updaterManager == null)
+            {
+                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - CheckUpdatesClick not Setting AppUpdaterManager if groupid[{groupId}]");
+                return;
+            }
+
             SetStartUpdateInfo(UpdateStatusType.CHECKING, groupId);
             CheckUpdate = sgCheckUpdate;
             AvailableUpdate = sgAvailableUpdate;
@@ -540,9 +566,11 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             FinishedDownload = sgFinishedDownload;
             MessageNotification = sgMessageNotification;
 
-            CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ Checking for updates... ]");
+            CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - CheckUpdates : [ Checking for updates... ]");
+
             CheckUpdate?.OpenPopUp();
-            UpdateInfo = await SparkleInst.CheckForUpdatesQuietly();
+
+            updaterManager.UpdateInfo = await updaterManager.SparkleInst.CheckForUpdatesQuietly();
             await Task.Delay(1000);
 
             await Task.Run(() =>
@@ -551,26 +579,26 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 // use _sparkle.CheckForUpdatesQuietly() if you don't want the user to know you are checking for updates!
                 // if you use CheckForUpdatesAtUserRequest() and are using a UI, then handling things yourself is rather silly
                 // as it will show a UI for things
-                if (UpdateInfo != null)
+                if (updaterManager.UpdateInfo != null)
                 {
-                    switch (UpdateInfo.Status)
+                    switch (updaterManager.UpdateInfo.Status)
                     {
                         case UpdateStatus.UpdateAvailable:
-                            CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ There's an update available! ]");
-                            AvailableUpdate?.OpenPopUp(SparkleInst, UpdateInfo.Updates);
+                            CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - CheckUpdates : [ There's an update available! ]");
+                            AvailableUpdate?.OpenPopUp(updaterManager.SparkleInst, updaterManager.UpdateInfo.Updates);
                             break;
                         case UpdateStatus.UpdateNotAvailable:
-                            CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ There's no update available :( ]");
+                            CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - CheckUpdates : [ There's no update available :( ]");
                             MessageNotification?.OpenPopUp("There's no update available :(");
                             SetInitUpdateStatus();
                             break;
                         case UpdateStatus.UserSkipped:
-                            CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ The user skipped this update! ]");
+                            CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - CheckUpdates : [ The user skipped this update! ]");
                             MessageNotification?.OpenPopUp("The user skipped this update!<br>You have elected to skip this version.");
                             SetInitUpdateStatus();
                             break;
                         case UpdateStatus.CouldNotDetermine:
-                            CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ We couldn't tell if there was an update... ]");
+                            CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - CheckUpdates : [ We couldn't tell if there was an update... ]");
                             MessageNotification?.OpenPopUp("We couldn't tell if there was an update...");
                             SetInitUpdateStatus();
                             break;
@@ -578,8 +606,15 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 }
             });
         }
-        public async void SkipUpdateClick(AppCastItem CurrentItem)
+        public async void SkipUpdateClick(int groupId, AppCastItem CurrentItem)
         {
+            AppUpdaterManager updaterManager = getUpdateManager(groupId);
+            if (updaterManager == null)
+            {
+                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - SkipUpdateClick not Setting AppUpdaterManager if groupid[{groupId}]");
+                return;
+            }
+
             await Task.Run(() =>
             {
                 CLog.Here().Information($"AppUpdaterService - SkipUpdate : [ {CurrentItem.AppName} {CurrentItem.Version} ]");
@@ -1002,7 +1037,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         {
             CLog.Here().Information($"AppUpdaterService - SetInitUpdateStatus");
             //m_DicGroupIDUpdateStatus.Clear();
-            
+
             nowUpdateInfo.status = UpdateStatusType.NONE;
             nowUpdateInfo.groupId = -1;
         }
@@ -1013,5 +1048,13 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         /// <param name="groupId"></param>
         /// <returns></returns>
         public (UpdateStatusType, int) GetNowUpdateInfo() => nowUpdateInfo;
+
+        private AppUpdaterManager getUpdateManager(int groupid)
+        {
+            AppUpdaterManager tmpData = null;
+            if (SparkleManager.TryGetValue(groupid, out tmpData) != true)
+                return null;
+            return tmpData;
+        }
     }
 }
