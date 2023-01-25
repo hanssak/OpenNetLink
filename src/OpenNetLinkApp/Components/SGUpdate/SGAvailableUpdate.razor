@@ -167,6 +167,7 @@
 
         await Task.Run(() =>
         {
+         #region [사용안함] SGAppUpdaterService로 공통화         
             //_ReleaseNotesGrabber = new SelfReleaseNotesGrabber(separatorTemplate, headAddition, sparkle);
             //
             //AppCastItem item = items.FirstOrDefault();
@@ -193,14 +194,13 @@
             //else
             //{
             //    InfoText = string.Format("Would you like to {0} it now?", downloadInstallText);
-            //}
-
+            //}         
+         #endregion
 
             string appName = downReleaseNote.appName;
             string versionString = downReleaseNote.oldVersion;
             string newVersion = downReleaseNote.newVersion;
             string releaseNotes = downReleaseNote.releaseNotes;
-
 
             TitleHeaderText = string.Format("A new version of {0} is available.", appName ?? "the application");
             var downloadInstallText = isUpdateAlreadyDownloaded ? "install" : "download";

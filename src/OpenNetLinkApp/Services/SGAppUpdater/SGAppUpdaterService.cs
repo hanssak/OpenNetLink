@@ -645,6 +645,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 AvailableUpdate?.ClosePopUp();
 
                 LastProgressPercentage = 0;
+
+                InitialSparkleInstEvent();
                 // this is async so that it can grab the download file name from the server
                 updaterManager.SparkleInst.DownloadStarted -= CBStartedDownloading;
                 updaterManager.SparkleInst.DownloadStarted += CBStartedDownloading;
@@ -660,6 +662,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
                 updaterManager.SparkleInst.DownloadCanceled -= CBDownloadCanceled;
                 updaterManager.SparkleInst.DownloadCanceled += CBDownloadCanceled;
+
 
             });
 
@@ -1010,34 +1013,34 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             return (true, appName, oldVersion, newVersion, releaseNotes);
         }
 
-        /// <summary>
-        /// appcast.xml 파일을 기반으로 new Ver 파일 다운로드
-        /// </summary>
-        /// <param name="sparkle"></param>
-        /// <param name="items"></param>
-        /// <param name="isUpdateAlreadyDownloaded"></param>
-        /// <param name="separatorTemplate"></param>
-        /// <param name="headAddition"></param>
-        private async void _InitializeBackgroundUpdate(SparkleUpdater sparkle, List<AppCastItem> items, bool isUpdateAlreadyDownloaded = false,
-                                            string separatorTemplate = "", string headAddition = "")
-        {
-            CLog.Here().Information($"- InitializeBackgroundUpdate...");
-            SelfReleaseNotesGrabber _ReleaseNotesGrabber = null;
-            AppCastItem latestVersion = null;
+        ///// <summary>
+        ///// appcast.xml 파일을 기반으로 new Ver 파일 다운로드
+        ///// </summary>
+        ///// <param name="sparkle"></param>
+        ///// <param name="items"></param>
+        ///// <param name="isUpdateAlreadyDownloaded"></param>
+        ///// <param name="separatorTemplate"></param>
+        ///// <param name="headAddition"></param>
+        //private async void InitializeBackgroundUpdate(SparkleUpdater sparkle, List<AppCastItem> items, bool isUpdateAlreadyDownloaded = false,
+        //                                    string separatorTemplate = "", string headAddition = "")
+        //{
+        //    CLog.Here().Information($"- InitializeBackgroundUpdate...");
+        //    SelfReleaseNotesGrabber _ReleaseNotesGrabber = null;
+        //    AppCastItem latestVersion = null;
 
-            await Task.Run(() =>
-            {
-                _ReleaseNotesGrabber = new SelfReleaseNotesGrabber(separatorTemplate, headAddition, sparkle);
+        //    await Task.Run(() =>
+        //    {
+        //        _ReleaseNotesGrabber = new SelfReleaseNotesGrabber(separatorTemplate, headAddition, sparkle);
 
-                latestVersion = items.OrderByDescending(p => p.Version).FirstOrDefault();
-            });
+        //        latestVersion = items.OrderByDescending(p => p.Version).FirstOrDefault();
+        //    });
 
-            CancellationTokenSource _CancellationTokenSource = new CancellationTokenSource();
-            CancellationToken _CancellationToken = _CancellationTokenSource.Token;
+        //    CancellationTokenSource _CancellationTokenSource = new CancellationTokenSource();
+        //    CancellationToken _CancellationToken = _CancellationTokenSource.Token;
 
-            string releaseNotes = await _ReleaseNotesGrabber.DownloadAllReleaseNotes(items, latestVersion, _CancellationToken);
-            CLog.Here().Information($"- InitializeBackgroundUpdate...Done");
-        }
+        //    string releaseNotes = await _ReleaseNotesGrabber.DownloadAllReleaseNotes(items, latestVersion, _CancellationToken);
+        //    CLog.Here().Information($"- InitializeBackgroundUpdate...Done");
+        //}
 
         public async void DownloadUpdateBackground(int groupId)
         {
@@ -1056,6 +1059,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
                 //자동으로 프로그램이 종료되는 걸 방지하기 위해, DownloadAndInstall 모드 OFF
                 //SparkleInst.UserInteractionMode = UserInteractionMode.DownloadAndInstall;
+                InitialSparkleInstEvent();
                 updaterManager.SparkleInst.UpdateDetected -= CBFullUpdateUpdateDetected;
                 updaterManager.SparkleInst.UpdateDetected += CBFullUpdateUpdateDetected;
 
@@ -1187,6 +1191,24 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
             nowUpdateInfo.status = UpdateStatusType.NONE;
             nowUpdateInfo.groupId = -1;
+        }
+
+        public void InitialSparkleInstEvent()
+        {
+            foreach (AppUpdaterManager sparkle in SparkleManager.Values)
+            {
+                sparkle.SparkleInst.DownloadStarted -= CBStartedDownloading;
+                sparkle.SparkleInst.DownloadFinished -= CBFinishedDownloading;
+                sparkle.SparkleInst.DownloadHadError -= CBDownloadError;
+                sparkle.SparkleInst.DownloadMadeProgress -= CBDownloadMadeProgress;
+                sparkle.SparkleInst.DownloadCanceled -= CBDownloadCanceled;
+                sparkle.SparkleInst.UpdateDetected -= CBFullUpdateUpdateDetected;
+                sparkle.SparkleInst.DownloadStarted -= CBFullUpdateStartedDownloading;
+                sparkle.SparkleInst.DownloadFinished -= CBFullUpdateDownloadFileIsReady;
+                sparkle.SparkleInst.CloseApplication -= CBFullUpdateCloseApplication;
+                sparkle.SparkleInst.DownloadHadError -= CBDownloadError;
+                
+            } 
         }
 
         /// <summary>
