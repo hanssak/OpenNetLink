@@ -2166,7 +2166,7 @@
 
     private void CancelDownloadUpdate()
     {
-        AppUpdaterSvc.SparkleInst.CancelFileDownload();
+        AppUpdaterSvc.RequestCancelFileDownload();
         AppUpdaterSvc.IsCancelRequested = true;
     }
 

@@ -146,20 +146,22 @@
 
         conTimer.Stop();
 
+
+        //groupId 별로 AppUpdaterServie 관리
+        string strRipNport = "";
+        HsNetWork hsNetWork = null;
+        hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
+        if (hsNetWork != null)
+        {
+            strRipNport = hsNetWork.GetRealHostInfo();
+        }
+
+        strRipNport += ":3439";
+        SGAppUpdaterSvc.Init(groupId, strRipNport, SGAppMgrSvc.VersionConfigInfoService.GetUpdatePlatform(), HSCmdCenter);
+
+
         if (groupId == 0)
         {
-
-            string strRipNport = "";
-
-            HsNetWork hsNetWork = null;
-            hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
-            if (hsNetWork != null)
-            {
-                strRipNport = hsNetWork.GetRealHostInfo();
-            }
-
-            strRipNport += ":3439";
-            SGAppUpdaterSvc.Init(strRipNport, SGAppMgrSvc.VersionConfigInfoService.GetUpdatePlatform(),HSCmdCenter);
             goLogIn(loginType);
         }
 

@@ -29,11 +29,11 @@
         <div class="modal-content">
             <div class="modal-header-default">
                 <div class="modal-title"><i class="fas fa-cog blue-txt mr-2 "></i>@XmlConf.GetTitle("T_ETC_SOFTWARE_UPDATE")</div>
-           @if (IsCloseVisible)
+                @if (IsCloseVisible)
                 {
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"  @onclick="@(async () => AvailableUpdateButNotUpdate())">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@(async () => AvailableUpdateButNotUpdate())">
                         <span aria-hidden="true">&times;</span>
-                        </button>
+                    </button>
                 }
             </div>
             <div class="modal-body-default_up">
@@ -65,9 +65,9 @@
             <div class="modal-footer-default clearfix">
                 <div class="container">
                     @*@if (IsSkipVisible)   //'이 버전 넘기기' 처리 시 다른 Client에서도 해당 버전을 받을 수 없기 떄문에 해당 기능 제거
-                    {
+                        {
                         <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-1 float-left" @onclick="@(async () => SkipThisUpdateVersion())">이 버전 넘기기</button>
-                    }*@
+                        }*@
                     @if (IsRemindMeLaterVisible)
                     {
                         <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-1 float-right" @onclick="@(async () => RemindMeLater())">@XmlConf.GetTitle("T_ETC_REMIND_ME_LATER")</button>
@@ -81,7 +81,6 @@
     <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
-
 @code
 {
 
@@ -94,6 +93,7 @@
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGAvailableUpdate>();
 
+    private int popUpGroupID;
     private SparkleUpdater Sparkle { get; set; } = null;
     private List<AppCastItem> Updates { get; set; } = null;
     private bool IsDownloaded { get; set; } = false;
@@ -106,7 +106,7 @@
 
     private bool _isRemindMeLaterVisible = true;
 
-    private bool _isCloseVisible =true;
+    private bool _isCloseVisible = true;
     //'이 버전 넘기기' 처리 시 다른 Client에서도 해당 버전을 받을 수 없기 떄문에 해당 기능 제거
     //private bool _isSkipVisible = true;
 
@@ -135,14 +135,14 @@
     public bool IsCloseVisible
     {
         get => _isCloseVisible;
-        set{ _isCloseVisible = value; CtrlSideUISvc.EmitNotifyStateChangedCtrlSide(); }
+        set { _isCloseVisible = value; CtrlSideUISvc.EmitNotifyStateChangedCtrlSide(); }
     }
 
     @*public bool IsSkipVisible
-    {
+        {
         get => _isSkipVisible;
         set { _isSkipVisible = value; CtrlSideUISvc.EmitNotifyStateChangedCtrlSide(); }
-    }*@
+        }*@
 
     public string ReleaseNotes
     {
@@ -161,35 +161,54 @@
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         CLog.Here().Information($"- InitializeSGAvailableUpdate...");
 
+        var downReleaseNote = await AppUpdaterSvc.DownloadReleaseNote(popUpGroupID);
+        if (downReleaseNote.result!)
+            return;
+
         await Task.Run(() =>
         {
-            _ReleaseNotesGrabber = new SelfReleaseNotesGrabber(separatorTemplate, headAddition, sparkle);
+            //_ReleaseNotesGrabber = new SelfReleaseNotesGrabber(separatorTemplate, headAddition, sparkle);
+            //
+            //AppCastItem item = items.FirstOrDefault();
+            //
+            //TitleHeaderText = string.Format("A new version of {0} is available.", item?.AppName ?? "the application");
+            //var downloadInstallText = isUpdateAlreadyDownloaded ? "install" : "download";
+            //if (item != null)
+            //{
+            //    var versionString = "";
+            //    try
+            //    {
+            //        // Use try/catch since Version constructor can throw an exception and we don't want to
+            //        // die just because the user has a malformed version string
+            //        Version versionObj = new Version(item.AppVersionInstalled);
+            //        versionString = NetSparkleUpdater.Utilities.GetVersionString(versionObj);
+            //    }
+            //    catch
+            //    {
+            //        versionString = "?";
+            //    }
+            //    InfoText = string.Format("{0} {3} is now available (you have {1}). Would you like to {2} it now?", item.AppName, versionString,
+            //        downloadInstallText, item.Version);
+            //}
+            //else
+            //{
+            //    InfoText = string.Format("Would you like to {0} it now?", downloadInstallText);
+            //}
 
-            AppCastItem item = items.FirstOrDefault();
 
-            TitleHeaderText = string.Format("A new version of {0} is available.", item?.AppName ?? "the application");
+            string appName = downReleaseNote.appName;
+            string versionString = downReleaseNote.oldVersion;
+            string newVersion = downReleaseNote.newVersion;
+            string releaseNotes = downReleaseNote.releaseNotes;
+
+
+            TitleHeaderText = string.Format("A new version of {0} is available.", appName ?? "the application");
             var downloadInstallText = isUpdateAlreadyDownloaded ? "install" : "download";
-            if (item != null)
-            {
-                var versionString = "";
-                try
-                {
-                    // Use try/catch since Version constructor can throw an exception and we don't want to
-                    // die just because the user has a malformed version string
-                    Version versionObj = new Version(item.AppVersionInstalled);
-                    versionString = NetSparkleUpdater.Utilities.GetVersionString(versionObj);
-                }
-                catch
-                {
-                    versionString = "?";
-                }
-                InfoText = string.Format("{0} {3} is now available (you have {1}). Would you like to {2} it now?", item.AppName, versionString,
-                    downloadInstallText, item.Version);
-            }
+
+            if (!string.IsNullOrEmpty(versionString))
+                InfoText = $"{appName} {newVersion} is now available (you have {versionString}). Would you like to {downloadInstallText} it now?";
             else
-            {
-                InfoText = string.Format("Would you like to {0} it now?", downloadInstallText);
-            }
+                InfoText = $"Would you like to {downloadInstallText} it now?";
 
             //강제 업데이트 기능 사용 시 이 버전 넘기기, 나중에 업데이트 버튼 숨김
             if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
@@ -206,11 +225,11 @@
                 //IsSkipVisible = isUserMissingCriticalUpdate == false;
             }
 
-            _CancellationTokenSource = new CancellationTokenSource();
-            _CancellationToken = _CancellationTokenSource.Token;
-
-            ReleaseNotes = _ReleaseNotesGrabber.GetLoadingText();
-            LoadReleaseNotes(items);
+            //_CancellationTokenSource = new CancellationTokenSource();
+            //_CancellationToken = _CancellationTokenSource.Token;
+            //
+            //ReleaseNotes = _ReleaseNotesGrabber.GetLoadingText();
+            //LoadReleaseNotes(items);
         });
 
         CLog.Here().Information($"- InitializeSGAvailableUpdate...Done");
@@ -227,10 +246,11 @@
         CLog.Here().Information($"- LoadReleaseNotes...Done");
     }
 
-    public async void OpenPopUp(SparkleUpdater sparkle, List<AppCastItem> updates, bool isDownloaded = false)
+    public async void OpenPopUp(int groupId, SparkleUpdater sparkle, List<AppCastItem> updates, bool isDownloaded = false)
     {
         CLog.Here().Information($"- OpenAvailableUpdate");
 
+        popUpGroupID = groupId;
         Sparkle = sparkle;
         Updates = updates;
         IsDownloaded = isDownloaded;
@@ -281,7 +301,7 @@
 
         await Task.Run(() =>
         {
-            AppUpdaterSvc.SkipUpdateClick(
+            AppUpdaterSvc.SkipUpdateClick(popUpGroupID,
                 Updates.OrderByDescending(p => p.Version).FirstOrDefault()
             );
 
