@@ -158,81 +158,99 @@
     private async void InitializeSGAvailableUpdate(SparkleUpdater sparkle, List<AppCastItem> items, bool isUpdateAlreadyDownloaded = false,
                                             string separatorTemplate = "", string headAddition = "")
     {
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        CLog.Here().Information($"- InitializeSGAvailableUpdate...");
-
-        var downReleaseNote = await AppUpdaterSvc.DownloadReleaseNote(popUpGroupID);
-        if (downReleaseNote.result!)
-            return;
-
-        await Task.Run(() =>
+        try
         {
-         #region [사용안함] SGAppUpdaterService로 공통화         
-            //_ReleaseNotesGrabber = new SelfReleaseNotesGrabber(separatorTemplate, headAddition, sparkle);
-            //
-            //AppCastItem item = items.FirstOrDefault();
-            //
-            //TitleHeaderText = string.Format("A new version of {0} is available.", item?.AppName ?? "the application");
-            //var downloadInstallText = isUpdateAlreadyDownloaded ? "install" : "download";
-            //if (item != null)
-            //{
-            //    var versionString = "";
-            //    try
-            //    {
-            //        // Use try/catch since Version constructor can throw an exception and we don't want to
-            //        // die just because the user has a malformed version string
-            //        Version versionObj = new Version(item.AppVersionInstalled);
-            //        versionString = NetSparkleUpdater.Utilities.GetVersionString(versionObj);
-            //    }
-            //    catch
-            //    {
-            //        versionString = "?";
-            //    }
-            //    InfoText = string.Format("{0} {3} is now available (you have {1}). Would you like to {2} it now?", item.AppName, versionString,
-            //        downloadInstallText, item.Version);
-            //}
-            //else
-            //{
-            //    InfoText = string.Format("Would you like to {0} it now?", downloadInstallText);
-            //}         
-         #endregion
 
-            string appName = downReleaseNote.appName;
-            string versionString = downReleaseNote.oldVersion;
-            string newVersion = downReleaseNote.newVersion;
-            string releaseNotes = downReleaseNote.releaseNotes;
 
-            TitleHeaderText = string.Format("A new version of {0} is available.", appName ?? "the application");
-            var downloadInstallText = isUpdateAlreadyDownloaded ? "install" : "download";
+            siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+            CLog.Here().Information($"- InitializeSGAvailableUpdate...");
 
-            if (!string.IsNullOrEmpty(versionString))
-                InfoText = $"{appName} {newVersion} is now available (you have {versionString}). Would you like to {downloadInstallText} it now?";
-            else
-                InfoText = $"Would you like to {downloadInstallText} it now?";
+            var downReleaseNote = await AppUpdaterSvc.DownloadReleaseNote(popUpGroupID);
+            if (!downReleaseNote.result)
+                return;
 
-            //강제 업데이트 기능 사용 시 이 버전 넘기기, 나중에 업데이트 버튼 숨김
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
+            await Task.Run(() =>
             {
-                IsRemindMeLaterVisible = false;
-                IsCloseVisible = false;
-                //IsSkipVisible = false;
-            }
-            else
-            {
-                //크리티컬한 업데이인 경우엔, SKIP이나 나중에는 하지 못하도록
-                bool isUserMissingCriticalUpdate = items.Any(x => x.IsCriticalUpdate);
-                IsRemindMeLaterVisible = isUserMissingCriticalUpdate = IsCloseVisible == false;
-                //IsSkipVisible = isUserMissingCriticalUpdate == false;
-            }
+                string appName = downReleaseNote.appName;
+                string versionString = downReleaseNote.oldVersion;
+                string newVersion = downReleaseNote.newVersion;
+                ReleaseNotes = downReleaseNote.releaseNotes;
 
-            //_CancellationTokenSource = new CancellationTokenSource();
-            //_CancellationToken = _CancellationTokenSource.Token;
-            //
-            //ReleaseNotes = _ReleaseNotesGrabber.GetLoadingText();
-            //LoadReleaseNotes(items);
-        });
+                TitleHeaderText = string.Format("A new version of {0} is available.", appName ?? "the application");
+                var downloadInstallText = isUpdateAlreadyDownloaded ? "install" : "download";
 
-        CLog.Here().Information($"- InitializeSGAvailableUpdate...Done");
+                if (!string.IsNullOrEmpty(versionString))
+                    InfoText = $"{appName} {newVersion} is now available (you have {versionString}). Would you like to {downloadInstallText} it now?";
+                else
+                    InfoText = $"Would you like to {downloadInstallText} it now?";
+
+                //강제 업데이트 기능 사용 시 이 버전 넘기기, 나중에 업데이트 버튼 숨김
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
+                {
+                    IsRemindMeLaterVisible = false;
+                    IsCloseVisible = false;
+                    //IsSkipVisible = false;
+                }
+                else
+                {
+                    //크리티컬한 업데이인 경우엔, SKIP이나 나중에는 하지 못하도록
+                    bool isUserMissingCriticalUpdate = items.Any(x => x.IsCriticalUpdate);
+                    if (isUserMissingCriticalUpdate)
+                        IsRemindMeLaterVisible = IsCloseVisible = false;
+                    else
+                        IsRemindMeLaterVisible = IsCloseVisible = true;
+                    //IsSkipVisible = isUserMissingCriticalUpdate == false;
+                }
+
+                //[사용안함] SGAppUpdaterService로 공통화
+                //_ReleaseNotesGrabber = new SelfReleaseNotesGrabber(separatorTemplate, headAddition, sparkle);
+                //
+                //AppCastItem item = items.FirstOrDefault();
+                //
+                //TitleHeaderText = string.Format("A new version of {0} is available.", item?.AppName ?? "the application");
+                //var downloadInstallText = isUpdateAlreadyDownloaded ? "install" : "download";
+                //if (item != null)
+                //{
+                //    var versionString = "";
+                //    try
+                //    {
+                //        // Use try/catch since Version constructor can throw an exception and we don't want to
+                //        // die just because the user has a malformed version string
+                //        Version versionObj = new Version(item.AppVersionInstalled);
+                //        versionString = NetSparkleUpdater.Utilities.GetVersionString(versionObj);
+                //    }
+                //    catch
+                //    {
+                //        versionString = "?";
+                //    }
+                //    InfoText = string.Format("{0} {3} is now available (you have {1}). Would you like to {2} it now?", item.AppName, versionString,
+                //        downloadInstallText, item.Version);
+                //}
+                //else
+                //{
+                //    InfoText = string.Format("Would you like to {0} it now?", downloadInstallText);
+                //}
+
+                 //_CancellationTokenSource = new CancellationTokenSource();
+                //_CancellationToken = _CancellationTokenSource.Token;
+                //
+                //ReleaseNotes = _ReleaseNotesGrabber.GetLoadingText();
+                //LoadReleaseNotes(items);
+
+                //_CancellationTokenSource = new CancellationTokenSource();
+                //_CancellationToken = _CancellationTokenSource.Token;
+                //
+                //ReleaseNotes = _ReleaseNotesGrabber.GetLoadingText();
+                //LoadReleaseNotes(items);
+            });
+
+            //    StateHasChanged();
+            CLog.Here().Information($"- InitializeSGAvailableUpdate...Done");
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"InitializeSGAvailableUpdate - Exception {ex.ToString()}");
+        }
     }
 
     private async void LoadReleaseNotes(List<AppCastItem> items)
@@ -255,6 +273,8 @@
         Updates = updates;
         IsDownloaded = isDownloaded;
 
+        InitializeSGAvailableUpdate(Sparkle, Updates, IsDownloaded, separatorTemplate: "", headAddition: "");
+
         object[] param = { "modal-availableupdate" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
         object[] param2 = { "1000" };
@@ -264,8 +284,6 @@
 
         object[] param4 = { "0" };
         await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param4);
-
-        InitializeSGAvailableUpdate(Sparkle, Updates, IsDownloaded, separatorTemplate: "", headAddition: "");
     }
 
     private async void AvailableUpdateButNotUpdate()

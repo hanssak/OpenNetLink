@@ -560,7 +560,7 @@
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_UPDATE")</div>                                                                                                       <!--업데이트-->
     <div class="ml-2 mb-5 updates">
         <ul class="mb-1  w-100 ">
-            <li><a class="update" @onclick="@(async () => CheckUpdatesControlClick())" data-toggle="modal" data-target="#modal-checkupdate" style="cursor: pointer;">@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
+            <li><a class="update" @onclick="@(async () => CheckUpdatesControlClick())" data-toggle="modal" style="cursor: pointer;">@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_LASTUPDATE") :  @(GetLastUpdated())</li> <!--마지막 업데이트-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_SOFTWARE_VERSION") :  OpenNetLink @(GetSWVersion())+@(GetSWCommitId())</li> <!--소프트웨어버전-->
         </ul>
@@ -571,7 +571,7 @@
 
 <!-- /.Control Sidebar -->
 <SelectSaveFolder @ref="refSelectSaveFolder" OnSaveDirPath="SaveDownloadDir"></SelectSaveFolder>
-<SGCheckUpdate @ref="refSGCheckUpdate" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
+<SGCheckUpdate @ref="refSGCheckUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
 <SGAvailableUpdate @ref="refSGAvailableUpdate" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseAvailableUpdate"></SGAvailableUpdate>
 <SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CancelDownloadUpdate"></SGDownloadUpdate>
 <SGFinishedDownload @ref="refSGFinishedDownload" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseFinishedDownload"></SGFinishedDownload>
@@ -2126,10 +2126,20 @@
         (Enums.UpdateStatusType status, int groupId) nowUpdateInfo = AppUpdaterSvc.GetNowUpdateInfo();
         if (nowUpdateInfo.status != Enums.UpdateStatusType.NONE && nowUpdateInfo.groupId > -1)
         {
-            CLog.Here().Information($"nowUpdateInfo.groupId : {groupId} - Update Already Started By GroupID[{nowUpdateInfo.groupId}] / Status[{nowUpdateInfo.status.ToString()}]");
+            CLog.Here().Information($"GID:{groupId}] SKIP - Update Already Started By GroupID[{nowUpdateInfo.groupId}] / Status[{nowUpdateInfo.status.ToString()}]");
             refSGMessageNotification?.OpenPopUp("Update Already Starting :(");
             return;
         }
+
+        //업데이트 진행은 아니지만, Update Cancel 중이면 SKIP
+        if(AppUpdaterSvc.IsCancelRequested)
+        {
+            CLog.Here().Information($"[GID:{groupId}] SKIP - Update Canceling...");
+            refSGMessageNotification?.OpenPopUp($"We are working on [Canceling] the update.{Environment.NewLine}Please try again in a few minutes. :(");
+            return;
+        }
+
+
          await Task.Run(() =>
         {
             AppUpdaterSvc.CheckUpdatesClick(groupId, refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
@@ -2159,11 +2169,11 @@
         refSGAvailableUpdate.ClosePopUp();
     }
 
-    private void OpenDownloadUpdate(string downloadInfo)
+    @*private void OpenDownloadUpdate(string downloadInfo)
     {
         refSGDownloadUpdate.OpenPopUp(downloadInfo);
     }
-
+*@
     private void CancelDownloadUpdate()
     {
         AppUpdaterSvc.RequestCancelFileDownload();

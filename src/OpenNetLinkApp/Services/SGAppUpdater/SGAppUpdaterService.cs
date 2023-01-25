@@ -494,12 +494,12 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
         private Serilog.ILogger CLog => Serilog.Log.ForContext<SGAppUpdaterService>();
         public SGAppUpdaterService() { }
-        public void Init(int groupID, string updateSvcIP, string updatePlatform, HSCmdCenter hSCmdCenter)
+        public void Init(int groupId, string updateSvcIP, string updatePlatform, HSCmdCenter hSCmdCenter)
         {
-            CLog.Here().Information($"- AppUpdaterService (groupID:{groupID}) Initializing... : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
+            CLog.Here().Information($"[GID:{groupId}]- AppUpdaterService Initializing... : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
             //SparkleInst = new SparkleUpdater($"https://{updateSvcIP}/NetSparkle/files/sample-app/appcast.xml", new DSAChecker(SecurityMode.Strict))
 
-            AppUpdaterManager updaterManager = new AppUpdaterManager(groupID);
+            AppUpdaterManager updaterManager = new AppUpdaterManager(groupId);
             updaterManager.SparkleInst = new SelfSparkleUpdater($"https://{updateSvcIP}/updatePlatform/{updatePlatform}/appcast.xml",
                                                   new Ed25519Checker(SecurityMode.Strict, null, "wwwroot/conf/Sparkling.service"))
             {
@@ -513,12 +513,12 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             (updaterManager.SparkleInst.AppCastDataDownloader as WebRequestAppCastDataDownloader).TrustEverySSLConnection = true;
             updaterManager.SparkleInst.LogWriter = new SGAppUpdaterLogWriter();
 
-            SparkleManager.AddOrUpdate(groupID, updaterManager, (key, value) => value = updaterManager);
+            SparkleManager.AddOrUpdate(groupId, updaterManager, (key, value) => value = updaterManager);
 
             //파일 송수신 상태를 알기 위해 참조
             if (_HSCmdCenter == null) _HSCmdCenter = hSCmdCenter;
 
-            CLog.Here().Information($"- AppUpdaterService Initializing...Done : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
+            CLog.Here().Information($"[GID:{groupId}]- AppUpdaterService Initializing...Done : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
         }
 
         /* To Manage Updater, NetSparkle Instance */
@@ -559,7 +559,14 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             AppUpdaterManager updaterManager = getUpdateManager(groupId);
             if (updaterManager == null)
             {
-                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - CheckUpdatesClick not Setting AppUpdaterManager of groupid[{groupId}]");
+                CLog.Here().Error($"[GID:{groupId}] AppUpdaterService - CheckUpdatesClick not Setting AppUpdaterManager of groupid[{groupId}]");
+                return;
+            }
+
+            //업데이트 진행은 아니지만, Update Cancel 중이면 SKIP
+            if (this.IsCancelRequested)
+            {
+                CLog.Here().Error($"[GID:{groupId}] AppUpdaterService - CheckUpdatesClick SKIP - Update Canceling...");
                 return;
             }
 
@@ -570,7 +577,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             FinishedDownload = sgFinishedDownload;
             MessageNotification = sgMessageNotification;
 
-            CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - CheckUpdates : [ Checking for updates... ]");
+            CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - CheckUpdates : [ Checking for updates... ]");
 
             CheckUpdate?.OpenPopUp();
 
@@ -589,21 +596,21 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 switch (updaterManager.UpdateInfo.Status)
                 {
                     case UpdateStatus.UpdateAvailable:
-                        CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - CheckUpdates : [ There's an update available! ]");
+                        CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - CheckUpdates : [ There's an update available! ]");
                         AvailableUpdate?.OpenPopUp(groupId, updaterManager.SparkleInst, updaterManager.UpdateInfo.Updates);
                         break;
                     case UpdateStatus.UpdateNotAvailable:
-                        CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - CheckUpdates : [ There's no update available :( ]");
+                        CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - CheckUpdates : [ There's no update available :( ]");
                         MessageNotification?.OpenPopUp("There's no update available :(");
                         SetInitUpdateStatus();
                         break;
                     case UpdateStatus.UserSkipped:
-                        CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - CheckUpdates : [ The user skipped this update! ]");
+                        CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - CheckUpdates : [ The user skipped this update! ]");
                         MessageNotification?.OpenPopUp("The user skipped this update!<br>You have elected to skip this version.");
                         SetInitUpdateStatus();
                         break;
                     case UpdateStatus.CouldNotDetermine:
-                        CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - CheckUpdates : [ We couldn't tell if there was an update... ]");
+                        CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - CheckUpdates : [ We couldn't tell if there was an update... ]");
                         MessageNotification?.OpenPopUp("We couldn't tell if there was an update...");
                         SetInitUpdateStatus();
                         break;
@@ -616,13 +623,13 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             AppUpdaterManager updaterManager = getUpdateManager(groupId);
             if (updaterManager == null)
             {
-                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - SkipUpdateClick not Setting AppUpdaterManager of groupid[{groupId}]");
+                CLog.Here().Error($"[GID:{groupId}] AppUpdaterService - SkipUpdateClick not Setting AppUpdaterManager of groupid[{groupId}]");
                 return;
             }
 
             await Task.Run(() =>
             {
-                CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - SkipUpdate : [ {CurrentItem.AppName} {CurrentItem.Version} ]");
+                CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - SkipUpdate : [ {CurrentItem.AppName} {CurrentItem.Version} ]");
                 updaterManager.SparkleInst.Configuration.SetVersionToSkip(CurrentItem.Version);
             });
         }
@@ -634,14 +641,14 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             AppUpdaterManager updaterManager = getUpdateManager(groupId);
             if (updaterManager == null)
             {
-                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - DownloadUpdateClick not Setting AppUpdaterManager of groupid[{groupId}]");
+                CLog.Here().Error($"[GID:{groupId}] AppUpdaterService - DownloadUpdateClick not Setting AppUpdaterManager of groupid[{groupId}]");
                 return;
             }
 
             SetUpdateStatus(UpdateStatusType.DOWNLOADING);
             await Task.Run(() =>
             {
-                CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - DownloadUpdate : [ Download for Update... ]");
+                CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - DownloadUpdate : [ Download for Update... ]");
                 AvailableUpdate?.ClosePopUp();
 
                 LastProgressPercentage = 0;
@@ -680,7 +687,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             AppUpdaterManager updaterManager = getUpdateManager(groupId);
             if (updaterManager == null)
             {
-                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - CBDownloadMadeProgress not Setting AppUpdaterManager of groupid[{groupId}]");
+                if (!IsCancelRequested)
+                    CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - CBDownloadMadeProgress not Setting AppUpdaterManager of groupid[{groupId}]");
                 return;
             }
 
@@ -700,6 +708,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                     }
                     else
                     {
+
                         SetInitUpdateStatus();
                         if (IsCanceled == false)
                         {
@@ -734,7 +743,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             AppUpdaterManager updaterManager = getUpdateManager(groupId);
             if (updaterManager == null)
             {
-                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - CBStartedDownloading not Setting AppUpdaterManager of groupid[{groupId}]");
+                CLog.Here().Error($"[GID:{groupId}] AppUpdaterService - CBStartedDownloading not Setting AppUpdaterManager of groupid[{groupId}]");
                 return;
             }
 
@@ -746,7 +755,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>Started downloading...");
 
                 updaterManager.SparkleInst.LogWriter.PrintMessage(DownloadLog);
-                DownloadUpdate?.OpenPopUp(DownloadInfo);
+                DownloadUpdate?.OpenPopUp(DownloadInfo, item.IsCriticalUpdate);
             });
         }
         public async void CBFinishedDownloading(AppCastItem item, string path)
@@ -755,7 +764,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             AppUpdaterManager updaterManager = getUpdateManager(groupId);
             if (updaterManager == null)
             {
-                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - CBFinishedDownloading not Setting AppUpdaterManager of groupid[{groupId}]");
+                CLog.Here().Error($"[GID:{groupId}] AppUpdaterService - CBFinishedDownloading not Setting AppUpdaterManager of groupid[{groupId}]");
                 return;
             }
 
@@ -810,6 +819,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                     IsCanceled = true;
                     DownloadUpdate?.ClosePopUp();
                 }
+                IsCancelRequested = false;
             });
         }
 
@@ -819,7 +829,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             AppUpdaterManager updaterManager = getUpdateManager(groupId);
             if (updaterManager == null)
             {
-                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - InstallUpdateClick not Setting AppUpdaterManager of groupid[{groupId}]");
+                CLog.Here().Error($"[GID:{groupId}] AppUpdaterService - InstallUpdateClick not Setting AppUpdaterManager of groupid[{groupId}]");
                 return;
             }
 
@@ -831,7 +841,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 {
                     if (!_HSCmdCenter.GetFileRecving())
                         break;
-                    CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - InstallUpdate Wait : File Recving");
+                    CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - InstallUpdate Wait : File Recving");
                     Thread.Sleep(2000);
                 }
             }
@@ -843,7 +853,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                     if (!_HSCmdCenter.GetFileSending())
                         break;
 
-                    CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - InstallUpdate Wait : File Sending");
+                    CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - InstallUpdate Wait : File Sending");
                     Thread.Sleep(2000);
                 }
             }
@@ -856,7 +866,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
             await Task.Run(() =>
             {
-                CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - InstallUpdate : [ Install for Update [{DownloadPath}] ]");
+                CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - InstallUpdate : [ Install for Update [{DownloadPath}] ]");
                 updaterManager.SparkleInst.CloseApplication += CBCloseApplication;
                 updaterManager.SparkleInst.InstallUpdate(updaterManager.UpdateInfo.Updates.First(), DownloadPath);
             });
@@ -882,7 +892,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             AppUpdaterManager updaterManager = getUpdateManager(groupId);
             if (updaterManager == null)
             {
-                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - CheckUpdateBackgroundDown not Setting AppUpdaterManager of groupid[{groupId}]");
+                CLog.Here().Error($"[GID:{groupId}] AppUpdaterService - CheckUpdateBackgroundDown not Setting AppUpdaterManager of groupid[{groupId}]");
                 return;
             }
 
@@ -893,7 +903,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             //FinishedDownload = sgFinishedDownload;
             //MessageNotification = sgMessageNotification;
 
-            CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - CheckUpdatesAutomatically : [ Checking for updates... ]");
+            CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - CheckUpdatesAutomatically : [ Checking for updates... ]");
 
             //파일 송/수신 중일땐 업데이트 Skip
             if (_HSCmdCenter.GetFileRecving())
@@ -902,7 +912,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 {
                     if (!_HSCmdCenter.GetFileRecving())
                         break;
-                    CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - CheckUpdatesAutomatically Wait : File Recving");
+                    CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - CheckUpdatesAutomatically Wait : File Recving");
                     Thread.Sleep(2000);
                 }
             }
@@ -914,7 +924,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                     if (!_HSCmdCenter.GetFileSending())
                         break;
 
-                    CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - CheckUpdatesAutomatically Wait : File Sending");
+                    CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - CheckUpdatesAutomatically Wait : File Sending");
                     Thread.Sleep(2000);
                 }
             }
@@ -932,13 +942,13 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 if (updaterManager.UpdateInfo == null)
                     return;
 
-                CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - Check Update Status : {updaterManager.UpdateInfo.Status.ToString()}");
+                CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - Check Update Status : {updaterManager.UpdateInfo.Status.ToString()}");
                 switch (updaterManager.UpdateInfo.Status)
                 {
                     case UpdateStatus.UpdateAvailable:
-                        CLog.Here().Information($"AppUpdaterService (groupID:{groupId}) - CheckUpdatesAutomatically : [ There's an update available! ]");
+                        CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - CheckUpdatesAutomatically : [ There's an update available! ]");
                         //InitializeBackgroundUpdate(SparkleInst, UpdateInfo.Updates);
-                        DownloadReleaseNote(groupId);
+                        DownloadReleaseNote(groupId).Wait();
                         DownloadUpdateBackground(groupId);
                         // AvailableUpdate?.OpenPopUp(SparkleInst, UpdateInfo.Updates);
                         break;
@@ -961,14 +971,14 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             AppUpdaterManager updaterManager = getUpdateManager(groupId);
             if (updaterManager == null)
             {
-                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - DownloadReleaseNote not Setting AppUpdaterManager of groupid[{groupId}]");
+                CLog.Here().Error($"[GID:{groupId}] AppUpdaterService - DownloadReleaseNote not Setting AppUpdaterManager of groupid[{groupId}]");
                 AvailableUpdate?.ClosePopUp();
                 MessageNotification?.OpenPopUp("We can't find AppUpdaterManager. Try Again :(");
                 SetInitUpdateStatus();
                 return (false, appName, oldVersion, newVersion, releaseNotes);
             }
 
-            CLog.Here().Information($"- DownloadReleaseNote...");
+            CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - DownloadReleaseNote...");
             SelfReleaseNotesGrabber _ReleaseNotesGrabber = null;
             AppCastItem latestVersion = null;
 
@@ -1008,7 +1018,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             CancellationToken _CancellationToken = _CancellationTokenSource.Token;
 
             releaseNotes = await _ReleaseNotesGrabber.DownloadAllReleaseNotes(updaterManager.UpdateInfo.Updates, latestVersion, _CancellationToken);
-            CLog.Here().Information($"- DownloadReleaseNote...Done");
+            CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - DownloadReleaseNote...Done");
 
             return (true, appName, oldVersion, newVersion, releaseNotes);
         }
@@ -1047,7 +1057,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             AppUpdaterManager updaterManager = getUpdateManager(groupId);
             if (updaterManager == null)
             {
-                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - DownloadUpdateBackground not Setting AppUpdaterManager of groupid[{groupId}]");
+                CLog.Here().Error($"[GID:{groupId}] AppUpdaterService - DownloadUpdateBackground not Setting AppUpdaterManager of groupid[{groupId}]");
                 return;
             }
 
@@ -1055,7 +1065,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             await Task.Run(() =>
             {
                 // RunFullUpdateUpdateStatusLabel.Text = "Checking for update...";
-                CLog.Here().Information($"AppUpdaterService - UpdateAutomatically : [ Checking for updates... ]");
+                CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - UpdateAutomatically : [ Checking for updates... ]");
 
                 //자동으로 프로그램이 종료되는 걸 방지하기 위해, DownloadAndInstall 모드 OFF
                 //SparkleInst.UserInteractionMode = UserInteractionMode.DownloadAndInstall;
@@ -1083,14 +1093,14 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             AppUpdaterManager updaterManager = getUpdateManager(groupId);
             if (updaterManager == null)
             {
-                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - CBFullUpdateUpdateDetected not Setting AppUpdaterManager of groupid[{groupId}]");
+                CLog.Here().Error($"[GID:{groupId}] AppUpdaterService - CBFullUpdateUpdateDetected not Setting AppUpdaterManager of groupid[{groupId}]");
                 return;
             }
 
             await Task.Run(() =>
             {
                 // RunFullUpdateUpdateStatusLabel.Text = "Found update...";
-                string UpdateLog = string.Format($"AppUpdaterService - CBFullUpdateUpdateDetected : [ Found update... ]");
+                string UpdateLog = string.Format($"[GID:{groupId}] AppUpdaterService - CBFullUpdateUpdateDetected : [ Found update... ]");
                 updaterManager.SparkleInst.LogWriter.PrintMessage(UpdateLog);
             });
         }
@@ -1100,14 +1110,14 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             AppUpdaterManager updaterManager = getUpdateManager(groupId);
             if (updaterManager == null)
             {
-                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - CBFullUpdateStartedDownloading not Setting AppUpdaterManager of groupid[{groupId}]");
+                CLog.Here().Error($"[GID:{groupId}] AppUpdaterService - CBFullUpdateStartedDownloading not Setting AppUpdaterManager of groupid[{groupId}]");
                 return;
             }
 
             await Task.Run(() =>
             {
                 // RunFullUpdateUpdateStatusLabel.Text = "Started downloading update...";
-                string DownloadLog = string.Format($"AppUpdaterService - CBFullUpdateStartedDownloading : [{item.AppName} {item.Version} - Started downloading update... [{path}]]");
+                string DownloadLog = string.Format($"[GID:{groupId}] AppUpdaterService - CBFullUpdateStartedDownloading : [{item.AppName} {item.Version} - Started downloading update... [{path}]]");
                 updaterManager.SparkleInst.LogWriter.PrintMessage(DownloadLog);
             });
         }
@@ -1117,14 +1127,14 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             AppUpdaterManager updaterManager = getUpdateManager(groupId);
             if (updaterManager == null)
             {
-                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - CBFullUpdateDownloadFileIsReady not Setting AppUpdaterManager of groupid[{groupId}]");
+                CLog.Here().Error($"[GID:{groupId}] AppUpdaterService - CBFullUpdateDownloadFileIsReady not Setting AppUpdaterManager of groupid[{groupId}]");
                 return;
             }
 
             await Task.Run(() =>
             {
                 // RunFullUpdateUpdateStatusLabel.Text = "Update is ready...";
-                string DownloadLog = string.Format($"AppUpdaterService - CBFullUpdateDownloadFileIsReady : [{item.AppName} {item.Version} - Update is ready... [{downloadPath}]]");
+                string DownloadLog = string.Format($"[GID:{groupId}] AppUpdaterService - CBFullUpdateDownloadFileIsReady : [{item.AppName} {item.Version} - Update is ready... [{downloadPath}]]");
                 updaterManager.SparkleInst.LogWriter.PrintMessage(DownloadLog);
             });
 
@@ -1151,7 +1161,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             AppUpdaterManager updaterManager = getUpdateManager(groupId);
             if (updaterManager == null)
             {
-                CLog.Here().Error($"AppUpdaterService (groupID:{groupId}) - RequestCancelFileDownload not Setting AppUpdaterManager of groupid[{groupId}]");
+                CLog.Here().Error($"[GID:{groupId}] AppUpdaterService - RequestCancelFileDownload not Setting AppUpdaterManager of groupid[{groupId}]");
                 return;
             }
             updaterManager.SparkleInst.CancelFileDownload();
@@ -1176,7 +1186,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
         public void SetStartUpdateInfo(UpdateStatusType status, int groupId)
         {
-            CLog.Here().Information($"AppUpdaterService - SetStartUpdateInfo : GroupID[{groupId}] UpdateStatue[{status.ToString()}]");
+            CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - SetStartUpdateInfo : GroupID[{groupId}] UpdateStatue[{status.ToString()}]");
             nowUpdateInfo.status = status;
             nowUpdateInfo.groupId = groupId;
         }
@@ -1207,8 +1217,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 sparkle.SparkleInst.DownloadFinished -= CBFullUpdateDownloadFileIsReady;
                 sparkle.SparkleInst.CloseApplication -= CBFullUpdateCloseApplication;
                 sparkle.SparkleInst.DownloadHadError -= CBDownloadError;
-                
-            } 
+
+            }
         }
 
         /// <summary>
