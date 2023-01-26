@@ -770,6 +770,9 @@ namespace OpenNetLinkApp.Services
                         if (updatePolicyEvent != null) updatePolicyEvent(groupId);
                     }
                     break;
+                case eCmdList.eOLEMIMELISTQUERY:
+                    OLEMimeListAfterSend(groupId, sgData);
+                    break;
                 default:
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
@@ -906,6 +909,7 @@ namespace OpenNetLinkApp.Services
             {
                 SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
                 SendUserSFMInfo(groupId, sgLoginUserInfo.GetUserID());
+                SendUserOLEMimeList(groupId, sgLoginUserInfo.GetUserID());
             }
         }
 
@@ -2773,6 +2777,47 @@ namespace OpenNetLinkApp.Services
             sgDicRecvData.SetSFMListData(groupId, e[0] as SGData);
         }
 
+        /// <summary>
+        /// OLE마임리스트 정보 요청 (from tbl_ole_mimetype)
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public int SendUserOLEMimeList(int groupId, string userId)
+        {
+            SGUserData userData = (SGUserData)sgDicRecvData.GetUserData(groupId);
+            string strQuery = SGQueryExtend.GetOLEMimeList();
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupId);
+            if (hsNetWork != null)
+            {
+                return sgSendData.RequestSendOLEMimeListQuery(hsNetWork, userId, strQuery);
+            }
+
+            return -1;
+        }
+        /// <summary>
+        /// 문서 OLE용 마임리스트 정보 저장
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="data"></param>
+        public void OLEMimeListAfterSend(int groupId, SGData data)
+        {
+            OLEMimeRecvEvent oleMimeRecvEvent = sgPageEvent.GetOLEMimeRecvEvent();
+            if (oleMimeRecvEvent != null)
+            {
+                oleMimeRecvEvent(groupId, data);
+            }
+
+            //sgDicRecvData.SetOLEMimeListData(groupId, data);
+        }
+
+        //public SGData GetOLEMimeListData(int groupId)
+        //{
+        //    SGData data = sgDicRecvData.GetOLEMimeListData(groupId);
+        //    return data;
+        //}
+
         public int CommonSendQuery(eCmdList eCmd, int groupid, string strUserID, string strQuery)
         {
             HsNetWork hsNetWork = null;
@@ -2781,6 +2826,7 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestCommonSendQuery(hsNetWork, eCmd, strUserID, strQuery);
             return -1;
         }
+
         public int SendGenericNotiType2(int groupid, string strUserID, string strUserName, string strDeptName, string strFileName, string strPreworkType)
         {
             HsNetWork hsNetWork = null;

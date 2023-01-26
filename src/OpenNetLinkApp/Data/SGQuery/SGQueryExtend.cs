@@ -384,5 +384,14 @@ WHERE A.TRANS_SEQ = '{transSeq}'
         }
 
 
+
+
+        /// <summary>
+        /// tbl_file_ole_mimetype 테이블 조회하기
+        /// </summary>
+        /// <returns></returns>
+        public static string GetOLEMimeList() => "SELECT MIMETYPE, TYPE FROM TBL_FILE_OLE_MIMETYPE";
+
+
     }
 }

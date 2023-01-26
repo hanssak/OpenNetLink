@@ -1646,6 +1646,7 @@ protected override void OnInitialized()
     HsCmdCenter.sgPageEvent.SetSFMRefreshEvent(SendUserSFMInfo);
     HsCmdCenter.sgPageEvent.SetUpdatePolicyEvent(UpdatePolicy);
     HsCmdCenter.sgPageEvent.SetFileMimeRecvEvent(FileMimeRecvEvent);
+    HsCmdCenter.sgPageEvent.SetOLEMimeRecvEvent(OLEMimeRecvEvent);
     pageService.SetAlramAndMessageDeleteEvent(DelAllAlramAndMessage);
 
     pageService.SetAfterApprCommonNotiEvent(AfterApproveStatusChange); //사후정책 노티
@@ -2012,6 +2013,17 @@ public void FileMimeRecvEvent(int groupId)
     statusData.fileAddManage.LoadMimeConf(groupId);
 }
 
+//서버DB 로 OLE MIME 리스트 결과 이벤트
+public void OLEMimeRecvEvent(int groupId, SGData e)
+{
+    PageStatusData statusData = pageService.GetPageStatus(groupId);
+    if (statusData == null)
+        return;
+    if (statusData.fileAddManage == null)
+        return;
+      List<Dictionary<int, string>> oleMimeList= e.GetSvrRecordData("RECORD");
+    statusData.fileAddManage.SetOLEMimeList(groupId, oleMimeList);
+}
 public void AfterApproveStatusChange()
 {
     int groupID = nGroupID;
