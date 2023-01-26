@@ -494,6 +494,33 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
         private Serilog.ILogger CLog => Serilog.Log.ForContext<SGAppUpdaterService>();
         public SGAppUpdaterService() { }
+     
+        /* To Manage Updater, NetSparkle Instance */
+        /// <summary>GroupId 별 업데이트 객체 (SparkleInst,UpdateInfo) 관리 </summary>
+        public ConcurrentDictionary<int, AppUpdaterManager> SparkleManager { get; private set; } = new ConcurrentDictionary<int, AppUpdaterManager>();
+
+        ///* To Save the gathered Update Info */
+        //public ConcurrentDictionary<int, UpdateInfo> UpdateInfo { get; private set; } = new ConcurrentDictionary<int, UpdateInfo>();
+
+        //To Check FileSending / FileRecving
+        private HSCmdCenter _HSCmdCenter { get; set; } = null;
+
+        /* To Save Downloaded Package File */
+        public string DownloadPath { get; private set; } = string.Empty;
+        public bool IsCancelRequested { get; set; } = false;
+        public bool IsCanceled { get; set; } = false;
+        public SGCheckUpdate CheckUpdate { get; private set; } = null;
+        public SGAvailableUpdate AvailableUpdate { get; private set; } = null;
+        public SGDownloadUpdate DownloadUpdate { get; private set; } = null;
+        public SGFinishedDownload FinishedDownload { get; private set; } = null;
+        public SGMessageNotification MessageNotification { get; private set; } = null;
+
+
+        /// <summary>HeaderUI에 패치 설치를 알립니다. </summary>
+        StartPatchNotiHandler StartPatchNotiEvent { get; set; } = null;
+        /// <summary>패치파일 업데이트 알림</summary>
+        public void SetStartPatchNotiEventAdd(StartPatchNotiHandler e) => StartPatchNotiEvent = e;
+
         public void Init(int groupId, string updateSvcIP, string updatePlatform, HSCmdCenter hSCmdCenter)
         {
             CLog.Here().Information($"[GID:{groupId}]- AppUpdaterService Initializing... : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
@@ -520,31 +547,6 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
             CLog.Here().Information($"[GID:{groupId}]- AppUpdaterService Initializing...Done : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
         }
-
-        /* To Manage Updater, NetSparkle Instance */
-        public ConcurrentDictionary<int, AppUpdaterManager> SparkleManager { get; private set; } = new ConcurrentDictionary<int, AppUpdaterManager>();
-
-        ///* To Save the gathered Update Info */
-        //public ConcurrentDictionary<int, UpdateInfo> UpdateInfo { get; private set; } = new ConcurrentDictionary<int, UpdateInfo>();
-
-        //To Check FileSending / FileRecving
-        private HSCmdCenter _HSCmdCenter { get; set; } = null;
-
-        /* To Save Downloaded Package File */
-        public string DownloadPath { get; private set; } = string.Empty;
-        public bool IsCancelRequested { get; set; } = false;
-        public bool IsCanceled { get; set; } = false;
-        public SGCheckUpdate CheckUpdate { get; private set; } = null;
-        public SGAvailableUpdate AvailableUpdate { get; private set; } = null;
-        public SGDownloadUpdate DownloadUpdate { get; private set; } = null;
-        public SGFinishedDownload FinishedDownload { get; private set; } = null;
-        public SGMessageNotification MessageNotification { get; private set; } = null;
-
-
-        /// <summary>HeaderUI에 패치 설치를 알립니다. </summary>
-        StartPatchNotiHandler StartPatchNotiEvent { get; set; } = null;
-        /// <summary>패치파일 업데이트 알림</summary>
-        public void SetStartPatchNotiEventAdd(StartPatchNotiHandler e) => StartPatchNotiEvent = e;
 
 
         /* To Function Features */
