@@ -49,7 +49,7 @@
     public string m_strSvrVersion = "";
 
     //해당 POPUP 처리한 Groupid
-    private int popUpGroupID;
+    public int popUpGroupID = -1;
 
     public delegate void LoginUpdateEvent();
     public LoginUpdateEvent LoginUpdate;
@@ -103,6 +103,8 @@
         clientUpdateExe = HSCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
         if (clientUpdateExe != null)
             clientUpdateExe(popUpGroupID);
+
+        popUpGroupID = -1;
         //if (type == 0)
         //    LoginUpdate();
         //else if (type == 1)
