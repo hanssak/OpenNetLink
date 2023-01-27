@@ -809,7 +809,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     str = xmlConf.GetTitle("T_eFADOC_EXTRACT_CHANGE");                                               //압축형식 위변조 제한
                     break;
                 case eFileAddErr.eFADOC_EXTRACT_FILEFILTER:
-                    str = xmlConf.GetTitle("T_eFADOC_EXTRACT_FILES");
+                    str = xmlConf.GetTitle("T_eFADOC_EXTRACT_FILEFILTER");
                     break;
                 #endregion
 
@@ -4406,17 +4406,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
         }
 
-        /// <summary>
-        /// OLE 개체의 MimeType 정보를 fileAddManage의 정적 변수로 등록
-        /// </summary>
-        /// <param name="strMime"></param>
-        /// <param name="strExt"></param>
-        private void OLEMimeTypeMapAddOrUpdate(string strMime)
-        {
-            if (!gOLEMimeTypeMap.Value.Contains(strMime))
-                gOLEMimeTypeMap.Value.Add(strMime);
-        }
-
         //public void AddDataForInnerZip(int nErrCount, string strOrgZipFile, string strOrgZipFileRelativePath, string strErrFileName, eFileAddErr enErr, string strParentFileName)
         //{
         //    if (nErrCount == 1) AddData(strOrgZipFile, eFileAddErr.eFAZIP, strOrgZipFileRelativePath);
@@ -4997,7 +4986,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             int index = gOLEMimeTypeMap.Value.IndexOf(mime);
             if (index >= 0)
             {
-                Log.Logger.Here().Information($"Find OLE MimeList MimeList[{gOLEMimeTypeMap.Value[index]}] for File[{fileName}]");
+                Log.Logger.Here().Information($"Find OLE MimeList MimeList[{gOLEMimeTypeMap.Value[index]}] MimeBlockType[{oleMimeBlockType}] of File[{fileName}]");
                 existsInMimeList = true;
                 //string[] exts = result.Split(' ');
                 //foreach (var ext in exts)
@@ -5055,6 +5044,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public void SetOLEMimeList(int groupID, List<Dictionary<int, string>> oleMimeList)
         {
+            gOLEMimeTypeMap.Value.Clear();   
             if (oleMimeList != null)
             {
                 if (oleMimeList.Count > 0)
@@ -5063,7 +5053,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 foreach (Dictionary<int, string> row in oleMimeList)
                 {
                     string mimetype = row[0];
-                    OLEMimeTypeMapAddOrUpdate(mimetype);
+
+                    //OLE 개체의 MimeType 정보를 fileAddManage의 정적 변수로 등록
+                    if (!gOLEMimeTypeMap.Value.Contains(mimetype))
+                        gOLEMimeTypeMap.Value.Add(mimetype);
                 }
             }
         }
