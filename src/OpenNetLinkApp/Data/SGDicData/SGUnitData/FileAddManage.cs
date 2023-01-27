@@ -3079,46 +3079,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (CheckExtForFileByteData(btFileData, strExt) == true) return eFileAddErr.eFANone;
 
             return eFileAddErr.eUnZipInnerExtChange;
-        }
-
-        /// <summary>
-        /// 문서 내 OLE 개체의 파일확장자 위변조 검사 수행 
-        /// <br>0KB = true</br>
-        /// <br>text/plain = true</br>
-        /// </summary>
-        /// <param name="stFile"> 위변조 검사 대상 파일의 MemoryStream or FileStream </param>
-        /// <param name="strExt">위변조 검사 대상 파일의 확장자 </param>
-        /// <param name="blAllowDRM"></param>
-        /// <returns></returns>
-        public bool IsValidFileExtOfOLEObject(Stream stFile, string strExt, bool blAllowDRM = true)
-        {
-            byte[] btFileData = StreamToByteArray(stFile, MaxBufferSize);
-
-            /* Check DRM File */
-            if (IsDRM(btFileData) == true)
-            {
-                Log.Logger.Here().Information($"[IsValidFileExtOnOLEObject] IsDRM - Ext[{strExt}] AllowDrm[{blAllowDRM}]");
-                return (blAllowDRM == true);
-            }
-
-            string strFileMime = MimeGuesser.GuessMimeType(btFileData);
-            Log.Logger.Here().Information($"[IsValidFileExtOnOLEObject] FileMime[{strFileMime}] Ext[{strExt}] AllowDrm[{blAllowDRM}]");
-
-            // 0kb			
-            if (String.Compare(strFileMime, "application/x-empty") == 0) return true;
-
-            if (String.Compare(strFileMime, "text/plain") == 0) return true;
-
-            if (String.IsNullOrEmpty(strExt) == true)
-            {
-                Log.Logger.Here().Information($"[IsValidFileExtOnOLEObject] Extension is Empty - FileMime[{strFileMime}] Ext[{strExt}] AllowDrm[{blAllowDRM}]");
-                return (String.Compare(strFileMime, "application/x-executable") == 0);
-            }
-
-            strExt = strExt.Replace(".", "");
-            btFileData = StreamToByteArray(stFile, MaxBufferSize2);
-            return (CheckExtForFileByteData(btFileData, strExt) == true);
-        }
+        }      
 
         /// <summary>
         /// MimeType 및 확장자 정보 DB인 magic.mgc을 다른 파일로 갱신시 사용
@@ -4561,7 +4522,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     fileStream.CopyTo(fileMemoryStream);
                 }
 
-                //1단계 : 모듈검사 (문서 검사의 필수)
+                //0단계 : 모듈검사 (문서 검사의 필수)
                 extractorResult = OfficeExtractor.Controller.ExcuteExtractor(fileMemoryStream, hsStream.FileName, strExtractFilePath);
                 Log.Logger.Here().Information($"[scanDocumentFile]  ExcuteExtractor DocumentFile[{Path.GetFileName(hsStream.FileName)}] extractorResult[{extractorResult}]");
             }
@@ -4592,7 +4553,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 
             if (extractorResult < 0)      //OLE 개체 검출 중 오류 발생
-            { 
+            {
                 //오류 표시
                 currentFile.eErrType = GetOLEError(extractorResult);
                 currentFile.ChildrenFiles = null;
@@ -4613,10 +4574,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     if (oleFileStream.Length <= 0)
                         continue;
 
-                    //2단계 : OLE 검사
+                    //1단계 : OLE 마임리스트 체크
                     if (documentExtractType.HasFlag(DocumentExtractType.OLEOBJECT_EXTRACT))
                     {
-                        //문서용 마임리스트 체크
                         if (!IsValidOLEMimeType(oleFileMime, extractFile.Name))
                         {
                             //2단계 시 OLE개체 차단 시도
@@ -4644,12 +4604,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
                     }
 
-                    //3단계 : 확장자 변조 및 FileFilter 검사
+                    //2단계 : 기본 마임리스트/ 확장자 변조 및 FileFilter 검사
                     if (documentExtractType.HasFlag(DocumentExtractType.OLEOBJECT_EXTEXCHANGE_EXTRACT))
                     {
                         if ((fileFilterExtInfo.Equals("")) || (fileFilterExtInfo.Equals(";")))
                         {
-                            Log.Logger.Here().Information($"No check OLE Step3 for EMPTY FILEFILTER(;)");
+                            Log.Logger.Here().Information($"No check OLE Step2 for EMPTY FILEFILTER(;)");
                             continue;
                         }
 
@@ -4662,7 +4622,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
 
                         //위변조 제한, 0KB 체크
-                        if (!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
+                        if (await IsValidFileExt(oleFileStream, oleExtension) != eFileAddErr.eFANone)//(!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
                         {
                             oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_CHANGE;
                             currentFile.HasChildrenErr = true;
