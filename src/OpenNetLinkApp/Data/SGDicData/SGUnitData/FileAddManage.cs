@@ -129,7 +129,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eFADOC_EXTRACT_FILE_ADD_ONPURPOSE = 103,
         /// <summary>
         /// OLE 검사 결과 -> 마임검사 실패
-        /// <para>103</para>
+        /// <para>104</para>
         /// </summary>
         eFADOC_EXTRACT_MIME = 104,
         ///// <summary>
@@ -177,6 +177,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// OLE 문서 검사 모듈 호출 결과 코드
         /// </summary>
         public int OLEExtractorResult = 0;
+
+        /// <summary>
+        /// 해당 파일의 마임타입
+        /// </summary>
+        public string MimeType = "";
 
         /// <summary>
         /// 하위 폴더나 파일에 검사 오류 항목이 존재하는 경우 True
@@ -261,7 +266,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return str;
         }
 
-        public string GetFileAddErrContent(string strFileName, eFileAddErr efa, string strFileLimitSize = "1500")
+        public string GetFileAddErrContent(string strFileName, eFileAddErr efa, string strFileLimitSize = "1500", string strMIMEType = "", string strParentFileName = "")
         {
             string strMsg = "";
             switch (efa)
@@ -463,8 +468,22 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strMsg = String.Format(strMsg, strFileName);
                     break;
 
-
-
+                // 101~107
+                case eFileAddErr.eFADOC_EXTRACT_COMMONE:
+                case eFileAddErr.eFADOC_EXTRACT_PASSWORD:
+                    strMsg = string.Format("{0}|{1}|{2}", strFileName, "", MimeType);
+                    break;
+                case eFileAddErr.eFADOC_EXTRACT_FILE_ADD_ONPURPOSE:
+                    if(strParentFileName == "")
+                        strMsg = string.Format("{0}|{1}|{2}", strFileName, "", MimeType);
+                    else
+                        strMsg = string.Format("{0}|{1}|{2}", strParentFileName, strFileName, MimeType);
+                    break;
+                case eFileAddErr.eFADOC_EXTRACT_MIME:
+                case eFileAddErr.eFADOC_EXTRACT_FILEFILTER:
+                case eFileAddErr.eFADOC_EXTRACT_CHANGE:
+                    strMsg = string.Format("{0}|{1}|{2}", strParentFileName, strFileName, MimeType);
+                    break;
                 default:
                     break;
             }
@@ -4570,6 +4589,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 {
                     byte[] btFileData = StreamToByteArray(oleFileStream, MaxBufferSize);
                     string oleFileMime = MimeGuesser.GuessMimeType(btFileData);
+                    oleFile.MimeType = oleFileMime;
 
                     if (oleFileStream.Length <= 0)
                         continue;
