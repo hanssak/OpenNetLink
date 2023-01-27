@@ -176,6 +176,8 @@
         StateHasChanged();
     }
 
+
+
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -1214,7 +1216,7 @@
         InitText();
         @*action1 = HandleFileInputChange;
             action2 = HandleFileInputChange;*@
-    //SGFileExamEvent = FileExamResult;
+        //SGFileExamEvent = FileExamResult;
         HSCmdCenter.sgPageEvent.SetFileExamNotiEventAdd(groupID, FileExamResult);
         PageStatusData pageSData = pageService.GetPageStatus(groupID);
         HsStreamList = pageSData.GetFileDragListData();
@@ -1380,6 +1382,18 @@
                 refTransferDenied.CopyReason(listReason);
                 fileAddManage.RestoreFileSizeLimit();   //전송량 원복 2021/04/23 YKH
                 await refTransferDenied.openPopUp();
+
+                //한글파일이 문서 검사 오류 발생 했을 경우, 구버전 알림 메세지 처리
+                List<string> oldVersionHWP = new List<string>();
+                listErr.ForEach(delegate (FileAddErr err)
+                {
+                    string ext = err.FileName.Substring(err.FileName.LastIndexOf(".") + 1).ToUpper();
+                    if (err.OLEExtractorResult == -1 && (ext == "HWP" || ext == "HWPX"))
+                        oldVersionHWP.Add($"[{err.FileName}]");
+                });
+
+                if (oldVersionHWP.Count > 0)
+                    ShowMessage("error", string.Format(XmlConf.GetErrMsg("E_0255") ,string.Join("<br>", oldVersionHWP)));
             }
             else
                 fileAddManage.m_nCurRegisteringSize = 0;
@@ -1723,7 +1737,7 @@
             return 0;
         }
 
-        
+
         string strDocumentExtractType = sgLoginData.GetDocumentExtractType(sgLoginData.GetSystemPosition());        //문서파일 내부 검사유형 (0 : 문서 검사 않함. / 1 : 모듈검사 & OLE객체 마임리스트검사 / 2 : 모듈검사 & 위변조 체크 / 3 : 모듈검사 & OLE마임리스트검사 & 위변조체크 )
         if (string.IsNullOrEmpty(strDocumentExtractType))   //ENV테이블에 해당 항목 없으면 검사X
             return 0;
@@ -1754,8 +1768,8 @@
         //}
         ////  fileAddManage.OLEMimeTypeMapAddOrUpdate()
 
-       
-     
+
+
 
         bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
         string strFileExtInfo = sgLoginData.GetFileFilter();
