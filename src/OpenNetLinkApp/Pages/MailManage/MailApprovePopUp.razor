@@ -5,6 +5,7 @@
 @using System.Runtime.InteropServices
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Common
+@using AgLogManager
 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
@@ -12,7 +13,7 @@
 @inject HSCmdCenter HSCmdCenter
 @inject PageStatusService pageService
 
-<div class="modal fade" id="MailApprovePopUp">
+<div class="modal fade" id="MailApprovePopUp" data-backdrop="static" data-keyboard="false" style="z-index:5000;">
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
         <div class="modal-content">
             <div class="modal-header modal-outline">
@@ -31,7 +32,7 @@
                                 <th>@XmlConf.GetTitle("T_COMMON_EMAILTRANSKIND") </th>      <!-- 발송구분 -->
                                 <td>@GetTransKindString(stTransKindValue)</td>
                                 <th>@XmlConf.GetTitle("T_EMAIL_STATUS")</th>    <!-- 발송상태 -->
-                                <td>@GetTransStatusString(stTransStatusValue)</td>
+                                <td>@GetTransStatusString(stTransStatusValue, stApproveStatusValue)</td>
 
                                 <th>@XmlConf.GetTitle("T_EMAIL_SENDDATE")</th>        <!--발신일-->
                                 <td>@GetTimeFormatString(stReqTime)</td>
@@ -44,41 +45,47 @@
                                 <th>@XmlConf.GetTitle("T_COMMON_APPROVE_KIND")</th> <!-- 결재종류 -->
                                 <td>@GetApproveKindString(stApproveKindValue)</td>
                                 <th>@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th> <!--  승인상태 -->
-                                <td>@GetApproveStatusString(stApproveStatusValue)</td>
+                                <td>@GetApproveStatusString(stApproveStatusValue, stTransStatusValue)</td>
 
                                 <th>@XmlConf.GetTitle("T_DETAIL_APPROVEUSER")</th>    <!--승인자-->
                                 <td>@stApproverList</td>
                                 <th>@XmlConf.GetTitle("T_DETAIL_APPROVEHIST")</th>  <!-- 승인이력 -->
                                 <td>
-                                    <div class="navbar-nav ml-auto txte-right">
-                                        <!-- Messages Dropdown Menu -->
-                                        <div class="nav-item dropdown show">
-                                            <a class="nav-link p-0" data-toggle="dropdown" href="#" aria-expanded="true">
-                                                <i class="fas fa-list-alt fa-lg"></i>
-                                            </a>
 
-                                            <div class="dropdown-menu dropdown-menu-xl dropdown-menu-right" style=" right:0px; height:135px; overflow-y:scroll;transform:matrix3d(-338px,19px,0px);">
-                                                @for (int i = 0; i < apvList.Count; i++)
-                                                {
-                                                    <a href="#" class="dropdown-item">
-                                                        <div class="media">
-                                                            <div class="media-body">
-                                                                <div class="col-md-2 float-left dropdown-item-title">@apvList[i].approveOrder</div>
-                                                                <div class="col-md-2 float-left dropdown-item-title">@apvList[i].approverName</div>
-                                                                <div class="col-md-2 float-left dropdown-item-title">@apvList[i].approverRank</div>
-                                                                <div class="col-md-2 float-left dropdown-item-title">@apvList[i].approveFlag</div>
-                                                                <div class="col-md-2 float-left dropdown-item-title">@apvList[i].approveResTime</div>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                    if (i < apvList.Count - 1)
+                                    @if (apvList.Count > 0)
+                                    {
+                                        <div class="navbar-nav ml-auto txte-right">
+                                            <!-- Messages Dropdown Menu -->
+                                            <div class="nav-item dropdown show">
+                                                <a class="nav-link p-0" data-toggle="dropdown" href="#" aria-expanded="true">
+                                                    <i class="fas fa-list-alt fa-lg"></i>
+                                                </a>
+
+                                                <div class="dropdown-menu dropdown-menu-xl dropdown-menu-right" style=" right:0px; height:135px; overflow-y:scroll;transform:matrix3d(-338px,19px,0px);">
+                                                    @for (int i = 0; i < apvList.Count; i++)
                                                     {
-                                                        <div class="dropdown-divider"></div>
-                                                    }
-                                                }
+                                                            <div class="dropdown-item">
+                                                                <div class="media">
+                                                                    <div class="media-body">
+                                                                        @*<div class="col-md-2 float-left dropdown-item-title">@apvList[i].approveOrder</div>*@
+                                                                        <div class="col-md-2 float-left dropdown-item-title" style="text-align:center; vertical-align:middle;width:15%;" >@apvList[i].approverName</div>
+                                                                        <div class="col-md-2 float-left dropdown-item-title" style="text-align:center; vertical-align:middle;width:15%;" >@apvList[i].approverRank</div>
+                                                                        <div class="col-md-2 float-left dropdown-item-title" style="text-align:center; vertical-align:middle;width:15%;" >@apvList[i].approveFlag</div>
+                                                                        <div class="float-left dropdown-item-title" style="text-align:center; vertical-align:middle;width:30%;">@apvList[i].approveResTime</div>
+                                                                        <div class="col-md-2 float-left dropdown-item-title" style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@apvList[i].apprRejectReason</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            if (i < apvList.Count - 1)
+                                                            {
+                                                                <div class="dropdown-divider"></div>
+                                                            }
+                                                        }
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+
+                                    }
 
                                 </td>
                             </tr>
@@ -115,12 +122,12 @@
                     <div class="modal-sub-title mb-2"> @XmlConf.GetTitle("T_DETAIL_EMAILFILEINFO") </div>  <!--첨부 파일정보 -->
 
                     <div class="col-md-12">
-                        <!--
+                        
                         <div class="float-left mt-2">
                             <i class="fas fa-lightbulb fa-1x"></i>&nbsp;&nbsp;
-                            업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
+                            @strPrevInfo1 &nbsp;&nbsp; @strPrevInfo2
                         </div>
-                        -->
+                        
                         @*<div class="float-right mb-2">
                                 @if (bApproveEnable)
                                 {
@@ -137,6 +144,7 @@
                                 @if (bUseDlpDataView)
                                 {
                                     <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>
+                                    <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DLP_CONTENTS") </th>
                                     <!-- 개인정보-->
                                 }
 
@@ -145,7 +153,7 @@
                                 <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_SIZE") </th>                    <!-- 크기-->
                                 <th style="text-align:center;">@XmlConf.GetTitle("T_DETAIL_VIRUSHIST") </th>            <!-- 바이러스내역-->
 
-                                @if (bApproveEnable)
+                                @if (bApproveEnable && m_bReject)
                                 {
                                     <th style="text-align:center;width:8%;">@XmlConf.GetTitle("T_COMMON_DETAILVIEW")</th>
                                 }
@@ -159,12 +167,13 @@
                                     @if (bUseDlpDataView)
                                     {
                                         <td style="text-align:center;">@file.fileDLP</td>
+                                        <td style="text-align:center;">@file.fileDLPContents</td>
                                     }
                                     <td>@file.fileName</td>
                                     <td style="text-align:center;">@file.fileKind</td>
                                     <td style="text-align:center;">@file.fileSize</td>
-                                    <td>@file.virusDesc</td>
-                                    @if (bApproveEnable)
+                                    <td style="text-align:center;">@file.virusDesc</td>
+                                    @if (bApproveEnable && m_bReject)
                                     {
                                         <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e => attachDownload(file.fileSeq, file.fileKey, file.fileName))"><i class="fas fa-search"></i></button></td>
                                     }
@@ -182,8 +191,14 @@
                 {
                     <button type="button" class="btn btn-md btn-blue" @onclick="DetailApprove"><i class="fas fa-check-circle"></i>@XmlConf.GetTitle("T_COMMON_APPROVE")</button>
 
-                    // KKW - 수정해야됨(사후결재 일때, 반려못할때에는 btn-gray 로 표시
-                    <button type="button" class="btn btn-md btn-red" @onclick="DetailReject"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_COMMON_REJECTION")</button>
+                    @if (m_bReject)
+                    {
+                        <button type="button" class="btn btn-md btn-red" disabled="@false" @onclick="DetailReject"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_COMMON_REJECTION")</button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-md btn-gray" disabled="@true" ><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_COMMON_REJECTION")</button>
+                    }
                 }
                 <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_FILE_FOLD")</button>
             </div>
@@ -193,7 +208,11 @@
     <!-- /.modal-dialog -->
 </div>
 <SGDetailReject @ref="refSGDetailReject"></SGDetailReject>
-@code {
+
+@code 
+{
+    ISGNetworkService NetWorkSvc;
+
     string stEmailSeq = String.Empty;
     string stApproveSeq = String.Empty;
     bool bApproveEnable = false;
@@ -220,6 +239,18 @@
 
     public bool bUseDlpDataView = true;
 
+    public string strPrevInfo1 = "";
+    public string strPrevInfo2 = "";
+    public bool m_bReject = true;                              // 반려 가능 상태 여부
+
+    SGeMailTransManageData strDisplayData = new SGeMailTransManageData();
+
+    /// <summary>
+    /// 첨부파일 다운로드 요청
+    /// </summary>
+    /// <param name="fileseq"></param>
+    /// <param name="filekey"></param>
+    /// <param name="filename"></param>
     private void attachDownload(string fileseq, string filekey, string filename)
     {
         //AppId, ClientId, EmailSeq, FileName, FileKey, FileSeq
@@ -241,15 +272,24 @@
         HSCmdCenter.SendEmailDownload(groupID, strUserID, stEmailSeq, filename, filekey, fileseq);
     }
 
+    /// <summary>
+    /// 파일 수신 진행과정 보여주는 Noti
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
     public void FileDownloadProgressNoti(int groupID, PageEventArgs e)
     {
+
         string strMsg = "";
+        CLog.Here().Error($"FileDownloadProgressNoti - result : {e.result}, StrMsg : {e.strMsg}");
+
         if (e.result != 0)
         {
             strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
             return;
         }
+
         string sFileName = e.strMsg;
         int per = e.count;
         int type = 0;
@@ -271,7 +311,14 @@
 
         ShowProgress(groupID, type, per, sFileName);
     }
-    // type : 1 - open , 2 - update ,3 -close
+
+    /// <summary>
+    /// 파일수신 ProgressBar 표현 (type : 1 - open , 2 - update ,3 -close)
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="type"></param>
+    /// <param name="per"></param>
+    /// <param name="sFileName"></param>
     private async void ShowProgress(int groupID, int type, int per, string sFileName)
     {
         object[] param = { };
@@ -363,6 +410,9 @@
         }
     }
 
+    /// <summary>
+    /// 승인 동작
+    /// </summary>
     public void DetailApprove()
     {
         string strMsg = "";
@@ -397,6 +447,11 @@
         HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq);
         closePopUp();
     }
+
+    /// <summary>
+    /// 반려 동작
+    /// </summary>
+    /// <returns></returns>
     private async Task DetailReject()
     {
         string strMsg = "";
@@ -427,6 +482,11 @@
         await refSGDetailReject.openPopUp();
     }
 
+    /// <summary>
+    /// 반려동작 실제 서버에 data 전송하는 event
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="strReason"></param>
     public void DetailApproveRejectSend(int groupID, string strReason)
     {
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -440,7 +500,11 @@
         closePopUp();
     }
 
-
+    /// <summary>
+    /// 상세내용 실제 조회된 data 
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void DetailResult(int groupId, SGData e)
     {
         stTransKindValue = String.Empty;
@@ -473,12 +537,14 @@
                 if (item[0].IndexOf("DATA") > -1)
                     stData = item[0];
                 else if (item[0].IndexOf("TITLE") > -1)
+                {
                     if (item[0].IndexOf("\"") > -1)
                         stTitle = item[0].Substring(item[0].IndexOf("\"") + 1, (item[0].LastIndexOf("\"") - item[0].IndexOf("\"")) - 1);
                     else if (item[0].IndexOf("(") > -1)
                         stTitle = item[0].Substring(item[0].IndexOf("(") + 1, (item[0].LastIndexOf(")") - item[0].IndexOf("(")) - 1).Split(",")[1];
                     else
                         stTitle = item[0];
+                }
                 else if (item[0].IndexOf("RECIEVER") > -1)
                     listReceiver.Add(item[0]);
                 else if (item[0].IndexOf("CCUSER") > -1)
@@ -509,13 +575,19 @@
                 tmpApv.approveOrder = arrVal[0].Split(",")[1];
                 tmpApv.approverName = arrVal[2];
                 tmpApv.approverRank = arrVal[3];
-                tmpApv.approveFlag = GetApproveStatusString(arrVal[4]);
+                tmpApv.approveFlag = GetApproveStatusString(arrVal[4], stTransStatusValue);
                 if (arrVal[5].Length > 10)
                     tmpApv.approveResTime = arrVal[5].Substring(0, 4) + "-" + arrVal[5].Substring(4, 2) + "-" + arrVal[5].Substring(6, 2) + " " + arrVal[5].Substring(8, 2) + ":" + arrVal[5].Substring(10, 2) + ":" + arrVal[5].Substring(12, 2);
                 else
                     tmpApv.approveResTime = "-";
+
+                tmpApv.apprRejectReason = "-";
+                if (arrVal[4] == "3")   // 반려일때에만 - 사유정보 표현
+                    tmpApv.apprRejectReason = arrVal[6];
+
                 apvList.Add(tmpApv);
             }
+
             for (int i = 0; i < listReceiver.Count - 1; i++)
             {
                 string[] arrVal = listReceiver[i + 1].Split(",");
@@ -538,38 +610,44 @@
                     stHideCC += ", ";
             }
 
+
+            fileList.Clear();
             for (int i = 0; i < listFile.Count - 1; i++)
             {
+
                 string[] arrVal = listFile[i + 1].Split("|");
+                // 0 : EmailSeq, 1:개인정보 검출(유무등정보), 2:파일 이름, 3 :파일 Type, 4:파일 크기, 5:파일위변조 및 바이러스 검출내용, 6:개인정보 검출내용
 
                 emailFile tmpFile = new emailFile();
-                if (arrVal[1] == "1")
-                    tmpFile.fileDLP = XmlConf.GetTitle("T_COMMON_DLP_INCLUSION");
-                else
-                    tmpFile.fileDLP = XmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION");
+                tmpFile.fileDLP = strDisplayData.GetDlpDisplayData(arrVal[1]);
+                tmpFile.fileDLPContents = "-";
+
                 tmpFile.fileSeq = arrVal[0].Split("\"")[1];
                 tmpFile.fileName = arrVal[2];
                 tmpFile.fileKind = arrVal[3];
                 tmpFile.fileKey = arrVal[4];
                 tmpFile.fileSize = GetFileSizeString(arrVal[4]);
                 tmpFile.virusDesc = arrVal[5];
+
+                if (arrVal.Length > 6)
+                    tmpFile.fileDLPContents = arrVal[6];
+
                 fileList.Add(tmpFile);
             }
-
-            // if (stApproveKindValue == "0" && stTransStatusValue == "W" && stApproveStatusValue == "1")
-            //    bTransCancelVisuable = true;
 
         }
         catch (Exception ex)
         {
+            CLog.Here().Error($@"DetailResult - Exception - Msg : {ex.Message}, StackTrace : {ex.StackTrace}");
             CLog.Error(ex.StackTrace);
-            CLog.Error(ex.Message);
             System.Diagnostics.Debug.WriteLine(ex.Message);
         }
         StateHasChanged();
     }
+
+
     //Param : Email Seq, Request Seq, 승인가능여부
-    public async Task openPopUp(string seq, string apvseq, string apvenable)
+    public async Task openPopUp(string seq, string apvseq, string apvenable, bool bIsAfterApprove)
     {
         apvList.Clear();
         fileList.Clear();
@@ -580,6 +658,9 @@
             bApproveEnable = true;
         else
             bApproveEnable = false;
+
+        if (bIsAfterApprove)
+            m_bReject = false;
 
         ISGSideBarUI sgSideBar = SGAppMgrSvc.SideBarUIService.ActiveMenu;
         int groupID = 0;
@@ -595,9 +676,10 @@
 
         MailManageDao dao = new MailManageDao();
         string strQuery = dao.MailDetail(seq);
-        //Debug.WriteLine(strQuery);
-        HSCmdCenter.SendDetailQuery(groupID, curUserID, strQuery);
 
+        CLog.Here().Information($@"QueryDetail-@@@@@@@@@@ : {strQuery}");
+
+        HSCmdCenter.SendDetailQuery(groupID, curUserID, strQuery);
 
         object[] param = { "MailApprovePopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
@@ -609,22 +691,9 @@
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
-    private string GetApproveStatusString(string value)
+    private string GetApproveStatusString(string strApproveStatus, string strTransStatus)
     {
-        string rtn = String.Empty;
-        switch (value)
-        {
-            case "1":
-                rtn = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
-                break;
-            case "2":
-                rtn = XmlConf.GetTitle("T_COMMON_APPROVE");
-                break;
-            case "3":
-                rtn = XmlConf.GetTitle("T_DASH_APPROVE_REJECT");
-                break;
-        }
-        return rtn;
+        return strDisplayData.GetApprStausDisplayData(strApproveStatus, strTransStatus);
     }
 
     private string GetFileSizeString(string value)
@@ -641,38 +710,17 @@
     {
         string rtn = String.Empty;
         if (value == "0")
-            rtn = XmlConf.GetTitle("T_COMMON_IMPORT");
-        else if (value == "1")
             rtn = XmlConf.GetTitle("T_COMMON_EXPORT");
+        else if (value == "1")
+            rtn = XmlConf.GetTitle("T_COMMON_IMPORT");
         return rtn;
     }
 
-    private string GetTransStatusString(string value)
+    private string GetTransStatusString(string strTransStatus, string strApproveStatusValue)
     {
-        string rtn = String.Empty;
-        switch(value)
-        {
-            case "S":
-                rtn = XmlConf.GetTitle("T_MAIL_TRANS_SUCCESS");
-                break;
-            case "F":
-                rtn = XmlConf.GetTitle("T_MAIL_TRANSFRFAILED");
-                break;
-            case "W":
-                rtn = XmlConf.GetTitle("T_MAIL_TRANSWAIT");
-                break;
-            case "V":
-                rtn = XmlConf.GetTitle("T_MAIL_INSPECT");
-                break;
-            case "C":
-                rtn = XmlConf.GetTitle("T_MAIL_TRANSCANCLE");
-                break;
-            default:
-                rtn = "";
-                break;
-        }
-        return rtn;
+        return strDisplayData.GetTransStatusDisplayData(strTransStatus, strApproveStatusValue);
     }
+
     private string GetTimeFormatString(string value)
     {
         string rtn = String.Empty;
@@ -706,6 +754,8 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        InitText();
         HSCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FileDownloadProgressNoti);
         base.OnInitialized();
     }
@@ -717,22 +767,43 @@
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
-    public class emalApprover
+
+    public void InitText()
     {
-        public string approveOrder;
-        public string approverName;
-        public string approverRank;
-        public string approveFlag;
-        public string approveResTime;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        string strConNetwork = "UnKnown";
+        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+        for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
+        {
+            if (listNetWork[nIdx].GroupID == groupID)
+            {
+                strConNetwork = listNetWork[nIdx].FromName;
+                break;
+            }
+        }
+
+        strPrevInfo1 = strConNetwork + XmlConf.GetWarnMsg("W_0237");                // 업무망에 접속되어 있습니다.
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+
+        if (sgLoginData == null)
+            strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
+        else
+        {
+            bool bInner = sgLoginData.GetSystemPosition();
+            if (bInner)
+                strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
+            else
+                strPrevInfo2 = XmlConf.GetWarnMsg("W_0240");                            // 반입파일만 파일미리보기가 가능합니다.
+        }
+
     }
-    public class emailFile
-    {
-        public string fileDLP;
-        public string fileName;
-        public string fileKind;
-        public string virusDesc;
-        public string fileSize;
-        public string fileKey;
-        public string fileSeq;
-    }
+
+
+
 }

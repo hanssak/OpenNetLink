@@ -42,7 +42,7 @@ namespace OpenNetLinkApp.Data.SGDomain
         public string DlpValue = "";
 
         public string Receiver = "";
-        public string Title = "";   //UTF-8변환 필요한듯(?)
+        public string Title = "";
         public int PageListCount = 10;
         public int ViewPageNo = 1;
 
@@ -100,6 +100,7 @@ namespace OpenNetLinkApp.Data.SGDomain
         {
             return TransKind;
         }
+
         public void SetTransKindCode(string value)
         {
             if (value == XmlConf.GetTitle("T_COMMON_ALL"))
@@ -120,13 +121,17 @@ namespace OpenNetLinkApp.Data.SGDomain
             return ApproveKind;
         }
 
+        /// <summary>
+        /// UI에서 설정한 선결, 후결 에 대한 code 값을 저장
+        /// </summary>
+        /// <param name="value"></param>
         public void SetApprKindCode(string value)
         {
             if (value == XmlConf.GetTitle("T_COMMON_ALL"))
                 ApproveKind = "";
-            else if (value == XmlConf.GetTitle("T_DETAIL_BEFORE_APPROVE"))
+            else if (value == XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE"))
                 ApproveKind = "0";
-            else if (value == XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE"))
+            else if (value == XmlConf.GetTitle("T_COMMON_APPROVE_AFTER"))
                 ApproveKind = "1";
         }
 
@@ -179,14 +184,16 @@ namespace OpenNetLinkApp.Data.SGDomain
 
             if (bOldStyle)
             {
-                if (TransStatus == "S") //발송완료
-                    return "7";
                 if (TransStatus == "W") //발송대기
                     return "9";
-                if (TransStatus == "C") //발송취소
-                    return "5";
                 if (TransStatus == "F") //발송실패 
                     return "8";
+                if (TransStatus == "S") //발송완료
+                    return "7";
+                if (TransStatus == "V") //검사중
+                    return "6";
+                if (TransStatus == "C") //발송취소
+                    return "5";
             }
 
             return TransStatus;
@@ -226,6 +233,15 @@ namespace OpenNetLinkApp.Data.SGDomain
             return DlpValue;
         }
 
+        public void SetDlpValueCode(string value)
+        {
+            if (value == XmlConf.GetTitle("T_COMMON_DLP_INCLUSION"))
+                DlpValue = "1";
+            else if (value == XmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION"))
+                DlpValue = "2";
+            else
+                DlpValue = "";
+        }
 
         public void SetReceiver(string strValue)
         {

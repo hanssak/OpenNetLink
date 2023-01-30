@@ -6,7 +6,7 @@
 #define _AFXDLL
 
 #include <afx.h>
-#include <afxwin.h>         // MFC �ٽ� �� ǥ�� ���� ����Դϴ�.
+#include <afxwin.h>         // MFC
 
 //#include <Windows.h>
 #include <wrl/event.h>

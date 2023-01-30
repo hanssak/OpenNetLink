@@ -419,7 +419,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             for (int i = 0; i < count; i++)
             {
                 SGSiteConfig sgSiteConfig = new SGSiteConfig();
-                sgSiteConfig.m_bUserIDSave = true;                      // 로그인한 ID 저장 여부
+                sgSiteConfig.m_bUserIDSave = false;                      // 로그인한 ID 저장 여부
                 sgSiteConfig.m_bAutoLogin = false;                      // 자동로그인 사용 여부.
                 sgSiteConfig.m_bAutoLoginCheck = false;                 // 자동로그인 체크박스 체크여부.
                 sgSiteConfig.m_bApprLineLocalSave = false;              // 결재라인 로컬 저장 여부.
@@ -435,19 +435,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 sgSiteConfig.m_bRecvFolderChange = true;                // 수신폴더 변경 사용 여부
 
-                sgSiteConfig.m_bUseApproveAfterLimit = true;            // 사후결재 결재 Count 제한 사용유무
+                sgSiteConfig.m_bUseApproveAfterLimit = false;            // 사후결재 결재 Count 제한 사용유무
                 sgSiteConfig.m_bUseClipBoardApproveAfterLimit = false;
 
-                sgSiteConfig.m_bUseScreenLock = true;                  //Screen Lock 설정여부
+                sgSiteConfig.m_bUseScreenLock = false;                  //Screen Lock 설정여부
 
                 sgSiteConfig.m_bUseUserRecvDownPath = true;            // 로그인 유저별 다운로드 경로 사용 여부
                 sgSiteConfig.m_bUseDenyPasswordZip = false;             // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
 
-                sgSiteConfig.m_bUseEmail = true;                        // 이메일 결재 사용 유무
-                sgSiteConfig.m_bUsePCURL = true;                        // PCURL 사용여부
+                sgSiteConfig.m_bUseEmail = false;                        // 이메일 결재 사용 유무
+                sgSiteConfig.m_bUsePCURL = false;                        // PCURL 사용여부
                 sgSiteConfig.m_bUseClipApprove = true;                  //클립보드 결재 사용 유무
-                sgSiteConfig.m_bUsePublicBoard = true;                  // 공지사항 사용 유무.
-                sgSiteConfig.m_bUseCertSend = true;                     // 공인인증서 전송 사용 유무.
+                sgSiteConfig.m_bUsePublicBoard = false;                  // 공지사항 사용 유무.
+                sgSiteConfig.m_bUseCertSend = false;                     // 공인인증서 전송 사용 유무.
                 sgSiteConfig.m_bUseClipBoardFileTrans = true;           // 클립보드 파일형태 전송 사용유무
 
                 sgSiteConfig.m_bUseFileClipManageUI = true;             // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부

@@ -168,6 +168,7 @@ namespace OpenNetLinkApp.Common
                 values.Add(_xmlConfInstance.GetTitle("T_COMMON_APPROVE_WAIT"));
                 values.Add(_xmlConfInstance.GetTitle("T_COMMON_APPROVE"));
                 values.Add(_xmlConfInstance.GetTitle("T_COMMON_REJECTION"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_REQUESTCANCEL"));
             }
             else if (option == "ApproveKind")
             {

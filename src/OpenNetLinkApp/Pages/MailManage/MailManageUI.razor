@@ -8,7 +8,7 @@
 @using OpenNetLinkApp.Services.SGAppManager
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
-@using OpenNetLinkApp.Data.SGDomain
+@using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.Components.SGSearchCondition
 @using AgLogManager
 @using Serilog
@@ -52,7 +52,7 @@
                         <table>
 
                             <tr>
-                                <th class="p-2">@strPeriod</th>
+                                <th class="p-1" style="text-align: right; vertical-align: middle;">@strPeriod</th>
                                 <td style="width:30%;">
                                     @*<input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker9" readonly="readonly" value="@strFromDay">
             <span class="float-left col-md-1">-</span>
@@ -60,7 +60,7 @@
                                     <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
 
-                                <th class="p-2"> @strApproveKind </th>                     <!--결재종류-->
+                                <th class="p-1" style="text-align: right; vertical-align: middle;"> @strApproveKind </th>                     <!--결재종류-->
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -76,7 +76,7 @@
                                     <!--<button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApproveTypeText<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
 
-                                <th class="p-2"> @strApproveStatus </th>                     <!--승인상태-->
+                                <th class="p-1" style="text-align: right; vertical-align: middle;"> @strApproveStatus </th>                     <!--승인상태-->
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -95,7 +95,7 @@
 
                                 @if (bUseDlpDataView)
                                 {
-                                    <th class="p-2"> @strDlpInfo </th> <!-- 개인정보 -->
+                                    <th class="p-1"style="text-align: right; vertical-align: middle;"> @strDlpInfo </th> <!-- 개인정보 -->
                                     <td>
                                         <div class="dropdown">
                                             <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -115,13 +115,13 @@
                             </tr>
 
                             <tr>
-                                <th class="p-2 pt-2"> @strReceiver </th> <!-- 수신자 -->
+                                <th class="p-1 pt-2" style="text-align: right; vertical-align: middle;"> @strReceiver </th> <!-- 수신자 -->
                                 <td class="pt-2" colspan="1"><input type="text" class="form-control  col-md-11" placeholder="@stReceivePlease" @bind="strSearchReceiver" @onkeyup="HandleKeyEvent"></td>
 
-                                <th class="p-2 pt-2"> @strTitle </th> <!-- 제목 -->
+                                <th class="p-1 pt-2" style="text-align: right; vertical-align: middle;"> @strTitle </th> <!-- 제목 -->
                                 <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="@stTitlePlease" @bind="strSearchTitle" @onkeyup="HandleKeyEvent"></td>
 
-                                <th class="p-2"> @strTransferKind </th>                     <!--발송구분-->
+                                <th class="p-1" style="text-align: right; vertical-align: middle;"> @strTransferKind </th>                     <!--발송구분-->
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -137,7 +137,7 @@
                                     <!--<button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransTypeText<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
 
-                                <th class="p-2"> @strTransferStatus </th>                     <!--발송상태-->
+                                <th class="p-1" style="text-align: right; vertical-align: middle;"> @strTransferStatus </th>                     <!--발송상태-->
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -402,7 +402,7 @@
     private string stReceivePlease;         //수신자를 입력해 주세요.
     private string stTitlePlease;           //제목을 입력해 주세요.
 
-    public string GetRequestTime(string value)
+    @*public string GetRequestTime(string value)
     {
         return value.Substring(0, 10);
     }
@@ -459,6 +459,8 @@
         else
             return XmlConf.GetTitle("T_COMMON_IMPORT"); //반입
     }
+*@
+
 
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
@@ -605,8 +607,8 @@
             mailParam.SetApprKindCode(strApproveTypeText);
             mailParam.SetTransKindCode(strTransTypeText);
 
-            mailParam.SetApprStatusCode(strSearchApproveStatus);
             mailParam.SetTransStatusCode(strTransFlag);
+            mailParam.SetApprStatusCode(strSearchApproveStatus);
 
             mailParam.SetDlpValue(strDlpValue);
             mailParam.SetReceiver(strSearchReceiver);
@@ -664,7 +666,7 @@
 
         // Test용도
         curFromDay = "20220101";
-        curToDay = "20221227";
+        curToDay = "20221231";
 
         mailParam.SetSearchStartDate(curFromDay);
         mailParam.SetSearchEndDate(curToDay);
@@ -672,8 +674,8 @@
         mailParam.SetApprKindCode(strApproveTypeText);
         mailParam.SetTransKindCode(strTransTypeText);
 
-        mailParam.SetApprStatusCode(strSearchApproveStatus);
         mailParam.SetTransStatusCode(strTransFlag);
+        mailParam.SetApprStatusCode(strSearchApproveStatus);
 
         mailParam.SetDlpValue(strDlpValue);
         mailParam.SetReceiver(strSearchReceiver);
@@ -1214,10 +1216,10 @@
             FileAddManage fileAddManage = new FileAddManage();
             tData.Title = fileAddManage.GetConvertTitleDesc(false, tData.Title);
             tData.RequestTime = sgData.GetTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
-            //tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
-            //tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
-            //tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
-            //tData.expiredDate = sgData.GetExpiredDate(dic);             //파일저장 만료일
+                                                                   //tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
+                                                                   //tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
+                                                                   //tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
+                                                                   //tData.expiredDate = sgData.GetExpiredDate(dic);             //파일저장 만료일
             tData.stDLP = sgData.GetDlp(dic);
             tData.isPossibleDownload = GetIsPossibleDownLoad(tData, isInner, maxDownloadCount, nowDate);
 
@@ -1253,8 +1255,8 @@
 
         if (isPossibleDownload)
         {
-            //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
-            @*
+                //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
+                @*
                 if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForwardDownBeforeRecv())
                 {
                 if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))

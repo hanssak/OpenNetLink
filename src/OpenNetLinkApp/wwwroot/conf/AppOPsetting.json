@@ -9,7 +9,7 @@
 
   "bUseLanguageSet": false,
 
-  "bUseMainPageType": true,
+  "bUseMainPageType": false,
 
   "bUseStartProgramReg": false,
 
@@ -19,7 +19,7 @@
   "bRFileAutoSend": false,
   "bRMouseFileAddAfterTrans": false,
 
-  "bShowAfterApprAutoCheck": true,
+  "bShowAfterApprAutoCheck": false,
   "bAfterBasicChk": false,
 
   "bFileRecvAlarmRetain": false,
@@ -35,8 +35,8 @@
 
 
   "bUserIDSave": false,
-  "bAutoLogin": true,
-  "bAutoLoginCheck": true,
+  "bAutoLogin": false,
+  "bAutoLoginCheck": false,
   "bUserPWChange": false,
 
 
@@ -71,9 +71,9 @@
 
   "bUseClipBoardFileTrans": true,
   "bUseFileClipManageUI": true,
-  "bUseFileClipApproveUI": true,
+  "bUseFileClipApproveUI": false,
 
-  "bScreenLockUserChange": true,
+  "bScreenLockUserChange": false,
   "bScreenLock": false,
 
   "enMainPageType": 0,
@@ -95,20 +95,21 @@
   "bURLListPolicyRecv": false,
   "bUseCertSend": false,
   "blistUseEmail": [
-    true,
+    false,
+    false,
     false
   ],
   "bUseForceUpdate": true,
   "bUsePCURL": false,
   "bUsePublicBoard": false,
-  "bUseUserRecvDownPath": false,
-  "bUseUserRecvDownPathUserName": false,
+  "bUseUserRecvDownPath": true,
+  "bUseUserRecvDownPathUserName": true,
   "bUseUserSelectFirstServer": false,
   "bViewDlpApproverSelectMyDept": false,
   "bViewFileFilter": true,
   "bViewSGHeaderUIAlarmNoriAllDel": true,
   "bViewSGSideBarUIBadge": false,
-  "nClipAfterApproveUseType": 2,
+  "nClipAfterApproveUseType": 1,
   "bUseOneToMultiLogin": false,
   "bUseOneByOneLogOut" : false,
   "bApprDeptSearch": true,
@@ -127,26 +128,14 @@
   "bUseStartTrayMove": false,
   "bStartTrayMove": false,
 
-  "bUseFileForward": true,
+  "bUseFileForward": false,
   "bFileDownloadBeforeReciving": false,
 
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
 
-  "bUsePartialFileAddInTransfer": false,
-  "bUseInitAlarmPerDay": false,
-  "bUseInitMessagePerDay": false,
-  "bVisiblePolicyUpdateButton": true,
-  "bUseForceBackgroundUpdate": false,
-  "bUseChkHardSpace": true,  
-  "bUseOver1Auth": [
-    false,
-    false,
-    false
-  ],
-  "blistUiDlpShow": [
-    false,
-    false,
-    false
-  ]  
+  "bUsePartialFileAddInTransfer" : false
+
+  
+
 }

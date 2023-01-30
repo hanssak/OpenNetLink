@@ -557,7 +557,7 @@ namespace OpenNetLinkApp.Services
                     VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
                     break;
                 case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
-                    EmailApproveNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId, sgData);
+                    EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
                     break;
                 case eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
                     BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
@@ -1496,6 +1496,8 @@ namespace OpenNetLinkApp.Services
                 if (!strCount.Equals(""))
                     e.count = Convert.ToInt32(strCount);
                 e.strMsg = "";
+                e.strDummy = "4";
+
                 sNotiEvent(groupId, cmd, e);
             }
         }

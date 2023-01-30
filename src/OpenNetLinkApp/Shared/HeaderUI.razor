@@ -2542,12 +2542,19 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
     }
 
 
-
+    /// <summary>
+    /// Server에서 오는 Noti 받는 함수
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="cmd"></param>
+    /// <param name="e"></param>
     public void RecvServerNoti(int groupID, eCmdList cmd, PageEventArgs e)
     {
+
         OS_NOTI os_noti = ConvertCmd(cmd);
         string naviURI = "";
-        if (os_noti == OS_NOTI.WAIT_APPR)
+        if (os_noti == OS_NOTI.WAIT_APPR ||
+            os_noti == OS_NOTI.MAIL_APPR)
         {
             bool bUseApprWaitNoti = OpConfigSvc.GetUseApprWaitNoti();
             if (!bUseApprWaitNoti)
@@ -2584,6 +2591,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     }
                     //}
                 }
+
                 if (siteConfig.GetApproveAfterLimit(groupID))
                 {
                     if (!pageService.GetApproveAfterMyCountChecking())
@@ -2616,6 +2624,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     }
                 }
             }
+
             switch (e.strDummy)
             {
                 case "0":
@@ -2631,10 +2640,11 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 case "3":
                     naviURI = "/clipBoardApprove/";
                     break;
-
+                case "4":
+                    naviURI = "/mailApprove/";      // mail 결재Noti값이 올때 처리
+                    break;
             }
             //naviURI = "/transferApprove/";
-
 
             naviURI += groupID.ToString();
         }
@@ -2649,6 +2659,19 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 return;
             }
         }
+        @*else if (os_noti == OS_NOTI.MAIL_APPR)
+        {
+            bool bUseApprWaitNoti = OpConfigSvc.GetUseApprWaitNoti();
+            if (!bUseApprWaitNoti)
+                return;
+
+            if (SGAppMgrSvc.SiteConfigInfoService.GetNoApproveManageUI(groupID)) // OpConfigInfoService
+            {
+                CLog.Here().Information("OS_NOTI.WAIT_APPR - But OpConfig is NoApproveManageUI - No insert Alarm : {0}",
+                    SGAppMgrSvc.SiteConfigInfoService.GetNoApproveManageUI(groupID).ToString()); // OpConfigInfoService
+                return;
+            }
+        }*@
 
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = NotiMsgMake(cmd, e);
@@ -3351,7 +3374,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         }
         string strHead = sgMsgData.GetConvertMessageTitle(eMsgType);
         string strNotiContent = body;
-        SQLiteDB.InsertNotiInfo(type, groupID, strUserSeq, "0", menuCategory, path, "", strHead, strNotiContent);   // KKW
+        SQLiteDB.InsertNotiInfo(type, groupID, strUserSeq, "0", menuCategory, path, "", strHead, strNotiContent);
 
         LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
         loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();

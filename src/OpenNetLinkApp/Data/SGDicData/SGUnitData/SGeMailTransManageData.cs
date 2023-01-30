@@ -7,14 +7,7 @@ using OpenNetLinkApp.Services;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
-    public enum eEmailTransManageMsg
-    {
-        eNone=0,
-        eNotData = 1,
-        eSearchError = 2,
-        eTransCancelError= 3,
-        eTransCancelSuccess = 4
-    }
+
     public class SGeMailTransManageData : SGData
     {
         XmlConfService xmlConf;
@@ -174,23 +167,53 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             strTransStatus = dic[5];            // 전송상태
             strApprStatus = dic[6];             // 승인상태
 
-            if(strTransStatus.Equals("W"))
+            return GetTransStatusDisplayData(strTransStatus, strApprStatus);
+
+            if (strTransStatus.Equals("W"))
             {
                 if (strApprStatus.Equals("3"))       // 반려
                     strTransStatus = xmlConf.GetTitle("T_MAIL_TRANSCANCLE");      // 발송취소
                 else
                     strTransStatus = xmlConf.GetTitle("T_MAIL_TRANSWAIT");        // 발송대기
             }
-            else if(strTransStatus.Equals("C"))
+            else if (strTransStatus.Equals("C"))
                 strTransStatus = xmlConf.GetTitle("T_MAIL_TRANSCANCLE");      // 발송취소
-            else if(strTransStatus.Equals("S"))
+            else if (strTransStatus.Equals("S"))
                 strTransStatus = xmlConf.GetTitle("T_MAIL_TRANS_SUCCESS");      // 발송완료
-            else if(strTransStatus.Equals("F"))
+            else if (strTransStatus.Equals("F"))
                 strTransStatus = xmlConf.GetTitle("T_MAIL_TRANSFRFAILED");      // 발송실패
-            else
+            else if (strTransStatus.Equals("V"))
                 strTransStatus = xmlConf.GetTitle("T_MAIL_INSPECT");      // 검사중
+            else
+                strTransStatus = "";
 
             return strTransStatus;
+        }
+
+        public string GetTransStatusDisplayData(string strTransStatus, string strApprStatus)
+        {
+
+            string strRet = "";
+
+            if (strTransStatus.Equals("W"))
+            {
+                if (strApprStatus.Equals("3"))       // 반려
+                    strRet = xmlConf.GetTitle("T_MAIL_TRANSCANCLE");      // 발송취소
+                else
+                    strRet = xmlConf.GetTitle("T_MAIL_TRANSWAIT");        // 발송대기
+            }
+            else if (strTransStatus.Equals("C"))
+                strRet = xmlConf.GetTitle("T_MAIL_TRANSCANCLE");      // 발송취소
+            else if (strTransStatus.Equals("S"))
+                strRet = xmlConf.GetTitle("T_MAIL_TRANS_SUCCESS");      // 발송완료
+            else if (strTransStatus.Equals("F"))
+                strRet = xmlConf.GetTitle("T_MAIL_TRANSFRFAILED");      // 발송실패
+            else if (strTransStatus.Equals("V"))
+                strRet = xmlConf.GetTitle("T_MAIL_INSPECT");      // 검사중
+            else
+                strRet = "";
+
+            return strRet;
         }
 
 
@@ -228,30 +251,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             strTransStatus = dic[5];            // 전송상태
             strApprStatus = dic[6];             // 승인상태
 
-            int nIndex = 0;
-            if (!strApprStatus.Equals(""))
-                nIndex = Convert.ToInt32(strApprStatus);
-
-            switch(nIndex)
-            {
-                case 1:
-                    if(strTransStatus.Equals("C"))
-                        strApprStatus = xmlConf.GetTitle("T_COMMON_REQUESTCANCEL");      // 요청취소
-                    else
-                        strApprStatus = xmlConf.GetTitle("T_COMMON_APPROVE_WAIT");      // 승인대기
-                    break;
-                case 2:
-                    strApprStatus = xmlConf.GetTitle("T_COMMON_APPROVE");      // 승인
-                    break;
-                case 3:
-                    strApprStatus = xmlConf.GetTitle("T_COMMON_REJECTION");      // 반려
-                    break;
-                default:
-                    strApprStatus = "-";
-                    break;
-            }
-            return strApprStatus;
+            return GetApprStausDisplayData(strApprStatus, strTransStatus);
         }
+
+
+        public string GetApprStausDisplayData(string strApprStatus, string strTransStatus)
+        {
+            string strRet = "";
+            if (strApprStatus == "1")
+            {
+                if (strTransStatus.Equals("C"))
+                    strRet = xmlConf.GetTitle("T_COMMON_REQUESTCANCEL");      // 요청취소
+                else
+                    strRet = xmlConf.GetTitle("T_COMMON_APPROVE_WAIT");      // 승인대기
+            }
+            else if (strApprStatus == "2")
+                strRet = xmlConf.GetTitle("T_COMMON_APPROVE");      // 승인
+            else if (strApprStatus == "3")
+                strRet = xmlConf.GetTitle("T_COMMON_REJECTION");      // 반려
+            else
+                strRet = "-";
+
+            return strRet;
+        }
+
 
         /// <summary>
         /// 결재상태 원본 데이터 정보를 반환한다.<br></br>
@@ -362,30 +385,32 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return strDlp;
             strDlp = dic[3];
 
-            int nIndex = 0;
-            if (!strDlp.Equals(""))
-                nIndex = Convert.ToInt32(strDlp);
-
-            switch(nIndex)
-            {
-                case 0:
-                    strDlp = xmlConf.GetTitle("T_COMMON_DLP_UNUSE");            // 미사용
-                    break;
-                case 1:
-                    strDlp = xmlConf.GetTitle("T_COMMON_DLP_INCLUSION");        // 포함
-                    break;
-                case 2:
-                    strDlp = xmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION");     // 미포함
-                    break;
-                case 3:
-                    strDlp = xmlConf.GetTitle("T_COMMON_DLP_UNKNOWN");          // 검출불가
-                    break;
-                default:
-                    strDlp = "-";
-                    break;
-            }
-            return strDlp;
+            return GetDlpDisplayData(strDlp);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strDlp"></param>
+        /// <returns></returns>
+        public string GetDlpDisplayData(string strDlp)
+        {
+            string strRet = "";
+
+            if (strDlp == "0")
+                strRet = xmlConf.GetTitle("T_COMMON_DLP_UNUSE");            // 미사용
+            else if (strDlp == "1")
+                strRet = xmlConf.GetTitle("T_COMMON_DLP_INCLUSION");            // 포함
+            else if (strDlp == "2")
+                strRet = xmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION");            // 포함
+            else if (strDlp == "3")
+                strRet = xmlConf.GetTitle("T_COMMON_DLP_UNKNOWN");            // 포함
+            else
+                strRet = "-";
+
+            return strRet;
+        }
+
 
         /// <summary>
         /// 파일 첨부 유무 정보를 반환한다.<br></br>
@@ -507,24 +532,22 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return strApprKind;
             strApprKind = dic[1];
 
-            int nIndex = 0;
-            if (!strApprKind.Equals(""))
-                nIndex = Convert.ToInt32(strApprKind);
-
-            switch(nIndex)
-            {
-                case 0:
-                    strApprKind = xmlConf.GetTitle("T_COMMON_APPROVE_BEFORE");        // 선결
-                    break;
-                case 1:
-                    strApprKind = xmlConf.GetTitle("T_COMMON_APPROVE_AFTER");        // 후결
-                    break;
-                default:
-                    break;
-            }
-
-            return strApprKind;
+            return GetApprKindDisplayData(strApprKind);
         }
+
+
+        public string GetApprKindDisplayData(string strApprKind)
+        {
+            string strRet = "";
+
+            if (strApprKind == "0")
+                strRet = xmlConf.GetTitle("T_COMMON_APPROVE_BEFORE");        // 선결
+            else if (strApprKind == "1")
+                strRet = xmlConf.GetTitle("T_COMMON_APPROVE_AFTER");        // 후결
+
+            return strRet;
+        }
+
 
         /// <summary>
         /// 
@@ -586,7 +609,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns></returns>
         public bool GetTransCancelEnableChk(string userId, Dictionary<int, string> dic)
         {
-            // KKW
 
             string strTransStatus = "";
             string strApprStatus = "";
@@ -603,4 +625,5 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return false;
         }
     }
+
 }

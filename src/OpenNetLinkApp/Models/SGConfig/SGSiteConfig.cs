@@ -13,14 +13,14 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool m_bApprLineLocalSave { get; set; } = false;             // 결재라인 로컬 저장 여부.
         public int m_nZipPWBlock { get; set; } = 0;                         // zip 파일 패스워드 검사 여부 ( 0 : 사용 안함, 1 : 비번 걸려 있을 경우 차단,  2 : 비번이 안걸려 있을 경우 차단 )
         public bool m_bTitleDescSameChk { get; set; } = false;              // 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부.
-        public bool m_bApprLineChkBlock { get; set; } = false;              // 고정 결재라인 차단 시 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
+        public bool m_bApprLineChkBlock { get; set; } = true;              // 고정 결재라인 차단 시 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
         public bool m_bApprDeptSearch { get; set; } = true;                 // 결재자 검색 창의 타부서 수정 가능 여부.
         public bool m_bApprTreeSearch { get; set; } = false;                // 결재자 검색 부서트리 사용 유무.
         public bool m_bUserPWChange { get; set; } = false;                  // 사용자 패스워드 변경 사용 여부.
         public string m_strPWChangeProhibitLimit { get; set; } = "";        // 패스워드 사용금지 문자열 지정.
         public int m_nPWChangeApplyCnt { get; set; } = 9;                   // 패스워드 변경 시 허용되는 자리수 지정.
         public string m_strInitPasswd { get; set; } = "";                   // 초기 패스워드 정보.
-        public bool m_bUseScreenLock { get; set; } = true;                  // 화면잠금 사용 여부
+        public bool m_bUseScreenLock { get; set; } = false;                  // 화면잠금 사용 여부
         public bool m_bUseClipBoard { get; set; } = true;                   // 클립보드 사용 여부
         public bool m_bUseURLRedirection { get; set; } = true;              // URL 리다이렉션 사용 여부
         public bool m_bUseFileSend { get; set; } = true;                    // 파일 전송 사용 여부
@@ -28,7 +28,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool m_bUseUserRecvDownPath { get; set; } = true;           // 로그인 유저별 다운로드 경로 사용 여부
         public bool m_bUseEmail { get; set; } = false;               // 메일 관리/결재 사용 유무.
         public bool m_bUsePCURL { get; set; } = false;                      // PCURL 사용 유무.
-        public bool m_bUseClipApprove { get; set; } = false;                // 클립보드 결재 사용 유무
+        public bool m_bUseClipApprove { get; set; } = true;                // 클립보드 결재 사용 유무
         public bool m_bUsePublicBoard { get; set; } = false;                // 공지사항 사용 유무.
         public bool m_bUseCertSend { get; set; } = false;                   // 인증서 전송 사용 유무.
         //public bool m_bUseOSMaxFilePath { get; set; } = true;               // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
@@ -43,7 +43,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool m_bUseClipTypeTextFirstSend { get; set; } = false;         // 클립보드를 보낼때, Text 및 image Mixed 상태일때 Text를 우선적으로 보내도록 설정
 
-        public bool m_bUseApproveAfterLimit { get; set; } = true;             // 파일전송시 사후결재 Count 제한 사용유무
+        public bool m_bUseApproveAfterLimit { get; set; } = false;             // 파일전송시 사후결재 Count 제한 사용유무
 
         public bool m_bUseClipBoardApproveAfterLimit { get; set; } = false;       // 클립보드 파일전송시 사후결재 Count 제한 사용유무
 

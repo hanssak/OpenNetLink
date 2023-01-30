@@ -13,11 +13,11 @@
   "LogLevel": 2,
   "LoginType": 0,
   "RecvDownPath": [
-    "%USERPATH%/Downloads",
-    "%USERPATH%/Downloads",
+    "K:\\",
+    "K:\\",
     "%USERPATH%/Downloads"
   ],
-  "UpdateSvcIP": "10.240.19.111:3439",
+  "UpdateSvcIP": "10.1.207.13:3439",
   "bAfterBasicChk": true,
   "bApprTrayFix": false,
   "bClipCopyAutoSend": false,
@@ -33,8 +33,8 @@
   "bManualRecvDownChange": false,
   "bRMouseFileAddAfterTrans": false,
   "bRecvDownPathChange": true,
-  "bScreenLock": true,
-  "bScreenLockUserChange": true,
+  "bScreenLock": false,
+  "bScreenLockUserChange": false,
   "bShowAdminInfo": false,
   "bStartProgramReg": true,
   "bStartTrayMove": false,
@@ -70,9 +70,9 @@
   ],
   "strLanguage": "KR",
   "strURLAutoAfterBrowser": [
-    "N",
-    "N",
-    "N"
+    "C",
+    "C",
+    "F"
   ],
   "tScreenTime": 0
 }
