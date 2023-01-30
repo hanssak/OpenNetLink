@@ -19,12 +19,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGAlz
 #elif _LINUX
         public const string strGpkiLibName = "libgpkiapi.so";
 #elif _MACOSX
-        public const string strGpkiLibName = "libgpkiapi.so";
+        public const string strAlzLibName = "UnAlzDll";
 #else
         public const string strGpkiLibName = "libgpkiapi.so";
 #endif
 
-#if _WINDOWS
+//#if _WINDOWS
         [DllImport(strAlzLibName, CallingConvention = CallingConvention.Cdecl)]
         public static extern int UnAlzExtract(string stSource, string stDest);
         [DllImport(strAlzLibName, CallingConvention = CallingConvention.Cdecl)]
@@ -57,6 +57,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGAlz
 
             return ret;
         }
-#endif
+//#endif
     }
 }
