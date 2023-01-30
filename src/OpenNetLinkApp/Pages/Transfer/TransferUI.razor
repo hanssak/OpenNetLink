@@ -685,7 +685,7 @@
                     //웹매니저에 등록된 최초 결재라인은 유효성 검증에서 제외
                     if (!strApprLineDeptSeq.Equals("-"))
                     {
-                        SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
+                        SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq, sgLoginData.GetApproveProxyRight());
                         cntSendQuery++;
                     }
                 }
@@ -703,10 +703,10 @@
     /// <param name="strUserID">로그인 ID</param>
     /// <param name="userSeq">결재자 Seq</param>
     /// <param name="deptSeq">결재자 부서Seq</param>
-    private void SendQuery(int groupID, string strUserID, string userSeq, string deptSeq)
+    private void SendQuery(int groupID, string strUserID, string userSeq, string deptSeq, bool approveProxyRight)
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
-        string strQuery = sgQuery.GetUserConfirm(userSeq, deptSeq, false);
+        string strQuery = sgQuery.GetUserConfirm(userSeq, deptSeq, approveProxyRight);
         HSCmdCenter.SendDetailQuery(groupID, strUserID, strQuery);
     }
 
