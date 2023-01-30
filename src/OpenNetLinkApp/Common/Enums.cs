@@ -103,6 +103,9 @@ namespace OpenNetLinkApp.Common
         /// </summary>
         public enum UpdateStatusType
         {
+            /// <summary>
+            /// INIT 또는 업데이트 중 취소
+            /// </summary>
             NONE = 0,
             /// <summary>
             /// 업데이트 체크 중

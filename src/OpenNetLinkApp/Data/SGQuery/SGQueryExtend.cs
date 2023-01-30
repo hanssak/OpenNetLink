@@ -43,11 +43,11 @@ namespace OpenNetLinkApp.Data.SGQuery
         /// <param name="strTeamCode">팀코드(부서시퀀스)</param>
         /// <param name="bApprPos">결재자권한</param>
         /// <returns>사용자 정보 조회 쿼리</returns>
-        public string GetUserConfirm(string strUserSeq, string strTeamCode, bool bApprPos)
+        public string GetUserConfirm(string strUserSeq, string strTeamCode, bool bApproveProxyRight)
         {
-            string strApprPos = "0";
-            if (bApprPos)
-                strApprPos = "1";
+
+            //일반 사용자도 결재권한을 가진다면 권한 인자 empty로 하여 권한 체크하지 않도록
+            string strApprPos = (bApproveProxyRight) ? "" : "1";
 
             string strQuery = "";
             strQuery = String.Format("SELECT * FROM func_nl_getuserconfirm_v3('{0}', '{1}', '{2}')", strUserSeq, strTeamCode, strApprPos);
@@ -382,6 +382,15 @@ WHERE A.TRANS_SEQ = '{transSeq}'
 ";
             return sql;
         }
+
+
+
+
+        /// <summary>
+        /// tbl_file_ole_mimetype 테이블 조회하기
+        /// </summary>
+        /// <returns></returns>
+        public static string GetOLEMimeList() => "SELECT MIMETYPE, TYPE FROM TBL_FILE_OLE_MIMETYPE";
 
 
     }
