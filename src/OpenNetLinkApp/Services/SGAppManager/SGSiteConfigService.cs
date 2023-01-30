@@ -435,9 +435,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUseClipApprove = false;                 // 클립보드 결재 사용 유무.
                 sgSiteConfig.m_bUsePublicBoard = false;                 // 공지사항 사용 유무.
 
-                sgSiteConfig.m_bUseFileClipManageUI = false;            // 클립보드 파일형태 전송시 관리 UI
-                sgSiteConfig.m_bUseFileClipApproveUI = false;           // 클립보드 파일형태 전송시 결재 UI
-
                 sgSiteConfig.m_bUseApproveAfterLimit = false;            // 사후결재 결재 Count 제한 사용유무 - Default false 로 변경 2022.12.28, 나의 사후결재 Count를 파악하여 결재 페이지로 이동
                 sgSiteConfig.m_bUseClipBoardApproveAfterLimit = false;   // 클립보드 사후결재 Count 제한 사용유무 - Default false 로 변경 2022.12.28
                                                                          // 클립보드의 경우 결재자의 사후결재 Count를 파악하여 전송 제한을 건다.
@@ -458,7 +455,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUseClipBoardFileTrans = true;           // 클립보드 파일형태 전송 사용유무
 
                 sgSiteConfig.m_bUseFileClipManageUI = true;             // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
-                sgSiteConfig.m_bUseFileClipApproveUI = true;            // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
+                sgSiteConfig.m_bUseFileClipApproveUI = false;            // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
 
                 sgSiteConfig.m_bUseClipTypeSelectSend = true;           // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
                 sgSiteConfig.m_bUseClipTypeTextFirstSend = true;        // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
