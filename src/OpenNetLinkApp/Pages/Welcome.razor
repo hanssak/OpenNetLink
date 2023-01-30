@@ -1006,8 +1006,6 @@
             if (sgLoginData == null)
                 return;
 
-
-
             if (ClientPatch(sgLoginData))
             {
                 string strSvrVersion = sgLoginData.GetServClientVersion();
@@ -1020,11 +1018,11 @@
                     ClientUpgradeExeEvent clientUpdateExe = null;
                     clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
                     if (clientUpdateExe != null)
-                        clientUpdateExe();
+                        clientUpdateExe(groupID);
                 }
                 else
                 {
-                    await refUpdate_PopUp.openPopUp();
+                    await refUpdate_PopUp.openPopUp(groupID);
                 }
 
                 return;

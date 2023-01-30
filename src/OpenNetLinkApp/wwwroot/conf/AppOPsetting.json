@@ -44,6 +44,7 @@
   "bDlpInfoDisplay": false,
   "bEmptyfileTrans": true,
 
+  "bUserPWChange": true,
   "strInitPasswd": "1K27SdexltsW0ubSCJgsZw==",
   "strPWChangeProhibitLimit": "",
   "nPWChangeApplyCnt": 9,
@@ -134,8 +135,18 @@
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
 
-  "bUsePartialFileAddInTransfer" : false
-
-  
-
+  "bUsePartialFileAddInTransfer": false,
+  "bUseInitAlarmPerDay": false,
+  "bUseInitMessagePerDay": false,
+  "bVisiblePolicyUpdateButton": true,
+  "bUseForceBackgroundUpdate": false,
+  "bUseChkHardSpace": true,
+  "bUseOver1Auth": [
+    false,
+    false,
+    false
+  ],
+  "bUseLoginAfterTray": false,
+  "bUseFileApproveReason": false,
+  "bUseClipBoardApproveReason": false
 }

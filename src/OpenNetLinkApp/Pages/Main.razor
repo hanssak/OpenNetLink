@@ -125,10 +125,10 @@
 <SGAlert @ref="refSGAlert" Guid="modal-alert-main" OnCancel="SessionAlertCancel" OnConfirm="SessionAlertConfirm"></SGAlert>
 
 @code {
-        SGAlert refSGAlert;
+    SGAlert refSGAlert;
 
-        [Parameter]
-        public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
+    [Parameter]
+    public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
 
     public string id { get; set; }
     public string pw { get; set; }
@@ -155,6 +155,7 @@
     public bool bLoginBtnDisable;
     Dictionary<string, SGNetOverData> dicSysIdName = null;
 
+    public bool bStartedLogin = false;//중복으로 로그인버튼 클릭 방지에 사용하는 상태
 
     object obj = new object();
     Dictionary<int, bool> dicLoginResult = new Dictionary<int, bool>(); // ConcurrentDictionary / Dictionary
@@ -168,6 +169,8 @@
     private void SessionAlertCancel()
     {
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+        bStartedLogin = false;
+        bLoginBtnDisable = false;
         refSGAlert.closePopUp();
     }
 
@@ -211,12 +214,14 @@
     /// <param name="e"></param>
     private async void ShowSessionCountPopup(int groupID, PageEventArgs e)
     {
+        bStartedLogin = false;
         await refSGAlert.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
     }
 
     private void keyCheck(KeyboardEventArgs arg)
     {
-        if (arg.Key == "Enter")
+        //Enter 로 인한 로그인은 [로그인] 버튼이 존재하는  AD 외 로그인 타입만 적용토록 변경
+        if (arg.Key == "Enter" && pageService.m_nLoginType != (int)eLoginType.eLOGINTYPE_AD)
             doLogIn();
     }
 
@@ -262,6 +267,8 @@
     {
         try
         {
+            if (bStartedLogin)
+                return;
 
             if ((id?.Length ?? 0) < 1)
             {
@@ -289,6 +296,7 @@
             }
 
             JSRuntime.InvokeAsync<object>("loginCursorChange");
+            bStartedLogin = true;
 
             ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";
@@ -417,7 +425,6 @@
             Debug.WriteLine(ex.Message);
         }
     }
-
     /// <summary>
     ///
     /// </summary>
@@ -444,23 +451,26 @@
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-            if (listNetWork[ngroupid].ADDomain == null || listNetWork[ngroupid].ADDomain.Length < 1)
+            if (listNetWork[ngroupid].ADDomain == null || listNetWork[ngroupid].ADDomain.Count < 1)
             {
                 CLog.Here().Information($"doADLoginLocalCheck - Agent ADDomain Data Empty(groupID : {ngroupid}) - Do IDPW!");
                 return false;
             }
 
-            SGRSACrypto sgRSACrypto = new SGRSACrypto();
-            //string strEncID = "";
-            //sgRSACrypto?.ValueEn(strPW, out strDescPW);
-            string strDescPW = "";
-            sgRSACrypto?.ValueDecrypt(listNetWork[ngroupid].ADDomain, out strDescPW);
-
-            // hash 값으로 비교하면 대소문자 가려서 비교하게 되므로
-            if (listNetWork.Count > 0 && String.Compare(strPW, strDescPW, true) == 0)
+            foreach (string strDomain in listNetWork[ngroupid].ADDomain)
             {
-                CLog.Here().Information($"doADLoginLocalCheck - DoLogin(groupID : {ngroupid}) - Do!");
-                return true;
+                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                //string strEncID = "";
+                //sgRSACrypto?.ValueEn(strPW, out strDescPW);
+                string strDescPW = "";
+                sgRSACrypto?.ValueDecrypt(strDomain, out strDescPW);
+
+                // hash 값으로 비교하면 대소문자 가려서 비교하게 되므로
+                if (listNetWork.Count > 0 && String.Compare(strPW, strDescPW, true) == 0)
+                {
+                    CLog.Here().Information($"doADLoginLocalCheck - DoLogin(groupID : {ngroupid}) - Do!");
+                    return true;
+                }
             }
 
             CLog.Here().Information($"doADLoginLocalCheck - PC Ad Domain : {strPW} - Can't Login AD TYPE(#####), groupID : {ngroupid}");
@@ -473,7 +483,6 @@
 
         return false;
     }
-
     /// <summary>
     ///
     /// </summary>
@@ -487,6 +496,8 @@
             CLog.Here().Information($"ADLogin - ###### -  Start");
 
             JSRuntime.InvokeAsync<object>("loginCursorChange");
+            bStartedLogin = true;
+
             id = Environment.UserName;
 
             //OSX의 경우 임의로 아래와 같이 처리 추후 objective-c API 찾아볼 예정
@@ -553,7 +564,6 @@
         }
 
     }
-
     /// <summary>
     ///
     /// </summary>

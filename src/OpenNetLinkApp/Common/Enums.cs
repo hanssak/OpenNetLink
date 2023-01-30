@@ -49,8 +49,20 @@ namespace OpenNetLinkApp.Common
             ClipApproveUI = 3,
             [Description("파일전송 예외처리")]
             FileException = 4,
+            [Description("일반결재 사후")]
+            ApproveUIAfter = 5
         }
+        /// <summary>
+        /// 승인/반려
+        /// </summary>
+        public enum EnumApproveType : Int32
+        {
+            [Description("승인")]
+            Approve = 1,
+            [Description("반려")]
+            Reject = 2,
 
+        }
         /// <summary>
         /// 검사단계표시 타입
         /// <para>포맷 : 전체검사단계/현재검사단계 (INTERLOCKFLAG 값 기준으로 표시) </para>
@@ -66,7 +78,6 @@ namespace OpenNetLinkApp.Common
             [Description("개인정보 검사")]
             PERSONAL_DATA_SCAN = 8,
         }
-
         /// <summary>
         /// 문서파일 첨부파일 검사 타입
         /// <para>OLEOBJECT_EXTRACT : OLE 개체 검사 (문서 편집기 내)</para>
@@ -84,9 +95,30 @@ namespace OpenNetLinkApp.Common
             /// OLE 개체 위변조 검사
             /// </summary>
             OLEOBJECT_EXTEXCHANGE_EXTRACT=2,
-            //COMPRESS_EXTRACT = 2,
-            
-            
+            //COMPRESS_EXTRACT = 2,   
+        }
+
+        /// <summary>
+        /// groupID 별 업데이트 상태체크
+        /// </summary>
+        public enum UpdateStatusType
+        {
+            /// <summary>
+            /// INIT 또는 업데이트 중 취소
+            /// </summary>
+            NONE = 0,
+            /// <summary>
+            /// 업데이트 체크 중
+            /// </summary>
+            CHECKING = 1,
+            /// <summary>
+            /// 패치 버전 다운로드 중
+            /// </summary>
+            DOWNLOADING =2,
+            /// <summary>
+            /// 설치 중
+            /// </summary>
+            INSTALLING =4,
         }
     }
 }

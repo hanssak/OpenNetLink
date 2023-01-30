@@ -587,7 +587,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eCLIENTVERSION:                                                       // 업데이트 노티.
-                    UpgradeNotiAfterSend(nRet, sgData);
+                    UpgradeNotiAfterSend(nRet, groupId, sgData);
                     break;
 
                 case eCmdList.eDASHBOARDCOUNT:                                  // 대쉬보드 조회 쿼리 데이터.
@@ -815,7 +815,7 @@ namespace OpenNetLinkApp.Services
                     break;
                 case 2103:                                                              // filemime.conf
                     FileMimeRecvEvent fileMimeRecvEvent = sgPageEvent.GetFileMimeRecvEvent();
-                    if(fileMimeRecvEvent != null)
+                    if (fileMimeRecvEvent != null)
                     {
                         fileMimeRecvEvent(groupId);
                     }
@@ -1632,7 +1632,7 @@ namespace OpenNetLinkApp.Services
             }
         }
 
-        public void UpgradeNotiAfterSend(int nRet, SGData data)
+        public void UpgradeNotiAfterSend(int nRet, int groupId, SGData data)
         {
             ClientUpgradeEvent clipUpdate = sgPageEvent.GetClientUpgradeNotiEvent();
             if (clipUpdate != null)
@@ -1640,7 +1640,7 @@ namespace OpenNetLinkApp.Services
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
                 e.strMsg = data.GetBasicTagData("CLIVERSION");
-                clipUpdate(e);
+                clipUpdate(groupId, e);
             }
         }
 
@@ -1811,6 +1811,37 @@ namespace OpenNetLinkApp.Services
 
             m_DicFileSending.TryAdd(groupid, bSending);
             //m_DicFileSending[groupid] = bSending;
+        }
+
+
+        /// <summary>
+        /// 다중망 시점으로 모든 연결망 중 파일 송신중인 것이 존재하는 지 확인
+        /// </summary>
+        /// <returns></returns>
+        public bool GetFileSending()
+        {
+            bool isSending = false;
+            foreach (int key in m_DicFileSending.Keys)
+            {
+                Console.WriteLine($"GetFileSending - [{key} / {m_DicFileSending[key]}]");
+                isSending = isSending || m_DicFileSending[key];
+            }
+            return isSending;
+        }
+
+        /// <summary>
+        /// 다중망 시점으로 모든 연결망 중 파일 수신중인 것이 존재하는 지 확인
+        /// </summary>
+        /// <returns></returns>
+        public bool GetFileRecving()
+        {
+            bool isRecving = false;
+            foreach (int key in m_DicFileRecving.Keys)
+            {
+                Console.WriteLine($"GetFileRecving - [{key} / {m_DicFileRecving[key]}]");
+                isRecving = isRecving || m_DicFileRecving[key];
+            }
+            return isRecving;
         }
 
         /// <summary>
@@ -2335,7 +2366,7 @@ namespace OpenNetLinkApp.Services
             return nRet;
         }
 
-        public int ContinueSendFileTrans(int groupid, Dictionary<string,string> values, string strNetOver3info, string hszFileName, int currentFileSize)
+        public int ContinueSendFileTrans(int groupid, Dictionary<string, string> values, string strNetOver3info, string hszFileName, int currentFileSize)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);

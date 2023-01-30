@@ -960,7 +960,7 @@
         {
             CLog.Here().Information("SearchCount - RECORD - empty!");
 
-            ShowMessage("warn", XmlConf.GetWarnMsg("W_0286"));            // 검색결과가 존재하지 않습니다.
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
             ListData.Clear();
 
             //UpdateList(0);
@@ -987,7 +987,7 @@
 
         if (totalCnt <= 0)
         {
-            ShowMessage("warn", XmlConf.GetWarnMsg("W_0286"));            // 검색결과가 존재하지 않습니다.
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
             if (listCnt != null) listCnt.Clear();
             SetPageinfo(totalCnt);
             ListData.Clear();
@@ -1092,7 +1092,7 @@
         if (listTempData == null || listTempData.Count < 1)
         {
             CLog.Here().Information("DetailSearchResultEmail - RECORD - empty!");
-            ShowMessage("error", XmlConf.GetWarnMsg("W_0286"));            // 검색결과가 존재하지 않습니다.
+            ShowMessage("error", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
             StateHasChanged();
             return;
         }
@@ -1149,7 +1149,7 @@
         {
             CLog.Here().Information("SearchListResult - RECORD - empty!");
 
-            ShowMessage("warn", XmlConf.GetWarnMsg("W_0286"));            // 검색결과가 존재하지 않습니다.
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
             ListData.Clear();
             mData.Clear();
 

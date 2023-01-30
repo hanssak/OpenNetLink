@@ -232,7 +232,21 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         /// <returns></returns>
         public bool GetUsePartialFileAddInTransfer();
-
+        /// <summary>
+        /// 로그인 완료후 Tray로 이동
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseLoginAfterTray();
+        /// <summary>
+        /// 파일 승인시에도 사유 입력
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseFileApproveReason();
+        /// <summary>
+        /// 클립보드 승인시에도 사유 입력
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseClipBoardApproveReason();
 
         /// <summary>
         /// 알람 초기화 매일 자정마다
@@ -826,6 +840,20 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseCheckHardSpace()
         {
             return AppConfigInfo.bUseChkHardSpace;
+        }
+
+        public bool GetUseLoginAfterTray()
+        {
+            return AppConfigInfo.bUseLoginAfterTray;
+        }
+
+        public bool GetUseFileApproveReason()
+        {
+            return AppConfigInfo.bUseFileApproveReason;
+        }
+        public bool GetUseClipBoardApproveReason()
+        {
+            return AppConfigInfo.bUseClipBoardApproveReason;
         }
 
         public bool GetUseInitAlarmPerDay()

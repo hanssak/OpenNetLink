@@ -5,6 +5,7 @@
 #addin nuget:?package=Cake.Json&version=6.0.1
 #addin nuget:?package=Newtonsoft.Json&version=13.0.1
 #addin nuget:?package=Cake.Prompt&version=1.0.15
+#addin nuget:?package=Cake.FileHelpers&version=4.0.0
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -14,6 +15,7 @@ var sitename = Argument("sitename", "hanssak");
 var configuration = Argument("configuration", "Release");
 var setNetwork = Argument<bool>("setNetwork", true);
 var isPatch = Argument<bool>("isPatch", false);
+var isLightPatch = Argument<bool>("isLightPatch", false);
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
 var customName = "NONE";
 var AppProps = new AppProperty(Context, 
@@ -21,7 +23,8 @@ var AppProps = new AppProperty(Context,
 								"../", 													// Path of the Git Local Repository
 								"./OpenNetLinkApp/wwwroot/conf/AppVersion.json",		// Version file Path 
 								"./OpenNetLinkApp/wwwroot/conf/AppEnvSetting.json",		// Env file Path of the Application env settings
-								"./OpenNetLinkApp/wwwroot/conf/NetWork.json");			// Network file Path of the Network settings
+								"./OpenNetLinkApp/wwwroot/conf/NetWork.json",			// Network file Path of the Network settings
+								"./openNetLinkApp/ReleaseNote.md");						// Release Note of Patch File
 
 string PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppUpdatePlatform);
 string ReleaseNoteDirPath 	= String.Format("artifacts/installer/{0}/release_note", AppProps.AppUpdatePlatform);
@@ -37,11 +40,12 @@ public class AppProperty
 	public string VersionFile { get; }
 	public string AppEnvFile { get; }
 	public string NetworkFile { get; }
+	public string ReleaseNoteFile {get;}
 	private JObject VersionJObj { get; }
 	private JObject AppEnvJObj { get; }
 	private JObject NetworkJobj { get; }
 	
-    public AppProperty(ICakeContext context, string propsFile, string gitRepoPath, string versionFile, string appEnvFile, string networkFile)
+    public AppProperty(ICakeContext context, string propsFile, string gitRepoPath, string versionFile, string appEnvFile, string networkFile, string releaseNoteFile)
     {
         Context = context;
 		PropsFile = propsFile;
@@ -49,10 +53,11 @@ public class AppProperty
 		VersionFile = versionFile;
 		AppEnvFile = appEnvFile;
 		NetworkFile = networkFile;
+		ReleaseNoteFile = releaseNoteFile;
 		VersionJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(VersionFile));
 		AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(AppEnvFile));
 		NetworkJobj = JsonAliases.ParseJsonFromFile(Context, new FilePath(NetworkFile));
-    }
+	}
 
 	public Version PropVersion {
 		get {
@@ -422,6 +427,19 @@ Task("PkgWin10")
 	DeleteFiles("./artifacts/windows/published/*.so");
 	DeleteFiles("./artifacts/windows/published/*.pdb");
 
+	//Light Patch 버전일 땐, edge 폴더 배포전에 제거
+	if(isPatch.ToString().ToUpper().Equals("TRUE"))
+	{
+		if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
+		{
+			if(DirectoryExists("./artifacts/windows/published/wwwroot/edge")) 
+			{
+				DeleteDirectory("./artifacts/windows/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
+			}
+		}
+	}
+	Information("5");
+	
 	var files = GetFiles("./artifacts/windows/published/*.so.*");
 	foreach(var file in files)
 	{
@@ -447,6 +465,7 @@ Task("PkgWin10")
 		Defines = new Dictionary<string, string>{
 			{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
 			{"IS_PATCH", isPatch.ToString().ToUpper()},
+			{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
 			{"NETWORK_FLAG", networkFlag.ToUpper()},
 			{"CUSTOM_NAME", customName.ToUpper()}			
 		}
@@ -511,11 +530,24 @@ Task("CreateReleaseNote")
 
 	// Write File
 	using(StreamWriter writer = new StreamWriter(ReleaseNotePath)){
-		writer.WriteLine("# "+Title);
-		writer.WriteLine("");
-		foreach (var tag in AppProps.GitLastTag)
+		
+
+		if(FileExists(AppProps.ReleaseNoteFile))
 		{
-			writer.WriteLine(tag.Message);
+			foreach(var line in FileReadLines(AppProps.ReleaseNoteFile))
+			{
+				writer.WriteLine(line);
+			}
+			
+		}
+		else
+		{
+			writer.WriteLine("# "+Title);
+			writer.WriteLine("");
+			foreach (var tag in AppProps.GitLastTag)
+			{
+				writer.WriteLine(tag.Message);
+			}
 		}
 	};
 });

@@ -21,6 +21,10 @@ namespace OfficeExtractor
                 var files = extractor.Extract(strSource, strDest);
                 result = files.Count;
             }
+            catch (XmlParsingException ex)
+            {
+                result = -11;
+            }
             catch (DocumentCorrupt ex)
             {
                 result = -10;
@@ -78,7 +82,11 @@ namespace OfficeExtractor
                 var files = extractor.Extract(inputFile, inputFileName, strDest);
                 result = files.Count;
             }
-            catch(DocumentCorrupt ex)
+            catch (XmlParsingException ex)
+            {
+                result = -11;
+            }
+            catch (DocumentCorrupt ex)
             {
                 result = -10;
             }

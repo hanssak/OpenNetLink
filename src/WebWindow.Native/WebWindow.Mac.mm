@@ -756,27 +756,32 @@ bool WebWindow::GetTrayUse()
 void WebWindow::MoveWebWindowToTray()
 {
 	NTLog(this, Info, "Called : OpenNetLink Move To Tray");
-	struct tray_menu *item = tray.menu;
-	do
-	{
-		if (strcmp(item->text, TEXT_HIDE) == 0) {
-			toggle_show(item);
-			break;
-		}
-	} while ((++item)->text != NULL);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        struct tray_menu *item = tray.menu;
+        do
+        {
+            if (strcmp(item->text, TEXT_HIDE) == 0) {
+                toggle_show(item);
+                break;
+            }
+        } while ((++item)->text != NULL);
+    });
 }
 
 void WebWindow::MoveTrayToWebWindow()
 {
 	NTLog(this, Info, "Called : OpenNetLink Move To WebWindow");
-	struct tray_menu* item = tray.menu;
-	do
-	{
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        struct tray_menu* item = tray.menu;
+        do
+	    {
 		if (strcmp(item->text, TEXT_SHOW) == 0) {
 			toggle_show(item);
 			break;
 		}
-	} while ((++item)->text != NULL);
+	    } while ((++item)->text != NULL);
+    });
 }
 
 void WebWindow::MinimizeWebWindow()

@@ -1591,7 +1591,6 @@ int WebWindow::SendClipBoard(int groupID)
 
 			if (nType == 0)
 			{
-
 				CloseClipboard();
 				g_bDoingSendClipBoard = false;
 				ClipDataBufferClear();

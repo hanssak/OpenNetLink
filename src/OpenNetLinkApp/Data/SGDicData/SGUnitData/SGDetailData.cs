@@ -1036,7 +1036,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// 결재 이력 정보를 반환한다
         /// </summary>
         /// <returns></returns>
-        public List<ApproverHist> GetApproverInfoHist(bool bApproveUseReason = false)
+        public List<ApproverHist> GetApproverInfoHist(bool isVisibleApproveReason)
         {
             List<ApproverHist> approverHist = new List<ApproverHist>();
             ApproverHist tmpApprover;
@@ -1133,7 +1133,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if (strApprStatusCode.Equals("1"))
                     strApprDate = "-";
                 else if (strApprStatusCode.Equals("2"))
-                    strApprReason = "-";
+                {
+                    if(!isVisibleApproveReason)
+                        strApprReason = "-";
+                }
 
                 string strTransStatus = GetBasicTagData("TRANSSTATUS");
                 if ((strTransStatus.Equals("C")) || (strTransStatus.Equals("F")))    // 전송취소 이거나 전송실패
@@ -1181,10 +1184,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="ApproveStep">결재유형</param>
         /// <param name="DataApprStatusCode">해당전송건의 결재상태</param>
         /// <returns></returns>
-        public ApproverHist GetTransLastApproverHistData(ApproverHist ApprHist, int ApproveStep, string DataApprStatusCode)
+        public ApproverHist GetTransLastApproverHistData(ApproverHist ApprHist, int ApproveStep, string DataApprStatusCode, bool isVisibleApproveReason)
         {
             List<ApproverHist> approverHist = null;
-            approverHist = GetApproverInfoHist();
+            approverHist = GetApproverInfoHist(isVisibleApproveReason);
             if ((approverHist == null) || (approverHist.Count <= 0))
             {
                 ApprHist = null;
@@ -1241,10 +1244,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="ApprHist"></param>
         /// <returns></returns>
-        public ApproverHist GetApprLastApproverHistData(ApproverHist ApprHist)
+        public ApproverHist GetApprLastApproverHistData(ApproverHist ApprHist, bool isVisibleApproveReason)
         {
             List<ApproverHist> approverHist = null;
-            approverHist = GetApproverInfoHist();
+            approverHist = GetApproverInfoHist(isVisibleApproveReason);
             if ((approverHist == null) || (approverHist.Count <= 0))
             {
                 ApprHist = null;
