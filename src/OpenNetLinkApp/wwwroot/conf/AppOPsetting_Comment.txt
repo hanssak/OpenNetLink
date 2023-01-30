@@ -191,3 +191,7 @@ bUseChkHardSpace : 파일 수신시 디바이스 용량 체크 여부
 bUseOver1Auth : AD로그인 실패시, IDPW 로그인시도할수 있게 Login UI 설정 및 동작(자동로그인X)
 
 bUseLoginAfterTray : 로그인 후 Tray로 이동, bStartTrayMove 이 옵션과 혼동해서 사용 금지, 로그인 후 Tray 로 이동과 프로그램 시작시 Tray로 이동
+
+bUseFileApproveReason: 파일 전송 승인시 승인사유 입력 여부
+
+bUseClipBoardApproveReason : 클립보드 전송 승인시 승인 사유 입력 여부

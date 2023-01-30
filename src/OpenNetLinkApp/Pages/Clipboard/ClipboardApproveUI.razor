@@ -238,7 +238,7 @@
 
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
 <ClipboardApprovePopUp @ref="refApprovePopUp"></ClipboardApprovePopUp>
-<SGReject @ref="refSGReject"></SGReject>
+<SGReject @ref="refSGReject" Guid="modalReject"></SGReject>
 
 @code {
 
@@ -579,79 +579,82 @@
         {
             @*     object[] param = { "datepicker5", "datepicker6" };
                 jsRuntime.InvokeAsync<object>("initDatePicker", param);*@
-            jsRuntime.InvokeAsync<object>("initApproveUIPosition");
-            jsRuntime.InvokeAsync<object>("initPageLeft");
-            await ApproveSearchCount();
-        }
-        base.OnAfterRender(firstRender);
-        
+        jsRuntime.InvokeAsync<object>("initApproveUIPosition");
+        jsRuntime.InvokeAsync<object>("initPageLeft");
+        await ApproveSearchCount();
+    }
+    base.OnAfterRender(firstRender);
+
+}
+
+public void InitText()
+{
+    strApprTitle = XmlConf.GetTitle("T_COMMON_CLIPAPPR");                           // 클립보드 결재
+    strApproveKind = XmlConf.GetTitle("T_COMMON_APPROVE_KIND");                     // 결재종류
+    strPeriod = XmlConf.GetTitle("T_COMMON_PERIOD");                                // 기간
+    strPreAppr = XmlConf.GetTitle("T_DETAIL_BEFORE_APPROVE");                       // 선결
+    strAfterAppr = XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE");                      // 후결
+    strTransKind = XmlConf.GetTitle("T_COMMON_TRANSKIND");                          // 전송구분
+    strTotal = XmlConf.GetTitle("T_COMMON_ALL");                                    // 전체
+    strCarryIn = XmlConf.GetTitle("T_COMMON_IMPORT");                               // 반입
+    strCarryOut = XmlConf.GetTitle("T_COMMON_EXPORT");                              // 반출
+    strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");                  // 승인상태
+    strApprove = XmlConf.GetTitle("T_COMMON_APPROVE");                              // 승인
+    strApproveWait = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");                     // 승인대기
+    strReject = XmlConf.GetTitle("T_COMMON_REJECTION");                             // 반려
+    strApproveCancle = XmlConf.GetTitle("T_COMMON_REQUESTCANCEL");                  // 요청취소
+    strReqApprover = XmlConf.GetTitle("T_COMMON_REQUESTER");                        // 승인요청자
+    strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                         // 승인자
+    strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                                // 조회
+    strBtnApprove = XmlConf.GetTitle("T_APPROVE_BTN");                              // 결재승인
+    strBtnReject = XmlConf.GetTitle("T_REJECT_BTN");                                // 결재반려
+    strFileForward = XmlConf.GetTitle("T_ETC_FILEFORWARD");                         // 파일전달
+    strTitle = XmlConf.GetTitle("T_TRANS_TITLE");                                   // 제목
+    strApproveReqDay = XmlConf.GetTitle("T_COMMON_APPROVEREQDATE");                 // 승인요청일
+    strApproveDay = XmlConf.GetTitle("T_COMMON_APPROVEDATE");                       // 승인일
+    strApproveDetail = XmlConf.GetTitle("T_COMMON_DETAILVIEW");                     // 상세보기
+    strURLAuto = XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO");                   // URL 자동전환 사용
+    strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
+    strTitleInputInfo = XmlConf.GetWarnMsg("W_0021");                               // 제목을 입력하여 주십시오.
+    strTotalPage = XmlConf.GetTitle("T_TRANS_TOTALPAGE");                           // 총페이지
+    strDataType = XmlConf.GetTitle("T_DATA_TYPE");                                  // 데이타 타입
+
+    strDataTypeText = XmlConf.GetTitle("T_DATA_TYPE_TEXT");
+    strDataTypeImage = XmlConf.GetTitle("T_DATA_TYPE_IMAGE");
+
+    strTransKindValue = strTotal;
+    strApprKindValue = strTotal;
+    strApprStatusValue = strTotal;
+    strDataTypeValue = strTotal;
+}
+
+public async Task ApproveAction()
+{
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+    string strMsg = "";
+    if (pageService.GetConnectStatus(groupID) == false)
+    {
+        strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        ShowMessage("error", strMsg);
+        return;
     }
 
-    public void InitText()
+    string strApprSeq = GetCheckApprSeq();
+
+    if (strApprSeq.Equals(""))
     {
-        strApprTitle = XmlConf.GetTitle("T_COMMON_CLIPAPPR");                           // 클립보드 결재
-        strApproveKind = XmlConf.GetTitle("T_COMMON_APPROVE_KIND");                     // 결재종류
-        strPeriod = XmlConf.GetTitle("T_COMMON_PERIOD");                                // 기간
-        strPreAppr = XmlConf.GetTitle("T_DETAIL_BEFORE_APPROVE");                       // 선결
-        strAfterAppr = XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE");                      // 후결
-        strTransKind = XmlConf.GetTitle("T_COMMON_TRANSKIND");                          // 전송구분
-        strTotal = XmlConf.GetTitle("T_COMMON_ALL");                                    // 전체
-        strCarryIn = XmlConf.GetTitle("T_COMMON_IMPORT");                               // 반입
-        strCarryOut = XmlConf.GetTitle("T_COMMON_EXPORT");                              // 반출
-        strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");                  // 승인상태
-        strApprove = XmlConf.GetTitle("T_COMMON_APPROVE");                              // 승인
-        strApproveWait = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");                     // 승인대기
-        strReject = XmlConf.GetTitle("T_COMMON_REJECTION");                             // 반려
-        strApproveCancle = XmlConf.GetTitle("T_COMMON_REQUESTCANCEL");                  // 요청취소
-        strReqApprover = XmlConf.GetTitle("T_COMMON_REQUESTER");                        // 승인요청자
-        strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                         // 승인자
-        strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                                // 조회
-        strBtnApprove = XmlConf.GetTitle("T_APPROVE_BTN");                              // 결재승인
-        strBtnReject = XmlConf.GetTitle("T_REJECT_BTN");                                // 결재반려
-        strFileForward = XmlConf.GetTitle("T_ETC_FILEFORWARD");                         // 파일전달
-        strTitle = XmlConf.GetTitle("T_TRANS_TITLE");                                   // 제목
-        strApproveReqDay = XmlConf.GetTitle("T_COMMON_APPROVEREQDATE");                 // 승인요청일
-        strApproveDay = XmlConf.GetTitle("T_COMMON_APPROVEDATE");                       // 승인일
-        strApproveDetail = XmlConf.GetTitle("T_COMMON_DETAILVIEW");                     // 상세보기
-        strURLAuto = XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO");                   // URL 자동전환 사용
-        strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
-        strTitleInputInfo = XmlConf.GetWarnMsg("W_0021");                               // 제목을 입력하여 주십시오.
-        strTotalPage = XmlConf.GetTitle("T_TRANS_TOTALPAGE");                           // 총페이지
-        strDataType = XmlConf.GetTitle("T_DATA_TYPE");                                  // 데이타 타입
-
-        strDataTypeText = XmlConf.GetTitle("T_DATA_TYPE_TEXT");
-        strDataTypeImage = XmlConf.GetTitle("T_DATA_TYPE_IMAGE");
-
-        strTransKindValue = strTotal;
-        strApprKindValue = strTotal;
-        strApprStatusValue = strTotal;
-        strDataTypeValue = strTotal;
+        strMsg = XmlConf.GetWarnMsg("W_0068"); // 선택된 항목이 없습니다.
+        ShowMessage("info", strMsg);
+        return;
     }
 
-    public void ApproveAction()
+
+    if (!SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason())
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-        string strMsg = "";
-        if (pageService.GetConnectStatus(groupID) == false)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
-
-        string strApprSeq = GetCheckApprSeq();
-
-        if (strApprSeq.Equals(""))
-        {
-            strMsg = XmlConf.GetWarnMsg("W_0068"); // 선택된 항목이 없습니다.
-            ShowMessage("info", strMsg);
-            return;
-        }
-
 
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         string strUserID = "";
@@ -674,137 +677,167 @@
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
     }
-
-    private async Task ApproveReject()
+    else
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-        string strMsg = "";
-        if (pageService.GetConnectStatus(groupID) == false)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
-
-        if (GetCheckRejectPossible() != true)
-        {
-            strMsg = XmlConf.GetWarnMsg("W_0092"); // 후결은 반려를 할 수 없습니다./r/n다시 확인하십시오.
-            ShowMessage("info", strMsg);
-            return;
-        }
-        string strApprSeq = GetCheckApprSeq();
-        if (strApprSeq.Equals(""))
-        {
-            strMsg = XmlConf.GetWarnMsg("W_0068"); // 선택된 항목이 없습니다.
-            ShowMessage("info", strMsg);
-            return;
-        }
-
-        refSGReject.ResetReason();
+        refSGReject.ResetReason(Common.Enums.EnumApproveType.Approve);
         refSGReject.SetGroupID(groupID);
-        refSGReject.SetApprRejectEvent(ApproveRejectSend);
+        refSGReject.SetApprRejectEvent(ApproveSend);
         await refSGReject.openPopUp();
     }
+}
 
-    public void ApproveRejectSend(int groupID, string strReason)
+public void ApproveSend(int groupID, string strReason)
+{
+    SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+    string strUserID = "";
+    if (sgLoginData != null)
+        strUserID = sgLoginData.GetUserID();
+    string strProcID = "A";
+    string strApproveSeqs = "";
+    for (int i = 0; i < ListData.Count; i++)
     {
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        string strUserID = "";
-        if (sgLoginData != null)
-            strUserID = sgLoginData.GetUserID();
-        string strProcID = "R";
-        string strApproveSeqs = "";
-        for (int i = 0; i < ListData.Count; i++)
+        if (ListData[i].bCheck == true)
         {
-            if (ListData[i].bCheck == true)
-            {
-                string temp = (ListData[i].ApprSeq + '\u0002');
-                strApproveSeqs += temp;
-            }
+            string temp = (ListData[i].ApprSeq + '\u0002');
+            strApproveSeqs += temp;
         }
-        string strApprover = "1";
-        string strApproveUserKind = "0";
-
-        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
     }
-    public string GetCheckApprSeq()
+    string strApprover = "1";
+    string strApproveUserKind = "0";
+
+    HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+}
+
+private async Task ApproveReject()
+{
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+    string strMsg = "";
+    if (pageService.GetConnectStatus(groupID) == false)
     {
-        string strApprSeq = "";
-        int nCount = ListData.Count;
-        for (int i = 0; i < nCount; i++)
+        strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        ShowMessage("error", strMsg);
+        return;
+    }
+
+    if (GetCheckRejectPossible() != true)
+    {
+        strMsg = XmlConf.GetWarnMsg("W_0092"); // 후결은 반려를 할 수 없습니다./r/n다시 확인하십시오.
+        ShowMessage("info", strMsg);
+        return;
+    }
+    string strApprSeq = GetCheckApprSeq();
+    if (strApprSeq.Equals(""))
+    {
+        strMsg = XmlConf.GetWarnMsg("W_0068"); // 선택된 항목이 없습니다.
+        ShowMessage("info", strMsg);
+        return;
+    }
+
+    refSGReject.ResetReason(Common.Enums.EnumApproveType.Reject);
+    refSGReject.SetGroupID(groupID);
+    refSGReject.SetApprRejectEvent(ApproveRejectSend);
+    await refSGReject.openPopUp();
+}
+
+public void ApproveRejectSend(int groupID, string strReason)
+{
+    SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+    string strUserID = "";
+    if (sgLoginData != null)
+        strUserID = sgLoginData.GetUserID();
+    string strProcID = "R";
+    string strApproveSeqs = "";
+    for (int i = 0; i < ListData.Count; i++)
+    {
+        if (ListData[i].bCheck == true)
         {
-            SGApproveData temp = ListData[i];
-            if (temp.bCheck)
-            {
-                strApprSeq = temp.TransSeq;
-            }
+            string temp = (ListData[i].ApprSeq + '\u0002');
+            strApproveSeqs += temp;
         }
-        return strApprSeq;
     }
-    public SGApproveData GetApprListData(string strTransSeq)
-    {
-        SGApproveData tdata = null;
-        int nCount = ListData.Count;
-        if (nCount <= 0)
-            return tdata;
+    string strApprover = "1";
+    string strApproveUserKind = "0";
 
-        for (int i = 0; i < nCount; i++)
+    HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+}
+public string GetCheckApprSeq()
+{
+    string strApprSeq = "";
+    int nCount = ListData.Count;
+    for (int i = 0; i < nCount; i++)
+    {
+        SGApproveData temp = ListData[i];
+        if (temp.bCheck)
         {
-            SGApproveData temp = ListData[i];
-            if (temp.TransSeq.Equals(strTransSeq))
+            strApprSeq = temp.TransSeq;
+        }
+    }
+    return strApprSeq;
+}
+public SGApproveData GetApprListData(string strTransSeq)
+{
+    SGApproveData tdata = null;
+    int nCount = ListData.Count;
+    if (nCount <= 0)
+        return tdata;
+
+    for (int i = 0; i < nCount; i++)
+    {
+        SGApproveData temp = ListData[i];
+        if (temp.TransSeq.Equals(strTransSeq))
+        {
+            tdata = temp;
+            break;
+        }
+    }
+    return tdata;
+}
+public bool GetCheckRejectPossible()
+{
+    string strApprKind = "";
+    string strTemp = XmlConf.GetTitle("T_COMMON_APPROVE_AFTER");        // 후결
+    bool bRejectPossible = true;
+    int nCount = ListData.Count;
+    for (int i = 0; i < nCount; i++)
+    {
+        SGApproveData temp = ListData[i];
+        if (temp.bCheck == true)
+        {
+            strApprKind = temp.ApvType;
+            if (strApprKind.Equals(strTemp))
             {
-                tdata = temp;
+                bRejectPossible = false;
                 break;
             }
         }
-        return tdata;
     }
-    public bool GetCheckRejectPossible()
+    return bRejectPossible;
+}
+
+
+public async Task ApproveSearchCount()
+{
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+
+    string strMsg = "";
+    if (pageService.GetConnectStatus(groupID) == false)
     {
-        string strApprKind = "";
-        string strTemp = XmlConf.GetTitle("T_COMMON_APPROVE_AFTER");        // 후결
-        bool bRejectPossible = true;
-        int nCount = ListData.Count;
-        for (int i = 0; i < nCount; i++)
-        {
-            SGApproveData temp = ListData[i];
-            if (temp.bCheck == true)
-            {
-                strApprKind = temp.ApvType;
-                if (strApprKind.Equals(strTemp))
-                {
-                    bRejectPossible = false;
-                    break;
-                }
-            }
-        }
-        return bRejectPossible;
+        strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        ShowMessage("error", strMsg);
+        return;
     }
 
-
-    public async Task ApproveSearchCount()
-    {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        string strMsg = "";
-        if (pageService.GetConnectStatus(groupID) == false)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
-
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
+    SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+    if (sgLoginData != null)
+        curUserID = sgLoginData.GetUserID();
 
         @*await GetDateTime();*@
         curApprKind = GetApprKind();

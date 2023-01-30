@@ -25,6 +25,8 @@
     /// <summary>
     ///조회를 위한 From 날짜 (포맷:yyyyMMdd00000)
     /// </summary>
+    /// 
+
     public string FromDateSearchValue
     {
         get
@@ -88,7 +90,7 @@
         base.OnAfterRender(firstRender);
     }
 
-    private async void setInitDate()
+    public async void setInitDate()
     {
         //초기 조회조건 날짜 금일 기준 -7일~오늘
         FromDateValue = DateTime.Now.AddDays(FromPeriodRange).ToString("yyyy-MM-dd");
@@ -98,6 +100,12 @@
         await jsRuntime.InvokeVoidAsync("setElementValue", new object[] { "datepicker3", FromDateValue });
         await jsRuntime.InvokeVoidAsync("setElementValue", new object[] { "datepicker4", ToDateValue });
 
+    }
+
+    public async void SetDateTime(string fromDate, string toDate)
+    {
+        await jsRuntime.InvokeVoidAsync("setElementValue", new object[] { "datepicker3", fromDate });
+        await jsRuntime.InvokeVoidAsync("setElementValue", new object[] { "datepicker4", toDate });
     }
 
     /// <summary>

@@ -39,6 +39,7 @@
 <SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
 <SGAlert @ref="refSGAlertApproveAfter" OnConfirm="ApproveAfterTransFile" Guid="HeaderUIApporveAfterAlert"></SGAlert>
 <SGAlert @ref="refSGAlertApproveAfterMyCount" OnConfirm="ApproveAfterPageMove" OnCancel="ApproveAfterCancel" Guid="HeaderUIApporveAfterMyCountAlert"></SGAlert>
+<SGAlert @ref="refSGAlertUpdateStart" Guid="HeaderUIUpdateStartAlert"></SGAlert>
 
 @code
 {
@@ -54,6 +55,7 @@
     ClipBoardTypeSelect refClipBoardTypeSelect;
     SGAlert refSGAlertApproveAfter;
     SGAlert refSGAlertApproveAfterMyCount;
+    SGAlert refSGAlertUpdateStart;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
 
@@ -86,6 +88,8 @@
         OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
         VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+
+        SGAppUpdaterSvc.SetStartPatchNotiEventAdd(StartPatchNoti);
 
         GetIpV4Str();
         SetPlatFormInfo();
@@ -1705,7 +1709,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             ISGSideBarUI sgSideBarUI = SGAppMgrSvc.SideBarUIService.ActiveMenu;
             if (sgSideBarUI.Path.Contains("transferApprove") && sgSideBarUI.GroupId.ToString() == arg)
             {
-                PageDataRefreshEvent pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
+                PageDataRefreshEvent pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUIAfter);
                 if (pgRefreshEvent != null)
                     pgRefreshEvent();
             }
@@ -1716,7 +1720,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
                 ISGSideBarUI activeMenu = SideBarUISvc.FindSubMenu(Convert.ToInt32(arg), $"/transferApprove/{arg}");
                 ChangeActiveMenuWrap(eventArgs, activeMenu);
-                MyNavigationManager.NavigateTo($"/transferApprove/{arg}");
+                MyNavigationManager.NavigateTo($"/transferApprove/{arg}/1");
             }
 
             pageService.SetApproveAfterMyCountChecking(false);
@@ -2716,6 +2720,15 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         InsertAlarm(groupID, sidebar, eAType, "", strMsg);
         if (HsCmdCenter.GetFileRecvPossible(groupID) == true)
             Window.Notification(os_noti, strTitle, strMsg);
+    }
+
+    void StartPatchNoti(string newVersion)
+    {
+        string patchTitle = XmlConf.GetInfoMsg("I_0239");   //패치 업데이트 시작
+        string patchMsg = string.Format(XmlConf.GetInfoMsg("I_0240"), newVersion); //잠시 후 OpenNetLink 업데이트가 진행됩니다. (version {0})
+
+        Task.Run(async () => { await refSGAlertUpdateStart.openPopUp(patchTitle, patchMsg, 0, 0); });
+        Window.Notification(OS_NOTI.NOTICE, patchTitle, patchMsg);
     }
 
 

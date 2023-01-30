@@ -363,7 +363,8 @@
             return;
 
         List<ApproverHist> apprListHist = null;
-        apprListHist = sgDetailData.GetApproverInfoHist();
+        bool isVisibleClipBoardApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason();
+        apprListHist = sgDetailData.GetApproverInfoHist(isVisibleClipBoardApproveReason);
         if ((apprListHist == null) || (apprListHist.Count <= 1))
         {
             bApprHistHidden = true;
@@ -375,7 +376,7 @@
         else
         {
             ApproverHist apprHist = null;
-            apprHist = sgDetailData.GetTransLastApproverHistData(apprHist, DataApproveStep, strDataApprStatusCode);
+            apprHist = sgDetailData.GetTransLastApproverHistData(apprHist, DataApproveStep, strDataApprStatusCode, isVisibleClipBoardApproveReason);
             if (apprHist == null)
                 strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
             else
@@ -469,7 +470,14 @@
         strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                             // 승인자
         strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");                      // 승인상태
         strApproveDay = XmlConf.GetTitle("T_COMMON_APPROVEDATE");                           // 승인일
-        strRejectReason = XmlConf.GetTitle("T_APPROVE_APRROVEREASON");                      // 반려사유
+        if(SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason())
+        {
+            strRejectReason = XmlConf.GetTitle("T_APPROVE_APPROVE_REJECT_REASON");                      // 반려사유
+        }
+        else
+        {
+            strRejectReason = XmlConf.GetTitle("T_APPROVE_REJECTREASON");                      // 반려사유
+        }
         strTransCancle = XmlConf.GetTitle("T_COMMON_TRANSCANCLE");                          // 전송취소
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                                         // 닫기
 

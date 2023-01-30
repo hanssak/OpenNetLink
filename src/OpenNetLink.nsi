@@ -328,8 +328,11 @@ Function .onInit
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
 	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db" "$TEMP" 
-	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db" "$TEMP" 
-    
+	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db" "$TEMP"
+
+	${If} ${IS_LIGHT_PATCH} == 'TRUE'		
+		CopyFiles /SILENT "C:\HANSSAK\OpenNetLink\wwwroot\edge" "$TEMP\HANSSAK\edge"
+	${endif}
     
 
     Banner::show "Calculating important stuff..."
@@ -363,6 +366,14 @@ Function .onInstSuccess
       CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
 	  CopyFiles /FILESONLY "$TEMP\SGNotifyDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"
 	  CopyFiles /FILESONLY "$TEMP\SGSettingsDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"  
+	  
+	${If} ${IS_LIGHT_PATCH} == 'TRUE'		
+		CopyFiles /SILENT "$TEMP\HANSSAK\edge" "C:\HANSSAK\OpenNetLink\wwwroot\edge" 
+	${endif}
+	  
+	  
+	  
+	  
   ${endif}
 
   IfSilent 0 +2

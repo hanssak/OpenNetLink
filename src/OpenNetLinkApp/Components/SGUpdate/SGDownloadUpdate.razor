@@ -23,26 +23,29 @@
                 <span aria-hidden="true">&times;</span>
                 </button>-->
             </div>
-            <div class="modal-body-default_up" >
-            <!-- content -->
+            <div class="modal-body-default_up">
+                <!-- content -->
 
                 <div class=" alert_txt ">
                     <label class="mb-3" style="font-size:20px; color:black;">
-                    <i class="fas fa-download pr-2" style="color:#609c00; "></i>Downloading... 
-                    </label>	
+                        <i class="fas fa-download pr-2" style="color:#609c00; "></i>Downloading...
+                    </label>
                     <div style=" font-size:15px; color:#001a9c; font-weight: normal; padding-bottom:5px;">
-                    @((MarkupString)DownloadInfo)
-                    </div>		
-                    
+                        @((MarkupString)DownloadInfo)
+                    </div>
+
                     <div class="progress progress-sm mb-2" style="position: relative; border-radius:3px">
                         <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: @(IndicatorProgress)%;  border-radius: 3px"></div>
                     </div>
                 </div>
 
-            <!--/. content -->
+                <!--/. content -->
             </div>
             <div class="modal-footer-default ">
-                <button type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-0 " @onclick="@(OnCancelDownloadUpdate.InvokeAsync)">취소</button>
+                @if (IsCancelVisible)
+                {
+                    <button type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-0 " @onclick="@(OnCancelDownloadUpdate.InvokeAsync)">취소</button>
+                }
             </div>
         </div>
         <!-- /.modal-content -->
@@ -50,7 +53,6 @@
     <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
-
 @code
 {
     [Parameter]
@@ -64,12 +66,21 @@
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGDownloadUpdate>();
 
-    public async void OpenPopUp(string downloadInfo)
+    private bool _isCancelVisible = true;
+    public bool IsCancelVisible
+    {
+        get => _isCancelVisible;
+        set { _isCancelVisible = value; CtrlSideUISvc.EmitNotifyStateChangedCtrlSide(); }
+    }
+
+
+    public async void OpenPopUp(string downloadInfo, bool IsCriticalUpdate)
     {
         object[] param4 = { "0" };
         await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param4);
 
-        await Task.Run(() => {
+        await Task.Run(() =>
+        {
             CLog.Here().Information($"- OpenDownloadUpdate");
 
             DownloadInfo = downloadInfo;
@@ -82,6 +93,14 @@
             JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
             //object[] param3 = { "black" };
             //JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
+
+            //강제 업데이트 기능 사용 시 업데이트 중 취소 버튼 숨김
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
+                IsCancelVisible = false;
+            else if (IsCriticalUpdate)
+                IsCancelVisible = false;
+            else
+                IsCancelVisible = true;
         });
     }
 
@@ -90,7 +109,8 @@
         object[] param5 = { "1101" };
         await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param5);
 
-        await Task.Run(() => {
+        await Task.Run(() =>
+        {
             CLog.Here().Information($"- CloseDownloadUpdate");
             object[] param = { "modal-downloadupdate" };
             JSRuntime.InvokeAsync<object>("closePopUp", param);
@@ -103,7 +123,8 @@
 
     public async void UpdateProgress(string downloadInfo, int indicatorProgress)
     {
-        await Task.Run(() => {
+        await Task.Run(() =>
+        {
             DownloadInfo = downloadInfo;
             IndicatorProgress = indicatorProgress;
             CtrlSideUISvc.EmitNotifyStateChangedCtrlSide();
