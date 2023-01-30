@@ -748,7 +748,7 @@
                         }*@
 
                     // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
-                    SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "");
+                    SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "", sgLoginData.GetApproveProxyRight());                    
                     cntSendQuery++;
                 }
             }
@@ -768,10 +768,10 @@
     /// <param name="strUserID">로그인 ID</param>
     /// <param name="userSeq">결재자 Seq</param>
     /// <param name="deptSeq">결재자 부서Seq</param>
-    private void SendQuery(int groupID, string strUserID, string userSeq, string deptSeq)
+    private void SendQuery(int groupID, string strUserID, string userSeq, string deptSeq, bool approveProxyRight)
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
-        string strQuery = sgQuery.GetUserConfirm(userSeq, deptSeq, false);
+        string strQuery = sgQuery.GetUserConfirm(userSeq, deptSeq, approveProxyRight);
         HSCmdCenter.SendDetailQuery(groupID, strUserID, strQuery);
     }
 
