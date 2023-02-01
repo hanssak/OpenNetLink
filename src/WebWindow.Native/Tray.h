@@ -305,7 +305,8 @@ static LRESULT CALLBACK _tray_wnd_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARA
     PostQuitMessage(0);
     return 0;
   case WM_TRAY_CALLBACK_MESSAGE:
-    if (lparam == WM_LBUTTONUP || lparam == WM_RBUTTONUP) {
+    /*if (lparam == WM_LBUTTONUP || lparam == WM_RBUTTONUP) {*/
+    if (lparam == WM_RBUTTONUP) {
       POINT p;
       GetCursorPos(&p);
       SetForegroundWindow(hwnd);
@@ -315,6 +316,12 @@ static LRESULT CALLBACK _tray_wnd_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARA
       SendMessage(hwnd, WM_COMMAND, cmd, 0);
       return 0;
     }
+    if (lparam == WM_LBUTTONDBLCLK) {
+        //Tray 더블클릭 시 WebWindow를 표시하도록 변경
+         RequestMoveTrayToWebWindow();
+        return 0;
+    }
+
     break;
   case WM_COMMAND:
     if (wparam >= ID_TRAY_FIRST) {
@@ -368,15 +375,20 @@ static HMENU _tray_menu(struct tray_menu *m, UINT *id) {
       InsertMenuItem(hmenu, *id, TRUE, &item);
     }
   }
-  return hmenu;
+  return hmenu;  
 }
 
+
+
 static int tray_init(struct tray *tray) {
+
   memset(&wc, 0, sizeof(wc));
   wc.cbSize = sizeof(WNDCLASSEX);
   wc.lpfnWndProc = _tray_wnd_proc;
   wc.hInstance = GetModuleHandle(NULL);
   wc.lpszClassName = WC_TRAY_CLASS_NAME;
+   
+
   if (!RegisterClassEx(&wc)) {
     return -1;
   }
