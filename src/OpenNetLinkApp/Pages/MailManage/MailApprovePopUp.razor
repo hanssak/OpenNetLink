@@ -5,6 +5,7 @@
 @using System.Runtime.InteropServices
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Common
+@using AgLogManager
 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
@@ -544,12 +545,12 @@
         }
         catch (Exception ex)
         {
-            CLog.Error(ex.StackTrace);
-            CLog.Error(ex.Message);
+            CLog.Here().Error($"DetailResult - Exception - MSG : {ex.Message}, StackTrace : {ex.StackTrace}");
             System.Diagnostics.Debug.WriteLine(ex.Message);
         }
         StateHasChanged();
     }
+
     //Param : Email Seq, Request Seq, 승인가능여부
     public async Task openPopUp(string seq, string apvseq, string apvenable)
     {

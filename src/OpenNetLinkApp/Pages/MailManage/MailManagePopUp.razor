@@ -3,6 +3,7 @@
 @using HsNetWorkSGData
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Common
+@using AgLogManager
 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
@@ -66,8 +67,9 @@
                                                             </div>
                                                         </div>
                                                     </a>
-                                                    if( i < apvList.Count - 1) {
-                                                    <div class="dropdown-divider"></div>
+                                                    if (i < apvList.Count - 1)
+                                                    {
+                                                        <div class="dropdown-divider"></div>
                                                     }
                                                 }
                                             </div>
@@ -118,7 +120,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @for(int j=0; j< fileList.Count; j++)
+                            @for (int j = 0; j < fileList.Count; j++)
                             {
                                 <tr>
                                     <td>@fileList[j].fileDLP</td>
@@ -137,9 +139,9 @@
             </div>
             <div class="modal-footer">
                 @*@if(bTransCancelVisuable == true)
-                {
-                    <button type="button" class="btn btn-md btn-red mr-0" @onclick="emailTransCancel"><i class="fas fa-times-circle"></i>발송취소</button>
-                }*@
+                    {
+                        <button type="button" class="btn btn-md btn-red mr-0" @onclick="emailTransCancel"><i class="fas fa-times-circle"></i>발송취소</button>
+                    }*@
                 <button type="button" class="btn btn-md btn-red mr-0" @onclick="emailTransCancel"><i class="fas fa-times-circle"></i>발송취소</button>
                 <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>닫기</button>
             </div>
@@ -198,7 +200,7 @@
         stHideCC = String.Empty;
 
         string result = e.GetTagData("RESULT");
-        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수 
+        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
         string reason = e.GetTagData("REASON");
         detailData = e.GetSvrRecordData2("RECORD");
 
@@ -216,9 +218,9 @@
                 if (item[0].IndexOf("DATA") > -1)
                     stData = item[0];
                 else if (item[0].IndexOf("TITLE") > -1)
-                    if(item[0].IndexOf("\"") > -1)
-                        stTitle = item[0].Substring(item[0].IndexOf("\"")+1, (item[0].LastIndexOf("\"") - item[0].IndexOf("\""))-1).Split(",")[1];
-                    else if(item[0].IndexOf("(") > -1)
+                    if (item[0].IndexOf("\"") > -1)
+                        stTitle = item[0].Substring(item[0].IndexOf("\"") + 1, (item[0].LastIndexOf("\"") - item[0].IndexOf("\"")) - 1).Split(",")[1];
+                    else if (item[0].IndexOf("(") > -1)
                         stTitle = item[0].Substring(item[0].IndexOf("(") + 1, (item[0].LastIndexOf(")") - item[0].IndexOf("(")) - 1).Split(",")[1];
                     else
                         stTitle = item[0];
@@ -241,9 +243,9 @@
             stApproveKindValue = arrData[4].Split(":")[1];
             stApproveStatusValue = arrData[5].Split(":")[1];
 
-            for( int i=0; i< listApprover.Count-1; i++)
+            for (int i = 0; i < listApprover.Count - 1; i++)
             {
-                string[] arrVal = listApprover[i+1].Split("|");
+                string[] arrVal = listApprover[i + 1].Split("|");
                 stApproverList += arrVal[2] + "(" + arrVal[3] + ")";
                 if (i < listApprover.Count - 2)
                     stApproverList += ",";
@@ -259,10 +261,10 @@
                     tmpApv.approveResTime = "-";
                 apvList.Add(tmpApv);
             }
-            for( int i=0; i< listReceiver.Count-1; i++)
+            for (int i = 0; i < listReceiver.Count - 1; i++)
             {
                 string[] arrVal = listReceiver[i + 1].Split(",");
-                stDispReceiver += arrVal[1].Substring(0, arrVal[1].Length-1);
+                stDispReceiver += arrVal[1].Substring(0, arrVal[1].Length - 1);
                 if (i < listReceiver.Count - 2)
                     stDispReceiver += ", ";
             }
@@ -304,8 +306,7 @@
         }
         catch (Exception ex)
         {
-            CLog.Error(ex.StackTrace);
-            CLog.Error(ex.Message);
+            CLog.Here().Error($"DetailResult - Exception - MSG : {ex.Message}, StackTrace : {ex.StackTrace}");
             System.Diagnostics.Debug.WriteLine(ex.Message);
         }
         StateHasChanged();
@@ -324,7 +325,7 @@
     private string GetApproveStatusString(string value)
     {
         string rtn = String.Empty;
-        switch(value)
+        switch (value)
         {
             case "1":
                 rtn = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
@@ -342,7 +343,7 @@
     private string GetApproveKindString(string value)
     {
         string rtn = String.Empty;
-        switch(value)
+        switch (value)
         {
             case "0":
                 rtn = XmlConf.GetTitle("T_FILE_APPROVEBEFORE");
@@ -359,14 +360,14 @@
     private string GetTimeFormatString(string value)
     {
         string rtn = String.Empty;
-        if(value.Length > 0)
+        if (value.Length > 0)
             rtn = value.Substring(0, 4) + "-" + value.Substring(4, 2) + "-" + value.Substring(6, 2);
         return rtn;
     }
     private string GetTransStatusString(string value)
     {
         string rtn = String.Empty;
-        switch(value)
+        switch (value)
         {
             case "S":
                 rtn = XmlConf.GetTitle("T_COMMON_TRANS_SUCCESS");
@@ -391,7 +392,7 @@
         string rtn = String.Empty;
         if (value == "0")
             rtn = XmlConf.GetTitle("T_COMMON_IMPORT");
-        else if( value == "1")
+        else if (value == "1")
             rtn = XmlConf.GetTitle("T_COMMON_EXPORT");
         return rtn;
     }
@@ -427,7 +428,7 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
-        HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑 
+        HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑
         HSCmdCenter.sgPageEvent.SetEmailSendCancelEvent(groupID, CancelResult);
 
         MailManageDao dao = new MailManageDao();
