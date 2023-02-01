@@ -397,7 +397,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             }
             else
             {
-                Log.Information(tag + " " + message, arguments);
+                Log.Logger.Here().Information(tag + " " + message, arguments);
             }
         }
     }

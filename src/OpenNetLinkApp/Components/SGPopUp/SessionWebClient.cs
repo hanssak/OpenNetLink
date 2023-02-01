@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
@@ -12,6 +12,10 @@ namespace OpenNetLinkApp.Components.SGPopUp
 {
     class SessionWebClient
     {
+
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SessionWebClient>();
+
+
         private WebClient m_webClient = new WebClient();
         private CookieContainer m_cookieContainer = new CookieContainer();
         private string m_Cookie = "";
@@ -35,7 +39,7 @@ namespace OpenNetLinkApp.Components.SGPopUp
             }
             catch (Exception ex)
             {
-                Log.Error(string.Format("PostRequest Exception - {0}", ex.Message));
+                CLog.Here().Error(string.Format("PostRequest Exception - {0}", ex.Message));
             }
             return responseJSON;
         }

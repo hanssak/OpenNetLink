@@ -4188,7 +4188,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 }
                 catch (System.Exception err)
                 {
-                    Log.Warning("[CheckZipFile] Directory.Delete() " + err.Message + " " + err.GetType().FullName);
+                    Log.Logger.Here().Warning("[CheckZipFile] Directory.Delete() " + err.Message + " " + err.GetType().FullName);
                 }
 
                 fiZipFile = new FileInfo(strZipFile);
