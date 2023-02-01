@@ -1991,6 +1991,13 @@ namespace OpenNetLinkApp.Services
                 hsNetWork.bIgnoreSessionDuplicate = true;
         }
 
+        public void SetAllowSessionDuplicate(int groupid, bool bIgnoreSessionDuplicate)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                hsNetWork.bIgnoreSessionDuplicate = bIgnoreSessionDuplicate;
+        }
+
         public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType = 0)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
