@@ -1832,6 +1832,18 @@
     <Folder Include="Migrations\SGNotify\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Library\UnAlzDll.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Library\UnAlzDll.dylib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Library\UnAlzDll.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 <Target Name="PostBuild" AfterTargets="PostBuildEvent">
      <MakeDir Condition="'$(OS)' == 'Windows_NT'" Directories="$(PublishDir)" />
      <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(ProjectDir)Library\* $(PublishDir)" />
