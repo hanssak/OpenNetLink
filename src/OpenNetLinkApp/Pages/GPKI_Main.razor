@@ -259,7 +259,7 @@
         if (Mode == "1")
         {
             // Login 모드 창으로 떴을때
-            CLog.Information("인증 모드에서 GPKI 등록버튼 사용 불가능. UI 동작 ERROR!");
+            CLog.Here().Information("인증 모드에서 GPKI 등록버튼 사용 불가능. UI 동작 ERROR!");
             ShowMessage("error", XmlConf.GetErrMsg("E_0222"));
         }
         else
@@ -273,7 +273,7 @@
 
             if (objUserSelectedGpki.m_strUserID.Length < 1)
             {
-                CLog.Information("선택한 인증서의 Gpki cn을 알 수 없습니다!");
+                CLog.Here().Information("선택한 인증서의 Gpki cn을 알 수 없습니다!");
                 ShowMessage("error", XmlConf.GetErrMsg("E_0223"));
                 return;
             }
@@ -283,7 +283,7 @@
             // 먼저 입력된 data에서 얻은 사용자정보
             if (RequestGpkiCNregisterNchange())
             {
-                CLog.Information("Gpki 인증서 서버에 등록 진행합니다!");
+                CLog.Here().Information("Gpki 인증서 서버에 등록 진행합니다!");
                 ShowMessage("info", XmlConf.GetInfoMsg("I_0210"));
             }
 
@@ -320,7 +320,7 @@
         // 인증서 선택 실패
         if (objUserSelectedGpki == null)
         {
-            CLog.Information("인증 실패 : 인증서를 선택하지 않고 시도!");
+            CLog.Here().Information("인증 실패 : 인증서를 선택하지 않고 시도!");
             ShowMessage("error", XmlConf.GetInfoMsg("I_0124"));     // 인증서를 선택하고 암호를 입력하세요.
             return false;
         }
@@ -330,7 +330,7 @@
         // 인증서 passWord 검증동작 실패
         if (bCheckPassWord && sgGpkiLib.IsValiedGPKIFile(objUserSelectedGpki, strUserinputGPKIPW, ref strReason) == false)
         {
-            CLog.Information("인증 실패 : 인증서 패스워드 틀림!");
+            CLog.Here().Information("인증 실패 : 인증서 패스워드 틀림!");
             ShowMessage("error", strReason);
             return false;
         }
@@ -338,7 +338,7 @@
         // 인증서 등록유무 서버에서 아직 결과값 받지 못했음.
         if (bCheckGetResponse && bGetResponseGpkiCNatServer == false)
         {
-            CLog.Information("인증 실패 : 인증서가 서버에 등록됐는지 유무 결과를 받지 못했음!");
+            CLog.Here().Information("인증 실패 : 인증서가 서버에 등록됐는지 유무 결과를 받지 못했음!");
             ShowMessage("error", XmlConf.GetErrMsg("E_0224"));
             return false;
         }
@@ -347,7 +347,7 @@
         // 등록확인.1
         if (bCheckDriveAllReg && bIsGpkiCNatServer == false)
         {
-            CLog.Information("인증 실패 : 해당 드라이브의 모든 인증서가 등록되어 있지 않음!");
+            CLog.Here().Information("인증 실패 : 해당 드라이브의 모든 인증서가 등록되어 있지 않음!");
             ShowMessage("error", XmlConf.GetErrMsg("E_0225"));
             return false;
         }
@@ -356,13 +356,13 @@
         // 등록확인.2
         if (bCheckSelectRegistered && objUserSelectedGpki.m_bIsRegisteredServer == false)
         {
-            CLog.Information("인증 실패 : 선택된 인증서는 서버에 등록되어 있지 않음!");
+            CLog.Here().Information("인증 실패 : 선택된 인증서는 서버에 등록되어 있지 않음!");
             ShowMessage("error", XmlConf.GetErrMsg("E_0226"));
             return false;
         }
         else if (bCheckSelectRegistered == false && objUserSelectedGpki.m_bIsRegisteredServer)
         {
-            CLog.Information("등록 실패 : 선택된 인증서는 서버에 이미 등록되어 있음!");
+            CLog.Here().Information("등록 실패 : 선택된 인증서는 서버에 이미 등록되어 있음!");
             ShowMessage("error", XmlConf.GetErrMsg("E_0227"));
             return false;
         }
@@ -454,7 +454,7 @@
         listViewGpkiFileList = sgGpkiLib.GetGpkiFileList();
         if ((listViewGpkiFileList == null) || (listViewGpkiFileList.Count <= 0))
         {
-            CLog.Information("HardDisk Gpki Cert File Empty!!");
+            CLog.Here().Information("HardDisk Gpki Cert File Empty!!");
             return;
         }
 
@@ -473,7 +473,7 @@
         listViewGpkiFileList = sgGpkiLib.GetGpkiFileList();
         if ((listViewGpkiFileList == null) || (listViewGpkiFileList.Count <= 0))
         {
-            CLog.Information("MoveDisk Gpki Cert File Empty!!");
+            CLog.Here().Information("MoveDisk Gpki Cert File Empty!!");
             return;
         }
 
@@ -542,7 +542,7 @@
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
-        CLog.Information("Gpki_Main - OnInitialized!");
+        CLog.Here().Information("Gpki_Main - OnInitialized!");
     }
 
 
@@ -640,7 +640,7 @@
     public void GPKIRandomKeyResult(int groupID)
     {
 
-        CLog.Information("$GPKI_RANDOM_ACK - Result!!");
+        CLog.Here().Information("$GPKI_RANDOM_ACK - Result!!");
 
         SGData tmpData = null;
         tmpData = HsCmdCenter.GetSGGpkiData(groupID);
@@ -676,18 +676,18 @@
 
             // Log로 확인
             strLog = "RESULT: " + strResult;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "REASON: " + strReason;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "SESSIONKEY: " + strSessionKey;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "RANDOM: " + strRandomKey;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
 
             // ref pSignedData
             if (sgGpkiLib.GetGpkiSignedData(objUserSelectedGpki, ref pDataRandom, ref pSignedData) == false)
             {
-                CLog.Information("sgGpkiLib.GetGpkiSignedData error : 서명된 인증 데이티 가져오기 실패.");
+                CLog.Here().Information("sgGpkiLib.GetGpkiSignedData error : 서명된 인증 데이티 가져오기 실패.");
                 ShowMessage("error", XmlConf.GetErrMsg("E_0229"));
                 bGpkiBtnDisable = false;
                 StateHasChanged();
@@ -696,13 +696,13 @@
 
             // Log로 확인
             strLog = "RESULT: " + strResult;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "REASON: " + strReason;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "SESSIONKEY: " + strSessionKey;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "RANDOM: " + strRandomKey;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
 
             HsCmdCenter.SendSVRGPKICert(groupID, objUserSelectedGpki.m_strUserID, strSessionKey, pSignedData);
 
@@ -754,7 +754,7 @@
             //Debug.WriteLine(ex.Message);
             string strMsg = "Gpki_Main - Exception : ";
             strMsg += ex.Message;
-            CLog.Information(strMsg);
+            CLog.Here().Information(strMsg);
         }
 
 
@@ -769,7 +769,7 @@
     public void GPKICertResult(int groupID)
     {
 
-        CLog.Information("$GPKI_CERT_ACK - Result!!");
+        CLog.Here().Information("$GPKI_CERT_ACK - Result!!");
 
 
         SGData tmpData = null;
@@ -784,11 +784,11 @@
 
             // Log로 확인
             strLog = "RESULT: " + strResult;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "REASON: " + strReason;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "USERID: " + strUserID;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
 
 
             if (strResult != "0")
@@ -798,12 +798,12 @@
                 return;
             }
 
-            CLog.Information("Gpki_Main - 실행!!");
+            CLog.Here().Information("Gpki_Main - 실행!!");
 
             if (Login_GPKI(strUserID) == false)
             {
                 bGpkiBtnDisable = false;
-                CLog.Information("Gpki_Main - 인증 실패!");
+                CLog.Here().Information("Gpki_Main - 인증 실패!");
                 ShowMessage("error", XmlConf.GetErrMsg("E_0230") + "(1)");
                 return;
             }
@@ -820,7 +820,7 @@
     /// <returns></returns>
     public bool RequestGpkiCNregisterNchange()
     {
-        CLog.Information("$CHANGEGPKI_CN - Request!!");
+        CLog.Here().Information("$CHANGEGPKI_CN - Request!!");
 
         int groupID = pageService.m_nCurViewPageGroupID;
 
@@ -844,7 +844,7 @@
     public void GPKIRegChangeResult(int groupID)
     {
 
-        CLog.Information("CHANGEGPKI_CN_ACK - Result!!");
+        CLog.Here().Information("CHANGEGPKI_CN_ACK - Result!!");
 
 
         SGData tmpData = null;
@@ -859,9 +859,9 @@
 
             // Log로 확인
             strLog = "RESULT: " + strResult;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "REASON: " + strReason;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
 
             if (strResult != "0")
             {
@@ -869,7 +869,7 @@
                 return;
             }
 
-            CLog.Information("Register_GPKI - 실행!!");
+            CLog.Here().Information("Register_GPKI - 실행!!");
             ShowMessage("info", XmlConf.GetErrMsg("E_0232"));
 
             // 인증서 등록모드 완료
@@ -909,7 +909,7 @@
     public void GpkiLoginResult(int groupId, PageEventArgs e)
     {
 
-        CLog.Information("Gpki_Main - LoginResult - 실행!!");
+        CLog.Here().Information("Gpki_Main - LoginResult - 실행!!");
 
         int ret = e.result;
         if (ret == 0)

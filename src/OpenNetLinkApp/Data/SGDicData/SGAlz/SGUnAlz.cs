@@ -17,7 +17,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGAlz
         //public const string strAlzLibName = "D:\\github\\OpenNetLink\\src\\OpenNetLinkApp\\Library\\UnAlzDll.dll";
         public const string strAlzLibName = "UnAlzDll";
 #elif _LINUX
-        public const string strGpkiLibName = "libgpkiapi.so";
+        public const string strAlzLibName = "libunalz";
 #elif _MACOSX
         public const string strAlzLibName = "UnAlzDll";
 #else

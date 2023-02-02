@@ -327,6 +327,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         public ref ISGopConfig AppConfigInfo => ref _AppConfigInfo;
 
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGopConfigService>();
+
         public SGopConfigService()
         {
             var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
@@ -335,25 +337,23 @@ namespace OpenNetLinkApp.Services.SGAppManager
             HsLogDel hsLog = new HsLogDel();
             hsLog.Delete(7);    // 7일이전 Log들 삭제
 
-            Log.Information($"- AppOPsetting Path: [{AppConfig}]");
+            CLog.Here().Information($"- AppOPsetting Path: [{AppConfig}]");
             if (File.Exists(AppConfig))
             {
                 try
                 {
-                    Log.Information($"- AppOPsetting Loading... : [{AppConfig}]");
+                    CLog.Here().Information($"- AppOPsetting Loading... : [{AppConfig}]");
                     //Open the stream and read it back.
                     using (FileStream fs = File.OpenRead(AppConfig))
                     {
                         SGopConfig appConfig = (SGopConfig)serializer.ReadObject(fs);
                         _AppConfigInfo = appConfig;
                     }
-                    Log.Information($"- AppOPsetting Load Completed : [{AppConfig}]");
+                    CLog.Here().Information($"- AppOPsetting Load Completed : [{AppConfig}]");
                 }
                 catch (Exception ex)
                 {
-                    Log.Warning($"\nMessage ---\n{ex.Message}");
-                    Log.Warning($"\nHelpLink ---\n{ex.HelpLink}");
-                    Log.Warning($"\nStackTrace ---\n{ex.StackTrace}");
+                    CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
                     _AppConfigInfo = new SGopConfig();
                 }
             }
