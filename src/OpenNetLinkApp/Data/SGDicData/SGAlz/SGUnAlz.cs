@@ -19,7 +19,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGAlz
 #elif _LINUX
         public const string strAlzLibName = "libunalz";
 #elif _MACOSX
-        public const string strGpkiLibName = "libgpkiapi.so";
+        public const string strAlzLibName = "/users/kd_mac/Work/kng/Project/OpenNetLink/src/OpenNetLinkApp/Library/UnAlzDll.so";
 #else
         public const string strGpkiLibName = "libgpkiapi.so";
 #endif

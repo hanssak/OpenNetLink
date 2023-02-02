@@ -649,12 +649,12 @@
 
     private void AlzTest()
     {
-        //string source = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)\\chào.alz";
-        //string dest = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)";
-        //string passWord = "1234";
-        //SGUnAlz lib = new SGUnAlz();
-        ////int ret = lib.UnAlzExtract(source, dest);
-        //int ret = lib.UnAlzExtract_PassWordWDll(source, dest, passWord);
+        string source = "/사용자/kd_mac/데스크탑/무제 풀더 6/국방재정.alz";
+        string dest = "/사용자/kd_mac/데스크탑/무제 풀더 6/";
+        
+        SGUnAlz lib = new SGUnAlz();
+        //int ret = lib.UnAlzExtract(source, dest);
+        int ret = lib.UnAlzExtractDll(source, dest);
 
     }
 
