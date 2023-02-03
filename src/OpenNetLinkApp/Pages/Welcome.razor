@@ -2223,8 +2223,8 @@
         strToDate = dateTo.ToString("yyyy-MM-dd");
         strFromDate = dateFrom.ToString("yyyy-MM-dd");
 
-        strToDate = strToDate.Replace("-", "");
-        strFromDate = strFromDate.Replace("-", "");
+        strToDate = strToDate.Replace("-", "") + "235959";
+        strFromDate = strFromDate.Replace("-", "") + "000000";
     }
 
     /// <summary>
