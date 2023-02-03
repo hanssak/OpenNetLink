@@ -5,6 +5,7 @@
 @using OpenNetLinkApp.Components.SGTransfer
 @using System.Security.Permissions
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using AgLogManager
 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
@@ -185,7 +186,7 @@
         }
         catch (Exception ex0)
         {
-            CLog.Error("GetParentError:" + ex0.Message);
+            CLog.Here().Error("GetParentError:" + ex0.Message);
         }
 
         IEnumerable<string> fList = null;
@@ -196,12 +197,12 @@
         }
         catch (UnauthorizedAccessException e)
         {
-            CLog.Error("UnauthorizedAccessException:" + e.Message);
+            CLog.Here().Error("UnauthorizedAccessException:" + e.Message);
             Console.WriteLine(e.Message);
         }
         catch (Exception e2)
         {
-            CLog.Error("Exception:" + e2.Message);
+            CLog.Here().Error("Exception:" + e2.Message);
             Console.WriteLine(e2.Message);
         }
 
@@ -245,7 +246,7 @@
         }
         catch (Exception ex3)
         {
-            CLog.Error("Exception:" + ex3.Message);
+            CLog.Here().Error("Exception:" + ex3.Message);
         }
 
         string listHtml = makeSubFileList();
@@ -282,7 +283,7 @@
                         stRtn.Append(@"<div style='cursor:pointer;' label='" + dragLabel + "' data-draggable='item' class='draggable' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' onclick='addFileToDropZoneForSingleSelect(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                         stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
                     }
-                    else    //이것은 폴더 
+                    else    //이것은 폴더
                     {
                         stRtn.Append(@"<div style='cursor:pointer;' label='" + dragLabel + "' data-draggable='item' class='draggable' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' onclick='refreshListPopUpForSingleSelect(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                         stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");

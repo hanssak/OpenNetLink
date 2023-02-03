@@ -399,6 +399,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
     }
     public class SGGpkiLib
     {
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGGpkiLib>();
+
         public List<GPKIFileInfo> listGpkiFile = new List<GPKIFileInfo>();
         public string m_strWorkDir = "GPKI";
         private IntPtr m_pClientCtx = IntPtr.Zero;
@@ -530,14 +532,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 ret = HsGpkiLib.GPKI_API_Init(ref m_pClientCtx, sb);
                 if ((ret != 0) && (m_pClientCtx != IntPtr.Zero))
                 {
-                    Log.Error($"GPKI_API_Init error!! ret={ret}");
-                    Log.Error(String.Format($"GPKI_API_Init error!! ret={ret}"));
+                    CLog.Here().Error($"GPKI_API_Init error!! ret={ret}");
+                    CLog.Here().Error(String.Format($"GPKI_API_Init error!! ret={ret}"));
                     return false;
                 }
             }
             catch
             {
-                Log.Error($"System.DllNotFoundException: 'Unable to load DLL 'gpkiapi64.dll'");
+                CLog.Here().Error($"System.DllNotFoundException: 'Unable to load DLL 'gpkiapi64.dll'");
                 return false;
             }
 
@@ -572,7 +574,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             int nRet = HsGpkiLib.GPKI_BINSTR_Create(bData);
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
-                Log.Error($"GPKI_BINSTR_Create Error");
+                CLog.Here().Error($"GPKI_BINSTR_Create Error");
                 byteBinStr = null;
                 return false;
             }
@@ -613,7 +615,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             catch (Exception e)
             {
                 nRet = (int)eGpkiError.ERR_EXCEPTION;
-                Log.Error($"GPKI_BINSTR_Delete Exception(source:{e.Source}) - Msg : {e.Message}");
+                CLog.Here().Error($"GPKI_BINSTR_Delete Exception(source:{e.Source}) - Msg : {e.Message}");
             }
             finally
             {
@@ -667,7 +669,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 else
                     strErrMsg = GetGpkiError((eGpkiError)nRet);
 
-                Log.Error($"GPKI_STORAGE_ReadPriKey Error - PW check - Failed (errorCode :{nRet}) : {strErrMsg}");
+                CLog.Here().Error($"GPKI_STORAGE_ReadPriKey Error - PW check - Failed (errorCode :{nRet}) : {strErrMsg}");
 
                 return false;
             }
@@ -701,7 +703,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             catch(Exception e)
             {
                 bRet = false;
-                Log.Error($"GPKI_STORAGE_ReadPriKey - Copy Memory Exception(source:{e.Source}) - Msg : {e.Message}");
+                CLog.Here().Error($"GPKI_STORAGE_ReadPriKey - Copy Memory Exception(source:{e.Source}) - Msg : {e.Message}");
             }
             finally
             {
@@ -763,8 +765,8 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             int nRet = HsGpkiLib.GPKI_API_GetErrInfo(m_pClientCtx, 128, sb);
             if (nRet == (int)eGpkiError.GPKI_OK)
             {
-                Log.Error($"Gpki Error Code = {err.ToString()}");
-                Log.Error($"Gpki Error Msg = {sb.ToString()}");
+                CLog.Here().Error($"Gpki Error Code = {err.ToString()}");
+                CLog.Here().Error($"Gpki Error Msg = {sb.ToString()}");
                 //return "";
             }
             return sb.ToString();
@@ -792,7 +794,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GpkiLoad ErrMsg = {strErrMsg}");
+                CLog.Here().Error($"GpkiLoad ErrMsg = {strErrMsg}");
                 return false;
             }
 #endif
@@ -812,7 +814,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GpkiUnLoad ErrMsg = {strErrMsg}");
+                CLog.Here().Error($"GpkiUnLoad ErrMsg = {strErrMsg}");
                 return false;
             }
 #endif
@@ -833,7 +835,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GetGpkiUserID ErrMsg = {strErrMsg}");
+                CLog.Here().Error($"GetGpkiUserID ErrMsg = {strErrMsg}");
                 return "";
             }
             return sb.ToString();
@@ -856,7 +858,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GetGpkiValidate ErrMsg = {strErrMsg}");
+                CLog.Here().Error($"GetGpkiValidate ErrMsg = {strErrMsg}");
                 return "";
             }
 
@@ -887,7 +889,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GetGpkiKeyUseCase ErrMsg = {strErrMsg}");
+                CLog.Here().Error($"GetGpkiKeyUseCase ErrMsg = {strErrMsg}");
                 return "";
             }
             return sb.ToString();
@@ -912,7 +914,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             if (nRet != (int)eGpkiError.GPKI_OK && nRet != (int)eGpkiError.ERR_EXPIRED_CERT)	// 만료된 인증서 1203 return
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GetRemainDays ErrMsg = {strErrMsg}");
+                CLog.Here().Error($"GetRemainDays ErrMsg = {strErrMsg}");
                 return -1;
             }
 
@@ -937,7 +939,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GetGPKIOID ErrMsg = {strErrMsg}");
+                CLog.Here().Error($"GetGPKIOID ErrMsg = {strErrMsg}");
                 return "-";
             }
 
@@ -963,7 +965,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GetGPKIIssuerName ErrMsg = {strErrMsg}");
+                CLog.Here().Error($"GetGPKIIssuerName ErrMsg = {strErrMsg}");
                 return "-";
             }
 
@@ -990,7 +992,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GetGenRandom GPKI_BINSTR_Create ErrMsg = {strErrMsg}");
+                CLog.Here().Error($"GetGenRandom GPKI_BINSTR_Create ErrMsg = {strErrMsg}");
                 return -1;
             }
 
@@ -998,7 +1000,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GetGenRandom GPKI_CRYPT_GenRandom ErrMsg = {strErrMsg}");
+                CLog.Here().Error($"GetGenRandom GPKI_CRYPT_GenRandom ErrMsg = {strErrMsg}");
                 return -1;
             }
 
@@ -1008,7 +1010,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             int nRetLen = binStr.nLen;
             if (nRetLen != 20)
             {
-                Log.Error($"GetGenRandom binStr.nLen Error!");
+                CLog.Here().Error($"GetGenRandom binStr.nLen Error!");
                 return -1;
             }
             else
@@ -1017,7 +1019,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             Marshal.StructureToPtr(binStr, ptrRandom, true);
             if (ptrRandom == IntPtr.Zero)
             {
-                Log.Error($"GetGenRandom BINSTR to IntPtr Error!");
+                CLog.Here().Error($"GetGenRandom BINSTR to IntPtr Error!");
                 return -1;
             }
 
@@ -1044,7 +1046,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GPKI_CMS_MakeSignedData Error(errorCode :{nRet}), Message : {strErrMsg}");
+                CLog.Here().Error($"GPKI_CMS_MakeSignedData Error(errorCode :{nRet}), Message : {strErrMsg}");
                 return nRet;
             }
 
@@ -1067,7 +1069,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             catch (Exception e)
             {
                 nRet = (int)eGpkiError.ERR_EXCEPTION;
-                Log.Error($"GPKI_CMS_MakeSignedData - Copy Memory Exception(source:{e.Source}) - Msg : {e.Message}");                
+                CLog.Here().Error($"GPKI_CMS_MakeSignedData - Copy Memory Exception(source:{e.Source}) - Msg : {e.Message}");                
             }
             finally
             {
@@ -1103,7 +1105,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GPKI_STORAGE_ReadCert Error(errorCode :{nRet}), Message : {strErrMsg}");
+                CLog.Here().Error($"GPKI_STORAGE_ReadCert Error(errorCode :{nRet}), Message : {strErrMsg}");
                 return nRet;
             }
 
@@ -1126,7 +1128,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             catch (Exception e)
             {
                 nRet = (int)eGpkiError.ERR_EXCEPTION;
-                Log.Error($"GPKI_STORAGE_ReadPriKey - Copy Memory Exception(source:{e.Source}) - Msg : {e.Message}");
+                CLog.Here().Error($"GPKI_STORAGE_ReadPriKey - Copy Memory Exception(source:{e.Source}) - Msg : {e.Message}");
             }
             finally
             {
@@ -1151,7 +1153,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             DirectoryInfo di = new DirectoryInfo(strGPKIPath);
             if(!di.Exists)
             {
-                Log.Information($"GPKI Directory Not Found = {strGPKIPath}");
+                CLog.Here().Information($"GPKI Directory Not Found = {strGPKIPath}");
                 return null;
             }
             string[] strFileList = null;
@@ -1194,14 +1196,14 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             DirectoryInfo di = new DirectoryInfo(strGPKIPath);
             if (!di.Exists)
             {
-                Log.Information($"GPKI Directory Not Found = {strGPKIPath}");
+                CLog.Here().Information($"GPKI Directory Not Found = {strGPKIPath}");
                 return 0;
             }
             string[] strFileList = null;
             strFileList = Directory.GetFiles(strGPKIPath);
             if ((strFileList.Length <= 0) || (strFileList == null))
             {
-                Log.Information($"GPKI FileList Not Found = {strGPKIPath}");
+                CLog.Here().Information($"GPKI FileList Not Found = {strGPKIPath}");
                 return 0;
             }
 
@@ -1213,18 +1215,18 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
                 if (strFileName.Contains("_sig") && strFileExt.Equals(".cer"))
                 {
 
-                    Log.Information($"GPKI Cert File Found = {strFileList[i]}");
+                    CLog.Here().Information($"GPKI Cert File Found = {strFileList[i]}");
 
                     string strKeyFilePath = Path.ChangeExtension(strFileList[i], "key");
 
                     if (File.Exists(strKeyFilePath))
                     {
-                        Log.Information($"GPKI Key File Found = {strKeyFilePath} ");
+                        CLog.Here().Information($"GPKI Key File Found = {strKeyFilePath} ");
                         DicGpkiFile.Add(strFileList[i], strKeyFilePath);                        
                     }
                     else
                     {
-                        Log.Information($"But Key File Not Found = {strKeyFilePath} ");
+                        CLog.Here().Information($"But Key File Not Found = {strKeyFilePath} ");
                     }
                 }
             }
@@ -1288,7 +1290,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             catch (Exception e)
             {
                 bRet = false;
-                Log.Error($"BINSTR2inPtr - Copy Memory Exception(source:{e.Source}) - Msg : {e.Message}");
+                CLog.Here().Error($"BINSTR2inPtr - Copy Memory Exception(source:{e.Source}) - Msg : {e.Message}");
             }
             finally
             {
@@ -1305,13 +1307,13 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
         public unsafe bool LoadCertKeyFileList(string strGPKIFullPath)
         {
 
-            Log.Information($"GPKI Path = {strGPKIFullPath}");
+            CLog.Here().Information($"GPKI Path = {strGPKIFullPath}");
 
             Dictionary<string, string> DicGpkiFile = new Dictionary<string, string>();
             int nGpkiWithKeyFileCnt = FindGPKIFileWithKey(strGPKIFullPath, ref DicGpkiFile);
             if (nGpkiWithKeyFileCnt < 1)
             {
-                Log.Information($"GPKI File(Cert & key Pair Exist) Empty!!");
+                CLog.Here().Information($"GPKI File(Cert & key Pair Exist) Empty!!");
                 listGpkiFile.Clear();
                 return false;
             }
@@ -1332,7 +1334,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
                 if (nRet != (int)eGpkiError.GPKI_OK)
                 {
                     string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                    Log.Error($"GPKI_STORAGE_ReadCert (read Fail) - error:{nRet} - msg : {strErrMsg}, File : {strFilename} ");
+                    CLog.Here().Error($"GPKI_STORAGE_ReadCert (read Fail) - error:{nRet} - msg : {strErrMsg}, File : {strFilename} ");
                     continue;
                 }
 
@@ -1344,13 +1346,13 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
 
                 if (BINSTR2inPtr(binstr, ref ptrBinSTRData) == false)
                 {
-                    Log.Error($"BiNSTR2inPtr error!!");
+                    CLog.Here().Error($"BiNSTR2inPtr error!!");
                     continue;
                 }
 
                 if (!GpkiLoad(ptrBinSTRData))  // ref ptrBinSTRData
                 {
-                    Log.Error($"{strFilename} is Load Fail");
+                    CLog.Here().Error($"{strFilename} is Load Fail");
                     continue;
                 }
 
@@ -1476,7 +1478,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
 
             if (GPKIBinReadPriKey(gpkiFile, strUserinputPW) == false)            
             {
-                Log.Error($"PW Identify Fail : {gpkiFile.m_strFileName}");
+                CLog.Here().Error($"PW Identify Fail : {gpkiFile.m_strFileName}");
                 return false;
             }
 
@@ -1517,7 +1519,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
 
             if (m_pClientCtx == IntPtr.Zero)
             {
-                Log.Error($"GetGpkiSignedData - m_pClientCtx is null!");
+                CLog.Here().Error($"GetGpkiSignedData - m_pClientCtx is null!");
                 return false;
             }
 
@@ -1540,7 +1542,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GPKI_STORAGE_ReadCert (read Fail) - error:{nRet} - msg : {strErrMsg}, File : {gpkiFile.m_strFileName} ");
+                CLog.Here().Error($"GPKI_STORAGE_ReadCert (read Fail) - error:{nRet} - msg : {strErrMsg}, File : {gpkiFile.m_strFileName} ");
                 return false;
             }
 
@@ -1550,7 +1552,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
 
             if (BINSTR2inPtr(bsCert, ref ptrCert) == false)
             {
-                Log.Error($"BiNSTR2inPtr - Cert - error!!");
+                CLog.Here().Error($"BiNSTR2inPtr - Cert - error!!");
                 return false;
             }
 
@@ -1560,7 +1562,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
 
             if (BINSTR2inPtr(bsPriKey, ref ptrPrikey) == false)
             {
-                Log.Error($"BiNSTR2inPtr - PriKey - error!!");
+                CLog.Here().Error($"BiNSTR2inPtr - PriKey - error!!");
                 return false;
             }
 
@@ -1570,7 +1572,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
 
             if (BINSTR2inPtr(bsRandom, ref ptrRandom) == false)
             {
-                Log.Error($"BiNSTR2inPtr - Random - error!!");
+                CLog.Here().Error($"BiNSTR2inPtr - Random - error!!");
                 return false;
             }
 
@@ -1578,7 +1580,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GPKI_CMS_MakeSignedData - Fail(error:{nRet}) - Message :{strErrMsg}, File : {gpkiFile.m_strFileName}");
+                CLog.Here().Error($"GPKI_CMS_MakeSignedData - Fail(error:{nRet}) - Message :{strErrMsg}, File : {gpkiFile.m_strFileName}");
                 return false;
             }
 
@@ -1586,7 +1588,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             {
                 nRet = (int)eGpkiError.ERR_UNDEF_APP_ERROR;
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GPKI_CMS_MakeSignedData - Fail(error:{nRet}) - Message :{strErrMsg}, File : {gpkiFile.m_strFileName}");
+                CLog.Here().Error($"GPKI_CMS_MakeSignedData - Fail(error:{nRet}) - Message :{strErrMsg}, File : {gpkiFile.m_strFileName}");
                 return false;
             }
 
@@ -1594,7 +1596,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             byteSigned.CopyTo(pSignedData, 0);
 
             string strSignedDataHex = Convert.ToBase64String(pSignedData);
-            Log.Error($"GetGpkiSignedData - Signed Data - Base64 : {strSignedDataHex}");
+            CLog.Here().Error($"GetGpkiSignedData - Signed Data - Base64 : {strSignedDataHex}");
 
             return true;
         }

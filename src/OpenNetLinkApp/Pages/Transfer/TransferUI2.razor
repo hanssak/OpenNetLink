@@ -649,12 +649,16 @@
 
     private void AlzTest()
     {
-        //string source = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)\\chào.alz";
-        //string dest = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)";
-        //string passWord = "1234";
-        //SGUnAlz lib = new SGUnAlz();
-        ////int ret = lib.UnAlzExtract(source, dest);
-        //int ret = lib.UnAlzExtract_PassWordWDll(source, dest, passWord);
+        string source = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)\\국방재정.alz";
+        string dest = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)";
+
+        SGUnAlz lib = new SGUnAlz();
+        //int ret = lib.UnAlzExtract(source, dest);
+#if _WINDOWS
+        int ret = lib.UnAlzExtractWDll(source, dest);
+#else
+        int ret = lib.UnAlzExtractDll(source, dest);
+#endif
 
     }
 
@@ -748,7 +752,7 @@
                         }*@
 
                     // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
-                    SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "");
+                    SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "", sgLoginData.GetApproveProxyRight());
                     cntSendQuery++;
                 }
             }
@@ -768,10 +772,10 @@
     /// <param name="strUserID">로그인 ID</param>
     /// <param name="userSeq">결재자 Seq</param>
     /// <param name="deptSeq">결재자 부서Seq</param>
-    private void SendQuery(int groupID, string strUserID, string userSeq, string deptSeq)
+    private void SendQuery(int groupID, string strUserID, string userSeq, string deptSeq, bool approveProxyRight)
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
-        string strQuery = sgQuery.GetUserConfirm(userSeq, deptSeq, false);
+        string strQuery = sgQuery.GetUserConfirm(userSeq, deptSeq, approveProxyRight);
         HSCmdCenter.SendDetailQuery(groupID, strUserID, strQuery);
     }
 
@@ -1391,12 +1395,12 @@
             {
                 await dropFile.DataClear();
                 FileList?.Clear();  // approveExt 결재없는 전송때, List중 결재없는 목록만 별도 생성한것도 정리
-                CLog.Information($"dropFile.DataClear - !");
+                CLog.Here().Information($"dropFile.DataClear - !");
             }
             catch (Exception err)
             {
                 // error
-                CLog.Error($"dropFile.DataClear - error:{err.Source} - Msg : {err.Message}");
+                CLog.Here().Error($"dropFile.DataClear - error:{err.Source} - Msg : {err.Message}");
             }
 
             strBindTitle = "";
@@ -2855,7 +2859,7 @@
         //    MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
         //}
 
-        CLog.Information("[CLEAR] 삭제");
+        CLog.Here().Information("[CLEAR] 삭제");
     }
 
     [JSInvokable("NotifyChange")]
@@ -2867,7 +2871,7 @@
     public static void LogWrite(string str)
     {
         Debug.WriteLine(str);
-        CLog.Information(str);
+        CLog.Here().Information(str);
     }
     [JSInvokable("NotifyChange2")]
     public static void NotifyChange2(FileListEntryImpl[] files)
@@ -2892,10 +2896,10 @@
         //    return;
         //}
 
-        CLog.Information("[HandleFileInputChange]파일드랍 이벤트 수신, 갯수:" + files.Length);
+        CLog.Here().Information("[HandleFileInputChange]파일드랍 이벤트 수신, 갯수:" + files.Length);
         foreach (var file in files)
         {
-            CLog.Information("[HandleFileInputChange]파일명:" + file.Name);
+            CLog.Here().Information("[HandleFileInputChange]파일명:" + file.Name);
         }
 
         dropFile.fileSizeError = false;

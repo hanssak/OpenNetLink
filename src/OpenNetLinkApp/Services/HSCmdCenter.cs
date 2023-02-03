@@ -26,12 +26,13 @@ using Microsoft.EntityFrameworkCore.Storage;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-
+using AgLogManager;
 
 namespace OpenNetLinkApp.Services
 {
     public class HSCmdCenter
     {
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<HSCmdCenter>();
 
         private ConcurrentDictionary<int, HsNetWork> m_DicNetWork = new ConcurrentDictionary<int, HsNetWork>();
         public SGDicRecvData sgDicRecvData = new SGDicRecvData();
@@ -770,6 +771,9 @@ namespace OpenNetLinkApp.Services
                         if (updatePolicyEvent != null) updatePolicyEvent(groupId);
                     }
                     break;
+                case eCmdList.eOLEMIMELISTQUERY:
+                    OLEMimeListAfterSend(groupId, sgData);
+                    break;
                 default:
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
@@ -843,7 +847,7 @@ namespace OpenNetLinkApp.Services
             HsNetWork hs = null;
             if (m_DicNetWork.TryGetValue(groupId, out hs) == false && nRet == 0)
             {
-                HsLog.info($"BindAfterSend - BIND Success But - m_DicNetWork.TryGetValue return false");
+                CLog.Here().Information($"BindAfterSend - BIND Success But - m_DicNetWork.TryGetValue return false");
                 return;
             }
 
@@ -906,6 +910,7 @@ namespace OpenNetLinkApp.Services
             {
                 SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
                 SendUserSFMInfo(groupId, sgLoginUserInfo.GetUserID());
+                SendUserOLEMimeList(groupId, sgLoginUserInfo.GetUserID());
             }
         }
 
@@ -947,10 +952,10 @@ namespace OpenNetLinkApp.Services
             if (string.IsNullOrEmpty(strDeletePath))
                 return;
 
-            HsLog.info($"DeleteTimeOverFiles : {strDeletePath}, delete OVer Time : {nDeleteTimeHour}");
+            CLog.Here().Information($"DeleteTimeOverFiles : {strDeletePath}, delete OVer Time : {nDeleteTimeHour}");
             if (nDeleteTimeHour < 1)
             {
-                HsLog.info($"DeleteTimeOverFiles - invalid input : {nDeleteTimeHour}");
+                CLog.Here().Information($"DeleteTimeOverFiles - invalid input : {nDeleteTimeHour}");
                 return;
             }
 
@@ -967,7 +972,7 @@ namespace OpenNetLinkApp.Services
                 DateTime tmDelete = tmCreate.AddHours(nDeleteTimeHour);
                 DateTime tmCurrent = DateTime.Now;
 
-                HsLog.info($"DeleteTimeOverFiles - File : {File.FullName}, " +
+                CLog.Here().Information($"DeleteTimeOverFiles - File : {File.FullName}, " +
                     $"CreateTime : {tmCreate.ToString("yyyy/MM/dd HH:mm:ss")}, " +
                     $"DeleteTime : {tmDelete.ToString("yyyy/MM/dd HH:mm:ss")}, " +
                     $"CueentTime : {tmCurrent.ToString("yyyy/MM/dd HH:mm:ss")}");
@@ -975,7 +980,7 @@ namespace OpenNetLinkApp.Services
                 if ((tmCurrent - tmDelete).TotalSeconds > 0)
                 {
                     System.IO.File.Delete(File.FullName);
-                    HsLog.info($"DeleteTimeOverFiles - FileDelte! : {File.FullName}");
+                    CLog.Here().Information($"DeleteTimeOverFiles - FileDelte! : {File.FullName}");
                 }
 
             } // foreach (System.IO.FileInfo File in di.GetFiles())
@@ -990,7 +995,7 @@ namespace OpenNetLinkApp.Services
                 if (Directory.EnumerateFileSystemEntries(Dir.FullName).Any() == false)
                 {
                     Directory.Delete(Dir.FullName);
-                    HsLog.info($"DeleteTimeOverFiles - Delete Empty Folder : {Dir.FullName}");
+                    CLog.Here().Information($"DeleteTimeOverFiles - Delete Empty Folder : {Dir.FullName}");
                 }
             }
 
@@ -1009,7 +1014,7 @@ namespace OpenNetLinkApp.Services
             }
 
             Stopwatch sw = new Stopwatch();
-            HsLog.info($"Recv File Delete Cycle - Thread - Do");
+            CLog.Here().Information($"Recv File Delete Cycle - Thread - Do");
             HSCmdCenter hSCmdCenter = (HSCmdCenter)obj;
             int nIdx = 0;
             int[] nArryDeleteTime = new int[hSCmdCenter.m_nNetWorkCount];
@@ -1041,11 +1046,11 @@ namespace OpenNetLinkApp.Services
                     if (bIsLogin && sgLoginData != null)
                     {
                         nArryDeleteTime[nIdx] = sgLoginData.GetFileRemoveCycle();
-                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DELETECYCLE : {nArryDeleteTime[nIdx]}");
+                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DELETECYCLE : {nArryDeleteTime[nIdx]}");
                     }
                     else
                     {
-                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , Logout Status!");
+                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , Logout Status!");
                     }
 
 
@@ -1058,7 +1063,7 @@ namespace OpenNetLinkApp.Services
                     {
                         // 삭제주기 설정된 값마다 삭제
                         strDownPath = GetDownLoadPath(nIdx);
-                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DeletePath : {strDownPath}");
+                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DeletePath : {strDownPath}");
 
 
                         DeleteTimeOverFiles(strDownPath, nArryDeleteTime[nIdx]);
@@ -1987,6 +1992,13 @@ namespace OpenNetLinkApp.Services
                 hsNetWork.bIgnoreSessionDuplicate = true;
         }
 
+        public void SetAllowSessionDuplicate(int groupid, bool bIgnoreSessionDuplicate)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                hsNetWork.bIgnoreSessionDuplicate = bIgnoreSessionDuplicate;
+        }
+
         public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType = 0)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
@@ -2773,6 +2785,47 @@ namespace OpenNetLinkApp.Services
             sgDicRecvData.SetSFMListData(groupId, e[0] as SGData);
         }
 
+        /// <summary>
+        /// OLE마임리스트 정보 요청 (from tbl_ole_mimetype)
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public int SendUserOLEMimeList(int groupId, string userId)
+        {
+            SGUserData userData = (SGUserData)sgDicRecvData.GetUserData(groupId);
+            string strQuery = SGQueryExtend.GetOLEMimeList();
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupId);
+            if (hsNetWork != null)
+            {
+                return sgSendData.RequestSendOLEMimeListQuery(hsNetWork, userId, strQuery);
+            }
+
+            return -1;
+        }
+        /// <summary>
+        /// 문서 OLE용 마임리스트 정보 저장
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="data"></param>
+        public void OLEMimeListAfterSend(int groupId, SGData data)
+        {
+            OLEMimeRecvEvent oleMimeRecvEvent = sgPageEvent.GetOLEMimeRecvEvent();
+            if (oleMimeRecvEvent != null)
+            {
+                oleMimeRecvEvent(groupId, data);
+            }
+
+            //sgDicRecvData.SetOLEMimeListData(groupId, data);
+        }
+
+        //public SGData GetOLEMimeListData(int groupId)
+        //{
+        //    SGData data = sgDicRecvData.GetOLEMimeListData(groupId);
+        //    return data;
+        //}
+
         public int CommonSendQuery(eCmdList eCmd, int groupid, string strUserID, string strQuery)
         {
             HsNetWork hsNetWork = null;
@@ -2781,6 +2834,7 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestCommonSendQuery(hsNetWork, eCmd, strUserID, strQuery);
             return -1;
         }
+
         public int SendGenericNotiType2(int groupid, string strUserID, string strUserName, string strDeptName, string strFileName, string strPreworkType)
         {
             HsNetWork hsNetWork = null;

@@ -105,10 +105,10 @@
 
 @code {
 
-        SGAlert refSGloginDuplicate;
+    SGAlert refSGloginDuplicate;
 
-        [Parameter]
-        public EventCallback<int> goToPage { get; set; }
+    [Parameter]
+    public EventCallback<int> goToPage { get; set; }
 
     public bool bLoginTryOver1auth = false;
     public bool bAutoLogin = true;                          // 자동로그인 CheckBox 표현 및 사용유무
@@ -139,6 +139,7 @@
 
     public async Task openPopUp()
     {
+        HSCmdCenter.SetAllowSessionDuplicate(nGroupID, false);
         object[] param = { "PopUpLogIn" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }

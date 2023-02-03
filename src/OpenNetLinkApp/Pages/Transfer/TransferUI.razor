@@ -685,7 +685,7 @@
                     //웹매니저에 등록된 최초 결재라인은 유효성 검증에서 제외
                     if (!strApprLineDeptSeq.Equals("-"))
                     {
-                        SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
+                        SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq, sgLoginData.GetApproveProxyRight());
                         cntSendQuery++;
                     }
                 }
@@ -703,10 +703,10 @@
     /// <param name="strUserID">로그인 ID</param>
     /// <param name="userSeq">결재자 Seq</param>
     /// <param name="deptSeq">결재자 부서Seq</param>
-    private void SendQuery(int groupID, string strUserID, string userSeq, string deptSeq)
+    private void SendQuery(int groupID, string strUserID, string userSeq, string deptSeq, bool approveProxyRight)
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
-        string strQuery = sgQuery.GetUserConfirm(userSeq, deptSeq, false);
+        string strQuery = sgQuery.GetUserConfirm(userSeq, deptSeq, approveProxyRight);
         HSCmdCenter.SendDetailQuery(groupID, strUserID, strQuery);
     }
 
@@ -1031,12 +1031,12 @@
             try
             {
                 await dropFile.DataClear();
-                CLog.Information($"dropFile.DataClear - !");
+                CLog.Here().Information($"dropFile.DataClear - !");
             }
             catch (Exception err)
             {
                 // error
-                CLog.Error($"dropFile.DataClear - error:{err.Source} - Msg : {err.Message}");
+                CLog.Here().Error($"dropFile.DataClear - error:{err.Source} - Msg : {err.Message}");
             }
 
             strBindTitle = "";
@@ -2201,7 +2201,7 @@
         //    MyNavigationManager.NavigateTo("/Transfer/" + groupID.ToString());
         //}
 
-        CLog.Information("[CLEAR] 삭제");
+        CLog.Here().Information("[CLEAR] 삭제");
     }
 
     [JSInvokable("NotifyChange_New")]
@@ -2213,7 +2213,7 @@
     public static void LogWrite(string str)
     {
         Debug.WriteLine(str);
-        CLog.Information(str);
+        CLog.Here().Information(str);
     }
     [JSInvokable("NotifyChange2_New")]
     public static void NotifyChange2(FileListEntryImpl[] files)
@@ -2258,10 +2258,10 @@
             return;
         }
 
-        CLog.Information("[HandleFileInputChange]파일드랍 이벤트 수신, 갯수:" + files.Length);
+        CLog.Here().Information("[HandleFileInputChange]파일드랍 이벤트 수신, 갯수:" + files.Length);
         foreach (var file in files)
         {
-            CLog.Information("[HandleFileInputChange]파일명:" + file.Name);
+            CLog.Here().Information("[HandleFileInputChange]파일명:" + file.Name);
         }
 
         dropFile.fileSizeError = false;

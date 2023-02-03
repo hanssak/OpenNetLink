@@ -299,7 +299,7 @@
             if (strCurCliVersion.Equals(""))
                 return;
 
-            CLog.Information("[Main] LogIn Type:" + pageService.m_nLoginType.ToString());
+            CLog.Here().Information("[Main] LogIn Type:" + pageService.m_nLoginType.ToString());
             HSCmdCenter.SetCliVersion(strCurCliVersion);
 
 
@@ -440,7 +440,7 @@
             if (strCurCliVersion.Equals(""))
                 return;
 
-            CLog.Information("[Main] LogIn Type:" + pageService.m_nLoginType.ToString());
+            CLog.Here().Information("[Main] LogIn Type:" + pageService.m_nLoginType.ToString());
             HSCmdCenter.SetCliVersion(strCurCliVersion);
 
 
@@ -645,7 +645,7 @@
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
             foreach (ISGNetwork netlist in listNetWork)
             {
-                HsLog.info($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
+                CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
 
                 // 1 login ALL 적용때에는 중복로그인시 강제 로그인 적용
                 HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(netlist.GroupID, ShowSessionCountPopup);
@@ -661,8 +661,27 @@
         }
 
         // 다중망 로그인에서 로그아웃됐을때에 다시 자동로그인 안되게 처리
-        if (srcLoc != "Logout")
+        if (srcLoc == "Logout")
         {
+
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1)
+                MyNavigationManager.NavigateTo("/SelectNet");
+
+
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
+            {
+                // 중복로그인된거 확인하고 강제로그인후, 다음부터도 확인하고 강제로그인 하도록 적용
+                List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+                foreach (ISGNetwork netlist in listNetWork)
+                {
+                    HSCmdCenter.SetAllowSessionDuplicate(netlist.GroupID, false);
+                }
+            }
+
+        }
+        else
+        {
+
             if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
             {
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupid))
@@ -683,8 +702,6 @@
             }
         }
 
-        if (srcLoc == "Logout" && (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1))
-            MyNavigationManager.NavigateTo("/SelectNet");
 
     }
 

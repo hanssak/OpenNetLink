@@ -4881,18 +4881,18 @@
 			<CN></CN>
 		</T_eFADOC_EXTRACT_COMPRESS_EXTENSION>
 		<T_eFADOC_EXTRACT_CHANGE>
-			<KR>문서 내 파일 위변조 제한</KR>
+			<KR>문서 내 파일의 위변조 제한</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
 		</T_eFADOC_EXTRACT_CHANGE>
 
-		<T_eFADOC_EXTRACT_FILES>
-			<KR>문서 내 검출된 파일</KR>
+		<T_eFADOC_EXTRACT_FILEFILTER>
+			<KR>문서 내 파일의 확장자 제한</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_eFADOC_EXTRACT_FILES>
+		</T_eFADOC_EXTRACT_FILEFILTER>
 		<T_APPROVEEXT_USE_APPROVE>
 			<KR>결재 사용</KR>
 			<JP></JP>
@@ -10337,11 +10337,13 @@
       <EN></EN>
       <CN></CN>
     </E_0254>
-
-
-
-
-
+	
+	<E_0255>
+		<KR>한글97~3.0 파일은 지원되지 않습니다.<![CDATA[<br>]]>한글 문서 버전을 변경하여 다시 추가해주세요.<![CDATA[<br>]]>파일명:<![CDATA[<br>]]>{0}</KR>
+		<JP></JP>
+		<EN></EN>
+		<CN></CN>
+	</E_0255>
   </ERROR>
 	<!-- ********************************************* [END] MSG ERROR (E_0000) ********************************************* -->
 </TEXT>
