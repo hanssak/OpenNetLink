@@ -276,8 +276,8 @@ GROUP BY U.USER_ID ";
         /// <returns></returns>
         public string GetDashboardTransReqCountQuery(string strUserSeq, string strFromDate, string strToDate)
         {
-            string strQuery = "SELECT (select A.cnt + B.cnt FROM(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '##FROMDATE##' AND '##TODATE##') A, ";
-            strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '##FROMDATE##' AND '##TODATE##') B) AS reqcount";
+            //동일쿼리 두번 호출하여 합하는 버그 수정
+            string strQuery = "select COUNT(*) reqcount from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '##FROMDATE##' AND '##TODATE##'";
             strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
             //strQuery = strQuery.Replace("##DATE##", strDate);
             strQuery = strQuery.Replace("##FROMDATE##", strFromDate);
