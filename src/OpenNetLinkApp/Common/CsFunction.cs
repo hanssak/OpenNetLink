@@ -16,6 +16,7 @@ using HsNetWorkSG;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.InteropServices;
 using IWshRuntimeLibrary;
+using System.IO.Compression;
 
 namespace OpenNetLinkApp.Common
 {
@@ -299,6 +300,23 @@ namespace OpenNetLinkApp.Common
             byte[] temp = Convert.FromBase64String(tempVal);
             tempVal = Encoding.UTF8.GetString(temp);
             return tempVal;
+        }
+
+        public static void GzFileDecompress(string filePath, string destPath)
+        {
+            using (FileStream originalFileStream = System.IO.File.OpenRead(filePath))
+            {
+                string currentFileName = filePath;
+                string newFileName = Path.Combine(destPath, Path.GetFileName(currentFileName.Remove(currentFileName.Length - Path.GetExtension(filePath).Length)));
+
+                using (FileStream decompressedFileStream = System.IO.File.Create(newFileName))
+                {
+                    using (GZipStream decompressionStream = new GZipStream(originalFileStream, CompressionMode.Decompress))
+                    {
+                        decompressionStream.CopyTo(decompressedFileStream);
+                    }
+                }
+            }
         }
     }
 
