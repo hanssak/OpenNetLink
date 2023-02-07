@@ -13,13 +13,13 @@ cd /Applications/OpenNetLinkApp.app/Contents/PlugIns
 rm -rf /Applications/SecureGate.app
 
 if [ -e $NETWORK_FILE ]; then    
-    cp /tmp/Network.json /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
+    #cp /tmp/Network.json /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
     rm -rf /tmp/Network.json
 fi
 
 APPENV_FILE="/tmp/AppEnvSetting.json"
 if [ -e $APPENV_FILE ]; then
-    cp /tmp/AppEnvSetting.json /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
+    #cp /tmp/AppEnvSetting.json /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
     rm -rf /tmp/AppEnvSetting.json
 fi
 
