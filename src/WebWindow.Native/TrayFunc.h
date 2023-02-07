@@ -42,6 +42,7 @@ static void toggle_show(struct tray_menu *item) {
 		gtk_widget_hide(_g_window);
 #elif TRAY_APPKIT
 		[_g_window orderOut:(id)SelfThis];
+		SelfId = nullptr;
 #elif TRAY_WINAPI
 		::ShowWindow(messageLoopRootWindowHandle, SW_HIDE);
 #endif
@@ -55,6 +56,7 @@ static void toggle_show(struct tray_menu *item) {
 #elif TRAY_APPKIT
 		[_g_window makeKeyAndOrderFront:(id)SelfThis];
 		[NSApp activateIgnoringOtherApps:YES];
+		SelfId = _g_window;
 #elif TRAY_WINAPI
 		::ShowWindow(messageLoopRootWindowHandle, SW_RESTORE);
 		::ShowWindow(messageLoopRootWindowHandle, SW_SHOW);

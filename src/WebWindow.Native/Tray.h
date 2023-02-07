@@ -134,6 +134,7 @@ static id pool;
 static id statusBar;
 static id statusItem;
 static id statusBarButton;
+static id SelfId;
 
 static id _tray_menu(struct tray_menu *m) {
     id menu = ((id(*)(id, SEL))objc_msgSend)((id)objc_getClass("NSMenu"), sel_registerName("new"));
@@ -164,7 +165,6 @@ static id _tray_menu(struct tray_menu *m) {
       }
     }
   }
-
   return menu;
 }
 
@@ -204,7 +204,7 @@ static int tray_init(struct tray *tray) {
   
     app = ((id(*)(id, SEL))objc_msgSend)((id)objc_getClass("NSApplication"),
                           sel_registerName("sharedApplication"));
-  
+
     Class trayDelegateClass = objc_allocateClassPair(objc_getClass("NSObject"), "Tray", 0);
     class_addProtocol(trayDelegateClass, objc_getProtocol("NSApplicationDelegate"));
     class_addMethod(trayDelegateClass, sel_registerName("menuCallback:"), (IMP)menu_callback, "v@:@");
@@ -227,6 +227,9 @@ static int tray_init(struct tray *tray) {
     statusBarButton = ((id(*)(id, SEL))objc_msgSend)(statusItem, sel_registerName("button"));
     tray_update(tray);
     ((void(*)(id, SEL, bool))objc_msgSend)(app, sel_registerName("activateIgnoringOtherApps:"), true);
+
+    SelfId = nullptr;
+    
     return 0;
 }
 
@@ -243,7 +246,7 @@ static int tray_loop(int blocking) {
                   "kCFRunLoopDefaultMode"), 
                 true);
     if (event) {
-      /*
+      
       //NSLog(@"isClass %s", object_isClass(event) ? "yes":"no");
       //NSLog(@"%@", NSStringFromClass([event class]));
       //NSLog(@"GetClassName %s", NSStringFromClass([event class]));
@@ -251,23 +254,81 @@ static int tray_loop(int blocking) {
       NSUInteger eventType = ((NSUInteger (*)(id, SEL))objc_msgSend)(event, sel_registerName("type"));
       switch(eventType)
       {
-        case 13:
-            if([event subtype] == NSEventSubtypeApplicationActivated) {
-            NSLog(@"%@", event);
-          }
-          break;
-        case 14:
-          if([event subtype] == NSEventSubtypePowerOff) {
-            NSLog(@"%@", event);
-          }
-          break;
+        //Left Click
+        case 1:
+            //NSLog(@"Mouse Click");
+            //NSLog(@"%@", event);
+            //NSLog(@"%d", [event clickCount]);
+            //NSLog(@"%@", SelfId);              
+            
+            if(SelfId == nullptr || [event windowNumber] != [SelfId windowNumber])
+            {
+              //Tray 쪽 left Click 동작 이벤트는 더블클릭에 대한 기능만 동작하도록 설정
+              if([event clickCount] == 2)
+              {
+                NSLog(@"################ Mouse Double Click Event !!!!!!");
+                RequestMoveTrayToWebWindow();                
+              }
+              return 0;
+            }         
+
+            /*  [이벤트 참고 사항]
+            if([event clickCount] == 2)
+            {              
+              if(SelfId == nullptr || [event windowNumber] != [SelfId windowNumber])
+              {
+                NSLog(@"################ Mouse Double Click Event !!!!!!");                
+                RequestMoveTrayToWebWindow();
+                return 0;
+              }              
+              if(SelfId != nullptr)
+              {
+                  NSLog(@"%d", [event windowNumber]);
+                  NSLog(@"%d", [SelfId windowNumber]);
+                  if([event windowNumber] != [SelfId windowNumber])
+                  {
+                    NSLog(@"################ Mouse Double Click Event !!!!!!");
+
+                      //tray 더블클릭 시 WebWindow를 표시하도록 추가
+                      ((WebWindow*)SelfThis)->MoveTrayToWebWindow();
+                      NSLog(@"Mouse Click Event !!!!!!");
+                      return 0;
+                  }
+                }
+                else
+                {
+                   NSLog(@"################ Mouse Double Click Event !!!!!!");
+
+                      //tray 더블클릭 시 WebWindow를 표시하도록 추가
+                      ((WebWindow*)SelfThis)->MoveTrayToWebWindow();
+                    NSLog(@"Mouse Click Event !!!!!!");
+                    return 0;
+                }
+            }
+            else
+            {
+                if(SelfId != nullptr)
+                {
+                  //NSLog(@"%d", [event windowNumber]);
+                  //NSLog(@"%d", [SelfId windowNumber]);
+                  if([event windowNumber] != [SelfId windowNumber])
+                  {
+                      return 0;
+                  }
+                }
+                else
+                {
+                  return 0;
+                }
+            }
+            */
+            break;
         default:
+          //NSLog(@"%@", event);
           break;  
       }
-      */
+      
       ((void(*)(id, SEL, id))objc_msgSend)(app, sel_registerName("sendEvent:"), event);
-      //[NSApp updateWindows];
-			//((void (*)(id, SEL))objc_msgSend)(app, sel_registerName("updateWindows"));
     }
 
     return 0;
