@@ -21,8 +21,6 @@
 @using OpenNetLinkApp.Common
 @using OfficeExtractor
 @using Data.SGDicData.SGAlz;
-@using SharpCompress.Common;
-@using SharpCompress.Readers;
 
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
@@ -161,7 +159,6 @@
                                                     </td>
                                                 }
                                                 <td>
-                                                    <button type="button" class="btn btn-md btn-green" @onclick="AlzTest"><i class="fas fa-share"></i>압축</button>
                                                     <button type="button" class="btn btn-md btn-green" @onclick="CheckApprLine"><i class="fas fa-share"></i>@strFileSend</button>
                                                     <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
                                                     <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
@@ -648,46 +645,6 @@ private async Task UploadFiles()
     }
 
 }
-
-private void AlzTest()
-{
-    string source = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)\\국방재정.txt.gz";
-    string dest = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)";
-
-    //alz file 압축풀기
-    //        SGUnAlz lib = new SGUnAlz();
-    //
-    //#if _WINDOWS
-    //        int ret = lib.UnAlzExtractWDll(source, dest);
-    //#else
-    //        int ret = lib.UnAlzExtractDll(source, dest);
-    //#endif
-
-    //tar, tar.gz, tgz
-    //using (Stream stream = File.OpenRead(source))
-    //{
-    //    using (var reader = ReaderFactory.Open(stream))
-    //    {
-    //        while (reader.MoveToNextEntry())
-    //        {
-    //            if(!reader.Entry.IsDirectory)
-    //            {
-    //                reader.WriteEntryToDirectory(dest, new ExtractionOptions()
-    //                {
-    //                    ExtractFullPath = true,
-    //                    Overwrite = true
-    //                });
-    //            }
-    //        }
-    //    }
-    //}
-
-    //gz 파일
-    Common.CsFunction.GzFileDecompress(source, dest);
-
-
-}
-
 
 private async Task CheckApprLine()
 {

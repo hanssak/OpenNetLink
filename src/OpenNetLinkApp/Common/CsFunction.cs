@@ -17,6 +17,9 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.InteropServices;
 using IWshRuntimeLibrary;
 using System.IO.Compression;
+using SharpCompress.Common;
+using SharpCompress.Readers;
+using OpenNetLinkApp.Data.SGDicData.SGAlz;
 
 namespace OpenNetLinkApp.Common
 {
@@ -301,7 +304,11 @@ namespace OpenNetLinkApp.Common
             tempVal = Encoding.UTF8.GetString(temp);
             return tempVal;
         }
-
+        /// <summary>
+        /// gz파일 압축해제
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="destPath"></param>
         public static void GzFileDecompress(string filePath, string destPath)
         {
             using (FileStream originalFileStream = System.IO.File.OpenRead(filePath))
@@ -317,6 +324,45 @@ namespace OpenNetLinkApp.Common
                     }
                 }
             }
+        }
+        /// <summary>
+        /// tar, tgz, tar.gz 파일 압축해제
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="destPath"></param>
+        public static void TarFileDecompress(string filePath, string destPath)
+        {
+            using (Stream stream = System.IO.File.OpenRead(filePath))
+            {
+                using (var reader = ReaderFactory.Open(stream))
+                {
+                    while (reader.MoveToNextEntry())
+                    {
+                        if (!reader.Entry.IsDirectory)
+                        {
+                            reader.WriteEntryToDirectory(destPath, new ExtractionOptions()
+                            {
+                                ExtractFullPath = true,
+                                Overwrite = true
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        public static int AlzFileDecompress(string filePath, string destPath)
+        {
+            //alz file 압축풀기
+            SGUnAlz lib = new SGUnAlz();
+            int ret = 0;
+
+#if _WINDOWS
+            ret = lib.UnAlzExtractWDll(filePath, destPath);
+#else
+            ret = lib.UnAlzExtractDll(filePath, destPath);
+#endif
+            return ret;
         }
     }
 
