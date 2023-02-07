@@ -159,7 +159,6 @@
                                                     </td>
                                                 }
                                                 <td>
-                                                    @*<button type="button" class="btn btn-md btn-green" @onclick="AlzTest"><i class="fas fa-share"></i>압축</button>*@
                                                     <button type="button" class="btn btn-md btn-green" @onclick="CheckApprLine"><i class="fas fa-share"></i>@strFileSend</button>
                                                     <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
                                                     <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
@@ -425,320 +424,308 @@
                 break;
                 @*case "결재자 추가 2":
                     await refApproverSelect_TreePopUp.openPopUp();*@
-                break;
-            case "결재자 추가 3":
-                await refApproverSelect_StepPopUp.openPopUp();
-                break;
-            //case "전송제한":
-            //    await refTransferDenied.openPopUp();
-            //    break;
-            case "MESSAGE":
-                //1. 토스트 메시지 사용법
-                //type: success, info, waring, error 2020/07/02 YKH
-                //object[] param5 = { "error", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
-                //await JSRuntime.InvokeAsync<object>("fireToastMessage", param5);
+            break;
+        case "결재자 추가 3":
+            await refApproverSelect_StepPopUp.openPopUp();
+            break;
+        //case "전송제한":
+        //    await refTransferDenied.openPopUp();
+        //    break;
+        case "MESSAGE":
+            //1. 토스트 메시지 사용법
+            //type: success, info, waring, error 2020/07/02 YKH
+            //object[] param5 = { "error", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
+            //await JSRuntime.InvokeAsync<object>("fireToastMessage", param5);
 
-                //2. javascript alert 사용법
-                //object[] param = { "JS Alert 메시지 호출입니다." };
-                //await JSRuntime.InvokeAsync<object>("alertMessage", param);
+            //2. javascript alert 사용법
+            //object[] param = { "JS Alert 메시지 호출입니다." };
+            //await JSRuntime.InvokeAsync<object>("alertMessage", param);
 
-                //3. 모달형 메시지, mode:1은 alert mode:2는 confirm
-                //await refSGAlert.openPopUp("시스템 알림", "이것은 시스템 알림 메시지 입니다.", 2);
-                break;
-            //case "GPKI":
-            //  await refLogInGPKI.openPopUp();
-            //  break;
-            case "로그인(인터넷망)":
-                //await LogInPopUp.openPopUp();
-                break;
-            case "로그인(업무망)":
-                //await refLogIn_SecurityNetwork.openPopUp();
-                break;
-            case "로그인(메일연계)":
-                //await refLogIn_Mail.openPopUp();
-                break;
-            case "로그인(PCURL)":
-                //await refLogIn_PCURL.openPopUp();
-                break;
-            case "반려팝업":
-                //await refSGReject.openPopUp();
-                break;
-            case "PDF변환":
-                //refSGPDFTrans.ChangeProgress(10);
-                //await refSGPDFTrans.openPopUp();
-                //진행율 변환 예제
-                //System.Threading.Thread.Sleep(2000);
-                //refSGPDFTrans.ChangeProgress(90);
-                break;
-            case "파일전송진행율":
-                refTransProgress.ChangeProgress(10);
-                await refTransProgress.openPopUp();
-                //진행율 변환 예제
-                await Task.Delay(2000);
-                refTransProgress.ChangeProgress(90);
-                break;
-            case "미리보기":
-                OpenPreviewWindow();
-                //object[] param = { "https://www.naver.com", "오픈윈도우", 200, 200 };
-                //await JSRuntime.InvokeAsync<object>("openWindow", param);
-                break;
-            case "프로그래스알림":
-                object[] param = { "POP1234", "업무망 <i class='fas fa-long-arrow-alt-right p-1'></i> 인터넷망", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 1%" };
-                await JSRuntime.InvokeAsync<object>("fireProgressMessage", param);
-                await Task.Delay(3000);
-                object[] param2 = { "POP1234", "파일수신 중입니다. <br>수신이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
-                await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
-                await Task.Delay(3000);
-                object[] param3 = { "POP1234" };
-                await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
-                break;
-            case "프로그래스업데이트":
-                // object[] param2 = { "POP1234", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
-                //  await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
-                break;
-            case "프로그래스닫기":
-                // object[] param3 = { "POP1234" };
-                //   await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
-                break;
-            case "오프라인":
-                //await refOffLine.openPopUp();
-                break;
+            //3. 모달형 메시지, mode:1은 alert mode:2는 confirm
+            //await refSGAlert.openPopUp("시스템 알림", "이것은 시스템 알림 메시지 입니다.", 2);
+            break;
+        //case "GPKI":
+        //  await refLogInGPKI.openPopUp();
+        //  break;
+        case "로그인(인터넷망)":
+            //await LogInPopUp.openPopUp();
+            break;
+        case "로그인(업무망)":
+            //await refLogIn_SecurityNetwork.openPopUp();
+            break;
+        case "로그인(메일연계)":
+            //await refLogIn_Mail.openPopUp();
+            break;
+        case "로그인(PCURL)":
+            //await refLogIn_PCURL.openPopUp();
+            break;
+        case "반려팝업":
+            //await refSGReject.openPopUp();
+            break;
+        case "PDF변환":
+            //refSGPDFTrans.ChangeProgress(10);
+            //await refSGPDFTrans.openPopUp();
+            //진행율 변환 예제
+            //System.Threading.Thread.Sleep(2000);
+            //refSGPDFTrans.ChangeProgress(90);
+            break;
+        case "파일전송진행율":
+            refTransProgress.ChangeProgress(10);
+            await refTransProgress.openPopUp();
+            //진행율 변환 예제
+            await Task.Delay(2000);
+            refTransProgress.ChangeProgress(90);
+            break;
+        case "미리보기":
+            OpenPreviewWindow();
+            //object[] param = { "https://www.naver.com", "오픈윈도우", 200, 200 };
+            //await JSRuntime.InvokeAsync<object>("openWindow", param);
+            break;
+        case "프로그래스알림":
+            object[] param = { "POP1234", "업무망 <i class='fas fa-long-arrow-alt-right p-1'></i> 인터넷망", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 1%" };
+            await JSRuntime.InvokeAsync<object>("fireProgressMessage", param);
+            await Task.Delay(3000);
+            object[] param2 = { "POP1234", "파일수신 중입니다. <br>수신이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
+            await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
+            await Task.Delay(3000);
+            object[] param3 = { "POP1234" };
+            await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
+            break;
+        case "프로그래스업데이트":
+            // object[] param2 = { "POP1234", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
+            //  await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
+            break;
+        case "프로그래스닫기":
+            // object[] param3 = { "POP1234" };
+            //   await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
+            break;
+        case "오프라인":
+            //await refOffLine.openPopUp();
+            break;
 
-            case "마우스우클릭":
-                HSCmdCenter.RMouseFileAddNotiAfterSend(0, 0);
-                break;
-            case "OTP":
-                //await refOTP.openPopUp();
-                break;
-            case "소프트웨어 업데이트":
-                //await refUpdate_PopUp.openPopUp();
-                break;
-            case "바이러스팝업":
-                // await refVirusReport.openPopUp();
-                break;
-            case "PCURL사용신청":
-                //await refPcurlUsingRegistPopUp.openPopUp();
-                break;
-            case "PCURL사용가능한URL":
-                //await refPcurlAvailableUrlListPopUp.openPopUp();
-                break;
-            case "ZIP파일미리보기":
-                //await refZipPreviewPopop.openPopUp();
-                break;
-            case "화면잠금":
-                //object[] param9 = { "modal-displaylock" };
-                //await JSRuntime.InvokeAsync<object>("openPopUp", param9);
-                break;
-        }
+        case "마우스우클릭":
+            HSCmdCenter.RMouseFileAddNotiAfterSend(0, 0);
+            break;
+        case "OTP":
+            //await refOTP.openPopUp();
+            break;
+        case "소프트웨어 업데이트":
+            //await refUpdate_PopUp.openPopUp();
+            break;
+        case "바이러스팝업":
+            // await refVirusReport.openPopUp();
+            break;
+        case "PCURL사용신청":
+            //await refPcurlUsingRegistPopUp.openPopUp();
+            break;
+        case "PCURL사용가능한URL":
+            //await refPcurlAvailableUrlListPopUp.openPopUp();
+            break;
+        case "ZIP파일미리보기":
+            //await refZipPreviewPopop.openPopUp();
+            break;
+        case "화면잠금":
+            //object[] param9 = { "modal-displaylock" };
+            //await JSRuntime.InvokeAsync<object>("openPopUp", param9);
+            break;
+    }
+}
+
+private async Task OpenFileDialog()
+{
+    await refFileSelectPopUp.openPopUp();
+}
+
+private async Task UploadFiles()
+{
+    cntSendQuery = 0;
+    cntRecvQuery = 0;
+    int groupID = groupIDbyParam;
+
+    if (pageService.GetConnectStatus(groupID) == false)
+    {
+        string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        ShowMessage("error", strMsg);
+        return;
     }
 
-    private async Task OpenFileDialog()
+    string strTitle = strBindTitle;
+    string strContents = strBindDesc;
+    if (!strBindTitle.Equals(""))
     {
-        await refFileSelectPopUp.openPopUp();
-    }
-
-    private async Task UploadFiles()
-    {
-        cntSendQuery = 0;
-        cntRecvQuery = 0;
-        int groupID = groupIDbyParam;
-
-        if (pageService.GetConnectStatus(groupID) == false)
+        if (Encoding.UTF8.GetByteCount(strBindTitle) > 250)
         {
-            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
-
-        string strTitle = strBindTitle;
-        string strContents = strBindDesc;
-        if (!strBindTitle.Equals(""))
-        {
-            if (Encoding.UTF8.GetByteCount(strBindTitle) > 250)
-            {
-                string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
-                ShowMessage("warn", strMsg);
-                strBindTitle = "";
-                strBindDesc = "";
-                StateHasChanged();
-                return;
-            }
-        }
-
-        if (!strBindDesc.Equals(""))
-        {
-            if (Encoding.UTF8.GetByteCount(strBindDesc) > 250)
-            {
-                string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
-                ShowMessage("warn", strMsg);
-                strBindTitle = "";
-                strBindDesc = "";
-                StateHasChanged();
-                return;
-            }
-        }
-
-        if (pageService.GetDayFileTransCountEnable(groupID) != true)
-        {
-            string strMsg = XmlConf.GetErrMsg("E_0106");    // 일일 전송 최대 횟수는 {0}번 입니다./r/n일일 전송 횟수를 초과하였습니다.
-            int FileMaxCount = pageService.GetDayFileMaxCount(groupID);
-            strMsg = String.Format(strMsg, FileMaxCount);
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            DayFileChangeNotiEvent dayFileChange = null;
-            dayFileChange = HSCmdCenter.sgPageEvent.GetDayFileChangeNotiEvent(groupID);
-            if (dayFileChange == null)
-                return;
-            dayFileChange(groupID);
-            return;
-        }
-
-        int TransDataCount = 0;
-        TransDataCount = dropFile.GetFileListAddCount();
-        if (TransDataCount <= 0)
-        {
-            string strMsg = XmlConf.GetWarnMsg("W_0016"); // 전송하고자 하는 파일이 없습니다./r/n전송파일을 등록해주십시오.
-            strMsg = strMsg.Replace("/r/n", "<br/>");
+            string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
             ShowMessage("warn", strMsg);
+            strBindTitle = "";
+            strBindDesc = "";
+            StateHasChanged();
             return;
         }
+    }
 
-        // 3중망일때 목적지 점검
-        if (dicDestSysPos != null && dicDestSysPos.Count > 0 && strDestNetWork.Length < 1)
+    if (!strBindDesc.Equals(""))
+    {
+        if (Encoding.UTF8.GetByteCount(strBindDesc) > 250)
         {
-            ShowMessage("error", XmlConf.GetErrMsg("E_0234"));
+            string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
+            ShowMessage("warn", strMsg);
+            strBindTitle = "";
+            strBindDesc = "";
+            StateHasChanged();
             return;
         }
-
-        //사후결재 제한 체크 여부
-
-        if (siteConfig.GetApproveAfterLimit(groupID))
-            await CheckApproveAfterLimit();
-        else
-        {
-
-            SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sgLoginData == null)
-                return;
-
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isFilesNeedApprove())
-            {
-
-                refApproveExtApproverSelect_PopUp.FileList = dropFile.GetHsStreamList();
-
-                // 파일목록이 있는 화면을 갱신해줘야 UI상에 나타남
-                refApproveExtApproverSelect_PopUp.Refresh();
-
-                // 파일송신 버튼, 실행
-                refApproveExtApproverSelect_PopUp.SetFileTransWithApproveEvent(FileTransWithApprover);
-
-                await refApproveExtApproverSelect_PopUp.openPopUp();
-            }
-            else
-            {
-                FileTrans();
-                //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
-                await stopClick();
-            }
-
-        }
-
     }
 
-    private void AlzTest()
+    if (pageService.GetDayFileTransCountEnable(groupID) != true)
     {
-        string source = "/사용자/kd_mac/데스크탑/무제 풀더 6/국방재정.alz";
-        string dest = "/사용자/kd_mac/데스크탑/무제 풀더 6/";
-        
-        SGUnAlz lib = new SGUnAlz();
-        //int ret = lib.UnAlzExtract(source, dest);
-        int ret = lib.UnAlzExtractDll(source, dest);
-
+        string strMsg = XmlConf.GetErrMsg("E_0106");    // 일일 전송 최대 횟수는 {0}번 입니다./r/n일일 전송 횟수를 초과하였습니다.
+        int FileMaxCount = pageService.GetDayFileMaxCount(groupID);
+        strMsg = String.Format(strMsg, FileMaxCount);
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        ShowMessage("error", strMsg);
+        DayFileChangeNotiEvent dayFileChange = null;
+        dayFileChange = HSCmdCenter.sgPageEvent.GetDayFileChangeNotiEvent(groupID);
+        if (dayFileChange == null)
+            return;
+        dayFileChange(groupID);
+        return;
     }
 
-
-    private async Task CheckApprLine()
+    int TransDataCount = 0;
+    TransDataCount = dropFile.GetFileListAddCount();
+    if (TransDataCount <= 0)
     {
-        cntSendQuery = 0;
-        cntRecvQuery = 0;
+        string strMsg = XmlConf.GetWarnMsg("W_0016"); // 전송하고자 하는 파일이 없습니다./r/n전송파일을 등록해주십시오.
+        strMsg = strMsg.Replace("/r/n", "<br/>");
+        ShowMessage("warn", strMsg);
+        return;
+    }
 
-        int groupID = groupIDbyParam;
-        HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑
+    // 3중망일때 목적지 점검
+    if (dicDestSysPos != null && dicDestSysPos.Count > 0 && strDestNetWork.Length < 1)
+    {
+        ShowMessage("error", XmlConf.GetErrMsg("E_0234"));
+        return;
+    }
+
+    //사후결재 제한 체크 여부
+
+    if (siteConfig.GetApproveAfterLimit(groupID))
+        await CheckApproveAfterLimit();
+    else
+    {
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
 
-        //bool bUseApprove = sgLoginData.GetApprove();
-        bool bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
-        bool bApprEdit = sgLoginData.GetApproveAppend();
-
-        if (!pageService.GetSFMChecking())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isFilesNeedApprove())
         {
-            SFMRefreshEvent sfmRefreshEvent = HSCmdCenter.sgPageEvent.GetSFMRefreshEvent();
-            if (sfmRefreshEvent != null)
-            {
-                int check = await sfmRefreshEvent(groupID);
-            }
+
+            refApproveExtApproverSelect_PopUp.FileList = dropFile.GetHsStreamList();
+
+            // 파일목록이 있는 화면을 갱신해줘야 UI상에 나타남
+            refApproveExtApproverSelect_PopUp.Refresh();
+
+            // 파일송신 버튼, 실행
+            refApproveExtApproverSelect_PopUp.SetFileTransWithApproveEvent(FileTransWithApprover);
+
+            await refApproveExtApproverSelect_PopUp.openPopUp();
+        }
+        else
+        {
+            FileTrans();
+            //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+            await stopClick();
         }
 
-        ISGUserInfo userInfoService = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
-        int nApprovePos = userInfoService.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)); //sgUserData.GetUserApprpos();
-        SGApprLineData sgApprLineData = null;
-        sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
-        if (sgApprLineData == null)
-            return;
+    }
 
-        string strUserSeq = userInfoService.UserSeq;
-        int ApprLineCount = sgApprLineData.GetApprAndLineSeqCount(strUserSeq);
-        bool bIsVipUser = sgLoginData.IsVipUser();
-        if (bIsVipUser == false && bUseApprove && nApprovePos < 2)
+}
+
+private async Task CheckApprLine()
+{
+    cntSendQuery = 0;
+    cntRecvQuery = 0;
+
+    int groupID = groupIDbyParam;
+    HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑
+
+    SGLoginData sgLoginData = null;
+    sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+    if (sgLoginData == null)
+        return;
+
+    //bool bUseApprove = sgLoginData.GetApprove();
+    bool bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
+    bool bApprEdit = sgLoginData.GetApproveAppend();
+
+    if (!pageService.GetSFMChecking())
+    {
+        SFMRefreshEvent sfmRefreshEvent = HSCmdCenter.sgPageEvent.GetSFMRefreshEvent();
+        if (sfmRefreshEvent != null)
         {
-            string strMsg = "";
-            if ((nApprovePos < 2) && (ApprLineCount <= 0))
-            {
-                if (bApprEdit)
-                {
-                    strMsg = XmlConf.GetWarnMsg("W_0076");                   // 결재자를 추가하십시오.
-                    ShowMessage("warn", strMsg);
-                    return;
+            int check = await sfmRefreshEvent(groupID);
+        }
+    }
 
-                }
-                else if (SGAppMgrSvc.OpConfigInfoService.GetUseApprLineChkBlock(groupID))
-                {
-                    strMsg = XmlConf.GetWarnMsg("W_0206");                   // 결재자가 설정되어 있지 않습니다./r/n관리자에게 문의하십시오.
-                    strMsg = strMsg.Replace("/r/n", "<br>");
-                    ShowMessage("warn", strMsg);
-                    return;
-                }
+    ISGUserInfo userInfoService = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+    int nApprovePos = userInfoService.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)); //sgUserData.GetUserApprpos();
+    SGApprLineData sgApprLineData = null;
+    sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+    if (sgApprLineData == null)
+        return;
+
+    string strUserSeq = userInfoService.UserSeq;
+    int ApprLineCount = sgApprLineData.GetApprAndLineSeqCount(strUserSeq);
+    bool bIsVipUser = sgLoginData.IsVipUser();
+    if (bIsVipUser == false && bUseApprove && nApprovePos < 2)
+    {
+        string strMsg = "";
+        if ((nApprovePos < 2) && (ApprLineCount <= 0))
+        {
+            if (bApprEdit)
+            {
+                strMsg = XmlConf.GetWarnMsg("W_0076");                   // 결재자를 추가하십시오.
+                ShowMessage("warn", strMsg);
+                return;
 
             }
-
-            else if (ApprLineCount > 0)      //
+            else if (SGAppMgrSvc.OpConfigInfoService.GetUseApprLineChkBlock(groupID))
             {
-                string strApprLineUserSeq = "";
-                string strApprLineDeptSeq = "";
-                string strApprLineName = "";
-                string strUserID = sgLoginData.GetUserID();
-                LinkedList<ApproverInfo> apprLinkedList = sgApprLineData.GetApprAndLineData();
+                strMsg = XmlConf.GetWarnMsg("W_0206");                   // 결재자가 설정되어 있지 않습니다./r/n관리자에게 문의하십시오.
+                strMsg = strMsg.Replace("/r/n", "<br>");
+                ShowMessage("warn", strMsg);
+                return;
+            }
 
-                foreach (var item in apprLinkedList)
-                {
-                    strApprLineUserSeq = item.UserSeq;
-                    strApprLineDeptSeq = item.DeptSeq;
-                    strApprLineName = item.Name;
+        }
 
-                    //사용자 유효성 검사 시, 로그인한 본인은 제외하고 확인한다.
-                    if (strApprLineUserSeq == strUserSeq)
-                        continue;
+        else if (ApprLineCount > 0)      //
+        {
+            string strApprLineUserSeq = "";
+            string strApprLineDeptSeq = "";
+            string strApprLineName = "";
+            string strUserID = sgLoginData.GetUserID();
+            LinkedList<ApproverInfo> apprLinkedList = sgApprLineData.GetApprAndLineData();
 
-                    //웹매니저에서 등록된 기본결재라인 부서Seq는 "-"로 설정됨
-                    //웹매니저에 등록된 최초 결재라인은 유효성 검증에서 제외
-                    //if (!strApprLineDeptSeq.Equals("-"))
-                    //if (strApprLineDeptSeq.Length == 18)    // Dept - seq 일때에만 검색함.
+            foreach (var item in apprLinkedList)
+            {
+                strApprLineUserSeq = item.UserSeq;
+                strApprLineDeptSeq = item.DeptSeq;
+                strApprLineName = item.Name;
+
+                //사용자 유효성 검사 시, 로그인한 본인은 제외하고 확인한다.
+                if (strApprLineUserSeq == strUserSeq)
+                    continue;
+
+                //웹매니저에서 등록된 기본결재라인 부서Seq는 "-"로 설정됨
+                //웹매니저에 등록된 최초 결재라인은 유효성 검증에서 제외
+                //if (!strApprLineDeptSeq.Equals("-"))
+                //if (strApprLineDeptSeq.Length == 18)    // Dept - seq 일때에만 검색함.
 
 
                     @*if (CsSeqFunc.isDeptSeq(strApprLineDeptSeq))
@@ -748,7 +735,7 @@
                         }*@
 
                     // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
-                    SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "", sgLoginData.GetApproveProxyRight());                    
+                    SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "", sgLoginData.GetApproveProxyRight());
                     cntSendQuery++;
                 }
             }
