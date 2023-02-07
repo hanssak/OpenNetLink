@@ -102,7 +102,7 @@
 
                             <div class="col-md-3 text-right p-0">
                                 <button @onclick="CheckFileFullLength" type="button" class="btn btn-md btn-blue mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
-                                <button @onclick="DoCancle" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_TRANSCANCLE")</button>
+                                <button @onclick="DoCancel" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_TRANSCANCLE")</button>
                             </div>
                         </div>
                     </div>
@@ -119,6 +119,7 @@
                 </div>
 
                 <div class="modal-footer">
+                    <button @onclick="DoCancel" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_TRANSCANCLE")</button>
                     <button @onclick="DoOk" type="button" class="btn btn-md btn-blue mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
                 </div>
             }
@@ -348,7 +349,7 @@
         closePopUp();
     }
 
-    public void DoCancle()
+    public void DoCancel()
     {
         int groupid = Int32.Parse(lstInfo[0]);
         string curTransSeq = lstInfo[1];
@@ -367,7 +368,6 @@
             CLog.Here().Information($"SelectReceiveFolder SendForwardCancel TransSeq : {curTransSeq} pushType : {curPushType}");
             HsCmdCenter.SendForwardCancel(groupid, sgLoginData.GetUserID(), curTransSeq);
         }
-
         //파일 전송 취소
         else
         {
