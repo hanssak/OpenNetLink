@@ -39,7 +39,7 @@ else
     else
         # nautilus (right click) action setting
         cp -rf ${PATH_BIN_SCRIPT}/ContextMenu.nautilus_action ${PATH_NAUTILUS}/'Sending OpenNetLink'
-        chmod 777 ${PATH_NAUTILUS}/ContextMenu.nautilus_action
+        chmod 777 ${PATH_NAUTILUS}/'Sending OpenNetLink'
     fi
 fi
 
