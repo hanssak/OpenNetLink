@@ -1,7 +1,7 @@
 {
 
-  "bUseAppLoginType": false,
-  "LoginType": 0,
+  "bUseAppLoginType": true,
+  "LoginType": 3,
 
   "bUseLogLevel": true,
 
@@ -11,7 +11,7 @@
 
   "bUseMainPageType": true,
 
-  "bUseStartProgramReg": false,
+  "bUseStartProgramReg": true,
 
   "bManualDownFolderChange": false,
   "bManualRecvDownChange": false,
@@ -20,7 +20,7 @@
   "bRMouseFileAddAfterTrans": false,
 
   "bShowAfterApprAutoCheck": true,
-  "bAfterBasicChk": false,
+  "bAfterBasicChk": true,
 
   "bFileRecvAlarmRetain": false,
   "bApprCountAlarmRetain": false,
@@ -36,7 +36,7 @@
   "bUseApprWaitNoti": true,
 
 
-  "bUserIDSave": false,
+  "bUserIDSave": true,
   "bAutoLogin": true,
   "bAutoLoginCheck": true,
   "bEmptyfileTrans": true,
@@ -126,7 +126,7 @@
   "bUsePartialFileAddInTransfer": false,
   "bUseInitAlarmPerDay": false,
   "bUseInitMessagePerDay": false,
-  "bVisiblePolicyUpdateButton": true,
+  "bVisiblePolicyUpdateButton": false,
   "bUseForceBackgroundUpdate": false,
   "bUseChkHardSpace": true,
   "bUseOver1Auth": [
