@@ -25,6 +25,20 @@ namespace OpenNetLinkApp.Common
         public string fileSize;
         public string fileKey;
         public string fileSeq;
+        public bool bFilePreviewPossiable;
+
+        public emailFile()
+        {
+            fileDLP = "";
+            fileDLPContents = "";
+            fileName = "";
+            fileKind = "";
+            virusDesc = "";
+            fileSize = "";
+            fileKey = "";
+            fileSeq = "";
+            bFilePreviewPossiable = true;
+        }
     }
 
 }

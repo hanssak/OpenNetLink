@@ -37,8 +37,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseLogLevel { get; set; }                      // 로그 레벨 사용 여부
         public List<bool> listUseGpkiLogin { get; set; }            // GPKI 로그인 사용 여부
 
-
-
         public bool bScreenLockUserChange { get; set; }             //스크린락 사용자 임의 조작 가능 여부
         public bool bShowAdminInfo { get; set; }                    //대쉬보드에 관리자 정보 표시여부
         public bool bUseAppLoginType { get; set; }                  //사용자 지정 로그인타입 사용 여부
@@ -79,7 +77,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseUserRecvDownPath { get; set; }            // 로그인 유저별 다운로드 경로 사용 여부
         //public bool bUseEmail { get; set; }                // 메일 결재 사용 유무.
 
-        public bool bUseUserRecvDownPathUserName { get; set; }
         public List<bool> blistUseEmail { get; }
 
         public bool bUsePCURL { get; set; }                       // PCURL 사용 유무.

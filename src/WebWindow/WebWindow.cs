@@ -442,7 +442,7 @@ namespace WebWindows
         public void ShowUserNotification(string image, string title, string message, string navURI = null)
         {
             //WebWindow_ShowUserNotification(_nativeWebWindow, image, title, message, navURI);
-            Invoke(() => WebWindow_ShowUserNotification(_nativeWebWindow,image, title, message, navURI));   // KKW
+            Invoke(() => WebWindow_ShowUserNotification(_nativeWebWindow,image, title, message, navURI));
         }
 
         public void Notification(OS_NOTI category, string title, string message, string navURI = "")

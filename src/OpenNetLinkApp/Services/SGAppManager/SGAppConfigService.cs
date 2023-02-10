@@ -43,39 +43,35 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetAfterBasicChk();
         string GetRecvDownPath(int groupId);
         bool GetFileRecvFolderOpen();
-        bool GetManualRecvDownChange();
+        //bool GetManualRecvDownChange();
         bool GetFileRecvTrayFix();
         bool GetApprTrayFix();
         bool GetUserApprActionTrayFix();
         bool GetUserApprRejectTrayFix();
-        bool GetExitTrayMove();
+        //bool GetExitTrayMove();
         bool GetStartTrayMove();
         bool GetStartProgramReg();
         string GetLanguage();
         //bool GetUseScreenLock();
         bool GetScreenLock();
-        bool GetScreenLockUserChange();
+        //bool GetScreenLockUserChange();
         int GetScreenTime();
         LogEventLevel GetLogLevel();
         bool GetUseApprWaitNoti();
         string GetUpdateSvcIP();
-        bool GetUseLogLevel();
-        bool GetUseGPKILogin(int groupID);
-
+        //bool GetUseLogLevel();
+        //bool GetUseGPKILogin(int groupID);
         //bool GetUseOverNetwork2();
         //bool GetUseNetOverAllsend();
         //bool GetFileForward();
         //bool GetFileDownloadBeforeReciving();
         //bool GetEmailApproveUse();
-
         //bool GetClipboardFileTransUse();
-
         //bool GetClipboardManageUse();
-
-        bool GetShowAdminInfo();
+        //bool GetShowAdminInfo();
         //bool GetUseFileCheckException();
         //bool GetDenyPasswordZIP();
-        bool GetUseAppLoginType();
+        //bool GetUseAppLoginType();
         int GetAppLoginType();
 
         int GetUserSelectFirstNet();
@@ -478,10 +474,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bFileRecvFolderOpen;
         }
 
-        public bool GetManualRecvDownChange()
+        /*public bool GetManualRecvDownChange()
         {
             return AppConfigInfo.bManualRecvDownChange;
-        }
+        }*/
         public bool GetFileRecvTrayFix()
         {
             return AppConfigInfo.bFileRecvTrayFix;
@@ -498,10 +494,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bUserApprRejectTrayFix;
         }
-        public bool GetExitTrayMove()
+        /*public bool GetExitTrayMove()
         {
             return AppConfigInfo.bExitTrayMove;
-        }
+        }*/
         public bool GetStartTrayMove()
         {
             return AppConfigInfo.bStartTrayMove;
@@ -522,10 +518,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bScreenLock;
         }
-        public bool GetScreenLockUserChange()
+        /*public bool GetScreenLockUserChange()
         {
             return AppConfigInfo.bScreenLockUserChange;
-        }
+        }*/
         public int GetScreenTime()
         {
             return AppConfigInfo.tScreenTime;
@@ -542,10 +538,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.UpdateSvcIP;
         }
-        public bool GetUseLogLevel()
+        /*public bool GetUseLogLevel()
         {
             return AppConfigInfo.bUseLogLevel;
-        }
+        }*/
         public string ConvertRecvDownPath(string DownPath)
         {
             string strDownPath = "";
@@ -572,13 +568,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             return strDownPath;
         }
-        public bool GetUseGPKILogin(int groupID)
+        /*public bool GetUseGPKILogin(int groupID)
         {
             if (AppConfigInfo.listUseGpkiLogin == null)
                 return false;
 
             return AppConfigInfo.listUseGpkiLogin[groupID];
-        }
+        }*/
 
         /// <summary>
         /// 클립보드 파일전송 Type으로 사용할 건지 유무
@@ -598,10 +594,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bClipboardManageUse;
         }*/        
 
-        public bool GetShowAdminInfo()
+        /*public bool GetShowAdminInfo()
         {
             return AppConfigInfo.bShowAdminInfo;
-        }
+        }*/
         /*public bool GetUseFileCheckException()
         {
             return AppConfigInfo.bUseFileCheckException;
@@ -610,10 +606,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bDenyPasswordZIP;
         }*/
-        public bool GetUseAppLoginType()
+        /*public bool GetUseAppLoginType()
         {
             return AppConfigInfo.bUseAppLoginType;
-        }
+        }*/
         public int GetAppLoginType()
         {
             return AppConfigInfo.LoginType;

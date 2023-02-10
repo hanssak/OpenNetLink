@@ -38,7 +38,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseNetOverAllsend { get; set; } = false;
         public bool bFileDownloadBeforeReciving { get; set; } = false;              //파일포워드 사용시 PC 미수신한 상태에서도 다운로드 가능 유무
 
-
         public bool bShowAdminInfo { get; set; } = false;                           //대시보드에 관리자 정보 표시 여부 
 
         public bool bUseFileCheckException { get; set; } = false;                   // 파일검사 예외 신청( Virus / Apt )
@@ -80,7 +79,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseUserRecvDownPath { get; set; } = false;           // 로그인 유저별 다운로드 경로 사용 여부
         //public bool bUseEmail { get; set; } = false;               
 
-        public bool bUseUserRecvDownPathUserName { get; set; } = true;           // 로그인 유저별 다운로드 경로 사용때, 사용자ID가 아니라 사용자이름 사용할지 유무
+        //public bool bUseUserRecvDownPathUserName { get; set; } = true;           // 로그인 유저별 다운로드 경로 사용때, 사용자ID가 아니라 사용자이름 사용할지 유무
         
 
         public List<bool> blistUseEmail { get; set; } = null;               // 메일 관리/결재 사용 유무.
@@ -135,7 +134,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseInitMessagePerDay { get; set; } = false; // 일일 이전 날짜 메세지 자동 삭제
 
-        public bool bVisiblePolicyUpdateButton { get; set; } = false; //정책 업데이트 버튼 보여주기
+        public bool bVisiblePolicyUpdateButton { get; set; } = true; //정책 업데이트 버튼 보여주기
         /// <summary>
         /// ////////////////////////////////
         /// </summary>

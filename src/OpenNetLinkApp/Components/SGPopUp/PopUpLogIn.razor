@@ -105,10 +105,10 @@
 
 @code {
 
-        SGAlert refSGloginDuplicate;
+    SGAlert refSGloginDuplicate;
 
-        [Parameter]
-        public EventCallback<int> goToPage { get; set; }
+    [Parameter]
+    public EventCallback<int> goToPage { get; set; }
 
     public bool bLoginTryOver1auth = false;
     public bool bAutoLogin = true;                          // 자동로그인 CheckBox 표현 및 사용유무
@@ -139,6 +139,7 @@
 
     public async Task openPopUp()
     {
+        HSCmdCenter.SetAllowSessionDuplicate(nGroupID, false);
         object[] param = { "PopUpLogIn" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -510,9 +511,9 @@
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                     pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
-            #if DEBUG
+#if DEBUG
                 pw = "HsckAD.com";
-            #endif
+#endif
                 pw = pw.ToLower();
 
                 // PW 암호화해서 Log남김
@@ -1035,10 +1036,10 @@
             sgQueryExtend = new SGQueryExtend();
             if (sgQueryExtend != null)
             {
-	    
-		        string strGetinfoTagName = "";
-		        strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
-		        strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
+
+                string strGetinfoTagName = "";
+                strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
+                strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
                 strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
                 strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";
                 strGetinfoTagName += ", 'CLIENT_TRANSFER_TITLE'";
@@ -1096,12 +1097,12 @@
             }
 
 
-        DateTime dt =(SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
-        pageService.SetSvrTime(groupId, dt, sgLoginData);
-        bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
-        bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
-        pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
-        pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
+            DateTime dt =(SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
+            pageService.SetSvrTime(groupId, dt, sgLoginData);
+            bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+            bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
+            pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
+            pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
 
             bool bAfterCheck = false;
             if (!bAfterApprEnable)

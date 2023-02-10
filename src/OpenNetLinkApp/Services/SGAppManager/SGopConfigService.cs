@@ -114,9 +114,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns>true : 로그인 유저별 수신경로 사용, false : 로그인 유저별 수신경로 미사용</returns>
         public bool GetUseUserRecvDownPath(int groupID);
 
-        public bool GetUseUserRecvDownPathUserName(int groupID);
-        
-
         public bool GetUseEmailManageApprove(int groupID);
 
         public bool GetUseUIdlpData(int groupID);
@@ -655,11 +652,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseUserRecvDownPath(int groupID)
         {
             return AppConfigInfo.bUseUserRecvDownPath;
-        }
-
-        public bool GetUseUserRecvDownPathUserName(int groupID)
-        {
-            return AppConfigInfo.bUseUserRecvDownPathUserName;
         }
 
         public bool GetUsePCURL(int groupID)

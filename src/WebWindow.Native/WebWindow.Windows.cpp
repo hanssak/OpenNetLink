@@ -943,6 +943,8 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	if (handler != NULL)
 	{
 		handler->SetNaviURI(navURI != NULL ? navURI : L"");
+		USES_CONVERSION;
+		NTLog(SelfThis, Info, "SetNaviURI : %s", navURI != NULL ? T2A(navURI) : "(NONE)");
 		std::wcerr << "URI : " << navURI << endl;
 	}
 
@@ -1070,13 +1072,11 @@ void WebWindow::OnHotKey(int groupID)
 void WebWindow::ClipTypeSelect(int groupID)
 {
 	m_mapBoolUseClipSelect[groupID] = true;
-	//NTLog(SelfThis, Info, "Called(@@@@@@@@@@@@@@@@@@) : WebWindow::ClipTypeSelect - groupID : %d", groupID);
 }
 
 void WebWindow::ClipFirstSendTypeText(int groupID)
 {
 	m_mapBoolClipSendTextFirst[groupID] = true;
-	//NTLog(SelfThis, Info, "Called(@@@@@@@@@@@@@@@@@@) : WebWindow::ClipFirstSendTypeText - groupID : %d", groupID);
 }
 
 void WebWindow::ClipMemFree(int groupID)

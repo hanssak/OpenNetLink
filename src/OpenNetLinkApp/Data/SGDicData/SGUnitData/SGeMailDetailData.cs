@@ -70,6 +70,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public bool bIsAfterApprove { get; set; } = false;    // 승인 / 반려를 할 수 있는지 유무
 
+        public bool bIsCanFilePreview { get; set; } = false;    // 파일 미리보기가 가능한지 유무
+
         public emailApproveData()
         {
             bCheckDisable = bCheck = false;

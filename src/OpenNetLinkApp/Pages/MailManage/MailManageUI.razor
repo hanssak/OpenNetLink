@@ -597,8 +597,8 @@
             curToDay = curToDay.Substring(0, 8);
 
             // Test용도
-            curFromDay = "20220101";
-            curToDay = "20221227";
+            //curFromDay = "20220101";
+            //curToDay = "20221227";
 
             // 실제사용 - UI상에 설정된 값 안나옴
             mailParam.SetSearchStartDate(curFromDay);
@@ -665,8 +665,8 @@
         curToDay = curToDay.Substring(0, 8);
 
         // Test용도
-        curFromDay = "20220101";
-        curToDay = "20221231";
+        // curFromDay = "20220101";
+        // curToDay = "20221231";
 
         mailParam.SetSearchStartDate(curFromDay);
         mailParam.SetSearchEndDate(curToDay);
@@ -878,8 +878,6 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        HSCmdCenter.sgPageEvent.SetEmailSendCancelEvent(groupID, TransCancelResult);             // 전송 취소 결과.
-
         string strMsg = "";
         if (pageService.GetConnectStatus(groupID) == false)
         {
@@ -927,6 +925,7 @@
             groupID = sgSideBar.GroupId;
 
         bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
+        HSCmdCenter.sgPageEvent.SetEmailSendCancelEvent(groupIDbyParam, TransCancelResult);             // 전송 취소 결과.
 
         base.OnInitialized();
 
@@ -960,13 +959,11 @@
         {
             CLog.Here().Information("SearchCount - RECORD - empty!");
 
-            ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
             ListData.Clear();
-
-            //UpdateList(0);
-            //SetPageinfo();
+            mData.Clear();
             StateHasChanged();
 
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
             return;
         }
 
@@ -987,13 +984,14 @@
 
         if (totalCnt <= 0)
         {
-            ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
             if (listCnt != null) listCnt.Clear();
             SetPageinfo(totalCnt);
             ListData.Clear();
             mData.Clear();
 
             StateHasChanged();
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
+
             return;
         }
 
@@ -1255,23 +1253,23 @@
 
         if (isPossibleDownload)
         {
-                //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
-                @*
-                if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForwardDownBeforeRecv())
-                {
-                if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
-                isPossibleDownload = true;
-                else
-                isPossibleDownload = false;
-                }
-                else
-                {
-                //수동다운로드 이므로 PC수신완료 건만 다운가능
-                if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
-                isPossibleDownload = true;
-                else
-                isPossibleDownload = false;
-                }
+            //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
+            @*
+            if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForwardDownBeforeRecv())
+            {
+            if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
+            isPossibleDownload = true;
+            else
+            isPossibleDownload = false;
+            }
+            else
+            {
+            //수동다운로드 이므로 PC수신완료 건만 다운가능
+            if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
+            isPossibleDownload = true;
+            else
+            isPossibleDownload = false;
+            }
             *@
 
             //수동다운로드 이므로 PC수신완료 건만 다운가능

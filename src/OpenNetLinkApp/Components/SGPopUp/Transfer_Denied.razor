@@ -2,6 +2,8 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using Radzen
 @using Radzen.Blazor
+@using AgLogManager
+
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
@@ -76,10 +78,10 @@
                                         <td>@listDeniedReason[idx].Item1</td>
                                         <td>@listDeniedReason[idx].Item2</td>
 
-                                        @if (idx+2 <= listDeniedReason.Count)
+                                        @if (idx + 2 <= listDeniedReason.Count)
                                         {
-                                            <td>@listDeniedReason[idx+1].Item1</td>
-                                            <td>@listDeniedReason[idx+1].Item2</td>
+                                            <td>@listDeniedReason[idx + 1].Item1</td>
+                                            <td>@listDeniedReason[idx + 1].Item2</td>
                                         }
                                         else
                                         {
@@ -107,6 +109,7 @@
 
 @code {
 
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<Transfer_Denied>();
     public List<FileAddErr> listDenied = new List<FileAddErr>();
 
     @*public List<FileAddErr> listTreeDenied = new List<FileAddErr>();*@
@@ -149,7 +152,7 @@
             style += "color: #FFAA54;";
         }
         else        //정상
-        {
+    {
             builder.AddAttribute(1, "Icon", "check_circle");
             style += "color: #327AD9;";
 
@@ -161,7 +164,7 @@
         builder.AddAttribute(3, "Style", style);
         builder.CloseComponent();
 
-        @*builder.AddContent(3, context.Text);*@
+    @*builder.AddContent(3, context.Text);*@
         string htmlString = "<div class=\"p-0 m-0\" style=\"width:100%;\">" +
                                 "<div class=\"p-0 m-0\" style=\"width:60%;float:left;\">" + context.Text + "</div>"
                                 +
@@ -169,10 +172,10 @@
                             + "</div>";
         builder.AddContent(3, (MarkupString)htmlString);
 
-        @*builder.OpenComponent<Radzen>(0);*@
-        @*builder.OpenComponent<RadzenContent>(0);
-            builder.AddAttribute(1, "Style", "color: red");
-            builder.CloseComponent();*@
+    @*builder.OpenComponent<Radzen>(0);*@
+    @*builder.OpenComponent<RadzenContent>(0);
+        builder.AddAttribute(1, "Style", "color: red");
+        builder.CloseComponent();*@
     };
 
 
@@ -196,8 +199,22 @@
         strInnerErrorInfoMsg = XmlConf.GetInfoMsg("I_0231");                                    //내부파일 확인
     }
 
+    public void FileAddFailLog()
+    {
+        for (int i = 0; i < listDenied.Count; i++)
+        {
+            eFileAddErr errType = listDenied[i].eErrType;
+            string strFileName = listDenied[i].FileName;
+            string strReason = listDenied[i].GetFileAddErrContent(strFileName, errType);
+
+            CLog.Here().Information($"######### - 파일추가 실패 원인 - FileAddErr : {errType}, FileName : {strFileName}, Reason : {strReason}");
+        }
+    }
+
     public async Task openPopUp()
     {
+        FileAddFailLog();
+
         object[] param = { "Transfer_Denied" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -302,7 +319,7 @@
             // WebManager에서 값이 표현이 되도록 적당히 변경해서 올림(NetLink에 맞춤)
             if (SGAppMgrSvc.SiteConfigInfoService.GetUseAgentBlockValueChange())
             {
-                if (errType == eFileAddErr.eFAZIP 
+                if (errType == eFileAddErr.eFAZIP
                 || (errType > eFileAddErr.eFADLPERR && errType != eFileAddErr.eFADAYCOUNTOVER && errType != eFileAddErr.eFADAYSIZEOVER))
                     nType = 4;
             }

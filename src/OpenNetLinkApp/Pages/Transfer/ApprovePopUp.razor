@@ -603,650 +603,651 @@ using (Process proc = Process.Start(startInfo))
     @*    public string strFromServerNetOver = "";        // 3망상황 시작지
         public string strDestServerNetOver = "";        // 3망상황 목적지*@
 
-    public async Task openPopUp(long seq)
-    {
-        stSelectedSeq = seq.ToString();
-        stSelectedFileNo = "";
-        stSelectedFileName = "";
+public async Task openPopUp(long seq)
+{
+    stSelectedSeq = seq.ToString();
+    stSelectedFileNo = "";
+    stSelectedFileName = "";
 
-        object[] param = { "ApprovePopUp" };
-        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    object[] param = { "ApprovePopUp" };
+    await JSRuntime.InvokeAsync<object>("openPopUp", param);
+}
+
+public void closePopUp()
+{
+    if (pageService.GetFilePrevRecving() == true)
+    {
+        string strMsg = XmlConf.GetWarnMsg("W_0249");           // 파일 미리보기 수행 중에는 닫을 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        ShowMessage("warn", strMsg);
+        return;
+    }
+    object[] param = { "ApprovePopUp" };
+    JSRuntime.InvokeAsync<object>("closePopUp", param);
+}
+
+
+protected override void OnInitialized()
+{
+    SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+    SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+    NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+    InitText();
+    HsCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FilePrevProgressNoti);
+
+    bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
+
+}
+
+
+public void SetBindingData(string approverName, string apvStatus, string apvTime)
+{
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+
+    SGDetailData sgDetailData = null;
+    sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+    if (sgDetailData == null)
+        return;
+
+    strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
+    strDataTransStatus = sgDetailData.GetTransStatus();                                 // 전송상태
+
+
+    Dictionary<string, SGNetOverData> dicDestSysPos = null;
+    dicDestSysPos = pageService.GetTargetSystemList(groupID);
+    if (dicDestSysPos != null && dicDestSysPos.Count > 1)  // && strFromServerNetOver.Length > 0 && strDestServerNetOver.Length > 0)
+        strDataFilePos = sgDetailData.GetFilePosNetOver(dicDestSysPos); // strFromServerNetOver, strDestServerNetOver); // 파일위치(3망연계상황)
+    else
+        strDataFilePos = sgDetailData.GetFilePos();                                         // 파일위치
+
+    strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
+    strDataApprStatus = sgDetailData.GetApprStatus();                                   // 승인상태
+    strDataApprReqUser = sgDetailData.GetReqUser();                                     // 승인요청자
+    strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
+    strDataTitle = sgDetailData.GetTitle();                                             // 제목
+    FileAddManage fileAddManage = new FileAddManage();
+    strDataTitle = fileAddManage.GetConvertTitleDesc(false, strDataTitle);
+    strDataDesc = sgDetailData.GetDesc();                                              // 설명
+    strDataDesc = fileAddManage.GetConvertTitleDesc(false, strDataDesc);
+    //stSelectedEncKey = sgDetailData.GetBasicTagData("FILEKEY");
+    stSelectedEncKey = sgDetailData.GetFileKey();
+    stDLP = sgDetailData.GetDLP();
+
+    bool bInner = false;
+    SGLoginData sgLoginData = null;
+    sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+    if (sgLoginData == null)
+        bInner = true;
+
+    bInner = sgLoginData.GetSystemPosition();
+    m_bFilePrevDisable = !(sgDetailData.GetFilePrevEnable(bInner));
+    sgDetailData.GetFileInfo(out mFileData);
+    if (mFileData == null)
+        return;
+
+    for (int i = 0; i < mFileData.Count; i++)
+    {
+        mFileData[i].bCheckDisable = m_bFilePrevDisable;
+        if (mFileData[i].bCheckDisable)
+            mFileData[i].bCheck = false;
     }
 
-    public void closePopUp()
+    List<ApproverHist> apprListHist = null;
+    bool isVisibleFileApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason();
+    apprListHist = sgDetailData.GetApproverInfoHist(isVisibleFileApproveReason);
+
+    if ((apprListHist == null) || (apprListHist.Count <= 1))
     {
-        if (pageService.GetFilePrevRecving() == true)
-        {
-            string strMsg = XmlConf.GetWarnMsg("W_0249");           // 파일 미리보기 수행 중에는 닫을 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("warn", strMsg);
-            return;
-        }
-        object[] param = { "ApprovePopUp" };
-        JSRuntime.InvokeAsync<object>("closePopUp", param);
+        bApprHistHidden = true;
     }
 
-
-    protected override void OnInitialized()
+    if ((apprListHist == null) || (apprListHist.Count <= 0))
     {
-        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
-        InitText();
-        HsCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FilePrevProgressNoti);
-
-        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
-
+        strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
     }
-
-
-    public void SetBindingData(string approverName, string apvStatus, string apvTime)
+    else
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        SGDetailData sgDetailData = null;
-        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
-        if (sgDetailData == null)
-            return;
-
-        strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
-        strDataTransStatus = sgDetailData.GetTransStatus();                                 // 전송상태
-
-
-        Dictionary<string, SGNetOverData> dicDestSysPos = null;
-        dicDestSysPos = pageService.GetTargetSystemList(groupID);
-        if (dicDestSysPos != null && dicDestSysPos.Count > 1)  // && strFromServerNetOver.Length > 0 && strDestServerNetOver.Length > 0)
-            strDataFilePos = sgDetailData.GetFilePosNetOver(dicDestSysPos); // strFromServerNetOver, strDestServerNetOver); // 파일위치(3망연계상황)
-        else
-            strDataFilePos = sgDetailData.GetFilePos();                                         // 파일위치
-
-        strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
-        strDataApprStatus = sgDetailData.GetApprStatus();                                   // 승인상태
-        strDataApprReqUser = sgDetailData.GetReqUser();                                     // 승인요청자
-        strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
-        strDataTitle = sgDetailData.GetTitle();                                             // 제목
-        FileAddManage fileAddManage = new FileAddManage();
-        strDataTitle = fileAddManage.GetConvertTitleDesc(false, strDataTitle);
-        strDataDesc = sgDetailData.GetDesc();                                              // 설명
-        strDataDesc = fileAddManage.GetConvertTitleDesc(false, strDataDesc);
-        //stSelectedEncKey = sgDetailData.GetBasicTagData("FILEKEY");
-        stSelectedEncKey = sgDetailData.GetFileKey();
-        stDLP = sgDetailData.GetDLP();
-
-        bool bInner = false;
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
-            bInner = true;
-
-        bInner = sgLoginData.GetSystemPosition();
-        m_bFilePrevDisable = !(sgDetailData.GetFilePrevEnable(bInner));
-        sgDetailData.GetFileInfo(out mFileData);
-        if (mFileData == null)
-            return;
-
-        for (int i = 0; i < mFileData.Count; i++)
-        {
-            mFileData[i].bCheckDisable = m_bFilePrevDisable;
-            if (mFileData[i].bCheckDisable)
-                mFileData[i].bCheck = false;
-        }
-
-        List<ApproverHist> apprListHist = null;
-        bool isVisibleFileApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason();
-        apprListHist = sgDetailData.GetApproverInfoHist(isVisibleFileApproveReason);
-
-        if ((apprListHist == null) || (apprListHist.Count <= 1))
-        {
-            bApprHistHidden = true;
-        }
-
-        if ((apprListHist == null) || (apprListHist.Count <= 0))
+        ApproverHist apprHist = null;
+        apprHist = sgDetailData.GetApprLastApproverHistData(apprHist, isVisibleFileApproveReason);
+        if (apprHist == null)
         {
             strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
+            //대결재자가 결제 상세보기 하였을 경우, 결재 Hist엔 대결재자ID 가 없으므로, search에서 받아온 값으로 표시하도록 수정
+            strDataLastApprName = approverName;
+            strDataLastApprStatus = apvStatus;
+            strDataLastApprDay = apvTime;
         }
         else
         {
-            ApproverHist apprHist = null;
-            apprHist = sgDetailData.GetApprLastApproverHistData(apprHist, isVisibleFileApproveReason);
-            if (apprHist == null)
-            {
-                strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
-                //대결재자가 결제 상세보기 하였을 경우, 결재 Hist엔 대결재자ID 가 없으므로, search에서 받아온 값으로 표시하도록 수정
-                strDataLastApprName = approverName;
-                strDataLastApprStatus = apvStatus;
-                strDataLastApprDay = apvTime;
-            }
-            else
-            {
-                //strDataLastApprName = apprHist.m_strApproverName;
-                //strDataLastApprStatus = apprHist.m_strApprStatus;
-                //strDataLastApprDay = apprHist.m_strApprDay;
+            //strDataLastApprName = apprHist.m_strApproverName;
+            //strDataLastApprStatus = apprHist.m_strApprStatus;
+            //strDataLastApprDay = apprHist.m_strApprDay;
 
-                strDataLastApprName = approverName;
-                strDataLastApprStatus = apvStatus;
-                strDataLastApprDay = apvTime;
+            strDataLastApprName = approverName;
+            strDataLastApprStatus = apvStatus;
+            strDataLastApprDay = apvTime;
 
 
-                //if ((!strDataLastApprDay.Equals("")) && (!strDataLastApprDay.Equals("-")))
-                //    strDataLastApprDay = sgDetailData.GetConvertDay(strDataLastApprDay);
-                strDataLastApprRejectReason = apprHist.m_strRejectReason;
+            //if ((!strDataLastApprDay.Equals("")) && (!strDataLastApprDay.Equals("-")))
+            //    strDataLastApprDay = sgDetailData.GetConvertDay(strDataLastApprDay);
+            strDataLastApprRejectReason = apprHist.m_strRejectReason;
 
-                if (strDataLastApprRejectReason.Length > 100)
-                    strDataLastApprRejectReason = strDataLastApprRejectReason.Substring(0, 100) + "\n" + strDataLastApprRejectReason.Substring(101);
-            }
+            if (strDataLastApprRejectReason.Length > 100)
+                strDataLastApprRejectReason = strDataLastApprRejectReason.Substring(0, 100) + "\n" + strDataLastApprRejectReason.Substring(101);
         }
-        m_bApprove = (!sgDetailData.GetApproveEnable());
-        m_bReject = (!sgDetailData.GetRejectEnable());
+    }
+    m_bApprove = (!sgDetailData.GetApproveEnable());
+    m_bReject = (!sgDetailData.GetRejectEnable());
 
-        //OR 결재 승인상태 교정 시작 2021/06/28 YKH
-        //같은 결재 단계에 여러명이 존재하고 그중 한명이 승인상태라면 승인상태 제외한 나머지는 요청취소로 승인상태문구를 변경해준다.
-        //최종 스탭 결정
-        if (apprListHist != null && apprListHist.Count > 0)
+    //OR 결재 승인상태 교정 시작 2021/06/28 YKH
+    //같은 결재 단계에 여러명이 존재하고 그중 한명이 승인상태라면 승인상태 제외한 나머지는 요청취소로 승인상태문구를 변경해준다.
+    //최종 스탭 결정
+    if (apprListHist != null && apprListHist.Count > 0)
+    {
+        int nMaxStep = 1;
+        foreach (ApproverHist data in apprListHist)
         {
-            int nMaxStep = 1;
-            foreach (ApproverHist data in apprListHist)
+            if (nMaxStep > data.m_nApprStep)
+                nMaxStep = data.m_nApprStep;
+        }
+        //각 스텝별 승인여부 확인
+        for (int i = 1; i <= nMaxStep; i++)
+        {
+            bool bApproveFlag = false;
+            for (int j = 0; j < apprListHist.Count; j++)
             {
-                if (nMaxStep > data.m_nApprStep)
-                    nMaxStep = data.m_nApprStep;
+                ApproverHist appr = apprListHist[j];
+                if (appr.m_nApprStep != i)
+                    continue;
+                if (appr.m_strApprStatus == XmlConf.GetTitle("T_COMMON_APPROVE"))
+                    bApproveFlag = true;
             }
-            //각 스텝별 승인여부 확인
-            for (int i = 1; i <= nMaxStep; i++)
+            if (bApproveFlag == true)
             {
-                bool bApproveFlag = false;
                 for (int j = 0; j < apprListHist.Count; j++)
                 {
                     ApproverHist appr = apprListHist[j];
                     if (appr.m_nApprStep != i)
                         continue;
-                    if (appr.m_strApprStatus == XmlConf.GetTitle("T_COMMON_APPROVE"))
-                        bApproveFlag = true;
-                }
-                if (bApproveFlag == true)
-                {
-                    for (int j = 0; j < apprListHist.Count; j++)
-                    {
-                        ApproverHist appr = apprListHist[j];
-                        if (appr.m_nApprStep != i)
-                            continue;
-                        if (appr.m_strApprStatus != XmlConf.GetTitle("T_COMMON_APPROVE"))
-                            appr.m_strApprStatus = XmlConf.GetTitle("T_COMMON_WORKCOMPLETE");
-                    }
+                    if (appr.m_strApprStatus != XmlConf.GetTitle("T_COMMON_APPROVE"))
+                        appr.m_strApprStatus = XmlConf.GetTitle("T_COMMON_WORKCOMPLETE");
                 }
             }
         }
-        //OR 결재 승인 상태 교정 종료
+    }
+    //OR 결재 승인 상태 교정 종료
 
 
-        if (apprListHist != null)
+    if (apprListHist != null)
+    {
+        apprHList.Clear();
+        foreach (ApproverHist data in apprListHist)
         {
-            apprHList.Clear();
-            foreach (ApproverHist data in apprListHist)
-            {
-                string sName = data.m_strApproverName;
-                string sApprStatus = data.m_strApprStatus;
-                string sApprDay = data.m_strApprDay;
-                string sRejectReason = data.m_strRejectReason;
-                apprHList.Add(new ApprHist(sName, sApprStatus, sApprDay, sRejectReason));
-            }
+            string sName = data.m_strApproverName;
+            string sApprStatus = data.m_strApprStatus;
+            string sApprDay = data.m_strApprDay;
+            string sRejectReason = data.m_strRejectReason;
+            apprHList.Add(new ApprHist(sName, sApprStatus, sApprDay, sRejectReason));
         }
-
-        StateHasChanged();
     }
 
+    StateHasChanged();
+}
 
-    public void InitText()
+
+public void InitText()
+{
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+
+    strApprDetailTitle = XmlConf.GetTitle("T_APPROVE_DETAIL");              // 결재 상세보기
+    strApprCategory = XmlConf.GetTitle("T_DETAIL_APPROVE_CATEGORY");        // 결재내역
+    strTransKind = XmlConf.GetTitle("T_COMMON_TRANSKIND");                  // 전송구분
+    strTransStatus = XmlConf.GetTitle("T_TRANS_STATUS");                    // 전송상태
+    strFilePos = XmlConf.GetTitle("T_DETAIL_FILEPOS");                      // 파일위치
+    strReciver = XmlConf.GetTitle("T_ETC_RECIVER");                         // 수신자
+    strApprKind = XmlConf.GetTitle("T_COMMON_APPROVEKIND");                 // 승인구분
+    strApprStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");             // 승인상태
+    strRequester = XmlConf.GetTitle("T_COMMON_REQUESTER");                  // 승인요청자
+    strReqday = XmlConf.GetTitle("T_DETAIL_REQDAY");                        // 승인요청일
+    strTitle = XmlConf.GetTitle("T_DETAIL_TITLE");                          // 제목
+    strFileInfo = XmlConf.GetTitle("T_DETAIL_FILEINFO");                    // 파일정보
+    strFilePrev = XmlConf.GetTitle("T_DETAIL_FILEPREVIEW");                 // 파일미리보기
+    strDesc = XmlConf.GetTitle("T_DETAIL_DESC");                            // 설명
+                                                                            //strPrevInfo = XmlConf.GetWarnMsg("W_0077");                             // &nbsp;&nbsp;업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
+    strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                    // 파일명
+    strFileType = XmlConf.GetTitle("T_COMMON_KIND");                        // 유형
+    strFileSize = XmlConf.GetTitle("T_COMMON_SIZE");                        // 크기
+    strFolder = XmlConf.GetTitle("T_COMMON_FOLDER");                        // 폴더
+    strVirusHist = XmlConf.GetTitle("T_DETAIL_VIRUSHIST");                  // 바이러스 내역
+    strVirusCheckDate = XmlConf.GetTitle("T_DETAIL_VIRUSCHECKDATE");        // 바이러스 검사일
+    strApproveInfo = XmlConf.GetTitle("T_DETAIL_APPROVEINFO");              // 결재자정보
+    strApprove = XmlConf.GetTitle("T_COMMON_APPROVE");                      // 승인
+    strReject = XmlConf.GetTitle("T_COMMON_REJECTION");                     // 반려
+    strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                 // 승인자
+    strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");          // 승인상태
+    strApproveday = XmlConf.GetTitle("T_COMMON_APPROVEDATE");               // 승인일
+    if (SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason())
+        strRejectReason = XmlConf.GetTitle("T_APPROVE_APPROVE_REJECT_REASON");          // 승인/반려사유
+    else
+        strRejectReason = XmlConf.GetTitle("T_APPROVE_REJECTREASON");          // 반려사유
+    strClose = XmlConf.GetTitle("T_FILE_FOLD");                             // 닫기
+
+    string strConNetwork = "UnKnown";
+    List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+    for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        strApprDetailTitle = XmlConf.GetTitle("T_APPROVE_DETAIL");              // 결재 상세보기
-        strApprCategory = XmlConf.GetTitle("T_DETAIL_APPROVE_CATEGORY");        // 결재내역
-        strTransKind = XmlConf.GetTitle("T_COMMON_TRANSKIND");                  // 전송구분
-        strTransStatus = XmlConf.GetTitle("T_TRANS_STATUS");                    // 전송상태
-        strFilePos = XmlConf.GetTitle("T_DETAIL_FILEPOS");                      // 파일위치
-        strReciver = XmlConf.GetTitle("T_ETC_RECIVER");                         // 수신자
-        strApprKind = XmlConf.GetTitle("T_COMMON_APPROVEKIND");                 // 승인구분
-        strApprStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");             // 승인상태
-        strRequester = XmlConf.GetTitle("T_COMMON_REQUESTER");                  // 승인요청자
-        strReqday = XmlConf.GetTitle("T_DETAIL_REQDAY");                        // 승인요청일
-        strTitle = XmlConf.GetTitle("T_DETAIL_TITLE");                          // 제목
-        strFileInfo = XmlConf.GetTitle("T_DETAIL_FILEINFO");                    // 파일정보
-        strFilePrev = XmlConf.GetTitle("T_DETAIL_FILEPREVIEW");                 // 파일미리보기
-        strDesc = XmlConf.GetTitle("T_DETAIL_DESC");                            // 설명
-                                                                                //strPrevInfo = XmlConf.GetWarnMsg("W_0077");                             // &nbsp;&nbsp;업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
-        strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                    // 파일명
-        strFileType = XmlConf.GetTitle("T_COMMON_KIND");                        // 유형
-        strFileSize = XmlConf.GetTitle("T_COMMON_SIZE");                        // 크기
-        strFolder = XmlConf.GetTitle("T_COMMON_FOLDER");                        // 폴더
-        strVirusHist = XmlConf.GetTitle("T_DETAIL_VIRUSHIST");                  // 바이러스 내역
-        strVirusCheckDate = XmlConf.GetTitle("T_DETAIL_VIRUSCHECKDATE");        // 바이러스 검사일
-        strApproveInfo = XmlConf.GetTitle("T_DETAIL_APPROVEINFO");              // 결재자정보
-        strApprove = XmlConf.GetTitle("T_COMMON_APPROVE");                      // 승인
-        strReject = XmlConf.GetTitle("T_COMMON_REJECTION");                     // 반려
-        strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                 // 승인자
-        strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");          // 승인상태
-        strApproveday = XmlConf.GetTitle("T_COMMON_APPROVEDATE");               // 승인일
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason())
-            strRejectReason = XmlConf.GetTitle("T_APPROVE_APPROVE_REJECT_REASON");          // 승인/반려사유
-        else
-            strRejectReason = XmlConf.GetTitle("T_APPROVE_REJECTREASON");          // 반려사유
-        strClose = XmlConf.GetTitle("T_FILE_FOLD");                             // 닫기
-
-        string strConNetwork = "UnKnown";
-        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-        for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
+        if (listNetWork[nIdx].GroupID == groupID)
         {
-            if (listNetWork[nIdx].GroupID == groupID)
-            {
-                strConNetwork = listNetWork[nIdx].FromName;
-                break;
-            }
+            strConNetwork = listNetWork[nIdx].FromName;
+            break;
         }
+    }
 
-        strPrevInfo1 = strConNetwork + XmlConf.GetWarnMsg("W_0237");                            // 업무망에 접속되어 있습니다.
+    strPrevInfo1 = strConNetwork + XmlConf.GetWarnMsg("W_0237");                            // 업무망에 접속되어 있습니다.
 
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+    SGLoginData sgLoginData = null;
+    sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
 
-        if (sgLoginData == null)
+    if (sgLoginData == null)
+        strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
+    else
+    {
+        bool bInner = sgLoginData.GetSystemPosition();
+        if (bInner)
             strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
         else
-        {
-            bool bInner = sgLoginData.GetSystemPosition();
-            if (bInner)
-                strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
-            else
-                strPrevInfo2 = XmlConf.GetWarnMsg("W_0240");                            // 반입파일만 파일미리보기가 가능합니다.
-        }
-
+            strPrevInfo2 = XmlConf.GetWarnMsg("W_0240");                            // 반입파일만 파일미리보기가 가능합니다.
     }
 
+}
 
-    public async Task DetailApprove()
+
+public async Task DetailApprove()
+{
+    string strMsg = "";
+    if (pageService.GetFilePrevRecving() == true)
     {
-        string strMsg = "";
-        if (pageService.GetFilePrevRecving() == true)
-        {
-            strMsg = XmlConf.GetWarnMsg("W_0250");           // 파일 미리보기 수행 중에는 승인 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("warn", strMsg);
-            return;
-        }
-
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        if (pageService.GetConnectStatus(groupID) == false)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
-
-        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        string strUserID = "";
-        if (sgLoginData != null)
-            strUserID = sgLoginData.GetUserID();
-
-        SGDetailData sgDetailData = null;
-        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
-        if (sgDetailData == null)
-            return;
-
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason())
-        {
-            refSGDetailReject.ResetReason(Common.Enums.EnumApproveType.Approve);
-            refSGDetailReject.SetGroupID(groupID);
-            refSGDetailReject.SetApprRejectEvent(ApproveSend);
-            m_bFilePrevOpening = false;
-            await refSGDetailReject.openPopUp();
-        }
-        else
-        {
-            string strProcID = "A";
-            string strReason = "Approve";
-            string strApproveSeq = sgDetailData.GetApprSeq();
-            string strApprover = "1";
-            string strApproveUserKind = "0";
-
-            HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
-
-            closePopUp();
-        }
+        strMsg = XmlConf.GetWarnMsg("W_0250");           // 파일 미리보기 수행 중에는 승인 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        ShowMessage("warn", strMsg);
+        return;
     }
-    private async Task DetailReject()
+
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+
+    if (pageService.GetConnectStatus(groupID) == false)
     {
-        string strMsg = "";
-        if (pageService.GetFilePrevRecving() == true)
-        {
-            strMsg = XmlConf.GetWarnMsg("W_0251");           // 파일 미리보기 수행 중에는 반려 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("warn", strMsg);
-            return;
-        }
+        strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        ShowMessage("error", strMsg);
+        return;
+    }
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+    SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+    string strUserID = "";
+    if (sgLoginData != null)
+        strUserID = sgLoginData.GetUserID();
 
-        if (pageService.GetConnectStatus(groupID) == false)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
+    SGDetailData sgDetailData = null;
+    sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+    if (sgDetailData == null)
+        return;
 
-        refSGDetailReject.ResetReason(Common.Enums.EnumApproveType.Reject);
+    if (SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason())
+    {
+        refSGDetailReject.ResetReason(Common.Enums.EnumApproveType.Approve);
         refSGDetailReject.SetGroupID(groupID);
-        refSGDetailReject.SetApprRejectEvent(DetailApproveRejectSend);
+        refSGDetailReject.SetApprRejectEvent(ApproveSend);
         m_bFilePrevOpening = false;
         await refSGDetailReject.openPopUp();
     }
-
-    public void DetailApproveRejectSend(int groupID, string strReason)
+    else
     {
-        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        string strUserID = "";
-        if (sgLoginData != null)
-            strUserID = sgLoginData.GetUserID();
-
-        SGDetailData sgDetailData = null;
-        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
-        if (sgDetailData == null)
-            return;
-
-        string strProcID = "R";
-        string strApproveSeq = sgDetailData.GetApprSeq();
-        string strApprover = "1";
-        string strApproveUserKind = "0";
-
-        HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
-        closePopUp();
-    }
-
-    public void ApproveSend(int groupID, string strReason)
-    {
-        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        string strUserID = "";
-        if (sgLoginData != null)
-            strUserID = sgLoginData.GetUserID();
-
-        SGDetailData sgDetailData = null;
-        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
-        if (sgDetailData == null)
-            return;
-
         string strProcID = "A";
+        string strReason = "Approve";
         string strApproveSeq = sgDetailData.GetApprSeq();
         string strApprover = "1";
         string strApproveUserKind = "0";
 
         HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+
         closePopUp();
     }
-
-    public void FilePrevCancel(string arg)
+}
+private async Task DetailReject()
+{
+    string strMsg = "";
+    if (pageService.GetFilePrevRecving() == true)
     {
-        System.Diagnostics.Debug.WriteLine("Callback FilePrevCancel Cancel Alert");
-        HsCmdCenter.SendFilePrevCancel();
-
-        string strMsg = XmlConf.GetInfoMsg("I_0202");   // 파일 미리보기가 취소되었습니다.
-        ShowMessage("info", strMsg);
+        strMsg = XmlConf.GetWarnMsg("W_0251");           // 파일 미리보기 수행 중에는 반려 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        ShowMessage("warn", strMsg);
+        return;
     }
 
-    public bool FilePrevDownExtension(string sFileName)
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+
+    if (pageService.GetConnectStatus(groupID) == false)
     {
-
-
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-        SGDetailData sgDetailData = null;
-        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
-        if (sgDetailData == null)
-            return true;
-
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
-            return true;
-
-        // 0kb 인지 확인 및 Msg 처리
-        string strFileSeq = stSelectedFileNo;
-
-        if (sgDetailData.GetFileSizeEmpty(strFileSeq))
-        {
-            ShowMessage("error", XmlConf.GetErrMsg("E_0243"));
-            return false;
-        }
-
-        // 확장자 종류로 Web으로 preview 할지 결정
-        string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp", "log" };
-        string strExtName = Path.GetExtension(sFileName);
-        strExtName = strExtName.Substring(1);
-        if (strExtName.Equals(""))
-            return true;
-
-        strExtName = strExtName.ToLower();
-        bool bFind = false;
-        for (int i = 0; i < strExt.Length; i++)
-        {
-            if (strExt[i].Equals(strExtName))
-            {
-                bFind = true;
-                break;
-            }
-        }
-
-        if (!bFind)
-        {
-            // Web으로 preview 안하는 파일 down해서 띄워줌
-            string strUserID = sgLoginData.GetUserID();
-            string strTransSeq = sgDetailData.GetTransSeq();
-            sFileName = Path.GetFileName(sFileName);
-
-            string strFilePath = Path.Combine("wapprove", sFileName);
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                strFilePath = strFilePath.Replace("/", "\\");
-            }
-            else
-            {
-                strFilePath = strFilePath.Replace("\\", "/");
-            }
-
-            if (File.Exists(strFilePath))
-            {
-                if (!IsAccessAble(strFilePath))
-                {
-                    string strMsg = XmlConf.GetWarnMsg("W_0252");   // 해당 파일은 다른 프로그램에 의해 열려 있습니다./r/n열려있는 프로그램을 닫고 다시 시도하여 주십시요.
-                    strMsg = strMsg.Replace("/r/n", "<br>");
-                    ShowMessage("warn", strMsg);
-                    return true;
-                }
-                File.Delete(strFilePath);
-            }
-
-            string strFileKey = sgDetailData.GetFileKey();
-
-            pageService.SetFilePrevRecving(true);
-            ShowProgress(groupID, 1, 0, sFileName);
-            Task.Delay(1000);
-            FileAddManage fileAddManage = new FileAddManage();
-            sFileName = fileAddManage.GetFileRename(true, sFileName);
-            HsCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq, sFileName, strFileKey, strFileSeq, "0");
-        }
-        return bFind;
+        strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        ShowMessage("error", strMsg);
+        return;
     }
 
-    public void FilePrevProgressNoti(int groupID, PageEventArgs e)
-    {
-        string strMsg = "";
-        if (e.result != 0)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
-            ShowMessage("error", strMsg);
-            return;
-        }
-        string sFileName = e.strMsg;
-        int per = e.count;
-        int type = 0;
-        if (per >= 100)
-        {
-            type = 2;
-            ShowProgress(groupID, type, 100, sFileName);
-            Task.Delay(500);
-            type = 3;                                       // close
-            pageService.SetFilePrevRecving(false);
-        }
-        else if ((per > 0) && (per < 100))
-        {
-            type = 2;                                       // update
-            pageService.SetFilePrevRecving(true);
-        }
-        else
-            return;
+    refSGDetailReject.ResetReason(Common.Enums.EnumApproveType.Reject);
+    refSGDetailReject.SetGroupID(groupID);
+    refSGDetailReject.SetApprRejectEvent(DetailApproveRejectSend);
+    m_bFilePrevOpening = false;
+    await refSGDetailReject.openPopUp();
+}
 
-        ShowProgress(groupID, type, per, sFileName);
-    }
+public void DetailApproveRejectSend(int groupID, string strReason)
+{
+    SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+    string strUserID = "";
+    if (sgLoginData != null)
+        strUserID = sgLoginData.GetUserID();
 
-    // type : 1 - open , 2 - update ,3 -close
-    private async void ShowProgress(int groupID, int type, int per, string sFileName)
-    {
-        object[] param = { };
-        string identifier = "";
-        string strID = groupID.ToString();
-        //strID = strFileName;
-        strID = "FILEPREVIEW";
-        string strProgress = String.Format("{0}%", per);
-        string strFileRecvInfo = "";
-        if (per == 0)
-        {
-            string strInfoStart = XmlConf.GetInfoMsg("I_0203");                 // 다른 서버에서 파일을 탐색하는 중입니다./r/n잠시만 기다려 주십시요.
-            strInfoStart = strInfoStart.Replace("/r/n", "<br>");
-            strFileRecvInfo = strFileRecvInfo + strInfoStart;
-        }
-        else
-        {
-            strFileRecvInfo = XmlConf.GetWarnMsg("W_0087");                     // 파일 수신중 입니다./r/n잠시만 기다려 주십시오.
-            strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
-        }
-        strFileRecvInfo = strFileRecvInfo + "<br>";
+    SGDetailData sgDetailData = null;
+    sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+    if (sgDetailData == null)
+        return;
 
-        string strProgressInfo = XmlConf.GetTitle("T_FILERECV_PER");           // 파일 수신 진행률
-        string strProgressInfoStart =
+    string strProcID = "R";
+    string strApproveSeq = sgDetailData.GetApprSeq();
+    string strApprover = "1";
+    string strApproveUserKind = "0";
 
-        strFileRecvInfo = strFileRecvInfo + strProgressInfo + " : " + strProgress;
+    HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+    closePopUp();
+}
 
-        switch (type)
-        {
-            case 1:
-                string strTitleName = XmlConf.GetTitle("T_DETAIL_FILEPREVIEW");
-                identifier = "fireProgressMessage";
-                param = new object[3];
-                param[0] = strID;
-                param[1] = strTitleName;
-                param[2] = strFileRecvInfo;
-                pageService.SetFilePrevRecving(true);
-                break;
-            case 2:
-                identifier = "updateProgressMessage";
-                param = new object[3];
-                param[0] = strID;
-                param[1] = strFileRecvInfo;
-                param[2] = strProgress;
-                break;
-            case 3:
-                identifier = "closeProgressMessage";
-                param = new object[1];
-                param[0] = strID;
-                pageService.SetFilePrevRecving(false);
-                await Task.Delay(500);
-                break;
-            default:
-                break;
-        }
-        await JSRuntime.InvokeAsync<object>(identifier, param);
+public void ApproveSend(int groupID, string strReason)
+{
+    SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+    string strUserID = "";
+    if (sgLoginData != null)
+        strUserID = sgLoginData.GetUserID();
 
-        if (type == 3)
-        {
-            if (sFileName.Equals(""))
-                return;
+    SGDetailData sgDetailData = null;
+    sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+    if (sgDetailData == null)
+        return;
 
-            if (m_bFilePrevOpening)
-                return;
-            else
-                m_bFilePrevOpening = true;
-            string strFilePath = Path.Combine("wapprove", sFileName);
-            string strModulePath = "";
-            strModulePath = System.IO.Directory.GetCurrentDirectory();
-            strFilePath = Path.Combine(strModulePath, strFilePath);
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                strFilePath = strFilePath.Replace("/", "\\");
-            }
-            else
-            {
-                strFilePath = strFilePath.Replace("\\", "/");
-            }
-            await Task.Delay(2000);
+    string strProcID = "A";
+    string strApproveSeq = sgDetailData.GetApprSeq();
+    string strApprover = "1";
+    string strApproveUserKind = "0";
 
-            ProcessStartInfo pi = new ProcessStartInfo(strFilePath);
-            pi.Arguments = Path.GetFileName(strFilePath);
-            pi.UseShellExecute = true;
-            pi.WorkingDirectory = Path.GetDirectoryName(strFilePath);
-            pi.FileName = strFilePath;
-            pi.Verb = "OPEN";
-            Process.Start(pi);
-            m_bFilePrevOpening = false;
-        }
-    }
+    HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+    closePopUp();
+}
 
-    public bool IsAccessAble(string path)
-    {
-        FileStream fs = null;
-        try
-        {
-            fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-        }
+public void FilePrevCancel(string arg)
+{
+    System.Diagnostics.Debug.WriteLine("Callback FilePrevCancel Cancel Alert");
+    HsCmdCenter.SendFilePrevCancel();
 
-        catch (IOException)
-        {
-            //에러가 발생한 이유는 이미 다른 프로세서에서 점유중이거나.
-            //혹은 파일이 존재하지 않기 때문이다.
-            return false;
-        }
-        finally
-        {
-            if (fs != null)
-            {
-                //만약에 파일이 정상적으로 열렸다면 점유중이 아니다.
-                //다시 파일을 닫아줘야 한다.
-                fs.Close();
-            }
-        }
+    string strMsg = XmlConf.GetInfoMsg("I_0202");   // 파일 미리보기가 취소되었습니다.
+    ShowMessage("info", strMsg);
+}
+
+public bool FilePrevDownExtension(string sFileName)
+{
+
+
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+    SGDetailData sgDetailData = null;
+    sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+    if (sgDetailData == null)
         return true;
+
+    SGLoginData sgLoginData = null;
+    sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+    if (sgLoginData == null)
+        return true;
+
+    // 0kb 인지 확인 및 Msg 처리
+    string strFileSeq = stSelectedFileNo;
+
+    if (sgDetailData.GetFileSizeEmpty(strFileSeq))
+    {
+        ShowMessage("error", XmlConf.GetErrMsg("E_0243"));
+        return false;
     }
 
-    public void ReFresh()
+    // 확장자 종류로 Web으로 preview 할지 결정
+    //string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp", "log" };
+    string[] strExt = new string[] { "docx", "doc"};
+    string strExtName = Path.GetExtension(sFileName);
+    strExtName = strExtName.Substring(1);
+    if (strExtName.Equals(""))
+        return true;
+
+    strExtName = strExtName.ToLower();
+    bool bFind = false;
+    for (int i = 0; i < strExt.Length; i++)
     {
-        StateHasChanged();
+        if (strExt[i].Equals(strExtName))
+        {
+            bFind = true;
+            break;
+        }
     }
+
+    if (!bFind)
+    {
+        // Web으로 preview 안하는 파일 down해서 띄워줌
+        string strUserID = sgLoginData.GetUserID();
+        string strTransSeq = sgDetailData.GetTransSeq();
+        sFileName = Path.GetFileName(sFileName);
+
+        string strFilePath = Path.Combine("wapprove", sFileName);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            strFilePath = strFilePath.Replace("/", "\\");
+        }
+        else
+        {
+            strFilePath = strFilePath.Replace("\\", "/");
+        }
+
+        if (File.Exists(strFilePath))
+        {
+            if (!IsAccessAble(strFilePath))
+            {
+                string strMsg = XmlConf.GetWarnMsg("W_0252");   // 해당 파일은 다른 프로그램에 의해 열려 있습니다./r/n열려있는 프로그램을 닫고 다시 시도하여 주십시요.
+                strMsg = strMsg.Replace("/r/n", "<br>");
+                ShowMessage("warn", strMsg);
+                return true;
+            }
+            File.Delete(strFilePath);
+        }
+
+        string strFileKey = sgDetailData.GetFileKey();
+
+        pageService.SetFilePrevRecving(true);
+        ShowProgress(groupID, 1, 0, sFileName);
+        Task.Delay(1000);
+        FileAddManage fileAddManage = new FileAddManage();
+        sFileName = fileAddManage.GetFileRename(true, sFileName);
+        HsCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq, sFileName, strFileKey, strFileSeq, "0");
+    }
+    return bFind;
+}
+
+public void FilePrevProgressNoti(int groupID, PageEventArgs e)
+{
+    string strMsg = "";
+    if (e.result != 0)
+    {
+        strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+        ShowMessage("error", strMsg);
+        return;
+    }
+    string sFileName = e.strMsg;
+    int per = e.count;
+    int type = 0;
+    if (per >= 100)
+    {
+        type = 2;
+        ShowProgress(groupID, type, 100, sFileName);
+        Task.Delay(500);
+        type = 3;                                       // close
+        pageService.SetFilePrevRecving(false);
+    }
+    else if ((per > 0) && (per < 100))
+    {
+        type = 2;                                       // update
+        pageService.SetFilePrevRecving(true);
+    }
+    else
+        return;
+
+    ShowProgress(groupID, type, per, sFileName);
+}
+
+// type : 1 - open , 2 - update ,3 -close
+private async void ShowProgress(int groupID, int type, int per, string sFileName)
+{
+    object[] param = { };
+    string identifier = "";
+    string strID = groupID.ToString();
+    //strID = strFileName;
+    strID = "FILEPREVIEW";
+    string strProgress = String.Format("{0}%", per);
+    string strFileRecvInfo = "";
+    if (per == 0)
+    {
+        string strInfoStart = XmlConf.GetInfoMsg("I_0203");                 // 다른 서버에서 파일을 탐색하는 중입니다./r/n잠시만 기다려 주십시요.
+        strInfoStart = strInfoStart.Replace("/r/n", "<br>");
+        strFileRecvInfo = strFileRecvInfo + strInfoStart;
+    }
+    else
+    {
+        strFileRecvInfo = XmlConf.GetWarnMsg("W_0087");                     // 파일 수신중 입니다./r/n잠시만 기다려 주십시오.
+        strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
+    }
+    strFileRecvInfo = strFileRecvInfo + "<br>";
+
+    string strProgressInfo = XmlConf.GetTitle("T_FILERECV_PER");           // 파일 수신 진행률
+    string strProgressInfoStart =
+
+    strFileRecvInfo = strFileRecvInfo + strProgressInfo + " : " + strProgress;
+
+    switch (type)
+    {
+        case 1:
+            string strTitleName = XmlConf.GetTitle("T_DETAIL_FILEPREVIEW");
+            identifier = "fireProgressMessage";
+            param = new object[3];
+            param[0] = strID;
+            param[1] = strTitleName;
+            param[2] = strFileRecvInfo;
+            pageService.SetFilePrevRecving(true);
+            break;
+        case 2:
+            identifier = "updateProgressMessage";
+            param = new object[3];
+            param[0] = strID;
+            param[1] = strFileRecvInfo;
+            param[2] = strProgress;
+            break;
+        case 3:
+            identifier = "closeProgressMessage";
+            param = new object[1];
+            param[0] = strID;
+            pageService.SetFilePrevRecving(false);
+            await Task.Delay(500);
+            break;
+        default:
+            break;
+    }
+    await JSRuntime.InvokeAsync<object>(identifier, param);
+
+    if (type == 3)
+    {
+        if (sFileName.Equals(""))
+            return;
+
+        if (m_bFilePrevOpening)
+            return;
+        else
+            m_bFilePrevOpening = true;
+        string strFilePath = Path.Combine("wapprove", sFileName);
+        string strModulePath = "";
+        strModulePath = System.IO.Directory.GetCurrentDirectory();
+        strFilePath = Path.Combine(strModulePath, strFilePath);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            strFilePath = strFilePath.Replace("/", "\\");
+        }
+        else
+        {
+            strFilePath = strFilePath.Replace("\\", "/");
+        }
+        await Task.Delay(2000);
+
+        ProcessStartInfo pi = new ProcessStartInfo(strFilePath);
+        pi.Arguments = Path.GetFileName(strFilePath);
+        pi.UseShellExecute = true;
+        pi.WorkingDirectory = Path.GetDirectoryName(strFilePath);
+        pi.FileName = strFilePath;
+        pi.Verb = "OPEN";
+        Process.Start(pi);
+        m_bFilePrevOpening = false;
+    }
+}
+
+public bool IsAccessAble(string path)
+{
+    FileStream fs = null;
+    try
+    {
+        fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+    }
+
+    catch (IOException)
+    {
+        //에러가 발생한 이유는 이미 다른 프로세서에서 점유중이거나.
+        //혹은 파일이 존재하지 않기 때문이다.
+        return false;
+    }
+    finally
+    {
+        if (fs != null)
+        {
+            //만약에 파일이 정상적으로 열렸다면 점유중이 아니다.
+            //다시 파일을 닫아줘야 한다.
+            fs.Close();
+        }
+    }
+    return true;
+}
+
+public void ReFresh()
+{
+    StateHasChanged();
+}
 
 }

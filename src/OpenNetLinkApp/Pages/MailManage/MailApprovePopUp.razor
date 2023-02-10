@@ -153,7 +153,7 @@
                                 <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_SIZE") </th>                    <!-- 크기-->
                                 <th style="text-align:center;">@XmlConf.GetTitle("T_DETAIL_VIRUSHIST") </th>            <!-- 바이러스내역-->
 
-                                @if (bApproveEnable && m_bReject)
+                                @if (bApproveEnable && m_bCanFilePreView)
                                 {
                                     <th style="text-align:center;width:8%;">@XmlConf.GetTitle("T_COMMON_DETAILVIEW")</th>
                                 }
@@ -173,9 +173,16 @@
                                     <td style="text-align:center;">@file.fileKind</td>
                                     <td style="text-align:center;">@file.fileSize</td>
                                     <td style="text-align:center;">@file.virusDesc</td>
-                                    @if (bApproveEnable && m_bReject)
+                                    @if (bApproveEnable && m_bCanFilePreView)
                                     {
-                                        <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e => attachDownload(file.fileSeq, file.fileKey, file.fileName))"><i class="fas fa-search"></i></button></td>
+                                        if (file.bFilePreviewPossiable)
+                                        { 
+                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e => attachDownload(file.fileSeq, file.fileKey, file.fileName))"><i class="fas fa-search"></i></button></td>
+                                        }
+                                        else
+                                        { 
+                                            <td style="text-align:center">-</td>
+                                        }
                                     }
                                 </tr>
                             }
@@ -207,17 +214,18 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
-<SGDetailReject @ref="refSGDetailReject"></SGDetailReject>
+
+<SGReject @ref="refSGDetailReject" Guid="modalEmailDetailReject"></SGReject>
 
 @code 
 {
-    ISGNetworkService NetWorkSvc;
+        ISGNetworkService NetWorkSvc;
 
-    string stEmailSeq = String.Empty;
-    string stApproveSeq = String.Empty;
-    bool bApproveEnable = false;
+        string stEmailSeq = String.Empty;
+        string stApproveSeq = String.Empty;
+        bool bApproveEnable = false;
 
-    SGDetailReject refSGDetailReject;
+        SGReject refSGDetailReject;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<MailApprovePopUp>();
     List<Dictionary<int, string>> detailData = null;          //DB 데이타 직접 사용하는걸로 수정
     string stTransKindValue = String.Empty;
@@ -242,6 +250,7 @@
     public string strPrevInfo1 = "";
     public string strPrevInfo2 = "";
     public bool m_bReject = true;                              // 반려 가능 상태 여부
+    public bool m_bCanFilePreView = false;                     // 파일 미리보기 가능유무
 
     SGeMailTransManageData strDisplayData = new SGeMailTransManageData();
 
@@ -264,11 +273,12 @@
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
-        pageService.SetFilePrevRecving(true);
-        ShowProgress(groupID, 1, 0, filename);
-        Task.Delay(1000);
+        //pageService.SetFilePrevRecving(true);
         FileAddManage fileAddManage = new FileAddManage();
         //string sFileName = fileAddManage.GetFileRename(true, filename);
+        ShowProgress(groupID, 1, 0, filename);
+        HSCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FileDownloadProgressNoti);
+        //Task.Delay(1000);
         HSCmdCenter.SendEmailDownload(groupID, strUserID, stEmailSeq, filename, filekey, fileseq);
     }
 
@@ -293,6 +303,9 @@
         string sFileName = e.strMsg;
         int per = e.count;
         int type = 0;
+
+        CLog.Here().Error($"FileDownloadProgressNoti - Percent : {per}");
+
         if (per >= 100)
         {
             type = 2;
@@ -369,7 +382,7 @@
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFilePrevRecving(false);
-                await Task.Delay(300);
+                await Task.Delay(500);
                 break;
             default:
                 break;
@@ -410,10 +423,37 @@
         }
     }
 
+
+    /// <summary>
+    /// 승인CMD 보내기
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="strReason"></param>
+    public void ApproveSend(int groupID, string strReason)
+    {
+
+        string strMsg = "";
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string strUserID = "";
+        if (sgLoginData != null)
+            strUserID = sgLoginData.GetUserID();
+
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, stApproveSeq);
+        closePopUp();
+    }
+
     /// <summary>
     /// 승인 동작
     /// </summary>
-    public void DetailApprove()
+    public async Task DetailApprove()
     {
         string strMsg = "";
         if (pageService.GetFilePrevRecving() == true)
@@ -429,23 +469,36 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        if (pageService.GetConnectStatus(groupID) == false)
+
+
+        if (!SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason())
         {
-            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
+            if (pageService.GetConnectStatus(groupID) == false)
+            {
+                strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+                strMsg = strMsg.Replace("/r/n", "<br>");
+                ShowMessage("error", strMsg);
+                return;
+            }
+
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            string strUserID = "";
+            if (sgLoginData != null)
+                strUserID = sgLoginData.GetUserID();
+
+            string strProcID = "A";
+            string strReason = "Approve";
+            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq);
+            closePopUp();
+        }
+        else
+        {
+            refSGDetailReject.ResetReason(Common.Enums.EnumApproveType.Approve);
+            refSGDetailReject.SetGroupID(groupID);
+            refSGDetailReject.SetApprRejectEvent(ApproveSend);
+            await refSGDetailReject.openPopUp();
         }
 
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        string strUserID = "";
-        if (sgLoginData != null)
-            strUserID = sgLoginData.GetUserID();
-
-        string strProcID = "A";
-        string strReason = "Approve";
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq);
-        closePopUp();
     }
 
     /// <summary>
@@ -498,6 +551,24 @@
 
         HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq);
         closePopUp();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="strData"></param>
+    /// <returns></returns>
+    public string GetApproveRejectReasonText(string strData)
+    {
+        string strOnlyData = strData;
+        int nIdx = strOnlyData.LastIndexOf(')');
+        if (nIdx < 1)
+            return "";
+        else
+        {
+            strOnlyData = strOnlyData.Substring(0, nIdx);
+            return strOnlyData;
+        }
     }
 
     /// <summary>
@@ -564,6 +635,9 @@
             stApproveKindValue = arrData[4].Split(":")[1];
             stApproveStatusValue = arrData[5].Split(":")[1];
 
+            bool bViewOnlyReject = true;
+            bViewOnlyReject = !SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason();
+
             for (int i = 0; i < listApprover.Count - 1; i++)
             {
                 string[] arrVal = listApprover[i + 1].Split("|");
@@ -582,8 +656,16 @@
                     tmpApv.approveResTime = "-";
 
                 tmpApv.apprRejectReason = "-";
-                if (arrVal[4] == "3")   // 반려일때에만 - 사유정보 표현
-                    tmpApv.apprRejectReason = arrVal[6];
+                if (bViewOnlyReject)
+                {
+                    if (arrVal[4] == "3")   // 반려일때에만 - 사유정보 표현
+                        tmpApv.apprRejectReason = GetApproveRejectReasonText(arrVal[6]);
+                }
+                else
+                {
+                    if (arrVal[4] == "2" || arrVal[4] == "3")   // 승인-반려일때에 사유정보 표현
+                        tmpApv.apprRejectReason = GetApproveRejectReasonText(arrVal[6]);
+                }
 
                 apvList.Add(tmpApv);
             }
@@ -625,6 +707,12 @@
                 tmpFile.fileSeq = arrVal[0].Split("\"")[1];
                 tmpFile.fileName = arrVal[2];
                 tmpFile.fileKind = arrVal[3];
+
+                // 정각차장이 작업 완료하면 확인해보고 "메일 본문", "메일 원본", "첨부 파일" 모두 다운로드 되게끔 나갈건지 결정
+                if (tmpFile.fileKind != "첨부 파일")    // "메일 본문", "메일 원본", "첨부 파일" : 서버에서 만드는 Text임
+                    tmpFile.bFilePreviewPossiable = false;
+
+                tmpFile.bFilePreviewPossiable = true;
                 tmpFile.fileKey = arrVal[4];
                 tmpFile.fileSize = GetFileSizeString(arrVal[4]);
                 tmpFile.virusDesc = arrVal[5];
@@ -647,7 +735,7 @@
 
 
     //Param : Email Seq, Request Seq, 승인가능여부
-    public async Task openPopUp(string seq, string apvseq, string apvenable, bool bIsAfterApprove)
+    public async Task openPopUp(string seq, string apvseq, string apvenable, bool bIsAfterApprove, bool bIsFilePreView)
     {
         apvList.Clear();
         fileList.Clear();
@@ -661,6 +749,8 @@
 
         if (bIsAfterApprove)
             m_bReject = false;
+
+        m_bCanFilePreView = bIsFilePreView;
 
         ISGSideBarUI sgSideBar = SGAppMgrSvc.SideBarUIService.ActiveMenu;
         int groupID = 0;
@@ -756,7 +846,6 @@
 
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         InitText();
-        HSCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FileDownloadProgressNoti);
         base.OnInitialized();
     }
 

@@ -84,7 +84,7 @@ bNoApproveManageUI : 모든 기능 결재관리 UI 않나오도록함.(보안결
 bStartProgramReg : 시작 프로그램 등록 ( true : 부팅때 OpenNetLink 실행, false : 부팅때 OpenNetLink 실행 등록 해제 ) [기능X]
 bTitleDescSameChk : 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부 [기능X]
 
-bUseFileCheckException : 파일검사 예외 신청 기능 활성화유무 (파일검사 예외 신청 기능 수정개발필요)
+bUseFileCheckException : 파일검사 예외 신청 기능 활성화유무 (true, false)
 bUseNetOverAllsend : 3망상황에 모든 망에 파일, 클립보드 보내는 기능 활성화(true,false) [기능이상 가능성 높음, Server필요]
 listUseGpkiLogin : GPKI 로그인 사용 여부(망별로 로그인시 사용하는 기능) [기능이상 가능성 높음, Server필요] 
 bClipBoardNoApproveButFileTrans : 클립보드 파일전송으로 보낼때, 권한상관없이 결재없이 송신할수 있도록 설정(siteConfig)

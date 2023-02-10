@@ -205,6 +205,8 @@
             curUserID = sgLoginData.GetUserID();
 
         HSCmdCenter.SendEmailTransferCancel(groupID, curUserID, stEmailSeq);
+
+        closePopUp();
     }
 
     public void DetailResult(int groupId, SGData e)
@@ -423,15 +425,20 @@
         bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
     }
 
-    private void CancelResult(int groupId, SGData e)
+    @*private void CancelResult(int groupId, SGData e)
     {
         string result = e.GetTagData("RESULT");
         string reason = e.GetTagData("REASON");
+
+        CLog.Here().Information($"CancelResult - RESULT : {result}, REASON : {reason}");
+
         if (result == "0")
-            ShowMessage("success", reason);
+            ShowMessage("success", XmlConf.GetInfoMsg("I_0021"));
         else
             ShowMessage("error", reason);
-    }
+
+        closePopUp();
+    }*@
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -455,7 +462,8 @@
             curUserID = sgLoginData.GetUserID();
 
         HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑
-        HSCmdCenter.sgPageEvent.SetEmailSendCancelEvent(groupID, CancelResult);
+
+        //HSCmdCenter.sgPageEvent.SetEmailSendCancelEvent(groupID, CancelResult);
 
         MailManageDao dao = new MailManageDao();
         string strQuery = dao.MailDetail(seq);

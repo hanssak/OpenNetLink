@@ -40,11 +40,8 @@
   "bUserPWChange": false,
 
 
-  "bDeputyApprTerminateDel": false,
   "bDlpInfoDisplay": false,
   "bEmptyfileTrans": true,
-
-  "bUserPWChange": true,
   "strInitPasswd": "1K27SdexltsW0ubSCJgsZw==",
   "strPWChangeProhibitLimit": "",
   "nPWChangeApplyCnt": 9,
@@ -55,8 +52,8 @@
     false
   ],
   "strURLAutoAfterBrowser": [
-    "N",
-    "N",
+    "F",
+    "F",
     "F"
   ],
   "bURLAutoAfterMsg": [
@@ -65,9 +62,9 @@
     true
   ],
   "strForwardUrl": [
-    "http:\/\/naver.com",
-    "http:\/\/daum.net",
-    "http:\/\/daum.net"
+    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
+    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
+    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html"
   ],
 
   "bUseClipBoardFileTrans": true,
@@ -79,7 +76,6 @@
 
   "enMainPageType": 0,
   "bNoApproveManageUI": false,
-  "bRecvDownPathChange": true,
   "bStartProgramReg": true,
   "bTitleDescSameChk": false,
 
@@ -93,7 +89,6 @@
   "bClipBoardNoApproveButFileTrans": true,
   "bUseDenyPasswordZip": true,
   "bRecvFolderChange": false,
-  "bURLListPolicyRecv": false,
   "bUseCertSend": false,
   "blistUseEmail": [
     false,
@@ -104,7 +99,6 @@
   "bUsePCURL": false,
   "bUsePublicBoard": false,
   "bUseUserRecvDownPath": true,
-  "bUseUserRecvDownPathUserName": true,
   "bUseUserSelectFirstServer": false,
   "bViewDlpApproverSelectMyDept": false,
   "bViewFileFilter": true,
@@ -117,14 +111,12 @@
   "bApprLineChkBlock": false,
   "bApprLineLocalSave": true,
 
-  "nApprStepLimit": 0,
-
   "bUseClipAlarmType": true,
   "bUseClipCopyAndSend": false,
   "bClipCopyAutoSend": false,
 
-  "bUseCloseTrayMove": false,
-  "bExitTrayMove": false,
+  "bUseCloseTrayMove": true,
+  "bExitTrayMove": true,
 
   "bUseStartTrayMove": false,
   "bStartTrayMove": false,
@@ -135,7 +127,7 @@
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
 
-  "bUsePartialFileAddInTransfer": false,
+  "bUsePartialFileAddInTransfer": true,
   "bUseInitAlarmPerDay": false,
   "bUseInitMessagePerDay": false,
   "bVisiblePolicyUpdateButton": true,

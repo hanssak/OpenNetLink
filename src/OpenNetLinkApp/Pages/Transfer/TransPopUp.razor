@@ -586,43 +586,69 @@
         HSCmdCenter.sgPageEvent.SetDownloadCountEventAdd(groupID, ReceiveDownloadCount);
         HSCmdCenter.SendDownloadCount(groupID, strUserID, seq.ToString());
 
+        await Task.Delay(300);  // KKW-download개수 의심됨
+
         object[] param = { "TransPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
     public void ReceiveDownloadCount(int groupID, SGData e)
     {
-        string result = e.GetSvrRecordTagData("RESULT");
-        int count = 0;
-        if (e.GetSvrRecordTagData("DOWNCOUNT") == "" || e.GetSvrRecordTagData("DOWNCOUNT") == null)
-            count = 0;
-        else
-            count = Int32.Parse(e.GetSvrRecordTagData("DOWNCOUNT"));  //결과레코드수
-        string reason = e.GetSvrRecordTagData("REASON");
 
-        if (result != "0")
+        SGLoginData sgLoginData = null;
+
+        try
         {
-            ShowMessage("error", reason);
-            return;
-        }
-        m_downloadCount = count;
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null) return;
+            string result = e.GetSvrRecordTagData("RESULT");
+            int count = 0;
+            bool bGetDownCount = false;
+            CLog.Here().Information($"DownLoadCount-RESULT : {result}");
 
-        m_downMaxCurr = $"{XmlConf.GetTitle("T_ETC_DOWNLOADCOUNT")} :  {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
-
-        //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
-        if (m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
-        {
-            if (m_downloadCount < sgLoginData.GetMaxDownCount())
-                m_bNetDownloadable = true;
+            if (e.GetSvrRecordTagData("DOWNCOUNT") == "" || e.GetSvrRecordTagData("DOWNCOUNT") == null)
+            {
+                count = 0;
+                CLog.Here().Information($"DownLoadCount-DOWNCOUNT : null or Empty!");
+            }
             else
             {
-                m_bNetDownloadable = false;
+                bGetDownCount = true;
+                count = Int32.Parse(e.GetSvrRecordTagData("DOWNCOUNT"));  //결과레코드수
             }
+
+            CLog.Here().Information($"DownLoadCount-DOWNCOUNT : {count}");
+
+            string reason = e.GetSvrRecordTagData("REASON");
+
+            if (result != "0")
+            {
+                ShowMessage("error", reason);
+                return;
+            }
+            m_downloadCount = count;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null) return;
+
+            m_downMaxCurr = $"{XmlConf.GetTitle("T_ETC_DOWNLOADCOUNT")} :  {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
+
+            //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
+            if (m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
+            {
+                if (m_downloadCount < sgLoginData.GetMaxDownCount())
+                    m_bNetDownloadable = true;
+                else
+                {
+                    m_bNetDownloadable = false;
+                }
+            }
+
         }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"#####(DownLoadCount-확인) - Exception[MSG] : {ex.Message}");
+        }
+
         StateHasChanged();
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
+        CLog.Here().Information($"#####(DownLoadCount-확인)-m_bNetDownloadable-##### : [{m_bNetDownloadable.ToString()}] (NowDownload-Count:{m_downloadCount}, MaxDownloadCount : {((sgLoginData==null)?"null":sgLoginData.GetMaxDownCount().ToString())})");
     }
 
     public void closePopUp()
@@ -667,6 +693,7 @@
         //검사단계표시 설정
         SetPreworkInfo(sgDetailData.GetPreworkStep(), sgDetailData.GetBasicTagData("TRANSSTATUS"));
 
+        CLog.Here().Information($"DetailData- ##### - TranSeq : {sgDetailData.GetTransSeq()}");
 
         //*************************************************************************************************************************
         //수동다운로드 가능여부 판단 2021/05/24 YKH 시작
@@ -676,12 +703,13 @@
 
         if (sgLoginData != null)
             bInner = sgLoginData.GetSystemPosition();   // 망구분 true : 내부, false : 외부
+
         if (!bInner && strDataTransKind == XmlConf.GetTitle("T_COMMON_EXPORT"))
             m_bNetDownloadable = true;
         else if (bInner && strDataTransKind == XmlConf.GetTitle("T_COMMON_IMPORT"))
             m_bNetDownloadable = true;
 
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (IN/EX : {bInner.ToString()}, IN/EX Title : {strDataTransKind})");
+        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (IN/EX : {bInner.ToString()}, IN/EX Title : {strDataTransKind})");
 
 
         //수동다운로드는 요청자가 PC수신완료 됐을 경우에만 다운로드 가능 (!!!승인여부가 아닌 요청자 PC수신여부!!!)
@@ -709,8 +737,8 @@
             }
         }
 
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataTransStatus : {strDataTransStatus})");
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileDownloadBeforeReciving : {SGAppMgrSvc.OpConfigInfoService.GetFileDownloadBeforeReciving().ToString()})");
+        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataTransStatus : {strDataTransStatus})");
+        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileDownloadBeforeReciving : {SGAppMgrSvc.OpConfigInfoService.GetFileDownloadBeforeReciving().ToString()})");
         //CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileDownloadBeforeReciving : {sgAppConfig.GetFileDownloadBeforeReciving().ToString()})");
 
         int expireDate = Int32.Parse(sgDetailData.GetExpiredDay());
@@ -723,7 +751,7 @@
                 m_bNetDownloadable = false;
         }
 
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (expireDate : {expireDate.ToString()}, nowDate : {nowDate})");
+        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (expireDate : {expireDate.ToString()}, nowDate : {nowDate})");
         m_downMaxCurr = $"{XmlConf.GetTitle("T_ETC_DOWNLOADCOUNT")} : {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
         //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
         if (m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
@@ -734,7 +762,7 @@
                 m_bNetDownloadable = false;
         }
 
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
+        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (NowDownload-Count:{m_downloadCount}, MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
 
         //수동다운로드 가능여부 판단 2021/05/24 YKH 종료
         //*************************************************************************************************************************
@@ -769,7 +797,7 @@
             m_bNetDownloadable = false;
         }
 
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataApprStatus : {strDataApprStatus}, strDataApprStatusCode : {strDataApprStatusCode})");
+        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataApprStatus : {strDataApprStatus}, strDataApprStatusCode : {strDataApprStatusCode})");
 
         sgDetailData.GetFileInfo(out mFileData);
         if (mFileData == null)

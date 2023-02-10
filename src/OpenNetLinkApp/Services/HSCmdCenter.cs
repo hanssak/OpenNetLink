@@ -1989,6 +1989,13 @@ namespace OpenNetLinkApp.Services
                 hsNetWork.bIgnoreSessionDuplicate = true;
         }
 
+        public void SetAllowSessionDuplicate(int groupid, bool bIgnoreSessionDuplicate)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                hsNetWork.bIgnoreSessionDuplicate = bIgnoreSessionDuplicate;
+        }
+
         public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType = 0)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
@@ -2003,7 +2010,7 @@ namespace OpenNetLinkApp.Services
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             int ret = 0;
             if (hsNetWork != null)
-                ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, 0, loginType);
+                ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, 9, loginType);
             return 0;
         }
 

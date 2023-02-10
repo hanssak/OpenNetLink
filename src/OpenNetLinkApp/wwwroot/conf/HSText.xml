@@ -4469,6 +4469,40 @@
 		</T_FILE_RECEIVER_ADD>
 		<!-- ********************************************* [END] PC URL TITLE ********************************************* -->
 
+
+		<!-- ********************************************* [START] App 설정 (T_APPCONFIG_0000) ********************************************* -->
+		<T_EMAIL_APPROVE_DONE>
+			<KR>Email 승인작업이 완료 되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_EMAIL_APPROVE_DONE>
+
+		<T_EMAIL_APPROVE_FAILED>
+			<KR>Email 승인작업 실패 했습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_EMAIL_APPROVE_FAILED>
+		
+		
+		<T_EMAIL_REJECT_DONE>
+			<KR>Email 반려작업이 완료 되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_EMAIL_REJECT_DONE>
+		
+		<T_EMAIL_REJECT_FAILED>
+			<KR>Email 반려작업 실패 했습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_EMAIL_REJECT_FAILED>				
+
+		<!-- ********************************************* [END] EMAIL ********************************************* -->
+
+
 		<!-- ********************************************* [START] App 설정 (T_APPCONFIG_0000) ********************************************* -->
 
 		<T_APPCONFIG_COMMON>
@@ -4933,14 +4967,14 @@
 			<CN></CN>
 		</T_eFADOC_EXTRACT_COMPRESS_EXTENSION>
 		<T_eFADOC_EXTRACT_CHANGE>
-			<KR>문서 내 파일 위변조 제한</KR>
+			<KR>문서 내 파일의 위변조 제한</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
 		</T_eFADOC_EXTRACT_CHANGE>
 
 		<T_eFADOC_EXTRACT_FILES>
-			<KR>문서 내 검출된 파일</KR>
+			<KR>문서 내 파일의 확장자 제한</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
@@ -6668,6 +6702,15 @@
 		<EN></EN>
 		<CN></CN>
 	</I_0240>
+
+    <I_0241>
+      <KR>새로운 메일승인 요청자료가 존재합니다.</KR>
+      <JP>新しいメール承認要請資料が </JP>
+      <EN>There are new mail approval request materials.</EN>
+      <CN>件待邮件审批的请求资料。</CN>
+    </I_0241>
+
+
     <!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
 	</INFO>
@@ -8616,21 +8659,22 @@
 			<CN></CN>
 		</W_0285>
 
-    <W_0286>
-      <KR>승인/반려사유를 입력해주십시오.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0286>
+	    <W_0286>
+	      <KR>승인/반려사유를 입력해주십시오.</KR>
+	      <JP></JP>
+	      <EN></EN>
+	      <CN></CN>
+	    </W_0286>
+
+	  <W_0287>
+	    <KR>검색 결과가 존재하지 않습니다.</KR>
+	    <JP></JP>
+	    <EN></EN>
+	    <CN></CN>
+	  </W_0287>
 
 	</WARNING>
 
-  <W_0287>
-    <KR>검색 결과가 존재하지 않습니다.</KR>
-    <JP></JP>
-    <EN></EN>
-    <CN></CN>
-  </W_0287>
 
 
   <!-- ********************************************* [END] MSG WARNING (W_0000) ********************************************* -->

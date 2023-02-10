@@ -2369,8 +2369,69 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         try
         {
 
+            string[] strArray = navURI.Split("/");
+
+            if (strArray != null && strArray.Length > 1)
+            {
+                nGroupID = Convert.ToInt32(strArray[2]);
+
+                KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+                eventArgs.Key = "Enter";
+
+                ISGSideBarUI activeMenu = null;
+                string path = $"/{strArray[1]}/{strArray[2]}";
+                activeMenu = SideBarUISvc.FindSubMenu(nGroupID, path);
+
+                if (activeMenu != null)
+                {
+
+                    PageDataRefreshEvent pgRefreshEvent = null;
+
+                    if (!activeMenu.Actived)
+                    {
+                        ChangeActiveMenuWrap(eventArgs, activeMenu);
+                        bChangedMenu = true;
+
+                        if (string.Compare(strArray[1], "transferApprove", true) == 0)
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveWaitAllUI);
+                        else if (string.Compare(strArray[1], "mailApprove", true) == 0)
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveWaitUI);
+
+                        // Page가 1번이라도 열렸을때에 여기서 호출 - 로그인후 한번도 mail Page 안열렸을때에는 아래 NavigateTo 에서 호출
+                    }
+                    else
+                    {
+                        if (activeMenu.Path.Contains("transferApprove"))
+                        {
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveWaitAllUI);
+                        }
+                        else if (activeMenu.Path.Contains("securityApprove"))
+                        {
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.SecurityApproveUI);
+                        }
+                        else if (activeMenu.Path.Contains("clipBoardApprove"))
+                        {
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
+                        }
+                        else if (activeMenu.Path.Contains("fileException"))
+                        {
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.FileException);
+                        }
+                        else if (activeMenu.Path.Contains("mailApprove"))
+                        {
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveWaitUI);
+                        }
+                    }
+
+                    if (pgRefreshEvent != null)
+                        pgRefreshEvent();
+
+                }
+            }
+
+
             // 왼쪽 SideBar Navigate 되는 곳으로 선택되게 적용
-            nPos = navURI.LastIndexOf('/');
+            @*nPos = navURI.LastIndexOf('/');
             if (nPos > 0 && navURI.Length > 3 && nPos < navURI.Length - 1)
             {
                 strGroupID = navURI.Substring(nPos + 1);
@@ -2432,9 +2493,6 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     }
                 }
 
-
-
-
                 // 결재관리 확인 - 선택변경
                 //strMenuName = "transferApprove";
                 //nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
@@ -2486,12 +2544,12 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     }
                 }*/
 
-            }
+            }*@
 
         }
         catch (Exception e)
         {
-            CLog.Here().Information("Toast-Click-Navigate-Exception(Msg) : {0}", e.Message);
+            CLog.Here().Information($"Toast-Click-Navigate-Exception, navURI : {navURI}, Exception(MSG) : {e.Message}");
         }
 
         if (bChangedMenu)
@@ -2647,12 +2705,23 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     naviURI = "/clipBoardApprove/";
                     break;
                 case "4":
-                    naviURI = "/mailApprove/";      // mail 결재Noti값이 올때 처리
+                    naviURI = "/mailApprove/";      // mail 결재Noti값이 올때 처리 : mailApprove
                     break;
             }
             //naviURI = "/transferApprove/";
 
             naviURI += groupID.ToString();
+            //if (os_noti == OS_NOTI.MAIL_APPR)
+            if (e.strDummy != null)
+            {
+                // CLick시에 승인대기 중인 항목들만 기간상관없이 조회되도록 적용
+                if (e.strDummy == "0")
+                    naviURI += "/2";    // 결재 - 승인대기 전체조회
+                else if (e.strDummy == "4")
+                    naviURI += "/1";    // 메일결재 - 승인대기 전체조회
+            }
+
+
         }
         else if (os_noti == OS_NOTI.NOTICE)
         {
@@ -2681,7 +2750,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = NotiMsgMake(cmd, e);
-        if (HsCmdCenter.GetFileRecvPossible(groupID) == true)
+        if (HsCmdCenter.GetFileRecvPossible(groupID) == true)   // DashBoard 혹은 파일전송 화면이 뜨고 나서 알림 시작
             Window.Notification(os_noti, strTitle, strMsg, naviURI);
 
         SGMsgData sgMsgData = null;
@@ -2807,20 +2876,23 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     {
                         switch (pEventArgs.strDummy)
                         {
-                            case "0":
-                                strMsg = XmlConf.GetInfoMsg("I_0222");                      // 새로운 결재승인 요청자료가 {0}건 존재합니다.
-                                strMsg = String.Format(strMsg, pEventArgs.count);
+                            case "0":   // 일반결재
+
+                                // KKW - Server 수정후에나 사용
+                                @*strMsg = XmlConf.GetInfoMsg("I_0222");                      // 새로운 결재승인 요청자료가 {0}건 존재합니다.
+                                strMsg = String.Format(strMsg, pEventArgs.count);*@
                                 break;
-                            case "1":
+
+                            case "1":   // 보안결재
                                 strMsg = XmlConf.GetInfoMsg("I_0223");                      // 새로운 보안결재승인 요청자료가 {0}건 존재합니다.
                                 strMsg = String.Format(strMsg, pEventArgs.count);
                                 break;
-                            case "2":
+                            case "2":   // PCtoURL 결재
                                 //PCtoURL 결재 화면 없음...
                                 strMsg = XmlConf.GetInfoMsg("I_0222");                      // 새로운 승인 요청자료가 있습니다.
                                 strMsg = String.Format(strMsg, pEventArgs.count);
                                 break;
-                            case "3":
+                            case "3":   // 클립보드 결재
                                 strMsg = XmlConf.GetInfoMsg("I_0224");                      // 새로운 클립보드결재승인 요청자료가 {0}건 존재합니다.
                                 strMsg = String.Format(strMsg, pEventArgs.count);
                                 break;
@@ -2831,9 +2903,11 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             case eCmdList.eEMAILAPPROVENOTIFY:
                 {
-                    strMsg = XmlConf.GetInfoMsg("I_0098");                      // 새로운 메일승인 요청자료가 {0}건 존재합니다.
+                    // KKW - Server 수정후에나 사용
+                    @*strMsg = XmlConf.GetInfoMsg("I_0098");                      // 새로운 메일승인 요청자료가 {0}건 존재합니다.
                     PageEventArgs pEventArgs = (PageEventArgs)e;
-                    strMsg = String.Format(strMsg, pEventArgs.count);
+                    strMsg = String.Format(strMsg, pEventArgs.count);*@
+                    strMsg = XmlConf.GetInfoMsg("I_0241");                      // 새로운 메일승인 요청자료가 {0}건 존재합니다.
                     break;
                 }
 

@@ -105,8 +105,18 @@
                     <tbody>
                         <tr>
                             <td style="width:33%;font-weight:bold">@XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT")</td>
-                            <td style="width:33%;font-weight:bold">@(bUseClipBoard?XmlConf.GetTitle("T_COMMON_CLIPBOARD"):"")</td>
-                            <td style="width:33%;font-weight:bold">@XmlConf.GetTitle("T_DASH_RECEIVE_DIR_AMOUNT")</td>
+
+                            @if (bUseClipBoard)
+                            {
+                                <td style="width:33%;font-weight:bold">@XmlConf.GetTitle("T_COMMON_CLIPBOARD")</td>
+                                <td style="width:33%;font-weight:bold">@XmlConf.GetTitle("T_DASH_RECEIVE_DIR_AMOUNT")</td>
+                            }
+                            else
+                            {
+                                <td style="width:33%;font-weight:bold">@XmlConf.GetTitle("T_DASH_RECEIVE_DIR_AMOUNT")</td>
+                                <td style="width:33%;font-weight:bold"></td>
+                            }
+
                         </tr>
                         <tr>
                             <td style="padding:5px 15px 5px 5px;">
@@ -126,36 +136,49 @@
                                     </div>
                                 </div>
                             </td>
-                            <td style="padding:5px 15px 5px 5px;">
-                                @if (bUseClipBoard)
-                                {
+                            @if (bUseClipBoard)
+                            {
+                                <td style="padding:5px 15px 5px 5px;">
                                     <div class="progress-group text-left">
                                         <!-- 클립보드 용량-->
                                         <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
                                         <span class="float-right">
-                                            <b>@nDayUseClipSize</b>/@(nDayMaxClipSize==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipSize.ToString())
+                                            <b>@nDayUseClipSize</b>/@(nDayMaxClipSize == 0 ? XmlConf.GetTitle(bUseClipBoard ? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") : nDayMaxClipSize.ToString())
                                         </span>
                                         <div class="progress progress-sm">
                                             @if (nDayMaxClipSize == 0)
                                             {
-                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: @(bUseClipBoard?100:0)%"></div>
+                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: @(bUseClipBoard ? 100 : 0)%"></div>
                                             }
                                             else
                                             {
-                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: @((nDayUseClipSize*100/nDayMaxClipSize))%"></div>
+                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: @((nDayUseClipSize * 100 / nDayMaxClipSize))%"></div>
                                             }
                                         </div>
                                     </div>
-                                }
-                            </td>
-                            <td rowspan="2">
-                                <div class="main_chart">
-                                    <p align="center">
-                                        <canvas class="pt-3" id="myCapacityChart" width="100" height="100"></canvas>
-                                        @*<div class="text-center pr-1">(MB)</div>*@
-                                    </p>
-                                </div>
-                            </td>
+                                </td>
+                                <td rowspan="2">
+                                    <div class="main_chart">
+                                        <p align="center">
+                                            <canvas class="pt-3" id="myCapacityChart" width="100" height="100"></canvas>
+                                            @*<div class="text-center pr-1">(MB)</div>*@
+                                        </p>
+                                    </div>
+                                </td>
+                            }
+                            else
+                            {
+                                <td rowspan="2">
+                                    <div class="main_chart">
+                                        <p align="center">
+                                            <canvas class="pt-3" id="myCapacityChart" width="100" height="100"></canvas>
+                                            @*<div class="text-center pr-1">(MB)</div>*@
+                                        </p>
+                                    </div>
+                                </td>
+                                <td style="padding:5px 15px 5px 5px;">
+                                </td>
+                            }
                         </tr>
                         <tr>
                             <td style="padding: 5px 15px 5px 5px; text-align: center;">

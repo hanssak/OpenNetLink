@@ -410,8 +410,6 @@ namespace OpenNetLinkApp.Common
             string[] strArgumentArry = System.Environment.GetCommandLineArgs();
             strAgentPath = strArgumentArry[0];
 
-            Log.Information($"GetCurrentProcessName - Before(###) : {strAgentPath}");
-
             int nIdex = strArgumentArry[0].LastIndexOf(".");
             if (bGetExePath && nIdex > 0)
             {
@@ -419,7 +417,7 @@ namespace OpenNetLinkApp.Common
                 strAgentPath += ".exe";
             }
 
-            Log.Information($"GetCurrentProcessName - After(###) : {strAgentPath}");
+            Log.Information($"GetCurrentProcessName : {strAgentPath}");
 
             return strAgentPath;
         }

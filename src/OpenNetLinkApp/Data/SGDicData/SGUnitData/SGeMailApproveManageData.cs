@@ -150,6 +150,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strTransKind;
         }
 
+        /// <summary>
+        /// 반출 : "1", 반입 : "2" return
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetTransKindRawData(Dictionary<int, string> dic)
+        {
+            string strTransKind = "";
+            if (dic.TryGetValue(3, out strTransKind) != true)
+                return strTransKind;
+
+            strTransKind = dic[3];
+
+            return strTransKind;
+        }
 
         /// <summary>
         /// 전송상태 정보를 반환한다.<br></br>
@@ -686,7 +701,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns></returns>
         public bool GetTransCancelEnableChk(string userId, Dictionary<int, string> dic)
         {
-            // KKW
 
             string strTransStatus = "";
             string strApprStatus = "";

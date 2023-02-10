@@ -1183,6 +1183,10 @@ public void SFMInfoAfterSend(int groupId, object[] e)
                 {
                     pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
                 }
+                else if (sgSideBar.Path.Contains("mailApprove"))
+                {
+                    pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveUI);
+                }
 
                 if (pgRefreshEvent != null)
                     pgRefreshEvent();

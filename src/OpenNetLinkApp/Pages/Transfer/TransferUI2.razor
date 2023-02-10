@@ -1412,7 +1412,7 @@
             {
                 await dropFile.DataClear();
                 FileList?.Clear();  // approveExt 결재없는 전송때, List중 결재없는 목록만 별도 생성한것도 정리
-                CLog.Information($"dropFile.DataClear - !");
+                CLog.Here().Information($"dropFile.DataClear - !");
             }
             catch (Exception err)
             {
@@ -2924,7 +2924,7 @@
         //    MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
         //}
 
-        CLog.Information("[CLEAR] 삭제");
+        CLog.Here().Information("[CLEAR] 삭제");
     }
 
     [JSInvokable("NotifyChange")]
@@ -2936,7 +2936,7 @@
     public static void LogWrite(string str)
     {
         Debug.WriteLine(str);
-        CLog.Information(str);
+        CLog.Here().Information(str);
     }
     [JSInvokable("NotifyChange2")]
     public static void NotifyChange2(FileListEntryImpl[] files)
@@ -2961,10 +2961,10 @@
         //    return;
         //}
 
-        CLog.Information("[HandleFileInputChange]파일드랍 이벤트 수신, 갯수:" + files.Length);
+        CLog.Here().Information("[HandleFileInputChange]파일드랍 이벤트 수신, 갯수:" + files.Length);
         foreach (var file in files)
         {
-            CLog.Information("[HandleFileInputChange]파일명:" + file.Name);
+            CLog.Here().Here().Information("[HandleFileInputChange]파일명:" + file.Name);
         }
 
         dropFile.fileSizeError = false;

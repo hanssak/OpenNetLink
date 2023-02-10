@@ -153,33 +153,61 @@ begin
 	END IF;
 
 	whand:='WHERE ';
-	-- 결재구분
-	IF apprkind IS NOT NULL AND apprkind!='' THEN
-		sql:=sql||whand||'A.APPROVEKIND='''||apprkind||''''||chr(13);
-		whand:=' AND ';
-	END IF;
-
 	
 	-- 전송구분
 	IF transkind IS NOT NULL AND transkind!='' THEN
 		sql:=sql||whand||'A.TRANSKIND='''||transkind||''''||chr(13);
 		whand:=' AND ';
 	END IF;
-
 	
-	-- 결재상태
-	IF approvestatus IS NOT NULL AND approvestatus!='' THEN
-		sql:=sql||whand||'A.APPROVESTATUS='''||approvestatus||''''||chr(13);
-		whand:=' AND ';
+
+	-- 승인대기(전체조회)
+	IF (approvestatus='1' AND transstatus = 'W') THEN
+	
+		-- 결재구분		
+		IF apprkind = '0' THEN	-- 사전			
+			sql:=sql||whand||'A.APPROVEKIND='''||apprkind||''''||chr(13);
+			whand:=' AND ';			
+			sql:=sql||whand||'A.TRANSSTATUS='''||transstatus||''''||chr(13);
+			sql:=sql||whand||'A.APPROVESTATUS='''||approvestatus||''''||chr(13);
+		ELSIF apprkind = '1' THEN	-- 사후
+			transstatus := 'S';		
+			sql:=sql||whand||'A.APPROVEKIND='''||apprkind||''''||chr(13);
+			whand:=' AND ';			
+			sql:=sql||whand||'A.TRANSSTATUS='''||transstatus||''''||chr(13);
+			sql:=sql||whand||'A.APPROVESTATUS='''||approvestatus||''''||chr(13);
+		ELSE	-- 전체		
+			sql:=sql||whand||'((A.APPROVEKIND=''0'' AND A.TRANSSTATUS=''W'' AND A.APPROVESTATUS=''1'') OR ';
+
+			--transstatus := 'S';
+			
+			sql:=sql||'(A.APPROVEKIND=''1'' AND A.TRANSSTATUS=''S'' AND A.APPROVESTATUS=''1''))';
+			whand:=' AND ';
+		END IF;
+
+	ELSE
+
+		-- 결재구분
+		IF apprkind IS NOT NULL AND apprkind!='' THEN
+			sql:=sql||whand||'A.APPROVEKIND='''||apprkind||''''||chr(13);
+			whand:=' AND ';
+		END IF;
+
+		-- 결재상태
+		IF approvestatus IS NOT NULL AND approvestatus!='' THEN
+			sql:=sql||whand||'A.APPROVESTATUS='''||approvestatus||''''||chr(13);
+			whand:=' AND ';
+		END IF;
+
+		-- 전송상태
+		IF transstatus IS NOT NULL AND transstatus!='' THEN
+			sql:=sql||whand||'A.TRANSSTATUS='''||transstatus||''''||chr(13);
+			whand:=' AND ';
+		END IF;
+
 	END IF;
 
-	-- 전송상태
-	IF transstatus IS NOT NULL AND transstatus!='' THEN
-		sql:=sql||whand||'A.TRANSSTATUS='''||transstatus||''''||chr(13);
-		whand:=' AND ';
-	END IF;
 
-	
 	-- 개인정보상태
 	IF dlp IS NOT NULL AND dlp!='' THEN
 		sql:=sql||whand||'A.DLP='''||dlp||''''||chr(13);
@@ -196,6 +224,7 @@ begin
 		sql:=sql||'ORDER BY A.TRANSDATE DESC LIMIT '|| PageListCount || ' OFFSET (' || ViewPageNo || '-1) *' || PageListCount;
 	END IF;
 	
+
 --	RAISE NOTICE 'Quantity here is %', sql;  -- Prints 50
 
 
