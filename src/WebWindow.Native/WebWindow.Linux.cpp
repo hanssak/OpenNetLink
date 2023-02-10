@@ -32,7 +32,17 @@ bool g_bDoExit2TrayUse = false;
 bool g_bStartTray = true;
 bool g_bClipCopyNsend = false;
 
+gchar *g_ClipTextResult = NULL;
+gsize g_ClipTextLength = 0;
+gchar *g_ImageBuffer = NULL;
+gsize g_BufferSize = 0;
+guint8 *g_richTextResult = NULL;
+
+
+
 std::map<int, std::wstring> mapHotKey;
+std::map<int, bool> m_mapBoolUseClipSelect;
+std::map<int, bool> m_mapBoolClipSendTextFirst;
 
 
 std::mutex invokeLockMutex;
@@ -393,15 +403,15 @@ void WebWindow::SetTrayUse(bool useTray)
     g_bDoExit2TrayUse = useTray;
     NTLog(this, Info, "Called : SetTrayUse(@@@@@@@@@@) : %s", (AutoString)(g_bDoExit2TrayUse ? "Yes": "No") );
 }	
-
+//선택 전송 사용 유무(사용하지 않을 경우 값이 들어온다.)
 void WebWindow::ClipTypeSelect(int groupID)
 {
-	
+	m_mapBoolUseClipSelect[groupID] = true;
 }
-
+//텍스트를 먼저 내보낸다.
 void WebWindow::ClipFirstSendTypeText(int groupID)
 {
-
+	m_mapBoolClipSendTextFirst[groupID] = true;
 }
 
 void WebWindow::WaitForExit()
@@ -521,6 +531,10 @@ void WebWindow::SendMessage(AutoString message)
 
 void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI)
 {
+
+	g_print ("Start Noti\n");
+
+
 	GNotification *notification;
 	GFile *file;
 	GIcon *icon;
@@ -536,10 +550,12 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	g_object_unref (icon);
 	g_object_unref (file);
 
-	if (navURI) g_notification_add_button_with_target (notification, "페이지 이동", "app.navigate-uri", "s", navURI);
+	//if (navURI) g_notification_add_button_with_target (notification, "페이지 이동", "app.navigate-uri", "s", navURI);
 
 	g_application_send_notification (G_APPLICATION(_app), title, notification);
 	g_object_unref (notification);
+
+	g_print ("End Nofi\n");
 }
 
 void HandleCustomSchemeRequest(WebKitURISchemeRequest* request, gpointer user_data)
@@ -705,19 +721,11 @@ request_text_received_func (GtkClipboard     *clipboard,
 
 	if (result)
 	{
-		// printf("recv func: %s\n", result);
-		// Send Clipboard Text Transfer
-		/*
-			public enum CLIPTYPE : int
-			{
-				TEXT = 1,
-				IMAGE = 2,
-				OBJECT = 3,
-			}
-		*/
-
-		((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_TEXT, strlen(result), result, 0, NULL);
-		if (result) g_free (result);
+		NTLog(pstParm->self, Warning, "WARN : isTEXT ClipBoard \n");
+		g_ClipTextResult = result;
+		g_ClipTextLength = strlen(result);
+		//((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_TEXT, strlen(result), result, 0, NULL);
+		//g_free (result);
 	}
 }
 
@@ -774,6 +782,7 @@ request_image_received_func (GtkClipboard     *clipboard,
 			NTLog(pstParm->self, Warning, "WARN: Don't judged Image Type !!!!!\n");
 			return;
 		}
+		
 	}
 
 	if (result)
@@ -803,10 +812,15 @@ request_image_received_func (GtkClipboard     *clipboard,
 				OBJECT = 3,
 			}
 		*/
-		((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_IMAGE, BufferSize, ImageBuffer, 0, NULL);
+
+		NTLog(pstParm->self, Warning, "Clip Image Select : GOOD\n");
+		g_ImageBuffer = ImageBuffer;
+		g_BufferSize = BufferSize;
+
+		//((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_IMAGE, BufferSize, ImageBuffer, 0, NULL);
 		// Just Test : Recv ClipBoard
 		//((WebWindow*)(pstParm->self))->SetClipBoard(D_CLIP_IMAGE, BufferSize, ImageBuffer);
-		g_free(ImageBuffer);
+		//g_free(ImageBuffer);
 		g_object_unref (result);
 	}
 }
@@ -887,8 +901,15 @@ request_rich_text_received_func (GtkClipboard     *clipboard,
 
 	NTLog(pstParm->self, Warning, "ClipBoard data(Native-End) To UI, Length : %d, Data : %s", length, result);
 
-	// do not needed free result
-	((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_TEXT, length, result, 0, NULL);
+
+	if(g_ClipTextLength == 0)
+	{
+		g_ClipTextLength = length;
+		g_richTextResult = result;
+
+		// do not needed free result
+		//((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_TEXT, length, result, 0, NULL);
+	}
 }
 
 /*
@@ -926,37 +947,52 @@ void ClipBoardReceivedFunc(GtkClipboard *clipboard, GtkSelectionData *selection_
 
 	if (target == gdk_atom_intern_static_string ("UTF8_STRING"))
 	{
-		gtk_clipboard_request_contents (clipboard,
-				gdk_atom_intern_static_string ("UTF8_STRING"),
-				request_text_received_func, data);
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, gdk_atom_intern_static_string ("UTF8_STRING"));
+		request_text_received_func(clipboard, selection_data, data);
+
+		//gtk_clipboard_request_contents (clipboard,
+		//		gdk_atom_intern_static_string ("UTF8_STRING"),
+		//		request_text_received_func, data);
 		return;
 	}
 	else if (target == gdk_atom_intern_static_string ("COMPOUND_TEXT"))
 	{
-		gtk_clipboard_request_contents (clipboard,
-				gdk_atom_intern_static_string ("COMPOUND_TEXT"),
-				request_text_received_func, data);
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, gdk_atom_intern_static_string ("COMPOUND_TEXT"));
+		request_text_received_func(clipboard, selection_data, data);
+
+		// gtk_clipboard_request_contents (clipboard,
+		// 		gdk_atom_intern_static_string ("COMPOUND_TEXT"),
+		// 		request_text_received_func, data);
 		return;
 	}
 	else if (target == gdk_atom_intern_static_string ("STRING"))
 	{
-		gtk_clipboard_request_contents (clipboard,
-				gdk_atom_intern_static_string ("STRING"),
-				request_text_received_func, data);
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, gdk_atom_intern_static_string ("STRING"));
+		request_text_received_func(clipboard, selection_data, data);
+
+		// gtk_clipboard_request_contents (clipboard,
+		// 		gdk_atom_intern_static_string ("STRING"),
+		// 		request_text_received_func, data);
 		return;
 	}
 	else if (target == gdk_atom_intern_static_string ("TEXT"))
 	{
-		gtk_clipboard_request_contents (clipboard,
-				gdk_atom_intern_static_string ("TEXT"),
-				request_text_received_func, data);
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, gdk_atom_intern_static_string ("TEXT"));
+		request_text_received_func(clipboard, selection_data, data);
+
+		// gtk_clipboard_request_contents (clipboard,
+		// 		gdk_atom_intern_static_string ("TEXT"),
+		// 		request_text_received_func, data);
 		return;
 	}
 	else if (target == GDK_TARGET_STRING)
 	{
-		gtk_clipboard_request_contents (clipboard,
-				GDK_TARGET_STRING,
-				request_text_received_func, data);
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, GDK_TARGET_STRING);
+		request_text_received_func(clipboard, selection_data, data);
+
+		// gtk_clipboard_request_contents (clipboard,
+		// 		GDK_TARGET_STRING,
+		// 		request_text_received_func, data);
 		return;
 	}
 	/* If we asked for image/png and didn't get it, try image/jpeg;
@@ -967,33 +1003,48 @@ void ClipBoardReceivedFunc(GtkClipboard *clipboard, GtkSelectionData *selection_
 	else if (target == gdk_atom_intern_static_string ("image/png"))
 	{
 		strcpy(pstParm->szExt, "png");
-		gtk_clipboard_request_contents (clipboard,
-				gdk_atom_intern_static_string ("image/png"),
-				request_image_received_func, pstParm);
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, gdk_atom_intern_static_string ("image/png"));
+		request_image_received_func(clipboard, selection_data, pstParm);
+
+		// gtk_clipboard_request_contents (clipboard,
+		// 		gdk_atom_intern_static_string ("image/png"),
+		// 		request_image_received_func, pstParm);
 		return;
 	}
 	else if (target == gdk_atom_intern_static_string ("image/jpeg"))
 	{
 		strcpy(pstParm->szExt, "jpeg");
-		gtk_clipboard_request_contents (clipboard,
-				gdk_atom_intern_static_string ("image/jpeg"),
-				request_image_received_func, pstParm);
+
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, gdk_atom_intern_static_string ("image/jpeg"));
+		request_image_received_func(clipboard, selection_data, pstParm);
+
+		// gtk_clipboard_request_contents (clipboard,
+		// 		gdk_atom_intern_static_string ("image/jpeg"),
+		// 		request_image_received_func, pstParm);
 		return;
 	}
 	else if (target == gdk_atom_intern_static_string ("image/gif"))
 	{
 		strcpy(pstParm->szExt, "gif");
-		gtk_clipboard_request_contents (clipboard,
-				gdk_atom_intern_static_string ("image/gif"),
-				request_image_received_func, pstParm);
+
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, gdk_atom_intern_static_string ("image/gif"));
+		request_image_received_func(clipboard, selection_data, pstParm);
+
+		// gtk_clipboard_request_contents (clipboard,
+		// 		gdk_atom_intern_static_string ("image/gif"),
+		// 		request_image_received_func, pstParm);
 		return;
 	}
 	else if (target == gdk_atom_intern_static_string ("image/bmp"))
 	{
 		strcpy(pstParm->szExt, "bmp");
-		gtk_clipboard_request_contents (clipboard,
-				gdk_atom_intern_static_string ("image/bmp"),
-				request_image_received_func, pstParm);
+
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, gdk_atom_intern_static_string ("image/bmp"));
+		request_image_received_func(clipboard, selection_data, pstParm);
+
+		// gtk_clipboard_request_contents (clipboard,
+		// 		gdk_atom_intern_static_string ("image/bmp"),
+		// 		request_image_received_func, pstParm);
 		return;
 	}
 	else if (target == gdk_atom_intern_static_string ("text/uri-list"))
@@ -1005,37 +1056,52 @@ void ClipBoardReceivedFunc(GtkClipboard *clipboard, GtkSelectionData *selection_
 	}
 	else if (target == gdk_atom_intern_static_string ("text/html;charset=utf-8"))
 	{
-	 	gtk_clipboard_request_contents (clipboard, 
-				gdk_atom_intern_static_string ("text/html;charset=utf-8"),
-				request_rich_text_received_func, data);
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, gdk_atom_intern_static_string ("text/html;charset=utf-8"));
+		request_rich_text_received_func(clipboard, selection_data, data);
+
+	 	// gtk_clipboard_request_contents (clipboard, 
+		// 		gdk_atom_intern_static_string ("text/html;charset=utf-8"),
+		// 		request_rich_text_received_func, data);
 		return;
 	}
 	else if (target == gdk_atom_intern_static_string ("text/plain;charset=utf-8"))
 	{
-	 	gtk_clipboard_request_contents (clipboard, 
-				gdk_atom_intern_static_string ("text/plain;charset=utf-8"),
-				request_rich_text_received_func, data);
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, gdk_atom_intern_static_string ("text/plain;charset=utf-8"));
+		request_rich_text_received_func(clipboard, selection_data, data);
+
+	 	// gtk_clipboard_request_contents (clipboard, 
+		// 		gdk_atom_intern_static_string ("text/plain;charset=utf-8"),
+		// 		request_rich_text_received_func, data);
 		return;
 	}
 	else if (target == gdk_atom_intern_static_string ("text/html"))
 	{
-	 	gtk_clipboard_request_contents (clipboard, 
-				gdk_atom_intern_static_string ("text/html"),
-				request_rich_text_received_func, data);
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, gdk_atom_intern_static_string ("text/html"));
+		request_rich_text_received_func(clipboard, selection_data, data);
+
+	 	// gtk_clipboard_request_contents (clipboard, 
+		// 		gdk_atom_intern_static_string ("text/html"),
+		// 		request_rich_text_received_func, data);
 		return;
 	}
 	else if (target == gdk_atom_intern_static_string ("text/plain"))
 	{
-	 	gtk_clipboard_request_contents (clipboard, 
-				gdk_atom_intern_static_string ("text/plain"),
-				request_rich_text_received_func, data);
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, gdk_atom_intern_static_string ("text/plain"));
+		request_rich_text_received_func(clipboard, selection_data, data);
+
+	 	// gtk_clipboard_request_contents (clipboard, 
+		// 		gdk_atom_intern_static_string ("text/plain"),
+		// 		request_rich_text_received_func, data);
 		return;
 	}
 	else if (target == gdk_atom_intern_static_string("Rich Text Format"))
 	{
-	 	gtk_clipboard_request_contents (clipboard, 
-				gdk_atom_intern_static_string("Rich Text Format"),
-				request_rich_text_received_func, data);
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, gdk_atom_intern_static_string ("Rich Text Format"));
+		request_rich_text_received_func(clipboard, selection_data, data);
+
+	 	// gtk_clipboard_request_contents (clipboard, 
+		// 		gdk_atom_intern_static_string("Rich Text Format"),
+		// 		request_rich_text_received_func, data);
 		return;
 	}
 }
@@ -1157,9 +1223,90 @@ void TargetCallback(GtkClipboard *clipboard, GdkAtom *atoms, gint n_atoms, gpoin
 		else continue;
 
 		NTLog(pstParm->self, Info, "In targetCallback(Check Type): Atom(%d. %s)\n", i_for, gdk_atom_name(atoms[i_for]));
-		gtk_clipboard_request_contents (clipboard, atoms[i_for], ClipBoardReceivedFunc, data);
+		NTLog(pstParm->self, Info, "ClipCount : %d\n", n_atoms);
 
-	} // for(i_for = 0; i_for < n_atoms; i_for++) {
+		GtkSelectionData *selection_data = gtk_clipboard_wait_for_contents(clipboard, atoms[i_for]);
+		ClipBoardReceivedFunc(clipboard, selection_data, data);
+		//gtk_clipboard_request_contents (clipboard, atoms[i_for], ClipBoardReceivedFunc, data);
+
+	}
+
+	int nGroupId = pstParm->nGroupId;
+	bool bUseClipSelectSend = false;
+	int nDataType= D_CLIP_TEXT;
+
+	bool isImage = false;
+	bool isText = false;
+
+	if(g_ClipTextLength > 0)
+		isText = true;
+	if(g_BufferSize > 0)
+		isImage = true;
+
+
+	if (m_mapBoolUseClipSelect.find(nGroupId) != m_mapBoolUseClipSelect.end())
+		bUseClipSelectSend = true;
+
+
+	NTLog(SelfThis, Info, "Image : %d , Text : %d", isImage, isText);
+	if(isImage && isText)
+    {
+        if(!bUseClipSelectSend)
+        {   
+			if (m_mapBoolClipSendTextFirst.find(nGroupId) != m_mapBoolClipSendTextFirst.end())    
+            {
+                nDataType = D_CLIP_TEXT;
+            }
+            else
+            {
+                nDataType = D_CLIP_IMAGE;
+            }
+        }
+        else
+        {
+            nDataType = D_CLIP_OBJECT;    
+        }
+    }
+    else if(isImage)
+    {
+        nDataType = D_CLIP_IMAGE;
+    }
+    else if(isText)
+    {
+        nDataType = D_CLIP_TEXT;
+    }
+    else
+    {
+        nDataType = 0;
+    }
+
+	if (nDataType == D_CLIP_TEXT)
+	{
+		if(g_ClipTextResult != NULL)
+			((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, nDataType, g_ClipTextLength, g_ClipTextResult, 0, NULL);
+		else
+			((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, nDataType, g_ClipTextLength, g_richTextResult, 0, NULL);
+	}
+	else if(nDataType == D_CLIP_IMAGE)
+	{
+		((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, nDataType, g_BufferSize, g_ImageBuffer, 0, NULL);
+	}
+	else if (nDataType == D_CLIP_OBJECT)
+	{
+		if(g_ClipTextResult != NULL)
+			((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, nDataType, g_BufferSize, g_ImageBuffer, g_ClipTextLength, g_ClipTextResult);
+		else
+			((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, nDataType, g_BufferSize, g_ImageBuffer, g_ClipTextLength, g_richTextResult);
+	}
+	else
+		return;
+
+	g_free(g_ImageBuffer);
+	g_ImageBuffer = NULL;
+	g_BufferSize = 0;
+	g_free(g_ClipTextResult);
+	g_ClipTextResult = NULL;
+	g_ClipTextLength = 0;
 }
 
 
@@ -1591,5 +1738,5 @@ void WebWindow::SetTrayStatus(bool bSetTextShowNchecked)
 {
 
 }
-
 #endif
+
