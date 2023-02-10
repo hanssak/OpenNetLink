@@ -532,8 +532,7 @@ void WebWindow::SendMessage(AutoString message)
 void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI)
 {
 
-	g_print ("Start Noti\n");
-
+	//g_print ("Start Noti\n");
 
 	GNotification *notification;
 	GFile *file;
@@ -550,12 +549,12 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	g_object_unref (icon);
 	g_object_unref (file);
 
-	//if (navURI) g_notification_add_button_with_target (notification, "페이지 이동", "app.navigate-uri", "s", navURI);
+	if (navURI) g_notification_add_button_with_target (notification, "페이지 이동", "app.navigate-uri", "s", navURI);
 
 	g_application_send_notification (G_APPLICATION(_app), title, notification);
 	g_object_unref (notification);
 
-	g_print ("End Nofi\n");
+	//g_print ("End Nofi\n");
 }
 
 void HandleCustomSchemeRequest(WebKitURISchemeRequest* request, gpointer user_data)
