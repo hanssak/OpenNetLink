@@ -1,4 +1,4 @@
-오후 2:59 2023-02-13///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // ADDINS
 ///////////////////////////////////////////////////////////////////////////////
 #addin nuget:?package=Cake.Git&version=1.1.0
@@ -352,10 +352,10 @@ Task("PubDebian")
 
 	// 필요할때에 추가로 개발예정
     	using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility"))
-             {
-		process.WaitForExit();
-		Information("Package linux: Exit code: {0}", process.GetExitCode());
-	}
+        {
+			process.WaitForExit();
+			//Information("Package linux: Exit code: {0}", process.GetExitCode());
+		}
 });
 
 Task("PkgDebian")
