@@ -196,8 +196,22 @@
         strInnerErrorInfoMsg = XmlConf.GetInfoMsg("I_0231");                                    //내부파일 확인
     }
 
+    public void FileAddFailLog()
+    {
+        for (int i = 0; i < listDenied.Count; i++)
+        {
+            eFileAddErr errType = listDenied[i].eErrType;
+            string strFileName = listDenied[i].FileName;
+            string strReason = listDenied[i].GetFileAddErrContent(strFileName, errType);
+
+            CLog.Here().Information($"######### - 파일추가 실패 원인 - FileAddErr : {errType}, FileName : {strFileName}, Reason : {strReason}");
+        }
+    }
+
     public async Task openPopUp()
     {
+        FileAddFailLog();
+
         object[] param = { "Transfer_Denied" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
