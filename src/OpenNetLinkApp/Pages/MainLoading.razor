@@ -138,9 +138,11 @@
 
         //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
         //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
+        //현재 소스상의 SiteConfig 값을 사용하게 했는데 이것보다 OpConfig 를 사용하게 해서 가독성 및 혼란이 없게 한다.
+        //(Popup Login일 경우 OpConfig 사용, 하지만 OpConfig일 경우 GroupId별로 정의할 수 없다. 추후 수정이 필요하다면 수정.
         //if (AppConfigSvc.GetUseAppLoginType())
-        //if (OpConfigSvc.GetUseAppLoginType())
-        if (siteConfig.GetUseAppLoginType(groupId))
+        if (OpConfigSvc.GetUseAppLoginType())
+        //if (siteConfig.GetUseAppLoginType(groupId))
         {
             loginType = OpConfigSvc.GetAppLoginType().ToString();
         }
