@@ -1,6 +1,6 @@
 // For this to build on WSL (Ubuntu 18.04) you need to:
 //  sudo apt-get install libgtk-3-dev libwebkit2gtk-4.0-dev
-#ifdef OS_LINUX
+
 #include "WebWindow.h"
 #include <mutex>
 #include <condition_variable>
@@ -162,7 +162,8 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 	gtk_init(0, NULL);
  	keybinder_init();
 
-	_app = gtk_application_new("hanssak.webwindow.open.netlink", G_APPLICATION_FLAGS_NONE);
+	_app = gtk_application_new("org.gnome.SecureGate", G_APPLICATION_FLAGS_NONE);
+	//_app = gtk_application_new("hanssak.webwindow.open.netlink", G_APPLICATION_FLAGS_NONE);
 	g_application_register(G_APPLICATION(_app), NULL, NULL);
 	_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	_g_window = _window;
@@ -531,9 +532,6 @@ void WebWindow::SendMessage(AutoString message)
 
 void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI)
 {
-
-	//g_print ("Start Noti\n");
-
 	GNotification *notification;
 	GFile *file;
 	GIcon *icon;
@@ -552,9 +550,9 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	if (navURI) g_notification_add_button_with_target (notification, "페이지 이동", "app.navigate-uri", "s", navURI);
 
 	g_application_send_notification (G_APPLICATION(_app), title, notification);
+	
 	g_object_unref (notification);
 
-	//g_print ("End Nofi\n");
 }
 
 void HandleCustomSchemeRequest(WebKitURISchemeRequest* request, gpointer user_data)
@@ -1737,5 +1735,5 @@ void WebWindow::SetTrayStatus(bool bSetTextShowNchecked)
 {
 
 }
-#endif
+
 

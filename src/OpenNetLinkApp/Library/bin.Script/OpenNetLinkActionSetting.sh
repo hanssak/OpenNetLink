@@ -30,7 +30,7 @@ if [ tmaxos = "${OS,,}" ] ; then
     cp -rf ${PATH_BIN_SCRIPT}/tmaxos/SecureGate.desktop ${PATH_APPLICATIONS}
 else 
     # start desktop stting
-    cp -rf ${PATH_BIN_SCRIPT}/SecureGate.desktop ${PATH_APPLICATIONS}
+    cp -rf ${PATH_BIN_SCRIPT}/org.gnome.SecureGate.desktop ${PATH_APPLICATIONS}
 
     #파일탐색기가 나무가 아닌 경우엔, 노틸러스 쪽 우클릭 동작   
     if [ -d ${PATH_NEMO} ] ; then

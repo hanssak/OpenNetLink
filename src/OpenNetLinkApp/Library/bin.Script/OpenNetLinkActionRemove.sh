@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PATH_NEMO_CONTEXTMENU=/usr/share/nemo/actions/ContextMenu.nemo_action
-PATH_APPLICATIONS_SECUREGATE=/usr/share/applications/SecureGate.desktop
+PATH_APPLICATIONS_SECUREGATE=/usr/share/applications/org.gnome.SecureGate.desktop
 PATH_OPENNETLINK=/opt/hanssak/opennetlink
 
 USERNAME=`users | xargs -n1 | uniq`
