@@ -1037,8 +1037,8 @@ public bool FilePrevDownExtension(string sFileName)
     }
 
     // 확장자 종류로 Web으로 preview 할지 결정
-    //string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp", "log" };
-    string[] strExt = new string[] { "docx", "doc"};
+    string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp", "log" };
+    //string[] strExt = new string[] { "docx", "doc"};
     string strExtName = Path.GetExtension(sFileName);
     strExtName = strExtName.Substring(1);
     if (strExtName.Equals(""))

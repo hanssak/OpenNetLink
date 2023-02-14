@@ -26,12 +26,13 @@ using Microsoft.EntityFrameworkCore.Storage;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-
+using AgLogManager;
 
 namespace OpenNetLinkApp.Services
 {
     public class HSCmdCenter
     {
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<HSCmdCenter>();
 
         private ConcurrentDictionary<int, HsNetWork> m_DicNetWork = new ConcurrentDictionary<int, HsNetWork>();
         public SGDicRecvData sgDicRecvData = new SGDicRecvData();
@@ -843,7 +844,7 @@ namespace OpenNetLinkApp.Services
             HsNetWork hs = null;
             if (m_DicNetWork.TryGetValue(groupId, out hs) == false && nRet == 0)
             {
-                HsLog.info($"BindAfterSend - BIND Success But - m_DicNetWork.TryGetValue return false");
+                CLog.Here().Information($"BindAfterSend - BIND Success But - m_DicNetWork.TryGetValue return false");
                 return;
             }
 
@@ -947,10 +948,10 @@ namespace OpenNetLinkApp.Services
             if (string.IsNullOrEmpty(strDeletePath))
                 return;
 
-            HsLog.info($"DeleteTimeOverFiles : {strDeletePath}, delete OVer Time : {nDeleteTimeHour}");
+            CLog.Here().Information($"DeleteTimeOverFiles : {strDeletePath}, delete OVer Time : {nDeleteTimeHour}");
             if (nDeleteTimeHour < 1)
             {
-                HsLog.info($"DeleteTimeOverFiles - invalid input : {nDeleteTimeHour}");
+                CLog.Here().Information($"DeleteTimeOverFiles - invalid input : {nDeleteTimeHour}");
                 return;
             }
 
@@ -967,7 +968,7 @@ namespace OpenNetLinkApp.Services
                 DateTime tmDelete = tmCreate.AddHours(nDeleteTimeHour);
                 DateTime tmCurrent = DateTime.Now;
 
-                HsLog.info($"DeleteTimeOverFiles - File : {File.FullName}, " +
+                CLog.Here().Information($"DeleteTimeOverFiles - File : {File.FullName}, " +
                     $"CreateTime : {tmCreate.ToString("yyyy/MM/dd HH:mm:ss")}, " +
                     $"DeleteTime : {tmDelete.ToString("yyyy/MM/dd HH:mm:ss")}, " +
                     $"CueentTime : {tmCurrent.ToString("yyyy/MM/dd HH:mm:ss")}");
@@ -975,7 +976,7 @@ namespace OpenNetLinkApp.Services
                 if ((tmCurrent - tmDelete).TotalSeconds > 0)
                 {
                     System.IO.File.Delete(File.FullName);
-                    HsLog.info($"DeleteTimeOverFiles - FileDelte! : {File.FullName}");
+                    CLog.Here().Information($"DeleteTimeOverFiles - FileDelte! : {File.FullName}");
                 }
 
             } // foreach (System.IO.FileInfo File in di.GetFiles())
@@ -990,7 +991,7 @@ namespace OpenNetLinkApp.Services
                 if (Directory.EnumerateFileSystemEntries(Dir.FullName).Any() == false)
                 {
                     Directory.Delete(Dir.FullName);
-                    HsLog.info($"DeleteTimeOverFiles - Delete Empty Folder : {Dir.FullName}");
+                    CLog.Here().Information($"DeleteTimeOverFiles - Delete Empty Folder : {Dir.FullName}");
                 }
             }
 
@@ -1009,7 +1010,7 @@ namespace OpenNetLinkApp.Services
             }
 
             Stopwatch sw = new Stopwatch();
-            HsLog.info($"Recv File Delete Cycle - Thread - Do");
+            CLog.Here().Information($"Recv File Delete Cycle - Thread - Do");
             HSCmdCenter hSCmdCenter = (HSCmdCenter)obj;
             int nIdx = 0;
             int[] nArryDeleteTime = new int[hSCmdCenter.m_nNetWorkCount];
@@ -1041,11 +1042,11 @@ namespace OpenNetLinkApp.Services
                     if (bIsLogin && sgLoginData != null)
                     {
                         nArryDeleteTime[nIdx] = sgLoginData.GetFileRemoveCycle();
-                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DELETECYCLE : {nArryDeleteTime[nIdx]}");
+                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DELETECYCLE : {nArryDeleteTime[nIdx]}");
                     }
                     else
                     {
-                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , Logout Status!");
+                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , Logout Status!");
                     }
 
 
@@ -1058,7 +1059,7 @@ namespace OpenNetLinkApp.Services
                     {
                         // 삭제주기 설정된 값마다 삭제
                         strDownPath = GetDownLoadPath(nIdx);
-                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DeletePath : {strDownPath}");
+                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DeletePath : {strDownPath}");
 
 
                         DeleteTimeOverFiles(strDownPath, nArryDeleteTime[nIdx]);

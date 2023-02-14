@@ -586,7 +586,7 @@
         HSCmdCenter.sgPageEvent.SetDownloadCountEventAdd(groupID, ReceiveDownloadCount);
         HSCmdCenter.SendDownloadCount(groupID, strUserID, seq.ToString());
 
-        await Task.Delay(300);  // KKW-download개수 의심됨
+        await Task.Delay(300);  // download개수 정보 필요
 
         object[] param = { "TransPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
@@ -621,6 +621,7 @@
 
             if (result != "0")
             {
+                CLog.Here().Information($"#####(DownLoadCount - reason : {reason}");
                 ShowMessage("error", reason);
                 return;
             }
@@ -630,8 +631,11 @@
 
             m_downMaxCurr = $"{XmlConf.GetTitle("T_ETC_DOWNLOADCOUNT")} :  {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
 
+            if (bGetDownCount == false)     // Server에서 data가 안내려 올때, 다운로드 가능 횟수 표현안함.
+                m_bNetDownloadable = false;
+
             //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
-            if (m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
+            if (bGetDownCount && m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
             {
                 if (m_downloadCount < sgLoginData.GetMaxDownCount())
                     m_bNetDownloadable = true;

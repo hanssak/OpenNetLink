@@ -409,7 +409,14 @@
 
                     string strJsonData = stringIDpwJsonString(strEncID, strEncPW);
                     string stRtn = "";
+                    int nCode = 0;
+                    string strMsg = "";
+                    string strData = "";
+                    int nData = 0;
 
+#if false   // 사무실(Office KKW Test) 용도
+
+                //#if true  // SITE배포용도
 
                     stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
                     if (stRtn == null || (1 > stRtn.Length))
@@ -418,11 +425,6 @@
                         ShowLoginFail(XmlConf.GetErrMsg("E_0254"));
                         return;
                     }
-
-                    int nCode = 0;
-                    string strMsg = "";
-                    string strData = "";
-                    int nData = 0;
 
                     // json으로 온 Data에서 실제 data 뽑아내는 동작
                     using (JsonDocument document = JsonDocument.Parse(stRtn))
@@ -433,7 +435,13 @@
                         strData = jroot.GetProperty("data").GetString();
                     }
 
-                    CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");                                        
+#else
+                    CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
+                    strData = "1";
+                    stRtn = "1";
+#endif
+
+                    CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
 
                     if (stRtn != null && stRtn.Length > 0 && strData == "1")
                     {
@@ -818,7 +826,7 @@
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
             foreach (ISGNetwork netlist in listNetWork)
             {
-                HsLog.info($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
+                CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
 
                 // 1 login ALL 적용때에는 중복로그인시 강제 로그인 적용
                 HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(netlist.GroupID, ShowSessionCountPopup);

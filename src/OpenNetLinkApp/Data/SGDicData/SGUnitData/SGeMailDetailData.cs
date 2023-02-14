@@ -15,19 +15,6 @@ using OpenNetLinkApp.Common;
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
 
-
-    public class SGemailDetailData : SGDetailData
-    {
-        public SGemailDetailData()
-        {
-        }
-
-        ~SGemailDetailData()
-        {
-        }
-    }
-
-
     public class emailtransData : transData
     {
 

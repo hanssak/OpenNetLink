@@ -1630,39 +1630,40 @@
     }
 
 
-    /// <summary>
-    /// UI상에 승인정보현황에 전송요청, 승인대기, 승인완료, 승인반려 개수 표시할것들 query 서버에보냄
-    /// </summary>
-    public void DashBoardSearchCount()
-    {
-        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*/
-        int groupID = groupIDbyParam;
-
-        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-        {
-            StateHasChanged();
-            return;
-        }
-
-        string strUserSeq = sgUserData.GetUserSequence();
-        SGQueryExtend sgQueryExtend = new SGQueryExtend();
-        string strDate = DateTime.Now.ToString("yyyyMMdd");
-        string strQuery = sgQueryExtend.GetDashboardCountQuery(strUserSeq, strDate);
-        HsCmdCenter.SendDashBoardCount(groupID, curUserID, strQuery);
-    }
+    ///// <summary>
+    ///// UI상에 승인정보현황에 전송요청, 승인대기, 승인완료, 승인반려 개수 표시할것들 query 서버에보냄
+    ///// </summary>
+    //public void DashBoardSearchCount()
+    //{
+    //    /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    //    int groupID = 0;
+    //    if (sgSideBar != null)
+    //        groupID = sgSideBar.GroupId;*/
+    //    int groupID = groupIDbyParam;
+    //
+    //    SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+    //    if (sgLoginData != null)
+    //        curUserID = sgLoginData.GetUserID();
+    //
+    //    SGUserData sgUserData = null;
+    //    sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+    //    if (sgUserData == null)
+    //    {
+    //        StateHasChanged();
+    //        return;
+    //    }
+    //
+    //    string strUserSeq = sgUserData.GetUserSequence();
+    //    SGQueryExtend sgQueryExtend = new SGQueryExtend();
+    //    string strDate = DateTime.Now.ToString("yyyyMMdd");
+    //    string strQuery = sgQueryExtend.GetDashboardCountQuery(strUserSeq, strDate);
+    //    HsCmdCenter.SendDashBoardCount(groupID, curUserID, strQuery);
+    //}
 
 
     /// <summary>
     /// UI상에 승인정보현황 전송요청, 승인대기, 승인완료, 승인반려 개수 표시할것들 정보 받음
+    /// , 승인대기, 승인완료, 승인반려 개수 표시할것들 정보 받음
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -2245,8 +2246,8 @@
         strToDate = dateTo.ToString("yyyy-MM-dd");
         strFromDate = dateFrom.ToString("yyyy-MM-dd");
 
-        strToDate = strToDate.Replace("-", "");
-        strFromDate = strFromDate.Replace("-", "");
+        strToDate = strToDate.Replace("-", "") + "235959";
+        strFromDate = strFromDate.Replace("-", "") + "000000";
     }
 
     /// <summary>

@@ -11,6 +11,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Serilog;
 using OpenNetLinkApp.Common;
+using AgLogManager;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -833,7 +834,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             if (strFIleIdx.Length < 1)
             {
-                Log.Information($"FILE-Index : Empty");
+                Log.Logger.Here().Information($"FILE-Index : Empty");
                 return true;
             }
 
@@ -842,7 +843,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             int dataCount = listDicdata.Count;
             if (dataCount <= 0)
             {
-                Log.Information($"FILERECORD Count: 0");
+                Log.Logger.Here().Information($"FILERECORD Count: 0");
                 return true;
             }
 
@@ -862,7 +863,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         strFileSize = "";
                         if (data.TryGetValue(3, out strFileSize))                   // 파일 Size
                         {
-                            Log.Information($"FILE({strFileIndexData}) Size : {strFileSize}");
+                            Log.Logger.Here().Information($"FILE({strFileIndexData}) Size : {strFileSize}");
 
                             Int64 nSize = 0;
                             if (!strFileSize.Equals(""))
@@ -876,7 +877,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             }
 
-            Log.Information($"FILE Not Found !!!");
+            Log.Logger.Here().Information($"FILE Not Found !!!");
             return true;
         }
 

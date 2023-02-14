@@ -3196,7 +3196,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             btHLP_Header = new byte[] { 0x53, 0x43, 0x44, 0x53, 0x41, 0x30, 0x30 };
             if (ByteArrayCompare(btFileData, btHLP_Header) == true)
             {
-                Log.Information("[IsDRM] - softcamp !");
+                Log.Logger.Here().Information("[IsDRM] - softcamp !");
                 return true;
             }
 
@@ -3204,14 +3204,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             btHLP_Header = new byte[] { 0x3C, 0x44, 0x4F, 0x43, 0x55, 0x4D, 0x45, 0x4E, 0x54, 0x20, 0x53, 0x41, 0x46, 0x45, 0x52, 0x20 };
             if (ByteArrayCompare(btFileData, btHLP_Header) == true)
             {
-                Log.Information("[IsDRM] - MarkAny(1) !");
+                Log.Logger.Here().Information("[IsDRM] - MarkAny(1) !");
                 return true;
             }
 
             btHLP_Header = new byte[] { 0x3C, 0x44, 0x4F, 0x43, 0x55, 0x4D, 0x45, 0x4E, 0x54, 0x53, 0x41, 0x46, 0x45, 0x52, 0x5F };
             if (ByteArrayCompare(btFileData, btHLP_Header) == true)
             {
-                Log.Information("[IsDRM] - MarkAny(2) !");
+                Log.Logger.Here().Information("[IsDRM] - MarkAny(2) !");
                 return true;
             }
 
@@ -3220,7 +3220,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 0x43, 0x6F, 0x6E, 0x74, 0x61, 0x69, 0x6E, 0x65, 0x72, 0x20 };
             if (ByteArrayCompare(btFileData, btHLP_Header) == true)
             {
-                Log.Information("[IsDRM] - fasoo(1) !");
+                Log.Logger.Here().Information("[IsDRM] - fasoo(1) !");
                 return true;
             }
 
@@ -3231,7 +3231,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 0x64, 0x20, 0x62, 0x79, 0x20, 0x46, 0x61, 0x73, 0x6F, 0x6F, 0x20, 0x44, 0x52, 0x4D, 0x20 };
             if (ByteArrayCompare(btFileData, btHLP_Header) == true)
             {
-                Log.Information("[IsDRM] - fasoo(2) !");
+                Log.Logger.Here().Information("[IsDRM] - fasoo(2) !");
                 return true;
             }
 
@@ -3241,7 +3241,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 0x64, 0x20, 0x62, 0x79, 0x20, 0x46, 0x61, 0x73, 0x6F, 0x6F, 0x20, 0x44, 0x52, 0x4D };
             if (ByteArrayCompare(btFileData, btHLP_Header) == true)
             {
-                Log.Information("[IsDRM] - fasoo(3) !");
+                Log.Logger.Here().Information("[IsDRM] - fasoo(3) !");
                 return true;
             }
 
@@ -3307,7 +3307,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 
             string strFileMime = MimeGuesser.GuessMimeType(btFileData);
-            Log.Information("[IsValidFileExt] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM);
+            Log.Logger.Here().Information("[IsValidFileExt] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM);
 
             // 0kb			
             if (bEmptyFIleNoCheck && String.Compare(strFileMime, "application/x-empty") == 0) return eFileAddErr.eFANone;
@@ -3343,7 +3343,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 
             string strFileMime = MimeGuesser.GuessMimeType(btFileData);
-            Log.Information("[IsValidFileExtInnerZip] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM);
+            Log.Logger.Here().Information("[IsValidFileExtInnerZip] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM);
             if (String.Compare(strFileMime, "text/plain") == 0) return eFileAddErr.eFANone;
 
             if (String.IsNullOrEmpty(strExt) == true)
@@ -4476,7 +4476,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (!dirZipBase.Exists)
                 dirZipBase.Create();
 
-            Log.Information("[CheckZipFile] ZipFile[{0}] Ext[WhiteF({1})-Info({2})] ZipCheck[MaxDepth({3})-BlockOption({4})] AllowDrmF[{5}]",
+            Log.Logger.Here().Information("[CheckZipFile] ZipFile[{0}] Ext[WhiteF({1})-Info({2})] ZipCheck[MaxDepth({3})-BlockOption({4})] AllowDrmF[{5}]",
                  Path.GetFileName(hsStream.FileName), blWhite, strExtInfo, nMaxDepth, nOption, blAllowDRM);
 
             bool bIsApproveExt = false;
@@ -4505,7 +4505,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 }
                 catch (System.Exception err)
                 {
-                    Log.Warning("[CheckZipFile] Directory.Delete() " + err.Message + " " + err.GetType().FullName);
+                    Log.Logger.Here().Warning("[CheckZipFile] Directory.Delete() " + err.Message + " " + err.GetType().FullName);
                 }
 
                 fiZipFile = new FileInfo(strZipFile);
@@ -4585,7 +4585,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     {
                         FileAddErr childFile = currentFile.CreateChildren(entry.Key, strOrgZipFileRelativePath, currentFile.FileName);            //zip파일의 자식 File 생성
 
-                        Log.Information("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
+                        Log.Logger.Here().Information("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
                         int per = (ExamCount * 100) / TotalCount;
                         if (per < 20)
                             per = 20;
@@ -4683,7 +4683,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                         if (nCurDepth >= nMaxDepth)
                         {
-                            Log.Information($"[ScanZipFile] Skip to check zip file[{Path.GetFileName(strZipFile)}]. MaxDepth[{nMaxDepth}] CurDepth[{nCurDepth}] BlockOption[{nBlockOption}] Remain Zip File[{strZipFile}] in {strOrgZipFile}");
+                            Log.Logger.Here().Information($"[ScanZipFile] Skip to check zip file[{Path.GetFileName(strZipFile)}]. MaxDepth[{nMaxDepth}] CurDepth[{nCurDepth}] BlockOption[{nBlockOption}] Remain Zip File[{strZipFile}] in {strOrgZipFile}");
                             strOverMaxDepthZipFile = entry.Key;
 
                             //2022.10.07 BY KYH - CLIENT_ZIP_DEPTH 의 Block 옵션 활용
@@ -4766,7 +4766,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             try
             {
-                Log.Information($"[CheckDocumentFile] DocumentFile[{Path.GetFileName(hsStream.FileName)}] OLEMimeWhite[{isOLEMimeTypeWhite}] Ext[White({isWhite})-Info({fileFilterExtInfo})]");
+                Log.Logger.Here().Information($"[CheckDocumentFile] DocumentFile[{Path.GetFileName(hsStream.FileName)}] OLEMimeWhite[{isOLEMimeTypeWhite}] Ext[White({isWhite})-Info({fileFilterExtInfo})]");
 
                 //bool usecheckOLE_Mime = true;       //기본 OLE 기능 - OLE 검출 함수 호출 여부
                 //bool usecheckOLE_Extension = true;  //OLE 검사 옵션1 - OLE개체 마임리스트 검사 여부
@@ -4780,7 +4780,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             catch (Exception ex)
             {
-                Log.Error($"[CheckDocumentFile] Exception = [{ex.ToString()}]");
+                Log.Logger.Here().Error($"[CheckDocumentFile] Exception = [{ex.ToString()}]");
                 return -1;
             }
             finally
@@ -4790,7 +4790,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     Directory.Delete(strDocumentExtractRootPath, true);
                 }
                 catch (System.Exception err)
-                { Log.Warning("[CheckDocumentFile] Fail Directory.Delete() " + err.Message + " " + err.GetType().FullName); }
+                { Log.Logger.Here().Warning("[CheckDocumentFile] Fail Directory.Delete() " + err.Message + " " + err.GetType().FullName); }
             }
         }
 
@@ -4848,7 +4848,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 //1단계 : 모듈검사 (문서 검사의 필수)
                 extractorResult = OfficeExtractor.Controller.ExcuteExtractor(fileMemoryStream, hsStream.FileName, strExtractFilePath);
-                Log.Information($"[scanDocumentFile]  ExcuteExtractor DocumentFile[{Path.GetFileName(hsStream.FileName)}] extractorResult[{extractorResult}]");
+                Log.Logger.Here().Information($"[scanDocumentFile]  ExcuteExtractor DocumentFile[{Path.GetFileName(hsStream.FileName)}] extractorResult[{extractorResult}]");
             }
 
             GC.Collect();
@@ -5024,7 +5024,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             catch (FileNotFoundException ioEx)
             {
-                Log.Information("LoadMimeConf Exception Msg = [{0}]", ioEx.Message);
+                Log.Logger.Here().Error("LoadMimeConf Exception Msg = [{0}]", ioEx.Message);
             }
         }
 
@@ -5064,7 +5064,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             catch (FileNotFoundException ioEx)
             {
-                Log.Information("LoadOLEMimeConf Exception Msg = [{0}]", ioEx.Message);
+                Log.Logger.Here().Information("LoadOLEMimeConf Exception Msg = [{0}]", ioEx.Message);
             }
         }
     }

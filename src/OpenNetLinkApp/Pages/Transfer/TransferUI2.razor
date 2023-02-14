@@ -1417,7 +1417,7 @@
             catch (Exception err)
             {
                 // error
-                CLog.Error($"dropFile.DataClear - error:{err.Source} - Msg : {err.Message}");
+                CLog.Here().Error($"dropFile.DataClear - error:{err.Source} - Msg : {err.Message}");
             }
 
             strBindTitle = "";
@@ -2964,7 +2964,7 @@
         CLog.Here().Information("[HandleFileInputChange]파일드랍 이벤트 수신, 갯수:" + files.Length);
         foreach (var file in files)
         {
-            CLog.Here().Here().Information("[HandleFileInputChange]파일명:" + file.Name);
+            CLog.Here().Information("[HandleFileInputChange]파일명:" + file.Name);
         }
 
         dropFile.fileSizeError = false;
