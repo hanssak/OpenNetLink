@@ -183,7 +183,13 @@
         }
 
         if (HsStreamList != null && HsStreamList.Count > 0)
+        {
+            foreach(HsStream stream in HsStreamList)
+            {
+                stream.stream.Dispose();
+            }
             HsStreamList.Clear();
+        }
 
         bAllCheck = false;
 
@@ -204,6 +210,7 @@
                     {
                         fileAddManage.m_nTansCurSize = fileAddManage.m_nTansCurSize - HsStreamList[i - 1].Size;
                         fileAddManage.m_nTransCurCount = fileAddManage.m_nTransCurCount - 1;
+                        HsStreamList[i - 1].stream.Dispose();
                         HsStreamList.RemoveAt(i - 1);
                     }
                 }
