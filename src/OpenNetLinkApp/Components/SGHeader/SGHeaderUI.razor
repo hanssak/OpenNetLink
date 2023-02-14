@@ -771,7 +771,7 @@ public void DoLogOutSetData(int nGroupID)
     HsCmdCenter.sgDicRecvData.SetSFMListData(nGroupID, null);
     pageService.SetSFMChecking(false);
     pageService.SetApproveAfterMyCountChecking(false);
-
+    HsCmdCenter.sgDicRecvData.SetLoginDataEmpty(nGroupID);
 
     CLog.Here().Information($"groupID : {nGroupID} - User Do Logout, UrlRedirection LogOut State ReSet !!!");
     HsNetWorkSG.HsHttpWatcher.SetLoginOutState(nGroupID, false);
