@@ -771,7 +771,7 @@ public void DoLogOutSetData(int nGroupID)
     HsCmdCenter.sgDicRecvData.SetSFMListData(nGroupID, null);
     pageService.SetSFMChecking(false);
     pageService.SetApproveAfterMyCountChecking(false);
-
+    HsCmdCenter.sgDicRecvData.SetLoginDataEmpty(nGroupID);
 
     CLog.Here().Information($"groupID : {nGroupID} - User Do Logout, UrlRedirection LogOut State ReSet !!!");
     HsNetWorkSG.HsHttpWatcher.SetLoginOutState(nGroupID, false);
@@ -819,8 +819,6 @@ private void LogOut(int groupId)
         DoLogOutSetData(nGroupID);
     }
 
-
-
     // 파일전송에 추가해 놓은 파일목록 정보들 삭제필요
     ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
     if (sgSideBar == null)
@@ -864,6 +862,7 @@ private void LogOut(int groupId)
     // MyNavigationManager.NavigateTo("/SelectNet");
     // origin-master
     MyNavigationManager.NavigateTo("/LogIn/Logout");
+
 }
 
 private void SfmLogOut(string arg)

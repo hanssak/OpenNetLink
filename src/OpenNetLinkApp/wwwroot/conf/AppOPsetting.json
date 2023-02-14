@@ -11,7 +11,7 @@
 
   "bUseMainPageType": false,
 
-  "bUseStartProgramReg": false,
+  "bUseStartProgramReg": true,
 
   "bManualDownFolderChange": false,
   "bManualRecvDownChange": false,
@@ -19,8 +19,8 @@
   "bRFileAutoSend": false,
   "bRMouseFileAddAfterTrans": false,
 
-  "bShowAfterApprAutoCheck": false,
-  "bAfterBasicChk": false,
+  "bShowAfterApprAutoCheck": true,
+  "bAfterBasicChk": true,
 
   "bFileRecvAlarmRetain": false,
   "bFileRecvTrayFix": false,
@@ -52,8 +52,8 @@
     false
   ],
   "strURLAutoAfterBrowser": [
-    "F",
-    "F",
+    "N",
+    "N",
     "F"
   ],
   "bURLAutoAfterMsg": [
@@ -62,9 +62,9 @@
     true
   ],
   "strForwardUrl": [
-    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
-    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
-    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html"
+    "http:\/\/naver.com",
+    "http:\/\/daum.net",
+    "http:\/\/daum.net"
   ],
 
   "bUseClipBoardFileTrans": true,
@@ -76,7 +76,7 @@
 
   "enMainPageType": 0,
   "bNoApproveManageUI": false,
-  "bStartProgramReg": true,
+  "bStartProgramReg": false,
   "bTitleDescSameChk": false,
 
   "bUseFileCheckException": false,
@@ -98,7 +98,7 @@
   "bUseForceUpdate": true,
   "bUsePCURL": false,
   "bUsePublicBoard": false,
-  "bUseUserRecvDownPath": true,
+  "bUseUserRecvDownPath": false,
   "bUseUserSelectFirstServer": false,
   "bViewDlpApproverSelectMyDept": false,
   "bViewFileFilter": true,
@@ -124,7 +124,7 @@
   "bUseFileForward": false,
   "bFileDownloadBeforeReciving": false,
 
-  "bRecvFolderOpen": false,
+  "bRecvFolderOpen": true,
   "bUseAgentTime1aClock": false,
 
   "bUsePartialFileAddInTransfer": true,

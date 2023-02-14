@@ -641,10 +641,10 @@
     SGMessageNotification refSGMessageNotification;
     ISGSiteConfigService siteConfig;
 
-    public bool m_bUseClipBoard = true;
+    public bool m_bUseClipBoard = false;
     public bool m_bUseMainPage = true;
     public bool m_bUseURLRedirection = true;
-    public bool m_bUseFileSend = true;
+    public bool m_bUseFileSend = false;
 
 
     public bool m_bUseClipAlarmType = true;                                             // 클립보드 알림 형식 사용 유무
@@ -652,10 +652,10 @@
     public bool m_bUseClipCopyAndSend = false;                                           // 클립보드 복사 후 전송 사용 유무
     public bool m_bUseURLRedirectionAlarm = true;                                       // URL 자동전환 알림 사용 유무
     public bool m_bUseURLRedirectionAlarmType = true;                                   // URL 자동전환 알림 타입 선택 사용 유무
-    public bool m_bRFileAutoSend = true;                                                // 마우스 우클릭 후 자동전송 사용 유무
-    public bool m_bAfterApprAutoCheck = true;                                           // 사후결재 기본 체크 사용 유무
-    public bool m_bRecvFolderOpen = true;                                               // 파일 수신 후 폴더 열기 사용 유무
-    public bool m_bManualDownFolderChange = true;                                       // 수동다운로드로 다운 시 폴더 선택 사용 유무
+    public bool m_bRFileAutoSend = false;                                                // 마우스 우클릭 후 자동전송 사용 유무
+    public bool m_bAfterApprAutoCheck = false;                                           // 사후결재 기본 체크 사용 유무
+    public bool m_bRecvFolderOpen = false;                                               // 파일 수신 후 폴더 열기 사용 유무
+    public bool m_bManualDownFolderChange = false;                                       // 수동다운로드로 다운 시 폴더 선택 사용 유무
     public bool m_bFileRecvAlarmRetain = true;                                          // 파일 수신 후 알림 유지 사용 유무
     public bool m_bApprCountAlarmRetain = true;                                         // 승인대기 알림 유지 사용 유무
     public bool m_bApprCompleteAlarmRetain = true;                                      // 승인완료 알림 유지 사용 유무
@@ -663,12 +663,12 @@
     public bool m_bUseApprCountAlaram = true;                                           // 승인대기 알림 사용 유무.
     public bool m_bUseCloseTrayMove = true;                                             // 종료 시 트레이 사용 유무.
     public bool m_bUseStartTrayMove = false;                                             // 프로그램 시작 시 트레이 이동 사용 유무.
-    public bool m_bUseStartProgramReg = true;                                           // 시작 프로그램 등록 사용 유무.
+    public bool m_bUseStartProgramReg = false;                                           // 시작 프로그램 등록 사용 유무.
     public bool m_bUseLanguageSet = true;                                               // 언어설정 사용 유무.
     public bool m_bLogLevelSet = true;                                                  // 로그 레벨 설정 사용 유무.
 
-    public bool m_bTrayMove = true;
-    public bool m_bAlarmTray = true;
+    public bool m_bTrayMove = false;
+    public bool m_bAlarmTray = false;
     public bool m_bScreenLockUserChange = false;                                        // 화면잠금을 사용자가 설정변경할수 있음(true), 없음(false)
 
     Dictionary<string, SGNetOverData> m_dicDestSysPos = null;                       // 3망상황일때 정보
@@ -1075,7 +1075,8 @@
 
     private bool GetAfterBasicChk()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+        //return SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+        return SGAppMgrSvc.AppConfigInfoService.GetAfterBasicChk();
     }
 
     private string GetRecvDownPath(int groupId)
@@ -1134,7 +1135,8 @@
 
     private bool GetExitTrayMove()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetExitTrayMove();
+        //return SGAppMgrSvc.OpConfigInfoService.GetExitTrayMove();
+        return SGAppMgrSvc.AppConfigInfoService.GetExitTrayMove();        
     }
 
     private bool GetStartTrayMove()
@@ -1894,6 +1896,7 @@
         ISGSideBarUIService SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
 
+        bool bTmpUseClipBoard = false;
         for (int i = 0; i < loginDataCount; i++)
         {
             sgLoginData = null;
@@ -1902,7 +1905,7 @@
                 continue;
 
 
-            bool bTmpUseClipBoard = sgLoginData.GetClipboard();             //클립보드 기능 사용여부
+            bTmpUseClipBoard = sgLoginData.GetClipboard();             //클립보드 기능 사용여부
             bool bTmpUseURLRedirection = sgLoginData.GetURLRedirect();      //리다이렉션 기능 사용여부
             bool bTmpFileSend = sgLoginData.GetFileTrans();                 //파일전송 사용여부
 
@@ -1915,7 +1918,8 @@
             pageService.SetUseClipBoard(i, bTmpUseClipBoard);
 
             //SetDicUseClipBoard(i, bTmpUseClipBoard);
-            m_bUseClipBoard |= bTmpUseClipBoard;
+            if (bTmpUseClipBoard)
+                m_bUseClipBoard = true;
 
             ListUseClipNetOverALL.Add(sgLoginData.GetClipboard());
 
@@ -1986,6 +1990,8 @@
         m_bUseApprCountAlaram = SGAppMgrSvc.OpConfigInfoService.GetUseApprCountAlaram();
 
         m_bAlarmTray = (m_bFileRecvAlarmRetain | m_bApprCountAlarmRetain | m_bApprCompleteAlarmRetain | m_bApprRejectAlarmRetain | m_bUseApprCountAlaram);
+
+        m_bAlarmTray = false;   // site요청
 
         m_bUseCloseTrayMove = SGAppMgrSvc.OpConfigInfoService.GetUseCloseTrayMove();
         m_bUseStartTrayMove = SGAppMgrSvc.OpConfigInfoService.GetUseStartTrayMove();

@@ -48,7 +48,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetApprTrayFix();
         bool GetUserApprActionTrayFix();
         bool GetUserApprRejectTrayFix();
-        //bool GetExitTrayMove();
+        bool GetExitTrayMove();
         bool GetStartTrayMove();
         bool GetStartProgramReg();
         string GetLanguage();
@@ -494,10 +494,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bUserApprRejectTrayFix;
         }
-        /*public bool GetExitTrayMove()
+        public bool GetExitTrayMove()
         {
             return AppConfigInfo.bExitTrayMove;
-        }*/
+        }
         public bool GetStartTrayMove()
         {
             return AppConfigInfo.bStartTrayMove;

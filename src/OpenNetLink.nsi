@@ -81,7 +81,7 @@ Var /GLOBAL g_strAddFileRM2CompareStr
 Var /GLOBAL g_iCount
 
 Var /GLOBAL g_strNetPos			; 3망중에 다중망(중간망)인지 여부 확인(NETPOS 값 IN일때:1, CN일때:2, EX일때: 3, NCI일때:4, 없으면 0)
-Var /GLOBAL g_iNetPos			; 3망중에 다중망(중간망)인지 여부 ("IN": 중요단말, "CN": 중간망-다중망(업무망), "NCI": 중간망-단일망(업무망), "EX" : 인터넷망), IN(1) / CN(2) / OUT(3) / NCI(4) / NotFound(0)
+Var /GLOBAL g_iNetPos			; 3망중에 다중망(중간망)인지 여부 ("IN": 중요단말, "CN": 중간망-다중망(업무망), "NCI": 중간망-인터넷망(업무망), "EX" : 인터넷망), IN(1) / CN(2) / OUT(3) / NCI(4) / NotFound(0)
 Var /GLOBAL g_iPatchEdge	        ; edge(wwwroot\edge)-patch진행여부
 Var /GLOBAL g_UseStartProgram	        ; Booting시에 agent 자동시작 되게할 지 여부
 

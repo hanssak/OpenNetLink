@@ -414,9 +414,9 @@
                     string strData = "";
                     int nData = 0;
 
-#if false   // 사무실(Office KKW Test) 용도
+                //#if false   // 사무실(Office KKW Test) 용도
 
-                //#if true  // SITE배포용도
+#if true  // SITE배포용도
 
                     stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
                     if (stRtn == null || (1 > stRtn.Length))

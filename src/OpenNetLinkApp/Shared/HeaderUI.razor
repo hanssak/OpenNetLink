@@ -3006,6 +3006,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         pageService.SetConnectStatus(groupID, false);
         pageService.SetLogoutStatus(groupID, true);
         HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
+        HsCmdCenter.sgDicRecvData.SetLoginDataEmpty(groupID);
 
         // 추가된 파일리스트 제거하는 동작
         LogOutFileListClearEvent LogOutFileListClearEvent = null;
@@ -3019,6 +3020,11 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         // UI쪽 Logout 처리
         SideBarUISvc.DeleteMenuAllButRoot(groupID);
+
+        // 로그아웃에 따른 공통환경설정 UI조정
+        CtrlSideEvent ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
+        if (ctrlSideEvent != null)
+            ctrlSideEvent();
 
         // Page 이동
         int i = 0;

@@ -336,8 +336,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetAfterBasicChk(bool afterBasicChk)
         {
-            (OpConfigInfo as SGopConfig).bAfterBasicChk = afterBasicChk;
-            SaveOpConfigSerialize();
+            //(OpConfigInfo as SGopConfig).bAfterBasicChk = afterBasicChk;
+            //SaveOpConfigSerialize();
+            (AppConfigInfo as SGAppConfig).bAfterBasicChk = afterBasicChk;
+            SaveAppConfigSerialize();
+
             NotifyStateChangedCtrlSide();
         }
         public void SetRecvDownPath(int groupId, string recvDownPath)
@@ -394,8 +397,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetExitTrayMove(bool exitTrayMove)
         {
-            (OpConfigInfo as SGopConfig).bExitTrayMove = exitTrayMove;
-            SaveOpConfigSerialize();
+            //(OpConfigInfo as SGopConfig).bExitTrayMove = exitTrayMove;
+            //SaveOpConfigSerialize();
+
+            (AppConfigInfo as SGAppConfig).bExitTrayMove = exitTrayMove;
+            SaveAppConfigSerialize();
+
             NotifyStateChangedCtrlSide();
         }
         public void SetStartTrayMove(bool startTrayMove)

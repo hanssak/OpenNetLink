@@ -13,11 +13,11 @@
   "LogLevel": 2,
   "LoginType": 0,
   "RecvDownPath": [
-    "K:\\",
-    "K:\\",
+    "%USERPATH%/Downloads",
+    "%USERPATH%/Downloads",
     "%USERPATH%/Downloads"
   ],
-  "UpdateSvcIP": "10.232.19.111:3439",
+  "UpdateSvcIP": "10.240.19.111:3439",
   "bAfterBasicChk": true,
   "bApprTrayFix": false,
   "bClipCopyAutoSend": false,
@@ -25,7 +25,7 @@
   "bFileRecvTrayFix": false,
   "bRMouseFileAddAfterTrans": false,
   "bScreenLock": false,
-  "bStartProgramReg": true,
+  "bStartProgramReg": false,
   "bStartTrayMove": false,
   "bURLAutoAfterMsg": [
     true,
@@ -33,7 +33,7 @@
     true
   ],
   "bURLAutoTrans": [
-    true,
+    false,
     false,
     false
   ],
@@ -41,18 +41,19 @@
   "bUserApprActionTrayFix": false,
   "bUserApprRejectTrayFix": false,
   "enClipAlarmType": 2,
+  "bExitTrayMove": true,
   "enMainPageType": 0,
   "nUserSelectFirstNet": 0,
   "strForwardUrl": [
-    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
-    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",
-    "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html"
+    "http:\/\/naver.com",
+    "http:\/\/daum.net",
+    "http:\/\/daum.net"
   ],
   "strLanguage": "KR",
   "strURLAutoAfterBrowser": [
-    "F",
-    "F",
-    "F"
+    "N",
+    "N",
+    "N"
   ],
   "tScreenTime": 0
 }
