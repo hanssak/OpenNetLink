@@ -558,7 +558,7 @@ namespace OpenNetLinkApp.Services
                     VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
                     break;
                 case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
-                    EmailApproveNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId, sgData);
+                    EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
                     break;
                 case eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
                     BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
@@ -1501,6 +1501,8 @@ namespace OpenNetLinkApp.Services
                 if (!strCount.Equals(""))
                     e.count = Convert.ToInt32(strCount);
                 e.strMsg = "";
+                e.strDummy = "4";
+
                 sNotiEvent(groupId, cmd, e);
             }
         }
@@ -2005,6 +2007,15 @@ namespace OpenNetLinkApp.Services
             int ret = 0;
             if (hsNetWork != null)
                 ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, 0, loginType);
+            return 0;
+        }
+
+        public int LoginNotCheckPw(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType = 0)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            int ret = 0;
+            if (hsNetWork != null)
+                ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, 9, loginType);
             return 0;
         }
 

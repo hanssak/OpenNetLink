@@ -167,6 +167,8 @@
     /// </summary>
     private void SessionAlertCancel()
     {
+        CLog.Here().Information($"[Main] SessionAlertCancel - GroupID:{refSGAlert.groupId} - LogInType: {pageService.m_nLoginType.ToString()}");
+
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
         bStartedLogin = false;
         bLoginBtnDisable = false;
@@ -270,6 +272,11 @@
                 return;
             }
 
+
+            CLog.Here().Information($"doLogin - ###### -  Start");
+
+            int groupid = pageService.m_nCurViewPageGroupID;
+
             //VAlidation Check  PW_OTP(4), OTP(5)
             if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5)
             {
@@ -345,7 +352,7 @@
 
             string strPW = "";
 
-
+            //Linux는 아직 실제값 확인해보지 못함
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 strPW = IPGlobalProperties.GetIPGlobalProperties().DomainName;
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -388,8 +395,37 @@
 
         return false;
     }
+
     /// <summary>
-    ///
+    /// AD 로그인에 사용되는 data를 화면상에 표현
+    /// </summary>
+    private void SetADLoginData()
+    {
+
+        CLog.Here().Information($"SetADLoginData - #Start");
+
+        id = Environment.UserName;
+
+        //OSX의 경우 임의로 아래와 같이 처리 추후 objective-c API 찾아볼 예정
+        //Linux는 아직 실제값 확인해보지 못함
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
+
+#if DEBUG
+        pw = "HsckAD.com";
+#endif
+
+        pw = pw.ToLower();
+
+        CLog.Here().Information($"SetADLoginData - #End");
+
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// AD로그인 방식으로 로그인동작 진행
     /// </summary>
     private void doADLogin()
     {
@@ -449,7 +485,7 @@
                 List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
                 foreach (ISGNetwork netlist in listNetWork)
                 {
-                    HsLog.info($"LoginAD - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
+                    CLog.Here().Information($"LoginAD - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
                     HSCmdCenter.LoginAD(netlist.GroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
                     pageService.SetGroupIDLoginType(netlist.GroupID, eLoginType.eLOGINTYPE_AD);
                 }

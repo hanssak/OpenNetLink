@@ -78,7 +78,12 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bRecvFolderChange { get; set; } = true;               // 수신 폴더 변경 사용 여부.
         public bool bUseUserRecvDownPath { get; set; } = false;           // 로그인 유저별 다운로드 경로 사용 여부
-        public bool bUseEmail { get; set; } = false;               // 메일 관리/결재 사용 유무.
+        
+
+        public List<bool> blistUseEmail { get; set; } = null;               // 메일 관리/결재 사용 유무.
+
+        public List<bool> blistUiDlpShow { get; set; } = null;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
+
         public bool bUsePCURL { get; set; } = false;                      // PCURL 사용 유무.
 
         public bool bUsePublicBoard { get; set; } = true;                // 공지사항 사용 유무.

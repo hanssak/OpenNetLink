@@ -90,7 +90,11 @@
   "bUseDenyPasswordZip": true,
   "bRecvFolderChange": true,
   "bUseCertSend": false,
-  "bUseEmail": false,
+  "blistUseEmail": [
+    false,
+    false,
+    false
+  ],
   "bUseForceUpdate": true,
   "bUsePCURL": false,
   "bUsePublicBoard": false,

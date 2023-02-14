@@ -853,6 +853,13 @@
 			<EN>Unused</EN>
 			<CN>未使用</CN>
 		</T_COMMON_DLP_UNUSE>
+		
+		<T_COMMON_DLP_CONTENTS>
+			<KR>개인정보검출내용</KR>
+			<JP>未使用</JP>
+			<EN>Personal information detection details</EN>
+			<CN>未使用</CN>
+		</T_COMMON_DLP_CONTENTS>
 
 		<T_COMMON_TRANSFAIL>
 			<KR>전송실패</KR>
@@ -1315,6 +1322,51 @@
 
 
 		<!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
+
+
+		<!-- ********************************************* [START] 메일 (T_MAIL_0000) ********************************************* -->
+
+		<!-- ******************* [START] 메일 (MailTransStatus) ********************** -->
+		
+		<T_MAIL_TRANSWAIT>
+			<KR>발송대기</KR>
+			<JP>転送待機</JP>
+			<EN>Waiting</EN>
+			<CN>等候传输</CN>
+		</T_MAIL_TRANSWAIT>
+
+		<T_MAIL_TRANSCANCLE>
+			<KR>발송취소</KR>
+			<JP>転送取消</JP>
+			<EN>Cancel</EN>
+			<CN>取消传输</CN>
+		</T_MAIL_TRANSCANCLE>
+
+		<T_MAIL_TRANS_SUCCESS>
+			<KR>발송완료</KR>
+			<JP>Success</JP>
+			<EN>Success</EN>
+			<CN>Success</CN>
+		</T_MAIL_TRANS_SUCCESS>
+
+		<T_MAIL_TRANSFRFAILED>
+			<KR>발송실패</KR>
+			<JP>On Transfering</JP>
+			<EN>On Transfering</EN>
+			<CN>On Transfering</CN>
+		</T_MAIL_TRANSFRFAILED>
+
+		<T_MAIL_INSPECT>
+			<KR>검사중</KR>
+			<JP>On Transfering</JP>
+			<EN>On Transfering</EN>
+			<CN>On Transfering</CN>
+		</T_MAIL_INSPECT>		
+		
+		<!-- ******************* [END] 메일 (MailTransStatus) ********************** -->
+
+		<!-- ********************************************* [END] 메일 (T_MAIL_0000) ********************************************* -->
+
 
 		<!-- ********************************************* [START] 메뉴 (T_MENU_0000) ********************************************* -->
 
@@ -4417,6 +4469,40 @@
 		</T_FILE_RECEIVER_ADD>
 		<!-- ********************************************* [END] PC URL TITLE ********************************************* -->
 
+
+		<!-- ********************************************* [START] App 설정 (T_APPCONFIG_0000) ********************************************* -->
+		<T_EMAIL_APPROVE_DONE>
+			<KR>Email 승인작업이 완료 되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_EMAIL_APPROVE_DONE>
+
+		<T_EMAIL_APPROVE_FAILED>
+			<KR>Email 승인작업 실패 했습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_EMAIL_APPROVE_FAILED>
+		
+		
+		<T_EMAIL_REJECT_DONE>
+			<KR>Email 반려작업이 완료 되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_EMAIL_REJECT_DONE>
+		
+		<T_EMAIL_REJECT_FAILED>
+			<KR>Email 반려작업 실패 했습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_EMAIL_REJECT_FAILED>				
+
+		<!-- ********************************************* [END] EMAIL ********************************************* -->
+
+
 		<!-- ********************************************* [START] App 설정 (T_APPCONFIG_0000) ********************************************* -->
 
 		<T_APPCONFIG_COMMON>
@@ -5089,7 +5175,7 @@
 		</I_0020>
 
 		<I_0021>
-			<KR>전송취소가 완료되었습니다.</KR>
+			<KR>취소가 완료되었습니다.</KR>
 			<JP>送取消が完了しました。</JP>
 			<EN>Cancel the transfer is complete.</EN>
 			<CN>已完成取消传输。</CN>
@@ -6616,6 +6702,15 @@
 		<EN></EN>
 		<CN></CN>
 	</I_0240>
+
+    <I_0241>
+      <KR>새로운 메일승인 요청자료가 존재합니다.</KR>
+      <JP>新しいメール承認要請資料が </JP>
+      <EN>There are new mail approval request materials.</EN>
+      <CN>件待邮件审批的请求资料。</CN>
+    </I_0241>
+
+
     <!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
 	</INFO>
@@ -8564,16 +8659,25 @@
 			<CN></CN>
 		</W_0285>
 
-    <W_0286>
-      <KR>승인/반려사유를 입력해주십시오.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0286>
+	    <W_0286>
+	      <KR>승인/반려사유를 입력해주십시오.</KR>
+	      <JP></JP>
+	      <EN></EN>
+	      <CN></CN>
+	    </W_0286>
+
+	  <W_0287>
+	    <KR>검색 결과가 존재하지 않습니다.</KR>
+	    <JP></JP>
+	    <EN></EN>
+	    <CN></CN>
+	  </W_0287>
 
 	</WARNING>
 
-	<!-- ********************************************* [END] MSG WARNING (W_0000) ********************************************* -->
+
+
+  <!-- ********************************************* [END] MSG WARNING (W_0000) ********************************************* -->
 
 	<!-- ********************************************* [START] MSG ERROR (E_0000) ********************************************* -->
 
@@ -10001,7 +10105,7 @@
 		</E_0205>
 
 		<E_0206>
-			<KR>전송 취소 중 오류가 발생되었습니다.</KR>
+			<KR>취소 중 오류가 발생되었습니다.</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>

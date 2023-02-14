@@ -3,6 +3,7 @@
 @using Radzen
 @using Radzen.Blazor
 @using AgLogManager
+
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
@@ -107,6 +108,7 @@
 </div>
 
 @code {
+
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<Transfer_Denied>();
     public List<FileAddErr> listDenied = new List<FileAddErr>();
 
@@ -150,7 +152,7 @@
             style += "color: #FFAA54;";
         }
         else        //정상
-    {
+        {
             builder.AddAttribute(1, "Icon", "check_circle");
             style += "color: #327AD9;";
 
@@ -162,7 +164,7 @@
         builder.AddAttribute(3, "Style", style);
         builder.CloseComponent();
 
-    @*builder.AddContent(3, context.Text);*@
+        @*builder.AddContent(3, context.Text);*@
         string htmlString = "<div class=\"p-0 m-0\" style=\"width:100%;\">" +
                                                 "<div class=\"p-0 m-0\" style=\"width:60%;float:left;\">" + context.Text + "</div>"
                                                 +

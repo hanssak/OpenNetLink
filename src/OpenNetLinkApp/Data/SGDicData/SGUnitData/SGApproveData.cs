@@ -14,7 +14,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string ApprSeq { get; set; }               // ApproveSeq
         public string ApvType { get; set; }               // 결재 종류 (선결/후결)
         public string TransferType { get; set; }          // 전송 구분 (반출/반입)
-        public string TransStatus { get; set; }           // 전송 상태 (전송대기, 전송취소, 전송실패)
+        //public string TransStatus { get; set; }           // 전송 상태 (전송대기, 전송취소, 전송실패)
         public string RequesterName { get; set; }         // 승인요청자
         public string ApproverName { get; set; }          // 승인자
         public string ApvStatus { get; set; }             // 결재상태(승인대기/승인/반려)

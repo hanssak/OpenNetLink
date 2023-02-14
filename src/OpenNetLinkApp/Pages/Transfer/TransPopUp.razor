@@ -11,8 +11,8 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
 
-<div class="modal fade" id="TransPopUp" data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog" style="vertical-align:top;">
+<div class="modal fade" id="TransPopUp" data-backdrop="static" data-keyboard="false" style="z-index:5000;">
+    <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
         <div class="modal-content">
             <div class="modal-header modal-outline">
                 <h5 class="modal-title pt-1 text-bold">@strTransDetailTitle</h5>                              <!--전송 상세보기-->
@@ -34,8 +34,14 @@
                                 <td style="text-align:center;">@strDataTransStatus</td>
                                 <th>@strFilePos </th>                                                       <!--파일위치-->
                                 <td style="text-align:center;">@strDataFilePos</td>
-                                <th>@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>                                              <!--개인정보-->
-                                <td style="text-align:center;">@strDLP</td>
+
+                                @if (bUseDlpDataView)
+                                {
+                                    <th>@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>
+                                    <!--개인정보-->
+                                    <td style="text-align:center;">@strDLP</td>
+                                }
+
                             </tr>
 
                             <tr>
@@ -177,7 +183,12 @@
                                 <th style="text-align:center;">@strFileType </th>                   <!--유형-->
                                 <th style="text-align:center;">@strFileSize </th>                   <!--크기-->
                                 <th style="text-align:center;width:15%;">@strVirusHistory </th>     <!--바이러스내역-->
-                                <th style="text-align:center;width:15%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>     <!--개인정보 내역-->
+
+                                @if (bUseDlpDataView)
+                                { 
+                                    <th style="text-align:center;width:15%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>     <!--개인정보 내역-->
+                                }
+
                             </tr>
                         </thead>
                         <tbody>
@@ -190,7 +201,12 @@
                                         <td style="text-align:center;">@item.strFileType</td>
                                         <td style="text-align:center;">@item.strFileSize</td>
                                         <td style="text-align:center;">@item.strVirusHistory</td>
-                                        <td style="text-align:center;">@item.stDLPDesc</td>
+
+                                        @if (bUseDlpDataView)
+                                        { 
+                                            <td style="text-align:center;">@item.stDLPDesc</td>
+                                        }
+
                                     </tr>
                                 }
                             }
@@ -298,6 +314,8 @@
             strReason = Reason;
         }
     }
+
+    public bool bUseDlpDataView = true;
 
     public string strTransDetailTitle = "";
     public string strArrpHistory = "";
@@ -568,43 +586,73 @@
         HSCmdCenter.sgPageEvent.SetDownloadCountEventAdd(groupID, ReceiveDownloadCount);
         HSCmdCenter.SendDownloadCount(groupID, strUserID, seq.ToString());
 
+        await Task.Delay(300);  // download개수 정보 필요
+
         object[] param = { "TransPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
     public void ReceiveDownloadCount(int groupID, SGData e)
     {
-        string result = e.GetSvrRecordTagData("RESULT");
-        int count = 0;
-        if (e.GetSvrRecordTagData("DOWNCOUNT") == "" || e.GetSvrRecordTagData("DOWNCOUNT") == null)
-            count = 0;
-        else
-            count = Int32.Parse(e.GetSvrRecordTagData("DOWNCOUNT"));  //결과레코드수
-        string reason = e.GetSvrRecordTagData("REASON");
 
-        if (result != "0")
+        SGLoginData sgLoginData = null;
+
+        try
         {
-            ShowMessage("error", reason);
-            return;
-        }
-        m_downloadCount = count;
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null) return;
+            string result = e.GetSvrRecordTagData("RESULT");
+            int count = 0;
+            bool bGetDownCount = false;
+            CLog.Here().Information($"DownLoadCount-RESULT : {result}");
 
-        m_downMaxCurr = $"{XmlConf.GetTitle("T_ETC_DOWNLOADCOUNT")} :  {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
-
-        //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
-        if (m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
-        {
-            if (m_downloadCount < sgLoginData.GetMaxDownCount())
-                m_bNetDownloadable = true;
+            if (e.GetSvrRecordTagData("DOWNCOUNT") == "" || e.GetSvrRecordTagData("DOWNCOUNT") == null)
+            {
+                count = 0;
+                CLog.Here().Information($"DownLoadCount-DOWNCOUNT : null or Empty!");
+            }
             else
             {
-                m_bNetDownloadable = false;
+                bGetDownCount = true;
+                count = Int32.Parse(e.GetSvrRecordTagData("DOWNCOUNT"));  //결과레코드수
             }
+
+            CLog.Here().Information($"DownLoadCount-DOWNCOUNT : {count}");
+
+            string reason = e.GetSvrRecordTagData("REASON");
+
+            if (result != "0")
+            {
+                CLog.Here().Information($"#####(DownLoadCount - reason : {reason}");
+                ShowMessage("error", reason);
+                return;
+            }
+            m_downloadCount = count;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null) return;
+
+            m_downMaxCurr = $"{XmlConf.GetTitle("T_ETC_DOWNLOADCOUNT")} :  {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
+
+            if (bGetDownCount == false)     // Server에서 data가 안내려 올때, 다운로드 가능 횟수 표현안함.
+                m_bNetDownloadable = false;
+
+            //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
+            if (bGetDownCount && m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
+            {
+                if (m_downloadCount < sgLoginData.GetMaxDownCount())
+                    m_bNetDownloadable = true;
+                else
+                {
+                    m_bNetDownloadable = false;
+                }
+            }
+
         }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"#####(DownLoadCount-확인) - Exception[MSG] : {ex.Message}");
+        }
+
         StateHasChanged();
-        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
+        CLog.Here().Information($"#####(DownLoadCount-확인)-m_bNetDownloadable-##### : [{m_bNetDownloadable.ToString()}] (NowDownload-Count:{m_downloadCount}, MaxDownloadCount : {((sgLoginData==null)?"null":sgLoginData.GetMaxDownCount().ToString())})");
     }
 
     public void closePopUp()
@@ -621,6 +669,12 @@
         sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
 
         InitText();
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
     }
 
     public void SetBindingData()
@@ -643,6 +697,7 @@
         //검사단계표시 설정
         SetPreworkInfo(sgDetailData.GetPreworkStep(), sgDetailData.GetBasicTagData("TRANSSTATUS"));
 
+        CLog.Here().Information($"DetailData- ##### - TranSeq : {sgDetailData.GetTransSeq()}");
 
         //*************************************************************************************************************************
         //수동다운로드 가능여부 판단 2021/05/24 YKH 시작
@@ -652,6 +707,7 @@
 
         if (sgLoginData != null)
             bInner = sgLoginData.GetSystemPosition();   // 망구분 true : 내부, false : 외부
+
         if (!bInner && strDataTransKind == XmlConf.GetTitle("T_COMMON_EXPORT"))
             m_bNetDownloadable = true;
         else if (bInner && strDataTransKind == XmlConf.GetTitle("T_COMMON_IMPORT"))
@@ -710,7 +766,7 @@
                 m_bNetDownloadable = false;
         }
 
-        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
+        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (NowDownload-Count:{m_downloadCount}, MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
 
         //수동다운로드 가능여부 판단 2021/05/24 YKH 종료
         //*************************************************************************************************************************
