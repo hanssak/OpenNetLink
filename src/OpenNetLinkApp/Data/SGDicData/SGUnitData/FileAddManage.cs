@@ -4709,6 +4709,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             {
                 strFileName = strFileName.Replace("\\", "/");
             }
+			
             try
             {
                 string strEncMimeInfo = System.IO.File.ReadAllText(strFileName);
@@ -4728,6 +4729,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     string[] strSplit = strMimeList[i].Split(' ');
                     if (strSplit.Length < 2)
                         continue;
+						
+					Log.Logger.Here().Information($"LoadMimeConf - Add MimeType : {strSplit[0]}, Ext : {strSplit[1]}");
+					
                     MimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
                 }
             }
@@ -4751,7 +4755,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                     //OLE 개체의 MimeType 정보를 fileAddManage의 정적 변수로 등록
                     if (!gOLEMimeTypeMap.Value.Contains(mimetype))
+                    {
                         gOLEMimeTypeMap.Value.Add(mimetype);
+                        Log.Logger.Here().Information($"OLEMimeList - MimeType : {mimetype}");
+                    }
                 }
             }
         }
