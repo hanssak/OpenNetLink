@@ -2861,10 +2861,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 if (String.Compare(strExt, "hwp", true) == 0) return IsHWP(btFileData, strExt);
 
-                if (String.Compare(strExt, "txt", true) == 0 || String.Compare(strExt, "log", true) == 0 ||
+                // TXT 파일 분석기능은 mime 으로만 판단
+                /*if (String.Compare(strExt, "txt", true) == 0 || String.Compare(strExt, "log", true) == 0 ||
                     String.Compare(strExt, "ini", true) == 0 || String.Compare(strExt, "sql", true) == 0 ||
                     String.Compare(strExt, "conf", true) == 0)
-                    return IsTXT(btFileData, strExt);
+                    return IsTXT(btFileData, strExt);*/
 
                 /* 이미지 파일*/
                 if (String.Compare(strExt, "pdf", true) == 0) return IsPDF(btFileData, strExt);
