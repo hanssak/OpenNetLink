@@ -2218,7 +2218,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     else return false;
                 }
             }
-
             return true;
         }
 
@@ -4066,7 +4065,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             var ind = fileExt.LastIndexOf('.');
             if (ind != -1 && fileExt.Length > ind + 1)
             {
-                fileExt = fileName.Substring(ind + 1).ToLower();
+                fileExt = fileName.Substring(ind + 1);
             }
 
             if (gMimeTypeMap.Value.TryGetValue(mime, out string result))
@@ -4075,7 +4074,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 string[] exts = result.Split(' ');
                 foreach (var ext in exts)
                 {
-                    if (string.Compare(fileExt, ext) == 0) return true;
+                    if (string.Compare(fileExt, ext, true) == 0) return true;                    
                 }
             }
             return false;
