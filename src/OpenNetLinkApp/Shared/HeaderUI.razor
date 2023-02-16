@@ -865,6 +865,11 @@
 
                                 CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection policy - SetUrlListis Call !!!");
 
+                                // URLRedirection 되지 않는 Url 특정 Url로 Forward
+                                if (OpConfigSvc.GetUseNotinURLListForward())
+                                    HsNetWorkSG.HsHttpWatcher.SetNotinListUrlForwardUrl(groupid, OpConfigSvc.GetNotinURLListForwardUrl());
+
+
                             }
                             else
                             {
@@ -3734,6 +3739,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
                 string strMsg = XmlConf.GetInfoMsg("I_0208");                                                         // 파일 수신이 완료되었습니다.
                 ShowMessage("info", strMsg);
+
+                Window.Notification(OS_NOTI.RECV_DONE, XmlConf.GetTitle("T_COMMON_RECEIVE_FILE"), strMsg);
                 InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileRecv, "", strMsg);
             }
 

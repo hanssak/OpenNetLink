@@ -2481,7 +2481,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     else return false;
                 }
             }
-
             return true;
         }
 
@@ -3124,10 +3123,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 if (String.Compare(strExt, "hwp", true) == 0) return IsHWP(btFileData, strExt);
 
-                if (String.Compare(strExt, "txt", true) == 0 || String.Compare(strExt, "log", true) == 0 ||
+                // TXT 파일 분석기능은 mime 검사기능만 사용
+                /*if (String.Compare(strExt, "txt", true) == 0 || String.Compare(strExt, "log", true) == 0 ||
                     String.Compare(strExt, "ini", true) == 0 || String.Compare(strExt, "sql", true) == 0 ||
                     String.Compare(strExt, "conf", true) == 0)
-                    return IsTXT(btFileData, strExt);
+                    return IsTXT(btFileData, strExt);*/
 
                 /* 이미지 파일*/
                 if (String.Compare(strExt, "pdf", true) == 0) return IsPDF(btFileData, strExt);
@@ -4363,7 +4363,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             var ind = fileExt.LastIndexOf('.');
             if (ind != -1 && fileExt.Length > ind + 1)
             {
-                fileExt = fileName.Substring(ind + 1).ToLower();
+                fileExt = fileName.Substring(ind + 1);
             }
 
             if (gMimeTypeMap.Value.TryGetValue(mime, out string result))
@@ -4372,7 +4372,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 string[] exts = result.Split(' ');
                 foreach (var ext in exts)
                 {
-                    if (string.Compare(fileExt, ext) == 0) return true;
+                    if (string.Compare(fileExt, ext, true) == 0) return true;                    
                 }
             }
             return false;
@@ -5000,6 +5000,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             {
                 strFileName = strFileName.Replace("\\", "/");
             }
+
             try
             {
                 string strEncMimeInfo = System.IO.File.ReadAllText(strFileName);
@@ -5019,6 +5020,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     string[] strSplit = strMimeList[i].Split(' ');
                     if (strSplit.Length < 2)
                         continue;
+
+                    Log.Logger.Here().Information($"LoadMimeConf - Add MimeType : {strSplit[0]}, Ext : {strSplit[1]}");
+
                     MimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
                 }
             }

@@ -196,3 +196,7 @@ bUseLoginAfterTray : 로그인 후 Tray로 이동, bStartTrayMove 이 옵션과 
 bUseFileApproveReason: 파일 전송 승인시 승인사유 입력 여부
 
 bUseClipBoardApproveReason : 클립보드 전송 승인시 승인 사유 입력 여부
+
+bUseNotinListForwardUrl : URLRedirection 하지 않는 URL들은 특정(아래 strNotinListForwardUrl 값) Page로 무조건 Redirect 함 사용유무(true, false)
+strNotinListForwardUrl : URLRedirection 하지 않는 URL들 Redirect 할 주소 값, ex) "file:///C:/HANSSAK/OpenNetLink/wwwroot/Web/WebLinkInfoNotList.html"
+

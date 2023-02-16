@@ -155,5 +155,10 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseClipBoardApproveReason { get; set; } // 클립보드 승인사유 입력 여부
 
+
+        public bool bUseNotinListForwardUrl { get; set; }              //URL Redirect 정책에 안먹히는 URL forward 기능 사용유무
+
+        public string strNotinListForwardUrl { get; set; }                 // URL Redirect 정책에 안먹히는 URL forward할 주소
+
     }
 }

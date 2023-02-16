@@ -268,6 +268,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns></returns>
         public bool GetUseOver1auth(int nGroupID);
 
+        public bool GetUseNotinURLListForward();
+
+        /// <summary>
+        /// URL Redirection 되지 않는 Url들을 Forward할 URL
+        /// </summary>
+        /// <returns></returns>
+        public string GetNotinURLListForwardUrl();
+
     }
 
 
@@ -871,6 +879,24 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return (AppConfigInfo as SGopConfig).bUseOver1Auth[nGroupID];
 
             return false;    // 기본값
+        }
+
+        /// <summary>
+        /// URL Redirection 되지 않는 Url들을 특정 URL로 Forward 하는 기능 사용유무
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseNotinURLListForward()
+        {
+            return AppConfigInfo.bUseNotinListForwardUrl;
+        }
+
+        /// <summary>
+        /// URL Redirection 되지 않는 Url들을 Forward할 URL
+        /// </summary>
+        /// <returns></returns>
+        public string GetNotinURLListForwardUrl()
+        {
+            return AppConfigInfo.strNotinListForwardUrl;
         }
 
     }

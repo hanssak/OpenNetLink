@@ -536,7 +536,7 @@ namespace OpenNetLinkApp.Services
                     }
                     break;
 
-                case eCmdList.eSUBDATANOTIFY:                                                    // 클립보드 데이터 Recv(서버에서)
+                case eCmdList.eSUBDATANOTIFY:                                                    // 클립보드 데이터 Recv(브라우저에서)
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
                     {
