@@ -54,6 +54,10 @@ static void tray_update(struct tray *tray);
 #include <libappindicator/app-indicator.h>
 
 #define TRAY_APPINDICATOR_ID "tray-id"
+//트레이 표시 방식설정 
+//0:ubuntu20버전에서 표시가능 / 더블클릭 기능 구현 필요함
+//1:CentOS, ubuntu22버전에서 표시가능 / 더블클릭 기능 있음
+#define TRAY_TYPE_IS_GTK_ICON 1 //0 : appindicator / 1 :gtkstatusicon
 
 static AppIndicator *indicator = NULL;
 static int loop_result = 0;
@@ -94,14 +98,51 @@ static GtkMenuShell *_tray_menu(struct tray_menu *m) {
   return menu;
 }
 
+//gtk_status_icon 방식
+static gboolean tray_clicked(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+  if(SelfThis == NULL)
+  {
+    return TRUE;
+  }
+  //1: Left / 2:Middle / 3:Right
+  if(event->button ==1)
+  {
+    //Tray 쪽 left click 동작 이벤트를 더블클릭에 대한 기능만 동작하도록 설정
+    if(event->type == GDK_DOUBLE_BUTTON_PRESS)
+    {
+      RequestMoveTrayToWebWindow();      
+      NTLog(SelfThis, Info, "################ Mouse Double Click Event !!!!!!");
+    }      
+  }
+  else
+  {
+    //우클릭 시 메뉴 표시
+    struct tray *tray = (struct tray *)user_data;        
+    GtkMenu *menu =GTK_MENU(_tray_menu(tray->menu));
+    gtk_menu_popup(menu, NULL, NULL, gtk_status_icon_position_menu, widget, event->button, event->time);
+  }  
+  return FALSE;
+}
+
 static int tray_init(struct tray *tray) {
   if (gtk_init_check(0, NULL) == FALSE) {
     return -1;
   }
-  indicator = app_indicator_new(TRAY_APPINDICATOR_ID, tray->icon,
-                                APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
-  app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
-  tray_update(tray);
+  //새로운 방식 (GtkStatuIcon 사용)
+  #if TRAY_TYPE_IS_GTK_ICON == 1
+  GtkStatusIcon *icon = gtk_status_icon_new();  
+  gtk_status_icon_set_from_file(icon, "wwwroot/SecureGate.ico");
+  gtk_status_icon_set_visible(icon, TRUE);  
+  g_signal_connect(icon, "button-press-event", G_CALLBACK(tray_clicked), tray);   
+  
+  #else
+  //기존 방식 (AppIndicator 사용)
+   indicator = app_indicator_new(TRAY_APPINDICATOR_ID, tray->icon,
+                                 APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
+   app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
+   tray_update(tray);
+  #endif
   return 0;
 }
 
@@ -111,10 +152,12 @@ static int tray_loop(int blocking) {
 }
 
 static void tray_update(struct tray *tray) {
+  #if TRAY_TYPE_IS_GTK_ICON != 1
   app_indicator_set_icon(indicator, tray->icon);
   // GTK is all about reference counting, so previous menu should be destroyed
   // here
   app_indicator_set_menu(indicator, GTK_MENU(_tray_menu(tray->menu)));
+  #endif
 }
 
 static void tray_exit() { loop_result = -1; }

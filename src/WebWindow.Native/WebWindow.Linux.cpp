@@ -149,6 +149,12 @@ const GActionEntry action_entries[] = {
 	{ "navigate-uri", activate_navigate_uri, "s", NULL, NULL}
 };
 
+void RequestMoveTrayToWebWindow()
+{
+	NTLog(SelfThis, Info, "Called : Request OpenNetLink Move To WebWindow using DoubleClick");
+	((WebWindow*)SelfThis)->MoveTrayToWebWindow();
+}
+
 WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCallback webMessageReceivedCallback) : _webview(nullptr)
 {
 	SelfThis = this;
