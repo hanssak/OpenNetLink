@@ -405,7 +405,7 @@ Task("PubRedhat")
     //        {
 	//	process.WaitForExit();
 	//	Information("Package linux: Exit code: {0}", process.GetExitCode());
-	}
+	//}
 });
 
 Task("PkgRedhat")
