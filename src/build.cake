@@ -338,7 +338,8 @@ Task("PubDebian")
 		Framework = "net5.0",
 		Configuration = "Release",
 		Runtime = "linux-x64",
-		OutputDirectory = $"./artifacts/{AppProps.AppUpdatePlatform}/published"
+		OutputDirectory = $"./artifacts/{AppProps.AppUpdatePlatform}/published",
+		SelfContain = true
 	};
 	
 	if(DirectoryExists(settings.OutputDirectory)) {
@@ -351,11 +352,11 @@ Task("PubDebian")
     DotNetCorePublish("./ContextTransferClient", settings);
 
 	// 필요할때에 추가로 개발예정
-    	using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility"))
-        {
-			process.WaitForExit();
-			//Information("Package linux: Exit code: {0}", process.GetExitCode());
-		}
+    //	using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility"))
+    //    {
+	//		process.WaitForExit();
+	//		//Information("Package linux: Exit code: {0}", process.GetExitCode());
+	//	}
 });
 
 Task("PkgDebian")

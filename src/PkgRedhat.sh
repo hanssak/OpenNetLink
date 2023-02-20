@@ -16,6 +16,6 @@ if [[ $2 == "TRUE" ]]; then
     mv $PKG_NAME"-$1-0.x86_64.rpm" "OpenNetLink-redhat-$1.rpm"
 else
     #for setup
-    mv $PKG_NAME"-$1-0.x86_64.rpm" "[$4] OpenNetLink_"$3"_redhat_"$1".rpm"
+    mv $PKG_NAME"-$1-0.x86_64.rpm" "$4_OpenNetLink_"$3"_redhat_"$1".rpm"
 fi
 
