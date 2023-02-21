@@ -1833,6 +1833,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Library\libbz2.so.1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Library\libbz2.so.1.0">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Library\UnAlzDll.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
