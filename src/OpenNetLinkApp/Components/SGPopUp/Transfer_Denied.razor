@@ -201,15 +201,37 @@
 
     public void FileAddFailLog()
     {
-        for (int i = 0; i < listDenied.Count; i++)
-        {
-            eFileAddErr errType = listDenied[i].eErrType;
-            string strFileName = listDenied[i].FileName;
-            string strReason = listDenied[i].GetFileAddErrContent(strFileName, errType);
+        doDisplayFileAddErr(listDenied, 0);
+    }
 
-            CLog.Here().Information($"######### - 파일추가 실패 원인 - FileAddErr : {errType}, FileName : {strFileName}, Reason : {strReason}");
+
+    /// <summary>
+    /// 파일추가 error 원인 SubFolder에 있는 파일들도 찾아서 출력(폴더우클릭 전송때 확인)
+    /// </summary>
+    /// <param name="listFileErrorLevel"></param>
+    /// <param name="nDepth"></param>
+    public void doDisplayFileAddErr(List<FileAddErr> listFileErrorLevel, int nDepth)
+    {
+
+        string strReason = "";
+
+        for (int i = 0; i < listFileErrorLevel.Count; i++)
+        {
+
+            if (listFileErrorLevel[i].eErrType != eFileAddErr.eFANone)
+            {
+                strReason = listFileErrorLevel[i].GetFileAddErrContent(strFileName, listFileErrorLevel[i].eErrType);
+                CLog.Here().Information($"### - 파일추가 실패 원인(추가한파일-Depth:{nDepth}) - FileAddErr : {listFileErrorLevel[i].eErrType}, " +
+                    $"ParentFileName : {listFileErrorLevel[i].ParentFileName}, FileName : {listFileErrorLevel[i].FileName}, Reason : {strReason}");
+            }
+
+            if (listFileErrorLevel[i].HasChildrenErr && (listFileErrorLevel[i].ChildrenFiles?.Count ?? 0) > 0)
+            {
+                doDisplayFileAddErr(listFileErrorLevel[i].ChildrenFiles, ++nDepth);
+            }
         }
     }
+
 
     public async Task openPopUp()
     {
