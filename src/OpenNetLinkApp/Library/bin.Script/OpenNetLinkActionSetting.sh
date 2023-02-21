@@ -63,9 +63,35 @@ if [ -e $BACKUP_APPENV_FILE ] ; then
     rm -rf /tmp/AppEnvSetting.json
 fi
 
+#로그인 정보 및 노티 정보가 있는 DB 파일도 백업하여 유지
+BACKUP_SGNOTIFY_FILE=/tmp/SGNotifyDB.db
+if [ -e $BACKUP_SGNOTIFY_FILE ] ; then
+    cp ${BACKUP_SGNOTIFY_FILE} ${PATH_OPENNETLINK}/wwwroot/db/
+    rm -rf ${BACKUP_SGNOTIFY_FILE}
+fi
 
+BACKUP_SGSETTING_FILE=/tmp/SGSettingsDB.db
+ if [ -e $BACKUP_SGSETTING_FILE ] ; then
+    cp ${BACKUP_SGSETTING_FILE} ${PATH_OPENNETLINK}/wwwroot/db/
+    rm -rf ${BACKUP_SGSETTING_FILE}
+fi
 
- 
+#####<마임체크에 필요한 libbz2에 대한 so파일 확인>########
+#libgtk를 이용하여 해당 OS에 라이브러리 폴더 경로 추출한다. (필수 요소인 GTK 사용)
+LIBGTK_FILE=`ldconfig -p | grep libgtk |awk 'NR==1 {print $4}'`
+if [ -z $LIBGTK_FILE ] ; then
+    LIBRARY_PATH=/lib64/    
+else    
+    LIBRARY_PATH=`dirname $LIBGTK_FILE`
+fi;
+#마임체크를 위해 존재해야하는 so 파일
+LIBBZ2_1_FILE="$LIBRARY_PATH/libbz2.so.1"
+LIBBZ2_2_FILE="$LIBRARY_PATH/libbz2.so.1.0"
 
+if [ ! -f $LIBBZ2_1_FILE ] ; then   #libbz2.so.1 파일이 존재하지 않으면, 라이브러리에 복사    
+    cp ${PATH_OPENNETLINK}/Library/libbz2.so.1 $LIBBZ2_1_FILE
+fi;
 
-
+if [ ! -f $LIBBZ2_2_FILE ] ; then   #libbz2.so.1.0 파일이 존재하진 않으면, 라이브러리에 복사   
+    cp ${PATH_OPENNETLINK}/Library/libbz2.so.1 $LIBBZ2_2_FILE
+fi;
