@@ -3034,6 +3034,9 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         if (i < count)
             return;
 
+        pageService.m_nCurViewPageGroupID = groupID;
+        pageService.m_nLoginType = (int)pageService.GetGroupIDLoginType(groupID);
+
         jsRuntime.InvokeAsync<object>("beforeLogOut");
 
         // Main.razor에서 판단해서 동작

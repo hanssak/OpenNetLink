@@ -857,6 +857,9 @@ private void LogOut(int groupId)
     if (i < count)
         return;
 
+    pageService.m_nCurViewPageGroupID = nGroupID;
+    pageService.m_nLoginType = (int)pageService.GetGroupIDLoginType(nGroupID);
+
     JSRuntime.InvokeAsync<object>("beforeLogOut");
     //MyNavigationManager.NavigateTo(siteConfig.GetUseSelectFirstConnectNetServer() ? "/SelectNet" : "/LogIn/Logout");
 
@@ -2025,7 +2028,7 @@ public void OLEMimeRecvEvent(int groupId, SGData e)
         return;
     if (statusData.fileAddManage == null)
         return;
-      List<Dictionary<int, string>> oleMimeList= e.GetSvrRecordData("RECORD");
+    List<Dictionary<int, string>> oleMimeList= e.GetSvrRecordData("RECORD");
     statusData.fileAddManage.SetOLEMimeList(groupId, oleMimeList);
 }
 public void AfterApproveStatusChange()
