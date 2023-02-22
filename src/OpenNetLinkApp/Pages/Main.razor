@@ -772,7 +772,7 @@
     public async void LoginResultOnetoAll(int groupId, PageEventArgs e)
     {
 
-        await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault"); 
+        await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
         int ret = e.result;
         int nGroupIDfirst = -1;
 
@@ -839,6 +839,7 @@
                     strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
                     strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
                     strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";
+                    strGetinfoTagName += ", 'MAX_CLIP_SIZE'";
 
                     string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
                     HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);

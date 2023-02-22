@@ -44,7 +44,7 @@
                                 // 다중접속일때에는 단일망에만 전달가능
                                 // 단일접속일때에는 3중망에 전달가능
                                 @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0 &&
-                               (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                              (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                 {
 
                                     //@if (itemData.Value.nIdx == 1 && ListModKey.Count > 0)
@@ -57,7 +57,7 @@
                                             @*<input type="checkbox" class="mr-1" checked="@(ListModKey[NetworkInfo.GroupID][Index])"
                                                 @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />*@
                                             <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))"
-                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
+                                                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
                                             <span class="mr-2">@Modifier</span>
                                         }
 
@@ -94,7 +94,7 @@
                                         @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
                                         {
                                             <input type="checkbox" class="mr-1" checked="@dicModKeyNetOver[strNetgroupIDidxKey][Index]"
-                   @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, itemData.Value.nIdx, (HOTKEY_MOD)Index, eventArgs); }" />
+                                                   @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, itemData.Value.nIdx, (HOTKEY_MOD)Index, eventArgs); }" />
                                             <span class="mr-2">@Modifier</span>
                                         }
                                         @*<select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
@@ -138,7 +138,7 @@
                                 @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
                                 {
                                     <input type="checkbox" class="mr-1" checked="@dicModKeyNetOver[strNetgroupIDidxKey][Index]"
-                   @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, 0, (HOTKEY_MOD)Index, eventArgs); }" />
+                                           @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, 0, (HOTKEY_MOD)Index, eventArgs); }" />
                                     <span class="mr-2">@Modifier</span>
                                 }
                                 @*<select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
@@ -179,7 +179,7 @@
                                     @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />*@
 
                                 <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))"
-                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
+                                       @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
 
                                 <span class="mr-2">@Modifier</span>
                             }
@@ -223,7 +223,7 @@
                         <option value="@((int)CLIPALM_TYPE.UI)">UI</option>
                     </select>-->
 
-            <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         @GetClipAlarmTypeStr()
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenu2" style="min-width:85px">
@@ -239,9 +239,9 @@
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetClipCopyAutoSend())"
-                   @onchange="eventArgs => { SetClipCopyAutoSend(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPCOPYANDSEND")</span>                <!--클립보드 복사 후 전송 -->
-        </div>
-            }
+                           @onchange="eventArgs => { SetClipCopyAutoSend(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPCOPYANDSEND")</span>                <!--클립보드 복사 후 전송 -->
+                    </div>
+                }
         </div>
     }
 
@@ -290,41 +290,41 @@
                 <br>
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetURLAutoTrans(NetworkInfo.GroupID))"
-                   @onchange="eventArgs => { SetURLAutoTrans(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO")</span>                  <!--URL 자동전환 사용 -->
-        </div>
+                           @onchange="eventArgs => { SetURLAutoTrans(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO")</span>                  <!--URL 자동전환 사용 -->
+                    </div>
 
-                @if (m_bUseURLRedirectionAlarm)
-                {
-                    <div class="mb-1  w-101">
-                        <input type="checkbox" class="mr-1" checked="@(GetURLAutoAfterMsg(NetworkInfo.GroupID))"
-                   @onchange="eventArgs => { SetURLAutoAfterMsg(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM")</span>               <!--URL 자동전환 알림 -->
-        </div>
+                    @if (m_bUseURLRedirectionAlarm)
+                    {
+                        <div class="mb-1  w-101">
+                            <input type="checkbox" class="mr-1" checked="@(GetURLAutoAfterMsg(NetworkInfo.GroupID))"
+                                   @onchange="eventArgs => { SetURLAutoAfterMsg(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM")</span>               <!--URL 자동전환 알림 -->
+                            </div>
+                        }
+
+                    // 1번째 망꺼 설정값으로만 전체 적용
+                    /*@if (m_bUseURLRedirectionAlarmType)
+                    {
+                    <div class="mb-1  w-102">
+                    <span class="pr-2">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM_TYPE")</span>                                                                 <!--URL 자동전환 알림형식-->
+                    <select value="@(GetURLAutoAfterBrowser(NetworkInfo.GroupID))"
+                    @onchange="eventArgs => { SetURLRedirectType(NetworkInfo.GroupID, eventArgs); }">
+                    <option value="C">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FOLD")</option>                                                                               <!--닫기-->
+                    <option value="N">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN")</option>                                                                               <!--유지-->
+                    <option value="F">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</option>                                                                    <!--특정 URL포워딩-->
+                    </select>
+                    </div>
+                    }
+
+                    @if (false)  // 확인용도
+                    {
+                    <div class="mb-1  w-100">
+                    <span class="pr-3">@(XmlConf.GetTitle("T_FORWARD_URL")+" : "+ GetForwardUrl(NetworkInfo.GroupID)) </span>                                                                 <!-- ForWarding 하는 주소 -->
+                    </div>
+                        }*/
+
+                    <br />
+
                 }
-
-                // 1번째 망꺼 설정값으로만 전체 적용
-                /*@if (m_bUseURLRedirectionAlarmType)
-                {
-                <div class="mb-1  w-102">
-                <span class="pr-2">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM_TYPE")</span>                                                                 <!--URL 자동전환 알림형식-->
-                <select value="@(GetURLAutoAfterBrowser(NetworkInfo.GroupID))"
-                @onchange="eventArgs => { SetURLRedirectType(NetworkInfo.GroupID, eventArgs); }">
-                <option value="C">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FOLD")</option>                                                                               <!--닫기-->
-                <option value="N">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN")</option>                                                                               <!--유지-->
-                <option value="F">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</option>                                                                    <!--특정 URL포워딩-->
-                </select>
-                </div>
-                }
-
-                @if (false)  // 확인용도
-                {
-                <div class="mb-1  w-100">
-                <span class="pr-3">@(XmlConf.GetTitle("T_FORWARD_URL")+" : "+ GetForwardUrl(NetworkInfo.GroupID)) </span>                                                                 <!-- ForWarding 하는 주소 -->
-                </div>
-                    }*/
-
-                <br />
-
-            }
 
             @if (m_bUseURLRedirectionAlarmType)
             {
@@ -337,7 +337,7 @@
                     <!--<option value="N">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN")</option>-->                                                                               <!--유지-->
                     <!--<option value="F">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</option>-->                                                                    <!--특정 URL포워딩-->
                     <!--</select>-->
-            <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         @GetURLAutoAfterBrowser(0)
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenu4" style="min-width:105px">
@@ -360,16 +360,16 @@
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetRMouseFileAddAfterTrans())"
-                   @onchange="eventArgs => { SetRMouseFileAddAfterTrans(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RMOUSEAUTOTRNAS")</span>          <!--마우스 우클릭 자동전송-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetRMouseFileAddAfterTrans(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RMOUSEAUTOTRNAS")</span>          <!--마우스 우클릭 자동전송-->
+                    </div>
+                }
             @if (m_bAfterApprAutoCheck)
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetAfterBasicChk())"
-                   @onchange="eventArgs => { SetAfterBasicChk(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK")</span>                            <!--사후결재 체크-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetAfterBasicChk(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK")</span>                            <!--사후결재 체크-->
+                    </div>
+                }
         </div>
     }
 
@@ -388,16 +388,16 @@
         {
             <div class="mb-1 w-100">
                 <input type="checkbox" class="mr-1" checked="@(GetFileRecvFolderOpen())"
-                   @onchange="eventArgs => { SetFileRecvFolderOpen(eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_AFTEROPENFOLDER_FILEDOWN")</span>             <!--파일 수신 후 폴더 열기-->
-        </div>
-        }
+                       @onchange="eventArgs => { SetFileRecvFolderOpen(eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_AFTEROPENFOLDER_FILEDOWN")</span>             <!--파일 수신 후 폴더 열기-->
+                </div>
+            }
         @if (m_bManualDownFolderChange)
         {
             <div class="mb-1  w-100">
                 <input type="checkbox" class="mr-1" checked="@(GetManualRecvDownChange())"
-                   @onchange="eventArgs => { SetManualRecvDownChange(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_MANUALDOWN_FOLDEROPEN")</span>            <!--수동다운로드 폴더 선택-->
-        </div>
-        }
+                       @onchange="eventArgs => { SetManualRecvDownChange(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_MANUALDOWN_FOLDEROPEN")</span>            <!--수동다운로드 폴더 선택-->
+                </div>
+            }
     </div>
 
     @if (m_bAlarmTray)
@@ -408,37 +408,37 @@
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetFileRecvTrayFix())"
-                   @onchange="eventArgs => { SetFileRecvTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RECVALARM_RETAIN")</span>                 <!--수신 완료 후 알림 유지-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetFileRecvTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RECVALARM_RETAIN")</span>                 <!--수신 완료 후 알림 유지-->
+                    </div>
+                }
             @if (m_bApprCountAlarmRetain)
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetApprTrayFix())"
-                   @onchange="eventArgs => { SetApprTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRWAITALARM_RETAIN")</span>                         <!--승인대기 알림 유지-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetApprTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRWAITALARM_RETAIN")</span>                         <!--승인대기 알림 유지-->
+                    </div>
+                }
             @if (m_bApprCompleteAlarmRetain)
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetUserApprActionTrayFix())"
-                   @onchange="eventArgs => { SetUserApprActionTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRCOMPLETEALARM_RETAIN")</span>              <!--승인완료 알림 유지-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetUserApprActionTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRCOMPLETEALARM_RETAIN")</span>              <!--승인완료 알림 유지-->
+                    </div>
+                }
             @if (m_bApprRejectAlarmRetain)
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetUserApprRejectTrayFix())"
-                   @onchange="eventArgs => { SetUserApprRejectTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRREJECTALARM_RETAIN")</span>                    <!--반려 알림 유지-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetUserApprRejectTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRREJECTALARM_RETAIN")</span>                    <!--반려 알림 유지-->
+                    </div>
+                }
             @if (m_bUseApprCountAlaram)
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetUseApprWaitNoti())"
-                   @onchange="eventArgs => { SetUseApprWaitNoti(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRWAITNOTI_USE")</span>                    <!--승인대기 알림설정-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetUseApprWaitNoti(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRWAITNOTI_USE")</span>                    <!--승인대기 알림설정-->
+                    </div>
+                }
         </div>
     }
 
@@ -450,16 +450,16 @@
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetExitTrayMove())"
-                   @onchange="eventArgs => { SetExitTrayMove(eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_EXITKEY_MOVETRAY")</span>                            <!--종료 시, 트레이로 이동-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetExitTrayMove(eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_EXITKEY_MOVETRAY")</span>                            <!--종료 시, 트레이로 이동-->
+                    </div>
+                }
             @if (m_bUseStartTrayMove)
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetStartTrayMove())"
-                   @onchange="eventArgs => { SetStartTrayMove(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_PROGRAMSTART_MOVETRAY")</span>                       <!--프로그램 시작 시, 트레이 이동-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetStartTrayMove(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_PROGRAMSTART_MOVETRAY")</span>                       <!--프로그램 시작 시, 트레이 이동-->
+                    </div>
+                }
         </div>
     }
 
@@ -469,10 +469,10 @@
         <div class="ml-2 mb-4">
             <div class="mb-1  w-100">
                 <input type="checkbox" class="mr-1" checked="@(GetStartProgramReg())"
-                   @onchange="eventArgs => { SetStartProgramReg(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_PROGRAMSTART_REG")</span>                           <!--시작 프로그램에 등록-->
-        </div>
-        </div>
-    }
+                       @onchange="eventArgs => { SetStartProgramReg(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_PROGRAMSTART_REG")</span>                           <!--시작 프로그램에 등록-->
+                </div>
+            </div>
+        }
 
     @if (m_bUseLanguageSet)
     {
@@ -488,7 +488,7 @@
                 <!--<option value="CN">@XmlConf.GetTitle("T_LANGUAGE_CHINA")</option>-->                                                                                             <!--중국어-->
                 <!--<option value="EN">@XmlConf.GetTitle("T_LANGUAGE_ENGLISH")</option>-->                                                                                             <!--영어-->
                 <!--</select>-->
-            <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     @GetLanguage()
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenu5" style="min-width:85px">
@@ -510,17 +510,17 @@
                 @if (m_bScreenLockUserChange == true)
                 {
                     <input type="checkbox" class="mr-1" checked="@(GetScreenLock())"
-                   @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-1">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
-                    <input type="text" value="@(GetScreenTime())" class="mr-2 col-md-2" style="text-align:right"
-                   @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
-                }
-                else
-                {
-                    <input disabled="disabled" type="checkbox" class="mr-1" checked="@(GetScreenLock())"
-                   @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-1">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
-                    <input readonly="readonly" type="text" value="@(GetScreenTime())" class="mr-2 col-md-2" style="text-align:right"
-                   @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
-                }
+                           @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-1">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
+                        <input type="text" value="@(GetScreenTime())" class="mr-2 col-md-2" style="text-align:right"
+                               @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
+                        }
+                        else
+                        {
+                            <input disabled="disabled" type="checkbox" class="mr-1" checked="@(GetScreenLock())"
+                                   @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-1">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
+                                <input readonly="readonly" type="text" value="@(GetScreenTime())" class="mr-2 col-md-2" style="text-align:right"
+                                       @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
+                                }
             </div>
         </div>
     }
@@ -541,7 +541,7 @@
                 <!--<option value="@LogEventLevel.Error">@XmlConf.GetTitle("T_LOGLEVEL_ERROR")</option>-->                                                                                             <!--영어-->
                 <!--<option value="@LogEventLevel.Fatal">@XmlConf.GetTitle("T_LOGLEVEL_FATAL")</option>-->                                                                                             <!--영어-->
                 <!--</select>-->
-            <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu6" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu6" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     @GetLogLevel()
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenu6" style="min-width:105px">
@@ -2096,7 +2096,24 @@
     public bool GetRecvDownPathChangeHide(int groupID)
     {
         // siteConfig. json으로 이동
-        return !(SGAppMgrSvc.SiteConfigInfoService.GetUseRecvFolderChange(groupID)); // OpConfigInfoService
+        // 마핀의 경우 고정
+
+
+        foreach(var sgNetWork in GetSGNetworkList())
+        {
+            if(sgNetWork.GroupID == groupID)
+            {
+                if (sgNetWork.NetPos == "IN")
+                    return false;
+                else
+                    return true;
+
+            }
+        }
+        return true;
+
+
+        //return !(SGAppMgrSvc.SiteConfigInfoService.GetUseRecvFolderChange(groupID)); // OpConfigInfoService
     }
 
 

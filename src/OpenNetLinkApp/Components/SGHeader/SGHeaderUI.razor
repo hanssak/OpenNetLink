@@ -977,10 +977,10 @@ private async void mouseTimer_Elapsed(object sender, System.Timers.ElapsedEventA
     if (i == count)
         return;
 
-        //bool bUseScreenLock = AppConfigSvc.GetScreenLock();
-        bool bUseScreenLock = SGAppMgrSvc.AppConfigInfoService.GetScreenLock();
-        if (bUseScreenLock)
-        {
+    //bool bUseScreenLock = AppConfigSvc.GetScreenLock();
+    bool bUseScreenLock = SGAppMgrSvc.AppConfigInfoService.GetScreenLock();
+    if (bUseScreenLock)
+    {
 
         object[] param = { screentime };
         //object[] param = { 1 };
@@ -1846,6 +1846,25 @@ private void UpdatePolicy(int groupId)
     //UserInfoCheck를 요청하여 사용자의 정보 갱신
     HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eUSERINFOCHECK, ResultUserInfoCheck);
     HsCmdCenter.SendUserInfoCheck(groupId, sgUserData.UserId);
+
+    // CLIENT_ZIP_DEPTH, CS_EXCEPTION_EXT_REASON_TYPE
+    // 정보 가져옴 환경변수 설정
+    SGQueryExtend sgQueryExtend = null;
+    sgQueryExtend = new SGQueryExtend();
+    if (sgQueryExtend != null)
+    {
+
+        string strGetinfoTagName = "";
+        strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
+        strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
+        strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
+        strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";
+        strGetinfoTagName += ", 'MAX_CLIP_SIZE'";
+
+        string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
+        HsCmdCenter.SendZipDepthInfo(groupId, sgUserData.UserId, strQuery);
+    }
+
 }
 
 /// <summary>

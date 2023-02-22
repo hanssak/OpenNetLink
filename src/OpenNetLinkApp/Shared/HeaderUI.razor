@@ -1395,9 +1395,10 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             return -1;
         }
 
-
-        Int64 MaxClipSize = sgLoginData.GetClipboardLimitSize();
-        if (MaxClipSize > 0 && (MaxClipSize * 1024 * 1024) < (Int64)nClipSize)
+        Int64 MaxClipSize = Convert.ToInt64(sgLoginData.GetTagDataBySystemEnvName("MAX_CLIP_SIZE"));
+        //Int64 MaxClipSize = sgLoginData.GetClipboardLimitSize();
+        //if (MaxClipSize > 0 && (MaxClipSize * 1024 * 1024) < (Int64)nClipSize)
+        if (MaxClipSize > 0 && (MaxClipSize) < (Int64)nClipSize)
         {
 
             CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{nGroupID}, SendFailed - Msg : ClipboardLimitSize Over Status!");

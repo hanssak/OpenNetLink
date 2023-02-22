@@ -108,16 +108,25 @@ namespace OpenNetLinkApp.Services
             }
 
             bool isCheckHardSpace = true;
-            serializer = new DataContractJsonSerializer(typeof(SGopConfig));
-            string OpConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppOPsetting.json";
-            if (File.Exists(OpConfig))
+            foreach(SGNetwork sgNetwork in listNetworks)
             {
-                using (FileStream fs = File.OpenRead(OpConfig))
-                {
-                    SGopConfig opConfig = (SGopConfig)serializer.ReadObject(fs);
-                    isCheckHardSpace = opConfig.bUseChkHardSpace;
-                }
+                if (sgNetwork.NetPos == "IN")
+                    isCheckHardSpace = true;
+                else
+                    isCheckHardSpace = false;
             }
+            //serializer = new DataContractJsonSerializer(typeof(SGopConfig));
+            //string OpConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppOPsetting.json";
+            //if (File.Exists(OpConfig))
+            //{
+            //    using (FileStream fs = File.OpenRead(OpConfig))
+            //    {
+            //        SGopConfig opConfig = (SGopConfig)serializer.ReadObject(fs);
+            //        isCheckHardSpace = opConfig.bUseChkHardSpace;
+            //    }
+            //}
+
+
 
             int count = listNetworks.Count;
             SetNetWorkCount(count);

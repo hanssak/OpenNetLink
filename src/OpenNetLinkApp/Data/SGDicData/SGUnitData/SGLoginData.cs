@@ -1523,7 +1523,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strData= (bSystem) ? GetTagData("I_CLIENT_DOCUMENT_MIME_FILTER_TYPE") : GetTagData("E_CLIENT_DOCUMENT_MIME_FILTER_TYPE");          
             return (strData.Equals("W"));
         }
-
+        
         /// <summary>
         /// value 값을 암호화해서 sgData에 저장
         /// </summary>
