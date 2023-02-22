@@ -214,13 +214,13 @@
                         HsStreamList.RemoveAt(i - 1);
                     }
                 }
+
+                bAllCheck = false;
+                StateHasChanged();
+                jsRuntime.InvokeAsync<object>("setDropzoneInputSize");
+                StateHasChanged();
             }
         });
-
-        bAllCheck = false;
-        StateHasChanged();
-        await jsRuntime.InvokeAsync<object>("setDropzoneInputSize");
-        StateHasChanged();
     }
 
     //public async Task DataClear()
