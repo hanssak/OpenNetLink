@@ -2092,7 +2092,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 FindZipContent(btFileData, Encoding.UTF8.GetBytes("[Content_Types].xml")) == true)
             {
 
-                if (String.Compare(strExt, "doc", true) == 0)
+                if (String.Compare(strExt, "doc", true) == 0 ||
+                    String.Compare(strExt, "thmx", true) == 0)
                 {
                     if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("theme")) == true)
                         return true;
@@ -2847,7 +2848,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             {
                 if (String.Compare(strExt, "egg", true) == 0) return IsEGG(btFileData, strExt);
 
-                if (String.Compare(strExt, "doc", true) == 0 || String.Compare(strExt, "docx", true) == 0)
+                if (String.Compare(strExt, "doc", true) == 0 || 
+                    String.Compare(strExt, "docx", true) == 0 ||
+                    String.Compare(strExt, "thmx", true) == 0)
                     return IsWord(btFileData, strExt);
 
                 if (String.Compare(strExt, "xls", true) == 0 || String.Compare(strExt, "xlsx", true) == 0)
@@ -3061,10 +3064,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             strExt = strExt.Replace(".", "");
             btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize2);
-            if (CheckExtForFileByteData(btFileData, strExt) == true)
-                return eFileAddErr.eFANone;
 
-            return eFileAddErr.eFACHG;
+            bool bIsExtForFileByteData = CheckExtForFileByteData(btFileData, strExt);
+
+            Log.Logger.Here().Information($"[IsValidFileExt] CheckExtForFileByteData, Ext : {strExt}, EXT isChanged : {!bIsExtForFileByteData}");
+
+            return (bIsExtForFileByteData ? eFileAddErr.eFANone:eFileAddErr.eFACHG);
         }
 
         public eFileAddErr IsValidFileExtInnerZip(string strFile, string strExt, bool blAllowDRM)

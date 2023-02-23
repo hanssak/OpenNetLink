@@ -402,7 +402,7 @@ namespace OpenNetLinkApp.Common
                 }
                 catch (Exception e)
                 {
-                    Log.Information($"GetFileSize - Exception - msg : {e.Message}, path : {filePath}");
+                    Log.Logger.Here().Information($"GetFileSize - Exception - msg : {e.Message}, path : {filePath}");
                     lSize = -1;
                 }
                 finally
@@ -413,6 +413,80 @@ namespace OpenNetLinkApp.Common
 
             return lSize;
         }
+
+
+        /// <summary>
+        /// Windows / Linux / Mac OSx 에서 다 지원하는 파일명인지 확인하는 함수<br></br>
+        /// return : true - 지원함
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="strItem"></param>
+        /// <returns></returns>
+        public static bool isSupportFileName(string fileName, out string strItem)
+        {
+
+            Log.Logger.Here().Information($"isSupportFileName - fileName : {fileName}");
+
+            // 빈문자인지 확인
+            if ((fileName?.Length ?? 0) == 0)
+            {
+                strItem = "$EMPTY";
+                return false;
+            }
+
+            fileName = fileName.Replace(" ", "");
+            if ((fileName?.Length ?? 0) == 0)
+            {
+                strItem = "$EMPTY";
+                return false;
+            }
+
+
+            // File / Folder 이름으로 정해질 수 없는 문자 있는지 확인
+
+            // Windows
+            string strNotSupportData = "\\/:*?\"<>";
+
+            // Linux
+            // "/"
+
+            // Mac ( Finder)
+
+
+            // 문자 1개라도 허용불가능 
+            char[] chNotSupport = strNotSupportData.ToCharArray();
+
+            for (int i = 0; i < chNotSupport.Length; i++)
+            {
+                if (fileName.IndexOf(chNotSupport[i]) >= 0)
+                {
+                    strItem = chNotSupport[i].ToString();
+                    Log.Logger.Here().Information($"isSupportFileName - Not Support Char(###-Char)(Windows) : {strItem}");
+                    return false;
+                }
+            }
+
+            // 단어전체 동일할때 허용불가능
+            if (fileName == "." ||  // Linux
+                fileName == "..")
+            {
+                strItem = fileName;
+                Log.Logger.Here().Information($"isSupportFileName - Not Support FileName(###-Word)(Linux) : {strItem}");
+                return false;
+            }
+
+            // 특정문자로 시작될때 허용불가능 
+            if (fileName.IndexOf('.') == 0)
+            {
+                strItem = ".";
+                Log.Logger.Here().Information($"isSupportFileName - Not Support Start Char(###-StartChar)(MacOSx) : {"."}");
+                return false;
+            }
+
+            strItem = "";
+            return true;
+        }
+
     }
 
     public class CsHashFunc
