@@ -1020,6 +1020,10 @@ namespace OpenNetLinkApp.Services
             int[] nArryDeleteTime = new int[hSCmdCenter.m_nNetWorkCount];
             string strDownPath = "";
 
+            bool bDisplayCycle = false;
+            int nHour = -1;
+            DateTime nowData = DateTime.Now;
+
             while (true)
             {
                 // 30초마다 한번씩 삭제 동작 : NetLink 기준
@@ -1043,17 +1047,25 @@ namespace OpenNetLinkApp.Services
                         }
                     }
 
-                    if (bIsLogin && sgLoginData != null)
+
+                    if (bDisplayCycle)
                     {
-                        nArryDeleteTime[nIdx] = sgLoginData.GetFileRemoveCycle();
-                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DELETECYCLE : {nArryDeleteTime[nIdx]}");
+                        // Log 시간단위로 출력
+                        nowData = DateTime.Now;
+                        if (nHour != nowData.Hour)
+                        {
+                            nHour = nowData.Hour;
+                            CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , " + $"{ ((bIsLogin && sgLoginData != null) ? $"DELETECYCLE : { nArryDeleteTime[nIdx]} " : "Logout Status!") }");
+                        }
                     }
                     else
                     {
-                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , Logout Status!");
+                        // Log 첫출력
+                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , " + $"{ ( (bIsLogin && sgLoginData != null) ? $"DELETECYCLE : { nArryDeleteTime[nIdx]} " : "Logout Status!") }");
+                        bDisplayCycle = true;
+                        nowData = DateTime.Now;
+                        nHour = nowData.Hour;
                     }
-
-
                 }
 
 
