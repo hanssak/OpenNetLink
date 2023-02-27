@@ -292,6 +292,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns></returns>
         public bool GetUseClipBoardApproveReason();
 
+        /// <summary>
+        /// 파일 선택 삭제 사용 유무
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseFileSelectDelete();
+
         public string GetApproveExtSelectType();
 
         public bool GetUseApproveExt();
@@ -938,6 +944,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseClipBoardApproveReason()
         {
             return AppConfigInfo.bUseClipBoardApproveReason;
+        }
+
+        public bool GetUseFileSelectDelete()
+        {
+            return AppConfigInfo.bUseFileSelectDelete;
         }
 
         public string GetApproveExtSelectType()

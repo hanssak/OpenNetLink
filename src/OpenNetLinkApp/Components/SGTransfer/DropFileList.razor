@@ -21,10 +21,10 @@
 @inject WebWindow Window
 
 <DropTarget Drop="@OnDrop">
-    <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;" @onclick="fileSelectOpen">
-        <input type="file" id="fileInputTrans" style="display:block;" onclick="stopClickOpen(event);" multiple="multiple" />
+    @*<div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;" @onclick="fileSelectOpen">
+        <input type="file" id="fileInputTrans" style="display:block;" onclick="stopClickOpen(event);" multiple="multiple" />*@
 
-
+    <div class="dropzone col-md-12 p-0" style="overflow:auto; height:100%;">
         @if (bViewDropFileAddError && (fileTypeError || fileSizeError))
         {
             <ul class="validation-errors mb-0">
@@ -41,26 +41,41 @@
 
         @if (HsStreamList != null && HsStreamList.Count > 0)
         {
-            <div>
-                <table id="example2" class="table table-head-fixed table-hover mb-0" style="font-size: 14px;table-layout: fixed; line-height:20px;">
+            <div id="DropzoneTable" style="height:max-content;">
+                <table id="example2" class="table table-head-fixed table-hover mb-0" style="font-size: 14px; table-layout: fixed; line-height: 20px;">
                     <thead>
                         <tr>
-                            <th style="width:60%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left:5px;">@strFileName</th>                 <!--파일명-->
-                        <th style="text-align:right;vertical-align:middle;width:10%;">@strFileSize</th>                 <!--크기-->
-                        <th style="text-align:center;vertical-align:middle;width:10%;">@strFileType</th>                 <!--유형-->
+                            @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileSelectDelete())
+                            {
+                                <th style="text-align: center; vertical-align: middle; width: 5%">
+                                    <input class="input" type="checkbox" checked="@bAllCheck" @onclick="(e => AllCheckStateUpdate())">
+                                </th>
+                            }
+                            <th style="vertical-align: middle; width: 60%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left: 5px;">@strFileName</th>
+                            <!--파일명-->
+                            <th style="text-align:right;vertical-align:middle;width:10%;">@strFileSize</th>
+                            <!--크기-->
+                            <th style="text-align:center;vertical-align:middle;width:10%;">@strFileType</th>
+                            <!--유형-->
                             @if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
                             {
                                 <th style="text-align:center;vertical-align:middle;width:20%;">@XmlConf.GetTitle("T_COMMON_REMARK")</th>
                                 <!--비고-->
                             }
 
-                            <!--<th width="30%">@strLastModDay</th>-->               <!--수정한 날짜-->
-                    </tr>
+                            <!--<th width="30%">@strLastModDay</th>--> <!--수정한 날짜-->
+                        </tr>
                     </thead>
                     <tbody>
                         @foreach (var file in HsStreamList)
                         {
                             <tr>
+                                @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileSelectDelete())
+                                {
+                                    <td style="text-align: center; vertical-align: middle; width: 5%;">
+                                        <input class="input" type="checkbox" checked=@file.isCheck @onclick="(e => CheckStateUpdate(file))">
+                                    </td>
+                                }
                                 <td style="width:60%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left:5px;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
                                 <td style="text-align:right;vertical-align:middle;width:10%;">@(file.IsDir? "" : CsFunction.GetSizeStr(file.Length))</td>
                                 <td style="text-align:center;vertical-align:middle;width:10%;">@file.Type</td>
@@ -69,7 +84,7 @@
                                     <td style="text-align:center;vertical-align:middle;width:20%;">@(file.isNeedApprove? XmlConf.GetTitle("T_COMMON_APPROVE_EXT_ITEM") : "")</td>
                                 }
                                 <!--<td width="30%">@file.ModifyTime.ToString("yyyy/MM/dd HH:mm:ss")</td>-->
-                    </tr>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -81,9 +96,10 @@
             <p style="font-size:13px;">
                 <br /><br /><br /><br />
                 @((MarkupString)strFileDragInfo)         <!--파일을 이곳으로 드래그 하세요.-->
-        </p>
+            </p>
 
         }
+        <input type="file" id="fileInputTrans" style="display:block;" onclick="stopClickOpen(event);" multiple="multiple" />
     </div>
     <a hidden data-toggle="modal" data-target="modal-dropprogress"></a>
     <a hidden data-toggle="modal" data-target="Transfer_Denied"></a>
@@ -114,6 +130,12 @@
     public bool fileTypeError = false;
 
     public bool bViewDropFileAddError = false;
+
+    /// <summary>
+    /// 드랍리스트 전체 선택여부
+    /// </summary>
+    public bool bAllCheck = false;
+    public bool tempTest = false;
 
     // private static Action<FileListEntryImpl[], bool> action1;
     // private static Action<FileListEntryImpl[],bool> action2;
@@ -171,11 +193,98 @@
         }
 
         if (HsStreamList != null && HsStreamList.Count > 0)
+        {
+            foreach (HsStream stream in HsStreamList)
+            {
+                stream.stream.Dispose();
+            }
             HsStreamList.Clear();
+        }
+
+        bAllCheck = false;
+
+        StateHasChanged();
+        await jsRuntime.InvokeAsync<object>("setDropzoneInputSize");
+        StateHasChanged();
+    }
+
+    public async Task DataSelectClear()
+    {
+        await Task.Run(() =>
+        {
+            if (HsStreamList != null && HsStreamList.Count > 0)
+            {
+                for (int i = HsStreamList.Count; i > 0; i--)
+                {
+                    if (HsStreamList[i - 1].isCheck)
+                    {
+                        fileAddManage.m_nTansCurSize = fileAddManage.m_nTansCurSize - HsStreamList[i - 1].Size;
+                        fileAddManage.m_nTransCurCount = fileAddManage.m_nTransCurCount - 1;
+                        HsStreamList[i - 1].stream.Dispose();
+                        HsStreamList.RemoveAt(i - 1);
+                    }
+                }
+
+                bAllCheck = false;
+                StateHasChanged();
+                jsRuntime.InvokeAsync<object>("setDropzoneInputSize");
+                StateHasChanged();
+            }
+        });
+    }
+
+    //public async Task DataClear()
+    //{
+
+    //    fileAddManage.m_nTansCurSize = 0;
+    //    fileAddManage.m_nTransCurCount = 0;
+
+    //    try
+    //    {
+    //        if (bAsyncData)
+    //        {
+    //            await ExtDropClear();
+    //        }
+    //        CLog.Here().Information($"dropFile.DataClear - !");
+    //    }
+    //    catch (Exception err)
+    //    {
+    //        // error
+    //        CLog.Here().Error($"DataClear - Exception - error:{err.Source} - Msg : {err.Message}");
+    //    }
+
+    //    if (HsStreamList != null && HsStreamList.Count > 0)
+    //        HsStreamList.Clear();
+
+    //    StateHasChanged();
+    //}
+
+    public void CheckStateUpdate(HsStream item)
+    {
+        item.isCheck = !item.isCheck;
 
         StateHasChanged();
     }
 
+    public void AllCheckStateUpdate()
+    {
+        bAllCheck = !(bAllCheck);
+        int nCount = HsStreamList.Count;
+        string strMsg = "";
+        if (nCount <= 0)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0243"); // 체크할 항목이 존재하지 않습니다.
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        for (int i = 0; i < nCount; i++)
+        {
+            HsStreamList[i].isCheck = bAllCheck;
+        }
+
+        StateHasChanged();
+    }
 
 
     private void ShowMessage(string strType, string strMsg)
@@ -740,6 +849,9 @@
 
         // Important: Invoke StateHasChanged() to update the page
         StateHasChanged();
+        // 파일 추가후 화면갱신
+        StateHasChanged();
+        await jsRuntime.InvokeAsync<object>("setDropzoneInputSize");
     }
 
     protected override void OnInitialized()
@@ -1184,6 +1296,8 @@
         //}
         SetFileAdd(fileList);
         StateHasChanged();
+        await jsRuntime.InvokeAsync<object>("setDropzoneInputSize");
+        StateHasChanged();
     }
 
     private void RemoveFile(IFileListEntry file)
@@ -1200,6 +1314,11 @@
     public async Task RemoveAllFile()
     {
         await DataClear();
+    }
+
+    public async Task RemoveSelectFile()
+    {
+        await DataSelectClear();
     }
 
     //DropZone 클릭방지코드
@@ -1393,7 +1512,7 @@
                 });
 
                 if (oldVersionHWP.Count > 0)
-                    ShowMessage("error", string.Format(XmlConf.GetErrMsg("E_0255") ,string.Join("<br>", oldVersionHWP)));
+                    ShowMessage("error", string.Format(XmlConf.GetErrMsg("E_0255"), string.Join("<br>", oldVersionHWP)));
             }
             else
                 fileAddManage.m_nCurRegisteringSize = 0;

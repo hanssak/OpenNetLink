@@ -8468,7 +8468,7 @@ a.fc-event {
 .ui-state-highlight .link {
   color: #ffffff; }
 
-/* DRAG AND DROP °ü·Ã Ãß°¡ 2020/06/09 YKH*/
+/* DRAG AND DROP ê´€ë ¨ ì¶”ê°€ 2020/06/09 YKH*/
 .dropzone {
     border: 1px groove steelblue;
     /*padding: 5rem;*/
@@ -8490,10 +8490,10 @@ a.fc-event {
 
 .dropzone input[type=file] {
     position: absolute;
-    width: 100%;
+    width: 90%;
     height: 100%;
     opacity: 0;
-    cursor: pointer;
+    cursor: default;
 }
 
 .dropzone-drag {

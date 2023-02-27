@@ -174,5 +174,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseClipBoardApproveReason { get; set; } // 클립보드 승인사유 입력 여부
 
+        public bool bUseFileSelectDelete { get; set; } // 파일 선택 삭제 사용 유무
+
     }
 }

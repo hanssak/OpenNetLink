@@ -493,6 +493,29 @@ window.refreshList = (path) => {
         DotNet.invokeMethodAsync("OpenNetLinkApp", "JSLoadListFiles2", path);
 }
 
+//DropZone의 Height를 조절하여 DragAndDrop이 가능하게 변경
+window.setDropzoneInputSize = () => {
+    setDropzonSize();
+}
+function setDropzonSize() {
+    var divDropFileHeight = $("#divDropFile").css("height");
+    var divDropFileHeightint = parseInt(divDropFileHeight.replace("px", ""));
+    var divDropzoneTableHeight = $("#DropzoneTable").css("height");
+    if (divDropzoneTableHeight != null) {
+
+        var divDropzoneTableHeightint = parseInt(divDropzoneTableHeight.replace("px", ""))
+        if (divDropFileHeightint >= divDropzoneTableHeightint) {
+            $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
+        }
+        else {
+            $('#fileInputTrans').css("height", divDropzoneTableHeight);
+        }
+    }
+    else {
+        $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
+    }
+}
+
 window.appendHtml = (id, val) => {
     $('#' + id).html(val);
 }
@@ -612,6 +635,8 @@ window.exitLogIn = () => {
     if (divRightUpper != null && divRightBottom != null) {
         var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
         $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
+        //Window 사이즈 조절 시 divDropFile Height 도 함께 조절
+        setDropzonSize();
     }
 }
 
@@ -866,9 +891,11 @@ window.adJustWindowsize = () => {
         var dirRightHeight = $("#divRightContent").css("height");
         var divRightUpper = $("#divRightUpperSide").css("height");
         var divRightBottom = $("#divRightBottomSide").css("height");
+        var dirRightWidth = $("#divDropFile").css("width");
         if (divRightUpper != null && divRightBottom != null) {
             var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
             $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
+            setDropzonSize();
         }
     });
 }
