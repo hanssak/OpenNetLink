@@ -2095,8 +2095,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 FindZipContent(btFileData, Encoding.UTF8.GetBytes("[Content_Types].xml")) == true)
             {
 
-                if (String.Compare(strExt, "doc", true) == 0 ||
-                    String.Compare(strExt, "thmx", true) == 0)
+                if (String.Compare(strExt, "doc", true) == 0)
                 {
                     if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("theme")) == true)
                         return true;
@@ -2174,6 +2173,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 FindZipContent(btFileData, Encoding.UTF8.GetBytes("docProps")) == true &&
                 FindZipContent(btFileData, Encoding.UTF8.GetBytes("ppt")) == true)
                 return true;
+
+            if (String.Compare(strExt, "thmx", true) == 0 &&
+                FindZipContent(btFileData, Encoding.UTF8.GetBytes("_rels")) == true &&
+                FindZipContent(btFileData, Encoding.UTF8.GetBytes("[Content_Types].xml")) == true &&
+                FindZipContent(btFileData, Encoding.UTF8.GetBytes("docProps")) == true &&
+                FindZipContent(btFileData, Encoding.UTF8.GetBytes("theme")) == true)
+                return true;
+
 
             return false;
         }
@@ -2851,15 +2858,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             {
                 if (String.Compare(strExt, "egg", true) == 0) return IsEGG(btFileData, strExt);
 
-                if (String.Compare(strExt, "doc", true) == 0 || 
-                    String.Compare(strExt, "docx", true) == 0 ||
-                    String.Compare(strExt, "thmx", true) == 0)
+                if (String.Compare(strExt, "doc", true) == 0 || String.Compare(strExt, "docx", true) == 0 )
                     return IsWord(btFileData, strExt);
 
                 if (String.Compare(strExt, "xls", true) == 0 || String.Compare(strExt, "xlsx", true) == 0)
                     return IsXls(btFileData, strExt);
 
-                if (String.Compare(strExt, "ppt", true) == 0 || String.Compare(strExt, "pptx", true) == 0)
+                if (String.Compare(strExt, "ppt", true) == 0 || String.Compare(strExt, "pptx", true) == 0 || String.Compare(strExt, "thmx", true) == 0)
                     return IsPPT(btFileData, strExt);
 
                 if (String.Compare(strExt, "xps", true) == 0) return IsXPS(btFileData, strExt);
