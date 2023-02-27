@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -490,11 +490,11 @@ namespace OfficeExtractor
                         if (_passwordProtectedChecker.IsStreamProtected(inputFile).Protected)
                             ThrowPasswordProtected(inputFileName);
 
-                        //if (extension == ".DOCX")
-                        //{
+                        if (extension == ".DOCX")
+                        {
                             if (DocumentCorruptCheck(inputFile, outputFolder))
                                 throw new DocumentCorrupt("ERROR FILE CHANGE");
-                        //}
+                        }
 
                         // Word 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/word/embeddings/", outputFolder, "Word");
@@ -514,21 +514,20 @@ namespace OfficeExtractor
                         result = Excel.Extract(inputFile, outputFolder);
                         break;
 
-                    case ".XLSX":
-                    case ".XLSM":
-                    case ".XLTX":
-                    case ".XLTM":
                     case ".XLSB":
-                    case ".XLAM":
+                    case ".XLSM":
+                    case ".XLSX":
+                    case ".XLTM":
+                    case ".XLTX":
                         if (_passwordProtectedChecker.IsStreamProtected(inputFile).Protected)
                             ThrowPasswordProtected(inputFileName);
 
-                        //if (extension == ".XLSX")
-                        //{
+                        if (extension == ".XLSX")
+                        {
                             if (DocumentCorruptCheck(inputFile, outputFolder))
                                 throw new DocumentCorrupt("ERROR FILE CHANGE");
 
-                        //}
+                        }
                         // Excel 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/xl/embeddings/", outputFolder, "Excel");
                         break;
@@ -551,32 +550,29 @@ namespace OfficeExtractor
                         result = PowerPoint.Extract(inputFile, outputFolder);
                         break;
 
-                    case ".PPTX":
-                    case ".PPTM":
-                    case ".POTX":
                     case ".POTM":
-                    case ".PPAM":
-                    case ".PPSX":
+                    case ".POTX":
                     case ".PPSM":
-                    case ".SLDX":
-                    case ".SLDM":
-                    case ".THMX":
+                    case ".PPSX":
+                    case ".PPTM":
+                    case ".PPTX":
                         if (_passwordProtectedChecker.IsStreamProtected(inputFile).Protected)
                             ThrowPasswordProtected(inputFileName);
 
-                        //if (extension == ".PPTX")
-                        //{
+                        if (extension == ".PPTX")
+                        {
                             if (DocumentCorruptCheck(inputFile, outputFolder))
                                 throw new DocumentCorrupt("ERROR FILE CHANGE");
 
-                        //}
+                        }
                         // PowerPoint 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/ppt/embeddings/", outputFolder, "PowerPoint");
                         break;
 
                     default:
                         var message = "The file '" + Path.GetFileName(inputFileName) +
-                                      "' is not supported";
+                                      "' is not supported, only .ODT, .ODS, .ODP, .DOC, .DOCM, .DOCX, .DOT, .DOTM, .DOTX, .RTF, .XLS, .XLSB, .XLSM, .XLSX, .XLT, " +
+                                      ".XLTM, .XLTX, .XLW, .POT, .PPT, .POTM, .POTX, .PPS, .PPSM, .PPSX, .PPTM, .PPTX, .HWP and .HWPX are supported";
 
                         Logger.WriteToLog(message);
                         throw new OEFileTypeNotSupported(message);
