@@ -1045,8 +1045,10 @@ namespace OpenNetLinkApp.Services
                                 PageStatusService.m_DicPageStatusData[nIdx].GetConnectStatus() == true)
                                 bIsLogin = true;
                         }
-                    }
 
+                        if (bIsLogin && sgLoginData != null)
+                            nArryDeleteTime[nIdx] = sgLoginData.GetFileRemoveCycle();
+                    }
 
                     if (bDisplayCycle)
                     {
@@ -1066,11 +1068,7 @@ namespace OpenNetLinkApp.Services
                         nowData = DateTime.Now;
                         nHour = nowData.Hour;
                     }
-                }
 
-
-                for (nIdx = 0; nIdx < hSCmdCenter.m_nNetWorkCount; nIdx++)
-                {
                     if (nArryDeleteTime[nIdx] > 0)
                     {
                         // 삭제주기 설정된 값마다 삭제
