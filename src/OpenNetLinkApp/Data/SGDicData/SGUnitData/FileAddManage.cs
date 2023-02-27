@@ -493,6 +493,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
     public class FileAddManage
     {
+        public static object objLock = new object();
+        public static Dictionary<int, string> dicMimeConfData = new Dictionary<int, string>();
+
         private List<FileAddErr> m_FileAddErrList = new List<FileAddErr>();
 
         public List<(string reason, string count)> m_FileAddErrReason = new List<(string reason, string count)>();
@@ -2092,7 +2095,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 FindZipContent(btFileData, Encoding.UTF8.GetBytes("[Content_Types].xml")) == true)
             {
 
-                if (String.Compare(strExt, "doc", true) == 0)
+                if (String.Compare(strExt, "doc", true) == 0 ||
+                    String.Compare(strExt, "thmx", true) == 0)
                 {
                     if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("theme")) == true)
                         return true;
@@ -2847,7 +2851,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             {
                 if (String.Compare(strExt, "egg", true) == 0) return IsEGG(btFileData, strExt);
 
-                if (String.Compare(strExt, "doc", true) == 0 || String.Compare(strExt, "docx", true) == 0)
+                if (String.Compare(strExt, "doc", true) == 0 || 
+                    String.Compare(strExt, "docx", true) == 0 ||
+                    String.Compare(strExt, "thmx", true) == 0)
                     return IsWord(btFileData, strExt);
 
                 if (String.Compare(strExt, "xls", true) == 0 || String.Compare(strExt, "xlsx", true) == 0)
@@ -3061,10 +3067,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             strExt = strExt.Replace(".", "");
             btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize2);
-            if (CheckExtForFileByteData(btFileData, strExt) == true)
-                return eFileAddErr.eFANone;
 
-            return eFileAddErr.eFACHG;
+            bool bIsExtForFileByteData = CheckExtForFileByteData(btFileData, strExt);
+
+            Log.Logger.Here().Information($"[IsValidFileExt] CheckExtForFileByteData, Ext : {strExt}, EXT isChanged : {!bIsExtForFileByteData}");
+
+            return (bIsExtForFileByteData ? eFileAddErr.eFANone:eFileAddErr.eFACHG);
         }
 
         public eFileAddErr IsValidFileExtInnerZip(string strFile, string strExt, bool blAllowDRM)
@@ -4699,46 +4707,72 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public void LoadMimeConf(int groupID)
         {
-            string strFileName = String.Format("FileMime.{0}.conf", groupID.ToString());
-            strFileName = Path.Combine("wwwroot/conf", strFileName);
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            lock (objLock)
             {
-                strFileName = strFileName.Replace("/", "\\");
-            }
-            else
-            {
-                strFileName = strFileName.Replace("\\", "/");
-            }
-			
-            try
-            {
-                string strEncMimeInfo = System.IO.File.ReadAllText(strFileName);
-                SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                string strMimeInfo = sgRSACrypto.MimeConfDecrypt(strEncMimeInfo);
 
-                if (strMimeInfo.Equals(""))
-                    return;
-
-                if (strMimeInfo[strMimeInfo.Length - 1] == '\n')
-                    strMimeInfo = strMimeInfo.Substring(0, strMimeInfo.Length - 1);
-                string[] strMimeList = strMimeInfo.Split('\n');
-                if (strMimeList.Length <= 1)
-                    return;
-                for (int i = 1; i < strMimeList.Length; i++)
+                string strFileName = String.Format("FileMime.{0}.conf", groupID.ToString());
+                strFileName = Path.Combine("wwwroot/conf", strFileName);
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    string[] strSplit = strMimeList[i].Split(' ');
-                    if (strSplit.Length < 2)
-                        continue;
-						
-					Log.Logger.Here().Information($"LoadMimeConf - Add MimeType : {strSplit[0]}, Ext : {strSplit[1]}");
-					
-                    MimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
+                    strFileName = strFileName.Replace("/", "\\");
                 }
-            }
-            catch (FileNotFoundException ioEx)
-            {
-                Log.Logger.Here().Error("LoadMimeConf Exception Msg = [{0}]", ioEx.Message);
-            }
+                else
+                {
+                    strFileName = strFileName.Replace("\\", "/");
+                }
+
+                try
+                {
+                    string strEncMimeInfo = System.IO.File.ReadAllText(strFileName);
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strMimeInfo = sgRSACrypto.MimeConfDecrypt(strEncMimeInfo);
+
+                    if (strMimeInfo.Equals(""))
+                        return;
+
+                    string strMimeSavedData = "";
+                    bool bShowMimeLog = false;
+                    if (dicMimeConfData.TryGetValue(groupID, out strMimeSavedData))
+                    {
+                        if (strMimeSavedData != strEncMimeInfo)
+                        {
+                            if (dicMimeConfData.Remove(groupID))
+                                bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
+                        }
+                    }
+                    else
+                    {
+                        bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
+                    }
+                    
+                    //if (bShowMimeLog == false)
+                    //    Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Skip MimeType Display");
+
+
+                    if (strMimeInfo[strMimeInfo.Length - 1] == '\n')
+                        strMimeInfo = strMimeInfo.Substring(0, strMimeInfo.Length - 1);
+                    string[] strMimeList = strMimeInfo.Split('\n');
+                    if (strMimeList.Length <= 1)
+                        return;
+                    for (int i = 1; i < strMimeList.Length; i++)
+                    {
+                        string[] strSplit = strMimeList[i].Split(' ');
+                        if (strSplit.Length < 2)
+                            continue;
+
+                        if (bShowMimeLog)
+                            Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Add MimeType : {strSplit[0]}, Ext : {strSplit[1]}");
+
+                        MimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
+                    }
+                }
+                catch (FileNotFoundException ioEx)
+                {
+                    Log.Logger.Here().Error($"LoadMimeConf, GroupID:{groupID}, Exception Msg = [{ioEx.Message}]");
+                }
+
+            } // lock (objLock)
+
         }
 
         public void SetOLEMimeList(int groupID, List<Dictionary<int, string>> oleMimeList)

@@ -57,7 +57,7 @@ static void tray_update(struct tray *tray);
 //트레이 표시 방식설정 
 //0:ubuntu20버전에서 표시가능 / 더블클릭 기능 구현 필요함
 //1:CentOS, ubuntu22버전에서 표시가능 / 더블클릭 기능 있음
-#define TRAY_TYPE_IS_GTK_ICON 1 //0 : appindicator / 1 :gtkstatusicon
+#define TRAY_TYPE_IS_GTK_ICON 0 //0 : appindicator / 1 :gtkstatusicon
 
 static AppIndicator *indicator = NULL;
 static int loop_result = 0;
