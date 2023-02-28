@@ -12,6 +12,8 @@ using Serilog.Events;
 using AgLogManager;
 using OpenNetLinkApp.Services;
 using System.Threading;
+using System.Data;
+
 
 namespace OpenNetLinkApp.Data.SGNotify
 {
@@ -143,6 +145,22 @@ namespace OpenNetLinkApp.Data.SGNotify
         private SGNtfyDBProc() 
         { 
             DBCtx = new SGNotifyContext();
+            if (DBCtx.Database.GetPendingMigrations().Any())
+            {
+                var migrationList = DBCtx.Database.GetPendingMigrations();
+                foreach(var migration in migrationList)
+                {
+                    if(migration.Contains("20221026070638"))
+                    {
+                        int count = DBCtx.Database.ExecuteSqlRaw(@"SELECT * FROM sqlite_master 
+                                                                    WHERE type='table' AND name = 'T_SG_RESEND'", "");
+                        
+                    }
+                }
+
+                DBCtx.Database.Migrate();
+            }
+
         }
         //private static 인스턴스 객체
         private static readonly Lazy<SGNtfyDBProc> _instance = new Lazy<SGNtfyDBProc> (() => new SGNtfyDBProc());
