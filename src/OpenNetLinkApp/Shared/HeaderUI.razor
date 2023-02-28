@@ -3596,6 +3596,9 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 break;
 
         }
+
+        CLog.Here().Information($"Progress Update : type[{type.ToString()}] per[{per.ToString()}]");
+
         await jsRuntime.InvokeAsync<object>(identifier, param);
 
         if (type == 3)
