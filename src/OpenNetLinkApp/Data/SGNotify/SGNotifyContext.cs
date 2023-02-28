@@ -162,6 +162,7 @@ namespace OpenNetLinkApp.Data.SGNotify
                 }
 
                 DBCtx.Database.Migrate();
+                DBCtx.SaveChanges();
             }
 
         }
