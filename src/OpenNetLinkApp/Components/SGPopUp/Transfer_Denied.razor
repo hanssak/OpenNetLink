@@ -141,16 +141,20 @@
         builder.OpenComponent<RadzenIcon>(0);
 
         string style = "";
-        if (errInfo.eErrType != eFileAddErr.eFANone)
+        if (errInfo.eErrType != eFileAddErr.eFANone)    //오류난 항목은 빨간색
         {
             builder.AddAttribute(1, "Icon", "cancel");
             style += "color: #D44867;";
         }
-        else if (errInfo.HasChildrenErr)
+        else if(errInfo.ChildrenFiles != null && errInfo.ChildrenFiles.Count > 0)        //하위항목이 있는 항목은 폴더아이콘
         {
-            builder.AddAttribute(1, "Icon", "info");
-            style += "color: #FFAA54;";
+            builder.AddAttribute(1, "Icon", "folder");
         }
+        //else if (errInfo.HasChildrenErr)                
+        //{
+        //    builder.AddAttribute(1, "Icon", "info");
+        //    style += "color: #FFAA54;";
+        //}
         else        //정상
         {
             builder.AddAttribute(1, "Icon", "check_circle");
