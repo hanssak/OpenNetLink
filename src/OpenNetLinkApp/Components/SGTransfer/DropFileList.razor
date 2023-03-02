@@ -196,7 +196,7 @@
         {
             foreach (HsStream stream in HsStreamList)
             {
-                if (stream.Type != "DIR")
+                if (!stream.IsDir)
                     stream.stream.Dispose();
             }
             HsStreamList.Clear();
@@ -222,7 +222,7 @@
                         fileAddManage.m_nTansCurSize = fileAddManage.m_nTansCurSize - HsStreamList[i - 1].Size;
                         fileAddManage.m_nTransCurCount = fileAddManage.m_nTransCurCount - 1;
 
-                        if (HsStreamList[i - 1].Type != "DIR")
+                        if (!HsStreamList[i - 1].IsDir)
                             HsStreamList[i - 1].stream.Dispose();
                         HsStreamList.RemoveAt(i - 1);
                     }
