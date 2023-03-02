@@ -3,6 +3,8 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HsCmdCenter
 @using System.Runtime.InteropServices
+@*@using System.Runtime.CompilerServices*@
+@using Microsoft.AspNetCore.Components.CompilerServices
 @using Radzen
 @using Radzen.Blazor
 @using System.Diagnostics
@@ -11,13 +13,15 @@
 @using AgLogManager
 @using System.Text
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Common;
 
 <div class="modal fade" id="modal-selectsavefolder" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
-            <div class="modal-header modal-outline pl-3 pr-3">
+            <div class="modal-header modal-outline pl-3 pr-3" @ondblclick="()=>EnumerateFolder(false, strTestPath)">
                 @*<h5 class="modal-title pt-1 text-bold "> <i class="fas fa-search pr-2"></i>@XmlConf.GetTitle("T_COMMON_FOLDER_SEARCH")</h5>*@
-                <h5 class="modal-title pt-1 text-bold" style="color:black">
+                <h5 class="modal-title pt-1 text-bold" style="color: black; text-overflow: ellipsis;">
+                    @* white-space: nowrap; overflow: hidden;*@
                     <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
                     @stDisplayPath
                 </h5>
@@ -73,14 +77,13 @@
                                                 <div class="card-body table-responsive" style="height:300px; border:1px solid #c6ceda; background-color:#fff;overflow:hidden;padding:0 0 0 0;overflow:auto">
 
 
-                                                    @*
-                                                        //상위 루트로 이동하는 기능 제거
-                                                        <div @onclick="toUpperTree">
+                                                    @*상위 루트로 이동하는 기능 제거*@
+                                                    <div @onclick="toUpperTree">
                                                         <i class="fas fa-folder align-items-center" style="padding-left:17px;cursor:pointer;"></i><span style="cursor:pointer;">&nbsp;..</span>
-                                                        </div>*@
+                                                    </div>
                                                     <div>
                                                         <RadzenTree Change="@OnSelectPath" Data="@entries" Expand="@LoadFiles" Style="width: 100%;height:100%;overflow:auto">
-                                                            <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
+                                                            <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />  @*Expanded="@((data) => false)" HasChildren="@((data) => false)" *@
                                                         </RadzenTree>
                                                     </div>
 
@@ -128,17 +131,61 @@
 </div>
 
 @code {
+
+    string strTestPath = "C:\\ESD";
+
+    public int nGroupid = 0;
+
+    /// <summary>
+    /// 탐색된 TreeList 의 Root Path를 저장
+    /// </summary>
     private string stTreeDir = String.Empty;
+
+    /// <summary>
+    /// 탐색된 TreeList 의 목록들 저장
+    /// </summary>
     IEnumerable<string> entries = null;
+
+    /// <summary>
+    /// double click을 위해 사용되는 값
+    /// </summary>
+    static DateTime timeInterval = DateTime.Now;
+
+    /// <summary>
+    /// double click을 위해 사용되는 값
+    /// </summary>
+    static string lastSelectPath = "";
+
+    /// <summary>
+    /// double click을 위해 사용되는 값
+    /// </summary>
+    static private int doubleClickMaxTime = 500; //밀리세컨
+
     public int dragLabel = 1;
-    public string curDir { get; set; }
-    public bool IsVisible { get; set; }
+
+    /// <summary>
+    /// 사용자가 생성하는 Folder 이름
+    /// </summary>
     private string stMakeDirName = String.Empty;
+
+    /// <summary>
+    /// 상단에 표시되는 Path 경로
+    /// </summary>
     private string stDisplayPath = String.Empty;
+
+    /// <summary>
+    /// groupID 전달받은 index(groupid와 동일)
+    /// </summary>
     private int nNetIdx = 0;
     private string stOriginPath = String.Empty;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SelectSaveFolder>();
-    private string[] rootDrives;
+
+
+    /// <summary>
+    /// 사용자가 접근,선택 가능한 드라이브 볼륨 목록(C,D,..Z) 저장
+    /// </summary>
+    private string[] rootDrives = null;
+
     private string stCurrentDrive = "";
     public string _stCurrentDrive
     {
@@ -149,8 +196,12 @@
             changeDrive();
         }
     }
-    private static Action<string> actionPopUpLoadFileList;
+
+    private static Action<string> actionDoubleClickListitem;
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
+
+    //private static Action<string> actionTargetSelect;
+
     [Parameter]
     public EventCallback<string> OnSaveDirPath { get; set; }
 
@@ -161,6 +212,36 @@
         //StateHasChanged();
     }
 
+    /// <summary>
+    /// 더블클릭때 java script에서 실행해주는 함수
+    /// </summary>
+    /// <param name="value"></param>
+    @*[JSInvokable("SelectSaveFolderDoubleClick")]
+    public static void SelectSaveFolderDoubleClick(string value)
+    {
+        CLog.Here().Information($"JS-SelectSaveFolderDoubleClick, Path : {value}");
+        actionDoubleClickListitem.Invoke(value);
+    }*@
+
+    /// <summary>
+    /// 더블클릭때 실행되는 마지막 함수
+    /// </summary>
+    /// <param name="value"></param>
+    private void DoubleClickItem(string value)
+    {
+        CLog.Here().Information($"DoubleClickItem(#####), Path : {value}");
+        EnumerateFolder(false, value);
+        //stTreeDir = stDisplayPath;
+
+        JSRuntime.InvokeAsync<object>("RadzenTreeCollapse", null);
+
+        StateHasChanged();
+    }
+
+
+    /// <summary>
+    /// 확인 눌러서 변경된 경로 저장
+    /// </summary>
     public void Confirm()
     {
 
@@ -213,9 +294,55 @@
         closePopUp();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="bDestPath"></param>
+    /// <param name="strPath"></param>
+    public void EnumerateFolder(bool bDestPath, string strPath)
+    {
+        string root = Directory.GetDirectoryRoot(strPath);
+        SetCurrentDrive(root);
+        //   entries = Directory.GetDirectories(root);
+        entries = Directory.EnumerateFileSystemEntries(strPath)
+        .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+        .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+
+        //args.Children.Data = Directory.EnumerateDirectories(directory)
+        //.Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
+
+        stTreeDir = strPath;
+        stDisplayPath = stTreeDir;
+
+        StateHasChanged();
+    }
+
+
+    public void EnumerateFolder(bool bDestPath, int nData)
+    {
+        @*        string root = Directory.GetDirectoryRoot(strPath);
+            SetCurrentDrive(root);
+            //   entries = Directory.GetDirectories(root);
+            entries = Directory.EnumerateFileSystemEntries(strPath)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+
+            //args.Children.Data = Directory.EnumerateDirectories(directory)
+            //.Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
+
+            stTreeDir = strPath;
+            stDisplayPath = stTreeDir;*@
+
+        stDisplayPath = nData.ToString();
+
+        StateHasChanged();
+    }
+
+
+
     public async Task openPopUp(int Idx, string dir)
     {
-        //CLog.Here().Information($"SelectSaveFolder openPopUp");
+        CLog.Here().Information($"SelectSaveFolder openPopUp");
         nNetIdx = Idx;
         stOriginPath = dir;
 
@@ -226,34 +353,53 @@
         //(entries 변경되어도 과거 드라이브의 하위가 잔여되는 버그 수정 건)
         await JSRuntime.InvokeAsync<object>("RadzenTreeCollapse", null);
 
+        //await JSRuntime.InvokeVoidAsync("RadzenTreeNodeDoubleClick");
+
         if (dir != null && dir.Length > 0)
         {
             try
             {
-                //파일 탐색기를 드라이버를 기반으로 한 트리 타입으로 처리
-                string root = Directory.GetDirectoryRoot(dir);
-                SetCurrentDrive(root);
-                //   entries = Directory.GetDirectories(root);
-                entries = Directory.EnumerateFileSystemEntries(root)
-              .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
-              .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
-                stTreeDir = dir;
+
+                if (Directory.Exists(dir))
+                {
+                    //파일 탐색기를 드라이버를 기반으로 한 트리 타입으로 처리
+                    @*string root = Directory.GetDirectoryRoot(dir);
+                        SetCurrentDrive(root);
+                        //   entries = Directory.GetDirectories(root);
+                        entries = Directory.EnumerateFileSystemEntries(dir)
+                        .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+                        .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+                        stTreeDir = dir;*@
+
+                    EnumerateFolder(true, dir);
+
+                }
+                else
+                {
+                    DirectoryInfo di = Directory.CreateDirectory(dir);
+                    if (di.Exists)
+                    {
+                        EnumerateFolder(true, dir);
+                    }
+                }
+
             }
             catch (Exception ex)
             {
-                CLog.Here().Error($"openPopUp - Exception : {ex.Message}");
+                CLog.Here().Error($"openPopUp - Exception(MSG) : {ex.Message}");
                 //entries = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-                entries = Directory.EnumerateFileSystemEntries(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
-                .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
-                .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
-                stTreeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                @*entries = Directory.EnumerateFileSystemEntries(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
+                    .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+                    .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+                    stTreeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);*@
+
+                EnumerateFolder(true, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
             }
         }
-        stDisplayPath = stTreeDir;
-        StateHasChanged();
 
         object[] param = { "modal-selectsavefolder" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
+
     }
 
     public void closePopUp()
@@ -275,39 +421,83 @@
 
     private void CreateNewFolder()
     {
-        //CLog.Here().Information($"SelectSaveFolder CreateNewFolder");
-        ISGSideBarUIService SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
 
-        if (stMakeDirName.Length < 1)
+        CLog.Here().Information($"SelectSaveFolder CreateNewFolder");
+
+        try
         {
-            string stMsg = XmlConf.GetTitle("L_FOLDER_NAME_IS_NEEDED");
-            ShowMessage("error", stMsg);
-            return;
+
+            ISGSideBarUIService SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            if (stMakeDirName.Length < 1)
+            {
+                string stMsg = XmlConf.GetTitle("L_FOLDER_NAME_IS_NEEDED");
+                ShowMessage("error", stMsg);
+                return;
+            }
+            if (stMakeDirName.Length > HsCmdCenter.GetReceiveFileNameLengthMax(groupID))
+            {
+                string stMsg = XmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");
+                ShowMessage("error", stMsg);
+                return;
+            }
+
+            // OS 미지원 문자 check, 알려줌
+            string strDenyChar = "";
+            if (CsFileFunc.isSupportFileName(stMakeDirName, out strDenyChar) == false)
+            {
+                strDenyChar = strDenyChar.Replace("$EMPTY", XmlConf.GetTitle("T_COMMON_EMPTY_CHAR"));
+                string stMsg = String.Format(XmlConf.GetTitle("T_COMMON_OS_NOT_FILENAME_CHAR"), strDenyChar);
+                ShowMessage("error", stMsg);
+                return;
+            }
+
+            string stFullPath = stDisplayPath + "/" + stMakeDirName;
+            DirectoryInfo di = new DirectoryInfo(stFullPath);
+            if (di.Exists == false)
+                di.Create();
+            else
+                return;
+
+            ShowMessage("success", XmlConf.GetTitle("T_COMMON_FOLDER_CREATE_COMPLETE"));
+
+            stMakeDirName = "";
+
+            @*stTreeDir = stFullPath;
+                stDisplayPath = stFullPath;*@
+
+            //파일 탐색기를 드라이버를 기반으로 한 트리 타입으로 처리
+            @*string root = Directory.GetDirectoryRoot(stDisplayPath);
+                entries = Directory.GetDirectories(root);*@
+            //entries = Directory.GetDirectories(stDisplayPath);
+
+            // 사용유무, 낮에 결정
+            EnumerateFolder(true, stDisplayPath);
+
+            @*if (string.Compare(stDisplayPath, stTreeDir, true) != 0 &&
+                    stDisplayPath.Length > stTreeDir.Length)
+                {
+                    DirectoryInfo dinfo = new DirectoryInfo(stDisplayPath);
+
+                    TreeExpandEventArgs argData = new TreeExpandEventArgs();
+                    argData.Text = dinfo.Name;
+                    argData.Value = stDisplayPath;
+                    argData.Children = new TreeItemSettings();
+
+                    //argData.Text
+                    LoadFiles(argData);
+                }*@
+
         }
-        if (stMakeDirName.Length > HsCmdCenter.GetReceiveFileNameLengthMax(groupID))
+        catch (Exception ex)
         {
-            string stMsg = XmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");
-            ShowMessage("error", stMsg);
-            return;
+            CLog.Here().Information($"SelectSaveFolder CreateNewFolder, Exception(MSG) : {ex.Message}");
         }
-        string stFullPath = stDisplayPath + "/" + stMakeDirName;
-        DirectoryInfo di = new DirectoryInfo(stFullPath);
-        if (di.Exists == false)
-            di.Create();
-        else
-            return;
 
-        string stMsgComplete = XmlConf.GetTitle("T_COMMON_FOLDER_CREATE_COMPLETE");
-        ShowMessage("success", stMsgComplete);
-
-        //파일 탐색기를 드라이버를 기반으로 한 트리 타입으로 처리
-        string root = Directory.GetDirectoryRoot(stDisplayPath);
-        entries = Directory.GetDirectories(root);
-        //entries = Directory.GetDirectories(stDisplayPath);
         StateHasChanged();
     }
 
@@ -321,7 +511,8 @@
 
     private void toUpperTree()
     {
-        //CLog.Here().Information($"SelectSaveFolder toUpperTree");
+        CLog.Here().Information($"SelectSaveFolder toUpperTree : {stTreeDir}");
+
         Debug.WriteLine(stTreeDir);
         if (Directory.GetParent(stTreeDir) != null)
         {
@@ -333,6 +524,7 @@
             stDisplayPath = stTreeDir;
             StateHasChanged();
         }
+
     }
 
     private void changeDrive()
@@ -353,10 +545,10 @@
 
     void OnSelectPath(TreeEventArgs args)
     {
-        //CLog.Here().Information($"SelectSaveFolder OnSelectPath");
         dragLabel = 1;
-        curDir = args.Text;
         stDisplayPath = (string)args.Value;
+
+        CLog.Here().Information($"SelectSaveFolder OnSelectPath : {stDisplayPath}");
 
         //LoadListFiles(args.Value as string);
         //OnSelectPathFromFileTree.InvokeAsync(args); //부모컴포넌트에 이벤트 전달
@@ -375,10 +567,10 @@
         }
         rootDrives = drivers.ToArray();//Directory.GetLogicalDrives();
         stCurrentDrive = rootDrives[0];
-        actionPopUpLoadFileList = LoadListFiles;
+        //actionPopUpLoadFileList = LoadListFiles;
+        actionDoubleClickListitem = DoubleClickItem;
 
         //CLog.Here().Information($"SelectSaveFolder OnInitialized");
-        IsVisible = true;
         string[] drives = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         //CLog.Here().Information($"SelectSaveFolder initiallized GetFolderPath : [{Environment.SpecialFolder.UserProfile}]");
         //CLog.Here().Information($"SelectSaveFolder FileAttributes.Hidden : [{FileAttributes.Hidden}]");
@@ -433,12 +625,12 @@
         }
         catch (UnauthorizedAccessException e)
         {
-            CLog.Here().Error("UnauthorizedAccessException:" + e.Message);
+            CLog.Here().Error("LoadListFiles, UnauthorizedAccessException:" + e.Message);
             Console.WriteLine(e.Message);
         }
         catch (Exception e2)
         {
-            CLog.Here().Error("Exception:" + e2.Message);
+            CLog.Here().Error("LoadListFiles, Exception:" + e2.Message);
             Console.WriteLine(e2.Message);
         }
 
@@ -482,7 +674,7 @@
         }
         catch (Exception ex3)
         {
-            CLog.Here().Error("Exception:" + ex3.Message);
+            CLog.Here().Error("LoadListFiles, Exception(MSG):" + ex3.Message);
         }
 
         string listHtml = makeSubFileList();
@@ -527,6 +719,10 @@
         return stRtn.ToString();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="args"></param>
     void LoadFiles(TreeExpandEventArgs args)
     {
         //CLog.Here().Information($"SelectSaveFolder LoadFiles");
@@ -553,10 +749,13 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            CLog.Here().Information($"LoadFiles, Exception(MSG) : {ex.Message}");
+            //Console.WriteLine(ex.Message);
         }
 
+        StateHasChanged();
     }
+
     string GetTextForNode(object data)
     {
         //CLog.Here().Information($"SelectSaveFolder GetTextForNode");
@@ -568,20 +767,78 @@
         return name;
     }
 
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="args"></param>
+    /// <param name="item"></param>
+    private static void OnItemClick(MouseEventArgs args, RadzenTreeItem item)
+    {
+
+        DateTime now = DateTime.Now;
+
+        //if (timeInterval.AddMilliseconds(doubleClickMaxTime) <= now || lastSelectPath != item.Value) // != 기호사용시 문제 발생
+        if (timeInterval.AddMilliseconds(doubleClickMaxTime) <= now || string.Compare(lastSelectPath, (string)item.Value, false) != 0)
+        {
+            //일반클릭
+            timeInterval = now;
+            CLog.Here().Information($"##### - OnItemClick, OnClick time : {timeInterval.AddMilliseconds(doubleClickMaxTime) <= now}, PathChanged : {string.Compare(lastSelectPath, (string)item.Value, false) != 0}");
+            //CLog.Here().Information($"##### - OnItemClick, OnClick(timeInterval(Min,Sec,MilliSec) : {timeInterval.Minute}-{timeInterval.Second}-{timeInterval.Millisecond}, Now : {now.ToString()} ), item : {item.Text}, lastSelectPath : {lastSelectPath}, Path : {item.Value}");
+        }
+        else
+        {
+            //더블클릭
+            timeInterval = now.AddSeconds(-10);     //이후 3번클릭은 더블클릭 되지 않도록
+
+            CLog.Here().Information($"##### - OnItemClick, OnDoubleClick(#####) time : {timeInterval.AddMilliseconds(doubleClickMaxTime) <= now}, PathChanged : {string.Compare(lastSelectPath, (string)item.Value, false) != 0}");
+            //CLog.Here().Information($"##### - OnClick, DoubleClick(#####)(timeInterval(Min,Sec,MilliSec) : {timeInterval.Minute}-{timeInterval.Second}-{timeInterval.Millisecond}, Now : {now.ToString()} ), item : {item.Text}, lastSelectPath : {lastSelectPath}, Path : {item.Value}");
+            actionDoubleClickListitem.Invoke((string)item.Value);
+        }
+
+        lastSelectPath = (string)item.Value;
+
+        //CLog.Here().Information($"##### - OnClick, item : {item.Text}, Path : {item.Value}");
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
     RenderFragment<RadzenTreeItem> FileOrFolderTemplate = (context) => builder =>
     {
-        //CLog.Here().Information($"SelectSaveFolder FileOrFolderTemplate");
-        string path = context.Value as string;
-        bool isDirectory = Directory.Exists(path);
 
-        builder.OpenComponent<RadzenIcon>(0);
-        builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
+    //context.Selected = false;
 
-        if (!isDirectory)
-        {
-            builder.AddAttribute(2, "Style", "margin-left: 24px");
-        }
-        builder.CloseComponent();
-        builder.AddContent(3, context.Text);
+    // path : fullpath 경로
+    string path = context.Value as string;
+    bool isDirectory = Directory.Exists(path);
+
+    //CLog.Here().Information($"SelectSaveFolder, FileOrFolderTemplate : {path}");
+
+    builder.OpenComponent<RadzenIcon>(0);
+    builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
+
+    builder.CloseComponent();
+    if (isDirectory)
+    {
+        builder.OpenElement(2, "div");
+        builder.AddAttribute(2, "class", "p-0 m-0");
+        builder.AddAttribute(2, "Style", "width:100%;");
+        builder.AddAttribute<MouseEventArgs>(3, "onclick", RuntimeHelpers.TypeCheck<EventCallback<MouseEventArgs>>(EventCallback.Factory.Create<MouseEventArgs>(builder, (args) => OnItemClick(args, context))));
+        builder.AddContent(4, context.Text);
+    }
+    builder.CloseElement();
+
+    //builder.AddAttribute(2, "Selected", "false");
+    // context.Text : 파일이름
+    //builder.AddContent(3, context.Text);
+    //          @ondblclick="()=>EnumerateFolder(false, strTestPath)"
+
+        @*string htmlString = "<div class=\"p-0 m-0\" style=\"width:100%;\"" +
+            // " @ondblclick=\"()=>EnumerateFolder(true, " + path.Replace(@"\", @"\\") + ")\" >" + context.Text + "</div>";
+            " @ondblclick=\"()=>EnumerateFolder(true, 1)\" >" + context.Text + "</div>";
+        builder.AddContent(3, (MarkupString)htmlString);*@
     };
+
 }

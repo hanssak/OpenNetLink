@@ -26,7 +26,7 @@
 
     public string[] dirs { get; set; }
     IEnumerable<string> entries = null;
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    //Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
     public string curDir { get; set; }
 
     public bool IsVisible { get; set; }
@@ -73,14 +73,16 @@
             //OnSelectPathFromFileTree.InvokeAsync(args); //부모컴포넌트에 이벤트 전달
         }
     }
-    void Log(string eventName, string value)
+
+    @*void Log(string eventName, string value)
     {
         events.Add(DateTime.Now, $"{eventName}: {value}");
-    }
+    }*@
 
     void OnSelectPath(TreeEventArgs args)
     {
-        Log("Change", $"Item Text: {args.Text}");
+        //Log("Change", $"Item Text: {args.Text}");
+        CLog.Here().Information($"OnSelectPath, Item Text: {args.Text}");
         curDir = args.Text;
 
         //LoadListFiles(args.Value as string);
@@ -106,11 +108,13 @@
             args.Children.HasChildren = (path) => Directory.Exists((string)path);
             args.Children.Template = FileOrFolderTemplate;
 
-            Log("Expand", $"Text: {args.Text}");
+            //Log("Expand", $"Text: {args.Text}");
+            CLog.Here().Information($"Expand-LoadFiles, Text: {args.Text}");
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
+            CLog.Here().Error($"LoadFiles, Exception(MSG) : {ex.Message}");
         }
 
     }

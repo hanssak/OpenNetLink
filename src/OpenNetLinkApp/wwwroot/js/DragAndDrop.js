@@ -1426,3 +1426,61 @@ window.addDragStart = (message) => {
 
     }, false);
 }
+
+function onDoubleClickFUNC() {
+    var text = this.innerText;
+    DotNet.invokeMethodAsync("OpenNetLinkApp", "SelectSaveFolderDoubleClick", text);
+}
+
+window.RadzenTreeNodeDoubleClick = function () {
+
+    //alert('add complete')
+    /*var nodes = document.getElementsByClassName("ui-treenode");
+
+    // ui-treenode-content
+    //var nodes = document.getElementsByClassName("ui-treenode");
+    //var parent = document.querySelector(".ui-treenode-content");
+    //var nodes = parent.querySelectorAll(".ui-treenode-content-selected");
+    //Add a click event listener to each node
+
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].removeEventListener("dblclick", onDoubleClickFUNC);
+        nodes[i].addEventListener("dblclick", onDoubleClickFUNC);
+    }
+    nodes = document.getElementsByClassName("ui-treenode-content");
+
+    for (var i = 0; i < nodes.length; i++) {
+
+        nodes[i].removeEventListener("dblclick", onDoubleClickFUNC);
+        nodes[i].addEventListener("dblclick", onDoubleClickFUNC);
+    }*/
+
+    /*nodes[i].addEventListener("dblclick", function () {
+        // Get the text of the clicked node
+        var text = this.innerText;
+        DotNet.invokeMethodAsync("OpenNetLinkApp", "SelectSaveFolderDoubleClick", text);
+    });*/
+
+    // ui-treenode-content
+    //var nodes = document.getElementsByClassName("ui-treenode");
+    //var parent = document.querySelector(".ui-treenode-content");
+    //var nodes = parent.querySelectorAll(".ui-treenode-content-selected");
+    //Add a click event listener to each node
+    /*nodes = document.getElementsByClassName("ui-treenode-children");
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].addEventListener("dblclick", function () {
+            var text = this.innerText;
+            DotNet.invokeMethodAsync("OpenNetLinkApp", "SelectSaveFolderDoubleClick", text);
+        });
+    }*/
+
+};
+
+
+
+
+
+
+
+
+
