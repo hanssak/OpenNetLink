@@ -18,7 +18,7 @@
 <div class="modal fade" id="modal-selectsavefolder" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
-            <div class="modal-header modal-outline pl-3 pr-3" @ondblclick="()=>EnumerateFolder(false, strTestPath)">
+            <div class="modal-header modal-outline pl-3 pr-3">
                 @*<h5 class="modal-title pt-1 text-bold "> <i class="fas fa-search pr-2"></i>@XmlConf.GetTitle("T_COMMON_FOLDER_SEARCH")</h5>*@
                 <h5 class="modal-title pt-1 text-bold" style="color: black; text-overflow: ellipsis;">
                     @* white-space: nowrap; overflow: hidden;*@
@@ -132,8 +132,6 @@
 
 @code {
 
-    string strTestPath = "C:\\ESD";
-
     public int nGroupid = 0;
 
     /// <summary>
@@ -217,11 +215,11 @@
     /// </summary>
     /// <param name="value"></param>
     @*[JSInvokable("SelectSaveFolderDoubleClick")]
-    public static void SelectSaveFolderDoubleClick(string value)
-    {
-        CLog.Here().Information($"JS-SelectSaveFolderDoubleClick, Path : {value}");
-        actionDoubleClickListitem.Invoke(value);
-    }*@
+        public static void SelectSaveFolderDoubleClick(string value)
+        {
+            CLog.Here().Information($"JS-SelectSaveFolderDoubleClick, Path : {value}");
+            actionDoubleClickListitem.Invoke(value);
+        }*@
 
     /// <summary>
     /// 더블클릭때 실행되는 마지막 함수
@@ -240,6 +238,27 @@
 
 
     /// <summary>
+    /// 사용자 ProFile 경로를 system 환경설정 형태로 변경하는 함수
+    /// </summary>
+    /// <param name="strOriginPath"></param>
+    /// <param name="strOriginSavePath"></param>
+    /// <param name="strSystemVarType"></param>
+    /// <returns></returns>
+    private bool ChangePathToSystemVarType(string strOriginPath, string strOriginSavePath, out string strSystemVarType)
+    {
+        strOriginPath = strOriginPath.ToLower();
+        strSystemVarType = strOriginSavePath.ToLower();
+
+        int nPos = strSystemVarType.IndexOf(strOriginPath);
+        if (nPos != 0)
+            return false;
+
+        strSystemVarType.Replace(strOriginPath, "%USERPATH%");
+
+        return true;
+    }
+
+    /// <summary>
     /// 확인 눌러서 변경된 경로 저장
     /// </summary>
     public void Confirm()
@@ -254,10 +273,14 @@
         CLog.Here().Information($"SelectSaveFolder-Confirm, System Path : {Environment.GetFolderPath(Environment.SpecialFolder.System)}");
         CLog.Here().Information($"SelectSaveFolder-Confirm, SystemX86 Path : {Environment.GetFolderPath(Environment.SpecialFolder.SystemX86)}");
 
+        string strSystemVarType = "";
         string strTempPath = "";
         string strMsg = "";
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
+
+            // Black 방식
+
             if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
             {
                 CLog.Here().Error($"Confirm, OS:Windows, is RootPath, Path : {stDisplayPath}");
@@ -268,13 +291,136 @@
             if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
             {
                 CLog.Here().Error($"Confirm, OS:Windows, is UserProfile, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
                 return;
             }
             else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
             {
                 CLog.Here().Error($"Confirm, OS:Windows, is Desktop, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is Windows, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is ProgramFiles, Path : {stDisplayPath}");
                 ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            // 빈문자열 나와서 무조건 여기서 차단됨 : Linux, MAC
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is ProgramFilesX86, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.System);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is System, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
+                return;
+            }
+
+            // 빈문자열 나와서 무조건 여기서 차단됨 : Linux, MAC
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is SystemX86, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
+                return;
+            }
+
+            OnSaveDirPath.InvokeAsync(stDisplayPath + "|" + nNetIdx);
+
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            // White 방식
+            // '/Users/......' 경로에만 지정가능
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            CLog.Here().Error($"Confirm, OS:Mac OSX, UserProfile - Path : {strTempPath}");
+
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) != 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Mac OSX, is UserProfile, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
+                return;
+            }
+
+            if (ChangePathToSystemVarType(strTempPath, stDisplayPath, out strSystemVarType) == false)
+            {
+                CLog.Here().Error($"Confirm, OS:Mac OSX, UserProfile - error, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
+                return;
+            }
+
+            CLog.Here().Error($"Confirm, OS:Mac OSX, UserProfile - Path : {strSystemVarType}");
+
+            OnSaveDirPath.InvokeAsync(strSystemVarType + "|" + nNetIdx);
+
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            // White 방식
+            // '/home/......' 경로에만 지정가능
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            CLog.Here().Error($"Confirm, OS:Mac OSX, UserProfile - Path : {strTempPath}");
+
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) != 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Linux, is UserProfile, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
+                return;
+            }
+
+            if (ChangePathToSystemVarType(strTempPath, stDisplayPath, out strSystemVarType) == false)
+            {
+                CLog.Here().Error($"Confirm, OS:Linux, UserProfile - error, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
+                return;
+            }
+
+            CLog.Here().Error($"Confirm, OS:Mac OSX, UserProfile - Path : {strSystemVarType}");
+
+            OnSaveDirPath.InvokeAsync(strSystemVarType + "|" + nNetIdx);
+
+        }
+        else
+        {
+
+            // Black 방식
+            if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is RootPath, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString()));
+                return;
+            }
+
+            if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is UserProfile, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
+                return;
+            }
+            else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is Desktop, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
                 return;
             }
 
@@ -307,7 +453,7 @@
             if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
             {
                 CLog.Here().Error($"Confirm, OS:Windows, is System, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
                 return;
             }
 
@@ -315,209 +461,25 @@
             if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
             {
                 CLog.Here().Error($"Confirm, OS:Windows, is SystemX86, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
-            {
-                CLog.Here().Error($"Confirm, OS:Mac OSx, is RootPath, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString()));
-                return;
-            }
-
-            if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
-            {
-                CLog.Here().Error($"Confirm, OS:Mac OSx, is UserProfile, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }
-            else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
-            {
-                CLog.Here().Error($"Confirm, OS:Mac OSx, is Desktop, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }
-
-            // 빈문자열 나와서 무조건 여기서 차단됨
-            @*strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Mac OSx, is Windows, Path : {stDisplayPath}");
                 ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
-                return;
-            }*@
-
-            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Mac OSx, is ProgramFiles, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }
-
-            // 빈문자열 나와서 무조건 여기서 차단됨
-            @*strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Mac OSx, is ProgramFilesX86, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }*@
-
-            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.System);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Mac OSx, is System, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
                 return;
             }
 
             // 빈문자열 나와서 무조건 여기서 차단됨
             @*strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Mac OSx, is SystemX86, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }*@
+                if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+                {
+                    CLog.Here().Error($"Confirm, OS:Others, is SystemX86, Path : {stDisplayPath}");
+                    ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                    return;
+                }*@
 
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
-            {
-                CLog.Here().Error($"Confirm, OS:Linux, is RootPath, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString()));
-                return;
-            }
-
-            if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
-            {
-                CLog.Here().Error($"Confirm, OS:Linux, is UserProfile, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }
-            else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
-            {
-                CLog.Here().Error($"Confirm, OS:Linux, is Desktop, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }
-
-            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Linux, is Windows, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
-                return;
-            }
-
-            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Linux, is ProgramFiles, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }
-
-            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Linux, is ProgramFilesX86, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }
-
-            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.System);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Mac OSx, is System, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }
-
-            // 빈문자열 나와서 무조건 여기서 차단됨
-            @*strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Mac OSx, is SystemX86, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }*@
-
-        }
-        else
-        {
-
-            if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
-            {
-                CLog.Here().Error($"Confirm, OS:Others, is RootPath, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString()));
-                return;
-            }
-
-            if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
-            {
-                CLog.Here().Error($"Confirm, OS:Others, is UserProfile, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }
-            else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
-            {
-                CLog.Here().Error($"Confirm, OS:Others, is Desktop, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }
-
-            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Others, is Windows, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
-                return;
-            }
-
-            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Others, is ProgramFiles, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }
-
-            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Others, is ProgramFilesX86, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }
-
-            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.System);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Others, is System, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }
-
-            // 빈문자열 나와서 무조건 여기서 차단됨
-            @*strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
-            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
-            {
-                CLog.Here().Error($"Confirm, OS:Others, is SystemX86, Path : {stDisplayPath}");
-                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
-                return;
-            }*@
-
+            OnSaveDirPath.InvokeAsync(stDisplayPath + "|" + nNetIdx);
         }
 
 
         //CLog.Here().Information($"SelectSaveFolder Confirm");
-        OnSaveDirPath.InvokeAsync(stDisplayPath + "|" + nNetIdx);
+        
         closePopUp();
     }
 
@@ -997,7 +959,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="args"></param>
     /// <param name="item"></param>
@@ -1039,30 +1001,30 @@
 
     // path : fullpath 경로
     string path = context.Value as string;
-    bool isDirectory = Directory.Exists(path);
+        bool isDirectory = Directory.Exists(path);
 
     //CLog.Here().Information($"SelectSaveFolder, FileOrFolderTemplate : {path}");
 
     builder.OpenComponent<RadzenIcon>(0);
-    builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
+        builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
 
-    builder.CloseComponent();
-    if (isDirectory)
-    {
-        builder.OpenElement(2, "div");
-        builder.AddAttribute(2, "class", "p-0 m-0");
-        builder.AddAttribute(2, "Style", "width:100%;");
-        builder.AddAttribute<MouseEventArgs>(3, "onclick", RuntimeHelpers.TypeCheck<EventCallback<MouseEventArgs>>(EventCallback.Factory.Create<MouseEventArgs>(builder, (args) => OnItemClick(args, context))));
-        builder.AddContent(4, context.Text);
-    }
-    builder.CloseElement();
+        builder.CloseComponent();
+        if (isDirectory)
+        {
+            builder.OpenElement(2, "div");
+            builder.AddAttribute(2, "class", "p-0 m-0");
+            builder.AddAttribute(2, "Style", "width:100%;");
+            builder.AddAttribute<MouseEventArgs>(3, "onclick", RuntimeHelpers.TypeCheck<EventCallback<MouseEventArgs>>(EventCallback.Factory.Create<MouseEventArgs>(builder, (args) => OnItemClick(args, context))));
+            builder.AddContent(4, context.Text);
+        }
+        builder.CloseElement();
 
     //builder.AddAttribute(2, "Selected", "false");
     // context.Text : 파일이름
     //builder.AddContent(3, context.Text);
     //          @ondblclick="()=>EnumerateFolder(false, strTestPath)"
 
-        @*string htmlString = "<div class=\"p-0 m-0\" style=\"width:100%;\"" +
+    @*string htmlString = "<div class=\"p-0 m-0\" style=\"width:100%;\"" +
             // " @ondblclick=\"()=>EnumerateFolder(true, " + path.Replace(@"\", @"\\") + ")\" >" + context.Text + "</div>";
             " @ondblclick=\"()=>EnumerateFolder(true, 1)\" >" + context.Text + "</div>";
         builder.AddContent(3, (MarkupString)htmlString);*@
