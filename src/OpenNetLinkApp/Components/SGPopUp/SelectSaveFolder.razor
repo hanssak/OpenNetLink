@@ -254,54 +254,267 @@
         CLog.Here().Information($"SelectSaveFolder-Confirm, System Path : {Environment.GetFolderPath(Environment.SpecialFolder.System)}");
         CLog.Here().Information($"SelectSaveFolder-Confirm, SystemX86 Path : {Environment.GetFolderPath(Environment.SpecialFolder.SystemX86)}");
 
-        if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
-        {
-            string strMsg = String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString());
-            ShowMessage("warn", strMsg);
-            return;
-        }
-
-        if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
-        {
-            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-            ShowMessage("warn", strMsg);
-            return;
-        }
-        else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
-        {
-            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-            ShowMessage("warn", strMsg);
-            return;
-        }
-
         string strTempPath = "";
-
-        // if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-
-
-        if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
+        string strMsg = "";
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            string strMsg = String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString());
-            ShowMessage("warn", strMsg);
-            return;
+            if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is RootPath, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString()));
+                return;
+            }
+
+            if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is UserProfile, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+            else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is Desktop, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is Windows, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is ProgramFiles, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is ProgramFilesX86, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.System);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is System, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is SystemX86, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
+            {
+                CLog.Here().Error($"Confirm, OS:Mac OSx, is RootPath, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString()));
+                return;
+            }
+
+            if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
+            {
+                CLog.Here().Error($"Confirm, OS:Mac OSx, is UserProfile, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+            else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
+            {
+                CLog.Here().Error($"Confirm, OS:Mac OSx, is Desktop, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            // 빈문자열 나와서 무조건 여기서 차단됨
+            @*strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Mac OSx, is Windows, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
+                return;
+            }*@
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Mac OSx, is ProgramFiles, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            // 빈문자열 나와서 무조건 여기서 차단됨
+            @*strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Mac OSx, is ProgramFilesX86, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }*@
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.System);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Mac OSx, is System, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            // 빈문자열 나와서 무조건 여기서 차단됨
+            @*strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Mac OSx, is SystemX86, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }*@
+
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
+            {
+                CLog.Here().Error($"Confirm, OS:Linux, is RootPath, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString()));
+                return;
+            }
+
+            if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
+            {
+                CLog.Here().Error($"Confirm, OS:Linux, is UserProfile, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+            else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
+            {
+                CLog.Here().Error($"Confirm, OS:Linux, is Desktop, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Linux, is Windows, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Linux, is ProgramFiles, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Linux, is ProgramFilesX86, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.System);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Mac OSx, is System, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            // 빈문자열 나와서 무조건 여기서 차단됨
+            @*strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Mac OSx, is SystemX86, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }*@
+
+        }
+        else
+        {
+
+            if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
+            {
+                CLog.Here().Error($"Confirm, OS:Others, is RootPath, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString()));
+                return;
+            }
+
+            if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
+            {
+                CLog.Here().Error($"Confirm, OS:Others, is UserProfile, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+            else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
+            {
+                CLog.Here().Error($"Confirm, OS:Others, is Desktop, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Others, is Windows, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Others, is ProgramFiles, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Others, is ProgramFilesX86, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.System);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Others, is System, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            // 빈문자열 나와서 무조건 여기서 차단됨
+            @*strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Others, is SystemX86, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }*@
+
         }
 
-        strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-        if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
-        {
-            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-            ShowMessage("warn", strMsg);
-            return;
-        }
-
-        strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-        if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
-        {
-            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-            ShowMessage("warn", strMsg);
-            return;
-        }
 
         //CLog.Here().Information($"SelectSaveFolder Confirm");
         OnSaveDirPath.InvokeAsync(stDisplayPath + "|" + nNetIdx);
