@@ -245,6 +245,15 @@
     public void Confirm()
     {
 
+        CLog.Here().Information($"SelectSaveFolder-Confirm, DisPlayPath : {stDisplayPath}, PathRoot : {Path.GetPathRoot(stDisplayPath)}");
+        CLog.Here().Information($"SelectSaveFolder-Confirm, UserProfile Path : {Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}");
+        CLog.Here().Information($"SelectSaveFolder-Confirm, Desktop Path : {Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}");
+        CLog.Here().Information($"SelectSaveFolder-Confirm, Windows Path : {Environment.GetFolderPath(Environment.SpecialFolder.Windows)}");
+        CLog.Here().Information($"SelectSaveFolder-Confirm, ProgramFiles Path : {Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)}");
+        CLog.Here().Information($"SelectSaveFolder-Confirm, ProgramFilesX86 Path : {Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)}");
+        CLog.Here().Information($"SelectSaveFolder-Confirm, System Path : {Environment.GetFolderPath(Environment.SpecialFolder.System)}");
+        CLog.Here().Information($"SelectSaveFolder-Confirm, SystemX86 Path : {Environment.GetFolderPath(Environment.SpecialFolder.SystemX86)}");
+
         if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
         {
             string strMsg = String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString());
@@ -265,7 +274,12 @@
             return;
         }
 
-        string strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+        string strTempPath = "";
+
+        // if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+
+
         if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
         {
             string strMsg = String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString());
