@@ -4897,7 +4897,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     if (!gOLEMimeTypeMap.Value.Contains(mimetype))
                     {
                         gOLEMimeTypeMap.Value.Add(mimetype);
-                        Log.Logger.Here().Information($"OLEMimeList - MimeType : {mimetype}");
+                      //  Log.Logger.Here().Information($"OLEMimeList - MimeType : {mimetype}");
                     }
                 }
             }
