@@ -78,6 +78,8 @@ namespace OpenNetLinkApp.Data.SGSettings
         private SGSettingsDBProc() 
         { 
             DBSDataCtx = new SGSettingDataContext();
+            if (!DBSDataCtx.Database.GetPendingMigrations().Any())
+                DBSDataCtx.Database.Migrate();
         }
         //private static 인스턴스 객체
         private static readonly Lazy<SGSettingsDBProc> _instance = new Lazy<SGSettingsDBProc> (() => new SGSettingsDBProc());

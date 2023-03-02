@@ -12,6 +12,8 @@ using Serilog.Events;
 using AgLogManager;
 using OpenNetLinkApp.Services;
 using System.Threading;
+using System.Data;
+
 
 namespace OpenNetLinkApp.Data.SGNotify
 {
@@ -143,12 +145,81 @@ namespace OpenNetLinkApp.Data.SGNotify
         private SGNtfyDBProc() 
         { 
             DBCtx = new SGNotifyContext();
+            if (DBCtx.Database.GetPendingMigrations().Any())
+            {
+                var migrationList = DBCtx.Database.GetPendingMigrations();
+                foreach(var migration in migrationList)
+                {
+                    if(migration.Contains("20221026070638"))
+                    {
+                        if(TableExists("T_SG_RESEND"))
+                        {
+                            InsertMigration("20221026070638_InitialCreate1", "3.1.6");                        
+                        }
+                        else
+                            DBCtx.Database.Migrate();
+                    }
+                }
+
+                DBCtx.Database.Migrate();
+                DBCtx.SaveChanges();
+            }
+
         }
         //private static 인스턴스 객체
         private static readonly Lazy<SGNtfyDBProc> _instance = new Lazy<SGNtfyDBProc> (() => new SGNtfyDBProc());
         //public static 의 객체반환 함수
         public static SGNtfyDBProc Instance { get { return _instance.Value; } }
 
+        public bool TableExists(string tableName)
+        {
+            var connection = DBCtx.Database.GetDbConnection();
+
+            if (connection.State.Equals(ConnectionState.Closed))
+                connection.Open();
+
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"
+            SELECT 1 FROM sqlite_master
+            WHERE type = 'table'
+            AND name = @TableName";
+
+                var tableNameParam = command.CreateParameter();
+                tableNameParam.ParameterName = "@TableName";
+                tableNameParam.Value = tableName;
+                command.Parameters.Add(tableNameParam);
+
+                return command.ExecuteScalar() != null;
+            }
+        }
+
+        public bool InsertMigration(string id, string version)
+        {
+            var connection = DBCtx.Database.GetDbConnection();
+
+            if (connection.State.Equals(ConnectionState.Closed))
+                connection.Open();
+
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"
+            INSERT INTO __EFMigrationsHistory
+            VALUES (@id, @version)";
+
+                var idParam = command.CreateParameter();
+                idParam.ParameterName = "@id";
+                idParam.Value = id;
+                command.Parameters.Add(idParam);
+
+                var versionParam = command.CreateParameter();
+                versionParam.ParameterName = "@version";
+                versionParam.Value = version;
+                command.Parameters.Add(versionParam);
+
+                return command.ExecuteScalar() != null;
+            }
+        }
         /* Insert to SGReSendInfo */
         public bool InsertReSendInfo(int groupId, string userSeq, string clientId, string mid, string hszName, object transInfo)
         {

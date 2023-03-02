@@ -474,7 +474,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strMsg = string.Format("{0}|{1}|{2}", strFileName, "", MimeType);
                     break;
                 case eFileAddErr.eFADOC_EXTRACT_FILE_ADD_ONPURPOSE:
-                    if(strParentFileName == "")
+                    if (strParentFileName == "")
                         strMsg = string.Format("{0}|{1}|{2}", strFileName, "", MimeType);
                     else
                         strMsg = string.Format("{0}|{1}|{2}", strParentFileName, strFileName, MimeType);
@@ -525,6 +525,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                             , "XLS", "XLSB", "XLSM", "XLSX", "XLT", "XLTM", "XLTX", "XLW"
                                             , "POT", "PPT", "POTM", "POTX", "PPS", "PPSM", "PPSX", "PPTM", "PPTX"
                                             , "HML", "HWP", "HWPX"};
+
+        /// <summary>
+        /// 압축형식 내부검사가 필요한 파일 확장자 대상 목록
+        /// <para>ZIP, 7Z, TAR, GZ, TGZ</para>
+        /// </summary>
+        public readonly List<string> ListCheckableCompressExtension = new List<string>() { "ZIP", "7Z", "TAR", "GZ", "TGZ", "BZ2" };
 
         /// <summary>
         /// 전체경로길이 체크용
@@ -1719,7 +1725,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                                 : eFileAddErr.eFA_LONG_PATH_FILEORPATH;     //파일 및 폴더명 길이 초과
                 return false;
             }
-            
+
             Log.Information($@"###################### - 파일이름 : {hsStream.FileName}, 파일크기 : {hsStream.Size} - ######################");
 
             //빈파일 체크 (0kb 허용)
@@ -3113,7 +3119,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (CheckExtForFileByteData(btFileData, strExt) == true) return eFileAddErr.eFANone;
 
             return eFileAddErr.eUnZipInnerExtChange;
-        }      
+        }
 
         /// <summary>
         /// MimeType 및 확장자 정보 DB인 magic.mgc을 다른 파일로 갱신시 사용
@@ -4087,7 +4093,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 string[] exts = result.Split(' ');
                 foreach (var ext in exts)
                 {
-                    if (string.Compare(fileExt, ext, true) == 0) return true;                    
+                    if (string.Compare(fileExt, ext, true) == 0) return true;
                 }
             }
             return false;
@@ -4185,8 +4191,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 await stStream.CopyToAsync(fileStream);
                 fileStream.Close();
 
-                enRet = ScanZipFile(currentFile, strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, nOption, 1, blWhite, strExtInfo, 0,
-                    out nTotalErrCount, out strOverMaxDepthInnerZipFile, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, bDenyPasswordZIP);
+                enRet = ScanZipFile(currentFile, strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, nOption, 1, blWhite, strExtInfo, 0, hsStream.Type.ToUpper(),
+                    out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, bDenyPasswordZIP);
 
                 // KKW
                 /*if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
@@ -4223,13 +4229,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="currentFile">현재 Zip 파일</param>
         /// <param name="strOrgZipFile"></param>
         /// <param name="strOrgZipFileRelativePath"></param>
-        /// <param name="strZipFile"></param>
-        /// <param name="strBasePath"></param>
+        /// <param name="strZipFile">Temp/ZipExtract/ThisZipFiles</param>
+        /// <param name="strBasePath">압축을 해제한 경로 (Temp/ZipExtract)</param>
         /// <param name="nMaxDepth"></param>
         /// <param name="nBlockOption"></param>
         /// <param name="nCurDepth"></param>
-        /// <param name="blWhite"></param>
-        /// <param name="strExtInfo"></param>
+        /// <param name="blWhite">FileFilter Type(true:White방식)</param>
+        /// <param name="strExtInfo">FileFilter 정보</param>
         /// <param name="nErrCount"></param>
         /// <param name="nTotalErrCount"></param>
         /// <param name="strOverMaxDepthInnerZipFile"></param>
@@ -4240,213 +4246,307 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="bZipPasswdCheck"></param>
         /// <returns></returns>
         public eFileAddErr ScanZipFile(FileAddErr currentFile, string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nBlockOption, int nCurDepth,
-            bool blWhite, string strExtInfo, int nErrCount, out int nTotalErrCount, out string strOverMaxDepthInnerZipFile, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = true)
+            bool blWhite, string strExtInfo, int nErrCount, string strExtType, out int nTotalErrCount, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = true)
         {
             bIsApproveExt = false;
-            eFileAddErr enErr;
+            eFileAddErr enErr = eFileAddErr.eFANone;
             string strExt;
-            int nCurErrCount;
+            int nCurErrCount = nErrCount;
             string strOverMaxDepthZipFile = "";
+            int nInnerErrCount = 0;
 
-            var opts = new SharpCompress.Readers.ReaderOptions();
-            var encoding = Encoding.Default;
-
-            byte[] buff = null;
-            using (FileStream fsSource = new FileStream(strZipFile, FileMode.Open, FileAccess.Read))
-            {
-                BinaryReader br = new BinaryReader(fsSource);
-                long numBytes = 8;
-                buff = br.ReadBytes((int)numBytes);
-
-                //Zip File Foramt : Local File Header 구조 바이트 차트
-                //Signature 4byte / Version 2Byte / Flags 2Byte / => Flags Bit가 서로 다름 Mac의 경우 8 그 이외는 0
-                encoding = (buff[6] == 0x08) ? Encoding.Default : Encoding.GetEncoding(949);
-            }
-
-            opts.ArchiveEncoding = new SharpCompress.Common.ArchiveEncoding();
-            opts.ArchiveEncoding.CustomDecoder = (data, x, y) =>
-            {
-                return encoding.GetString(data);
-            };
-
-            //2022.10.06 BY kYH sharpPress 버전업하며, WriteToDirectory 호출 시 존재하지 않는 폴더는 오류가 발생하여 추가
-            DirectoryInfo dirZipInner = new DirectoryInfo(strBasePath);
-            if (dirZipInner.Exists != true) dirZipInner.Create();
-
-            enErr = eFileAddErr.eFANone;
-            nCurErrCount = nErrCount;
             try
             {
-                using (var archive = ArchiveFactory.Open(strZipFile, opts))
+                FileInfo scanFileInfo = new FileInfo(strZipFile);
+                DirectoryInfo dirUnzipFilesDir = null;
+
+                //스캔대상이 파일인 경우만 압축 해제 시도
+                if (scanFileInfo.Attributes != FileAttributes.Directory)
                 {
-                    foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
+                    string strTempUnzipDirPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(strZipFile)); //Temp에 Copy된 문서의 압축해제 개체를 보관할 폴더 (Temp/ZipExtract/ZipName)
+                    dirUnzipFilesDir = new DirectoryInfo(strTempUnzipDirPath);
+                    if (dirUnzipFilesDir.Exists != true) dirUnzipFilesDir.Create();
+
+                    #region [검사를 위해 임시 폴더에 압축 해제]
+                    eFileAddErr unzipResult = unzipFile(strZipFile, strTempUnzipDirPath, nCurDepth, SGFileExamEvent, ExamCount, TotalCount, bZipPasswdCheck);
+                    if (unzipResult != eFileAddErr.eFANone)
                     {
-                        FileAddErr childFile = currentFile.CreateChildren(entry.Key, strOrgZipFileRelativePath, currentFile.FileName);            //zip파일의 자식 File 생성
+                        //비밀번호 등의 문제로 압축해제 실패 시 검사 실패 return
+                        currentFile.eErrType = unzipResult;
+                        nTotalErrCount = nCurErrCount++;
+                        return unzipResult;
+                    }
+                    #endregion
+                }
+                else
+                {
+                    dirUnzipFilesDir = new DirectoryInfo(strZipFile);
+                }
 
-                        Log.Logger.Here().Information("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
-                        int per = (ExamCount * 100) / TotalCount;
-                        if (per < 20)
-                            per = 20;
+                //압축해제 내부 파일 검사
+                foreach (FileSystemInfo extractFile in dirUnzipFilesDir.GetFileSystemInfos())
+                {
+                    FileAddErr childFile = currentFile.CreateChildren(extractFile.Name, strOrgZipFileRelativePath, currentFile.FileName);            //zip파일의 자식 File 생성
 
-                        if (SGFileExamEvent != null)
-                            SGFileExamEvent(per, entry.Key);
+                    string key_relativePathFileName = Path.GetRelativePath(strBasePath, extractFile.FullName);
 
-                        // Check Password	
-                        if (entry.IsEncrypted == true && bZipPasswdCheck == true)
-                        {
-                            if (nCurDepth != 1)
-                            {
-                                childFile.eErrType = eFileAddErr.eUnZipInnerZipPassword;
-                                enErr = eFileAddErr.eUnZipInnerZipPassword;
+                    Log.Logger.Here().Information("[ScanZipFile] Check File[{0}] in {1} (Depth[{2}])", key_relativePathFileName, Path.GetFileName(strZipFile), nCurDepth);
+                    int per = (ExamCount * 100) / TotalCount;
+                    if (per < 20)
+                        per = 20;
 
-                                //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(strZipFile), enErr, Path.GetFileName(strZipFile));
-                            }
-                            else
-                            {
-                                currentFile.eErrType = eFileAddErr.eFAZipPW;        //하위 파일이 아닌 검사 대상 자체 ZIP에 암호화된 경우
-                                enErr = eFileAddErr.eFAZipPW;
-                                nCurErrCount++;
-                            }
-                            nTotalErrCount = nCurErrCount;
-                            strOverMaxDepthInnerZipFile = strOverMaxDepthZipFile;
-                            return enErr;
-                        }
+                    if (SGFileExamEvent != null)
+                        SGFileExamEvent(per, extractFile.Name);
 
-                        // Check FileName Length 
-                        bool bSuper = false;
-                        if (nCurDepth == 1 && (FileFolderNameLength(entry.Key, out bSuper) != true || FilePathLength(entry.Key) != true))
-                        {
-                            enErr = eFileAddErr.eUnZipInnerLengthOver;
-                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, entry.Key, enErr, Path.GetFileName(strZipFile));
-                            childFile.eErrType = eFileAddErr.eUnZipInnerLengthOver;
-                            currentFile.HasChildrenErr = true;
-                            nCurErrCount++;
-                            continue;
-                        }
+                    // Check FileName Length 
+                    bool bSuper = false;
+                    if (nCurDepth == 1 && (FileFolderNameLength(key_relativePathFileName, out bSuper) != true || FilePathLength(key_relativePathFileName) != true))
+                    {
+                        enErr = eFileAddErr.eUnZipInnerLengthOver;
+                        //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, entry.Key, enErr, Path.GetFileName(strZipFile));
+                        childFile.eErrType = eFileAddErr.eUnZipInnerLengthOver;
+                        currentFile.HasChildrenErr = true;
+                        nCurErrCount++;
+                        continue;
+                    }
 
-                        // Check Directory 
-                        if (entry.IsDirectory == true) continue;
+                    if(extractFile.Attributes == FileAttributes.Directory)
+                    {
+                        //디렉토리는 내부 항목 검사
+                        eFileAddErr enRetDir = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, extractFile.FullName, Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.Name)), nMaxDepth, nBlockOption, nCurDepth,
+                                                            blWhite, strExtInfo, nCurErrCount, "", out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
 
-                        // Check Empty File 
-                        // 0kb 파일 허용(기본)
-                        if (bEmptyFIleNoCheck == false && entry.Size <= 0)
-                        {
-                            enErr = eFileAddErr.eUnZipInnerFileEmpty;
-                            childFile.eErrType = eFileAddErr.eUnZipInnerFileEmpty;
-                            currentFile.HasChildrenErr = true;
-                            nCurErrCount++;
-                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
-                            continue;
-                        }
-
-                        // Check Block File Extension
-                        strExt = Path.GetExtension(entry.Key);
-                        if (GetRegExtEnable(blWhite, strExtInfo, strExt.Replace(".", "")) != true)
-                        {
-                            enErr = eFileAddErr.eUnZipInnerExt;
-                            childFile.eErrType = eFileAddErr.eUnZipInnerExt;
-                            currentFile.HasChildrenErr = true;
-                            nCurErrCount++;
-                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
-                            continue;
-                        }
-
-                        // Extract File in Zip 
-                        entry.WriteToDirectory(strBasePath, new ExtractionOptions()
-                        {
-                            ExtractFullPath = true,
-                            Overwrite = true,
-                        });
-
-                        // Check Changed File Extension 
-                        enErr = IsValidFileExtInnerZip(Path.Combine(strBasePath, entry.Key), strExt.Replace(".", ""), blAllowDRM);
-                        if (enErr != eFileAddErr.eFANone)
-                        {
-                            childFile.eErrType = enErr;
-                            currentFile.HasChildrenErr = true;
-                            nCurErrCount++;
-                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
-                            continue;
-                        }
-
-                        // 필수결재 확장자인지 확인
-                        if (strApproveExt.Length > 0)
-                        {
-                            if (CsFunction.isFileExtinListStr(false, strExt, strApproveExt))
-                                bIsApproveExt = true;
-                        }
-
-                        // Check Zip File  (압축파일 내 압축파일이 또 존재하는 경우.
-                        if ((String.Compare(strExt, ".zip", true) != 0) && (String.Compare(strExt, ".7z", true) != 0)) continue;
-
-                        if (nCurDepth >= nMaxDepth)
-                        {
-                            Log.Logger.Here().Information($"[ScanZipFile] Skip to check zip file[{Path.GetFileName(strZipFile)}]. MaxDepth[{nMaxDepth}] CurDepth[{nCurDepth}] BlockOption[{nBlockOption}] Remain Zip File[{strZipFile}] in {strOrgZipFile}");
-                            strOverMaxDepthZipFile = entry.Key;
-
-                            //2022.10.07 BY KYH - CLIENT_ZIP_DEPTH 의 Block 옵션 활용
-                            if (nBlockOption <= 0)
-                            {
-                                // kkw 추가
-                                enErr = eFileAddErr.eUnZipInnerLeftZip;
-                                childFile.eErrType = eFileAddErr.eUnZipInnerLeftZip;
-                                currentFile.HasChildrenErr = true;
-                                nCurErrCount++;
-                                //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
-                            }
-                            continue;
-                        }
-
-                        // Scan Zip File in Zip
-                        int nInnerErrCount = 0;
-                        string strCurZip = Path.Combine(strBasePath, entry.Key);
-                        string strExtractPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(entry.Key));
-
-                        eFileAddErr enRet = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, strCurZip, strExtractPath, nMaxDepth, nBlockOption, nCurDepth + 1,
-                            blWhite, strExtInfo, nCurErrCount, out nInnerErrCount, out strOverMaxDepthZipFile, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
-
-                        if (enRet != eFileAddErr.eFANone) enErr = enRet;
+                        if (enRetDir != eFileAddErr.eFANone) enErr = enRetDir;
                         if (childFile.HasChildrenErr) currentFile.HasChildrenErr = true;
                         nCurErrCount += nInnerErrCount;
+                        continue;
                     }
+
+                    // Check Empty File 
+                    // 0kb 파일 허용(기본)
+                    FileInfo fileInfo = new FileInfo(extractFile.FullName);
+                    if (bEmptyFIleNoCheck == false && fileInfo.Length <= 0)
+                    {
+                        enErr = eFileAddErr.eUnZipInnerFileEmpty;
+                        childFile.eErrType = eFileAddErr.eUnZipInnerFileEmpty;
+                        currentFile.HasChildrenErr = true;
+                        nCurErrCount++;
+                        //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
+                        continue;
+                    }
+
+                    // Check Block File Extension
+                    strExt = Path.GetExtension(extractFile.Name);
+
+                    if (GetRegExtEnable(blWhite, strExtInfo, strExt.Replace(".", "")) != true)
+                    {
+                        enErr = eFileAddErr.eUnZipInnerExt;
+                        childFile.eErrType = eFileAddErr.eUnZipInnerExt;
+                        currentFile.HasChildrenErr = true;
+                        nCurErrCount++;
+                        //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
+                        continue;
+                    }
+
+                    //// Extract File in Zip 
+                    //entry.WriteToDirectory(strBasePath, new ExtractionOptions()
+                    //{
+                    //    ExtractFullPath = true,
+                    //    Overwrite = true,
+                    //});
+
+                    // Check Changed File Extension 
+                    enErr = IsValidFileExtInnerZip(extractFile.FullName, strExt.Replace(".", ""), blAllowDRM);
+                    if (enErr != eFileAddErr.eFANone)
+                    {
+                        childFile.eErrType = enErr;
+                        currentFile.HasChildrenErr = true;
+                        nCurErrCount++;
+                        //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
+                        continue;
+                    }
+
+                    // 필수결재 확장자인지 확인
+                    if (strApproveExt.Length > 0)
+                    {
+                        if (CsFunction.isFileExtinListStr(false, strExt, strApproveExt))
+                            bIsApproveExt = true;
+                    }
+
+                    // Check Zip File  (압축파일 내 압축파일이 또 존재하는 경우.
+                    if (!ListCheckableCompressExtension.Exists(ext => ext == strExt.Replace(".", "").ToUpper())) continue;
+                    //if ((String.Compare(strExt, ".zip", true) != 0) && (String.Compare(strExt, ".7z", true) != 0)) continue;
+
+                    if (nCurDepth >= nMaxDepth)
+                    {
+                        Log.Logger.Here().Information($"[ScanZipFile] Skip to check zip file[{extractFile.Name} in {Path.GetFileName(strZipFile)}]. MaxDepth[{nMaxDepth}] CurDepth[{nCurDepth}] BlockOption[{nBlockOption}] Remain Zip File[{strZipFile}] in {strOrgZipFile}");
+                        strOverMaxDepthZipFile = extractFile.Name;
+
+                        //2022.10.07 BY KYH - CLIENT_ZIP_DEPTH 의 Block 옵션 활용
+                        if (nBlockOption <= 0)
+                        {
+                            // kkw 추가
+                            enErr = eFileAddErr.eUnZipInnerLeftZip;
+                            childFile.eErrType = eFileAddErr.eUnZipInnerLeftZip;
+                            currentFile.HasChildrenErr = true;
+                            nCurErrCount++;
+                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
+                        }
+                        continue;
+                    }
+
+                    // Scan Zip File in Zip
+
+                    string strCurZip = extractFile.FullName;// Path.Combine(strBasePath, entry.Key);
+                                                            //                    string strExtractPath = strExtractFilePath;//Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.));
+
+                    eFileAddErr enRet = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, strCurZip, Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.Name)), nMaxDepth, nBlockOption, nCurDepth + 1,
+                        blWhite, strExtInfo, nCurErrCount, Path.GetExtension(extractFile.Name).Substring(1), out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
+
+                    if (enRet != eFileAddErr.eFANone) enErr = enRet;
+                    if (childFile.HasChildrenErr) currentFile.HasChildrenErr = true;
+                    nCurErrCount += nInnerErrCount;
                 }
-            }
-            catch (System.Exception ex)
-            {
-                if (bZipPasswdCheck == true)
+
+                nTotalErrCount = nCurErrCount;
+
+                // 가장 마지막에 난 error 값 넣음
+                if (nTotalErrCount > 0)
                 {
-                    // Check Passowrd in 7zip(7z)
-                    if (nCurDepth != 1)
-                    {
-                        enErr = eFileAddErr.eUnZipInnerZipPassword;
-                        currentFile.eErrType = eFileAddErr.eUnZipInnerZipPassword;
-                        nCurErrCount++;
-                        //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(strZipFile), enErr, Path.GetFileName(strZipFile));
-                    }
-                    else
-                    {
-                        enErr = eFileAddErr.eFAZipPW;
-                        currentFile.eErrType = eFileAddErr.eFAZipPW;
-                        nCurErrCount++;
-                    }
-                    nTotalErrCount = nCurErrCount;
-                    strOverMaxDepthInnerZipFile = strOverMaxDepthZipFile;
-                    return enErr;
+                    FileAddErr faerr = m_FileAddErrList.ElementAt<FileAddErr>(m_FileAddErrList.Count - 1);
+                    enErr = faerr.eErrType;
                 }
+
+                return enErr;
             }
-
-            nTotalErrCount = nCurErrCount;
-            strOverMaxDepthInnerZipFile = strOverMaxDepthZipFile;
-
-            // 가장 마지막에 난 error 값 넣음
-            if (nTotalErrCount > 0)
+            catch (Exception ex) { throw ex; }
+            finally
             {
-                FileAddErr faerr = m_FileAddErrList.ElementAt<FileAddErr>(m_FileAddErrList.Count - 1);
-                enErr = faerr.eErrType;
+                Console.WriteLine("파일 검사 끝 #################################################\n\n\n\n");
             }
-
-            return enErr;
         }
+
+        /// <summary>
+        /// 압축형식 파일 임시 폴더에 압축해제
+        /// </summary>
+        /// <param name="fileFullName"></param>
+        /// <param name="destFullPath"></param>
+        public eFileAddErr unzipFile(string fileFullName, string destFullPath, int nCurDepth, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = true)
+        {
+            try
+            {
+                //2022.10.06 BY kYH sharpPress 버전업하며, WriteToDirectory 호출 시 존재하지 않는 폴더는 오류가 발생하여 추가
+                DirectoryInfo destPath = new DirectoryInfo(destFullPath);
+                if (destPath.Exists == false) destPath.Create();
+
+                string fileName = Path.GetFileName(fileFullName);
+                string extType = Path.GetExtension(fileFullName).Substring(1).ToUpper();
+
+                switch (extType)
+                {
+                    case "ZIP":
+                    case "7Z":
+                        #region [ZIP/7Z 형식 검사]        
+                        var opts = new SharpCompress.Readers.ReaderOptions();
+                        var encoding = Encoding.Default;
+
+                        byte[] buff = null;
+                        using (FileStream fsSource = new FileStream(fileFullName, FileMode.Open, FileAccess.Read))
+                        {
+                            BinaryReader br = new BinaryReader(fsSource);
+                            long numBytes = 8;
+                            buff = br.ReadBytes((int)numBytes);
+
+                            //Zip File Foramt : Local File Header 구조 바이트 차트
+                            //Signature 4byte / Version 2Byte / Flags 2Byte / => Flags Bit가 서로 다름 Mac의 경우 8 그 이외는 0
+                            encoding = (buff[6] == 0x08) ? Encoding.Default : Encoding.GetEncoding(949);
+                        }
+
+                        opts.ArchiveEncoding = new SharpCompress.Common.ArchiveEncoding();
+                        opts.ArchiveEncoding.CustomDecoder = (data, x, y) =>
+                        {
+                            return encoding.GetString(data);
+                        };
+
+                        try
+                        {
+                            using (var archi = ArchiveFactory.Open(fileFullName, opts))
+                            {
+                                Log.Logger.Here().Information("[unzipFile] Try Unzip File[{0}]", fileName);
+
+                                int per = (ExamCount * 100) / TotalCount;
+                                if (per < 20)
+                                    per = 20;
+
+                                if (SGFileExamEvent != null)
+                                    SGFileExamEvent(per, fileName);
+
+                                foreach (var entry in archi.Entries.Where(entry => !entry.IsDirectory))
+                                {
+                                    // Check Password	
+                                    if (entry.IsEncrypted == true && bZipPasswdCheck == true)
+                                        return (nCurDepth == 1) ? eFileAddErr.eFAZipPW : eFileAddErr.eUnZipInnerZipPassword;
+
+                                    //그냥 만들고 시작하는게 나을 거 같다.
+                                    // Extract File in Zip 
+                                    entry.WriteToDirectory(destFullPath, new ExtractionOptions()
+                                    {
+                                        ExtractFullPath = true,
+                                        Overwrite = true,
+                                    });
+                                }
+                            }
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            if (bZipPasswdCheck == true)
+                                return (nCurDepth == 1) ? eFileAddErr.eFAZipPW : eFileAddErr.eUnZipInnerZipPassword;
+                        }
+                        #endregion [ZIP/7Z 형식 검사]
+                        break;
+                    case "TAR":
+                    case "GZ":
+                    case "TGZ":
+                    case "BZ2":
+                        #region [TAR 형식 검사]        
+
+                        try
+                        {
+                            Log.Logger.Here().Information("[unzipFile] Try Decompress File[{0}]", fileName);
+
+                            int per = (ExamCount * 100) / TotalCount;
+                            if (per < 20)
+                                per = 20;
+
+                            if (SGFileExamEvent != null)
+                                SGFileExamEvent(per, fileName);
+                            CsFunction.TarFileDecompress(fileFullName, destFullPath);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            if (bZipPasswdCheck == true)
+                                return (nCurDepth == 1) ? eFileAddErr.eFAZipPW : eFileAddErr.eUnZipInnerZipPassword;
+                        }
+                        #endregion [TAR 형식 검사]
+                        break;
+                }
+                return eFileAddErr.eFANone;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        void scanDecompressedFile()
+        {
+
+        }
+
+
+
 
         /// <summary>
         /// 문서검사
@@ -4496,7 +4596,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             {
                 try
                 {
-                    Directory.Delete(strDocumentExtractRootPath, true);
+                    if (Directory.Exists(strDocumentExtractRootPath))
+                        Directory.Delete(strDocumentExtractRootPath, true);
                 }
                 catch (System.Exception err)
                 { Log.Logger.Here().Warning("[CheckDocumentFile] Fail Directory.Delete() " + err.Message + " " + err.GetType().FullName); }
