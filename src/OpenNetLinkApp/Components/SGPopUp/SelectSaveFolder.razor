@@ -30,7 +30,10 @@
                 </button>
             </div>
             <div class="modal-body ">
-                <div class="card-body  mb-3" style="border:1px solid #b3c8e4; background-color:#fff; border-radius:3px; padding:.3rem !important;">
+
+                @if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) == false && RuntimeInformation.IsOSPlatform(OSPlatform.OSX) == false)
+                {
+                    <div class="card-body  mb-3" style="border:1px solid #b3c8e4; background-color:#fff; border-radius:3px; padding:.3rem !important;">
 
                     <!-- s 결재라인 -->
 
@@ -50,7 +53,7 @@
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenu1" style="min-width:200px;">
                                         @foreach (string str in rootDrives)
                                         {
-                                            <button class="dropdown-item text-xs p-1" style="text-align:left" type="button" @onclick="@(()=>SetCurrentDrive(str))">@str</button>
+                                            <button class="dropdown-item text-xs p-1" style="text-align:left" type="button" @onclick="@(() => SetCurrentDrive(str))">@str</button>
                                         }
                                     </div>
                                 </div>
@@ -62,7 +65,7 @@
                         </div>
                     </div>
                 </div>
-
+                }
                 <div class="card-bod">
 
                     <div class="row">
@@ -253,7 +256,7 @@
         if (nPos != 0)
             return false;
 
-        strSystemVarType.Replace(strOriginPath, "%USERPATH%");
+        strSystemVarType = strSystemVarType.Replace(strOriginPath, "%USERPATH%");
 
         return true;
     }
