@@ -53,9 +53,9 @@
                             }
                             <th style="vertical-align: middle; width: 60%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left: 5px;">@strFileName</th>
                             <!--파일명-->
-                        <th style="text-align:right;vertical-align:middle;width:10%;">@strFileSize</th>
+                            <th style="text-align:right;vertical-align:middle;width:10%;">@strFileSize</th>
                             <!--크기-->
-                        <th style="text-align:center;vertical-align:middle;width:10%;">@strFileType</th>
+                            <th style="text-align:center;vertical-align:middle;width:10%;">@strFileType</th>
                             <!--유형-->
                             @if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
                             {
@@ -64,7 +64,7 @@
                             }
 
                             <!--<th width="30%">@strLastModDay</th>--> <!--수정한 날짜-->
-                    </tr>
+                        </tr>
                     </thead>
                     <tbody>
                         @foreach (var file in HsStreamList)
@@ -84,7 +84,7 @@
                                     <td style="text-align:center;vertical-align:middle;width:20%;">@(file.isNeedApprove? XmlConf.GetTitle("T_COMMON_APPROVE_EXT_ITEM") : "")</td>
                                 }
                                 <!--<td width="30%">@file.ModifyTime.ToString("yyyy/MM/dd HH:mm:ss")</td>-->
-                    </tr>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -96,7 +96,7 @@
             <p style="font-size:13px;">
                 <br /><br /><br /><br />
                 @((MarkupString)strFileDragInfo)         <!--파일을 이곳으로 드래그 하세요.-->
-        </p>
+            </p>
 
         }
         <input type="file" id="fileInputTrans" style="display:block;" onclick="stopClickOpen(event);" multiple="multiple" />
@@ -196,8 +196,7 @@
         {
             foreach (HsStream stream in HsStreamList)
             {
-                if (stream.Type != "DIR")
-                    stream.stream.Dispose();
+                stream.stream.Dispose();
             }
             HsStreamList.Clear();
         }
@@ -221,9 +220,7 @@
                     {
                         fileAddManage.m_nTansCurSize = fileAddManage.m_nTansCurSize - HsStreamList[i - 1].Size;
                         fileAddManage.m_nTransCurCount = fileAddManage.m_nTransCurCount - 1;
-
-                        if (HsStreamList[i - 1].Type != "DIR")
-                            HsStreamList[i - 1].stream.Dispose();
+                        HsStreamList[i - 1].stream.Dispose();
                         HsStreamList.RemoveAt(i - 1);
                     }
                 }
@@ -1480,7 +1477,7 @@
     /// <param name="strFileName"></param>
     private async void FileExamResult(int per, string strFileName)
     {
-        // Console.WriteLine($"SGFileExamEvent 응답 per : {per} / strFileName : {strFileName}");
+       // Console.WriteLine($"SGFileExamEvent 응답 per : {per} / strFileName : {strFileName}");
         if (per < 0)
         {
             await refProgress.closePopUp();
