@@ -279,6 +279,17 @@
         string strSystemVarType = "";
         string strTempPath = "";
         string strMsg = "";
+
+        // ReadOnly 일때에는 지정하지 못하도록 수정적용
+        System.IO.FileInfo sf = new System.IO.FileInfo(stDisplayPath);
+        CLog.Here().Information($"SelectSaveFolder-Confirm, FileAttributes : {sf.Attributes.ToString()}, Path : {stDisplayPath}");
+        if ((sf.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+        {
+            CLog.Here().Error($"SelectSaveFolder-Confirm, SavePath is READONLY(###) - Deny, Path : {stDisplayPath}");
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0289"));
+            return;
+        }
+
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
 
@@ -495,7 +506,7 @@
     {
 
         try
-        { 
+        {
 
             if (bSetDrive)
             {
@@ -508,6 +519,20 @@
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
 
+            // Folder 관련 정보들 파악중
+            foreach (string strPathData in entries)
+            {
+                System.IO.FileInfo sf = new System.IO.FileInfo(strPathData);
+                CLog.Here().Error($"EnumerateFolder, Path : {strPathData}, FileInfo-Attributes(#####) : {sf.Attributes.ToString()}");
+
+                @*DirectoryInfo diInfo = new DirectoryInfo(strPathData);
+                    foreach(FileSystemInfo infodata in diInfo.GetFileSystemInfos())
+                    {
+                        CLog.Here().Error($"EnumerateFolder, Path : {strPathData}, FileSystemInfo-Attributes(#####) : {infodata.Attributes.ToString()}");
+                    }*@
+            }
+
+
             //args.Children.Data = Directory.EnumerateDirectories(directory)
             //.Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
 
@@ -517,8 +542,8 @@
             StateHasChanged();
 
         }
-        catch(Exception ex)
-        { 
+        catch (Exception ex)
+        {
             CLog.Here().Error($"EnumerateFolder, Exception(MSG) : {ex.Message}");
         }
 
@@ -740,6 +765,14 @@
             entries = Directory.EnumerateFileSystemEntries(stTreeDir)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+
+            // Folder 관련 정보들 파악중
+            foreach (string strPathData in entries)
+            {
+                System.IO.FileInfo sf = new System.IO.FileInfo(strPathData);
+                CLog.Here().Error($"EnumerateFolder, Path : {strPathData}, FileInfo-Attributes(#####) : {sf.Attributes.ToString()}");
+            }
+
             stDisplayPath = stTreeDir;
             StateHasChanged();
         }
@@ -1029,23 +1062,23 @@
 
     // path : fullpath 경로
     string path = context.Value as string;
-    bool isDirectory = Directory.Exists(path);
+        bool isDirectory = Directory.Exists(path);
 
     //CLog.Here().Information($"SelectSaveFolder, FileOrFolderTemplate : {path}");
 
     builder.OpenComponent<RadzenIcon>(0);
-    builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
+        builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
 
-    builder.CloseComponent();
-    if (isDirectory)
-    {
-        builder.OpenElement(2, "div");
-        builder.AddAttribute(2, "class", "p-0 m-0");
-        builder.AddAttribute(2, "Style", "width:100%;");
-        builder.AddAttribute<MouseEventArgs>(3, "onclick", RuntimeHelpers.TypeCheck<EventCallback<MouseEventArgs>>(EventCallback.Factory.Create<MouseEventArgs>(builder, (args) => OnItemClick(args, context))));
-        builder.AddContent(4, context.Text);
-    }
-    builder.CloseElement();
+        builder.CloseComponent();
+        if (isDirectory)
+        {
+            builder.OpenElement(2, "div");
+            builder.AddAttribute(2, "class", "p-0 m-0");
+            builder.AddAttribute(2, "Style", "width:100%;");
+            builder.AddAttribute<MouseEventArgs>(3, "onclick", RuntimeHelpers.TypeCheck<EventCallback<MouseEventArgs>>(EventCallback.Factory.Create<MouseEventArgs>(builder, (args) => OnItemClick(args, context))));
+            builder.AddContent(4, context.Text);
+        }
+        builder.CloseElement();
 
     //builder.AddAttribute(2, "Selected", "false");
     // context.Text : 파일이름
