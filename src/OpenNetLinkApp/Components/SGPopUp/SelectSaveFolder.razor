@@ -35,36 +35,36 @@
                 {
                     <div class="card-body  mb-3" style="border:1px solid #b3c8e4; background-color:#fff; border-radius:3px; padding:.3rem !important;">
 
-                    <!-- s 결재라인 -->
+                        <!-- s 결재라인 -->
 
-                    <div class="col-md-12 p-0">
-                        <div class="row">
-                            <div class="col-md-12" style="letter-spacing:.3px !important; ">
-                                @*<select style="width:200px;" @bind="_stCurrentDrive">
-                                    @foreach (string item in rootDrives)
-                                    {
-                                    <option value="@item">@item</option>
-                                    }
-                                    </select>*@
-                                <div class="dropdown">
-                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:200px; text-align:left">
-                                        @_stCurrentDrive
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenu1" style="min-width:200px;">
-                                        @foreach (string str in rootDrives)
+                        <div class="col-md-12 p-0">
+                            <div class="row">
+                                <div class="col-md-12" style="letter-spacing:.3px !important; ">
+                                    @*<select style="width:200px;" @bind="_stCurrentDrive">
+                                        @foreach (string item in rootDrives)
                                         {
-                                            <button class="dropdown-item text-xs p-1" style="text-align:left" type="button" @onclick="@(() => SetCurrentDrive(str))">@str</button>
+                                        <option value="@item">@item</option>
                                         }
+                                        </select>*@
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:200px; text-align:left">
+                                            @_stCurrentDrive
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu1" style="min-width:200px;">
+                                            @foreach (string str in rootDrives)
+                                            {
+                                                <button class="dropdown-item text-xs p-1" style="text-align:left" type="button" @onclick="@(() => SetCurrentDrive(str))">@str</button>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
+                                @*<div class="col-md-12" style="letter-spacing:.3px !important; ">
+                                    <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
+                                    @stDisplayPath
+                                    </div>*@
                             </div>
-                            @*<div class="col-md-12" style="letter-spacing:.3px !important; ">
-                                <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
-                                @stDisplayPath
-                                </div>*@
                         </div>
                     </div>
-                </div>
                 }
                 <div class="card-bod">
 
@@ -482,7 +482,7 @@
 
 
         //CLog.Here().Information($"SelectSaveFolder Confirm");
-        
+
         closePopUp();
     }
 
@@ -704,11 +704,45 @@
     private void toUpperTree()
     {
         CLog.Here().Information($"SelectSaveFolder toUpperTree : {stTreeDir}");
-
         Debug.WriteLine(stTreeDir);
+        bool bSearchtoTop = true;
+        string strUserPath = "";
+
+        //
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            strUserPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            bSearchtoTop = false;
+            CLog.Here().Error($"toUpperTree, OS:Linux, UserProfile - Path(is Root Path) : {strUserPath}");
+        }
+
+        //
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            strUserPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            bSearchtoTop = false;
+            CLog.Here().Error($"toUpperTree, OS:Mac OSX, UserProfile - Path(is Root Path) : {strUserPath}");
+        }
+
+
         if (Directory.GetParent(stTreeDir) != null)
         {
-            stTreeDir = Directory.GetParent(stTreeDir).FullName;
+            string strTempPath = Directory.GetParent(stTreeDir).FullName;
+
+            if (bSearchtoTop == false)
+            {
+                if (string.Compare(strTempPath, 0, strUserPath, 0, strUserPath.Length, true) != 0)
+                {
+                    CLog.Here().Error($"toUpperTree, Block(#####) - OS:Mac OSX / Linux, is Root Position, Path : {stDisplayPath}");
+                    ShowMessage("warn", XmlConf.GetWarnMsg("W_0288"));
+                    return;
+                }
+            }
+
+            CLog.Here().Error($"toUpperTree, Move(####) - CurPath : {stTreeDir}, ToParentPath : {strTempPath}");
+
+            stTreeDir = strTempPath;
+
             //entries = Directory.GetDirectories(stTreeDir);
             entries = Directory.EnumerateFileSystemEntries(stTreeDir)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
@@ -716,7 +750,6 @@
             stDisplayPath = stTreeDir;
             StateHasChanged();
         }
-
     }
 
     private void changeDrive()
@@ -991,7 +1024,6 @@
 
         lastSelectPath = (string)item.Value;
 
-        //CLog.Here().Information($"##### - OnClick, item : {item.Text}, Path : {item.Value}");
     }
 
     /// <summary>
@@ -1004,23 +1036,23 @@
 
     // path : fullpath 경로
     string path = context.Value as string;
-        bool isDirectory = Directory.Exists(path);
+    bool isDirectory = Directory.Exists(path);
 
     //CLog.Here().Information($"SelectSaveFolder, FileOrFolderTemplate : {path}");
 
     builder.OpenComponent<RadzenIcon>(0);
-        builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
+    builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
 
-        builder.CloseComponent();
-        if (isDirectory)
-        {
-            builder.OpenElement(2, "div");
-            builder.AddAttribute(2, "class", "p-0 m-0");
-            builder.AddAttribute(2, "Style", "width:100%;");
-            builder.AddAttribute<MouseEventArgs>(3, "onclick", RuntimeHelpers.TypeCheck<EventCallback<MouseEventArgs>>(EventCallback.Factory.Create<MouseEventArgs>(builder, (args) => OnItemClick(args, context))));
-            builder.AddContent(4, context.Text);
-        }
-        builder.CloseElement();
+    builder.CloseComponent();
+    if (isDirectory)
+    {
+        builder.OpenElement(2, "div");
+        builder.AddAttribute(2, "class", "p-0 m-0");
+        builder.AddAttribute(2, "Style", "width:100%;");
+        builder.AddAttribute<MouseEventArgs>(3, "onclick", RuntimeHelpers.TypeCheck<EventCallback<MouseEventArgs>>(EventCallback.Factory.Create<MouseEventArgs>(builder, (args) => OnItemClick(args, context))));
+        builder.AddContent(4, context.Text);
+    }
+    builder.CloseElement();
 
     //builder.AddAttribute(2, "Selected", "false");
     // context.Text : 파일이름
