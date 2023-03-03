@@ -491,10 +491,15 @@
     /// </summary>
     /// <param name="bDestPath"></param>
     /// <param name="strPath"></param>
-    public void EnumerateFolder(bool bDestPath, string strPath)
+    public void EnumerateFolder(bool bSetDrive, string strPath)
     {
-        string root = Directory.GetDirectoryRoot(strPath);
-        SetCurrentDrive(root);
+
+        if (bSetDrive)
+        {
+            string root = Directory.GetDirectoryRoot(strPath);
+            SetCurrentDrive(root);
+        }
+
         //   entries = Directory.GetDirectories(root);
         entries = Directory.EnumerateFileSystemEntries(strPath)
         .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
@@ -668,7 +673,7 @@
             //entries = Directory.GetDirectories(stDisplayPath);
 
             // 사용유무, 낮에 결정
-            EnumerateFolder(true, stDisplayPath);
+            EnumerateFolder(false, stDisplayPath);
 
             @*if (string.Compare(stDisplayPath, stTreeDir, true) != 0 &&
                     stDisplayPath.Length > stTreeDir.Length)
