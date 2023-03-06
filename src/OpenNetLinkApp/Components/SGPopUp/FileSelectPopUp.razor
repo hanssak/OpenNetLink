@@ -9,6 +9,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.Services
 @using AgLogManager
+@using System.Runtime.InteropServices
 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
@@ -194,19 +195,30 @@
     protected override void OnInitialized()
     {
         List<string> drivers = new List<string>();
-        //드라이버 목록 중 접근 가능한 드라이버만 표시하도록 수정
-        foreach (DriveInfo d in DriveInfo.GetDrives())
-        {
-            if (!d.IsReady)
-                continue;
 
-            drivers.Add(d.Name);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            //Window : 드라이버 목록 중 접근 가능한 드라이버만 표시하도록 수정
+            foreach (DriveInfo d in DriveInfo.GetDrives())
+            {
+                if (!d.IsReady)
+                    continue;
+
+                drivers.Add(d.Name);
+            }
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            //OSX/LINUX : 사용자 경로만 표시
+            drivers.Add(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+
         }
 
         drives = drivers.ToArray();//Directory.GetLogicalDrives();
         stCurrentDrive = drives[0];
         actionPopUpLoadFileList = LoadListFiles;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -215,6 +227,7 @@
         {
             @*LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));*@
             stDisplayPath = Directory.GetDirectoryRoot(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            refFileTreeCustom.changeDrive(stCurrentDrive);
         }
         base.OnAfterRender(firstRender);
     }
