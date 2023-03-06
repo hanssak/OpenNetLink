@@ -593,6 +593,79 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_FileAddErrList.Add(createFile);
             return createFile;
         }
+
+        /// <summary>
+        /// 파일 경로를 이용하여 트리 구성        
+        /// <br/>상대적 경로 정보만 알 수 있는 드래그앤드롭 파일의 트리를 구성하는 데 사용
+        /// <br/>Top Tree부터 트리 구성 시작
+        /// </summary>
+        /// <param name="dragFiilPath"></param>
+        /// <param name="seperatorChar"></param>
+        /// <returns></returns>
+        public FileAddErr SetFileTreeFromFilePath(string dragFiilPath, string seperatorChar)
+        {
+            int splitIdx = dragFiilPath.IndexOf(seperatorChar);
+            string name = (splitIdx < 0) ? dragFiilPath : dragFiilPath.Substring(0, splitIdx);
+            FileAddErr topFile = m_FileAddErrList.Find(na => na.FileName == name);
+
+            if (topFile == null)
+                topFile = CreateFileAddErrInfo(name, name, "");
+
+            return _setChild(topFile, dragFiilPath.Remove(0, name.Length));
+
+            FileAddErr _setChild(FileAddErr parentFile, string childPath)
+            {
+                try
+                {
+                    if (childPath.StartsWith(seperatorChar))
+                        childPath = childPath.Remove(0, seperatorChar.Length);
+
+                    if (string.IsNullOrEmpty(childPath))
+                        return parentFile;
+
+                    splitIdx = childPath.IndexOf(seperatorChar);
+                    string childName = (splitIdx < 0) ? childPath : childPath.Substring(0, splitIdx);
+                    FileAddErr childFile = parentFile.ChildrenFiles?.Find(ch => ch.FileName == childName);
+
+                    if (childFile == null)
+                        childFile = parentFile.CreateChildren(childName, Path.Combine(parentFile.FilePath, childName), parentFile.FileName);
+
+                    return _setChild(childFile, childPath.Remove(0, childName.Length));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    throw ex;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 파일 경로를 이용하여 트리 구성
+        /// <br/>전제 경로 정보를 알 수 있는 드롭 파일의 트리를 구성하는 데 사용
+        /// <br/>Top Tree 가 이미 구성되어 있고, 하위 트리 구성 시작
+        /// </summary>
+        /// <param name="parentFile"></param>
+        /// <param name="childInfo"></param>
+        /// <returns></returns>
+        public FileAddErr SetFileTreeFromFilePath(FileAddErr parentFile, FileInfo childInfo)
+        {
+            string relativePath = Path.GetRelativePath(parentFile.FilePath, childInfo.FullName);
+            string[] dirDivide = relativePath.Split(Path.DirectorySeparatorChar);
+
+            if(dirDivide.Length <=1)    //바로 하위 디렉토리인 경우, Tree 바로 구성하여 반환
+                return parentFile.CreateChildren(childInfo.Name, childInfo.FullName, parentFile.FileName);
+
+            //이후 경로가 존재할 경우 child 로 지정 후 재귀호출
+            string childDirName = dirDivide[0];
+            FileAddErr childDir = parentFile.ChildrenFiles?.Find(ch => ch.FileName == childDirName);
+
+            if(childDir == null)
+                childDir = parentFile.CreateChildren(childDirName, Path.Combine(parentFile.FilePath, childDirName), parentFile.FileName);
+
+            return SetFileTreeFromFilePath(childDir, childInfo);
+        }
+        //}
         //public void AddErrData(string strFilename, eFileAddErr err, string strFilePath, bool bSub = false, string strParentFileName = "")
         //{
         //    FileAddErr fileAddErr = new FileAddErr();
@@ -2864,7 +2937,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             {
                 if (String.Compare(strExt, "egg", true) == 0) return IsEGG(btFileData, strExt);
 
-                if (String.Compare(strExt, "doc", true) == 0 || String.Compare(strExt, "docx", true) == 0 )
+                if (String.Compare(strExt, "doc", true) == 0 || String.Compare(strExt, "docx", true) == 0)
                     return IsWord(btFileData, strExt);
 
                 if (String.Compare(strExt, "xls", true) == 0 || String.Compare(strExt, "xlsx", true) == 0)
@@ -3083,7 +3156,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             Log.Logger.Here().Information($"[IsValidFileExt] CheckExtForFileByteData, Ext : {strExt}, EXT isChanged : {!bIsExtForFileByteData}");
 
-            return (bIsExtForFileByteData ? eFileAddErr.eFANone:eFileAddErr.eFACHG);
+            return (bIsExtForFileByteData ? eFileAddErr.eFANone : eFileAddErr.eFACHG);
         }
 
         public eFileAddErr IsValidFileExtInnerZip(string strFile, string strExt, bool blAllowDRM)
@@ -4310,7 +4383,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         continue;
                     }
 
-                    if(extractFile.Attributes == FileAttributes.Directory)
+                    if (extractFile.Attributes == FileAttributes.Directory)
                     {
                         //디렉토리는 내부 항목 검사
                         eFileAddErr enRetDir = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, extractFile.FullName, Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.Name)), nMaxDepth, nBlockOption, nCurDepth,
@@ -4420,10 +4493,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return enErr;
             }
             catch (Exception ex) { throw ex; }
-            finally
-            {
-                Console.WriteLine("파일 검사 끝 #################################################\n\n\n\n");
-            }
         }
 
         /// <summary>
@@ -4850,7 +4919,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     {
                         bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
                     }
-                    
+
                     //if (bShowMimeLog == false)
                     //    Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Skip MimeType Display");
 
@@ -4897,7 +4966,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     if (!gOLEMimeTypeMap.Value.Contains(mimetype))
                     {
                         gOLEMimeTypeMap.Value.Add(mimetype);
-                      //  Log.Logger.Here().Information($"OLEMimeList - MimeType : {mimetype}");
+                        //  Log.Logger.Here().Information($"OLEMimeList - MimeType : {mimetype}");
                     }
                 }
             }
