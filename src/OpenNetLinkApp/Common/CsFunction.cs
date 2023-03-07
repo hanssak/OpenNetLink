@@ -652,5 +652,37 @@ namespace OpenNetLinkApp.Common
 
     }
 
+    public class CsWASfunc
+    {
+
+        public static string GetErrorCodeToStr(string strData)
+        {
+            string strMsg = "";
+
+            if (strData == "-1")
+                strMsg = "ID 정보를 수신받지 못했습니다.";
+            else if (strData == "-2")
+                strMsg = "PW 정보를 수신받지 못했습니다.";
+            else if (strData == "-3")
+                strMsg = "사용자 인증 실패 되었습니다.";
+            else if (strData == "-4")
+                strMsg = "사용자가 존재하지 않습니다.";
+            else if (strData == "-5")
+                strMsg = "입력한 PW가 틀립니다.";
+            else if (strData == "-6")
+                strMsg = "내부시스템(서버오류 및 DB 접근 오류 등)에서 오류가 발생되었습니다.";
+            else
+                strMsg = "사용자 인증과정 중 알수없는 오류가 발생하였습니다.";
+
+            return strMsg;
+        }
+
+        public static string stringIDpwJsonString(string strID, string strPW)
+        {
+            string json = "{\n\"id\":\"" + strID + "\",\n\"pw\":\"" + strPW + "\"\n}";
+            return json;
+        }
+
+    }
 
 }
