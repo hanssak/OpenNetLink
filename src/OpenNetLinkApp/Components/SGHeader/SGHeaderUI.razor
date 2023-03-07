@@ -771,7 +771,7 @@ public void DoLogOutSetData(int nGroupID)
     HsCmdCenter.sgDicRecvData.SetSFMListData(nGroupID, null);
     pageService.SetSFMChecking(false);
     pageService.SetApproveAfterMyCountChecking(false);
-
+    HsCmdCenter.sgDicRecvData.SetLoginDataEmpty(nGroupID);
 
     CLog.Here().Information($"groupID : {nGroupID} - User Do Logout, UrlRedirection LogOut State ReSet !!!");
     HsNetWorkSG.HsHttpWatcher.SetLoginOutState(nGroupID, false);
@@ -856,6 +856,9 @@ private void LogOut(int groupId)
 
     if (i < count)
         return;
+
+    pageService.m_nCurViewPageGroupID = nGroupID;
+    pageService.m_nLoginType = (int)pageService.GetGroupIDLoginType(nGroupID);
 
     JSRuntime.InvokeAsync<object>("beforeLogOut");
     //MyNavigationManager.NavigateTo(siteConfig.GetUseSelectFirstConnectNetServer() ? "/SelectNet" : "/LogIn/Logout");
@@ -1182,6 +1185,10 @@ public void SFMInfoAfterSend(int groupId, object[] e)
                 else if (sgSideBar.Path.Contains("clipBoardApprove"))
                 {
                     pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
+                }
+                else if (sgSideBar.Path.Contains("mailApprove"))
+                {
+                    pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveUI);
                 }
 
                 if (pgRefreshEvent != null)
@@ -2021,7 +2028,7 @@ public void OLEMimeRecvEvent(int groupId, SGData e)
         return;
     if (statusData.fileAddManage == null)
         return;
-      List<Dictionary<int, string>> oleMimeList= e.GetSvrRecordData("RECORD");
+    List<Dictionary<int, string>> oleMimeList= e.GetSvrRecordData("RECORD");
     statusData.fileAddManage.SetOLEMimeList(groupId, oleMimeList);
 }
 public void AfterApproveStatusChange()

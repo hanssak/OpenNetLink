@@ -25,6 +25,7 @@ namespace PreviewUtil
 
             Console.WriteLine("0: {0}", args[0]);
             window.NavigateToUrl(args[0]);
+            window.SetTrayStartUse(false);
             window.WaitForExit();
         }
     }

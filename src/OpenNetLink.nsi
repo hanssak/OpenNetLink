@@ -78,8 +78,8 @@ Var /GLOBAL g_strAddFileRM0CompareStr
 Var /GLOBAL g_strAddFileRM1CompareStr
 Var /GLOBAL g_iCount
 
-Var /GLOBAL g_strNetPos			; 3망중에 다중망(중간망)인지 여부 확인
-Var /GLOBAL g_iNetPos			; 3망중에 다중망(중간망)인지 여부 ("IN": 중요단말, "CN" : 중간망(업무망), "EX" : 인터넷망), IN(1) / CN(2) / OUT(3) / NotFound(0)
+Var /GLOBAL g_strNetPos			; 3망중에 다중망(중간망)인지 여부 확인(NETPOS 값 IN일때:1, CN일때:2, EX일때: 3, NCI일때:4, 없으면 0)
+Var /GLOBAL g_iNetPos			; 3망중에 다중망(중간망)인지 여부 ("IN": 중요단말, "CN": 중간망-다중망(업무망), "NCI": 중간망-인터넷망(업무망), "EX" : 인터넷망), IN(1) / CN(2) / OUT(3) / NCI(4) / NotFound(0)
 Var /GLOBAL g_iPatchEdge	        ; edge(wwwroot\edge)-patch진행여부
 Var /GLOBAL g_UseStartProgram	        ; Booting시에 agent 자동시작 되게할 지 여부
 
@@ -174,6 +174,18 @@ Var /GLOBAL g_UseStartProgram	        ; Booting시에 agent 자동시작 되게할 지 여�
 
 notfoundCn:
 
+    ${StrContains} $1 "NCI" $g_strNetPos
+    StrCmp $1 "" notfoundNCI
+    StrCpy $g_iNetPos 4
+
+    ; 확인용도
+    ;CreateDirectory "${INSTALLPATH}\41111"
+    ;MessageBox MB_ICONINFORMATION|MB_OK "#IN# 발견함!"
+    Goto exit_loop
+
+
+notfoundNCI:
+
     ${StrContains} $1 "IN" $g_strNetPos 
     StrCmp $1 "" notfoundIN
     StrCpy $g_iNetPos 1    
@@ -215,7 +227,7 @@ exit_loop:
         ; 함께 배포된 edge 삭제후 Patch 할지 여부  미사용(0), 사용(1)
 	StrCpy $g_iPatchEdge 1
 
-	; 망위치 강제 지정 - IN(1) / CN(2) / OUT(3) / NotFound(0)
+	; 망위치 강제 지정 - IN(1) / CN(2) / NCI(4)/ OUT(3) / NotFound(0)
 	StrCpy $g_iNetPos 0
         ; 단일망에서 우클릭모듈 문구 다르게 나오길 원한다면, build해서 Library 폴더에 따로 두고 Build하는걸 2번 해줘야함
 
@@ -3664,6 +3676,9 @@ Section "MainSection" SEC01
 		  ;File "artifacts\windows\published\AddFileRMex1X64.dll"
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex1X64.dll"'
+	  ${ElseIf}  $g_iNetPos == 4
+                  ;CreateDirectory "${INSTALLPATH}\44444" ; 확인용
+		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
 	  ${Else}
 
 		  ${If} $g_iNetPos == 1
@@ -3683,6 +3698,9 @@ Section "MainSection" SEC01
 	  	  ;CreateDirectory "${INSTALLPATH}\22222" ; 확인용
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex1X64.dll"'
+	  ${ElseIf}  ${NETWORK_FLAG} == 'NCI'
+	  	  ;CreateDirectory "${INSTALLPATH}\44444" ; 확인용
+		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
 	  ${Else}	  	
 		  ${If} ${NETWORK_FLAG} == 'IN'
 	          	;CreateDirectory "${INSTALLPATH}\11111" ; 확인용

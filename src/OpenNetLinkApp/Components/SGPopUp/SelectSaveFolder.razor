@@ -3,6 +3,8 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HsCmdCenter
 @using System.Runtime.InteropServices
+@*@using System.Runtime.CompilerServices*@
+@using Microsoft.AspNetCore.Components.CompilerServices
 @using Radzen
 @using Radzen.Blazor
 @using System.Diagnostics
@@ -11,13 +13,15 @@
 @using AgLogManager
 @using System.Text
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Common;
 
 <div class="modal fade" id="modal-selectsavefolder" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline pl-3 pr-3">
                 @*<h5 class="modal-title pt-1 text-bold "> <i class="fas fa-search pr-2"></i>@XmlConf.GetTitle("T_COMMON_FOLDER_SEARCH")</h5>*@
-                <h5 class="modal-title pt-1 text-bold" style="color:black">
+                <h5 class="modal-title pt-1 text-bold" style="color: black; text-overflow: ellipsis;">
+                    @* white-space: nowrap; overflow: hidden;*@
                     <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
                     @stDisplayPath
                 </h5>
@@ -26,39 +30,42 @@
                 </button>
             </div>
             <div class="modal-body ">
-                <div class="card-body  mb-3" style="border:1px solid #b3c8e4; background-color:#fff; border-radius:3px; padding:.3rem !important;">
 
-                    <!-- s 결재라인 -->
+                @if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) == false && RuntimeInformation.IsOSPlatform(OSPlatform.OSX) == false)
+                {
+                    <div class="card-body  mb-3" style="border:1px solid #b3c8e4; background-color:#fff; border-radius:3px; padding:.3rem !important;">
 
-                    <div class="col-md-12 p-0">
-                        <div class="row">
-                            <div class="col-md-12" style="letter-spacing:.3px !important; ">
-                                @*<select style="width:200px;" @bind="_stCurrentDrive">
-                                    @foreach (string item in rootDrives)
-                                    {
-                                    <option value="@item">@item</option>
-                                    }
-                                    </select>*@
-                                <div class="dropdown">
-                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:200px; text-align:left">
-                                        @_stCurrentDrive
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenu1" style="min-width:200px;">
-                                        @foreach (string str in rootDrives)
+                        <!-- s 결재라인 -->
+
+                        <div class="col-md-12 p-0">
+                            <div class="row">
+                                <div class="col-md-12" style="letter-spacing:.3px !important; ">
+                                    @*<select style="width:200px;" @bind="_stCurrentDrive">
+                                        @foreach (string item in rootDrives)
                                         {
-                                            <button class="dropdown-item text-xs p-1" style="text-align:left" type="button" @onclick="@(()=>SetCurrentDrive(str))">@str</button>
+                                        <option value="@item">@item</option>
                                         }
+                                        </select>*@
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:200px; text-align:left">
+                                            @_stCurrentDrive
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu1" style="min-width:200px;">
+                                            @foreach (string str in rootDrives)
+                                            {
+                                                <button class="dropdown-item text-xs p-1" style="text-align:left" type="button" @onclick="@(() => SetCurrentDrive(str))">@str</button>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
+                                @*<div class="col-md-12" style="letter-spacing:.3px !important; ">
+                                    <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
+                                    @stDisplayPath
+                                    </div>*@
                             </div>
-                            @*<div class="col-md-12" style="letter-spacing:.3px !important; ">
-                                <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
-                                @stDisplayPath
-                                </div>*@
                         </div>
                     </div>
-                </div>
-
+                }
                 <div class="card-bod">
 
                     <div class="row">
@@ -73,14 +80,13 @@
                                                 <div class="card-body table-responsive" style="height:300px; border:1px solid #c6ceda; background-color:#fff;overflow:hidden;padding:0 0 0 0;overflow:auto">
 
 
-                                                    @*
-                                                        //상위 루트로 이동하는 기능 제거
-                                                        <div @onclick="toUpperTree">
+                                                    @*상위 루트로 이동하는 기능 제거*@
+                                                    <div @onclick="toUpperTree">
                                                         <i class="fas fa-folder align-items-center" style="padding-left:17px;cursor:pointer;"></i><span style="cursor:pointer;">&nbsp;..</span>
-                                                        </div>*@
+                                                    </div>
                                                     <div>
                                                         <RadzenTree Change="@OnSelectPath" Data="@entries" Expand="@LoadFiles" Style="width: 100%;height:100%;overflow:auto">
-                                                            <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
+                                                            <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />  @*Expanded="@((data) => false)" HasChildren="@((data) => false)" *@
                                                         </RadzenTree>
                                                     </div>
 
@@ -128,17 +134,59 @@
 </div>
 
 @code {
+
+    public int nGroupid = 0;
+
+    /// <summary>
+    /// 탐색된 TreeList 의 Root Path를 저장
+    /// </summary>
     private string stTreeDir = String.Empty;
+
+    /// <summary>
+    /// 탐색된 TreeList 의 목록들 저장
+    /// </summary>
     IEnumerable<string> entries = null;
+
+    /// <summary>
+    /// double click을 위해 사용되는 값
+    /// </summary>
+    static DateTime timeInterval = DateTime.Now;
+
+    /// <summary>
+    /// double click을 위해 사용되는 값
+    /// </summary>
+    static string lastSelectPath = "";
+
+    /// <summary>
+    /// double click을 위해 사용되는 값
+    /// </summary>
+    static private int doubleClickMaxTime = 500; //밀리세컨
+
     public int dragLabel = 1;
-    public string curDir { get; set; }
-    public bool IsVisible { get; set; }
+
+    /// <summary>
+    /// 사용자가 생성하는 Folder 이름
+    /// </summary>
     private string stMakeDirName = String.Empty;
+
+    /// <summary>
+    /// 상단에 표시되는 Path 경로
+    /// </summary>
     private string stDisplayPath = String.Empty;
+
+    /// <summary>
+    /// groupID 전달받은 index(groupid와 동일)
+    /// </summary>
     private int nNetIdx = 0;
-    private string stOriginPath = String.Empty;
+
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SelectSaveFolder>();
-    private string[] rootDrives;
+
+
+    /// <summary>
+    /// 사용자가 접근,선택 가능한 드라이브 볼륨 목록(C,D,..Z) 저장
+    /// </summary>
+    private string[] rootDrives = null;
+
     private string stCurrentDrive = "";
     public string _stCurrentDrive
     {
@@ -149,8 +197,12 @@
             changeDrive();
         }
     }
-    private static Action<string> actionPopUpLoadFileList;
+
+    private static Action<string> actionDoubleClickListitem;
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
+
+    //private static Action<string> actionTargetSelect;
+
     [Parameter]
     public EventCallback<string> OnSaveDirPath { get; set; }
 
@@ -161,63 +213,347 @@
         //StateHasChanged();
     }
 
+    /// <summary>
+    /// 더블클릭때 java script에서 실행해주는 함수
+    /// </summary>
+    /// <param name="value"></param>
+    @*[JSInvokable("SelectSaveFolderDoubleClick")]
+        public static void SelectSaveFolderDoubleClick(string value)
+        {
+            CLog.Here().Information($"JS-SelectSaveFolderDoubleClick, Path : {value}");
+            actionDoubleClickListitem.Invoke(value);
+        }*@
+
+    /// <summary>
+    /// 더블클릭때 실행되는 마지막 함수
+    /// </summary>
+    /// <param name="value"></param>
+    private void DoubleClickItem(string value)
+    {
+        CLog.Here().Information($"DoubleClickItem(#####), Path : {value}");
+        EnumerateFolder(false, value);
+        //stTreeDir = stDisplayPath;
+
+        JSRuntime.InvokeAsync<object>("RadzenTreeCollapse", null);
+
+        StateHasChanged();
+    }
+
+
+    /// <summary>
+    /// 사용자 ProFile 경로를 system 환경설정 형태로 변경하는 함수
+    /// </summary>
+    /// <param name="strOriginPath"></param>
+    /// <param name="strOriginSavePath"></param>
+    /// <param name="strSystemVarType"></param>
+    /// <returns></returns>
+    private bool ChangePathToSystemVarType(string strOriginPath, string strOriginSavePath, out string strSystemVarType)
+    {
+        strOriginPath = strOriginPath.ToLower();
+        strSystemVarType = strOriginSavePath.ToLower();
+
+        int nPos = strSystemVarType.IndexOf(strOriginPath);
+        if (nPos != 0)
+            return false;
+
+        strSystemVarType = strSystemVarType.Replace(strOriginPath, "%USERPATH%");
+
+        return true;
+    }
+
+    /// <summary>
+    /// 확인 눌러서 변경된 경로 저장
+    /// </summary>
     public void Confirm()
     {
 
-        if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
+        CLog.Here().Information($"SelectSaveFolder-Confirm, DisPlayPath : {stDisplayPath}, PathRoot : {Path.GetPathRoot(stDisplayPath)}");
+        CLog.Here().Information($"SelectSaveFolder-Confirm, UserProfile Path : {Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}");
+        CLog.Here().Information($"SelectSaveFolder-Confirm, Desktop Path : {Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}");
+        CLog.Here().Information($"SelectSaveFolder-Confirm, Windows Path : {Environment.GetFolderPath(Environment.SpecialFolder.Windows)}");
+        CLog.Here().Information($"SelectSaveFolder-Confirm, ProgramFiles Path : {Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)}");
+        CLog.Here().Information($"SelectSaveFolder-Confirm, ProgramFilesX86 Path : {Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)}");
+        CLog.Here().Information($"SelectSaveFolder-Confirm, System Path : {Environment.GetFolderPath(Environment.SpecialFolder.System)}");
+        CLog.Here().Information($"SelectSaveFolder-Confirm, SystemX86 Path : {Environment.GetFolderPath(Environment.SpecialFolder.SystemX86)}");
+
+        string strSystemVarType = "";
+        string strTempPath = "";
+        string strMsg = "";
+
+        // ReadOnly 일때에는 지정하지 못하도록 수정적용
+        System.IO.FileInfo sf = new System.IO.FileInfo(stDisplayPath);
+        CLog.Here().Information($"SelectSaveFolder-Confirm, FileAttributes : {sf.Attributes.ToString()}, Path : {stDisplayPath}");
+        if ((sf.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
         {
-            string strMsg = String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString());
-            ShowMessage("warn", strMsg);
+            CLog.Here().Error($"SelectSaveFolder-Confirm, SavePath is READONLY(###) - Deny, Path : {stDisplayPath}");
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0289"));
             return;
         }
 
-        if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-            ShowMessage("warn", strMsg);
-            return;
+
+            // Black 방식
+
+            if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is RootPath, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString()));
+                return;
+            }
+
+            if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is UserProfile, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
+                return;
+            }
+            else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is Desktop, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is Windows, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is ProgramFiles, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            // 빈문자열 나와서 무조건 여기서 차단됨 : Linux, MAC
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is ProgramFilesX86, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.System);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is System, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
+                return;
+            }
+
+            // 빈문자열 나와서 무조건 여기서 차단됨 : Linux, MAC
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is SystemX86, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
+                return;
+            }
+
+            OnSaveDirPath.InvokeAsync(stDisplayPath + "|" + nNetIdx);
+
         }
-        else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-            ShowMessage("warn", strMsg);
-            return;
+            // White 방식
+            // '/Users/......' 경로에만 지정가능
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            CLog.Here().Error($"Confirm, OS:Mac OSX, UserProfile - Path : {strTempPath}");
+
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) != 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Mac OSX, is UserProfile, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
+                return;
+            }
+
+            if (ChangePathToSystemVarType(strTempPath, stDisplayPath, out strSystemVarType) == false)
+            {
+                CLog.Here().Error($"Confirm, OS:Mac OSX, UserProfile - error, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
+                return;
+            }
+
+            CLog.Here().Error($"Confirm, OS:Mac OSX, UserProfile - Path : {strSystemVarType}");
+
+            OnSaveDirPath.InvokeAsync(strSystemVarType + "|" + nNetIdx);
+
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            // White 방식
+            // '/home/......' 경로에만 지정가능
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            CLog.Here().Error($"Confirm, OS:Mac OSX, UserProfile - Path : {strTempPath}");
+
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) != 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Linux, is UserProfile, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
+                return;
+            }
+
+            if (ChangePathToSystemVarType(strTempPath, stDisplayPath, out strSystemVarType) == false)
+            {
+                CLog.Here().Error($"Confirm, OS:Linux, UserProfile - error, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
+                return;
+            }
+
+            CLog.Here().Error($"Confirm, OS:Mac OSX, UserProfile - Path : {strSystemVarType}");
+
+            OnSaveDirPath.InvokeAsync(strSystemVarType + "|" + nNetIdx);
+
+        }
+        else
+        {
+
+            // Black 방식
+            if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is RootPath, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString()));
+                return;
+            }
+
+            if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is UserProfile, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
+                return;
+            }
+            else if (stDisplayPath.Equals(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is Desktop, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0256"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is Windows, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is ProgramFiles, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is ProgramFilesX86, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                return;
+            }
+
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.System);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is System, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
+                return;
+            }
+
+            strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+            if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+            {
+                CLog.Here().Error($"Confirm, OS:Windows, is SystemX86, Path : {stDisplayPath}");
+                ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString()));
+                return;
+            }
+
+            // 빈문자열 나와서 무조건 여기서 차단됨
+            @*strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+                if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, false) == 0)
+                {
+                    CLog.Here().Error($"Confirm, OS:Others, is SystemX86, Path : {stDisplayPath}");
+                    ShowMessage("warn", String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString()));
+                    return;
+                }*@
+
+            OnSaveDirPath.InvokeAsync(stDisplayPath + "|" + nNetIdx);
         }
 
-        string strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-        if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
-        {
-            string strMsg = String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString());
-            ShowMessage("warn", strMsg);
-            return;
-        }
-
-        strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-        if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
-        {
-            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-            ShowMessage("warn", strMsg);
-            return;
-        }
-
-        strTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-        if (string.Compare(stDisplayPath, 0, strTempPath, 0, strTempPath.Length, true) == 0)
-        {
-            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
-            ShowMessage("warn", strMsg);
-            return;
-        }
 
         //CLog.Here().Information($"SelectSaveFolder Confirm");
-        OnSaveDirPath.InvokeAsync(stDisplayPath + "|" + nNetIdx);
+
         closePopUp();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="bDestPath"></param>
+    /// <param name="strPath"></param>
+    public void EnumerateFolder(bool bSetDrive, string strPath)
+    {
+
+        try
+        {
+
+            if (bSetDrive)
+            {
+                string root = Directory.GetDirectoryRoot(strPath);
+                SetCurrentDrive(root);
+            }
+
+            //   entries = Directory.GetDirectories(root);
+            entries = Directory.EnumerateFileSystemEntries(strPath)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+
+            // Folder 관련 정보들 파악중
+            foreach (string strPathData in entries)
+            {
+                System.IO.FileInfo sf = new System.IO.FileInfo(strPathData);
+                CLog.Here().Error($"EnumerateFolder, Path : {strPathData}, FileInfo-Attributes(#####) : {sf.Attributes.ToString()}");
+
+                @*DirectoryInfo diInfo = new DirectoryInfo(strPathData);
+                    foreach(FileSystemInfo infodata in diInfo.GetFileSystemInfos())
+                    {
+                        CLog.Here().Error($"EnumerateFolder, Path : {strPathData}, FileSystemInfo-Attributes(#####) : {infodata.Attributes.ToString()}");
+                    }*@
+            }
+
+
+            //args.Children.Data = Directory.EnumerateDirectories(directory)
+            //.Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
+
+            stTreeDir = strPath;
+            stDisplayPath = stTreeDir;
+
+            StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"EnumerateFolder, Exception(MSG) : {ex.Message}");
+        }
+
+    }
+
+
     public async Task openPopUp(int Idx, string dir)
     {
-        //CLog.Here().Information($"SelectSaveFolder openPopUp");
+        CLog.Here().Information($"SelectSaveFolder openPopUp");
         nNetIdx = Idx;
-        stOriginPath = dir;
 
         object[] param3 = { "0" };
         await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param3);
@@ -226,34 +562,53 @@
         //(entries 변경되어도 과거 드라이브의 하위가 잔여되는 버그 수정 건)
         await JSRuntime.InvokeAsync<object>("RadzenTreeCollapse", null);
 
+        //await JSRuntime.InvokeVoidAsync("RadzenTreeNodeDoubleClick");
+
         if (dir != null && dir.Length > 0)
         {
             try
             {
-                //파일 탐색기를 드라이버를 기반으로 한 트리 타입으로 처리
-                string root = Directory.GetDirectoryRoot(dir);
-                SetCurrentDrive(root);
-                //   entries = Directory.GetDirectories(root);
-                entries = Directory.EnumerateFileSystemEntries(root)
-              .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
-              .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
-                stTreeDir = dir;
+
+                if (Directory.Exists(dir))
+                {
+                    //파일 탐색기를 드라이버를 기반으로 한 트리 타입으로 처리
+                    @*string root = Directory.GetDirectoryRoot(dir);
+                        SetCurrentDrive(root);
+                        //   entries = Directory.GetDirectories(root);
+                        entries = Directory.EnumerateFileSystemEntries(dir)
+                        .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+                        .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+                        stTreeDir = dir;*@
+
+                    EnumerateFolder(true, dir);
+
+                }
+                else
+                {
+                    DirectoryInfo di = Directory.CreateDirectory(dir);
+                    if (di.Exists)
+                    {
+                        EnumerateFolder(true, dir);
+                    }
+                }
+
             }
             catch (Exception ex)
             {
-                CLog.Here().Error($"openPopUp - Exception : {ex.Message}");
+                CLog.Here().Error($"openPopUp - Exception(MSG) : {ex.Message}");
                 //entries = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-                entries = Directory.EnumerateFileSystemEntries(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
-                .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
-                .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
-                stTreeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                @*entries = Directory.EnumerateFileSystemEntries(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
+                    .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+                    .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+                    stTreeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);*@
+
+                EnumerateFolder(true, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
             }
         }
-        stDisplayPath = stTreeDir;
-        StateHasChanged();
 
         object[] param = { "modal-selectsavefolder" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
+
     }
 
     public void closePopUp()
@@ -275,39 +630,83 @@
 
     private void CreateNewFolder()
     {
-        //CLog.Here().Information($"SelectSaveFolder CreateNewFolder");
-        ISGSideBarUIService SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
 
-        if (stMakeDirName.Length < 1)
+        CLog.Here().Information($"SelectSaveFolder CreateNewFolder");
+
+        try
         {
-            string stMsg = XmlConf.GetTitle("L_FOLDER_NAME_IS_NEEDED");
-            ShowMessage("error", stMsg);
-            return;
+
+            ISGSideBarUIService SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            if (stMakeDirName.Length < 1)
+            {
+                string stMsg = XmlConf.GetTitle("L_FOLDER_NAME_IS_NEEDED");
+                ShowMessage("error", stMsg);
+                return;
+            }
+            if (stMakeDirName.Length > HsCmdCenter.GetReceiveFileNameLengthMax(groupID))
+            {
+                string stMsg = XmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");
+                ShowMessage("error", stMsg);
+                return;
+            }
+
+            // OS 미지원 문자 check, 알려줌
+            string strDenyChar = "";
+            if (CsFileFunc.isSupportFileName(stMakeDirName, out strDenyChar) == false)
+            {
+                strDenyChar = strDenyChar.Replace("$EMPTY", XmlConf.GetTitle("T_COMMON_EMPTY_CHAR"));
+                string stMsg = String.Format(XmlConf.GetTitle("T_COMMON_OS_NOT_FILENAME_CHAR"), strDenyChar);
+                ShowMessage("error", stMsg);
+                return;
+            }
+
+            string stFullPath = stDisplayPath + "/" + stMakeDirName;
+            DirectoryInfo di = new DirectoryInfo(stFullPath);
+            if (di.Exists == false)
+                di.Create();
+            else
+                return;
+
+            ShowMessage("success", XmlConf.GetTitle("T_COMMON_FOLDER_CREATE_COMPLETE"));
+
+            stMakeDirName = "";
+
+            @*stTreeDir = stFullPath;
+                stDisplayPath = stFullPath;*@
+
+            //파일 탐색기를 드라이버를 기반으로 한 트리 타입으로 처리
+            @*string root = Directory.GetDirectoryRoot(stDisplayPath);
+                entries = Directory.GetDirectories(root);*@
+            //entries = Directory.GetDirectories(stDisplayPath);
+
+            // 사용유무, 낮에 결정
+            EnumerateFolder(false, stDisplayPath);
+
+            @*if (string.Compare(stDisplayPath, stTreeDir, true) != 0 &&
+                    stDisplayPath.Length > stTreeDir.Length)
+                {
+                    DirectoryInfo dinfo = new DirectoryInfo(stDisplayPath);
+
+                    TreeExpandEventArgs argData = new TreeExpandEventArgs();
+                    argData.Text = dinfo.Name;
+                    argData.Value = stDisplayPath;
+                    argData.Children = new TreeItemSettings();
+
+                    //argData.Text
+                    LoadFiles(argData);
+                }*@
+
         }
-        if (stMakeDirName.Length > HsCmdCenter.GetReceiveFileNameLengthMax(groupID))
+        catch (Exception ex)
         {
-            string stMsg = XmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");
-            ShowMessage("error", stMsg);
-            return;
+            CLog.Here().Information($"SelectSaveFolder CreateNewFolder, Exception(MSG) : {ex.Message}");
         }
-        string stFullPath = stDisplayPath + "/" + stMakeDirName;
-        DirectoryInfo di = new DirectoryInfo(stFullPath);
-        if (di.Exists == false)
-            di.Create();
-        else
-            return;
 
-        string stMsgComplete = XmlConf.GetTitle("T_COMMON_FOLDER_CREATE_COMPLETE");
-        ShowMessage("success", stMsgComplete);
-
-        //파일 탐색기를 드라이버를 기반으로 한 트리 타입으로 처리
-        string root = Directory.GetDirectoryRoot(stDisplayPath);
-        entries = Directory.GetDirectories(root);
-        //entries = Directory.GetDirectories(stDisplayPath);
         StateHasChanged();
     }
 
@@ -321,15 +720,58 @@
 
     private void toUpperTree()
     {
-        //CLog.Here().Information($"SelectSaveFolder toUpperTree");
+        CLog.Here().Information($"SelectSaveFolder toUpperTree : {stTreeDir}");
         Debug.WriteLine(stTreeDir);
+        bool bSearchtoTop = true;
+        string strUserPath = "";
+
+        //
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            strUserPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            bSearchtoTop = false;
+            CLog.Here().Error($"toUpperTree, OS:Linux, UserProfile - Path(is Root Path) : {strUserPath}");
+        }
+
+        //
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            strUserPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            bSearchtoTop = false;
+            CLog.Here().Error($"toUpperTree, OS:Mac OSX, UserProfile - Path(is Root Path) : {strUserPath}");
+        }
+
+
         if (Directory.GetParent(stTreeDir) != null)
         {
-            stTreeDir = Directory.GetParent(stTreeDir).FullName;
+            string strTempPath = Directory.GetParent(stTreeDir).FullName;
+
+            if (bSearchtoTop == false)
+            {
+                if (string.Compare(strTempPath, 0, strUserPath, 0, strUserPath.Length, true) != 0)
+                {
+                    CLog.Here().Error($"toUpperTree, Block(#####) - OS:Mac OSX / Linux, is Root Position, Path : {stDisplayPath}");
+                    ShowMessage("warn", XmlConf.GetWarnMsg("W_0288"));
+                    return;
+                }
+            }
+
+            CLog.Here().Error($"toUpperTree, Move(####) - CurPath : {stTreeDir}, ToParentPath : {strTempPath}");
+
+            stTreeDir = strTempPath;
+
             //entries = Directory.GetDirectories(stTreeDir);
             entries = Directory.EnumerateFileSystemEntries(stTreeDir)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+
+            // Folder 관련 정보들 파악중
+            foreach (string strPathData in entries)
+            {
+                System.IO.FileInfo sf = new System.IO.FileInfo(strPathData);
+                CLog.Here().Error($"EnumerateFolder, Path : {strPathData}, FileInfo-Attributes(#####) : {sf.Attributes.ToString()}");
+            }
+
             stDisplayPath = stTreeDir;
             StateHasChanged();
         }
@@ -353,10 +795,10 @@
 
     void OnSelectPath(TreeEventArgs args)
     {
-        //CLog.Here().Information($"SelectSaveFolder OnSelectPath");
         dragLabel = 1;
-        curDir = args.Text;
         stDisplayPath = (string)args.Value;
+
+        CLog.Here().Information($"SelectSaveFolder OnSelectPath : {stDisplayPath}");
 
         //LoadListFiles(args.Value as string);
         //OnSelectPathFromFileTree.InvokeAsync(args); //부모컴포넌트에 이벤트 전달
@@ -375,10 +817,10 @@
         }
         rootDrives = drivers.ToArray();//Directory.GetLogicalDrives();
         stCurrentDrive = rootDrives[0];
-        actionPopUpLoadFileList = LoadListFiles;
+        //actionPopUpLoadFileList = LoadListFiles;
+        actionDoubleClickListitem = DoubleClickItem;
 
         //CLog.Here().Information($"SelectSaveFolder OnInitialized");
-        IsVisible = true;
         string[] drives = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         //CLog.Here().Information($"SelectSaveFolder initiallized GetFolderPath : [{Environment.SpecialFolder.UserProfile}]");
         //CLog.Here().Information($"SelectSaveFolder FileAttributes.Hidden : [{FileAttributes.Hidden}]");
@@ -433,12 +875,12 @@
         }
         catch (UnauthorizedAccessException e)
         {
-            CLog.Here().Error("UnauthorizedAccessException:" + e.Message);
+            CLog.Here().Error("LoadListFiles, UnauthorizedAccessException:" + e.Message);
             Console.WriteLine(e.Message);
         }
         catch (Exception e2)
         {
-            CLog.Here().Error("Exception:" + e2.Message);
+            CLog.Here().Error("LoadListFiles, Exception:" + e2.Message);
             Console.WriteLine(e2.Message);
         }
 
@@ -482,7 +924,7 @@
         }
         catch (Exception ex3)
         {
-            CLog.Here().Error("Exception:" + ex3.Message);
+            CLog.Here().Error("LoadListFiles, Exception(MSG):" + ex3.Message);
         }
 
         string listHtml = makeSubFileList();
@@ -527,6 +969,10 @@
         return stRtn.ToString();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="args"></param>
     void LoadFiles(TreeExpandEventArgs args)
     {
         //CLog.Here().Information($"SelectSaveFolder LoadFiles");
@@ -553,10 +999,13 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            CLog.Here().Information($"LoadFiles, Exception(MSG) : {ex.Message}");
+            //Console.WriteLine(ex.Message);
         }
 
+        StateHasChanged();
     }
+
     string GetTextForNode(object data)
     {
         //CLog.Here().Information($"SelectSaveFolder GetTextForNode");
@@ -568,20 +1017,77 @@
         return name;
     }
 
+
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="args"></param>
+    /// <param name="item"></param>
+    private static void OnItemClick(MouseEventArgs args, RadzenTreeItem item)
+    {
+
+        DateTime now = DateTime.Now;
+
+        //if (timeInterval.AddMilliseconds(doubleClickMaxTime) <= now || lastSelectPath != item.Value) // != 기호사용시 문제 발생
+        if (timeInterval.AddMilliseconds(doubleClickMaxTime) <= now || string.Compare(lastSelectPath, (string)item.Value, false) != 0)
+        {
+            //일반클릭
+            timeInterval = now;
+            CLog.Here().Information($"##### - OnItemClick, OnClick time : {timeInterval.AddMilliseconds(doubleClickMaxTime) <= now}, PathChanged : {string.Compare(lastSelectPath, (string)item.Value, false) != 0}");
+            //CLog.Here().Information($"##### - OnItemClick, OnClick(timeInterval(Min,Sec,MilliSec) : {timeInterval.Minute}-{timeInterval.Second}-{timeInterval.Millisecond}, Now : {now.ToString()} ), item : {item.Text}, lastSelectPath : {lastSelectPath}, Path : {item.Value}");
+        }
+        else
+        {
+            //더블클릭
+            timeInterval = now.AddSeconds(-10);     //이후 3번클릭은 더블클릭 되지 않도록
+
+            CLog.Here().Information($"##### - OnItemClick, OnDoubleClick(#####) time : {timeInterval.AddMilliseconds(doubleClickMaxTime) <= now}, PathChanged : {string.Compare(lastSelectPath, (string)item.Value, false) != 0}");
+            //CLog.Here().Information($"##### - OnClick, DoubleClick(#####)(timeInterval(Min,Sec,MilliSec) : {timeInterval.Minute}-{timeInterval.Second}-{timeInterval.Millisecond}, Now : {now.ToString()} ), item : {item.Text}, lastSelectPath : {lastSelectPath}, Path : {item.Value}");
+            actionDoubleClickListitem.Invoke((string)item.Value);
+        }
+
+        lastSelectPath = (string)item.Value;
+
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
     RenderFragment<RadzenTreeItem> FileOrFolderTemplate = (context) => builder =>
     {
-        //CLog.Here().Information($"SelectSaveFolder FileOrFolderTemplate");
-        string path = context.Value as string;
+
+    //context.Selected = false;
+
+    // path : fullpath 경로
+    string path = context.Value as string;
         bool isDirectory = Directory.Exists(path);
 
-        builder.OpenComponent<RadzenIcon>(0);
+    //CLog.Here().Information($"SelectSaveFolder, FileOrFolderTemplate : {path}");
+
+    builder.OpenComponent<RadzenIcon>(0);
         builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
 
-        if (!isDirectory)
-        {
-            builder.AddAttribute(2, "Style", "margin-left: 24px");
-        }
         builder.CloseComponent();
-        builder.AddContent(3, context.Text);
+        if (isDirectory)
+        {
+            builder.OpenElement(2, "div");
+            builder.AddAttribute(2, "class", "p-0 m-0");
+            builder.AddAttribute(2, "Style", "width:100%;");
+            builder.AddAttribute<MouseEventArgs>(3, "onclick", RuntimeHelpers.TypeCheck<EventCallback<MouseEventArgs>>(EventCallback.Factory.Create<MouseEventArgs>(builder, (args) => OnItemClick(args, context))));
+            builder.AddContent(4, context.Text);
+        }
+        builder.CloseElement();
+
+    //builder.AddAttribute(2, "Selected", "false");
+    // context.Text : 파일이름
+    //builder.AddContent(3, context.Text);
+    //          @ondblclick="()=>EnumerateFolder(false, strTestPath)"
+
+    @*string htmlString = "<div class=\"p-0 m-0\" style=\"width:100%;\"" +
+            // " @ondblclick=\"()=>EnumerateFolder(true, " + path.Replace(@"\", @"\\") + ")\" >" + context.Text + "</div>";
+            " @ondblclick=\"()=>EnumerateFolder(true, 1)\" >" + context.Text + "</div>";
+        builder.AddContent(3, (MarkupString)htmlString);*@
     };
+
 }

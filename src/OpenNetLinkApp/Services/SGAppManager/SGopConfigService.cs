@@ -92,6 +92,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApprLineLocalSave(int groupID);
 
         public bool GetUseApprLineChkBlock(int groupID);
+
         public bool GetUseApprDeptSearch(int groupID);
         public bool GetUseApprTreeSearch(int groupID);
         public bool GetUseUserPWChange(int groupID);
@@ -112,7 +113,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="groupID">그룹ID</param>
         /// <returns>true : 로그인 유저별 수신경로 사용, false : 로그인 유저별 수신경로 미사용</returns>
         public bool GetUseUserRecvDownPath(int groupID);
+
         public bool GetUseEmailManageApprove(int groupID);
+
+        public bool GetUseUIdlpData(int groupID);
+
         public bool GetUsePCURL(int groupID);
 
         public bool GetUsePublicBoard(int groupID);
@@ -241,6 +246,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseClipBoardApproveReason();
 
         /// <summary>
+        /// 파일 선택 삭제 사용 유무
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseFileSelectDelete();
+
+        /// <summary>
         /// 알람 초기화 매일 자정마다
         /// </summary>
         /// <returns></returns>
@@ -263,6 +274,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns></returns>
         public bool GetUseOver1auth(int nGroupID);
 
+
+        /// <summary>
+        /// 인증서 전송기능
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUsePKIsendRecv(int groupID);
     }
 
 
@@ -383,6 +401,31 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return (AppConfigInfo as SGopConfig).bURLAutoTrans[nGroupID];
 
             return true;    // 기본값
+        }
+
+        public bool GetUseEmailManageApprove(int nGroupID)
+        {
+            (AppConfigInfo as SGopConfig).blistUseEmail ??= new List<bool>();
+
+            if ((AppConfigInfo as SGopConfig).blistUseEmail.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGopConfig).blistUseEmail[nGroupID];
+
+            return false;    // 기본값
+        }
+
+        /// <summary>
+        /// email에서 DLP 검색기능 사용할지 유무
+        /// </summary>
+        /// <param name="nGroupID"></param>
+        /// <returns></returns>
+        public bool GetUseUIdlpData(int nGroupID)
+        {
+            (AppConfigInfo as SGopConfig).blistUiDlpShow ??= new List<bool>();
+
+            if ((AppConfigInfo as SGopConfig).blistUiDlpShow.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGopConfig).blistUiDlpShow[nGroupID];
+
+            return false;    // 기본값
         }
 
         public bool GetURLAutoAfterMsg(int nGroupID)
@@ -584,6 +627,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bApprLineChkBlock;
         }
+
         public bool GetUseApprDeptSearch(int groupID)
         {
             return AppConfigInfo.bApprDeptSearch;
@@ -621,10 +665,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bUseUserRecvDownPath;
         }
-        public bool GetUseEmailManageApprove(int groupID)
-        {
-            return AppConfigInfo.bUseEmail;
-        }
+
         public bool GetUsePCURL(int groupID)
         {
             return AppConfigInfo.bUsePCURL;
@@ -819,6 +860,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bUseClipBoardApproveReason;
         }
 
+        public bool GetUseFileSelectDelete()
+        {
+            return AppConfigInfo.bUseFileSelectDelete;
+        }
+
         public bool GetUseInitAlarmPerDay()
         {
             return AppConfigInfo.bUseInitAlarmPerDay;
@@ -840,6 +886,18 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             if ((AppConfigInfo as SGopConfig).bUseOver1Auth.Count >= nGroupID + 1)
                 return (AppConfigInfo as SGopConfig).bUseOver1Auth[nGroupID];
+
+            return false;    // 기본값
+        }
+
+
+
+        public bool GetUsePKIsendRecv(int nGroupID)
+        {
+            (AppConfigInfo as SGopConfig).bListUsePKIsendRecv ??= new List<bool>();
+
+            if ((AppConfigInfo as SGopConfig).bListUsePKIsendRecv.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGopConfig).bListUsePKIsendRecv[nGroupID];
 
             return false;    // 기본값
         }

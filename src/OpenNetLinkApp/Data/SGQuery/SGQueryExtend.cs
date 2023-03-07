@@ -5,7 +5,7 @@ using static OpenNetLinkApp.Common.Enums;
 
 namespace OpenNetLinkApp.Data.SGQuery
 {
-    class SGQueryExtend
+    public class SGQueryExtend
     {
         public SGQueryExtend()
         {

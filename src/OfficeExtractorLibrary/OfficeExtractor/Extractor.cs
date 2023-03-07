@@ -495,11 +495,11 @@ namespace OfficeExtractor
                         if (_passwordProtectedChecker.IsStreamProtected(inputFile).Protected)
                             ThrowPasswordProtected(inputFileName);
 
-                        if (extension == ".DOCX")
-                        {
+                        //if (extension == ".DOCX")
+                        //{
                             if (DocumentCorruptCheck(inputFile, outputFolder))
                                 throw new DocumentCorrupt("ERROR FILE CHANGE");
-                        }
+                        //}
 
                         // Word 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/word/embeddings/", outputFolder, "Word");
@@ -519,20 +519,21 @@ namespace OfficeExtractor
                         result = Excel.Extract(inputFile, outputFolder);
                         break;
 
-                    case ".XLSB":
-                    case ".XLSM":
                     case ".XLSX":
-                    case ".XLTM":
+                    case ".XLSM":
                     case ".XLTX":
+                    case ".XLTM":
+                    case ".XLSB":
+                    case ".XLAM":
                         if (_passwordProtectedChecker.IsStreamProtected(inputFile).Protected)
                             ThrowPasswordProtected(inputFileName);
 
-                        if (extension == ".XLSX")
-                        {
+                        //if (extension == ".XLSX")
+                        //{
                             if (DocumentCorruptCheck(inputFile, outputFolder))
                                 throw new DocumentCorrupt("ERROR FILE CHANGE");
 
-                        }
+                        //}
                         // Excel 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/xl/embeddings/", outputFolder, "Excel");
                         break;
@@ -561,21 +562,25 @@ namespace OfficeExtractor
                         result = PowerPoint.Extract(inputFile, outputFolder);
                         break;
 
-                    case ".POTM":
-                    case ".POTX":
-                    case ".PPSM":
-                    case ".PPSX":
-                    case ".PPTM":
                     case ".PPTX":
+                    case ".PPTM":
+                    case ".POTX":
+                    case ".POTM":
+                    case ".PPAM":
+                    case ".PPSX":
+                    case ".PPSM":
+                    case ".SLDX":
+                    case ".SLDM":
+                    case ".THMX":
                         if (_passwordProtectedChecker.IsStreamProtected(inputFile).Protected)
                             ThrowPasswordProtected(inputFileName);
 
-                        if (extension == ".PPTX")
-                        {
+                        //if (extension == ".PPTX")
+                        //{
                             if (DocumentCorruptCheck(inputFile, outputFolder))
                                 throw new DocumentCorrupt("ERROR FILE CHANGE");
 
-                        }
+                        //}
                         // PowerPoint 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/ppt/embeddings/", outputFolder, "PowerPoint");
                         break;

@@ -6,6 +6,8 @@ using HsNetWorkSGData;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
+
+    [Flags]
     public enum eLoginType
     {
         eLOGINTYPE_ORIGIN = 0,

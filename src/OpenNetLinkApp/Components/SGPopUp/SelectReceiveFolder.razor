@@ -662,7 +662,7 @@
         }
         catch (Exception ex0)
         {
-            CLog.Here().Error("GetParentError:" + ex0.Message);
+            CLog.Here().Error("LoadListFiles, GetParentError:" + ex0.Message);
         }
 
         IEnumerable<string> fList = null;
@@ -673,12 +673,12 @@
         }
         catch (UnauthorizedAccessException e)
         {
-            CLog.Here().Error("UnauthorizedAccessException:" + e.Message);
+            CLog.Here().Error("LoadListFiles, UnauthorizedAccessException:" + e.Message);
             Console.WriteLine(e.Message);
         }
         catch (Exception e2)
         {
-            CLog.Here().Error("Exception:" + e2.Message);
+            CLog.Here().Error("LoadListFiles, Exception:" + e2.Message);
             Console.WriteLine(e2.Message);
         }
 
@@ -722,7 +722,7 @@
         }
         catch (Exception ex3)
         {
-            CLog.Here().Error("Exception:" + ex3.Message);
+            CLog.Here().Error("LoadListFiles, Exception(MSG):" + ex3.Message);
         }
 
         string listHtml = makeSubFileList();

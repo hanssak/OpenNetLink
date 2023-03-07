@@ -90,12 +90,16 @@
   "bUseDenyPasswordZip": true,
   "bRecvFolderChange": true,
   "bUseCertSend": false,
-  "bUseEmail": false,
+  "blistUseEmail": [
+    false,
+    false,
+    false
+  ],
   "bUseForceUpdate": true,
   "bUsePCURL": false,
   "bUsePublicBoard": false,
   "bUseUserRecvDownPath": false,
-  "bUseUserSelectFirstServer": true,
+  "bUseUserSelectFirstServer": false,
   "bViewDlpApproverSelectMyDept": false,
   "bViewFileFilter": true,
   "bViewSGHeaderUIAlarmNoriAllDel": true,
@@ -136,5 +140,6 @@
   ],
   "bUseLoginAfterTray": false,
   "bUseFileApproveReason": false,
-  "bUseClipBoardApproveReason": false
+  "bUseClipBoardApproveReason": false,
+  "bUseFileSelectDelete" :  false
 }

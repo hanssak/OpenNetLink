@@ -2,6 +2,8 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using Radzen
 @using Radzen.Blazor
+@using AgLogManager
+
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
@@ -78,8 +80,8 @@
 
                                         @if (idx + 2 <= listDeniedReason.Count)
                                         {
-                                            <td>@listDeniedReason[idx+1].Item1</td>
-                                            <td>@listDeniedReason[idx+1].Item2</td>
+                                            <td>@listDeniedReason[idx + 1].Item1</td>
+                                            <td>@listDeniedReason[idx + 1].Item2</td>
                                         }
                                         else
                                         {
@@ -107,6 +109,7 @@
 
 @code {
 
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<Transfer_Denied>();
     public List<FileAddErr> listDenied = new List<FileAddErr>();
 
     @*public List<FileAddErr> listTreeDenied = new List<FileAddErr>();*@
@@ -138,16 +141,20 @@
         builder.OpenComponent<RadzenIcon>(0);
 
         string style = "";
-        if (errInfo.eErrType != eFileAddErr.eFANone)
+        if (errInfo.eErrType != eFileAddErr.eFANone)    //오류난 항목은 빨간색
         {
             builder.AddAttribute(1, "Icon", "cancel");
             style += "color: #D44867;";
         }
-        else if (errInfo.HasChildrenErr)
+        else if(errInfo.ChildrenFiles != null && errInfo.ChildrenFiles.Count > 0)        //하위항목이 있는 항목은 폴더아이콘
         {
-            builder.AddAttribute(1, "Icon", "info");
-            style += "color: #FFAA54;";
+            builder.AddAttribute(1, "Icon", "folder");
         }
+        //else if (errInfo.HasChildrenErr)                
+        //{
+        //    builder.AddAttribute(1, "Icon", "info");
+        //    style += "color: #FFAA54;";
+        //}
         else        //정상
         {
             builder.AddAttribute(1, "Icon", "check_circle");
@@ -169,10 +176,10 @@
                                             + "</div>";
         builder.AddContent(3, (MarkupString)htmlString);
 
-        @*builder.OpenComponent<Radzen>(0);*@
-        @*builder.OpenComponent<RadzenContent>(0);
-            builder.AddAttribute(1, "Style", "color: red");
-            builder.CloseComponent();*@
+    @*builder.OpenComponent<Radzen>(0);*@
+    @*builder.OpenComponent<RadzenContent>(0);
+        builder.AddAttribute(1, "Style", "color: red");
+        builder.CloseComponent();*@
     };
 
 
@@ -196,8 +203,44 @@
         strInnerErrorInfoMsg = XmlConf.GetInfoMsg("I_0231");                                    //내부파일 확인
     }
 
+    public void FileAddFailLog()
+    {
+        doDisplayFileAddErr(listDenied, 0);
+    }
+
+
+    /// <summary>
+    /// 파일추가 error 원인 SubFolder에 있는 파일들도 찾아서 출력(폴더우클릭 전송때 확인)
+    /// </summary>
+    /// <param name="listFileErrorLevel"></param>
+    /// <param name="nDepth"></param>
+    public void doDisplayFileAddErr(List<FileAddErr> listFileErrorLevel, int nDepth)
+    {
+
+        string strReason = "";
+
+        for (int i = 0; i < listFileErrorLevel.Count; i++)
+        {
+
+            if (listFileErrorLevel[i].eErrType != eFileAddErr.eFANone)
+            {
+                strReason = listFileErrorLevel[i].GetFileAddErrContent(strFileName, listFileErrorLevel[i].eErrType);
+                CLog.Here().Information($"### - 파일추가 실패 원인(추가한파일-Depth:{nDepth}) - FileAddErr : {listFileErrorLevel[i].eErrType}, " +
+                    $"ParentFileName : {listFileErrorLevel[i].ParentFileName}, FileName : {listFileErrorLevel[i].FileName}, Reason : {strReason}");
+            }
+
+            if (listFileErrorLevel[i].HasChildrenErr && (listFileErrorLevel[i].ChildrenFiles?.Count ?? 0) > 0)
+            {
+                doDisplayFileAddErr(listFileErrorLevel[i].ChildrenFiles, ++nDepth);
+            }
+        }
+    }
+
+
     public async Task openPopUp()
     {
+        FileAddFailLog();
+
         object[] param = { "Transfer_Denied" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }

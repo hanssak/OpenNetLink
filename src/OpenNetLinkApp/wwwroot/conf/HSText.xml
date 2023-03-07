@@ -526,12 +526,12 @@
 			<CN>帮助</CN>
 		</T_COMMON_HELP>
 
-		<T_COMMON_SIZE>
-			<KR>크기</KR>
-			<JP>サイズ</JP>
-			<EN>Size</EN>
-			<CN>大小</CN>
-		</T_COMMON_SIZE>
+		<T_COMMON_PKI_TRANS>
+			<KR>인증서전송</KR>
+			<JP>ヘルプ</JP>
+			<EN>Help</EN>
+			<CN>帮助</CN>
+		</T_COMMON_PKI_TRANS>
 
 		<T_COMMON_SIZE>
 			<KR>크기</KR>
@@ -539,6 +539,7 @@
 			<EN>Size</EN>
 			<CN>大小</CN>
 		</T_COMMON_SIZE>
+		
 		<T_COMMON_KIND>
 			<KR>유형</KR>
 			<JP>タイプ</JP>
@@ -853,6 +854,13 @@
 			<EN>Unused</EN>
 			<CN>未使用</CN>
 		</T_COMMON_DLP_UNUSE>
+		
+		<T_COMMON_DLP_CONTENTS>
+			<KR>개인정보검출내용</KR>
+			<JP>未使用</JP>
+			<EN>Personal information detection details</EN>
+			<CN>未使用</CN>
+		</T_COMMON_DLP_CONTENTS>
 
 		<T_COMMON_TRANSFAIL>
 			<KR>전송실패</KR>
@@ -1313,8 +1321,67 @@
 		</T_COMMON_APPROVE_EXT_ITEM>
 
 
+		<T_COMMON_EMPTY_CHAR>
+			<KR>공백</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_COMMON_EMPTY_CHAR>
+
+		<T_COMMON_OS_NOT_FILENAME_CHAR>
+			<KR>'{0}' 문자는 지원되지 않습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_COMMON_OS_NOT_FILENAME_CHAR>
+
 
 		<!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
+
+
+		<!-- ********************************************* [START] 메일 (T_MAIL_0000) ********************************************* -->
+
+		<!-- ******************* [START] 메일 (MailTransStatus) ********************** -->
+		
+		<T_MAIL_TRANSWAIT>
+			<KR>발송대기</KR>
+			<JP>転送待機</JP>
+			<EN>Waiting</EN>
+			<CN>等候传输</CN>
+		</T_MAIL_TRANSWAIT>
+
+		<T_MAIL_TRANSCANCLE>
+			<KR>발송취소</KR>
+			<JP>転送取消</JP>
+			<EN>Cancel</EN>
+			<CN>取消传输</CN>
+		</T_MAIL_TRANSCANCLE>
+
+		<T_MAIL_TRANS_SUCCESS>
+			<KR>발송완료</KR>
+			<JP>Success</JP>
+			<EN>Success</EN>
+			<CN>Success</CN>
+		</T_MAIL_TRANS_SUCCESS>
+
+		<T_MAIL_TRANSFRFAILED>
+			<KR>발송실패</KR>
+			<JP>On Transfering</JP>
+			<EN>On Transfering</EN>
+			<CN>On Transfering</CN>
+		</T_MAIL_TRANSFRFAILED>
+
+		<T_MAIL_INSPECT>
+			<KR>검사중</KR>
+			<JP>On Transfering</JP>
+			<EN>On Transfering</EN>
+			<CN>On Transfering</CN>
+		</T_MAIL_INSPECT>		
+		
+		<!-- ******************* [END] 메일 (MailTransStatus) ********************** -->
+
+		<!-- ********************************************* [END] 메일 (T_MAIL_0000) ********************************************* -->
+
 
 		<!-- ********************************************* [START] 메뉴 (T_MENU_0000) ********************************************* -->
 
@@ -1763,6 +1830,20 @@
 			<EN></EN>
 			<CN></CN>
 		</T_FILE_PATH>
+
+    <T_FILE_SELECT_DELETE>
+      <KR>선택삭제</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </T_FILE_SELECT_DELETE>
+
+    <T_FILE_SELECT_DELETE_COMMENT>
+      <KR>※체크박스 선택 후 선택삭제를 클릭해 주세요.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </T_FILE_SELECT_DELETE_COMMENT>
 
 		<!-- ********************************************* [END] 파일 전송 화면 (T_FILE_0000) ********************************************* -->
 
@@ -3019,6 +3100,21 @@
 		</T_COMMON_SAVE>
 
 		<!-- ********************************************* [END] 메일관련화면 (T_EMAIL_0000) ********************************************* -->
+
+
+
+		<!-- ********************************************* [START] 인증서전송 화면 (T_PKI_0000) ********************************************* -->
+
+		<T_PKI_MENU_NAME>
+			<KR>인증서전송</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PKI_MENU_NAME>
+
+		<!-- ********************************************* [END] 인증서전송 화면 (T_PKI_0000) ********************************************* -->
+
+
 
 		<!-- ********************************************* [START] 구글 OTP (T_GOOGLE_OTP_0000) ********************************************* -->
 
@@ -4417,6 +4513,40 @@
 		</T_FILE_RECEIVER_ADD>
 		<!-- ********************************************* [END] PC URL TITLE ********************************************* -->
 
+
+		<!-- ********************************************* [START] App 설정 (T_APPCONFIG_0000) ********************************************* -->
+		<T_EMAIL_APPROVE_DONE>
+			<KR>Email 승인작업이 완료 되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_EMAIL_APPROVE_DONE>
+
+		<T_EMAIL_APPROVE_FAILED>
+			<KR>Email 승인작업 실패 했습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_EMAIL_APPROVE_FAILED>
+		
+		
+		<T_EMAIL_REJECT_DONE>
+			<KR>Email 반려작업이 완료 되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_EMAIL_REJECT_DONE>
+		
+		<T_EMAIL_REJECT_FAILED>
+			<KR>Email 반려작업 실패 했습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_EMAIL_REJECT_FAILED>				
+
+		<!-- ********************************************* [END] EMAIL ********************************************* -->
+
+
 		<!-- ********************************************* [START] App 설정 (T_APPCONFIG_0000) ********************************************* -->
 
 		<T_APPCONFIG_COMMON>
@@ -5089,7 +5219,7 @@
 		</I_0020>
 
 		<I_0021>
-			<KR>전송취소가 완료되었습니다.</KR>
+			<KR>취소가 완료되었습니다.</KR>
 			<JP>送取消が完了しました。</JP>
 			<EN>Cancel the transfer is complete.</EN>
 			<CN>已完成取消传输。</CN>
@@ -6083,7 +6213,7 @@
 		</I_0162>
 
 		<I_0163>
-			<KR>클립보드 전송</KR>
+			<KR>클립보드 송신</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
@@ -6616,6 +6746,15 @@
 		<EN></EN>
 		<CN></CN>
 	</I_0240>
+
+    <I_0241>
+      <KR>새로운 메일승인 요청자료가 존재합니다.</KR>
+      <JP>新しいメール承認要請資料が </JP>
+      <EN>There are new mail approval request materials.</EN>
+      <CN>件待邮件审批的请求资料。</CN>
+    </I_0241>
+
+
     <!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
 	</INFO>
@@ -8564,16 +8703,40 @@
 			<CN></CN>
 		</W_0285>
 
-    <W_0286>
-      <KR>승인/반려사유를 입력해주십시오.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0286>
+	    <W_0286>
+	      <KR>승인/반려사유를 입력해주십시오.</KR>
+	      <JP></JP>
+	      <EN></EN>
+	      <CN></CN>
+	    </W_0286>
+
+	  <W_0287>
+	    <KR>검색 결과가 존재하지 않습니다.</KR>
+	    <JP></JP>
+	    <EN></EN>
+	    <CN></CN>
+	  </W_0287>
+
+	  <W_0288>
+	    <KR>더 높은 상위 경로로 이동할 수 없습니다.</KR>
+	    <JP></JP>
+	    <EN></EN>
+	    <CN></CN>
+	  </W_0288>
+
+	  <W_0289>
+	    <KR>읽기전용인 곳은 수신 경로로 지정할 수 없습니다.</KR>
+	    <JP></JP>
+	    <EN></EN>
+	    <CN></CN>
+	  </W_0289>
+
 
 	</WARNING>
 
-	<!-- ********************************************* [END] MSG WARNING (W_0000) ********************************************* -->
+
+
+  <!-- ********************************************* [END] MSG WARNING (W_0000) ********************************************* -->
 
 	<!-- ********************************************* [START] MSG ERROR (E_0000) ********************************************* -->
 
@@ -10001,7 +10164,7 @@
 		</E_0205>
 
 		<E_0206>
-			<KR>전송 취소 중 오류가 발생되었습니다.</KR>
+			<KR>취소 중 오류가 발생되었습니다.</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
@@ -10344,6 +10507,23 @@
 		<EN></EN>
 		<CN></CN>
 	</E_0255>
+
+	<E_0256>
+		<KR>지정한 경로에는 파일다운경로를 설정할 수 없습니다.&#10;다시 설정해 주십시오. [{0}]</KR>
+		<JP>最上位経路にはファイルダウンロード経路を設定することができません。&#10;再度設定してください。 [{0}]</JP>
+		<EN>You can not set the file download path to the top path.&#10;Please set back. [{0}]</EN>
+		<CN>最上级路径无法设置文件下载路径。&#10;请重新设置。[{0}]</CN>
+	</E_0256>
+
+
+    <E_0257>
+      <KR>WAS Server와 원활히 통신하지 못했습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </E_0257>
+
+
   </ERROR>
 	<!-- ********************************************* [END] MSG ERROR (E_0000) ********************************************* -->
 </TEXT>

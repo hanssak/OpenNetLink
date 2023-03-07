@@ -474,7 +474,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strMsg = string.Format("{0}|{1}|{2}", strFileName, "", MimeType);
                     break;
                 case eFileAddErr.eFADOC_EXTRACT_FILE_ADD_ONPURPOSE:
-                    if(strParentFileName == "")
+                    if (strParentFileName == "")
                         strMsg = string.Format("{0}|{1}|{2}", strFileName, "", MimeType);
                     else
                         strMsg = string.Format("{0}|{1}|{2}", strParentFileName, strFileName, MimeType);
@@ -493,6 +493,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
     public class FileAddManage
     {
+        public static object objLock = new object();
+        public static Dictionary<int, string> dicMimeConfData = new Dictionary<int, string>();
+
         private List<FileAddErr> m_FileAddErrList = new List<FileAddErr>();
 
         public List<(string reason, string count)> m_FileAddErrReason = new List<(string reason, string count)>();
@@ -522,6 +525,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                             , "XLS", "XLSB", "XLSM", "XLSX", "XLT", "XLTM", "XLTX", "XLW"
                                             , "POT", "PPT", "POTM", "POTX", "PPS", "PPSM", "PPSX", "PPTM", "PPTX"
                                             , "HML", "HWP", "HWPX"};
+
+        /// <summary>
+        /// 압축형식 내부검사가 필요한 파일 확장자 대상 목록
+        /// <para>ZIP, 7Z, TAR, GZ, TGZ</para>
+        /// </summary>
+        public readonly List<string> ListCheckableCompressExtension = new List<string>() { "ZIP", "7Z", "TAR", "GZ", "TGZ", "BZ2" };
 
         /// <summary>
         /// 전체경로길이 체크용
@@ -584,6 +593,79 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_FileAddErrList.Add(createFile);
             return createFile;
         }
+
+        /// <summary>
+        /// 파일 경로를 이용하여 트리 구성        
+        /// <br/>상대적 경로 정보만 알 수 있는 드래그앤드롭 파일의 트리를 구성하는 데 사용
+        /// <br/>Top Tree부터 트리 구성 시작
+        /// </summary>
+        /// <param name="dragFiilPath"></param>
+        /// <param name="seperatorChar"></param>
+        /// <returns></returns>
+        public FileAddErr SetFileTreeFromFilePath(string dragFiilPath, string seperatorChar)
+        {
+            int splitIdx = dragFiilPath.IndexOf(seperatorChar);
+            string name = (splitIdx < 0) ? dragFiilPath : dragFiilPath.Substring(0, splitIdx);
+            FileAddErr topFile = m_FileAddErrList.Find(na => na.FileName == name);
+
+            if (topFile == null)
+                topFile = CreateFileAddErrInfo(name, name, "");
+
+            return _setChild(topFile, dragFiilPath.Remove(0, name.Length));
+
+            FileAddErr _setChild(FileAddErr parentFile, string childPath)
+            {
+                try
+                {
+                    if (childPath.StartsWith(seperatorChar))
+                        childPath = childPath.Remove(0, seperatorChar.Length);
+
+                    if (string.IsNullOrEmpty(childPath))
+                        return parentFile;
+
+                    splitIdx = childPath.IndexOf(seperatorChar);
+                    string childName = (splitIdx < 0) ? childPath : childPath.Substring(0, splitIdx);
+                    FileAddErr childFile = parentFile.ChildrenFiles?.Find(ch => ch.FileName == childName);
+
+                    if (childFile == null)
+                        childFile = parentFile.CreateChildren(childName, Path.Combine(parentFile.FilePath, childName), parentFile.FileName);
+
+                    return _setChild(childFile, childPath.Remove(0, childName.Length));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    throw ex;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 파일 경로를 이용하여 트리 구성
+        /// <br/>전제 경로 정보를 알 수 있는 드롭 파일의 트리를 구성하는 데 사용
+        /// <br/>Top Tree 가 이미 구성되어 있고, 하위 트리 구성 시작
+        /// </summary>
+        /// <param name="parentFile"></param>
+        /// <param name="childInfo"></param>
+        /// <returns></returns>
+        public FileAddErr SetFileTreeFromFilePath(FileAddErr parentFile, FileInfo childInfo)
+        {
+            string relativePath = Path.GetRelativePath(parentFile.FilePath, childInfo.FullName);
+            string[] dirDivide = relativePath.Split(Path.DirectorySeparatorChar);
+
+            if(dirDivide.Length <=1)    //바로 하위 디렉토리인 경우, Tree 바로 구성하여 반환
+                return parentFile.CreateChildren(childInfo.Name, childInfo.FullName, parentFile.FileName);
+
+            //이후 경로가 존재할 경우 child 로 지정 후 재귀호출
+            string childDirName = dirDivide[0];
+            FileAddErr childDir = parentFile.ChildrenFiles?.Find(ch => ch.FileName == childDirName);
+
+            if(childDir == null)
+                childDir = parentFile.CreateChildren(childDirName, Path.Combine(parentFile.FilePath, childDirName), parentFile.FileName);
+
+            return SetFileTreeFromFilePath(childDir, childInfo);
+        }
+        //}
         //public void AddErrData(string strFilename, eFileAddErr err, string strFilePath, bool bSub = false, string strParentFileName = "")
         //{
         //    FileAddErr fileAddErr = new FileAddErr();
@@ -1475,7 +1557,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string[] strExtList = strStandardFileExtInfo.Split(sep);
             int count = strExtList.Length;
             if (count <= 0)
+            {
+                Log.Logger.Here().Information($"### - GetRegExtEnable, FileExt ';' empty!!!, return: {!bWhite} ");
                 return !bWhite;
+            }
 
             bool bFind = false;
             for (int i = 0; i < count; i++)
@@ -1487,6 +1572,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     break;
                 }
             }
+
+            Log.Logger.Here().Information($"### - GetRegExtEnable, isWhite:{bWhite}, Ext-Find : {bFind} , return: {(bWhite && bFind) || ((!bWhite) && (!bFind))} ");
 
             if (bWhite && bFind)
                 return true;
@@ -1683,6 +1770,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return false;
             }
 
+            Log.Logger.Here().Information($"### - GetExamFileAddEnable, BlackWhite : {(bWhite ? "WHITE!" : "BLACK!")}, FileExtInfo : {strFileExtInfo}, FileExt : {hsStream.Type}");
+
             //black, white 리스트 체크
             bExtEnable = GetRegExtEnable(bWhite, strFileExtInfo, hsStream.Type);
             if (!bExtEnable)
@@ -1716,6 +1805,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                                 : eFileAddErr.eFA_LONG_PATH_FILEORPATH;     //파일 및 폴더명 길이 초과
                 return false;
             }
+            
+            Log.Logger.Here().Information($"###################### - 파일이름 : {hsStream.FileName}, 파일크기 : {hsStream.Size} - ######################");
 
             //빈파일 체크 (0kb 허용)
             bEmpty = (bEmptyFIleNoCheck || GetEmptyEnable(hsStream.Size));//GetRegFileEmptyEnable(hsStream.Size);
@@ -2169,6 +2260,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 FindZipContent(btFileData, Encoding.UTF8.GetBytes("ppt")) == true)
                 return true;
 
+            if (String.Compare(strExt, "thmx", true) == 0 &&
+                FindZipContent(btFileData, Encoding.UTF8.GetBytes("_rels")) == true &&
+                FindZipContent(btFileData, Encoding.UTF8.GetBytes("[Content_Types].xml")) == true &&
+                FindZipContent(btFileData, Encoding.UTF8.GetBytes("docProps")) == true &&
+                FindZipContent(btFileData, Encoding.UTF8.GetBytes("theme")) == true)
+                return true;
+
+
             return false;
         }
         private static bool IsXPS(byte[] btFileData, string strExt)
@@ -2216,7 +2315,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     else return false;
                 }
             }
-
             return true;
         }
 
@@ -2852,17 +2950,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if (String.Compare(strExt, "xls", true) == 0 || String.Compare(strExt, "xlsx", true) == 0)
                     return IsXls(btFileData, strExt);
 
-                if (String.Compare(strExt, "ppt", true) == 0 || String.Compare(strExt, "pptx", true) == 0)
+                if (String.Compare(strExt, "ppt", true) == 0 || String.Compare(strExt, "pptx", true) == 0 || String.Compare(strExt, "thmx", true) == 0)
                     return IsPPT(btFileData, strExt);
 
                 if (String.Compare(strExt, "xps", true) == 0) return IsXPS(btFileData, strExt);
 
                 if (String.Compare(strExt, "hwp", true) == 0) return IsHWP(btFileData, strExt);
 
-                if (String.Compare(strExt, "txt", true) == 0 || String.Compare(strExt, "log", true) == 0 ||
+                // TXT 파일 분석기능은 mime 으로만 판단
+                /*if (String.Compare(strExt, "txt", true) == 0 || String.Compare(strExt, "log", true) == 0 ||
                     String.Compare(strExt, "ini", true) == 0 || String.Compare(strExt, "sql", true) == 0 ||
                     String.Compare(strExt, "conf", true) == 0)
-                    return IsTXT(btFileData, strExt);
+                    return IsTXT(btFileData, strExt);*/
 
                 /* 이미지 파일*/
                 if (String.Compare(strExt, "pdf", true) == 0) return IsPDF(btFileData, strExt);
@@ -3059,10 +3158,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             strExt = strExt.Replace(".", "");
             btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize2);
-            if (CheckExtForFileByteData(btFileData, strExt) == true)
-                return eFileAddErr.eFANone;
 
-            return eFileAddErr.eFACHG;
+            bool bIsExtForFileByteData = CheckExtForFileByteData(btFileData, strExt);
+
+            Log.Logger.Here().Information($"[IsValidFileExt] CheckExtForFileByteData, Ext : {strExt}, EXT isChanged : {!bIsExtForFileByteData}");
+
+            return (bIsExtForFileByteData ? eFileAddErr.eFANone : eFileAddErr.eFACHG);
         }
 
         public eFileAddErr IsValidFileExtInnerZip(string strFile, string strExt, bool blAllowDRM)
@@ -3098,7 +3199,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (CheckExtForFileByteData(btFileData, strExt) == true) return eFileAddErr.eFANone;
 
             return eFileAddErr.eUnZipInnerExtChange;
-        }      
+        }
 
         /// <summary>
         /// MimeType 및 확장자 정보 DB인 magic.mgc을 다른 파일로 갱신시 사용
@@ -4063,7 +4164,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             var ind = fileExt.LastIndexOf('.');
             if (ind != -1 && fileExt.Length > ind + 1)
             {
-                fileExt = fileName.Substring(ind + 1).ToLower();
+                fileExt = fileName.Substring(ind + 1);
             }
 
             if (gMimeTypeMap.Value.TryGetValue(mime, out string result))
@@ -4072,7 +4173,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 string[] exts = result.Split(' ');
                 foreach (var ext in exts)
                 {
-                    if (string.Compare(fileExt, ext) == 0) return true;
+                    if (string.Compare(fileExt, ext, true) == 0) return true;
                 }
             }
             return false;
@@ -4170,8 +4271,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 await stStream.CopyToAsync(fileStream);
                 fileStream.Close();
 
-                enRet = ScanZipFile(currentFile, strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, nOption, 1, blWhite, strExtInfo, 0,
-                    out nTotalErrCount, out strOverMaxDepthInnerZipFile, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, bDenyPasswordZIP);
+                enRet = ScanZipFile(currentFile, strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, nOption, 1, blWhite, strExtInfo, 0, hsStream.Type.ToUpper(),
+                    out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, bDenyPasswordZIP);
 
                 // KKW
                 /*if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
@@ -4208,13 +4309,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="currentFile">현재 Zip 파일</param>
         /// <param name="strOrgZipFile"></param>
         /// <param name="strOrgZipFileRelativePath"></param>
-        /// <param name="strZipFile"></param>
-        /// <param name="strBasePath"></param>
+        /// <param name="strZipFile">Temp/ZipExtract/ThisZipFiles</param>
+        /// <param name="strBasePath">압축을 해제한 경로 (Temp/ZipExtract)</param>
         /// <param name="nMaxDepth"></param>
         /// <param name="nBlockOption"></param>
         /// <param name="nCurDepth"></param>
-        /// <param name="blWhite"></param>
-        /// <param name="strExtInfo"></param>
+        /// <param name="blWhite">FileFilter Type(true:White방식)</param>
+        /// <param name="strExtInfo">FileFilter 정보</param>
         /// <param name="nErrCount"></param>
         /// <param name="nTotalErrCount"></param>
         /// <param name="strOverMaxDepthInnerZipFile"></param>
@@ -4225,213 +4326,305 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="bZipPasswdCheck"></param>
         /// <returns></returns>
         public eFileAddErr ScanZipFile(FileAddErr currentFile, string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nBlockOption, int nCurDepth,
-            bool blWhite, string strExtInfo, int nErrCount, out int nTotalErrCount, out string strOverMaxDepthInnerZipFile, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = true)
+            bool blWhite, string strExtInfo, int nErrCount, string strExtType, out int nTotalErrCount, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = true)
         {
             bIsApproveExt = false;
-            eFileAddErr enErr;
+            eFileAddErr enErr = eFileAddErr.eFANone;
             string strExt;
-            int nCurErrCount;
+            int nCurErrCount = nErrCount;
             string strOverMaxDepthZipFile = "";
+            int nInnerErrCount = 0;
 
-            var opts = new SharpCompress.Readers.ReaderOptions();
-            var encoding = Encoding.Default;
-
-            byte[] buff = null;
-            using (FileStream fsSource = new FileStream(strZipFile, FileMode.Open, FileAccess.Read))
-            {
-                BinaryReader br = new BinaryReader(fsSource);
-                long numBytes = 8;
-                buff = br.ReadBytes((int)numBytes);
-
-                //Zip File Foramt : Local File Header 구조 바이트 차트
-                //Signature 4byte / Version 2Byte / Flags 2Byte / => Flags Bit가 서로 다름 Mac의 경우 8 그 이외는 0
-                encoding = (buff[6] == 0x08) ? Encoding.Default : Encoding.GetEncoding(949);
-            }
-
-            opts.ArchiveEncoding = new SharpCompress.Common.ArchiveEncoding();
-            opts.ArchiveEncoding.CustomDecoder = (data, x, y) =>
-            {
-                return encoding.GetString(data);
-            };
-
-            //2022.10.06 BY kYH sharpPress 버전업하며, WriteToDirectory 호출 시 존재하지 않는 폴더는 오류가 발생하여 추가
-            DirectoryInfo dirZipInner = new DirectoryInfo(strBasePath);
-            if (dirZipInner.Exists != true) dirZipInner.Create();
-
-            enErr = eFileAddErr.eFANone;
-            nCurErrCount = nErrCount;
             try
             {
-                using (var archive = ArchiveFactory.Open(strZipFile, opts))
+                FileInfo scanFileInfo = new FileInfo(strZipFile);
+                DirectoryInfo dirUnzipFilesDir = null;
+
+                //스캔대상이 파일인 경우만 압축 해제 시도
+                if (scanFileInfo.Attributes != FileAttributes.Directory)
                 {
-                    foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
+                    string strTempUnzipDirPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(strZipFile)); //Temp에 Copy된 문서의 압축해제 개체를 보관할 폴더 (Temp/ZipExtract/ZipName)
+                    dirUnzipFilesDir = new DirectoryInfo(strTempUnzipDirPath);
+                    if (dirUnzipFilesDir.Exists != true) dirUnzipFilesDir.Create();
+
+                    #region [검사를 위해 임시 폴더에 압축 해제]
+                    eFileAddErr unzipResult = unzipFile(strZipFile, strTempUnzipDirPath, nCurDepth, SGFileExamEvent, ExamCount, TotalCount, bZipPasswdCheck);
+                    if (unzipResult != eFileAddErr.eFANone)
                     {
-                        FileAddErr childFile = currentFile.CreateChildren(entry.Key, strOrgZipFileRelativePath, currentFile.FileName);            //zip파일의 자식 File 생성
+                        //비밀번호 등의 문제로 압축해제 실패 시 검사 실패 return
+                        currentFile.eErrType = unzipResult;
+                        nTotalErrCount = nCurErrCount++;
+                        return unzipResult;
+                    }
+                    #endregion
+                }
+                else
+                {
+                    dirUnzipFilesDir = new DirectoryInfo(strZipFile);
+                }
 
-                        Log.Logger.Here().Information("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
-                        int per = (ExamCount * 100) / TotalCount;
-                        if (per < 20)
-                            per = 20;
+                //압축해제 내부 파일 검사
+                foreach (FileSystemInfo extractFile in dirUnzipFilesDir.GetFileSystemInfos())
+                {
+                    FileAddErr childFile = currentFile.CreateChildren(extractFile.Name, strOrgZipFileRelativePath, currentFile.FileName);            //zip파일의 자식 File 생성
 
-                        if (SGFileExamEvent != null)
-                            SGFileExamEvent(per, entry.Key);
+                    string key_relativePathFileName = Path.GetRelativePath(strBasePath, extractFile.FullName);
 
-                        // Check Password	
-                        if (entry.IsEncrypted == true && bZipPasswdCheck == true)
-                        {
-                            if (nCurDepth != 1)
-                            {
-                                childFile.eErrType = eFileAddErr.eUnZipInnerZipPassword;
-                                enErr = eFileAddErr.eUnZipInnerZipPassword;
+                    Log.Logger.Here().Information("[ScanZipFile] Check File[{0}] in {1} (Depth[{2}])", key_relativePathFileName, Path.GetFileName(strZipFile), nCurDepth);
+                    int per = (ExamCount * 100) / TotalCount;
+                    if (per < 20)
+                        per = 20;
 
-                                //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(strZipFile), enErr, Path.GetFileName(strZipFile));
-                            }
-                            else
-                            {
-                                currentFile.eErrType = eFileAddErr.eFAZipPW;        //하위 파일이 아닌 검사 대상 자체 ZIP에 암호화된 경우
-                                enErr = eFileAddErr.eFAZipPW;
-                                nCurErrCount++;
-                            }
-                            nTotalErrCount = nCurErrCount;
-                            strOverMaxDepthInnerZipFile = strOverMaxDepthZipFile;
-                            return enErr;
-                        }
+                    if (SGFileExamEvent != null)
+                        SGFileExamEvent(per, extractFile.Name);
 
-                        // Check FileName Length 
-                        bool bSuper = false;
-                        if (nCurDepth == 1 && (FileFolderNameLength(entry.Key, out bSuper) != true || FilePathLength(entry.Key) != true))
-                        {
-                            enErr = eFileAddErr.eUnZipInnerLengthOver;
-                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, entry.Key, enErr, Path.GetFileName(strZipFile));
-                            childFile.eErrType = eFileAddErr.eUnZipInnerLengthOver;
-                            currentFile.HasChildrenErr = true;
-                            nCurErrCount++;
-                            continue;
-                        }
+                    // Check FileName Length 
+                    bool bSuper = false;
+                    if (nCurDepth == 1 && (FileFolderNameLength(key_relativePathFileName, out bSuper) != true || FilePathLength(key_relativePathFileName) != true))
+                    {
+                        enErr = eFileAddErr.eUnZipInnerLengthOver;
+                        //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, entry.Key, enErr, Path.GetFileName(strZipFile));
+                        childFile.eErrType = eFileAddErr.eUnZipInnerLengthOver;
+                        currentFile.HasChildrenErr = true;
+                        nCurErrCount++;
+                        continue;
+                    }
 
-                        // Check Directory 
-                        if (entry.IsDirectory == true) continue;
+                    if (extractFile.Attributes == FileAttributes.Directory)
+                    {
+                        //디렉토리는 내부 항목 검사
+                        eFileAddErr enRetDir = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, extractFile.FullName, Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.Name)), nMaxDepth, nBlockOption, nCurDepth,
+                                                            blWhite, strExtInfo, nCurErrCount, "", out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
 
-                        // Check Empty File 
-                        // 0kb 파일 허용(기본)
-                        if (bEmptyFIleNoCheck == false && entry.Size <= 0)
-                        {
-                            enErr = eFileAddErr.eUnZipInnerFileEmpty;
-                            childFile.eErrType = eFileAddErr.eUnZipInnerFileEmpty;
-                            currentFile.HasChildrenErr = true;
-                            nCurErrCount++;
-                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
-                            continue;
-                        }
-
-                        // Check Block File Extension
-                        strExt = Path.GetExtension(entry.Key);
-                        if (GetRegExtEnable(blWhite, strExtInfo, strExt.Replace(".", "")) != true)
-                        {
-                            enErr = eFileAddErr.eUnZipInnerExt;
-                            childFile.eErrType = eFileAddErr.eUnZipInnerExt;
-                            currentFile.HasChildrenErr = true;
-                            nCurErrCount++;
-                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
-                            continue;
-                        }
-
-                        // Extract File in Zip 
-                        entry.WriteToDirectory(strBasePath, new ExtractionOptions()
-                        {
-                            ExtractFullPath = true,
-                            Overwrite = true,
-                        });
-
-                        // Check Changed File Extension 
-                        enErr = IsValidFileExtInnerZip(Path.Combine(strBasePath, entry.Key), strExt.Replace(".", ""), blAllowDRM);
-                        if (enErr != eFileAddErr.eFANone)
-                        {
-                            childFile.eErrType = enErr;
-                            currentFile.HasChildrenErr = true;
-                            nCurErrCount++;
-                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
-                            continue;
-                        }
-
-                        // 필수결재 확장자인지 확인
-                        if (strApproveExt.Length > 0)
-                        {
-                            if (CsFunction.isFileExtinListStr(false, strExt, strApproveExt))
-                                bIsApproveExt = true;
-                        }
-
-                        // Check Zip File  (압축파일 내 압축파일이 또 존재하는 경우.
-                        if ((String.Compare(strExt, ".zip", true) != 0) && (String.Compare(strExt, ".7z", true) != 0)) continue;
-
-                        if (nCurDepth >= nMaxDepth)
-                        {
-                            Log.Logger.Here().Information($"[ScanZipFile] Skip to check zip file[{Path.GetFileName(strZipFile)}]. MaxDepth[{nMaxDepth}] CurDepth[{nCurDepth}] BlockOption[{nBlockOption}] Remain Zip File[{strZipFile}] in {strOrgZipFile}");
-                            strOverMaxDepthZipFile = entry.Key;
-
-                            //2022.10.07 BY KYH - CLIENT_ZIP_DEPTH 의 Block 옵션 활용
-                            if (nBlockOption <= 0)
-                            {
-                                // kkw 추가
-                                enErr = eFileAddErr.eUnZipInnerLeftZip;
-                                childFile.eErrType = eFileAddErr.eUnZipInnerLeftZip;
-                                currentFile.HasChildrenErr = true;
-                                nCurErrCount++;
-                                //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
-                            }
-                            continue;
-                        }
-
-                        // Scan Zip File in Zip
-                        int nInnerErrCount = 0;
-                        string strCurZip = Path.Combine(strBasePath, entry.Key);
-                        string strExtractPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(entry.Key));
-
-                        eFileAddErr enRet = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, strCurZip, strExtractPath, nMaxDepth, nBlockOption, nCurDepth + 1,
-                            blWhite, strExtInfo, nCurErrCount, out nInnerErrCount, out strOverMaxDepthZipFile, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
-
-                        if (enRet != eFileAddErr.eFANone) enErr = enRet;
+                        if (enRetDir != eFileAddErr.eFANone) enErr = enRetDir;
                         if (childFile.HasChildrenErr) currentFile.HasChildrenErr = true;
                         nCurErrCount += nInnerErrCount;
+                        continue;
                     }
+
+                    // Check Empty File 
+                    // 0kb 파일 허용(기본)
+                    FileInfo fileInfo = new FileInfo(extractFile.FullName);
+                    if (bEmptyFIleNoCheck == false && fileInfo.Length <= 0)
+                    {
+                        enErr = eFileAddErr.eUnZipInnerFileEmpty;
+                        childFile.eErrType = eFileAddErr.eUnZipInnerFileEmpty;
+                        currentFile.HasChildrenErr = true;
+                        nCurErrCount++;
+                        //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
+                        continue;
+                    }
+
+                    // Check Block File Extension
+                    strExt = Path.GetExtension(extractFile.Name);
+                    string strNoDotExt = strExt.Replace(".", "");
+                    Log.Logger.Here().Information($"### - ScanZipFile, BlackWhite : {(blWhite ? "WHITE!" : "BLACK!")}, FileExtInfo : {strExtInfo}, FileExt : {strNoDotExt}");
+
+                    if (GetRegExtEnable(blWhite, strExtInfo, strExt.Replace(".", "")) != true)
+                    {
+                        enErr = eFileAddErr.eUnZipInnerExt;
+                        childFile.eErrType = eFileAddErr.eUnZipInnerExt;
+                        currentFile.HasChildrenErr = true;
+                        nCurErrCount++;
+                        //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
+                        continue;
+                    }
+
+                    //// Extract File in Zip 
+                    //entry.WriteToDirectory(strBasePath, new ExtractionOptions()
+                    //{
+                    //    ExtractFullPath = true,
+                    //    Overwrite = true,
+                    //});
+
+                    // Check Changed File Extension 
+                    enErr = IsValidFileExtInnerZip(extractFile.FullName, strExt.Replace(".", ""), blAllowDRM);
+                    if (enErr != eFileAddErr.eFANone)
+                    {
+                        childFile.eErrType = enErr;
+                        currentFile.HasChildrenErr = true;
+                        nCurErrCount++;
+                        //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
+                        continue;
+                    }
+
+                    // 필수결재 확장자인지 확인
+                    if (strApproveExt.Length > 0)
+                    {
+                        if (CsFunction.isFileExtinListStr(false, strExt, strApproveExt))
+                            bIsApproveExt = true;
+                    }
+
+                    // Check Zip File  (압축파일 내 압축파일이 또 존재하는 경우.
+                    if (!ListCheckableCompressExtension.Exists(ext => ext == strExt.Replace(".", "").ToUpper())) continue;
+                    //if ((String.Compare(strExt, ".zip", true) != 0) && (String.Compare(strExt, ".7z", true) != 0)) continue;
+
+                    if (nCurDepth >= nMaxDepth)
+                    {
+                        Log.Logger.Here().Information($"[ScanZipFile] Skip to check zip file[{extractFile.Name} in {Path.GetFileName(strZipFile)}]. MaxDepth[{nMaxDepth}] CurDepth[{nCurDepth}] BlockOption[{nBlockOption}] Remain Zip File[{strZipFile}] in {strOrgZipFile}");
+                        strOverMaxDepthZipFile = extractFile.Name;
+
+                        //2022.10.07 BY KYH - CLIENT_ZIP_DEPTH 의 Block 옵션 활용
+                        if (nBlockOption <= 0)
+                        {
+                            // kkw 추가
+                            enErr = eFileAddErr.eUnZipInnerLeftZip;
+                            childFile.eErrType = eFileAddErr.eUnZipInnerLeftZip;
+                            currentFile.HasChildrenErr = true;
+                            nCurErrCount++;
+                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
+                        }
+                        continue;
+                    }
+
+                    // Scan Zip File in Zip
+
+                    string strCurZip = extractFile.FullName;// Path.Combine(strBasePath, entry.Key);
+                                                            //                    string strExtractPath = strExtractFilePath;//Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.));
+
+                    eFileAddErr enRet = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, strCurZip, Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.Name)), nMaxDepth, nBlockOption, nCurDepth + 1,
+                        blWhite, strExtInfo, nCurErrCount, Path.GetExtension(extractFile.Name).Substring(1), out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
+
+                    if (enRet != eFileAddErr.eFANone) enErr = enRet;
+                    if (childFile.HasChildrenErr) currentFile.HasChildrenErr = true;
+                    nCurErrCount += nInnerErrCount;
                 }
-            }
-            catch (System.Exception ex)
-            {
-                if (bZipPasswdCheck == true)
+
+                nTotalErrCount = nCurErrCount;
+
+                // 가장 마지막에 난 error 값 넣음
+                if (nTotalErrCount > 0)
                 {
-                    // Check Passowrd in 7zip(7z)
-                    if (nCurDepth != 1)
-                    {
-                        enErr = eFileAddErr.eUnZipInnerZipPassword;
-                        currentFile.eErrType = eFileAddErr.eUnZipInnerZipPassword;
-                        nCurErrCount++;
-                        //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(strZipFile), enErr, Path.GetFileName(strZipFile));
-                    }
-                    else
-                    {
-                        enErr = eFileAddErr.eFAZipPW;
-                        currentFile.eErrType = eFileAddErr.eFAZipPW;
-                        nCurErrCount++;
-                    }
-                    nTotalErrCount = nCurErrCount;
-                    strOverMaxDepthInnerZipFile = strOverMaxDepthZipFile;
-                    return enErr;
+                    FileAddErr faerr = m_FileAddErrList.ElementAt<FileAddErr>(m_FileAddErrList.Count - 1);
+                    enErr = faerr.eErrType;
                 }
+
+                return enErr;
             }
-
-            nTotalErrCount = nCurErrCount;
-            strOverMaxDepthInnerZipFile = strOverMaxDepthZipFile;
-
-            // 가장 마지막에 난 error 값 넣음
-            if (nTotalErrCount > 0)
-            {
-                FileAddErr faerr = m_FileAddErrList.ElementAt<FileAddErr>(m_FileAddErrList.Count - 1);
-                enErr = faerr.eErrType;
-            }
-
-            return enErr;
+            catch (Exception ex) { throw ex; }
         }
+
+        /// <summary>
+        /// 압축형식 파일 임시 폴더에 압축해제
+        /// </summary>
+        /// <param name="fileFullName"></param>
+        /// <param name="destFullPath"></param>
+        public eFileAddErr unzipFile(string fileFullName, string destFullPath, int nCurDepth, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = true)
+        {
+            try
+            {
+                //2022.10.06 BY kYH sharpPress 버전업하며, WriteToDirectory 호출 시 존재하지 않는 폴더는 오류가 발생하여 추가
+                DirectoryInfo destPath = new DirectoryInfo(destFullPath);
+                if (destPath.Exists == false) destPath.Create();
+
+                string fileName = Path.GetFileName(fileFullName);
+                string extType = Path.GetExtension(fileFullName).Substring(1).ToUpper();
+
+                switch (extType)
+                {
+                    case "ZIP":
+                    case "7Z":
+                        #region [ZIP/7Z 형식 검사]        
+                        var opts = new SharpCompress.Readers.ReaderOptions();
+                        var encoding = Encoding.Default;
+
+                        byte[] buff = null;
+                        using (FileStream fsSource = new FileStream(fileFullName, FileMode.Open, FileAccess.Read))
+                        {
+                            BinaryReader br = new BinaryReader(fsSource);
+                            long numBytes = 8;
+                            buff = br.ReadBytes((int)numBytes);
+
+                            //Zip File Foramt : Local File Header 구조 바이트 차트
+                            //Signature 4byte / Version 2Byte / Flags 2Byte / => Flags Bit가 서로 다름 Mac의 경우 8 그 이외는 0
+                            encoding = (buff[6] == 0x08) ? Encoding.Default : Encoding.GetEncoding(949);
+                        }
+
+                        opts.ArchiveEncoding = new SharpCompress.Common.ArchiveEncoding();
+                        opts.ArchiveEncoding.CustomDecoder = (data, x, y) =>
+                        {
+                            return encoding.GetString(data);
+                        };
+
+                        try
+                        {
+                            using (var archi = ArchiveFactory.Open(fileFullName, opts))
+                            {
+                                Log.Logger.Here().Information("[unzipFile] Try Unzip File[{0}]", fileName);
+
+                                int per = (ExamCount * 100) / TotalCount;
+                                if (per < 20)
+                                    per = 20;
+
+                                if (SGFileExamEvent != null)
+                                    SGFileExamEvent(per, fileName);
+
+                                foreach (var entry in archi.Entries.Where(entry => !entry.IsDirectory))
+                                {
+                                    // Check Password	
+                                    if (entry.IsEncrypted == true && bZipPasswdCheck == true)
+                                        return (nCurDepth == 1) ? eFileAddErr.eFAZipPW : eFileAddErr.eUnZipInnerZipPassword;
+
+                                    //그냥 만들고 시작하는게 나을 거 같다.
+                                    // Extract File in Zip 
+                                    entry.WriteToDirectory(destFullPath, new ExtractionOptions()
+                                    {
+                                        ExtractFullPath = true,
+                                        Overwrite = true,
+                                    });
+                                }
+                            }
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            if (bZipPasswdCheck == true)
+                                return (nCurDepth == 1) ? eFileAddErr.eFAZipPW : eFileAddErr.eUnZipInnerZipPassword;
+                        }
+                        #endregion [ZIP/7Z 형식 검사]
+                        break;
+                    case "TAR":
+                    case "GZ":
+                    case "TGZ":
+                    case "BZ2":
+                        #region [TAR 형식 검사]        
+
+                        try
+                        {
+                            Log.Logger.Here().Information("[unzipFile] Try Decompress File[{0}]", fileName);
+
+                            int per = (ExamCount * 100) / TotalCount;
+                            if (per < 20)
+                                per = 20;
+
+                            if (SGFileExamEvent != null)
+                                SGFileExamEvent(per, fileName);
+                            CsFunction.TarFileDecompress(fileFullName, destFullPath);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            if (bZipPasswdCheck == true)
+                                return (nCurDepth == 1) ? eFileAddErr.eFAZipPW : eFileAddErr.eUnZipInnerZipPassword;
+                        }
+                        #endregion [TAR 형식 검사]
+                        break;
+                }
+                return eFileAddErr.eFANone;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        void scanDecompressedFile()
+        {
+
+        }
+
+
+
 
         /// <summary>
         /// 문서검사
@@ -4481,7 +4674,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             {
                 try
                 {
-                    Directory.Delete(strDocumentExtractRootPath, true);
+                    if (Directory.Exists(strDocumentExtractRootPath))
+                        Directory.Delete(strDocumentExtractRootPath, true);
                 }
                 catch (System.Exception err)
                 { Log.Logger.Here().Warning("[CheckDocumentFile] Fail Directory.Delete() " + err.Message + " " + err.GetType().FullName); }
@@ -4633,6 +4827,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             continue;
                         }
 
+                        Log.Logger.Here().Information($"### - scanDocumentFile, BlackWhite : {(isWhite ? "WHITE!" : "BLACK!")}, FileExtInfo : {fileFilterExtInfo}, FileExt : {oleExtension}");
+
                         //File Fileter 체크
                         if (!GetRegExtEnable(isWhite, fileFilterExtInfo, oleExtension))
                         {
@@ -4697,42 +4893,72 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public void LoadMimeConf(int groupID)
         {
-            string strFileName = String.Format("FileMime.{0}.conf", groupID.ToString());
-            strFileName = Path.Combine("wwwroot/conf", strFileName);
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            lock (objLock)
             {
-                strFileName = strFileName.Replace("/", "\\");
-            }
-            else
-            {
-                strFileName = strFileName.Replace("\\", "/");
-            }
-            try
-            {
-                string strEncMimeInfo = System.IO.File.ReadAllText(strFileName);
-                SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                string strMimeInfo = sgRSACrypto.MimeConfDecrypt(strEncMimeInfo);
 
-                if (strMimeInfo.Equals(""))
-                    return;
-
-                if (strMimeInfo[strMimeInfo.Length - 1] == '\n')
-                    strMimeInfo = strMimeInfo.Substring(0, strMimeInfo.Length - 1);
-                string[] strMimeList = strMimeInfo.Split('\n');
-                if (strMimeList.Length <= 1)
-                    return;
-                for (int i = 1; i < strMimeList.Length; i++)
+                string strFileName = String.Format("FileMime.{0}.conf", groupID.ToString());
+                strFileName = Path.Combine("wwwroot/conf", strFileName);
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    string[] strSplit = strMimeList[i].Split(' ');
-                    if (strSplit.Length < 2)
-                        continue;
-                    MimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
+                    strFileName = strFileName.Replace("/", "\\");
                 }
-            }
-            catch (FileNotFoundException ioEx)
-            {
-                Log.Logger.Here().Error("LoadMimeConf Exception Msg = [{0}]", ioEx.Message);
-            }
+                else
+                {
+                    strFileName = strFileName.Replace("\\", "/");
+                }
+
+                try
+                {
+                    string strEncMimeInfo = System.IO.File.ReadAllText(strFileName);
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strMimeInfo = sgRSACrypto.MimeConfDecrypt(strEncMimeInfo);
+
+                    if (strMimeInfo.Equals(""))
+                        return;
+
+                    string strMimeSavedData = "";
+                    bool bShowMimeLog = false;
+                    if (dicMimeConfData.TryGetValue(groupID, out strMimeSavedData))
+                    {
+                        if (strMimeSavedData != strEncMimeInfo)
+                        {
+                            if (dicMimeConfData.Remove(groupID))
+                                bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
+                        }
+                    }
+                    else
+                    {
+                        bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
+                    }
+
+                    //if (bShowMimeLog == false)
+                    //    Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Skip MimeType Display");
+
+
+                    if (strMimeInfo[strMimeInfo.Length - 1] == '\n')
+                        strMimeInfo = strMimeInfo.Substring(0, strMimeInfo.Length - 1);
+                    string[] strMimeList = strMimeInfo.Split('\n');
+                    if (strMimeList.Length <= 1)
+                        return;
+                    for (int i = 1; i < strMimeList.Length; i++)
+                    {
+                        string[] strSplit = strMimeList[i].Split(' ');
+                        if (strSplit.Length < 2)
+                            continue;
+
+                        if (bShowMimeLog)
+                            Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Add MimeType : {strSplit[0]}, Ext : {strSplit[1]}");
+
+                        MimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
+                    }
+                }
+                catch (FileNotFoundException ioEx)
+                {
+                    Log.Logger.Here().Error($"LoadMimeConf, GroupID:{groupID}, Exception Msg = [{ioEx.Message}]");
+                }
+
+            } // lock (objLock)
+
         }
 
         public void SetOLEMimeList(int groupID, List<Dictionary<int, string>> oleMimeList)
@@ -4749,7 +4975,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                     //OLE 개체의 MimeType 정보를 fileAddManage의 정적 변수로 등록
                     if (!gOLEMimeTypeMap.Value.Contains(mimetype))
+                    {
                         gOLEMimeTypeMap.Value.Add(mimetype);
+                        //  Log.Logger.Here().Information($"OLEMimeList - MimeType : {mimetype}");
+                    }
                 }
             }
         }

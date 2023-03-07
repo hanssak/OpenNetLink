@@ -16,6 +16,10 @@ using HsNetWorkSG;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.InteropServices;
 using IWshRuntimeLibrary;
+using System.IO.Compression;
+using SharpCompress.Common;
+using SharpCompress.Readers;
+using OpenNetLinkApp.Data.SGDicData.SGAlz;
 
 namespace OpenNetLinkApp.Common
 {
@@ -147,9 +151,11 @@ namespace OpenNetLinkApp.Common
             else if (option == "MailTransStatus")
             {
                 values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
-                values.Add(_xmlConfInstance.GetTitle("T_COMMON_TRANSWAIT"));     //전송대기
-                values.Add(_xmlConfInstance.GetTitle("T_COMMON_TRANS_SUCCESS")); //전송완료
-                values.Add(_xmlConfInstance.GetTitle("T_COMMON_TRANSFAIL"));     //전송실패
+                values.Add(_xmlConfInstance.GetTitle("T_MAIL_TRANSWAIT"));          //발송대기
+                values.Add(_xmlConfInstance.GetTitle("T_MAIL_TRANSCANCLE"));        //발송취소
+                values.Add(_xmlConfInstance.GetTitle("T_MAIL_TRANS_SUCCESS"));      //발송완료
+                values.Add(_xmlConfInstance.GetTitle("T_MAIL_TRANSFRFAILED"));      //발송실패
+                values.Add(_xmlConfInstance.GetTitle("T_MAIL_INSPECT"));            //검사중
             }
             else if (option == "ApproveStatus")
             {
@@ -163,8 +169,9 @@ namespace OpenNetLinkApp.Common
             {
                 values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
                 values.Add(_xmlConfInstance.GetTitle("T_COMMON_APPROVE_WAIT"));
-                values.Add(_xmlConfInstance.GetTitle("T_DASH_APPROVE_COMPLETE"));
-                values.Add(_xmlConfInstance.GetTitle("T_DASH_APPROVE_REJECT"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_APPROVE"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_REJECTION"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_REQUESTCANCEL"));
             }
             else if (option == "ApproveKind")
             {
@@ -181,8 +188,9 @@ namespace OpenNetLinkApp.Common
             else if (option == "DlpValue")
             {
                 values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
-                values.Add(_xmlConfInstance.GetTitle("T_COMMON_DLP_INCLUSION"));
                 values.Add(_xmlConfInstance.GetTitle("T_COMMON_DLP_NOTINCLUSION"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_DLP_INCLUSION"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_DLP_UNKNOWN"));
             }
             else if (option == "DataType")
             {
@@ -300,6 +308,66 @@ namespace OpenNetLinkApp.Common
             tempVal = Encoding.UTF8.GetString(temp);
             return tempVal;
         }
+        /// <summary>
+        /// gz파일 압축해제
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="destPath"></param>
+        public static void GzFileDecompress(string filePath, string destPath)
+        {
+            using (FileStream originalFileStream = System.IO.File.OpenRead(filePath))
+            {
+                string currentFileName = filePath;
+                string newFileName = Path.Combine(destPath, Path.GetFileName(currentFileName.Remove(currentFileName.Length - Path.GetExtension(filePath).Length)));
+
+                using (FileStream decompressedFileStream = System.IO.File.Create(newFileName))
+                {
+                    using (GZipStream decompressionStream = new GZipStream(originalFileStream, CompressionMode.Decompress))
+                    {
+                        decompressionStream.CopyTo(decompressedFileStream);
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// tar, tgz, tar.gz 파일 압축해제
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="destPath"></param>
+        public static void TarFileDecompress(string filePath, string destPath)
+        {
+            using (Stream stream = System.IO.File.OpenRead(filePath))
+            {
+                using (var reader = ReaderFactory.Open(stream))
+                {
+                    while (reader.MoveToNextEntry())
+                    {
+                        if (!reader.Entry.IsDirectory)
+                        {
+                            reader.WriteEntryToDirectory(destPath, new ExtractionOptions()
+                            {
+                                ExtractFullPath = true,
+                                Overwrite = true
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        public static int AlzFileDecompress(string filePath, string destPath)
+        {
+            //alz file 압축풀기
+            SGUnAlz lib = new SGUnAlz();
+            int ret = 0;
+
+#if _WINDOWS
+            ret = lib.UnAlzExtractWDll(filePath, destPath);
+#else
+            ret = lib.UnAlzExtractDll(filePath, destPath);
+#endif
+            return ret;
+        }
     }
 
     public class CsSeqFunc
@@ -334,7 +402,7 @@ namespace OpenNetLinkApp.Common
                 }
                 catch (Exception e)
                 {
-                    Log.Information($"GetFileSize - Exception - msg : {e.Message}, path : {filePath}");
+                    Log.Logger.Here().Information($"GetFileSize - Exception - msg : {e.Message}, path : {filePath}");
                     lSize = -1;
                 }
                 finally
@@ -345,6 +413,80 @@ namespace OpenNetLinkApp.Common
 
             return lSize;
         }
+
+
+        /// <summary>
+        /// Windows / Linux / Mac OSx 에서 다 지원하는 파일명인지 확인하는 함수<br></br>
+        /// return : true - 지원함
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="strItem"></param>
+        /// <returns></returns>
+        public static bool isSupportFileName(string fileName, out string strItem)
+        {
+
+            Log.Logger.Here().Information($"isSupportFileName - fileName : {fileName}");
+
+            // 빈문자인지 확인
+            if ((fileName?.Length ?? 0) == 0)
+            {
+                strItem = "$EMPTY";
+                return false;
+            }
+
+            fileName = fileName.Replace(" ", "");
+            if ((fileName?.Length ?? 0) == 0)
+            {
+                strItem = "$EMPTY";
+                return false;
+            }
+
+
+            // File / Folder 이름으로 정해질 수 없는 문자 있는지 확인
+
+            // Windows
+            string strNotSupportData = "\\/:*?\"<>";
+
+            // Linux
+            // "/"
+
+            // Mac ( Finder)
+
+
+            // 문자 1개라도 허용불가능 
+            char[] chNotSupport = strNotSupportData.ToCharArray();
+
+            for (int i = 0; i < chNotSupport.Length; i++)
+            {
+                if (fileName.IndexOf(chNotSupport[i]) >= 0)
+                {
+                    strItem = chNotSupport[i].ToString();
+                    Log.Logger.Here().Information($"isSupportFileName - Not Support Char(###-Char)(Windows) : {strItem}");
+                    return false;
+                }
+            }
+
+            // 단어전체 동일할때 허용불가능
+            if (fileName == "." ||  // Linux
+                fileName == "..")
+            {
+                strItem = fileName;
+                Log.Logger.Here().Information($"isSupportFileName - Not Support FileName(###-Word)(Linux) : {strItem}");
+                return false;
+            }
+
+            // 특정문자로 시작될때 허용불가능 
+            if (fileName.IndexOf('.') == 0)
+            {
+                strItem = ".";
+                Log.Logger.Here().Information($"isSupportFileName - Not Support Start Char(###-StartChar)(MacOSx) : {"."}");
+                return false;
+            }
+
+            strItem = "";
+            return true;
+        }
+
     }
 
     public class CsHashFunc
@@ -405,8 +547,6 @@ namespace OpenNetLinkApp.Common
             string[] strArgumentArry = System.Environment.GetCommandLineArgs();
             strAgentPath = strArgumentArry[0];
 
-            Log.Information($"GetCurrentProcessName - Before(###) : {strAgentPath}");
-
             int nIdex = strArgumentArry[0].LastIndexOf(".");
             if (bGetExePath && nIdex > 0)
             {
@@ -414,7 +554,7 @@ namespace OpenNetLinkApp.Common
                 strAgentPath += ".exe";
             }
 
-            Log.Information($"GetCurrentProcessName - After(###) : {strAgentPath}");
+            Log.Information($"GetCurrentProcessName : {strAgentPath}");
 
             return strAgentPath;
         }
@@ -512,5 +652,37 @@ namespace OpenNetLinkApp.Common
 
     }
 
+    public class CsWASfunc
+    {
+
+        public static string GetErrorCodeToStr(string strData)
+        {
+            string strMsg = "";
+
+            if (strData == "-1")
+                strMsg = "ID 정보를 수신받지 못했습니다.";
+            else if (strData == "-2")
+                strMsg = "PW 정보를 수신받지 못했습니다.";
+            else if (strData == "-3")
+                strMsg = "사용자 인증 실패 되었습니다.";
+            else if (strData == "-4")
+                strMsg = "사용자가 존재하지 않습니다.";
+            else if (strData == "-5")
+                strMsg = "입력한 PW가 틀립니다.";
+            else if (strData == "-6")
+                strMsg = "내부시스템(서버오류 및 DB 접근 오류 등)에서 오류가 발생되었습니다.";
+            else
+                strMsg = "사용자 인증과정 중 알수없는 오류가 발생하였습니다.";
+
+            return strMsg;
+        }
+
+        public static string stringIDpwJsonString(string strID, string strPW)
+        {
+            string json = "{\n\"id\":\"" + strID + "\",\n\"pw\":\"" + strPW + "\"\n}";
+            return json;
+        }
+
+    }
 
 }

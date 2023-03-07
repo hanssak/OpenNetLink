@@ -433,6 +433,13 @@ namespace OpenNetLinkApp.Services
                 //매일 자정마다 Alram & Message 정보 삭제
                 if (svrTime.Hour == 0 && PageStatusData.DeleteAlramAndMessage != null)  //매일 자정마다 실행
                     PageStatusData.DeleteAlramAndMessage();
+
+                //매일 자정마다 오래된 로그 삭제
+                if (svrTime.Hour == 0)
+                {
+                    AgLogManager.HsLogDel hsLog = new AgLogManager.HsLogDel();
+                    hsLog.Delete(7);    // 7일이전 Log들 삭제
+                }
             }
         }
 

@@ -173,7 +173,11 @@
                                     <th style="text-align: center; vertical-align: middle; width: 15%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
                                     <th style="text-align: center; vertical-align: middle; width: 14%">@strApproveReqDay</th>                            <!--승인요청일-->
                                     <th style="text-align: center; vertical-align: middle; width: 14%">@strApproveDay</th>                                  <!--승인일-->
-                                    <th style="text-align: center; vertical-align: middle; width: 7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>                        <!--개인정보-->
+                                    @if (bUseDlpDataView)
+                                    { 
+                                        <th style="text-align: center; vertical-align: middle; width: 7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>                        <!--개인정보-->
+                                    }
+
                                     <th style="text-align: center; vertical-align: middle; width: 7%">@strApproveDetail</th>                             <!--상세보기-->
                                 </tr>
                             </thead>
@@ -201,7 +205,10 @@
                                         <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                         <td style="text-align: center; vertical-align: middle">@item.RequestTime</td>
                                         <td style="text-align: center; vertical-align: middle">@item.ApvTime</td>
-                                        <td style="text-align: center; vertical-align: middle">@item.stDLP</td>
+                                        @if (bUseDlpDataView)
+                                        { 
+                                            <td style="text-align: center; vertical-align: middle">@item.stDLP</td>
+                                        }
                                         <td style="text-align: center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                     </tr>
                                 }
@@ -275,6 +282,8 @@
     public int menuMode { get; set; } = 0;
     [Parameter]
     public int groupIDbyParam { get; set; }
+
+    bool bUseDlpDataView = true;
 
     ApprovePopUp refApprovePopUp;
     SGCustomSelect refSGCustomSelect;
@@ -432,8 +441,19 @@
     private void AfterLimitUpdateDate()
     {
         refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
-        strApprKindValue = "후결";
-        strApprStatusValue = "승인대기";
+        strApprKindValue = XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE");
+        strApprStatusValue = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
+
+        ApproveSearchCount();
+    }
+
+    private void ApproveWaitAllUpdateDate()
+    {
+        refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
+        
+        strTransKindValue = XmlConf.GetTitle("T_COMMON_ALL");
+        strApprKindValue = XmlConf.GetTitle("T_COMMON_ALL");
+        strApprStatusValue = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
 
         ApproveSearchCount();
     }
@@ -445,6 +465,7 @@
     {
         Console.WriteLine("Open Detail Start" + transSeq);
         long ltransSeq = Convert.ToInt64(transSeq);
+        refApprovePopUp.bUseDlpDataView = bUseDlpDataView;
         await refApprovePopUp.openPopUp(ltransSeq);
     }
 
@@ -547,6 +568,8 @@
         // 데이터 리프레쉬 등록
         HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI, UpdateData);
         HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUIAfter, AfterLimitUpdateDate);
+        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveWaitAllUI, ApproveWaitAllUpdateDate);
+    
 
         strDestNetWork = strTotal;
 
@@ -557,6 +580,8 @@
         }
 
         approveTypesfm = sgLoginData.GetApproveTypeSFM();
+
+        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
 
         @*GetInitDateTime(out strFromDay, out strToDay);*@
 
@@ -579,8 +604,14 @@
             if (menuMode == 1)
             {
                 refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
-                strApprKindValue = "후결";
-                strApprStatusValue = "승인대기";
+
+                strApprKindValue = XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE");
+                strApprStatusValue = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
+            }
+            else if (menuMode == 2)
+            {
+                refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
+                strApprStatusValue = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
             }
             await ApproveSearchCount();
         }
@@ -774,6 +805,8 @@
         }
         return strApprSeq;
     }
+
+    
     public SGApproveData GetApprListData(string strTransSeq)
     {
         SGApproveData tdata = null;

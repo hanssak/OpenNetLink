@@ -246,7 +246,7 @@
         </div>
     }
 
-    @if (m_bUseMainPageType)
+    @if (m_bUseMainPage)
     {
         <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_MAINPAGE_SETTING")</div> <!--화면설정-->
         <div class="ml-2 mb-4">
@@ -648,7 +648,6 @@
 
 
     public bool m_bUseClipAlarmType = true;                                             // 클립보드 알림 형식 사용 유무
-    public bool m_bUseMainPageType = true;                                               // 메인페이지 형식 사용 유무
     public bool m_bUseClipCopyAndSend = false;                                           // 클립보드 복사 후 전송 사용 유무
     public bool m_bUseURLRedirectionAlarm = true;                                       // URL 자동전환 알림 사용 유무
     public bool m_bUseURLRedirectionAlarmType = true;                                   // URL 자동전환 알림 타입 선택 사용 유무
@@ -681,6 +680,8 @@
 
     private async Task openSaveDirPopup(int Idx, string dir)
     {
+
+        refSelectSaveFolder.nGroupid = Idx;
         await refSelectSaveFolder.openPopUp(Idx, dir);
 
         object[] param2 = { "0" };
@@ -1911,7 +1912,7 @@
             SGSvrData sgSvrData = null;
             sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(NetworkInfo.GroupID);
             if (sgSvrData == null)
-                return;
+                continue;
 
             eLoginType eLoginTypeData = sgSvrData.GetLoginType();
 
@@ -1931,12 +1932,7 @@
             //m_bUseClipBoard = (m_bUseClipAlarmType | m_bUseClipCopyAndSend);
         }
 
-        if (m_bUseMainPage)
-        {
-            // siteConfig. json으로 이동
-            m_bUseMainPageType = SGAppMgrSvc.OpConfigInfoService.GetUseMainPageTypeChange();
-            m_bUseMainPage = (m_bUseMainPageType);
-        }
+        m_bUseMainPage = SGAppMgrSvc.OpConfigInfoService.GetUseMainPageTypeChange();
 
 
         if (m_bUseFileSend)

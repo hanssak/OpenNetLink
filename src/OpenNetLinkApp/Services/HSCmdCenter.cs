@@ -558,7 +558,7 @@ namespace OpenNetLinkApp.Services
                     VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
                     break;
                 case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
-                    EmailApproveNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId, sgData);
+                    EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
                     break;
                 case eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
                     BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
@@ -1020,6 +1020,10 @@ namespace OpenNetLinkApp.Services
             int[] nArryDeleteTime = new int[hSCmdCenter.m_nNetWorkCount];
             string strDownPath = "";
 
+            bool bDisplayCycle = false;
+            int nHour = -1;
+            DateTime nowData = DateTime.Now;
+
             while (true)
             {
                 // 30초마다 한번씩 삭제 동작 : NetLink 기준
@@ -1041,24 +1045,30 @@ namespace OpenNetLinkApp.Services
                                 PageStatusService.m_DicPageStatusData[nIdx].GetConnectStatus() == true)
                                 bIsLogin = true;
                         }
+
+                        if (bIsLogin && sgLoginData != null)
+                            nArryDeleteTime[nIdx] = sgLoginData.GetFileRemoveCycle();
                     }
 
-                    if (bIsLogin && sgLoginData != null)
+                    if (bDisplayCycle)
                     {
-                        nArryDeleteTime[nIdx] = sgLoginData.GetFileRemoveCycle();
-                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DELETECYCLE : {nArryDeleteTime[nIdx]}");
+                        // Log 시간단위로 출력
+                        nowData = DateTime.Now;
+                        if (nHour != nowData.Hour)
+                        {
+                            nHour = nowData.Hour;
+                            CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , " + $"{ ((bIsLogin && sgLoginData != null) ? $"DELETECYCLE : { nArryDeleteTime[nIdx]} " : "Logout Status!") }");
+                        }
                     }
                     else
                     {
-                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , Logout Status!");
+                        // Log 첫출력
+                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , " + $"{ ( (bIsLogin && sgLoginData != null) ? $"DELETECYCLE : { nArryDeleteTime[nIdx]} " : "Logout Status!") }");
+                        bDisplayCycle = true;
+                        nowData = DateTime.Now;
+                        nHour = nowData.Hour;
                     }
 
-
-                }
-
-
-                for (nIdx = 0; nIdx < hSCmdCenter.m_nNetWorkCount; nIdx++)
-                {
                     if (nArryDeleteTime[nIdx] > 0)
                     {
                         // 삭제주기 설정된 값마다 삭제
@@ -1501,6 +1511,8 @@ namespace OpenNetLinkApp.Services
                 if (!strCount.Equals(""))
                     e.count = Convert.ToInt32(strCount);
                 e.strMsg = "";
+                e.strDummy = "4";
+
                 sNotiEvent(groupId, cmd, e);
             }
         }
@@ -2005,6 +2017,15 @@ namespace OpenNetLinkApp.Services
             int ret = 0;
             if (hsNetWork != null)
                 ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, 0, loginType);
+            return 0;
+        }
+
+        public int LoginNotCheckPw(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType = 0)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            int ret = 0;
+            if (hsNetWork != null)
+                ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, 9, loginType);
             return 0;
         }
 

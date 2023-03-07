@@ -50,8 +50,19 @@
                                 <th>@strFilePos</th>  <!--파일위치-->
                                 <td style="text-align:center;">@strDataFilePos</td>
                                 <!--<th>@strReciver</th> -->   <!--수신자-->
-                                <th>@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
-                                <td style="text-align:center;">@stDLP</td>
+
+                                @if (bUseDlpDataView)
+                                {
+                                    <th>@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
+                                    <td style="text-align:center;">@stDLP</td>
+                                }
+				                else
+				                {
+                                    <th></th>
+                                    <td style="text-align:center;"></td>				
+				                }
+				
+
                             </tr>
 
                             <tr>
@@ -111,7 +122,13 @@
                                 <th style="text-align: center; width: 7%;">@strFileSize </th>             <!--크기-->
                                 <th style="text-align: center;">@strVirusHist </th>         <!--바이러스내역-->
                                 <th style="text-align: center;">@strVirusCheckDate </th>     <!--바이러스검사-->
-                                <th style="text-align: center;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>     <!--개인정보 내역-->
+
+                                @if (bUseDlpDataView)
+                                {
+                                    <th style="text-align: center;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
+                                    <!--개인정보 내역-->
+                                }
+
                             </tr>
                         </thead>
                         <tbody>
@@ -133,7 +150,11 @@
                                     <td style="text-align: center;">@item.strFileSize</td>
                                     <td style="text-align: center;">@item.strVirusHistory</td>
                                     <td style="text-align: center;">@item.strVirusExamDay</td>
-                                    <td style="text-align: center; width: 20%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.stDLPDesc</td>
+
+                                    @if (bUseDlpDataView)
+                                    { 
+                                        <td style="text-align: center; width: 20%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.stDLPDesc</td>
+                                    }
                                 </tr>
                             }
                         </tbody>
@@ -570,6 +591,8 @@ using (Process proc = Process.Start(startInfo))
 
     public bool m_bFilePrevOpening = false;
 
+    public bool bUseDlpDataView = true;
+
     @*    public string strFromServerNetOver = "";        // 3망상황 시작지
         public string strDestServerNetOver = "";        // 3망상황 목적지*@
 
@@ -608,6 +631,8 @@ using (Process proc = Process.Start(startInfo))
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         InitText();
         HsCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FilePrevProgressNoti);
+
+    bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
     }
 
 
