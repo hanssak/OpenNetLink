@@ -1557,7 +1557,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string[] strExtList = strStandardFileExtInfo.Split(sep);
             int count = strExtList.Length;
             if (count <= 0)
+            {
+                Log.Logger.Here().Information($"### - GetRegExtEnable, FileExt ';' empty!!!, return: {!bWhite} ");
                 return !bWhite;
+            }
 
             bool bFind = false;
             for (int i = 0; i < count; i++)
@@ -1569,6 +1572,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     break;
                 }
             }
+
+            Log.Logger.Here().Information($"### - GetRegExtEnable, isWhite:{bWhite}, Ext-Find : {bFind} , return: {(bWhite && bFind) || ((!bWhite) && (!bFind))} ");
 
             if (bWhite && bFind)
                 return true;
@@ -1765,6 +1770,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return false;
             }
 
+            Log.Logger.Here().Information($"### - GetExamFileAddEnable, BlackWhite : {(bWhite ? "WHITE!" : "BLACK!")}, FileExtInfo : {strFileExtInfo}, FileExt : {hsStream.Type}");
+
             //black, white 리스트 체크
             bExtEnable = GetRegExtEnable(bWhite, strFileExtInfo, hsStream.Type);
             if (!bExtEnable)
@@ -1798,8 +1805,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                                 : eFileAddErr.eFA_LONG_PATH_FILEORPATH;     //파일 및 폴더명 길이 초과
                 return false;
             }
-
-            Log.Information($@"###################### - 파일이름 : {hsStream.FileName}, 파일크기 : {hsStream.Size} - ######################");
+            
+            Log.Logger.Here().Information($"###################### - 파일이름 : {hsStream.FileName}, 파일크기 : {hsStream.Size} - ######################");
 
             //빈파일 체크 (0kb 허용)
             bEmpty = (bEmptyFIleNoCheck || GetEmptyEnable(hsStream.Size));//GetRegFileEmptyEnable(hsStream.Size);
@@ -4410,6 +4417,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                     // Check Block File Extension
                     strExt = Path.GetExtension(extractFile.Name);
+                    string strNoDotExt = strExt.Replace(".", "");
+                    Log.Logger.Here().Information($"### - ScanZipFile, BlackWhite : {(blWhite ? "WHITE!" : "BLACK!")}, FileExtInfo : {strExtInfo}, FileExt : {strNoDotExt}");
 
                     if (GetRegExtEnable(blWhite, strExtInfo, strExt.Replace(".", "")) != true)
                     {
@@ -4817,6 +4826,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             Log.Logger.Here().Information($"No check OLE Step2 for EMPTY FILEFILTER(;)");
                             continue;
                         }
+
+                        Log.Logger.Here().Information($"### - scanDocumentFile, BlackWhite : {(isWhite ? "WHITE!" : "BLACK!")}, FileExtInfo : {fileFilterExtInfo}, FileExt : {oleExtension}");
 
                         //File Fileter 체크
                         if (!GetRegExtEnable(isWhite, fileFilterExtInfo, oleExtension))

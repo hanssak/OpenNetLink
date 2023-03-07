@@ -30,7 +30,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bStartTrayMove { get; set; } = false;                                   // 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
         public bool bStartProgramReg { get; set; } = false;                                 // 시작 프로그램 등록 ( true : 시작프로그램 등록, false : 시작프로그램 등록 해제 )
 
-        public bool bScreenLock { get; set; } = true;                                       // 화면잠금 사용 여부.(체크)
+        public bool bScreenLock { get; set; } = false;                                       // 화면잠금 사용 여부.(체크)
         public bool bScreenLockUserChange { get; set; } = false;                            //스크린 잠금 사용자 임의 변경 가능여부
         public bool bUseApprWaitNoti { get; set; } = true;                                  // 승인대기 알림 사용 여부.(체크)
         public bool bUseLogLevel { get; set; } = false;                                     // 로그 레벨 사용 여부
@@ -121,7 +121,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bViewDlpApproverSelectMyDept { get; set; } = false;   // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
         public bool bClipBoardNoApproveButFileTrans { get; set; } = false;   // 클립보드 파일전송 사용 형태로 결재없이 동작
         public int nClipAfterApproveUseType { get; set; } = 0;   // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
-        public bool bUseUserSelectFirstServer { get; set; } = true;   // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
+        public bool bUseUserSelectFirstServer { get; set; } = false;   // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
 
         public bool bUseFileForward { get; set; } = false;   // 파일포워드 기능 사용유무
 
@@ -132,7 +132,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseInitMessagePerDay { get; set; } = false; // 일일 이전 날짜 메세지 자동 삭제
 
-        public bool bVisiblePolicyUpdateButton { get; set; } = false; //정책 업데이트 버튼 보여주기
+        public bool bVisiblePolicyUpdateButton { get; set; } = true; //정책 업데이트 버튼 보여주기
         /// <summary>
         /// ////////////////////////////////
         /// </summary>
@@ -180,5 +180,8 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseFileSelectDelete { get; set; }                          //파일 선택 삭제 사용 유무
 
+
+        public List<bool> bListUsePKIsendRecv { get; set; } = null;             // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
+        
     }
 }

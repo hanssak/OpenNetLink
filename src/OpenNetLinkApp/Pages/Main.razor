@@ -26,6 +26,7 @@
 @using System.Xml.Linq
 @using OpenNetLinkApp.Common
 @using System.Collections.Concurrent;
+@using System.Text.Json;
 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
@@ -97,7 +98,7 @@
                                                 <table style="width:100%;">
                                                     <tr>
                                                         <td>
-                                                            <button id="btnLogin" @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="6" disabled="@bLoginBtnDisable">LOGIN</button>
+                                                            <button id="btnLogin" @onclick="ClickdoLogin" class="full_login_btn btn mb-3" tabindex="6" disabled="@bLoginBtnDisable">LOGIN</button>
                                                         </td>
                                                         <td>
                                                             <button id="btnLoginCancel" @onclick="doBack" class="full_cancel_btn btn mb-3" tabindex="7" disabled="@bLoginBtnDisable">Cancel</button>
@@ -232,7 +233,7 @@
         //Enter 로 인한 로그인은 [로그인] 버튼이 존재하는  AD 외 로그인 타입만 적용토록 변경
         if (arg.Key == "Enter" )
         {
-            CLog.Here().Information($"keyCheck - ENTER - ###### - try login");
+            CLog.Here().Information($"keyCheck, ENTER Key - ###### - try login");
             ClickdoLogin();
         }
     }
@@ -246,7 +247,6 @@
         int groupid = pageService.m_nCurViewPageGroupID;
 
         CLog.Here().Information($"ClickdoLogin - login - groupid : {groupid}");
-        //if (arg.Key == "Enter" && pageService.m_nLoginType != (int)eLoginType.eLOGINTYPE_AD)
 
         bLoginBtnDisable = true;
         StateHasChanged();
@@ -358,7 +358,7 @@
             if (strCurCliVersion.Equals(""))
                 return;
 
-            CLog.Here().Information("[Main] LogIn Type:" + pageService.m_nLoginType.ToString());
+            CLog.Here().Information($"[Main] LogIn Type (######) : {pageService.m_nLoginType.ToString()}, GroupIDLoginType : {pageService.GetGroupIDLoginType(groupid)}");
             HSCmdCenter.SetCliVersion(strCurCliVersion);
 
 
@@ -385,7 +385,7 @@
         }
         catch (Exception ex)
         {
-            CLog.Here().Error($"doLogIn - Exception Msg : {ex.Message}");
+            CLog.Here().Error($"doLogIn - Exception(Msg) : {ex.Message}");
             Debug.WriteLine(ex.Message);
         }
     }
@@ -507,12 +507,6 @@
 #endif
             pw = pw.ToLower();
 
-            // PW 암호화해서 Log남김
-            string strCheckData = "";
-            SGRSACrypto sgRSACrypto = new SGRSACrypto();
-            sgRSACrypto?.ValueEncrypt(pw, out strCheckData);
-            CLog.Here().Information($"ADLogin - ###### - PWCheck : {strCheckData}");
-
             ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";
             string strPlatform = "";
@@ -558,6 +552,9 @@
         }
 
     }
+
+
+
     /// <summary>
     ///
     /// </summary>
@@ -1009,7 +1006,7 @@
                     pageService.SetConnectStatus(groupId, true);
                     pageService.SetLogoutStatus(groupId, false);
 
-                    CLog.Here().Information($"groupID : {groupId} - User Do Login(GPKI_Main), UrlRedirection LogIn State ReSet !!!");
+                    CLog.Here().Information($"LoginResultOnetoAll, groupID : {groupId}, User Do Login, UrlRedirection LogIn State ReSet !!!");
                     HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupId, true);
 
                     SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
@@ -1021,6 +1018,7 @@
                             break;
                         Thread.Sleep(50);
                     }
+                    CLog.Here().Information($"LoginResultOnetoAll, groupID : {groupId}, Recved Sfm Data !!!");
                     sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
                     HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));
@@ -1315,6 +1313,16 @@
                 else
                 {
 
+                    // PW 암호화해서 Log남김
+
+                    if (pageService.GetGroupIDLoginType(groupId) == eLoginType.eLOGINTYPE_AD)
+                    {
+                        string strCheckData = "";
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        sgRSACrypto?.ValueEncrypt(pw, out strCheckData);
+                        CLog.Here().Information($"LoginResultOnetoAll, RetVal : {ret}, LoginType : {pageService.GetGroupIDLoginType(groupId)}, Login Fail - PWCheck : {strCheckData}");
+                    }
+
                     //await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
 
                     //bLoginBtnDisable = false; //버튼 활성화는 finally로 이동
@@ -1372,7 +1380,7 @@
                                 if (bLoginResult)
                                 {
                                     nGroupIDfirst = Net.GroupID;
-                                    CLog.Here().Information($"LoginResultOnetoAll(##############) eLOGINTYPE_ORIGIN - IDPW Check - GroupID : {groupId}, Saved-GroupID : {nGroupIDfirst}, Ret : {ret}, CHECKED!");
+                                    CLog.Here().Information($"LoginResultOnetoAll(########) , LoginType : {pageService.GetGroupIDLoginType(Net.GroupID)} , GroupID : {groupId}, Saved-GroupID : {nGroupIDfirst}, Ret : {ret}, CHECKED!");
                                     break;
                                 }
                             }
@@ -1403,7 +1411,7 @@
 
                 // nGroupIDfirst : 로그인된 제일 첫번째 GroupID
 
-                CLog.Here().Information($"LoginResultOnetoAll(##############) eLOGINTYPE_ORIGIN - IDPW Check - GroupID : {groupId}, Saved-GroupID : {nGroupIDfirst}, START!");
+                CLog.Here().Information($"LoginResultOnetoAll, LoginType : {pageService.GetGroupIDLoginType(groupId)}, GroupID : {groupId}, Saved-GroupID : {nGroupIDfirst}, START!");
 
                 SGUserData sgUserData = null;
                 SGLoginData sgLoginData = null;
@@ -1491,7 +1499,7 @@
 
                 }
 
-                CLog.Here().Information($"1 to ALL Login, GroupID : {nGroupIDfirst}, First Screen !");
+                CLog.Here().Information($"LoginResultOnetoAll, 1 to ALL Login, GroupID : {nGroupIDfirst}, First Screen !");
 
                 string strNavigatePathnGroupID = "";
 
@@ -1527,7 +1535,7 @@
                 // SideBarUI 에서 nGroupIDfirst로 지정된 UI로 선택
                 MoveSiderBarFocusTogroupid(nGroupIDfirst);
 
-                CLog.Here().Information($"LoginResultOnetoAll - IDPW Check - GroupID : {groupId}, Saved-GroupID : {nGroupIDfirst}, Ret : {ret}, END!");
+                CLog.Here().Information($"LoginResultOnetoAll, LoginType : {pageService.GetGroupIDLoginType(groupId)}, GroupID : {groupId}, Saved-GroupID : {nGroupIDfirst}, END!");
 
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray()) //(SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
                 {
@@ -1577,6 +1585,9 @@
         await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
         int ret = e.result;
 
+        bStartedLogin = false;
+        bLoginBtnDisable = false;
+
         if (ret == 0)
         {
 
@@ -1611,7 +1622,7 @@
                     break;
                 Thread.Sleep(50);
             }
-
+            CLog.Here().Information($"LoginResultOnetoAll, groupID : {groupId}, Recved Sfm Data !!!");
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
 
@@ -2002,6 +2013,13 @@
         }
         else
         {
+
+            // PW 암호화해서 Log남김
+            string strCheckData = "";
+            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+            sgRSACrypto?.ValueEncrypt(pw, out strCheckData);
+            CLog.Here().Information($"LoginResult, Login Fail - PWCheck : {strCheckData}");
+
             //await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
             bLoginBtnDisable = false;
             string strPopupMsg = "";
@@ -2166,6 +2184,7 @@
                 }
             }
         }
+
         //메뉴루프 시작
         for (int i = 0; i < count; i++)
         {
@@ -2337,6 +2356,14 @@
                         SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
                 }
 
+                // 인증서전송(6)
+                if (SGAppMgrSvc.OpConfigInfoService.GetUsePKIsendRecv(groupid))
+                {
+                    strNavigatePathWithGroupID = "/pkiTransfer/";
+                    strNavigatePathWithGroupID += gID.ToString();
+                    if (SideBarUISvc.FindSubMenu(gID, nParentID, 6) == null)
+                        SideBarUISvc.AddSubMenu(groupId: gID, Id: 6, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_PKI_TRANS"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strUserSeq);
+                }
 
                 if (bEmailUse)
                 {

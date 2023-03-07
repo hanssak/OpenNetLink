@@ -679,7 +679,8 @@
                             hsStream.RelativePath = hsStream.RelativePath;
 
                         hsStream.isNeedApprove = false;
-                        if ((hsStream.Type.Equals("Directory")) || (hsStream.Type.Equals("Hidden, Directory")))
+                        //if ((hsStream.Type.Equals("Directory")) || (hsStream.Type.Equals("Hidden, Directory")))
+                        if ( (item.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
                         {
                             hsStream.Size = 0;
                             hsStream.Type = "DIR";
@@ -696,10 +697,7 @@
                                 if (CsFunction.isFileExtinListStr(true, fInfo.Extension, sgLoginData.GetExceptionExt()))
                                     hsStream.isNeedApprove = true;
                             }
-                        }
 
-                        if (hsStream.Type.Contains("Archive"))//(hsStream.Type.Equals("Archive"))
-                        {
                             if (item.Name.LastIndexOf(".") > -1)
                                 hsStream.Type = item.Name.Substring(item.Name.LastIndexOf(".") + 1);
                             else
@@ -715,6 +713,28 @@
 
                             hsStream.IsDir = false;
                         }
+
+                        CLog.Here().Information($"DirSearch - AfterData, fileName : {hsStream.FileName}, DirOrFile : {(hsStream.IsDir?"DIR !!!":"FILE !!!")}");
+
+                        // hsStream.Type.Equals("Archive")
+                        @*if (string.Compare(hsStream.Type, "Archive", true) == 0 ||
+                            string.Compare(hsStream.Type, "Normal", true) == 0)
+                        {
+                            if (item.Name.LastIndexOf(".") > -1)
+                                hsStream.Type = item.Name.Substring(item.Name.LastIndexOf(".") + 1);
+                            else
+                                hsStream.Type = "";
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                            }
+                            else
+                            {
+                                hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                            }
+
+                            hsStream.IsDir = false;
+                        }*@
 
                         hsStream.ModifyTime = item.LastWriteTime;
                         DateTime SubDate = (DateTime)hsStream.ModifyTime;
@@ -819,7 +839,6 @@
         if (!existErr || usePartialFileAdd) SetFileAdd(listTryHsStream);
 
         // Important: Invoke StateHasChanged() to update the page
-        StateHasChanged();
         // 파일 추가후 화면갱신
         StateHasChanged();
         await jsRuntime.InvokeAsync<object>("setDropzoneInputSize");
@@ -1364,11 +1383,13 @@
             System.IO.FileInfo fInfo = new System.IO.FileInfo(item);
             temp.Add(fInfo);
             DirSearch(item, temp);
+            CLog.Here().Information($"### - DirSearch, Directories : {item}");
         }
 
         foreach (var item in di.GetFiles())
         {
             temp.Add(item);
+            CLog.Here().Information($"######### - DirSearch, files-Name : {item.FullName}, Ext:{item.Extension}, files-Attributes(###) : {item.Attributes.ToString()}");
         }
         return temp;
     }
@@ -1643,6 +1664,8 @@
 
         //fileAddErr.SetUseOSmaxPath(SGAppMgrSvc.OpConfigInfoService.GetUseOSMaxFilePath());
         HSCmdCenter.SetUseOSMaxPath(groupID, true);
+
+        CLog.Here().Information($"Ext(or Type): {strExt}, ###-FileAddCheck-###, FileFilterType : {(bWhite ? "WHITE" : "BLACK")}");
 
         // okb
         fileAddManager.bEmptyFIleNoCheck = SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans();
