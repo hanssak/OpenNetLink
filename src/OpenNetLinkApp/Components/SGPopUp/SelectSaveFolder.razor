@@ -178,7 +178,7 @@
     /// groupID 전달받은 index(groupid와 동일)
     /// </summary>
     private int nNetIdx = 0;
-    private string stOriginPath = String.Empty;
+
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SelectSaveFolder>();
 
 
@@ -554,7 +554,6 @@
     {
         CLog.Here().Information($"SelectSaveFolder openPopUp");
         nNetIdx = Idx;
-        stOriginPath = dir;
 
         object[] param3 = { "0" };
         await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param3);

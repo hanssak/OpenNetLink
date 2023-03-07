@@ -1911,7 +1911,7 @@
             SGSvrData sgSvrData = null;
             sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(NetworkInfo.GroupID);
             if (sgSvrData == null)
-                return;
+                continue;
 
             eLoginType eLoginTypeData = sgSvrData.GetLoginType();
 
