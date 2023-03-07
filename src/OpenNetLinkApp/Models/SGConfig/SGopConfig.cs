@@ -167,5 +167,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public string strNotinListForwardUrl { get; set; } = "file:///C:/HANSSAK/OpenNetLink/wwwroot/Web/WebLinkInfoNotList.html";              // URL Redirect 정책에 안먹히는 URL forward할 주소
 
+        public List<bool> bListUsePKIsendRecv { get; set; } = null;             // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
+        
     }
 }

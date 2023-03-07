@@ -98,7 +98,7 @@
   "bUseForceUpdate": true,
   "bUsePCURL": false,
   "bUsePublicBoard": false,
-  "bUseUserRecvDownPath": false,
+  "bUseUserRecvDownPath": true,
   "bUseUserSelectFirstServer": false,
   "bViewDlpApproverSelectMyDept": false,
   "bViewFileFilter": true,
@@ -118,8 +118,8 @@
   "bUseCloseTrayMove": true,
   "bExitTrayMove": true,
 
-  "bUseStartTrayMove": false,
-  "bStartTrayMove": false,
+  "bUseStartTrayMove": true,
+  "bStartTrayMove": true,
 
   "bUseFileForward": false,
   "bFileDownloadBeforeReciving": false,
@@ -138,10 +138,16 @@
     false,
     false
   ],
-  "bUseLoginAfterTray": false,
+  "bUseLoginAfterTray": true,
   "bUseFileApproveReason": false,
   "bUseClipBoardApproveReason": false,
+  
+  "bUseNotinListForwardUrl" : false,
+  "strNotinListForwardUrl" : "file:///C:/HANSSAK/OpenNetLink/wwwroot/Web/WebLinkInfoNotList.html",
+  "bListUsePKIsendRecv": [
+    false,
+    false,
+    false
+  ]
 
-  "bUseNotinListForwardUrl" : true,
-  "strNotinListForwardUrl" : "file:///C:/HANSSAK/OpenNetLink/wwwroot/Web/WebLinkInfoNotList.html"
 }

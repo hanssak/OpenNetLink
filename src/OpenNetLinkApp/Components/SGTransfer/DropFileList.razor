@@ -437,7 +437,7 @@
 
                     int nRet = 0;
                     nRet = await GetExamCheckZip(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount);
-                    if (nRet == 1)
+                    if (nRet == 1)   // GetExamCheckZip 내부, 예외확장자 이외에 첨부 error가 날 요소가 없을때에만 nRet = 1로 return함
                         hsStream.isNeedApprove = true;
                     else if (nRet != 0)
                     {
@@ -605,29 +605,24 @@
                             hsStream.RelativePath = hsStream.RelativePath;
 
                         hsStream.isNeedApprove = false;
-                        if ((hsStream.Type.Equals("Directory")) || (hsStream.Type.Equals("Hidden, Directory")))
+                        //if ((hsStream.Type.Equals("Directory")) || (hsStream.Type.Equals("Hidden, Directory")))
+                        if ( (item.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
                         {
                             hsStream.Size = 0;
                             hsStream.Type = "DIR";
                             hsStream.stream = null;
                             hsStream.MemoryType = HsStreamType.FileStream;
                             hsStream.IsDir = true;
-
-
                         }
                         else
                         {
                             hsStream.Size = item.Length;
-
                             if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID)  && isUserNeedApproveExtUI())
                             {
                                 if (CsFunction.isFileExtinListStr(true, fInfo.Extension, sgLoginData.GetExceptionExt()))
                                     hsStream.isNeedApprove = true;
                             }
-                        }
 
-                        if (hsStream.Type.Equals("Archive"))
-                        {
                             if (item.Name.LastIndexOf(".") > -1)
                                 hsStream.Type = item.Name.Substring(item.Name.LastIndexOf(".") + 1);
                             else
@@ -643,6 +638,28 @@
 
                             hsStream.IsDir = false;
                         }
+
+                        CLog.Here().Information($"DirSearch - AfterData, fileName : {hsStream.FileName}, DirOrFile : {(hsStream.IsDir?"DIR !!!":"FILE !!!")}");
+
+                        // hsStream.Type.Equals("Archive")
+                        @*if (string.Compare(hsStream.Type, "Archive", true) == 0 ||
+                            string.Compare(hsStream.Type, "Normal", true) == 0)
+                        {
+                            if (item.Name.LastIndexOf(".") > -1)
+                                hsStream.Type = item.Name.Substring(item.Name.LastIndexOf(".") + 1);
+                            else
+                                hsStream.Type = "";
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                            }
+                            else
+                            {
+                                hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                            }
+
+                            hsStream.IsDir = false;
+                        }*@
 
                         hsStream.ModifyTime = item.LastWriteTime;
                         DateTime SubDate = (DateTime)hsStream.ModifyTime;
@@ -1280,11 +1297,13 @@ protected override Task OnAfterRenderAsync(bool firstRender)
             System.IO.FileInfo fInfo = new System.IO.FileInfo(item);
             temp.Add(fInfo);
             DirSearch(item, temp);
+            CLog.Here().Information($"### - DirSearch, Directories : {item}");
         }
 
         foreach (var item in di.GetFiles())
         {
             temp.Add(item);
+            CLog.Here().Information($"######### - DirSearch, files-Name : {item.FullName}, Ext:{item.Extension}, files-Attributes(###) : {item.Attributes.ToString()}");
         }
         return temp;
     }
@@ -1548,6 +1567,8 @@ protected override Task OnAfterRenderAsync(bool firstRender)
         //fileAddErr.SetUseOSmaxPath(SGAppMgrSvc.OpConfigInfoService.GetUseOSMaxFilePath());
         HSCmdCenter.SetUseOSMaxPath(groupID, true);
 
+        CLog.Here().Information($"Ext(or Type): {strExt}, ###-FileAddCheck-###, FileFilterType : {(bWhite ? "WHITE" : "BLACK")}");
+
         // okb
         fileAddManager.bEmptyFIleNoCheck = SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans();
 
@@ -1658,6 +1679,8 @@ protected override Task OnAfterRenderAsync(bool firstRender)
         {
             bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
 
+            CLog.Here().Information($"{strExtType}, ###-INSPECTION-###, Ext FileFilterType : {(bWhite?"WHITE":"BLACK")}");
+
             string strZipDepthInfo = sgLoginData.GetZipDepthInfo(sgLoginData.GetSystemPosition());
             string[] strTemp = strZipDepthInfo.Split('/');  //ZIP파일 내부 검사 [ Depth/옵션(1이상 검사/0: 차단, 1 허용)
 
@@ -1747,7 +1770,7 @@ protected override Task OnAfterRenderAsync(bool firstRender)
 
         bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
         string strFileExtInfo = sgLoginData.GetFileFilter();
-        
+
         //bool bDenyPasswordZIP = SGAppMgrSvc.AppConfigInfoService.GetDenyPasswordZIP();
         if (await fileAddManager.CheckDocumentFile(hsStream, currentFile, strDocumentExtractType, bOLECheckMimeType, bWhite, strFileExtInfo) != 0)
             return -1;

@@ -462,6 +462,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
     public class FileAddManage
     {
+        public static object objLock = new object();
+        public static Dictionary<int, string> dicMimeConfData = new Dictionary<int, string>();
+
         private List<FileAddErr> m_FileAddErrList = new List<FileAddErr>();
 
         public List<(string reason, string count)> m_FileAddErrReason = new List<(string reason, string count)>();
@@ -1444,7 +1447,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string[] strExtList = strStandardFileExtInfo.Split(sep);
             int count = strExtList.Length;
             if (count <= 0)
+            {
+                Log.Logger.Here().Information($"### - GetRegExtEnable, FileExt ';' empty!!!, return: {!bWhite} ");
                 return !bWhite;
+            }
 
             bool bFind = false;
             for (int i = 0; i < count; i++)
@@ -1456,6 +1462,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     break;
                 }
             }
+
+            Log.Logger.Here().Information($"### - GetRegExtEnable, isWhite:{bWhite}, Ext-Find : {bFind} , return: {(bWhite && bFind) || ((!bWhite) && (!bFind))} ");
 
             if (bWhite && bFind)
                 return true;
@@ -1652,6 +1660,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return false;
             }
 
+            Log.Logger.Here().Information($"### - GetExamFileAddEnable, BlackWhite : {(bWhite ? "WHITE!" : "BLACK!")}, FileExtInfo : {strFileExtInfo}, FileExt : {hsStream.Type}");
+
             //black, white 리스트 체크
             bExtEnable = GetRegExtEnable(bWhite, strFileExtInfo, hsStream.Type);
             if (!bExtEnable)
@@ -1686,7 +1696,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return false;
             }
             
-            Log.Information($@"###################### - 파일이름 : {hsStream.FileName}, 파일크기 : {hsStream.Size} - ######################");
+            Log.Logger.Here().Information($"###################### - 파일이름 : {hsStream.FileName}, 파일크기 : {hsStream.Size} - ######################");
 
             //빈파일 체크 (0kb 허용)
             bEmpty = (bEmptyFIleNoCheck || GetEmptyEnable(hsStream.Size));//GetRegFileEmptyEnable(hsStream.Size);
@@ -1891,300 +1901,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             //Parent 혹은 Children의 Err를 가진 항목만 필터링 하여 표시
             ListDisaplayErrSource = m_FileAddErrList.FindAll(file => file.eErrType != eFileAddErr.eFANone || file.HasChildrenErr);
-            #region [간소화로 사용안함]
-            //string strReason = "";
-            //string strCount = "";
-
-            //FileAddErr fileAddErr = new FileAddErr();
-
-            //int nExtExceptionCount = 0;
-            //nExtExceptionCount = GetExtExceptionCount();
-            //if (nExtExceptionCount > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAEXT);
-            //    strCount = fileAddErr.GetExceptionCountString(nExtExceptionCount);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nChangeExceptionCount = 0;
-            //nChangeExceptionCount = GetChangeExceptionCount();
-            //if (nChangeExceptionCount > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFACHG);
-            //    strCount = fileAddErr.GetExceptionCountString(nChangeExceptionCount);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nHiddenExceptionCount = 0;
-            //nHiddenExceptionCount = GetHiddenExceptionCount();
-            //if (nHiddenExceptionCount > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAHidden);
-            //    strCount = fileAddErr.GetExceptionCountString(nHiddenExceptionCount);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-            //int nEmptyExceptionCount = 0;
-            //nEmptyExceptionCount = GetEmptyExceptionCount();
-            //if (nEmptyExceptionCount > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAEMPTY);
-            //    strCount = fileAddErr.GetExceptionCountString(nEmptyExceptionCount);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nFilePathOverExcetpion = 0;
-            //nFilePathOverExcetpion = GetFilePathOverExceptionCount();
-            //if (nFilePathOverExcetpion > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFA_LONG_PATH);
-            //    strCount = fileAddErr.GetExceptionCountString(nFilePathOverExcetpion);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nSuperFolderNameOverException = 0;
-            //nSuperFolderNameOverException = GetSuperFolderNameOverExceptionCount();
-            //if (nSuperFolderNameOverException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFA_LONG_PATH_PARENT);
-            //    strCount = fileAddErr.GetExceptionCountString(nSuperFolderNameOverException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nFileFolderNameOverException = 0;
-            //nFileFolderNameOverException = GetFileFolderNameOverExceptionCount();
-            //if (nFileFolderNameOverException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFA_LONG_PATH_FILEORPATH);
-            //    strCount = fileAddErr.GetExceptionCountString(nFileFolderNameOverException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nFileSizeOverException = 0;
-            //nFileSizeOverException = GetSizeExceptionCount();
-            //if (nFileSizeOverException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAFileSize);
-            //    strCount = fileAddErr.GetExceptionCountString(nFileSizeOverException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nFileCountOverException = GetCountExceptionCount();
-            //if (nFileCountOverException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAFileCount);
-            //    strCount = fileAddErr.GetExceptionCountString(nFileCountOverException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-
-
-            //int nFileReadAccessException = 0;
-            //nFileReadAccessException = GetReadDenyCount();
-            //if (nFileReadAccessException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFA_FILE_READ_ERROR);
-            //    strCount = fileAddErr.GetExceptionCountString(nFileReadAccessException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-
-            //int nFileDaySizeOverException = 0;
-            //nFileDaySizeOverException = GetDaySizeOverExceptionCount();
-            //if (nFileDaySizeOverException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFADAYSIZEOVER);
-            //    strCount = fileAddErr.GetExceptionCountString(nFileDaySizeOverException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nFileDayCountOverException = GetDayCountOverExceptionCount();
-            //if (nFileDayCountOverException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFADAYCOUNTOVER);
-            //    strCount = fileAddErr.GetExceptionCountString(nFileDayCountOverException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-
-            //int nZIpPWException = 0;
-            //nZIpPWException = GetZipPWExceptionCount();
-            //if (nZIpPWException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAZipPW);
-            //    strCount = fileAddErr.GetExceptionCountString(nZIpPWException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nZIpNotPWException = 0;
-            //nZIpNotPWException = GetZipNotPWExceptionCount();
-            //if (nZIpNotPWException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAZipNotPW);
-            //    strCount = fileAddErr.GetExceptionCountString(nZIpNotPWException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nZIpErrorException = 0;
-            //nZIpErrorException = GetZipErrorExceptionCount();
-            //if (nZIpErrorException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAZipError);
-            //    strCount = fileAddErr.GetExceptionCountString(nZIpErrorException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nZipException = 0;
-            //nZipException = GetZipExtExceptionCount();
-            //if (nZipException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAZIP);
-            //    strCount = fileAddErr.GetExceptionCountString(nZipException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nInnerZipOpenFailException = 0;
-            //nInnerZipOpenFailException = GetInnerZipOpenFailCount();
-            //if (nInnerZipOpenFailException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerZipOpenFail);
-            //    strReason = " => " + strReason;
-            //    strCount = fileAddErr.GetExceptionCountString(nInnerZipOpenFailException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nInnerZipPassWordException = 0;
-            //nInnerZipPassWordException = GetInnerZipPassWordCount();
-            //if (nInnerZipPassWordException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerZipPassword);
-            //    strReason = " => " + strReason;
-            //    strCount = fileAddErr.GetExceptionCountString(nInnerZipPassWordException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nInnerZipExtException = 0;
-            //nInnerZipExtException = GetInnerZipExtCount();
-            //if (nInnerZipExtException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerExt);
-            //    strReason = " => " + strReason;
-            //    strCount = fileAddErr.GetExceptionCountString(nInnerZipExtException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nInnerZipExtChangeException = 0;
-            //nInnerZipExtChangeException = GetInnerZipExtChangeCount();
-            //if (nInnerZipExtChangeException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerExtChange);
-            //    strReason = " => " + strReason;
-            //    strCount = fileAddErr.GetExceptionCountString(nInnerZipExtChangeException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nInnerZipExtUnKnownException = 0;
-            //nInnerZipExtUnKnownException = GetInnerZipUnKnownCount();
-            //if (nInnerZipExtUnKnownException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerExtUnknown);
-            //    strReason = " => " + strReason;
-            //    strCount = fileAddErr.GetExceptionCountString(nInnerZipExtUnKnownException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nInnerZipFileEmptyException = 0;
-            //nInnerZipFileEmptyException = GetInnerZipEmptyCount();
-            //if (nInnerZipFileEmptyException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerFileEmpty);
-            //    strReason = " => " + strReason;
-            //    strCount = fileAddErr.GetExceptionCountString(nInnerZipFileEmptyException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nInnerZipLengthOverException = 0;
-            //nInnerZipLengthOverException = GetInnerZipLengthOverCount();
-            //if (nInnerZipLengthOverException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerLengthOver);
-            //    strReason = " => " + strReason;
-            //    strCount = fileAddErr.GetExceptionCountString(nInnerZipLengthOverException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nInnerZipLeftZipException = 0;
-            //nInnerZipLeftZipException = GetInnerZipLeftZipCount();
-            //if (nInnerZipLeftZipException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerLeftZip);
-            //    strReason = " => " + strReason;
-            //    strCount = fileAddErr.GetExceptionCountString(nInnerZipLeftZipException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //int nInnerZipDRMException = 0;
-            //nInnerZipDRMException = GetInnerZipDRMCount();
-            //if (nInnerZipDRMException > 0)
-            //{
-            //    strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerDRM);
-            //    strReason = " => " + strReason;
-            //    strCount = fileAddErr.GetExceptionCountString(nInnerZipDRMException);
-            //    strReason = strReason + " : " + strCount;
-            //    m_FileAddErrReason.Add(strReason);
-            //    strReason = "";
-            //}
-
-            //return m_FileAddErrReason; 
-            #endregion
-
             return hasErr;
         }
         /// <summary>
@@ -2355,7 +2071,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 FindZipContent(btFileData, Encoding.UTF8.GetBytes("[Content_Types].xml")) == true)
             {
 
-                if (String.Compare(strExt, "doc", true) == 0)
+                if (String.Compare(strExt, "doc", true) == 0 ||
+                    String.Compare(strExt, "thmx", true) == 0)
                 {
                     if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("theme")) == true)
                         return true;
@@ -3110,7 +2827,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             {
                 if (String.Compare(strExt, "egg", true) == 0) return IsEGG(btFileData, strExt);
 
-                if (String.Compare(strExt, "doc", true) == 0 || String.Compare(strExt, "docx", true) == 0)
+                if (String.Compare(strExt, "doc", true) == 0 || 
+                    String.Compare(strExt, "docx", true) == 0 ||
+                    String.Compare(strExt, "thmx", true) == 0)
                     return IsWord(btFileData, strExt);
 
                 if (String.Compare(strExt, "xls", true) == 0 || String.Compare(strExt, "xlsx", true) == 0)
@@ -3324,10 +3043,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             strExt = strExt.Replace(".", "");
             btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize2);
-            if (CheckExtForFileByteData(btFileData, strExt) == true)
-                return eFileAddErr.eFANone;
 
-            return eFileAddErr.eFACHG;
+            bool bIsExtForFileByteData = CheckExtForFileByteData(btFileData, strExt);
+
+            Log.Logger.Here().Information($"[IsValidFileExt] CheckExtForFileByteData, Ext : {strExt}, EXT isChanged : {!bIsExtForFileByteData}");
+
+            return (bIsExtForFileByteData ? eFileAddErr.eFANone:eFileAddErr.eFACHG);
         }
 
         public eFileAddErr IsValidFileExtInnerZip(string strFile, string strExt, bool blAllowDRM)
@@ -4643,6 +4364,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                         // Check Block File Extension
                         strExt = Path.GetExtension(entry.Key);
+                        string strNoDotExt = strExt.Replace(".", "");
+                        Log.Logger.Here().Information($"### - ScanZipFile, BlackWhite : {(blWhite ? "WHITE!" : "BLACK!")}, FileExtInfo : {strExtInfo}, FileExt : {strNoDotExt}");
+
                         if (GetRegExtEnable(blWhite, strExtInfo, strExt.Replace(".", "")) != true)
                         {
                             enErr = eFileAddErr.eUnZipInnerExt;
@@ -4934,6 +4658,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             continue;
                         }
 
+                        Log.Logger.Here().Information($"### - scanDocumentFile, BlackWhite : {(isWhite ? "WHITE!" : "BLACK!")}, FileExtInfo : {fileFilterExtInfo}, FileExt : {oleExtension}");
+
                         //File Fileter 체크
                         if (!GetRegExtEnable(isWhite, fileFilterExtInfo, oleExtension))
                         {
@@ -4990,46 +4716,72 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public void LoadMimeConf(int groupID)
         {
-            string strFileName = String.Format("FileMime.{0}.conf", groupID.ToString());
-            strFileName = Path.Combine("wwwroot/conf", strFileName);
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            lock (objLock)
             {
-                strFileName = strFileName.Replace("/", "\\");
-            }
-            else
-            {
-                strFileName = strFileName.Replace("\\", "/");
-            }
 
-            try
-            {
-                string strEncMimeInfo = System.IO.File.ReadAllText(strFileName);
-                SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                string strMimeInfo = sgRSACrypto.MimeConfDecrypt(strEncMimeInfo);
-
-                if (strMimeInfo.Equals(""))
-                    return;
-
-                if (strMimeInfo[strMimeInfo.Length - 1] == '\n')
-                    strMimeInfo = strMimeInfo.Substring(0, strMimeInfo.Length - 1);
-                string[] strMimeList = strMimeInfo.Split('\n');
-                if (strMimeList.Length <= 1)
-                    return;
-                for (int i = 1; i < strMimeList.Length; i++)
+                string strFileName = String.Format("FileMime.{0}.conf", groupID.ToString());
+                strFileName = Path.Combine("wwwroot/conf", strFileName);
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    string[] strSplit = strMimeList[i].Split(' ');
-                    if (strSplit.Length < 2)
-                        continue;
-
-                    Log.Logger.Here().Information($"LoadMimeConf - Add MimeType : {strSplit[0]}, Ext : {strSplit[1]}");
-
-                    MimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
+                    strFileName = strFileName.Replace("/", "\\");
                 }
-            }
-            catch (FileNotFoundException ioEx)
-            {
-                Log.Logger.Here().Error("LoadMimeConf Exception Msg = [{0}]", ioEx.Message);
-            }
+                else
+                {
+                    strFileName = strFileName.Replace("\\", "/");
+                }
+
+                try
+                {
+                    string strEncMimeInfo = System.IO.File.ReadAllText(strFileName);
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strMimeInfo = sgRSACrypto.MimeConfDecrypt(strEncMimeInfo);
+
+                    if (strMimeInfo.Equals(""))
+                        return;
+
+                    string strMimeSavedData = "";
+                    bool bShowMimeLog = false;
+                    if (dicMimeConfData.TryGetValue(groupID, out strMimeSavedData))
+                    {
+                        if (strMimeSavedData != strEncMimeInfo)
+                        {
+                            if (dicMimeConfData.Remove(groupID))
+                                bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
+                        }
+                    }
+                    else
+                    {
+                        bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
+                    }
+                    
+                    //if (bShowMimeLog == false)
+                    //    Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Skip MimeType Display");
+
+
+                    if (strMimeInfo[strMimeInfo.Length - 1] == '\n')
+                        strMimeInfo = strMimeInfo.Substring(0, strMimeInfo.Length - 1);
+                    string[] strMimeList = strMimeInfo.Split('\n');
+                    if (strMimeList.Length <= 1)
+                        return;
+                    for (int i = 1; i < strMimeList.Length; i++)
+                    {
+                        string[] strSplit = strMimeList[i].Split(' ');
+                        if (strSplit.Length < 2)
+                            continue;
+
+                        if (bShowMimeLog)
+                            Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Add MimeType : {strSplit[0]}, Ext : {strSplit[1]}");
+
+                        MimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
+                    }
+                }
+                catch (FileNotFoundException ioEx)
+                {
+                    Log.Logger.Here().Error($"LoadMimeConf, GroupID:{groupID}, Exception Msg = [{ioEx.Message}]");
+                }
+
+            } // lock (objLock)
+
         }
 
         public void LoadOLEMimeConf(int groupID)

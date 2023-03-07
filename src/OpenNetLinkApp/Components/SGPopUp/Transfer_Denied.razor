@@ -146,13 +146,12 @@
             builder.AddAttribute(1, "Icon", "cancel");
             style += "color: #D44867;";
         }
-        else if (errInfo.HasChildrenErr)
+        else if(errInfo.ChildrenFiles != null && errInfo.ChildrenFiles.Count > 0)        //하위항목이 있는 항목은 폴더아이콘
         {
-            builder.AddAttribute(1, "Icon", "info");
-            style += "color: #FFAA54;";
+            builder.AddAttribute(1, "Icon", "folder");
         }
         else        //정상
-    {
+        {
             builder.AddAttribute(1, "Icon", "check_circle");
             style += "color: #327AD9;";
 
@@ -201,15 +200,37 @@
 
     public void FileAddFailLog()
     {
-        for (int i = 0; i < listDenied.Count; i++)
-        {
-            eFileAddErr errType = listDenied[i].eErrType;
-            string strFileName = listDenied[i].FileName;
-            string strReason = listDenied[i].GetFileAddErrContent(strFileName, errType);
+        doDisplayFileAddErr(listDenied, 0);
+    }
 
-            CLog.Here().Information($"######### - 파일추가 실패 원인 - FileAddErr : {errType}, FileName : {strFileName}, Reason : {strReason}");
+
+    /// <summary>
+    /// 파일추가 error 원인 SubFolder에 있는 파일들도 찾아서 출력(폴더우클릭 전송때 확인)
+    /// </summary>
+    /// <param name="listFileErrorLevel"></param>
+    /// <param name="nDepth"></param>
+    public void doDisplayFileAddErr(List<FileAddErr> listFileErrorLevel, int nDepth)
+    {
+
+        string strReason = "";
+
+        for (int i = 0; i < listFileErrorLevel.Count; i++)
+        {
+
+            if (listFileErrorLevel[i].eErrType != eFileAddErr.eFANone)
+            {
+                strReason = listFileErrorLevel[i].GetFileAddErrContent(strFileName, listFileErrorLevel[i].eErrType);
+                CLog.Here().Information($"### - 파일추가 실패 원인(추가한파일-Depth:{nDepth}) - FileAddErr : {listFileErrorLevel[i].eErrType}, " +
+                    $"ParentFileName : {listFileErrorLevel[i].ParentFileName}, FileName : {listFileErrorLevel[i].FileName}, Reason : {strReason}");
+            }
+
+            if (listFileErrorLevel[i].HasChildrenErr && (listFileErrorLevel[i].ChildrenFiles?.Count ?? 0) > 0)
+            {
+                doDisplayFileAddErr(listFileErrorLevel[i].ChildrenFiles, ++nDepth);
+            }
         }
     }
+
 
     public async Task openPopUp()
     {
@@ -264,52 +285,106 @@
 
         @*listTreeDenied = getTreeData(list);*@
 
-        StateHasChanged();
-    }
+    StateHasChanged();
+}
 
 
-    public void CopyReason(List<(string reason, string count)> list)
+public void CopyReason(List<(string reason, string count)> list)
+{
+    listDeniedReason.Clear();
+    listDeniedReason = new List<(string, string)>(list);
+    StateHasChanged();
+}
+
+/// <summary>
+/// 파일추가 error 원인 SubFolder에 있는 파일들도 찾아서 전송
+/// </summary>
+/// <param name="listQuery"></param>
+/// <param name="listLevelDenied"></param>
+/// <param name="UseAgentBlockValueChange"></param>
+public void addErrorBlockQuery(ref List<string> listQuery, List<FileAddErr> listLevelDenied, bool UseAgentBlockValueChange, string strUserSeq, string strSystemType, ref SGQueryExtend sgQuery)
+{
+
+
+    try
     {
-        listDeniedReason.Clear();
-        listDeniedReason = new List<(string, string)>(list);
-        StateHasChanged();
-    }
-
-    public void SendFileAddList()
-    {
-        if (listDenied.Count <= 0)
-            return;
-
-        //err가 없거나, 하위 파일들에도 err가 없는 경우엔 Return 처리
-        if (!listDenied.Exists(file => file.eErrType != eFileAddErr.eFANone || file.HasChildrenErr))
-            return;
-        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
+        if (listQuery == null ||
+        listLevelDenied == null)
         {
             return;
         }
-        string strUserID = sgLoginData.GetUserID();
-        string strSystemType = "E";
-        if (sgLoginData.GetSystemPosition())
-            strSystemType = "I";
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+        for (int i = 0; i < listLevelDenied.Count; i++)
         {
-            return;
-        }
-        string strUserSeq = sgUserData.GetUserSequence();
+            int nType = (int)listLevelDenied[i].eErrType;
+            eFileAddErr errType = listLevelDenied[i].eErrType;
 
-        List<string> listQuery = new List<string>();
-        SGQueryExtend sgQuery = new SGQueryExtend();
-        for (int i = 0; i < listDenied.Count; i++)
+            if (errType != eFileAddErr.eFANone)
+            {
+                string strFileName = listLevelDenied[i].FileName;
+                string strReason = listLevelDenied[i].GetFileAddErrContent(strFileName, errType);
+
+                // WebManager에서 값이 표현이 되도록 적당히 변경해서 올림(NetLink에 맞춤)
+                if (UseAgentBlockValueChange)
+                {
+                    if (errType == eFileAddErr.eFAZIP
+                    || (errType > eFileAddErr.eFADLPERR && errType != eFileAddErr.eFADAYCOUNTOVER && errType != eFileAddErr.eFADAYSIZEOVER))
+                        nType = 4;
+                }
+
+                string strUnitQuery = sgQuery.GetAgentBlock(strUserSeq, strSystemType, nType.ToString(), strReason);
+                listQuery.Add(strUnitQuery);
+            }
+
+            if (listLevelDenied[i].HasChildrenErr && (listLevelDenied[i].ChildrenFiles?.Count ?? 0) > 0)
+                addErrorBlockQuery(ref listQuery, listLevelDenied[i].ChildrenFiles, UseAgentBlockValueChange, strUserSeq, strSystemType, ref sgQuery);
+        }
+
+    }
+    catch(Exception ex)
+    {
+        CLog.Here().Error($"addErrorBlockQuery - Exception(MSG): {ex.Message}");
+    }
+
+}
+
+public void SendFileAddList()
+{
+    if (listDenied.Count <= 0)
+        return;
+
+    //err가 없거나, 하위 파일들에도 err가 없는 경우엔 Return 처리
+    if (!listDenied.Exists(file => file.eErrType != eFileAddErr.eFANone || file.HasChildrenErr))
+        return;
+    SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+    SGLoginData sgLoginData = null;
+    sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+    if (sgLoginData == null)
+    {
+        return;
+    }
+    string strUserID = sgLoginData.GetUserID();
+    string strSystemType = "E";
+    if (sgLoginData.GetSystemPosition())
+        strSystemType = "I";
+
+    SGUserData sgUserData = null;
+    sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+    if (sgUserData == null)
+    {
+        return;
+    }
+    string strUserSeq = sgUserData.GetUserSequence();
+    SGQueryExtend sgQuery = new SGQueryExtend();
+    List<string> listQuery = new List<string>();
+    addErrorBlockQuery(ref listQuery, listDenied, SGAppMgrSvc.SiteConfigInfoService.GetUseAgentBlockValueChange(), strUserSeq, strSystemType, ref sgQuery);
+
+
+        @*for (int i = 0; i < listDenied.Count; i++)
         {
             int nType = (int)listDenied[i].eErrType;
             eFileAddErr errType = listDenied[i].eErrType;
@@ -326,7 +401,7 @@
 
             string strUnitQuery = sgQuery.GetAgentBlock(strUserSeq, strSystemType, nType.ToString(), strReason);
             listQuery.Add(strUnitQuery);
-        }
+        }*@
 
         int nTotalLen = 0;
         string strTotalQuery = "Hsck_Transaction:";

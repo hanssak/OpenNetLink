@@ -276,6 +276,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns></returns>
         public string GetNotinURLListForwardUrl();
 
+        /// <summary>
+        /// 인증서 전송기능
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUsePKIsendRecv(int groupID);
     }
 
 
@@ -897,6 +903,17 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetNotinURLListForwardUrl()
         {
             return AppConfigInfo.strNotinListForwardUrl;
+        }
+
+
+        public bool GetUsePKIsendRecv(int nGroupID)
+        {
+            (AppConfigInfo as SGopConfig).bListUsePKIsendRecv ??= new List<bool>();
+
+            if ((AppConfigInfo as SGopConfig).bListUsePKIsendRecv.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGopConfig).bListUsePKIsendRecv[nGroupID];
+
+            return false;    // 기본값
         }
 
     }

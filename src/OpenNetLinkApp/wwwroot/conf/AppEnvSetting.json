@@ -13,11 +13,11 @@
   "LogLevel": 2,
   "LoginType": 0,
   "RecvDownPath": [
-    "%USERPATH%/Downloads",
-    "%USERPATH%/Downloads",
+    "K:\\",
+    "K:\\",
     "%USERPATH%/Downloads"
   ],
-  "UpdateSvcIP": "10.240.19.111:3439",
+  "UpdateSvcIP": "10.232.19.111:3439",
   "bAfterBasicChk": true,
   "bApprTrayFix": false,
   "bClipCopyAutoSend": false,
@@ -26,14 +26,14 @@
   "bRMouseFileAddAfterTrans": false,
   "bScreenLock": false,
   "bStartProgramReg": false,
-  "bStartTrayMove": false,
+  "bStartTrayMove": true,
   "bURLAutoAfterMsg": [
     true,
     true,
     true
   ],
   "bURLAutoTrans": [
-    false,
+    true,
     false,
     false
   ],

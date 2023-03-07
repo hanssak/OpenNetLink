@@ -301,6 +301,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                     }
                     catch (Exception e)
                     {
+                        Log.Logger.Here($"Got Exception: execute (chmod) => {e}");
                         LogWriter.PrintMessage($"Got Exception: execute (chmod) => {e}");
                     }
                 }
@@ -397,7 +398,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             }
             else
             {
-                Log.Information(tag + " " + message, arguments);
+                Log.Logger.Here().Information(tag + " " + message, arguments);
             }
         }
     }

@@ -392,7 +392,7 @@
             }
             catch (Exception ex)
             {
-                CLog.Error(ex.Message);
+                CLog.Here().Error($"openPopUp - Exception : {ex.Message}");
                 //entries = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
                 entries = Directory.EnumerateFileSystemEntries(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
                 .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
@@ -662,7 +662,7 @@
         }
         catch (Exception ex0)
         {
-            CLog.Error("GetParentError:" + ex0.Message);
+            CLog.Here().Error("LoadListFiles, GetParentError:" + ex0.Message);
         }
 
         IEnumerable<string> fList = null;
@@ -673,12 +673,12 @@
         }
         catch (UnauthorizedAccessException e)
         {
-            CLog.Error("UnauthorizedAccessException:" + e.Message);
+            CLog.Here().Error("LoadListFiles, UnauthorizedAccessException:" + e.Message);
             Console.WriteLine(e.Message);
         }
         catch (Exception e2)
         {
-            CLog.Error("Exception:" + e2.Message);
+            CLog.Here().Error("LoadListFiles, Exception:" + e2.Message);
             Console.WriteLine(e2.Message);
         }
 
@@ -722,7 +722,7 @@
         }
         catch (Exception ex3)
         {
-            CLog.Error("Exception:" + ex3.Message);
+            CLog.Here().Error("LoadListFiles, Exception(MSG):" + ex3.Message);
         }
 
         string listHtml = makeSubFileList();

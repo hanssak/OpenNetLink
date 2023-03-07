@@ -302,12 +302,16 @@
         //stSelectedFileNo = "";
     }
 
+
     private void OpenPreviewWindow()
     {
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
+        CLog.Here().Information($"OpenPreviewWindow, GroupID : {groupID}, FilePreView(#####), Request : WebView!");
 
         SGDetailData sgDetailData = null;
         sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
@@ -1012,6 +1016,7 @@ public void FilePrevCancel(string arg)
 public bool FilePrevDownExtension(string sFileName)
 {
 
+    CLog.Here().Information($"FilePrevDownExtension, FilePreView Use WebView Check, FIleName : {sFileName}");
 
     ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
     int groupID = 0;
@@ -1032,6 +1037,7 @@ public bool FilePrevDownExtension(string sFileName)
 
     if (sgDetailData.GetFileSizeEmpty(strFileSeq))
     {
+        CLog.Here().Information($"FilePrevDownExtension, FileSize Empty - No Down & No WebView - fileSeq : {strFileSeq}");
         ShowMessage("error", XmlConf.GetErrMsg("E_0243"));
         return false;
     }
@@ -1042,7 +1048,11 @@ public bool FilePrevDownExtension(string sFileName)
     string strExtName = Path.GetExtension(sFileName);
     strExtName = strExtName.Substring(1);
     if (strExtName.Equals(""))
+    {
+        CLog.Here().Information($"FilePrevDownExtension, File PreView, Ext Empty - Use WebView!");
         return true;
+    }
+
 
     strExtName = strExtName.ToLower();
     bool bFind = false;
@@ -1054,6 +1064,8 @@ public bool FilePrevDownExtension(string sFileName)
             break;
         }
     }
+
+    CLog.Here().Information($"FilePrevDownExtension, FilePreView(#####), Ext : {strExtName}, Use :{(bFind? "WebView" : "FileDownLoad View")} !");
 
     if (!bFind)
     {
@@ -1091,7 +1103,11 @@ public bool FilePrevDownExtension(string sFileName)
         Task.Delay(1000);
         FileAddManage fileAddManage = new FileAddManage();
         sFileName = fileAddManage.GetFileRename(true, sFileName);
+
+        CLog.Here().Information($"FilePrevDownExtension, FilePreView(#####), File : {sFileName}, Request : FileDownLoad View!");
+
         HsCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq, sFileName, strFileKey, strFileSeq, "0");
+
     }
     return bFind;
 }

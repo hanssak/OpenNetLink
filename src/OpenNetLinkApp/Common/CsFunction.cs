@@ -16,6 +16,10 @@ using HsNetWorkSG;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.InteropServices;
 using IWshRuntimeLibrary;
+using System.IO.Compression;
+using SharpCompress.Common;
+using SharpCompress.Readers;
+using OpenNetLinkApp.Data.SGDicData.SGAlz;
 
 namespace OpenNetLinkApp.Common
 {
@@ -85,7 +89,6 @@ namespace OpenNetLinkApp.Common
             string rtn = "";
             if (Size == 0)
             {
-                Log.Information($@"###################### - GetSizeStr : 0 - ######################");
                 rtn = "0 Byte";
             }
             if (Size > 1024 * 1024 * 1024)
@@ -339,7 +342,7 @@ namespace OpenNetLinkApp.Common
                 }
                 catch (Exception e)
                 {
-                    Log.Information($"GetFileSize - Exception - msg : {e.Message}, path : {filePath}");
+                    Log.Logger.Here().Information($"GetFileSize - Exception - msg : {e.Message}, path : {filePath}");
                     lSize = -1;
                 }
                 finally
@@ -350,6 +353,88 @@ namespace OpenNetLinkApp.Common
 
             return lSize;
         }
+
+
+        /// <summary>
+        /// Windows / Linux / Mac OSx 에서 다 지원하는 파일명인지 확인하는 함수<br></br>
+        /// return : true - 지원함
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="strItem"></param>
+        /// <returns></returns>
+        public static bool isSupportFileName(string fileName, out string strItem)
+        {
+
+            Log.Logger.Here().Information($"isSupportFileName - fileName : {fileName}");
+
+            // 빈문자인지 확인
+            if ((fileName?.Length ?? 0) == 0)
+            {
+                strItem = "$EMPTY";
+                return false;
+            }
+
+            fileName = fileName.Replace(" ", "");
+            if ((fileName?.Length ?? 0) == 0)
+            {
+                strItem = "$EMPTY";
+                return false;
+            }
+
+
+            // File / Folder 이름으로 정해질 수 없는 문자 있는지 확인
+
+            // Windows
+            string strNotSupportData = "\\/:*?\"<>";
+
+            // Linux
+            // "/"
+
+            // Mac ( Finder)
+
+
+            // 문자 1개라도 허용불가능 
+            char[] chNotSupport = strNotSupportData.ToCharArray();
+
+            for (int i = 0; i < chNotSupport.Length; i++)
+            {
+                if (fileName.IndexOf(chNotSupport[i]) >= 0)
+                {
+                    strItem = chNotSupport[i].ToString();
+                    Log.Logger.Here().Information($"isSupportFileName - Not Support Char(###-Char)(Windows) : {strItem}");
+                    return false;
+                }
+            }
+
+            // 단어전체 동일할때 허용불가능
+            if (fileName == "." ||  // Linux
+                fileName == "..")
+            {
+                strItem = fileName;
+                Log.Logger.Here().Information($"isSupportFileName - Not Support FileName(###-Word)(Linux) : {strItem}");
+                return false;
+            }
+
+            // 특정문자로 시작될때 허용불가능 
+            if (fileName.IndexOf('.') == 0)
+            {
+                strItem = ".";
+                Log.Logger.Here().Information($"isSupportFileName - Not Support Start Char(###-StartChar)(MacOSx) : {"."}");
+                return false;
+            }
+
+            strItem = "";
+            return true;
+        }
+
+
+        public static bool GetLastFileFolderName(string strPath, out string strItem)
+        {
+            strItem = "";
+
+            return true;
+        }
+
     }
 
     public class CsHashFunc
@@ -515,5 +600,37 @@ namespace OpenNetLinkApp.Common
 
     }
 
+    public class CsWASfunc
+    {
+
+        public static string GetErrorCodeToStr(string strData)
+        {
+            string strMsg = "";
+
+            if (strData == "-1")
+                strMsg = "ID 정보를 수신받지 못했습니다.";
+            else if (strData == "-2")
+                strMsg = "PW 정보를 수신받지 못했습니다.";
+            else if (strData == "-3")
+                strMsg = "사용자 인증 실패 되었습니다.";
+            else if (strData == "-4")
+                strMsg = "사용자가 존재하지 않습니다.";
+            else if (strData == "-5")
+                strMsg = "입력한 PW가 틀립니다.";
+            else if (strData == "-6")
+                strMsg = "내부시스템(서버오류 및 DB 접근 오류 등)에서 오류가 발생되었습니다.";
+            else
+                strMsg = "사용자 인증과정 중 알수없는 오류가 발생하였습니다.";
+
+            return strMsg;
+        }
+
+        public static string stringIDpwJsonString(string strID, string strPW)
+        {
+            string json = "{\n\"id\":\"" + strID + "\",\n\"pw\":\"" + strPW + "\"\n}";
+            return json;
+        }
+
+    }
 
 }

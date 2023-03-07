@@ -90,6 +90,14 @@
                 siteConfig.SetUseOver1auth(listNetWork[i].GroupID, true);
                 siteConfig.SetUseAccessAllDrive(listNetWork[i].GroupID, true);
             }
+            else if (String.Compare(listNetWork[i].NetPos, "CN", true) == 0 ||
+                    String.Compare(listNetWork[i].NetPos, "NCI", true) == 0)
+            {
+                siteConfig.SetUseOver1auth(listNetWork[i].GroupID, true);
+            }
+
+            // Hanssak in Office
+            //siteConfig.SetUseAccessAllDrive(listNetWork[i].GroupID, true);
 
             CLog.Here().Information($"Connect Network Check, From :{listNetWork[i].FromName}, To : {listNetWork[i].ToName}");
         }

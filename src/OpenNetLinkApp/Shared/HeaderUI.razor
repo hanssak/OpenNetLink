@@ -1247,6 +1247,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             ShowClipboardMessage("info", strText, clipData.nGroupId, OS_NOTI.CLIPBOARD);
             SendDayClipInfo(clipData.nGroupId);
             InsertMessage(NOTI_TYPE.USER, clipData.nGroupId, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipSend, "", strText);
+            Window.Notification(OS_NOTI.CLIPBOARD, XmlConf.GetInfoMsg("I_0163"), XmlConf.GetInfoMsg("I_0032"));
         }
 
     }
@@ -2041,6 +2042,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             strMsg = XmlConf.GetInfoMsg("I_0032");   // 클립보드를 전송하였습니다.
             ShowClipboardMessage("info", strMsg, groupID, OS_NOTI.CLIPBOARD);
+            Window.Notification(OS_NOTI.CLIPBOARD, XmlConf.GetInfoMsg("I_0163"), XmlConf.GetInfoMsg("I_0032"));
 
             if (FileList.Count > 0)
             {
@@ -2321,6 +2323,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         string strText = XmlConf.GetInfoMsg("I_0193");                         // 클립보드를 수신받았습니다.
         ShowClipboardMessage("info", strText, groupID, OS_NOTI.CLIPBOARD);
         InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipRecv, "", strText);
+        Window.Notification(OS_NOTI.CLIPBOARD, XmlConf.GetInfoMsg("I_0164"), XmlConf.GetInfoMsg("I_0193"));
+
     }
 
     public void FileForwardNotify(int groupid, SGData e)
@@ -2883,7 +2887,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                         {
                             case "0":   // 일반결재
 
-                                // KKW - Server 수정후에나 사용
+                                // Server 수정후에나 사용
                                 @*strMsg = XmlConf.GetInfoMsg("I_0222");                      // 새로운 결재승인 요청자료가 {0}건 존재합니다.
                                 strMsg = String.Format(strMsg, pEventArgs.count);*@
                                 break;
@@ -2908,7 +2912,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             case eCmdList.eEMAILAPPROVENOTIFY:
                 {
-                    // KKW - Server 수정후에나 사용
+                    // Server 수정후에나 사용
                     @*strMsg = XmlConf.GetInfoMsg("I_0098");                      // 새로운 메일승인 요청자료가 {0}건 존재합니다.
                     PageEventArgs pEventArgs = (PageEventArgs)e;
                     strMsg = String.Format(strMsg, pEventArgs.count);*@

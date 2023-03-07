@@ -383,6 +383,7 @@
                 <span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span><br>
                 <input type="text" value="@(GetRecvDownPath(Idx))" class="mr-1 col-md-10" readonly="readonly" />
                 <a class="file_dw" @onclick="@(e => openSaveDirPopup(Idx, GetRecvDownPath(Idx)))" hidden="@(GetRecvDownPathChangeHide(Idx))"><i class="fas fa-folder-open pl-1"></i></a>
+                @*<a class="file_dw" @onclick="@(e => openSaveDirPopup(Idx, GetRecvDownPath(Idx)))" ><i class="fas fa-folder-open pl-1"></i></a>*@
             </div>
         }
         @if (m_bRecvFolderOpen)
@@ -682,6 +683,7 @@
     {
 
         refSelectSaveFolder.nGroupid = Idx;
+        refSelectSaveFolder.bUseisolationMode = !SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(Idx); // 
         await refSelectSaveFolder.openPopUp(Idx, dir);
 
         object[] param2 = { "0" };
@@ -1884,6 +1886,8 @@
     public void CtrlSideUILoginAfter()
     {
 
+        CLog.Here().Information($"########### - CtrlSideUILoginAfter - ###########");
+
         int loginDataCount = HsCmdCenter.GetNetWorkCount();
         m_bUseClipBoard = false;
         m_bUseURLRedirection = false;
@@ -1936,7 +1940,7 @@
             SGSvrData sgSvrData = null;
             sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(NetworkInfo.GroupID);
             if (sgSvrData == null)
-                return;
+                continue;
 
             eLoginType eLoginTypeData = sgSvrData.GetLoginType();
 
@@ -1958,16 +1962,18 @@
 
         m_bUseMainPage = SGAppMgrSvc.OpConfigInfoService.GetUseMainPageTypeChange();
 
+
         if (m_bUseFileSend)
         {
             // siteConfig. json으로 이동
             m_bRFileAutoSend = SGAppMgrSvc.OpConfigInfoService.GetRFileAutoSend();
             m_bAfterApprAutoCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterApprAutoCheck();
+
             if (bAfterCheckHide)
                 m_bAfterApprAutoCheck = false;
+
             m_bUseFileSend = (m_bRFileAutoSend | m_bAfterApprAutoCheck);
         }
-
 
         m_bRecvFolderOpen = SGAppMgrSvc.OpConfigInfoService.GetRecvFolderOpen();
 
@@ -1995,6 +2001,8 @@
         m_bUseLanguageSet = SGAppMgrSvc.OpConfigInfoService.GetUseLanguageSet();
 
         m_bLogLevelSet = SGAppMgrSvc.OpConfigInfoService.GetUseLogLevel();
+
+        //StateHasChanged();
 
         // 단축키 정보값 받아옴 (3망고려)
 
@@ -2111,6 +2119,8 @@
             }
         }
 
+        CLog.Here().Information($"########### - CtrlSideUILoginAfter - StateHasChanged ###########");
+
         StateHasChanged();
     }
 
@@ -2120,10 +2130,13 @@
         // siteConfig. json으로 이동
         // return !(SGAppMgrSvc.SiteConfigInfoService.GetUseRecvFolderChange(groupID)); // OpConfigInfoService
 
-        if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(groupID))
+        // 고객요청사항 변경
+        return false;
+
+        @*if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(groupID))
             return false;
         else
-            return true;
+            return true;*@
     }
 
 
@@ -2166,7 +2179,7 @@
         }
 
 
-         await Task.Run(() =>
+        await Task.Run(() =>
         {
             AppUpdaterSvc.CheckUpdatesClick(groupId, refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
         });

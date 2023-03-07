@@ -49,7 +49,6 @@
         {
             stTreeDir = Directory.GetParent(stTreeDir).FullName;
             entries = Directory.GetDirectories(stTreeDir);
-            StateHasChanged();
         }
         else
         {
@@ -60,9 +59,8 @@
             }
             else
                 entries = Directory.GetLogicalDrives();
-
-            StateHasChanged();
         }
+        StateHasChanged();
     }
 
     protected override void OnInitialized()
@@ -150,7 +148,7 @@
 
         if (!isDirectory)
         {
-            builder.AddAttribute(2, "Style", "margin-left: 24px");
+            builder.AddAttribute(2, "Style", ""); // margin-left: 24px
         }
         builder.CloseComponent();
         builder.AddContent(3, context.Text);
