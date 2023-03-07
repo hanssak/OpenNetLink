@@ -383,7 +383,6 @@
                 <span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span><br>
                 <input type="text" value="@(GetRecvDownPath(Idx))" class="mr-1 col-md-10" readonly="readonly" />
                 <a class="file_dw" @onclick="@(e => openSaveDirPopup(Idx, GetRecvDownPath(Idx)))" hidden="@(GetRecvDownPathChangeHide(Idx))"><i class="fas fa-folder-open pl-1"></i></a>
-                @*<a class="file_dw" @onclick="@(e => openSaveDirPopup(Idx, GetRecvDownPath(Idx)))" ><i class="fas fa-folder-open pl-1"></i></a>*@
             </div>
         }
         @if (m_bRecvFolderOpen)
@@ -1142,7 +1141,7 @@
 
     private bool GetStartTrayMove()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove();
+        return SGAppMgrSvc.AppConfigInfoService.GetStartTrayMove();
     }
 
     private bool GetStartProgramReg()
@@ -2001,8 +2000,6 @@
         m_bUseLanguageSet = SGAppMgrSvc.OpConfigInfoService.GetUseLanguageSet();
 
         m_bLogLevelSet = SGAppMgrSvc.OpConfigInfoService.GetUseLogLevel();
-
-        //StateHasChanged();
 
         // 단축키 정보값 받아옴 (3망고려)
 

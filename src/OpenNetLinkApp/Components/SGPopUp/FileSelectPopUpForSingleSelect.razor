@@ -283,7 +283,7 @@
                         stRtn.Append(@"<div style='cursor:pointer;' label='" + dragLabel + "' data-draggable='item' class='draggable' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' onclick='addFileToDropZoneForSingleSelect(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                         stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
                     }
-                    else    //이것은 폴더 
+                    else    //이것은 폴더
                     {
                         stRtn.Append(@"<div style='cursor:pointer;' label='" + dragLabel + "' data-draggable='item' class='draggable' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' onclick='refreshListPopUpForSingleSelect(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                         stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");

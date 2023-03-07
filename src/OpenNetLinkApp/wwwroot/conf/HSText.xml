@@ -5017,12 +5017,12 @@
 			<CN></CN>
 		</T_eFADOC_EXTRACT_CHANGE>
 
-		<T_eFADOC_EXTRACT_FILES>
+		<T_eFADOC_EXTRACT_FILEFILTER>
 			<KR>문서 내 파일의 확장자 제한</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_eFADOC_EXTRACT_FILES>
+		</T_eFADOC_EXTRACT_FILEFILTER>
 		<T_APPROVEEXT_USE_APPROVE>
 			<KR>결재 사용</KR>
 			<JP></JP>
@@ -10500,13 +10500,13 @@
       <EN></EN>
       <CN></CN>
     </E_0254>
-
-    <E_0255>
-      <KR>WAS Server와 원활히 통신하지 못했습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </E_0255>
+	
+	<E_0255>
+		<KR>한글97~3.0 파일은 지원되지 않습니다.<![CDATA[<br>]]>한글 문서 버전을 변경하여 다시 추가해주세요.<![CDATA[<br>]]>파일명:<![CDATA[<br>]]>{0}</KR>
+		<JP></JP>
+		<EN></EN>
+		<CN></CN>
+	</E_0255>
 
 	<E_0256>
 		<KR>지정한 경로에는 파일다운경로를 설정할 수 없습니다.&#10;다시 설정해 주십시오. [{0}]</KR>
@@ -10514,6 +10514,14 @@
 		<EN>You can not set the file download path to the top path.&#10;Please set back. [{0}]</EN>
 		<CN>最上级路径无法设置文件下载路径。&#10;请重新设置。[{0}]</CN>
 	</E_0256>
+
+
+    <E_0257>
+      <KR>WAS Server와 원활히 통신하지 못했습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </E_0257>
 
 
   </ERROR>

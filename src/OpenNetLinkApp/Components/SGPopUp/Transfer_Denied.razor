@@ -141,7 +141,7 @@
         builder.OpenComponent<RadzenIcon>(0);
 
         string style = "";
-        if (errInfo.eErrType != eFileAddErr.eFANone)
+        if (errInfo.eErrType != eFileAddErr.eFANone)    //오류난 항목은 빨간색
         {
             builder.AddAttribute(1, "Icon", "cancel");
             style += "color: #D44867;";
@@ -150,6 +150,11 @@
         {
             builder.AddAttribute(1, "Icon", "folder");
         }
+        //else if (errInfo.HasChildrenErr)                
+        //{
+        //    builder.AddAttribute(1, "Icon", "info");
+        //    style += "color: #FFAA54;";
+        //}
         else        //정상
         {
             builder.AddAttribute(1, "Icon", "check_circle");
@@ -165,10 +170,10 @@
 
     @*builder.AddContent(3, context.Text);*@
         string htmlString = "<div class=\"p-0 m-0\" style=\"width:100%;\">" +
-                                "<div class=\"p-0 m-0\" style=\"width:60%;float:left;\">" + context.Text + "</div>"
-                                +
-                                "<div class=\"p-0 m-0\" style=\"width:40%;float:right;font-style:italic;color:#D44867\">" + errInfo.ExceptionReason + "</div>"
-                            + "</div>";
+                                                "<div class=\"p-0 m-0\" style=\"width:60%;float:left;\">" + context.Text + "</div>"
+                                                +
+                                                "<div class=\"p-0 m-0\" style=\"width:40%;float:right;font-style:italic;color:#D44867\">" + errInfo.ExceptionReason + "</div>"
+                                            + "</div>";
         builder.AddContent(3, (MarkupString)htmlString);
 
     @*builder.OpenComponent<Radzen>(0);*@
@@ -285,16 +290,16 @@
 
         @*listTreeDenied = getTreeData(list);*@
 
-    StateHasChanged();
-}
+        StateHasChanged();
+    }
 
 
-public void CopyReason(List<(string reason, string count)> list)
-{
-    listDeniedReason.Clear();
-    listDeniedReason = new List<(string, string)>(list);
-    StateHasChanged();
-}
+    public void CopyReason(List<(string reason, string count)> list)
+    {
+        listDeniedReason.Clear();
+        listDeniedReason = new List<(string, string)>(list);
+        StateHasChanged();
+    }
 
 /// <summary>
 /// 파일추가 error 원인 SubFolder에 있는 파일들도 찾아서 전송
@@ -353,55 +358,74 @@ public void SendFileAddList()
     if (listDenied.Count <= 0)
         return;
 
-    //err가 없거나, 하위 파일들에도 err가 없는 경우엔 Return 처리
-    if (!listDenied.Exists(file => file.eErrType != eFileAddErr.eFANone || file.HasChildrenErr))
-        return;
-    SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-    int groupID = 0;
-    if (sgSideBar != null)
-        groupID = sgSideBar.GroupId;
-    SGLoginData sgLoginData = null;
-    sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-    if (sgLoginData == null)
-    {
-        return;
-    }
-    string strUserID = sgLoginData.GetUserID();
-    string strSystemType = "E";
-    if (sgLoginData.GetSystemPosition())
-        strSystemType = "I";
+        //err가 없거나, 하위 파일들에도 err가 없는 경우엔 Return 처리
+        if (!listDenied.Exists(file => file.eErrType != eFileAddErr.eFANone || file.HasChildrenErr))
+            return;
 
-    SGUserData sgUserData = null;
-    sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-    if (sgUserData == null)
-    {
-        return;
-    }
-    string strUserSeq = sgUserData.GetUserSequence();
-    SGQueryExtend sgQuery = new SGQueryExtend();
-    List<string> listQuery = new List<string>();
-    addErrorBlockQuery(ref listQuery, listDenied, SGAppMgrSvc.SiteConfigInfoService.GetUseAgentBlockValueChange(), strUserSeq, strSystemType, ref sgQuery);
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
 
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
 
-        @*for (int i = 0; i < listDenied.Count; i++)
+        string strUserID = sgLoginData.GetUserID();
+        string strSystemType = "E";
+        if (sgLoginData.GetSystemPosition())
+            strSystemType = "I";
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+
+        List<string> listQuery = new List<string>();
+        SGQueryExtend sgQuery = new SGQueryExtend();
+
+        // WebManager에서 값이 표현이 되도록 적당히 변경해서 올림(NetLink에 맞춤)
+        bool useAgentBlockValueChange = SGAppMgrSvc.SiteConfigInfoService.GetUseAgentBlockValueChange();
+        for (int i = 0; i < listDenied.Count; i++)
         {
-            int nType = (int)listDenied[i].eErrType;
-            eFileAddErr errType = listDenied[i].eErrType;
-            string strFileName = listDenied[i].FileName;
-            string strReason = listDenied[i].GetFileAddErrContent(strFileName, errType);
+            addBlockQuery(listDenied[i]);
+        }
 
-            // WebManager에서 값이 표현이 되도록 적당히 변경해서 올림(NetLink에 맞춤)
-            if (SGAppMgrSvc.SiteConfigInfoService.GetUseAgentBlockValueChange())
+        //지역함수 - 파일 내 포함된 하위 파일도 함께 error 쿼리 생성하는 함수
+        void addBlockQuery(FileAddErr deniedValue)
+        {
+            if (deniedValue.eErrType != eFileAddErr.eFANone)
             {
-                if (errType == eFileAddErr.eFAZIP
-                || (errType > eFileAddErr.eFADLPERR && errType != eFileAddErr.eFADAYCOUNTOVER && errType != eFileAddErr.eFADAYSIZEOVER))
-                    nType = 4;
+                int nType = (int)deniedValue.eErrType;
+                eFileAddErr errType = deniedValue.eErrType;
+                string strFileName = deniedValue.FileName;
+                string strReason = deniedValue.GetFileAddErrContent(strFileName, errType, strMIMEType: deniedValue.MimeType, strParentFileName: deniedValue.ParentFileName);
+
+                // WebManager에서 값이 표현이 되도록 적당히 변경해서 올림(NetLink에 맞춤)
+                if (nType < 100 && useAgentBlockValueChange)
+                {
+                    if (errType == eFileAddErr.eFAZIP
+                    || (errType > eFileAddErr.eFADLPERR && errType != eFileAddErr.eFADAYCOUNTOVER && errType != eFileAddErr.eFADAYSIZEOVER))
+                        nType = 4;
+                }
+
+                string strUnitQuery = sgQuery.GetAgentBlock(strUserSeq, strSystemType, nType.ToString(), strReason);
+                listQuery.Add(strUnitQuery);
             }
 
-            string strUnitQuery = sgQuery.GetAgentBlock(strUserSeq, strSystemType, nType.ToString(), strReason);
-            listQuery.Add(strUnitQuery);
-        }*@
+            //OLE 개체가 있는 파일인 경우, OLE 개체에 대한 Block 데이터도 생성
+            if (deniedValue.HasChildrenErr)
+            {
+                foreach (FileAddErr child in deniedValue.ChildrenFiles)
+                {
+                    addBlockQuery(child);
+                }
+            }
+        }
 
         int nTotalLen = 0;
         string strTotalQuery = "Hsck_Transaction:";

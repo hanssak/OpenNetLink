@@ -246,6 +246,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseClipBoardApproveReason();
 
         /// <summary>
+        /// 파일 선택 삭제 사용 유무
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseFileSelectDelete();
+
+        /// <summary>
         /// 알람 초기화 매일 자정마다
         /// </summary>
         /// <returns></returns>
@@ -860,6 +866,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseClipBoardApproveReason()
         {
             return AppConfigInfo.bUseClipBoardApproveReason;
+        }
+
+        public bool GetUseFileSelectDelete()
+        {
+            return AppConfigInfo.bUseFileSelectDelete;
         }
 
         public bool GetUseInitAlarmPerDay()

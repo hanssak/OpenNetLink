@@ -160,5 +160,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public string strNotinListForwardUrl { get; set; }                 // URL Redirect 정책에 안먹히는 URL forward할 주소
 
+        public bool bUseFileSelectDelete { get; set; } // 파일 선택 삭제 사용 유무
+
     }
 }

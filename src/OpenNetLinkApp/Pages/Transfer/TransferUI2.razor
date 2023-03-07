@@ -164,6 +164,12 @@
                                                 </tr>
                                         </table>
                                     </div>
+                                    @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileSelectDelete())
+                                    {
+                                        <div>
+                                            <label><font color="red">@strSelectFileDelComment</font></label>
+                                        </div>
+                                    }
                                 </div>
                                 <div class="float-right">
                                     <div class="float-right">
@@ -177,10 +183,11 @@
                                                     </td>
                                                 }
                                                 <td>
-                                                    @*<button type="button" class="btn btn-md btn-green" @onclick="AlzTest"><i class="fas fa-share"></i>압축</button>*@
-                                                    <button type="button" class="btn btn-md btn-green" @onclick="CheckApprLine"><i class="fas fa-share"></i>@strFileSend</button>
-                                                    <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
-                                                    <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
+                                                <button type="button" class="btn btn-md btn-green" @onclick="CheckApprLine"><i class="fas fa-share"></i>@strFileSend</button>
+                                                <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
+                                                <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
+                                                <button type="button" class="btn btn-md btn-red" @onclick="@(e => RemoveSelectFile())" hidden="@bFileSelectDeleteBtn"><i class="fas fa-times"></i>@strSelectFileDel</button>
+                                                
                                                 </td>
                                             </tr>
                                         </table>
@@ -320,6 +327,8 @@
     public string strRemainFile = "";
     public string strFileSend = "";
     public string strFileDel = "";
+    public string strSelectFileDel = "";
+    public string strSelectFileDelComment = "";
     public string strApprLine = "";
     public string strApproverAdd = "";
     public string strFileReg = "";
@@ -358,6 +367,11 @@
     /// 사후결재 checkBox Disable 설정유무(By:서버정책, true : 사용못함, false : 사용함)
     /// </summary>
     public bool bAfterApprDisable = false;
+
+    /// <summary>
+    /// 선택 삭제 버튼 사용 유무
+    /// </summary>
+    public bool bFileSelectDeleteBtn = false;
 
     public bool bURLRedirection = true;
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
@@ -668,18 +682,6 @@
 
     }
 
-    private void AlzTest()
-    {
-        //string source = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)\\chào.alz";
-        //string dest = "C:\\Users\\smkoo\\Desktop\\새 폴더 (18)";
-        //string passWord = "1234";
-        //SGUnAlz lib = new SGUnAlz();
-        ////int ret = lib.UnAlzExtract(source, dest);
-        //int ret = lib.UnAlzExtract_PassWordWDll(source, dest, passWord);
-
-    }
-
-
     private async Task CheckApprLine()
     {
         cntSendQuery = 0;
@@ -769,7 +771,7 @@
                         }*@
 
                     // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
-                    SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "");
+                    SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "", sgLoginData.GetApproveProxyRight());
                     cntSendQuery++;
                 }
             }
@@ -789,10 +791,10 @@
     /// <param name="strUserID">로그인 ID</param>
     /// <param name="userSeq">결재자 Seq</param>
     /// <param name="deptSeq">결재자 부서Seq</param>
-    private void SendQuery(int groupID, string strUserID, string userSeq, string deptSeq)
+    private void SendQuery(int groupID, string strUserID, string userSeq, string deptSeq, bool approveProxyRight)
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
-        string strQuery = sgQuery.GetUserConfirm(userSeq, deptSeq, false);
+        string strQuery = sgQuery.GetUserConfirm(userSeq, deptSeq, approveProxyRight);
         HSCmdCenter.SendDetailQuery(groupID, strUserID, strQuery);
     }
 
@@ -1470,6 +1472,7 @@
 
         bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
         bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
+        bFileSelectDeleteBtn = !OpConfigSvc.GetUseFileSelectDelete();
 
         if (bAfterApprChkHIde)
             strAfterApprove = "";
@@ -2052,6 +2055,11 @@
         await dropFile.RemoveAllFile();
     }
 
+    private async Task RemoveSelectFile()
+    {
+        await dropFile.RemoveSelectFile();
+    }
+
     private void AddDataList(string str, string type)
     {
         DragAndDropService.AddDataList(str, type);
@@ -2099,6 +2107,8 @@
         strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
         strFileSend = XmlConf.GetTitle("T_FILE_SENDFILE");                              // 파일 보내기
         strFileDel = XmlConf.GetTitle("T_FILE_FILEDEL");                                // 파일 삭제
+        strSelectFileDel = XmlConf.GetTitle("T_FILE_SELECT_DELETE");                    // 선택 삭제
+        strSelectFileDelComment = XmlConf.GetTitle("T_FILE_SELECT_DELETE_COMMENT");     // ※체크박스 선택 후 선택삭제를 클릭해 주세요.
         strApprLine = XmlConf.GetTitle("T_FILE_APPROVELINE");                           // 결재라인
         strApproverAdd = XmlConf.GetTitle("T_FILE_APPROVER");                           // 결재자추가
         strFileReg = XmlConf.GetTitle("T_FILE_FILEREG");                                // 파일등록

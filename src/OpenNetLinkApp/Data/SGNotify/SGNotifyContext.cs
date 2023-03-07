@@ -12,6 +12,8 @@ using Serilog.Events;
 using AgLogManager;
 using OpenNetLinkApp.Services;
 using System.Threading;
+using System.Data;
+
 
 namespace OpenNetLinkApp.Data.SGNotify
 {
@@ -143,18 +145,87 @@ namespace OpenNetLinkApp.Data.SGNotify
         private SGNtfyDBProc() 
         { 
             DBCtx = new SGNotifyContext();
+            if (DBCtx.Database.GetPendingMigrations().Any())
+            {
+                var migrationList = DBCtx.Database.GetPendingMigrations();
+                foreach(var migration in migrationList)
+                {
+                    if(migration.Contains("20221026070638"))
+                    {
+                        if(TableExists("T_SG_RESEND"))
+                        {
+                            InsertMigration("20221026070638_InitialCreate1", "3.1.6");                        
+                        }
+                        else
+                            DBCtx.Database.Migrate();
+                    }
+                }
+
+                DBCtx.Database.Migrate();
+                DBCtx.SaveChanges();
+            }
+
         }
         //private static 인스턴스 객체
         private static readonly Lazy<SGNtfyDBProc> _instance = new Lazy<SGNtfyDBProc> (() => new SGNtfyDBProc());
         //public static 의 객체반환 함수
         public static SGNtfyDBProc Instance { get { return _instance.Value; } }
 
+        public bool TableExists(string tableName)
+        {
+            var connection = DBCtx.Database.GetDbConnection();
+
+            if (connection.State.Equals(ConnectionState.Closed))
+                connection.Open();
+
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"
+            SELECT 1 FROM sqlite_master
+            WHERE type = 'table'
+            AND name = @TableName";
+
+                var tableNameParam = command.CreateParameter();
+                tableNameParam.ParameterName = "@TableName";
+                tableNameParam.Value = tableName;
+                command.Parameters.Add(tableNameParam);
+
+                return command.ExecuteScalar() != null;
+            }
+        }
+
+        public bool InsertMigration(string id, string version)
+        {
+            var connection = DBCtx.Database.GetDbConnection();
+
+            if (connection.State.Equals(ConnectionState.Closed))
+                connection.Open();
+
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"
+            INSERT INTO __EFMigrationsHistory
+            VALUES (@id, @version)";
+
+                var idParam = command.CreateParameter();
+                idParam.ParameterName = "@id";
+                idParam.Value = id;
+                command.Parameters.Add(idParam);
+
+                var versionParam = command.CreateParameter();
+                versionParam.ParameterName = "@version";
+                versionParam.Value = version;
+                command.Parameters.Add(versionParam);
+
+                return command.ExecuteScalar() != null;
+            }
+        }
         /* Insert to SGReSendInfo */
         public bool InsertReSendInfo(int groupId, string userSeq, string clientId, string mid, string hszName, object transInfo)
         {
             // Create
             mut.WaitOne();
-            Log.Information("Inserting a ReSendInfo, {userSeq}, {clientId}, {mid}", userSeq, clientId, mid);
+            Log.Logger.Here().Information("Inserting a ReSendInfo, {userSeq}, {clientId}, {mid}", userSeq, clientId, mid);
             DBCtx.Add(new SGReSendData
             {
                 RESENDID = 0,
@@ -180,7 +251,7 @@ namespace OpenNetLinkApp.Data.SGNotify
                     .Where(x => x.GROUPID == groupId && x.USERSEQ == userSeq && x.ISEND == false)
                     .OrderByDescending(x => x.RESENDID).FirstOrDefault();
             
-            Log.Information("Querying for a ReSendInfo");
+            Log.Logger.Here().Information("Querying for a ReSendInfo");
             mut.ReleaseMutex();
             return reSendData;
         }
@@ -194,7 +265,7 @@ namespace OpenNetLinkApp.Data.SGNotify
                     .Where(x => x.RESENDID == reSendDataId)
                     .FirstOrDefault();
 
-            Log.Information("Querying for a ReSendInfo");
+            Log.Logger.Here().Information("Querying for a ReSendInfo");
             mut.ReleaseMutex();
             return reSendData;
         }
@@ -213,7 +284,7 @@ namespace OpenNetLinkApp.Data.SGNotify
 
             DBCtx.SaveChanges();
 
-            Log.Information("Update ReSendInfo");
+            Log.Logger.Here().Information("Update ReSendInfo");
             mut.ReleaseMutex();
             return true;
         }
@@ -235,7 +306,7 @@ namespace OpenNetLinkApp.Data.SGNotify
 
             DBCtx.SaveChanges();
 
-            Log.Information("Update ReSendInfo");
+            Log.Logger.Here().Information("Update ReSendInfo");
             mut.ReleaseMutex();
             return true;
         }
@@ -257,7 +328,7 @@ namespace OpenNetLinkApp.Data.SGNotify
 
             DBCtx.SaveChanges();
 
-            Log.Information("Update ReSendInfo");
+            Log.Logger.Here().Information("Update ReSendInfo");
             mut.ReleaseMutex();
             return true;
         }
@@ -267,7 +338,7 @@ namespace OpenNetLinkApp.Data.SGNotify
         {
             // Create
             mut.WaitOne();
-            Log.Information("Inserting a NotiInfo, {NotiHead}, {NotiBody}", head, body);
+            Log.Logger.Here().Information("Inserting a NotiInfo, {NotiHead}, {NotiBody}", head, body);
             DBCtx.Add(new SGNotiData 
                         { 
                             Id = 0, 
@@ -304,7 +375,7 @@ namespace OpenNetLinkApp.Data.SGNotify
                     .OrderByDescending(x => x.Time).Take(nLimit)
                     .ToList();
             }
-            Log.Information("Querying for a NotiInfo Limit {nLimit}", nLimit);
+            Log.Logger.Here().Information($"Querying for a NotiInfo Limit {nLimit}");
             mut.ReleaseMutex();
             return NotiList;
         }
@@ -324,7 +395,7 @@ namespace OpenNetLinkApp.Data.SGNotify
                     .Where(x => x.Type == type && x.GroupId == groupId && x.UserSeq == userSeq)
                     .Count();
             }
-            Log.Information("Querying for a NotiInfo Count {nCount}", nCount);
+            Log.Logger.Here().Information($"Querying for a NotiInfo Count {nCount}");
             mut.ReleaseMutex();
             return nCount;
         }
@@ -378,7 +449,7 @@ namespace OpenNetLinkApp.Data.SGNotify
             // Delete
             DBCtx.Remove(notiData);
             DBCtx.SaveChanges();
-            Log.Information("Delete the SGNotiData, {NotiData}", notiData);
+            Log.Logger.Here().Information($"Delete the SGNotiData, {notiData.GroupId}");
             mut.ReleaseMutex();
 
             return true;
@@ -388,7 +459,7 @@ namespace OpenNetLinkApp.Data.SGNotify
         {
             mut.WaitOne();
             // Create
-            Log.Information("Inserting a AlarmInfo, {AlarmHead}, {AlarmBody}", head, body);
+            Log.Logger.Here().Information($"Inserting a AlarmInfo, {head}, {body}");
             DBCtx.Add(new SGAlarmData 
                         { 
                             Id = 0, 
@@ -416,7 +487,7 @@ namespace OpenNetLinkApp.Data.SGNotify
                 .Where(x => x.GroupId == groupId && x.UserSeq == userSeq)
                 .OrderByDescending(x => x.Time).Take(nLimit)
                 .ToList();
-            Log.Information("Querying for a AlarmInfo Limit {nLimit}", nLimit);
+            Log.Logger.Here().Information($"Querying for a AlarmInfo Limit {nLimit}");
             mut.ReleaseMutex();
             return AlarmList;
         }
@@ -429,7 +500,7 @@ namespace OpenNetLinkApp.Data.SGNotify
             nCount = DBCtx.Alarms
                 .Where(x => x.GroupId == groupId && x.UserSeq == userSeq)
                 .Count();
-            Log.Information("Querying for a AlarmInfo Count {nCount}", nCount);
+            Log.Logger.Here().Information($"Querying for a AlarmInfo Count {nCount}");
             mut.ReleaseMutex();
             return nCount;
         }
@@ -465,7 +536,7 @@ namespace OpenNetLinkApp.Data.SGNotify
             // Delete
             DBCtx.Remove(alarmData);
             DBCtx.SaveChanges();
-            Log.Information("Delete the SGAlarmData, {AlarmData}", alarmData);
+            Log.Logger.Here().Information("Delete the SGAlarmData, {alarmData.GroupId}");
             mut.ReleaseMutex();
             return true;
         }
@@ -510,12 +581,12 @@ namespace OpenNetLinkApp.Data.SGNotify
 
                 }
 
-                Log.Information($"Delete the SGAlarmData, UserSeq : {strUserSeq}, nGroupID : {nGroupID}");
+                Log.Logger.Here().Information($"Delete the SGAlarmData, UserSeq : {strUserSeq}, nGroupID : {nGroupID}");
                 mut.ReleaseMutex();
             }
             catch(Exception e)
             {
-                Log.Error($"Delete the SGAlarmData(ERROR:{e.Message}), UserSeq : {strUserSeq}, nGroupID : {nGroupID}");
+                Log.Logger.Here().Error($"Delete the SGAlarmData(ERROR:{e.Message}), UserSeq : {strUserSeq}, nGroupID : {nGroupID}");
                 return false;
             }
 
@@ -556,12 +627,12 @@ namespace OpenNetLinkApp.Data.SGNotify
 
                 }
 
-                Log.Information($"Delete the SGAlarmData ALL");
+                Log.Logger.Here().Information($"Delete the SGAlarmData ALL");
                 mut.ReleaseMutex();
             }
             catch (Exception e)
             {
-                Log.Error($"Delete the SGAlarmData(ERROR:{e.Message}) ALL");
+                Log.Logger.Here().Error($"Delete the SGAlarmData(ERROR:{e.Message}) ALL");
                 return false;
             }
 
@@ -607,12 +678,12 @@ namespace OpenNetLinkApp.Data.SGNotify
 
                 }
 
-                Log.Information($"Delete the Data, StandardDate Before Data");
+                Log.Logger.Here().Information($"Delete the Data, StandardDate Before Data");
                 mut.ReleaseMutex();
             }
             catch (Exception e)
             {
-                Log.Error($"Delete the Data(ERROR:{e.Message}) StandardDate Before Data");
+                Log.Logger.Here().Error($"Delete the Data(ERROR:{e.Message}) StandardDate Before Data");
                 return false;
             }
 

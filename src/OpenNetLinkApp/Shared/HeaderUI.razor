@@ -2432,6 +2432,14 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                         }
                     }
 
+                    // tray 상태라면 화면상에 나타나게 수정
+                    if (activeMenu.Path.Contains("transferApprove") ||
+                        activeMenu.Path.Contains("securityApprove") ||
+                        activeMenu.Path.Contains("clipBoardApprove") ||
+                        activeMenu.Path.Contains("fileException") ||
+                        activeMenu.Path.Contains("mailApprove"))
+                        Window.MoveTrayToWebWindow();
+
                     if (pgRefreshEvent != null)
                         pgRefreshEvent();
 
@@ -2623,7 +2631,6 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
     /// <param name="e"></param>
     public void RecvServerNoti(int groupID, eCmdList cmd, PageEventArgs e)
     {
-
         OS_NOTI os_noti = ConvertCmd(cmd);
         string naviURI = "";
         if (os_noti == OS_NOTI.WAIT_APPR ||
@@ -2717,7 +2724,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     naviURI = "/mailApprove/";      // mail 결재Noti값이 올때 처리 : mailApprove
                     break;
             }
-            //naviURI = "/transferApprove/";
+
 
             naviURI += groupID.ToString();
             //if (os_noti == OS_NOTI.MAIL_APPR)
@@ -2891,7 +2898,6 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                                 @*strMsg = XmlConf.GetInfoMsg("I_0222");                      // 새로운 결재승인 요청자료가 {0}건 존재합니다.
                                 strMsg = String.Format(strMsg, pEventArgs.count);*@
                                 break;
-
                             case "1":   // 보안결재
                                 strMsg = XmlConf.GetInfoMsg("I_0223");                      // 새로운 보안결재승인 요청자료가 {0}건 존재합니다.
                                 strMsg = String.Format(strMsg, pEventArgs.count);
@@ -3062,6 +3068,9 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         if (i < count)
             return;
+
+        pageService.m_nCurViewPageGroupID = groupID;
+        pageService.m_nLoginType = (int)pageService.GetGroupIDLoginType(groupID);
 
         jsRuntime.InvokeAsync<object>("beforeLogOut");
 

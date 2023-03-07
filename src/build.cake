@@ -351,11 +351,11 @@ Task("PubDebian")
     DotNetCorePublish("./ContextTransferClient", settings);
 
 	// 필요할때에 추가로 개발예정
-    /*using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe"))
-             {
-		process.WaitForExit();
-		Information("Package linux: Exit code: {0}", process.GetExitCode());
-	}*/
+    	using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility"))
+        {
+			process.WaitForExit();
+			//Information("Package linux: Exit code: {0}", process.GetExitCode());
+		}
 });
 
 Task("PkgDebian")
@@ -374,6 +374,56 @@ Task("PkgDebian")
 	{
 		process.WaitForExit();
 		Information("Package Debin: Exit code: {0}", process.GetExitCode());
+	}
+});
+
+
+Task("PubRedhat")
+    .IsDependentOn("Version")
+    .Does(() => {
+
+	AppProps.AppUpdatePlatform = "redhat";
+	PackageDirPath 	= String.Format("artifacts/installer/{0}/packages", AppProps.AppUpdatePlatform);
+	var settings = new DotNetCorePublishSettings {
+		Framework = "net5.0",
+		Configuration = "Release",
+		Runtime = "linux-x64",
+		OutputDirectory = $"./artifacts/{AppProps.AppUpdatePlatform}/published"
+	};
+	
+	if(DirectoryExists(settings.OutputDirectory)) {
+		DeleteDirectory(settings.OutputDirectory, new DeleteDirectorySettings { 
+		Force = true, Recursive = true });
+	}
+
+    DotNetCorePublish("./OpenNetLinkApp", settings);
+    DotNetCorePublish("./PreviewUtil", settings);
+    DotNetCorePublish("./ContextTransferClient", settings);
+
+	// 필요할때에 추가로 개발예정
+    //	using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility"))
+    //        {
+	//	process.WaitForExit();
+	//	Information("Package linux: Exit code: {0}", process.GetExitCode());
+	//}
+});
+
+Task("PkgRedhat")
+	.IsDependentOn("SetFileName")
+	.IsDependentOn("SetNetwork")
+    .IsDependentOn("PubRedhat")
+    .Does(() => {
+
+	using(var process = StartAndReturnProcess("./PkgRedhat.sh", new ProcessSettings{ 
+		Arguments = new ProcessArgumentBuilder()
+			.Append(AppProps.PropVersion.ToString())
+			.Append(isPatch.ToString().ToUpper())
+			.Append(networkFlag.ToUpper()) 
+			.Append(customName.ToUpper())
+		}))
+	{
+		process.WaitForExit();
+		Information("Package Redhat: Exit code: {0}", process.GetExitCode());
 	}
 });
 

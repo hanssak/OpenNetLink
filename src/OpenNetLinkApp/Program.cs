@@ -20,7 +20,7 @@ namespace OpenNetLinkApp
 
 
         static void Main(string[] args)
-        {
+         {
             string cwdPath = "";
             string CWD = Directory.GetCurrentDirectory();
             Console.WriteLine("==> {0}", CWD);

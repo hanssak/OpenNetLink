@@ -308,6 +308,66 @@ namespace OpenNetLinkApp.Common
             tempVal = Encoding.UTF8.GetString(temp);
             return tempVal;
         }
+        /// <summary>
+        /// gz파일 압축해제
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="destPath"></param>
+        public static void GzFileDecompress(string filePath, string destPath)
+        {
+            using (FileStream originalFileStream = System.IO.File.OpenRead(filePath))
+            {
+                string currentFileName = filePath;
+                string newFileName = Path.Combine(destPath, Path.GetFileName(currentFileName.Remove(currentFileName.Length - Path.GetExtension(filePath).Length)));
+
+                using (FileStream decompressedFileStream = System.IO.File.Create(newFileName))
+                {
+                    using (GZipStream decompressionStream = new GZipStream(originalFileStream, CompressionMode.Decompress))
+                    {
+                        decompressionStream.CopyTo(decompressedFileStream);
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// tar, tgz, tar.gz 파일 압축해제
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="destPath"></param>
+        public static void TarFileDecompress(string filePath, string destPath)
+        {
+            using (Stream stream = System.IO.File.OpenRead(filePath))
+            {
+                using (var reader = ReaderFactory.Open(stream))
+                {
+                    while (reader.MoveToNextEntry())
+                    {
+                        if (!reader.Entry.IsDirectory)
+                        {
+                            reader.WriteEntryToDirectory(destPath, new ExtractionOptions()
+                            {
+                                ExtractFullPath = true,
+                                Overwrite = true
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        public static int AlzFileDecompress(string filePath, string destPath)
+        {
+            //alz file 압축풀기
+            SGUnAlz lib = new SGUnAlz();
+            int ret = 0;
+
+#if _WINDOWS
+            ret = lib.UnAlzExtractWDll(filePath, destPath);
+#else
+            ret = lib.UnAlzExtractDll(filePath, destPath);
+#endif
+            return ret;
+        }
     }
 
     public class CsSeqFunc
@@ -424,14 +484,6 @@ namespace OpenNetLinkApp.Common
             }
 
             strItem = "";
-            return true;
-        }
-
-
-        public static bool GetLastFileFolderName(string strPath, out string strItem)
-        {
-            strItem = "";
-
             return true;
         }
 

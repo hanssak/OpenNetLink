@@ -106,7 +106,7 @@
   "bViewSGSideBarUIBadge": false,
   "nClipAfterApproveUseType": 1,
   "bUseOneToMultiLogin": false,
-  "bUseOneByOneLogOut" : false,
+  "bUseOneByOneLogOut": false,
   "bApprDeptSearch": true,
   "bApprLineChkBlock": false,
   "bApprLineLocalSave": true,
@@ -141,13 +141,15 @@
   "bUseLoginAfterTray": true,
   "bUseFileApproveReason": false,
   "bUseClipBoardApproveReason": false,
-  
-  "bUseNotinListForwardUrl" : false,
-  "strNotinListForwardUrl" : "file:///C:/HANSSAK/OpenNetLink/wwwroot/Web/WebLinkInfoNotList.html",
+
+  "bUseNotinListForwardUrl": false,
+  "strNotinListForwardUrl": "file:///C:/HANSSAK/OpenNetLink/wwwroot/Web/WebLinkInfoNotList.html",
   "bListUsePKIsendRecv": [
     false,
     false,
     false
-  ]
+  ],
+
+  "bUseFileSelectDelete": false
 
 }

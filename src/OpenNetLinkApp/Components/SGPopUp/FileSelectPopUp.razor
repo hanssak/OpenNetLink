@@ -52,6 +52,19 @@
                     </div>
                 </div>
 
+                <div class="card-body  mb-1" style="border:1px solid #b3c8e4; background-color:#fff; border-radius:3px; padding:.3rem !important;">
+                    <div class="col-md-12 p-0">
+                        <div class="row">
+                            <div class="col-md-12" style="letter-spacing:.3px !important; ">
+                                <h7 class="modal-title pt-1 text-bold" style="color: gray; text-overflow: ellipsis;">
+                                    <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#c2baba;" />
+                                    @stDisplayPath
+                                </h7>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card-bod">
                     <div class="row">
                         <div class="col-md-12">
@@ -88,11 +101,9 @@
 
             <div class="modal-footer clearfix pl-4 pr-4 pt-3 pb-3">
                 <div class="col-md-12  p-0">
-                    <div class="row  p-0">
-                        <div class="col-md-9 text-right p-0">
-                            <button type="button" name="popUpOkBtn" class="btn btn-md btn-blue mr-0" @onclick="selectOK"><i class="fas fa-check"></i>확인</button>
-                            <button type="button" class="btn btn-md btn-black mr-0" data-dismiss="modal"><i class="fas fa-times"></i>취소</button>
-                        </div>
+                    <div class="text-right p-0">
+                        <button type="button" name="popUpOkBtn" class="btn btn-md btn-blue mr-0" @onclick="selectOK"><i class="fas fa-check"></i>확인</button>
+                        <button type="button" class="btn btn-md btn-black mr-0" data-dismiss="modal"><i class="fas fa-times"></i>취소</button>
                     </div>
                 </div>
             </div>
@@ -103,6 +114,11 @@
 @code {
     [Parameter]
     public EventCallback<List<string>> OnSelectOK { get; set; }
+
+    /// <summary>
+    /// 상단에 표시되는 Path 경로
+    /// </summary>
+    private string stDisplayPath = String.Empty;
 
     private string[] drives = null;
     private string stCurrentDrive = "";
@@ -274,7 +290,6 @@
             fList = Directory.EnumerateFileSystemEntries(stPath)
              .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
             // .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
-
         }
         catch (UnauthorizedAccessException e)
         {
@@ -331,6 +346,7 @@
         }
 
     append:
+        stDisplayPath = (string.IsNullOrEmpty(stPath)) ? stCurrentDrive : stPath;
         string listHtml = makeSubFileList();
         object[] param = { "divPopUpFileList", listHtml };
         JSRuntime.InvokeAsync<object>("appendHtml", param);

@@ -77,9 +77,6 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bRecvFolderChange { get; set; } = true;               // 수신 폴더 변경 사용 여부.
         public bool bUseUserRecvDownPath { get; set; } = false;           // 로그인 유저별 다운로드 경로 사용 여부
-        //public bool bUseEmail { get; set; } = false;               
-
-        //public bool bUseUserRecvDownPathUserName { get; set; } = true;           // 로그인 유저별 다운로드 경로 사용때, 사용자ID가 아니라 사용자이름 사용할지 유무
         
 
         public List<bool> blistUseEmail { get; set; } = null;               // 메일 관리/결재 사용 유무.
@@ -166,6 +163,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseNotinListForwardUrl { get; set; } = false;              //URL Redirect 정책에 안먹히는 URL forward 기능 사용유무
 
         public string strNotinListForwardUrl { get; set; } = "file:///C:/HANSSAK/OpenNetLink/wwwroot/Web/WebLinkInfoNotList.html";              // URL Redirect 정책에 안먹히는 URL forward할 주소
+
+        public bool bUseFileSelectDelete { get; set; }                          //파일 선택 삭제 사용 유무
 
         public List<bool> bListUsePKIsendRecv { get; set; } = null;             // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
         

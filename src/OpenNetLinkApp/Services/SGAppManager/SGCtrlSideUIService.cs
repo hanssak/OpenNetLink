@@ -77,6 +77,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         private ISGAppConfig _AppConfigInfo;
         private ISGopConfig _OpConfigInfo;
         private ISGVersionConfig _VersionConfigInfo;
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUIService>();
         public SGCtrlSideUIService(ref ISGAppConfig appConfigInfo, ref ISGopConfig opConfigInfo, ref ISGVersionConfig verConfigInfo)
         {
             _AppConfigInfo = appConfigInfo;
@@ -118,9 +119,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             catch(Exception ex)
             {
-                Log.Error($"\nMessage ---\n{ex.Message}");
-                Log.Error($"\nHelpLink ---\n{ex.HelpLink}");
-                Log.Error($"\nStackTrace ---\n{ex.StackTrace}");
+                CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
             }
         }
 
@@ -144,9 +143,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             catch (Exception ex)
             {
-                Log.Error($"\nMessage ---\n{ex.Message}");
-                Log.Error($"\nHelpLink ---\n{ex.HelpLink}");
-                Log.Error($"\nStackTrace ---\n{ex.StackTrace}");
+                CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
             }
         }
 
@@ -170,9 +167,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             catch (Exception ex)
             {
-                Log.Error($"\nMessage ---\n{ex.Message}");
-                Log.Error($"\nHelpLink ---\n{ex.HelpLink}");
-                Log.Error($"\nStackTrace ---\n{ex.StackTrace}");
+                CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
             }
         }
         public void SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode)
@@ -273,8 +268,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             catch(Exception e)
             {
-                //CLog.Here().Information("FindSubMenu-Exception(Msg) : {0}", e.Message);
-                string strMsg = e.Message;
+                CLog.Here().Information($"FindSubMenu-Exception(Msg) : {e.Message}");
             }
 
             SaveOpConfigSerialize();
@@ -402,20 +396,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             (AppConfigInfo as SGAppConfig).bExitTrayMove = exitTrayMove;
             SaveAppConfigSerialize();
-
             NotifyStateChangedCtrlSide();
         }
         public void SetStartTrayMove(bool startTrayMove)
         {
-            (OpConfigInfo as SGopConfig).bStartTrayMove = startTrayMove;
-            SaveOpConfigSerialize();
+            (AppConfigInfo as SGAppConfig).bStartTrayMove = startTrayMove;
+            SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
-        }
-
-
-        public void GetStartProgramReg()
-        {
-
         }
 
         /// <summary>
@@ -441,7 +428,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             else
             {
-                Log.Information($"makeAgentBootStart - UnSupported OS Type - OSDescription : {RuntimeInformation.OSDescription}, OSArchitecture : {RuntimeInformation.OSArchitecture}");
+                CLog.Here().Information($"makeAgentBootStart - UnSupported OS Type - OSDescription : {RuntimeInformation.OSDescription}, OSArchitecture : {RuntimeInformation.OSArchitecture}");
             }
 
             // 일단 설정값을 운영하는 방식으로 적용
@@ -488,7 +475,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         private void ChangeLogLevel(LogEventLevel logLevel)
         {
             AgLog.LogLevelSwitch.MinimumLevel = logLevel;
-            Log.Fatal($"Changed LogLevel to {logLevel.ToString()}");
+            CLog.Here().Fatal($"Changed LogLevel to {logLevel.ToString()}");
         }
         public void SetLogLevel(LogEventLevel logLevel)
         {

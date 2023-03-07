@@ -225,6 +225,12 @@ namespace OpenNetLinkApp.PageEvent
     /// <param name="groupId"></param>
     public delegate void FileMimeRecvEvent(int groupId);
 
+    /// <summary>
+    /// OLE Mime 정보 갱신 Event
+    /// </summary>
+    /// <param name="groupId"></param>
+    public delegate void OLEMimeRecvEvent(int groupId, SGData e);
+
     // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
     //public delegate void GPKICNListRecvEvent(int groupid, PageEventArgs e);
 
@@ -255,7 +261,7 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void SkipFileNotiEvent(int groupid, SGData e);
     //Page Data 갱신 처리
     public delegate void PageDataRefreshEvent();
-    
+
     // 부서정보 조회 요청 응답 처리    
     public delegate void DeptInfoNotiEvent(int groupId);
 }
@@ -416,9 +422,13 @@ namespace OpenNetLinkApp.PageEvent
 
         public SFMRefreshEvent sfmRefreshEvent = null;
 
-        public NotiUpdatePolicyEvent notiUpdatePolicyEvent= null;
+        public NotiUpdatePolicyEvent notiUpdatePolicyEvent = null;
 
         public FileMimeRecvEvent fileMimeRecvEvent = null;
+
+        public OLEMimeRecvEvent oleMimeRecvEvent = null;
+
+
 
         private Dictionary<int, DeptInfoNotiEvent> _dicDeptInfoEvnet = new Dictionary<int, DeptInfoNotiEvent>();
 
@@ -440,6 +450,12 @@ namespace OpenNetLinkApp.PageEvent
         {
             fileMimeRecvEvent = e;
         }
+
+        /// <summary> Db 쿼리 조회 결과가 오면, SGHeaderUI에 전달하여, OLE 마임 리스트 세팅</summary>
+        public OLEMimeRecvEvent GetOLEMimeRecvEvent() => oleMimeRecvEvent;
+        
+        /// <summary> Db 쿼리 조회 결과가 오면, SGHeaderUI에 전달하여, OLE 마임 리스트 세팅</summary>
+        public void SetOLEMimeRecvEvent(OLEMimeRecvEvent e) => oleMimeRecvEvent = e;
 
         public SFMRefreshEvent GetSFMRefreshEvent()
         {

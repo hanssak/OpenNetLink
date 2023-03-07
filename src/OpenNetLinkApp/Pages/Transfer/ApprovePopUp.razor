@@ -631,21 +631,20 @@ public void closePopUp()
 }
 
 
-protected override void OnInitialized()
-{
-    SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-    int groupID = 0;
-    if (sgSideBar != null)
-        groupID = sgSideBar.GroupId;
-    SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-    NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
-    InitText();
-    HsCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FilePrevProgressNoti);
+    protected override void OnInitialized()
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        InitText();
+        HsCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FilePrevProgressNoti);
 
     bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
-
-}
+    }
 
 
 public void SetBindingData(string approverName, string apvStatus, string apvTime)

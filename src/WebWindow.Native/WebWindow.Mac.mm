@@ -14,7 +14,6 @@
 #import <Carbon/Carbon.h>
 
 void *SelfThis = nullptr;
-
 #include "NativeLog.h"
 #include "TrayFunc.h"
 
@@ -40,6 +39,12 @@ bool g_bClipCopyNsend = false;
 static id _appDelegate;
 
 map<NSWindow*, WebWindow*> nsWindowToWebWindow;
+
+void RequestMoveTrayToWebWindow()
+{
+   NTLog(SelfThis, Info, "Called : Request OpenNetLink Move To WebWindow using DoubleCliCk");
+  ((WebWindow*)SelfThis)->MoveTrayToWebWindow();
+}
 
 void WebWindow::Register()
 {

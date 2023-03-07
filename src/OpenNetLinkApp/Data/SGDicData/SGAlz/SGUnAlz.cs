@@ -14,17 +14,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGAlz
     {
 #if _WINDOWS
         //dll 경로 지정
-        public const string strAlzLibName = "D:\\github\\OpenNetLink\\src\\OpenNetLinkApp\\Library\\UnAlzDll.dll";
-        //public const string strAlzLibName = "UnAlzDll.dll";
+        //public const string strAlzLibName = "D:\\github\\OpenNetLink\\src\\OpenNetLinkApp\\Library\\UnAlzDll.dll";
+        public const string strAlzLibName = "\\Library\\UnAlzDll.dll";
 #elif _LINUX
-        public const string strGpkiLibName = "libgpkiapi.so";
+        public const string strAlzLibName = "/Library/UnAlzDll.so";
 #elif _MACOSX
-        public const string strGpkiLibName = "libgpkiapi.so";
+        public const string strAlzLibName = "/Library/UnAlzDll.dylib";
 #else
         public const string strGpkiLibName = "libgpkiapi.so";
 #endif
 
-#if _WINDOWS
+        //#if _WINDOWS
         [DllImport(strAlzLibName, CallingConvention = CallingConvention.Cdecl)]
         public static extern int UnAlzExtract(string stSource, string stDest);
         [DllImport(strAlzLibName, CallingConvention = CallingConvention.Cdecl)]
@@ -57,6 +57,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGAlz
 
             return ret;
         }
-#endif
+//#endif
     }
 }

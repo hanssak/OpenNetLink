@@ -448,7 +448,7 @@ namespace WebWindows
         public void Notification(OS_NOTI category, string title, string message, string navURI = "")
         {
             string image = String.Format($"wwwroot/images/noti/{(int)category}.png");
-            Log.Information("ImageString: " + image);
+            CLog.Here().Information("ImageString: " + image);
 
             /*
             switch(category)
@@ -611,8 +611,7 @@ namespace WebWindows
                     _width = value.Width;
                     _height = value.Height;
                     SetSize();
-                    CLog.Here().Information("Window Size Is Setted {width} {height}", _width, _height);
-                    Log.Information("Window Size Is Setted {width} {height}", _width, _height);
+                    CLog.Here().Information($"Window Size Is Setted {_width} {_height}");
                 }
             }
         }
@@ -804,7 +803,7 @@ namespace WebWindows
                                         bool result = int.TryParse(sval, out ProcId);
                                         if(result)
                                         {
-                                            CLog.Here().Information("Before Folder Oepn: previous nemo({0}) process is kill", ProcId);
+                                            CLog.Here().Information($"Before Folder Oepn: previous nemo({ProcId}) process is kill");
                                             Process localById = Process.GetProcessById(ProcId);
                                             localById.Kill();
                                             break;
@@ -819,7 +818,7 @@ namespace WebWindows
                     }
                     catch(Exception e)
                     {
-                        CLog.Here().Error($"{e}");
+                        CLog.Here().Error($"Exception - MSG : {e.Message}");
                     }
                 }
             }

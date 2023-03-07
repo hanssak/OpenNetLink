@@ -2,7 +2,7 @@
 @inject XmlConfService XmlConf
 @inject PageStatusService pageService
 @inject HSCmdCenter HsCmdCenter
-
+@using AgLogManager
 
 <div class="modal fade" id="PopUpSelectClipType" data-backdrop="static" style="z-index:9999;">
     @*modal-dialog modal-default1*@
@@ -61,11 +61,11 @@
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<ClipBoardTypeSelect>();
 
-    public async Task openPopUp() //Task 
+    public async Task openPopUp() //Task
     {
         eSelectClipType = CLIPTYPE.NONE;
         object[] param = { "PopUpSelectClipType" }; // PopUpLogIn PopUpSelectClipType
-        await JSRuntime.InvokeAsync<object>("openPopUp", param); // await 
+        await JSRuntime.InvokeAsync<object>("openPopUp", param); // await
     }
 
     public void closePopUp()
@@ -80,13 +80,13 @@
 
         base.OnInitialized();
         @*sgUserSvr = SGAppMgrSvc.UserInfoService;
-        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-        sgSettingProc = SGSettingsDBProc.Instance;*@
+            SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+            NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+            siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+            AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+            sgSettingProc = SGSettingsDBProc.Instance;*@
 
-        CLog.Information("ClipBoardTypeSelect - OnInitialized!");
+        CLog.Here().Information("ClipBoardTypeSelect - OnInitialized!");
     }
 
 
