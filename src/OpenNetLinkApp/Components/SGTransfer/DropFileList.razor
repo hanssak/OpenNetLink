@@ -577,8 +577,9 @@
                     if (di.Exists != true)
                         continue;
 
-                    if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
-                        continue;
+                    //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
+                    //if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
+                    //    continue;
 
                     hsStream = new HsStream();
                     hsStream.FileName = fInfo.Name;
@@ -681,7 +682,7 @@
                             hsStream.RelativePath = hsStream.RelativePath;
 
                         hsStream.isNeedApprove = false;
-                        if ((hsStream.Type.Equals("Directory")) || (hsStream.Type.Equals("Hidden, Directory")))
+                        if (hsStream.Type.Contains("Directory"))
                         {
                             hsStream.Size = 0;
                             hsStream.Type = "DIR";
