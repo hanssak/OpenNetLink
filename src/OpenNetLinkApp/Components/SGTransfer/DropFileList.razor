@@ -494,8 +494,10 @@
                     }
 
                     bool bHidden = false;
-                    if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
-                        bHidden = true;
+                    
+                    //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
+                    //if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
+                    //    bHidden = true;
                     if (!GetRegExamEnable(fileAddManage, topFile, hsStream, hsStream.Type, bHidden, hsStream.Size))
                     {
                         existErr = true;
@@ -734,8 +736,9 @@
                         if (hsStream.IsDir == false)
                         {
                             bool bHidden = false;
-                            if ((item.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
-                                bHidden = true;
+                            //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
+                            //if ((item.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                            //    bHidden = true;
                             if (!GetRegExamEnable(fileAddManage, childFile, hsStream, hsStream.Type, bHidden, hsStream.Size))
                             {
                                 existErr = true;
