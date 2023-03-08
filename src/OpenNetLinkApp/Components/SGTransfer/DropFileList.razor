@@ -368,237 +368,295 @@
     async Task OnDropFileAdd(List<string> recvList, bool isRMouseAdd)
     {
         FileExamEvent SGFileExamEvent = null;
-        try
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null && sgLoginData.GetFileTrans() == false)
+            return;
+
+        SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
+        if (SGFileExamEvent == null)
+            return;
+
+        List<HsStream> listTryHsStream = new List<HsStream>();      //등록 시도한 목록이 모두 정상 처리되어야 저장하도록 임시 List로 확인
+        HsStream hsStream = null;
+
+        fileAddManage.DataClear();
+
+        foreach (var item in HsStreamList)
         {
-            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupID = 0;
-            if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;
-
-            SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sgLoginData != null && sgLoginData.GetFileTrans() == false)
-                return;
-
-            SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
-            if (SGFileExamEvent == null)
-                return;
-
-            List<HsStream> listTryHsStream = new List<HsStream>();      //등록 시도한 목록이 모두 정상 처리되어야 저장하도록 임시 List로 확인
-            HsStream hsStream = null;
-
-            fileAddManage.DataClear();
-
-            foreach (var item in HsStreamList)
+            for (int i = 0; i < recvList.Count; i++)
             {
-                for (int i = 0; i < recvList.Count; i++)
+                string strItemFileName = Path.GetFileName(item.RelativePath);
+                string strListFileName = Path.GetFileName(recvList[i]);
+                if (strItemFileName == strListFileName)
                 {
-                    string strItemFileName = Path.GetFileName(item.RelativePath);
-                    string strListFileName = Path.GetFileName(recvList[i]);
-                    if (strItemFileName == strListFileName)
-                    {
-                        recvList.RemoveAt(i);
-                    }
+                    recvList.RemoveAt(i);
                 }
             }
+        }
 
-            int nTotalCount = GetListTotalCount(recvList);
-            if (nTotalCount <= 0)
-                return;
+        int nTotalCount = GetListTotalCount(recvList);
+        if (nTotalCount <= 0)
+            return;
 
-            if (GetRegCountEnable(nTotalCount) == false)
-                return;
+        if (GetRegCountEnable(nTotalCount) == false)
+            return;
 
-            List<string> list = new List<string>(recvList);
-            await refProgress.openPopUp();
+        List<string> list = new List<string>(recvList);
+        await refProgress.openPopUp();
 
-            bool existErr = false;      //검사 파일 중 에러 발생 여부
-            int per = 0;
-            int nExamCount = 0;
-            for (int i = 0; i < list.Count; i++)        //등록 시도 파일 리스트 검사
+        bool existErr = false;      //검사 파일 중 에러 발생 여부
+        int per = 0;
+        int nExamCount = 0;
+        for (int i = 0; i < list.Count; i++)        //등록 시도 파일 리스트 검사
+        {
+            if (pageService.GetFileExaming() == false)
             {
-                if (pageService.GetFileExaming() == false)
+                if (isRMouseAdd)
+                    NotifyChange_InDropFileList(null);
+                else
+                    StateHasChanged();
+                return;
+            }
+            string data = list[i];
+            //Console.WriteLine($"File Dropped  {data}");
+            if (data != null && data.Length > 0)
+            {
+                bool bFind = false;
+                string strDataFileName = "";
+                foreach (var item in HsStreamList)
                 {
-                    if (isRMouseAdd)
-                        NotifyChange_InDropFileList(null);
-                    else
-                        StateHasChanged();
-                    return;
+                    string strItemFileName = Path.GetFileName(item.RelativePath);
+                    strDataFileName = Path.GetFileName(data);
+                    if (strItemFileName == strDataFileName)
+                    //if (item.RelativePath == data)
+                    {
+                        bFind = true;
+                        break;
+                    }
                 }
-                string data = list[i];
-                //Console.WriteLine($"File Dropped  {data}");
-                if (data != null && data.Length > 0)
+                if (bFind == true)
                 {
-                    bool bFind = false;
-                    string strDataFileName = "";
-                    foreach (var item in HsStreamList)
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per, strDataFileName);
+                    continue;
+                }
+
+                System.IO.FileInfo fInfo = new System.IO.FileInfo(data);
+                FileAttributes attr = fInfo.Attributes;
+
+                //최상위 파일 구성
+                FileAddErr topFile = fileAddManage.CreateFileAddErrInfo(fInfo.Name, fInfo.FullName, "");
+
+                CLog.Here().Information($"FileName [{fInfo.Name}]");
+                CLog.Here().Information($"DIR Attribute = [{attr & FileAttributes.Directory}]");
+                if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
+                {
+                    topFile.FilePath = fInfo.Name;
+
+                    hsStream = new HsStream();
+                    hsStream.FileName = fInfo.Name;
+                    hsStream.Type = fInfo.Attributes.ToString();
+                    hsStream.StartPath = "";
+                    hsStream.RelativePath = fInfo.Name;
+                    hsStream.Size = fInfo.Length;
+
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    else
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+
+
+                    if (fInfo.Name.LastIndexOf(".") > -1)
+                        hsStream.Type = fInfo.Name.Substring(fInfo.Name.LastIndexOf(".") + 1);
+                    else
+                        hsStream.Type = "";
+
+                    hsStream.ModifyTime = fInfo.LastWriteTime;
+                    DateTime SubDate = (DateTime)hsStream.ModifyTime;
+                    string strSubDate = SubDate.ToShortDateString();
+                    strSubDate = strSubDate.Replace("-", "");
+                    string strSubTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", SubDate.Hour, SubDate.Minute, SubDate.Second);
+                    hsStream.MTime = strSubDate + strSubTime;
+                    hsStream.IsDir = false;
+                    hsStream.MemoryType = HsStreamType.FileStream;
+                    hsStream.isNeedApprove = false;
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
                     {
-                        string strItemFileName = Path.GetFileName(item.RelativePath);
-                        strDataFileName = Path.GetFileName(data);
-                        if (strItemFileName == strDataFileName)
-                        //if (item.RelativePath == data)
-                        {
-                            bFind = true;
-                            break;
-                        }
-                    }
-                    if (bFind == true)
-                    {
-                        nExamCount++;
-                        per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per, strDataFileName);
-                        continue;
-                    }
-
-                    System.IO.FileInfo fInfo = new System.IO.FileInfo(data);
-                    FileAttributes attr = fInfo.Attributes;
-
-                    //최상위 파일 구성
-                    FileAddErr topFile = fileAddManage.CreateFileAddErrInfo(fInfo.Name, fInfo.FullName, "");
-
-                    CLog.Here().Information($"FileName [{fInfo.Name}]");
-                    CLog.Here().Information($"DIR Attribute = [{attr & FileAttributes.Directory}]");
-                    if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
-                    {
-                        topFile.FilePath = fInfo.Name;
-
-                        hsStream = new HsStream();
-                        hsStream.FileName = fInfo.Name;
-                        hsStream.Type = fInfo.Attributes.ToString();
-                        hsStream.StartPath = "";
-                        hsStream.RelativePath = fInfo.Name;
-                        hsStream.Size = fInfo.Length;
-
-                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                        else
-                            hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
-
-
-                        if (fInfo.Name.LastIndexOf(".") > -1)
-                            hsStream.Type = fInfo.Name.Substring(fInfo.Name.LastIndexOf(".") + 1);
-                        else
-                            hsStream.Type = "";
-
-                        hsStream.ModifyTime = fInfo.LastWriteTime;
-                        DateTime SubDate = (DateTime)hsStream.ModifyTime;
-                        string strSubDate = SubDate.ToShortDateString();
-                        strSubDate = strSubDate.Replace("-", "");
-                        string strSubTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", SubDate.Hour, SubDate.Minute, SubDate.Second);
-                        hsStream.MTime = strSubDate + strSubTime;
-                        hsStream.IsDir = false;
-                        hsStream.MemoryType = HsStreamType.FileStream;
-                        hsStream.isNeedApprove = false;
-                        if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
-                        {
-                            if (CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
-                                hsStream.isNeedApprove = true;
-                        }
-
-                        bool bHidden = false;
-
-                        //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
-                        //if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
-                        //    bHidden = true;
-                        if (!GetRegExamEnable(fileAddManage, topFile, hsStream, hsStream.Type, bHidden, hsStream.Size))
-                        {
-                            existErr = true;
-                            nExamCount++;
-                            per = (nExamCount * 100) / nTotalCount;
-                            SGFileExamEvent(per, hsStream.FileName);
-                            continue;
-                        }
-
-                        try
-                        {
-                            hsStream.stream = File.OpenRead(fInfo.FullName);
-                        }
-                        catch
-                        {
-                            existErr = true;
-
-                            @*fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);*@
-                            topFile.eErrType = eFileAddErr.eFA_FILE_READ_ERROR;
-                            CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
-                            hsStream.stream = null;
-                            nExamCount++;
-                            per = (nExamCount * 100) / nTotalCount;
-                            SGFileExamEvent(per, hsStream.FileName);
-                            continue;
-                        }
-                        //hsStream.stream = File.OpenRead(fInfo.FullName);
-                        if (await GetExamExtChange(fileAddManage, topFile, hsStream) != 0)
-                        {
-                            existErr = true;
-                            hsStream.stream = null;
-                            nExamCount++;
-                            per = (nExamCount * 100) / nTotalCount;
-                            SGFileExamEvent(per, hsStream.FileName);
-                            continue;
-                        }
-
-                        int nRet = 0;
-                        nRet = await GetExamCheckZip(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount);
-                        if (nRet == 1)
+                        if (CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
                             hsStream.isNeedApprove = true;
-                        else if (nRet != 0)
-                        {
-                            existErr = true;
-                            hsStream.stream = null;
-                            nExamCount++;
-                            per = (nExamCount * 100) / nTotalCount;
-                            SGFileExamEvent(per, hsStream.FileName);
-                            continue;
-                        }
+                    }
 
-                        //2022.10.07 BY KYH - OLE 상세파일 UI 표현 기능 추가
-                        //01. 문서파일 내 OLE 개체 검사
-                        //02. 문서파일 압축해제 후 파일 검사
+                    bool bHidden = false;
 
-                        //01. 문서파일 내 OLE 개체 검사
-                        if (await GetExamCheckDocument(fileAddManage, topFile, hsStream) != 0)
-                        {
-                            existErr = true;
-                            hsStream.stream = null;
-                            nExamCount++;
-                            per = (nExamCount * 100) / nTotalCount;
-                            SGFileExamEvent(per, hsStream.FileName);
-                            continue;
-                        }
-
-                        //HsStreamList.Add(hsStream);
-                        //SetFileAdd(hsStream);    // 2022.10.05 BY KYH - 등록 시도 파일이 모두 정상인 경우 등록 가능하도록 이동
-                        listTryHsStream.Add(hsStream);
+                    //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
+                    //if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
+                    //    bHidden = true;
+                    if (!GetRegExamEnable(fileAddManage, topFile, hsStream, hsStream.Type, bHidden, hsStream.Size))
+                    {
+                        existErr = true;
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
                         SGFileExamEvent(per, hsStream.FileName);
+                        continue;
                     }
-                    else if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
-                    {
-                        DirectoryInfo di = new DirectoryInfo(fInfo.FullName);
-                        if (di.Exists != true)
-                            continue;
 
-                        //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
-                        //if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
-                        //    continue;
+                    try
+                    {
+                        hsStream.stream = File.OpenRead(fInfo.FullName);
+                    }
+                    catch
+                    {
+                        existErr = true;
+
+                        @*fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);*@
+                        topFile.eErrType = eFileAddErr.eFA_FILE_READ_ERROR;
+                        CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
+                        hsStream.stream = null;
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per, hsStream.FileName);
+                        continue;
+                    }
+                    //hsStream.stream = File.OpenRead(fInfo.FullName);
+                    if (await GetExamExtChange(fileAddManage, topFile, hsStream) != 0)
+                    {
+                        existErr = true;
+                        hsStream.stream = null;
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per, hsStream.FileName);
+                        continue;
+                    }
+
+                    int nRet = 0;
+                    nRet = await GetExamCheckZip(fileAddManage, topFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount);
+                    if (nRet == 1)
+                        hsStream.isNeedApprove = true;
+                    else if (nRet != 0)
+                    {
+                        existErr = true;
+                        hsStream.stream = null;
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per, hsStream.FileName);
+                        continue;
+                    }
+
+                    //2022.10.07 BY KYH - OLE 상세파일 UI 표현 기능 추가
+                    //01. 문서파일 내 OLE 개체 검사
+                    //02. 문서파일 압축해제 후 파일 검사
+
+                    //01. 문서파일 내 OLE 개체 검사
+                    if (await GetExamCheckDocument(fileAddManage, topFile, hsStream) != 0)
+                    {
+                        existErr = true;
+                        hsStream.stream = null;
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per, hsStream.FileName);
+                        continue;
+                    }
+
+                    //HsStreamList.Add(hsStream);
+                    //SetFileAdd(hsStream);    // 2022.10.05 BY KYH - 등록 시도 파일이 모두 정상인 경우 등록 가능하도록 이동
+                    listTryHsStream.Add(hsStream);
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per, hsStream.FileName);
+                }
+                else if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                {
+                    DirectoryInfo di = new DirectoryInfo(fInfo.FullName);
+                    if (di.Exists != true)
+                        continue;
+
+                    //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
+                    //if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
+                    //    continue;
+
+                    hsStream = new HsStream();
+                    hsStream.FileName = fInfo.Name;
+                    hsStream.Size = 0;
+                    hsStream.Type = "DIR";
+                    hsStream.ModifyTime = fInfo.LastWriteTime;
+                    DateTime date = (DateTime)hsStream.ModifyTime;
+                    string strDate = date.ToShortDateString();
+                    strDate = strDate.Replace("-", "");
+                    string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
+                    hsStream.MTime = strDate + strTime;
+                    hsStream.RelativePath = fInfo.FullName;
+                    hsStream.IsDir = true;
+                    hsStream.StartPath = hsStream.RelativePath;
+                    string strStartPath = hsStream.StartPath;
+                    hsStream.stream = null;
+                    hsStream.MemoryType = HsStreamType.FileStream;
+                    if (!hsStream.StartPath.Equals(""))
+                    {
+                        int index = -1;
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            index = hsStream.StartPath.LastIndexOf("\\");
+                        else
+                            index = hsStream.StartPath.LastIndexOf("/");
+                        //index = hsStream.StartPath.LastIndexOf("\\");
+                        if (index >= 0)
+                        {
+                            hsStream.StartPath = hsStream.StartPath.Substring(0, index);
+                            string startPath = "";
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                                startPath = hsStream.StartPath + "\\";
+                            else
+                                startPath = hsStream.StartPath + "/";
+                            //string startPath = hsStream.StartPath + "\\";
+                            if (!hsStream.RelativePath.Equals(startPath))
+                                hsStream.RelativePath = hsStream.RelativePath.Replace(startPath, "");
+                        }
+                    }
+                    else
+                        hsStream.RelativePath = hsStream.RelativePath;
+
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    else
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    //HsStreamList.Add(hsStream);
+                    //SetFileAdd(hsStream);
+                    listTryHsStream.Add(hsStream);
+                    nExamCount++;
+
+                    List<System.IO.FileInfo> FileData = DirSearch(fInfo.FullName);
+                    if (FileData == null)
+                    {
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per, fInfo.Name);
+                        continue;
+                    }
+                    if (FileData.Count == 0)
+                    {
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per, fInfo.Name);
+                        continue;
+                    }
+
+                    foreach (var item in FileData)
+                    {
+                        //FileAddErr childFile = topFile.CreateChildren(item.Name, item.FullName, topFile.FileName);
+                        FileAddErr childFile = fileAddManage.SetFileTreeFromFilePath(topFile, item);
 
                         hsStream = new HsStream();
-                        hsStream.FileName = fInfo.Name;
-                        hsStream.Size = 0;
-                        hsStream.Type = "DIR";
-                        hsStream.ModifyTime = fInfo.LastWriteTime;
-                        DateTime date = (DateTime)hsStream.ModifyTime;
-                        string strDate = date.ToShortDateString();
-                        strDate = strDate.Replace("-", "");
-                        string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
-                        hsStream.MTime = strDate + strTime;
-                        hsStream.RelativePath = fInfo.FullName;
-                        hsStream.IsDir = true;
-                        hsStream.StartPath = hsStream.RelativePath;
-                        string strStartPath = hsStream.StartPath;
-                        hsStream.stream = null;
-                        hsStream.MemoryType = HsStreamType.FileStream;
+                        hsStream.FileName = item.Name;
+                        hsStream.Type = item.Attributes.ToString();
+                        hsStream.StartPath = strStartPath;
+                        hsStream.RelativePath = item.FullName;
+
                         if (!hsStream.StartPath.Equals(""))
                         {
                             int index = -1;
@@ -606,7 +664,7 @@
                                 index = hsStream.StartPath.LastIndexOf("\\");
                             else
                                 index = hsStream.StartPath.LastIndexOf("/");
-                            //index = hsStream.StartPath.LastIndexOf("\\");
+
                             if (index >= 0)
                             {
                                 hsStream.StartPath = hsStream.StartPath.Substring(0, index);
@@ -623,218 +681,147 @@
                         else
                             hsStream.RelativePath = hsStream.RelativePath;
 
-                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                        else
-                            hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
-                        //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                        //HsStreamList.Add(hsStream);
-                        //SetFileAdd(hsStream);
-                        listTryHsStream.Add(hsStream);
-                        nExamCount++;
-
-                        List<System.IO.FileInfo> FileData = DirSearch(fInfo.FullName);
-                        if (FileData == null)
+                        hsStream.isNeedApprove = false;
+                        if (hsStream.Type.Contains("Directory"))
                         {
-                            nExamCount++;
-                            per = (nExamCount * 100) / nTotalCount;
-                            SGFileExamEvent(per, fInfo.Name);
-                            continue;
-                        }
-                        if (FileData.Count == 0)
-                        {
-                            per = (nExamCount * 100) / nTotalCount;
-                            SGFileExamEvent(per, fInfo.Name);
-                            continue;
-                        }
-
-                        foreach (var item in FileData)
-                        {
-                            //FileAddErr childFile = topFile.CreateChildren(item.Name, item.FullName, topFile.FileName);
-                            FileAddErr childFile = fileAddManage.SetFileTreeFromFilePath(topFile, item);
-
-                            hsStream = new HsStream();
-                            hsStream.FileName = item.Name;
-                            hsStream.Type = item.Attributes.ToString();
-                            hsStream.StartPath = strStartPath;
-                            hsStream.RelativePath = item.FullName;
-
-                            if (!hsStream.StartPath.Equals(""))
-                            {
-                                int index = -1;
-                                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                                    index = hsStream.StartPath.LastIndexOf("\\");
-                                else
-                                    index = hsStream.StartPath.LastIndexOf("/");
-
-                                if (index >= 0)
-                                {
-                                    hsStream.StartPath = hsStream.StartPath.Substring(0, index);
-                                    string startPath = "";
-                                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                                        startPath = hsStream.StartPath + "\\";
-                                    else
-                                        startPath = hsStream.StartPath + "/";
-                                    //string startPath = hsStream.StartPath + "\\";
-                                    if (!hsStream.RelativePath.Equals(startPath))
-                                        hsStream.RelativePath = hsStream.RelativePath.Replace(startPath, "");
-                                }
-                            }
-                            else
-                                hsStream.RelativePath = hsStream.RelativePath;
-
-                            hsStream.isNeedApprove = false;
-                            if (hsStream.Type.Contains("Directory"))
-                            {
-                                hsStream.Size = 0;
-                                hsStream.Type = "DIR";
-                                hsStream.stream = null;
-                                hsStream.MemoryType = HsStreamType.FileStream;
-                                hsStream.IsDir = true;
-                            }
-                            else
-                            {
-                                hsStream.Size = item.Length;
-
-                                if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
-                                {
-                                    if (CsFunction.isFileExtinListStr(true, fInfo.Extension, sgLoginData.GetExceptionExt()))
-                                        hsStream.isNeedApprove = true;
-                                }
-                            }
-
-                            if (hsStream.Type.Contains("Archive"))//(hsStream.Type.Equals("Archive"))
-                            {
-                                if (item.Name.LastIndexOf(".") > -1)
-                                    hsStream.Type = item.Name.Substring(item.Name.LastIndexOf(".") + 1);
-                                else
-                                    hsStream.Type = "";
-                                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                                else
-                                    hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
-
-                                hsStream.IsDir = false;
-                            }
-
-                            hsStream.ModifyTime = item.LastWriteTime;
-                            DateTime SubDate = (DateTime)hsStream.ModifyTime;
-                            string strSubDate = SubDate.ToShortDateString();
-                            strSubDate = strSubDate.Replace("-", "");
-                            string strSubTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
-                            hsStream.MTime = strSubDate + strSubTime;
+                            hsStream.Size = 0;
+                            hsStream.Type = "DIR";
+                            hsStream.stream = null;
                             hsStream.MemoryType = HsStreamType.FileStream;
+                            hsStream.IsDir = true;
+                        }
+                        else
+                        {
+                            hsStream.Size = item.Length;
 
+                            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
+                            {
+                                if (CsFunction.isFileExtinListStr(true, fInfo.Extension, sgLoginData.GetExceptionExt()))
+                                    hsStream.isNeedApprove = true;
+                            }
+                        }
+
+                        if (hsStream.Type.Contains("Archive"))//(hsStream.Type.Equals("Archive"))
+                        {
+                            if (item.Name.LastIndexOf(".") > -1)
+                                hsStream.Type = item.Name.Substring(item.Name.LastIndexOf(".") + 1);
+                            else
+                                hsStream.Type = "";
                             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                                 hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
                             else
                                 hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
 
-                            if (hsStream.IsDir == false)
-                            {
-                                bool bHidden = false;
-                                //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
-                                //if ((item.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
-                                //    bHidden = true;
-                                if (!GetRegExamEnable(fileAddManage, childFile, hsStream, hsStream.Type, bHidden, hsStream.Size))
-                                {
-                                    existErr = true;
-                                    nExamCount++;
-                                    per = (nExamCount * 100) / nTotalCount;
-                                    SGFileExamEvent(per, hsStream.FileName);
-                                    continue;
-                                }
-                            }
-
-                            if (!hsStream.Type.Equals("DIR"))
-                            {
-                                try
-                                {
-                                    hsStream.stream = File.OpenRead(item.FullName);
-                                }
-                                catch
-                                {
-                                    existErr = true;
-                                    @*fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);*@
-                                    childFile.eErrType = eFileAddErr.eFA_FILE_READ_ERROR;
-                                    CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
-                                    hsStream.stream = null;
-                                    nExamCount++;
-                                    per = (nExamCount * 100) / nTotalCount;
-                                    SGFileExamEvent(per, hsStream.FileName);
-                                    continue;
-                                }
-                                //hsStream.stream = File.OpenRead(fInfo.FullName);
-                                if (await GetExamExtChange(fileAddManage, childFile, hsStream) != 0)
-                                {
-                                    existErr = true;
-                                    hsStream.stream = null;
-                                    nExamCount++;
-                                    per = (nExamCount * 100) / nTotalCount;
-                                    SGFileExamEvent(per, hsStream.FileName);
-                                    continue;
-                                }
-
-                                int nRet = 0;
-                                nRet = await GetExamCheckZip(fileAddManage, childFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount);
-                                if (nRet == 1)
-                                    hsStream.isNeedApprove = true;
-                                else if (nRet != 0)
-                                {
-                                    existErr = true;
-                                    hsStream.stream = null;
-                                    nExamCount++;
-                                    per = (nExamCount * 100) / nTotalCount;
-                                    SGFileExamEvent(per, hsStream.FileName);
-                                    continue;
-                                }
-
-                                //2022.10.07 BY KYH - OLE 상세파일 UI 표현 기능 추가
-                                //01. 문서파일 내 OLE 개체 검사
-                                //02. 문서파일 압축해제 후 파일 검사
-
-                                //01. 문서파일 내 OLE 개체 검사
-                                if (await GetExamCheckDocument(fileAddManage, childFile, hsStream) != 0)
-                                {
-                                    existErr = true;
-                                    hsStream.stream = null;
-                                    nExamCount++;
-                                    per = (nExamCount * 100) / nTotalCount;
-                                    SGFileExamEvent(per, hsStream.FileName);
-                                    continue;
-                                }
-                            }
-                            //HsStreamList.Add(hsStream);
-                            //SetFileAdd(hsStream);
-                            listTryHsStream.Add(hsStream);
-                            nExamCount++;
-                            per = (nExamCount * 100) / nTotalCount;
-                            SGFileExamEvent(per, hsStream.FileName);
+                            hsStream.IsDir = false;
                         }
+
+                        hsStream.ModifyTime = item.LastWriteTime;
+                        DateTime SubDate = (DateTime)hsStream.ModifyTime;
+                        string strSubDate = SubDate.ToShortDateString();
+                        strSubDate = strSubDate.Replace("-", "");
+                        string strSubTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
+                        hsStream.MTime = strSubDate + strSubTime;
+                        hsStream.MemoryType = HsStreamType.FileStream;
+
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                        else
+                            hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+
+                        if (hsStream.IsDir == false)
+                        {
+                            bool bHidden = false;
+                            //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
+                            //if ((item.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                            //    bHidden = true;
+                            if (!GetRegExamEnable(fileAddManage, childFile, hsStream, hsStream.Type, bHidden, hsStream.Size))
+                            {
+                                existErr = true;
+                                nExamCount++;
+                                per = (nExamCount * 100) / nTotalCount;
+                                SGFileExamEvent(per, hsStream.FileName);
+                                continue;
+                            }
+                        }
+
+                        if (!hsStream.Type.Equals("DIR"))
+                        {
+                            try
+                            {
+                                hsStream.stream = File.OpenRead(item.FullName);
+                            }
+                            catch
+                            {
+                                existErr = true;
+                                @*fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);*@
+                                childFile.eErrType = eFileAddErr.eFA_FILE_READ_ERROR;
+                                CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
+                                hsStream.stream = null;
+                                nExamCount++;
+                                per = (nExamCount * 100) / nTotalCount;
+                                SGFileExamEvent(per, hsStream.FileName);
+                                continue;
+                            }
+                            //hsStream.stream = File.OpenRead(fInfo.FullName);
+                            if (await GetExamExtChange(fileAddManage, childFile, hsStream) != 0)
+                            {
+                                existErr = true;
+                                hsStream.stream = null;
+                                nExamCount++;
+                                per = (nExamCount * 100) / nTotalCount;
+                                SGFileExamEvent(per, hsStream.FileName);
+                                continue;
+                            }
+
+                            int nRet = 0;
+                            nRet = await GetExamCheckZip(fileAddManage, childFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount);
+                            if (nRet == 1)
+                                hsStream.isNeedApprove = true;
+                            else if (nRet != 0)
+                            {
+                                existErr = true;
+                                hsStream.stream = null;
+                                nExamCount++;
+                                per = (nExamCount * 100) / nTotalCount;
+                                SGFileExamEvent(per, hsStream.FileName);
+                                continue;
+                            }
+
+                            //2022.10.07 BY KYH - OLE 상세파일 UI 표현 기능 추가
+                            //01. 문서파일 내 OLE 개체 검사
+                            //02. 문서파일 압축해제 후 파일 검사
+
+                            //01. 문서파일 내 OLE 개체 검사
+                            if (await GetExamCheckDocument(fileAddManage, childFile, hsStream) != 0)
+                            {
+                                existErr = true;
+                                hsStream.stream = null;
+                                nExamCount++;
+                                per = (nExamCount * 100) / nTotalCount;
+                                SGFileExamEvent(per, hsStream.FileName);
+                                continue;
+                            }
+                        }
+                        //HsStreamList.Add(hsStream);
+                        //SetFileAdd(hsStream);
+                        listTryHsStream.Add(hsStream);
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per, hsStream.FileName);
                     }
                 }
             }
-            //파일 등록처리 조건 : 등록 시도 된 파일이 모두 정상적인 경우 OR 부분등록 옵션이 설정된 경우
-            bool usePartialFileAdd = SGAppMgrSvc.OpConfigInfoService.GetUsePartialFileAddInTransfer();
-            if (!existErr || usePartialFileAdd) SetFileAdd(listTryHsStream);
+        }
+        //파일 등록처리 조건 : 등록 시도 된 파일이 모두 정상적인 경우 OR 부분등록 옵션이 설정된 경우
+        bool usePartialFileAdd = SGAppMgrSvc.OpConfigInfoService.GetUsePartialFileAddInTransfer();
+        if (!existErr || usePartialFileAdd) SetFileAdd(listTryHsStream);
 
-            // Important: Invoke StateHasChanged() to update the page
-            StateHasChanged();
-            // 파일 추가후 화면갱신
-            StateHasChanged();
-            await jsRuntime.InvokeAsync<object>("setDropzoneInputSize");
-        }
-        catch (Exception ex)
-        {
-            CLog.Here().Error("OnDropFileAdd Exception - " + ex.ToString());
-            if (SGFileExamEvent != null)
-                SGFileExamEvent(-1, "Exception Error");
-        }
-        finally
-        {
-            if (SGFileExamEvent != null)
-                SGFileExamEvent(100, "File Exam Complete");
-        }
+        // Important: Invoke StateHasChanged() to update the page
+        StateHasChanged();
+        // 파일 추가후 화면갱신
+        StateHasChanged();
+        await jsRuntime.InvokeAsync<object>("setDropzoneInputSize");
+
     }
 
     protected override void OnInitialized()
@@ -886,285 +873,269 @@
     {
         FileExamEvent SGFileExamEvent = null;
         List<HsStream> hsStreamList = new List<HsStream>();
-        try
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
+        if (SGFileExamEvent == null)
+            return (hsStreamList, false);
+
+        fileAddManage.DataClear();
+        List<string> dirs = new List<string>();
+
+        int nTotalCount = files.Count();
+        if (nTotalCount < 1)
+            return (hsStreamList, false);
+
+        if (GetRegCountEnable(nTotalCount) == false)
+            return (hsStreamList, false);
+
+        await refProgress.openPopUp();
+
+        List<HsStream> listTryHsStream = new List<HsStream>();      //등록 시도한 목록이 모두 정상 처리되어야 저장하도록 임시 List로 확인
+        HsStream hsStream = null;
+
+        bool existErr = false;      //검사 파일 중 에러 발생 여부
+        int nExamCount = 0;
+        int per = 0;
+        foreach (var file in files)
         {
-            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupID = 0;
-            if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;
-
-            SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
-            if (SGFileExamEvent == null)
-                return (hsStreamList, false);
-                
-            fileAddManage.DataClear();
-            List<string> dirs = new List<string>();
-
-            int nTotalCount = files.Count();
-            if (nTotalCount < 1)
-                return (hsStreamList, false);
-
-            if (GetRegCountEnable(nTotalCount) == false)
-                return (hsStreamList, false);
-
-            await refProgress.openPopUp();
-
-            List<HsStream> listTryHsStream = new List<HsStream>();      //등록 시도한 목록이 모두 정상 처리되어야 저장하도록 임시 List로 확인
-            HsStream hsStream = null;
-
-            bool existErr = false;      //검사 파일 중 에러 발생 여부
-            int nExamCount = 0;
-            int per = 0;
-            foreach (var file in files)
+            if (pageService.GetFileExaming() == false)
             {
-                if (pageService.GetFileExaming() == false)
+                StateHasChanged();
+                return (hsStreamList, existErr);
+            }
+
+            //자바스크립트로부터 드래그앤 드롭한 폴더 정보 가져오기
+            //파일 불러오는데 문제가 있다면 필히 자바스크립트를 확인해야함!!!
+            var fileInfo = await file.ReadFileInfoAsync();
+
+            if (fileInfo == null)
+            {
+                await refProgress.closePopUp();
+                return (hsStreamList, existErr);
+            }
+            bool bFind = false;
+            foreach (var item in HsStreamList)
+            {
+                string stListPath = item.RelativePath.Replace("\\", "").Replace("/", "");
+                string stNewPath = fileInfo.Path.Replace("\\", "").Replace("/", "");
+
+                if (stListPath == stNewPath)
                 {
-                    StateHasChanged();
-                    return (hsStreamList, existErr);
-                }
-
-                //자바스크립트로부터 드래그앤 드롭한 폴더 정보 가져오기
-                //파일 불러오는데 문제가 있다면 필히 자바스크립트를 확인해야함!!!
-                var fileInfo = await file.ReadFileInfoAsync();
-
-                if (fileInfo == null)
-                {
-                    await refProgress.closePopUp();
-                    return (hsStreamList, existErr);
-                }
-                bool bFind = false;
-                foreach (var item in HsStreamList)
-                {
-                    string stListPath = item.RelativePath.Replace("\\", "").Replace("/", "");
-                    string stNewPath = fileInfo.Path.Replace("\\", "").Replace("/", "");
-
-                    if (stListPath == stNewPath)
-                    {
-                        bFind = true;
-                        break;
-                    }
-                }
-
-                if (bFind == true)
-                {
-                    nExamCount++;
-                    per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per, fileInfo.Name);
-
-                    continue;
-                }
-
-                bAsyncData = true;
-                hsStream = new HsStream();
-
-                /*
-                드래그로 인한 파일추가는 Dir과 File이 전체경로가 포함되어 있지 않음
-                ex) files :
-                compress_1Depth_ExtentionErr / compress_1Depth_ExtentionErr / Dir
-                AddFileRMX64.dll / compress_1Depth_ExtentionErr/AddFileRMX64.dll / File
-                SecureGate-20230217.Log / compress_1Depth_ExtentionErr/SecureGate-20230217.Log / File
-                SecureGate-20230220.Log / compress_1Depth_ExtentionErr/SecureGate-20230220.Log / File
-                SecureGate-20230215.Log / compress_1Depth_ExtentionErr/OLD_LOG/SecureGate-20230215.Log / File
-                SecureGate-20230216.Log / compress_1Depth_ExtentionErr/OLD_LOG/SecureGate-20230216.Log / File
-                UnAlzDll.dll / compress_1Depth_ExtentionErr/OLD_LOG/UnAlzDll.dll / File
-                */
-
-                //최상위 파일 구성
-                //FileAddErr topFile = fileAddManage.CreateFileAddErrInfo(fileInfo.Name, fileInfo.Path, "");
-                FileAddErr currentFile = fileAddManage.SetFileTreeFromFilePath(fileInfo.Path, "/");
-                if (fileInfo.Dir != "Dir")
-                {
-                    hsStream.Size = fileInfo.Size;
-                    hsStream.FileName = Path.GetFileName(fileInfo.Path);
-                    hsStream.RelativePath = fileInfo.Path;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                    else
-                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
-
-                    DateTime date = DateTime.ParseExact(fileInfo.Etc, "yyyy/MM/dd HH:mm:ss", null);
-                    //DateTime date = (DateTime)fileInfo.LastModifiedDate;
-                    hsStream.ModifyTime = date;
-                    string strDate = date.ToShortDateString();
-                    strDate = strDate.Replace("-", "");
-                    string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
-                    hsStream.MTime = strDate + strTime;
-
-
-                    if (!hsStream.FileName.Equals(""))
-                    {
-                        if (hsStream.FileName.LastIndexOf(".") > -1)
-                            hsStream.Type = hsStream.FileName.Substring(hsStream.FileName.LastIndexOf(".") + 1);
-                        else
-                            hsStream.Type = "";
-                    }
-                    hsStream.IsDir = false;
-                    hsStream.MemoryType = HsStreamType.MemoryStream;
-                    if (!GetRegExamEnable(fileAddManage, currentFile, hsStream, hsStream.Type, false, hsStream.Size))
-                    {
-                        existErr = true;
-                        nExamCount++;
-                        per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per, hsStream.FileName);
-                        continue;
-                    }
-                    CLog.Here().Information($"fileName : [{fileInfo.Name}] OpenReadAsync before!");
-
-                    //OpenReadAsyncNoSetUsedList로 변경
-                    //레드마인 #2446 [2022-04-19] 드래그 앤 드롭 폴더 추가 이슈사항 참고
-                    //hsStream.stream = await file.OpenReadAsync(); // => 이 로직에는 DirSubFiles.use[i] = "y"로 설정하는 부분이 있음 그래서 짝수번째 폴더는 추가 안되는 현상 발생
-
-                    hsStream.stream = await file.OpenReadAsyncNoSetUsedList();
-
-                    //메모리에 올리는 과정에서 한번에 모든 값을 메모리에 올릴 경우 제대로 올라가지 않음.
-                    //메로리에 올리길 원한다면 메가 단위 또는 몇 메가씩 쪼개서 올려야 한다.
-
-                    //MemoryStream fileMemoryStream = new MemoryStream();
-
-                    //if (hsStream.MemoryType == HsStreamType.MemoryStream)
-                    //{
-                    //    int bufferSize = 1024 * 1024;
-                    //    int readCount = 0;
-                    //    byte[] buf = new byte[bufferSize];
-                    //    while (true)
-                    //    {
-                    //        Array.Clear(buf, 0, buf.Length);
-                    //        readCount = await hsStream.stream.ReadAsync(buf);
-
-                    //        if (readCount > 0)
-                    //        {
-                    //            fileMemoryStream.Write(buf, 0, readCount);
-                    //        }
-                    //        else
-                    //            break;
-                    //    }
-
-                    //}
-                    //else if (hsStream.MemoryType == HsStreamType.FileStream)
-                    //{
-                    //    hsStream.stream.CopyTo(fileMemoryStream);
-                    //}
-                    //hsStream.stream.Dispose();
-                    //GC.Collect();
-                    //hsStream.stream = null;
-                    //hsStream.stream = fileMemoryStream;
-
-                    CLog.Here().Information($"fileName : [{fileInfo.Name}] OpenReadAsync after!");
-
-                    if (await GetReadRightCheck(fileAddManage, currentFile, hsStream) == 0)
-                    {
-                        existErr = true;
-                        CLog.Here().Information($"fileName : [{fileInfo.Name}] File Access deny!");
-                        hsStream.stream = null;
-                        nExamCount++;
-                        per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per, hsStream.FileName);
-                        continue;
-                    }
-
-                    if (await GetExamExtChange(fileAddManage, currentFile, hsStream) != 0)
-                    {
-                        existErr = true;
-                        hsStream.stream = null;
-                        nExamCount++;
-                        per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per, hsStream.FileName);
-                        continue;
-                    }
-                    if (hsStream.FileName.ToLower().IndexOf(".zip") > -1)
-                    {
-                        per = (nExamCount * 100) / nTotalCount;
-                        if (per < 10) //압축해제 시간이 너무 걸려서 멈춰보여서 진행율 임의로 올림
-                            per = 10;
-
-                        SGFileExamEvent(per, hsStream.FileName);
-                    }
-
-                    hsStream.isNeedApprove = false;
-                    int nRet = 0;
-                    nRet = await GetExamCheckZip(fileAddManage, currentFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount);
-                    if (nRet == 1)
-                        hsStream.isNeedApprove = true;
-                    else if (nRet != 0)
-                    {
-                        existErr = true;
-                        hsStream.stream = null;
-                        nExamCount++;
-                        per = (nExamCount * 100) / nTotalCount;
-                        if (per < 10)
-                            per = 10;
-                        SGFileExamEvent(per, hsStream.FileName);
-                        continue;
-                    }
-
-                    //2022.10.07 BY KYH - OLE 상세파일 UI 표현 기능 추가
-                    //01. 문서파일 내 OLE 개체 검사
-                    //02. 문서파일 압축해제 후 파일 검사
-
-                    //01. 문서파일 내 OLE 개체 검사
-                    if (await GetExamCheckDocument(fileAddManage, currentFile, hsStream) != 0)
-                    {
-                        existErr = true;
-                        hsStream.stream = null;
-                        nExamCount++;
-                        per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per, hsStream.FileName);
-                        continue;
-                    }
-
-                    //02. 문서파일 압축해제 후 파일 검사
-                    //구현필요
-
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                    else
-                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
-
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
-                    {
-                        SGLoginData sgLoginData = null;
-                        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-
-                        if (sgLoginData != null && CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
-                            hsStream.isNeedApprove = true;
-                    }
-
-                    listTryHsStream.Add(hsStream);
-                    nExamCount++;
-                    per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per, hsStream.FileName);
-                }
-                else    //디렉토리
-                {
-                    nExamCount++;
-                    per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per, fileInfo.Name);
+                    bFind = true;
+                    break;
                 }
             }
 
-            //파일 등록처리 조건 : 등록 시도 된 파일이 모두 정상적인 경우 OR 부분등록 옵션이 설정된 경우
-            bool usePartialFileAdd = SGAppMgrSvc.OpConfigInfoService.GetUsePartialFileAddInTransfer();
+            if (bFind == true)
+            {
+                nExamCount++;
+                per = (nExamCount * 100) / nTotalCount;
+                SGFileExamEvent(per, fileInfo.Name);
 
-            if (!existErr || usePartialFileAdd)
-                hsStreamList = new List<HsStream>(listTryHsStream);
-            return (hsStreamList, existErr);
+                continue;
+            }
 
-            //StateHasChanged();
+            bAsyncData = true;
+            hsStream = new HsStream();
+
+            /*
+            드래그로 인한 파일추가는 Dir과 File이 전체경로가 포함되어 있지 않음
+            ex) files :
+            compress_1Depth_ExtentionErr / compress_1Depth_ExtentionErr / Dir
+            AddFileRMX64.dll / compress_1Depth_ExtentionErr/AddFileRMX64.dll / File
+            SecureGate-20230217.Log / compress_1Depth_ExtentionErr/SecureGate-20230217.Log / File
+            SecureGate-20230220.Log / compress_1Depth_ExtentionErr/SecureGate-20230220.Log / File
+            SecureGate-20230215.Log / compress_1Depth_ExtentionErr/OLD_LOG/SecureGate-20230215.Log / File
+            SecureGate-20230216.Log / compress_1Depth_ExtentionErr/OLD_LOG/SecureGate-20230216.Log / File
+            UnAlzDll.dll / compress_1Depth_ExtentionErr/OLD_LOG/UnAlzDll.dll / File
+            */
+
+            //최상위 파일 구성
+            //FileAddErr topFile = fileAddManage.CreateFileAddErrInfo(fileInfo.Name, fileInfo.Path, "");
+            FileAddErr currentFile = fileAddManage.SetFileTreeFromFilePath(fileInfo.Path, "/");
+            if (fileInfo.Dir != "Dir")
+            {
+                hsStream.Size = fileInfo.Size;
+                hsStream.FileName = Path.GetFileName(fileInfo.Path);
+                hsStream.RelativePath = fileInfo.Path;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                else
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+
+                DateTime date = DateTime.ParseExact(fileInfo.Etc, "yyyy/MM/dd HH:mm:ss", null);
+                //DateTime date = (DateTime)fileInfo.LastModifiedDate;
+                hsStream.ModifyTime = date;
+                string strDate = date.ToShortDateString();
+                strDate = strDate.Replace("-", "");
+                string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
+                hsStream.MTime = strDate + strTime;
+
+
+                if (!hsStream.FileName.Equals(""))
+                {
+                    if (hsStream.FileName.LastIndexOf(".") > -1)
+                        hsStream.Type = hsStream.FileName.Substring(hsStream.FileName.LastIndexOf(".") + 1);
+                    else
+                        hsStream.Type = "";
+                }
+                hsStream.IsDir = false;
+                hsStream.MemoryType = HsStreamType.MemoryStream;
+                if (!GetRegExamEnable(fileAddManage, currentFile, hsStream, hsStream.Type, false, hsStream.Size))
+                {
+                    existErr = true;
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per, hsStream.FileName);
+                    continue;
+                }
+                CLog.Here().Information($"fileName : [{fileInfo.Name}] OpenReadAsync before!");
+
+                //OpenReadAsyncNoSetUsedList로 변경
+                //레드마인 #2446 [2022-04-19] 드래그 앤 드롭 폴더 추가 이슈사항 참고
+                //hsStream.stream = await file.OpenReadAsync(); // => 이 로직에는 DirSubFiles.use[i] = "y"로 설정하는 부분이 있음 그래서 짝수번째 폴더는 추가 안되는 현상 발생
+
+                hsStream.stream = await file.OpenReadAsyncNoSetUsedList();
+
+                //메모리에 올리는 과정에서 한번에 모든 값을 메모리에 올릴 경우 제대로 올라가지 않음.
+                //메로리에 올리길 원한다면 메가 단위 또는 몇 메가씩 쪼개서 올려야 한다.
+
+                //MemoryStream fileMemoryStream = new MemoryStream();
+
+                //if (hsStream.MemoryType == HsStreamType.MemoryStream)
+                //{
+                //    int bufferSize = 1024 * 1024;
+                //    int readCount = 0;
+                //    byte[] buf = new byte[bufferSize];
+                //    while (true)
+                //    {
+                //        Array.Clear(buf, 0, buf.Length);
+                //        readCount = await hsStream.stream.ReadAsync(buf);
+
+                //        if (readCount > 0)
+                //        {
+                //            fileMemoryStream.Write(buf, 0, readCount);
+                //        }
+                //        else
+                //            break;
+                //    }
+
+                //}
+                //else if (hsStream.MemoryType == HsStreamType.FileStream)
+                //{
+                //    hsStream.stream.CopyTo(fileMemoryStream);
+                //}
+                //hsStream.stream.Dispose();
+                //GC.Collect();
+                //hsStream.stream = null;
+                //hsStream.stream = fileMemoryStream;
+
+                CLog.Here().Information($"fileName : [{fileInfo.Name}] OpenReadAsync after!");
+
+                if (await GetReadRightCheck(fileAddManage, currentFile, hsStream) == 0)
+                {
+                    existErr = true;
+                    CLog.Here().Information($"fileName : [{fileInfo.Name}] File Access deny!");
+                    hsStream.stream = null;
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per, hsStream.FileName);
+                    continue;
+                }
+
+                if (await GetExamExtChange(fileAddManage, currentFile, hsStream) != 0)
+                {
+                    existErr = true;
+                    hsStream.stream = null;
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per, hsStream.FileName);
+                    continue;
+                }
+                if (hsStream.FileName.ToLower().IndexOf(".zip") > -1)
+                {
+                    per = (nExamCount * 100) / nTotalCount;
+                    if (per < 10) //압축해제 시간이 너무 걸려서 멈춰보여서 진행율 임의로 올림
+                        per = 10;
+
+                    SGFileExamEvent(per, hsStream.FileName);
+                }
+
+                hsStream.isNeedApprove = false;
+                int nRet = 0;
+                nRet = await GetExamCheckZip(fileAddManage, currentFile, hsStream, SGFileExamEvent, nExamCount, nTotalCount);
+                if (nRet == 1)
+                    hsStream.isNeedApprove = true;
+                else if (nRet != 0)
+                {
+                    existErr = true;
+                    hsStream.stream = null;
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    if (per < 10)
+                        per = 10;
+                    SGFileExamEvent(per, hsStream.FileName);
+                    continue;
+                }
+
+                //2022.10.07 BY KYH - OLE 상세파일 UI 표현 기능 추가
+                //01. 문서파일 내 OLE 개체 검사
+                //02. 문서파일 압축해제 후 파일 검사
+
+                //01. 문서파일 내 OLE 개체 검사
+                if (await GetExamCheckDocument(fileAddManage, currentFile, hsStream) != 0)
+                {
+                    existErr = true;
+                    hsStream.stream = null;
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per, hsStream.FileName);
+                    continue;
+                }
+
+                //02. 문서파일 압축해제 후 파일 검사
+                //구현필요
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                else
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
+                {
+                    SGLoginData sgLoginData = null;
+                    sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+
+                    if (sgLoginData != null && CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
+                        hsStream.isNeedApprove = true;
+                }
+
+                listTryHsStream.Add(hsStream);
+                nExamCount++;
+                per = (nExamCount * 100) / nTotalCount;
+                SGFileExamEvent(per, hsStream.FileName);
+            }
+            else    //디렉토리
+            {
+                nExamCount++;
+                per = (nExamCount * 100) / nTotalCount;
+                SGFileExamEvent(per, fileInfo.Name);
+            }
         }
-        catch (Exception ex)
-        {
-            CLog.Here().Error("SubFileAddAsync Exception - " + ex.ToString());
 
-            if (SGFileExamEvent != null)
-                SGFileExamEvent(-1, "Exception Error");
+        //파일 등록처리 조건 : 등록 시도 된 파일이 모두 정상적인 경우 OR 부분등록 옵션이 설정된 경우
+        bool usePartialFileAdd = SGAppMgrSvc.OpConfigInfoService.GetUsePartialFileAddInTransfer();
 
-            return (hsStreamList, true);
-        }
-        finally
-        {
-            if (SGFileExamEvent != null)
-                SGFileExamEvent(100, "File Exam Complete");
-        }
+        if (!existErr || usePartialFileAdd)
+            hsStreamList = new List<HsStream>(listTryHsStream);
+        return (hsStreamList, existErr);
+
+        //StateHasChanged();
+
     }
 
     /// <summary>
@@ -1173,7 +1144,7 @@
     /// <param name="files"></param>
     /// <returns></returns>
     public async Task<List<HsStream>> SubDirAddAsync(IEnumerable<IFileReference> files)
-    {                                                                           
+    {
         List<HsStream> hsList = new List<HsStream>();
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -2063,9 +2034,9 @@
         }
 
         //파일 등록처리 조건 : 등록 시도 된 파일이 모두 정상적인 경우 OR 부분등록 옵션이 설정된 경우 - 2022.10.05 BY KYH
-        bool usePartialFileAdd = SGAppMgrSvc.OpConfigInfoService.GetUsePartialFileAddInTransfer();        
+        bool usePartialFileAdd = SGAppMgrSvc.OpConfigInfoService.GetUsePartialFileAddInTransfer();
 
-        var fileExamResult = await SubFileAddAsync(files);           
+        var fileExamResult = await SubFileAddAsync(files);
         bool existErrInExamResult = fileExamResult.Item2;
         if (!existErrInExamResult || usePartialFileAdd)
         {
