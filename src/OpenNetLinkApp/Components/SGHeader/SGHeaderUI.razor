@@ -1021,7 +1021,7 @@ private void dayTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         if (count == 0)
             return;
 
-        if (DateTime.Now.Hour == 9 && DateTime.Now.Minute == 31 && DateTime.Now.Second == 0)
+        if (DateTime.Now.Hour == 0 && DateTime.Now.Minute == 0 && DateTime.Now.Second == 0)
         {
             SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.sfmRefreshEvent;
             if (sfmRefreshEvent != null)
