@@ -72,6 +72,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //bool GetUseFileCheckException();
         //bool GetDenyPasswordZIP();
         //bool GetUseAppLoginType();
+
+        string ConvertRecvDownPath(string DownPath);
+
         int GetAppLoginType();
 
         int GetUserSelectFirstNet();
