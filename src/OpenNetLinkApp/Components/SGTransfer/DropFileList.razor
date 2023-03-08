@@ -745,17 +745,6 @@
                                     continue;
                                 }
                             }
-                            else if (childFile.FileName.StartsWith(".")) //[20230308]원복필수//else if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && childFile.FileName.StartsWith("."))
-                            {
-                                existErr = true;
-                                childFile.eErrType = eFileAddErr.eFAHidden;
-                                CLog.Here().Information($"DirName : [{childFile.FileName}] Directory Hidden!");
-                                hsStream.stream = null;
-                                nExamCount++;
-                                per = (nExamCount * 100) / nTotalCount;
-                                SGFileExamEvent(per, childFile.FileName);
-                                continue;
-                            }
 
                             if (!hsStream.Type.Equals("DIR"))
                             {
