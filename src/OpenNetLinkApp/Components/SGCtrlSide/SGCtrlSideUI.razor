@@ -1521,7 +1521,7 @@
             stPath = stPath.Replace("\\", "/");
         }
 
-        bool bFind = false;
+        @*bool bFind = false;
         int count = AppConfigSvc.AppConfigInfo.RecvDownPath.Count;
         string strPreDownPath = "";
         for (int i = 0; i < count; i++)
@@ -1548,7 +1548,7 @@
             strMsg = strMsg.Replace("/r/n", "<br>");
             ShowMessage("warn", strMsg);
             return;
-        }
+        }*@
 
         //HsCmdCenter.SetDownLoadPath(groupId, stPath);
         //HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
@@ -1699,7 +1699,6 @@
         // NetLib 쪽에는 실재절대경로로 전달해줘야함, 아님 수신때 이상한곳에 저장함
         HsCmdCenter.SetDownLoadPath(groupId, strNosystemVarPath);
         HsCmdCenter.SetBaseDownLoadPath(groupId, strNosystemVarPath);
-
         CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
 
         CLog.Here().Information($"Set DownLoadPath, BaseDownLoadPath, RecvDownPath Set: [{stPath}] useUserPath : {SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId)}");   // siteConfig
