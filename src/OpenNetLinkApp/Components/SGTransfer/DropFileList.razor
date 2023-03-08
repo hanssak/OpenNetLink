@@ -367,6 +367,7 @@
     /// <param name="isRMouseAdd"></param>
     async Task OnDropFileAdd(List<string> recvList, bool isRMouseAdd)
     {
+        FileExamEvent SGFileExamEvent = null;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -377,7 +378,6 @@
         if (sgLoginData != null && sgLoginData.GetFileTrans() == false)
             return;
 
-        FileExamEvent SGFileExamEvent = null;
         SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
         if (SGFileExamEvent == null)
             return;
@@ -494,8 +494,10 @@
                     }
 
                     bool bHidden = false;
-                    if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
-                        bHidden = true;
+
+                    //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
+                    //if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
+                    //    bHidden = true;
                     if (!GetRegExamEnable(fileAddManage, topFile, hsStream, hsStream.Type, bHidden, hsStream.Size))
                     {
                         existErr = true;
@@ -575,8 +577,9 @@
                     if (di.Exists != true)
                         continue;
 
-                    if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
-                        continue;
+                    //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
+                    //if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
+                    //    continue;
 
                     hsStream = new HsStream();
                     hsStream.FileName = fInfo.Name;
@@ -627,7 +630,7 @@
                     //SetFileAdd(hsStream);
                     listTryHsStream.Add(hsStream);
                     nExamCount++;
-                 
+
                     List<System.IO.FileInfo> FileData = DirSearch(fInfo.FullName);
                     if (FileData == null)
                     {
@@ -725,13 +728,9 @@
                             else
                                 hsStream.Type = "";
                             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                            {
                                 hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                            }
                             else
-                            {
                                 hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
-                            }
 
                             hsStream.IsDir = false;
                         }*@
@@ -743,19 +742,18 @@
                         string strSubTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
                         hsStream.MTime = strSubDate + strSubTime;
                         hsStream.MemoryType = HsStreamType.FileStream;
+
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        {
                             hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                        }
                         else
-                        {
                             hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
-                        }
+
                         if (hsStream.IsDir == false)
                         {
                             bool bHidden = false;
-                            if ((item.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
-                                bHidden = true;
+                            //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
+                            //if ((item.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                            //    bHidden = true;
                             if (!GetRegExamEnable(fileAddManage, childFile, hsStream, hsStream.Type, bHidden, hsStream.Size))
                             {
                                 existErr = true;
@@ -842,6 +840,7 @@
         // 파일 추가후 화면갱신
         StateHasChanged();
         await jsRuntime.InvokeAsync<object>("setDropzoneInputSize");
+
     }
 
     protected override void OnInitialized()
@@ -891,13 +890,13 @@
     /// <returns></returns>
     public async Task<(List<HsStream>, bool)> SubFileAddAsync(IEnumerable<IFileReference> files)
     {
+        FileExamEvent SGFileExamEvent = null;
         List<HsStream> hsStreamList = new List<HsStream>();
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        FileExamEvent SGFileExamEvent = null;
         SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
         if (SGFileExamEvent == null)
             return (hsStreamList, false);
@@ -931,6 +930,7 @@
             //자바스크립트로부터 드래그앤 드롭한 폴더 정보 가져오기
             //파일 불러오는데 문제가 있다면 필히 자바스크립트를 확인해야함!!!
             var fileInfo = await file.ReadFileInfoAsync();
+
             if (fileInfo == null)
             {
                 await refProgress.closePopUp();
@@ -982,13 +982,9 @@
                 hsStream.FileName = Path.GetFileName(fileInfo.Path);
                 hsStream.RelativePath = fileInfo.Path;
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
                     hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                }
                 else
-                {
                     hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
-                }
 
                 DateTime date = DateTime.ParseExact(fileInfo.Etc, "yyyy/MM/dd HH:mm:ss", null);
                 //DateTime date = (DateTime)fileInfo.LastModifiedDate;
@@ -1124,17 +1120,12 @@
                 //구현필요
 
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
                     hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                }
                 else
-                {
                     hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
-                }
 
                 if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID)  && isUserNeedApproveExtUI())
                 {
-
                     SGLoginData sgLoginData = null;
                     sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
 
@@ -1143,12 +1134,11 @@
                 }
 
                 listTryHsStream.Add(hsStream);
-                //SetFileAdd(hsStream);
                 nExamCount++;
                 per = (nExamCount * 100) / nTotalCount;
                 SGFileExamEvent(per, hsStream.FileName);
             }
-            else
+            else    //디렉토리
             {
                 nExamCount++;
                 per = (nExamCount * 100) / nTotalCount;
@@ -1164,6 +1154,7 @@
         return (hsStreamList, existErr);
 
         //StateHasChanged();
+
     }
 
     /// <summary>
@@ -1641,12 +1632,13 @@
         if (sgLoginData == null)
             return false;
 
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            string strFileName = hsStream.FileName;
-            if (strFileName[0] == '.')
-                bHidden = true;
-        }
+        //Linux/MAC의 수신폴더가 시스템 폴더에 접근하지 않으므로, 해당 위험성을 위해 추가되었을 하기 제한 제거
+        //if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        //{
+        //    string strFileName = hsStream.FileName;
+        //    if (strFileName[0] == '.')
+        //        bHidden = true;
+        //}
 
         bool bWhite = sgLoginData.GetFileFilterType();
         string strFileExtInfo = sgLoginData.GetFileFilter();

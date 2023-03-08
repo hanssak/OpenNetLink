@@ -326,6 +326,25 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetAfterApprChkHide();
         }
+        public void SetIsPolicyUpdate(int groupID, bool bPolicyUpdate)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+
+            m_DicPageStatusData[groupID].SetPolicyUpdate(bPolicyUpdate);
+        }
+        public bool GetIsPolicyUpdate(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetPolicyUpdate();
+        }
         public void SetAfterApprEnable(int groupID, bool bAfterApprEnable)
         {
             PageStatusData tmpData = null;

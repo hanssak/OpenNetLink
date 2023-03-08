@@ -1021,7 +1021,8 @@ private void dayTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         if (count == 0)
             return;
 
-        if (DateTime.Now.Hour == 9 && DateTime.Now.Minute == 31 && DateTime.Now.Second == 0)
+        //SFM Refresh 매일 정각 0시에 실행 -- HeaderUI쪽에 있음.... 
+        if (DateTime.Now.Hour == 0 && DateTime.Now.Minute == 0 && DateTime.Now.Second == 0)
         {
             SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.sfmRefreshEvent;
             if (sfmRefreshEvent != null)
@@ -1844,7 +1845,12 @@ private void UpdatePolicy(int groupId)
     //URL List Data 요청
     HsCmdCenter.RequestUrlList(groupId, sgUserData.UserId);
 
+    pageService.SetIsPolicyUpdate(groupId, true);
+
     //UserInfo 재요청 - 결재라인 정보, SFM 정보, 시스템 환경설정정보 갱신
+    //SFM 정보 삭제
+    HsCmdCenter.sgDicRecvData.SetSFMListData(groupId, null);
+    HsCmdCenter.SendUserSFMInfo(groupId, sgUserData.UserId);
     HsCmdCenter.SendApproveLine(groupId, sgUserData.UserId);
 
     //UserInfoCheck를 요청하여 사용자의 정보 갱신

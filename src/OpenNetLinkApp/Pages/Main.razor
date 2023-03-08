@@ -1537,24 +1537,27 @@
 
                 CLog.Here().Information($"LoginResultOnetoAll, LoginType : {pageService.GetGroupIDLoginType(groupId)}, GroupID : {groupId}, Saved-GroupID : {nGroupIDfirst}, END!");
 
-                if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray()) //(SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
+                if (!pageService.GetIsPolicyUpdate(groupId))
                 {
-                    if (pageService.GetConnectCount(nGroupIDfirst) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray()) //(SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
                     {
-                        string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                        string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
-                        Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
-                        Window.MoveWebWindowToTray();
+                        if (pageService.GetConnectCount(nGroupIDfirst) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
+                        {
+                            string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                            string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
+                            Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                            Window.MoveWebWindowToTray();
+                        }
+                        else
+                            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
                     }
                     else
+                    {
                         Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-                }
-                else
-                {
-                    Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-                }
+                    }
 
-                pageService.ConnectCountAdd(nGroupIDfirst);
+                    pageService.ConnectCountAdd(nGroupIDfirst);
+                }
 
             } // if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && nGroupIDfirst > -1 && groupId == nGroupIDfirst)
         }
@@ -1564,13 +1567,18 @@
         }
         finally
         {
-            if (!SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() || dicLoginResult.Count == NetWorkSvc.NetWorkInfo.Count)
+            if (!pageService.GetIsPolicyUpdate(groupId))
             {
-                //멀티로그인이 아니거나, 멀티로그인이 전부 이루어 졌을 시, 재로그인 가능상태로 설정
-                await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
-                bStartedLogin = false;
-                bLoginBtnDisable = false;
+                if (!SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() || dicLoginResult.Count == NetWorkSvc.NetWorkInfo.Count)
+                {
+                    //멀티로그인이 아니거나, 멀티로그인이 전부 이루어 졌을 시, 재로그인 가능상태로 설정
+                    await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+                    bStartedLogin = false;
+                    bLoginBtnDisable = false;
+                }
             }
+
+            pageService.SetIsPolicyUpdate(groupId, false);
         }
     }
 
