@@ -3118,6 +3118,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 return temp;
             }
+
         }
 
         /// <summary>
@@ -4296,15 +4297,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 try
                 {
-                    Directory.Delete(strExtractTempZipPath, true);
+                    if (Directory.Exists(strExtractTempZipPath))
+                        Directory.Delete(strExtractTempZipPath, true);
+                    
+                    fiZipFile = new FileInfo(strZipFile);
+                    fiZipFile.Delete();
                 }
                 catch (System.Exception err)
                 {
                     Log.Logger.Here().Warning("[CheckZipFile] Directory.Delete() " + err.Message + " " + err.GetType().FullName);
                 }
 
-                fiZipFile = new FileInfo(strZipFile);
-                fiZipFile.Delete();
+             
             }
 
             stStream.Position = 0;
@@ -4340,7 +4344,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public eFileAddErr ScanZipFile(FileAddErr currentFile, string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nBlockOption, int nCurDepth,
             bool blWhite, string strExtInfo, int nErrCount, string strExtType, out int nTotalErrCount, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, DocumentExtractType documentExtractType, bool bZipPasswdCheck = true)
         {
-            Console.WriteLine($"[20230309] ScanZipFile Name[{currentFile.FileName}] Path[{currentFile.FilePath}] Parent[{currentFile.ParentFileName}] strZipFile[{strZipFile}] strBasePath[{strBasePath}]");
             bIsApproveExt = false;
             eFileAddErr enErr = eFileAddErr.eFANone;
             string strExt;
@@ -4470,21 +4473,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         //압축 내부 문서의 압축해제 개체를 보관할 폴더 (Temp/ZipExtract/ZipName/Document_Extract)
                         string strTempDocumentExtractDirPath = Path.Combine(strTempUnzipDirPath, "Document_Extract");
                         int documentScanDepth = 1;               //OLE개체 검사 하위 범위 (0인 상태에서도 개체 검출 시 Block)
-                        
+
                         //압축해제한 파일의 Stream 필요
                         HsStream oleHsStream = null;
+
+
                         using (Stream oleFileStream = File.OpenRead(extractFile.FullName))
                         {
-                            oleHsStream = new HsStream();
-
-                            oleHsStream.stream = new MemoryStream();
-                            oleFileStream.CopyTo(oleHsStream.stream);
-                            oleHsStream.FileName = extractFile.FullName;
-                            oleHsStream.MemoryType = HsStreamType.FileStream;
+                            oleHsStream = new HsStream() { stream = oleFileStream, FileName = extractFile.FullName, MemoryType = HsStreamType.FileStream };
+                            scanDocumentFile(oleHsStream, childFile, strTempDocumentExtractDirPath, blWhite, strExtInfo, documentScanDepth, documentExtractType).Wait();                            
                         }
-                        Console.WriteLine("Zip 파일내 Docuemnt 기다리기 시작===========");
-                        scanDocumentFile(oleHsStream, childFile, strTempDocumentExtractDirPath, blWhite, strExtInfo, documentScanDepth, documentExtractType).Wait();
-                        Console.WriteLine("Zip 파일내 Docuemnt 기다리기 끝=============");
 
                         if (childFile.eErrType != eFileAddErr.eFANone || childFile.HasChildrenErr)
                         {
@@ -4853,12 +4851,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                 //추출 개체가 엑셀인 경우, 한번 더 검사 허용
                                 HsStream oleHsStream = new HsStream() { stream = oleFileStream, FileName = extractFile.FullName, MemoryType = HsStreamType.FileStream };
                                 int extractResult = await scanDocumentFile(oleHsStream, oleFile, strExtractFilePath, isWhite, fileFilterExtInfo, (scanDepth - 1), documentExtractType);
+
                                 if (extractResult != 0)
                                 {
                                     oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_MIME;
                                     currentFile.HasChildrenErr = true;
                                     continue;
                                 }
+
                             }
                             else
                             {
@@ -4888,13 +4888,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             currentFile.HasChildrenErr = true;
                             continue;
                         }
-
-                        //위변조 제한, 0KB 체크
-                        if (await IsValidFileExt(oleFileStream, oleExtension) != eFileAddErr.eFANone)//(!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
+                        using (Stream oleValidStream = new MemoryStream())
                         {
-                            oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_CHANGE;
-                            currentFile.HasChildrenErr = true;
-                            continue;
+                            oleFileStream.CopyTo(oleValidStream);
+                            //위변조 제한, 0KB 체크
+                            if (await IsValidFileExt(oleValidStream, oleExtension) != eFileAddErr.eFANone)//(!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
+                            {
+                                oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_CHANGE;
+                                currentFile.HasChildrenErr = true;
+                                continue;
+                            }
                         }
                     }
                 }
