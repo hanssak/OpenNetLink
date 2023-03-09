@@ -9,6 +9,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.Services
 @using AgLogManager
+@using System.Runtime.InteropServices
 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
@@ -219,6 +220,7 @@
         stCurrentDrive = drives[0];
         actionPopUpLoadFileList = LoadListFiles;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        
     }
 
 
@@ -231,7 +233,15 @@
     {
         if (firstRender)
         {
-            LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            
+
+            @*LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));*@
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                stDisplayPath = Directory.GetDirectoryRoot(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            else if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                stDisplayPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            refFileTreeCustom.changeDrive(stCurrentDrive);
         }
         base.OnAfterRender(firstRender);
     }

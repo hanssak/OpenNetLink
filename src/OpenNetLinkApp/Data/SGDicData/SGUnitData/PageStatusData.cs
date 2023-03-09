@@ -119,6 +119,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public bool m_bLoginComplete = false;
 
+        public bool m_bPolicyUpdate = false;
+
         public bool m_bFileView = true;       // true 이면 일일 파일 전송량 횟수 표시 , false 이면 일일 클립보드 전송량 횟수 표시 
 
         public ePassWDType m_ePassWDChgType = ePassWDType.eINITPASSWDCHG;            // 패스워드 변경 종류 ( eINITPASSWDCHG : 초기 비밀번호, eDAYPASSWDCHG: 날짜,eUSERPASSWDCHG: 사용자 )
@@ -754,6 +756,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public void SetInitApprLine(bool bInitApprLine)
         {
             m_bInitApprLine = bInitApprLine;
+        }
+
+        public bool GetPolicyUpdate()
+        {
+            return m_bPolicyUpdate;
+        }
+        
+        public void SetPolicyUpdate(bool isPolicyUpDate)
+        {
+            m_bPolicyUpdate = isPolicyUpDate;
         }
         public void SetCurFileSendInfo(string strFileSendInfo)
         {
