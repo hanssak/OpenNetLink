@@ -1797,10 +1797,12 @@
 
         bool bDenyPasswordZIP = SGAppMgrSvc.OpConfigInfoService.GetUseDenyPasswordZip();
         CLog.Here().Information($"압축(Zip) 파일 passwd 있을때 차단 : [{bDenyPasswordZIP.ToString()}]");
-        //bool bDenyPasswordZIP = SGAppMgrSvc.AppConfigInfoService.GetDenyPasswordZIP();
+        
+        //문서파일 내부 검사유형 (0 : 문서 검사 않함. / 1 : 모듈검사 & OLE객체 마임리스트검사 / 2 : 모듈검사 & 위변조 체크 / 3 : 모듈검사 & OLE마임리스트검사 & 위변조체크 )
+        string strDocumentExtractType = sgLoginData.GetDocumentExtractType(sgLoginData.GetSystemPosition());        
 
         int nRet = 0;
-        nRet = await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option, true,
+        nRet = await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, strDocumentExtractType, MaxDepth, Option, true,
             ((SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI()) ? sgLoginData.GetExceptionExt() : ""));
         // if (await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option) != 0)
 
