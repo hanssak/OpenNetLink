@@ -415,7 +415,7 @@
                     if (stRtn == null || (1 > stRtn.Length))
                     {
                         CLog.Here().Information($"Result - json, Data is null OR 0 Size");
-                        ShowLoginFail(XmlConf.GetWarnMsg("W_0036"));
+                        ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
                         return;
                     }
 
@@ -1416,7 +1416,7 @@
 
 
                     // 첫 연결때에만 Move Tray To WebWindow
-                    if (AppConfigSvc.GetStartTrayMove() && pageService.GetConnectCount(groupId) == 1)
+                    if (AppConfigSvc.GetStartTrayMove() && pageService.GetConnectCount(groupId) == 0)
                         Window.MoveWebWindowToTray();
 
                 }

@@ -1094,7 +1094,10 @@
         try
         {
             if (e.strUrlData != null && e.strUrlData.Length > 0)
-                System.Diagnostics.Process.Start("explorer", e.strUrlData);
+            {
+                string url = $"\"{e.strUrlData}\"";
+                System.Diagnostics.Process.Start("explorer", url);
+            }
         }
         catch (Exception ex)
         {
@@ -1103,49 +1106,50 @@
 
 #elif _LINUX
 
-if (e.strUrlData != null && e.strUrlData.Length > 0)
-{
-string strProcessName = "";
-int nIdx = 0;
-for(; nIdx < 2 ; nIdx++)
-{
-try
-{
-// Linux OS Type 별로
-if (nIdx == 0)
-strProcessName = "x-www-browser";
-else if (nIdx == 1)
-strProcessName = "xdg-open";
+    if (e.strUrlData != null && e.strUrlData.Length > 0)
+    {
+        string strProcessName = "";
+        int nIdx = 0;
+        for(; nIdx < 2 ; nIdx++)
+        {
+            try
+            {
+                // Linux OS Type 별로
+                if (nIdx == 0)
+                strProcessName = "x-www-browser";
+                else if (nIdx == 1)
+                strProcessName = "xdg-open";
 
-System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
-break;
-}
-catch (Exception ex)
-{
-CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
-groupid, strProcessName, e.strUrlData, ex.Message);
-}
-}
-}
-else
-{
-CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
-}
+                System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
+                break;
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
+                groupid, strProcessName, e.strUrlData, ex.Message);
+            }
+        }
+    }
+    else
+    {
+         CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
+    }
 
 #elif _MACOSX
 
-try
-{
-if (e.strUrlData != null && e.strUrlData.Length > 0) {
-System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
-}
-}
-catch (Exception ex)
-{
-CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-}
+    try
+    {
+        if (e.strUrlData != null && e.strUrlData.Length > 0) {
+        System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
+        }
+    }
+    catch (Exception ex)
+    {
+        CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+    }
 
 #else
+
 #endif
     }
 

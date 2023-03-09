@@ -91,7 +91,7 @@
   "bRecvFolderChange": false,
   "bUseCertSend": false,
   "blistUseEmail": [
-    false,
+    true,
     false,
     false
   ],
@@ -106,7 +106,7 @@
   "bViewSGSideBarUIBadge": false,
   "nClipAfterApproveUseType": 1,
   "bUseOneToMultiLogin": false,
-  "bUseOneByOneLogOut": false,
+  "bUseOneByOneLogOut" : false,
   "bApprDeptSearch": true,
   "bApprLineChkBlock": false,
   "bApprLineLocalSave": true,
@@ -118,8 +118,8 @@
   "bUseCloseTrayMove": true,
   "bExitTrayMove": true,
 
-  "bUseStartTrayMove": true,
-  "bStartTrayMove": true,
+  "bUseStartTrayMove": false,
+  "bStartTrayMove": false,
 
   "bUseFileForward": false,
   "bFileDownloadBeforeReciving": false,
@@ -138,18 +138,16 @@
     false,
     false
   ],
-  "bUseLoginAfterTray": true,
+  "bUseLoginAfterTray": false,
   "bUseFileApproveReason": false,
   "bUseClipBoardApproveReason": false,
-
-  "bUseNotinListForwardUrl": false,
-  "strNotinListForwardUrl": "file:///C:/HANSSAK/OpenNetLink/wwwroot/Web/WebLinkInfoNotList.html",
+  
+  "bUseNotinListForwardUrl" : false,
+  "strNotinListForwardUrl" : "file:///C:/HANSSAK/OpenNetLink/wwwroot/Web/WebLinkInfoNotList.html",
   "bListUsePKIsendRecv": [
     false,
     false,
     false
-  ],
-
-  "bUseFileSelectDelete": false
+  ]
 
 }
