@@ -653,14 +653,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string relativePath = Path.GetRelativePath(parentFile.FilePath, childInfo.FullName);
             string[] dirDivide = relativePath.Split(Path.DirectorySeparatorChar);
 
-            if(dirDivide.Length <=1)    //바로 하위 디렉토리인 경우, Tree 바로 구성하여 반환
+            if (dirDivide.Length <= 1)    //바로 하위 디렉토리인 경우, Tree 바로 구성하여 반환
                 return parentFile.CreateChildren(childInfo.Name, childInfo.FullName, parentFile.FileName);
 
             //이후 경로가 존재할 경우 child 로 지정 후 재귀호출
             string childDirName = dirDivide[0];
             FileAddErr childDir = parentFile.ChildrenFiles?.Find(ch => ch.FileName == childDirName);
 
-            if(childDir == null)
+            if (childDir == null)
                 childDir = parentFile.CreateChildren(childDirName, Path.Combine(parentFile.FilePath, childDirName), parentFile.FileName);
 
             return SetFileTreeFromFilePath(childDir, childInfo);
@@ -1805,7 +1805,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                                 : eFileAddErr.eFA_LONG_PATH_FILEORPATH;     //파일 및 폴더명 길이 초과
                 return false;
             }
-            
+
             Log.Logger.Here().Information($"###################### - 파일이름 : {hsStream.FileName}, 파일크기 : {hsStream.Size} - ######################");
 
             //빈파일 체크 (0kb 허용)
@@ -3166,6 +3166,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return (bIsExtForFileByteData ? eFileAddErr.eFANone : eFileAddErr.eFACHG);
         }
 
+        /// <summary>
+        /// 마임체크 및 위변조
+        /// </summary>
+        /// <param name="strFile"></param>
+        /// <param name="strExt"></param>
+        /// <param name="blAllowDRM"></param>
+        /// <returns></returns>
         public eFileAddErr IsValidFileExtInnerZip(string strFile, string strExt, bool blAllowDRM)
         {
             var fsStream = new FileStream(strFile, FileMode.Open, FileAccess.Read);
@@ -4224,11 +4231,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="SGFileExamEvent">압축해제 및 분석 진행상황 UI쪽에 전달하는데 사용되는 함수</param>
         /// <param name="ExamCount">사용자가 추가해서 내부검사해야되는 ZIP 파일 Index</param>
         /// <param name="TotalCount">사용자가 추가해서 내부검사해야되는 ZIP 파일개수 </param>
+        /// <param name="documentExtractType">ZIP 파일 내부의 문서검사여부 옵션값</param>
         /// <param name="nMaxDepth"> CLIENT_ZIP_DEPTH의 1번값(3: ZIP 파일 내부에 ZIP이 발견되면 3depth 까지 해제함) </param>
         /// <param name="nOption">CLIENT_ZIP_DEPTH의 2번값(0: 1번째 zip depth에 또 zip이 발견되면 차단, 1 : 허용)</param>
         /// <param name="blAllowDRM"> drm 파일 허용유무(true:허용)</param>
         /// <returns></returns>
-        public async Task<int> CheckZipFile(HsStream hsStream, FileAddErr currentFile, bool bDenyPasswordZIP, bool blWhite, string strExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true, string strApproveExt = "")
+        public async Task<int> CheckZipFile(HsStream hsStream, FileAddErr currentFile, bool bDenyPasswordZIP, bool blWhite, string strExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, string documentExtractType, int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true, string strApproveExt = "")
         {
             int nTotalErrCount = 0;
             eFileAddErr enRet;
@@ -4260,10 +4268,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (!dirZipBase.Exists)
                 dirZipBase.Create();
 
-            Log.Logger.Here().Information("[CheckZipFile] ZipFile[{0}] Ext[WhiteF({1})-Info({2})] ZipCheck[MaxDepth({3})-BlockOption({4})] AllowDrmF[{5}]",
-                 Path.GetFileName(hsStream.FileName), blWhite, strExtInfo, nMaxDepth, nOption, blAllowDRM);
+            Log.Logger.Here().Information("[CheckZipFile] ZipFile[{0}] Ext[WhiteF({1})-Info({2})] ZipCheck[MaxDepth({3})-BlockOption({4})] AllowDrmF[{5}] OLECheck[{6}]",
+                 Path.GetFileName(hsStream.FileName), blWhite, strExtInfo, nMaxDepth, nOption, blAllowDRM, documentExtractType);
 
             bool bIsApproveExt = false;
+
+            DocumentExtractType documentExtract = DocumentExtractType.NONE;
+            if (!Enum.TryParse(documentExtractType, out documentExtract)) documentExtract = DocumentExtractType.NONE;
 
             // Zip File Temp쪽에 Copy 및 Scan 
             using (var fileStream = new FileStream(strZipFile, FileMode.Create, FileAccess.Write))
@@ -4272,7 +4283,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 fileStream.Close();
 
                 enRet = ScanZipFile(currentFile, strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, nOption, 1, blWhite, strExtInfo, 0, hsStream.Type.ToUpper(),
-                    out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, bDenyPasswordZIP);
+                    out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtract, bDenyPasswordZIP);
 
                 // KKW
                 /*if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
@@ -4323,11 +4334,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="SGFileExamEvent"></param>
         /// <param name="ExamCount"></param>
         /// <param name="TotalCount"></param>
+        /// <param name="documentExtractType">ZIP 파일 내부의 문서검사여부 옵션값</param>
         /// <param name="bZipPasswdCheck"></param>
         /// <returns></returns>
         public eFileAddErr ScanZipFile(FileAddErr currentFile, string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nBlockOption, int nCurDepth,
-            bool blWhite, string strExtInfo, int nErrCount, string strExtType, out int nTotalErrCount, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = true)
+            bool blWhite, string strExtInfo, int nErrCount, string strExtType, out int nTotalErrCount, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, DocumentExtractType documentExtractType, bool bZipPasswdCheck = true)
         {
+            Console.WriteLine($"[20230309] ScanZipFile Name[{currentFile.FileName}] Path[{currentFile.FilePath}] Parent[{currentFile.ParentFileName}] strZipFile[{strZipFile}] strBasePath[{strBasePath}]");
             bIsApproveExt = false;
             eFileAddErr enErr = eFileAddErr.eFANone;
             string strExt;
@@ -4340,10 +4353,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 FileInfo scanFileInfo = new FileInfo(strZipFile);
                 DirectoryInfo dirUnzipFilesDir = null;
 
+                string strTempUnzipDirPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(strZipFile)); //Temp에 Copy된 문서의 압축해제 개체를 보관할 폴더 (Temp/ZipExtract/ZipName)
                 //스캔대상이 파일인 경우만 압축 해제 시도
-                if (scanFileInfo.Attributes != FileAttributes.Directory)
+                if (!scanFileInfo.Attributes.HasFlag(FileAttributes.Directory))
                 {
-                    string strTempUnzipDirPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(strZipFile)); //Temp에 Copy된 문서의 압축해제 개체를 보관할 폴더 (Temp/ZipExtract/ZipName)
                     dirUnzipFilesDir = new DirectoryInfo(strTempUnzipDirPath);
                     if (dirUnzipFilesDir.Exists != true) dirUnzipFilesDir.Create();
 
@@ -4390,11 +4403,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         continue;
                     }
 
-                    if (extractFile.Attributes == FileAttributes.Directory)
+                    if (extractFile.Attributes.HasFlag(FileAttributes.Directory))
                     {
                         //디렉토리는 내부 항목 검사
                         eFileAddErr enRetDir = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, extractFile.FullName, Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.Name)), nMaxDepth, nBlockOption, nCurDepth,
-                                                            blWhite, strExtInfo, nCurErrCount, "", out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
+                                                            blWhite, strExtInfo, nCurErrCount, "", out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtractType);
 
                         if (enRetDir != eFileAddErr.eFANone) enErr = enRetDir;
                         if (childFile.HasChildrenErr) currentFile.HasChildrenErr = true;
@@ -4448,6 +4461,44 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         continue;
                     }
 
+                    //ZIP파일 내부에 문서파일 인 경우 OLE 개체 검사
+                    //CheckDocumentFile()
+                    //압축해제한 파일의 Stream 필요
+                    //Check Document File (압축파일 내 문서검사할 파일이 존재하는 경우)
+                    if (ListCheckableDocumentExtension.Exists(ext => ext == strExt.Replace(".", "").ToUpper()))
+                    {
+                        //압축 내부 문서의 압축해제 개체를 보관할 폴더 (Temp/ZipExtract/ZipName/Document_Extract)
+                        string strTempDocumentExtractDirPath = Path.Combine(strTempUnzipDirPath, "Document_Extract");
+                        int documentScanDepth = 1;               //OLE개체 검사 하위 범위 (0인 상태에서도 개체 검출 시 Block)
+                        
+                        //압축해제한 파일의 Stream 필요
+                        HsStream oleHsStream = null;
+                        using (Stream oleFileStream = File.OpenRead(extractFile.FullName))
+                        {
+                            oleHsStream = new HsStream();
+
+                            oleHsStream.stream = new MemoryStream();
+                            oleFileStream.CopyTo(oleHsStream.stream);
+                            oleHsStream.FileName = extractFile.FullName;
+                            oleHsStream.MemoryType = HsStreamType.FileStream;
+                        }
+                        Console.WriteLine("Zip 파일내 Docuemnt 기다리기 시작===========");
+                        scanDocumentFile(oleHsStream, childFile, strTempDocumentExtractDirPath, blWhite, strExtInfo, documentScanDepth, documentExtractType).Wait();
+                        Console.WriteLine("Zip 파일내 Docuemnt 기다리기 끝=============");
+
+                        if (childFile.eErrType != eFileAddErr.eFANone || childFile.HasChildrenErr)
+                        {
+                            childFile.eErrType = enErr;
+                            currentFile.HasChildrenErr = true;
+                            nCurErrCount++;
+                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
+                            continue;
+                        }
+
+
+
+                    }
+
                     // 필수결재 확장자인지 확인
                     if (strApproveExt.Length > 0)
                     {
@@ -4483,7 +4534,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                                             //                    string strExtractPath = strExtractFilePath;//Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.));
 
                     eFileAddErr enRet = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, strCurZip, Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.Name)), nMaxDepth, nBlockOption, nCurDepth + 1,
-                        blWhite, strExtInfo, nCurErrCount, Path.GetExtension(extractFile.Name).Substring(1), out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
+                        blWhite, strExtInfo, nCurErrCount, Path.GetExtension(extractFile.Name).Substring(1), out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtractType);
 
                     if (enRet != eFileAddErr.eFANone) enErr = enRet;
                     if (childFile.HasChildrenErr) currentFile.HasChildrenErr = true;
@@ -4744,6 +4795,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             GC.WaitForPendingFinalizers();
 
             currentFile.OLEExtractorResult = extractorResult;
+
 
             if (extractorResult == 0)        //검출된 OLE 개체 없음 (정상처리)
                 return 0;
