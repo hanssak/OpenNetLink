@@ -836,10 +836,12 @@
         }
         else    // 다중망 로그인에서 로그아웃됐을때에 다시 자동로그인 안되게 처리
         {
+	
+            bLoginBtnDisable = true;
+	
             if (siteConfig.GetUseOver1auth(groupid))
             {
 
-                bLoginBtnDisable = true;
                 StateHasChanged();
                 if (doADLoginLocalCheck(groupid))
                 {
@@ -1430,8 +1432,8 @@
                         ctrlSideEvent();
 
 
-                    // Move Tray To WebWindow
-                    if (AppConfigSvc.GetStartTrayMove())
+                    // 첫 연결때에만 Move Tray To WebWindow
+                    if (AppConfigSvc.GetStartTrayMove() && pageService.GetConnectCount(groupId) == 1)
                         Window.MoveWebWindowToTray();
 
                 }
@@ -1546,7 +1548,7 @@
                 sgUserData = (SGUserData)HSCmdCenter.GetUserData(nGroupIDfirst);
                 sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupIDfirst);
 
-                if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && siteConfig.GetUseOver1auth(nGroupIDfirst) == false)
+                if (pageService.GetGroupIDLoginType(groupId) == eLoginType.eLOGINTYPE_ORIGIN && siteConfig.GetUseOver1auth(nGroupIDfirst) == false)
                 {
 
                     refPWChange.nGroupID = nGroupIDfirst;
@@ -2556,7 +2558,7 @@
                     SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strUserSeq);
 
                 // 기본설정(2)
-                if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && bBasicConf && siteConfig.GetUseOver1auth(gID) == false)
+                if (pageService.GetGroupIDLoginType(gID) == eLoginType.eLOGINTYPE_ORIGIN && bBasicConf && siteConfig.GetUseOver1auth(gID) == false)
                 {
                     strNavigatePathWithGroupID = "/netConf/";
                     strNavigatePathWithGroupID += gID.ToString();

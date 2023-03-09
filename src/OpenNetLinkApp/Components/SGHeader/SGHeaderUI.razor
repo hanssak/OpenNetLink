@@ -1837,6 +1837,13 @@ private void UpdatePolicy(int groupId)
         return;
     }
 
+    if (pageService.GetConnectStatus(groupId) == false || pageService.GetLogoutStatus(groupId))
+    {
+        // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+        ShowMessage("error", xmlConf.GetErrMsg("E_0218").Replace("/r/n", "<br>"));
+        return;
+    }
+
     //파일 Mime 정보 갱신 요청
     hsNetWork.getFileSvrFileMime(hsNetWork.GetFileMimeHash());
 
