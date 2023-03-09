@@ -1089,7 +1089,10 @@
         try
         {
             if (e.strUrlData != null && e.strUrlData.Length > 0)
-                System.Diagnostics.Process.Start("explorer", e.strUrlData);
+            {
+                string url = $"\"{e.strUrlData}\"";
+                System.Diagnostics.Process.Start("explorer", url);
+            }
         }
         catch (Exception ex)
         {

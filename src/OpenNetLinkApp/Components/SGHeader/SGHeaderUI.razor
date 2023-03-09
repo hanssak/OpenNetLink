@@ -1024,7 +1024,7 @@ private void dayTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         //SFM Refresh 매일 정각 0시에 실행 -- HeaderUI쪽에 있음.... 
         if (DateTime.Now.Hour == 0 && DateTime.Now.Minute == 0 && DateTime.Now.Second == 0)
         {
-            SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.sfmRefreshEvent;
+            SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.GetSFMRefreshEvent();
             if (sfmRefreshEvent != null)
                 sfmRefreshEvent(curGroupId);
         }
