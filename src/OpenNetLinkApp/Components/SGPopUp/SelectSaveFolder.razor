@@ -261,6 +261,69 @@
         return true;
     }
 
+
+    /// <summary>
+    /// 파일을 생성할 수 있는 권한이 있는지 확인(직접 파일 생성해봄)
+    /// </summary>
+    /// <param name="strPath"></param>
+    /// <returns></returns>
+    public bool CanCreateWriteFile(string strPath)
+    {
+
+        bool bRet = false;
+        string strTestTryFile = strPath;
+
+        try
+        {
+
+            if ( (strTestTryFile?.Length ?? 0) < 2)
+            {
+                CLog.Here().Error($"SelectSaveFolder-CanCreateWriteFile, Too Short Path (###), Path : {strTestTryFile}");
+                return false;
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                strTestTryFile = strTestTryFile.Replace("/", "\\");
+            else
+                strTestTryFile = strTestTryFile.Replace("\\", "/");
+
+            string strLastChar = strTestTryFile.Substring(strTestTryFile.Length - 1, 1);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                if (strLastChar != "\\")
+                    strTestTryFile += "\\";
+            }
+            else
+            {
+                if (strLastChar != "/")
+                    strTestTryFile += "/";
+            }
+
+            strTestTryFile += "test.hsz";
+
+            if (File.Exists(strTestTryFile)) File.Delete(strTestTryFile);
+
+            FileStream HsztoSendFs = new FileStream(strTestTryFile, FileMode.CreateNew);
+            byte[] headBuf = new byte[1];
+            HsztoSendFs.Write(headBuf, 0, headBuf.Length);
+            HsztoSendFs?.Close();
+            HsztoSendFs?.Dispose();
+            HsztoSendFs = null;
+
+            if (File.Exists(strTestTryFile)) File.Delete(strTestTryFile);
+
+            bRet = true;
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"SelectSaveFolder-CanCreateWriteFile, Test Create Fail : {strTestTryFile}, Exception(MSG) : {ex.Message}");
+            bRet = false;
+        }
+
+        return bRet;
+    }
+
     /// <summary>
     /// 확인 눌러서 변경된 경로 저장
     /// </summary>
@@ -279,16 +342,7 @@
         string strSystemVarType = "";
         string strTempPath = "";
         string strMsg = "";
-
-        // ReadOnly 일때에는 지정하지 못하도록 수정적용
-        System.IO.FileInfo sf = new System.IO.FileInfo(stDisplayPath);
-        CLog.Here().Information($"SelectSaveFolder-Confirm, FileAttributes : {sf.Attributes.ToString()}, Path : {stDisplayPath}");
-        if ((sf.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
-        {
-            CLog.Here().Error($"SelectSaveFolder-Confirm, SavePath is READONLY(###) - Deny, Path : {stDisplayPath}");
-            ShowMessage("warn", XmlConf.GetWarnMsg("W_0289"));
-            return;
-        }
+        string strSavePath = "";
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
@@ -357,8 +411,7 @@
                 return;
             }
 
-            OnSaveDirPath.InvokeAsync(stDisplayPath + "|" + nNetIdx);
-
+            strSavePath = stDisplayPath;
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
@@ -384,7 +437,8 @@
 
             CLog.Here().Error($"Confirm, OS:Mac OSX, UserProfile - Path : {strSystemVarType}");
 
-            OnSaveDirPath.InvokeAsync(strSystemVarType + "|" + nNetIdx);
+            strSavePath = strSystemVarType;
+            //OnSaveDirPath.InvokeAsync(strSystemVarType + "|" + nNetIdx);
 
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -411,8 +465,8 @@
 
             CLog.Here().Error($"Confirm, OS:Mac OSX, UserProfile - Path : {strSystemVarType}");
 
-            OnSaveDirPath.InvokeAsync(strSystemVarType + "|" + nNetIdx);
-
+            strSavePath = strSystemVarType;
+            //OnSaveDirPath.InvokeAsync(strSystemVarType + "|" + nNetIdx);
         }
         else
         {
@@ -488,9 +542,18 @@
                     return;
                 }*@
 
-            OnSaveDirPath.InvokeAsync(stDisplayPath + "|" + nNetIdx);
+            strSavePath = stDisplayPath;
         }
 
+        // file 생성불가능하면 error처리
+        if (CanCreateWriteFile(stDisplayPath) == false)
+        {
+            CLog.Here().Error($"SelectSaveFolder-Confirm, SavePath Unable to create file(###) - Deny, Path : {stDisplayPath}");
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0289").Replace("/r/n", "<br/>"));
+            return;
+        }
+
+        OnSaveDirPath.InvokeAsync(strSavePath + "|" + nNetIdx);
 
         //CLog.Here().Information($"SelectSaveFolder Confirm");
 
