@@ -12,6 +12,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using System.Threading
 @using OpenNetLinkApp.Common
+@using System.Text.Json;
 
 @inherits LayoutComponentBase
 @inject HSCmdCenter HSCmdCenter
@@ -57,28 +58,28 @@
                             </div>
                             @if (eLoginUITypeData != eLoginType.eLOGINTYPE_OTP) //OTP PW 필요없음
                             {
-                                <div class="input-group mb-2">
-                                    @*AD 로그인은 PW 사용자 입력 불가 (Readonly)*@
-                                    <input type="password" class="form-control-login" placeholder="Password" readonly="@(eLoginUITypeData== eLoginType.eLOGINTYPE_AD)" @bind="pw" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2">
-                                </div>
+                            <div class="input-group mb-2">
+                                @*AD 로그인은 PW 사용자 입력 불가 (Readonly)*@
+                                <input type="password" class="form-control-login" placeholder="Password" readonly="@(eLoginUITypeData== eLoginType.eLOGINTYPE_AD)" @bind="pw" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2">
+                            </div>
                             }
                             @if (eLoginUITypeData == eLoginType.eLOGINTYPE_PW_OTP || eLoginUITypeData == eLoginType.eLOGINTYPE_OTP) //PW_OTP(4), OTP(5)
                             {
-                                <div class="input-group mb-2">
-                                    <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" @bind="otp" @onkeyup="keyCheck" tabindex="3" autocomplete="off">
-                                </div>
+                            <div class="input-group mb-2">
+                                <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" @bind="otp" @onkeyup="keyCheck" tabindex="3" autocomplete="off">
+                            </div>
                             }
                             <div class="row">
                                 @if (nGroupID > -1 && bAutoLogin && eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
                                 {
-                                    <div class="col-12 pt-1 pr-4 text-right ">
-                                        <div class="icheck-primary">
-                                            <input type="checkbox" id="remember" @onclick="CheckStateChange" checked=@bAutoLoginCheck disabled=@bUIBtnDisable>
-                                            <label for="remember">
-                                                @XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX")
-                                            </label>
-                                        </div>
+                                <div class="col-12 pt-1 pr-4 text-right ">
+                                    <div class="icheck-primary">
+                                        <input type="checkbox" id="remember" @onclick="CheckStateChange" checked=@bAutoLoginCheck disabled=@bUIBtnDisable>
+                                        <label for="remember">
+                                            @XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX")
+                                        </label>
                                     </div>
+                                </div>
                                 }
                                 <div class="col-12  pt-2">
                                     <button class="btn btn-login btn-block btn_blue" @onclick="doLogInByBtn" disabled=@bUIBtnDisable>LOGIN</button>
@@ -289,7 +290,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupid"></param>
     /// <returns></returns>
@@ -353,8 +354,8 @@
             if (stRtn == null || (1 > stRtn.Length))
             {
                 CLog.Here().Information($"Result - json, Data is null OR 0 Size");
-                ShowLoginFail(XmlConf.GetWarnMsg("W_0036"));
-                return;
+                ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
+                return false;
             }
 
             // json으로 온 Data에서 실제 data 뽑아내는 동작
