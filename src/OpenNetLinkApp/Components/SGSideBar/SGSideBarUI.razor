@@ -40,8 +40,8 @@
                                 <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
                                 <p style="font-size:1rem;" class="p-2">
                                     @(MenuItem.FromName /*Dashboard*/)
-                                    <i class="fas fa-long-arrow-alt-right p-1"></i>
-                                    @(MenuItem.ToName /*Dashboard*/)
+                                    @*<i class="fas fa-long-arrow-alt-right p-1"></i>
+                                    @(MenuItem.ToName /*Dashboard*/)*@
                                     <!--<i class="right fas fa-angle-left mt-1"></i>-->
                                     <!-- Badge -->
                                     @if (bViewSGSideBarUIBadge)
@@ -64,8 +64,8 @@
                                 <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
                                 <p style="font-size:1rem;" class="p-2">
                                     @(MenuItem.FromName /*Dashboard*/)
-                                    <i class="fas fa-long-arrow-alt-right p-1"></i>
-                                    @(MenuItem.ToName /*Dashboard*/)
+                                @*    <i class="fas fa-long-arrow-alt-right p-1"></i>
+                                    @(MenuItem.ToName /*Dashboard*/)*@
                                     <!-- <i class="right fas fa-angle-left mt-1"></i> -->
                                     <!-- Badge -->
                                     @if (bViewSGSideBarUIBadge)
@@ -229,9 +229,9 @@
                @onkeydown="@(async eventArgs => await ChangeActiveMenuWrapPopup(eventArgs, MenuItem))">
                             <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/) text-md logo-xs mt-2"></i>
                             <p style="font-size:1rem;" class="p-2">
-                                @(MenuItem.FromName /*Dashboard*/)
-                                <i class="fas fa-long-arrow-alt-right p-1"></i>
-                                @(MenuItem.ToName /*Dashboard*/)
+                                @(MenuItem.FromName /*Dashboard*/)@*<i class="fas fa-long-arrow-alt-right p-1"></i>
+                                @(MenuItem.ToName /*Dashboard*/*@
+                                @*)*@
                             </p>
                         </a>
                     </li>

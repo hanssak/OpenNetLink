@@ -368,9 +368,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         //public bool m_bUseNetOverAllsend { get; set; } = false;                              // 3망 연결된 망에 한번에 전부 전송하는 기능 사용유무
 
-        public bool m_bUseFileCheckException { get; set; } = true;                              // virus / Apt에대한 예외처리 요청 기능 사용유무
+        public bool m_bUseFileCheckException { get; set; } = false;                              // virus / Apt에대한 예외처리 요청 기능 사용유무
 
-        public bool m_bUseFileForward { get; set; } = true;                                    // 파일포워드 기능 사용유무(site.넷마블)
+        public bool m_bUseFileForward { get; set; } = false;                                    // 파일포워드 기능 사용유무(site.넷마블)
 
         public bool m_bUseFileForwardDownNotRecv { get; set; } = true;                         // 파일 수신되기전에 파일포워드로 다운로드 가능유무
 
