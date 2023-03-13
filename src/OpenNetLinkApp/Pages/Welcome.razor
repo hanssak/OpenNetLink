@@ -2086,7 +2086,7 @@
     }
 
     /// <summary>
-    /// Server와 Local가 Client version의 버전 비교 후 자동 업데이트 (PATCHMODE= 1 일때 기능함)
+    /// Server와 Local의 Client version 버전 비교 후 자동 업데이트 (PATCHMODE= 1 일때 기능함)
     /// </summary>
     /// <param name="sgLoginData"></param>
     /// <returns></returns>
@@ -2104,7 +2104,7 @@
         if (strSvrCliVersion.Equals(""))
             return;
 
-        CLog.Here().Information("DashBoard Server Client Version {0}", strSvrCliVersion);
+        CLog.Here().Information("groupID : {0} - DashBoard Server Client Version {1}", groupID, strSvrCliVersion);
 
         string strCliVersion = HsCmdCenter.GetCliVersion().ToUpper();
 
@@ -2115,8 +2115,8 @@
         if (!versionConfigSvc.isUpperVersion(strSvrCliVersion, strCliVersion))
             return;
 
-        CLog.Here().Information("WelCome Server Client Version {0}", strSvrCliVersion);
-        CLog.Here().Information("WelCome Local Client Version {0}", strCliVersion);
+        CLog.Here().Information("groupID : {0} - WelCome Server Client Version {1}", groupID, strSvrCliVersion);
+        CLog.Here().Information("groupID : {0} - WelCome Local Client Version {1}", groupID, strCliVersion);
 
         //업데이트  진행중이면 SKIP 하도록 처리 (KYH)
         (Enums.UpdateStatusType status, int groupId) nowUpdateInfo = AppUpdaterSvc.GetNowUpdateInfo();
