@@ -67,7 +67,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         // 필수결재 기능 사용UI 떴을때, 사용자가 결재로 파일전송 요청했는지 유무
         bool m_bApproveExtTransFileWithApprove = false;
 
-
         //타이머관련 변수는 PageStatusService로 이동
         //public Timer timer = null;
         //public static DateTime svrTime;
@@ -119,6 +118,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool m_bUseClipBoard = false;
 
         public bool m_bLoginComplete = false;
+
+        public bool m_bPolicyUpdate = false;
 
         public bool m_bFileView = true;       // true 이면 일일 파일 전송량 횟수 표시 , false 이면 일일 클립보드 전송량 횟수 표시 
 
@@ -755,6 +756,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public void SetInitApprLine(bool bInitApprLine)
         {
             m_bInitApprLine = bInitApprLine;
+        }
+
+        public bool GetPolicyUpdate()
+        {
+            return m_bPolicyUpdate;
+        }
+        
+        public void SetPolicyUpdate(bool isPolicyUpDate)
+        {
+            m_bPolicyUpdate = isPolicyUpDate;
         }
         public void SetCurFileSendInfo(string strFileSendInfo)
         {

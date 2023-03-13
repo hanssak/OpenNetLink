@@ -71,6 +71,7 @@ extern void *SelfThis;
 #define WINDOW_MIN_WIDTH 1220
 #define WINDOW_MIN_HEIGHT 750
 
+
 extern bool g_bDoExit2TrayUse;
 extern bool g_bStartTray;
 extern bool g_bClipCopyNsend;
@@ -79,7 +80,7 @@ typedef enum enDefineClipType
 {
 	D_CLIP_TEXT 	= 1,
 	D_CLIP_IMAGE 	= 2,
-	D_CLIP_OBJECT 	= 3
+	D_CLIP_OBJECT 	= 3 //Image Or Text 둘다 가능
 } D_CLIP_TYPE;
 
 //
@@ -133,6 +134,7 @@ typedef void (*ClipBoardCallback)(const int nGroupId, const int nType, const int
 typedef void (*RecvClipBoardCallback)(const int nGroupId);
 typedef void (*RequestedNavigateURLCallback)(AutoString navURI);
 
+void RequestMoveTrayToWebWindow();
 class WebWindow
 {
 private:

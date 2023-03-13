@@ -3494,6 +3494,20 @@ input[type="button"].btn-block {
   border: 0;
 }
 
+.dropdown-item-small {
+    display: block;
+    width: 160px;
+    /*padding: 0.25rem 1rem;*/
+    /*padding: 0.25rem 1rem;*/
+    clear: both;
+    font-weight: 400;
+    color: #212529;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+}
+
 .dropdown-item:hover, .dropdown-item:focus {
   color: #16181b;
   text-decoration: none;
@@ -13692,6 +13706,13 @@ body.text-sm .control-sidebar {
   font-size: 0.875rem;
   padding: 0.5rem 1rem;
   text-align: center;
+}
+
+.dropdown-footer-left {
+    display: block;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    text-align: left;
 }
 
 .open:not(.dropup) > .animated-dropdown-menu {

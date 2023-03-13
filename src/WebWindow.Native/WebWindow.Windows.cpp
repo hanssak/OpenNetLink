@@ -49,6 +49,7 @@ std::map<HWND, WebWindow*> hwndToWebWindow;
 
 void* SelfThis = nullptr;
 
+
 BYTE* g_ptrByte = NULL;		// result
 BYTE* g_ptrExByte = NULL;		// result
 bool g_bDoingSendClipBoard = false;
@@ -59,6 +60,7 @@ bool g_bStartTray = true;
 bool g_bClipCopyNsend = false;
 
 std::map<int, wstring> mapHotKey;
+void RequestMoveTrayToWebWindow();
 
 enum Results {
 	ToastClicked,					// user clicked on the toast
@@ -247,8 +249,9 @@ void WebWindow::Register(HINSTANCE hInstance)
 }
 
 WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCallback webMessageReceivedCallback)
-{
+{	
 	SelfThis = this;
+
 	// Create the window
 	_webMessageReceivedCallback = webMessageReceivedCallback;
 	g_bDoExit2TrayUse = false;
@@ -584,6 +587,8 @@ void WebWindow::WaitForExit()
 		DispatchMessage(&msg);
 	}
 #else
+	
+
 	if (tray_init(&tray) < 0)
 	{
 		// printf("failed to create tray\n");
@@ -1225,6 +1230,16 @@ void LogWrite(int lvl, tstring strFile, tstring strTime, tstring strLog, tstring
 	fclose(f);
 }
 
+/// <summary>
+/// Tray Header 파일에서, 더블클릭 시 호출하는 Webwindow 표시 함수 
+/// <para>(WebWindow::MoveTrayToWebWindow와 동일)</para>
+/// </summary>
+void RequestMoveTrayToWebWindow()
+{
+	NTLog(SelfThis, Info, "Called : Request OpenNetLink Move To WebWindow using DoubleClick");	
+	((WebWindow*)SelfThis)->MoveTrayToWebWindow();
+}
+
 /**
 *@breif 현재 문제 있음. (@@@@@.사용하면 App 종료됨.)
 *@prarm lvl 로그 레벨
@@ -1589,6 +1604,7 @@ int WebWindow::SendClipBoard(int groupID)
 
 			if (nType == 0)
 			{
+				CloseClipboard();
 				g_bDoingSendClipBoard = false;
 				ClipDataBufferClear();
 				NTLog(SelfThis, Info, "WebWindow::SendClipBoard - UnKnown Type - Error : %d", groupID);
@@ -2003,7 +2019,6 @@ void WebWindow::MoveTrayToWebWindow()
 		}
 	} while ((++item)->text != NULL);
 }
-
 void WebWindow::MinimizeWebWindow()
 {
 	NTLog(this, Info, "Called : OpenNetLink Minimize WebWindow");

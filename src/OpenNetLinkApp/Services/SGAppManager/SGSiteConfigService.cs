@@ -291,6 +291,38 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseInputSearchApproveExtTree(int groupId);
 
+
+        /// <summary>
+        /// 대결재자로서, 원결재자의 모든 권한을 위임받아 사용할지 유무
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseAllProxyAuthority(int groupID);
+
+        /// <summary>
+        /// //결재미리보기(파일전송/클립보드) 시 WebLink 뷰어 사용 유무
+        /// <br>사용안할 시, 기존 viewer 주소 사용</br>
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseWebLinkPreviewer(int groupID);
+
+        /// <summary>
+        /// WebLink 미리보기 사용 시 WebLink 주소 ( + AP001_Docs_Viewer.do 사용)
+        /// <br>m_bUseWebLinkPreviewer 가 true일때만 사용함</br>
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public void SetUseOver1auth(int groupID, bool bUseAuth);
+
+        /// <summary>
+        /// AD 로그인가능하면 AD로그인, 안되면 IDPW 로그인 UI로 변경되는 설정인지 유무
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseOver1auth(int groupID);
+
+        public string GetWebLinkPreviewerURL(int groupID);
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -389,6 +421,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 sgSiteConfig.m_bUseApproveAfterLimit = false;            // 파일 사후결재 결재 Count 제한 사용유무
                 sgSiteConfig.m_bUseClipBoardApproveAfterLimit = false;   // 클립보드 사후결재 결재 Count 제한 사용유무
+
+                sgSiteConfig.m_bUseEmail = false;                // 이메일 결재 사용 유무
+                sgSiteConfig.m_bUsePCURL = false;                       // PCURL 사용 유무.
+                sgSiteConfig.m_bUseClipApprove = false;                 // 클립보드 결재 사용 유무.
+                sgSiteConfig.m_bUsePublicBoard = false;                 // 공지사항 사용 유무.
+
+                sgSiteConfig.m_bUseApproveAfterLimit = false;            // 사후결재 결재 Count 제한 사용유무 - Default false 로 변경 2022.12.28, 나의 사후결재 Count를 파악하여 결재 페이지로 이동
+                sgSiteConfig.m_bUseClipBoardApproveAfterLimit = false;   // 클립보드 사후결재 Count 제한 사용유무 - Default false 로 변경 2022.12.28
+                                                                         // 클립보드의 경우 결재자의 사후결재 Count를 파악하여 전송 제한을 건다.
 
                 sgSiteConfig.m_bUserIDSave = true;                     //유저 아이디 저장
                 sgSiteConfig.m_bUseScreenLock = false;                  //Screen Lock 설정여부
@@ -1283,6 +1324,52 @@ namespace OpenNetLinkApp.Services.SGAppManager
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
                 return listSiteConfig[groupID].bUseInputSearchInSecurityApproverTree;
+            return false;
+        }
+
+
+        /// <summary>
+        /// 대결재자로서, 원결재자의 모든 권한을 위임받아 사용할지 유무
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseAllProxyAuthority(int groupID)
+        { 
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseAllProxyAuthority;
+            return false;
+        }
+
+        public bool GetUseWebLinkPreviewer(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseWebLinkPreviewer;
+            return false;
+        }
+
+        public string GetWebLinkPreviewerURL(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_strWebLinkPreviewerURL;
+            return "";
+        }
+
+        public void SetUseOver1auth(int groupID, bool bUseAuth)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseOver1Auth = bUseAuth;
+        }
+
+        public bool GetUseOver1auth(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseOver1Auth;
+
             return false;
         }
 

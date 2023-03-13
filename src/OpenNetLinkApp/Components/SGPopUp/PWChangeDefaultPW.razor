@@ -338,7 +338,7 @@
             }
 
             //if (AppConfigSvc.GetStartTrayMove())
-            if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray())
             {
                 if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                 {

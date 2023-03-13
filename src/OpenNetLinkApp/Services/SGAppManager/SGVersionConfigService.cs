@@ -22,6 +22,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         private ISGVersionConfig _VersionConfigInfo;
         public ref ISGVersionConfig VersionConfigInfo => ref _VersionConfigInfo;
 
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGVersionConfigService>();
+
         public SGVersionConfigService()
         {
             var serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));
@@ -30,25 +32,23 @@ namespace OpenNetLinkApp.Services.SGAppManager
             HsLogDel hsLog = new HsLogDel();
             hsLog.Delete(7);    // 7일이전 Log들 삭제
 
-            Log.Information($"- VersionConfig Path: [{VersionConfig}]");
+            CLog.Here().Information($"- VersionConfig Path: [{VersionConfig}]");
             if(File.Exists(VersionConfig))
             {
                 try
                 {
-                    Log.Information($"- VersionConfig Loading... : [{VersionConfig}]");
+                    CLog.Here().Information($"- VersionConfig Loading... : [{VersionConfig}]");
                     //Open the stream and read it back.
                     using (FileStream fs = File.OpenRead(VersionConfig))
                     {
                         SGVersionConfig versionConfig = (SGVersionConfig)serializer.ReadObject(fs);
                         _VersionConfigInfo = versionConfig;
                     }
-                    Log.Information($"- VersionConfig Load Completed : [{VersionConfig}]");
+                    CLog.Here().Information($"- VersionConfig Load Completed : [{VersionConfig}]");
                 }
                 catch(Exception ex)
                 {
-                    Log.Warning($"\nMessage ---\n{ex.Message}");
-                    Log.Warning($"\nHelpLink ---\n{ex.HelpLink}");
-                    Log.Warning($"\nStackTrace ---\n{ex.StackTrace}");
+                    CLog.Here().Warning($"Exception - Message  : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
                     _VersionConfigInfo = new SGVersionConfig();
                 }
             }

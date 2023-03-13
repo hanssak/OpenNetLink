@@ -75,6 +75,17 @@ namespace OpenNetLinkApp.Data.SGDicData
             m_DicLoginData.TryAdd(groupid, tmpData);
         }
 
+        public void SetLoginDataEmpty(int groupid)
+        {
+            SGLoginData tmpData = null;
+            if (m_DicLoginData.TryGetValue(groupid, out tmpData) == true)
+            {
+                m_DicLoginData.TryRemove(groupid, out tmpData);
+                //m_DicLoginData.Remove(groupid);
+                tmpData = null;
+            }
+        }
+
         public SGData GetUserData(int groupid)
         {
             SGUserData tmpData = null;

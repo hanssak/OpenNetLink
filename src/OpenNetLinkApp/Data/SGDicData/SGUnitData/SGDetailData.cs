@@ -11,6 +11,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Serilog;
 using OpenNetLinkApp.Common;
+using AgLogManager;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -833,7 +834,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             if (strFIleIdx.Length < 1)
             {
-                Log.Information($"FILE-Index : Empty");
+                Log.Logger.Here().Information($"FILE-Index : Empty");
                 return true;
             }
 
@@ -842,7 +843,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             int dataCount = listDicdata.Count;
             if (dataCount <= 0)
             {
-                Log.Information($"FILERECORD Count: 0");
+                Log.Logger.Here().Information($"FILERECORD Count: 0");
                 return true;
             }
 
@@ -862,7 +863,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         strFileSize = "";
                         if (data.TryGetValue(3, out strFileSize))                   // 파일 Size
                         {
-                            Log.Information($"FILE({strFileIndexData}) Size : {strFileSize}");
+                            Log.Logger.Here().Information($"FILE({strFileIndexData}) Size : {strFileSize}");
 
                             Int64 nSize = 0;
                             if (!strFileSize.Equals(""))
@@ -876,7 +877,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             }
 
-            Log.Information($"FILE Not Found !!!");
+            Log.Logger.Here().Information($"FILE Not Found !!!");
             return true;
         }
 
@@ -1036,7 +1037,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// 결재 이력 정보를 반환한다
         /// </summary>
         /// <returns></returns>
-        public List<ApproverHist> GetApproverInfoHist()
+        public List<ApproverHist> GetApproverInfoHist(bool isVisibleApproveReason)
         {
             List<ApproverHist> approverHist = new List<ApproverHist>();
             ApproverHist tmpApprover;
@@ -1133,7 +1134,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if (strApprStatusCode.Equals("1"))
                     strApprDate = "-";
                 else if (strApprStatusCode.Equals("2"))
-                    strApprReason = "-";
+                {
+                    if(!isVisibleApproveReason)
+                        strApprReason = "-";
+                }
 
                 string strTransStatus = GetBasicTagData("TRANSSTATUS");
                 if ((strTransStatus.Equals("C")) || (strTransStatus.Equals("F")))    // 전송취소 이거나 전송실패
@@ -1181,10 +1185,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="ApproveStep">결재유형</param>
         /// <param name="DataApprStatusCode">해당전송건의 결재상태</param>
         /// <returns></returns>
-        public ApproverHist GetTransLastApproverHistData(ApproverHist ApprHist, int ApproveStep, string DataApprStatusCode)
+        public ApproverHist GetTransLastApproverHistData(ApproverHist ApprHist, int ApproveStep, string DataApprStatusCode, bool isVisibleApproveReason)
         {
             List<ApproverHist> approverHist = null;
-            approverHist = GetApproverInfoHist();
+            approverHist = GetApproverInfoHist(isVisibleApproveReason);
             if ((approverHist == null) || (approverHist.Count <= 0))
             {
                 ApprHist = null;
@@ -1241,10 +1245,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="ApprHist"></param>
         /// <returns></returns>
-        public ApproverHist GetApprLastApproverHistData(ApproverHist ApprHist)
+        public ApproverHist GetApprLastApproverHistData(ApproverHist ApprHist, bool isVisibleApproveReason)
         {
             List<ApproverHist> approverHist = null;
-            approverHist = GetApproverInfoHist();
+            approverHist = GetApproverInfoHist(isVisibleApproveReason);
             if ((approverHist == null) || (approverHist.Count <= 0))
             {
                 ApprHist = null;

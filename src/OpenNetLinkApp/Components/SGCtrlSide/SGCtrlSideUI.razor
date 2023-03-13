@@ -1,6 +1,7 @@
 @using System
 @using System.Collections.Generic
 @using System.Linq
+@using OpenNetLinkApp.Common
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
@@ -245,7 +246,7 @@
         </div>
     }
 
-    @if (m_bUseMainPageType)
+    @if (m_bUseMainPage)
     {
         <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_MAINPAGE_SETTING")</div> <!--화면설정-->
         <div class="ml-2 mb-4">
@@ -559,7 +560,7 @@
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_UPDATE")</div>                                                                                                       <!--업데이트-->
     <div class="ml-2 mb-5 updates">
         <ul class="mb-1  w-100 ">
-            <li><a class="update" @onclick="@(async () => CheckUpdatesClick())" data-toggle="modal" data-target="#modal-checkupdate" style="cursor: pointer;">@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
+            <li><a class="update" @onclick="@(async () => CheckUpdatesControlClick())" data-toggle="modal" style="cursor: pointer;">@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_LASTUPDATE") :  @(GetLastUpdated())</li> <!--마지막 업데이트-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_SOFTWARE_VERSION") :  OpenNetLink @(GetSWVersion())+@(GetSWCommitId())</li> <!--소프트웨어버전-->
         </ul>
@@ -570,7 +571,7 @@
 
 <!-- /.Control Sidebar -->
 <SelectSaveFolder @ref="refSelectSaveFolder" OnSaveDirPath="SaveDownloadDir"></SelectSaveFolder>
-<SGCheckUpdate @ref="refSGCheckUpdate" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
+<SGCheckUpdate @ref="refSGCheckUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
 <SGAvailableUpdate @ref="refSGAvailableUpdate" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseAvailableUpdate"></SGAvailableUpdate>
 <SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CancelDownloadUpdate"></SGDownloadUpdate>
 <SGFinishedDownload @ref="refSGFinishedDownload" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseFinishedDownload"></SGFinishedDownload>
@@ -647,7 +648,6 @@
 
 
     public bool m_bUseClipAlarmType = true;                                             // 클립보드 알림 형식 사용 유무
-    public bool m_bUseMainPageType = true;                                               // 메인페이지 형식 사용 유무
     public bool m_bUseClipCopyAndSend = false;                                           // 클립보드 복사 후 전송 사용 유무
     public bool m_bUseURLRedirectionAlarm = true;                                       // URL 자동전환 알림 사용 유무
     public bool m_bUseURLRedirectionAlarmType = true;                                   // URL 자동전환 알림 타입 선택 사용 유무
@@ -680,6 +680,8 @@
 
     private async Task openSaveDirPopup(int Idx, string dir)
     {
+
+        refSelectSaveFolder.nGroupid = Idx;
         await refSelectSaveFolder.openPopUp(Idx, dir);
 
         object[] param2 = { "0" };
@@ -1519,7 +1521,7 @@
             stPath = stPath.Replace("\\", "/");
         }
 
-        bool bFind = false;
+        @*bool bFind = false;
         int count = AppConfigSvc.AppConfigInfo.RecvDownPath.Count;
         string strPreDownPath = "";
         for (int i = 0; i < count; i++)
@@ -1546,12 +1548,15 @@
             strMsg = strMsg.Replace("/r/n", "<br>");
             ShowMessage("warn", strMsg);
             return;
-        }
+        }*@
+
         //HsCmdCenter.SetDownLoadPath(groupId, stPath);
         //HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
         //CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
         SetAllDownloadPath(groupId, stPath);
     }
+
+
     private async void SetRecvDownPath(int groupId, ChangeEventArgs changeEventArg)
     {
         string recvDownPath = Convert.ToString(changeEventArg.Value);
@@ -1688,8 +1693,12 @@
 
     private void SetAllDownloadPath(int groupId, string stPath)
     {
-        HsCmdCenter.SetDownLoadPath(groupId, stPath);
-        HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
+
+        string strNosystemVarPath = AppConfigSvc.ConvertRecvDownPath(stPath);
+
+        // NetLib 쪽에는 실재절대경로로 전달해줘야함, 아님 수신때 이상한곳에 저장함
+        HsCmdCenter.SetDownLoadPath(groupId, strNosystemVarPath);
+        HsCmdCenter.SetBaseDownLoadPath(groupId, strNosystemVarPath);
         CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
 
         CLog.Here().Information($"Set DownLoadPath, BaseDownLoadPath, RecvDownPath Set: [{stPath}] useUserPath : {SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId)}");   // siteConfig
@@ -1910,7 +1919,7 @@
             SGSvrData sgSvrData = null;
             sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(NetworkInfo.GroupID);
             if (sgSvrData == null)
-                return;
+                continue;
 
             eLoginType eLoginTypeData = sgSvrData.GetLoginType();
 
@@ -1930,12 +1939,7 @@
             //m_bUseClipBoard = (m_bUseClipAlarmType | m_bUseClipCopyAndSend);
         }
 
-        if (m_bUseMainPage)
-        {
-            // siteConfig. json으로 이동
-            m_bUseMainPageType = SGAppMgrSvc.OpConfigInfoService.GetUseMainPageTypeChange();
-            m_bUseMainPage = (m_bUseMainPageType);
-        }
+        m_bUseMainPage = SGAppMgrSvc.OpConfigInfoService.GetUseMainPageTypeChange();
 
 
         if (m_bUseFileSend)
@@ -2130,11 +2134,43 @@
     }
     */
 
-    public async void CheckUpdatesClick()
+    public async void CheckUpdatesControlClick()
+    {
+        ISGSideBarUIService SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+
+        int groupId = sgSideBar.GroupId;
+        CLog.Here().Information($"Click Update Check Button groupID : {groupId} - Local Client Version {GetSWVersion()}");
+
+        //이미 업데이트  진행중이면 SKIP
+        (Enums.UpdateStatusType status, int groupId) nowUpdateInfo = AppUpdaterSvc.GetNowUpdateInfo();
+        if (nowUpdateInfo.status != Enums.UpdateStatusType.NONE && nowUpdateInfo.groupId > -1)
+        {
+            CLog.Here().Information($"GID:{groupId}] SKIP - Update Already Started By GroupID[{nowUpdateInfo.groupId}] / Status[{nowUpdateInfo.status.ToString()}]");
+            refSGMessageNotification?.OpenPopUp("Update Already Starting :(");
+            return;
+        }
+
+        //업데이트 진행은 아니지만, Update Cancel 중이면 SKIP
+        if(AppUpdaterSvc.IsCancelRequested)
+        {
+            CLog.Here().Information($"[GID:{groupId}] SKIP - Update Canceling...");
+            refSGMessageNotification?.OpenPopUp($"We are working on [Canceling] the update.{Environment.NewLine}Please try again in a few minutes. :(");
+            return;
+        }
+
+
+         await Task.Run(() =>
+        {
+            AppUpdaterSvc.CheckUpdatesClick(groupId, refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
+        });
+    }
+
+    public async void CheckUpdatesClick(int groupId)
     {
         await Task.Run(() =>
         {
-            AppUpdaterSvc.CheckUpdatesClick(refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
+            AppUpdaterSvc.CheckUpdatesClick(groupId, refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
         });
     }
 
@@ -2153,14 +2189,14 @@
         refSGAvailableUpdate.ClosePopUp();
     }
 
-    private void OpenDownloadUpdate(string downloadInfo)
+    @*private void OpenDownloadUpdate(string downloadInfo)
     {
         refSGDownloadUpdate.OpenPopUp(downloadInfo);
     }
-
+*@
     private void CancelDownloadUpdate()
     {
-        AppUpdaterSvc.SparkleInst.CancelFileDownload();
+        AppUpdaterSvc.RequestCancelFileDownload();
         AppUpdaterSvc.IsCancelRequested = true;
     }
 
@@ -2185,20 +2221,23 @@
         refSGMessageNotification.ClosePopUp();
     }
 
-    public async void clientUpgradeExe()
+    /// <summary>
+    ///
+    /// </summary>
+    public async void clientUpgradeExe(int groupId)
     {
         if (SGAppMgrSvc.OpConfigInfoService.GetUseForceBackgroundUpdate())
         {
             await Task.Run(() =>
             {
-                AppUpdaterSvc.CheckUpdateBackgroundDown();
+                AppUpdaterSvc.CheckUpdateBackgroundDown(groupId);
             });
         }
         else
         {
             await Task.Run(() =>
             {
-                CheckUpdatesClick();
+                CheckUpdatesClick(groupId);
                 JSRuntime.InvokeAsync<object>("OpenControlSide");
             });
         }

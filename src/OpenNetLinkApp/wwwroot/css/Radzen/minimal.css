@@ -539,10 +539,10 @@ p-treetabletoggler {
 
     .dropzone input[type=file] {
         position: absolute;
-        width: 100%;
+        width: 90%;
         height: 100%;
         opacity: 0;
-        cursor: pointer;
+        cursor: default;
     }
 
 .dropzone-drag {

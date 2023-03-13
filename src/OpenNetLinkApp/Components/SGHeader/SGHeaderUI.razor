@@ -771,7 +771,7 @@ public void DoLogOutSetData(int nGroupID)
     HsCmdCenter.sgDicRecvData.SetSFMListData(nGroupID, null);
     pageService.SetSFMChecking(false);
     pageService.SetApproveAfterMyCountChecking(false);
-
+    HsCmdCenter.sgDicRecvData.SetLoginDataEmpty(nGroupID);
 
     CLog.Here().Information($"groupID : {nGroupID} - User Do Logout, UrlRedirection LogOut State ReSet !!!");
     HsNetWorkSG.HsHttpWatcher.SetLoginOutState(nGroupID, false);
@@ -856,6 +856,9 @@ private void LogOut(int groupId)
 
     if (i < count)
         return;
+
+    pageService.m_nCurViewPageGroupID = nGroupID;
+    pageService.m_nLoginType = (int)pageService.GetGroupIDLoginType(nGroupID);
 
     JSRuntime.InvokeAsync<object>("beforeLogOut");
     //MyNavigationManager.NavigateTo(siteConfig.GetUseSelectFirstConnectNetServer() ? "/SelectNet" : "/LogIn/Logout");
@@ -1018,9 +1021,10 @@ private void dayTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         if (count == 0)
             return;
 
-        if (DateTime.Now.Hour == 9 && DateTime.Now.Minute == 31 && DateTime.Now.Second == 0)
+        //SFM Refresh 매일 정각 0시에 실행 -- HeaderUI쪽에 있음.... 
+        if (DateTime.Now.Hour == 0 && DateTime.Now.Minute == 0 && DateTime.Now.Second == 0)
         {
-            SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.sfmRefreshEvent;
+            SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.GetSFMRefreshEvent();
             if (sfmRefreshEvent != null)
                 sfmRefreshEvent(curGroupId);
         }
@@ -1129,7 +1133,7 @@ public void SFMInfoAfterSend(int groupId, object[] e)
 
     if (userInfo.HeaderUserName != headUserName)
     {
-        if (userInfo.GetUserApprPos() < sfmRight)
+        if (userInfo.GetUserApprPos(true, siteConfig.GetUseAllProxyAuthority(groupId)) < sfmRight)
         {
             pageService.SetSFMLogOut(true);
             pageService.SetSFMChecking(false);
@@ -1151,11 +1155,7 @@ public void SFMInfoAfterSend(int groupId, object[] e)
                 pageService.SetSFMLogOut(true);
                 pageService.SetSFMChecking(false);
             }
-
-
-
             refSGAlert.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), str, 1, groupId, groupId.ToString());
-
         }
         else
         {
@@ -1186,6 +1186,10 @@ public void SFMInfoAfterSend(int groupId, object[] e)
                 else if (sgSideBar.Path.Contains("clipBoardApprove"))
                 {
                     pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
+                }
+                else if (sgSideBar.Path.Contains("mailApprove"))
+                {
+                    pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveUI);
                 }
 
                 if (pgRefreshEvent != null)
@@ -1650,6 +1654,7 @@ protected override void OnInitialized()
     HsCmdCenter.sgPageEvent.SetSFMRefreshEvent(SendUserSFMInfo);
     HsCmdCenter.sgPageEvent.SetUpdatePolicyEvent(UpdatePolicy);
     HsCmdCenter.sgPageEvent.SetFileMimeRecvEvent(FileMimeRecvEvent);
+    HsCmdCenter.sgPageEvent.SetOLEMimeRecvEvent(OLEMimeRecvEvent);
     pageService.SetAlramAndMessageDeleteEvent(DelAllAlramAndMessage);
 
     pageService.SetAfterApprCommonNotiEvent(AfterApproveStatusChange); //사후정책 노티
@@ -1840,7 +1845,12 @@ private void UpdatePolicy(int groupId)
     //URL List Data 요청
     HsCmdCenter.RequestUrlList(groupId, sgUserData.UserId);
 
+    pageService.SetIsPolicyUpdate(groupId, true);
+
     //UserInfo 재요청 - 결재라인 정보, SFM 정보, 시스템 환경설정정보 갱신
+    //SFM 정보 삭제
+    HsCmdCenter.sgDicRecvData.SetSFMListData(groupId, null);
+    HsCmdCenter.SendUserSFMInfo(groupId, sgUserData.UserId);
     HsCmdCenter.SendApproveLine(groupId, sgUserData.UserId);
 
     //UserInfoCheck를 요청하여 사용자의 정보 갱신
@@ -2035,6 +2045,17 @@ public void FileMimeRecvEvent(int groupId)
     statusData.fileAddManage.LoadMimeConf(groupId);
 }
 
+//서버DB 로 OLE MIME 리스트 결과 이벤트
+public void OLEMimeRecvEvent(int groupId, SGData e)
+{
+    PageStatusData statusData = pageService.GetPageStatus(groupId);
+    if (statusData == null)
+        return;
+    if (statusData.fileAddManage == null)
+        return;
+    List<Dictionary<int, string>> oleMimeList= e.GetSvrRecordData("RECORD");
+    statusData.fileAddManage.SetOLEMimeList(groupId, oleMimeList);
+}
 public void AfterApproveStatusChange()
 {
     int groupID = nGroupID;

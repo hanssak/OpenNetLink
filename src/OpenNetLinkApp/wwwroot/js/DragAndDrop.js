@@ -6,6 +6,9 @@ window.loginCursorChangeDefault = () => {
     $("#btnLogin").css("cursor", "default");
     $("#btnLoginCancel").css("cursor", "default");
     $("#btnLoginViewBack").css("cursor", "default");
+
+    //로그인 중, PW에 Enter 이벤트 방지 (btnLogin 버튼은 razor에서 따로 관리하므로 설정하지 않음)
+    $("#loginPw").attr("disabled", false);
 }
 
 window.loginCursorChange = () => {
@@ -15,6 +18,10 @@ window.loginCursorChange = () => {
     $("#btnLogin").css("cursor", "wait");
     $("#btnLoginCancel").css("cursor", "wait");
     $("#btnLoginViewBack").css("cursor", "wait");
+
+    //로그인 중, PW에 Enter 이벤트 방지 (btnLogin 버튼은 razor에서 따로 관리하므로 설정하지 않음)
+    $("#loginPw").attr("disabled", true);
+    
 }
 
 window.initCapaChart = (nUse, nRest) => {
@@ -486,6 +493,29 @@ window.refreshList = (path) => {
         DotNet.invokeMethodAsync("OpenNetLinkApp", "JSLoadListFiles2", path);
 }
 
+//DropZone의 Height를 조절하여 DragAndDrop이 가능하게 변경
+window.setDropzoneInputSize = () => {
+    setDropzonSize();
+}
+function setDropzonSize() {
+    var divDropFileHeight = $("#divDropFile").css("height");
+    var divDropFileHeightint = parseInt(divDropFileHeight.replace("px", ""));
+    var divDropzoneTableHeight = $("#DropzoneTable").css("height");
+    if (divDropzoneTableHeight != null) {
+
+        var divDropzoneTableHeightint = parseInt(divDropzoneTableHeight.replace("px", ""))
+        if (divDropFileHeightint >= divDropzoneTableHeightint) {
+            $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
+        }
+        else {
+            $('#fileInputTrans').css("height", divDropzoneTableHeight);
+        }
+    }
+    else {
+        $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
+    }
+}
+
 window.appendHtml = (id, val) => {
     $('#' + id).html(val);
 }
@@ -605,6 +635,8 @@ window.exitLogIn = () => {
     if (divRightUpper != null && divRightBottom != null) {
         var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
         $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
+        //Window 사이즈 조절 시 divDropFile Height 도 함께 조절
+        setDropzonSize();
     }
 }
 
@@ -673,8 +705,8 @@ window.openPopUp = (popUpId) => {
         || popUpId == "ProxyApprover" || popUpId == "ProxyApproverTreePopUp" || popUpId == "SecurityApproverSelectPopUp" || popUpId == "PopUpSelectClipType" ) {
 		$("#left-sidebar").css("z-index", 2202);
 		$("#main-nav").css("z-index", 2202);
-	}
-	else if (popUpId == "HeaderUIApporveAfterAlert" || popUpId == "HeaderUIApporveAfterMyCountAlert")
+    }
+    else if (popUpId == "HeaderUIApporveAfterAlert" || popUpId == "HeaderUIApporveAfterMyCountAlert" || popUpId == "HeaderUIUpdateStartAlert")
 	{
 		$("#main-nav").css("z-index", 2203);
     }
@@ -732,6 +764,7 @@ window.closeAllPopup = () => {
     $("#DashBoardContinueFileTransAlert").modal("hide");
     $("#HeaderUIApporveAfterAlert").modal("hide");
     $("#HeaderUIApporveAfterMyCountAlert").modal("hide");
+    $("#HeaderUIUpdateStartAlert").modal("hide");    
     $("#SGBasicSelect").modal("hide");
     $("#modal-capcha").modal("hide");
     $("#SGConfirm").modal("hide");
@@ -858,9 +891,11 @@ window.adJustWindowsize = () => {
         var dirRightHeight = $("#divRightContent").css("height");
         var divRightUpper = $("#divRightUpperSide").css("height");
         var divRightBottom = $("#divRightBottomSide").css("height");
+        var dirRightWidth = $("#divDropFile").css("width");
         if (divRightUpper != null && divRightBottom != null) {
             var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
             $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
+            setDropzonSize();
         }
     });
 }
@@ -1391,3 +1426,61 @@ window.addDragStart = (message) => {
 
     }, false);
 }
+
+function onDoubleClickFUNC() {
+    var text = this.innerText;
+    DotNet.invokeMethodAsync("OpenNetLinkApp", "SelectSaveFolderDoubleClick", text);
+}
+
+window.RadzenTreeNodeDoubleClick = function () {
+
+    //alert('add complete')
+    /*var nodes = document.getElementsByClassName("ui-treenode");
+
+    // ui-treenode-content
+    //var nodes = document.getElementsByClassName("ui-treenode");
+    //var parent = document.querySelector(".ui-treenode-content");
+    //var nodes = parent.querySelectorAll(".ui-treenode-content-selected");
+    //Add a click event listener to each node
+
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].removeEventListener("dblclick", onDoubleClickFUNC);
+        nodes[i].addEventListener("dblclick", onDoubleClickFUNC);
+    }
+    nodes = document.getElementsByClassName("ui-treenode-content");
+
+    for (var i = 0; i < nodes.length; i++) {
+
+        nodes[i].removeEventListener("dblclick", onDoubleClickFUNC);
+        nodes[i].addEventListener("dblclick", onDoubleClickFUNC);
+    }*/
+
+    /*nodes[i].addEventListener("dblclick", function () {
+        // Get the text of the clicked node
+        var text = this.innerText;
+        DotNet.invokeMethodAsync("OpenNetLinkApp", "SelectSaveFolderDoubleClick", text);
+    });*/
+
+    // ui-treenode-content
+    //var nodes = document.getElementsByClassName("ui-treenode");
+    //var parent = document.querySelector(".ui-treenode-content");
+    //var nodes = parent.querySelectorAll(".ui-treenode-content-selected");
+    //Add a click event listener to each node
+    /*nodes = document.getElementsByClassName("ui-treenode-children");
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].addEventListener("dblclick", function () {
+            var text = this.innerText;
+            DotNet.invokeMethodAsync("OpenNetLinkApp", "SelectSaveFolderDoubleClick", text);
+        });
+    }*/
+
+};
+
+
+
+
+
+
+
+
+

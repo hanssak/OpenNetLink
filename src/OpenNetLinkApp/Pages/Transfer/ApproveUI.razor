@@ -1,5 +1,6 @@
 @page "/transferApprove"
 @page "/transferApprove/{groupIDbyParam:int}"
+@page "/transferApprove/{groupIDbyParam:int}/{menuMode:int}"
 
 @using OpenNetLinkApp.Services
 @using HsNetWorkSGData;
@@ -160,7 +161,7 @@
                                     @if (approveTypesfm == 2)
                                     {
                                         <th style="text-align: center; vertical-align: middle; width: 8%">@strApprover</th>
- <!--승인자-->
+                                        <!--승인자-->
                                     }
                                     <th style="text-align: center; vertical-align: middle; width: 8%">@strApproveStatus</th>                             <!--승인상태-->
                                     <!-- <th style="text-align: center;width:8%">@strFileForward</th> -->                            <!--파일전달-->
@@ -172,7 +173,11 @@
                                     <th style="text-align: center; vertical-align: middle; width: 15%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
                                     <th style="text-align: center; vertical-align: middle; width: 14%">@strApproveReqDay</th>                            <!--승인요청일-->
                                     <th style="text-align: center; vertical-align: middle; width: 14%">@strApproveDay</th>                                  <!--승인일-->
-                                    <th style="text-align: center; vertical-align: middle; width: 7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>                        <!--개인정보-->
+                                    @if (bUseDlpDataView)
+                                    { 
+                                        <th style="text-align: center; vertical-align: middle; width: 7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>                        <!--개인정보-->
+                                    }
+
                                     <th style="text-align: center; vertical-align: middle; width: 7%">@strApproveDetail</th>                             <!--상세보기-->
                                 </tr>
                             </thead>
@@ -189,7 +194,7 @@
                                         @if (approveTypesfm == 2)
                                         {
                                             <td style="text-align: center; vertical-align: middle">@item.ApproverName</td>
- <!--승인자 이름-->
+                                            <!--승인자 이름-->
                                         }
                                         <td style="text-align: center; vertical-align: middle">@item.ApvStatus</td>
                                         <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
@@ -200,7 +205,10 @@
                                         <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                         <td style="text-align: center; vertical-align: middle">@item.RequestTime</td>
                                         <td style="text-align: center; vertical-align: middle">@item.ApvTime</td>
-                                        <td style="text-align: center; vertical-align: middle">@item.stDLP</td>
+                                        @if (bUseDlpDataView)
+                                        { 
+                                            <td style="text-align: center; vertical-align: middle">@item.stDLP</td>
+                                        }
                                         <td style="text-align: center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                     </tr>
                                 }
@@ -235,7 +243,7 @@
 
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
 <ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
-<SGReject @ref="refSGReject"></SGReject>
+<SGReject @ref="refSGReject" Guid="modalReject"></SGReject>
 
 @code {
 
@@ -271,9 +279,11 @@
             _strApprKindValue = stValue;
     }
     [Parameter]
-    public string menuMode { get; set; }
+    public int menuMode { get; set; } = 0;
     [Parameter]
     public int groupIDbyParam { get; set; }
+
+    bool bUseDlpDataView = true;
 
     ApprovePopUp refApprovePopUp;
     SGCustomSelect refSGCustomSelect;
@@ -428,6 +438,26 @@
         ApproveSearchData(nViewPageNo);
     }
 
+    private void AfterLimitUpdateDate()
+    {
+        refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
+        strApprKindValue = XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE");
+        strApprStatusValue = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
+
+        ApproveSearchCount();
+    }
+
+    private void ApproveWaitAllUpdateDate()
+    {
+        refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
+        
+        strTransKindValue = XmlConf.GetTitle("T_COMMON_ALL");
+        strApprKindValue = XmlConf.GetTitle("T_COMMON_ALL");
+        strApprStatusValue = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
+
+        ApproveSearchCount();
+    }
+
     //원데이타라고 가정함
     public List<SGApproveData> ListData = new List<SGApproveData>();
 
@@ -435,6 +465,7 @@
     {
         Console.WriteLine("Open Detail Start" + transSeq);
         long ltransSeq = Convert.ToInt64(transSeq);
+        refApprovePopUp.bUseDlpDataView = bUseDlpDataView;
         await refApprovePopUp.openPopUp(ltransSeq);
     }
 
@@ -536,6 +567,9 @@
         HSCmdCenter.sgPageEvent.SetApprBatchEvent(groupID, ApproveBatchResult);
         // 데이터 리프레쉬 등록
         HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI, UpdateData);
+        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUIAfter, AfterLimitUpdateDate);
+        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveWaitAllUI, ApproveWaitAllUpdateDate);
+    
 
         strDestNetWork = strTotal;
 
@@ -546,6 +580,8 @@
         }
 
         approveTypesfm = sgLoginData.GetApproveTypeSFM();
+
+        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
 
         @*GetInitDateTime(out strFromDay, out strToDay);*@
 
@@ -564,6 +600,19 @@
                 jsRuntime.InvokeAsync<object>("initDatePicker", param);
                 jsRuntime.InvokeAsync<object>("initApproveUIPosition");
             *@
+
+            if (menuMode == 1)
+            {
+                refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
+
+                strApprKindValue = XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE");
+                strApprStatusValue = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
+            }
+            else if (menuMode == 2)
+            {
+                refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
+                strApprStatusValue = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
+            }
             await ApproveSearchCount();
         }
         @*pageService.SetDayInfoRefreshEvent(groupIDbyParam, DayInfoRefreshResult);*@
@@ -606,7 +655,7 @@
         strApprStatusValue = strTotal;
     }
 
-    public void ApproveAction()
+    public async Task ApproveAction()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -630,27 +679,37 @@
             return;
         }
 
-
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        string strUserID = "";
-        if (sgLoginData != null)
-            strUserID = sgLoginData.GetUserID();
-
-        string strProcID = "A";
-        string strReason = "Approve";
-        string strApproveSeqs = "";
-        for (int i = 0; i < ListData.Count; i++)
+        if (!SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason())
         {
-            if (ListData[i].bCheck == true)
-            {
-                string temp = (ListData[i].ApprSeq + '\u0002');
-                strApproveSeqs += temp;
-            }
-        }
-        string strApprover = "1";
-        string strApproveUserKind = "0";
 
-        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+            SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+            string strUserID = "";
+            if (sgLoginData != null)
+                strUserID = sgLoginData.GetUserID();
+
+            string strProcID = "A";
+            string strReason = "Approve";
+            string strApproveSeqs = "";
+            for (int i = 0; i < ListData.Count; i++)
+            {
+                if (ListData[i].bCheck == true)
+                {
+                    string temp = (ListData[i].ApprSeq + '\u0002');
+                    strApproveSeqs += temp;
+                }
+            }
+            string strApprover = "1";
+            string strApproveUserKind = "0";
+
+            HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+        }
+        else
+        {
+            refSGReject.ResetReason(Common.Enums.EnumApproveType.Approve);
+            refSGReject.SetGroupID(groupID);
+            refSGReject.SetApprRejectEvent(ApproveSend);
+            await refSGReject.openPopUp();
+        }
     }
 
     private async Task ApproveReject()
@@ -682,7 +741,7 @@
             return;
         }
 
-        refSGReject.ResetReason();
+        refSGReject.ResetReason(Common.Enums.EnumApproveType.Reject);
         refSGReject.SetGroupID(groupID);
         refSGReject.SetApprRejectEvent(ApproveRejectSend);
         await refSGReject.openPopUp();
@@ -709,6 +768,29 @@
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
     }
+
+    public void ApproveSend(int groupID, string strReason)
+    {
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        string strUserID = "";
+        if (sgLoginData != null)
+            strUserID = sgLoginData.GetUserID();
+        string strProcID = "A";
+        string strApproveSeqs = "";
+        for (int i = 0; i < ListData.Count; i++)
+        {
+            if (ListData[i].bCheck == true)
+            {
+                string temp = (ListData[i].ApprSeq + '\u0002');
+                strApproveSeqs += temp;
+            }
+        }
+        string strApprover = "1";
+        string strApproveUserKind = "0";
+
+        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+    }
+
     public string GetCheckApprSeq()
     {
         string strApprSeq = "";
@@ -723,6 +805,8 @@
         }
         return strApprSeq;
     }
+
+    
     public SGApproveData GetApprListData(string strTransSeq)
     {
         SGApproveData tdata = null;

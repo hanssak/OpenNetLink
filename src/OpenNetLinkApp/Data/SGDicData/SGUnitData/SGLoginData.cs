@@ -1508,21 +1508,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="bSystem"></param>
         /// <returns></returns>
         public string GetDocumentExtractType(bool bSystem)
-            => (bSystem) ? GetTagData("I_CLIENT_DOCUMENT_EXTRACT_TYPE") : GetTagData("E_CLIENT_DOCUMENT_EXTRACT_TYPE");
+            => (bSystem) ? GetTagData("I_CLIENT_OLE_EXTRACT") : GetTagData("E_CLIENT_OLE_EXTRACT");
 
 
-        /// <summary>
-        /// OLE 개체 검사 시 OLE MIME LIST의 블랙/화이트 여부 (서버ENV 테이블에서 GET)
-        /// </summary>
-        /// <returns>
-        /// <para>true : White List로 관리</para>
-        /// <para>false : Black List로 관리 (Default)</para>
-        /// </returns>
-        public bool GetOLECheckMimeFilterType(bool bSystem)
-        {
-            string strData= (bSystem) ? GetTagData("I_CLIENT_DOCUMENT_MIME_FILTER_TYPE") : GetTagData("E_CLIENT_DOCUMENT_MIME_FILTER_TYPE");          
-            return (strData.Equals("W"));
-        }
         
         /// <summary>
         /// value 값을 암호화해서 sgData에 저장

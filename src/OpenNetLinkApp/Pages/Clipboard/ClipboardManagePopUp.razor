@@ -33,8 +33,14 @@
                                 <td style="text-align:center;">@strDataTransStatus</td>
                                 <th>@strFilePos </th>                                               <!--파일위치-->
                                 <td style="text-align:center;">@strDataFilePos</td>
-                                <th>@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>                     <!--만료일-->
-                                <td style="text-align:center;">@strDLP</td>
+
+                                @if (bUseDlpDataView)
+                                {
+                                    <th>@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>
+                                    <!--개인정보-->
+                                    <td style="text-align:center;">@strDLP</td>
+                                }
+
                             </tr>
 
                             <tr>
@@ -84,7 +90,11 @@
                                 <th style="text-align:center;">@strFileType </th>                   <!--유형-->
                                 <th style="text-align:center;">@strFileSize </th>                   <!--크기-->
                                 <th style="text-align:center;width:15%;">@strVirusHistory </th>     <!--바이러스내역-->
-                                <th style="text-align:center;width:15%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>     <!--개인정보 내역-->
+                                @if (bUseDlpDataView)
+                                {
+                                    <th style="text-align:center;width:15%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>     <!--개인정보 내역-->                                    
+                                }
+
                             </tr>
                         </thead>
                         <tbody>
@@ -97,7 +107,10 @@
                                         <td style="text-align:center;">@item.strFileType</td>
                                         <td style="text-align:center;">@item.strFileSize</td>
                                         <td style="text-align:center;">@item.strVirusHistory</td>
-                                        <td style="text-align:center;">@item.stDLPDesc</td>
+                                        @if (bUseDlpDataView)
+                                        { 
+                                            <td style="text-align:center;">@item.stDLPDesc</td>
+                                        }
                                     </tr>
                                 }
                             }
@@ -277,6 +290,9 @@
     ISGAppConfigService sgAppConfig;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<ClipboardManagePopUp>();
 
+    public bool bUseDlpDataView = true;
+
+
     public async Task openPopUp(long seq)
     {
         m_transSeq = seq;
@@ -308,6 +324,13 @@
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
 
         InitText();
         //SetBindingData();
@@ -363,7 +386,8 @@
             return;
 
         List<ApproverHist> apprListHist = null;
-        apprListHist = sgDetailData.GetApproverInfoHist();
+        bool isVisibleClipBoardApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason();
+        apprListHist = sgDetailData.GetApproverInfoHist(isVisibleClipBoardApproveReason);
         if ((apprListHist == null) || (apprListHist.Count <= 1))
         {
             bApprHistHidden = true;
@@ -375,7 +399,7 @@
         else
         {
             ApproverHist apprHist = null;
-            apprHist = sgDetailData.GetTransLastApproverHistData(apprHist, DataApproveStep, strDataApprStatusCode);
+            apprHist = sgDetailData.GetTransLastApproverHistData(apprHist, DataApproveStep, strDataApprStatusCode, isVisibleClipBoardApproveReason);
             if (apprHist == null)
                 strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
             else
@@ -469,7 +493,14 @@
         strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                             // 승인자
         strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");                      // 승인상태
         strApproveDay = XmlConf.GetTitle("T_COMMON_APPROVEDATE");                           // 승인일
-        strRejectReason = XmlConf.GetTitle("T_APPROVE_APRROVEREASON");                      // 반려사유
+        if(SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason())
+        {
+            strRejectReason = XmlConf.GetTitle("T_APPROVE_APPROVE_REJECT_REASON");                      // 반려사유
+        }
+        else
+        {
+            strRejectReason = XmlConf.GetTitle("T_APPROVE_REJECTREASON");                      // 반려사유
+        }
         strTransCancle = XmlConf.GetTitle("T_COMMON_TRANSCANCLE");                          // 전송취소
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                                         // 닫기
 

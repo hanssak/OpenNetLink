@@ -26,9 +26,6 @@ bApprLineLocalSave : 결재라인 로컬 저장 여부 ( true : 저장, false : 
 // 로그레벨설정
 bUseLogLevel : 로그 레벨 사용자에 의해 수정가능 여부 ( true : 가능, false : 불가능)
 
-// 로그인후 UI 관련
-bShowAdminInfo : 대시보드에 관리자 정보 표시 여부부(true, false)
-
 // 언어설정
 bUseLanguageSet : 공통환경설정에 언어설정 UI가 나오도록 할지 여부부true,false)
 
@@ -38,16 +35,8 @@ bUseMainPageType : 공통환경설정에 로그인후 첫화면 선택 설정이
 // 부팅때 자동실행
 bUseStartProgramReg : 시작프로그램에 등록하는 체크박스 화면에 표현 여부 [기능 X, 체크박스만]
 
-
-
-// 수동다운로드 설정
-bManualDownFolderChange : 수동다운로드 폴더선택 체크박스 나오도록 (수동다운로드 서버설정됐을때에만 기능함) (true, false)
-bManualRecvDownChange : 수동다운로드 폴더선택 체크박스 설정값(true, false) [기능X]
-
-
 // 우클릭 파일추가 및 자동전송
 bRFileAutoSend: 마우스 우클릭 파일 추가 후 자동전송 체크박스 나오도록 (파일전송 사용할때에만 기능함)(true, false)
-bRMouseFileAddAfterTrans : 마우스 우클릭 파일 추가 후 자동전송 사용 여부 ( true : 사용, false : 미사용 ) [기능X]
 
 // 사후결재
 bShowAfterApprAutoCheck : 사후결재 기본 체크 사용유무 체크박스가 나오도록 (true,false)
@@ -70,8 +59,7 @@ bUseApprWaitNoti : 승인대기 알림설정 설정값(true, false)
 bUserIDSave : 로그인하는 사용자ID만 저장하는 option 사용유무( true / false )
 bAutoLogin : IDPW 자동로그인 기능 사용유무 ( true : 사용, false : 유지 안함 )
 bAutoLoginCheck : IDPW 자동로그인 체크박스 기본 체크되어 있게 설정 ( true : 사용, false : 유지 안함 )
-bUserPWChange : 사용자pw 변경 기능 사용 ( true, false ) [기능X] (무슨기능인지 파악 안됨.)
-
+bUserPWChange : 사용자pw 변경 기능 사용, PW 검증기능 동시 사용 ( true, false )
 bEmptyfileTrans : 0kb 파일 전송 가능 유무(true, false)
 
 
@@ -86,7 +74,6 @@ bUseClipBoardFileTrans : 파일형태로 클립보드를 송신할지유무, (tr
 bUseFileClipManageUI : 파일형태로 클립보드를 송수신할때, 클립보드 관리 UI를 나오도록할지 유무(true: 클립보드 전송관리UI 있음, false : 없음)
 
 // 화면잠금
-bScreenLockUserChange : 스크린 잠금 사용자가 설정가능 체크박스 나오도록 ( true, false )
 bScreenLock : 화면잠금 사용 여부.(체크박스값) (true, false)
 
 
@@ -100,8 +87,6 @@ bUseFileCheckException : 파일검사 예외 신청 기능 활성화유무 (파�
 bUseNetOverAllsend : 3망상황에 모든 망에 파일, 클립보드 보내는 기능 활성화(true,false)
 listUseGpkiLogin : GPKI 로그인 사용 여부(망별로 로그인시 사용하는 기능)
 bClipBoardNoApproveButFileTrans : 클립보드 파일전송으로 보낼때, 권한상관없이 결재없이 송신할수 있도록 설정
-bManualDownFolderChange": 수동다운로드 일때에 수신 Folder, 받을때마다 사용자가 지정 (true, false)
-bUseDenyPasswordZip : zip 파일에 비번걸려있을때에 차단 (true, false)
 
 bRecvFolderChange : 공통환경설정에서 수신폴더 변경가능하게 하는 버튼 show 유무 결정(true, false)
 
@@ -143,14 +128,5 @@ bClipCopyAutoSend : 클립보드 복사 후 전송 체크박스 설정값(true, 
 
 // APP 트레이 이동 설정
 bUseCloseTrayMove : 공통환경설정에서 종료 시, 트레이로 이동 체크박스가 나오도록 ( true, false )
-bExitTrayMove : 오른쪽 상단에 종료버튼으로 종료 시도시 Tray로 이동만 할지 여부(true: Tray로 이동, false: 종료)
-
 bUseStartTrayMove : 공통환경설정에서 시작 시 트레이 이동 체크박스가 나오도록 ( true, false )
 bStartTrayMove : 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 ) [기능X]
-
-
-// 파일포워딩 기능
-bUseFileForward : 파일포워드 기능 사용유무(true, false)
-bFileDownloadBeforeReciving : 파일포워드, 송신자가 수신PC에 미수신한 상태에서도 포워드수신자들이 수신다운로드 가능 유무(true, false)
-
-

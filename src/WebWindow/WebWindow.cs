@@ -113,18 +113,49 @@ namespace WebWindows
         public readonly int nExLength;
         public readonly IntPtr pExMem;
 
+        public readonly byte[] pMemByte;
+
+        public readonly byte[] pExMemByte;
+
         public ClipBoardData(int nGroupId, CLIPTYPE nType, int nLength, IntPtr pMem, int nExLength, IntPtr pExMem)
         {
             this.nGroupId = nGroupId;
             this.nType = nType;
             this.nLength = nLength;
             this.pMem = pMem;
-
             this.nExLength = nExLength;
             this.pExMem = pExMem;
+
+            this.pMemByte = new byte[nLength];
+            this.pExMemByte = new byte[nExLength];
+
+            if(nLength > 0)
+                Marshal.Copy(pMem, pMemByte, 0, nLength);
+            if(nExLength > 0)
+                Marshal.Copy(pExMem, pExMemByte, 0, nExLength);
         }
 
+        public ClipBoardData(ClipBoardData copyData)
+        {
+            this.nGroupId = copyData.nGroupId;
+            this.nType = copyData.nType;
+            this.nLength = copyData.nLength;
+            this.pMem = copyData.pMem;
+            this.nExLength = copyData.nExLength;
+            this.pExMem = copyData.pExMem;
+            this.pMemByte = new Byte[copyData.nLength];
+            this.pExMemByte = new Byte[copyData.nExLength];
 
+            if(copyData.nLength > 0 )
+            {
+                Marshal.Copy(copyData.pMem, this.pMemByte, 0, copyData.nLength);
+            }
+
+            if(copyData.nExLength > 0)
+            {
+                Marshal.Copy(copyData.pExMem, this.pExMemByte, 0, copyData.nExLength);
+            }
+        }
     }
 
 
@@ -417,7 +448,7 @@ namespace WebWindows
         public void Notification(OS_NOTI category, string title, string message, string navURI = "")
         {
             string image = String.Format($"wwwroot/images/noti/{(int)category}.png");
-            Log.Information("ImageString: " + image);
+            CLog.Here().Information("ImageString: " + image);
 
             /*
             switch(category)
@@ -580,8 +611,7 @@ namespace WebWindows
                     _width = value.Width;
                     _height = value.Height;
                     SetSize();
-                    CLog.Here().Information("Window Size Is Setted {width} {height}", _width, _height);
-                    Log.Information("Window Size Is Setted {width} {height}", _width, _height);
+                    CLog.Here().Information($"Window Size Is Setted {_width} {_height}");
                 }
             }
         }
@@ -773,7 +803,7 @@ namespace WebWindows
                                         bool result = int.TryParse(sval, out ProcId);
                                         if(result)
                                         {
-                                            CLog.Here().Information("Before Folder Oepn: previous nemo({0}) process is kill", ProcId);
+                                            CLog.Here().Information($"Before Folder Oepn: previous nemo({ProcId}) process is kill");
                                             Process localById = Process.GetProcessById(ProcId);
                                             localById.Kill();
                                             break;
@@ -788,7 +818,7 @@ namespace WebWindows
                     }
                     catch(Exception e)
                     {
-                        CLog.Here().Error($"{e}");
+                        CLog.Here().Error($"Exception - MSG : {e.Message}");
                     }
                 }
             }

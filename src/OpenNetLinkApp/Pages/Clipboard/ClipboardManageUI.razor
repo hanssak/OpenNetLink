@@ -153,7 +153,10 @@
                                         <th style="text-align:center; vertical-align:middle; width: 7%;">@strDataTypeStatus</th>                   <!--데이터타입-->
                                         <th style="text-align:center; vertical-align:middle;width:15%;">@strTitle</th>                             <!--제목-->
                                         <th style="text-align:center; vertical-align:middle;width:14%;">@strFileSendDay</th>                       <!--전송요청일-->
-                                        <th style="text-align:center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>  <!--개인정보-->
+                                        @if (bUseDlpDataView)
+                                        { 
+                                            <th style="text-align:center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>  <!--개인정보-->
+                                        }
                                         <th style="text-align:center; vertical-align:middle;width:7%;">@strDetail</th>                             <!--상세보기-->
                                     </tr>
                                 </thead>
@@ -171,7 +174,10 @@
                                             <td style="text-align:center; vertical-align:middle">@item.DataType</td>
                                             <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                             <td style="text-align:center; vertical-align:middle">@item.RequestTime</td>
-                                            <td style="text-align:center; vertical-align:middle">@item.stDLP</td>
+                                            @if (bUseDlpDataView)
+                                            { 
+                                                <td style="text-align:center; vertical-align:middle">@item.stDLP</td>
+                                            }
                                             <td style="text-align:center; vertical-align:middle"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                         </tr>
                                     }
@@ -251,6 +257,8 @@
     public string strTransFail = "";
     public string strTransInspect = "";
     public string strTitleInputInfo = "";
+
+    bool bUseDlpDataView = true;
 
     @*public string strFromDay = "";
         public string strToDay = "";*@
@@ -417,6 +425,7 @@
     {
         Console.WriteLine("Open Detail Start" + transSeq);
         long ltransSeq = Convert.ToInt64(transSeq);
+        refClipboardManagePopUp.bUseDlpDataView = bUseDlpDataView;
         await refClipboardManagePopUp.openPopUp(ltransSeq);
     }
 
@@ -528,6 +537,8 @@
         {
             dicDestSysPos = pageService.GetTargetSystemList(groupID);
         }
+
+        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
 
         @*GetInitDateTime();*@
         base.OnInitialized();

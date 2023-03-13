@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -383,15 +383,20 @@ namespace OfficeExtractor
                         // Excel 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/xl/embeddings/", outputFolder, "Excel");
                         break;
+                    case ".HML":
+                        if (!CheckXmlParsing(inputFile))
+                            throw new XmlParsingException("ERROR XML PARSING");
 
+                        result = ExtractFromXmlFormat(inputFile, outputFolder, "text/xml");
+                        break;
                     case ".HWP":
+                    case ".HWT":
                         result = ExtractFromHwpFormat(inputFile, outputFolder, "Hwp");
                         break;
+                    case ".HWTX":
                     case ".HWPX":
-
                         result = ExtractFromHwpxFormat(inputFile, outputFolder, "Hwpx");
                         break;
-
                     case ".POT":
                     case ".PPT":
                     case ".PPS":
@@ -424,7 +429,7 @@ namespace OfficeExtractor
                     default:
                         var message = "The file '" + Path.GetFileName(inputFile) +
                                       "' is not supported, only .ODT, .DOC, .DOCM, .DOCX, .DOT, .DOTM, .DOTX, .RTF, .XLS, .XLSB, .XLSM, .XLSX, .XLT, " +
-                                      ".XLTM, .XLTX, .XLW, .POT, .PPT, .POTM, .POTX, .PPS, .PPSM, .PPSX, .PPTM, .PPTX, .HWP and .HWPX are supported";
+                                      ".XLTM, .XLTX, .XLW, .POT, .PPT, .POTM, .POTX, .PPS, .PPSM, .PPSX, .PPTM, .PPTX, .HML, .HWP and .HWPX are supported";
 
                         Logger.WriteToLog(message);
                         throw new OEFileTypeNotSupported(message);
@@ -490,11 +495,11 @@ namespace OfficeExtractor
                         if (_passwordProtectedChecker.IsStreamProtected(inputFile).Protected)
                             ThrowPasswordProtected(inputFileName);
 
-                        if (extension == ".DOCX")
-                        {
+                        //if (extension == ".DOCX")
+                        //{
                             if (DocumentCorruptCheck(inputFile, outputFolder))
                                 throw new DocumentCorrupt("ERROR FILE CHANGE");
-                        }
+                        //}
 
                         // Word 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/word/embeddings/", outputFolder, "Word");
@@ -514,29 +519,36 @@ namespace OfficeExtractor
                         result = Excel.Extract(inputFile, outputFolder);
                         break;
 
-                    case ".XLSB":
-                    case ".XLSM":
                     case ".XLSX":
-                    case ".XLTM":
+                    case ".XLSM":
                     case ".XLTX":
+                    case ".XLTM":
+                    case ".XLSB":
+                    case ".XLAM":
                         if (_passwordProtectedChecker.IsStreamProtected(inputFile).Protected)
                             ThrowPasswordProtected(inputFileName);
 
-                        if (extension == ".XLSX")
-                        {
+                        //if (extension == ".XLSX")
+                        //{
                             if (DocumentCorruptCheck(inputFile, outputFolder))
                                 throw new DocumentCorrupt("ERROR FILE CHANGE");
 
-                        }
+                        //}
                         // Excel 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/xl/embeddings/", outputFolder, "Excel");
                         break;
+                    case ".HML":
+                        if (!CheckXmlParsing(inputFile))
+                            throw new XmlParsingException("ERROR XML PARSING");
 
+                        result = ExtractFromXmlFormat(inputFile, outputFolder, "text/xml");
+                        break;
                     case ".HWP":
+                    case ".HWT":
                         result = ExtractFromHwpFormat(inputFile, inputFileName, outputFolder, "Hwp");
                         break;
                     case ".HWPX":
-
+                    case ".HWTX":
                         result = ExtractFromHwpxFormat(inputFile, inputFileName, outputFolder, "Hwpx");
                         break;
 
@@ -550,21 +562,25 @@ namespace OfficeExtractor
                         result = PowerPoint.Extract(inputFile, outputFolder);
                         break;
 
-                    case ".POTM":
-                    case ".POTX":
-                    case ".PPSM":
-                    case ".PPSX":
-                    case ".PPTM":
                     case ".PPTX":
+                    case ".PPTM":
+                    case ".POTX":
+                    case ".POTM":
+                    case ".PPAM":
+                    case ".PPSX":
+                    case ".PPSM":
+                    case ".SLDX":
+                    case ".SLDM":
+                    case ".THMX":
                         if (_passwordProtectedChecker.IsStreamProtected(inputFile).Protected)
                             ThrowPasswordProtected(inputFileName);
 
-                        if (extension == ".PPTX")
-                        {
+                        //if (extension == ".PPTX")
+                        //{
                             if (DocumentCorruptCheck(inputFile, outputFolder))
                                 throw new DocumentCorrupt("ERROR FILE CHANGE");
 
-                        }
+                        //}
                         // PowerPoint 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/ppt/embeddings/", outputFolder, "PowerPoint");
                         break;
@@ -572,7 +588,7 @@ namespace OfficeExtractor
                     default:
                         var message = "The file '" + Path.GetFileName(inputFileName) +
                                       "' is not supported, only .ODT, .ODS, .ODP, .DOC, .DOCM, .DOCX, .DOT, .DOTM, .DOTX, .RTF, .XLS, .XLSB, .XLSM, .XLSX, .XLT, " +
-                                      ".XLTM, .XLTX, .XLW, .POT, .PPT, .POTM, .POTX, .PPS, .PPSM, .PPSX, .PPTM, .PPTX, .HWP and .HWPX are supported";
+                                      ".XLTM, .XLTX, .XLW, .POT, .PPT, .POTM, .POTX, .PPS, .PPSM, .PPSX, .PPTM, .PPTX, .HML, .HWP and .HWPX are supported";
 
                         Logger.WriteToLog(message);
                         throw new OEFileTypeNotSupported(message);
@@ -1028,9 +1044,136 @@ namespace OfficeExtractor
             compoundFile.RootStorage.VisitEntries(Entries, false);
             return result;
         }
+        private bool CheckXmlParsing(string inputFile)
+        {
+            try
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(File.ReadAllText(inputFile));
+                return true;
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+        }
+        private bool CheckXmlParsing(Stream inputFile)
+        {
+            try
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(inputFile);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+        private List<string> ExtractFromXmlFormat(string inputFile, string outputFolder, string programm)
+        {
+            Logger.WriteToLog($"The {programm} file is of the type '{programm} format'");
+            
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(File.ReadAllText(inputFile));
+
+            return ExtractFromXmlFormatBasic(xmlDoc, outputFolder, programm);
+        }
+
+        private List<string> ExtractFromXmlFormat(Stream inputFile, string outputFolder, string programm)
+        {
+            Logger.WriteToLog($"The {programm} file is of the type '{programm} format'");
+
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(inputFile);
+
+            return ExtractFromXmlFormatBasic(xmlDoc, outputFolder, programm);
+        }
+
+        private List<string> ExtractFromXmlFormatBasic(XmlDocument xmlDoc, string outputFolder, string programm)
+        {
+            var result = new List<string>();
+
+            Dictionary<string, string> binDataFormat = new Dictionary<string, string>();
+            XmlNodeList binDataeList = xmlDoc.SelectNodes("//BINITEM");
+            foreach (XmlNode xml in binDataeList)
+            {
+                var format = xml.Attributes["Format"];
+                var binData = xml.Attributes["BinData"];
+                string formatValue = String.Empty;
+                string binDataValue = String.Empty;
+                if (format != null)
+                {
+                    formatValue = format.Value;
+                }
+
+                if (binData != null)
+                {
+                    binDataValue = binData.Value;
+                }
+
+                if (binDataValue != String.Empty && formatValue != String.Empty)
+                {
+                    binDataFormat.Add(binDataValue, formatValue);
+                }
+            }
+
+
+            XmlNodeList binList = xmlDoc.SelectNodes("//BINDATA");
+            foreach (XmlNode xml in binList)
+            {
+                var id = xml.Attributes["Id"];
+                string idValue = String.Empty;
+                if (id != null)
+                {
+                    idValue = id.Value;
+                }
+                else
+                    continue;
+
+                string format = String.Empty;
+                if (!binDataFormat.TryGetValue(idValue, out format))
+                    continue;
+
+                switch (format)
+                {
+                    case "OLE":
+                        {
+                            byte[] byte64 = Convert.FromBase64String(xml.LastChild.Value);
+
+                            using (MemoryStream memoryStream = new MemoryStream(byte64))
+                            {
+                                using (CompoundFile compoundFile = new CompoundFile(memoryStream))
+                                {
+                                    var extractedFileName = Extraction.SaveFromStorageNode(compoundFile.RootStorage, outputFolder);
+                                    if (extractedFileName != null) result.Add(extractedFileName);
+
+                                }
+                            }
+                        }
+                        break;
+                    default:
+                        {
+                            byte[] byte64 = Convert.FromBase64String(xml.LastChild.Value);
+                            string fileName = $"EmbeddedOject.{format}";
+                            string extractedFileName = Extraction.SaveByteArrayToFile(byte64, FileManager.FileExistsMakeNew(Path.Combine(outputFolder, fileName)));
+                            if (extractedFileName != null) result.Add(extractedFileName);
+                        }
+                        break;
+
+                }
+            }
+
+            return result;
+        }
         private List<string> ExtractFromHwpFormat(string inputFile, string outputFolder, string programm)
         {
             Logger.WriteToLog($"The {programm} file is of the type '{programm} format'");
+
+            if (CheckXmlParsing(inputFile))
+            {
+                return ExtractFromXmlFormat(inputFile, outputFolder, "text/xml");
+            }
 
             var result = new List<string>();
             using (CompoundFile compoundFile = new CompoundFile(inputFile))
@@ -1039,10 +1182,14 @@ namespace OfficeExtractor
             }
             return result;
         }
-
         private List<string> ExtractFromHwpFormat(Stream inputFile, string inputFileName, string outputFolder, string programm)
         {
             Logger.WriteToLog($"The {programm} file is of the type '{programm} format'");
+
+            if (CheckXmlParsing(inputFile))
+            {
+                return ExtractFromXmlFormat(inputFile, outputFolder, "text/xml");
+            }
 
             var result = new List<string>();
             using (CompoundFile compoundFile = new CompoundFile(inputFile))

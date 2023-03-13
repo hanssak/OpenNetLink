@@ -50,8 +50,19 @@
                                 <th>@strFilePos</th>  <!--파일위치-->
                                 <td style="text-align:center;">@strDataFilePos</td>
                                 <!--<th>@strReciver</th> -->   <!--수신자-->
-                                <th>@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
-                                <td style="text-align:center;">@stDLP</td>
+
+                                @if (bUseDlpDataView)
+                                {
+                                    <th>@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
+                                    <td style="text-align:center;">@stDLP</td>
+                                }
+                                else
+                                {
+                                    <th></th>
+                                    <td style="text-align:center;"></td>
+                                }
+
+
                             </tr>
 
                             <tr>
@@ -85,7 +96,7 @@
                         <!--
                         <div class="float-left mt-2">
                             <i class="fas fa-lightbulb fa-1x"></i>&nbsp;&nbsp;
-                            업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
+                            업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기 가능합니다.
                         </div>
                         -->
                         <div class="float-right mb-2">
@@ -103,7 +114,13 @@
                                 <th style="text-align: center; width: 7%;">@strFileSize </th>             <!--크기-->
                                 <th style="text-align: center;">@strVirusHist </th>         <!--바이러스내역-->
                                 <th style="text-align: center;">@strVirusCheckDate </th>     <!--바이러스검사-->
-                                <th style="text-align: center;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>     <!--개인정보 내역-->
+
+                                @if (bUseDlpDataView)
+                                {
+                                    <th style="text-align: center;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
+                                    <!--개인정보 내역-->
+                                }
+
                             </tr>
                         </thead>
                         <tbody>
@@ -125,7 +142,12 @@
                                     <td style="text-align: center;">@item.strFileSize</td>
                                     <td style="text-align: center;">@item.strVirusHistory</td>
                                     <td style="text-align: center;">@item.strVirusExamDay</td>
-                                    <td style="text-align: center; width: 20%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.stDLPDesc</td>
+
+                                    @if (bUseDlpDataView)
+                                    { 
+                                        <td style="text-align: center; width: 20%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.stDLPDesc</td>
+                                    }
+
                                 </tr>
                             }
                         </tbody>
@@ -211,7 +233,7 @@
     <!-- /.modal-dialog -->
 </div>
 
-<SGDetailReject @ref="refSGDetailReject"></SGDetailReject>
+<SGReject @ref="refSGDetailReject" Guid="modalClipDetailReject"></SGReject>
 
 
 
@@ -260,6 +282,86 @@
             return;
         }
 
+        OpenPreviewWindow();
+
+        //stSelectedFileNo = "";
+    }
+
+    private void OpenPreviewWindow()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        string strIP = sgDetailData.GetFilePreviewIP();
+        string param = makeParamOfServerViewer();
+
+#if _WINDOWS
+
+        string strArguments = "";
+
+        if (!SGAppMgrSvc.SiteConfigInfoService.GetUseWebLinkPreviewer(groupID))
+        {
+            // 확인후 적용!
+            strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+            strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+        }
+        else
+        {
+            //웹링크쪽 뷰어 Param
+            string webLinkURL = SGAppMgrSvc.SiteConfigInfoService.GetWebLinkPreviewerURL(groupID);
+            string webLinkParam = makeViewerParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
+
+            strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
+            strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+        }
+
+#else
+
+ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+startInfo.WindowStyle = ProcessWindowStyle.Normal;
+#endif
+
+        try
+        {
+#if _WINDOWS
+
+            [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
+            ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
+#else
+
+// Run the external process & wait for it to finish
+using (Process proc = Process.Start(startInfo))
+{
+    //proc.WaitForExit();
+}
+#endif
+
+        }
+        catch (Exception e)
+        {
+            CLog.Here().Information("Process.Start - ### 1 - Exception : {0} ", e.Message);
+        }
+    }
+
+    /// <summary>
+    /// 기존 서버의 Viewer나 PreviewUtil에서 사용되는 Param 인자값
+    /// </summary>
+    /// <returns></returns>
+    private string makeParamOfServerViewer()
+    {
         string stYear = DateTime.Now.ToString("yyyy");
         string stMonth = DateTime.Now.ToString("MM");
         string stDay = DateTime.Now.ToString("dd");
@@ -303,55 +405,25 @@
         string stLawparam = stSelectedSeq + "|" + stSelectedFileNo + "|" + stSelectedFileName + "|" + stSelectedEncKey;
         string finalData = AESEncrypt256(stLawparam, stBase64);
         string stParam = HttpUtility.UrlEncode(finalData);
-        OpenPreviewWindow(stParam);
 
-        //stSelectedFileNo = "";
+        return stParam;
     }
 
-    private void OpenPreviewWindow(string param)
+    /// <summary>
+    /// WebLink의 Viewer에서 사용되는 인자값
+    /// <br>transSeq={stSelectedSeq}&fileNo={stSelectedFileNo}&encValue={encValue}</br>
+    /// </summary>
+    /// <param name="SystemType"></param>
+    /// <param name="UserID"></param>
+    /// <returns></returns>
+    private string makeViewerParamOfWebLinkViewer(string SystemType, string UserID)
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+        string encOriginal = $"{SystemType}|{UserID}";
+        SGCrypto cr = new SGCrypto();
+        cr.Aes256EncryptIVkey(encOriginal, out string encValue);
 
-        SGDetailData sgDetailData = null;
-        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
-        if (sgDetailData == null)
-            return;
-
-        string strIP = sgDetailData.GetFilePreviewIP();
-
-#if _WINDOWS
-        // 확인후 적용!
-        string strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-        strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
-#else
-ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
-startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-startInfo.WindowStyle = ProcessWindowStyle.Normal;
-#endif
-
-        try
-        {
-#if _WINDOWS
-            [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-            static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
-            ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
-#else
-// Run the external process & wait for it to finish
-using (Process proc = Process.Start(startInfo))
-{
-    //proc.WaitForExit();
-}
-#endif
-        }
-        catch (Exception e)
-        {
-            CLog.Here().Information("Process.Start - ### 1 - Exception : {0} ", e.Message);
-        }
+        return $"transSeq={stSelectedSeq}&fileNo={stSelectedFileNo}&encValue={encValue}";
     }
-
     private String AESEncrypt256(String Input, String key)
     {
         RijndaelManaged aes = new RijndaelManaged();
@@ -505,7 +577,7 @@ using (Process proc = Process.Start(startInfo))
 
     public List<FileInfoData> mFileData = new List<FileInfoData>();
 
-    SGDetailReject refSGDetailReject;
+    SGReject refSGDetailReject;
 
     List<ApprHist> apprHList = new List<ApprHist>();
     public bool bApprHistHidden = false;
@@ -513,6 +585,9 @@ using (Process proc = Process.Start(startInfo))
     public bool m_bFilePrevDisable = false;
 
     public bool m_bFilePrevOpening = false;
+
+    public bool bUseDlpDataView = true;
+
 
     @*    public string strFromServerNetOver = "";        // 3망상황 시작지
         public string strDestServerNetOver = "";        // 3망상황 목적지*@
@@ -549,6 +624,8 @@ using (Process proc = Process.Start(startInfo))
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         InitText();
         HsCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FilePrevProgressNoti);
+
+        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
     }
 
 
@@ -609,7 +686,8 @@ using (Process proc = Process.Start(startInfo))
         }
 
         List<ApproverHist> apprListHist = null;
-        apprListHist = sgDetailData.GetApproverInfoHist();
+        bool isVisibleClipBoardApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason();
+        apprListHist = sgDetailData.GetApproverInfoHist(isVisibleClipBoardApproveReason);
 
         if ((apprListHist == null) || (apprListHist.Count <= 1))
         {
@@ -623,7 +701,7 @@ using (Process proc = Process.Start(startInfo))
         else
         {
             ApproverHist apprHist = null;
-            apprHist = sgDetailData.GetApprLastApproverHistData(apprHist);
+            apprHist = sgDetailData.GetApprLastApproverHistData(apprHist, isVisibleClipBoardApproveReason);
             if (apprHist == null)
                 strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
             else
@@ -739,7 +817,11 @@ using (Process proc = Process.Start(startInfo))
         strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                 // 승인자
         strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");          // 승인상태
         strApproveday = XmlConf.GetTitle("T_COMMON_APPROVEDATE");               // 승인일
-        strRejectReason = XmlConf.GetTitle("T_APPROVE_APRROVEREASON");          // 반려사유
+
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason())
+            strRejectReason = XmlConf.GetTitle("T_APPROVE_APPROVE_REJECT_REASON");          // 승인/반려사유
+        else
+            strRejectReason = XmlConf.GetTitle("T_APPROVE_REJECTREASON");          // 반려사유
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                             // 닫기
 
         string strConNetwork = "UnKnown";
@@ -772,7 +854,7 @@ using (Process proc = Process.Start(startInfo))
     }
 
 
-    public void DetailApprove()
+    public async Task DetailApprove()
     {
         string strMsg = "";
         if (pageService.GetFilePrevRecving() == true)
@@ -806,15 +888,27 @@ using (Process proc = Process.Start(startInfo))
         if (sgDetailData == null)
             return;
 
-        string strProcID = "A";
-        string strReason = "Approve";
-        string strApproveSeq = sgDetailData.GetApprSeq();
-        string strApprover = "1";
-        string strApproveUserKind = "0";
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason())
+        {
+            refSGDetailReject.ResetReason(Common.Enums.EnumApproveType.Approve);
+            refSGDetailReject.SetGroupID(groupID);
+            refSGDetailReject.SetApprRejectEvent(ApproveSend);
+            m_bFilePrevOpening = false;
+            await refSGDetailReject.openPopUp();
 
-        HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+        }
+        else
+        {
+            string strProcID = "A";
+            string strReason = "Approve";
+            string strApproveSeq = sgDetailData.GetApprSeq();
+            string strApprover = "1";
+            string strApproveUserKind = "0";
 
-        closePopUp();
+            HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+
+            closePopUp();
+        }
     }
     private async Task DetailReject()
     {
@@ -840,7 +934,7 @@ using (Process proc = Process.Start(startInfo))
             return;
         }
 
-        refSGDetailReject.ResetReason();
+        refSGDetailReject.ResetReason(Common.Enums.EnumApproveType.Reject);
         refSGDetailReject.SetGroupID(groupID);
         refSGDetailReject.SetApprRejectEvent(DetailApproveRejectSend);
         m_bFilePrevOpening = false;
@@ -860,6 +954,27 @@ using (Process proc = Process.Start(startInfo))
             return;
 
         string strProcID = "R";
+        string strApproveSeq = sgDetailData.GetApprSeq();
+        string strApprover = "1";
+        string strApproveUserKind = "0";
+
+        HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+        closePopUp();
+    }
+
+    public void ApproveSend(int groupID, string strReason)
+    {
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        string strUserID = "";
+        if (sgLoginData != null)
+            strUserID = sgLoginData.GetUserID();
+
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+
+        string strProcID = "A";
         string strApproveSeq = sgDetailData.GetApprSeq();
         string strApprover = "1";
         string strApproveUserKind = "0";
@@ -922,12 +1037,12 @@ using (Process proc = Process.Start(startInfo))
             }
         }
 
-    if (!bFind)
-    {
-        // Web으로 preview 안하는 파일 down해서 띄워줌
-        string strUserID = sgLoginData.GetUserID();
-        string strTransSeq = sgDetailData.GetTransSeq();
-        sFileName = Path.GetFileName(sFileName);
+        if (!bFind)
+        {
+            // Web으로 preview 안하는 파일 down해서 띄워줌
+            string strUserID = sgLoginData.GetUserID();
+            string strTransSeq = sgDetailData.GetTransSeq();
+            sFileName = Path.GetFileName(sFileName);
 
             string strFilePath = Path.Combine("wapprove", sFileName);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

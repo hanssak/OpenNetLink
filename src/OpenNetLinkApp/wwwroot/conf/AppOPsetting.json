@@ -39,10 +39,9 @@
   "bUserIDSave": true,
   "bAutoLogin": true,
   "bAutoLoginCheck": true,
-  "bUserPWChange": false,
-
   "bEmptyfileTrans": true,
 
+  "bUserPWChange": true,
   "strInitPasswd": "o0mqmxYAyFmC1FDg72829w==",
   "strPWChangeProhibitLimit": "",
   "nPWChangeApplyCnt": 9,
@@ -86,12 +85,16 @@
   "bUseDenyPasswordZip": true,
   "bRecvFolderChange": true,
   "bUseCertSend": false,
-  "bUseEmail": false,
+  "blistUseEmail": [
+    false,
+    false,
+    false
+  ],
   "bUseForceUpdate": true,
   "bUsePCURL": false,
   "bUsePublicBoard": false,
   "bUseUserRecvDownPath": false,
-  "bUseUserSelectFirstServer": true,
+  "bUseUserSelectFirstServer": false,
   "bViewDlpApproverSelectMyDept": false,
   "bViewFileFilter": true,
   "bViewSGHeaderUIAlarmNoriAllDel": true,
@@ -121,6 +124,14 @@
   "bUseInitMessagePerDay": true,
   "bVisiblePolicyUpdateButton": true,
   "bUseForceBackgroundUpdate": false,
-  "bUseChkHardSpace": true
-
+  "bUseChkHardSpace": true,
+  "bUseOver1Auth": [
+    false,
+    false,
+    false
+  ],
+  "bUseLoginAfterTray": false,
+  "bUseFileApproveReason": false,
+  "bUseClipBoardApproveReason": false,
+  "bUseFileSelectDelete" :  false
 }

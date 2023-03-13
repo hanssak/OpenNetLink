@@ -21,7 +21,7 @@ bUseLanguageSet : 공통환경설정에 언어설정 UI가 나오도록 할지 �
 bUseMainPageType : 공통환경설정에 로그인후 첫화면 선택 설정이 나오도록 할지 여부(true,false)
 
 // 부팅때 자동실행
-bUseStartProgramReg : 시작프로그램에 등록하는 체크박스 화면에 표현 여부 [기능 X, 체크박스만]
+bUseStartProgramReg : 시작프로그램에 등록하는 체크박스 화면에 표현 여부 [체크박스 Show/Hide]
 
 // 수동다운로드 설정
 bManualDownFolderChange : 수동다운로드 폴더선택 체크박스 나오도록 (수동다운로드 서버설정됐을때에만 기능함) (true, false)
@@ -53,8 +53,7 @@ bUseApprWaitNoti : 승인대기 알림설정 설정값(true, false)
 bUserIDSave : 로그인하는 사용자ID만 저장하는 option 사용유무( true / false )
 bAutoLogin : IDPW 자동로그인 기능 사용유무 ( true : 사용, false : 유지 안함 )
 bAutoLoginCheck : IDPW 자동로그인 체크박스 기본 체크되어 있게 설정 ( true : 사용, false : 유지 안함 )
-bUserPWChange : 사용자pw 변경 기능 사용 ( true, false ) [기능X]
-
+bUserPWChange : 사용자pw 변경 기능 사용, PW 검증기능 동시 사용 ( true, false ) ( true, false )
 bEmptyfileTrans : 0kb 파일 전송 가능 유무(true, false)
 
 // IDPW - 관련 기타(siteConfig)
@@ -85,7 +84,7 @@ bNoApproveManageUI : 모든 기능 결재관리 UI 않나오도록함.(보안결
 bStartProgramReg : 시작 프로그램 등록 ( true : 부팅때 OpenNetLink 실행, false : 부팅때 OpenNetLink 실행 등록 해제 ) [기능X]
 bTitleDescSameChk : 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부 [기능X]
 
-bUseFileCheckException : 파일검사 예외 신청 기능 활성화유무 (파일검사 예외 신청 기능 수정개발필요)
+bUseFileCheckException : 파일검사 예외 신청 기능 활성화유무 (true, false)
 bUseNetOverAllsend : 3망상황에 모든 망에 파일, 클립보드 보내는 기능 활성화(true,false) [기능이상 가능성 높음, Server필요]
 listUseGpkiLogin : GPKI 로그인 사용 여부(망별로 로그인시 사용하는 기능) [기능이상 가능성 높음, Server필요] 
 bClipBoardNoApproveButFileTrans : 클립보드 파일전송으로 보낼때, 권한상관없이 결재없이 송신할수 있도록 설정(siteConfig)
@@ -96,6 +95,7 @@ bRecvFolderChange : 공통환경설정에서 수신폴더 변경가능하게 하
 bUseCertSend : 공인인증서 전송기능 사용유무 (true,false) [기능X]
 
 bUseEmail : email 관리 / 결재 UI 나오도록 할지 여부 (true, false)
+bUserEmailSearchDlp : email 관리 / 결재 UI에서 개인정보 관련 부분 표현 및 검색되게할지 유무 (true, false)
 
 bUseForceUpdate : 업데이트할 항목이 있으면 사용자 의사 관계없이 강제 업데이트 진행여부(true,false)
 
@@ -187,3 +187,14 @@ bUseInitMessagePerDay : 현 시점을 기준(날짜)으로 이전 메세지 삭�
 bVisiblePolicyUpdateButton : SGHeaderUI 에서 정책업데이트 버튼 보여주는 여부
 						=> true : 보여준다
 						=> false : 보여주지 않는다.
+bUseChkHardSpace : 파일 수신시 디바이스 용량 체크 여부
+
+bUseOver1Auth : AD로그인 실패시, IDPW 로그인시도할수 있게 Login UI 설정 및 동작(자동로그인X)
+
+bUseLoginAfterTray : 로그인 후 Tray로 이동, bStartTrayMove 이 옵션과 혼동해서 사용 금지, 로그인 후 Tray 로 이동과 프로그램 시작시 Tray로 이동
+
+bUseFileApproveReason: 파일 전송 승인시 승인사유 입력 여부
+
+bUseClipBoardApproveReason : 클립보드 전송 승인시 승인 사유 입력 여부
+
+bUseFileSelectDelete : 파일 선택 삭제 사용 유무
