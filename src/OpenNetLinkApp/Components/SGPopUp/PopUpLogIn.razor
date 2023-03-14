@@ -449,11 +449,15 @@
 
             bStartedLogin = true;
 
+            CLog.Here().Information($"doLogin, try Login Type : {eLoginUITypeData}");
+
             if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
                 HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginUITypeData);
             else
             {
-                if (siteConfig.GetUseOver1auth(nGroupID) == false)
+                HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginUITypeData);
+
+                @*if (siteConfig.GetUseOver1auth(nGroupID) == false)
                     HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginUITypeData);
                 else
                 {
@@ -463,7 +467,7 @@
                     {
                         HSCmdCenter.LoginNotCheckPw(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginUITypeData);
                     }
-                }
+                }*@
             }
 
         }
