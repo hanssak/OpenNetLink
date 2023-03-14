@@ -140,7 +140,7 @@
   "bUseInputSearchApproveExtTree": true,
   "bUseApproveExt": false,
 
-  "bUsePartialFileAddInTransfer": false,
+  "bUsePartialFileAddInTransfer": true,
 
   "bUseInitAlarmPerDay": false,
   "bUseInitMessagePerDay": false,
@@ -155,5 +155,6 @@
   "bUseLoginAfterTray": false,
   "bUseFileApproveReason": false,
   "bUseClipBoardApproveReason": false,
-  "bUseFileSelectDelete" :  false
+  "bUseFileSelectDelete": false,
+  "bUseCrossPlatformOSforFileName" : true
 }

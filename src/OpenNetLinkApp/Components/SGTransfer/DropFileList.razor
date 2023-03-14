@@ -131,6 +131,8 @@
 
     public bool bViewDropFileAddError = false;
 
+    public bool bUseCrossPlatformOS = true;
+
     /// <summary>
     /// 드랍리스트 전체 선택여부
     /// </summary>
@@ -407,6 +409,7 @@
         if (GetRegCountEnable(nTotalCount) == false)
             return;
 
+        nTotalCount = recvList.Count;
         List<string> list = new List<string>(recvList);
         await refProgress.openPopUp();
 
@@ -427,7 +430,10 @@
             //Console.WriteLine($"File Dropped  {data}");
             if (data != null && data.Length > 0)
             {
+
                 bool bFind = false;
+
+                // 이미 List에 있는지 확인
                 string strDataFileName = "";
                 foreach (var item in HsStreamList)
                 {
@@ -440,6 +446,7 @@
                         break;
                     }
                 }
+
                 if (bFind == true)
                 {
                     nExamCount++;
@@ -456,7 +463,8 @@
 
                 CLog.Here().Information($"FileName [{fInfo.Name}]");
                 CLog.Here().Information($"DIR Attribute = [{attr & FileAttributes.Directory}]");
-                if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
+
+                if ((attr & FileAttributes.Directory) != FileAttributes.Directory) // 파일일때 처리
                 {
                     topFile.FilePath = fInfo.Name;
 
@@ -493,12 +501,11 @@
                             hsStream.isNeedApprove = true;
                     }
 
-                    bool bHidden = false;
-
+                    //bool bHidden = false;
                     //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
                     //if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
                     //    bHidden = true;
-                    if (!GetRegExamEnable(fileAddManage, topFile, hsStream, hsStream.Type, bHidden, hsStream.Size))
+                    if (!GetRegExamEnable(fileAddManage, topFile, hsStream, hsStream.Type, false, hsStream.Size))
                     {
                         existErr = true;
                         nExamCount++;
@@ -571,7 +578,7 @@
                     per = (nExamCount * 100) / nTotalCount;
                     SGFileExamEvent(per, hsStream.FileName);
                 }
-                else if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                else
                 {
                     DirectoryInfo di = new DirectoryInfo(fInfo.FullName);
                     if (di.Exists != true)
@@ -628,6 +635,17 @@
                     //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
                     //HsStreamList.Add(hsStream);
                     //SetFileAdd(hsStream);
+
+                    // folder가 차단당하면 하위 파일들도 다 차단당하게 됨
+                    if (!GetRegExamEnable(fileAddManage, topFile, hsStream, hsStream.Type, false, hsStream.Size))
+                    {
+                        existErr = true;
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per, hsStream.FileName);
+                        continue;
+                    }
+
                     listTryHsStream.Add(hsStream);
                     nExamCount++;
 
@@ -748,23 +766,20 @@
                         else
                             hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
 
-                        if (hsStream.IsDir == false)
+                        // bool bHidden = false;
+                        //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
+                        //if ((item.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                        //    bHidden = true;
+                        if (!GetRegExamEnable(fileAddManage, childFile, hsStream, hsStream.Type, false, hsStream.Size))
                         {
-                            bool bHidden = false;
-                            //2023.03.07 JS에서 파일속성을 통한 숨김파일을 체크를 하지 않으므로, 통일성을 위해 삭제(Linux/MAC은 . 표시로 숨김 체크) by KYH
-                            //if ((item.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
-                            //    bHidden = true;
-                            if (!GetRegExamEnable(fileAddManage, childFile, hsStream, hsStream.Type, bHidden, hsStream.Size))
-                            {
-                                existErr = true;
-                                nExamCount++;
-                                per = (nExamCount * 100) / nTotalCount;
-                                SGFileExamEvent(per, hsStream.FileName);
-                                continue;
-                            }
+                            existErr = true;
+                            nExamCount++;
+                            per = (nExamCount * 100) / nTotalCount;
+                            SGFileExamEvent(per, hsStream.FileName);
+                            continue;
                         }
 
-                        if (!hsStream.Type.Equals("DIR"))
+                        if (hsStream.IsDir == false)
                         {
                             try
                             {
@@ -822,6 +837,7 @@
                                 continue;
                             }
                         }
+
                         //HsStreamList.Add(hsStream);
                         //SetFileAdd(hsStream);
                         listTryHsStream.Add(hsStream);
@@ -853,6 +869,7 @@
         _dropReference.SetDragTargetElementAsync(targets);
 
         bViewDropFileAddError = false; // SGAppMgrSvc.OpConfigInfoService.GetUseDropErrorUI();
+        bUseCrossPlatformOS = SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName();
     }
 
     private void onDrop()
@@ -976,24 +993,26 @@
             //최상위 파일 구성
             //FileAddErr topFile = fileAddManage.CreateFileAddErrInfo(fileInfo.Name, fileInfo.Path, "");
             FileAddErr currentFile = fileAddManage.SetFileTreeFromFilePath(fileInfo.Path, "/");
-            if (fileInfo.Dir != "Dir")
+
+            hsStream.Size = fileInfo.Size;
+            hsStream.FileName = Path.GetFileName(fileInfo.Path);
+            hsStream.RelativePath = fileInfo.Path;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+            else
+                hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+
+            DateTime date = DateTime.ParseExact(fileInfo.Etc, "yyyy/MM/dd HH:mm:ss", null);
+            //DateTime date = (DateTime)fileInfo.LastModifiedDate;
+            hsStream.ModifyTime = date;
+            string strDate = date.ToShortDateString();
+            strDate = strDate.Replace("-", "");
+            string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
+            hsStream.MTime = strDate + strTime;
+            fileAddManage.bUseCrossPlatformOSforFileName = bUseCrossPlatformOS;
+
+            if (fileInfo.Dir != "Dir")            // file
             {
-                hsStream.Size = fileInfo.Size;
-                hsStream.FileName = Path.GetFileName(fileInfo.Path);
-                hsStream.RelativePath = fileInfo.Path;
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                else
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
-
-                DateTime date = DateTime.ParseExact(fileInfo.Etc, "yyyy/MM/dd HH:mm:ss", null);
-                //DateTime date = (DateTime)fileInfo.LastModifiedDate;
-                hsStream.ModifyTime = date;
-                string strDate = date.ToShortDateString();
-                strDate = strDate.Replace("-", "");
-                string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
-                hsStream.MTime = strDate + strTime;
-
 
                 if (!hsStream.FileName.Equals(""))
                 {
@@ -1134,16 +1153,22 @@
                 }
 
                 listTryHsStream.Add(hsStream);
-                nExamCount++;
-                per = (nExamCount * 100) / nTotalCount;
-                SGFileExamEvent(per, hsStream.FileName);
+                //SGFileExamEvent(per, hsStream.FileName);
             }
             else    //디렉토리
             {
-                nExamCount++;
-                per = (nExamCount * 100) / nTotalCount;
-                SGFileExamEvent(per, fileInfo.Name);
+                hsStream.IsDir = true;
+            
+                if (bUseCrossPlatformOS)
+                    existErr = (!GetRegExamEnable(fileAddManage, currentFile, hsStream, hsStream.Type, false, hsStream.Size));
+                //SGFileExamEvent(per, hsStream.FileName);
+                //SGFileExamEvent(per, fileInfo.Name);
             }
+
+            nExamCount++;
+            per = (nExamCount * 100) / nTotalCount;            
+            SGFileExamEvent(per, (fileInfo.Dir != "Dir" ? hsStream.FileName : fileInfo.Name));
+
         }
 
         //파일 등록처리 조건 : 등록 시도 된 파일이 모두 정상적인 경우 OR 부분등록 옵션이 설정된 경우
@@ -1662,6 +1687,9 @@
         // okb
         fileAddManager.bEmptyFIleNoCheck = SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans();
 
+        // fileName Check
+        fileAddManager.bUseCrossPlatformOSforFileName = bUseCrossPlatformOS; // SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName();
+
         if (fileAddManager.GetExamFileAddEnable(hsStream, currentFile, bWhite, strFileExtInfo, bHidden, nConvEnableSize, RegSize, FileTransMaxSize, RemainFileTransSize, fileCountStandard, dayCountStandard, dayCountRemain, 1) != true)
             return false;
 
@@ -1797,9 +1825,9 @@
 
         bool bDenyPasswordZIP = SGAppMgrSvc.OpConfigInfoService.GetUseDenyPasswordZip();
         CLog.Here().Information($"압축(Zip) 파일 passwd 있을때 차단 : [{bDenyPasswordZIP.ToString()}]");
-        
+
         //문서파일 내부 검사유형 (0 : 문서 검사 않함. / 1 : 모듈검사 & OLE객체 마임리스트검사 / 2 : 모듈검사 & 위변조 체크 / 3 : 모듈검사 & OLE마임리스트검사 & 위변조체크 )
-        string strDocumentExtractType = sgLoginData.GetDocumentExtractType(sgLoginData.GetSystemPosition());        
+        string strDocumentExtractType = sgLoginData.GetDocumentExtractType(sgLoginData.GetSystemPosition());
 
         int nRet = 0;
         nRet = await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, strDocumentExtractType, MaxDepth, Option, true,
