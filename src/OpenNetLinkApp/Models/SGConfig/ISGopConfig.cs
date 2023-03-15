@@ -176,5 +176,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseFileSelectDelete { get; set; } // 파일 선택 삭제 사용 유무
 
+        public bool bUseCrossPlatformOSforFileName { get; set; } // 파일 선택 삭제 사용 유무        
+
     }
 }

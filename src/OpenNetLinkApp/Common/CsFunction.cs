@@ -422,7 +422,7 @@ namespace OpenNetLinkApp.Common
         /// <param name="fileName"></param>
         /// <param name="strItem"></param>
         /// <returns></returns>
-        public static bool isSupportFileName(string fileName, out string strItem)
+        public static bool isSupportFileName(string fileName, out string strItem, bool bIsForRecv=true)
         {
 
             Log.Logger.Here().Information($"isSupportFileName - fileName : {fileName}");
@@ -445,7 +445,7 @@ namespace OpenNetLinkApp.Common
             // File / Folder 이름으로 정해질 수 없는 문자 있는지 확인
 
             // Windows
-            string strNotSupportData = "\\/:*?\"<>";
+            string strNotSupportData = "\\/:*?\"<>|";  // 차단문자, Test때에 사용 "\\/:*?\"<>|0"
 
             // Linux
             // "/"
@@ -475,8 +475,8 @@ namespace OpenNetLinkApp.Common
                 return false;
             }
 
-            // 특정문자로 시작될때 허용불가능 
-            if (fileName.IndexOf('.') == 0)
+            // 특정문자로 시작될때 허용불가능 (수신때만)
+            if (bIsForRecv && fileName.IndexOf('.') == 0)
             {
                 strItem = ".";
                 Log.Logger.Here().Information($"isSupportFileName - Not Support Start Char(###-StartChar)(MacOSx) : {"."}");

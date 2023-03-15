@@ -178,8 +178,9 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseClipBoardApproveReason { get; set; }                   //클립보드 승인사유 입력여부
 
-        public bool bUseFileSelectDelete { get; set; }                          //파일 선택 삭제 사용 유무
+        public bool bUseFileSelectDelete { get; set; }                          // 파일 선택 삭제 사용 유무
 
+        public bool bUseCrossPlatformOSforFileName { get; set; }              // 윈도우에서 파일이름에 사용못하는 문자 막는지 유무
 
         public List<bool> bListUsePKIsendRecv { get; set; } = null;             // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
         

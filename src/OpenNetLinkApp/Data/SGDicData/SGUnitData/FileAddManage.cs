@@ -82,6 +82,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         eFA_FILE_READ_ERROR,    //파일읽기 권한오류 - @@@ NetLink에 없는거(1)
 
+        eFA_FILE_NAME_ERROR,    // 파일이름 윈도우에 지원하지 않는 문자 - @@@ NetLink에 없는거(2)
+
         /// <summary>
         /// 일일 전송 횟수 제한
         /// </summary>
@@ -102,6 +104,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eUnZipInnerExtUnknown,                  // zip파일에 내부B의 zip 알수 없는 파일형식 포함
         eUnZipInnerFileEmpty,                   // zip파일에 내부의 zip 비어있는 파일
         eUnZipInnerLengthOver,                  // zip파일에 내부의 zip Length Over
+        eUnZipInnerFileName,                    // zip파일에 파일이름 윈도우에 지원하지 않는 문자 - @@@ NetLink에 없는거(3)
+
         /// <summary>
         /// zip파일검사 후 남아 있는 zip포함
         /// </summary>
@@ -405,6 +409,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strMsg = String.Format(strMsg, strFileName);
                     break;
 
+                case eFileAddErr.eFA_FILE_NAME_ERROR:
+                    strMsg = xmlConf.GetErrMsg("E_0258");                      // {0} 파일에 지원하지 않는 문자가 있습니다.
+                    strMsg = String.Format(strMsg, strFileName);
+                    break;
+
                 // 51 ~ 52
                 case eFileAddErr.eFADAYCOUNTOVER:
                     strMsg = xmlConf.GetWarnMsg("W_0181");                      // 일일 전송 횟수를 초과하였습니다.
@@ -513,6 +522,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// true :전송 가능
         /// </summary>
         public bool bEmptyFIleNoCheck = false;
+
+        /// <summary>
+        /// Folder / 파일 이름에 지원하지 않는 문자 들어있는지 체크
+        /// true : 체크함(기본), false : 미체크
+        /// </summary>
+        public bool bUseCrossPlatformOSforFileName = true;
+       
 
         /// <summary>
         /// OLE개체 및 압축형식 검사가 필요한 문서 확장자 대상 목록
@@ -808,6 +824,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 case eFileAddErr.eFAUnZipCheckStop:                                //UnZip 체크 중단
                     str = xmlConf.GetTitle("T_eUNZIP_CHECK_STOP");                 // 압축파일 검사취소
                     break;
+
+                case eFileAddErr.eFA_FILE_NAME_ERROR:
+                    str = xmlConf.GetTitle("T_eFA_FILENAME_CHAR_ERR");                 // 파일이름에 지원하지 않는문자 있음
+                    break;
+
                 case eFileAddErr.eFADAYCOUNTOVER:                                // 일일 전송횟수 제한.
                     /* TODO */
                     str = xmlConf.GetTitle("T_INFO_ONEDAY_TRANCE_COUNTLIMIT");
@@ -1490,6 +1511,28 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return true;
         }
 
+        public bool GetFileNameEnable(string strFileNamePath)
+        {
+
+            string strNotSupportCharData = "";
+
+            string[] ListParsedData = strFileNamePath.Split("/");
+            if ((ListParsedData?.Count() ?? 0) > 0)
+            {
+                int nCount = ListParsedData.Count();
+                foreach(string strItem in ListParsedData)
+                {
+                    if (CsFileFunc.isSupportFileName(strItem, out strNotSupportCharData, false) == false)
+                    {
+                        Log.Logger.Here().Information($"GetFileNameEnable(#####), Not Support Char in FileName : {strNotSupportCharData}");
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         public bool GetCountEnable(int nStandardCount, int nRegCount)
         {
             int nAddedTotalCount = m_nTransCurCount + nRegCount;
@@ -1739,11 +1782,31 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             //파일 전송 시 체크했던 제한 사항을 파일 등록 시 체크하도록 추가(1회 파일갯수,일일 전송사이즈, 일일 전송횟수) by 2022.08.19 KYH
 
             //1회 전송가능 용량 제한
-            bSizeEnable = GetSizeEnable(ConvEnableSize, RegSize);       //1회 전송가능 용량 제한
-            if (!bSizeEnable)
+            if (hsStream.IsDir)
+                bSizeEnable = true;
+            else
             {
-                currentFile.eErrType = eFileAddErr.eFAFileSize;
-                return false;
+                bSizeEnable = GetSizeEnable(ConvEnableSize, RegSize);       //1회 전송가능 용량 제한
+                if (!bSizeEnable)
+                {
+                    currentFile.eErrType = eFileAddErr.eFAFileSize;
+                    return false;
+                }
+            }
+
+            // 파일이름에 지원하지 않는 문자 있는지 확인
+            if (bUseCrossPlatformOSforFileName)
+            {
+                string strTempPath = hsStream.RelativePath;
+                if ((strTempPath?.Length ?? 0) > 0)
+                {
+                    strTempPath = strTempPath.Replace("\\", "/");
+                    if (GetFileNameEnable(strTempPath) == false)
+                    {
+                        currentFile.eErrType = eFileAddErr.eFA_FILE_NAME_ERROR;
+                        return false;
+                    }
+                }
             }
 
             //1회 전송가능 파일 갯수
@@ -1763,21 +1826,31 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 
             //일일 전송가능 용량 제한
-            bDaySizeEnable = GetDaySizeEnable(FileTransMaxSize, RemainFileTransSize, RegSize);
-            if (!bDaySizeEnable)
+            if (hsStream.IsDir)
+                bDaySizeEnable = true;
+            else
             {
-                currentFile.eErrType = eFileAddErr.eFADAYSIZEOVER;
-                return false;
+                bDaySizeEnable = GetDaySizeEnable(FileTransMaxSize, RemainFileTransSize, RegSize);
+                if (!bDaySizeEnable)
+                {
+                    currentFile.eErrType = eFileAddErr.eFADAYSIZEOVER;
+                    return false;
+                }
             }
 
             Log.Logger.Here().Information($"### - GetExamFileAddEnable, BlackWhite : {(bWhite ? "WHITE!" : "BLACK!")}, FileExtInfo : {strFileExtInfo}, FileExt : {hsStream.Type}");
 
             //black, white 리스트 체크
-            bExtEnable = GetRegExtEnable(bWhite, strFileExtInfo, hsStream.Type);
-            if (!bExtEnable)
+            if (hsStream.IsDir)
+                bExtEnable = true;
+            else
             {
-                currentFile.eErrType = eFileAddErr.eFAEXT;
-                return false;
+                bExtEnable = GetRegExtEnable(bWhite, strFileExtInfo, hsStream.Type);
+                if (!bExtEnable)
+                {
+                    currentFile.eErrType = eFileAddErr.eFAEXT;
+                    return false;
+                }
             }
 
             //숨김파일 체크
@@ -1806,14 +1879,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return false;
             }
 
-            Log.Logger.Here().Information($"###################### - 파일이름 : {hsStream.FileName}, 파일크기 : {hsStream.Size} - ######################");
+            Log.Logger.Here().Information($"### - 파일이름 : {hsStream.FileName}, 파일크기 : {hsStream.Size}, 종류 : {(hsStream.IsDir?"폴더":"파일")} - ###");
 
             //빈파일 체크 (0kb 허용)
-            bEmpty = (bEmptyFIleNoCheck || GetEmptyEnable(hsStream.Size));//GetRegFileEmptyEnable(hsStream.Size);
-            if (!bEmpty)
+            if (hsStream.IsDir)
+                bEmpty = true;
+            else
             {
-                currentFile.eErrType = eFileAddErr.eFAEMPTY;
-                return false;
+                bEmpty = (bEmptyFIleNoCheck || GetEmptyEnable(hsStream.Size));//GetRegFileEmptyEnable(hsStream.Size);
+                if (!bEmpty)
+                {
+                    currentFile.eErrType = eFileAddErr.eFAEMPTY;
+                    return false;
+                }
             }
 
             bool bRet = (bExtEnable & bHiddenEnable & bFilePathEnable & bFileFolderNameEnable & bEmpty);
@@ -1995,7 +2073,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool GetReasonAndDisplayOfErrSource(out List<(string reason, string count)> ListReason, out List<FileAddErr> ListDisaplayErrSource)
         {
             m_FileAddErrReason.Clear();
-            FileAddErr fileAddErr = new FileAddErr();
+            //FileAddErr fileAddErr = new FileAddErr();
+
             Dictionary<eFileAddErr, int> fileAddErrReason = new Dictionary<eFileAddErr, int>();
 
             bool hasErr = getReasonAndDisplaySource(m_FileAddErrList, ref fileAddErrReason);
@@ -2013,6 +2092,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             ListDisaplayErrSource = m_FileAddErrList.FindAll(file => file.eErrType != eFileAddErr.eFANone || file.HasChildrenErr);
             return hasErr;
         }
+
         /// <summary>
         /// 하위 폴더,파일들까지 Reason 세팅 및 에러 존재 여부(HasChildren 세팅
         /// </summary>
@@ -2021,6 +2101,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         private bool getReasonAndDisplaySource(List<FileAddErr> getFileAddErrList, ref Dictionary<eFileAddErr, int> getFileAddErrReason)
         {
             bool includeErr = false;
+
             foreach (FileAddErr err in getFileAddErrList)
             {
                 if (err.eErrType != eFileAddErr.eFANone)
@@ -2041,6 +2122,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     includeErr = includeErr || hasChildrenErr;
                 }
             }
+
             return includeErr;
         }
 
