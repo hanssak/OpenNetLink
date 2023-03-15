@@ -936,13 +936,13 @@
 
         fileAddManage.DataClear();
 
-	int nTotalCount = files.Count() + ((dirDatas != null && dirDatas.Count() > 0) ? dirDatas.Count() : 0);
-	if (nTotalCount < 1)
-		return (hsStreamList, false);
+	    int nTotalCount = files.Count() + ((dirDatas != null && dirDatas.Count() > 0) ? dirDatas.Count() : 0);
+	    if (nTotalCount < 1)
+		    return (hsStreamList, false);
 
 
-	if (GetRegCountEnable(nTotalCount) == false)
-		return (hsStreamList, false);
+	    if (GetRegCountEnable(nTotalCount) == false)
+		    return (hsStreamList, false);
 
         await refProgress.openPopUp();
 

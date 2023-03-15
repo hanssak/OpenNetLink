@@ -1524,7 +1524,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 {
                     if (CsFileFunc.isSupportFileName(strItem, out strNotSupportCharData, false) == false)
                     {
-                        Log.Logger.Here().Information($"GetFileNameEnable(#####), Not Support Char in FileName : {strNotSupportCharData}");
+                        Log.Logger.Here().Information($"GetFileNameEnable(#####), Not Support Char : {strNotSupportCharData}, in FileName : {strItem}");
                         return false;
                     }
                 }
