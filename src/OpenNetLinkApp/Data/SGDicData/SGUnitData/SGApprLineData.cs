@@ -602,8 +602,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="strApprLineData"></param>
         /// <param name="strUserSeq"></param>
+        /// <param name="apvStep">APPROVESTEP (0: AND, 1: OR, 2: ANDOR</param>
         /// <returns></returns>
-        public bool LocalLoadANDApprLineData(string strApprLineData, string strUserSeq)
+        public bool LocalLoadANDApprLineData(string strApprLineData, string strUserSeq, int apvStep)
         {
             LinkedList<ApproverInfo> apprInfo = new LinkedList<ApproverInfo>();
             if (strApprLineData.Equals(""))
@@ -650,6 +651,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     apprdata.DeptSeq = strApprData[3];
                     apprdata.UserSeq = strApprData[4];
                     apprdata.Index = strApprData[5];
+
+                    //ANDOR 결재는 Local 저장 시 5번째에 ApprOrder 저장하므로 해당 정보로 GROUP 구성에 활용
+                    if (apvStep == 2 && int.TryParse(strApprData[5], out int apprStep)) 
+                        apprdata.nApvOrder = apprStep;
+
                     if (!strApprData[6].Equals(""))
                         apprdata.nApprPos = Convert.ToInt32(strApprData[6]);
                     if (!strApprData[7].Equals(""))
