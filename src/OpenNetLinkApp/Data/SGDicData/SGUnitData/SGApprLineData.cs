@@ -620,53 +620,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             char sep = (char)':';
             string[] strApprList;
             string[] strApprLineDataList = strApprLineData.Split('\u0002');
-            if (strApprLineDataList.Length == 1)
-            {
-                string[] strSplit = strApprLineData.Split(sep);
-                if (strSplit.Length == 1)
-                {
-                    return false;
-                }
-
-                if (!strSplit[0].Equals(strUserSeq))
-                {
-                    return false;
-                }
-
-                strApprList = strSplit[1].Split('\u0003');
-                if (strApprList.Length <= 0)
-                {
-                    return false;
-                }
-
-                for (int i = 0; i < strApprList.Length; i++)
-                {
-                    string[] strApprData = strApprList[i].Split('\u0001');
-                    if (strApprData.Length <= 0)
-                        continue;
-                    ApproverInfo apprdata = new ApproverInfo();
-                    apprdata.Name = strApprData[0];
-                    apprdata.Grade = strApprData[1];
-                    apprdata.DeptName = strApprData[2];
-                    apprdata.DeptSeq = strApprData[3];
-                    apprdata.UserSeq = strApprData[4];
-                    apprdata.Index = strApprData[5];
-
-                    //ANDOR 결재는 Local 저장 시 5번째에 ApprOrder 저장하므로 해당 정보로 GROUP 구성에 활용
-                    if (apvStep == 2 && int.TryParse(strApprData[5], out int apprStep)) 
-                        apprdata.nApvOrder = apprStep;
-
-                    if (!strApprData[6].Equals(""))
-                        apprdata.nApprPos = Convert.ToInt32(strApprData[6]);
-                    if (!strApprData[7].Equals(""))
-                        apprdata.nDlpApprove = Convert.ToInt32(strApprData[7]);
-
-                    apprInfo.AddLast(apprdata);
-                }
-
-                CopyApprLine(apprInfo);
-                return true;
-            }
 
             bool bFind = false;
             string strApprLine = "";
@@ -708,6 +661,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 apprdata.DeptSeq = strApprData[3];
                 apprdata.UserSeq = strApprData[4];
                 apprdata.Index = strApprData[5];
+
+                //ANDOR 결재는 Local 저장 시 5번째에 ApprOrder 저장하므로 해당 정보로 GROUP 구성에 활용
+                if (apvStep == 2 && int.TryParse(strApprData[5], out int apprStep))
+                    apprdata.nApvOrder = apprStep;
+
                 if (!strApprData[6].Equals(""))
                     apprdata.nApprPos = Convert.ToInt32(strApprData[6]);
                 if (!strApprData[7].Equals(""))
