@@ -551,31 +551,29 @@
             return;
 
         ApproverInfo apv = ApproverSearch.FirstOrDefault(x => x.UserSeq == stSelectApprover);
-        if (apv != null)
-        {
-            ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-            if (apvGroup == null)
-            {
-                ShowMessage("warning", XmlConf.GetInfoMsg("I_0218"));
-                return;
-            }
-            bool bFind = false;
-            foreach (ApproverInfo item in apvGroup.ApproverSelect)
-            {
-                if (item.UserSeq == apv.UserSeq)
-                    bFind = true;
-            }
+        if (apv == null)
+            return;
 
-            if (apvGroup != null && bFind == false)
+        ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
+        if (apvGroup == null)
+        {
+            ShowMessage("warning", XmlConf.GetInfoMsg("I_0218"));
+            return;
+        }
+
+        //모든 그룹에 없는 사용자인 경우만 등록 가능하도록 처리
+        foreach (ApproverGroup grp in ApvGroup)
+        {
+            ApproverInfo find = grp.ApproverSelect.FirstOrDefault(app => app.UserSeq == apv.UserSeq);
+
+            if (find != null)
             {
-                apvGroup.ApproverSelect.AddLast(apv);
-            }
-            else
-            {
-                ShowMessage("warning", XmlConf.GetInfoMsg("I_0219"));
+                ShowMessage("warning", string.Format(XmlConf.GetErrMsg("E_0258"), find.Name, "Step " + grp.seqGrp));
                 return;
             }
         }
+
+        apvGroup.ApproverSelect.AddLast(apv);
     }
 
     private void RemoveAssignApprover()
