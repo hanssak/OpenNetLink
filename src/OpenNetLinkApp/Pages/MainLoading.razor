@@ -95,6 +95,10 @@
             {
                 siteConfig.SetUseOver1auth(listNetWork[i].GroupID, true);
             }
+            else if (String.Compare(listNetWork[i].NetPos, "IN", true) == 0)
+            {
+                siteConfig.SetUseAccessAllDrive(listNetWork[i].GroupID, true);
+            }
 
             // Hanssak in Office
             //siteConfig.SetUseAccessAllDrive(listNetWork[i].GroupID, true);

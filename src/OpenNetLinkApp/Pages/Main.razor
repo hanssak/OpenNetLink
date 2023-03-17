@@ -836,9 +836,9 @@
         }
         else    // 다중망 로그인에서 로그아웃됐을때에 다시 자동로그인 안되게 처리
         {
-	
+
             bLoginBtnDisable = true;
-	
+
             if (siteConfig.GetUseOver1auth(groupid))
             {
 
@@ -858,6 +858,13 @@
             else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
             {
                 doADLogin();
+            }
+            else
+            {
+                // 기본 Login
+                bLoginBtnDisable = false;
+                StateHasChanged();
+                Window.MoveTrayToWebWindow();
             }
         }
 
