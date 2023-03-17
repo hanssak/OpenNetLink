@@ -2183,3 +2183,7 @@ window.FileReaderComponent = new FileReaderComponent();
 window.RadzenTreeCollapse = function () {
     $('.ui-treenode-children').remove();
 }
+
+window.ScrollIntoView = function (elementName) {
+    document.getElementById(elementName).scrollIntoView();
+}
