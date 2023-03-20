@@ -1053,7 +1053,9 @@
                         strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
                         strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
                         strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
-                        strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";
+                        strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_EXT'";
+                        // strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";     // Table 이름 따로 정해졌음
+                        strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
 
                         string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
                         HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
@@ -1463,6 +1465,7 @@
                             strTime = sgSettingProc.GetSettingDelayDspPw(nGroupIDfirst);
                             if (strTime.Equals(""))
                             {
+                                // 처음설치해서 사용하는 사용자들 항상 실행하게 되는 경로
                                 pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
                                 await refPWChange.openPopUp();
                                 return;

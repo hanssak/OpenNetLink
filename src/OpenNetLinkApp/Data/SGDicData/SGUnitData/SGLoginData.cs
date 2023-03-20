@@ -1510,8 +1510,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetDocumentExtractType(bool bSystem)
             => (bSystem) ? GetTagData("I_CLIENT_OLE_EXTRACT") : GetTagData("E_CLIENT_OLE_EXTRACT");
 
+        public string GetPreViewerExt()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_PREVIEW_VIEWER_EXT") : GetTagData("E_CLIENT_PREVIEW_VIEWER_EXT");
 
-        
+        public string GetDocumentExtractExt()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_OLE_EXTRACT_EXT") : GetTagData("E_CLIENT_OLE_EXTRACT_EXT");
+
         /// <summary>
         /// value 값을 암호화해서 sgData에 저장
         /// </summary>

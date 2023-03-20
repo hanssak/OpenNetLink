@@ -528,19 +528,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// true : 체크함(기본), false : 미체크
         /// </summary>
         public bool bUseCrossPlatformOSforFileName = true;
-       
+
 
         /// <summary>
-        /// OLE개체 및 압축형식 검사가 필요한 문서 확장자 대상 목록
+        /// OLE개체 및 압축형식 검사가 필요한 문서 확장자 대상 목록 (보통)
         /// <para>"ODT", "DOC", "DOCM", "DOCX", "DOT", "DOTM", "DOTX", "RTF"</para>
         /// <para>"XLS", "XLSB", "XLSM", "XLSX", "XLT", "XLTM", "XLTX", "XLW"</para>
         /// <para>"POT", "PPT", "POTM", "POTX", "PPS", "PPSM", "PPSX", "PPTM", "PPTX"</para>
         /// <para>"HWP", "HWPX"</para>
         /// </summary>
-        private readonly List<string> ListCheckableDocumentExtension = new List<string>() { "ODT", "ODS", "ODP", "DOC", "DOCM", "DOCX", "DOT", "DOTM", "DOTX", "RTF"
+        public List<string> ListCheckableDocumentExtension = new List<string>() { "ODT", "ODS", "ODP", "DOC", "DOCM", "DOCX", "DOT", "DOTM", "DOTX", "RTF"
                                             , "XLS", "XLSB", "XLSM", "XLSX", "XLT", "XLTM", "XLTX", "XLW"
                                             , "POT", "PPT", "POTM", "POTX", "PPS", "PPSM", "PPSX", "PPTM", "PPTX"
                                             , "HML", "HWP", "HWPX"};
+        //public List<string> ListCheckableDocumentExtension = new List<string>();
+
 
         /// <summary>
         /// 압축형식 내부검사가 필요한 파일 확장자 대상 목록
@@ -690,6 +692,32 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         //    Log.Information("[AddData] Cheked to Error[{Err}] File[{CurZipFile}] in {OrgZipFile}", err, strFilename, strFilePath);
         //}
+
+
+        public void SetOleExtractExtData(string strData)
+        {
+            if ((strData?.Length ?? 0) < 1)
+            {
+                Log.Logger.Here().Error($"SetOleExtractExtData, input Error - 0 size input!");
+                return;
+            }
+
+            if (strData == ";")
+            {
+                Log.Logger.Here().Error($"SetOleExtractExtData, input Error - Empty$ input!");
+                return;
+            }
+
+            string[] listItem = strData.Split(';');
+            if ((listItem?.Length ?? 0) < 1)
+            {
+                Log.Logger.Here().Error($"SetOleExtractExtData, input Error - file Ext : {strData}");
+                return;
+            }
+
+            ListCheckableDocumentExtension.Clear();
+            ListCheckableDocumentExtension.InsertRange(0, listItem);
+        }
 
         public void DataClear()
         {
@@ -4536,7 +4564,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     //});
 
                     // Check Changed File Extension 
-                    enErr = IsValidFileExtInnerZip(extractFile.FullName, strExt.Replace(".", ""), blAllowDRM);
+                    enErr = IsValidFileExtInnerZip(extractFile.FullName, strNoDotExt, blAllowDRM);
                     if (enErr != eFileAddErr.eFANone)
                     {
                         childFile.eErrType = enErr;
@@ -4550,7 +4578,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     //CheckDocumentFile()
                     //압축해제한 파일의 Stream 필요
                     //Check Document File (압축파일 내 문서검사할 파일이 존재하는 경우)
-                    if (ListCheckableDocumentExtension.Exists(ext => ext == strExt.Replace(".", "").ToUpper()))
+                    if (ListCheckableDocumentExtension.Exists(ext => (string.Compare(ext,strNoDotExt,true) == 0)))
                     {
                         //압축 내부 문서의 압축해제 개체를 보관할 폴더 (Temp/ZipExtract/ZipName/Document_Extract)
                         string strTempDocumentExtractDirPath = Path.Combine(strTempUnzipDirPath, "Document_Extract");
@@ -4780,9 +4808,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     return 0;
 
                 // 검사가 필요한 확장자(문서) 체크
-                if (!ListCheckableDocumentExtension.Exists(ext => ext == hsStream.Type.ToUpper()))
+                //if (!ListCheckableDocumentExtension.Exists(ext => ext == hsStream.Type.ToUpper()))
+                if (!ListCheckableDocumentExtension.Exists(ext => (string.Compare(ext, hsStream.Type, true) == 0)))
                 {
-                    Log.Logger.Here().Information($"[CheckDocumentFile] No Check of {hsStream.Type.ToUpper()} File.");
+                    Log.Logger.Here().Information($"[CheckDocumentFile] No Check, Ext : {hsStream.Type.ToUpper()}, check CLIENT_OLE_EXTRACT_EXT !!!");
                     return 0;
                 }
 
