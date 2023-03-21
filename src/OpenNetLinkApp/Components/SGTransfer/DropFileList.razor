@@ -346,17 +346,26 @@
 
     public async void OnDrop(List<string> recvlist)
     {
+
+        CLog.Here().Information($"OnDrop-Start, recvlist-count : {recvlist.Count}");
+
         int dropNdrop = await SubFileAddAsync(); //내부에서 드랍한 것인지 외부에서 드랍한 것인지 판단하기 위해 외부에서 들어온 것인지 먼저 판단
+
+        CLog.Here().Information($"");
 
         if (dropNdrop != 0)
         {
             return;
         }
 
+        CLog.Here().Information($"OnDrop-End, dropNdrop : {dropNdrop}");
+
         if (recvlist.Count <= 0)
         {
             return;
         }
+
+        CLog.Here().Information($"OnDrop-End, recvlist-count : {recvlist.Count}");
 
         OnDropFileAdd(recvlist, false);
     }
@@ -369,6 +378,8 @@
     /// <param name="isRMouseAdd"></param>
     async Task OnDropFileAdd(List<string> recvList, bool isRMouseAdd)
     {
+
+        CLog.Here().Information($"OnDropFileAdd, --------------------- ");
 
 
         FileExamEvent SGFileExamEvent = null;
@@ -396,6 +407,7 @@
         {
 
             fileAddManage.DataClear();
+            fileAddManage.SetOleExtractExtData(sgLoginData.GetDocumentExtractExt());
 
             foreach (var item in HsStreamList)
             {
@@ -923,6 +935,9 @@
     /// <returns></returns>
     public async Task<(List<HsStream>, bool)> SubFileAddAsync(IEnumerable<IFileReference> files, IEnumerable<IFileReference> dirDatas)
     {
+
+        CLog.Here().Information($"SubFileAddAsync, --------------------- ");
+
         FileExamEvent SGFileExamEvent = null;
         List<HsStream> hsStreamList = new List<HsStream>();
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -934,7 +949,13 @@
         if (SGFileExamEvent == null)
             return (hsStreamList, false);
 
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null && sgLoginData.GetFileTrans() == false)
+            return (hsStreamList, false);
+
         fileAddManage.DataClear();
+        fileAddManage.SetOleExtractExtData(sgLoginData.GetDocumentExtractExt());
 
 	    int nTotalCount = files.Count() + ((dirDatas != null && dirDatas.Count() > 0) ? dirDatas.Count() : 0);
 	    if (nTotalCount < 1)
@@ -1167,9 +1188,6 @@
 
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
                     {
-                        SGLoginData sgLoginData = null;
-                        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-
                         if (sgLoginData != null && CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
                             hsStream.isNeedApprove = true;
                     }
@@ -1242,9 +1260,6 @@
                 hsStream.isNeedApprove = false;
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
                 {
-                    SGLoginData sgLoginData = null;
-                    sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-
                     if (sgLoginData != null && CsFunction.isFileExtinListStr(false, fileInfo.Name, sgLoginData.GetExceptionExt()))
                         hsStream.isNeedApprove = true;
                 }

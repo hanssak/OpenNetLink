@@ -261,17 +261,27 @@ namespace OpenNetLinkApp.Common
                     return false;
 
                 strFileName = strFileName.Substring(nPos + 1);
-
             }
 
-            strFileName = strFileName.ToUpper();
-            strExtData = strExtData.ToUpper();
+            // strFileName = strFileName.ToUpper();
+            // strExtData = strExtData.ToUpper();
 
-            if (strExtData.IndexOf(strFileName) >= 0)
-                return true;
+            string[] liststr = strExtData.Split(';');
+            int nCount = liststr.Count();
 
+            for (int nDx = 0; nDx < nCount; nDx++)
+            {
+                if (string.Compare(strFileName, liststr[nDx], true) == 0)
+                {
+                    Log.Logger.Here().Information($"isFileExtinListStr, Found : {strFileName}");
+                    return true;
+                }
+            }
+
+            Log.Logger.Here().Information($"isFileExtinListStr, FileExt : {strFileName}, is not in str LIST : {strExtData}");
             return false;
         }
+
 
         public static byte[] ObjectToByteArray(Object obj)
         {
