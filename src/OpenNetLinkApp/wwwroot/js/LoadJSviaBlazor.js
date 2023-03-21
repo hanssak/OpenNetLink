@@ -1710,7 +1710,8 @@ window.loadFileReaderService = () => {
 
               _this.LogIfNull(elementReal);
               if (elementReal instanceof HTMLInputElement) {
-                  elementReal.value = null;
+                  //elementReal.value = null;
+                  elementReal.parentNode.replaceChild(elementReal.cloneNode(true), elementReal);
               }
               else {
                   _this.elementDataTransfers.delete(elementReal);
