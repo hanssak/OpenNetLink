@@ -743,6 +743,11 @@
 
                 // WhiteList / BlackList 최신으로 적용
                 bool bWBpolicy = true;  // true : WhiteList, false : BlackList
+
+                // 특정 Type으로 강제적용
+                // bWBpolicy = false;
+                // eUType = eUrlType.eBlackList;
+
                 if (dicBWpolicy.TryGetValue(groupid, out bWBpolicy))
                 {
                     dicBWpolicy.Remove(groupid);

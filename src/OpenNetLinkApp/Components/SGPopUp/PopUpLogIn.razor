@@ -990,6 +990,7 @@
                     strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
                     if (strTime.Equals(""))
                     {
+                        // pw 변경날짜 정보가 없는 첫Login시
                         eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
                         pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
                         goToPage.InvokeAsync((int)eLoginUITypeData);

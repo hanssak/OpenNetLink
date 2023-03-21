@@ -35,7 +35,7 @@
 
 
   "bUserIDSave": false,
-  "bAutoLogin": false,
+  "bAutoLogin": true,
   "bAutoLoginCheck": false,
   "bUserPWChange": false,
 
@@ -145,7 +145,7 @@
   "bUseNotinListForwardUrl" : false,
   "strNotinListForwardUrl" : "file:///C:/HANSSAK/OpenNetLink/wwwroot/Web/WebLinkInfoNotList.html",
   "bListUsePKIsendRecv": [
-    false,
+    true,
     false,
     false
   ]

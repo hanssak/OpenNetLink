@@ -2,25 +2,16 @@
   "NETWORKS": [
     {
       "GROUPID": 0,
-      "FROMNAME": "인터넷망",
-      "TONAME": "OA망",
+      "FROMNAME": "OA망",
+      "TONAME": "인터넷망",
       "IPADDRESS": "218.145.246.25",
       "PORT": 3435,
       "CONNECTTYPE": 1,
       "TLSVERSION": "1.2",
       "NETPOS": "IN",
-      "ADDomain": [ "IpIeACsMrMfzCyTt9WRFUQ==" ]
-    },
-    {
-      "GROUPID": 1,
-      "FROMNAME": "인터넷망",
-      "TONAME": "OA망",
-      "IPADDRESS": "218.145.246.27",
-      "PORT": 3435,
-      "CONNECTTYPE": 1,
-      "TLSVERSION": "1.2",
-      "NETPOS": "IN",
-      "ADDomain": [ "IpIeACsMrMfzCyTt9WRFUQ==" ]
-    }    
+      "ADDomain": [
+        "kv9iVN6fzGGKOK0XxLeWMg=="
+      ]
+    }
   ]
 }

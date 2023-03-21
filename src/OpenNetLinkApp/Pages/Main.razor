@@ -1579,6 +1579,7 @@
                         strTime = sgSettingProc.GetSettingDelayDspPw(nGroupIDfirst);
                         if (strTime.Equals(""))
                         {
+                            // pw 변경날짜 정보가 없는 첫Login시
                             pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
                             await refPWChange.openPopUp();
                             return;
