@@ -1478,7 +1478,7 @@
         InitText();
         @*action1 = HandleFileInputChange;
             action2 = HandleFileInputChange;*@
-        //SGFileExamEvent = FileExamResult;
+    //SGFileExamEvent = FileExamResult;
         HSCmdCenter.sgPageEvent.SetFileExamNotiEventAdd(groupID, FileExamResult);
         PageStatusData pageSData = pageService.GetPageStatus(groupID);
         HsStreamList = pageSData.GetFileDragListData();
@@ -2229,13 +2229,13 @@
         var fileExamResult = await SubFileAddAsync(files, dirs); // files
         bool existErrInExamResult = fileExamResult.Item2;
         if (!existErrInExamResult || usePartialFileAdd)
-        {
-            @*List<HsStream> folderList = await SubDirAddAsync(dirs);
-            List<HsStream> fileList = fileExamResult.Item1;
+        {          
+            List<HsStream> folderList = fileExamResult.Item1.FindAll(hs=>hs.IsDir == true);//  await SubDirAddAsync(dirs);
+            List<HsStream> fileList = fileExamResult.Item1.FindAll(hs=>hs.IsDir == false);  //fileExamResult.Item1;
             List<HsStream> finalList = ReSortFile(folderList, fileList);
-            await UpLoadFile(finalList);*@
+            await UpLoadFile(finalList);
 
-            await UpLoadFile(fileExamResult.Item1);
+         //   await UpLoadFile(fileExamResult.Item1);
         }
 
         string target = $"fileInputTrans";
