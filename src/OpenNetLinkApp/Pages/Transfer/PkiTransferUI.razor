@@ -2,6 +2,7 @@
 @page "/pkiTransfer/{groupIDbyParam:int}"
 
 @using OpenNetLinkApp.Data.SGDicData.SGGpki
+@using OpenNetLinkApp.Data.SGDicData.SGNpki
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Services.SGAppManager
 @using OpenNetLinkApp.Models.SGSideBar
@@ -14,8 +15,12 @@
 @using System.Text
 @using System.Diagnostics
 @using OpenNetLinkApp.Components.SGSearchCondition
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
+@using OpenNetLinkApp.Common
 
-
+@inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
@@ -27,12 +32,12 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">@("인증서(NPKI)전송")</h1>
+                <h1 class="m-0 text-dark">@XmlConf.GetTitle("T_PKI_TRANS")</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item" style="color:blue;cursor:pointer;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
-                    <li class="breadcrumb-item active">@("인증서(NPKI)전송")</li>
+                    <li class="breadcrumb-item active">@XmlConf.GetTitle("T_COMMON_PKI_TRANS")</li>
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -44,32 +49,102 @@
 
         <div class="row">
             <div class="col-md-12">
+
                 <div class="card card-secondary card-outline" style="height:100%;">
 
                     <div class="mb-1">
-                        <div class="mb-1 mt-2" style="line-height: 1.5; font-size: .9rem;font-weight: bold; color: #222;"> @XmlConf.GetInfoMsg("I_0187") </div>
-                        <div class="col-md-12 text-center" style="height: 120px; width: 400px; margin: auto; display: block; ">
-                            <button class="btn btn-outline-blue1 col-md-6 m1 @(stMedia == "hard" ? "active1" : "")" disabled=@bGpkiBtnDisable @onclick="@(e=>LocationSelect("hard"))">
-                                <label class="mt-80">@XmlConf.GetTitle("T_COMMON_DRIVEFIXED")</label>
-                            </button>
-                            <button class="btn btn-outline-blue2 col-md-6 m1 @(stMedia == "usb" ? "active2" : "")" disabled=@bGpkiBtnDisable @onclick="@(e=>LocationSelect("usb"))">
-                                <label class="mt-80">@XmlConf.GetTitle("T_COMMON_DRIVEREMOVABLE")</label>
-                            </button>
-                            <select class="form-control float-right col-md-3 p-0 mt-1" disabled=@bGpkiBtnDisable style="background-color:none !important; font-size:12px !important; padding:2px !important;" @onchange="SelectMoveDisk">
-                                @foreach (string strDriveName in driveList)
-                                {
-                                    <option>@strDriveName</option>
-                                }
-                            </select>
+
+                        <div class="card card-boder mb-3" style="box-shadow:none;">
+                            <div class="card-body clearfix">
+                                <label class="line-label pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_PKI_TRANS_SELECT_POS")</label>
+                            </div>
                         </div>
+
+                        <div class="col-md-12 text-center" style="height: 115px; width: 400px; margin: auto; display: block; ">
+                            <button class="btn btn-outline-blue3 col-md-6 m1 @(stMedia == "hard" ? "active3" : "")" disabled=@bUseDiveBtnDisable @onclick="@(e=>LocationSelect("hard"))">
+                                <label class="mt-80">@XmlConf.GetTitle("T_PKI_TRANS_HDD")</label>
+                            </button>
+                            <button class="btn btn-outline-blue4 col-md-6 m1 @(stMedia == "usb" ? "active4" : "")" disabled=@bUseDiveBtnDisable @onclick="@(e=>LocationSelect("usb"))">
+                                <label class="mt-80">@XmlConf.GetTitle("T_PKI_TRANS_USB")</label>
+                            </button>
+                        </div>
+
+                        <div class="col-md-12 text-right" style="height: 35px; width: 400px; margin: auto; display: block; ">
+                            <div class="dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    @strCurUsbDriveName
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenu1" style="height:120px; overflow-y:scroll; min-width:0px;">
+                                    @foreach (string strDriveName in driveList)
+                                    {
+                                        <button class="dropdown-item dropdown-footer text-xs p-1" type="button" @onclick="@(()=>SelectBoxUsbDrive(strDriveName))">@strDriveName</button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 text-left" style="height: 35px; margin: auto; display: block; ">
+                            @XmlConf.GetTitle("T_PKI_TRANS_SELECT_ITEM")
+                            <button type="button" class="btn btn-md btn-green" style="float:right" @onclick="@(e=>SendPkiFiles())"><i class="fas fa-share"></i>@XmlConf.GetTitle("T_PKI_TRANS_BTN")</button>
+                        </div>
+
+                        <div style="height:280px; overflow: auto;">
+                            <table class="table table-head-fixed table-bordered table-hover white_pop   p-0" style="table-layout: fixed;overflow:auto;">
+
+                                <thead class="text-center">
+                                    <tr>
+                                        <th style="width:5%;padding-left:0px;text-align:center;">
+                                            <input class="input" type="checkbox" checked=@(true) style="text-align: center; vertical-align: middle;">
+                                        </th>
+                                        <th style="width:23%;text-align:center;">@XmlConf.GetTitle("T_PKI_TRANS_ITEM")</th>
+                                        <th style="width:16%;text-align:center;">@XmlConf.GetTitle("T_PKI_TRANS_USER") </th>
+                                        <th style="width:20%;text-align:center;">@XmlConf.GetTitle("T_PKI_TRANS_EXPIREDATE") </th>
+                                        <th style="width:20%;text-align:center;">@XmlConf.GetTitle("T_PKI_TRANS_ISSUER") </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-center">
+                                    @*@foreach (GPKIFileInfo item in listViewGpkiFileList)
+                                        {
+                                        <tr style="cursor:pointer;" class="@item.m_selected" @onclick="@(e => selectGPKIItem(item.m_strUserID))">
+                                            @if (item.m_nRemainDay > 0)
+                                                {
+                                            <td style="padding-top: 4px; text-align: left; padding-left: 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><img src="/images/gpki_icon.png" class="p-1">@item.m_strUserID</td>
+                                                }
+                                                else
+                                                {
+                                            <td style="padding-top: 4px; text-align: left; padding-left: 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; "><img src="/images/gpki_expired_icon.png" class="p-1">@item.m_strUserID</td>
+                                                }
+                                            <td style="padding-top: 4px;">@item.m_strExpiredDate</td>
+                                            <td style="padding-top: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.m_strKeyUse</td>
+                                            <td style="padding-top: 4px;">@item.m_strOrg</td>
+                                            <td style="padding-top: 4px; padding-right: 0px;">@XmlConf.GetCommon(bGetResponseGpkiCNatServer ? (item.m_bIsRegisteredServer ? "T_YES" : "T_NO") : "T_IDENTIFING")</td>
+                                        </tr>
+                                        }*@
+
+                                    @for (int nDx = 0; nDx < 20; nDx++)
+                                    {
+                                        <tr>
+                                            <td style="text-align: center; vertical-align: middle; width: 5%;">
+                                                <input class="input" type="checkbox" checked=@(true) style="text-align: center; vertical-align: middle;"> <img src="/images/gpki_icon.png" class="p-1">
+                                            </td>
+                                            <td style="padding-top: 4px; text-align: left; padding-left: 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">11111</td> @*<img src="/images/gpki_icon.png" class="p-1">*@
+                                            <td style="padding-top: 4px;">2023-03-22</td>
+                                            <td style="padding-top: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">하하하</td>
+                                            <td style="padding-top: 4px;">한싹시스템</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
                     </div>
 
-                    @*<div class="col-md-7 login-card-body" style="height:600px; padding-left:0 !important; border-radius:0rem .7rem .7rem 0rem !important;">
-                    </div>*@
+
 
                     <form class="form-horizontal">
                         <Footer @ref="refFooter"></Footer>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -87,7 +162,9 @@
     public int groupIDbyParam { get; set; }
     private string stMedia = "hard";
     private List<GPKIFileInfo> listViewGpkiFileList = new List<GPKIFileInfo>();
-    public bool bGpkiBtnDisable = false;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
+    private List<NPKIFileInfo> listViewNpkiFileList = new List<NPKIFileInfo>();
+
+    public bool bUseDiveBtnDisable = false;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
 
     public string strCurSelDriveName = "";              // 현재 사용자가 선택한 드라이브명
     public GPKIFileInfo objUserSelectedGpki;            // 사용자가 선택한 GPKI 인증서 정보
@@ -95,11 +172,17 @@
     public List<string> driveList = new List<string>();
     public string strUserinputGPKIPW = "";              // 사용자가 입력한 gpki-password
 
+
+    string strCurUsbDriveName = "";
+
     Footer refFooter;
 
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
+
+
+    CsPcfFile sgPcfFile = new CsPcfFile();
 
 
     /// <summary>
@@ -135,15 +218,18 @@
     protected override void OnInitialized()
     {
         //InitText();
-
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+        sgGpkiLib.GPKI_Init();
+        InitDriveList();
+        LocationSelect("hard");
+
+        @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;*@
 
         @*HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
             HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
@@ -173,6 +259,19 @@
 
 
     /// <summary>
+    ///
+    /// </summary>
+    private void SendPkiFiles()
+    {
+
+        CLog.Here().Information($"SendPkiFiles, checked pki File Search!");
+
+
+
+    }
+
+
+    /// <summary>
     /// Drive 선택
     /// </summary>
     /// <param name="media"></param>
@@ -195,6 +294,16 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="strType"></param>
+    /// <param name="strMsg"></param>
+    private void ShowMessage(string strType, string strMsg)
+    {
+        object[] param = { strType, XmlConf.GetTitle("T_SYSTEMNAME2"), strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
 
     /// <summary>
     ///
@@ -222,6 +331,43 @@
         selectGPKIItemClean();
 
         LocationSelect("usb");
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="strDiveName"></param>
+    void SelectBoxUsbDrive(string strDiveName)
+    {
+        CLog.Here().Information($"SelectBoxUsbDrive - Selected: [{strDiveName}]");
+
+        strCurSelDriveName = strDiveName;
+
+        selectGPKIItemClean();
+
+        LocationSelect("usb");
+
+        StateHasChanged();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public void InitDriveList()
+    {
+        driveList.Clear();
+
+        string strOSDrive = Path.GetPathRoot(Environment.SystemDirectory);
+        var dList = DriveInfo.GetDrives();
+        foreach (DriveInfo drive in dList)
+        {
+            if (drive.Name.Equals(strOSDrive))
+                continue;
+            driveList.Add(drive.Name.Substring(0, drive.Name.Length - 1));
+        }
+
+        if (driveList.Count > 0)
+            strCurUsbDriveName = driveList[0];
     }
 
 
