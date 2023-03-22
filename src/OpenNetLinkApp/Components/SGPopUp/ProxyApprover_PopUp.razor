@@ -8,6 +8,7 @@
 @using HsNetWorkSG
 @using HsNetWorkSGData;
 @using System.Reflection;
+@using OpenNetLinkApp.Common;
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -48,7 +49,8 @@
                                     <tbody>
                                         @foreach (ApproverInfo item in ProxySearch)
                                         {
-                                            <tr name="trItem4" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq">
+                                            <tr name="trItem4" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq" @onclick="()=>searchClickItemList(item)" 
+                                                style="background-color :@((stSearchSelect ==item.UserSeq) ? CsDefinition.RowSeletedBackColor: CsDefinition.RowDefaultBackColor); color : @((stSearchSelect ==item.UserSeq) ? CsDefinition.RowSeletedForeColor: CsDefinition.RowDefaultForeColor)">
                                                 <td style="text-align:left;">@item.DeptName</td>
                                                 <td style="text-align:center;">@item.Grade</td>
                                                 <td style="text-align:center;">@item.Name</td>
@@ -95,7 +97,8 @@
                                 <tbody>
                                     @foreach (ApproverInfo item in ProxySelect)
                                     {
-                                        <tr name="trSelect4" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.ORDER">
+                                        <tr name="trSelect4" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.ORDER" @onclick="()=>targetClickItemList(item)" 
+                                            style="background-color :@((stTargetSelect ==item.UserSeq) ? CsDefinition.RowSeletedBackColor: CsDefinition.RowDefaultBackColor); color : @((stTargetSelect ==item.UserSeq) ? CsDefinition.RowSeletedForeColor: CsDefinition.RowDefaultForeColor)">
                                             <td style="text-align:center;">@item.ORDER</td>
                                             <td style="text-align:left;">@item.APPR_TEAMNAME</td>
                                             <td style="text-align:center;">@item.RANK</td>
@@ -135,7 +138,7 @@
     private LinkedList<ApproverInfo> ProxySearch = new LinkedList<ApproverInfo>();   //좌측 검색결과
     private List<ApproverInfo> ProxySelect = new List<ApproverInfo>();
 
-    private string stSelectProxy = "";
+    private string stSearchSelect = "";
     private string stTargetSelect = "";
     private static Action<string> actionAssign;
     private static Action<string> actionTargetSelect;
@@ -200,7 +203,7 @@
 
     private void SGDeptTreeList_OnItemDoubleClick(ApproverInfo doubleClickInfo)
     {
-        stSelectProxy = doubleClickInfo.UserSeq;
+        stSearchSelect = doubleClickInfo.UserSeq;
         AddSelectApprover();
     }
 
@@ -213,10 +216,10 @@
         }
 
 
-        if (stSelectProxy.Length < 1)
+        if (stSearchSelect.Length < 1)
             return;
 
-        ApproverInfo apv = ProxySearch.FirstOrDefault(x => x.UserSeq == stSelectProxy);
+        ApproverInfo apv = ProxySearch.FirstOrDefault(x => x.UserSeq == stSearchSelect);
 
         if (apv != null)
         {
@@ -292,7 +295,7 @@
         if (String.IsNullOrEmpty(stTargetSelect))
             return;
 
-        ApproverInfo apvTarget = ProxySelect.FirstOrDefault(x => x.ORDER == Convert.ToInt32(stTargetSelect));
+        ApproverInfo apvTarget = ProxySelect.FirstOrDefault(x => x.UserSeq == stTargetSelect);
         if (apvTarget != null)
         {
             ProxySelect.Remove(apvTarget);
@@ -548,26 +551,26 @@
         actionTargetSelect = SelectTarget;
     }
 
-    [JSInvokable("ProxyTargetSelect")]
-    public static void ProxyTargetSelect(string value)
-    {
-        actionTargetSelect.Invoke(value);
-    }
+    //[JSInvokable("ProxyTargetSelect")]
+    //public static void ProxyTargetSelect(string value)
+    //{
+    //    actionTargetSelect.Invoke(value);
+    //}
     private void SelectTarget(string value)
     {
         stTargetSelect = value;
         StateHasChanged();
     }
 
-    [JSInvokable("ProxySearchSelect")]
-    public static void ProxySearchSelect(string value)
-    {
-        actionAssign.Invoke(value);
-    }
+    //[JSInvokable("ProxySearchSelect")]
+    //public static void ProxySearchSelect(string value)
+    //{
+    //    actionAssign.Invoke(value);
+    //}
 
     private void AssignProxy(string value)
     {
-        stSelectProxy = value;
+        stSearchSelect = value;
         StateHasChanged();
     }
     private void ShowMessage(string strType, string strMsg)
@@ -578,4 +581,39 @@
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
+    DateTime searchClickterval = DateTime.Now;
+    string searchClicklastIndex = "";
+    void searchClickItemList(ApproverInfo selectedItem)
+    {
+        DateTime now = DateTime.Now;
+
+        if (searchClickterval.AddMilliseconds(CsDefinition.DoubleClickMaxTime) <= now || searchClicklastIndex != selectedItem.Index)    //일반클릭
+            searchClickterval = now;
+        else
+        {
+            //더블클릭
+            searchClickterval = now.AddSeconds(-10);     //이후 3번클릭은 더블클릭 되지 않도록
+            AddSelectApprover();
+        }
+        stSearchSelect = selectedItem.UserSeq;
+        searchClicklastIndex = selectedItem.Index;
+    }
+
+    DateTime targetClickterval = DateTime.Now;
+    string targetClicklastIndex = "";
+    void targetClickItemList(ApproverInfo selectedItem)
+    {
+        DateTime now = DateTime.Now;
+
+        if (targetClickterval.AddMilliseconds(CsDefinition.DoubleClickMaxTime) <= now || targetClicklastIndex != selectedItem.Index)    //일반클릭            
+            targetClickterval = now;        
+        else    
+        {       
+            //더블클릭
+            targetClickterval = now.AddSeconds(-10);     //이후 3번클릭은 더블클릭 되지 않도록
+            RemoveAssignApprover();
+        }
+        stTargetSelect = selectedItem.UserSeq;
+        targetClicklastIndex = selectedItem.Index;
+    }
 }
