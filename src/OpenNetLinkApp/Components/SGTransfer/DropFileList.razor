@@ -1188,8 +1188,8 @@
 
                 if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID)  && isUserNeedApproveExtUI())
                 {
-                    SGLoginData sgLoginData = null;
-                    sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                    //SGLoginData sgLoginData = null;
+                    //sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
 
                     if (sgLoginData != null && CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
                         hsStream.isNeedApprove = true;
@@ -1261,7 +1261,7 @@
                 hsStream.MemoryType = HsStreamType.MemoryStream;
                 hsStream.stream = null;
                 hsStream.isNeedApprove = false;
-                if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isUserNeedApproveExtUI())
+                if (SGAppMgrSvc.SiteConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI())
                 {
                     if (sgLoginData != null && CsFunction.isFileExtinListStr(false, fileInfo.Name, sgLoginData.GetExceptionExt()))
                         hsStream.isNeedApprove = true;
