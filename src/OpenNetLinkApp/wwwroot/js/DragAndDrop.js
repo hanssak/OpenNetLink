@@ -649,8 +649,12 @@ window.closeProgressMessage = (id) => {
     /*$("#" + id).parent().parent().find("[type='button']").trigger("click");*/
     $("#left-sidebar").css("z-index", 1101);
     $("#main-nav").css("z-index", 1100);
-    $("#DownloadProgress").modal("hide");
-    $("#downProgressRate").css("width", "1%");
+
+    //간헐적으로 hide 안되는 현상이 발생하여, js 자체 Fadeout 후 Hide 하도록 변경
+    $("#DownloadProgress").fadeOut(500, function () {
+        $("#DownloadProgress").modal("hide");
+        $("#downProgressRate").css("width", "1%");
+    });    
 }
 
 window.updateProgressMessage = (id, message, progress) => {
