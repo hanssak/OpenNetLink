@@ -568,6 +568,8 @@
 
         string strTitle = strBindTitle;
         string strContents = strBindDesc;
+
+        // 최대길이 Check 동작
         if (!strBindTitle.Equals(""))
         {
             if (Encoding.UTF8.GetByteCount(strBindTitle) > 250)
@@ -589,6 +591,33 @@
                 ShowMessage("warn", strMsg);
                 strBindTitle = "";
                 strBindDesc = "";
+                StateHasChanged();
+                return;
+            }
+        }
+
+	// 최소길이 체크 동작
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc())
+        {
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+                return;
+
+            string strLength = sgLoginData.GetTitleMinLength();
+            int nLength = Convert.ToInt32(strLength);
+            if ((strBindTitle?.Length ?? 0) < nLength)
+            {                 
+                ShowMessage("warning", string.Format(XmlConf.GetWarnMsg("W_0290"), nLength));
+                StateHasChanged();
+                return;
+            }
+
+            strLength = sgLoginData.GetDescMinLength();
+            nLength = Convert.ToInt32(strLength);
+            if ((strBindDesc?.Length ?? 0) < nLength)
+            {                 
+                ShowMessage("warning", string.Format(XmlConf.GetWarnMsg("W_0291"), nLength));
                 StateHasChanged();
                 return;
             }
