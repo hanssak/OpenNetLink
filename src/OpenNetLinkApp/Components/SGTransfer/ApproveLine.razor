@@ -58,7 +58,7 @@ else
     SGSettingsDBProc sgSettingProc;
     ISGUserInfoService sgUserSvr;
     ISGSiteConfigService siteConfig;
-  
+
     //결재단계 멤버변수 추가 0:AND 1:OR 2:AND+OR
     int m_step = 0;
 
@@ -98,11 +98,15 @@ else
 
                     string strUserSeq = sgUserData.GetUserSequence();
 
+                    SGLoginData sgLoginData= (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                    int approveStep = (sgLoginData != null) ? sgLoginData.GetApproveStep() : 0;
+
                     SGApprLineData sgApprLineData = null;
                     sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+
                     if (sgApprLineData != null)
                     {
-                        bApprLineExist = sgApprLineData.LocalLoadANDApprLineData(strApprLine, strUserSeq);
+                        bApprLineExist = sgApprLineData.LocalLoadANDApprLineData(strApprLine, strUserSeq, approveStep);
                         if (!bApprLineExist)
                             InitApproveLine();
                     }
@@ -266,7 +270,7 @@ else
             return;
         int step = sgLoginData.GetApproveStep();
 
-      ISGUserInfo sgUserInfo =   sgUserSvr.GetUserInfo(groupID);
+        ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupID);
 
         m_step = step;
 

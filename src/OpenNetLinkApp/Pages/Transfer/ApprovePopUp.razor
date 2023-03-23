@@ -9,6 +9,8 @@
 @using AgLogManager
 @using OpenNetLinkApp.PageEvent
 @using System.Runtime.InteropServices
+@using OpenNetLinkApp.Common
+
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HsCmdCenter
@@ -1029,14 +1031,33 @@ using (Process proc = Process.Start(startInfo))
         }
 
         // 확장자 종류로 Web으로 preview 할지 결정
-        string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp", "log" };
         string strExtName = Path.GetExtension(sFileName);
         strExtName = strExtName.Substring(1);
         if (strExtName.Equals(""))
             return true;
 
-        strExtName = strExtName.ToLower();
         bool bFind = false;
+
+#if true
+        
+        string strViewerExt = sgLoginData.GetPreViewerExt();
+        if ( (strViewerExt?.Length ?? 0) == 0)
+        { 
+            CLog.Here().Information($"ViewerExt : Empty!");
+            return false;
+        }
+
+        CLog.Here().Information($"ViewerExt : {strViewerExt}");
+
+        if (CsFunction.isFileExtinListStr(true, strExtName, strViewerExt))
+        {
+            bFind = true;
+        }
+
+#else
+        // 
+        string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp", "log" };
+        strExtName = strExtName.ToLower();
         for (int i = 0; i < strExt.Length; i++)
         {
             if (strExt[i].Equals(strExtName))
@@ -1045,6 +1066,7 @@ using (Process proc = Process.Start(startInfo))
                 break;
             }
         }
+#endif
 
         if (!bFind)
         {

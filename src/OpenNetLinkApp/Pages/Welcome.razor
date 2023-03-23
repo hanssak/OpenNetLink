@@ -2,6 +2,7 @@
 @page "/Welcome"
 
 @using Microsoft.JSInterop
+@using OpenNetLinkApp.Common
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery
@@ -21,6 +22,7 @@
 @inject HSCmdCenter HsCmdCenter
 @inject PageStatusService pageService
 @inject WebWindow Window
+@inject ISGAppUpdaterService AppUpdaterSvc;
 @*<div class="content-wrapper" style="background:url('/images/adminlte/main_tbg.png') no-repeat right top #f4f6f9;">*@
 
 <section class="content1" style="padding-top:5px !important;background:url('/images/adminlte/main_tbg.png') no-repeat right top #f4f6f9; ">
@@ -78,7 +80,7 @@
                             {
                                 <tr>
                                     <th>@XmlConf.GetTitle("T_DASH_PWPERIOD_DATE")</th> <!--패스워드 유효기간 -->
-                                    <td>@strPWChgDate</td>
+                                <td>@strPWChgDate</td>
                                 </tr>
                             }
                             <tr>
@@ -131,7 +133,7 @@
                                 {
                                     <div class="progress-group text-left">
                                         <!-- 클립보드 용량-->
-                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
+                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
                                         <span class="float-right">
                                             <b>@nDayUseClipSize</b>/@(nDayMaxClipSize==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipSize.ToString())
                                         </span>
@@ -180,7 +182,7 @@
                                 {
                                     <div class="progress-group text-left">
                                         <!-- 클립보드 건수-->
-                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
+                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
                                         <span class="float-right">
                                             <b>@nDayUseClipCount</b>/@(nDayMaxClipCount==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipCount.ToString())
                                         </span>
@@ -417,7 +419,7 @@
                         <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transfer"))">
                             <div class="text-center"><img src="/images/adminlte/quick_01.png"></div>
                             <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_FILESEND")</font>  <!--파일전송-->
-                        </button>
+                    </button>
                     }
 
                     <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transManage"))">
@@ -430,7 +432,7 @@
                         <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transferApprove"))">
                             <div class="text-center"><img src="/images/adminlte/quick_03.png"></div>
                             <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_APPROVEMANAGE")</font> <!--결재관리-->
-                        </button>
+                    </button>
                     }
 
                     <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/viewConf"))">
@@ -443,7 +445,7 @@
                         <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/netConf"))">
                             <div class="text-center"><img src="/images/adminlte/quick_05.png"></div>
                             <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_BASICSET_TITLE")</font> <!--기본설정-->
-                        </button>
+                    </button>
                     }
 
                 </div>
@@ -991,45 +993,6 @@
 
         int groupID = groupIDbyParam;
 
-        if (firstRender)
-        {
-
-            /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupID = 0;
-            if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*/
-
-            @*int groupID = groupIDbyParam;*@
-
-            SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-            if (sgLoginData == null)
-                return;
-
-            if (ClientPatch(sgLoginData))
-            {
-                string strSvrVersion = sgLoginData.GetServClientVersion();
-                refUpdate_PopUp.SetVersionText(strSvrVersion);
-                refUpdate_PopUp.SetType(0);
-                //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
-
-                if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
-                {
-                    ClientUpgradeExeEvent clientUpdateExe = null;
-                    clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
-                    if (clientUpdateExe != null)
-                        clientUpdateExe(groupID);
-                }
-                else
-                {
-                    await refUpdate_PopUp.openPopUp(groupID);
-                }
-
-                return;
-            }
-
-        }
-
         CLog.Here().Information($"Welcome - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
 
         // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
@@ -1037,12 +1000,9 @@
         {
             nDrawPageGroupID = groupIDbyParam;
             //strCurrentSeedKey = HsCmdCenter.GetSeedKey(groupIDbyParam);
-
-            @*int groupID = groupIDbyParam;*@
-
             SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupIDbyParam);
-            if (sgLoginData == null)
-                return;
+            if (sgLoginData == null) return;
+
             bUseClipBoard = sgLoginData.GetClipboard();
 
             HsCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
@@ -1070,10 +1030,10 @@
             HsCmdCenter.SetFileRecvPossible(groupID, true);
 
             // 수신 경로 변경은 기본 Page가 바뀔수 있으므로 Main, PopupLogin 쪽으로 이전
-             @*HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
-            SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정*@
+            @*HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
+                SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정*@
 
-    GetNetOverModeData(groupID);
+            GetNetOverModeData(groupID);
 
             SetQuickMenuModify(groupID);
 
@@ -1105,9 +1065,9 @@
 
             StateHasChanged();
 
-
             CheckContinueFileUpload();
-
+            
+            CheckClientPatch(sgLoginData, groupID);
         }
 
         pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);          //매일 자정 데이터 새로고침
@@ -2126,43 +2086,59 @@
     }
 
     /// <summary>
-    ///
+    /// Server와 Local의 Client version 버전 비교 후 자동 업데이트 (PATCHMODE= 1 일때 기능함)
     /// </summary>
     /// <param name="sgLoginData"></param>
     /// <returns></returns>
-    public bool ClientPatch(SGLoginData sgLoginData)
+    public void CheckClientPatch(SGLoginData sgLoginData, int groupID)
     {
         //return false;
         if (sgLoginData == null)
-            return false;
-        bool bUpdate = sgLoginData.GetClientUpgrade();
-        if (!bUpdate)
-            return false;
+            return;
+        if (!sgLoginData.GetClientUpgrade())
+            return;
 
-        string strSvrCliVersion = sgLoginData.GetServClientVersion();
+        //PATCHMODE가 1 일때, 서버에 업데이트 대기중인 버전 정보가 반환됨
+        string strSvrCliVersion = sgLoginData.GetServClientVersion().ToUpper();
+
         if (strSvrCliVersion.Equals(""))
-            return false;
-        strSvrCliVersion = strSvrCliVersion.ToUpper();
-        CLog.Here().Information("DashBoard Server Client Version {0}", strSvrCliVersion);
+            return;
 
-        string strCliVersion = HsCmdCenter.GetCliVersion();
+        CLog.Here().Information("groupID : {0} - DashBoard Server Client Version {1}", groupID, strSvrCliVersion);
+
+        string strCliVersion = HsCmdCenter.GetCliVersion().ToUpper();
+
         if (strCliVersion.Equals(""))
-            return false;
-        strCliVersion = strCliVersion.ToUpper();
+            return;
 
-        CLog.Here().Information("WelCome Server Client Version {0}", strSvrCliVersion);
-        CLog.Here().Information("WelCome Local Client Version {0}", strCliVersion);
 
-        return versionConfigSvc.isUpperVersion(strSvrCliVersion, strCliVersion);
+        if (!versionConfigSvc.isUpperVersion(strSvrCliVersion, strCliVersion))
+            return;
 
-        //if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-        //{
-        //    return true;
-        //}
-        //else
-        //    return false;
+        CLog.Here().Information("groupID : {0} - WelCome Server Client Version {1}", groupID, strSvrCliVersion);
+        CLog.Here().Information("groupID : {0} - WelCome Local Client Version {1}", groupID, strCliVersion);
 
-    }
+        //업데이트  진행중이면 SKIP 하도록 처리 (KYH)
+        (Enums.UpdateStatusType status, int groupId) nowUpdateInfo = AppUpdaterSvc.GetNowUpdateInfo();
+        if (nowUpdateInfo.status != Enums.UpdateStatusType.NONE && nowUpdateInfo.groupId > -1)
+        {
+            CLog.Here().Information($"nowUpdateInfo.groupId : {groupID} - Update Already Started By GroupID[{nowUpdateInfo.groupId}] / Status[{nowUpdateInfo.status.ToString()}]");
+            return;
+        }
+
+        //다른망에 Update Cancel 중이면 SKIP
+        if (AppUpdaterSvc.IsCancelRequested)
+        {
+            CLog.Here().Information($"groupId : {groupID} SKIP - Update Canceling...");
+            return;
+        }
+
+        //ForceUpdate와 상관없이, PatchMode가 1이면 무조건 강제 업데이트 처리
+        ClientUpgradeExeEvent clientUpdateExe = null;
+        clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
+        if (clientUpdateExe != null)
+            clientUpdateExe(groupID, true);
+        }
 
 
     /// <summary>

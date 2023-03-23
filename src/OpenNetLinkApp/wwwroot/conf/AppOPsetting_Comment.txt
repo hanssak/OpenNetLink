@@ -198,3 +198,7 @@ bUseFileApproveReason: 파일 전송 승인시 승인사유 입력 여부
 bUseClipBoardApproveReason : 클립보드 전송 승인시 승인 사유 입력 여부
 
 bUseFileSelectDelete : 파일 선택 삭제 사용 유무
+
+bUseCrossPlatformOSforFileName : 파일이름에 OS간에 사용할수 없는 문자 들어간거 차단하는기능 사용유무(Linux 간에만 사용한다든지 할때는 false 해도 무관)
+
+

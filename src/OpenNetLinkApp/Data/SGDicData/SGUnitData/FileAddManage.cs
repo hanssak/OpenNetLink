@@ -82,6 +82,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         eFA_FILE_READ_ERROR,    //파일읽기 권한오류 - @@@ NetLink에 없는거(1)
 
+        eFA_FILE_NAME_ERROR,    // 파일이름 윈도우에 지원하지 않는 문자 - @@@ NetLink에 없는거(2)
+
         /// <summary>
         /// 일일 전송 횟수 제한
         /// </summary>
@@ -102,6 +104,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eUnZipInnerExtUnknown,                  // zip파일에 내부B의 zip 알수 없는 파일형식 포함
         eUnZipInnerFileEmpty,                   // zip파일에 내부의 zip 비어있는 파일
         eUnZipInnerLengthOver,                  // zip파일에 내부의 zip Length Over
+        eUnZipInnerFileName,                    // zip파일에 파일이름 윈도우에 지원하지 않는 문자 - @@@ NetLink에 없는거(3)
+
         /// <summary>
         /// zip파일검사 후 남아 있는 zip포함
         /// </summary>
@@ -405,6 +409,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strMsg = String.Format(strMsg, strFileName);
                     break;
 
+                case eFileAddErr.eFA_FILE_NAME_ERROR:
+                    strMsg = xmlConf.GetErrMsg("E_0258");                      // {0} 파일에 지원하지 않는 문자가 있습니다.
+                    strMsg = String.Format(strMsg, strFileName);
+                    break;
+
                 // 51 ~ 52
                 case eFileAddErr.eFADAYCOUNTOVER:
                     strMsg = xmlConf.GetWarnMsg("W_0181");                      // 일일 전송 횟수를 초과하였습니다.
@@ -515,16 +524,25 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool bEmptyFIleNoCheck = false;
 
         /// <summary>
-        /// OLE개체 및 압축형식 검사가 필요한 문서 확장자 대상 목록
+        /// Folder / 파일 이름에 지원하지 않는 문자 들어있는지 체크
+        /// true : 체크함(기본), false : 미체크
+        /// </summary>
+        public bool bUseCrossPlatformOSforFileName = true;
+
+
+        /// <summary>
+        /// OLE개체 및 압축형식 검사가 필요한 문서 확장자 대상 목록 (보통)
         /// <para>"ODT", "DOC", "DOCM", "DOCX", "DOT", "DOTM", "DOTX", "RTF"</para>
         /// <para>"XLS", "XLSB", "XLSM", "XLSX", "XLT", "XLTM", "XLTX", "XLW"</para>
         /// <para>"POT", "PPT", "POTM", "POTX", "PPS", "PPSM", "PPSX", "PPTM", "PPTX"</para>
         /// <para>"HWP", "HWPX"</para>
         /// </summary>
-        private readonly List<string> ListCheckableDocumentExtension = new List<string>() { "ODT", "ODS", "ODP", "DOC", "DOCM", "DOCX", "DOT", "DOTM", "DOTX", "RTF"
+        public List<string> ListCheckableDocumentExtension = new List<string>() { "ODT", "ODS", "ODP", "DOC", "DOCM", "DOCX", "DOT", "DOTM", "DOTX", "RTF"
                                             , "XLS", "XLSB", "XLSM", "XLSX", "XLT", "XLTM", "XLTX", "XLW"
                                             , "POT", "PPT", "POTM", "POTX", "PPS", "PPSM", "PPSX", "PPTM", "PPTX"
                                             , "HML", "HWP", "HWPX"};
+        //public List<string> ListCheckableDocumentExtension = new List<string>();
+
 
         /// <summary>
         /// 압축형식 내부검사가 필요한 파일 확장자 대상 목록
@@ -653,14 +671,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string relativePath = Path.GetRelativePath(parentFile.FilePath, childInfo.FullName);
             string[] dirDivide = relativePath.Split(Path.DirectorySeparatorChar);
 
-            if(dirDivide.Length <=1)    //바로 하위 디렉토리인 경우, Tree 바로 구성하여 반환
+            if (dirDivide.Length <= 1)    //바로 하위 디렉토리인 경우, Tree 바로 구성하여 반환
                 return parentFile.CreateChildren(childInfo.Name, childInfo.FullName, parentFile.FileName);
 
             //이후 경로가 존재할 경우 child 로 지정 후 재귀호출
             string childDirName = dirDivide[0];
             FileAddErr childDir = parentFile.ChildrenFiles?.Find(ch => ch.FileName == childDirName);
 
-            if(childDir == null)
+            if (childDir == null)
                 childDir = parentFile.CreateChildren(childDirName, Path.Combine(parentFile.FilePath, childDirName), parentFile.FileName);
 
             return SetFileTreeFromFilePath(childDir, childInfo);
@@ -674,6 +692,32 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         //    Log.Information("[AddData] Cheked to Error[{Err}] File[{CurZipFile}] in {OrgZipFile}", err, strFilename, strFilePath);
         //}
+
+
+        public void SetOleExtractExtData(string strData)
+        {
+            if ((strData?.Length ?? 0) < 1)
+            {
+                Log.Logger.Here().Error($"SetOleExtractExtData, input Error - 0 size input!");
+                return;
+            }
+
+            if (strData == ";")
+            {
+                Log.Logger.Here().Error($"SetOleExtractExtData, input Error - Empty$ input!");
+                return;
+            }
+
+            string[] listItem = strData.Split(';');
+            if ((listItem?.Length ?? 0) < 1)
+            {
+                Log.Logger.Here().Error($"SetOleExtractExtData, input Error - file Ext : {strData}");
+                return;
+            }
+
+            ListCheckableDocumentExtension.Clear();
+            ListCheckableDocumentExtension.InsertRange(0, listItem);
+        }
 
         public void DataClear()
         {
@@ -808,6 +852,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 case eFileAddErr.eFAUnZipCheckStop:                                //UnZip 체크 중단
                     str = xmlConf.GetTitle("T_eUNZIP_CHECK_STOP");                 // 압축파일 검사취소
                     break;
+
+                case eFileAddErr.eFA_FILE_NAME_ERROR:
+                    str = xmlConf.GetTitle("T_eFA_FILENAME_CHAR_ERR");                 // 파일이름에 지원하지 않는문자 있음
+                    break;
+
                 case eFileAddErr.eFADAYCOUNTOVER:                                // 일일 전송횟수 제한.
                     /* TODO */
                     str = xmlConf.GetTitle("T_INFO_ONEDAY_TRANCE_COUNTLIMIT");
@@ -1490,6 +1539,28 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return true;
         }
 
+        public bool GetFileNameEnable(string strFileNamePath)
+        {
+
+            string strNotSupportCharData = "";
+
+            string[] ListParsedData = strFileNamePath.Split("/");
+            if ((ListParsedData?.Count() ?? 0) > 0)
+            {
+                int nCount = ListParsedData.Count();
+                foreach(string strItem in ListParsedData)
+                {
+                    if (CsFileFunc.isSupportFileName(strItem, out strNotSupportCharData, false) == false)
+                    {
+                        Log.Logger.Here().Information($"GetFileNameEnable(#####), Not Support Char : {strNotSupportCharData}, in FileName : {strItem}");
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         public bool GetCountEnable(int nStandardCount, int nRegCount)
         {
             int nAddedTotalCount = m_nTransCurCount + nRegCount;
@@ -1739,11 +1810,31 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             //파일 전송 시 체크했던 제한 사항을 파일 등록 시 체크하도록 추가(1회 파일갯수,일일 전송사이즈, 일일 전송횟수) by 2022.08.19 KYH
 
             //1회 전송가능 용량 제한
-            bSizeEnable = GetSizeEnable(ConvEnableSize, RegSize);       //1회 전송가능 용량 제한
-            if (!bSizeEnable)
+            if (hsStream.IsDir)
+                bSizeEnable = true;
+            else
             {
-                currentFile.eErrType = eFileAddErr.eFAFileSize;
-                return false;
+                bSizeEnable = GetSizeEnable(ConvEnableSize, RegSize);       //1회 전송가능 용량 제한
+                if (!bSizeEnable)
+                {
+                    currentFile.eErrType = eFileAddErr.eFAFileSize;
+                    return false;
+                }
+            }
+
+            // 파일이름에 지원하지 않는 문자 있는지 확인
+            if (bUseCrossPlatformOSforFileName)
+            {
+                string strTempPath = hsStream.RelativePath;
+                if ((strTempPath?.Length ?? 0) > 0)
+                {
+                    strTempPath = strTempPath.Replace("\\", "/");
+                    if (GetFileNameEnable(strTempPath) == false)
+                    {
+                        currentFile.eErrType = eFileAddErr.eFA_FILE_NAME_ERROR;
+                        return false;
+                    }
+                }
             }
 
             //1회 전송가능 파일 갯수
@@ -1763,21 +1854,31 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 
             //일일 전송가능 용량 제한
-            bDaySizeEnable = GetDaySizeEnable(FileTransMaxSize, RemainFileTransSize, RegSize);
-            if (!bDaySizeEnable)
+            if (hsStream.IsDir)
+                bDaySizeEnable = true;
+            else
             {
-                currentFile.eErrType = eFileAddErr.eFADAYSIZEOVER;
-                return false;
+                bDaySizeEnable = GetDaySizeEnable(FileTransMaxSize, RemainFileTransSize, RegSize);
+                if (!bDaySizeEnable)
+                {
+                    currentFile.eErrType = eFileAddErr.eFADAYSIZEOVER;
+                    return false;
+                }
             }
 
             Log.Logger.Here().Information($"### - GetExamFileAddEnable, BlackWhite : {(bWhite ? "WHITE!" : "BLACK!")}, FileExtInfo : {strFileExtInfo}, FileExt : {hsStream.Type}");
 
             //black, white 리스트 체크
-            bExtEnable = GetRegExtEnable(bWhite, strFileExtInfo, hsStream.Type);
-            if (!bExtEnable)
+            if (hsStream.IsDir)
+                bExtEnable = true;
+            else
             {
-                currentFile.eErrType = eFileAddErr.eFAEXT;
-                return false;
+                bExtEnable = GetRegExtEnable(bWhite, strFileExtInfo, hsStream.Type);
+                if (!bExtEnable)
+                {
+                    currentFile.eErrType = eFileAddErr.eFAEXT;
+                    return false;
+                }
             }
 
             //숨김파일 체크
@@ -1805,15 +1906,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                                 : eFileAddErr.eFA_LONG_PATH_FILEORPATH;     //파일 및 폴더명 길이 초과
                 return false;
             }
-            
-            Log.Logger.Here().Information($"###################### - 파일이름 : {hsStream.FileName}, 파일크기 : {hsStream.Size} - ######################");
+
+            Log.Logger.Here().Information($"### - 파일이름 : {hsStream.FileName}, 파일크기 : {hsStream.Size}, 종류 : {(hsStream.IsDir?"폴더":"파일")} - ###");
 
             //빈파일 체크 (0kb 허용)
-            bEmpty = (bEmptyFIleNoCheck || GetEmptyEnable(hsStream.Size));//GetRegFileEmptyEnable(hsStream.Size);
-            if (!bEmpty)
+            if (hsStream.IsDir)
+                bEmpty = true;
+            else
             {
-                currentFile.eErrType = eFileAddErr.eFAEMPTY;
-                return false;
+                bEmpty = (bEmptyFIleNoCheck || GetEmptyEnable(hsStream.Size));//GetRegFileEmptyEnable(hsStream.Size);
+                if (!bEmpty)
+                {
+                    currentFile.eErrType = eFileAddErr.eFAEMPTY;
+                    return false;
+                }
             }
 
             bool bRet = (bExtEnable & bHiddenEnable & bFilePathEnable & bFileFolderNameEnable & bEmpty);
@@ -1995,7 +2101,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool GetReasonAndDisplayOfErrSource(out List<(string reason, string count)> ListReason, out List<FileAddErr> ListDisaplayErrSource)
         {
             m_FileAddErrReason.Clear();
-            FileAddErr fileAddErr = new FileAddErr();
+            //FileAddErr fileAddErr = new FileAddErr();
+
             Dictionary<eFileAddErr, int> fileAddErrReason = new Dictionary<eFileAddErr, int>();
 
             bool hasErr = getReasonAndDisplaySource(m_FileAddErrList, ref fileAddErrReason);
@@ -2013,6 +2120,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             ListDisaplayErrSource = m_FileAddErrList.FindAll(file => file.eErrType != eFileAddErr.eFANone || file.HasChildrenErr);
             return hasErr;
         }
+
         /// <summary>
         /// 하위 폴더,파일들까지 Reason 세팅 및 에러 존재 여부(HasChildren 세팅
         /// </summary>
@@ -2021,6 +2129,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         private bool getReasonAndDisplaySource(List<FileAddErr> getFileAddErrList, ref Dictionary<eFileAddErr, int> getFileAddErrReason)
         {
             bool includeErr = false;
+
             foreach (FileAddErr err in getFileAddErrList)
             {
                 if (err.eErrType != eFileAddErr.eFANone)
@@ -2041,6 +2150,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     includeErr = includeErr || hasChildrenErr;
                 }
             }
+
             return includeErr;
         }
 
@@ -3118,6 +3228,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 return temp;
             }
+
         }
 
         /// <summary>
@@ -3166,6 +3277,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return (bIsExtForFileByteData ? eFileAddErr.eFANone : eFileAddErr.eFACHG);
         }
 
+        /// <summary>
+        /// 마임체크 및 위변조
+        /// </summary>
+        /// <param name="strFile"></param>
+        /// <param name="strExt"></param>
+        /// <param name="blAllowDRM"></param>
+        /// <returns></returns>
         public eFileAddErr IsValidFileExtInnerZip(string strFile, string strExt, bool blAllowDRM)
         {
             var fsStream = new FileStream(strFile, FileMode.Open, FileAccess.Read);
@@ -4224,11 +4342,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="SGFileExamEvent">압축해제 및 분석 진행상황 UI쪽에 전달하는데 사용되는 함수</param>
         /// <param name="ExamCount">사용자가 추가해서 내부검사해야되는 ZIP 파일 Index</param>
         /// <param name="TotalCount">사용자가 추가해서 내부검사해야되는 ZIP 파일개수 </param>
+        /// <param name="documentExtractType">ZIP 파일 내부의 문서검사여부 옵션값</param>
         /// <param name="nMaxDepth"> CLIENT_ZIP_DEPTH의 1번값(3: ZIP 파일 내부에 ZIP이 발견되면 3depth 까지 해제함) </param>
         /// <param name="nOption">CLIENT_ZIP_DEPTH의 2번값(0: 1번째 zip depth에 또 zip이 발견되면 차단, 1 : 허용)</param>
         /// <param name="blAllowDRM"> drm 파일 허용유무(true:허용)</param>
         /// <returns></returns>
-        public async Task<int> CheckZipFile(HsStream hsStream, FileAddErr currentFile, bool bDenyPasswordZIP, bool blWhite, string strExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true, string strApproveExt = "")
+        public async Task<int> CheckZipFile(HsStream hsStream, FileAddErr currentFile, bool bDenyPasswordZIP, bool blWhite, string strExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, string documentExtractType, int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true, string strApproveExt = "")
         {
             int nTotalErrCount = 0;
             eFileAddErr enRet;
@@ -4260,10 +4379,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (!dirZipBase.Exists)
                 dirZipBase.Create();
 
-            Log.Logger.Here().Information("[CheckZipFile] ZipFile[{0}] Ext[WhiteF({1})-Info({2})] ZipCheck[MaxDepth({3})-BlockOption({4})] AllowDrmF[{5}]",
-                 Path.GetFileName(hsStream.FileName), blWhite, strExtInfo, nMaxDepth, nOption, blAllowDRM);
+            Log.Logger.Here().Information("[CheckZipFile] ZipFile[{0}] Ext[WhiteF({1})-Info({2})] ZipCheck[MaxDepth({3})-BlockOption({4})] AllowDrmF[{5}] OLECheck[{6}]",
+                 Path.GetFileName(hsStream.FileName), blWhite, strExtInfo, nMaxDepth, nOption, blAllowDRM, documentExtractType);
 
             bool bIsApproveExt = false;
+
+            DocumentExtractType documentExtract = DocumentExtractType.NONE;
+            if (!Enum.TryParse(documentExtractType, out documentExtract)) documentExtract = DocumentExtractType.NONE;
 
             // Zip File Temp쪽에 Copy 및 Scan 
             using (var fileStream = new FileStream(strZipFile, FileMode.Create, FileAccess.Write))
@@ -4272,7 +4394,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 fileStream.Close();
 
                 enRet = ScanZipFile(currentFile, strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, nOption, 1, blWhite, strExtInfo, 0, hsStream.Type.ToUpper(),
-                    out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, bDenyPasswordZIP);
+                    out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtract, bDenyPasswordZIP);
 
                 // KKW
                 /*if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
@@ -4285,15 +4407,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 try
                 {
-                    Directory.Delete(strExtractTempZipPath, true);
+                    if (Directory.Exists(strExtractTempZipPath))
+                        Directory.Delete(strExtractTempZipPath, true);
+                    
+                    fiZipFile = new FileInfo(strZipFile);
+                    fiZipFile.Delete();
                 }
                 catch (System.Exception err)
                 {
                     Log.Logger.Here().Warning("[CheckZipFile] Directory.Delete() " + err.Message + " " + err.GetType().FullName);
                 }
 
-                fiZipFile = new FileInfo(strZipFile);
-                fiZipFile.Delete();
+             
             }
 
             stStream.Position = 0;
@@ -4323,10 +4448,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="SGFileExamEvent"></param>
         /// <param name="ExamCount"></param>
         /// <param name="TotalCount"></param>
+        /// <param name="documentExtractType">ZIP 파일 내부의 문서검사여부 옵션값</param>
         /// <param name="bZipPasswdCheck"></param>
         /// <returns></returns>
         public eFileAddErr ScanZipFile(FileAddErr currentFile, string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nBlockOption, int nCurDepth,
-            bool blWhite, string strExtInfo, int nErrCount, string strExtType, out int nTotalErrCount, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = true)
+            bool blWhite, string strExtInfo, int nErrCount, string strExtType, out int nTotalErrCount, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, DocumentExtractType documentExtractType, bool bZipPasswdCheck = true)
         {
             bIsApproveExt = false;
             eFileAddErr enErr = eFileAddErr.eFANone;
@@ -4340,10 +4466,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 FileInfo scanFileInfo = new FileInfo(strZipFile);
                 DirectoryInfo dirUnzipFilesDir = null;
 
+                string strTempUnzipDirPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(strZipFile)); //Temp에 Copy된 문서의 압축해제 개체를 보관할 폴더 (Temp/ZipExtract/ZipName)
                 //스캔대상이 파일인 경우만 압축 해제 시도
-                if (scanFileInfo.Attributes != FileAttributes.Directory)
+                if (!scanFileInfo.Attributes.HasFlag(FileAttributes.Directory))
                 {
-                    string strTempUnzipDirPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(strZipFile)); //Temp에 Copy된 문서의 압축해제 개체를 보관할 폴더 (Temp/ZipExtract/ZipName)
                     dirUnzipFilesDir = new DirectoryInfo(strTempUnzipDirPath);
                     if (dirUnzipFilesDir.Exists != true) dirUnzipFilesDir.Create();
 
@@ -4390,11 +4516,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         continue;
                     }
 
-                    if (extractFile.Attributes == FileAttributes.Directory)
+                    if (extractFile.Attributes.HasFlag(FileAttributes.Directory))
                     {
                         //디렉토리는 내부 항목 검사
                         eFileAddErr enRetDir = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, extractFile.FullName, Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.Name)), nMaxDepth, nBlockOption, nCurDepth,
-                                                            blWhite, strExtInfo, nCurErrCount, "", out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
+                                                            blWhite, strExtInfo, nCurErrCount, "", out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtractType);
 
                         if (enRetDir != eFileAddErr.eFANone) enErr = enRetDir;
                         if (childFile.HasChildrenErr) currentFile.HasChildrenErr = true;
@@ -4438,7 +4564,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     //});
 
                     // Check Changed File Extension 
-                    enErr = IsValidFileExtInnerZip(extractFile.FullName, strExt.Replace(".", ""), blAllowDRM);
+                    enErr = IsValidFileExtInnerZip(extractFile.FullName, strNoDotExt, blAllowDRM);
                     if (enErr != eFileAddErr.eFANone)
                     {
                         childFile.eErrType = enErr;
@@ -4446,6 +4572,39 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         nCurErrCount++;
                         //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
                         continue;
+                    }
+
+                    //ZIP파일 내부에 문서파일 인 경우 OLE 개체 검사
+                    //CheckDocumentFile()
+                    //압축해제한 파일의 Stream 필요
+                    //Check Document File (압축파일 내 문서검사할 파일이 존재하는 경우)
+                    if (ListCheckableDocumentExtension.Exists(ext => (string.Compare(ext,strNoDotExt,true) == 0)))
+                    {
+                        //압축 내부 문서의 압축해제 개체를 보관할 폴더 (Temp/ZipExtract/ZipName/Document_Extract)
+                        string strTempDocumentExtractDirPath = Path.Combine(strTempUnzipDirPath, "Document_Extract");
+                        int documentScanDepth = 1;               //OLE개체 검사 하위 범위 (0인 상태에서도 개체 검출 시 Block)
+
+                        //압축해제한 파일의 Stream 필요
+                        HsStream oleHsStream = null;
+
+
+                        using (Stream oleFileStream = File.OpenRead(extractFile.FullName))
+                        {
+                            oleHsStream = new HsStream() { stream = oleFileStream, FileName = extractFile.FullName, MemoryType = HsStreamType.FileStream };
+                            scanDocumentFile(oleHsStream, childFile, strTempDocumentExtractDirPath, blWhite, strExtInfo, documentScanDepth, documentExtractType).Wait();                            
+                        }
+
+                        if (childFile.eErrType != eFileAddErr.eFANone || childFile.HasChildrenErr)
+                        {
+                            childFile.eErrType = enErr;
+                            currentFile.HasChildrenErr = true;
+                            nCurErrCount++;
+                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
+                            continue;
+                        }
+
+
+
                     }
 
                     // 필수결재 확장자인지 확인
@@ -4483,7 +4642,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                                             //                    string strExtractPath = strExtractFilePath;//Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.));
 
                     eFileAddErr enRet = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, strCurZip, Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.Name)), nMaxDepth, nBlockOption, nCurDepth + 1,
-                        blWhite, strExtInfo, nCurErrCount, Path.GetExtension(extractFile.Name).Substring(1), out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
+                        blWhite, strExtInfo, nCurErrCount, Path.GetExtension(extractFile.Name).Substring(1), out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtractType);
 
                     if (enRet != eFileAddErr.eFANone) enErr = enRet;
                     if (childFile.HasChildrenErr) currentFile.HasChildrenErr = true;
@@ -4649,9 +4808,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     return 0;
 
                 // 검사가 필요한 확장자(문서) 체크
-                if (!ListCheckableDocumentExtension.Exists(ext => ext == hsStream.Type.ToUpper()))
+                //if (!ListCheckableDocumentExtension.Exists(ext => ext == hsStream.Type.ToUpper()))
+                if (!ListCheckableDocumentExtension.Exists(ext => (string.Compare(ext, hsStream.Type, true) == 0)))
                 {
-                    Log.Logger.Here().Information($"[CheckDocumentFile] No Check of {hsStream.Type.ToUpper()} File.");
+                    Log.Logger.Here().Information($"[CheckDocumentFile] No Check, Ext : {hsStream.Type.ToUpper()}, check CLIENT_OLE_EXTRACT_EXT !!!");
                     return 0;
                 }
 
@@ -4745,6 +4905,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             currentFile.OLEExtractorResult = extractorResult;
 
+
             if (extractorResult == 0)        //검출된 OLE 개체 없음 (정상처리)
                 return 0;
 
@@ -4801,12 +4962,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                 //추출 개체가 엑셀인 경우, 한번 더 검사 허용
                                 HsStream oleHsStream = new HsStream() { stream = oleFileStream, FileName = extractFile.FullName, MemoryType = HsStreamType.FileStream };
                                 int extractResult = await scanDocumentFile(oleHsStream, oleFile, strExtractFilePath, isWhite, fileFilterExtInfo, (scanDepth - 1), documentExtractType);
+
                                 if (extractResult != 0)
                                 {
                                     oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_MIME;
                                     currentFile.HasChildrenErr = true;
                                     continue;
                                 }
+
                             }
                             else
                             {
@@ -4836,13 +4999,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             currentFile.HasChildrenErr = true;
                             continue;
                         }
-
-                        //위변조 제한, 0KB 체크
-                        if (await IsValidFileExt(oleFileStream, oleExtension) != eFileAddErr.eFANone)//(!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
+                        using (Stream oleValidStream = new MemoryStream())
                         {
-                            oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_CHANGE;
-                            currentFile.HasChildrenErr = true;
-                            continue;
+                            oleFileStream.CopyTo(oleValidStream);
+                            //위변조 제한, 0KB 체크
+                            if (await IsValidFileExt(oleValidStream, oleExtension) != eFileAddErr.eFANone)//(!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
+                            {
+                                oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_CHANGE;
+                                currentFile.HasChildrenErr = true;
+                                continue;
+                            }
                         }
                     }
                 }
