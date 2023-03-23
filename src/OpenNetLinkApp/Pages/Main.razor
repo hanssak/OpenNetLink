@@ -61,7 +61,7 @@
                         <div style=" width:310px;">
                             <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.4rem;">@strSystemName <span class="full_txt">@strConNetwork </span></p>
 
-                            <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" @bind="id" tabindex="1" autocomplete="off">
+                            <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@id" @oninput="@(e => id = e.Value.ToString())" tabindex="1" autocomplete="off">
 
                             @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
                             {
@@ -70,7 +70,7 @@
                             }
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
                             {
-                                <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" @bind="otp" @onkeyup="keyCheck" tabindex="3" autocomplete="off">
+                                <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" value="@otp" @oninput="@(e=>otp = e.Value.ToString())" @onkeyup="keyCheck" tabindex="3" autocomplete="off">
                             }
                             <div class="row p-0">
                                 @if (bAutoLogin)
