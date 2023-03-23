@@ -2888,6 +2888,13 @@
 			<EN></EN>
 			<CN></CN>
 		</T_INFO_UPDATEPOLICY_LOGOUT>
+    
+    <T_INFO_URL_REDIRECTION_CHECK>
+      <KR>URL Redirection 검사 : </KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </T_INFO_URL_REDIRECTION_CHECK>
 
 		<!-- ********************************************* [END] 환경 정보 화면 (T_INFO_0000) ********************************************* -->
 
@@ -3855,6 +3862,13 @@
 			<CN>Office未安装、转换错误</CN>
 		</T_eFAOfficeNoinstalled>
 
+		<T_eFA_FILENAME_CHAR_ERR>
+			<KR>파일이름, 미지원 문자 오류</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eFA_FILENAME_CHAR_ERR>
+
 		<T_EXCEPTION_REASON>
 			<KR>제외사유</KR>
 			<JP>除外事由</JP>
@@ -4141,6 +4155,13 @@
 			<EN></EN>
 			<CN></CN>
 		</L_eFA_FILE_READ_ERROR>
+
+		<L_eFA_FILE_NAME_ERROR>
+			<KR>파일명 미지원 문자 오류</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</L_eFA_FILE_NAME_ERROR>
 
 		<T_ETC_FAEXCEPTIONCOUNT>
 			<KR>{0} 개</KR>
@@ -10522,6 +10543,20 @@
       <EN></EN>
       <CN></CN>
     </E_0257>
+
+    <E_0258>
+      <KR>파일이름에 지원하지 않는 문자가 있습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </E_0258>
+
+	<E_0259>
+		<KR>[{0}]님은 이미 [{1}]에 등록되어 있습니다.</KR>
+		<JP></JP>
+		<EN></EN>
+		<CN></CN>
+	</E_0259>
 
 
   </ERROR>

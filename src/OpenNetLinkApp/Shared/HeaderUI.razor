@@ -2423,6 +2423,14 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                         }
                     }
 
+                    // tray 상태라면 화면상에 나타나게 수정
+                    if (activeMenu.Path.Contains("transferApprove") ||
+                        activeMenu.Path.Contains("securityApprove") ||
+                        activeMenu.Path.Contains("clipBoardApprove") ||
+                        activeMenu.Path.Contains("fileException") ||
+                        activeMenu.Path.Contains("mailApprove"))
+                        Window.MoveTrayToWebWindow();
+
                     if (pgRefreshEvent != null)
                         pgRefreshEvent();
 

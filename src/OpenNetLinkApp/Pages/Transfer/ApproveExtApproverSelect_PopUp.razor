@@ -688,10 +688,13 @@
 
                     string strUserSeq = sgUserData.GetUserSequence();
 
+                    SGLoginData sgLoginData= (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                    int approveStep = (sgLoginData != null) ? sgLoginData.GetApproveStep() : 0;
+
                     SGApprLineData sgApprLineData = null;
                     sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
                     if (sgApprLineData != null)
-                        sgApprLineData.LocalLoadANDApprLineData(strApprLine, strUserSeq);
+                        sgApprLineData.LocalLoadANDApprLineData(strApprLine, strUserSeq, approveStep);
                     InitApprLine();
                 }
             }

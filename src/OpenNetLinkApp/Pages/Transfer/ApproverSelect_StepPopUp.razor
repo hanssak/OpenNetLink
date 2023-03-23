@@ -81,30 +81,27 @@
                     <!--e btn -->
                     <!--s table -->
                     <div class="box1" style=" width:46%;  float:left;">
-                        <div class="row mb-2  ">
-                            <div class="col-md-5 text-right">
-                                <!--
-                                <button type="button" class="btn bg-gradient-secondary mr-0"><i class="fas fa-chevron-circle-up  pr-1 pl-1"></i></button>
-                                <button type="button" class="btn bg-gradient-secondary"><i class="fas fa-chevron-circle-down  pr-1 pl-1"></i></button>
-                                -->
-                            </div>
-                            <div class="col-md-7 text-right">
-                                <button type="button" class="btn bg-gradient-secondary" @onclick="AddTargetGroup"><i class="fas fa-search pr-1 pl-1"></i>@strGroupAdd</button>   <!--그룹추가-->
-                            </div>
-
+                        <div class="d-inline-flex  mb-2 " style="height:28px;">
+                            <button type="button" class="btn bg-gradient-secondary" @onclick="AddTargetGroup"><i class="fas fa-plus"></i>@strGroupAdd</button>   <!--그룹추가-->
+                            <label class="p-1" style="margin-left:100px">@strGroupMove</label>
+                            <button @onclick="moveGroupToUpper" type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-eject fa-2x" style="padding-right:0px"></i></button>   <!--그룹간 이동 위로 이동-->
+                            <button @onclick="moveGroupToLower" type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-eject fa-rotate-180 fa-2x" style="padding-right:0px"></i></button>   <!--그룹간 이동 아래로 이동-->
                         </div>
 
-                        <div class="card-body table-responsive p-0" style="height:392px; border:1px solid #ddd; background-color:#fff;">
+
+
+
+                        <div class="card-body table-responsive p-0" id="ApprGropDiv" style="height:392px; border:1px solid #ddd; background-color:#fff;">
 
                             <!--  s step 01 -------------------------------------------------------------------------------------------------------------------------------------- -->
                             @foreach (ApproverGroup item in ApvGroup)
                             {
-                                <div aria-grabbed="@(item.seqGrp == Int32.Parse(CurrentDivSeq) ? "true" : "false")" name="TargetGropDiv-@(item.seqGrp)" data-draggable="divGroup" value="@item.seqGrp" class="card @item.groupTheme() shadow">
+                                <div aria-grabbed="@(item.seqGrp == Int32.Parse(CurrentDivSeq) ? "true" : "false")" id="TargetGropDiv-@(item.seqGrp)" name="TargetGropDiv-@(item.seqGrp)" data-draggable="divGroup" value="@item.seqGrp" class="card @item.groupTheme() shadow">
                                     <div class="card-header pt-1 pb-1">
                                         <h6 class="step-title">Step @item.seqGrp</h6>
                                         <div class="card-tools  pr-2">
                                             <button type="button" class="btn btn-tool fa-xs" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                                            <button type="button" class="btn btn-tool fa-xs" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                                            <button type="button" class="btn btn-tool fa-xs" @onclick="()=> RemoveTargetGroup(item.seqGrp)"><i class="fas fa-times"></i></button>
                                         </div>
                                     </div>
                                     <div class="card-body p-2">
@@ -192,7 +189,7 @@
     public string strOK = "";
     public string strClose = "";
     public string strGroupAdd = "";
-
+    public string strGroupMove = "";
     public string strCurDept = "";
     public string strCurName = "";
 
@@ -379,19 +376,22 @@
         }
         StateHasChanged();
     }
+
     private void moveToTop()
     {
         if (CurrentDivSeq.Length < 1)
             return;
 
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
-        if (apvAsign != null)
-        {
-            JSRuntime.InvokeAsync<object>("adjustTargetSelection");
-            apvGroup.ApproverSelect.Remove(apvAsign);
-            apvGroup.ApproverSelect.AddFirst(apvAsign);
-        }
+        ApproverInfo apvAsign = apvGroup?.ApproverSelect?.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
+
+        if (apvGroup == null || apvAsign == null)
+            return;
+
+        JSRuntime.InvokeAsync<object>("adjustTargetSelection");
+        apvGroup.ApproverSelect.Remove(apvAsign);
+        apvGroup.ApproverSelect.AddFirst(apvAsign);
+
         StateHasChanged();
     }
 
@@ -401,34 +401,35 @@
             return;
 
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
+        ApproverInfo apvAsign = apvGroup?.ApproverSelect?.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
 
-        if (apvAsign != null)
+        if (apvGroup == null || apvAsign == null)
+            return;
+
+        //현재값으 앞에값을 구하기
+        LinkedListNode<ApproverInfo> current;
+        LinkedListNode<ApproverInfo> next;
+        current = apvGroup.ApproverSelect.First;
+        if (current.Value.UserSeq == CurrentTagetSeq)
         {
-            //현재값으 앞에값을 구하기
-            LinkedListNode<ApproverInfo> current;
-            LinkedListNode<ApproverInfo> next;
-            current = apvGroup.ApproverSelect.First;
-            if (current.Value.UserSeq == CurrentTagetSeq)
-            {
-                return;
-            }
+            return;
+        }
 
-            for (int i = 0; i < apvGroup.ApproverSelect.Count; i++)
+        for (int i = 0; i < apvGroup.ApproverSelect.Count; i++)
+        {
+            next = current.Next;
+            if (next.Value.UserSeq == CurrentTagetSeq)
             {
-                next = current.Next;
-                if (next.Value.UserSeq == CurrentTagetSeq)
-                {
-                    apvGroup.ApproverSelect.Remove(apvAsign);
-                    apvGroup.ApproverSelect.AddBefore(current, apvAsign);
-                    break;
-                }
-                else
-                {
-                    current = current.Next;
-                }
+                apvGroup.ApproverSelect.Remove(apvAsign);
+                apvGroup.ApproverSelect.AddBefore(current, apvAsign);
+                break;
+            }
+            else
+            {
+                current = current.Next;
             }
         }
+
         StateHasChanged();
     }
     private void moveToLower()
@@ -436,36 +437,37 @@
         if (CurrentDivSeq.Length < 1)
             return;
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
+        ApproverInfo apvAsign = apvGroup?.ApproverSelect?.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
 
-        if (apvAsign != null)
+        if (apvGroup == null || apvAsign == null)
+            return;
+
+        //현재값으 앞에값을 구하기
+        LinkedListNode<ApproverInfo> current;
+        LinkedListNode<ApproverInfo> next;
+        LinkedListNode<ApproverInfo> last;
+        current = apvGroup.ApproverSelect.First;
+        last = apvGroup.ApproverSelect.Last;
+        if (last.Value.UserSeq == CurrentTagetSeq)
         {
-            //현재값으 앞에값을 구하기
-            LinkedListNode<ApproverInfo> current;
-            LinkedListNode<ApproverInfo> next;
-            LinkedListNode<ApproverInfo> last;
-            current = apvGroup.ApproverSelect.First;
-            last = apvGroup.ApproverSelect.Last;
-            if (last.Value.UserSeq == CurrentTagetSeq)
-            {
-                return;
-            }
+            return;
+        }
 
-            for (int i = 0; i < apvGroup.ApproverSelect.Count; i++)
+        for (int i = 0; i < apvGroup.ApproverSelect.Count; i++)
+        {
+            next = current.Next;
+            if (current.Value.UserSeq == CurrentTagetSeq)
             {
-                next = current.Next;
-                if (current.Value.UserSeq == CurrentTagetSeq)
-                {
-                    apvGroup.ApproverSelect.Remove(apvAsign);
-                    apvGroup.ApproverSelect.AddAfter(next, apvAsign);
-                    break;
-                }
-                else
-                {
-                    current = current.Next;
-                }
+                apvGroup.ApproverSelect.Remove(apvAsign);
+                apvGroup.ApproverSelect.AddAfter(next, apvAsign);
+                break;
+            }
+            else
+            {
+                current = current.Next;
             }
         }
+
         StateHasChanged();
     }
     private void moveToBottom()
@@ -473,13 +475,68 @@
         if (CurrentDivSeq.Length < 1)
             return;
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvTarget = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
-        if (apvTarget != null)
-        {
-            apvGroup.ApproverSelect.Remove(apvTarget);
-            apvGroup.ApproverSelect.AddLast(apvTarget);
-        }
+        ApproverInfo apvTarget = apvGroup?.ApproverSelect?.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
+
+        if (apvGroup == null || apvTarget == null)
+            return;
+
+        apvGroup.ApproverSelect.Remove(apvTarget);
+        apvGroup.ApproverSelect.AddLast(apvTarget);
+
         StateHasChanged();
+    }
+
+    /// <summary>
+    /// 선택된 결재자를 윗쪽 그룹으로 이동
+    /// </summary>
+    public void moveGroupToUpper()
+    {
+        if (CurrentDivSeq.Length < 1)
+            return;
+
+        if (!int.TryParse(CurrentDivSeq, out int groupNo) || groupNo <= 0 || groupNo <= 1) //이미 제일 첫번째 그룹인 경우 SKIP
+            return;
+
+        ApproverGroup upperGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == groupNo - 1);                       //이동할 그룹
+        ApproverGroup nowGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == groupNo);                             //현재 그룹
+        ApproverInfo selectedUser = nowGroup?.ApproverSelect?.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);  //현재 그룹에서 선택된 사용자
+
+        if (upperGroup == null || nowGroup == null || selectedUser == null)
+            return;
+
+        nowGroup.ApproverSelect.Remove(selectedUser);
+        upperGroup.ApproverSelect.AddLast(selectedUser);
+
+        CurrentDivSeq = upperGroup.seqGrp.ToString();
+
+        JSRuntime.InvokeAsync<object>("ScrollIntoView", $"TargetGropDiv-{CurrentDivSeq}");
+
+    }
+
+    /// <summary>
+    /// 선택된 결재자를 아랫쪽 그룹으로 이동
+    /// </summary>
+    public void moveGroupToLower()
+    {
+        if (CurrentDivSeq.Length < 1)
+            return;
+
+        if (!int.TryParse(CurrentDivSeq, out int groupNo) || groupNo <= 0 || groupNo >= ApvGroup.Count) //이미 제일 마지막 그룹인 경우 SKIP
+            return;
+
+        ApproverGroup lowerGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == groupNo + 1);                       //이동할 그룹
+        ApproverGroup nowGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == groupNo);                             //현재 그룹
+        ApproverInfo selectedUser = nowGroup?.ApproverSelect?.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);  //현재 그룹에서 선택된 사용자
+
+        if (lowerGroup == null || nowGroup == null || selectedUser == null)
+            return;
+
+        nowGroup.ApproverSelect.Remove(selectedUser);
+        lowerGroup.ApproverSelect.AddLast(selectedUser);
+
+        CurrentDivSeq = lowerGroup.seqGrp.ToString();
+
+        JSRuntime.InvokeAsync<object>("ScrollIntoView", $"TargetGropDiv-{CurrentDivSeq}");
     }
 
     private void SGDeptTreeList_OnItemDoubleClick(ApproverInfo doubleClickInfo)
@@ -494,41 +551,40 @@
             return;
 
         ApproverInfo apv = ApproverSearch.FirstOrDefault(x => x.UserSeq == stSelectApprover);
-        if (apv != null)
-        {
-            ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-            if (apvGroup == null)
-            {
-                ShowMessage("warning", XmlConf.GetInfoMsg("I_0218"));
-                return;
-            }
-            bool bFind = false;
-            foreach (ApproverInfo item in apvGroup.ApproverSelect)
-            {
-                if (item.UserSeq == apv.UserSeq)
-                    bFind = true;
-            }
+        if (apv == null)
+            return;
 
-            if (apvGroup != null && bFind == false)
+        ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
+        if (apvGroup == null)
+        {
+            ShowMessage("warning", XmlConf.GetInfoMsg("I_0218"));
+            return;
+        }
+
+        //모든 그룹에 없는 사용자인 경우만 등록 가능하도록 처리
+        foreach (ApproverGroup grp in ApvGroup)
+        {
+            ApproverInfo find = grp.ApproverSelect.FirstOrDefault(app => app.UserSeq == apv.UserSeq);
+
+            if (find != null)
             {
-                apvGroup.ApproverSelect.AddLast(apv);
-            }
-            else
-            {
-                ShowMessage("warning", XmlConf.GetInfoMsg("I_0219"));
+                ShowMessage("warning", string.Format(XmlConf.GetErrMsg("E_0259"), find.Name, "Step " + grp.seqGrp));
                 return;
             }
         }
+
+        apvGroup.ApproverSelect.AddLast(apv);
     }
 
     private void RemoveAssignApprover()
     {
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
-        if (apvAsign != null)
-        {
-            apvGroup.ApproverSelect.Remove(apvAsign);
-        }
+        ApproverInfo apvAsign = apvGroup?.ApproverSelect?.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
+
+        if (apvGroup == null || apvAsign == null)
+            return;
+
+        apvGroup.ApproverSelect.Remove(apvAsign);
     }
 
     [JSInvokable("ApproverSearchSelect3")]
@@ -564,6 +620,8 @@
     public void TargetDivSelect(string seq)
     {
         CurrentDivSeq = seq;
+
+        StateHasChanged();
     }
 
     public class ApproverGroup
@@ -605,6 +663,20 @@
         ApvGroup.Add(grp1);
     }
 
+
+    private void RemoveTargetGroup(int grpNo)
+    {
+        if (ApvGroup == null || ApvGroup.Count < grpNo)
+            return;
+
+        ApvGroup.RemoveAt(grpNo - 1);
+
+        //group No 재지정
+        for (int idx = 0; idx < ApvGroup.Count; idx++)
+        {
+            ApvGroup[idx].seqGrp = idx + 1;
+        }
+    }
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
@@ -688,6 +760,9 @@
     }
     public async Task openPopUp()
     {
+        CurrentDivSeq = "0";
+        CurrentTagetSeq = "0";
+        stSelectApprover = "0";
         object[] param = { "ApproverSelect_StepPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -778,9 +853,12 @@
         strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기
         strGroupAdd = XmlConf.GetTitle("T_APPROVE_GROUPADD");                       // 그룹추가
+        strGroupMove = XmlConf.GetTitle("T_APPROVE_GROUPMOVE");                     //그룹간이동
 
 
         strDeptPlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       //부서입력
         strNamePlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       //이름입력
+
+
     }
 }

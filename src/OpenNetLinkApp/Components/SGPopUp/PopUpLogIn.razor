@@ -54,19 +54,19 @@
                         <div class="login_w">
 
                             <div class="input-group mb-2">
-                                <input type="text" class="form-control-login" placeholder="ID" @bind="id" disabled=@bUIBtnDisable tabindex="1">
+                                <input type="text" class="form-control-login" placeholder="ID" value="@id" @oninput="@(e=>id = e.Value.ToString())" disabled=@bUIBtnDisable tabindex="1">
                             </div>
                             @if (eLoginUITypeData != eLoginType.eLOGINTYPE_OTP) //OTP PW 필요없음
                             {
                             <div class="input-group mb-2">
                                 @*AD 로그인은 PW 사용자 입력 불가 (Readonly)*@
-                                <input type="password" class="form-control-login" placeholder="Password" readonly="@(eLoginUITypeData== eLoginType.eLOGINTYPE_AD)" @bind="pw" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2">
+                                <input type="password" class="form-control-login" placeholder="Password" readonly="@(eLoginUITypeData== eLoginType.eLOGINTYPE_AD)" value="@pw" @oninput="@(e => pw = e.Value.ToString())" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2">
                             </div>
                             }
                             @if (eLoginUITypeData == eLoginType.eLOGINTYPE_PW_OTP || eLoginUITypeData == eLoginType.eLOGINTYPE_OTP) //PW_OTP(4), OTP(5)
                             {
                             <div class="input-group mb-2">
-                                <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" @bind="otp" @onkeyup="keyCheck" tabindex="3" autocomplete="off">
+                                <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" value="@otp" @oninput="@(e => otp= e.Value.ToString())" @onkeyup="keyCheck" tabindex="3" autocomplete="off">
                             </div>
                             }
                             <div class="row">
@@ -1074,20 +1074,20 @@
         try
         {
 
-	        int ret = e.result;
-	        if (ret == 0)
-	        {
+            int ret = e.result;
+            if (ret == 0)
+            {
 
-	            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+                SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
 
-	            pageService.ConnectCountAdd(groupId);
-	            pageService.SetConnectStatus(groupId, true);
-	            pageService.SetLogoutStatus(groupId, false);
+                pageService.ConnectCountAdd(groupId);
+                pageService.SetConnectStatus(groupId, true);
+                pageService.SetLogoutStatus(groupId, false);
 
-	                CLog.Here().Information($"LoginpopUpResult, groupID : {groupId}, UrlRedirection LogIn State ReSet !!!");
-	            HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupId, true);
+                CLog.Here().Information($"LoginpopUpResult, groupID : {groupId}, UrlRedirection LogIn State ReSet !!!");
+                HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupId, true);
 
-	            /*
+                /*
 	            if (ClientPatch(sgLoginData))
 	            {
 	                string strSvrVersion = sgLoginData.GetServClientVersion();
@@ -1099,103 +1099,104 @@
 	            }
 	            */
 
-	            SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
-	            SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
+                SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
+                SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
 
-	            while (true)
-	            {
-	                sfmData = HSCmdCenter.GetSFMListData(groupId);
-	                if (sfmData != null)
-	                    break;
-	                Thread.Sleep(50);
-	            }
-	            CLog.Here().Information($"LoginResultOnetoAll, groupID : {groupId}, Recved Sfm Data !!!");
-	            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
-
-
-	            HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));
-	            SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
-
-	            Dictionary<string, SGNetOverData> dicSysIdName = null;
-	            dicSysIdName = new Dictionary<string, SGNetOverData>();
-
-	            if (sgLoginData.GetUseOverNetwork2())
-	            {
-
-	                if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName, pageService.m_bIsMultiNetWork))
-	                {
-	                    pageService.SetTargetSystemList(groupId, dicSysIdName);
-
-	                    // 3중망이상일때, 왼쪽Sidebar 포함 도착망이름 변경
-	                    if (dicSysIdName != null && dicSysIdName.Count > 1)
-	                    {
-	                        ChangeNetOverTitle(groupId, dicSysIdName);
-	                    }
-	                }
-	            }
-
-	            // CLIENT_ZIP_DEPTH 정보 가져옴
-	            SGQueryExtend sgQueryExtend = null;
-	            sgQueryExtend = new SGQueryExtend();
-	            if (sgQueryExtend != null)
-	            {
-
-	                string strGetinfoTagName = "";
-	                strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
-	                strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
-	                strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
-	                strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";
-
-	                string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
-	                HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
-
-	                // string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
-	                // HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
-	            }
+                while (true)
+                {
+                    sfmData = HSCmdCenter.GetSFMListData(groupId);
+                    if (sfmData != null)
+                        break;
+                    Thread.Sleep(50);
+                }
+                CLog.Here().Information($"LoginResultOnetoAll, groupID : {groupId}, Recved Sfm Data !!!");
+                sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
 
-	            bool bUseClipBoard = sgLoginData.GetClipboard();
-	            if (bUseClipBoard)
-	            {
-	                List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(groupId);
-	                char chVKey = AppConfigSvc.GetClipBoardVKey(groupId);
+                HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));
+                SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
 
-	                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-	                {
-	                    bool bAlt = listModKey[(int)HOTKEY_MOD.ALT];
-	                    bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
-	                    bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
-	                    bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
-	                    Window.WinRegClipboardHotKey(groupId, bAlt, bCtrl, bShift, bWin, chVKey);
-	                }
-	                else
-	                {
-	                    Window.RegClipboardHotKey(groupId,
-	                                    listModKey[(int)HOTKEY_MOD.ALT],
-	                                    listModKey[(int)HOTKEY_MOD.CTRL],
-	                                    listModKey[(int)HOTKEY_MOD.SHIFT],
-	                                    listModKey[(int)HOTKEY_MOD.WINDOW],
-	                                    chVKey);
-	                }
+                Dictionary<string, SGNetOverData> dicSysIdName = null;
+                dicSysIdName = new Dictionary<string, SGNetOverData>();
 
-	                // clipboard 선택전송기능 사용유무설정
-	                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeSelectSend(groupId))
-	                    Window.UseClipBoardSelect(groupId);
+                if (sgLoginData.GetUseOverNetwork2())
+                {
 
-	                // ClipBoard(Type Mixed 일때) Text 우선송신 사용
-	                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
-	                    Window.UseClipFirstSendType(groupId);
+                    if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName, pageService.m_bIsMultiNetWork))
+                    {
+                        pageService.SetTargetSystemList(groupId, dicSysIdName);
 
-	                // 자동전송기능 위해
-	                if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend())
-	                {
-	                    Window.SetNativeClipboardHotKey(groupId, listModKey[(int)HOTKEY_MOD.ALT],
-	                                    listModKey[(int)HOTKEY_MOD.CTRL],
-	                                    listModKey[(int)HOTKEY_MOD.SHIFT],
-	                                    listModKey[(int)HOTKEY_MOD.WINDOW],
-	                                    chVKey, 0);
-	                }
-	            }
+                        // 3중망이상일때, 왼쪽Sidebar 포함 도착망이름 변경
+                        if (dicSysIdName != null && dicSysIdName.Count > 1)
+                        {
+                            ChangeNetOverTitle(groupId, dicSysIdName);
+                        }
+                    }
+                }
+
+                // CLIENT_ZIP_DEPTH 정보 가져옴
+                SGQueryExtend sgQueryExtend = null;
+                sgQueryExtend = new SGQueryExtend();
+                if (sgQueryExtend != null)
+                {
+
+                    string strGetinfoTagName = "";
+                    strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
+                    strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
+                    strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
+                    //strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";       // Table 이름 따로 정해졌음
+                    strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
+
+                    string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
+                    HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
+
+                    // string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+                    // HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
+                }
+
+
+                bool bUseClipBoard = sgLoginData.GetClipboard();
+                if (bUseClipBoard)
+                {
+                    List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(groupId);
+                    char chVKey = AppConfigSvc.GetClipBoardVKey(groupId);
+
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        bool bAlt = listModKey[(int)HOTKEY_MOD.ALT];
+                        bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
+                        bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
+                        bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
+                        Window.WinRegClipboardHotKey(groupId, bAlt, bCtrl, bShift, bWin, chVKey);
+                    }
+                    else
+                    {
+                        Window.RegClipboardHotKey(groupId,
+                                        listModKey[(int)HOTKEY_MOD.ALT],
+                                        listModKey[(int)HOTKEY_MOD.CTRL],
+                                        listModKey[(int)HOTKEY_MOD.SHIFT],
+                                        listModKey[(int)HOTKEY_MOD.WINDOW],
+                                        chVKey);
+                    }
+
+                    // clipboard 선택전송기능 사용유무설정
+                    if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeSelectSend(groupId))
+                        Window.UseClipBoardSelect(groupId);
+
+                    // ClipBoard(Type Mixed 일때) Text 우선송신 사용
+                    if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
+                        Window.UseClipFirstSendType(groupId);
+
+                    // 자동전송기능 위해
+                    if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend())
+                    {
+                        Window.SetNativeClipboardHotKey(groupId, listModKey[(int)HOTKEY_MOD.ALT],
+                                        listModKey[(int)HOTKEY_MOD.CTRL],
+                                        listModKey[(int)HOTKEY_MOD.SHIFT],
+                                        listModKey[(int)HOTKEY_MOD.WINDOW],
+                                        chVKey, 0);
+                    }
+                }
 
 
         DateTime dt =(SGAppMgrSvc.SiteConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
@@ -1205,74 +1206,74 @@
         pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
         pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
 
-	            bool bAfterCheck = false;
-	            if (!bAfterApprEnable)
-	                bAfterCheck = false;
-	            else
-	                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+                bool bAfterCheck = false;
+                if (!bAfterApprEnable)
+                    bAfterCheck = false;
+                else
+                    bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
 
-	            pageService.SetAfterApproveCheck(groupId, bAfterCheck);
+                pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
-	            Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
-	            int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
-	            Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
-	            int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
-	            pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
-
-
-	            ScreenTimeInitNotiEvent screenTimeInitEvent = HSCmdCenter.sgPageEvent.GetScreenTimeInitNotiEvent();
-	            if (screenTimeInitEvent != null)
-	            {
-	                ConfigArgs config = new ConfigArgs();
-	                config.ScreenTime = sgLoginData.GetSCRLimit();
-	                screenTimeInitEvent(groupId, config);
-	            }
-
-	            // ID/PW 로그인 AD 로그인한것처럼 동일하게 처리
-	            // 최종 로그인 형식이 어떻게 되는지에 따라 그 Type을 따라간다 (20230109)
-	            //if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(nGroupID))
-	            //{
-	            //    pageService.SetGroupIDLoginType(nGroupID, eLoginType.eLOGINTYPE_AD);
-	            //    eLoginUITypeData = eLoginType.eLOGINTYPE_AD;
-	            //}
+                Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
+                int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
+                Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
+                int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
+                pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
 
 
-	            // 이후 동작 처리
-	            if (ProcessLoginResultAll(groupId) == false)
-	                return;
+                ScreenTimeInitNotiEvent screenTimeInitEvent = HSCmdCenter.sgPageEvent.GetScreenTimeInitNotiEvent();
+                if (screenTimeInitEvent != null)
+                {
+                    ConfigArgs config = new ConfigArgs();
+                    config.ScreenTime = sgLoginData.GetSCRLimit();
+                    screenTimeInitEvent(groupId, config);
+                }
+
+                // ID/PW 로그인 AD 로그인한것처럼 동일하게 처리
+                // 최종 로그인 형식이 어떻게 되는지에 따라 그 Type을 따라간다 (20230109)
+                //if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(nGroupID))
+                //{
+                //    pageService.SetGroupIDLoginType(nGroupID, eLoginType.eLOGINTYPE_AD);
+                //    eLoginUITypeData = eLoginType.eLOGINTYPE_AD;
+                //}
 
 
-	            CtrlSideEvent ctrlSideEvent = null;
-	            ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
-	            if (ctrlSideEvent != null)
-	                ctrlSideEvent();
+                // 이후 동작 처리
+                if (ProcessLoginResultAll(groupId) == false)
+                    return;
 
-	            // 로그인 완료 -
 
-	            // 성공했을대에만 닫음
-	            closePopUp();
+                CtrlSideEvent ctrlSideEvent = null;
+                ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
+                if (ctrlSideEvent != null)
+                    ctrlSideEvent();
 
-	        }
-	        else
-	        {
-	            bUIBtnDisable = false;
-	            string strPopupMsg = "";
-	            // 다중망일때에는 실패한 망이름 표현
-	            if (pageService.m_bIsMultiNetWork)
-	            {
-	                string strFromNet = "";
-	                string strToNet = "";
-	                XmlConf.GetNetworkTitle(groupId, out strFromNet, out strToNet);
-	                strPopupMsg = $"{strFromNet}<i class=\"fas fa-long-arrow-alt-right p-1\"></i> {strToNet}<br/>";
-	            }
+                // 로그인 완료 -
 
-	            strPopupMsg += e.strMsg;
+                // 성공했을대에만 닫음
+                closePopUp();
 
-	            strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
-	            ShowLoginFail(strPopupMsg);
-	            HSCmdCenter.SendLogOut(groupId, "");
-	            StateHasChanged();
-	        }
+            }
+            else
+            {
+                bUIBtnDisable = false;
+                string strPopupMsg = "";
+                // 다중망일때에는 실패한 망이름 표현
+                if (pageService.m_bIsMultiNetWork)
+                {
+                    string strFromNet = "";
+                    string strToNet = "";
+                    XmlConf.GetNetworkTitle(groupId, out strFromNet, out strToNet);
+                    strPopupMsg = $"{strFromNet}<i class=\"fas fa-long-arrow-alt-right p-1\"></i> {strToNet}<br/>";
+                }
+
+                strPopupMsg += e.strMsg;
+
+                strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
+                ShowLoginFail(strPopupMsg);
+                HSCmdCenter.SendLogOut(groupId, "");
+                StateHasChanged();
+            }
 
         }
         catch (Exception ex)
