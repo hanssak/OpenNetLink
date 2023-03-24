@@ -946,13 +946,14 @@ window.addMouseDown = (message) => {
                 return;
             }
         }
+        //결재자 row select 처리는 razor에서 처리하도록 변경
         //결재자선택팝업 첫번째
-        if (e.target.parentElement.getAttribute('name') == "trItem") {
+        //if (e.target.parentElement.getAttribute('name') == "trItem") {
 
-            clearTrSelections();
-            addTrSelection(e.target.parentElement, 1);
-            return;
-        }
+        //    clearTrSelections();
+        //    addTrSelection(e.target.parentElement, 1);
+        //    return;
+        //}
         //결재자 선택팝업 두번째
         if (e.target.parentElement.getAttribute('name') == "trItem2") {
 
@@ -960,13 +961,14 @@ window.addMouseDown = (message) => {
             addTrSelection(e.target.parentElement, 2);
             return;
         }
+        //결재자(ANDOR) Search Row Select 처리는 Razor에서 처리하도록 변경
         //결재자 선택팝업 세번째
-        if (e.target.parentElement.getAttribute('name') == "trItem3") {
+        //if (e.target.parentElement.getAttribute('name') == "trItem3") {
 
-            clearTrSelections();
-            addTrSelection(e.target.parentElement, 3);
-            return;
-        }
+        //    clearTrSelections();
+        //    addTrSelection(e.target.parentElement, 3);
+        //    return;
+        //}
         //대결재 row select 처리는 razor에서 처리하도록 변경
         //대결자 검색 팝업
         //if (e.target.parentElement.getAttribute('name') == "trItem4") {
@@ -995,13 +997,14 @@ window.addMouseDown = (message) => {
             addTrSelection(e.target.parentElement, 7);
             return;
         }
+        //결재자 row select 처리는 razor에서 처리하도록 변경
         //결재자 지정 첫번째
-        if (e.target.parentElement.getAttribute('name') == "trSelect") {
+        //if (e.target.parentElement.getAttribute('name') == "trSelect") {
 
-            clearTrTargetSelections(true);
-            addTrTargetSelection(e.target.parentElement, 1);
-            return;
-        }
+        //    clearTrTargetSelections(true);
+        //    addTrTargetSelection(e.target.parentElement, 1);
+        //    return;
+        //}
         //결재자 지정 두번째
         if (e.target.parentElement.getAttribute('name') == "trSelect2") {
 
@@ -1241,9 +1244,9 @@ window.adjustTargetSelection = () => {
 
 function addTrTargetSelection(item, index) {
     item.setAttribute('aria-grabbed', 'true');
-    if (index == 1)
-        DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect", item.getAttribute('value'));
-    else if (index == 2)
+    //if (index == 1)       //결재자 row select 처리는 razor에서 처리하도록 변경
+    //    DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect", item.getAttribute('value'));
+     if (index == 2)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect2", item.getAttribute('value'));
     else if (index == 3)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect3", item.getAttribute('value'));
@@ -1279,12 +1282,12 @@ function clearTrTargetSelections(remove) {
 
 function addTrSelection(item, index) {
     item.setAttribute('aria-grabbed', 'true');
-    if (index == 1)
-        DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect", item.getAttribute('value'));
-    else if (index == 2)
+    //if (index == 1)       //결재자 row select 처리는 razor에서 처리하도록 변경
+    //    DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect", item.getAttribute('value'));
+    if (index == 2)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect2", item.getAttribute('value'));
-    else if (index == 3)
-        DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect3", item.getAttribute('value'));
+    //else if (index == 3)  //결재자(ANDOR) Search Row Select 처리는 Razor에서 처리하도록 변경
+    //    DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect3", item.getAttribute('value'));
     //else if (index == 4) //대결재 row select 처리는 razor에서 처리하도록 변경
     //    DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect", item.getAttribute('value'));
     else if (index == 5)
