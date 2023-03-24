@@ -649,8 +649,12 @@ window.closeProgressMessage = (id) => {
     /*$("#" + id).parent().parent().find("[type='button']").trigger("click");*/
     $("#left-sidebar").css("z-index", 1101);
     $("#main-nav").css("z-index", 1100);
-    $("#DownloadProgress").modal("hide");
-    $("#downProgressRate").css("width", "1%");
+
+    //간헐적으로 hide 안되는 현상이 발생하여, js 자체 Fadeout 후 Hide 하도록 변경
+    $("#DownloadProgress").fadeOut(500, function () {
+        $("#DownloadProgress").modal("hide");
+        $("#downProgressRate").css("width", "1%");
+    });    
 }
 
 window.updateProgressMessage = (id, message, progress) => {
@@ -968,13 +972,14 @@ window.addMouseDown = (message) => {
             addTrSelection(e.target.parentElement, 3);
             return;
         }
+        //대결재 row select 처리는 razor에서 처리하도록 변경
         //대결자 검색 팝업
-        if (e.target.parentElement.getAttribute('name') == "trItem4") {
+        //if (e.target.parentElement.getAttribute('name') == "trItem4") {
 
-            clearTrSelections();
-            addTrSelection(e.target.parentElement, 4);
-            return;
-        }
+        //    clearTrSelections();
+        //    addTrSelection(e.target.parentElement, 4);
+        //    return;
+        //}
         if (e.target.parentElement.getAttribute('name') == "trItem5") {
 
             clearTrSelections();
@@ -1018,13 +1023,14 @@ window.addMouseDown = (message) => {
             addTrTargetSelection(e.target.parentElement, 3);
             return;
         }
+        //대결재 row select 처리는 razor에서 처리하도록 변경
         //대결자 지정
-        if (e.target.parentElement.getAttribute('name') == "trSelect4") {
+        //if (e.target.parentElement.getAttribute('name') == "trSelect4") {
 
-            clearTrTargetSelections(true);
-            addTrTargetSelection(e.target.parentElement, 4);
-            return;
-        }
+        //    clearTrTargetSelections(true);
+        //    addTrTargetSelection(e.target.parentElement, 4);
+        //    return;
+        //}
         if (e.target.parentElement.getAttribute('name') == "trSelect5") {
 
             clearTrTargetSelections(true);
@@ -1244,8 +1250,9 @@ function addTrTargetSelection(item, index) {
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect2", item.getAttribute('value'));
     else if (index == 3)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect3", item.getAttribute('value'));
-    else if (index == 4)
-        DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxyTargetSelect", item.getAttribute('value'));
+    //대결재 row select 처리는 razor에서 처리하도록 변경
+    //else if (index == 4)
+    //    DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxyTargetSelect", item.getAttribute('value'));
     else if (index == 5)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxyTargetSelect2", item.getAttribute('value'));
     else if (index == 6)
@@ -1280,8 +1287,9 @@ function addTrSelection(item, index) {
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect2", item.getAttribute('value'));
     else if (index == 3)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect3", item.getAttribute('value'));
-    else if (index == 4)
-        DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect", item.getAttribute('value'));
+    //대결재 row select 처리는 razor에서 처리하도록 변경
+    //else if (index == 4)
+    //    DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect", item.getAttribute('value'));
     else if (index == 5)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect2", item.getAttribute('value'));
     else if (index == 6)
