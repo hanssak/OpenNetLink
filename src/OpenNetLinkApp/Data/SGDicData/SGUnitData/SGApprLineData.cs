@@ -391,45 +391,53 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if ((apprLineData == null) || (apprLineData.Count <= 0))
                 return null;
 
+            //ANDOR 결재 확장하면서 추가된 사항으로, 현재 사용 불필요
+            //Commit Info (Commit Date : 2021.03.11) - 1180530201cc384229d13fc6556b985fd161227a
+            #region [사용안함]
+            /////이걸하면 변경된 사항이 적용이 안되는데... 왜 하는건지 모르겠음..
+            //List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
+            //foreach (ApproverInfo item in apprLineData)
+            //{
+            //    for (int i = 0; i < listDicdata.Count; i++)
+            //    {
+            //        Dictionary<int, string> dic = listDicdata[i];
+            //        if (item.UserSeq == dic[0])
+            //        {
+            //            item.nApvOrder = Int32.Parse(dic[6]);
+            //            break;
+            //        }
+            //    }
+            //} 
+            #endregion
 
-            ///이걸하면 변경된 사항이 적용이 안되는데... 왜 하는건지 모르겠음..
-            List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
-            foreach (ApproverInfo item in apprLineData)
-            {
-                for (int i = 0; i < listDicdata.Count; i++)
-                {
-                    Dictionary<int, string> dic = listDicdata[i];
-                    if (item.UserSeq == dic[0])
-                    {
-                        item.nApvOrder = Int32.Parse(dic[6]);
-                        break;
-                    }
-                }
-            }
-
-            char Sep = (char)'\u0002';
+            char Sep = (char)'\u0002'; //(STX)
             char orSep = (char)'|';
             if (apprLineData != null && apprLineData.Count > 0)
             {
                 LinkedListNode<ApproverInfo> last = apprLineData.Last;
                 LinkedListNode<ApproverInfo> curNode = apprLineData.First;
 
-                if (apprStep == "0")
+
+                if (apprStep == "0")    //AND
                 {
                     foreach (ApproverInfo item in apprLineData)
                     {
                         if (item.UserSeq.Equals(strUserSeq))
                             continue;
+
+                        //AND 조건 : USERID[STX]USERID[STX]USERID[STX]USERID[STX]USERID[STX]USERID[STX]
                         rtn += item.UserSeq;
                         rtn += Sep;
                     }
                 }
-                if (apprStep == "1")
+                if (apprStep == "1")    //OR
                 {
                     foreach (ApproverInfo item in apprLineData)
                     {
                         if (item.UserSeq.Equals(strUserSeq))
                             continue;
+
+                        //OR 조건 : USERID|USERID......|USERID|USERID[STX]
                         rtn += item.UserSeq;
                         if (last.Value.UserSeq.Equals(item.UserSeq))
                             rtn += Sep;
@@ -437,7 +445,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             rtn += orSep;
                     }
                 }
-                if (apprStep == "2")
+                if (apprStep == "2")        //ANDOR
                 {
                     while (true)
                     {
@@ -602,8 +610,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="strApprLineData"></param>
         /// <param name="strUserSeq"></param>
+        /// <param name="apvStep">APPROVESTEP (0: AND, 1: OR, 2: ANDOR</param>
         /// <returns></returns>
-        public bool LocalLoadANDApprLineData(string strApprLineData, string strUserSeq)
+        public bool LocalLoadANDApprLineData(string strApprLineData, string strUserSeq, int apvStep)
         {
             LinkedList<ApproverInfo> apprInfo = new LinkedList<ApproverInfo>();
             if (strApprLineData.Equals(""))
@@ -619,48 +628,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             char sep = (char)':';
             string[] strApprList;
             string[] strApprLineDataList = strApprLineData.Split('\u0002');
-            if (strApprLineDataList.Length == 1)
-            {
-                string[] strSplit = strApprLineData.Split(sep);
-                if (strSplit.Length == 1)
-                {
-                    return false;
-                }
-
-                if (!strSplit[0].Equals(strUserSeq))
-                {
-                    return false;
-                }
-
-                strApprList = strSplit[1].Split('\u0003');
-                if (strApprList.Length <= 0)
-                {
-                    return false;
-                }
-
-                for (int i = 0; i < strApprList.Length; i++)
-                {
-                    string[] strApprData = strApprList[i].Split('\u0001');
-                    if (strApprData.Length <= 0)
-                        continue;
-                    ApproverInfo apprdata = new ApproverInfo();
-                    apprdata.Name = strApprData[0];
-                    apprdata.Grade = strApprData[1];
-                    apprdata.DeptName = strApprData[2];
-                    apprdata.DeptSeq = strApprData[3];
-                    apprdata.UserSeq = strApprData[4];
-                    apprdata.Index = strApprData[5];
-                    if (!strApprData[6].Equals(""))
-                        apprdata.nApprPos = Convert.ToInt32(strApprData[6]);
-                    if (!strApprData[7].Equals(""))
-                        apprdata.nDlpApprove = Convert.ToInt32(strApprData[7]);
-
-                    apprInfo.AddLast(apprdata);
-                }
-
-                CopyApprLine(apprInfo);
-                return true;
-            }
 
             bool bFind = false;
             string strApprLine = "";
@@ -702,6 +669,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 apprdata.DeptSeq = strApprData[3];
                 apprdata.UserSeq = strApprData[4];
                 apprdata.Index = strApprData[5];
+
+                //ANDOR 결재는 Local 저장 시 5번째에 ApprOrder 저장하므로 해당 정보로 GROUP 구성에 활용
+                if (apvStep == 2 && int.TryParse(strApprData[5], out int apprStep))
+                    apprdata.nApvOrder = apprStep;
+
                 if (!strApprData[6].Equals(""))
                     apprdata.nApprPos = Convert.ToInt32(strApprData[6]);
                 if (!strApprData[7].Equals(""))

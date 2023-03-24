@@ -1510,8 +1510,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetDocumentExtractType(bool bSystem)
             => (bSystem) ? GetTagData("I_CLIENT_OLE_EXTRACT") : GetTagData("E_CLIENT_OLE_EXTRACT");
 
+        public string GetPreViewerExt()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_PREVIEW_VIEWER_EXT") : GetTagData("E_CLIENT_PREVIEW_VIEWER_EXT");
 
-        
+        public string GetDocumentExtractExt()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_OLE_EXTRACT_EXT") : GetTagData("E_CLIENT_OLE_EXTRACT_EXT");
+
+        /// <summary>
+        /// 제목 최소 길이 값
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetTitleMinLength()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_TITLE_MIN_LENGTH") : GetTagData("E_CLIENT_TITLE_MIN_LENGTH");
+
+        /// <summary>
+        /// 설명 최소 길이 값
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetDescMinLength()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_DESC_MIN_LENGTH") : GetTagData("E_CLIENT_DESC_MIN_LENGTH");
+
+
+
         /// <summary>
         /// value 값을 암호화해서 sgData에 저장
         /// </summary>

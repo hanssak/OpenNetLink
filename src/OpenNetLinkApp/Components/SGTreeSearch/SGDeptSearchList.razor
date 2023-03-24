@@ -1,0 +1,190 @@
+@using OpenNetLinkApp.Common
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
+@using Radzen
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering;
+@inject ISGAppManagerService SGAppMgrSvc
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HsCmdCenter
+@inject PageStatusService pageService
+@inject IJSRuntime jsRuntime
+
+<div class="card-body  p-0" style="height:@(Height.ToString() + "px");">
+    @if (UseInputSearch)
+    {
+        <div class="d-inline-flex  w-100 mb-2 " style="height:29px;">
+            <label class="p-1">@strDept</label>                                                       <!--부서-->
+        <input type="text" class="form-control col-md-3" @onkeyup="HandleKeyEvent" placeholder="@strDeptPlaceHolder" @bind-value="strInputDept">
+            <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
+        <input type="text" class="form-control col-md-3" @onkeyup="HandleKeyEvent" placeholder="@strNamePlaceHolder" @bind-value="strInputName">
+            <div style="flex:1 0 auto" />
+            <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="callBackSearch"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>  <!--조회-->
+    </div>
+    }
+
+    <div class="card-body table-responsive p-0 " style="height:@(SearchListHeight.ToString() + "px"); border:1px solid #ddd; background-color:#fff;">
+        <table class="table table-head-fixed">
+            <thead>
+                <tr>
+                    <th style="text-align:center; @IndexDisplay">@XmlConf.GetTitle("T_COMMON_ORDER") </th>    <!--순번-->
+                    <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>     <!--부서-->
+                    <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>    <!--직급-->
+                    <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>    <!--이름-->
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (ApproverInfo item in UserDataSource)
+                {
+                    <tr draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq" @onclick="()=>clickItemList(item)"
+                    style="background-color :@((currentSelectKey ==item.UserSeq) ? CsDefinition.RowSeletedBackColor: CsDefinition.RowDefaultBackColor); color : @((currentSelectKey ==item.UserSeq) ? CsDefinition.RowSeletedForeColor: CsDefinition.RowDefaultForeColor)">
+                        <td style="text-align:center; @IndexDisplay">@item.Index</td>
+                        <td style="text-align:left;">@item.DeptName</td>
+                        <td style="text-align:left;">@item.Grade</td>
+                        <td style="text-align:left;">@item.Name</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+@code {
+    [Parameter] public int Height { get; set; } = 420;
+
+    /// <summary>
+    /// 리스트 상단에 부서/이름을 입력하여 검색할 수 있는 컨트롤 표시 여부
+    /// <br/>조회 리스트에서 사용하며, 타겟 리스트는 False로 설정하여야 한다.
+    /// </summary>
+    [Parameter]
+    public bool UseInputSearch { get; set; } = true;
+    [Parameter] public EventCallback<string[]> OnSearchClick { get; set; }
+    [Parameter] public EventCallback<ApproverInfo> OnItemClick { get; set; }
+    [Parameter] public EventCallback<ApproverInfo> OnItemDoubleClick { get; set; }
+    [Parameter] public ICollection<ApproverInfo> UserDataSource { get; set; }
+
+    [Parameter] public bool ColumnIndexVisible { get; set; } = true;
+    [Parameter] public bool ColumnDeptNameVisible { get; set; } = true;
+    [Parameter] public bool ColumnGradeVisible { get; set; } = true;
+    [Parameter] public bool ColumnNameVisible { get; set; } = true;
+
+    private string IndexDisplay { get => (ColumnIndexVisible) ? "" : "display:none;"; }
+
+    private int SearchListHeight { get => (UseInputSearch) ? (Height - 28) : Height; }
+
+    /// <summary>
+    /// 현재 Active 되어 있는 Groupid
+    /// </summary>
+    int activedGroupID
+    {
+        get
+        {
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            return (sgSideBar == null) ? 0 : sgSideBar.GroupId;
+        }
+    }
+
+    /// <summary>
+    /// 현재 Active된 GRoupid 에 로그인된 정보
+    /// </summary>
+    SGLoginData activedSGLogin
+    {
+        get
+        {
+            int groupid = activedGroupID;
+            SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+            return sgLoginData;
+        }
+    }
+
+    SGUserData activeSGUserData
+    {
+        get
+        {
+            int gouprid = activedGroupID;
+            SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(gouprid);
+            return sgUserData;
+        }
+    }
+
+    private ISGSideBarUIService SideBarUISvc;
+
+    string strInputDept = "";
+    string strInputName = "";
+
+    string currentSelectKey = "";
+
+    private string strDept = "";
+    private string strName = "";
+    private string strSearch = "";
+    private string strOrder = "";
+    private string strRank = "";
+    private string strDeptPlaceHolder = "";
+    private string strNamePlaceHolder = "";
+    private string strSelectedDeptCode = "";
+    private static Action<string> actionAssign;                 //조회대상 SEQ
+    private int doubleClickMaxTime = 500; //밀리세컨
+
+    protected override void OnInitialized()
+    {
+        @*actionAssign = AssignApprover;*@
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        InitText();
+        base.OnInitialized();
+    }
+
+    public void InitText()
+    {
+        strDept = XmlConf.GetTitle("T_COMMON_DEPT");                                // 부서
+        strName = XmlConf.GetTitle("T_COMMON_NAME");                                // 이름
+        strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                            // 조회
+        strOrder = XmlConf.GetTitle("T_COMMON_ORDER");                              // 순번
+        strRank = XmlConf.GetTitle("T_COMMON_RANK");                                // 직급
+        strDeptPlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       // 부서입력
+        strNamePlaceHolder = XmlConf.GetTitle("T_INPUT_NAME");                       // 이름입력
+    }
+
+    private void HandleKeyEvent(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            callBackSearch();
+        }
+    }
+
+    void callBackSearch()
+    {
+        if (OnSearchClick.HasDelegate)
+            OnSearchClick.InvokeAsync(new string[] { strInputDept, strInputName });
+    }
+
+
+    DateTime timeInterval = DateTime.Now;
+    string lastIndex = "";
+    void clickItemList(ApproverInfo selectedItem)
+    {
+        DateTime now = DateTime.Now;
+
+        if (OnItemDoubleClick.HasDelegate == false || timeInterval.AddMilliseconds(CsDefinition.DoubleClickMaxTime) <= now || lastIndex != selectedItem.Index)
+        {
+            //일반클릭
+            timeInterval = now;
+
+            if (OnItemClick.HasDelegate)
+                OnItemClick.InvokeAsync(selectedItem);
+        }
+        else
+        {
+            //더블클릭
+            timeInterval = now.AddSeconds(-10);     //이후 3번클릭은 더블클릭 되지 않도록
+
+            if (OnItemDoubleClick.HasDelegate)
+                OnItemDoubleClick.InvokeAsync(selectedItem);
+
+        }
+        currentSelectKey = selectedItem.UserSeq;
+        lastIndex = selectedItem.Index;
+    }
+}

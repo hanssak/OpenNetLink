@@ -61,16 +61,16 @@
                         <div style=" width:310px;">
                             <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.1rem;">@strSystemName <span class="full_txt">@strConNetwork <i class="fas fa-long-arrow-alt-right p-1"></i>  @strToNetWork</span></p>
 
-                            <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" @bind="id" tabindex="1" autocomplete="off">
+                            <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@id" @oninput="@(e => id = e.Value.ToString())" tabindex="1" autocomplete="off">
 
                             @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
                             {
                                 //AD 로그인은 PW 사용자 입력 불가 (Readonly)
-                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" @bind="pw" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
+                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)"  value="@pw" @oninput="@(e => pw = e.Value.ToString())"  @onkeyup="keyCheck" tabindex="2" autocomplete="off">
                             }
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
                             {
-                                <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" @bind="otp" @onkeyup="keyCheck" tabindex="3" autocomplete="off">
+                                <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" value="@otp" @oninput="@(e=>otp = e.Value.ToString())" @onkeyup="keyCheck" tabindex="3" autocomplete="off">
                             }
                             <div class="row p-0">
                                 @if (bAutoLogin)
@@ -88,25 +88,25 @@
                                     @*@if (pageService.m_nLoginType != (int)eLoginType.eLOGINTYPE_AD)*@
                                     @*{*@
 
-                                        @if (bViewBackButton == false)
-                                        {
-                                            <button id="btnLoginViewBack" @onclick="ClickdoLogin" class="full_login_btn btn mb-3" tabindex="5" disabled="@bLoginBtnDisable">LOGIN</button>
-                                        }
-                                        else
-                                        {
-                                            <div class="col-md-12 text-center">
-                                                <table style="width:100%;">
-                                                    <tr>
-                                                        <td>
-                                                            <button id="btnLogin" @onclick="ClickdoLogin" class="full_login_btn btn mb-3" tabindex="6" disabled="@bLoginBtnDisable">LOGIN</button>
-                                                        </td>
-                                                        <td>
-                                                            <button id="btnLoginCancel" @onclick="doBack" class="full_cancel_btn btn mb-3" tabindex="7" disabled="@bLoginBtnDisable">Cancel</button>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                        }
+                                    @if (bViewBackButton == false)
+                                    {
+                                        <button id="btnLoginViewBack" @onclick="ClickdoLogin" class="full_login_btn btn mb-3" tabindex="5" disabled="@bLoginBtnDisable">LOGIN</button>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-md-12 text-center">
+                                            <table style="width:100%;">
+                                                <tr>
+                                                    <td>
+                                                        <button id="btnLogin" @onclick="ClickdoLogin" class="full_login_btn btn mb-3" tabindex="6" disabled="@bLoginBtnDisable">LOGIN</button>
+                                                    </td>
+                                                    <td>
+                                                        <button id="btnLoginCancel" @onclick="doBack" class="full_cancel_btn btn mb-3" tabindex="7" disabled="@bLoginBtnDisable">Cancel</button>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    }
 
                                     @*}*@
                                     <div class="full_copy">COPYRIGHT &copy HANSSAK. ALL RIGHTS RESERVED</div>
@@ -130,11 +130,21 @@
 @code {
     SGAlert refSGAlert;
 
-    [Parameter]
-    public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
+        [Parameter]
+        public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
 
-    public string id { get; set; }
-    public string pw { get; set; }
+    public string id { get; set; } = "";
+
+
+   // public string _pw = "";
+    public string pw;
+   @* private void OnInput(string value)
+    {
+        var newValue = value ?? string.Empty;
+
+        pw  = newValue;
+    }*@
+
     public string otp { get; set; }
 
     public string strSystemName = "";
@@ -226,13 +236,14 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="arg"></param>
     private void keyCheck(KeyboardEventArgs arg)
     {
         //Enter 로 인한 로그인은 [로그인] 버튼이 존재하는  AD 외 로그인 타입만 적용토록 변경
-        if (arg.Key == "Enter" )
+        
+       if (arg.Key == "Enter")
         {
             CLog.Here().Information($"keyCheck, ENTER Key - ###### - try login");
             ClickdoLogin();
@@ -251,7 +262,7 @@
 
         bLoginBtnDisable = true;
         StateHasChanged();
-	
+
         if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
         {
             if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupid))
@@ -412,7 +423,7 @@
                 strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-            strPW = "HsckAD.com";
+    strPW = "HsckAD.com";
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -467,7 +478,7 @@
             pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-        pw = "HsckAD.com";
+    pw = "HsckAD.com";
 #endif
 
         pw = pw.ToLower();
@@ -504,7 +515,7 @@
 
 
 #if DEBUG
-            pw = "HsckAD.com";
+    pw = "HsckAD.com";
 #endif
             pw = pw.ToLower();
 
@@ -575,16 +586,16 @@
     }
 
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="firstRender"></param>
-    protected override void OnAfterRender(bool firstRender)
-    {
-        Thread waitTh = new Thread(WaitForFocus);
-        waitTh.Start();
-        base.OnAfterRender(firstRender);
-    }
+    ///// <summary>
+    /////
+    ///// </summary>
+    ///// <param name="firstRender"></param>
+    //protected override void OnAfterRender(bool firstRender)
+    //{
+    //    Thread waitTh = new Thread(WaitForFocus);
+    //    waitTh.Start();
+    //    base.OnAfterRender(firstRender);
+    //}
 
 
     /// <summary>
@@ -594,6 +605,7 @@
     /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        
         object[] param = { "none" };
         await JSRuntime.InvokeAsync<object>("initLogIn", param);
 
@@ -774,10 +786,10 @@
 
             if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
             {
-	    
+
                 bLoginBtnDisable = true;
                 StateHasChanged();
-	    
+
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupid))
                 {
                     if (doADLoginLocalCheck(groupid))
@@ -1055,7 +1067,15 @@
                         strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
                         strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
                         strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
-                        strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";
+                        strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_EXT'";
+                        // strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";     // Table 이름 따로 정해졌음
+                        strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
+
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc())
+                        {
+                            strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
+                            strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
+                        }
                         strGetinfoTagName += ", 'MAX_CLIP_SIZE'";
 
                         string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
@@ -1389,7 +1409,7 @@
                             }
                         }
 
-                        // Login 화면으로 머물러있지 않도록
+                            // Login 화면으로 머물러있지 않도록
                         @*if (nGroupIDfirst < 0)
                             nGroupIDfirst = 0;*@
 
@@ -1466,6 +1486,7 @@
                             strTime = sgSettingProc.GetSettingDelayDspPw(nGroupIDfirst);
                             if (strTime.Equals(""))
                             {
+                                // 처음설치해서 사용하는 사용자들 항상 실행하게 되는 경로
                                 pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
                                 await refPWChange.openPopUp();
                                 return;
@@ -2542,13 +2563,13 @@
         //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-            {
+        {
         return true;
-        }
-            else
-                return false;
+            }
+                else
+                    return false;
 
-                    }
+                        }
     */
 
-}
+    }

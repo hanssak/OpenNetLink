@@ -281,6 +281,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="groupID"></param>
         /// <returns></returns>
         public bool GetUsePKIsendRecv(int groupID);
+
+
+
+        public bool GetUseCrossPlatformOSforFileName();
+
+
+        public bool GetUseMinLengthTitleDesc();
+
+
     }
 
 
@@ -900,6 +909,17 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return (AppConfigInfo as SGopConfig).bListUsePKIsendRecv[nGroupID];
 
             return false;    // 기본값
+        }
+
+
+        public bool GetUseCrossPlatformOSforFileName()
+        {
+            return AppConfigInfo.bUseCrossPlatformOSforFileName;
+        }
+		
+        public bool GetUseMinLengthTitleDesc()
+        {
+            return AppConfigInfo.bUseTitleDescMinLength;
         }
 
     }

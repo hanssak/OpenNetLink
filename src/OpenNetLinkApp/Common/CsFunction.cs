@@ -261,17 +261,27 @@ namespace OpenNetLinkApp.Common
                     return false;
 
                 strFileName = strFileName.Substring(nPos + 1);
-
             }
 
-            strFileName = strFileName.ToUpper();
-            strExtData = strExtData.ToUpper();
+            // strFileName = strFileName.ToUpper();
+            // strExtData = strExtData.ToUpper();
 
-            if (strExtData.IndexOf(strFileName) >= 0)
-                return true;
+            string[] liststr = strExtData.Split(';');
+            int nCount = liststr.Count();
 
+            for (int nDx = 0; nDx < nCount; nDx++)
+            {
+                if (string.Compare(strFileName, liststr[nDx], true) == 0)
+                {
+                    Log.Logger.Here().Information($"isFileExtinListStr, Found : {strFileName}");
+                    return true;
+                }
+            }
+
+            Log.Logger.Here().Information($"isFileExtinListStr, FileExt : {strFileName}, is not in str LIST : {strExtData}");
             return false;
         }
+
 
         public static byte[] ObjectToByteArray(Object obj)
         {
@@ -422,7 +432,7 @@ namespace OpenNetLinkApp.Common
         /// <param name="fileName"></param>
         /// <param name="strItem"></param>
         /// <returns></returns>
-        public static bool isSupportFileName(string fileName, out string strItem)
+        public static bool isSupportFileName(string fileName, out string strItem, bool bIsForRecv=true)
         {
 
             Log.Logger.Here().Information($"isSupportFileName - fileName : {fileName}");
@@ -445,7 +455,7 @@ namespace OpenNetLinkApp.Common
             // File / Folder 이름으로 정해질 수 없는 문자 있는지 확인
 
             // Windows
-            string strNotSupportData = "\\/:*?\"<>";
+            string strNotSupportData = "\\/:*?\"<>|";  // 차단문자, Test때에 사용 "\\/:*?\"<>|0"
 
             // Linux
             // "/"
@@ -475,8 +485,8 @@ namespace OpenNetLinkApp.Common
                 return false;
             }
 
-            // 특정문자로 시작될때 허용불가능 
-            if (fileName.IndexOf('.') == 0)
+            // 특정문자로 시작될때 허용불가능 (수신때만)
+            if (bIsForRecv && fileName.IndexOf('.') == 0)
             {
                 strItem = ".";
                 Log.Logger.Here().Information($"isSupportFileName - Not Support Start Char(###-StartChar)(MacOSx) : {"."}");

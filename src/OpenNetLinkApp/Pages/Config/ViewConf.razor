@@ -152,6 +152,9 @@
                                 <div class="title_url"><i class="fas fa-cog mr-1"></i>@XmlConf.GetTitle("T_INFO_AVAILABLE_URL_LIST")</div>
                                 <div class="col-md-12 url">
                                     <div class="input-group mb-2">
+                                        <span style="font-weight:bold">@strURLRedirectCheck</span>
+                                    </div>
+                                    <div class="input-group mb-2">
                                         <input type="text" @bind="strSearchURL" ondrop="return false;" ondragover="return false;" class="form-control rounded-0 p-1 pl-3 text-md" placeholder="@XmlConf.GetTitle("T_INFO_PLEASE_TYPE_URL")" style="border:1px solid #83a0bd !important;">
                                         <span class="input-group-append">
                                             <button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-blue btn-flat  mr-1" @onclick="SearchURLList">@XmlConf.GetTitle("T_INFO_URL_SEARCH")</button>
@@ -237,6 +240,7 @@
     public string strDataDayFileTransMaxSize = "";                                         // 150000MB까지 전송
     public string strDataDayClipboardMaxCount = "";                                        // 3600회까지 전송
     public string strDataDayClipboardMaxSize = "";                                         // 1024MB까지 전송
+    public string strURLRedirectCheck = "";                                             //URL Redirect 검사 방식
     ISGSideBarUIService SideBarUISvc;
     ISGSiteConfigService siteConfig;
 
@@ -420,6 +424,21 @@
             strExtInfo = temp;
 
         bURLRedirection = sgLoginData.GetURLRedirect();
+
+        SGUrlListData sgUrlData = null;
+        sgUrlData = (SGUrlListData)HSCmdCenter.GetURLlistData(groupID);
+        if (sgUrlData != null)
+        {
+            eUrlType eUType = sgUrlData.GetURLuseType();
+            if(eUType == eUrlType.eWhiteList)
+                strURLRedirectCheck = $"{XmlConf.GetTitle("T_INFO_URL_REDIRECTION_CHECK")} {XmlConf.GetTitle("T_INFO_CHECK_EXTENSION_WHITE")}";
+            else if(eUType == eUrlType.eBlackList)
+                strURLRedirectCheck = $"{XmlConf.GetTitle("T_INFO_URL_REDIRECTION_CHECK")} {XmlConf.GetTitle("T_INFO_CHECK_EXTENSION_BLACK")}";
+            else
+                strURLRedirectCheck = $"{XmlConf.GetTitle("T_INFO_URL_REDIRECTION_CHECK")} {XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED")}";
+        }
+
+
         //URL 설정정보 추출
         SearchURLList();
 

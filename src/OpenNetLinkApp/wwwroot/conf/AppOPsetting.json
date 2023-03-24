@@ -133,5 +133,12 @@
   "bUseLoginAfterTray": false,
   "bUseFileApproveReason": false,
   "bUseClipBoardApproveReason": false,
-  "bUseFileSelectDelete" :  false
+  "bUseFileSelectDelete": false,
+  "bUseCrossPlatformOSforFileName" : true,
+  "bListUsePKIsendRecv": [
+    false,
+    false,
+    false
+  ],
+  "bUseTitleDescMinLength" : false
 }

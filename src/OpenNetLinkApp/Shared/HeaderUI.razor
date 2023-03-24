@@ -2424,6 +2424,14 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                         }
                     }
 
+                    // tray 상태라면 화면상에 나타나게 수정
+                    if (activeMenu.Path.Contains("transferApprove") ||
+                        activeMenu.Path.Contains("securityApprove") ||
+                        activeMenu.Path.Contains("clipBoardApprove") ||
+                        activeMenu.Path.Contains("fileException") ||
+                        activeMenu.Path.Contains("mailApprove"))
+                        Window.MoveTrayToWebWindow();
+
                     if (pgRefreshEvent != null)
                         pgRefreshEvent();
 
@@ -3671,7 +3679,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 param[1] = strFromName + " <i class='fas fa-long-arrow-alt-right p-1'></i> " + strToName;
                 param[2] = strFileRecvInfo;
                 pageService.SetFileRecving(true);
-                await Task.Delay(100);
+               // await Task.Delay(100);
                 break;
             case 2:
                 identifier = "updateProgressMessage";
@@ -3679,7 +3687,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 param[0] = strID;
                 param[1] = strFileRecvInfo;
                 param[2] = strProgress;
-                await Task.Delay(500);
+            //    await Task.Delay(500);
                 break;
             case 3:
                 if (pageService.m_bScreenLock == true)
@@ -3689,14 +3697,14 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFileRecving(false);
-                await Task.Delay(1000);
+           //     await Task.Delay(1000);
                 break;
             case 4:             // 파일 수신 중 오류
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFileRecving(false);
-                await Task.Delay(1000);
+             //   await Task.Delay(1000);
                 break;
             default:
                 break;

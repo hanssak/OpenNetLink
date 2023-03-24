@@ -2222,12 +2222,18 @@
     }
 
     /// <summary>
-    ///
+    /// 
     /// </summary>
-    public async void clientUpgradeExe(int groupId)
+    /// <param name="groupId"></param>
+    /// <param name="isTotalPathch">전체패치 여부 (서버의 PATCHMODE =1 )</param>
+    public async void clientUpgradeExe(int groupId, bool isTotalPathch)
     {
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseForceBackgroundUpdate())
+        Console.WriteLine("clientUpgradeExe : " + isTotalPathch.ToString());
+        
+        if (isTotalPathch || SGAppMgrSvc.OpConfigInfoService.GetUseForceBackgroundUpdate())
         {
+            //서버설정의 PATCHMODE = 1 (전체패지) 인 경우, 강제 패치처리
+            //OpConfig의 ForceBackgroundUpdate = True 인 경우, 강제 패치 처리
             await Task.Run(() =>
             {
                 AppUpdaterSvc.CheckUpdateBackgroundDown(groupId);

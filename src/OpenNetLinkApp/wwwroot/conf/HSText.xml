@@ -2888,6 +2888,13 @@
 			<EN></EN>
 			<CN></CN>
 		</T_INFO_UPDATEPOLICY_LOGOUT>
+    
+    <T_INFO_URL_REDIRECTION_CHECK>
+      <KR>URL Redirection 검사 : </KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </T_INFO_URL_REDIRECTION_CHECK>
 
 		<!-- ********************************************* [END] 환경 정보 화면 (T_INFO_0000) ********************************************* -->
 
@@ -3278,6 +3285,83 @@
 
 
 		<!-- ********************************************* [END] GPKI 인증서 화면 (T_GPKI_0000) ********************************************* -->
+
+
+
+		<!-- ********************************************* [START] PKI 인증서 화면 (T_PKI_0000) ********************************************* -->
+
+		<T_PKI_TRANS>
+			<KR>인증서(PKI)전송</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>选择证书</CN>
+		</T_PKI_TRANS>
+
+		<T_PKI_TRANS_SELECT_POS>
+			<KR>인증서 위치를 선택해주세요</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>磁盘</CN>
+		</T_PKI_TRANS_SELECT_POS>
+
+		<T_PKI_TRANS_SELECT_ITEM>
+			<KR>인증서를 선택해주세요</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>移动式磁盘</CN>
+		</T_PKI_TRANS_SELECT_ITEM>
+
+		<T_PKI_TRANS_HDD>
+			<KR>하드디스크</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>选择存储媒体</CN>
+		</T_PKI_TRANS_HDD>
+
+		<T_PKI_TRANS_USB>
+			<KR>이동식디스크</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>选择证书</CN>
+		</T_PKI_TRANS_USB>
+
+		<T_PKI_TRANS_BTN>
+			<KR>인증서 전송</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>证书密码</CN>
+		</T_PKI_TRANS_BTN>
+
+		<T_PKI_TRANS_ITEM>
+			<KR>구분</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>登录ID</CN>
+		</T_PKI_TRANS_ITEM>
+
+		<T_PKI_TRANS_USER>
+			<KR>사용자</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>证书ID</CN>
+		</T_PKI_TRANS_USER>
+
+		<T_PKI_TRANS_EXPIREDATE>
+			<KR>만료일</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>到期日期</CN>
+		</T_PKI_TRANS_EXPIREDATE>
+
+		<T_PKI_TRANS_ISSUER>
+			<KR>발급자</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>出具人</CN>
+		</T_PKI_TRANS_ISSUER>
+
+		<!-- ********************************************* [END] PKI 인증서 전송화면 (T_PKI_0000) ********************************************* -->
+
 
 		<!-- ********************************************* [START] ETC (T_ETC_0000) ********************************************* -->
 
@@ -3855,6 +3939,13 @@
 			<CN>Office未安装、转换错误</CN>
 		</T_eFAOfficeNoinstalled>
 
+		<T_eFA_FILENAME_CHAR_ERR>
+			<KR>파일이름, 미지원 문자 오류</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eFA_FILENAME_CHAR_ERR>
+
 		<T_EXCEPTION_REASON>
 			<KR>제외사유</KR>
 			<JP>除外事由</JP>
@@ -4141,6 +4232,13 @@
 			<EN></EN>
 			<CN></CN>
 		</L_eFA_FILE_READ_ERROR>
+
+		<L_eFA_FILE_NAME_ERROR>
+			<KR>파일명 미지원 문자 오류</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</L_eFA_FILE_NAME_ERROR>
 
 		<T_ETC_FAEXCEPTIONCOUNT>
 			<KR>{0} 개</KR>
@@ -8732,6 +8830,21 @@
 	  </W_0289>
 
 
+	<W_0290>
+		<KR>제목을 {0}자 이상 입력하십시오.</KR>
+		<JP>タイトルを入力して下さい。</JP>
+		<EN>Please enter a title.</EN>
+		<CN>请输入标题。</CN>
+	</W_0290>
+
+	<W_0291>
+		<KR>설명을 {0}자 이상 입력하십시오.</KR>
+		<JP>説明を入力して下さい。</JP>
+		<EN>Please enter a description.</EN>
+		<CN>请输入说明。</CN>
+	</W_0291>
+
+
 	</WARNING>
 
 
@@ -10522,6 +10635,20 @@
       <EN></EN>
       <CN></CN>
     </E_0257>
+
+    <E_0258>
+      <KR>파일이름에 지원하지 않는 문자가 있습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </E_0258>
+
+	<E_0259>
+		<KR>[{0}]님은 이미 [{1}]에 등록되어 있습니다.</KR>
+		<JP></JP>
+		<EN></EN>
+		<CN></CN>
+	</E_0259>
 
 
   </ERROR>

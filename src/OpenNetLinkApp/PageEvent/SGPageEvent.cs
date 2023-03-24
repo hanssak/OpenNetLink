@@ -179,7 +179,7 @@ namespace OpenNetLinkApp.PageEvent
     // 업데이트 노티
     public delegate void ClientUpgradeEvent(int groupid, PageEventArgs e);
     // 업데이트 실행
-    public delegate void ClientUpgradeExeEvent(int gouprid);
+    public delegate void ClientUpgradeExeEvent(int gouprid, bool isTotalPatch = false);
     // 대쉬보드 조회 카운트 노티.
     public delegate void DashBoardCountEvent(int groupid, PageEventArgs e);
     // 대쉬보드 전송요청 카운트 노티.
