@@ -21,7 +21,7 @@ window.loginCursorChange = () => {
 
     //로그인 중, PW에 Enter 이벤트 방지 (btnLogin 버튼은 razor에서 따로 관리하므로 설정하지 않음)
     $("#loginPw").attr("disabled", true);
-    
+
 }
 
 window.initCapaChart = (nUse, nRest) => {
@@ -699,16 +699,15 @@ window.fireToastMessage = (type, title, message) => {
 }
 var zIndex = 1101;
 window.openPopUp = (popUpId) => {
-	//여기 인덱스를 강제로 내리는것은 문제있는 코드인데 일단 정확한 사유를 몰라 그냥 둠 2021/03/08 YKH
-	//
-	if (popUpId == "PopUpLogIn" || popUpId == "GPKIPopUp" || popUpId == "modal-pwchange-sidebar" || popUpId == "modal-pwchangedefaultpw-sidebar"
-        || popUpId == "ProxyApprover" || popUpId == "ProxyApproverTreePopUp" || popUpId == "SecurityApproverSelectPopUp" || popUpId == "PopUpSelectClipType" ) {
-		$("#left-sidebar").css("z-index", 2202);
-		$("#main-nav").css("z-index", 2202);
+    //여기 인덱스를 강제로 내리는것은 문제있는 코드인데 일단 정확한 사유를 몰라 그냥 둠 2021/03/08 YKH
+    //
+    if (popUpId == "PopUpLogIn" || popUpId == "GPKIPopUp" || popUpId == "modal-pwchange-sidebar" || popUpId == "modal-pwchangedefaultpw-sidebar"
+        || popUpId == "ProxyApprover" || popUpId == "ProxyApproverTreePopUp" || popUpId == "SecurityApproverSelectPopUp" || popUpId == "PopUpSelectClipType") {
+        $("#left-sidebar").css("z-index", 2202);
+        $("#main-nav").css("z-index", 2202);
     }
-    else if (popUpId == "HeaderUIApporveAfterAlert" || popUpId == "HeaderUIApporveAfterMyCountAlert" || popUpId == "HeaderUIUpdateStartAlert")
-	{
-		$("#main-nav").css("z-index", 2203);
+    else if (popUpId == "HeaderUIApporveAfterAlert" || popUpId == "HeaderUIApporveAfterMyCountAlert" || popUpId == "HeaderUIUpdateStartAlert") {
+        $("#main-nav").css("z-index", 2203);
     }
     else if (popUpId == "modal-displaylock") {
         $("#left-sidebar").css("z-index", 0);
@@ -764,7 +763,7 @@ window.closeAllPopup = () => {
     $("#DashBoardContinueFileTransAlert").modal("hide");
     $("#HeaderUIApporveAfterAlert").modal("hide");
     $("#HeaderUIApporveAfterMyCountAlert").modal("hide");
-    $("#HeaderUIUpdateStartAlert").modal("hide");    
+    $("#HeaderUIUpdateStartAlert").modal("hide");
     $("#SGBasicSelect").modal("hide");
     $("#modal-capcha").modal("hide");
     $("#SGConfirm").modal("hide");
@@ -982,12 +981,13 @@ window.addMouseDown = (message) => {
             addTrSelection(e.target.parentElement, 5);
             return;
         }
-        if (e.target.parentElement.getAttribute('name') == "trItem6") {
+        //수신자 Row select 처리는 Razor에서 처리하도록 변경
+        //if (e.target.parentElement.getAttribute('name') == "trItem6") {
 
-            clearTrSelections();
-            addTrSelection(e.target.parentElement, 6);
-            return;
-        }
+        //    clearTrSelections();
+        //    addTrSelection(e.target.parentElement, 6);
+        //    return;
+        //}
 
         if (e.target.parentElement.getAttribute('name') == "trItem7") {
 
@@ -1033,12 +1033,13 @@ window.addMouseDown = (message) => {
             addTrTargetSelection(e.target.parentElement, 5);
             return;
         }
-        else if (e.target.parentElement.getAttribute('name') == "trSelect6") {
+        //수신자 Row select 처리는 Razor에서 처리하도록 변경
+        //else if (e.target.parentElement.getAttribute('name') == "trSelect6") {
 
-            clearTrTargetSelections(true);
-            addTrTargetSelection(e.target.parentElement, 6);
-            return;
-        }
+        //    clearTrTargetSelections(true);
+        //    addTrTargetSelection(e.target.parentElement, 6);
+        //    return;
+        //}
         else if (e.target.parentElement.getAttribute('name') == "trSelect7") {
 
             clearTrTargetSelections(true);
@@ -1251,10 +1252,11 @@ function addTrTargetSelection(item, index) {
     //    DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxyTargetSelect", item.getAttribute('value'));
     else if (index == 5)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxyTargetSelect2", item.getAttribute('value'));
-    else if (index == 6)
-        DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverTargetSelect", item.getAttribute('value'));
+    //수신자 Row select 처리는 Razor에서 처리하도록 변경
+    //else if (index == 6)
+    //    DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverTargetSelect", item.getAttribute('value'));
     else if (index == 7)
-        DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproveExtTargetSelect", item.getAttribute('value'));    
+        DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproveExtTargetSelect", item.getAttribute('value'));
 
     TrTargetSelections.items.push(item);
 }
@@ -1283,13 +1285,12 @@ function addTrSelection(item, index) {
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect2", item.getAttribute('value'));
     else if (index == 3)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect3", item.getAttribute('value'));
-    //대결재 row select 처리는 razor에서 처리하도록 변경
-    //else if (index == 4)
+    //else if (index == 4) //대결재 row select 처리는 razor에서 처리하도록 변경
     //    DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect", item.getAttribute('value'));
     else if (index == 5)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect2", item.getAttribute('value'));
-    else if (index == 6)
-        DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverSearchSelect", item.getAttribute('value'));
+    //else if (index == 6)  //수신자 Row select 처리는 Razor에서 처리하도록 변경
+    //    DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverSearchSelect", item.getAttribute('value'));
     else if (index == 7)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproveExtSearchSelect", item.getAttribute('value'));
     else if (index == 8)

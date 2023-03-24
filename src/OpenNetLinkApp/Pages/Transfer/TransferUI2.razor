@@ -1698,7 +1698,8 @@
             return;
 
         string strCurTeamName = sgUserData.GetTeamName();
-        refReceiverSelect_PopUp.SetInitDeptName(strCurTeamName);
+        //팝업 첫 화면은 해당 DEPT CODE 로 조회하여 해당 부서만 조회되도록 처리
+        //refReceiverSelect_PopUp.SetInitDeptName(strCurTeamName);
         refReceiverSelect_PopUp.BindEvent();
         await refReceiverSelect_PopUp.openPopUp();
 
