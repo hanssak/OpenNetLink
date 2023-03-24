@@ -355,7 +355,7 @@
         DeptApprLine();
     }
 
-    public void DeptApprLine()
+    public void DeptApprLine(bool isInit = false)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -383,8 +383,7 @@
         string strUserID = sgLoginData.GetUserID();
         string strUserName = strCurName;
         string strTeamName = strCurDept;
-        strCurDept = strTeamName;
-        string strTeamCode = "";
+        string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
         //if (strUserName == "" && strTeamName == "")
         //    strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
         //결재자만검색, 모두 검색 구분자
@@ -421,7 +420,7 @@
         if (proxySearchType == "TREE" && refSGDeptTreeList != null)
             refSGDeptTreeList.BindEvent();
         else
-            DeptApprLine();
+            DeptApprLine(true);
     }
 
     public void ProxySearchResult(int groupid, SGData data)
