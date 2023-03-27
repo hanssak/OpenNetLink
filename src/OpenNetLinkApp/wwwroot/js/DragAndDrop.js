@@ -990,13 +990,13 @@ window.addMouseDown = (message) => {
         //    addTrSelection(e.target.parentElement, 6);
         //    return;
         //}
+        //결재 필수 확장자 Row Select 처리는 Razor에서 처리하도록 변경
+        //if (e.target.parentElement.getAttribute('name') == "trItem7") {
 
-        if (e.target.parentElement.getAttribute('name') == "trItem7") {
-
-            clearTrSelections();
-            addTrSelection(e.target.parentElement, 7);
-            return;
-        }
+        //    clearTrSelections();
+        //    addTrSelection(e.target.parentElement, 7);
+        //    return;
+        //}
         //결재자 row select 처리는 razor에서 처리하도록 변경
         //결재자 지정 첫번째
         //if (e.target.parentElement.getAttribute('name') == "trSelect") {
@@ -1043,12 +1043,13 @@ window.addMouseDown = (message) => {
         //    addTrTargetSelection(e.target.parentElement, 6);
         //    return;
         //}
-        else if (e.target.parentElement.getAttribute('name') == "trSelect7") {
+        //결재 필수 확장자 Row Select 처리는 Razor에서 처리하도록 변경
+        //else if (e.target.parentElement.getAttribute('name') == "trSelect7") {
 
-            clearTrTargetSelections(true);
-            addTrTargetSelection(e.target.parentElement, 7);
-            return;
-        }
+        //    clearTrTargetSelections(true);
+        //    addTrTargetSelection(e.target.parentElement, 7);
+        //    return;
+        //}
 
         //팝업파일선택
         if (e.target.getAttribute('name') == "popfile") {
@@ -1258,8 +1259,9 @@ function addTrTargetSelection(item, index) {
     //수신자 Row select 처리는 Razor에서 처리하도록 변경
     //else if (index == 6)
     //    DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverTargetSelect", item.getAttribute('value'));
-    else if (index == 7)
-        DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproveExtTargetSelect", item.getAttribute('value'));
+    //결재 필수 확장자 Row Select 처리는 Razor에서 처리하도록 변경
+    //else if (index == 7)
+    //    DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproveExtTargetSelect", item.getAttribute('value'));
 
     TrTargetSelections.items.push(item);
 }
@@ -1294,8 +1296,9 @@ function addTrSelection(item, index) {
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect2", item.getAttribute('value'));
     //else if (index == 6)  //수신자 Row select 처리는 Razor에서 처리하도록 변경
     //    DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverSearchSelect", item.getAttribute('value'));
-    else if (index == 7)
-        DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproveExtSearchSelect", item.getAttribute('value'));
+    //결재 필수 확장자 Row Select 처리는 Razor에서 처리하도록 변경
+    //else if (index == 7)
+    //    DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproveExtSearchSelect", item.getAttribute('value'));
     else if (index == 8)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect3", item.getAttribute('value'));
     else if (index == 9)
