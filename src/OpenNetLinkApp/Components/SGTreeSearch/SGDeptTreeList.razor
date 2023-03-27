@@ -225,7 +225,7 @@
             strDown = XmlConf.GetTitle("T_ETC_DOWN");                                   // 아래
             strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
             strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기*@
-        strDeptPlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       // 부서입력
+    strDeptPlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       // 부서입력
         strNamePlaceHolder = XmlConf.GetTitle("T_INPUT_NAME");                       // 이름입력
     }
 
@@ -247,13 +247,17 @@
 
     public void BindEvent()
     {
+        //Tree 및 리스트 재정렬
+        deptTreeInfoValues = null;
+        currentSelectKey = "";
+
         HsCmdCenter.sgPageEvent.SetDeptInfoEventAdd(activedGroupID, setDeptTree);
         if (activedSGLogin != null)
             HsCmdCenter.SendDeptInfo(activedGroupID, activedSGLogin.GetUserID());
 
         if (activeSGUserData != null)
             strSelectedDeptCode = activeSGUserData.GetTeamCode();
-
+        
         @*updateDeptApprLine(strSelectedDeptCode);*@
 
     timeInterval = DateTime.Now;
