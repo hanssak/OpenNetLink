@@ -30,7 +30,7 @@
                         }
                         else //Tree
                         {
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="359" TreeHeight="170" UserSearchList="@ReceiverSearch"
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="359" TreeHeight="170" UserSearchList="@ReceiverSearch" IsApproverOnly="false"
                                         OnItemClick="(approve) => AssignApprover(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                     </div>

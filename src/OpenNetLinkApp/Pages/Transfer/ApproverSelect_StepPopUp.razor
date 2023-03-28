@@ -42,7 +42,8 @@
                         else //TREE
                         {
                             @*<SGDeptTreeList Height="368" UserSearchList="@ApproverSearch" @bind-SelectedUserSeq="@stSelectApprover" />*@
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="420" TreeHeight="160" UserSearchList="@ApproverSearch" OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => SGDeptTreeList_OnItemDoubleClick(item)" />
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="420" TreeHeight="160" UserSearchList="@ApproverSearch" IsApproverOnly="@bApproverOnly"
+                                            OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => SGDeptTreeList_OnItemDoubleClick(item)" />
                         }
                     </div>
                     <!--e table -->
@@ -181,6 +182,11 @@
     private string approverSearchType = "";
     private bool useInputInTree;
 
+    /// <summary>
+    /// true 결재자만 검색 / false 모두 검색
+    /// /// </br>(대결재자의 '일반사용자 조회 여부' 와 통일)
+    /// </summary>
+    private bool bApproverOnly = true;
 
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
@@ -232,10 +238,10 @@
         string strUserID = sgLoginData.GetUserID();
         string strUserName = strCurName;
         string strTeamName = strCurDept;
-
         string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
+
         SGQueryExtend sgQuery = new SGQueryExtend();
-        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
+        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
         HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
     }
     public void DeptApprLineResultStep(int groupid, PageEventArgs e)
@@ -669,9 +675,13 @@
     }
     protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender)
-        {
-        }
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = (sgSideBar != null) ? sgSideBar.GroupId : 0;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            bApproverOnly = !sgLoginData.GetApproveProxyRight();
+
         base.OnAfterRender(firstRender);
     }
 

@@ -42,7 +42,8 @@
                         }
                         else    //TREE
                         {
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="359" TreeHeight="160" UserSearchList="@ApproverSearch" OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="359" TreeHeight="160" UserSearchList="@ApproverSearch" IsApproverOnly="@bApproverOnly"
+                                            OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                     </div>
                     <!--e table -->
@@ -140,6 +141,12 @@
 
     ISGSiteConfigService siteConfig;
 
+
+    /// <summary>
+    /// true 결재자만 검색 / false 모두 검색
+    /// /// </br>(대결재자의 '일반사용자 조회 여부' 와 통일)
+    /// </summary>
+    private bool bApproverOnly = true;
 
     private void moveToTop()
     {
@@ -526,6 +533,18 @@
             StateHasChanged();
         }
     }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = (sgSideBar != null) ? sgSideBar.GroupId : 0;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            bApproverOnly = !sgLoginData.GetApproveProxyRight();
+
+        base.OnAfterRender(firstRender);
+    }
     public void BindEvent()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -744,8 +763,9 @@
         string strTeamName = strCurDept;
 
         string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
+
         SGQueryExtend sgQuery = new SGQueryExtend();
-        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
+        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
         HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
     }
     //public void DeptApprLineResult(int groupid, PageEventArgs e)

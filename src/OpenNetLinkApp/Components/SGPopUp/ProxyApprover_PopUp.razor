@@ -31,11 +31,13 @@
                     <div class="box1" style=" width:46%;  float:left;">
                         @if (proxySearchType == "SEARCH")
                         {
-                            <SGDeptSearchList UseInputSearch="@useInputInTree" Height="392" UserDataSource="@ProxySearch" OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
+                            <SGDeptSearchList UseInputSearch="@useInputInTree" Height="392" UserDataSource="@ProxySearch" 
+                                                OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                         else        //TREE
                         {
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="392" TreeHeight="160" UserSearchList="@ProxySearch" OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="392" TreeHeight="160" UserSearchList="@ProxySearch" IsApproverOnly="@bApproverOnly"
+                                            OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                     </div>
                     <!--e table -->
@@ -100,6 +102,13 @@
     private bool useInputInTree;
 
     private int nActionType = -1;  //1:삭제, 2:등록
+
+    /// <summary>
+    /// true 결재자만 검색 / false 모두 검색 
+    /// /// </br>(대결재자의 '일반사용자 조회 여부' 와 통일)
+    /// </summary>
+    private bool bApproverOnly = true;
+
     private void deleteProxyApprover(ApproverInfo apvInfo)
     {
         ProxySelect.Remove(apvInfo);
@@ -120,6 +129,15 @@
             object[] param = { "datepicker", "datepicker2" };
             jsRuntime.InvokeAsync<object>("initDatePicker", param);
         }
+        
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = (sgSideBar != null) ? sgSideBar.GroupId : 0;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            bApproverOnly = !sgLoginData.GetApproveProxyRight();
+
+
         base.OnAfterRender(firstRender);
     }
 
@@ -382,13 +400,6 @@
         string strUserName = strCurName;
         string strTeamName = strCurDept;
         string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
-        //if (strUserName == "" && strTeamName == "")
-        //    strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
-        //결재자만검색, 모두 검색 구분자
-        int nSelectAll = sgLoginData.GetTagValueInteger("APPROVEPROXYRIGHT");
-        bool bApproverOnly = true;
-        if (nSelectAll == 2)
-            bApproverOnly = false;
 
         SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
