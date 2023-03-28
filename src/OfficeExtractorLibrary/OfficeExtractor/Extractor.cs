@@ -1216,9 +1216,18 @@ namespace OfficeExtractor
                     {
                         if (zipEntry.IsDirectory) continue;
 
-                        //if (zipEntry.LastModifiedTime.Value.TimeOfDay != TimeSpan.Zero)
-                        //    return true;
-
+                        if (zipEntry.Key.ToLower().EndsWith(".xml"))
+                        {
+                            if (zipEntry.LastModifiedTime.Value.TimeOfDay != TimeSpan.Zero)
+                            {
+                                string fileName = outputFolder + Path.GetFileName(zipEntry.Key);
+                                fileName = FileManager.FileExistsMakeNew(fileName);
+                                byte[] bytes = new byte[zipEntry.Size];
+                                zipEntry.OpenEntryStream().Read(bytes, 0, bytes.Length);
+                                File.WriteAllBytes(fileName, bytes);
+                                return true;
+                            }
+                        }
                         zipCount++;
                     }
 
