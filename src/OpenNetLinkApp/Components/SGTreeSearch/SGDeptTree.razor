@@ -169,6 +169,9 @@
 
     public void BindEvent()
     {
+        //Tree 및 리스트 재정렬
+        deptTreeInfoValues = null;
+
         HsCmdCenter.sgPageEvent.SetDeptInfoEventAdd(activedGroupID, setDeptTree);
         if (activedSGLogin != null)
             HsCmdCenter.SendDeptInfo(activedGroupID, activedSGLogin.GetUserID());

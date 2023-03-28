@@ -31,7 +31,7 @@
                     <div class="box1" style=" width:46%;  float:left;">
                         @if (proxySearchType == "SEARCH")
                         {
-                            <SGDeptSearchList @ref="refSGDeptSearchList" UseInputSearch="@useInputInTree" Height="392" UserDataSource="@ProxySearch" OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
+                            <SGDeptSearchList UseInputSearch="@useInputInTree" Height="392" UserDataSource="@ProxySearch" OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                         else        //TREE
                         {
@@ -55,7 +55,7 @@
                             <span class="float-left p-1">-</span>
                             <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly="readonly" value="@strToDay">
                         </div>
-                        <SGDeptSearchList @ref="refSGDeptTargetList" UseInputSearch="false" Height="392" ColumnIndexVisible="false" UserDataSource="@ProxySelect" OnItemClick="(target)=> SelectTarget(target.UserSeq)" OnItemDoubleClick="target_OnItemDoubleClick" />
+                        <SGDeptSearchList UseInputSearch="false" Height="392" ColumnIndexVisible="false" UserDataSource="@ProxySelect" OnItemClick="(target)=> SelectTarget(target.UserSeq)" OnItemDoubleClick="target_OnItemDoubleClick" />
                     </div>
                     <!--e table -->
                 </div>
@@ -75,8 +75,6 @@
 @code {
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<ProxyApprover_PopUp>();
     SGDeptTreeList refSGDeptTreeList;
-    SGDeptSearchList refSGDeptSearchList;   //좌측 조회 쪽 리스트 컨트롤
-    SGDeptSearchList refSGDeptTargetList;   //우측 등록 쪽 리스트 컨트롤
     ISGSideBarUIService SideBarUISvc;
     SGSettingsDBProc sgSettingProc;
     ISGSiteConfigService siteConfig;
@@ -355,7 +353,7 @@
         DeptApprLine();
     }
 
-    public void DeptApprLine()
+    public void DeptApprLine(bool isInit = false)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -383,8 +381,7 @@
         string strUserID = sgLoginData.GetUserID();
         string strUserName = strCurName;
         string strTeamName = strCurDept;
-        strCurDept = strTeamName;
-        string strTeamCode = "";
+        string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
         //if (strUserName == "" && strTeamName == "")
         //    strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
         //결재자만검색, 모두 검색 구분자
@@ -421,7 +418,7 @@
         if (proxySearchType == "TREE" && refSGDeptTreeList != null)
             refSGDeptTreeList.BindEvent();
         else
-            DeptApprLine();
+            DeptApprLine(true);
     }
 
     public void ProxySearchResult(int groupid, SGData data)
