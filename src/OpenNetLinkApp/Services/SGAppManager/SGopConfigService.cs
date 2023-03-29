@@ -288,6 +288,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="groupID"></param>
         /// <returns></returns>
         public bool GetUsePKIsendRecv(int groupID);
+
+
+        public bool GetUseMinLengthTitleDesc();
+
     }
 
 
@@ -925,6 +929,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return (AppConfigInfo as SGopConfig).bListUsePKIsendRecv[nGroupID];
 
             return false;    // 기본값
+        }
+
+        public bool GetUseMinLengthTitleDesc()
+        {
+            return AppConfigInfo.bUseTitleDescMinLength;
         }
 
     }

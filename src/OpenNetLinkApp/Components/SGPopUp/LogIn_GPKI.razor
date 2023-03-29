@@ -918,14 +918,20 @@
             sgQueryExtend = new SGQueryExtend();
             if (sgQueryExtend != null)
             {
-	    
-		        string strGetinfoTagName = "";
-		        strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
-		        strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
+
+                string strGetinfoTagName = "";
+                strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
+                strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
                 strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
                 strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";
                 strGetinfoTagName += ", 'CLIENT_TRANSFER_TITLE'";
                 strGetinfoTagName += ", 'CLIENT_TRANSFER_DESCRIPTION'";
+
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc())
+                {
+                    strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
+                    strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
+                }
 
                 string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
                 HsCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);

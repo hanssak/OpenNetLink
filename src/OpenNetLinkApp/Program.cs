@@ -48,12 +48,14 @@ namespace OpenNetLinkApp
                 }
 
                 Directory.SetCurrentDirectory(cwdPath);
-                ComponentsDesktop.Run<Startup>("OpenNetLink", "wwwroot/index.html");
+                //ComponentsDesktop.Run<Startup>("OpenNetLink", "wwwroot/index.html"); // site요청
+                ComponentsDesktop.Run<Startup>("K-Link", "wwwroot/index.html");
             }
             else
             {
                 int nhWnd = 0;
-                nhWnd = FindWindow("WebWindow", "OpenNetLink");
+                //nhWnd = FindWindow("WebWindow", "OpenNetLink"); // site요청
+                nhWnd = FindWindow("WebWindow", "K-Link");
                 if (nhWnd != 0 && IsWindow(nhWnd))
                 {
                     PostMessage(nhWnd, 0x0400+0x0003, 0, 0);

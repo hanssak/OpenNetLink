@@ -6,6 +6,7 @@
 #addin nuget:?package=Newtonsoft.Json&version=13.0.1
 #addin nuget:?package=Cake.Prompt&version=1.0.15
 #addin nuget:?package=Cake.FileHelpers&version=4.0.0
+//#addin nuget:?package=Cake.Core=3.0.0
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -17,7 +18,9 @@ var setNetwork = Argument<bool>("setNetwork", true);
 var isPatch = Argument<bool>("isPatch", false);
 var isLightPatch = Argument<bool>("isLightPatch", false);
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
-var customName = "NONE";
+var customName = "KRX";
+var customFileUiName = "K-Link";	// site에서 요구하는 파일이름(OpenNetLink => K-Link)
+var isWithSilence = Argument<bool>("isWithSilence", false);
 var AppProps = new AppProperty(Context, 
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								"../", 													// Path of the Git Local Repository
@@ -308,8 +311,9 @@ Task("SetFileName")
 	//patch가 아닐 경우만 실행
 	.WithCriteria(!isPatch)
 	.Does(()=>{
-		customName = Prompt("Custom Name : ");	
-		networkFlag = Prompt("Network Flag (IN/CN/EX) : ");		
+		//customName = Prompt("Custom Name : ");
+		//customFileUiName = Prompt("Site Require File Name : ");	// site에서요구한 이름 입력받아처리할때 사용
+		networkFlag = Prompt("Network Flag (IN/CN/EX/NCI) : ");
 		AppProps.NetworkPos = networkFlag.ToUpper();
 	});
 
@@ -510,16 +514,121 @@ Task("PkgWin10")
 			}
         }		
 	}
-            
-	MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
-		Defines = new Dictionary<string, string>{
-			{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
-			{"IS_PATCH", isPatch.ToString().ToUpper()},
-			{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
-			{"NETWORK_FLAG", networkFlag.ToUpper()},
-			{"CUSTOM_NAME", customName.ToUpper()}			
+    
+	if(networkFlag.ToString().ToUpper().Equals("ALL"))
+	{
+	
+		var Folders = GetDirectories("./json/*");
+		//var dirPath = Directory("./json");
+		//var subDirs = dirPath.GetDirectories();
+		foreach(var folderA in Folders)
+		{
+			String strSearchFolder = (String)folderA.FullPath;
+			String strNetPosFolderName = "";
+			int nIdex = strSearchFolder.LastIndexOf('/');
+			if (nIdex > 0)
+			{
+				//Information("Folder-Name : GetNetPos!!!");
+				strNetPosFolderName = strSearchFolder.Substring(nIdex+1);
+			}			
+			
+			Information("NetPos/FolderName : {0}, FullPath: {1}", strNetPosFolderName, strSearchFolder);
+			strSearchFolder += "/*.json";
+			
+			// NetPos 별로 json 파일 복사 및 nsis make 동작
+			var jsonfiles = GetFiles(strSearchFolder);
+			foreach(var file in jsonfiles)
+			{
+				String strSrcFile = (String)file.FullPath;
+				String strTargetFile = "./artifacts/windows/published/wwwroot/conf/" + file.GetFilename();
+				Information("Json-File-Copy, Src  : {0}, Dest : {1}", strSrcFile, strTargetFile);
+
+				DeleteFile(strTargetFile);
+				CopyFile(strSrcFile, strTargetFile);
+				
+				// json 파일복사 확인
+				//Console.ReadKey();
+			}			
+			
+			MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
+				Defines = new Dictionary<string, string>{
+					{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
+					{"IS_PATCH", isPatch.ToString().ToUpper()},
+					{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
+					{"NETWORK_FLAG", strNetPosFolderName.ToUpper()},
+					{"CUSTOM_NAME", customName.ToUpper()},					
+					{"CUSTOM_FILE_NAME", customFileUiName.ToUpper()},
+					{"IS_WITH_SILENCE", "FALSE"}
+				}
+			});
+			Information("NetPos : {0}, NSIS-Make-Done !!!", strNetPosFolderName);
+			
+			if(isWithSilence.ToString().ToUpper().Equals("TRUE"))
+			{
+				MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
+					Defines = new Dictionary<string, string>{
+						{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
+						{"IS_PATCH", isPatch.ToString().ToUpper()},
+						{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
+						{"NETWORK_FLAG", strNetPosFolderName.ToUpper()},					
+						{"CUSTOM_NAME", customName.ToUpper()},	
+						{"CUSTOM_FILE_NAME", customFileUiName.ToUpper()},						
+						{"IS_WITH_SILENCE", isWithSilence.ToString().ToUpper()}
+					}
+				});
+				Information("NetPos : {0}, NSIS(silence)-Make-Done !!!", strNetPosFolderName);				
+			}
+
+			// 설치파일 생성확인
+			// Console.ReadKey();
+			
 		}
-	});
+
+		/*int nIdex = strSearchFile.LastIndexOf('.');
+		if (nIdex > 0)
+		{
+			String strItem = strSearchFile.Substring(nIdex+1);
+
+			int n=0;
+			bool isNumeric = int.TryParse(strItem, out n);
+			if (isNumeric)
+			{
+				Information("File-Deleted: {0}", strSearchFile);
+				DeleteFile(strSearchFile);
+			}
+		}*/
+		
+	}
+	else
+	{
+	
+		MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
+			Defines = new Dictionary<string, string>{
+				{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
+				{"IS_PATCH", isPatch.ToString().ToUpper()},
+				{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
+				{"NETWORK_FLAG", networkFlag.ToUpper()},
+				{"CUSTOM_NAME", customName.ToUpper()}			
+			}
+		});
+		
+		if(isWithSilence.ToString().ToUpper().Equals("TRUE"))
+		{
+			MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
+				Defines = new Dictionary<string, string>{
+					{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
+					{"IS_PATCH", isPatch.ToString().ToUpper()},
+					{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
+					{"NETWORK_FLAG", networkFlag.ToUpper()},
+					{"CUSTOM_NAME", customName.ToUpper()},			
+					{"IS_WITH_SILENCE", isWithSilence.ToString().ToUpper()}
+				}
+			});	
+		}	
+	
+	}
+	
+	
 });
 
 Task("PubOSX")

@@ -596,6 +596,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 if (updaterManager.UpdateInfo == null)
                     return;
 
+                XmlConfService xmlConf = new XmlConfService();
+
                 switch (updaterManager.UpdateInfo.Status)
                 {
                     case UpdateStatus.UpdateAvailable:
@@ -603,18 +605,18 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                         AvailableUpdate?.OpenPopUp(groupId, updaterManager.SparkleInst, updaterManager.UpdateInfo.Updates);
                         break;
                     case UpdateStatus.UpdateNotAvailable:
-                        CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - CheckUpdates : [ There's no update available :( ]");
-                        MessageNotification?.OpenPopUp("There's no update available :(");
+                        CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - CheckUpdates : [ There's NO update ]");
+                        MessageNotification?.OpenPopUp(xmlConf.GetTitle("T_PATCH_STATUS_NOPATCH"));
                         SetInitUpdateStatus();
                         break;
                     case UpdateStatus.UserSkipped:
                         CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - CheckUpdates : [ The user skipped this update! ]");
-                        MessageNotification?.OpenPopUp("The user skipped this update!<br>You have elected to skip this version.");
+                        MessageNotification?.OpenPopUp(xmlConf.GetTitle("T_PATCH_STATUS_USERREJECT"));
                         SetInitUpdateStatus();
                         break;
                     case UpdateStatus.CouldNotDetermine:
-                        CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - CheckUpdates : [ We couldn't tell if there was an update... ]");
-                        MessageNotification?.OpenPopUp("We couldn't tell if there was an update...");
+                        CLog.Here().Information($"[GID:{groupId}] AppUpdaterService - CheckUpdates, Get Patch Version info Failed(Port open Problem, etc!)");
+                        MessageNotification?.OpenPopUp(xmlConf.GetTitle("T_PATCH_STATUS_NOINFO"));
                         SetInitUpdateStatus();
                         break;
 

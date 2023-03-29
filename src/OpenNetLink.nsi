@@ -44,10 +44,17 @@ Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 ; OutFile "OpenNetLinkSetup.exe"
 ;OutFile ".\artifacts\installer\windows\packages\OpenNetLinkSetup_v${PRODUCT_VERSION}.exe"
 
+!if ${CUSTOM_FILE_NAME} == ""
+    ${CUSTOM_FILE_NAME} = "OpenNetLink"
+!endif
+
 !if ${IS_PATCH} == "TRUE"
+;  OutFile ".\artifacts\installer\windows\packages\OpenNetLink-Windows-${PRODUCT_VERSION}.exe"
   OutFile ".\artifacts\installer\windows\packages\OpenNetLink-Windows-${PRODUCT_VERSION}.exe"
+!else if ${IS_WITH_SILENCE} == "TRUE"
+  OutFile ".\artifacts\installer\windows\packages\[${CUSTOM_NAME}] ${CUSTOM_FILE_NAME}_${NETWORK_FLAG}_Windows[silence]_${PRODUCT_VERSION}.exe"
 !else
-  OutFile ".\artifacts\installer\windows\packages\[${CUSTOM_NAME}] OpenNetLink_${NETWORK_FLAG}_Windows_${PRODUCT_VERSION}.exe"
+  OutFile ".\artifacts\installer\windows\packages\[${CUSTOM_NAME}] ${CUSTOM_FILE_NAME}_${NETWORK_FLAG}_Windows_${PRODUCT_VERSION}.exe"
 !endif
 
 InstallDir "C:\HANSSAK\OpenNetLink"
@@ -355,9 +362,12 @@ FunctionEnd ; end the un.ReMoveAddFileRM
 
 Function .onInit
 
-	SetSilent silent
-	
+  ${If} ${IS_WITH_SILENCE} == 'TRUE'
+        SetSilent silent
+  ${EndIf}
+
   ${If} ${IS_PATCH} == 'TRUE'
+    SetSilent silent
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
 	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db" "$TEMP" 
@@ -3686,8 +3696,8 @@ Section "MainSection" SEC01
   
   ; 단축아이콘 생성
   CreateDirectory "$SMPROGRAMS\OpenNetLink"
-  CreateShortCut "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
-  CreateShortCut "C:\Users\Public\Desktop\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
+  CreateShortCut "$SMPROGRAMS\OpenNetLink\K-Link.lnk" "$INSTDIR\OpenNetLinkApp.exe"
+  CreateShortCut "C:\Users\Public\Desktop\K-Link.lnk" "$INSTDIR\OpenNetLinkApp.exe"
   
   ${If} ${IS_PATCH} == 'TRUE'
 
@@ -3748,7 +3758,7 @@ Section -Post
   WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\ContextTransferClient.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\ContextTransferClient.exe"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\OpenNetLinkApp.exe"
   
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
@@ -3797,8 +3807,8 @@ Section Uninstall
 
   Delete "$SMPROGRAMS\OpenNetLink\Uninstall.lnk"
   Delete "$SMPROGRAMS\OpenNetLink\Website.lnk"
-  Delete "C:\Users\Public\Desktop\OpenNetLink.lnk"
-  Delete "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk"
+  Delete "C:\Users\Public\Desktop\K-Link.lnk"
+  Delete "$SMPROGRAMS\OpenNetLink\K-Link.lnk"
 
   RMDir "$SMPROGRAMS\OpenNetLink"
   RMDir /r "$INSTDIR"

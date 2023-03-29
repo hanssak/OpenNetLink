@@ -19,6 +19,7 @@
 @using Serilog.Events
 @using AgLogManager
 @using OpenNetLinkApp.Common
+@using static OpenNetLinkApp.Common.Enums;
 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
@@ -71,10 +72,10 @@
 
                         <div class="col-md-12 text-right" style="height: 35px; width: 400px; margin: auto; display: block; ">
                             <div class="dropdown">
-                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    @strCurUsbDriveName
+                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:190px">
+                                    @strCurSelDriveName
                                 </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenu1" style="height:120px; overflow-y:scroll; min-width:0px;">
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenu1" style="height:90px; width:190px; overflow-y:scroll; min-width:0px;">
                                     @foreach (string strDriveName in driveList)
                                     {
                                         <button class="dropdown-item dropdown-footer text-xs p-1" type="button" @onclick="@(()=>SelectBoxUsbDrive(strDriveName))">@strDriveName</button>
@@ -94,7 +95,7 @@
                                 <thead class="text-center">
                                     <tr>
                                         <th style="width:5%;padding-left:0px;text-align:center;">
-                                            <input class="input" type="checkbox" checked=@(true) style="text-align: center; vertical-align: middle;">
+                                            <input class="input" type="checkbox" checked=@(true) style="text-align: center; vertical-align: middle;"> <img src="/images/gpki_icon.png" class="p-1">
                                         </th>
                                         <th style="width:23%;text-align:center;">@XmlConf.GetTitle("T_PKI_TRANS_ITEM")</th>
                                         <th style="width:16%;text-align:center;">@XmlConf.GetTitle("T_PKI_TRANS_USER") </th>
@@ -173,7 +174,7 @@
     public string strUserinputGPKIPW = "";              // 사용자가 입력한 gpki-password
 
 
-    string strCurUsbDriveName = "";
+    //string strCurUsbDriveName = "";
 
     Footer refFooter;
 
@@ -181,9 +182,7 @@
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
 
-
     CsPcfFile sgPcfFile = new CsPcfFile();
-
 
     /// <summary>
     /// 홈 이동 버튼
@@ -266,8 +265,28 @@
 
         CLog.Here().Information($"SendPkiFiles, checked pki File Search!");
 
+        //sgPcfFile.makeNpkiFIlesToPcf();
 
+    }
 
+    public void InitNPKIHardDiskFileList()
+    {
+
+        listViewNpkiFileList.Clear();
+
+        List<NPKIFileInfo> listTempPkiinfo = new List<NPKIFileInfo>();
+        if (CsPkiFile.GetNpkiinfoList(listTempPkiinfo, EnumSysPos.UserData))
+            listViewNpkiFileList.CopyTo(listTempPkiinfo.ToArray());
+
+        listTempPkiinfo.Clear();
+        if (CsPkiFile.GetNpkiinfoList(listTempPkiinfo, EnumSysPos.ProgramFiles))
+            listViewNpkiFileList.CopyTo(listTempPkiinfo.ToArray());
+
+        listTempPkiinfo.Clear();
+        if (CsPkiFile.GetNpkiinfoList(listTempPkiinfo, EnumSysPos.ProgramFilesX86))
+            listViewNpkiFileList.CopyTo(listTempPkiinfo.ToArray());
+
+        StateHasChanged();
     }
 
 
@@ -279,12 +298,13 @@
     {
         stMedia = media;
 
-        selectGPKIItemClean();
+        selectPKIItemClean();
 
         listViewGpkiFileList.Clear();
         if (stMedia == "hard")
         {
             //InitGPKIHardDiskFileList();
+            InitNPKIHardDiskFileList();
         }
         else if (stMedia == "usb")
         {
@@ -308,11 +328,16 @@
     /// <summary>
     ///
     /// </summary>
-    private void selectGPKIItemClean()
+    private void selectPKIItemClean()
     {
         foreach (GPKIFileInfo item in listViewGpkiFileList)
         {
             item.m_selected = "";
+        }
+
+        foreach (NPKIFileInfo item in listViewNpkiFileList)
+        {
+            item.m_bselected = false;
         }
 
         //objUserSelectedpki = null;
@@ -328,7 +353,7 @@
     {
         strCurSelDriveName = e.Value.ToString();
 
-        selectGPKIItemClean();
+        selectPKIItemClean();
 
         LocationSelect("usb");
     }
@@ -343,7 +368,7 @@
 
         strCurSelDriveName = strDiveName;
 
-        selectGPKIItemClean();
+        selectPKIItemClean();
 
         LocationSelect("usb");
 
@@ -367,7 +392,7 @@
         }
 
         if (driveList.Count > 0)
-            strCurUsbDriveName = driveList[0];
+            strCurSelDriveName = driveList[0];
     }
 
 

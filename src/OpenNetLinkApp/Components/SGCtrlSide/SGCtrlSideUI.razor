@@ -562,7 +562,7 @@
         <ul class="mb-1  w-100 ">
             <li><a class="update" @onclick="@(async () => CheckUpdatesControlClick())" data-toggle="modal" style="cursor: pointer;">@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_LASTUPDATE") :  @(GetLastUpdated())</li> <!--마지막 업데이트-->
-            <li>@XmlConf.GetTitle("T_APPCONFIG_SOFTWARE_VERSION") :  OpenNetLink @(GetSWVersion())+@(GetSWCommitId())</li> <!--소프트웨어버전-->
+            <li>@XmlConf.GetTitle("T_APPCONFIG_SOFTWARE_VERSION") : K-Link @(GetSWVersion())+@(GetSWCommitId())</li> <!--소프트웨어버전-->
         </ul>
 
     </div>

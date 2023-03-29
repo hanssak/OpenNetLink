@@ -84,7 +84,7 @@
                                 <div class="col-12  pt-2">
                                     <button class="btn btn-login btn-block btn_blue" @onclick="doLogInByBtn" disabled=@bUIBtnDisable>LOGIN</button>
                                 </div>
-                                <div class="col-12 text-center pt-3">Copyright &copy  HANSSAK Corp.  All rights reserved.</div>
+                                <div class="col-12 text-center pt-3">Korea Exchange Version.</div>
 
                             </div>
                         </div>
@@ -650,7 +650,7 @@
                     pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-            pw = "HsckAD.com";
+                pw = "HsckAD.com";
 #endif
                 pw = pw.ToLower();
 
@@ -1187,6 +1187,12 @@
                     strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";
                     strGetinfoTagName += ", 'CLIENT_TRANSFER_TITLE'";
                     strGetinfoTagName += ", 'CLIENT_TRANSFER_DESCRIPTION'";
+
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc())
+                    {
+                        strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
+                        strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
+                    }
 
                     string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
                     HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);

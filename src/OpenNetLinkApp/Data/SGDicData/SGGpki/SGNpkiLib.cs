@@ -44,8 +44,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGNpki
         //public GPKICA m_gpkiCA;                 // GPKI 인증서 발급기관 상세정보.
         //public string m_strOID;                   // GPKI 인증서 OID
         public int m_nRemainDay;                  // GPKI 인증서 남은 유효 기간
-        public string m_selected { get; set; }
-        public bool m_bIsRegisteredServer;         // Server에 CN이 등록되어 있는지 유무
+        public bool m_bselected { get; set; } = false;
         public byte[] m_pKeyData;
 
 
@@ -53,7 +52,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGNpki
         {
             m_strFileName = m_strUserID = m_strKeyUse = m_strOrg = "";
             m_nRemainDay = 0;
-            m_selected = "";
+            m_bselected = false;
             //m_strOID = "";
             //m_gpkiCA = new GPKICA();
             m_pKeyData = null;

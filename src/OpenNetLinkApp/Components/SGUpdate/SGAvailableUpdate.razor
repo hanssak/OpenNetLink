@@ -176,13 +176,17 @@
                 string newVersion = downReleaseNote.newVersion;
                 ReleaseNotes = downReleaseNote.releaseNotes;
 
-                TitleHeaderText = string.Format("A new version of {0} is available.", appName ?? "the application");
-                var downloadInstallText = isUpdateAlreadyDownloaded ? "install" : "download";
+                TitleHeaderText = XmlConf.GetTitle("T_PATCH_TITLE");
+                TitleHeaderText += newVersion;
 
-                if (!string.IsNullOrEmpty(versionString))
+                InfoText = XmlConf.GetTitle("T_PATCH_DETAIL_TEXT");
+
+                //TitleHeaderText = string.Format("A new version of {0} is available.", appName ?? "the application");
+                //var downloadInstallText = isUpdateAlreadyDownloaded ? "install" : "download";
+                @*if (!string.IsNullOrEmpty(versionString))
                     InfoText = $"{appName} {newVersion} is now available (you have {versionString}). Would you like to {downloadInstallText} it now?";
                 else
-                    InfoText = $"Would you like to {downloadInstallText} it now?";
+                    InfoText = $"Would you like to {downloadInstallText} it now?";*@
 
                 //강제 업데이트 기능 사용 시 이 버전 넘기기, 나중에 업데이트 버튼 숨김
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())

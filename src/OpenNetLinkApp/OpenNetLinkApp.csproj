@@ -24,8 +24,9 @@
 	  <RuntimeIdentifier Condition="'$(IsLinux)' == 'true'">linux-x64</RuntimeIdentifier>
 	  <RuntimeIdentifier Condition="'$(IsMacOS)' == 'true'">osx-x64</RuntimeIdentifier>
     <StartupObject></StartupObject>
-    <ApplicationIcon>SecureGate.ico</ApplicationIcon>
+    <ApplicationIcon>SecureGate_.ico</ApplicationIcon>
     <Platforms>AnyCPU;x64</Platforms>
+    <Win32Resource></Win32Resource>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

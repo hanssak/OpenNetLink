@@ -307,15 +307,16 @@
         if (sgLoginData == null)
             return;
 
-        string temp;
-        int nTemp;
-        Int64 nTemp64;
+        string temp="";
+        int nTemp=0;
+        Int64 nTemp64=0;
 
         // 버전정보
         string strAppVersion = sgLoginData.GetServClientVersion();
         int find = strAppVersion.IndexOf(':');
         strAppVersion = strAppVersion.Substring(0, find);
 
+        strAppVersion = strAppVersion.Replace("OpenNetLink", "K-Link");
         strDataVersion = strAppVersion;
         strDataNetWorkPos = sgLoginData.GetServName();                                                  // 내부시스템01 / 외부시스템01
 

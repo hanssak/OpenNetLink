@@ -1526,9 +1526,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetTransferDescription(bool bSystem)
             => (bSystem) ? GetTagData("I_CLIENT_TRANSFER_DESCRIPTION") : GetTagData("E_CLIENT_TRANSFER_DESCRIPTION");
 
+        /// <summary>
+        /// 제목 최소 길이 값
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetTitleMinLength()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_TITLE_MIN_LENGTH") : GetTagData("E_CLIENT_TITLE_MIN_LENGTH");
+
+        /// <summary>
+        /// 설명 최소 길이 값
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetDescMinLength()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_DESC_MIN_LENGTH") : GetTagData("E_CLIENT_DESC_MIN_LENGTH");
 
 
-        
+
         /// <summary>
         /// value 값을 암호화해서 sgData에 저장
         /// </summary>
