@@ -418,135 +418,151 @@
         cntRecvQuery = 0;
         int groupID = groupIDbyParam;
 
-        if (pageService.GetConnectStatus(groupID) == false)
+        try
         {
-            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
-
-        string strTitle = strBindTitle;
-        string strContents = strBindDesc;
-
-        // 최대길이 Check 동작
-        if (!strBindTitle.Equals(""))
-        {
-            if (Encoding.UTF8.GetByteCount(strBindTitle) > 250)
+            if (pageService.GetConnectStatus(groupID) == false)
             {
-                string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
+                string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+                strMsg = strMsg.Replace("/r/n", "<br>");
+                ShowMessage("error", strMsg);
+                return;
+            }
+
+            string strTitle = strBindTitle;
+            string strContents = strBindDesc;
+
+            // 최대길이 Check 동작
+            if (!strBindTitle.Equals(""))
+            {
+                if (Encoding.UTF8.GetByteCount(strBindTitle) > 250)
+                {
+                    string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
+                    ShowMessage("warn", strMsg);
+                    strBindTitle = "";
+                    strBindDesc = "";
+                    StateHasChanged();
+                    return;
+                }
+            }
+
+            if (!strBindDesc.Equals(""))
+            {
+                if (Encoding.UTF8.GetByteCount(strBindDesc) > 250)
+                {
+                    string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
+                    ShowMessage("warn", strMsg);
+                    strBindTitle = "";
+                    strBindDesc = "";
+                    StateHasChanged();
+                    return;
+                }
+            }
+
+	        // 최소길이 체크 동작
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc())
+            {
+                SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                if (sgLoginData == null)
+                    return;
+
+                string strLength = sgLoginData.GetTitleMinLength();
+                int nLength = 0;
+                if ((strLength?.Length ?? 0) > 0)
+                    nLength = Convert.ToInt32(strLength);
+
+                if ((strBindTitle?.Length ?? 0) < nLength)
+                {
+                    CLog.Here().Error($"UploadFiles, Stoped(#), Title-Req-Length : {nLength}, Title-Cur-Length : {strBindTitle.Length},");
+                    ShowMessage("warning", string.Format(XmlConf.GetWarnMsg("W_0290"), nLength));
+                    StateHasChanged();
+                    return;
+                }
+
+                strLength = sgLoginData.GetDescMinLength();
+                nLength = 0;
+                if ((strLength?.Length ?? 0) > 0)
+                    nLength = Convert.ToInt32(strLength);            
+
+                if ((strBindDesc?.Length ?? 0) < nLength)
+                {
+                    CLog.Here().Error($"UploadFiles, Stoped(#), Desc-Req-Length : {nLength}, Desc-Cur-Length : {strBindDesc.Length},");
+                    ShowMessage("warning", string.Format(XmlConf.GetWarnMsg("W_0291"), nLength));
+                    StateHasChanged();
+                    return;
+                }
+            }
+
+            if (pageService.GetDayFileTransCountEnable(groupID) != true)
+            {
+                string strMsg = XmlConf.GetErrMsg("E_0106");    // 일일 전송 최대 횟수는 {0}번 입니다./r/n일일 전송 횟수를 초과하였습니다.
+                int FileMaxCount = pageService.GetDayFileMaxCount(groupID);
+                strMsg = String.Format(strMsg, FileMaxCount);
+                strMsg = strMsg.Replace("/r/n", "<br>");
+                ShowMessage("error", strMsg);
+                DayFileChangeNotiEvent dayFileChange = null;
+                dayFileChange = HSCmdCenter.sgPageEvent.GetDayFileChangeNotiEvent(groupID);
+                if (dayFileChange == null)
+                    return;
+                dayFileChange(groupID);
+                return;
+            }
+
+            int TransDataCount = 0;
+            TransDataCount = dropFile.GetFileListAddCount();
+            if (TransDataCount <= 0)
+            {
+                string strMsg = XmlConf.GetWarnMsg("W_0016"); // 전송하고자 하는 파일이 없습니다./r/n전송파일을 등록해주십시오.
+                strMsg = strMsg.Replace("/r/n", "<br/>");
                 ShowMessage("warn", strMsg);
-                strBindTitle = "";
-                strBindDesc = "";
-                StateHasChanged();
                 return;
             }
-        }
 
-        if (!strBindDesc.Equals(""))
-        {
-            if (Encoding.UTF8.GetByteCount(strBindDesc) > 250)
+            // 3중망일때 목적지 점검
+            if (dicDestSysPos != null && dicDestSysPos.Count > 0 && strDestNetWork.Length < 1)
             {
-                string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
-                ShowMessage("warn", strMsg);
-                strBindTitle = "";
-                strBindDesc = "";
-                StateHasChanged();
-                return;
-            }
-        }
-
-	// 최소길이 체크 동작
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc())
-        {
-            SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sgLoginData == null)
-                return;
-
-            string strLength = sgLoginData.GetTitleMinLength();
-            int nLength = Convert.ToInt32(strLength);
-            if ((strBindTitle?.Length ?? 0) < nLength)
-            {                 
-                ShowMessage("warning", string.Format(XmlConf.GetWarnMsg("W_0290"), nLength));
-                StateHasChanged();
+                ShowMessage("error", XmlConf.GetErrMsg("E_0234"));
                 return;
             }
 
-            strLength = sgLoginData.GetDescMinLength();
-            nLength = Convert.ToInt32(strLength);
-            if ((strBindDesc?.Length ?? 0) < nLength)
-            {                 
-                ShowMessage("warning", string.Format(XmlConf.GetWarnMsg("W_0291"), nLength));
-                StateHasChanged();
-                return;
-            }
-        }
+            //사후결재 제한 체크 여부
 
-        if (pageService.GetDayFileTransCountEnable(groupID) != true)
-        {
-            string strMsg = XmlConf.GetErrMsg("E_0106");    // 일일 전송 최대 횟수는 {0}번 입니다./r/n일일 전송 횟수를 초과하였습니다.
-            int FileMaxCount = pageService.GetDayFileMaxCount(groupID);
-            strMsg = String.Format(strMsg, FileMaxCount);
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            DayFileChangeNotiEvent dayFileChange = null;
-            dayFileChange = HSCmdCenter.sgPageEvent.GetDayFileChangeNotiEvent(groupID);
-            if (dayFileChange == null)
-                return;
-            dayFileChange(groupID);
-            return;
-        }
-
-        int TransDataCount = 0;
-        TransDataCount = dropFile.GetFileListAddCount();
-        if (TransDataCount <= 0)
-        {
-            string strMsg = XmlConf.GetWarnMsg("W_0016"); // 전송하고자 하는 파일이 없습니다./r/n전송파일을 등록해주십시오.
-            strMsg = strMsg.Replace("/r/n", "<br/>");
-            ShowMessage("warn", strMsg);
-            return;
-        }
-
-        // 3중망일때 목적지 점검
-        if (dicDestSysPos != null && dicDestSysPos.Count > 0 && strDestNetWork.Length < 1)
-        {
-            ShowMessage("error", XmlConf.GetErrMsg("E_0234"));
-            return;
-        }
-
-        //사후결재 제한 체크 여부
-
-        if (siteConfig.GetApproveAfterLimit(groupID))
-            await CheckApproveAfterLimit();
-        else
-        {
-
-            SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sgLoginData == null)
-                return;
-
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isFilesNeedApprove())
-            {
-
-                refApproveExtApproverSelect_PopUp.FileList = dropFile.GetHsStreamList();
-
-                // 파일목록이 있는 화면을 갱신해줘야 UI상에 나타남
-                refApproveExtApproverSelect_PopUp.Refresh();
-
-                // 파일송신 버튼, 실행
-                refApproveExtApproverSelect_PopUp.SetFileTransWithApproveEvent(FileTransWithApprover);
-
-                await refApproveExtApproverSelect_PopUp.openPopUp();
-            }
+            if (siteConfig.GetApproveAfterLimit(groupID))
+                await CheckApproveAfterLimit();
             else
             {
-                FileTrans();
-                //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
-                await stopClick();
+
+                SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                if (sgLoginData == null)
+                    return;
+
+            	if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt() && isFilesNeedApprove())
+                {
+
+                    refApproveExtApproverSelect_PopUp.FileList = dropFile.GetHsStreamList();
+
+                    // 파일목록이 있는 화면을 갱신해줘야 UI상에 나타남
+                    refApproveExtApproverSelect_PopUp.Refresh();
+
+                    // 파일송신 버튼, 실행
+                    refApproveExtApproverSelect_PopUp.SetFileTransWithApproveEvent(FileTransWithApprover);
+
+                    await refApproveExtApproverSelect_PopUp.openPopUp();
+                }
+                else
+                {
+                    FileTrans();
+                    //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+                    await stopClick();
+                }
+
             }
 
+        }
+        catch(Exception ex)
+        { 
+            CLog.Here().Error($"UploadFiles, Exception(MSG) : {ex.Message}");
         }
 
     }

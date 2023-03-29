@@ -5171,6 +5171,57 @@
 		</T_APPROVEEXT_SELECT_APPROVER>
 
 		<!-- ********************************************* [END] Alarm 설정 (T_ALARM_0000) ******************************************** -->
+		
+
+		<!-- ********************************************* [START] UPDATE UI 설정 (T_PATCH_0000) ********************************************* -->
+
+		<T_PATCH_TITLE>
+			<KR>업데이트, Version : </KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PATCH_TITLE>
+
+		<T_PATCH_DETAIL_TEXT>
+			<KR>업데이트를 진행하시겠습니까?</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PATCH_DETAIL_TEXT>
+
+		<T_PATCH_CHECKING>
+			<KR>업데이트 확인중 ...</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PATCH_CHECKING>
+
+
+		<T_PATCH_STATUS_NOPATCH>
+			<KR>업데이트할 내용이 없습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PATCH_STATUS_NOPATCH>
+
+		<T_PATCH_STATUS_USERREJECT>
+			<KR>사용자가 업데이트를 거부했습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PATCH_STATUS_USERREJECT>
+
+		<T_PATCH_STATUS_NOINFO>
+			<KR>업데이트 정보를 얻을 수 없습니다. </KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PATCH_STATUS_NOINFO>
+
+
+
+		<!-- ********************************************* [END] UPDATE UI  설정 (T_PATCH_0000) ******************************************** -->		
+		
 	</TITLE>
 
 	<INFO>
