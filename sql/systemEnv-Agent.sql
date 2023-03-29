@@ -26,8 +26,17 @@ INSERT INTO tbl_system_env (system_id, tag, tag_value, tag_desc, writer) VALUES 
 INSERT INTO tbl_system_env (system_id, tag, tag_value, tag_desc, writer) VALUES ('E001', 'CLIENT_OLE_EXTRACT_EXT', 'ODT;ODS;ODP;DOC;DOCM;DOCX;DOT;DOTM;DOTX;RTF;XLS;XLSB;XLSM;XLSX;XLT;XLTM;XLTX;XLW;POT;PPT;POTM;POTX;PPS;PPSM;PPSX;PPTM;PPTX;HML;HWP;HWPX', 'OLE검사 대상 문서파일 확장자들', '201004010800000001');
 
 
+-------------------------------------------------------------------------------
+-- tbl_system_env : 제목 / 설명 최소길이
+-------------------------------------------------------------------------------
 
+-- DELETE FROM tbl_system_env WHERE tag='CLIENT_TITLE_MIN_LENGTH';
+-- DELETE FROM tbl_system_env WHERE tag='CLIENT_DESC_MIN_LENGTH';
 
+-- INSERT INTO tbl_system_env (system_id, tag, tag_value, tag_desc, writer) VALUES ('I001', 'CLIENT_TITLE_MIN_LENGTH', '6', '제목 최소길이', '201004010800000001');
+-- INSERT INTO tbl_system_env (system_id, tag, tag_value, tag_desc, writer) VALUES ('E001', 'CLIENT_TITLE_MIN_LENGTH', '6', '제목 최소길이', '201004010800000001');
 
+-- INSERT INTO tbl_system_env (system_id, tag, tag_value, tag_desc, writer) VALUES ('I001', 'CLIENT_DESC_MIN_LENGTH', '6', '설명 최소길이', '201004010800000001');
+-- INSERT INTO tbl_system_env (system_id, tag, tag_value, tag_desc, writer) VALUES ('E001', 'CLIENT_DESC_MIN_LENGTH', '6', '설명 최소길이', '201004010800000001');
 
 
