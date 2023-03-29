@@ -540,10 +540,14 @@
     {
         if (strIsFile.Equals("-"))
             return 0;
-        else if (strIsFile.Equals("발송"))
-            return 1;
-        else if (strIsFile.Equals("수신"))
-            return 2;
+        //else if (strIsFile.Equals("발송"))
+        //    return 1;
+        //else if (strIsFile.Equals("수신"))
+        //    return 2;
+        else if (strIsFile.Equals("미사용"))
+            return 0;
+        else if (strIsFile.Equals("사용"))
+            return 1;        
         else
             return 0;
     }
