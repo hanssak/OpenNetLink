@@ -561,7 +561,7 @@ Task("PkgWin10")
 					{"IS_WITH_SILENCE", "FALSE"}
 				}
 			});
-			Information("NetPos : {0}, NSIS-Make-Done !!!", strNetPosFolderName);
+			Information("NetPos : {0}, NSIS-Make-Done !!!\n\n", strNetPosFolderName);
 			
 			if(isWithSilence.ToString().ToUpper().Equals("TRUE"))
 			{
@@ -572,11 +572,11 @@ Task("PkgWin10")
 						{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
 						{"NETWORK_FLAG", strNetPosFolderName.ToUpper()},					
 						{"CUSTOM_NAME", customName.ToUpper()},	
-						{"CUSTOM_FILE_NAME", customFileUiName.ToUpper()},						
+						{"CUSTOM_FILE_NAME", customFileUiName.ToUpper()},
 						{"IS_WITH_SILENCE", isWithSilence.ToString().ToUpper()}
 					}
 				});
-				Information("NetPos : {0}, NSIS(silence)-Make-Done !!!", strNetPosFolderName);				
+				Information("NetPos : {0}, NSIS(silence)-Make-Done !!!\n\n", strNetPosFolderName);
 			}
 
 			// 설치파일 생성확인
@@ -608,9 +608,12 @@ Task("PkgWin10")
 				{"IS_PATCH", isPatch.ToString().ToUpper()},
 				{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
 				{"NETWORK_FLAG", networkFlag.ToUpper()},
-				{"CUSTOM_NAME", customName.ToUpper()}			
+				{"CUSTOM_NAME", customName.ToUpper()},
+				{"CUSTOM_FILE_NAME", customFileUiName.ToUpper()},
+				{"IS_WITH_SILENCE", isWithSilence.ToString().ToUpper()}
 			}
 		});
+		Information("NetPos : {0}, NSIS-Make-Done !!!\n\n", networkFlag);
 		
 		if(isWithSilence.ToString().ToUpper().Equals("TRUE"))
 		{
@@ -618,16 +621,19 @@ Task("PkgWin10")
 				Defines = new Dictionary<string, string>{
 					{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
 					{"IS_PATCH", isPatch.ToString().ToUpper()},
-					{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
+					{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},
 					{"NETWORK_FLAG", networkFlag.ToUpper()},
-					{"CUSTOM_NAME", customName.ToUpper()},			
+					{"CUSTOM_NAME", customName.ToUpper()},
+					{"CUSTOM_FILE_NAME", customFileUiName.ToUpper()},
 					{"IS_WITH_SILENCE", isWithSilence.ToString().ToUpper()}
 				}
 			});	
+			Information("NetPos : {0}, NSIS(silence)-Make-Done !!!\n\n", networkFlag);
 		}	
 	
 	}
 	
+	Information("NSIS-Make-ALL-Done !!!\n\n");	
 	
 });
 
