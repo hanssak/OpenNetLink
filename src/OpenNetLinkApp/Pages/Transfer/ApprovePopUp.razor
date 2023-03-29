@@ -1094,9 +1094,7 @@
 
         // 확장자 종류로 Web으로 preview 할지 결정
         string strExtName = Path.GetExtension(sFileName);
-        strExtName = strExtName.Substring(1);
-        if (strExtName.Equals(""))
-            return true;
+        strExtName =(strExtName.Equals("")) ? "" : strExtName.Substring(1);         //확장자가 없는 파일(text/plain)을 다운로드로 처리
 
         bool bFind = false;
 
