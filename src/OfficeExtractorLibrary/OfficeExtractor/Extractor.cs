@@ -1212,13 +1212,24 @@ namespace OfficeExtractor
             {
                 using (var zipFile = SharpCompress.Archives.Zip.ZipArchive.Open(inputFile))
                 {
+
+                    long contentTypeTicks = 0;
+                    foreach (var zipEntry in zipFile.Entries)
+                    {
+                        if (zipEntry.Key.Equals("[Content_Types].xml"))
+                        {
+                            contentTypeTicks = zipEntry.LastModifiedTime.Value.Ticks;
+                            break;
+                        }
+                    }
+
                     foreach (var zipEntry in zipFile.Entries)
                     {
                         if (zipEntry.IsDirectory) continue;
 
                         if (zipEntry.Key.ToLower().EndsWith(".xml"))
                         {
-                            if (zipEntry.LastModifiedTime.Value.TimeOfDay != TimeSpan.Zero)
+                            if (zipEntry.LastModifiedTime.Value.Ticks != contentTypeTicks)
                             {
                                 string fileName = outputFolder + Path.GetFileName(zipEntry.Key);
                                 fileName = FileManager.FileExistsMakeNew(fileName);
