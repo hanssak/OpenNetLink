@@ -57,7 +57,6 @@ else
     ISGSideBarUIService SideBarUISvc;
     SGSettingsDBProc sgSettingProc;
     ISGUserInfoService sgUserSvr;
-    ISGSiteConfigService siteConfig;
 
     //결재단계 멤버변수 추가 0:AND 1:OR 2:AND+OR
     int m_step = 0;
@@ -66,7 +65,6 @@ else
     {
         sgUserSvr = SGAppMgrSvc.UserInfoService;
         sgSettingProc = SGSettingsDBProc.Instance;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -193,7 +191,7 @@ else
 
         int nApprLineCount = listApprLineName.Count;
         bool bApprUseType = sgLoginData.GetApprove();
-        if ((bApprUseType == false || sgLoginData.IsVipUser() || sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 1) && (nApprLineCount > 0))
+        if ((bApprUseType == false || sgLoginData.IsVipUser() || sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupID)) > 1) && (nApprLineCount > 0))
             nApprLineCount = 1;
 
 
@@ -293,7 +291,7 @@ else
 
         apprLinkedList = null;
         apprLinkedList = sgApprLineData.GetApprAndLineData();
-        if (apprLinkedList == null || apprLinkedList.Count <= 0 || (sgLoginData.GetApprove() == false || sgLoginData.IsVipUser() || sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 1))
+        if (apprLinkedList == null || apprLinkedList.Count <= 0 || (sgLoginData.GetApprove() == false || sgLoginData.IsVipUser() || sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupID)) > 1))
         {
             last = approverList.Last();
             StateHasChanged();

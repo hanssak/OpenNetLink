@@ -422,7 +422,7 @@
         </div>
 
     </li>
-    @if (SGAppMgrSvc.OpConfigInfoService.GetVisiblePolicyUpdateButton())
+    @if (SGAppMgrSvc.OpConfigInfoService.GetVisiblePolicyUpdateButton(0))
     {
         <li class="nav-item">
             <a class="nav-link white_font" aria-expanded="true" style="cursor:pointer;" title="@xmlConf.GetTitle("T_TOOL_POLICYUPDATE")" @onclick="CurrentNetPolicyUpdate"><i class="fas fa-cloud-download-alt"></i></a>
@@ -443,7 +443,6 @@
     SGAlert refAfterApproveChangeAlert;
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
-    ISGSiteConfigService siteConfig;
 
     [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
     [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
@@ -794,8 +793,8 @@ private void LogOut(int groupId)
     LogOutFileListClearEvent LogOutFileListClearEvent = null;
 
 
-    if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() &&
-        SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLoginButoneBYoneLogout() == false)
+    if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0) &&
+        SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLoginButoneBYoneLogout(0) == false)
     {
         foreach (ISGNetwork Net in listNetWork)
         {
@@ -981,7 +980,7 @@ private async void mouseTimer_Elapsed(object sender, System.Timers.ElapsedEventA
         return;
 
     //bool bUseScreenLock = AppConfigSvc.GetScreenLock();
-    bool bUseScreenLock = SGAppMgrSvc.OpConfigInfoService.GetScreenLock();
+    bool bUseScreenLock = SGAppMgrSvc.OpConfigInfoService.GetUseScreenLock(0);
     if (bUseScreenLock)
     {
 
@@ -1133,7 +1132,7 @@ public void SFMInfoAfterSend(int groupId, object[] e)
 
     if (userInfo.HeaderUserName != headUserName)
     {
-        if (userInfo.GetUserApprPos(true, siteConfig.GetUseAllProxyAuthority(groupId)) < sfmRight)
+        if (userInfo.GetUserApprPos(true, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupId)) < sfmRight)
         {
             pageService.SetSFMLogOut(true);
             pageService.SetSFMChecking(false);
@@ -1229,11 +1228,12 @@ protected override async Task OnAfterRenderAsync(bool firstRender)
     }
 
     SetClipBoardUI();
-
-    bViewAlarmNotiAllDelMenu = SGAppMgrSvc.OpConfigInfoService.GetViewSGHeaderUIAlarmNoriAllDel();
     ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+
     if (sgSideBar != null)
     {
+        bViewAlarmNotiAllDelMenu = SGAppMgrSvc.OpConfigInfoService.GetViewSGHeaderUIAlarmNoriAllDel(sgSideBar.GroupId);
+
         if (dicCurrentAfterChkHide.ContainsKey(sgSideBar.GroupId))
             dicCurrentAfterChkHide[nGroupID] = pageService.GetAfterApprChkHide(sgSideBar.GroupId);
         else
@@ -1465,7 +1465,7 @@ private bool DelAllMsgInfo(string strUserSeq)
     if (strUserSeq == null || strUserSeq.Length < 1)
         return false;
 
-    if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
+    if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
     {
         foreach (ISGNetwork SGNet in listNetWorkData)
         {
@@ -1506,7 +1506,7 @@ private bool DelAllNotiInfo(string strUserSeq)
         return false;
 
 
-    if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
+    if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
     {
         // 한번에 로그인 했을때에는 한번에 전체 삭제
         foreach (ISGNetwork SGNet in listNetWorkData)
@@ -1627,10 +1627,10 @@ private bool DelAllNotiInfo(int ngroupID, string strUserSeq)
 
 private void DelAllAlramAndMessage()
 {
-    bool isInitAlram = SGAppMgrSvc.OpConfigInfoService.GetUseInitAlarmPerDay();
+    bool isInitAlram = SGAppMgrSvc.OpConfigInfoService.GetUseInitAlarmPerDay(0);
     if (isInitAlram)
         SQLiteDB.DeleteAllInfo(true);
-    bool isInitMessage = SGAppMgrSvc.OpConfigInfoService.GetUseInitMessagePerDay();
+    bool isInitMessage = SGAppMgrSvc.OpConfigInfoService.GetUseInitMessagePerDay(0);
     if (isInitMessage)
         SQLiteDB.DeleteAllInfo(false);
 
@@ -1643,7 +1643,6 @@ private void DelAllAlramAndMessage()
 
 protected override void OnInitialized()
 {
-    siteConfig = SGAppMgrSvc.SiteConfigInfoService;
     sgSettingProc = SGSettingsDBProc.Instance;
     AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
     HsCmdCenter.sgPageEvent.SetScreenTimeChangeNotiEvent(ScreenTimeChangeNoti);
@@ -1764,9 +1763,13 @@ public void DashBoardRecvDownCapacityChg(int groupID)
 /// <returns></returns>
 public bool IsCanTransferClipBoardAllNet()
 {
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
 
     // Agent 설정에 모든망 전송 기능이 있는지 확인
-    if (SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend() == false)
+    if (SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend(groupID) == false)
         return false;
 
     // 3망 설정상황이 아니면
@@ -1777,11 +1780,6 @@ public bool IsCanTransferClipBoardAllNet()
     // 다접속 상황이면
     if (pageService.m_bIsMultiNetWork)
         return false;
-
-    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-    int groupID = 0;
-    if (sgSideBar != null)
-        groupID = sgSideBar.GroupId;
 
     SGLoginData sgLoginData = null;
     sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -1920,7 +1918,7 @@ public void ResultUserInfoCheck(int groupId, object[] e)
     if (!bAfterApprEnable)
         bAfterCheck = false;
     else
-        bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+        bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk(groupId);
 
     pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 

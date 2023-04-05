@@ -668,12 +668,11 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
 
-        InitText();
-
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+        InitText(groupID);
         bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
     }
 
@@ -724,7 +723,7 @@
             //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
             //if (sgAppConfig.GetFileDownloadBeforeReciving())
             // GetUseFileForwardDownBeforeRecv
-            if (SGAppMgrSvc.OpConfigInfoService.GetFileDownloadBeforeReciving())
+            if (SGAppMgrSvc.OpConfigInfoService.GetFileDownloadBeforeReciving(groupID))
             {
                 if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || strDataTransStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
                     m_bNetDownloadable = true;
@@ -742,7 +741,7 @@
         }
 
         CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataTransStatus : {strDataTransStatus})");
-        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileDownloadBeforeReciving : {SGAppMgrSvc.OpConfigInfoService.GetFileDownloadBeforeReciving().ToString()})");
+        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileDownloadBeforeReciving : {SGAppMgrSvc.OpConfigInfoService.GetFileDownloadBeforeReciving(groupID).ToString()})");
         //CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileDownloadBeforeReciving : {sgAppConfig.GetFileDownloadBeforeReciving().ToString()})");
 
         int expireDate = Int32.Parse(sgDetailData.GetExpiredDay());
@@ -808,7 +807,7 @@
             return;
 
         List<ApproverHist> apprListHist = null;
-        bool isVisibleFileApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason();
+        bool isVisibleFileApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID);
         apprListHist = sgDetailData.GetApproverInfoHist(isVisibleFileApproveReason);
         if ((apprListHist == null) || (apprListHist.Count <= 1))
         {
@@ -892,7 +891,7 @@
         StateHasChanged();
     }
 
-    public void InitText()
+    public void InitText(int groupId)
     {
         strTransDetailTitle = XmlConf.GetTitle("T_TRANS_DETAIL");                          // 전송상세보기
         strArrpHistory = XmlConf.GetTitle("T_DETAIL_APPROVE_CATEGORY");                     // 결재내역
@@ -916,7 +915,7 @@
         strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                             // 승인자
         strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");                      // 승인상태
         strApproveDay = XmlConf.GetTitle("T_COMMON_APPROVEDATE");                           // 승인일
-        if(SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason())
+        if(SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupId))
             strRejectReason = XmlConf.GetTitle("T_APPROVE_APPROVE_REJECT_REASON");                      // 승인/반려사유
         else
             strRejectReason = XmlConf.GetTitle("T_APPROVE_REJECTREASON");                      // 반려사유

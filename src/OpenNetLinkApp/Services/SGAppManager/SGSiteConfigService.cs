@@ -11,10 +11,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
 {
     public interface ISGSiteConfigService
     {
-        public bool m_bUseClipAlarmType { get; set; }                                       // 클립보드 알림 형식 사용 유무
-        public PAGE_TYPE m_enMainPage { get; set; }                                         // 메인페이지
-        public bool m_bUseMainPageType { get; set; }                                        // 메인화면 사용 여부
-        public bool m_bUseClipCopyAndSend { get; set; }                                     // 클립보드 복사 후 전송 사용 유무
         public bool m_bUseURLRedirectionAlarm { get; set; }                                 // URL 자동전환 알림 사용 유무
         public bool m_bUseURLRedirectionAlarmType { get; set; }                             // URL 자동전환 알림 타입 선택 사용 유무
         public bool m_bRFileAutoSend { get; set; }                                          // 마우스 우클릭 후 자동전송 사용 유무
@@ -290,7 +286,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseForceUpdate { get; set; } = true;                                 // 넘기는 기능 없이 무조건 업데이트 사용 유무
         public bool m_bViewSGSideBarUIBadge { get; set; } = false;                          // 왼쪽 메뉴들에서 Badge 나오게할지 유무 설정값
         public bool m_bViewSGHeaderUIAlarmNoriAllDel { get; set; } = true;                  // 상단 HeaderUI에서 Alarm, Noti 상에 Badge 전체 삭제 메뉴 나오게할지 유무
-        public bool m_bViewDropFileAddError { get; set; } = false;                          // 파일추가때, 5GB 이상 파일 추가되면 최대추가 파일크기가 5GB라고 UI가 나오는거 사용안함(false)
+        
         public bool m_bViewDlpApproverSelectMyDept { get; set; } = false;                   // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
         public bool m_bClipBoardNoApproveButFileTrans { get; set; } = false;                // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
         public bool m_bUseUserRecvDownPath { get; set; } = false;                           // 로그인 유저별 다운로드 경로 사용 여부 (true : 사용, false : 미사용)
@@ -307,7 +303,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool m_bUseFileForwardDownNotRecv { get; set; } = true;                         // 파일 수신되기전에 파일포워드로 다운로드 가능유무
 
-        public bool m_bUseEmailManageApprove { get; set; } = false;                         // Email 관리 및 결재 기능 사용유무
+        
 
         public bool m_bUseDenyPasswordZip { get; set; } = true;                            // zip password 걸려 있으면 추가안되게 할지 유무(true:추가불가)
 
@@ -451,99 +447,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUseCertSend(0, false);                                   // 공인인증서 전송 사용 유무.*/
 
         }
-        public bool GetUseLoginIDSave(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bUserIDSave;
-            return false;
-        }
-        private void SetUseLoginIDSave(int groupID, bool bUserIDSave)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bUserIDSave = bUserIDSave;
-        }
-        public bool GetUseAutoLogin(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bAutoLogin;
-            return false;
-        }
-        private void SetUseAutoLogin(int groupID, bool bAutoLogin)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bAutoLogin = bAutoLogin;
-        }
 
-        public bool GetUseAutoLoginCheck(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bAutoLoginCheck;
-            return false;
-        }
-        private void SetUseAutoLoginCheck(int groupID, bool bAutoLoginCheck)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bAutoLoginCheck = bAutoLoginCheck;
-        }
-
-        public bool GetUseApprLineLocalSave(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bApprLineLocalSave;
-            return false;
-        }
-        private void SetUseApprLineLocalSave(int groupID, bool bApprLineLocalSave)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bApprLineLocalSave = bApprLineLocalSave;
-        }
-        public int GetZipPWBlock(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_nZipPWBlock;
-            return 0;
-        }
-        private void SetZipPWBlock(int groupID, int nZipPWBlock)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_nZipPWBlock = nZipPWBlock;
-        }
-        public bool GetUseApprLineChkBlock(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bApprLineChkBlock;
-            return false;
-        }
-        private void SetUseApprLineChkBlock(int groupID, bool bApprLineChkBlock)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bApprLineChkBlock = bApprLineChkBlock;
-        }
-        public bool GetUseApprDeptSearch(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bApprDeptSearch;
-            return false;
-        }
-        private void SetUseApprDeptSearch(int groupID, bool bApprDeptSearch)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bApprDeptSearch = bApprDeptSearch;
-        }
         public bool GetApproveAfterLimit(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
@@ -570,133 +474,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bUseClipBoardApproveAfterLimit = bClipBoardApproveAfterLimit;
         }
-        public bool GetUseApprTreeSearch(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bApprTreeSearch;
-            return false;
-        }
-        private void SetUseApprTreeSearch(int groupID, bool bApprTreeSearch)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bApprTreeSearch = bApprTreeSearch;
-        }
-        public bool GetUseUserPWChange(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bUserPWChange;
-            return false;
-        }
-        private void SetUseUserPWChange(int groupID, bool bUserPWChange)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bUserPWChange = bUserPWChange;
-        }
-        public string GetPWChangeProhibitLimit(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_strPWChangeProhibitLimit;
-            return "";
-        }
-        private void SetPWChangeProhibitLimit(int groupID, string strPWChangeProhibitLimit)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_strPWChangeProhibitLimit = strPWChangeProhibitLimit;
-        }
 
-        public int GetPWChangeApplyCnt(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_nPWChangeApplyCnt;
-            return 9;
-        }
-        private void SetPWChangeApplyCnt(int groupID, int nPWChangeApplyCnt)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_nPWChangeApplyCnt = nPWChangeApplyCnt;
-        }
-        public string GetInitPasswordInfo(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_strInitPasswd;
-            return "";
-        }
-        private void SetInitPasswordInfo(int groupID, string strInitPasswd)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_strInitPasswd = strInitPasswd;
-        }
-
-        private void SetUseScreenLock(int groupID, bool bUseScreenLock)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bUseScreenLock = bUseScreenLock;
-        }
-        public bool GetUseScreenLock()
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            bool bUse = false;
-
-            int count = listSiteConfig.Count;
-            for (int i = 0; i < count; i++)
-            {
-                bUse |= listSiteConfig[i].m_bUseScreenLock;
-            }
-            return bUse;
-        }
-
-        public void SetUseClipBoard(int groupID, bool bUseClipBoard)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bUseClipBoard = bUseClipBoard;
-        }
-        public bool GetUseClipBoard(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bUseClipBoard;
-            return false;
-        }
-
-        public void SetUseURLRedirection(int groupID, bool bUseURLRedirection)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bUseURLRedirection = bUseURLRedirection;
-        }
-        public bool GetUseURLRection(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bUseURLRedirection;
-            return false;
-        }
-
-        public void SetUseFileSend(int groupID, bool bUseFileSend)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bUseFileSend = bUseFileSend;
-        }
-        public bool GetUseFileSend(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bUseFileSend;
-            return false;
-        }
         public bool GetUseOSMaxFilePath()
         {
             return m_bUseOSMaxFilePath;
@@ -706,13 +484,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             m_bUseOSMaxFilePath = bUseOSMaxPath;
         }
 
-        public bool GetUseRecvFolderChange(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bRecvFolderChange;
-            return false;
-        }
         public bool GetUseUserRecvDownPath(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
@@ -754,19 +525,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 listSiteConfig[groupID].m_bUsePCURL = bUsePCURL;
         }
 
-        public bool GetUseClipApprove(int groupID)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bUseClipApprove;
-            return false;
-        }
-        private void SetUseClipApprove(int groupID, bool bUseClipApprove)
-        {
-            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
-            if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bUseClipApprove = bUseClipApprove;
-        }
 
         public bool GetUsePublicBoard(int groupID)
         {
@@ -814,14 +572,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return m_bUseClipCopyAndSend;
         }
-        private void SetUseURLRedirectionAlarm(bool bUseURLRedirectionAlarm)
-        {
-            m_bUseURLRedirectionAlarm = bUseURLRedirectionAlarm;
-        }
-        public bool GetUseURLRedirectionAlarm()
-        {
-            return m_bUseURLRedirectionAlarm;
-        }
+        
         private void SetUseURLRedirectionAlarmType(bool bUseURLRedirectionAlarmType)
         {
             m_bUseURLRedirectionAlarmType = bUseURLRedirectionAlarmType;

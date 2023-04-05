@@ -80,7 +80,7 @@
     VirusReport refVirusReport;
     Update_NotiPopUp refUpdate_NotiPopUp;
     ISGCtrlSideUIService CtrlSideUISvc;
-    ISGSiteConfigService siteConfig;
+    ISGopConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
     List<ISGNetwork> listNetWork = null;
     SecurityApproverSelectPopUp refSecurityAproverSelectPopUp;
@@ -94,7 +94,7 @@
     protected override void OnInitialized()
     {
         CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        siteConfig = SGAppMgrSvc.OpConfigInfoService;
         HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
         HsCmdCenter.sgPageEvent.SetClientUpgradeNotiEvent(UpdateNoti);
         //HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
@@ -341,7 +341,7 @@
             refUpdate_NotiPopUp.SetType(1);
             //refUpdate_PopUp.SetNotiUpdateEventAdd(NotiUpdateExe);
 
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate(0))
             {
                 ClientUpgradeExeEvent clientUpdateExe = null;
                 clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();

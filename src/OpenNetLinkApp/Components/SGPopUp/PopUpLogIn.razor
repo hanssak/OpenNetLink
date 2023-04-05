@@ -127,7 +127,6 @@
     ISGUserInfoService sgUserSvr;
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
-    ISGSiteConfigService siteConfig;
     ISGAppConfigService AppConfigSvc;
 
     //    PWChange2 refPWChange;
@@ -372,7 +371,7 @@
 
             if (stRtn != null && stRtn.Length > 0 && strData == "1")
             {
-                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (siteConfig.GetUseOver1auth(pageService.m_nCurViewPageGroupID) ? eLoginType.eLOGINTYPE_AD : (eLoginType)pageService.m_nLoginType));
+                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(pageService.m_nCurViewPageGroupID) ? eLoginType.eLOGINTYPE_AD : (eLoginType)pageService.m_nLoginType));
                 CLog.Here().Information($"doLogIn - IDPW - Web Certificate Done!");
                 bRet = true;
             }
@@ -499,7 +498,6 @@
         sgUserSvr = SGAppMgrSvc.UserInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
         sgSettingProc = SGSettingsDBProc.Instance;
@@ -544,8 +542,8 @@
 
             //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
             //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseAppLoginType())
-                eLoginUITypeData = (eLoginType)SGAppMgrSvc.OpConfigInfoService.GetAppLoginType();
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseAppLoginType(nGroupID))
+                eLoginUITypeData = (eLoginType)SGAppMgrSvc.OpConfigInfoService.GetAppLoginType(nGroupID);
 
             if(eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
             {
@@ -1150,7 +1148,7 @@
                     //strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";       // Table 이름 따로 정해졌음
                     strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
 
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc())
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupId))
                     {
                         strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
                         strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
@@ -1189,15 +1187,15 @@
                     }
 
                     // clipboard 선택전송기능 사용유무설정
-                    if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeSelectSend(groupId))
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseClipTypeSelectSend(groupId))
                         Window.UseClipBoardSelect(groupId);
 
                     // ClipBoard(Type Mixed 일때) Text 우선송신 사용
-                    if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
                         Window.UseClipFirstSendType(groupId);
 
                     // 자동전송기능 위해
-                    if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend())
+                    if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend(groupId))
                     {
                         Window.SetNativeClipboardHotKey(groupId, listModKey[(int)HOTKEY_MOD.ALT],
                                         listModKey[(int)HOTKEY_MOD.CTRL],
@@ -1207,7 +1205,7 @@
                     }
                 }
 
-                DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
+                DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer(groupId)) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
                 pageService.SetSvrTime(groupId, dt, sgLoginData);
                 bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
                 bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
@@ -1218,7 +1216,7 @@
                 if (!bAfterApprEnable)
                     bAfterCheck = false;
                 else
-                    bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+                    bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk(groupId);
 
                 pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 

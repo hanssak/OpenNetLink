@@ -108,15 +108,36 @@ namespace OpenNetLinkApp.Services
                 }
             }
 
-            bool isCheckHardSpace = true;
+            Dictionary<int, ISGopConfig> dicOpConfig = new Dictionary<int, ISGopConfig>();
             serializer = new DataContractJsonSerializer(typeof(SGopConfig));
-            string OpConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppOPsetting.json";
-            if (File.Exists(OpConfig))
+            foreach (SGNetwork sgNetwork in listNetworks)
             {
-                using (FileStream fs = File.OpenRead(OpConfig))
+                string opConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sgNetwork.GroupID}_{sgNetwork.NetPos}.json";
+
+                CLog.Here().Information($"- AppOPsetting Path: [{opConfig}]");
+
+                if (File.Exists(opConfig))
                 {
-                    SGopConfig opConfig = (SGopConfig)serializer.ReadObject(fs);
-                    isCheckHardSpace = opConfig.bUseChkHardSpace;
+                    try
+                    {
+                        CLog.Here().Information($"- AppOPsetting Loading... : [{opConfig}]");
+                        //Open the stream and read it back.
+                        using (FileStream fs = File.OpenRead(opConfig))
+                        {
+                            SGopConfig appConfig = (SGopConfig)serializer.ReadObject(fs);
+                            dicOpConfig.Add(sgNetwork.GroupID, appConfig);
+                        }
+                        CLog.Here().Information($"- AppOPsetting Load Completed : [{AppConfig}]");
+                    }
+                    catch (Exception ex)
+                    {
+                        CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+                        dicOpConfig.Add(sgNetwork.GroupID, new SGopConfig());
+                    }
+                }
+                else
+                {
+                    dicOpConfig.Add(sgNetwork.GroupID, new SGopConfig());
                 }
             }
 
@@ -179,7 +200,7 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
                 hsNetwork.SetGroupID(groupID);
                 hsNetwork.SetFileRecvPossible(false);
-                hsNetwork.SetIsCheckHardSpace(isCheckHardSpace);
+                hsNetwork.SetIsCheckHardSpace(dicOpConfig[groupID].bUseChkHardSpace);
 
                 //PageStatusData.RefreshInfoEvent()
 

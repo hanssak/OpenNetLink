@@ -111,7 +111,7 @@
                                                 <td>@strDataDayClipboardMaxSize</td>
                                             </tr>
                                         </table>
-                                        @if (SGAppMgrSvc.OpConfigInfoService.GetViewFileFilter() == true)
+                                        @if (SGAppMgrSvc.OpConfigInfoService.GetViewFileFilter(groupIDbyParam) == true)
                                         {
                                             <div class="table-responsive">
                                                 <div class="title_set"><i class="fas fa-cog mr-1"></i>@strExtLimitInfo</div>                   <!--확장자 제한-->
@@ -242,7 +242,6 @@
     public string strDataDayClipboardMaxSize = "";                                         // 1024MB까지 전송
     public string strURLRedirectCheck = "";                                             //URL Redirect 검사 방식
     ISGSideBarUIService SideBarUISvc;
-    ISGSiteConfigService siteConfig;
 
     public bool bURLRedirection = false;
     public bool bExt1 = true;
@@ -251,7 +250,6 @@
 
     protected override void OnInitialized()
     {
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         InitText();
     }

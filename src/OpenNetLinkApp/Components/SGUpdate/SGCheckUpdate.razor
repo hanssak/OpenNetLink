@@ -82,7 +82,7 @@
         object[] param4 = { "0" };
         await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param4);
           //강제 업데이트 기능 사용 시 업데이트 중 취소 버튼 숨김
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate(0))
                 IsCancelVisible = false;
             else
                 IsCancelVisible = true;

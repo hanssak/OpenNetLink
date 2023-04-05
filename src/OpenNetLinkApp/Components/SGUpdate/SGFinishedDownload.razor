@@ -64,17 +64,15 @@
     public string DownloadInfo { get; set; } = "NetSparkle.Samples.NetCore.Avalonia 2.0";
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGFinishedDownload>();
-    ISGSiteConfigService siteConfig;
 
     public async void OpenPopUp(string downloadInfo)
     {
         //강제 업데이트 시, 따로 신규 버전 다운로드 완료 화면 없이 바로 설치 진행
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate(0))
         {
             InstallAndRelaunch();
             return;
         }
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         CLog.Here().Information($"- OpenFinishedDownload");
 
         object[] param4 = { "0" };

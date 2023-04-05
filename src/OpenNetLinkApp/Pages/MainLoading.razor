@@ -42,7 +42,6 @@
 
     SGSettingsDBProc sgSettingProc;
 
-    ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
     ISGopConfigService OpConfigSvc;
@@ -62,7 +61,6 @@
     protected override void OnInitialized()
     {
 
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
@@ -126,7 +124,7 @@
 
         @*MyNavigationManager.NavigateTo("/fileException");*@
 
-        MyNavigationManager.NavigateTo((SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1) ? "/SelectNet" : "/LogIn");
+        MyNavigationManager.NavigateTo((SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer(0) && NetWorkSvc.NetWorkInfo.Count > 1) ? "/SelectNet" : "/LogIn");
 
     }
 
@@ -146,9 +144,9 @@
         //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
         //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
         //if (AppConfigSvc.GetUseAppLoginType())
-        if (OpConfigSvc.GetUseAppLoginType())
+        if (OpConfigSvc.GetUseAppLoginType(groupId))
         {
-            loginType = OpConfigSvc.GetAppLoginType().ToString();
+            loginType = OpConfigSvc.GetAppLoginType(groupId).ToString();
         }
 
         conTimer.Stop();

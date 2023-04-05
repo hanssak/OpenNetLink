@@ -337,7 +337,7 @@
         SGQueryExtend sgQuery = new SGQueryExtend();
 
         // WebManager에서 값이 표현이 되도록 적당히 변경해서 올림(NetLink에 맞춤)
-        bool useAgentBlockValueChange = SGAppMgrSvc.SiteConfigInfoService.GetUseAgentBlockValueChange();
+        bool useAgentBlockValueChange = SGAppMgrSvc.OpConfigInfoService.GetUseAgentBlockValueChange(groupID);
         for (int i = 0; i < listDenied.Count; i++)
         {
             addBlockQuery(listDenied[i]);

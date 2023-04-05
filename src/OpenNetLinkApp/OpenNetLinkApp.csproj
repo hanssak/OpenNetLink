@@ -84,6 +84,10 @@
     <Content Include="..\PreviewUtil\bin\$(Configuration)\$(TargetFramework)\PreviewUtil*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Compile Remove="Models\SGConfig\ISGSiteConfig.cs" />
+    <Compile Remove="Models\SGConfig\SGSiteConfig.cs" />
+    <Compile Remove="Services\SGAppManager\SGSiteConfigService.cs" />
+    <Content Remove="Pages\Transfer\TransferUI.razor" />
     <Content Condition="'$(IsMacOS)' == 'true'" Include="Info.plist">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

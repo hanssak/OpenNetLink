@@ -112,7 +112,6 @@
 
     private UpdateAvailableResult _userResponse = UpdateAvailableResult.None;
     public string _releaseNotes = "";
-    ISGSiteConfigService siteConfig;
 
     public string TitleHeaderText
     {
@@ -160,9 +159,6 @@
     {
         try
         {
-
-
-            siteConfig = SGAppMgrSvc.SiteConfigInfoService;
             CLog.Here().Information($"- InitializeSGAvailableUpdate...");
 
             var downReleaseNote = await AppUpdaterSvc.DownloadReleaseNote(popUpGroupID);
@@ -185,7 +181,7 @@
                     InfoText = $"Would you like to {downloadInstallText} it now?";
 
                 //강제 업데이트 기능 사용 시 이 버전 넘기기, 나중에 업데이트 버튼 숨김
-                if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate(0))
                 {
                     IsRemindMeLaterVisible = false;
                     IsCloseVisible = false;

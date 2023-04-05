@@ -171,7 +171,6 @@
 
     ISGUserInfoService sgUserSvr;
     ISGSideBarUIService SideBarUISvc;
-    ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
 
@@ -539,7 +538,6 @@
         sgUserSvr = SGAppMgrSvc.UserInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
         CLog.Here().Information("Gpki_Main - OnInitialized!");
@@ -881,7 +879,7 @@
             //else
             //    strNavigateWithGroupID = "/Transfer/";
 
-            string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+            string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupID) + "/";
 
             string strNavigateUrl = strNavigateWithGroupID.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
@@ -987,17 +985,17 @@
                 }
 
                 // clipboard 선택전송기능 사용유무설정
-                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeSelectSend(groupId))
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseClipTypeSelectSend(groupId))
                     Window.UseClipBoardSelect(groupId);
 
                 // ClipBoard(Type Mixed 일때) Text 우선송신 사용
-                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
                     Window.UseClipFirstSendType(groupId);
 
             }
 
 
-            DateTime dt =(SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
+            DateTime dt =(SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer(0)) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
             pageService.SetSvrTime(groupId, dt, sgLoginData);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
@@ -1007,7 +1005,7 @@
             if (!bAfterApprEnable)
                 bAfterCheck = false;
             else
-                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk(groupId);
 
             pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
@@ -1057,7 +1055,7 @@
                 //else
                 //    strNavigateWithGroupID = "/Transfer/";
 
-                string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+                string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupId) + "/";
                 string strNavigateUrl = strNavigateWithGroupID.ToLower();
                 if (strNavigateUrl.IndexOf("transfer") > 0)
                 {
@@ -1070,7 +1068,7 @@
                 strNavigateWithGroupID += groupId.ToString();
                 MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
-                if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
+                if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove(0))
                 {
                     if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                     {
@@ -1193,8 +1191,8 @@
 
                 //if (sgLoginData.GetApprove() == true)
                 // 3망 정책고려한 결재사용유무 설정
-                if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false) // 결재관리 UI 않나오는 설정추가
-                    if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupid)) > 0))
+                if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupid) == false) // 결재관리 UI 않나오는 설정추가
+                    if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupid)) > 0))
                         bApprMenuUse = true;
 
                 bSecurityApprMenuUse = sgUserData.GetUserPrivacyApprPos();
@@ -1205,7 +1203,7 @@
                 if (!siteConfig.GetUseDashBoard())
                 strRootPath = "/Transfer";*@
 
-            string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+            string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupid) + "/";
             string strNavigateUrl = strRootPath.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
             {

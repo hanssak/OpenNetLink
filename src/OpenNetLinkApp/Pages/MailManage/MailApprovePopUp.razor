@@ -472,7 +472,7 @@
 
 
 
-        if (!SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason())
+        if (!SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID))
         {
             if (pageService.GetConnectStatus(groupID) == false)
             {
@@ -637,7 +637,7 @@
             stApproveStatusValue = arrData[5].Split(":")[1];
 
             bool bViewOnlyReject = true;
-            bViewOnlyReject = !SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason();
+            bViewOnlyReject = !SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupId);
 
             for (int i = 0; i < listApprover.Count - 1; i++)
             {

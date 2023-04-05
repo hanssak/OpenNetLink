@@ -499,7 +499,6 @@
     ViewDetailPopUp refViewDetail;
     PublicBoardView refPublicBoardView;
     ISGUserInfoService sgUserSvr;
-    ISGSiteConfigService siteConfig;
     ISGVersionConfigService versionConfigSvc;
     ISGopConfigService OpConfigSvc;
 
@@ -733,9 +732,9 @@
         messageList.Clear();
 
         //이전날짜 데이터 모두 삭제
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseInitAlarmPerDay())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseInitAlarmPerDay(0))
             SQLiteDB.DeleteAllInfo(DateTime.Now, true);
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseInitMessagePerDay())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseInitMessagePerDay(0))
             SQLiteDB.DeleteAllInfo(DateTime.Now, false);
 
         List<SGAlarmData> listAlarmData = null;
@@ -815,14 +814,13 @@
         sgUserSvr = SGAppMgrSvc.UserInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         versionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
         sgSettingProc = SGSettingsDBProc.Instance;
         OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
 
         ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
-        if (OpConfigSvc.GetShowAdminInfo())
+        if (OpConfigSvc.GetShowAdminInfo(groupIDbyParam))
             //if (AppConfigSvc.GetShowAdminInfo() == true)
             stShowAdminInfo = "block";
         else
@@ -942,8 +940,8 @@
             // if (sgLoginData.GetApprove() == true)                        // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
 
             // 3망 정책고려한 결재사용유무 설정 && 설정상 결재관리 UI 사용
-            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
-                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 0))
+            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupID) == false)
+                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupID)) > 0))
                     bApprMenuUse = true;
         }
 
@@ -2417,8 +2415,8 @@
             // if (sgLoginData.GetApprove() == true)                        // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
 
             // 3망 정책고려한 결재사용유무 설정
-            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
-                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 0))
+            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupID) == false)
+                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupID)) > 0))
                     return true;
         }
 

@@ -116,7 +116,6 @@
     public bool bUseAutoLogin;
     SGSettingsDBProc sgSettingProc;
     ISGSideBarUIService SideBarUISvc;
-    ISGSiteConfigService siteConfig;
     //대결재 변수
     private LinkedList<ProxyInfo> ProxySearch = new LinkedList<ProxyInfo>();
     private LinkedList<ProxyInfo> ProxySelect = new LinkedList<ProxyInfo>();
@@ -153,7 +152,6 @@
             groupID = sgSideBar.GroupId;
         sgSettingProc = SGSettingsDBProc.Instance;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         // bUseAutoLogin = siteConfig.GetUseAutoLogin(groupID); // json으로 설정이동
         bUseAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID);
 
@@ -270,7 +268,7 @@
         if (!bAutoLoginContinue)
             bAutoLoginContinue = true;
 
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
         {
             List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
             foreach (ISGNetwork Net in listNetWork)
@@ -299,7 +297,7 @@
             bAutoLoginContinue = false;
 
 
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
         {
             List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
             foreach (ISGNetwork Net in listNetWork)

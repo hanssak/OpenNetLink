@@ -31,8 +31,9 @@
         VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         CtrlSideUISvc.OnChangeCtrlSide += StateHasChanged;
-
-        Window.SetTrayUse(OpConfigSvc.GetExitTrayMove());
+        
+        //Tray로 이동 같은 경우 무조건 GroupId 0 번째를 따른다. 다중망일때 셋팅을 같이
+        Window.SetTrayUse(OpConfigSvc.GetExitTrayMove(0));
     }
 
     public void Dispose()

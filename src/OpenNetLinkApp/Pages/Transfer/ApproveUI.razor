@@ -682,7 +682,7 @@
             return;
         }
 
-        if (!SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason())
+        if (!SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID))
         {
 
             SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);

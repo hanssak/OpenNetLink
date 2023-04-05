@@ -76,7 +76,6 @@
     private string stNewPW;
     private string stNewPWConfirm;
     ISGSideBarUIService SideBarUISvc;
-    ISGSiteConfigService siteConfig;
     public string strInfo1 = "";
     public string strInfo2 = "";
     ISGAppConfigService AppConfigSvc;
@@ -221,7 +220,7 @@
         string strUserID = sgLoginData.GetUserID();
 
 
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
         {
             List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
             foreach(ISGNetwork Net in listNetWork)
@@ -248,7 +247,7 @@
         if (nGroupID < 0) return;
 
         // 로그인한 groupID 선택되게 적용
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
         {
             foreach (var MenuItem in SideBarUISvc.MenuList)
             {
@@ -272,7 +271,6 @@
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         sgSettingProc = SGSettingsDBProc.Instance;
 
@@ -301,7 +299,7 @@
         string strNavigateWithGroupID = String.Empty;
         if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
-            strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+            strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupID) + "/";
             string strNavigateUrl = strNavigateWithGroupID.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
             {
@@ -338,7 +336,7 @@
             }
 
             //if (AppConfigSvc.GetStartTrayMove())
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray(groupID))
             {
                 if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                 {

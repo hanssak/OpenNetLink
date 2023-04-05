@@ -78,7 +78,6 @@
     private string stNewPW;
     private string stNewPWConfirm;
     ISGSideBarUIService SideBarUISvc;
-    ISGSiteConfigService siteConfig;
 
     public string strPWChangeInfo = "";
     public string strBtnText = "";
@@ -355,7 +354,6 @@
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         //pageService.SetDayPassWDCHGEvent(nGroupID, DayPassWordChangeNoti);
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         sgSettingProc = SGSettingsDBProc.Instance;

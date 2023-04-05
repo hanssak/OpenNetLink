@@ -157,7 +157,7 @@
                                         <th style="text-align: center; vertical-align: middle; width: 6%;">@strTransKind</th>                         <!--전송구분-->
                                         <th style="text-align: center; vertical-align: middle; width: 8%;">@strTransStatus</th>                         <!--전송상태-->
                                         <th style="text-align: center; vertical-align: middle; width: 7%;">@strApprStatus</th>                         <!--승인상태-->
-                                        @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward())
+                                        @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward(groupIDbyParam))
                                         {
                                             <th style="text-align: center; vertical-align: middle; width: 7%; ">@strFileForward</th>
                                             <!--파일전달-->
@@ -186,7 +186,7 @@
                                             <td style="text-align:center; vertical-align: middle">@item.TransferType</td>
                                             <td style="text-align:center; vertical-align: middle">@item.TransferStatus</td>
                                             <td style="text-align:center; vertical-align: middle">@item.ApvStatus</td>
-                                            @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward())
+                                            @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward(groupIDbyParam))
                                             {
                                                 <td style="text-align:center; vertical-align: middle">@item.IsFile</td>
                                             }
@@ -1108,7 +1108,7 @@
             tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
             tData.expiredDate = sgData.GetExpiredDate(dic);             //파일저장 만료일
             tData.stDLP = sgData.GetDlp(dic);
-            tData.isPossibleDownload = GetIsPossibleDownLoad(tData, isInner, maxDownloadCount, nowDate);
+            tData.isPossibleDownload = GetIsPossibleDownLoad(tData, isInner, maxDownloadCount, nowDate, groupId);
 
             if (maxDownloadCount - tData.downloadCount < 0)
                 tData.isPossibleDownloadCount = 0;
@@ -1124,7 +1124,7 @@
 
     }
 
-    public bool GetIsPossibleDownLoad(transData tData, bool isInner, int maxDownloadCount, int nowDate)
+    public bool GetIsPossibleDownLoad(transData tData, bool isInner, int maxDownloadCount, int nowDate, int groupId)
     {
         bool isPossibleDownload = false;
         //파일 다운로드 가능여부 판단
@@ -1137,7 +1137,7 @@
         {
             //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
             //if (sgAppConfig.GetFileDownloadBeforeReciving())
-            if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForwardDownBeforeRecv())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForwardDownNotRecv(groupId))
             {
                 if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
                     isPossibleDownload = true;

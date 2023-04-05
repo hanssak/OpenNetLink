@@ -137,7 +137,6 @@
 
     ISGUserInfoService sgUserSvr;
     ISGSideBarUIService SideBarUISvc;
-    ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
 
     public string strUserinputGPKIPW = "";          // 사용자가 입력한 gpki-password
@@ -525,7 +524,6 @@
         sgUserSvr = SGAppMgrSvc.UserInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
 
         CLog.Here().Information("Login_Gpki - OnInitialized!");
     }
@@ -958,16 +956,16 @@
                 }
 
                 // clipboard 선택전송기능 사용유무설정
-                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeSelectSend(groupId))
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseClipTypeSelectSend(groupId))
                     Window.UseClipBoardSelect(groupId);
 
                 // ClipBoard(Type Mixed 일때) Text 우선송신 사용
-                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
                     Window.UseClipFirstSendType(groupId);
             }
 
 
-            DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
+            DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer(groupId)) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
             pageService.SetSvrTime(groupId, dt, sgLoginData);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
@@ -978,7 +976,7 @@
             if (!bAfterApprEnable)
                 bAfterCheck = false;
             else
-                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk(groupId);
 
             pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 

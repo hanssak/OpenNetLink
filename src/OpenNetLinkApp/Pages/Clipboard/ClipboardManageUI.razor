@@ -264,11 +264,11 @@
 
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
-    ISGSiteConfigService siteConfig;
     ISGAppConfigService AppConfigSvc;
+    ISGopConfigService siteConfig;
 
     // 목적지 Data
-    Dictionary<string, SGNetOverData> dicDestSysPos = null;
+        Dictionary<string, SGNetOverData> dicDestSysPos = null;
     public string strDestNetWork = "";
     public string _strDestNetWork
     {
@@ -506,7 +506,7 @@
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        siteConfig = SGAppMgrSvc.OpConfigInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
 
@@ -1194,7 +1194,7 @@
         //    strNavigateWithGroupID = "/Transfer/";
 
         //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-        string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+        string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupID) + "/";
         string strNavigateUrl = strNavigateWithGroupID.ToLower();
         if (strNavigateUrl.IndexOf("transfer") > 0)
         {

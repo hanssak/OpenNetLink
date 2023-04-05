@@ -242,10 +242,15 @@
 
     protected override void OnInitialized()
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
         actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
-        receiverSearchType = SGAppMgrSvc.OpConfigInfoService.GetReceiverSearchType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInReceiverTree();
+        receiverSearchType = SGAppMgrSvc.OpConfigInfoService.GetReceiverSearchType(groupID);
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInReceiverTree(groupID);
 
         InitText();
 

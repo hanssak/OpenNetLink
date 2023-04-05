@@ -156,7 +156,6 @@
     ISGUserInfoService sgUserSvr;
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
-    ISGSiteConfigService siteConfig;
     ISGCtrlSideUIService CtrlSideUISvc;
 
     public bool bInitBaseLogin = true;
@@ -378,7 +377,7 @@
 
             //pageService.m_nCurViewPageGroupID=0;
 
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
             {
                 foreach (ISGNetwork netlist in listNetWork)
                 {
@@ -537,7 +536,7 @@
             HSCmdCenter.SetCliVersion(strCurCliVersion);
 
 
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
             {
                 List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
                 foreach (ISGNetwork netlist in listNetWork)
@@ -730,14 +729,13 @@
         sgUserSvr = SGAppMgrSvc.UserInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
         InitText();
 
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
         {
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
             foreach (ISGNetwork netlist in listNetWork)
@@ -760,7 +758,7 @@
         // 다중망 로그인에서 로그아웃됐을때에 다시 자동로그인 안되게 처리
         if (srcLoc == "Logout")
         {
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1)
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer(0) && NetWorkSvc.NetWorkInfo.Count > 1)
                 MyNavigationManager.NavigateTo("/SelectNet");
 
             if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD ||
@@ -769,7 +767,7 @@
                 SetADLoginData();
             }
 
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0) == false)
             {
                 // 중복로그인된거 확인하고 강제로그인후, 다음부터도 확인하고 강제로그인 하도록 적용
                 List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -940,7 +938,7 @@
         if (nGroupID < 0) return;
 
         // 로그인한 groupID 선택되게 적용
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
         {
             foreach (var MenuItem in SideBarUISvc.MenuList)
             {
@@ -1069,7 +1067,7 @@
                         // strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";     // Table 이름 따로 정해졌음
                         strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
 
-                        if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc())
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupId))
                         {
                             strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
                             strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
@@ -1156,7 +1154,7 @@
                             }
 
                             // 3중망 - 동시에 수신망 전체에 전송
-                            if (SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend() && bUseClipNetOverALL && NetWorkSvc.NetWorkInfo.Count < 2)
+                            if (SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend(groupId) && bUseClipNetOverALL && NetWorkSvc.NetWorkInfo.Count < 2)
                             {
                                 // 3중망, clipboard 단축키 추가작업필요
                                 listModKey = AppConfigSvc.GetClipBoardModifierWhenNetOver(groupId, 0);
@@ -1193,15 +1191,15 @@
                         }
 
                         // clipboard 선택전송기능 사용유무설정
-                        if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeSelectSend(groupId))
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseClipTypeSelectSend(groupId))
                             Window.UseClipBoardSelect(groupId);
 
                         // ClipBoard(Type Mixed 일때) Text 우선송신 사용
-                        if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
                             Window.UseClipFirstSendType(groupId);
 
                         // 자동전송기능 위해
-                        if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend())
+                        if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend(groupId))
                         {
                             Window.SetNativeClipboardHotKey(groupId,
                                 listModKey[(int)HOTKEY_MOD.ALT],
@@ -1213,7 +1211,7 @@
 
                     } // if (bUseClipBoard)
 
-                    DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
+                    DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer(groupId)) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
                     pageService.SetSvrTime(groupId, dt, sgLoginData);
                     bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
                     bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
@@ -1223,7 +1221,7 @@
                     if (!bAfterApprEnable)
                         bAfterCheck = false;
                     else
-                        bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+                        bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk(groupId);
 
                     pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
@@ -1287,7 +1285,7 @@
                             }
                         }
 
-                        if (siteConfig.GetUseLoginIDSave(groupId) == true)
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(groupId) == true)
                         {
                             SGRSACrypto sgRSACrypto = new SGRSACrypto();
                             string strEncID = "";
@@ -1302,7 +1300,7 @@
 
                         // enMainPageType 값이 2 : 파일전송화면, 다른거 : Dash보드 (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
                         //strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-                        strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+                        strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupId) + "/";
 
 
                         // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
@@ -1366,7 +1364,7 @@
                 }
 
                 // 지정해놓은 UI로 이동하도록 적용 : Random하게 Result 오는 쪽 menu가 열리도록 하지 않음
-                if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
                 {
 
                     CLog.Here().Information($"1 to ALL Login, GroupID : {groupId}, LoginResult Add Before(#####) - Current / Total : {dicLoginResult.Count} / {NetWorkSvc.NetWorkInfo.Count} ");
@@ -1530,7 +1528,7 @@
 
                     // enMainPageType 값이 2 : 파일전송화면, 다른거 : Dash보드 (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
                     //strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-                    strNavigatePathnGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+                    strNavigatePathnGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupId) + "/";
 
                     // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
                     string strNavigateUrl = strNavigatePathnGroupID.ToLower();
@@ -1560,7 +1558,7 @@
 
                 if (!pageService.GetIsPolicyUpdate(groupId))
                 {
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray()) //(SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray(0)) //(SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
                     {
                         if (pageService.GetConnectCount(nGroupIDfirst) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                         {
@@ -1590,7 +1588,7 @@
         {
             if (!pageService.GetIsPolicyUpdate(groupId))
             {
-                if (!SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() || dicLoginResult.Count == NetWorkSvc.NetWorkInfo.Count)
+                if (!SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0) || dicLoginResult.Count == NetWorkSvc.NetWorkInfo.Count)
                 {
                     //멀티로그인이 아니거나, 멀티로그인이 전부 이루어 졌을 시, 재로그인 가능상태로 설정
                     await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
@@ -1762,7 +1760,7 @@
                     }
 
                     // 3중망 - 동시에 수신망 전체에 전송
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend() && bUseClipNetOverALL && NetWorkSvc.NetWorkInfo.Count < 2)
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend(groupId) && bUseClipNetOverALL && NetWorkSvc.NetWorkInfo.Count < 2)
                     {
                         // 3중망, clipboard 단축키 추가작업필요
                         listModKey = AppConfigSvc.GetClipBoardModifierWhenNetOver(groupId, 0);
@@ -1799,17 +1797,17 @@
                 }
 
                 // clipboard 선택전송기능 사용유무설정
-                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeSelectSend(groupId))
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseClipTypeSelectSend(groupId))
                     Window.UseClipBoardSelect(groupId);
 
                 // ClipBoard(Type Mixed 일때) Text 우선송신 사용
-                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
                     Window.UseClipFirstSendType(groupId);
 
             } // if (bUseClipBoard)
 
 
-            DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
+            DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer(groupId)) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
             pageService.SetSvrTime(groupId, dt, sgLoginData);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
@@ -1820,7 +1818,7 @@
             if (!bAfterApprEnable)
                 bAfterCheck = false;
             else
-                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk(groupId);
 
             pageService.SetAfterApproveCheck(groupId, bAfterCheck);
             Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
@@ -1980,7 +1978,7 @@
 
             if (srcLoc != "GPKI")
             {
-                strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+                strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupId) + "/";
 
 
                 // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
@@ -2015,7 +2013,7 @@
             MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
             //if (AppConfigSvc.GetStartTrayMove())
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray(0))
             {
                 if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                 {
@@ -2071,7 +2069,7 @@
         }
 
         // 지정해놓은 UI로 이동하도록 적용 : Random하게 Result 오는 쪽 menu가 열리도록 하지 않음
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
         {
 
             lock (obj)
@@ -2102,7 +2100,7 @@
 
                         CLog.Here().Information($"1 to ALL Login, GroupID : {nGroupIDfirst}, First Screen !");
 
-                        string strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+                        string strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(nGroupIDfirst) + "/";
 
                         // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
                         string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
@@ -2251,9 +2249,9 @@
                 nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY");
                 //if (sgLoginData.GetApprove() == true)
                 // 3망 정책고려한 결재사용유무 설정
-                if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false) // 결재관리 UI 않나오는 설정추가
+                if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupid) == false) // 결재관리 UI 않나오는 설정추가
                     @*if ((sgLoginData.GetApproveProxyRight() && bSFMManageUse) || (sgUserInfo.GetUserApprPos() > 0))*@
-                    if (sgLoginData.GetApproveProxyRight() || (sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupid)) > 0))     //(일반사용자)대결재자 권한을 가지거나, 전결/결재자인 경우 결재관리 표시
+                    if (sgLoginData.GetApproveProxyRight() || (sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupid)) > 0))     //(일반사용자)대결재자 권한을 가지거나, 전결/결재자인 경우 결재관리 표시
                         bApprMenuUse = true;
 
                 //bSecurityApprMenuUse = sgUserData.GetUserPrivacyApprPos();
@@ -2275,7 +2273,7 @@
                 strRootPath = "/Transfer";*@
 
             // 파일전송화면 이면 저장했던 위치를 찾아서 사용한다. (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
-            string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+            string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupid) + "/";
             string strNavigateUrl = strRootPath.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
             {
@@ -2368,7 +2366,7 @@
                 }
 
                 //파일검사 예외 신청(4)
-                if (SGAppMgrSvc.OpConfigInfoService.GetUseFileCheckException())
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseFileCheckException(gID))
                 {
                     strNavigatePathWithGroupID = "/fileException/";
                     strNavigatePathWithGroupID += gID.ToString();
@@ -2377,7 +2375,7 @@
                 }
 
                 //대결재관리(5)
-                if (bDeputyApprove && bApprMenuUse && sgUserInfo.GetUserApprPos(true, siteConfig.GetUseAllProxyAuthority(gID)) > 0)      //일반사용자는 (대결재권한을 가져도) 대결재 관리 사용 불가
+                if (bDeputyApprove && bApprMenuUse && sgUserInfo.GetUserApprPos(true, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(gID)) > 0)      //일반사용자는 (대결재권한을 가져도) 대결재 관리 사용 불가
                 {
                     strNavigatePathWithGroupID = "";    //안씀
                                                         //strNavigatePathWithGroupID += gID.ToString();

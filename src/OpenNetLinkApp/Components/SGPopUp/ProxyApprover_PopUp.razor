@@ -79,7 +79,6 @@
     SGDeptTreeList refSGDeptTreeList;
     ISGSideBarUIService SideBarUISvc;
     SGSettingsDBProc sgSettingProc;
-    ISGSiteConfigService siteConfig;
 
     public string strCurDept = "";
     public string strCurName = "";
@@ -129,7 +128,7 @@
             object[] param = { "datepicker", "datepicker2" };
             jsRuntime.InvokeAsync<object>("initDatePicker", param);
         }
-        
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = (sgSideBar != null) ? sgSideBar.GroupId : 0;
 
@@ -410,6 +409,10 @@
     {
         int groupID = 0;
         groupID = SGAppMgrSvc.SideBarUIService.ActiveMenu.GroupId;
+
+        proxySearchType = SGAppMgrSvc.OpConfigInfoService.GetProxySearchType(groupID);
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInProxyTree(groupID);
+
         //*****************************************************************
         //EventBinding : EventBinding DeptApprLine -> DeptApprLineResult
         //*****************************************************************
@@ -537,10 +540,7 @@
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        proxySearchType = SGAppMgrSvc.OpConfigInfoService.GetProxySearchType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInProxyTree();
-
+        
         actionAssign = AssignProxy;
         actionTargetSelect = SelectTarget;
     }

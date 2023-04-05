@@ -14,395 +14,610 @@ using Serilog;
 using Serilog.Events;
 using AgLogManager;
 using Microsoft.EntityFrameworkCore.Storage;
+using OpenNetLinkApp.Models.SGNetwork;
+using System.Text.Json;
+using System.Security.Cryptography;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
     public interface ISGopConfigService
     {
-        ref ISGopConfig AppConfigInfo { get; }
-
-        PAGE_TYPE GetMainPageType();
-
-        /// <summary>
-        /// 로그인후 첫 Page Url(입력값에 의해 다르게 나오게 됨)
-        /// </summary>
-        /// <param name="enSiteMainPage"></param>
-        /// <param name="useDashBoard"></param>
-        /// <returns></returns>
-        string GetMainPage(PAGE_TYPE enSiteMainPage, bool useDashBoard);
-
-        /// <summary>
-        /// 로그인후 첫 Page Url(AppOPsetting.json의 enMainPageType 값으로 결정, 2:파일전송화면, 나머지:DashBoard)
-        /// </summary>
-        /// <returns></returns>
-        public string GetMainPage();
-
-        bool GetClipCopyAutoSend();
-        bool GetURLAutoTrans(int nGroupID);
-        bool GetURLAutoAfterMsg(int nGroupID);
-        string GetURLAutoAfterBrowser(int nGroupID);
-
-        string GetForwardUrl(int nGroupID);
-
-        bool GetRMouseFileAddAfterTrans();
-        bool GetAfterBasicChk();
-
-        bool GetManualRecvDownChange();
-        bool GetFileRecvTrayFix();
-        bool GetApprTrayFix();
-        bool GetUserApprActionTrayFix();
-        bool GetUserApprRejectTrayFix();
-        bool GetExitTrayMove();
-        bool GetStartTrayMove();
-        bool GetStartProgramReg();
-
-        bool GetScreenLock();
-        bool GetScreenLockUserChange();
-        bool GetUseApprWaitNoti();
-        bool GetUseLogLevel();
-        bool GetUseGPKILogin(int groupID);
-
-
-        bool GetUseNetOverAllsend();
-        bool GetFileDownloadBeforeReciving();
-        //bool GetEmailManageApproveUse();
-
-        bool GetShowAdminInfo();
-        bool GetUseFileCheckException();
-
-        bool GetUseAppLoginType();
-        int GetAppLoginType();
-
-        bool GetNoApproveManageUI();
-
-        /// <summary>
-        /// 빈파일 송신 가능하게 할지 유무
-        /// </summary>
-        /// <returns></returns>
-        bool GetEmptyfileTrans();
-
-
-        ////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////
-
-        public bool GetUseLoginIDSave(int groupID);
-        public bool GetUseAutoLogin(int groupID);
-        public bool GetUseAutoLoginCheck(int groupID);
-        public bool GetUseApprLineLocalSave(int groupID);
-
-        public bool GetUseApprLineChkBlock(int groupID);
-
-        public bool GetUseApprDeptSearch(int groupID);
-        public bool GetUseApprTreeSearch(int groupID);
-        public bool GetUseUserPWChange(int groupID);
-        public string GetPWChangeProhibitLimit(int groupID);
-        public int GetPWChangeApplyCnt(int groupID);
-        public string GetInitPasswordInfo(int groupID);
-
-        /// <summary>
-        /// 수신 폴더 사용자 변경 여부 가져오기
-        /// </summary>
-        /// <param name="groupID">그룹ID</param>
-        /// <returns>true : 사용자 변경 가능  false : 사용자 변경 불가능</returns>
-        public bool GetUseRecvFolderChange(int groupID);
-
-        /// <summary>
-        /// 로그인 유저별 다운로드 경로 사용 여부 가져오기
-        /// </summary>
-        /// <param name="groupID">그룹ID</param>
-        /// <returns>true : 로그인 유저별 수신경로 사용, false : 로그인 유저별 수신경로 미사용</returns>
-        public bool GetUseUserRecvDownPath(int groupID);
-
-        public bool GetUseEmailManageApprove(int groupID);
-
-        public bool GetUseUIdlpData(int groupID);
-
-        public bool GetUsePCURL(int groupID);
-
-        public bool GetUsePublicBoard(int groupID);
-        public bool GetUseCertSend(int groupID);
-        public bool GetUseClipAlarmTypeChange();
-        public bool GetUseMainPageTypeChange();
-        public bool GetUseClipCopyAndSend();
-        public bool GetRFileAutoSend();
-        public bool GetAfterApprAutoCheck();
-        public bool GetRecvFolderOpen();
-        public bool GetManualDownFolderChange();
-        public bool GetFileRecvAlarmRetain();
-        public bool GetApprCountAlarmRetain();
-        public bool GetApprCompleteAlarmRetain();
-        public bool GetApprRejectAlarmRetain();
-        public bool GetUseApprCountAlaram();
-        public bool GetUseCloseTrayMove();
-        public bool GetUseStartTrayMove();
-        public bool GetUseStartProgramReg();
-        public bool GetUseLanguageSet();
-        public bool GetViewFileFilter();
-        public bool GetUseForceUpdate();
-        public bool GetUseForceBackgroundUpdate();
-
-        public bool GetViewSGSideBarUIBadge();
-
-        public bool GetViewSGHeaderUIAlarmNoriAllDel();
-
-        public bool GetViewDlpApproverMyDept();
-
-        /// <summary>
-        /// 클립보드 파일전송형태 전송때, 무조건 결재없이  전송되게 함.
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseClipBoardNoApproveButFileTrans();
-
-        /// <summary>
-        /// 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로(개발중...), 1:사전, 2:사후 로 전송되게 적용
-        /// </summary>
-        /// <returns></returns>
-        public int GetClipUseAfterApprove();
-
-        /// <summary>
-        /// 처음 접속 Server(Network) 를 사용자가 선택할 수 있도록 할건지 유무(Network.json 파일에 2개이상있어야 가능)
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseSelectFirstConnectNetServer();
-
-        /// <summary>
-        /// 3망전송기능에서 한번에 모든 망에 자료를 송신하는 기능 사용 유무
-        /// </summary>
-        /// <returns></returns>
-        //public bool GetUseNetOverAllsend();
-
-        /// <summary>
-        /// 파일포워드 기능 사용할 것인지 유무
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseFileForward();
-
-
-        /// <summary>
-        /// PassWord 걸린 ZIP 파일에 대해 파일추가 거부하게 할지 유무(true:거부)
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseDenyPasswordZip();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="groupID"></param>
-        /// <returns></returns>
-        public bool GetUseFileClipManageUI(int groupID);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="groupID"></param>
-        /// <returns></returns>
-        public bool GetUseFileClipApproveUI(int groupID);
-
-        /// <summary>
-        /// ClipBoard를 파일전송 Type으로 전송
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseClipBoardFileTrans(int groupID);
-
-        /// <summary>
-        /// 1번에 모든망 로그인
-        /// </summary>
-        /// <param name="groupID"></param>
-        /// <returns></returns>
-
-        public bool GetUseOneToMultiLogin();
-
-        /// <summary>
-        /// 1번에 모든망 로그인하되 로그아웃은 선택한 망 1개만 진행여부
-        /// </summary>
-        /// <param name="groupID"></param>
-        /// <returns></returns>
-        public bool GetUseOneToMultiLoginButoneBYoneLogout();
-
-        public bool GetUseOneAClockChangeAgentTimer();
-
-        bool GetUseFileExceptionDescCheck();
-
-        /// <summary>
-        /// 결재자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
-        /// </summary>
-        /// <returns></returns>
-        public string GetApproverSearchType();
-
-        /// <summary>
-        /// 결재자 관련 팝업 시 직접 입력하여 결재자를 검색할 수 있는 기능 사용 유무 (Input 컨트롤 표시 유무)
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseInputSearchInApproverTree();
-
-        /// <summary>
-        /// 수신자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
-        /// </summary>
-        /// <returns></returns>
-        public string GetReceiverSearchType();
-
-        /// <summary>
-        /// 수신자 관련 팝업 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseInputSearchInReceiverTree();
-
-        /// <summary>
-        /// 대결재등록 시 부서 표시 방식을 SEARCH/TREE 타입 중 설정 (TREE 옵션일 경우, bApprDeptSearch 옵션 무효화)
-        /// </summary>
-        /// <returns></returns>
-        public string GetProxySearchType();
-
-        /// <summary>
-        /// 대결재등록 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseInputSearchInProxyTree();
-
-        /// <summary>
-        /// 보안결재자 등록 시 부서 표시 방식을 SEARCH/TREE 타입 중 설정 (TREE 옵션일 경우, bApprDeptSearch 옵션 무효화)
-        /// </summary>
-        /// <returns></returns>
-        public string GetSecurityApproverSearchType();
-        /// <summary>
-        /// 보안결재자 등록 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseInputSearchInSecurityApproverTree();
-
-        /// <summary>
-        /// '파일전송' 화면에서 등록시도한 파일목록에 정상파일과 오류파일이 함께 존재할 시 정상 파일에 대한 부분 등록 가능여부(true, false)
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUsePartialFileAddInTransfer();
-        /// <summary>
-        /// 로그인 완료후 Tray로 이동
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseLoginAfterTray();
-        /// <summary>
-        /// 파일 승인시에도 사유 입력
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseFileApproveReason();
-        /// <summary>
-        /// 클립보드 승인시에도 사유 입력
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseClipBoardApproveReason();
-
-        /// <summary>
-        /// 파일 선택 삭제 사용 유무
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseFileSelectDelete();
-
-        public string GetApproveExtSelectType();
-
-        public bool GetUseApproveExt();
-
-        public bool GetUseInputSearchApproveExtTree();
-
-        /// <summary>
-        /// 알람 초기화 매일 자정마다
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseInitAlarmPerDay();
-        /// <summary>
-        /// 메세지 초기화 매일 자정마다
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseInitMessagePerDay();
-        /// <summary>
-        /// 정책 수동 업데이트 버튼 보여주는 여부
-        /// </summary>
-        /// <returns></returns>
-        public bool GetVisiblePolicyUpdateButton();
-
-        /// <summary>
-        /// AD로그인 실패시, IDPW 로그인시도할수 있게 Login UI 설정 및 동작
-        /// </summary>
-        /// <param name="nGroupID"></param>
-        /// <returns></returns>
-        public bool GetUseOver1auth(int nGroupID);
-
-
-        /// <summary>
-        /// 인증서 전송기능
-        /// </summary>
-        /// <param name="groupID"></param>
-        /// <returns></returns>
-        public bool GetUsePKIsendRecv(int groupID);
-
-
-
-        public bool GetUseCrossPlatformOSforFileName();
-
-
-        public bool GetUseMinLengthTitleDesc();
-
-
+        ref Dictionary<int, ISGopConfig> AppConfigInfo { get; }
+
+        public bool GetUseAppLoginType(int groupId);
+
+        public int GetAppLoginType(int groupId);
+
+        public bool GetUseGPKILogin(int groupId);
+
+        public bool GetUseLoginIDSave(int groupId);
+
+        public bool GetUseAutoLogin(int groupId);
+
+        public bool GetUseAutoLoginCheck(int groupId);
+
+        public bool GetUseSelectFirstConnectNetServer(int groupId);
+
+        public bool GetUseOneToMultiLogin(int groupId);
+
+        public bool GetUseOneToMultiLoginButoneBYoneLogout(int groupId);
+
+        public bool GetUseOver1auth(int groupId);
+
+        public bool GetUseUserPWChange(int groupId);
+
+        public string GetPWChangeProhibitLimit(int groupId);
+
+        public int GetPWChangeApplyCnt(int groupId);
+
+        public string GetInitPasswordInfo(int groupId);
+
+        public bool GetRFileAutoSend(int groupId);
+
+        public bool GetRMouseFileAddAfterTrans(int groupId);
+
+        public bool GetUseNetOverAllsend(int groupId);
+
+        public bool GetFileDownloadBeforeReciving(int groupId);
+
+        public bool GetNoApproveManageUI(int groupId);
+
+        public bool GetEmptyfileTrans(int groupId);
+
+        public bool GetUseTitleDescSameCharCheck(int groupId);
+
+        public bool GetUseApprLineChkBlock(int groupId);
+        public bool GetRecvFolderOpen(int groupId);
+        public bool GetUseRecvFolderChange(int groupId);
+        public bool GetManualDownFolderChange(int groupId);
+        public bool GetManualRecvDownChange(int groupId);
+        public bool GetUseUserRecvDownPath(int groupId);
+        public bool GetUseDenyPasswordZip(int groupId);
+        public bool GetUseFileForward(int groupId);
+        public bool GetFileForward(int groupId);
+        public bool GetUsePartialFileAddInTransfer(int groupId);
+        public bool GetUseCheckHardSpace(int groupId);
+        public bool GetUseFileApproveReason(int groupId);
+        public bool GetUseClipBoardApproveReason(int groupId);
+        public bool GetUseFileSelectDelete(int groupId);
+        public bool GetUseCrossPlatformOSforFileName(int groupId);
+        public bool GetUseMinLengthTitleDesc(int groupId);
+        public bool GetUseAgentBlockValueChange(int groupId);
+        public bool GetUseOSMaxFilePath(int groupId);
+        public bool GetUseFileForwardDownNotRecv(int groupId);
+        public bool GetUseClipBoard(int groupId);
+        public bool GetUseClipCopyAndSend(int groupId);
+        public bool GetClipCopyAutoSend(int groupId);
+        public bool GetUseClipApprove(int groupId);
+        public bool GetUseClipBoardNoApproveButFileTrans(int groupId);
+        public int GetClipUseAfterApprove(int groupId);
+        public bool GetUseClipBoardFileTrans(int groupId);
+        public bool GetUseFileClipManageUI(int groupId);
+        public bool GetUseFileClipApproveUI(int groupId);
+        public bool GetUseClipTypeSelectSend(int groupId);
+        public bool GetUseClipTypeTextFirstSend(int groupId);
+        public bool GetUseEmailManageApprove(int groupId);
+        public bool GetUseUIdlpData(int groupId);
+        public bool GetURLAutoTrans(int groupId);
+        public bool GetUseURLRedirectionAlarm(int groupId);
+        public bool GetURLAutoAfterMsg(int groupId);
+        public bool GetUseURLRedirectionAlarmType(int groupId);
+        public string GetURLAutoAfterBrowser(int groupId);
+        public string GetForwardUrl(int groupId);
+        public bool GetAfterApprAutoCheck(int groupId);
+        public bool GetAfterBasicChk(int groupId);
+        public bool GetUseApprLineLocalSave(int groupId);
+        public bool GetUseApprDeptSearch(int groupId);
+        public bool GetViewDlpApproverMyDept(int groupId);
+        public bool GetUseOneAClockChangeAgentTimer(int groupId);
+        public bool GetFileRecvAlarmRetain(int groupId);
+        public bool GetFileRecvTrayFix(int groupId);
+        public bool GetApprCountAlarmRetain(int groupId);
+        public bool GetApprTrayFix(int groupId);
+        public bool GetApprCompleteAlarmRetain(int groupId);
+        public bool GetUserApprActionTrayFix(int groupId);
+        public bool GetApprRejectAlarmRetain(int groupId);
+        public bool GetUserApprRejectTrayFix(int groupId);
+        public bool GetUseApprCountAlaram(int groupId);
+        public bool GetUseApprWaitNoti(int groupId);
+        public bool GetUseClipAlarmTypeChange(int groupId);
+        public bool GetUseInitAlarmPerDay(int groupId);
+        public bool GetUseInitMessagePerDay(int groupId);
+        public bool GetUseMainPageTypeChange(int groupId);
+        public PAGE_TYPE GetMainPageType(int groupId);
+        public string GetMainPage(int groupId, PAGE_TYPE enInitMainPage, bool useDashBoard);
+        public string GetMainPage(int groupId);
+        public bool GetUseCloseTrayMove(int groupId);
+        public bool GetExitTrayMove(int groupId);
+        public bool GetUseStartTrayMove(int groupId);
+        public bool GetUseLoginAfterTray(int groupId);
+        public bool GetStartTrayMove(int groupId);
+        public bool GetUseStartProgramReg(int groupId);
+        public bool GetStartProgramReg(int groupId);
+        public bool GetScreenLockUserChange(int groupId);
+        public bool GetUseScreenLock(int groupId);
+        public bool GetUseLogLevel(int groupId);
+        public bool GetShowAdminInfo(int groupId);
+        public bool GetUseFileCheckException(int groupId);
+        public bool GetUsePCURL(int groupId);
+        public bool GetUsePublicBoard(int groupId);
+        public bool GetUseCertSend(int groupId);
+        public bool GetUseApproveAfterLimit(int groupId);
+        public bool GetUseClipBoardApproveAfterLimit(int groupId);
+        public bool GetUseAllProxyAuthority(int groupId);
+        public bool GetUseWebLinkPreviewer(int groupId);
+        public string GetWebLinkPreviewerURL(int groupId);
+        public bool GetUseLanguageSet(int groupId);
+        public bool GetViewFileFilter(int groupId);
+        public bool GetViewSGSideBarUIBadge(int groupId);
+        public bool GetViewSGHeaderUIAlarmNoriAllDel(int groupId);
+        public bool GetUseForceUpdate(int groupId);
+        public bool GetUseForceBackgroundUpdate(int groupId);
+        public bool GetVisiblePolicyUpdateButton(int groupId);
+        public string GetApproverSearchType(int groupId);
+        public bool GetUseInputSearchInApproverTree(int groupId);
+        public string GetReceiverSearchType(int groupId);
+        public bool GetUseInputSearchInReceiverTree(int groupId);
+        public string GetProxySearchType(int groupId);
+        public bool GetUseInputSearchInProxyTree(int groupId = 0);
+        public string GetSecurityApproverSearchType(int groupId);
+        public bool GetUseInputSearchInSecurityApproverTree(int groupId);
+        public string GetApproveExtSelectType(int groupId);
+        public bool GetUseInputSearchApproveExtTree(int groupId);
+        public bool GetUseApproveExt(int groupId);
+        public bool GetUseFileExceptionDescCheck(int groupId);
+        public bool GetUsePKIsendRecv(int groupId);
+        public bool GetUseApprTreeSearch(int groupId);
     }
 
 
     internal class SGopConfigService : ISGopConfigService
     {
-        private ISGopConfig _AppConfigInfo;
+        private Dictionary<int, ISGopConfig> _AppConfigInfo;
         /// <summary>
         /// AppOPsetting
         /// </summary>
-        public ref ISGopConfig AppConfigInfo => ref _AppConfigInfo;
+        public ref Dictionary<int ,ISGopConfig> AppConfigInfo => ref _AppConfigInfo;
 
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGopConfigService>();
 
         public SGopConfigService()
         {
-            var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
-            string AppConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppOPsetting.json";
-
+            //로그 삭제
             HsLogDel hsLog = new HsLogDel();
             hsLog.Delete(7);    // 7일이전 Log들 삭제
 
-            CLog.Here().Information($"- AppOPsetting Path: [{AppConfig}]");
-            if (File.Exists(AppConfig))
+            string strNetworkFileName = "wwwroot/conf/NetWork.json";
+            string jsonString = File.ReadAllText(strNetworkFileName);
+            List<ISGNetwork> listNetworks = new List<ISGNetwork>();
+            using (JsonDocument document = JsonDocument.Parse(jsonString))
             {
-                try
+                JsonElement root = document.RootElement;
+                JsonElement NetWorkElement = root.GetProperty("NETWORKS");
+                //JsonElement Element;
+                foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
                 {
-                    CLog.Here().Information($"- AppOPsetting Loading... : [{AppConfig}]");
-                    //Open the stream and read it back.
-                    using (FileStream fs = File.OpenRead(AppConfig))
+                    SGNetwork sgNet = new SGNetwork();
+                    string strJsonElement = netElement.ToString();
+                    var options = new JsonSerializerOptions
                     {
-                        SGopConfig appConfig = (SGopConfig)serializer.ReadObject(fs);
-                        _AppConfigInfo = appConfig;
-                    }
-                    CLog.Here().Information($"- AppOPsetting Load Completed : [{AppConfig}]");
-                }
-                catch (Exception ex)
-                {
-                    CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
-                    _AppConfigInfo = new SGopConfig();
+                        ReadCommentHandling = JsonCommentHandling.Skip,
+                        AllowTrailingCommas = true,
+                        PropertyNameCaseInsensitive = true,
+                    };
+                    sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
+                    listNetworks.Add(sgNet);
                 }
             }
-            else
+
+            _AppConfigInfo = new Dictionary<int, ISGopConfig>();
+            var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
+            foreach (SGNetwork sgNetwork in listNetworks)
             {
-                _AppConfigInfo = new SGopConfig();
+                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sgNetwork.GroupID}_{sgNetwork.NetPos}.json";
+
+                CLog.Here().Information($"- AppOPsetting Path: [{AppConfig}]");
+
+                if (File.Exists(AppConfig))
+                {
+                    try
+                    {
+                        CLog.Here().Information($"- AppOPsetting Loading... : [{AppConfig}]");
+
+                        byte[] hsckByte = File.ReadAllBytes(AppConfig);
+                        byte[] masterKey = SGCrypto.GetMasterKey();
+
+                        bool isDeCrypt = true;
+                        string strData = String.Empty;
+                        try
+                        {
+                            byte[] dData = SGCrypto.AESDecrypt256(hsckByte, masterKey, PaddingMode.PKCS7);
+                            strData = Encoding.UTF8.GetString(dData);
+                        }
+                        catch(Exception ex)
+                        {
+                            //디크립션 실패
+                            isDeCrypt = false;
+                        }
+
+                        if(isDeCrypt)
+                        {
+                            SGopConfig appConfig = JsonSerializer.Deserialize<SGopConfig>(strData);
+                            _AppConfigInfo.Add(sgNetwork.GroupID, appConfig);
+
+                        }
+                        else
+                        {
+                            //Open the stream and read it back.
+                            using (FileStream fs = File.OpenRead(AppConfig))
+                            {
+                                SGopConfig appConfig = (SGopConfig)serializer.ReadObject(fs);
+                                _AppConfigInfo.Add(sgNetwork.GroupID, appConfig);
+                            }
+                        }
+                        
+                        CLog.Here().Information($"- AppOPsetting Load Completed : [{AppConfig}]");
+                    }
+                    catch(Exception ex)
+                    {
+                        CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+                        _AppConfigInfo.Add(sgNetwork.GroupID, new SGopConfig());
+                    }
+                }
+                else
+                {
+                    SGopConfig sgOpConfig = new SGopConfig();
+                    _AppConfigInfo.Add(sgNetwork.GroupID, sgOpConfig);
+                    //파일이 없으면 생성
+                    try
+                    {
+                        using (var fs = new FileStream(AppConfig, FileMode.Create))
+                        {
+                            var encoding = Encoding.UTF8;
+                            var ownsStream = false;
+                            var indent = true;
+
+                            using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
+                            {
+                                serializer.WriteObject(writer, sgOpConfig);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+                    }
+                }
             }
         }
 
-
-
-        public PAGE_TYPE GetMainPageType()
+        public bool GetUseAppLoginType(int groupId)
         {
-            return AppConfigInfo.enMainPageType;
+            return AppConfigInfo[groupId].bUseAppLoginType;
         }
-        public string GetMainPage(PAGE_TYPE enInitMainPage, bool useDashBoard)
+        public int GetAppLoginType(int groupId)
+        {
+            return AppConfigInfo[groupId].LoginType;
+        }
+        public bool GetUseGPKILogin(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseGpkiLogin;
+        }
+        public bool GetUseLoginIDSave(int groupId)
+        {
+            return AppConfigInfo[groupId].bUserIDSave;
+        }
+        public bool GetUseAutoLogin(int groupId)
+        {
+            return AppConfigInfo[groupId].bAutoLogin;
+        }
+        public bool GetUseAutoLoginCheck(int groupId)
+        {
+            return AppConfigInfo[groupId].bAutoLoginCheck;
+        }
+        public bool GetUseSelectFirstConnectNetServer(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseUserSelectFirstServer;
+        }
+        public bool GetUseOneToMultiLogin(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseOneToMultiLogin;
+        }
+        public bool GetUseOneToMultiLoginButoneBYoneLogout(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseOneByOneLogOut;
+        }
+        public bool GetUseOver1auth(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseOver1Auth;    // 기본값
+        }
+        public bool GetUseUserPWChange(int groupId)
+        {
+            return AppConfigInfo[groupId].bUserPWChange;
+        }
+        public string GetPWChangeProhibitLimit(int groupId)
+        {
+            return AppConfigInfo[groupId].strPWChangeProhibitLimit;
+        }
+        public int GetPWChangeApplyCnt(int groupId)
+        {
+            return AppConfigInfo[groupId].nPWChangeApplyCnt;
+        }
+        public string GetInitPasswordInfo(int groupId)
+        {
+            return AppConfigInfo[groupId].strInitPasswd;
+        }
+        public bool GetRFileAutoSend(int groupId)
+        {
+            return AppConfigInfo[groupId].bRFileAutoSend;
+        }
+        public bool GetRMouseFileAddAfterTrans(int groupId)
+        {
+            return AppConfigInfo[groupId].bRMouseFileAddAfterTrans;
+        }
+        public bool GetUseNetOverAllsend(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseNetOverAllsend;
+        }
+        public bool GetFileDownloadBeforeReciving(int groupId)
+        {
+            return AppConfigInfo[groupId].bFileDownloadBeforeReciving;
+        }
+        public bool GetNoApproveManageUI(int groupId)
+        {
+            return AppConfigInfo[groupId].bNoApproveManageUI;
+        }
+        public bool GetEmptyfileTrans(int groupId)
+        {
+            return AppConfigInfo[groupId].bEmptyfileTrans;
+        }
+        public bool GetUseTitleDescSameCharCheck(int groupId)
+        {
+            return AppConfigInfo[groupId].bTitleDescSameChk;
+        }
+        public bool GetUseApprLineChkBlock(int groupId)
+        {
+            return AppConfigInfo[groupId].bApprLineChkBlock;
+        }
+        public bool GetRecvFolderOpen(int groupId)
+        {
+            return AppConfigInfo[groupId].bRecvFolderOpen;
+        }
+        public bool GetUseRecvFolderChange(int groupId)
+        {
+            return AppConfigInfo[groupId].bRecvFolderChange;
+        }
+        public bool GetManualDownFolderChange(int groupId)
+        {
+            return AppConfigInfo[groupId].bManualDownFolderChange;
+        }
+        public bool GetManualRecvDownChange(int groupId)
+        {
+            return AppConfigInfo[groupId].bManualRecvDownChange;
+        }
+        public bool GetUseUserRecvDownPath(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseUserRecvDownPath;
+        }
+        public bool GetUseDenyPasswordZip(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseDenyPasswordZip;
+        }
+        public bool GetUseFileForward(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseFileForward;
+        }
+        public bool GetFileForward(int groupId)
+        {
+            return AppConfigInfo[groupId].bFileForward;
+        }
+        public bool GetUsePartialFileAddInTransfer(int groupId)
+        {
+            return AppConfigInfo[groupId].bUsePartialFileAddInTransfer;
+        }
+        public bool GetUseCheckHardSpace(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseChkHardSpace;
+        }
+        public bool GetUseFileApproveReason(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseFileApproveReason;
+        }
+        public bool GetUseClipBoardApproveReason(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseClipBoardApproveReason;
+        }
+        public bool GetUseFileSelectDelete(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseFileSelectDelete;
+        }
+        public bool GetUseCrossPlatformOSforFileName(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseCrossPlatformOSforFileName;
+        }
+        public bool GetUseMinLengthTitleDesc(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseTitleDescMinLength;
+        }
+        public bool GetUseAgentBlockValueChange(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseAgentBlockValueChange;
+        }
+        public bool GetUseOSMaxFilePath(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseOSMaxFilePath;
+        }
+        public bool GetUseFileForwardDownNotRecv(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseFileForwardDownNotRecv;
+        }
+        public bool GetUseClipBoard(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseClipBoard;
+        }
+        public bool GetUseClipCopyAndSend(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseClipCopyAndSend;
+        }
+        public bool GetClipCopyAutoSend(int groupId)
+        {
+            return AppConfigInfo[groupId].bClipCopyAutoSend;
+        }
+        public bool GetUseClipApprove(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseClipApprove;
+        }
+        public bool GetUseClipBoardNoApproveButFileTrans(int groupId)
+        {
+            return AppConfigInfo[groupId].bClipBoardNoApproveButFileTrans;
+        }
+        public int GetClipUseAfterApprove(int groupId)
+        {
+            return AppConfigInfo[groupId].nClipAfterApproveUseType;
+        }
+        public bool GetUseClipBoardFileTrans(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseClipBoardFileTrans;
+        }
+        public bool GetUseFileClipManageUI(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseFileClipManageUI;
+        }
+        public bool GetUseFileClipApproveUI(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseFileClipApproveUI;
+        }
+        public bool GetUseClipTypeSelectSend(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseClipTypeSelectSend;
+        }
+        public bool GetUseClipTypeTextFirstSend(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseClipTypeTextFirstSend;
+        }
+        public bool GetUseEmailManageApprove(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseEmail;    
+        }
+        public bool GetUseUIdlpData(int groupId)
+        {
+            return AppConfigInfo[groupId].bUiDlpShow;    
+        }
+        public bool GetURLAutoTrans(int groupId)
+        {
+            return AppConfigInfo[groupId].bURLAutoTrans; 
+        }
+        public bool GetUseURLRedirectionAlarm(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseURLRedirectionAlarm;
+        }
+        public bool GetURLAutoAfterMsg(int groupId)
+        {
+            return AppConfigInfo[groupId].bURLAutoAfterMsg;   
+        }
+        public bool GetUseURLRedirectionAlarmType(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseURLRedirectionAlarmType;   
+        }
+        public string GetURLAutoAfterBrowser(int groupId)
+        {
+            return AppConfigInfo[groupId].strURLAutoAfterBrowser;
+        }
+        public string GetForwardUrl(int groupId)
+        {
+            return AppConfigInfo[groupId].strForwardUrl;
+        }
+        public bool GetAfterApprAutoCheck(int groupId)
+        {
+            return AppConfigInfo[groupId].bShowAfterApprAutoCheck;
+        }
+        public bool GetAfterBasicChk(int groupId)
+        {
+            return AppConfigInfo[groupId].bAfterBasicChk;
+        }
+        public bool GetUseApprLineLocalSave(int groupId)
+        {
+            return AppConfigInfo[groupId].bApprLineLocalSave;
+        }
+        public bool GetUseApprDeptSearch(int groupId)
+        {
+            return AppConfigInfo[groupId].bApprDeptSearch;
+        }
+        public bool GetViewDlpApproverMyDept(int groupId)
+        {
+            return AppConfigInfo[groupId].bViewDlpApproverSelectMyDept;
+        }
+        public bool GetUseOneAClockChangeAgentTimer(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseAgentTime1aClock;
+        }
+        public bool GetFileRecvAlarmRetain(int groupId)
+        {
+            return AppConfigInfo[groupId].bFileRecvAlarmRetain;
+        }
+        public bool GetFileRecvTrayFix(int groupId)
+        {
+            return AppConfigInfo[groupId].bFileRecvTrayFix;
+        }
+        public bool GetApprCountAlarmRetain(int groupId)
+        {
+            return AppConfigInfo[groupId].bApprCountAlarmRetain;
+        }
+        public bool GetApprTrayFix(int groupId)
+        {
+            return AppConfigInfo[groupId].bApprTrayFix;
+        }
+        public bool GetApprCompleteAlarmRetain(int groupId)
+        {
+            return AppConfigInfo[groupId].bApprCompleteAlarmRetain;
+        }
+        public bool GetUserApprActionTrayFix(int groupId)
+        {
+            return AppConfigInfo[groupId].bUserApprActionTrayFix;
+        }
+        public bool GetApprRejectAlarmRetain(int groupId)
+        {
+            return AppConfigInfo[groupId].bApprRejectAlarmRetain;
+        }
+        public bool GetUserApprRejectTrayFix(int groupId)
+        {
+            return AppConfigInfo[groupId].bUserApprRejectTrayFix;
+        }
+        public bool GetUseApprCountAlaram(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseApprCountAlaram;
+        }
+        public bool GetUseApprWaitNoti(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseApprWaitNoti;
+        }
+        public bool GetUseClipAlarmTypeChange(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseClipAlarmType;
+        }
+        public bool GetUseInitAlarmPerDay(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseInitAlarmPerDay;
+        }
+        public bool GetUseInitMessagePerDay(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseInitMessagePerDay;
+        }
+        public bool GetUseMainPageTypeChange(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseMainPageType;
+        }
+        public PAGE_TYPE GetMainPageType(int groupId)
+        {
+            return AppConfigInfo[groupId].enMainPageType;
+        }
+        public string GetMainPage(int groupId, PAGE_TYPE enInitMainPage, bool useDashBoard)
         {
             string strPage = "/Welcome";
             PAGE_TYPE page;
 
             //사용자 선택이 NONE(초기값)이라면 프로그램에서 지정된 페이지로 설정
-            page = (AppConfigInfo.enMainPageType == PAGE_TYPE.NONE) ? enInitMainPage : AppConfigInfo.enMainPageType;
+            page = (AppConfigInfo[groupId].enMainPageType == PAGE_TYPE.NONE) ? enInitMainPage : AppConfigInfo[groupId].enMainPageType;
 
             switch (page)
             {
@@ -422,10 +637,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return strPage;
         }
 
-        public string GetMainPage()
+        public string GetMainPage(int groupId)
         {
             string strPage = "/Welcome";
-            PAGE_TYPE page = AppConfigInfo.enMainPageType;
+            PAGE_TYPE page = AppConfigInfo[groupId].enMainPageType;
             switch (page)
             {
                 case PAGE_TYPE.NONE:
@@ -443,592 +658,169 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             return strPage;
         }
-
-        public bool GetClipCopyAutoSend()
+        public bool GetUseCloseTrayMove(int groupId)
         {
-            return AppConfigInfo.bClipCopyAutoSend;
+            return AppConfigInfo[groupId].bUseCloseTrayMove;
         }
-        public bool GetURLAutoTrans(int nGroupID)
+        public bool GetExitTrayMove(int groupId)
         {
-            //return AppConfigInfo.bURLAutoTrans;
-
-            (AppConfigInfo as SGopConfig).bURLAutoTrans ??= new List<bool>();
-            /*            (AppConfigInfo as SGopConfig).ClipBoardHotKeyNetOver ??= new Dictionary<string, Dictionary<string, string>>();
-                        Dictionary<string, string> dicIdxHotKey = new Dictionary<string, string>();
-                        if (dicIdxHotKey.TryAdd(nIdx.ToString(), "N,Y,N,Y,Z"))
-                            AppConfigInfo.ClipBoardHotKeyNetOver.TryAdd(groupId.ToString(), dicIdxHotKey);
-                        return AppConfigInfo.ClipBoardHotKeyNetOver[groupId.ToString()][nIdx.ToString()];*/
-
-            if ((AppConfigInfo as SGopConfig).bURLAutoTrans.Count >= nGroupID + 1)
-                return (AppConfigInfo as SGopConfig).bURLAutoTrans[nGroupID];
-
-            return true;    // 기본값
+            return AppConfigInfo[groupId].bExitTrayMove;
         }
-
-        public bool GetUseEmailManageApprove(int nGroupID)
+        public bool GetUseStartTrayMove(int groupId)
         {
-            (AppConfigInfo as SGopConfig).blistUseEmail ??= new List<bool>();
-
-            if ((AppConfigInfo as SGopConfig).blistUseEmail.Count >= nGroupID + 1)
-                return (AppConfigInfo as SGopConfig).blistUseEmail[nGroupID];
-
-            return false;    // 기본값
+            return AppConfigInfo[groupId].bUseStartTrayMove;
         }
-
-        /// <summary>
-        /// email에서 DLP 검색기능 사용할지 유무
-        /// </summary>
-        /// <param name="nGroupID"></param>
-        /// <returns></returns>
-        public bool GetUseUIdlpData(int nGroupID)
+        public bool GetUseLoginAfterTray(int groupId)
         {
-            (AppConfigInfo as SGopConfig).blistUiDlpShow ??= new List<bool>();
-
-            if ((AppConfigInfo as SGopConfig).blistUiDlpShow.Count >= nGroupID + 1)
-                return (AppConfigInfo as SGopConfig).blistUiDlpShow[nGroupID];
-
-            return false;    // 기본값
+            return AppConfigInfo[groupId].bUseLoginAfterTray;
         }
-
-        public bool GetURLAutoAfterMsg(int nGroupID)
+        public bool GetStartTrayMove(int groupId)
         {
-            //return AppConfigInfo.bURLAutoAfterMsg;
-            (AppConfigInfo as SGopConfig).bURLAutoAfterMsg ??= new List<bool>();
-
-            if ((AppConfigInfo as SGopConfig).bURLAutoAfterMsg.Count >= nGroupID + 1)
-                return (AppConfigInfo as SGopConfig).bURLAutoAfterMsg[nGroupID];
-
-            return false;   // 기본값
+            return AppConfigInfo[groupId].bStartTrayMove;
         }
-
-        public string GetURLAutoAfterBrowser(int nGroupID)
+        public bool GetUseStartProgramReg(int groupId)
         {
-            //return AppConfigInfo.strURLAutoAfterBrowser;
-            (AppConfigInfo as SGopConfig).strURLAutoAfterBrowser ??= new List<string>();
-
-            if ((AppConfigInfo as SGopConfig).strURLAutoAfterBrowser.Count >= nGroupID + 1)
-                return (AppConfigInfo as SGopConfig).strURLAutoAfterBrowser[nGroupID];
-
-            return "";
+            return AppConfigInfo[groupId].bUseStartProgramReg;
         }
-
-        public string GetForwardUrl(int nGroupID)
+        public bool GetStartProgramReg(int groupId)
         {
-            //return AppConfigInfo.strForwardUrl;
-            (AppConfigInfo as SGopConfig).strForwardUrl ??= new List<string>();
-
-            if ((AppConfigInfo as SGopConfig).strForwardUrl.Count >= nGroupID + 1)
-                return (AppConfigInfo as SGopConfig).strForwardUrl[nGroupID];
-
-            return "";
+            return AppConfigInfo[groupId].bStartProgramReg;
         }
-
-        public bool GetRMouseFileAddAfterTrans()
+        public bool GetScreenLockUserChange(int groupId)
         {
-            return AppConfigInfo.bRMouseFileAddAfterTrans;
+            return AppConfigInfo[groupId].bScreenLockUserChange;
         }
-        public bool GetAfterBasicChk()
+        public bool GetUseScreenLock(int groupId)
         {
-            return AppConfigInfo.bAfterBasicChk;
+            return AppConfigInfo[groupId].bUseScreenLock;
         }
-
-        public bool GetManualRecvDownChange()
+        public bool GetUseLogLevel(int groupId)
         {
-            return AppConfigInfo.bManualRecvDownChange;
+            return AppConfigInfo[groupId].bUseLogLevel;
         }
-        public bool GetFileRecvTrayFix()
+        public bool GetShowAdminInfo(int groupId)
         {
-            return AppConfigInfo.bFileRecvTrayFix;
+            return AppConfigInfo[groupId].bShowAdminInfo;
         }
-        public bool GetApprTrayFix()
+        public bool GetUseFileCheckException(int groupId)
         {
-            return AppConfigInfo.bApprTrayFix;
+            return AppConfigInfo[groupId].bUseFileCheckException;
         }
-        public bool GetUserApprActionTrayFix()
+        public bool GetUsePCURL(int groupId)
         {
-            return AppConfigInfo.bUserApprActionTrayFix;
+            return AppConfigInfo[groupId].bUsePCURL;
         }
-        public bool GetUserApprRejectTrayFix()
+        public bool GetUsePublicBoard(int groupId)
         {
-            return AppConfigInfo.bUserApprRejectTrayFix;
+            return AppConfigInfo[groupId].bUsePublicBoard;
         }
-        public bool GetExitTrayMove()
+        public bool GetUseCertSend(int groupId)
         {
-            return AppConfigInfo.bExitTrayMove;
+            return AppConfigInfo[groupId].bUseCertSend;
         }
-        public bool GetStartTrayMove()
+        public bool GetUseApproveAfterLimit(int groupId)
         {
-            return AppConfigInfo.bStartTrayMove;
+            return AppConfigInfo[groupId].bUseApproveAfterLimit;
         }
-        public bool GetStartProgramReg()
+        public bool GetUseClipBoardApproveAfterLimit(int groupId)
         {
-            return AppConfigInfo.bStartProgramReg;
+            return AppConfigInfo[groupId].bUseClipBoardApproveAfterLimit;
         }
-        public bool GetScreenLock()
+        public bool GetUseAllProxyAuthority(int groupId)
         {
-            return AppConfigInfo.bScreenLock;
+            return AppConfigInfo[groupId].bUseAllProxyAuthority;
         }
-        public bool GetScreenLockUserChange()
+        public bool GetUseWebLinkPreviewer(int groupId)
         {
-            return AppConfigInfo.bScreenLockUserChange;
+            return AppConfigInfo[groupId].bUseWebLinkPreviewer;
         }
-        public bool GetUseApprWaitNoti()
+        public string GetWebLinkPreviewerURL(int groupId)
         {
-            return AppConfigInfo.bUseApprWaitNoti;
+            return AppConfigInfo[groupId].strWebLinkPreviewerURL;
         }
-        public bool GetUseLogLevel()
+        public bool GetUseLanguageSet(int groupId)
         {
-            return AppConfigInfo.bUseLogLevel;
+            return AppConfigInfo[groupId].bUseLanguageSet;
         }
-        public string ConvertRecvDownPath(string DownPath)
+        public bool GetViewFileFilter(int groupId)
         {
-            string strDownPath = "";
-            if (DownPath.Contains("%USERPATH%"))
-            {
-                string strFullHomePath = Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
-                strDownPath = DownPath.Replace("%USERPATH%", strFullHomePath);
-            }
-            else if (DownPath.Contains("%MODULEPATH%"))
-            {
-                string strModulePath = System.IO.Directory.GetCurrentDirectory();
-                strDownPath = DownPath.Replace("%MODULEPATH%", strModulePath);
-            }
-            else
-                strDownPath = DownPath;
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                strDownPath = strDownPath.Replace("/", "\\");
-            }
-            else
-            {
-                strDownPath = strDownPath.Replace("\\", "/");
-            }
-            return strDownPath;
+            return AppConfigInfo[groupId].bViewFileFilter;
         }
-        public bool GetUseGPKILogin(int groupID)
+        public bool GetViewSGSideBarUIBadge(int groupId)
         {
-            if (AppConfigInfo.listUseGpkiLogin == null)
-                return false;
-
-            return AppConfigInfo.listUseGpkiLogin[groupID];
+            return AppConfigInfo[groupId].bViewSGSideBarUIBadge;
         }
-
-
-        public bool GetUseNetOverAllsend()
+        public bool GetViewSGHeaderUIAlarmNoriAllDel(int groupId)
         {
-            return AppConfigInfo.bUseNetOverAllsend;
+            return AppConfigInfo[groupId].bViewSGHeaderUIAlarmNoriAllDel;
         }
-
-        public bool GetFileDownloadBeforeReciving()
+        public bool GetUseForceUpdate(int groupId)
         {
-            return AppConfigInfo.bFileDownloadBeforeReciving;
+            return AppConfigInfo[groupId].bUseForceUpdate;
         }
-
-        /*public bool GetEmailManageApproveUse()
+        public bool GetUseForceBackgroundUpdate(int groupId)
         {
-            return AppConfigInfo.bUseEmailManageApprove;
-        }*/
-
-        public bool GetShowAdminInfo()
-        {
-            return AppConfigInfo.bShowAdminInfo;
+            return AppConfigInfo[groupId].bUseForceBackgroundUpdate;
         }
-        public bool GetUseFileCheckException()
+        public bool GetVisiblePolicyUpdateButton(int groupId)
         {
-            return AppConfigInfo.bUseFileCheckException;
+            return AppConfigInfo[groupId].bVisiblePolicyUpdateButton;
         }
-        public bool GetUseAppLoginType()
+        public string GetApproverSearchType(int groupId)
         {
-            return AppConfigInfo.bUseAppLoginType;
+            return AppConfigInfo[groupId].strApproverSearchType;
         }
-        public int GetAppLoginType()
+        public bool GetUseInputSearchInApproverTree(int groupId)
         {
-            return AppConfigInfo.LoginType;
+            return AppConfigInfo[groupId].bUseInputSearchInApproverTree;
         }
-
-        public bool GetNoApproveManageUI()
+        public string GetReceiverSearchType(int groupId)
         {
-            return AppConfigInfo.bNoApproveManageUI;
+            return AppConfigInfo[groupId].strReceiverSearchType;
         }
-
-        public bool GetEmptyfileTrans()
+        public bool GetUseInputSearchInReceiverTree(int groupId)
         {
-            return AppConfigInfo.bEmptyfileTrans;
+            return AppConfigInfo[groupId].bUseInputSearchInReceiverTree;
         }
-
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // siteConfig Code Level에서 동작하던거 AppOPsetting.json 으로 옮겨 온거
-
-        public bool GetUseLoginIDSave(int groupID)
+        public string GetProxySearchType(int groupId)
         {
-            return AppConfigInfo.bUserIDSave;
+            return AppConfigInfo[groupId].strProxySearchType;
         }
-        public bool GetUseAutoLogin(int groupID)
+        public bool GetUseInputSearchInProxyTree(int groupId = 0)
         {
-            return AppConfigInfo.bAutoLogin;
+            return AppConfigInfo[groupId].bUseInputSearchInProxyTree;
         }
-        public bool GetUseAutoLoginCheck(int groupID)
+        public string GetSecurityApproverSearchType(int groupId)
         {
-            return AppConfigInfo.bAutoLoginCheck;
+            return AppConfigInfo[groupId].strSecurityApproverSearchType;
         }
-
-        public bool GetUseApprLineLocalSave(int groupID)
+        public bool GetUseInputSearchInSecurityApproverTree(int groupId)
         {
-            return AppConfigInfo.bApprLineLocalSave;
+            return AppConfigInfo[groupId].bUseInputSearchInSecurityApproverTree;
         }
-
-
-        public bool GetUseTitleDescSameCharCheck(int groupID)
+        public string GetApproveExtSelectType(int groupId)
         {
-            return AppConfigInfo.bTitleDescSameChk;
+            return AppConfigInfo[groupId].strApproveExtApproverSearchType;
         }
-
-        public bool GetUseApprLineChkBlock(int groupID)
+        public bool GetUseInputSearchApproveExtTree(int groupId)
         {
-            return AppConfigInfo.bApprLineChkBlock;
+            return AppConfigInfo[groupId].bUseInputSearchApproveExtTree;
         }
-
-        public bool GetUseApprDeptSearch(int groupID)
+        public bool GetUseApproveExt(int groupId)
         {
-            return AppConfigInfo.bApprDeptSearch;
+            return AppConfigInfo[groupId].bUseApproveExt;
         }
-        public bool GetUseApprTreeSearch(int groupID)
+        public bool GetUseFileExceptionDescCheck(int groupId)
         {
-
+            return AppConfigInfo[groupId].bUseFileExceptionDescCheck;
+        }
+        public bool GetUsePKIsendRecv(int groupId)
+        {
+            return AppConfigInfo[groupId].bUsePKIsendRecv;    // 기본값
+        }
+        public bool GetUseApprTreeSearch(int groupId)
+        {
             return false;
         }
-
-        public bool GetUseUserPWChange(int groupID)
-        {
-            return AppConfigInfo.bUserPWChange;
-        }
-
-        public string GetPWChangeProhibitLimit(int groupID)
-        {
-            return AppConfigInfo.strPWChangeProhibitLimit;
-        }
-
-        public int GetPWChangeApplyCnt(int groupID)
-        {
-            return AppConfigInfo.nPWChangeApplyCnt;
-        }
-        public string GetInitPasswordInfo(int groupID)
-        {
-            return AppConfigInfo.strInitPasswd;
-        }
-
-        public bool GetUseRecvFolderChange(int groupID)
-        {
-            return AppConfigInfo.bRecvFolderChange;
-        }
-        public bool GetUseUserRecvDownPath(int groupID)
-        {
-            return AppConfigInfo.bUseUserRecvDownPath;
-        }
-
-        public bool GetUsePCURL(int groupID)
-        {
-            return AppConfigInfo.bUsePCURL;
-        }
-
-        public bool GetUsePublicBoard(int groupID)
-        {
-            return AppConfigInfo.bUsePublicBoard;
-        }
-
-        public bool GetUseCertSend(int groupID)
-        {
-            return AppConfigInfo.bUseCertSend;
-        }
-
-
-        public bool GetUseClipCopyAndSend()
-        {
-            return AppConfigInfo.bUseClipCopyAndSend;
-        }
-        public bool GetRFileAutoSend()
-        {
-            return AppConfigInfo.bRFileAutoSend;
-        }
-        public bool GetAfterApprAutoCheck()
-        {
-            return AppConfigInfo.bShowAfterApprAutoCheck;
-        }
-        public bool GetRecvFolderOpen()
-        {
-            return AppConfigInfo.bRecvFolderOpen;
-        }
-        public bool GetManualDownFolderChange()
-        {
-            return AppConfigInfo.bManualDownFolderChange;
-        }
-        public bool GetFileRecvAlarmRetain()
-        {
-            return AppConfigInfo.bFileRecvAlarmRetain;
-        }
-        public bool GetApprCountAlarmRetain()
-        {
-            return AppConfigInfo.bApprCountAlarmRetain;
-        }
-        public bool GetApprCompleteAlarmRetain()
-        {
-            return AppConfigInfo.bApprCompleteAlarmRetain;
-        }
-        public bool GetApprRejectAlarmRetain()
-        {
-            return AppConfigInfo.bApprRejectAlarmRetain;
-        }
-        public bool GetUseApprCountAlaram()
-        {
-            return AppConfigInfo.bUseApprCountAlaram;
-        }
-        public bool GetUseCloseTrayMove()
-        {
-            return AppConfigInfo.bUseCloseTrayMove;
-        }
-        public bool GetUseStartTrayMove()
-        {
-            return AppConfigInfo.bUseStartTrayMove;
-        }
-        public bool GetUseStartProgramReg()
-        {
-            return AppConfigInfo.bUseStartProgramReg;
-        }
-        public bool GetUseLanguageSet()
-        {
-            return AppConfigInfo.bUseLanguageSet;
-        }
-
-        public bool GetUseMainPageTypeChange()
-        {
-            return AppConfigInfo.bUseMainPageType;
-        }
-        public bool GetViewFileFilter()
-        {
-            return AppConfigInfo.bViewFileFilter;
-        }
-
-        public bool GetViewSGSideBarUIBadge()
-        {
-            return AppConfigInfo.bViewSGSideBarUIBadge;
-        }
-
-        public bool GetViewSGHeaderUIAlarmNoriAllDel()
-        {
-            return AppConfigInfo.bViewSGHeaderUIAlarmNoriAllDel;
-        }
-        public bool GetUseForceUpdate()
-        {
-            return AppConfigInfo.bUseForceUpdate;
-        }
-
-        public bool GetUseForceBackgroundUpdate()
-        {
-            return AppConfigInfo.bUseForceBackgroundUpdate;
-        }
-
-        public bool GetViewDlpApproverMyDept()
-        {
-            return AppConfigInfo.bViewDlpApproverSelectMyDept;
-        }
-        public bool GetUseClipBoardNoApproveButFileTrans()
-        {
-            return AppConfigInfo.bClipBoardNoApproveButFileTrans;
-        }
-        public int GetClipUseAfterApprove()
-        {
-            return AppConfigInfo.nClipAfterApproveUseType;
-        }
-
-        public bool GetUseSelectFirstConnectNetServer()
-        {
-            return AppConfigInfo.bUseUserSelectFirstServer;
-        }
-
-        public bool GetUseFileForward()
-        {
-            return AppConfigInfo.bUseFileForward;
-        }
-
-
-        public bool GetUseDenyPasswordZip()
-        {
-            return AppConfigInfo.bUseDenyPasswordZip;
-        }
-
-        public bool GetUseFileClipManageUI(int groupID)
-        {
-            return AppConfigInfo.bUseFileClipManageUI;
-        }
-
-        public bool GetUseFileClipApproveUI(int groupID)
-        {
-            return AppConfigInfo.bUseFileClipApproveUI;
-        }
-
-        public bool GetUseClipBoardFileTrans(int groupID)
-        {
-            return AppConfigInfo.bUseClipBoardFileTrans;
-        }
-
-        public bool GetUseClipAlarmTypeChange()
-        {
-            return AppConfigInfo.bUseClipAlarmType;
-        }
-
-        public bool GetUseOneToMultiLogin()
-        {
-            return AppConfigInfo.bUseOneToMultiLogin;
-        }
-
-        public bool GetUseOneAClockChangeAgentTimer()
-        {
-            return AppConfigInfo.bUseAgentTime1aClock;
-        }
-
-        public bool GetUseFileExceptionDescCheck()
-        {
-            return AppConfigInfo.bUseFileExceptionDescCheck;
-        }
-
-        public bool GetUseOneToMultiLoginButoneBYoneLogout()
-        {
-            return AppConfigInfo.bUseOneByOneLogOut;
-        }
-
-        public string GetApproverSearchType()
-        {
-            return AppConfigInfo.strApproverSearchType;
-        }
-
-        public bool GetUseInputSearchInApproverTree()
-        {
-            return AppConfigInfo.bUseInputSearchInApproverTree;
-        }
-
-        public string GetReceiverSearchType()
-        {
-            return AppConfigInfo.strReceiverSearchType;
-        }
-
-        public bool GetUseInputSearchInReceiverTree()
-        {
-            return AppConfigInfo.bUseInputSearchInReceiverTree;
-        }
-
-        public string GetProxySearchType()
-        {
-            return AppConfigInfo.strProxySearchType;
-        }
-
-        public bool GetUseInputSearchInProxyTree()
-        {
-            return AppConfigInfo.bUseInputSearchInProxyTree;
-        }
-
-        public string GetSecurityApproverSearchType()
-        {
-            return AppConfigInfo.strSecurityApproverSearchType;
-        }
-
-        public bool GetUseInputSearchInSecurityApproverTree()
-        {
-            return AppConfigInfo.bUseInputSearchInSecurityApproverTree;
-        }
-
-        public bool GetUsePartialFileAddInTransfer()
-        {
-            return AppConfigInfo.bUsePartialFileAddInTransfer;
-        }
-
-        public bool GetUseCheckHardSpace()
-        {
-            return AppConfigInfo.bUseChkHardSpace;
-        }
-
-        public bool GetUseLoginAfterTray()
-        {
-            return AppConfigInfo.bUseLoginAfterTray;
-        }
-
-        public bool GetUseFileApproveReason()
-        {
-            return AppConfigInfo.bUseFileApproveReason;
-        }
-        public bool GetUseClipBoardApproveReason()
-        {
-            return AppConfigInfo.bUseClipBoardApproveReason;
-        }
-
-        public bool GetUseFileSelectDelete()
-        {
-            return AppConfigInfo.bUseFileSelectDelete;
-        }
-
-        public string GetApproveExtSelectType()
-        {
-            return AppConfigInfo.strApproveExtApproverSearchType;
-        }
-
-        public bool GetUseApproveExt()
-        {
-            return AppConfigInfo.bUseApproveExt;
-        }
-
-        public bool GetUseInputSearchApproveExtTree()
-        {
-            return AppConfigInfo.bUseInputSearchApproveExtTree;
-        }
-
-        public bool GetUseInitAlarmPerDay()
-        {
-            return AppConfigInfo.bUseInitAlarmPerDay;
-        }
-
-        public bool GetUseInitMessagePerDay()
-        {
-            return AppConfigInfo.bUseInitMessagePerDay;
-        }
-
-        public bool GetVisiblePolicyUpdateButton()
-        {
-            return AppConfigInfo.bVisiblePolicyUpdateButton;
-        }
-
-        public bool GetUseOver1auth(int nGroupID)
-        {
-            (AppConfigInfo as SGopConfig).bUseOver1Auth ??= new List<bool>();
-
-            if ((AppConfigInfo as SGopConfig).bUseOver1Auth.Count >= nGroupID + 1)
-                return (AppConfigInfo as SGopConfig).bUseOver1Auth[nGroupID];
-
-            return false;    // 기본값
-        }
-
-
-
-        public bool GetUsePKIsendRecv(int nGroupID)
-        {
-            (AppConfigInfo as SGopConfig).bListUsePKIsendRecv ??= new List<bool>();
-
-            if ((AppConfigInfo as SGopConfig).bListUsePKIsendRecv.Count >= nGroupID + 1)
-                return (AppConfigInfo as SGopConfig).bListUsePKIsendRecv[nGroupID];
-
-            return false;    // 기본값
-        }
-
-
-        public bool GetUseCrossPlatformOSforFileName()
-        {
-            return AppConfigInfo.bUseCrossPlatformOSforFileName;
-        }
-		
-        public bool GetUseMinLengthTitleDesc()
-        {
-            return AppConfigInfo.bUseTitleDescMinLength;
-        }
-
     }
 }

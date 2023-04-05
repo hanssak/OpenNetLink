@@ -36,7 +36,7 @@
                         {
 
                             <SGDeptSearchList UseInputSearch="@useInputInTree" Height="420" UserDataSource="@ApproverSearch"
-                                          OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
+                                              OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
 
                         }
                         else //TREE
@@ -97,9 +97,9 @@
                                                 <thead>
                                                     <tr>
                                                         <th style="text-align:center">@strDept </th>     <!--부서-->
-                                                    <th style="text-align:center">@strRank </th>     <!--직급-->
-                                                    <th style="text-align:center">@strName </th>     <!--이름-->
-                                                </tr>
+                                                        <th style="text-align:center">@strRank </th>     <!--직급-->
+                                                        <th style="text-align:center">@strName </th>     <!--이름-->
+                                                    </tr>
                                                 </thead>
                                                 <tbody>
                                                     @foreach (ApproverInfo subitem in item.ApproverSelect)
@@ -177,7 +177,6 @@
 
     ISGSideBarUIService SideBarUISvc;
     SGSettingsDBProc sgSettingProc;
-    ISGSiteConfigService siteConfig;
 
     private string approverSearchType = "";
     private bool useInputInTree;
@@ -687,9 +686,14 @@
 
     protected override void OnInitialized()
     {
+        int groupID = 0;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+
 
         CurrentDivSeq = "0";
         CurrentTagetSeq = "0";
@@ -697,8 +701,8 @@
         actionAssign = AssignApprover;
         actionApproverDivSelect = TargetDivSelect;
         actionTargetSelect = SelectTarget;
-        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproverSearchType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproverTree();
+        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproverSearchType(groupID);
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproverTree(groupID);
         InitText();
     }
 

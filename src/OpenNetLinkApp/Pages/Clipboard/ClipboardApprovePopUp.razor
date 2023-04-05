@@ -310,7 +310,7 @@
 
         string strArguments = "";
 
-        if (!SGAppMgrSvc.SiteConfigInfoService.GetUseWebLinkPreviewer(groupID))
+        if (!SGAppMgrSvc.OpConfigInfoService.GetUseWebLinkPreviewer(groupID))
         {
             // 확인후 적용!
             strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
@@ -319,7 +319,7 @@
         else
         {
             //웹링크쪽 뷰어 Param
-            string webLinkURL = SGAppMgrSvc.SiteConfigInfoService.GetWebLinkPreviewerURL(groupID);
+            string webLinkURL = SGAppMgrSvc.OpConfigInfoService.GetWebLinkPreviewerURL(groupID);
             string webLinkParam = makeViewerParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
 
             strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
@@ -686,7 +686,7 @@ using (Process proc = Process.Start(startInfo))
         }
 
         List<ApproverHist> apprListHist = null;
-        bool isVisibleClipBoardApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason();
+        bool isVisibleClipBoardApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason(groupID);
         apprListHist = sgDetailData.GetApproverInfoHist(isVisibleClipBoardApproveReason);
 
         if ((apprListHist == null) || (apprListHist.Count <= 1))
@@ -818,7 +818,7 @@ using (Process proc = Process.Start(startInfo))
         strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");          // 승인상태
         strApproveday = XmlConf.GetTitle("T_COMMON_APPROVEDATE");               // 승인일
 
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason(groupID))
             strRejectReason = XmlConf.GetTitle("T_APPROVE_APPROVE_REJECT_REASON");          // 승인/반려사유
         else
             strRejectReason = XmlConf.GetTitle("T_APPROVE_REJECTREASON");          // 반려사유
@@ -888,7 +888,7 @@ using (Process proc = Process.Start(startInfo))
         if (sgDetailData == null)
             return;
 
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason(groupID))
         {
             refSGDetailReject.ResetReason(Common.Enums.EnumApproveType.Approve);
             refSGDetailReject.SetGroupID(groupID);

@@ -57,7 +57,6 @@
     private string stNewPW;
     private string stNewPWConfirm;
     ISGSideBarUIService SideBarUISvc;
-    ISGSiteConfigService siteConfig;
     SGSettingsDBProc sgSettingProc;
 
     public async Task openPopUp()
@@ -194,7 +193,6 @@
     {
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         sgSettingProc = SGSettingsDBProc.Instance;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;

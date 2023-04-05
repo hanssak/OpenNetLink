@@ -541,7 +541,7 @@
         }
 
         // 체크3. 설정에 따라 strReason 내용이 없으면 내용입력하라고 경고
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseFileExceptionDescCheck())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseFileExceptionDescCheck(groupID))
         {
             if (strReason == string.Empty || strReason.Length < 1)
             {
@@ -559,7 +559,7 @@
             return false;
         }
 
-        if (SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans() == false)
+        if (SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans(groupID) == false)
         {
             if (lSizeinfo == 0)
             {

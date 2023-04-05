@@ -117,7 +117,7 @@
             groupID = sgSideBar.GroupId;
 
         // Agent 설정에 모든망 전송 기능이 있는지 확인
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend() == false)
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend(groupID) == false)
             return false;
 
         // 3망 설정상황이 아니면

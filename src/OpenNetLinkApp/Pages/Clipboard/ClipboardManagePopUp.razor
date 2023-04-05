@@ -10,7 +10,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
 
-<div class="modal fade" id="ClipboardManagePopUp">
+<div class="modal fade" id="ClipboardManagePopUp" data-backdrop="static">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline">
@@ -332,7 +332,7 @@
 
         bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
 
-        InitText();
+        InitText(groupID);
         //SetBindingData();
     }
 
@@ -386,7 +386,7 @@
             return;
 
         List<ApproverHist> apprListHist = null;
-        bool isVisibleClipBoardApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason();
+        bool isVisibleClipBoardApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason(groupID);
         apprListHist = sgDetailData.GetApproverInfoHist(isVisibleClipBoardApproveReason);
         if ((apprListHist == null) || (apprListHist.Count <= 1))
         {
@@ -468,7 +468,7 @@
         StateHasChanged();
     }
 
-    public void InitText()
+    public void InitText(int groupId)
     {
         strTransDetailTitle = XmlConf.GetTitle("T_CLIPBOARD_TRANS_DETAIL");                 // 클립보드 상세보기
         strArrpHistory = XmlConf.GetTitle("T_DETAIL_APPROVE_CATEGORY");                     // 결재내역
@@ -493,7 +493,7 @@
         strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                             // 승인자
         strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");                      // 승인상태
         strApproveDay = XmlConf.GetTitle("T_COMMON_APPROVEDATE");                           // 승인일
-        if(SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason())
+        if(SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason(groupId))
         {
             strRejectReason = XmlConf.GetTitle("T_APPROVE_APPROVE_REJECT_REASON");                      // 반려사유
         }

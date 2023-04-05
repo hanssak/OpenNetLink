@@ -73,7 +73,6 @@
     private string stNewPW;
     private string stNewPWConfirm;
     ISGSideBarUIService SideBarUISvc;
-    ISGSiteConfigService siteConfig;
     public string strInfo1 = "";
     public string strInfo2 = "";
     ISGAppConfigService AppConfigSvc;
@@ -218,7 +217,6 @@
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         sgSettingProc = SGSettingsDBProc.Instance;
 

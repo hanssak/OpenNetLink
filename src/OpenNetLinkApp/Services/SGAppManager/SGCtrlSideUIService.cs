@@ -17,6 +17,8 @@ using Serilog.Events;
 using AgLogManager;
 using System.Runtime.InteropServices;
 using OpenNetLinkApp.Common;
+using OpenNetLinkApp.Models.SGNetwork;
+using HsNetWorkSG;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -75,14 +77,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
     public class SGCtrlSideUIService : ISGCtrlSideUIService
     {
         private ISGAppConfig _AppConfigInfo;
-        private ISGopConfig _OpConfigInfo;
+        private Dictionary<int , ISGopConfig> _OpConfigInfo;
         private ISGVersionConfig _VersionConfigInfo;
+        private List<ISGNetwork> _NetWorkInfo;
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUIService>();
-        public SGCtrlSideUIService(ref ISGAppConfig appConfigInfo, ref ISGopConfig opConfigInfo, ref ISGVersionConfig verConfigInfo)
+        public SGCtrlSideUIService(ref ISGAppConfig appConfigInfo, ref Dictionary<int , ISGopConfig> opConfigInfo, ref ISGVersionConfig verConfigInfo, List<ISGNetwork> netWorkInfo)
         {
             _AppConfigInfo = appConfigInfo;
             _OpConfigInfo = opConfigInfo;
             _VersionConfigInfo = verConfigInfo;
+            _NetWorkInfo = netWorkInfo;
             SetLogLevel(AppConfigInfo.LogLevel);
         }
 
@@ -92,9 +96,17 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         public ref ISGAppConfig AppConfigInfo => ref _AppConfigInfo;
 
-        public ref ISGopConfig OpConfigInfo => ref _OpConfigInfo;
+        public ref Dictionary<int, ISGopConfig> OpConfigInfo => ref _OpConfigInfo;
 
         public ref ISGVersionConfig VersionConfigInfo => ref _VersionConfigInfo;
+
+        public List<ISGNetwork> NetWorkInfo
+        {
+            get
+            {
+                return _NetWorkInfo;
+            }
+        }
 
         public event Action OnChangeCtrlSide;
         private void NotifyStateChangedCtrlSide() => OnChangeCtrlSide?.Invoke();
@@ -125,8 +137,61 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public void SaveOpConfigSerialize()
         {
+            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
+                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sGNetwork.GroupID}_{sGNetwork.NetPos}.json";
+                try
+                {
+                    using (var fs = new FileStream(AppConfig, FileMode.Create))
+                    {
+                        var encoding = Encoding.UTF8;
+                        var ownsStream = false;
+                        var indent = true;
+
+                        using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
+                        {
+                            serializer.WriteObject(writer, _OpConfigInfo[sGNetwork.GroupID]);
+                        }
+                    }
+
+                    byte[] info = null;
+                    using (FileStream fileStream = new FileStream(AppConfig, FileMode.Open, FileAccess.Read, FileShare.None))
+                    {
+                        using (StreamReader streamReader = new StreamReader(fileStream))
+                        {
+                            string str = streamReader.ReadToEnd();
+                            byte[] byteInput = Encoding.UTF8.GetBytes(str);
+                            byte[] masterKey = SGCrypto.GetMasterKey();
+                            info = SGCrypto.AESEncrypt256(byteInput, masterKey);
+                        }
+                    }
+
+                    using (FileStream fs = File.Create(AppConfig))
+                    {
+                        fs.Write(info, 0, info.Length);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+                }
+            }
+        }
+        public void SaveOpConfigSerialize(int groupId)
+        {
             var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
-            string AppConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppOPsetting.json";
+            string AppConfig = String.Empty;
+            foreach(ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                if(sGNetwork.GroupID == groupId)
+                    AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{groupId}_{sGNetwork.NetPos}.json";
+            }
+
+            if(AppConfig == String.Empty)
+            {
+                return;
+            }
             try
             {
                 using (var fs = new FileStream(AppConfig, FileMode.Create))
@@ -137,8 +202,25 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                     using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
                     {
-                        serializer.WriteObject(writer, _OpConfigInfo as SGopConfig);
+                        serializer.WriteObject(writer, _OpConfigInfo[groupId]);
                     }
+                }
+
+                byte[] info = null;
+                using (FileStream fileStream = new FileStream(AppConfig, FileMode.Open, FileAccess.Read, FileShare.None))
+                {
+                    using (StreamReader streamReader = new StreamReader(fileStream))
+                    {
+                        string str = streamReader.ReadToEnd();
+                        byte[] byteInput = Encoding.UTF8.GetBytes(str);
+                        byte[] masterKey = SGCrypto.GetMasterKey();
+                        info = SGCrypto.AESEncrypt256(byteInput, masterKey);
+                    }
+                }
+
+                using (FileStream fs = File.Create(AppConfig))
+                {
+                    fs.Write(info, 0, info.Length);
                 }
             }
             catch (Exception ex)
@@ -230,62 +312,46 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetMainPage(PAGE_TYPE pageType)
         {
-            (OpConfigInfo as SGopConfig).enMainPageType = pageType;
+            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                OpConfigInfo[sGNetwork.GroupID].enMainPageType = pageType;
+            }
+
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
 
         public void SetClipAfterSend(bool clipAfterSend)
         {
-            (OpConfigInfo as SGopConfig).bClipCopyAutoSend = clipAfterSend;
+            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                OpConfigInfo[sGNetwork.GroupID].bClipCopyAutoSend = clipAfterSend;
+            }
+
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
 
         public void SetURLAutoTrans(int nGroupID, bool urlAutoTrans)
         {
-
-            (OpConfigInfo as SGopConfig).bURLAutoTrans ??= new List<bool>();
-
             try
             {
-
-                if (OpConfigInfo.bURLAutoTrans.Count >= nGroupID+1)
-                    OpConfigInfo.bURLAutoTrans.RemoveAt(nGroupID);
-
-                OpConfigInfo.bURLAutoTrans.Insert(nGroupID, urlAutoTrans);
-
-                /*if (AppConfigInfo.bURLAutoTrans.ElementAtOrDefault(nGroupID) != null)
-                {
-                    AppConfigInfo.bURLAutoTrans.RemoveAt(nGroupID);
-                    AppConfigInfo.bURLAutoTrans.Insert(nGroupID, urlAutoTrans);
-                }
-                else
-                {
-                    AppConfigInfo.bURLAutoTrans.Insert(nGroupID, urlAutoTrans);
-                }*/
-
+                OpConfigInfo[nGroupID].bURLAutoTrans = urlAutoTrans;
             }
             catch(Exception e)
             {
                 CLog.Here().Information($"FindSubMenu-Exception(Msg) : {e.Message}");
             }
 
-            SaveOpConfigSerialize();
+            SaveOpConfigSerialize(nGroupID);
             NotifyStateChangedCtrlSide();
         }
 
         public void SetURLAutoAfterMsg(int nGroupID, bool urlAutoAfterMsg)
         {
-            // (AppConfigInfo as SGAppConfig).bURLAutoAfterMsg = urlAutoAfterMsg;
-            (OpConfigInfo as SGopConfig).bURLAutoAfterMsg ??= new List<bool>();
-
             try
             {
-                if (OpConfigInfo.bURLAutoAfterMsg.Count >= nGroupID + 1)
-                    OpConfigInfo.bURLAutoAfterMsg.RemoveAt(nGroupID);
-
-                OpConfigInfo.bURLAutoAfterMsg.Insert(nGroupID, urlAutoAfterMsg);
+                OpConfigInfo[nGroupID].bURLAutoAfterMsg = urlAutoAfterMsg;
             }
             catch (Exception e)
             {
@@ -293,44 +359,43 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 string strMsg = e.Message;
             }
 
-            SaveOpConfigSerialize();
+            SaveOpConfigSerialize(nGroupID);
             NotifyStateChangedCtrlSide();
         }
 
         public void SetURLAutoAfterBrowser(int nGroupID, string urlAutoAfterBrowser)
         {
+            OpConfigInfo[nGroupID].strURLAutoAfterBrowser = urlAutoAfterBrowser;
 
-            //(AppConfigInfo as SGAppConfig).strURLAutoAfterBrowser = urlAutoAfterBrowser;
-            if (OpConfigInfo.strURLAutoAfterBrowser.ElementAtOrDefault(nGroupID) != null)
-                OpConfigInfo.strURLAutoAfterBrowser.RemoveAt(nGroupID);
-
-            OpConfigInfo.strURLAutoAfterBrowser.Insert(nGroupID, urlAutoAfterBrowser);
-
-            SaveOpConfigSerialize();
+            SaveOpConfigSerialize(nGroupID);
             NotifyStateChangedCtrlSide();
         }
 
         public void SetForwardUrl(int nGroupID, string urlData)
         {
-            //(AppConfigInfo as SGAppConfig).strForwardUrl = urlData;
-            if (OpConfigInfo.strForwardUrl.ElementAtOrDefault(nGroupID) != null)
-                OpConfigInfo.strForwardUrl.RemoveAt(nGroupID);
+            OpConfigInfo[nGroupID].strForwardUrl = urlData;
 
-            OpConfigInfo.strForwardUrl.Insert(nGroupID, urlData);
-
-            SaveOpConfigSerialize();
+            SaveOpConfigSerialize(nGroupID);
             NotifyStateChangedCtrlSide();
         }
 
         public void SetRMouseFileAddAfterTrans(bool rmouseFileAddAfterTrans)
         {
-            (OpConfigInfo as SGopConfig).bRMouseFileAddAfterTrans = rmouseFileAddAfterTrans;
+            foreach(ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                OpConfigInfo[sGNetwork.GroupID].bRMouseFileAddAfterTrans = rmouseFileAddAfterTrans;
+            }
+
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetAfterBasicChk(bool afterBasicChk)
         {
-            (OpConfigInfo as SGopConfig).bAfterBasicChk = afterBasicChk;
+            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                OpConfigInfo[sGNetwork.GroupID].bAfterBasicChk = afterBasicChk;
+            }
+            
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
@@ -358,43 +423,71 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetManualRecvDownChange(bool manualRecvDownChange)
         {
-            (OpConfigInfo as SGopConfig).bManualRecvDownChange = manualRecvDownChange;
+            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                OpConfigInfo[sGNetwork.GroupID].bManualRecvDownChange = manualRecvDownChange;
+            }
+            
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetFileRecvTrayFix(bool fileRecvTrayFix)
         {
-            (OpConfigInfo as SGopConfig).bFileRecvTrayFix = fileRecvTrayFix;
+            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                OpConfigInfo[sGNetwork.GroupID].bFileRecvTrayFix = fileRecvTrayFix;
+            }
+            
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetApprTrayFix(bool apprTrayFix)
         {
-            (OpConfigInfo as SGopConfig).bApprTrayFix = apprTrayFix;
+            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                OpConfigInfo[sGNetwork.GroupID].bApprTrayFix = apprTrayFix;
+            }
+            
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetUserApprActionTrayFix(bool userApprActionTrayFix)
         {
-            (OpConfigInfo as SGopConfig).bUserApprActionTrayFix = userApprActionTrayFix;
+            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                OpConfigInfo[sGNetwork.GroupID].bUserApprActionTrayFix = userApprActionTrayFix;
+            }
+
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetUserApprRejectTrayFix(bool userApprRejectTrayFix)
         {
-            (OpConfigInfo as SGopConfig).bUserApprRejectTrayFix = userApprRejectTrayFix;
+            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                OpConfigInfo[sGNetwork.GroupID].bUserApprRejectTrayFix = userApprRejectTrayFix;
+            }
+
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetExitTrayMove(bool exitTrayMove)
         {
-            (OpConfigInfo as SGopConfig).bExitTrayMove = exitTrayMove;
+            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                OpConfigInfo[sGNetwork.GroupID].bExitTrayMove = exitTrayMove;
+            }
+
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetStartTrayMove(bool startTrayMove)
         {
-            (OpConfigInfo as SGopConfig).bStartTrayMove = startTrayMove;
+            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                OpConfigInfo[sGNetwork.GroupID].bStartTrayMove = startTrayMove;
+            }
+
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
@@ -444,7 +537,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetScreenLock(bool screenLock)
         {
-            (OpConfigInfo as SGopConfig).bScreenLock = screenLock;
+            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                OpConfigInfo[sGNetwork.GroupID].bUseScreenLock = screenLock;
+            }
+
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
@@ -486,7 +583,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetUseApprWaitNoti(bool useApprWaitNoti)
         {
-            (OpConfigInfo as SGopConfig).bUseApprWaitNoti = useApprWaitNoti;
+            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+            {
+                OpConfigInfo[sGNetwork.GroupID].bUseApprWaitNoti = useApprWaitNoti;
+            }
+
             SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }

@@ -26,7 +26,7 @@
                 {
                     <div class="d-inline-flex  mb-2 " style="height:28px;">
                         <label class="p-1">@XmlConf.GetTitle("T_COMMON_DEPT")</label>
-                        <input type="text" class="form-control col-md-3" @bind-value="strCurDept" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_DEPT")" disabled="@siteConfig.GetViewDlpApproverMyDept()">
+                        <input type="text" class="form-control col-md-3" @bind-value="strCurDept" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_DEPT")" disabled="@SGAppMgrSvc.OpConfigInfoService.GetViewDlpApproverMyDept(Int32.Parse(lstInfo[0]))">
                         <label class="p-1 pl-2">@XmlConf.GetTitle("T_COMMON_NAME")</label>
                         <input type="text" class="form-control col-md-3" @bind-value="strCurName" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_NAME")">
                         <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="SearchSecurityApprover"><i class="fas fa-search pr-1 pl-1"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
@@ -104,8 +104,6 @@
     List<Dictionary<int, string>> listApvdata = null;   //보안결재자 목록
     public string deputyMod { get; set; }
 
-    ISGSiteConfigService siteConfig;
-
     public void setDesc(string desc)
     {
         stDesc = desc;
@@ -125,6 +123,9 @@
     public async Task openPopUp()
     {
         int groupID = Int32.Parse(lstInfo[0]);
+
+        securityApproverSearchType = SGAppMgrSvc.OpConfigInfoService.GetSecurityApproverSearchType(groupID);
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInSecurityApproverTree(groupID);
 
         //대결자 검색
         SGUserData sgUserData = null;
@@ -213,7 +214,7 @@
         else
             isProxyUse = true;
 
-        strQuery = sgQuery.GetSecurityApprover(isProxyUse, strUserSeq, siteConfig.GetViewDlpApproverMyDept(), strDeptName, strUserName);
+        strQuery = sgQuery.GetSecurityApprover(isProxyUse, strUserSeq, SGAppMgrSvc.OpConfigInfoService.GetViewDlpApproverMyDept(groupID), strDeptName, strUserName);
 
         HSCmdCenter.SendSecurityApproverQuery(groupID, sgLoginData.GetUserID(), strQuery);
     }
@@ -228,9 +229,10 @@
 
     protected override void OnInitialized()
     {
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        securityApproverSearchType = SGAppMgrSvc.OpConfigInfoService.GetSecurityApproverSearchType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInSecurityApproverTree();
+        //int groupID = Int32.Parse(lstInfo[0]);
+
+        //securityApproverSearchType = SGAppMgrSvc.OpConfigInfoService.GetSecurityApproverSearchType(groupID);
+        //useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInSecurityApproverTree(groupID);
     }
 
 }

@@ -366,7 +366,7 @@
 
     string strArguments = "";
 
-    if (!SGAppMgrSvc.SiteConfigInfoService.GetUseWebLinkPreviewer(groupID))
+    if (!SGAppMgrSvc.OpConfigInfoService.GetUseWebLinkPreviewer(groupID))
     {
     //기존 뷰어 Param
     strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
@@ -375,7 +375,7 @@
     else
     {
     //웹링크쪽 뷰어 Param
-    string webLinkURL = SGAppMgrSvc.SiteConfigInfoService.GetWebLinkPreviewerURL(groupID);
+    string webLinkURL = SGAppMgrSvc.OpConfigInfoService.GetWebLinkPreviewerURL(groupID);
     string webLinkParam = makeParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
 
     strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
@@ -744,7 +744,7 @@
         }
 
         List<ApproverHist> apprListHist = null;
-        bool isVisibleFileApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason();
+        bool isVisibleFileApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID);
         apprListHist = sgDetailData.GetApproverInfoHist(isVisibleFileApproveReason);
 
         if ((apprListHist == null) || (apprListHist.Count <= 1))
@@ -881,7 +881,7 @@
         strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                 // 승인자
         strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");          // 승인상태
         strApproveday = XmlConf.GetTitle("T_COMMON_APPROVEDATE");               // 승인일
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID))
             strRejectReason = XmlConf.GetTitle("T_APPROVE_APPROVE_REJECT_REASON");          // 승인/반려사유
         else
             strRejectReason = XmlConf.GetTitle("T_APPROVE_REJECTREASON");          // 반려사유
@@ -962,7 +962,7 @@
         if (sgDetailData == null)
             return;
 
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID))
         {
             refSGDetailReject.ResetReason(Common.Enums.EnumApproveType.Approve);
             refSGDetailReject.SetGroupID(groupID);

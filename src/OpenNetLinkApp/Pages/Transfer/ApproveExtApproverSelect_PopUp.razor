@@ -216,8 +216,6 @@
 
     SGSettingsDBProc sgSettingProc;
 
-    ISGSiteConfigService siteConfig;
-
     public List<HsStream> FileList = null;
     public string strBindTitle = "";
     public string strTeamName = "";
@@ -635,22 +633,20 @@
 
     protected override void OnInitialized()
     {
-
-        actionAssign = AssignApprover;
-        actionTargetSelect = SelectTarget;
-
-        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproveExtSelectType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchApproveExtTree();
-        InitText();
-
-        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        sgSettingProc = SGSettingsDBProc.Instance;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
+        actionAssign = AssignApprover;
+        actionTargetSelect = SelectTarget;
+
+        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproveExtSelectType(groupID);
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchApproveExtTree(groupID);
+        InitText();
+
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        sgSettingProc = SGSettingsDBProc.Instance;
 
         bEditDeptName = SGAppMgrSvc.OpConfigInfoService.GetUseApprDeptSearch(groupID);
 

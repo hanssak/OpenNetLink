@@ -49,7 +49,6 @@
     ISGAppConfigService AppConfigSvc;
     ISGopConfigService OpConfigSvc;
     ISGVersionConfigService VersionConfigSvc;
-    ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
     SelectReceiveFolder refSelectReceiveFolder;
     ClipBoardTypeSelect refClipBoardTypeSelect;
@@ -80,7 +79,6 @@
     protected override void OnInitialized()
     {
         sgSettingProc = SGSettingsDBProc.Instance;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         HeaderUISvc = SGAppMgrSvc.HeaderUIService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         UserInfoSvc = SGAppMgrSvc.UserInfoService;
@@ -153,7 +151,7 @@
 
                 HsCmdCenter.sgPageEvent.SetAddFIleRecvErrEventAdd(listNetWork[nIdx].GroupID, RecvFileErrInfo);
                 //HsCmdCenter.sgPageEvent.SetFileForwardNotifyEventAdd(listNetWork[nIdx].GroupID, FileForwardNotify); //파일전달 알람 이벤트
-                HsCmdCenter.SetUseOSMaxPath(listNetWork[nIdx].GroupID, siteConfig.GetUseOSMaxFilePath());
+                HsCmdCenter.SetUseOSMaxPath(listNetWork[nIdx].GroupID, OpConfigSvc.GetUseOSMaxFilePath(listNetWork[nIdx].GroupID));
 
             }
         }
@@ -1548,7 +1546,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             _curGroupId = clipData.nGroupId;
 
 
-            if (siteConfig.GetClipBoardApproveAfterLimit(clipData.nGroupId))
+            if (OpConfigSvc.GetUseClipBoardApproveAfterLimit(clipData.nGroupId))
             {
                 CheckApproveAfterLimit(clipData.nGroupId);
                 return;
@@ -2119,17 +2117,17 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
 
         string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
-        if (sgLoginData.IsVipUser() || sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID)) > 1 ||
+        if (sgLoginData.IsVipUser() || sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupID)) > 1 ||
             (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) ||
-            SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardNoApproveButFileTrans())
+            SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardNoApproveButFileTrans(groupID))
             stApprLineSeq = "";
 
         // 클립보드 파일전송의 사후결재 설정
-        if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove() == 0)             // checkBox 설정따라 - 사용자선택따라(작업진행중...미완료상태)
+        if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove(groupID) == 0)             // checkBox 설정따라 - 사용자선택따라(작업진행중...미완료상태)
             bAfterApprove = pageService.GetAfterApproveCheck(groupID);
-        else if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove() == 1)        // 사전
+        else if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove(groupID) == 1)        // 사전
             bAfterApprove = false;
-        else if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove() == 2)        // 사후
+        else if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove(groupID) == 2)        // 사후
             bAfterApprove = true;
         else
             bAfterApprove = pageService.GetAfterApproveCheck(groupID);
@@ -2177,11 +2175,11 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             return;
 
         bool bAfterApprove = false;
-        if (siteConfig.GetClipUseAfterApprove() == 0)             // checkBox 설정따라 - 사용자선택따라(작업진행중...미완료상태)
+        if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove(groupID) == 0)             // checkBox 설정따라 - 사용자선택따라(작업진행중...미완료상태)
             bAfterApprove = pageService.GetAfterApproveCheck(groupID);
-        else if (siteConfig.GetClipUseAfterApprove() == 1)        // 사전
+        else if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove(groupID) == 1)        // 사전
             bAfterApprove = false;
-        else if (siteConfig.GetClipUseAfterApprove() == 2)        // 사후
+        else if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove(groupID) == 2)        // 사후
             bAfterApprove = true;
         else
             bAfterApprove = pageService.GetAfterApproveCheck(groupID);
@@ -2195,7 +2193,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         string strUserSeq = sgUserInfo.UserSeq;
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
 
-        int nUserApprPos = sgUserInfo.GetUserApprPos(false, siteConfig.GetUseAllProxyAuthority(groupID));
+        int nUserApprPos = sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupID));
 
         string stApprLineSeq = sgApprLineData.GetApprCommaSeqString(strUserSeq);
         if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
@@ -2627,14 +2625,14 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         if (os_noti == OS_NOTI.WAIT_APPR ||
             os_noti == OS_NOTI.MAIL_APPR)
         {
-            bool bUseApprWaitNoti = OpConfigSvc.GetUseApprWaitNoti();
+            bool bUseApprWaitNoti = OpConfigSvc.GetUseApprWaitNoti(groupID);
             if (!bUseApprWaitNoti)
                 return;
 
-            if (SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI())
+            if (SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupID))
             {
                 CLog.Here().Information("OS_NOTI.WAIT_APPR - But OpConfig is NoApproveManageUI - No insert Alarm : {0}",
-                    SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI().ToString());
+                    SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupID).ToString());
                 return;
             }
 
@@ -2662,7 +2660,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     }
                     //}
                 }
-                if (siteConfig.GetApproveAfterLimit(groupID))
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveAfterLimit(groupID))
                 {
                     if (!pageService.GetApproveAfterMyCountChecking())
                     {

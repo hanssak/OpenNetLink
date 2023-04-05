@@ -39,8 +39,6 @@
 
     public List<string> listInfo { get; set; }
 
-    ISGSiteConfigService siteConfig;
-
     public void setDesc(string desc)
     {
         stDesc = desc;
@@ -74,6 +72,6 @@
 
     protected override void OnInitialized()
     {
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+
     }
 }
