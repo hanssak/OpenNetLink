@@ -541,6 +541,25 @@ namespace OpenNetLinkApp.Common
     public class CsSystemFunc
     {
 
+        public static string GetCurrentModulePath()
+        {
+            string strAgentPath = "";
+            string[] strArgumentArry = System.Environment.GetCommandLineArgs();
+            strAgentPath = strArgumentArry[0];
+
+            int nIdex = strArgumentArry[0].LastIndexOf("\\");
+            if (nIdex > 0)
+            {
+                strAgentPath = strArgumentArry[0].Substring(0, nIdex);
+            }
+
+            Log.Logger.Here().Information($"GetCurrentModulePath : {strAgentPath}");
+
+            return strAgentPath;
+        }
+
+
+
         public static string GetCurrentProcessName(bool bGetExePath = true)
         {
             string strAgentPath = "";
@@ -554,7 +573,7 @@ namespace OpenNetLinkApp.Common
                 strAgentPath += ".exe";
             }
 
-            Log.Information($"GetCurrentProcessName : {strAgentPath}");
+            Log.Logger.Here().Information($"GetCurrentProcessName : {strAgentPath}");
 
             return strAgentPath;
         }
@@ -583,19 +602,19 @@ namespace OpenNetLinkApp.Common
                 if (bStartReg == false)
                     LinkFile.Delete();
 
-                Log.Information($"makeAgentBootStartOSwindow - Lnk File exist : {LinkFullPath},  {(bStartReg?"Lnk Create Skip!":"Lnk Delete Done!")}");
+                Log.Logger.Here().Information($"makeAgentBootStartOSwindow - Lnk File exist : {LinkFullPath},  {(bStartReg?"Lnk Create Skip!":"Lnk Delete Done!")}");
                 return true;
             }
             else
             {
                 if (bStartReg == false)
                 {
-                    Log.Information($"makeAgentBootStartOSwindow - Lnk File isn't exist(Lnk Delete Skip!) : {LinkFullPath}");
+                    Log.Logger.Here().Information($"makeAgentBootStartOSwindow - Lnk File isn't exist(Lnk Delete Skip!) : {LinkFullPath}");
                     return true;
                 }
             }
 
-            Log.Information($"makeAgentBootStartOSwindow - WorkingPath(#####) : {Environment.CurrentDirectory}");
+            Log.Logger.Here().Information($"makeAgentBootStartOSwindow - WorkingPath(#####) : {Environment.CurrentDirectory}");
 
             return CsLnkFunc.makeLnkShortCut(strOrgPath, LinkFullPath, "", Environment.CurrentDirectory);
         }
@@ -645,7 +664,7 @@ namespace OpenNetLinkApp.Common
                 bRet = false;
             }
 
-            Log.Information(@$"makeAgentBootStart OSwindow - Make Lnk File {(bRet?"SUCCESS":("FAILED+ERRmsg:"+ strErrMsg))} : {strLnkPath}");
+            Log.Logger.Here().Information(@$"makeAgentBootStart OSwindow - Make Lnk File {(bRet?"SUCCESS":("FAILED+ERRmsg:"+ strErrMsg))} : {strLnkPath}");
 
             return bRet;
         }

@@ -368,8 +368,9 @@ Function .onInit
 
   ${If} ${IS_PATCH} == 'TRUE'
     SetSilent silent
-    CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
-    CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
+        CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP"
+        CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP"
+        CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppOPsetting.json" "$TEMP" ; 3망구상에 patch 때문에 (필요에 따라서 AppOPsetting.json backup 하고 사용)
 	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db" "$TEMP" 
 	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db" "$TEMP"
 
@@ -404,23 +405,24 @@ Function .onInit
 FunctionEnd
 
 Function .onInstSuccess
+
   ${If} ${IS_PATCH} == 'TRUE'
-      CopyFiles /SILENT /FILESONLY "$TEMP\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
-      CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
+  
+          CopyFiles /SILENT /FILESONLY "$TEMP\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf"
+          CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf"
+          CopyFiles /SILENT /FILESONLY "$TEMP\AppOPsetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" ; 3망구상에 patch 때문에 (필요에 따라서 AppOPsetting.json backup 하고 사용)
 	  CopyFiles /FILESONLY "$TEMP\SGNotifyDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"
 	  CopyFiles /FILESONLY "$TEMP\SGSettingsDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"  
 	  
 	${If} ${IS_LIGHT_PATCH} == 'TRUE'		
 		CopyFiles /SILENT "$TEMP\HANSSAK\edge" "C:\HANSSAK\OpenNetLink\wwwroot\edge" 
 	${endif}
-	  
-	  
-	  
-	  
+
   ${endif}
 
   IfSilent 0 +2
     Exec '"$INSTDIR\OpenNetLinkApp.exe"'
+    
 FunctionEnd
 
 

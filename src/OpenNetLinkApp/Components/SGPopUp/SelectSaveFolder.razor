@@ -253,6 +253,8 @@
     bool isIsolationRootPath()
     {
 
+        CLog.Here().Information($"SelectSaveFolder, isIsolationRootPath - Start(##########)! : bUseisolationMode : {bUseisolationMode}");
+
         if (bUseisolationMode == false)
             return false;
 
@@ -273,6 +275,8 @@
             CLog.Here().Information($"SelectSaveFolder, isIsolationRootPath : TRUE, Add Seperator, DisPlayPath : {stDisplayPath}");
             return true;
         }
+
+        CLog.Here().Information($"SelectSaveFolder, isIsolationRootPath - End(##########)! : bUseisolationMode : {bUseisolationMode}");
 
         return false;
     }
@@ -610,6 +614,8 @@
         try
         {
 
+            CLog.Here().Error($"EnumerateFolder, Start - Path : {strPath}, bSetDrive : {bSetDrive}");
+
             if (bSetDrive)
             {
                 string root = Directory.GetDirectoryRoot(strPath);
@@ -641,6 +647,7 @@
             stTreeDir = strPath;
             stDisplayPath = stTreeDir;
 
+            CLog.Here().Error($"EnumerateFolder, End - Path : {strPath}, bSetDrive : {bSetDrive}");
             StateHasChanged();
 
         }
@@ -655,9 +662,12 @@
     public async Task openPopUp(int Idx, string dir)
     {
 
+        CLog.Here().Information($"SelectSaveFolder openPopUp(######)_1");
+
         GetSavedPath();
 
-        CLog.Here().Information($"SelectSaveFolder openPopUp");
+        CLog.Here().Information($"SelectSaveFolder openPopUp(######)_2");
+
         nNetIdx = Idx;
 
         object[] param3 = { "0" };
@@ -710,6 +720,8 @@
                 EnumerateFolder(true, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
             }
         }
+
+        CLog.Here().Information($"SelectSaveFolder openPopUp(######)_3");
 
         object[] param = { "modal-selectsavefolder" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
