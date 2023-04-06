@@ -29,7 +29,7 @@
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
-!define MUI_FINISHPAGE_RUN "$INSTDIR\${PRODUCT_MAIN_FILE_NAME}"
+;;!define MUI_FINISHPAGE_RUN "$INSTDIR\${PRODUCT_MAIN_FILE_NAME}"
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
@@ -388,10 +388,10 @@ Function .onInstSuccess
 	  
   ${endif}
 
-  IfSilent 0 +2
-    Exec '"$INSTDIR\OpenNetLinkApp.exe"'
+  ;;IfSilent 0 +2
+  Exec '"$INSTDIR\OpenNetLinkApp.exe"'
+  
 FunctionEnd
-
 
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"

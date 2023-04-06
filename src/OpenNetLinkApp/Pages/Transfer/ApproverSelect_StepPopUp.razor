@@ -6,13 +6,15 @@
 @using OpenNetLinkApp.Models.SGSettings
 @using OpenNetLinkApp.Components.SGTreeSearch
 @using HsNetWorkSG
+@using AgLogManager;
+
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
 
-<div class="modal fade" id="ApproverSelect_StepPopUp">
+<div class="modal fade" id="ApproverSelect_StepPopUp" data-backdrop="static">
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline pl-3 pr-3">
@@ -32,42 +34,16 @@
                     <div class="box1" style=" width:46%;  float:left;">
                         @if (approverSearchType == "SEARCH")
                         {
-                            <div class="d-inline-flex  mb-2 " style="height:28px;">
-                                <label class="p-1">@strDept</label>                                                       <!--부서-->
-                            <input type="text" class="form-control col-md-4" placeholder=@strDeptPlaceHolder @bind-value="strCurDept" @onkeyup="HandleKeyEvent">
-                                <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
-                            <input type="text" class="form-control col-md-3" placeholder=@strNamePlaceHolder @bind-value="strCurName" @onkeyup="HandleKeyEvent">
-                                <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>         <!--조회-->
-                        </div>
 
-                            <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
-                                <table class="table table-head-fixed">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align:center">@strOrder </th>                <!--순번-->
-                                        <th style="text-align:center">@strDept </th>                <!--부서-->
-                                        <th style="text-align:center">@strRank </th>                <!--직급-->
-                                        <th style="text-align:center">@strName </th>                <!--이름-->
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (ApproverInfo item in ApproverSearch)
-                                        {
-                                            <tr name="trItem3" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq">
-                                                <td style="text-align:center">@item.Index</td>
-                                                <td>@item.DeptName</td>
-                                                <td>@item.Grade</td>
-                                                <td>@item.Name</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
+                            <SGDeptSearchList UseInputSearch="@useInputInTree" Height="420" UserDataSource="@ApproverSearch"
+                                          OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
+
                         }
                         else //TREE
                         {
                             @*<SGDeptTreeList Height="368" UserSearchList="@ApproverSearch" @bind-SelectedUserSeq="@stSelectApprover" />*@
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="420" TreeHeight="160" UserSearchList="@ApproverSearch" OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => SGDeptTreeList_OnItemDoubleClick(item)" />
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="420" TreeHeight="160" UserSearchList="@ApproverSearch" IsApproverOnly="@bApproverOnly"
+                                            OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => SGDeptTreeList_OnItemDoubleClick(item)" />
                         }
                     </div>
                     <!--e table -->
@@ -161,6 +137,8 @@
     <!-- /.modal-dialog -->
 </div>
 @code {
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<ApproverSelect_StepPopUp>();
+
     private LinkedList<ApproverInfo> ApproverSearch = new LinkedList<ApproverInfo>();   //좌측 검색결과
     private List<ApproverGroup> ApvGroup = new List<ApproverGroup>();                   //우측 지정자
     private static Action<string> actionApproverDivSelect;      //결재자 GROUP 선택
@@ -204,6 +182,11 @@
     private string approverSearchType = "";
     private bool useInputInTree;
 
+    /// <summary>
+    /// true 결재자만 검색 / false 모두 검색
+    /// /// </br>(대결재자의 '일반사용자 조회 여부' 와 통일)
+    /// </summary>
+    private bool bApproverOnly = true;
 
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
@@ -220,7 +203,14 @@
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
-    public void DeptApprLine()
+    private void sgDeptSearch_SearchClick(string getInputDeptName, string getInputUserName)
+    {
+        strCurDept = getInputDeptName;
+        strCurName = getInputUserName;
+
+        DeptApprLine();
+    }
+    public void DeptApprLine(bool isInit = false)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -248,10 +238,10 @@
         string strUserID = sgLoginData.GetUserID();
         string strUserName = strCurName;
         string strTeamName = strCurDept;
-        strCurDept = strTeamName;
-        string strTeamCode = "";
+        string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
+
         SGQueryExtend sgQuery = new SGQueryExtend();
-        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
+        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
         HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
     }
     public void DeptApprLineResultStep(int groupid, PageEventArgs e)
@@ -545,6 +535,12 @@
         AddSelectApprover();
     }
 
+    private void search_OnItemDoubleClick(ApproverInfo doubleClickInfo)
+    {
+        stSelectApprover = doubleClickInfo.UserSeq;
+        AddSelectApprover();
+    }
+
     private void AddSelectApprover()
     {
         if (stSelectApprover.Length < 1 || CurrentDivSeq.Length < 1)
@@ -587,11 +583,11 @@
         apvGroup.ApproverSelect.Remove(apvAsign);
     }
 
-    [JSInvokable("ApproverSearchSelect3")]
-    public static void ApproverSearchSelect3(string value)
-    {
+    @*  [JSInvokable("ApproverSearchSelect3")]
+        public static void ApproverSearchSelect3(string value)
+        {
         actionAssign.Invoke(value);
-    }
+        }*@
 
     private void AssignApprover(string value)
     {
@@ -679,9 +675,13 @@
     }
     protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender)
-        {
-        }
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = (sgSideBar != null) ? sgSideBar.GroupId : 0;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            bApproverOnly = !sgLoginData.GetApproveProxyRight();
+
         base.OnAfterRender(firstRender);
     }
 
@@ -697,6 +697,7 @@
         actionAssign = AssignApprover;
         actionApproverDivSelect = TargetDivSelect;
         actionTargetSelect = SelectTarget;
+        
         InitText();
     }
 
@@ -707,55 +708,70 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        //*****************************************************************
-        //EventBinding : EventBinding DeptApprLine -> DeptApprLineResult
-        //*****************************************************************
 
         approverSearchType = SGAppMgrSvc.SiteConfigInfoService.GetApproverSearchType(groupID);
         useInputInTree = SGAppMgrSvc.SiteConfigInfoService.GetUseInputSearchInApproverTree(groupID);
 
-        HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResultStep);
-        HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResultStep);
-
         if (approverSearchType == "TREE" && refSGDeptTreeList != null)
             refSGDeptTreeList.BindEvent();
+        else
+        {
+            //*****************************************************************
+            //EventBinding : EventBinding DeptApprLine -> DeptApprLineResult
+            //*****************************************************************
+            //실제 사용안함
+            //HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResultStep);
+            HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResultStep);
+            DeptApprLine(true);
+        }
+        InitApprLine();
     }
 
     public void ApproveChooseResultStep(int groupid, PageEventArgs e)
     {
-        ApproverSearch.Clear();
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        SGDeptApprLineSearchData sgDeptApprLine = null;
-        sgDeptApprLine = (SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
-        if (sgDeptApprLine == null)
-            return;
-
-        LinkedList<ApproverInfo> apprLinkedList = null;
-        apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
-        if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
-            return;
-
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
-
-        int count = 1;
-        foreach (var item in apprLinkedList)
+        try
         {
-            if (strUserSeq.Equals(item.UserSeq))
-                continue;
-            item.Index = String.Format("{0,2}", count.ToString());
-            ApproverSearch.AddLast(item);
-            count++;
+            ApproverSearch.Clear();
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            SGDeptApprLineSearchData sgDeptApprLine = null;
+            sgDeptApprLine = (SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
+            if (sgDeptApprLine == null)
+                return;
+
+            LinkedList<ApproverInfo> apprLinkedList = null;
+            apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+            if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
+                return;
+
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+            if (sgUserData == null)
+                return;
+
+            string strUserSeq = sgUserData.GetUserSequence();
+
+            int count = 1;
+            foreach (var item in apprLinkedList)
+            {
+                if (strUserSeq.Equals(item.UserSeq))
+                    continue;
+                item.Index = String.Format("{0,2}", count.ToString());
+                ApproverSearch.AddLast(item);
+                count++;
+            }
         }
-        StateHasChanged();
+        catch (Exception ex)
+        {
+            CLog.Here().Error("ApproveChooseResultStep - Exception " + ex.ToString());
+        }
+        finally
+        {
+            StateHasChanged();
+        }
 
     }
     public async Task openPopUp()

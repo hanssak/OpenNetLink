@@ -31,11 +31,13 @@
                     <div class="box1" style=" width:46%;  float:left;">
                         @if (proxySearchType == "SEARCH")
                         {
-                            <SGDeptSearchList @ref="refSGDeptSearchList" UseInputSearch="@useInputInTree" Height="392" UserDataSource="@ProxySearch" OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
+                            <SGDeptSearchList UseInputSearch="@useInputInTree" Height="392" UserDataSource="@ProxySearch" 
+                                                OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                         else        //TREE
                         {
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="392" TreeHeight="160" UserSearchList="@ProxySearch" OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="392" TreeHeight="160" UserSearchList="@ProxySearch" IsApproverOnly="@bApproverOnly"
+                                            OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                     </div>
                     <!--e table -->
@@ -55,7 +57,7 @@
                             <span class="float-left p-1">-</span>
                             <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly="readonly" value="@strToDay">
                         </div>
-                        <SGDeptSearchList @ref="refSGDeptTargetList" UseInputSearch="false" Height="392" ColumnIndexVisible="false" UserDataSource="@ProxySelect" OnItemClick="(target)=> SelectTarget(target.UserSeq)" OnItemDoubleClick="target_OnItemDoubleClick" />
+                        <SGDeptSearchList UseInputSearch="false" Height="392" ColumnIndexVisible="false" UserDataSource="@ProxySelect" OnItemClick="(target)=> SelectTarget(target.UserSeq)" OnItemDoubleClick="target_OnItemDoubleClick" />
                     </div>
                     <!--e table -->
                 </div>
@@ -75,8 +77,6 @@
 @code {
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<ProxyApprover_PopUp>();
     SGDeptTreeList refSGDeptTreeList;
-    SGDeptSearchList refSGDeptSearchList;   //좌측 조회 쪽 리스트 컨트롤
-    SGDeptSearchList refSGDeptTargetList;   //우측 등록 쪽 리스트 컨트롤
     ISGSideBarUIService SideBarUISvc;
     SGSettingsDBProc sgSettingProc;
     ISGSiteConfigService siteConfig;
@@ -102,6 +102,13 @@
     private bool useInputInTree;
 
     private int nActionType = -1;  //1:삭제, 2:등록
+
+    /// <summary>
+    /// true 결재자만 검색 / false 모두 검색 
+    /// /// </br>(대결재자의 '일반사용자 조회 여부' 와 통일)
+    /// </summary>
+    private bool bApproverOnly = true;
+
     private void deleteProxyApprover(ApproverInfo apvInfo)
     {
         ProxySelect.Remove(apvInfo);
@@ -122,6 +129,15 @@
             object[] param = { "datepicker", "datepicker2" };
             jsRuntime.InvokeAsync<object>("initDatePicker", param);
         }
+        
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = (sgSideBar != null) ? sgSideBar.GroupId : 0;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            bApproverOnly = !sgLoginData.GetApproveProxyRight();
+
+
         base.OnAfterRender(firstRender);
     }
 
@@ -355,7 +371,7 @@
         DeptApprLine();
     }
 
-    public void DeptApprLine()
+    public void DeptApprLine(bool isInit = false)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -383,15 +399,7 @@
         string strUserID = sgLoginData.GetUserID();
         string strUserName = strCurName;
         string strTeamName = strCurDept;
-        strCurDept = strTeamName;
-        string strTeamCode = "";
-        //if (strUserName == "" && strTeamName == "")
-        //    strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
-        //결재자만검색, 모두 검색 구분자
-        int nSelectAll = sgLoginData.GetTagValueInteger("APPROVEPROXYRIGHT");
-        bool bApproverOnly = true;
-        if (nSelectAll == 2)
-            bApproverOnly = false;
+        string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
 
         SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
@@ -402,6 +410,9 @@
     {
         int groupID = 0;
         groupID = SGAppMgrSvc.SideBarUIService.ActiveMenu.GroupId;
+
+        proxySearchType = SGAppMgrSvc.SiteConfigInfoService.GetProxySearchType(groupID);
+        useInputInTree = SGAppMgrSvc.SiteConfigInfoService.GetUseInputSearchInProxyTree(groupID);
         //*****************************************************************
         //EventBinding : EventBinding DeptApprLine -> DeptApprLineResult
         //*****************************************************************
@@ -415,16 +426,13 @@
             strCurDept = sgUserData.GetTeamName();
         }
 
-        proxySearchType = SGAppMgrSvc.SiteConfigInfoService.GetProxySearchType(groupID);
-        useInputInTree = SGAppMgrSvc.SiteConfigInfoService.GetUseInputSearchInProxyTree(groupID);
-
         HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, ProxySearchResult);
         HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, ResultPossibleCount);
 
         if (proxySearchType == "TREE" && refSGDeptTreeList != null)
             refSGDeptTreeList.BindEvent();
         else
-            DeptApprLine();
+            DeptApprLine(true);
     }
 
     public void ProxySearchResult(int groupid, SGData data)
@@ -533,6 +541,7 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        
 
         actionAssign = AssignProxy;
         actionTargetSelect = SelectTarget;

@@ -2723,6 +2723,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 // CLick시에 승인대기 중인 항목들만 기간상관없이 조회되도록 적용
                 if (e.strDummy == "0")
                     naviURI += "/2";    // 결재 - 승인대기 전체조회
+                else if (e.strDummy == "3")
+                    naviURI += "/1";    // 클립보드 결재 - 승인대기 전체조회
                 else if (e.strDummy == "4")
                     naviURI += "/1";    // 메일결재 - 승인대기 전체조회
             }
