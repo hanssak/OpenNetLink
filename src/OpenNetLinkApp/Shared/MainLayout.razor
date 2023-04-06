@@ -91,8 +91,6 @@
 
     public ConcurrentQueue<Tuple<int, SGData>> _queDlpNoti = new ConcurrentQueue<Tuple<int, SGData>>();
 
-
-
     protected override void OnInitialized()
     {
         CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
@@ -295,7 +293,12 @@
 
     }
 
-    public async void UpdateNoti(PageEventArgs e)
+    /// <summary>
+    /// (Only) 서버 노티 발생 시 처리
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
+    public async void UpdateNoti(int groupId, PageEventArgs e)
     {
         string strSvrCliVersion = e.strMsg;
         if (strSvrCliVersion.Equals(""))
@@ -309,14 +312,30 @@
         }
 
         strSvrCliVersion = strSvrCliVersion.ToUpper();
-        CLog.Here().Information("UpdateNoti Server Client Version {0}", strSvrCliVersion);
+        CLog.Here().Information($"groupID : {groupId} - UpdateNoti Server Client Version {strSvrCliVersion}");
         strCliVersion = strCliVersion.ToUpper();
 
-        CLog.Here().Information("MainLayOut Server Client Version {0}", strSvrCliVersion);
-        CLog.Here().Information("MainLayOut Local Client Version {0}", strCliVersion);
+        CLog.Here().Information($"groupID : {groupId} - MainLayOut Server Client Version {strSvrCliVersion}");
+        CLog.Here().Information($"groupID : {groupId} - MainLayOut Local Client Version {strCliVersion}");
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
         {
+            //업데이트  진행중이면 SKIP 하도록 처리 (KYH)
+            (Enums.UpdateStatusType status, int groupId) nowUpdateInfo = AppUpdaterSvc.GetNowUpdateInfo();
+            if (nowUpdateInfo.status != Enums.UpdateStatusType.NONE && nowUpdateInfo.groupId > -1)
+            {
+                CLog.Here().Information($"nowUpdateInfo.groupId : {groupId} - Update Already Started By GroupID[{nowUpdateInfo.groupId}] / Status[{nowUpdateInfo.status.ToString()}]");
+                return;
+            }
+
+            //업데이트 진행은 아니지만, Update Cancel 중이면 SKIP
+            if(AppUpdaterSvc.IsCancelRequested)
+            {
+                CLog.Here().Information($"groupId : {groupId} SKIP - Update Canceling...");            
+                return;
+            }
+
+
             string strSvrVersion = e.strMsg;
             refUpdate_NotiPopUp.SetVersionText(strSvrCliVersion);
             refUpdate_NotiPopUp.SetType(1);
@@ -327,11 +346,17 @@
                 ClientUpgradeExeEvent clientUpdateExe = null;
                 clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
                 if (clientUpdateExe != null)
-                    clientUpdateExe();
+                    clientUpdateExe(groupId);
             }
             else
             {
-                await refUpdate_NotiPopUp.openPopUp();
+                
+                //업데이트 노티 팝업 사용 가능여부 반환
+                //다른 망에서 이미 해당 노티 팝업을 표시하였다면, 노티 패스
+                if (refUpdate_NotiPopUp.popUpGroupID < 0)
+                        await refUpdate_NotiPopUp.openPopUp(groupId);
+                else
+                    CLog.Here().Information($"nowUpdateInfo.groupId : {groupId} - Update Noti Popup Already Started By GroupID[{refUpdate_NotiPopUp.popUpGroupID}]");
             }
             //OpenDownloadUpdate();
         }

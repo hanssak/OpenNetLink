@@ -1,5 +1,6 @@
 @page "/clipBoardApprove"
 @page "/clipBoardApprove/{groupIDbyParam:int}"
+@page "/clipBoardApprove/{groupIDbyParam:int}/{menuMode:int}"
 
 @using OpenNetLinkApp.Services
 @using HsNetWorkSGData;
@@ -125,7 +126,7 @@
                                             </div>
                                         </div>
                                         <!--<button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>-->
-                                    </td>
+                                </td>
                                 }
                             </tr>
                         </table>
@@ -162,50 +163,60 @@
                                     @if (approveTypesfm == 2)
                                     {
                                         <th style="text-align: center; vertical-align:middle;width:8%">@strApprover</th>
- <!--승인자-->
+                                        <!--승인자-->
                                     }
                                     <th style="text-align: center; vertical-align:middle;width:8%">@strApproveStatus</th>                             <!--승인상태-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                     {
                                         <th style="text-align:center; vertical-align:middle;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
- <!--목적지-->
+                                        <!--목적지-->
                                     }
                                     <th style="text-align: center; vertical-align:middle;width:8%">@strDataType</th>                            <!--데이타타입-->
                                     <th style="text-align: center; vertical-align:middle;width:14%">@strTitle</th>                            <!--제목-->
                                     <th style="text-align: center; vertical-align:middle;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
                                     <th style="text-align: center; vertical-align:middle;width:14%">@strApproveDay</th>                                  <!--승인일-->
-                                    <th style="text-align: center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>                        <!--개인정보-->
+                                    @if (bUseDlpDataView)
+                                    {
+                                        <th style="text-align: center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
+                                        <!--개인정보-->
+                                    }
+
                                     <th style="text-align: center; vertical-align:middle;width:7%">@strApproveDetail</th>                             <!--상세보기-->
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (SGApproveData item in mData)
                                 {
-                                <tr>
-                                    <td style="text-align: center; vertical-align:middle">
-                                        <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                    </td>
-                                    <td style="text-align: center; vertical-align:middle">@item.ApvType</td>
-                                    <td style="text-align: center; vertical-align:middle">@item.TransferType</td>
-                                    <td style="text-align: center; vertical-align:middle">@item.RequesterName</td>
-                                    @if (approveTypesfm == 2)
-                                    {
-                                        <td style="text-align: center; vertical-align:middle">@item.ApproverName</td>
-                                        <!--승인자 이름-->
-                                    }
-                                    <td style="text-align: center; vertical-align:middle">@item.ApvStatus</td>
-                                    <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
-                                    @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                                    {
-                                        <th style="text-align:center; vertical-align:middle;width:11%;">@item.strDestNet</th>
-                                    }
-                                    <td style="text-align: center; vertical-align:middle">@item.DataType</td>
-                                    <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                    <td style="text-align: center; vertical-align:middle">@item.RequestTime</td>
-                                    <td style="text-align: center; vertical-align:middle">@item.ApvTime</td>
-                                    <td style="text-align: center; vertical-align:middle">@item.stDLP</td>
-                                    <td style="text-align: center; vertical-align:middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                </tr>
+                                    <tr>
+                                        <td style="text-align: center; vertical-align:middle">
+                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        </td>
+                                        <td style="text-align: center; vertical-align:middle">@item.ApvType</td>
+                                        <td style="text-align: center; vertical-align:middle">@item.TransferType</td>
+                                        <td style="text-align: center; vertical-align:middle">@item.RequesterName</td>
+                                        @if (approveTypesfm == 2)
+                                        {
+                                            <td style="text-align: center; vertical-align:middle">@item.ApproverName</td>
+                                            <!--승인자 이름-->
+                                        }
+                                        <td style="text-align: center; vertical-align:middle">@item.ApvStatus</td>
+                                        <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
+                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                        {
+                                            <th style="text-align:center; vertical-align:middle;width:11%;">@item.strDestNet</th>
+                                        }
+                                        <td style="text-align: center; vertical-align:middle">@item.DataType</td>
+                                        <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="text-align: center; vertical-align:middle">@item.RequestTime</td>
+                                        <td style="text-align: center; vertical-align:middle">@item.ApvTime</td>
+
+                                        @if (bUseDlpDataView)
+                                        {
+                                            <td style="text-align: center; vertical-align:middle">@item.stDLP</td>
+                                        }
+
+                                        <td style="text-align: center; vertical-align:middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -238,7 +249,7 @@
 
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
 <ClipboardApprovePopUp @ref="refApprovePopUp"></ClipboardApprovePopUp>
-<SGReject @ref="refSGReject"></SGReject>
+<SGReject @ref="refSGReject" Guid="modalClipReject"></SGReject>
 
 @code {
 
@@ -278,9 +289,11 @@
             _strDataTypeValue = stValue;
     }
     [Parameter]
-    public string menuMode { get; set; }
+    public int menuMode { get; set; } = 0;
     [Parameter]
     public int groupIDbyParam { get; set; }
+
+    bool bUseDlpDataView = true;
 
     ClipboardApprovePopUp refApprovePopUp;
     SGCustomSelect refSGCustomSelect;
@@ -455,6 +468,7 @@
     {
         Console.WriteLine("Open Detail Start" + transSeq);
         long ltransSeq = Convert.ToInt64(transSeq);
+        refApprovePopUp.bUseDlpDataView = bUseDlpDataView;
         await refApprovePopUp.openPopUp(ltransSeq);
     }
 
@@ -568,6 +582,8 @@
 
         approveTypesfm = sgLoginData.GetApproveTypeSFM();
 
+        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
+
         @*GetInitDateTime(out strFromDay, out strToDay);*@
 
         base.OnInitialized();
@@ -581,10 +597,16 @@
                 jsRuntime.InvokeAsync<object>("initDatePicker", param);*@
             jsRuntime.InvokeAsync<object>("initApproveUIPosition");
             jsRuntime.InvokeAsync<object>("initPageLeft");
+
+            if (menuMode == 1)
+            {
+                refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
+                strApprStatusValue = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
+            }
             await ApproveSearchCount();
         }
         base.OnAfterRender(firstRender);
-        
+
     }
 
     public void InitText()
@@ -628,7 +650,7 @@
         strDataTypeValue = strTotal;
     }
 
-    public void ApproveAction()
+    public async Task ApproveAction()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -653,13 +675,46 @@
         }
 
 
+        if (!SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason())
+        {
+
+            SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+            string strUserID = "";
+            if (sgLoginData != null)
+                strUserID = sgLoginData.GetUserID();
+
+            string strProcID = "A";
+            string strReason = "Approve";
+            string strApproveSeqs = "";
+            for (int i = 0; i < ListData.Count; i++)
+            {
+                if (ListData[i].bCheck == true)
+                {
+                    string temp = (ListData[i].ApprSeq + '\u0002');
+                    strApproveSeqs += temp;
+                }
+            }
+            string strApprover = "1";
+            string strApproveUserKind = "0";
+
+            HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+        }
+        else
+        {
+            refSGReject.ResetReason(Common.Enums.EnumApproveType.Approve);
+            refSGReject.SetGroupID(groupID);
+            refSGReject.SetApprRejectEvent(ApproveSend);
+            await refSGReject.openPopUp();
+        }
+    }
+
+    public void ApproveSend(int groupID, string strReason)
+    {
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
-
         string strProcID = "A";
-        string strReason = "Approve";
         string strApproveSeqs = "";
         for (int i = 0; i < ListData.Count; i++)
         {
@@ -704,7 +759,7 @@
             return;
         }
 
-        refSGReject.ResetReason();
+        refSGReject.ResetReason(Common.Enums.EnumApproveType.Reject);
         refSGReject.SetGroupID(groupID);
         refSGReject.SetApprRejectEvent(ApproveRejectSend);
         await refSGReject.openPopUp();

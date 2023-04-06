@@ -326,6 +326,25 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetAfterApprChkHide();
         }
+        public void SetIsPolicyUpdate(int groupID, bool bPolicyUpdate)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+
+            m_DicPageStatusData[groupID].SetPolicyUpdate(bPolicyUpdate);
+        }
+        public bool GetIsPolicyUpdate(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetPolicyUpdate();
+        }
         public void SetAfterApprEnable(int groupID, bool bAfterApprEnable)
         {
             PageStatusData tmpData = null;
@@ -433,6 +452,13 @@ namespace OpenNetLinkApp.Services
                 //매일 자정마다 Alram & Message 정보 삭제
                 if (svrTime.Hour == 0 && PageStatusData.DeleteAlramAndMessage != null)  //매일 자정마다 실행
                     PageStatusData.DeleteAlramAndMessage();
+
+                //매일 자정마다 오래된 로그 삭제
+                if (svrTime.Hour == 0)
+                {
+                    AgLogManager.HsLogDel hsLog = new AgLogManager.HsLogDel();
+                    hsLog.Delete(7);    // 7일이전 Log들 삭제
+                }
             }
         }
 

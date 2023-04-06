@@ -8,6 +8,9 @@
 @using HsNetWorkSG
 @using HsNetWorkSGData;
 @using System.Reflection;
+@using OpenNetLinkApp.Common;
+@using AgLogManager;
+
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -28,39 +31,13 @@
                     <div class="box1" style=" width:46%;  float:left;">
                         @if (proxySearchType == "SEARCH")
                         {
-                            <div class="d-inline-flex  mb-2 " style="height:28px;">
-                                <label class="p-1">@XmlConf.GetTitle("T_COMMON_DEPT")</label>
-                                <input type="text" class="form-control col-md-3" @bind-value="strCurDept" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_DEPT")">
-                                <label class="p-1 pl-2">@XmlConf.GetTitle("T_COMMON_NAME")</label>
-                                <input type="text" class="form-control col-md-3" @bind-value="strCurName" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_NAME")">
-                                <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
-                            </div>
-
-                            <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
-                                <table class="table table-head-fixed">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>
-                                            <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>
-                                            <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (ApproverInfo item in ProxySearch)
-                                        {
-                                            <tr name="trItem4" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq">
-                                                <td style="text-align:left;">@item.DeptName</td>
-                                                <td style="text-align:center;">@item.Grade</td>
-                                                <td style="text-align:center;">@item.Name</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
+                            <SGDeptSearchList UseInputSearch="@useInputInTree" Height="392" UserDataSource="@ProxySearch" 
+                                                OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                         else        //TREE
                         {
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="392" TreeHeight="160" UserSearchList="@ProxySearch" OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => SGDeptTreeList_OnItemDoubleClick(item)" />
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="392" TreeHeight="160" UserSearchList="@ProxySearch" IsApproverOnly="@bApproverOnly"
+                                            OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                     </div>
                     <!--e table -->
@@ -80,32 +57,7 @@
                             <span class="float-left p-1">-</span>
                             <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly="readonly" value="@strToDay">
                         </div>
-
-                        <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
-                            <table class="table table-head-fixed">
-                                <thead>
-                                    <tr>
-                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_ORDER") </th>
-                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>
-                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>
-                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>
-                                        <!--<th style="text-align:center;">@XmlConf.GetTitle("T_ETC_DELETEDATA")</th>-->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (ApproverInfo item in ProxySelect)
-                                    {
-                                        <tr name="trSelect4" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.ORDER">
-                                            <td style="text-align:center;">@item.ORDER</td>
-                                            <td style="text-align:left;">@item.APPR_TEAMNAME</td>
-                                            <td style="text-align:center;">@item.RANK</td>
-                                            <td style="text-align:center;">@item.APPR_USERNAME</td>
-                                            <!--<td style="text-align:center;" @onclick="@(e => deleteProxyApprover(item))"><i class="fas fa-times"></i></td>-->
-                                    </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                        <SGDeptSearchList UseInputSearch="false" Height="392" ColumnIndexVisible="false" UserDataSource="@ProxySelect" OnItemClick="(target)=> SelectTarget(target.UserSeq)" OnItemDoubleClick="target_OnItemDoubleClick" />
                     </div>
                     <!--e table -->
                 </div>
@@ -122,13 +74,12 @@
     <!-- /.modal-dialog -->
 </div>
 
-
 @code {
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<ProxyApprover_PopUp>();
     SGDeptTreeList refSGDeptTreeList;
     ISGSideBarUIService SideBarUISvc;
     SGSettingsDBProc sgSettingProc;
     ISGSiteConfigService siteConfig;
-    ISGUserInfoService sgUserSvr;
 
     public string strCurDept = "";
     public string strCurName = "";
@@ -136,7 +87,7 @@
     private LinkedList<ApproverInfo> ProxySearch = new LinkedList<ApproverInfo>();   //좌측 검색결과
     private List<ApproverInfo> ProxySelect = new List<ApproverInfo>();
 
-    private string stSelectProxy = "";
+    private string stSearchSelect = "";
     private string stTargetSelect = "";
     private static Action<string> actionAssign;
     private static Action<string> actionTargetSelect;
@@ -151,6 +102,13 @@
     private bool useInputInTree;
 
     private int nActionType = -1;  //1:삭제, 2:등록
+
+    /// <summary>
+    /// true 결재자만 검색 / false 모두 검색 
+    /// /// </br>(대결재자의 '일반사용자 조회 여부' 와 통일)
+    /// </summary>
+    private bool bApproverOnly = true;
+
     private void deleteProxyApprover(ApproverInfo apvInfo)
     {
         ProxySelect.Remove(apvInfo);
@@ -171,6 +129,15 @@
             object[] param = { "datepicker", "datepicker2" };
             jsRuntime.InvokeAsync<object>("initDatePicker", param);
         }
+        
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = (sgSideBar != null) ? sgSideBar.GroupId : 0;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            bApproverOnly = !sgLoginData.GetApproveProxyRight();
+
+
         base.OnAfterRender(firstRender);
     }
 
@@ -199,9 +166,9 @@
             strToDay = vStr2;
     }
 
-    private void SGDeptTreeList_OnItemDoubleClick(ApproverInfo doubleClickInfo)
+    private void search_OnItemDoubleClick(ApproverInfo doubleClickInfo)
     {
-        stSelectProxy = doubleClickInfo.UserSeq;
+        stSearchSelect = doubleClickInfo.UserSeq;
         AddSelectApprover();
     }
 
@@ -213,11 +180,10 @@
             return;
         }
 
-
-        if (stSelectProxy.Length < 1)
+        if (stSearchSelect.Length < 1)
             return;
 
-        ApproverInfo apv = ProxySearch.FirstOrDefault(x => x.UserSeq == stSelectProxy);
+        ApproverInfo apv = ProxySearch.FirstOrDefault(x => x.UserSeq == stSearchSelect);
 
         if (apv != null)
         {
@@ -228,20 +194,52 @@
                 return;
             }
 
-            ApproverInfo newApporver = new ApproverInfo();
-            newApporver.APPR_TEAMCODE = apv.DeptSeq;
-            newApporver.APPR_TEAMNAME = apv.DeptName;
-            newApporver.APPR_USERNAME = apv.Name;
-            newApporver.RANK = apv.Grade;
-            newApporver.UserSeq = apv.UserSeq;
+            ApproverInfo newApprover = new ApproverInfo();
+            newApprover.APPR_TEAMCODE = apv.DeptSeq;
+            newApprover.APPR_TEAMNAME = apv.DeptName;
+            newApprover.APPR_USERNAME = apv.Name;
+            newApprover.RANK = apv.Grade;
+            newApprover.UserSeq = apv.UserSeq;
 
             int count = ProxySelect.Count;
-            newApporver.ORDER = ++count;
+            newApprover.ORDER = ++count;
 
-            ProxySelect.Add(newApporver);
+            //UI 바인딩을 위한 값 설정
+            newApprover.DeptName = newApprover.APPR_TEAMNAME;
+            newApprover.Name = newApprover.APPR_USERNAME;
+            newApprover.Grade = newApprover.RANK;
+            newApprover.Index = newApprover.ORDER.ToString();
+
+            ProxySelect.Add(newApprover);
         }
         StateHasChanged();
     }
+
+    private void target_OnItemDoubleClick(ApproverInfo doubleClickInfo)
+    {
+        stTargetSelect = doubleClickInfo.UserSeq;
+        RemoveAssignApprover();
+    }
+
+    private void RemoveAssignApprover()
+    {
+        if (String.IsNullOrEmpty(stTargetSelect))
+            return;
+
+        ApproverInfo apvTarget = ProxySelect.FirstOrDefault(x => x.UserSeq == stTargetSelect);
+        if (apvTarget != null)
+        {
+            ProxySelect.Remove(apvTarget);
+
+            int i = 1;
+            foreach (ApproverInfo approver in ProxySelect)
+            {
+                approver.ORDER = i++;
+            }
+            //deleteProxyApprover(apvTarget);
+        }
+    }
+
 
     private async Task<bool> ModifyApprover()
     {
@@ -288,24 +286,6 @@
         return true;
     }
 
-    private void RemoveAssignApprover()
-    {
-        if (String.IsNullOrEmpty(stTargetSelect))
-            return;
-
-        ApproverInfo apvTarget = ProxySelect.FirstOrDefault(x => x.ORDER == Convert.ToInt32(stTargetSelect));
-        if (apvTarget != null)
-        {
-            ProxySelect.Remove(apvTarget);
-
-            int i = 1;
-            foreach (ApproverInfo approver in ProxySelect)
-            {
-                approver.ORDER = i++;
-            }
-            //deleteProxyApprover(apvTarget);
-        }
-    }
 
     public async Task openPopUp()
     {
@@ -383,7 +363,15 @@
         }
     }
 
-    public void DeptApprLine()
+    private void sgDeptSearch_SearchClick(string getInputDeptName, string getInputUserName)
+    {
+        strCurDept = getInputDeptName;
+        strCurName = getInputUserName;
+
+        DeptApprLine();
+    }
+
+    public void DeptApprLine(bool isInit = false)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -411,15 +399,7 @@
         string strUserID = sgLoginData.GetUserID();
         string strUserName = strCurName;
         string strTeamName = strCurDept;
-        strCurDept = strTeamName;
-        string strTeamCode = "";
-        //if (strUserName == "" && strTeamName == "")
-        //    strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
-        //결재자만검색, 모두 검색 구분자
-        int nSelectAll = sgLoginData.GetTagValueInteger("APPROVEPROXYRIGHT");
-        bool bApproverOnly = true;
-        if (nSelectAll == 2)
-            bApproverOnly = false;
+        string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
 
         SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
@@ -430,6 +410,9 @@
     {
         int groupID = 0;
         groupID = SGAppMgrSvc.SideBarUIService.ActiveMenu.GroupId;
+
+        proxySearchType = SGAppMgrSvc.SiteConfigInfoService.GetProxySearchType(groupID);
+        useInputInTree = SGAppMgrSvc.SiteConfigInfoService.GetUseInputSearchInProxyTree(groupID);
         //*****************************************************************
         //EventBinding : EventBinding DeptApprLine -> DeptApprLineResult
         //*****************************************************************
@@ -443,16 +426,13 @@
             strCurDept = sgUserData.GetTeamName();
         }
 
-        proxySearchType = SGAppMgrSvc.SiteConfigInfoService.GetProxySearchType(groupID);
-        useInputInTree = SGAppMgrSvc.SiteConfigInfoService.GetUseInputSearchInProxyTree(groupID);
-
         HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, ProxySearchResult);
         HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, ResultPossibleCount);
 
         if (proxySearchType == "TREE" && refSGDeptTreeList != null)
             refSGDeptTreeList.BindEvent();
         else
-            DeptApprLine();
+            DeptApprLine(true);
     }
 
     public void ProxySearchResult(int groupid, SGData data)
@@ -474,16 +454,11 @@
         List<Dictionary<int, string>> listDicdata = null;
         listDicdata = data.GetSvrRecordData("RECORD");
 
-        int groupID = SideBarUISvc.ActiveMenu.GroupId;
-        ISGUserInfo userInfo = sgUserSvr.GetUserInfo(groupID);
         ProxySelect.Clear();
 
         int i = 1;
         foreach (Dictionary<int, string> value in listDicdata)
         {
-      @*      //GS 팀코드가 동일한 부서가 아니면 미등록
-            if (value[2] != userInfo.DeptName)
-                    continue;*@
             ApproverInfo approver = new ApproverInfo();
             approver.ORDER = i;
             approver.STARTDATE = value[0];
@@ -497,6 +472,13 @@
             approver.POSITION = value[6];
             approver.RANK = value[7];
             approver.UserSeq = value[8];
+
+            //UI 바인딩을 위한 값 설정
+            approver.DeptName = approver.APPR_TEAMNAME;
+            approver.Name = approver.APPR_USERNAME;
+            approver.Grade = approver.RANK;
+            approver.Index = approver.ORDER.ToString();
+
             ProxySelect.Add(approver);
 
             i++;
@@ -511,40 +493,49 @@
 
     public void DeptApprSearchResultProxy(int groupid, PageEventArgs e)
     {
-        ProxySearch.Clear();
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        SGDeptApprLineSearchData sgDeptApprLine = null;
-        sgDeptApprLine = (SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
-        if (sgDeptApprLine == null)
-            return;
-
-        LinkedList<ApproverInfo> apprLinkedList = null;
-        apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
-        if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
-            return;
-
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-        string strUserSeq = sgUserData.GetUserSequence();
-
-        int count = 1;
-        foreach (var item in apprLinkedList)
+        try
         {
-            if (strUserSeq.Equals(item.UserSeq))
-                continue;
-            item.Index = String.Format("{0,2}", count.ToString());
-            //strCurDept = item.DeptName;
-            ProxySearch.AddLast(item);
-            count++;
-        }
+            ProxySearch.Clear();
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
 
-        StateHasChanged();
+            SGDeptApprLineSearchData sgDeptApprLine = null;
+            sgDeptApprLine = (SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
+            if (sgDeptApprLine == null)
+                return;
+
+            LinkedList<ApproverInfo> apprLinkedList = null;
+            apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+            if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
+                return;
+
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+            if (sgUserData == null)
+                return;
+            string strUserSeq = sgUserData.GetUserSequence();
+
+            int count = 1;
+            foreach (var item in apprLinkedList)
+            {
+                if (strUserSeq.Equals(item.UserSeq))
+                    continue;
+                item.Index = String.Format("{0,2}", count.ToString());
+                //strCurDept = item.DeptName;
+                ProxySearch.AddLast(item);
+                count++;
+            }
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error("DeptApprSearchResultProxy - Exception " + ex.ToString());
+        }
+        finally
+        {
+            StateHasChanged();
+        }
     }
 
     protected override void OnInitialized()
@@ -552,31 +543,21 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        sgUserSvr = SGAppMgrSvc.UserInfoService;
+        
+
         actionAssign = AssignProxy;
         actionTargetSelect = SelectTarget;
     }
 
-    [JSInvokable("ProxyTargetSelect")]
-    public static void ProxyTargetSelect(string value)
-    {
-        actionTargetSelect.Invoke(value);
-    }
     private void SelectTarget(string value)
     {
         stTargetSelect = value;
         StateHasChanged();
     }
 
-    [JSInvokable("ProxySearchSelect")]
-    public static void ProxySearchSelect(string value)
-    {
-        actionAssign.Invoke(value);
-    }
-
     private void AssignProxy(string value)
     {
-        stSelectProxy = value;
+        stSearchSelect = value;
         StateHasChanged();
     }
     private void ShowMessage(string strType, string strMsg)
@@ -587,4 +568,39 @@
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
-}
+    DateTime searchClickterval = DateTime.Now;
+    string searchClicklastIndex = "";
+    void searchClickItemList(ApproverInfo selectedItem)
+    {
+        DateTime now = DateTime.Now;
+
+        if (searchClickterval.AddMilliseconds(CsDefinition.DoubleClickMaxTime) <= now || searchClicklastIndex != selectedItem.Index)    //일반클릭
+            searchClickterval = now;
+        else
+        {
+            //더블클릭
+            searchClickterval = now.AddSeconds(-10);     //이후 3번클릭은 더블클릭 되지 않도록
+            AddSelectApprover();
+        }
+        stSearchSelect = selectedItem.UserSeq;
+        searchClicklastIndex = selectedItem.Index;
+    }
+
+    DateTime targetClickterval = DateTime.Now;
+    string targetClicklastIndex = "";
+    void targetClickItemList(ApproverInfo selectedItem)
+    {
+        DateTime now = DateTime.Now;
+
+        if (targetClickterval.AddMilliseconds(CsDefinition.DoubleClickMaxTime) <= now || targetClicklastIndex != selectedItem.Index)    //일반클릭
+            targetClickterval = now;
+        else
+        {
+            //더블클릭
+            targetClickterval = now.AddSeconds(-10);     //이후 3번클릭은 더블클릭 되지 않도록
+            RemoveAssignApprover();
+        }
+        stTargetSelect = selectedItem.UserSeq;
+        targetClicklastIndex = selectedItem.Index;
+    }
+    }

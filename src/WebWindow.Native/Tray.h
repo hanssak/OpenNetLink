@@ -54,6 +54,10 @@ static void tray_update(struct tray *tray);
 #include <libappindicator/app-indicator.h>
 
 #define TRAY_APPINDICATOR_ID "tray-id"
+//트레이 표시 방식설정 
+//0:ubuntu20버전에서 표시가능 / 더블클릭 기능 구현 필요함
+//1:CentOS, ubuntu22버전에서 표시가능 / 더블클릭 기능 있음
+#define TRAY_TYPE_IS_GTK_ICON 0 //0 : appindicator / 1 :gtkstatusicon
 
 static AppIndicator *indicator = NULL;
 static int loop_result = 0;
@@ -94,14 +98,51 @@ static GtkMenuShell *_tray_menu(struct tray_menu *m) {
   return menu;
 }
 
+//gtk_status_icon 방식
+static gboolean tray_clicked(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+  if(SelfThis == NULL)
+  {
+    return TRUE;
+  }
+  //1: Left / 2:Middle / 3:Right
+  if(event->button ==1)
+  {
+    //Tray 쪽 left click 동작 이벤트를 더블클릭에 대한 기능만 동작하도록 설정
+    if(event->type == GDK_DOUBLE_BUTTON_PRESS)
+    {
+      RequestMoveTrayToWebWindow();      
+      NTLog(SelfThis, Info, "################ Mouse Double Click Event !!!!!!");
+    }      
+  }
+  else
+  {
+    //우클릭 시 메뉴 표시
+    struct tray *tray = (struct tray *)user_data;        
+    GtkMenu *menu =GTK_MENU(_tray_menu(tray->menu));
+    gtk_menu_popup(menu, NULL, NULL, gtk_status_icon_position_menu, widget, event->button, event->time);
+  }  
+  return FALSE;
+}
+
 static int tray_init(struct tray *tray) {
   if (gtk_init_check(0, NULL) == FALSE) {
     return -1;
   }
-  indicator = app_indicator_new(TRAY_APPINDICATOR_ID, tray->icon,
-                                APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
-  app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
-  tray_update(tray);
+  //새로운 방식 (GtkStatuIcon 사용)
+  #if TRAY_TYPE_IS_GTK_ICON == 1
+  GtkStatusIcon *icon = gtk_status_icon_new();  
+  gtk_status_icon_set_from_file(icon, "wwwroot/SecureGate.ico");
+  gtk_status_icon_set_visible(icon, TRUE);  
+  g_signal_connect(icon, "button-press-event", G_CALLBACK(tray_clicked), tray);   
+  
+  #else
+  //기존 방식 (AppIndicator 사용)
+   indicator = app_indicator_new(TRAY_APPINDICATOR_ID, tray->icon,
+                                 APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
+   app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
+   tray_update(tray);
+  #endif
   return 0;
 }
 
@@ -111,10 +152,12 @@ static int tray_loop(int blocking) {
 }
 
 static void tray_update(struct tray *tray) {
+  #if TRAY_TYPE_IS_GTK_ICON != 1
   app_indicator_set_icon(indicator, tray->icon);
   // GTK is all about reference counting, so previous menu should be destroyed
   // here
   app_indicator_set_menu(indicator, GTK_MENU(_tray_menu(tray->menu)));
+  #endif
 }
 
 static void tray_exit() { loop_result = -1; }
@@ -134,6 +177,7 @@ static id pool;
 static id statusBar;
 static id statusItem;
 static id statusBarButton;
+static id SelfId;
 
 static id _tray_menu(struct tray_menu *m) {
     id menu = ((id(*)(id, SEL))objc_msgSend)((id)objc_getClass("NSMenu"), sel_registerName("new"));
@@ -164,7 +208,6 @@ static id _tray_menu(struct tray_menu *m) {
       }
     }
   }
-
   return menu;
 }
 
@@ -204,7 +247,7 @@ static int tray_init(struct tray *tray) {
   
     app = ((id(*)(id, SEL))objc_msgSend)((id)objc_getClass("NSApplication"),
                           sel_registerName("sharedApplication"));
-  
+
     Class trayDelegateClass = objc_allocateClassPair(objc_getClass("NSObject"), "Tray", 0);
     class_addProtocol(trayDelegateClass, objc_getProtocol("NSApplicationDelegate"));
     class_addMethod(trayDelegateClass, sel_registerName("menuCallback:"), (IMP)menu_callback, "v@:@");
@@ -227,6 +270,9 @@ static int tray_init(struct tray *tray) {
     statusBarButton = ((id(*)(id, SEL))objc_msgSend)(statusItem, sel_registerName("button"));
     tray_update(tray);
     ((void(*)(id, SEL, bool))objc_msgSend)(app, sel_registerName("activateIgnoringOtherApps:"), true);
+
+    SelfId = nullptr;
+    
     return 0;
 }
 
@@ -243,7 +289,7 @@ static int tray_loop(int blocking) {
                   "kCFRunLoopDefaultMode"), 
                 true);
     if (event) {
-      /*
+      
       //NSLog(@"isClass %s", object_isClass(event) ? "yes":"no");
       //NSLog(@"%@", NSStringFromClass([event class]));
       //NSLog(@"GetClassName %s", NSStringFromClass([event class]));
@@ -251,23 +297,81 @@ static int tray_loop(int blocking) {
       NSUInteger eventType = ((NSUInteger (*)(id, SEL))objc_msgSend)(event, sel_registerName("type"));
       switch(eventType)
       {
-        case 13:
-            if([event subtype] == NSEventSubtypeApplicationActivated) {
-            NSLog(@"%@", event);
-          }
-          break;
-        case 14:
-          if([event subtype] == NSEventSubtypePowerOff) {
-            NSLog(@"%@", event);
-          }
-          break;
+        //Left Click
+        case 1:
+            //NSLog(@"Mouse Click");
+            //NSLog(@"%@", event);
+            //NSLog(@"%d", [event clickCount]);
+            //NSLog(@"%@", SelfId);              
+            
+            if(SelfId == nullptr || [event windowNumber] != [SelfId windowNumber])
+            {
+              //Tray 쪽 left Click 동작 이벤트는 더블클릭에 대한 기능만 동작하도록 설정
+              if([event clickCount] == 2)
+              {
+                NSLog(@"################ Mouse Double Click Event !!!!!!");
+                RequestMoveTrayToWebWindow();                
+              }
+              return 0;
+            }         
+
+            /*  [이벤트 참고 사항]
+            if([event clickCount] == 2)
+            {              
+              if(SelfId == nullptr || [event windowNumber] != [SelfId windowNumber])
+              {
+                NSLog(@"################ Mouse Double Click Event !!!!!!");                
+                RequestMoveTrayToWebWindow();
+                return 0;
+              }              
+              if(SelfId != nullptr)
+              {
+                  NSLog(@"%d", [event windowNumber]);
+                  NSLog(@"%d", [SelfId windowNumber]);
+                  if([event windowNumber] != [SelfId windowNumber])
+                  {
+                    NSLog(@"################ Mouse Double Click Event !!!!!!");
+
+                      //tray 더블클릭 시 WebWindow를 표시하도록 추가
+                      ((WebWindow*)SelfThis)->MoveTrayToWebWindow();
+                      NSLog(@"Mouse Click Event !!!!!!");
+                      return 0;
+                  }
+                }
+                else
+                {
+                   NSLog(@"################ Mouse Double Click Event !!!!!!");
+
+                      //tray 더블클릭 시 WebWindow를 표시하도록 추가
+                      ((WebWindow*)SelfThis)->MoveTrayToWebWindow();
+                    NSLog(@"Mouse Click Event !!!!!!");
+                    return 0;
+                }
+            }
+            else
+            {
+                if(SelfId != nullptr)
+                {
+                  //NSLog(@"%d", [event windowNumber]);
+                  //NSLog(@"%d", [SelfId windowNumber]);
+                  if([event windowNumber] != [SelfId windowNumber])
+                  {
+                      return 0;
+                  }
+                }
+                else
+                {
+                  return 0;
+                }
+            }
+            */
+            break;
         default:
+          //NSLog(@"%@", event);
           break;  
       }
-      */
+      
       ((void(*)(id, SEL, id))objc_msgSend)(app, sel_registerName("sendEvent:"), event);
-      //[NSApp updateWindows];
-			//((void (*)(id, SEL))objc_msgSend)(app, sel_registerName("updateWindows"));
     }
 
     return 0;
@@ -305,7 +409,8 @@ static LRESULT CALLBACK _tray_wnd_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARA
     PostQuitMessage(0);
     return 0;
   case WM_TRAY_CALLBACK_MESSAGE:
-    if (lparam == WM_LBUTTONUP || lparam == WM_RBUTTONUP) {
+    /*if (lparam == WM_LBUTTONUP || lparam == WM_RBUTTONUP) {*/
+    if (lparam == WM_RBUTTONUP) {
       POINT p;
       GetCursorPos(&p);
       SetForegroundWindow(hwnd);
@@ -315,6 +420,12 @@ static LRESULT CALLBACK _tray_wnd_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARA
       SendMessage(hwnd, WM_COMMAND, cmd, 0);
       return 0;
     }
+    if (lparam == WM_LBUTTONDBLCLK) {
+        //Tray 더블클릭 시 WebWindow를 표시하도록 변경
+         RequestMoveTrayToWebWindow();
+        return 0;
+    }
+
     break;
   case WM_COMMAND:
     if (wparam >= ID_TRAY_FIRST) {
@@ -368,15 +479,20 @@ static HMENU _tray_menu(struct tray_menu *m, UINT *id) {
       InsertMenuItem(hmenu, *id, TRUE, &item);
     }
   }
-  return hmenu;
+  return hmenu;  
 }
 
+
+
 static int tray_init(struct tray *tray) {
+
   memset(&wc, 0, sizeof(wc));
   wc.cbSize = sizeof(WNDCLASSEX);
   wc.lpfnWndProc = _tray_wnd_proc;
   wc.hInstance = GetModuleHandle(NULL);
   wc.lpszClassName = WC_TRAY_CLASS_NAME;
+   
+
   if (!RegisterClassEx(&wc)) {
     return -1;
   }

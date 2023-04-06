@@ -7,7 +7,7 @@
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 
-    <div class="modal fade" id="modal-UpdatePopUp">
+    <div class="modal fade" id="modal-UpdatePopUp" data-backdrop="static">
         <div class="modal-dialog modal-default1">
             <div class="modal-content">
                 <div class="modal-header-default">
@@ -53,6 +53,9 @@
     public delegate void NotiUpdateEvent();
     public NotiUpdateEvent NotiUpdate;
 
+    //해당 POPUP 처리한 Groupid
+    private int popUpGroupID;
+
     public void SetLoginUpdateEventAdd(LoginUpdateEvent LUpdateEvent)
     {
         LoginUpdate = LUpdateEvent;
@@ -82,13 +85,15 @@
     {
         InitText();
     }
-    public async Task openPopUp()
+    public async Task openPopUp(int groupId)
     {
+        popUpGroupID = groupId;
         object[] param = { "modal-UpdatePopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
-    public void openPopUpSync()
+    public void openPopUpSync(int groupId)
     {
+        popUpGroupID = groupId;
         object[] param = { "modal-UpdatePopUp" };
         JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -102,7 +107,7 @@
         ClientUpgradeExeEvent clientUpdateExe = null;
         clientUpdateExe = HSCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
         if (clientUpdateExe != null)
-            clientUpdateExe();
+            clientUpdateExe(popUpGroupID);
         //if (type == 0)
         //    LoginUpdate();
         //else if (type == 1)

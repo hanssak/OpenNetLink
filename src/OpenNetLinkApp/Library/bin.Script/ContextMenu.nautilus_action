@@ -1,0 +1,4 @@
+#!/bin/bash
+
+#노틸러스 파일 탐색기 우클릭 메뉴 추가
+/opt/hanssak/opennetlink/ContextTransferClient  0 ${NAUTILUS_SCRIPT_SELECTED_FILE_PATHS}

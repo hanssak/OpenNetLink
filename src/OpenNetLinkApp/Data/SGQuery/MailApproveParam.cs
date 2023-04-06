@@ -26,17 +26,18 @@ namespace OpenNetLinkApp.Data.SGQuery
         public string DlpValue = "";
         public string ApproveKind = "";     //선결,후결
 
+        /// <summary>
+        /// 선결, 후결 설정값을 알려준다.
+        /// </summary>
+        /// <returns></returns>
         public string GetApproveKindCode()
         {
-            string rtn = "";
             if (ApproveKind == null || ApproveKind.Length == 0)
-                return rtn;
-            if (ApproveKind == XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE")) //선결
-                return "0";
-            if (ApproveKind == XmlConf.GetTitle("T_COMMON_APPROVE_AFTER")) //후결
-                return "1";
-            return rtn;
+                return "";
+
+            return ApproveKind;
         }
+
         public void SetApproveKindCode(string value)
         {
             if (value == XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE"))
@@ -46,41 +47,6 @@ namespace OpenNetLinkApp.Data.SGQuery
             else
                 ApproveKind = "";
         }
-        //public async Task<string> GetSearchStartDate(string pickerId)   //datepicker, datepicker2
-        //{
-        //    string rtn = "";
-        //    object[] param = { pickerId };
-        //    string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
-
-        //    char sep = '-';
-        //    string[] splitFrom = vStr.Split(sep);
-        //    rtn = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
-        //    return rtn;
-        //}
-        //public async Task<string> SetSearchStartDate(string pickerId)   //datepicker, datepicker2
-        //{
-        //    string rtn = "";
-        //    object[] param = { pickerId };
-        //    string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
-
-        //    char sep = '-';
-        //    string[] splitFrom = vStr.Split(sep);
-        //    rtn = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
-        //    SearchFromDay = rtn;
-        //    return rtn;
-        //}
-        //public async Task<string> SetSearchEndDate(string pickerId)   //datepicker, datepicker2
-        //{
-        //    string rtn = "";
-        //    object[] param = { pickerId };
-        //    string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
-
-        //    char sep = '-';
-        //    string[] splitFrom = vStr.Split(sep);
-        //    rtn = String.Format("{0}{1}{2}999999", splitFrom[0], splitFrom[1], splitFrom[2]);
-        //    SearchToDay = rtn;
-        //    return rtn;
-        //}
 
         public void SetSearchStartDate(string Value)
         {
@@ -185,5 +151,21 @@ namespace OpenNetLinkApp.Data.SGQuery
             else
                 ApprStatus = "";
         }
+
+        public void SetReceiver(string strValue)
+        {
+            Receiver = strValue;
+        }
+        public void SetTitle(string strValue)
+        {
+            Title = strValue;
+        }
+
+        public void SetSender(string strValue)
+        {
+            Sender = strValue;
+        }
+        
+
     }
 }

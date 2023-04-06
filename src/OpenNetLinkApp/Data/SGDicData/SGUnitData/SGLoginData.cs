@@ -1508,21 +1508,31 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="bSystem"></param>
         /// <returns></returns>
         public string GetDocumentExtractType(bool bSystem)
-            => (bSystem) ? GetTagData("I_CLIENT_DOCUMENT_EXTRACT_TYPE") : GetTagData("E_CLIENT_DOCUMENT_EXTRACT_TYPE");
+            => (bSystem) ? GetTagData("I_CLIENT_OLE_EXTRACT") : GetTagData("E_CLIENT_OLE_EXTRACT");
 
+        public string GetPreViewerExt()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_PREVIEW_VIEWER_EXT") : GetTagData("E_CLIENT_PREVIEW_VIEWER_EXT");
+
+        public string GetDocumentExtractExt()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_OLE_EXTRACT_EXT") : GetTagData("E_CLIENT_OLE_EXTRACT_EXT");
 
         /// <summary>
-        /// OLE 개체 검사 시 OLE MIME LIST의 블랙/화이트 여부 (서버ENV 테이블에서 GET)
+        /// 제목 최소 길이 값
         /// </summary>
-        /// <returns>
-        /// <para>true : White List로 관리</para>
-        /// <para>false : Black List로 관리 (Default)</para>
-        /// </returns>
-        public bool GetOLECheckMimeFilterType(bool bSystem)
-        {
-            string strData= (bSystem) ? GetTagData("I_CLIENT_DOCUMENT_MIME_FILTER_TYPE") : GetTagData("E_CLIENT_DOCUMENT_MIME_FILTER_TYPE");          
-            return (strData.Equals("W"));
-        }
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetTitleMinLength()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_TITLE_MIN_LENGTH") : GetTagData("E_CLIENT_TITLE_MIN_LENGTH");
+
+        /// <summary>
+        /// 설명 최소 길이 값
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetDescMinLength()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_DESC_MIN_LENGTH") : GetTagData("E_CLIENT_DESC_MIN_LENGTH");
+
+
 
         /// <summary>
         /// 서버로부터 수신받은 전송 시 제목 comment 정보를 반환한다.

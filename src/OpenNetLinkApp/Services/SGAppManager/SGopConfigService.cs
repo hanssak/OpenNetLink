@@ -92,6 +92,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApprLineLocalSave(int groupID);
 
         public bool GetUseApprLineChkBlock(int groupID);
+
         public bool GetUseApprDeptSearch(int groupID);
         public bool GetUseApprTreeSearch(int groupID);
         public bool GetUseUserPWChange(int groupID);
@@ -112,7 +113,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="groupID">그룹ID</param>
         /// <returns>true : 로그인 유저별 수신경로 사용, false : 로그인 유저별 수신경로 미사용</returns>
         public bool GetUseUserRecvDownPath(int groupID);
+
         public bool GetUseEmailManageApprove(int groupID);
+
+        public bool GetUseUIdlpData(int groupID);
+
         public bool GetUsePCURL(int groupID);
 
         public bool GetUsePublicBoard(int groupID);
@@ -224,8 +229,27 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         /// <returns></returns>
         public bool GetUsePartialFileAddInTransfer();
-
+        /// <summary>
+        /// 로그인 완료후 Tray로 이동
+        /// </summary>
+        /// <returns></returns>
         public bool GetUseLoginAfterTray();
+        /// <summary>
+        /// 파일 승인시에도 사유 입력
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseFileApproveReason();
+        /// <summary>
+        /// 클립보드 승인시에도 사유 입력
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseClipBoardApproveReason();
+
+        /// <summary>
+        /// 파일 선택 삭제 사용 유무
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseFileSelectDelete();
 
         /// <summary>
         /// 알람 초기화 매일 자정마다
@@ -250,6 +274,22 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns></returns>
         public bool GetUseOver1auth(int nGroupID);
 
+
+        /// <summary>
+        /// 인증서 전송기능
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUsePKIsendRecv(int groupID);
+
+
+
+        public bool GetUseCrossPlatformOSforFileName();
+
+
+        public bool GetUseMinLengthTitleDesc();
+
+
     }
 
 
@@ -261,6 +301,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         public ref ISGopConfig AppConfigInfo => ref _AppConfigInfo;
 
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGopConfigService>();
+
         public SGopConfigService()
         {
             var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
@@ -269,25 +311,23 @@ namespace OpenNetLinkApp.Services.SGAppManager
             HsLogDel hsLog = new HsLogDel();
             hsLog.Delete(7);    // 7일이전 Log들 삭제
 
-            Log.Information($"- AppOPsetting Path: [{AppConfig}]");
+            CLog.Here().Information($"- AppOPsetting Path: [{AppConfig}]");
             if (File.Exists(AppConfig))
             {
                 try
                 {
-                    Log.Information($"- AppOPsetting Loading... : [{AppConfig}]");
+                    CLog.Here().Information($"- AppOPsetting Loading... : [{AppConfig}]");
                     //Open the stream and read it back.
                     using (FileStream fs = File.OpenRead(AppConfig))
                     {
                         SGopConfig appConfig = (SGopConfig)serializer.ReadObject(fs);
                         _AppConfigInfo = appConfig;
                     }
-                    Log.Information($"- AppOPsetting Load Completed : [{AppConfig}]");
+                    CLog.Here().Information($"- AppOPsetting Load Completed : [{AppConfig}]");
                 }
                 catch (Exception ex)
                 {
-                    Log.Warning($"\nMessage ---\n{ex.Message}");
-                    Log.Warning($"\nHelpLink ---\n{ex.HelpLink}");
-                    Log.Warning($"\nStackTrace ---\n{ex.StackTrace}");
+                    CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
                     _AppConfigInfo = new SGopConfig();
                 }
             }
@@ -370,6 +410,31 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return (AppConfigInfo as SGopConfig).bURLAutoTrans[nGroupID];
 
             return true;    // 기본값
+        }
+
+        public bool GetUseEmailManageApprove(int nGroupID)
+        {
+            (AppConfigInfo as SGopConfig).blistUseEmail ??= new List<bool>();
+
+            if ((AppConfigInfo as SGopConfig).blistUseEmail.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGopConfig).blistUseEmail[nGroupID];
+
+            return false;    // 기본값
+        }
+
+        /// <summary>
+        /// email에서 DLP 검색기능 사용할지 유무
+        /// </summary>
+        /// <param name="nGroupID"></param>
+        /// <returns></returns>
+        public bool GetUseUIdlpData(int nGroupID)
+        {
+            (AppConfigInfo as SGopConfig).blistUiDlpShow ??= new List<bool>();
+
+            if ((AppConfigInfo as SGopConfig).blistUiDlpShow.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGopConfig).blistUiDlpShow[nGroupID];
+
+            return false;    // 기본값
         }
 
         public bool GetURLAutoAfterMsg(int nGroupID)
@@ -571,6 +636,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bApprLineChkBlock;
         }
+
         public bool GetUseApprDeptSearch(int groupID)
         {
             return AppConfigInfo.bApprDeptSearch;
@@ -608,10 +674,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bUseUserRecvDownPath;
         }
-        public bool GetUseEmailManageApprove(int groupID)
-        {
-            return AppConfigInfo.bUseEmail;
-        }
+
         public bool GetUsePCURL(int groupID)
         {
             return AppConfigInfo.bUsePCURL;
@@ -797,6 +860,20 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bUseLoginAfterTray;
         }
 
+        public bool GetUseFileApproveReason()
+        {
+            return AppConfigInfo.bUseFileApproveReason;
+        }
+        public bool GetUseClipBoardApproveReason()
+        {
+            return AppConfigInfo.bUseClipBoardApproveReason;
+        }
+
+        public bool GetUseFileSelectDelete()
+        {
+            return AppConfigInfo.bUseFileSelectDelete;
+        }
+
         public bool GetUseInitAlarmPerDay()
         {
             return AppConfigInfo.bUseInitAlarmPerDay;
@@ -820,6 +897,29 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return (AppConfigInfo as SGopConfig).bUseOver1Auth[nGroupID];
 
             return false;    // 기본값
+        }
+
+
+
+        public bool GetUsePKIsendRecv(int nGroupID)
+        {
+            (AppConfigInfo as SGopConfig).bListUsePKIsendRecv ??= new List<bool>();
+
+            if ((AppConfigInfo as SGopConfig).bListUsePKIsendRecv.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGopConfig).bListUsePKIsendRecv[nGroupID];
+
+            return false;    // 기본값
+        }
+
+
+        public bool GetUseCrossPlatformOSforFileName()
+        {
+            return AppConfigInfo.bUseCrossPlatformOSforFileName;
+        }
+		
+        public bool GetUseMinLengthTitleDesc()
+        {
+            return AppConfigInfo.bUseTitleDescMinLength;
         }
 
     }

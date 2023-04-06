@@ -30,7 +30,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bStartTrayMove { get; set; } = true;                                   // 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
         public bool bStartProgramReg { get; set; } = true;                                 // 시작 프로그램 등록 ( true : 시작프로그램 등록, false : 시작프로그램 등록 해제 )
 
-        public bool bScreenLock { get; set; } = true;                                       // 화면잠금 사용 여부.(체크)
+        public bool bScreenLock { get; set; } = false;                                       // 화면잠금 사용 여부.(체크)
         public bool bScreenLockUserChange { get; set; } = false;                            //스크린 잠금 사용자 임의 변경 가능여부
         public bool bUseApprWaitNoti { get; set; } = true;                                  // 승인대기 알림 사용 여부.(체크)
         public bool bUseLogLevel { get; set; } = false;                                     // 로그 레벨 사용 여부
@@ -78,7 +78,12 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bRecvFolderChange { get; set; } = true;               // 수신 폴더 변경 사용 여부.
         public bool bUseUserRecvDownPath { get; set; } = false;           // 로그인 유저별 다운로드 경로 사용 여부
-        public bool bUseEmail { get; set; } = false;               // 메일 관리/결재 사용 유무.
+        
+
+        public List<bool> blistUseEmail { get; set; } = null;               // 메일 관리/결재 사용 유무.
+
+        public List<bool> blistUiDlpShow { get; set; } = null;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
+
         public bool bUsePCURL { get; set; } = false;                      // PCURL 사용 유무.
 
         public bool bUsePublicBoard { get; set; } = true;                // 공지사항 사용 유무.
@@ -127,7 +132,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseInitMessagePerDay { get; set; } = false; // 일일 이전 날짜 메세지 자동 삭제
 
-        public bool bVisiblePolicyUpdateButton { get; set; } = false; //정책 업데이트 버튼 보여주기
+        public bool bVisiblePolicyUpdateButton { get; set; } = true; //정책 업데이트 버튼 보여주기
         /// <summary>
         /// ////////////////////////////////
         /// </summary>
@@ -150,7 +155,20 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public List<bool> bUseOver1Auth { get; set; } = null;                    // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
 
-        public bool bUseLoginAfterTray { get; set; }  //로그인 후 Tray 아이콘으로 이동
+        public bool bUseLoginAfterTray { get; set; }                            //로그인 후 Tray 아이콘으로 이동
+
+        public bool bUseFileApproveReason { get; set; }                        //파일 승인사유 입력 여부
+
+        public bool bUseClipBoardApproveReason { get; set; }                   //클립보드 승인사유 입력여부
+
+        public bool bUseFileSelectDelete { get; set; }                          // 파일 선택 삭제 사용 유무
+
+        public bool bUseCrossPlatformOSforFileName { get; set; }              // 윈도우에서 파일이름에 사용못하는 문자 막는지 유무
+
+        public List<bool> bListUsePKIsendRecv { get; set; } = null;             // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
+
+
+        public bool bUseTitleDescMinLength { get; set; } = false;             //제목,설명 최소길이 제한 사용유무
 
     }
 }

@@ -43,39 +43,38 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetAfterBasicChk();
         string GetRecvDownPath(int groupId);
         bool GetFileRecvFolderOpen();
-        bool GetManualRecvDownChange();
+        //bool GetManualRecvDownChange();
         bool GetFileRecvTrayFix();
         bool GetApprTrayFix();
         bool GetUserApprActionTrayFix();
         bool GetUserApprRejectTrayFix();
-        bool GetExitTrayMove();
+        //bool GetExitTrayMove();
         bool GetStartTrayMove();
         bool GetStartProgramReg();
         string GetLanguage();
         //bool GetUseScreenLock();
         bool GetScreenLock();
-        bool GetScreenLockUserChange();
+        //bool GetScreenLockUserChange();
         int GetScreenTime();
         LogEventLevel GetLogLevel();
         bool GetUseApprWaitNoti();
         string GetUpdateSvcIP();
-        bool GetUseLogLevel();
-        bool GetUseGPKILogin(int groupID);
-
+        //bool GetUseLogLevel();
+        //bool GetUseGPKILogin(int groupID);
         //bool GetUseOverNetwork2();
         //bool GetUseNetOverAllsend();
         //bool GetFileForward();
         //bool GetFileDownloadBeforeReciving();
         //bool GetEmailApproveUse();
-
         //bool GetClipboardFileTransUse();
-
         //bool GetClipboardManageUse();
-
-        bool GetShowAdminInfo();
+        //bool GetShowAdminInfo();
         //bool GetUseFileCheckException();
         //bool GetDenyPasswordZIP();
-        bool GetUseAppLoginType();
+        //bool GetUseAppLoginType();
+
+        string ConvertRecvDownPath(string DownPath);
+
         int GetAppLoginType();
 
         int GetUserSelectFirstNet();
@@ -85,6 +84,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         private ISGAppConfig _AppConfigInfo;
         public ref ISGAppConfig AppConfigInfo => ref _AppConfigInfo;
 
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGAppConfigService>();
+
         public SGAppConfigService()
         {
             var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));
@@ -93,25 +94,23 @@ namespace OpenNetLinkApp.Services.SGAppManager
             HsLogDel hsLog = new HsLogDel();
             hsLog.Delete(7);    // 7일이전 Log들 삭제
 
-            Log.Information($"- AppEnvSetting Path: [{AppConfig}]");
+            CLog.Here().Information($"- AppEnvSetting Path: [{AppConfig}]");
             if (File.Exists(AppConfig))
             {
                 try
                 {
-                    Log.Information($"- AppEnvSetting Loading... : [{AppConfig}]");
+                    CLog.Here().Information($"- AppEnvSetting Loading... : [{AppConfig}]");
                     //Open the stream and read it back.
                     using (FileStream fs = File.OpenRead(AppConfig))
                     {
                         SGAppConfig appConfig = (SGAppConfig)serializer.ReadObject(fs);
                         _AppConfigInfo = appConfig;
                     }
-                    Log.Information($"- AppEnvSetting Load Completed : [{AppConfig}]");
+                    CLog.Here().Information($"- AppEnvSetting Load Completed : [{AppConfig}]");
                 }
                 catch (Exception ex)
                 {
-                    Log.Warning($"\nMessage ---\n{ex.Message}");
-                    Log.Warning($"\nHelpLink ---\n{ex.HelpLink}");
-                    Log.Warning($"\nStackTrace ---\n{ex.StackTrace}");
+                    CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
                     _AppConfigInfo = new SGAppConfig();
                 }
             }
@@ -478,10 +477,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bFileRecvFolderOpen;
         }
 
-        public bool GetManualRecvDownChange()
+        /*public bool GetManualRecvDownChange()
         {
             return AppConfigInfo.bManualRecvDownChange;
-        }
+        }*/
         public bool GetFileRecvTrayFix()
         {
             return AppConfigInfo.bFileRecvTrayFix;
@@ -498,10 +497,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bUserApprRejectTrayFix;
         }
-        public bool GetExitTrayMove()
+        /*public bool GetExitTrayMove()
         {
             return AppConfigInfo.bExitTrayMove;
-        }
+        }*/
         public bool GetStartTrayMove()
         {
             return AppConfigInfo.bStartTrayMove;
@@ -522,10 +521,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bScreenLock;
         }
-        public bool GetScreenLockUserChange()
+        /*public bool GetScreenLockUserChange()
         {
             return AppConfigInfo.bScreenLockUserChange;
-        }
+        }*/
         public int GetScreenTime()
         {
             return AppConfigInfo.tScreenTime;
@@ -542,10 +541,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.UpdateSvcIP;
         }
-        public bool GetUseLogLevel()
+        /*public bool GetUseLogLevel()
         {
             return AppConfigInfo.bUseLogLevel;
-        }
+        }*/
         public string ConvertRecvDownPath(string DownPath)
         {
             string strDownPath = "";
@@ -572,31 +571,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             return strDownPath;
         }
-        public bool GetUseGPKILogin(int groupID)
+        /*public bool GetUseGPKILogin(int groupID)
         {
             if (AppConfigInfo.listUseGpkiLogin == null)
                 return false;
 
             return AppConfigInfo.listUseGpkiLogin[groupID];
-        }
-
-        /*public bool GetUseNetOverAllsend()
-        {
-            return AppConfigInfo.bUseNetOverAllsend;
-        }*/
-
-        /*public bool GetFileForward()
-        {
-            return AppConfigInfo.bFileForward;
-        }*/
-
-        /*public bool GetFileDownloadBeforeReciving()
-        {
-            return AppConfigInfo.bFileDownloadBeforeReciving;
-        }*/
-        /*public bool GetEmailApproveUse()
-        {
-            return AppConfigInfo.bEmailApproveUse;
         }*/
 
         /// <summary>
@@ -617,10 +597,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bClipboardManageUse;
         }*/        
 
-        public bool GetShowAdminInfo()
+        /*public bool GetShowAdminInfo()
         {
             return AppConfigInfo.bShowAdminInfo;
-        }
+        }*/
         /*public bool GetUseFileCheckException()
         {
             return AppConfigInfo.bUseFileCheckException;
@@ -629,10 +609,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bDenyPasswordZIP;
         }*/
-        public bool GetUseAppLoginType()
+        /*public bool GetUseAppLoginType()
         {
             return AppConfigInfo.bUseAppLoginType;
-        }
+        }*/
         public int GetAppLoginType()
         {
             return AppConfigInfo.LoginType;

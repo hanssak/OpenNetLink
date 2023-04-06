@@ -1,5 +1,7 @@
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using AgLogManager
+
 @inject HSCmdCenter HsCmdCenter
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
@@ -8,7 +10,7 @@
 @inject PageStatusService pageService
 
 <div class="modal fade" id="modal-displaylock" data-backdrop="static" data-keyboard="false">
-    
+
     <div class="modal-dialog" style="width:450px !important; height:500px !important;">
         <div class="modal-content border-0" style="!important; background:url('/images/adminlte/lock_bg.png');">
             <!--s login popup-->
@@ -53,7 +55,7 @@
         </div>
         <!-- /.modal-content -->
     </div>
- </div>
+</div>
 
 @code {
 
@@ -140,7 +142,7 @@
         //string strLoginType = sgSvrData.GetBasicTagData("LOGINTYPE");
         string strLoginType = sgSvrData.GetLoginTypeStr();
 
-        CLog.Information("[LogIn_DisplayLock] PageSvcLogIn Type:{0}, SvrDataLogIn Type:{1}", pageService.m_nLoginType.ToString(), strLoginType);
+        CLog.Here().Information("[LogIn_DisplayLock] PageSvcLogIn Type:{0}, SvrDataLogIn Type:{1}", pageService.m_nLoginType.ToString(), strLoginType);
         HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW, strLoginType);
         //HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW, pageService.m_nLoginType.ToString());
     }
@@ -152,7 +154,7 @@
 
     public void ScreenLockCearNoti(int groupID, OpenNetLinkApp.PageEvent.PageEventArgs e)
     {
-        if(e.result!=0)
+        if (e.result != 0)
         {
             string strMsg = XmlConf.GetErrMsg("E_0010");    // 화면 잠금 해제가 실패 했습니다./ r / n비밀번호를 다시 입력 해주세요.
             strMsg = strMsg.Replace("/r/n", "<br>");

@@ -67,20 +67,21 @@
     public async void OpenPopUp(string causeDescription)
     {
         CLog.Here().Information($"- OpenMessageNotification");
-        object[] param4 = { "0" };
-        await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param4);
-
+       
         CauseDescription = causeDescription;
         CtrlSideUISvc.EmitNotifyStateChangedCtrlSide();
 
         object[] param = { "modal-messagenotification" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
+        
         object[] param2 = { "1000" };
         await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
         //object[] param3 = { "black" };
         //await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
 
         //StateHasChanged();
+           object[] param4 = { "0" };
+        await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param4);
     }
 
     public async void ClosePopUp()

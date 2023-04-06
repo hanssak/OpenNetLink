@@ -8,13 +8,15 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.Services
+@using AgLogManager
+@using System.Runtime.InteropServices
 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 
-<div class="modal fade" id="FileSelectPopUp">
+<div class="modal fade" id="FileSelectPopUp" data-backdrop="static">
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline pl-3 pr-3">
@@ -46,6 +48,19 @@
                                         }
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body  mb-1" style="border:1px solid #b3c8e4; background-color:#fff; border-radius:3px; padding:.3rem !important;">
+                    <div class="col-md-12 p-0">
+                        <div class="row">
+                            <div class="col-md-12" style="letter-spacing:.3px !important; ">
+                                <h7 class="modal-title pt-1 text-bold" style="color: gray; text-overflow: ellipsis;">
+                                    <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#c2baba;" />
+                                    @stDisplayPath
+                                </h7>
                             </div>
                         </div>
                     </div>
@@ -87,11 +102,9 @@
 
             <div class="modal-footer clearfix pl-4 pr-4 pt-3 pb-3">
                 <div class="col-md-12  p-0">
-                    <div class="row  p-0">
-                        <div class="col-md-9 text-right p-0">
-                            <button type="button" name="popUpOkBtn" class="btn btn-md btn-blue mr-0" @onclick="selectOK"><i class="fas fa-check"></i>확인</button>
-                            <button type="button" class="btn btn-md btn-black mr-0" data-dismiss="modal"><i class="fas fa-times"></i>취소</button>
-                        </div>
+                    <div class="text-right p-0">
+                        <button type="button" name="popUpOkBtn" class="btn btn-md btn-blue mr-0" @onclick="selectOK"><i class="fas fa-check"></i>확인</button>
+                        <button type="button" class="btn btn-md btn-black mr-0" data-dismiss="modal"><i class="fas fa-times"></i>취소</button>
                     </div>
                 </div>
             </div>
@@ -102,6 +115,11 @@
 @code {
     [Parameter]
     public EventCallback<List<string>> OnSelectOK { get; set; }
+
+    /// <summary>
+    /// 상단에 표시되는 Path 경로
+    /// </summary>
+    private string stDisplayPath = String.Empty;
 
     private string[] drives;
     private string stCurrentDrive = "";
@@ -177,26 +195,45 @@
     protected override void OnInitialized()
     {
         List<string> drivers = new List<string>();
-        //드라이버 목록 중 접근 가능한 드라이버만 표시하도록 수정
-        foreach (DriveInfo d in DriveInfo.GetDrives())
-        {
-            if (!d.IsReady)
-                continue;
 
-            drivers.Add(d.Name);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            //Window : 드라이버 목록 중 접근 가능한 드라이버만 표시하도록 수정
+            foreach (DriveInfo d in DriveInfo.GetDrives())
+            {
+                if (!d.IsReady)
+                    continue;
+
+                drivers.Add(d.Name);
+            }
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            //OSX/LINUX : 사용자 경로만 표시
+            drivers.Add(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+
         }
 
         drives = drivers.ToArray();//Directory.GetLogicalDrives();
         stCurrentDrive = drives[0];
         actionPopUpLoadFileList = LoadListFiles;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
-            LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            
+
+            @*LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));*@
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                stDisplayPath = Directory.GetDirectoryRoot(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            else if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                stDisplayPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            refFileTreeCustom.changeDrive(stCurrentDrive);
         }
         base.OnAfterRender(firstRender);
     }
@@ -252,16 +289,15 @@
             fList = Directory.EnumerateFileSystemEntries(stPath)
              .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
             // .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
-
         }
         catch (UnauthorizedAccessException e)
         {
-            CLog.Error("UnauthorizedAccessException:" + e.Message);
+            CLog.Here().Error($"LoadListFiles, UnauthorizedAccessException(MSG):{e.Message}");
             Console.WriteLine(e.Message);
         }
         catch (Exception e2)
         {
-            CLog.Error("Exception:" + e2.Message);
+            CLog.Here().Error($"LoadListFiles, Exception(MSG):{e2.Message}");
             Console.WriteLine(e2.Message);
         }
 
@@ -305,10 +341,11 @@
         }
         catch (Exception ex3)
         {
-            CLog.Error("Exception:" + ex3.Message);
+            CLog.Here().Error("LoadListFiles, Exception(MSG):" + ex3.Message);
         }
 
     append:
+        stDisplayPath = (string.IsNullOrEmpty(stPath)) ? stCurrentDrive : stPath;
         string listHtml = makeSubFileList();
         object[] param = { "divPopUpFileList", listHtml };
         JSRuntime.InvokeAsync<object>("appendHtml", param);

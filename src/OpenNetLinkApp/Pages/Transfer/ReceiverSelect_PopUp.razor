@@ -10,7 +10,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
 
-<div class="modal fade" id="ReceiverSelect_PopUp">
+<div class="modal fade" id="ReceiverSelect_PopUp" data-backdrop="static">
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline pl-3 pr-3">
@@ -24,43 +24,15 @@
 
                     <div class="box1" style=" width:46%;  float:left;">
                         @if (receiverSearchType == "SEARCH")
-                        {
-                            <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
-                                <label class="p-1">@strDept</label>                                                       <!--부서-->
-                                <input type="text" class="form-control col-md-4" @onkeyup="HandleKeyEvent" placeholder="@strDept" @bind-value="strCurDept">
-                                <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
-                                <input type="text" class="form-control col-md-3" @onkeyup="HandleKeyEvent" placeholder="@strName" @bind-value="strCurName">
-                                <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>  <!--조회-->
-                            </div>
-
-                            <div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">
-                                <table class="table table-head-fixed">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align:center;">@strDept </th>        <!--부서-->
-                                            <th style="text-align:center;">@strRank </th>        <!--직급-->
-                                            <th style="text-align:center;">@strName </th>        <!--이름-->
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (ApproverInfo item in ReceiverSearch)
-                                        {
-                                            <tr name="trItem6" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq">
-                                                <td>@item.DeptName</td>
-                                                <td style="text-align:center;">@item.Grade</td>
-                                                <td style="text-align:center;">@item.Name</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
+                        {   //Search
+                            <SGDeptSearchList UseInputSearch="@useInputInTree" Height="359" UserDataSource="@ReceiverSearch" ColumnIndexVisible="false"
+                                          OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(approve) => AssignApprover(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                         else //Tree
                         {
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="359" TreeHeight="170" UserSearchList="@ReceiverSearch" OnItemClick="(approve) => AssignApprover(approve.UserSeq)" OnItemDoubleClick="(item) => SGDeptTreeList_OnItemDoubleClick(item)" />
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="359" TreeHeight="170" UserSearchList="@ReceiverSearch" IsApproverOnly="false"
+                                        OnItemClick="(approve) => AssignApprover(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
-
-
                     </div>
                     <!--e table -->
                     <!--s btn -->
@@ -69,44 +41,24 @@
                             <label class="p-1">@XmlConf.GetTitle("T_COMMON_SELECT2")</label>                                                       <!--선택-->
                         </div>
                         <div class="col-md-12 text-center" style="top:25% !important;">
-                            <button type="button" class="btn bg-gradient-primary mb-3" @onclick="AddSelectApprover"><i class="fas fa-angle-right fa-2x"></i></button>
-                            <button type="button" class="btn bg-gradient-primary" @onclick="RemoveAssignApprover"><i class="fas fa-angle-left fa-2x"></i></button>
+                            <button type="button" class="btn bg-gradient-primary mb-3" style="width:41px; height:31px;" @onclick="AddSelectApprover"><i class="fas fa-angle-right fa-2x"></i></button>
+                            <button type="button" class="btn bg-gradient-primary" style="width:41px; height:31px;" @onclick="RemoveAssignApprover"><i class="fas fa-angle-left fa-2x"></i></button>
 
 
                         </div><div class="col-md-12 text-center" style="top:44% !important;">
                             <label class="p-1">@XmlConf.GetTitle("T_COMMON_ALL")</label>                                                       <!--전체 -->
                         </div>
                         <div class="col-md-12 text-center" style="top:45% !important;">
-                            <button type="button" class="btn bg-gradient-primary mb-3" @onclick="AddAllSearchedUser"><i class="fas fa-angle-double-right fa-2x"></i></button>
-                            <button type="button" class="btn bg-gradient-primary" @onclick="RemoveAllReceiver"><i class="fas fa-angle-double-left fa-2x"></i></button>
+                            <button type="button" class="btn bg-gradient-primary mb-3" style="width:41px; height:31px;" @onclick="AddAllSearchedUser"><i class="fas fa-angle-double-right fa-2x"></i></button>
+                            <button type="button" class="btn bg-gradient-primary" style="width:41px; height:31px;" @onclick="RemoveAllReceiver"><i class="fas fa-angle-double-left fa-2x"></i></button>
                         </div>
                     </div>
 
                     <!--e btn -->
                     <!--s table -->
                     <div class="box1" style="width:46%;float:left;">
-
-                        <div class="card-body table-responsive p-0" style="height:368px; border:1px solid #ddd; background-color:#fff;">
-                            <table class="table table-head-fixed">
-                                <thead>
-                                    <tr>
-                                        <th style="text-align:center;">@strDept </th>            <!--부서-->
-                                        <th style="text-align:center;">@strRank </th>            <!--직급-->
-                                        <th style="text-align:center;">@strName </th>            <!--이름-->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (ApproverInfo item in ReceiverSelect)
-                                    {
-                                        <tr name="trSelect6" draggable="false" data-draggable="tritem" aria-grabbed="@(item.UserSeq == stTargetSelect ? "true" : "false")" value="@item.UserSeq">
-                                            <td>@item.DeptName</td>
-                                            <td style="text-align:center;">@item.Grade</td>
-                                            <td style="text-align:center;">@item.Name</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                        <SGDeptSearchList UseInputSearch="false" Height="358" UserDataSource="@ReceiverSelect" ColumnIndexVisible="false"
+                                          OnItemClick="(approve) => SelectTarget(approve.UserSeq)" OnItemDoubleClick="(item) => target_OnItemDoubleClick(item)" />
                     </div>
                     <!--e table -->
                 </div>
@@ -195,7 +147,7 @@
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
-    private void SGDeptTreeList_OnItemDoubleClick(ApproverInfo doubleClickInfo)
+    private void search_OnItemDoubleClick(ApproverInfo doubleClickInfo)
     {
         stSelectApprover = doubleClickInfo.UserSeq;
         AddSelectApprover();
@@ -225,6 +177,12 @@
         }
     }
 
+    private void target_OnItemDoubleClick(ApproverInfo doubleClickInfo)
+    {
+        stTargetSelect = doubleClickInfo.UserSeq;
+        RemoveAssignApprover();
+    }
+
     private void RemoveAssignApprover()
     {
         ApproverInfo apvTarget = ReceiverSelect.FirstOrDefault(x => x.UserSeq == stTargetSelect);
@@ -234,24 +192,6 @@
 
     private void AddAllSearchedUser()
     {
-        @*ApproverInfo apv = ReceiverSearch.FirstOrDefault(x => x.Index == stSelectApprover);
-            if (apv != null)
-            {
-            string strUserSeq = apv.UserSeq;
-            if (GetUserSeqExistence(strUserSeq))
-            {
-            string strName = GetUserSeqExistenceName(strUserSeq);
-            string strMsg = XmlConf.GetWarnMsg("W_0026");   //{0} 사용자는 결재자로 등록되어 있습니다.
-            strMsg = String.Format(strMsg, strName);
-            ShowMessage("warn", strMsg);
-            return;
-            }
-            else
-            {
-            ReceiverSelect.AddLast(apv);
-            }
-            }*@
-
         string strUserSeq = "";
         bool bIsUserSelectedReceiver = false;
         foreach (var item in ReceiverSearch)
@@ -315,7 +255,16 @@
         strCurDept = strDeptName;
     }
 
-    public void DeptApprLine()
+    private void sgDeptSearch_SearchClick(string getInputDeptName, string getInputUserName)
+    {
+        strCurDept = getInputDeptName;
+        strCurName = getInputUserName;
+
+        DeptApprLine();
+    }
+
+
+    public void DeptApprLine(bool isInit = false)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -343,18 +292,18 @@
         string strUserID = sgLoginData.GetUserID();
         string strUserName = strCurName;
         string strTeamName = strCurDept;
-        strCurDept = strTeamName;
-        string strTeamCode = "";
-        if (strUserName == "" && strTeamName == "")
-            strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
+
+        string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
+        //if (strUserName == "" && strTeamName == "")
+        //    strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
+
         //결재자만검색, 모두 검색 구분자
-        int nSelectAll = sgLoginData.GetTagValueInteger("APPROVEPROXYRIGHT");
+        //int nSelectAll = sgLoginData.GetTagValueInteger("APPROVEPROXYRIGHT");
 
         HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, DeptApprLineResult);
 
         SGQueryExtend sgQuery = new SGQueryExtend();
-        //string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
-        string strQuery = sgQuery.GetReceiverSearchQuery(strUserID, strUserName, strTeamName, "");
+        string strQuery = sgQuery.GetReceiverSearchQuery(strUserID, strUserName, strTeamName, strTeamCode);
         //HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
         HSCmdCenter.SendListQuery(groupID, strUserID, strQuery);
     }
@@ -379,37 +328,6 @@
             cnt++;
         }
 
-        @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupID = 0;
-            if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-            SGDeptApprLineSearchData sgDeptApprLine = null;
-            sgDeptApprLine = (SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
-            if (sgDeptApprLine == null)
-            return;
-
-            LinkedList<ApproverInfo> apprLinkedList = null;
-            apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
-            if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
-            return;
-
-            SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-            if (sgUserData == null)
-            return;
-
-            string strUserSeq = sgUserData.GetUserSequence();
-
-            int count = 1;
-            foreach (var item in apprLinkedList)
-            {
-            if (strUserSeq.Equals(item.UserSeq))
-            continue;
-            item.Index = String.Format("{0,2}", count.ToString());
-            ReceiverSearch.AddLast(item);
-            count++;
-            }*@
         StateHasChanged();
     }
 
@@ -425,25 +343,25 @@
         if (receiverSearchType == "TREE" && refSGDeptTreeList != null)
             refSGDeptTreeList.BindEvent();
         else
-            DeptApprLine();
+            DeptApprLine(true);
     }
-    [JSInvokable("ReceiverTargetSelect")]
-    public static void ReceiverTargetSelect(string value)
-    {
-        actionTargetSelect.Invoke(value);
-    }
+    // [JSInvokable("ReceiverTargetSelect")]
+    // public static void ReceiverTargetSelect(string value)
+    // {
+    //     actionTargetSelect.Invoke(value);
+    // }
     private void SelectTarget(string value)
     {
         stTargetSelect = value;
         StateHasChanged();
     }
 
-    [JSInvokable("ReceiverSearchSelect")]
-    public static void ReceiverSearchSelect(string value)
-    {
-        actionAssign.Invoke(value);
-    }
-
+    // [JSInvokable("ReceiverSearchSelect")]
+    // public static void ReceiverSearchSelect(string value)
+    // {
+    //     actionAssign.Invoke(value);
+    // }
+    //
     private void AssignApprover(string value)
     {
         stSelectApprover = value;

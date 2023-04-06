@@ -5,7 +5,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
 
-<div class="modal fade" id="SGCustomSelect">
+<div class="modal fade" id="SGCustomSelect" data-backdrop="static">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
             <div class="modal-header-default">
@@ -126,6 +126,7 @@
             m_Item.Add(XmlConf.GetTitle("T_COMMON_APPROVE_WAIT"));
             m_Item.Add(XmlConf.GetTitle("T_DASH_APPROVE_COMPLETE"));
             m_Item.Add(XmlConf.GetTitle("T_DASH_APPROVE_REJECT"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_REQUESTCANCEL"));
         }
         else if (option == "ApproveKind")
         {

@@ -78,6 +78,8 @@ namespace OpenNetLinkApp.Data.SGSettings
         private SGSettingsDBProc() 
         { 
             DBSDataCtx = new SGSettingDataContext();
+            if (!DBSDataCtx.Database.GetPendingMigrations().Any())
+                DBSDataCtx.Database.Migrate();
         }
         //private static 인스턴스 객체
         private static readonly Lazy<SGSettingsDBProc> _instance = new Lazy<SGSettingsDBProc> (() => new SGSettingsDBProc());
@@ -88,7 +90,7 @@ namespace OpenNetLinkApp.Data.SGSettings
         public bool InsertSettingData(int groupId, string uid, string upw, string apprline, string delayDspPw, int autoLoginUse)
         {
             // Create
-            Log.Information($"Inserting a SettingData, GROUPID:{groupId}, UID:{uid}, APPRLINE:{apprline}, DELAYDSPPW:{delayDspPw}, AUTOLOGIN:{autoLoginUse}");
+            Log.Logger.Here().Information($"Inserting a SettingData, GROUPID:{groupId}, UID:{uid}, APPRLINE:{apprline}, DELAYDSPPW:{delayDspPw}, AUTOLOGIN:{autoLoginUse}");
 
             lock (_locker)
             {
@@ -111,7 +113,7 @@ namespace OpenNetLinkApp.Data.SGSettings
         public bool UpdateSettingData(int groupId, string uid, string upw, string apprline, string delayDspPw, int autoLoginUse)
         {
             // Create
-            Log.Information($"Updating a SettingData, GROUPID:{groupId}, UID:{uid}, APPRLINE:{apprline}, DELAYDSPPW:{delayDspPw}, AUTOLOGIN:{autoLoginUse}");
+            Log.Logger.Here().Information($"Updating a SettingData, GROUPID:{groupId}, UID:{uid}, APPRLINE:{apprline}, DELAYDSPPW:{delayDspPw}, AUTOLOGIN:{autoLoginUse}");
 
             lock (_locker)
             {
@@ -133,7 +135,7 @@ namespace OpenNetLinkApp.Data.SGSettings
         public bool UpdateSettingDataObj(SGSettingData obj)
         {
             // Create
-            Log.Information($"Updating a SettingData, GROUPID:{obj.GROUPID}, UID:{obj.UID}, APPRLINE:{obj.APPRLINE}, DELAYDSPPW:{obj.DELAYDISPLAYPW}, AUTOLOGIN:{obj.AUTOLOGINING}");
+            Log.Logger.Here().Information($"Updating a SettingData, GROUPID:{obj.GROUPID}, UID:{obj.UID}, APPRLINE:{obj.APPRLINE}, DELAYDSPPW:{obj.DELAYDISPLAYPW}, AUTOLOGIN:{obj.AUTOLOGINING}");
             lock (_locker)
             {
                 DBSDataCtx.Update(obj);
@@ -151,7 +153,7 @@ namespace OpenNetLinkApp.Data.SGSettings
         public bool SetSettingUID(int groupId, string uid)
         {
             // Create
-            Log.Information($"Set a SettingData, GROUPID({groupId})=>UID({uid})");
+            Log.Logger.Here().Information($"Set a SettingData, GROUPID({groupId})=>UID({uid})");
 
             SGSettingData SData;
             lock (_locker)
@@ -175,7 +177,7 @@ namespace OpenNetLinkApp.Data.SGSettings
         public bool SetSettingUPW(int groupId, string upw)
         {
             // Create
-            Log.Information($"Set a SettingData, GROUPID({groupId})=>UPW({upw})");
+            Log.Logger.Here().Information($"Set a SettingData, GROUPID({groupId})=>UPW({upw})");
             SGSettingData SData;
 
             lock (_locker)
@@ -192,7 +194,7 @@ namespace OpenNetLinkApp.Data.SGSettings
         public bool SetSettingApprLine(int groupId, string apprline)
         {
             // Create
-            Log.Information($"Set a SettingData, GROUPID({groupId})=>APPRLINE({apprline})");
+            Log.Logger.Here().Information($"Set a SettingData, GROUPID({groupId})=>APPRLINE({apprline})");
             SGSettingData SData;
 
             lock (_locker)
@@ -209,7 +211,7 @@ namespace OpenNetLinkApp.Data.SGSettings
         public bool SetSettingDelayDspPw(int groupId, string delayDspPw)
         {
             // Create
-            Log.Information($"Set a SettingData, GROUPID({groupId})=>DELAYDISPLAYPW({delayDspPw})");
+            Log.Logger.Here().Information($"Set a SettingData, GROUPID({groupId})=>DELAYDISPLAYPW({delayDspPw})");
             SGSettingData SData;
 
             lock (_locker)
@@ -232,7 +234,7 @@ namespace OpenNetLinkApp.Data.SGSettings
         public bool SetSettingAutoLogin(int groupId, bool autoLogin)
         {
             // Create
-            Log.Information($"Set a SettingData, GROUPID({groupId})=>AUTOLOGINING({autoLogin})");
+            Log.Logger.Here().Information($"Set a SettingData, GROUPID({groupId})=>AUTOLOGINING({autoLogin})");
             SGSettingData SData;
 
             lock (_locker)
@@ -265,7 +267,7 @@ namespace OpenNetLinkApp.Data.SGSettings
                 .ToList();
             }
 
-            Log.Information($"Querying for a SGSettingData Limit {nLimit}");
+            Log.Logger.Here().Information($"Querying for a SGSettingData Limit {nLimit}");
             return SDataList;
         }
 
@@ -285,7 +287,7 @@ namespace OpenNetLinkApp.Data.SGSettings
                 .Where(x => x.GROUPID == groupId)
                 .FirstOrDefault();
             }
-            Log.Information($"Querying for a SGSettingData {SData}");
+            Log.Logger.Here().Information($"Querying for a SGSettingData {SData}");
             return SData;
         }
 
@@ -307,7 +309,7 @@ namespace OpenNetLinkApp.Data.SGSettings
                 .FirstOrDefault();
             }
 
-            Log.Information($"Get for a SGSettingData, GroupId({groupId})=>UID({strUID})");
+            Log.Logger.Here().Information($"Get for a SGSettingData, GroupId({groupId})=>UID({strUID})");
             return strUID;
         }
 
@@ -329,7 +331,7 @@ namespace OpenNetLinkApp.Data.SGSettings
                 .FirstOrDefault();
             }
 
-            Log.Information($"Get for a SGSettingData, GroupId({groupId})=>UPW({strUPW})");
+            Log.Logger.Here().Information($"Get for a SGSettingData, GroupId({groupId})=>UPW({strUPW})");
             return strUPW;
         }
 
@@ -346,7 +348,7 @@ namespace OpenNetLinkApp.Data.SGSettings
                 .FirstOrDefault();
             }
 
-            Log.Information($"Get for a SGSettingData, GroupId({groupId})=>APPRLINE({strApprLine})");
+            Log.Logger.Here().Information($"Get for a SGSettingData, GroupId({groupId})=>APPRLINE({strApprLine})");
             return strApprLine;
         }
 
@@ -368,7 +370,7 @@ namespace OpenNetLinkApp.Data.SGSettings
                 .FirstOrDefault();
             }
 
-            Log.Information($"Get for a SGSettingData, GroupId({groupId})=>DELAYDISPLAYPW({strDelayDspPw})");
+            Log.Logger.Here().Information($"Get for a SGSettingData, GroupId({groupId})=>DELAYDISPLAYPW({strDelayDspPw})");
             return strDelayDspPw;
         }
 
@@ -391,7 +393,7 @@ namespace OpenNetLinkApp.Data.SGSettings
             }
 
             bool bAutoLogin = nAutoLogin==1?true:false;
-            Log.Information($"Get for a SGSettingData, GroupId({groupId})=>DELAYDISPLAYPW({bAutoLogin})");
+            Log.Logger.Here().Information($"Get for a SGSettingData, GroupId({groupId})=>DELAYDISPLAYPW({bAutoLogin})");
             return bAutoLogin;
         }
 
@@ -408,7 +410,7 @@ namespace OpenNetLinkApp.Data.SGSettings
                 DBSDataCtx.Remove(settingData);
                 DBSDataCtx.SaveChanges();
             }
-            Log.Information($"Delete the SGSettingData, {settingData}");
+            Log.Logger.Here().Information($"Delete the SGSettingData, {settingData}");
 
             return true;
         }

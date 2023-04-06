@@ -90,7 +90,11 @@
   "bUseDenyPasswordZip": true,
   "bRecvFolderChange": true,
   "bUseCertSend": false,
-  "bUseEmail": false,
+  "blistUseEmail": [
+    false,
+    false,
+    false
+  ],
   "bUseForceUpdate": true,
   "bUsePCURL": false,
   "bUsePublicBoard": false,
@@ -134,5 +138,15 @@
     false,
     false
   ],
-  "bUseLoginAfterTray" : false
+  "bUseLoginAfterTray": false,
+  "bUseFileApproveReason": false,
+  "bUseClipBoardApproveReason": false,
+  "bUseFileSelectDelete": false,
+  "bUseCrossPlatformOSforFileName" : true,
+  "bListUsePKIsendRecv": [
+    false,
+    false,
+    false
+  ],
+  "bUseTitleDescMinLength" : false
 }

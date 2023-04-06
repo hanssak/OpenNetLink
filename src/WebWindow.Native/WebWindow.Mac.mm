@@ -14,7 +14,6 @@
 #import <Carbon/Carbon.h>
 
 void *SelfThis = nullptr;
-
 #include "NativeLog.h"
 #include "TrayFunc.h"
 
@@ -40,6 +39,12 @@ bool g_bClipCopyNsend = false;
 static id _appDelegate;
 
 map<NSWindow*, WebWindow*> nsWindowToWebWindow;
+
+void RequestMoveTrayToWebWindow()
+{
+   NTLog(SelfThis, Info, "Called : Request OpenNetLink Move To WebWindow using DoubleCliCk");
+  ((WebWindow*)SelfThis)->MoveTrayToWebWindow();
+}
 
 void WebWindow::Register()
 {
@@ -756,27 +761,32 @@ bool WebWindow::GetTrayUse()
 void WebWindow::MoveWebWindowToTray()
 {
 	NTLog(this, Info, "Called : OpenNetLink Move To Tray");
-	struct tray_menu *item = tray.menu;
-	do
-	{
-		if (strcmp(item->text, "Hide") == 0) {
-			toggle_show(item);
-			break;
-		}
-	} while ((++item)->text != NULL);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        struct tray_menu *item = tray.menu;
+        do
+        {
+            if (strcmp(item->text, "Hide") == 0) {
+                toggle_show(item);
+                break;
+            }
+        } while ((++item)->text != NULL);
+    });
 }
 
 void WebWindow::MoveTrayToWebWindow()
 {
 	NTLog(this, Info, "Called : OpenNetLink Move To WebWindow");
-	struct tray_menu* item = tray.menu;
-	do
-	{
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        struct tray_menu* item = tray.menu;
+        do
+	    {
 		if (strcmp(item->text, "Show") == 0) {
 			toggle_show(item);
 			break;
 		}
-	} while ((++item)->text != NULL);
+	    } while ((++item)->text != NULL);
+    });
 }
 
 void WebWindow::MinimizeWebWindow()

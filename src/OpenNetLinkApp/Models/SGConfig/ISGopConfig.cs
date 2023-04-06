@@ -77,7 +77,10 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bRecvFolderChange { get; set; }               // 수신 폴더 변경 사용 여부.
         public bool bUseUserRecvDownPath { get; set; }            // 로그인 유저별 다운로드 경로 사용 여부
-        public bool bUseEmail { get; set; }                // 메일 결재 사용 유무.
+        //public bool bUseEmail { get; set; }                // 메일 결재 사용 유무.
+
+        public List<bool> blistUseEmail { get; }
+
         public bool bUsePCURL { get; set; }                       // PCURL 사용 유무.
         public bool bUsePublicBoard { get; set; }                 // 공지사항 사용 유무.
         public bool bUseCertSend { get; set; }                    // 공인인증서 전송 사용 유무.
@@ -148,7 +151,18 @@ namespace OpenNetLinkApp.Models.SGConfig
         
         public bool bUseChkHardSpace { get; set; }         //파일 수신시 디바이스 용량 체크 여부
 
-        public bool bUseLoginAfterTray { get; set; }  //로그인 후 Tray 아이콘으로 이동
+        public bool bUseLoginAfterTray { get; set; }       //로그인 후 Tray 아이콘으로 이동
+
+        public bool bUseFileApproveReason { get; set; }   //파일 승인사유 입력 여부
+
+        public bool bUseClipBoardApproveReason { get; set; } // 클립보드 승인사유 입력 여부
+
+        public bool bUseFileSelectDelete { get; set; } // 파일 선택 삭제 사용 유무
+
+        public bool bUseCrossPlatformOSforFileName { get; set; } // 파일 선택 삭제 사용 유무        
+
+        public bool bUseTitleDescMinLength { get; set; }              //URL Redirect 정책에 안먹히는 URL forward 기능 사용유무
+        
 
     }
 }

@@ -764,17 +764,17 @@
 
         //sgSettingProc.SetSettingAutoLogin(nGroupID, false);
 
-        pageService.SetInitApprLine(nGroupID, false);
-        pageService.SetLoadApprBaseLine(nGroupID, false);
-        pageService.SetConnectStatus(nGroupID, false);
-        pageService.SetLogoutStatus(nGroupID, true);
-        HsCmdCenter.sgDicRecvData.SetSFMListData(nGroupID, null);
-        pageService.SetSFMChecking(false);
-        pageService.SetApproveAfterMyCountChecking(false);
+    pageService.SetInitApprLine(nGroupID, false);
+    pageService.SetLoadApprBaseLine(nGroupID, false);
+    pageService.SetConnectStatus(nGroupID, false);
+    pageService.SetLogoutStatus(nGroupID, true);
+    HsCmdCenter.sgDicRecvData.SetSFMListData(nGroupID, null);
+    pageService.SetSFMChecking(false);
+    pageService.SetApproveAfterMyCountChecking(false);
+    HsCmdCenter.sgDicRecvData.SetLoginDataEmpty(nGroupID);
 
-
-        CLog.Here().Information($"groupID : {nGroupID} - User Do Logout, UrlRedirection LogOut State ReSet !!!");
-        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(nGroupID, false);
+    CLog.Here().Information($"groupID : {nGroupID} - User Do Logout, UrlRedirection LogOut State ReSet !!!");
+    HsNetWorkSG.HsHttpWatcher.SetLoginOutState(nGroupID, false);
 
 
         // UI쪽 Logout 처리
@@ -857,8 +857,11 @@
         if (i < count)
             return;
 
-        JSRuntime.InvokeAsync<object>("beforeLogOut");
-        //MyNavigationManager.NavigateTo(siteConfig.GetUseSelectFirstConnectNetServer() ? "/SelectNet" : "/LogIn/Logout");
+    pageService.m_nCurViewPageGroupID = nGroupID;
+    pageService.m_nLoginType = (int)pageService.GetGroupIDLoginType(nGroupID);
+
+    JSRuntime.InvokeAsync<object>("beforeLogOut");
+    //MyNavigationManager.NavigateTo(siteConfig.GetUseSelectFirstConnectNetServer() ? "/SelectNet" : "/LogIn/Logout");
 
         // netmarble
         // MyNavigationManager.NavigateTo("/SelectNet");
@@ -1018,14 +1021,15 @@
             if (count == 0)
                 return;
 
-            if (DateTime.Now.Hour == 9 && DateTime.Now.Minute == 31 && DateTime.Now.Second == 0)
-            {
-                SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.sfmRefreshEvent;
-                if (sfmRefreshEvent != null)
-                    sfmRefreshEvent(curGroupId);
-            }
+        //SFM Refresh 매일 정각 0시에 실행 -- HeaderUI쪽에 있음.... 
+        if (DateTime.Now.Hour == 0 && DateTime.Now.Minute == 0 && DateTime.Now.Second == 0)
+        {
+            SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.GetSFMRefreshEvent();
+            if (sfmRefreshEvent != null)
+                sfmRefreshEvent(curGroupId);
         }
     }
+}
 
     public async Task<int> SendUserSFMInfo(int groupId)
     {
@@ -1169,22 +1173,26 @@
                 if (sgSideBar != null)
                     curGroupId = sgSideBar.GroupId;
 
-                if (groupId == curGroupId)
+            if (groupId == curGroupId)
+            {
+                StateHasChanged();
+                PageDataRefreshEvent pgRefreshEvent = null;
+                if (sgSideBar.Path.Contains("transferApprove"))
                 {
-                    StateHasChanged();
-                    PageDataRefreshEvent pgRefreshEvent = null;
-                    if (sgSideBar.Path.Contains("transferApprove"))
-                    {
-                        pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
-                    }
-                    else if (sgSideBar.Path.Contains("securityApprove"))
-                    {
-                        pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.SecurityApproveUI);
-                    }
-                    else if (sgSideBar.Path.Contains("clipBoardApprove"))
-                    {
-                        pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
-                    }
+                    pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
+                }
+                else if (sgSideBar.Path.Contains("securityApprove"))
+                {
+                    pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.SecurityApproveUI);
+                }
+                else if (sgSideBar.Path.Contains("clipBoardApprove"))
+                {
+                    pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
+                }
+                else if (sgSideBar.Path.Contains("mailApprove"))
+                {
+                    pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveUI);
+                }
 
                     if (pgRefreshEvent != null)
                         pgRefreshEvent();
@@ -1635,20 +1643,21 @@
         SideBarUISvc.EmitNotifyStateChangedActMenu();
     }
 
-    protected override void OnInitialized()
-    {
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        sgSettingProc = SGSettingsDBProc.Instance;
-        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-        HsCmdCenter.sgPageEvent.SetScreenTimeChangeNotiEvent(ScreenTimeChangeNoti);
-        HsCmdCenter.sgPageEvent.SetLoginAfterSGHeaderUIEventAdd(LoginAfterHeaderUI);
-        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
-        listNetWorkData = NetWorkSvc.NetWorkInfo;
-        nGroupID = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
-        HsCmdCenter.sgPageEvent.SetSFMRefreshEvent(SendUserSFMInfo);
-        HsCmdCenter.sgPageEvent.SetUpdatePolicyEvent(UpdatePolicy);
-        HsCmdCenter.sgPageEvent.SetFileMimeRecvEvent(FileMimeRecvEvent);
-        pageService.SetAlramAndMessageDeleteEvent(DelAllAlramAndMessage);
+protected override void OnInitialized()
+{
+    siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+    sgSettingProc = SGSettingsDBProc.Instance;
+    AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+    HsCmdCenter.sgPageEvent.SetScreenTimeChangeNotiEvent(ScreenTimeChangeNoti);
+    HsCmdCenter.sgPageEvent.SetLoginAfterSGHeaderUIEventAdd(LoginAfterHeaderUI);
+    NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+    listNetWorkData = NetWorkSvc.NetWorkInfo;
+    nGroupID = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
+    HsCmdCenter.sgPageEvent.SetSFMRefreshEvent(SendUserSFMInfo);
+    HsCmdCenter.sgPageEvent.SetUpdatePolicyEvent(UpdatePolicy);
+    HsCmdCenter.sgPageEvent.SetFileMimeRecvEvent(FileMimeRecvEvent);
+    HsCmdCenter.sgPageEvent.SetOLEMimeRecvEvent(OLEMimeRecvEvent);
+    pageService.SetAlramAndMessageDeleteEvent(DelAllAlramAndMessage);
 
         pageService.SetAfterApprCommonNotiEvent(AfterApproveStatusChange); //사후정책 노티
 
@@ -1838,8 +1847,13 @@
         //URL List Data 요청
         HsCmdCenter.RequestUrlList(groupId, sgUserData.UserId);
 
-        //UserInfo 재요청 - 결재라인 정보, SFM 정보, 시스템 환경설정정보 갱신
-        HsCmdCenter.SendApproveLine(groupId, sgUserData.UserId);
+    pageService.SetIsPolicyUpdate(groupId, true);
+
+    //UserInfo 재요청 - 결재라인 정보, SFM 정보, 시스템 환경설정정보 갱신
+    //SFM 정보 삭제
+    HsCmdCenter.sgDicRecvData.SetSFMListData(groupId, null);
+    HsCmdCenter.SendUserSFMInfo(groupId, sgUserData.UserId);
+    HsCmdCenter.SendApproveLine(groupId, sgUserData.UserId);
 
         //UserInfoCheck를 요청하여 사용자의 정보 갱신
         HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eUSERINFOCHECK, ResultUserInfoCheck);
@@ -2014,9 +2028,20 @@
         statusData.fileAddManage.LoadMimeConf(groupId);
     }
 
-    public void AfterApproveStatusChange()
-    {
-        int groupID = nGroupID;
+//서버DB 로 OLE MIME 리스트 결과 이벤트
+public void OLEMimeRecvEvent(int groupId, SGData e)
+{
+    PageStatusData statusData = pageService.GetPageStatus(groupId);
+    if (statusData == null)
+        return;
+    if (statusData.fileAddManage == null)
+        return;
+    List<Dictionary<int, string>> oleMimeList= e.GetSvrRecordData("RECORD");
+    statusData.fileAddManage.SetOLEMimeList(groupId, oleMimeList);
+}
+public void AfterApproveStatusChange()
+{
+    int groupID = nGroupID;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);

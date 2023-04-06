@@ -177,9 +177,9 @@ namespace OpenNetLinkApp.PageEvent
     // 로그인 후 오른쪽 사이드바 환경설정 노티
     public delegate void CtrlSideEvent();
     // 업데이트 노티
-    public delegate void ClientUpgradeEvent(PageEventArgs e);
+    public delegate void ClientUpgradeEvent(int groupid, PageEventArgs e);
     // 업데이트 실행
-    public delegate void ClientUpgradeExeEvent();
+    public delegate void ClientUpgradeExeEvent(int gouprid, bool isTotalPatch = false);
     // 대쉬보드 조회 카운트 노티.
     public delegate void DashBoardCountEvent(int groupid, PageEventArgs e);
     // 대쉬보드 전송요청 카운트 노티.
@@ -225,6 +225,12 @@ namespace OpenNetLinkApp.PageEvent
     /// <param name="groupId"></param>
     public delegate void FileMimeRecvEvent(int groupId);
 
+    /// <summary>
+    /// OLE Mime 정보 갱신 Event
+    /// </summary>
+    /// <param name="groupId"></param>
+    public delegate void OLEMimeRecvEvent(int groupId, SGData e);
+
     // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
     //public delegate void GPKICNListRecvEvent(int groupid, PageEventArgs e);
 
@@ -255,7 +261,7 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void SkipFileNotiEvent(int groupid, SGData e);
     //Page Data 갱신 처리
     public delegate void PageDataRefreshEvent();
-    
+
     // 부서정보 조회 요청 응답 처리    
     public delegate void DeptInfoNotiEvent(int groupId);
 }
@@ -416,9 +422,13 @@ namespace OpenNetLinkApp.PageEvent
 
         public SFMRefreshEvent sfmRefreshEvent = null;
 
-        public NotiUpdatePolicyEvent notiUpdatePolicyEvent= null;
+        public NotiUpdatePolicyEvent notiUpdatePolicyEvent = null;
 
         public FileMimeRecvEvent fileMimeRecvEvent = null;
+
+        public OLEMimeRecvEvent oleMimeRecvEvent = null;
+
+
 
         private Dictionary<int, DeptInfoNotiEvent> _dicDeptInfoEvnet = new Dictionary<int, DeptInfoNotiEvent>();
 
@@ -440,6 +450,12 @@ namespace OpenNetLinkApp.PageEvent
         {
             fileMimeRecvEvent = e;
         }
+
+        /// <summary> Db 쿼리 조회 결과가 오면, SGHeaderUI에 전달하여, OLE 마임 리스트 세팅</summary>
+        public OLEMimeRecvEvent GetOLEMimeRecvEvent() => oleMimeRecvEvent;
+        
+        /// <summary> Db 쿼리 조회 결과가 오면, SGHeaderUI에 전달하여, OLE 마임 리스트 세팅</summary>
+        public void SetOLEMimeRecvEvent(OLEMimeRecvEvent e) => oleMimeRecvEvent = e;
 
         public SFMRefreshEvent GetSFMRefreshEvent()
         {
@@ -1295,18 +1311,38 @@ namespace OpenNetLinkApp.PageEvent
             ctrlSideEvent = ctrlSideNoti;
         }
 
+        /// <summary>
+        /// 노티로 Update 버전 확인 발생
+        /// </summary>
+        /// <returns></returns>
         public ClientUpgradeEvent GetClientUpgradeNotiEvent()
         {
             return ClientUpdate;
         }
+        /// <summary>
+        /// 노티로 Update 버전 확인 발생
+        /// </summary>
+        /// <param name="updateNoti"></param>
         public void SetClientUpgradeNotiEvent(ClientUpgradeEvent updateNoti)
         {
             ClientUpdate = updateNoti;
         }
+        /// <summary>
+        /// 첫 화면에서 BIND의 패치버전 비교 시 발생
+        /// <br>Update Popup에서 처리 시 발생</br>
+        /// <br> 목적지 : SGCtrkSideUI 쪽 Update 버전 확인</br>
+        /// </summary>
+        /// <returns></returns>
         public ClientUpgradeExeEvent GetClientUpgradeExeNotiEvent()
         {
             return ClientUpgreadeExe;
         }
+        /// <summary>
+        /// 첫 화면에서 BIND의 패치버전 비교 시 발생
+        /// <br>Update Popup에서 처리 시 발생</br>
+        /// <br> 목적지 : SGCtrkSideUI 쪽 Update 버전 확인</br>
+        /// </summary>
+        /// <returns></returns>
         public void SetClientUpgradeExeNotiEvent(ClientUpgradeExeEvent updateNoti)
         {
             ClientUpgreadeExe = updateNoti;
