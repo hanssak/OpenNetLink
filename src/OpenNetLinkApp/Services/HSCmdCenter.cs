@@ -112,7 +112,7 @@ namespace OpenNetLinkApp.Services
             serializer = new DataContractJsonSerializer(typeof(SGopConfig));
             foreach (SGNetwork sgNetwork in listNetworks)
             {
-                string opConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sgNetwork.GroupID}_{sgNetwork.NetPos}.json";
+                string opConfig = Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile/AppOPsetting_{sgNetwork.GroupID}_{sgNetwork.NetPos}.json";
 
                 CLog.Here().Information($"- AppOPsetting Path: [{opConfig}]");
 

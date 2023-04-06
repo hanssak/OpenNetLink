@@ -134,13 +134,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
             }
         }
-
         public void SaveOpConfigSerialize()
         {
+            if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile"))
+                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile");
+
             foreach (ISGNetwork sGNetwork in NetWorkInfo)
             {
                 var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
-                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sGNetwork.GroupID}_{sGNetwork.NetPos}.json";
+                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile/AppOPsetting_{sGNetwork.GroupID}_{sGNetwork.NetPos}.json";
                 try
                 {
                     using (var fs = new FileStream(AppConfig, FileMode.Create))
@@ -154,7 +156,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                             serializer.WriteObject(writer, _OpConfigInfo[sGNetwork.GroupID]);
                         }
                     }
-
+#if !DEBUG
                     byte[] info = null;
                     using (FileStream fileStream = new FileStream(AppConfig, FileMode.Open, FileAccess.Read, FileShare.None))
                     {
@@ -171,6 +173,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     {
                         fs.Write(info, 0, info.Length);
                     }
+#endif
                 }
                 catch (Exception ex)
                 {
@@ -185,7 +188,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             foreach(ISGNetwork sGNetwork in NetWorkInfo)
             {
                 if(sGNetwork.GroupID == groupId)
-                    AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{groupId}_{sGNetwork.NetPos}.json";
+                    AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile/AppOPsetting_{groupId}_{sGNetwork.NetPos}.json";
             }
 
             if(AppConfig == String.Empty)
@@ -194,6 +197,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             try
             {
+                if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile"))
+                    Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile");
+
                 using (var fs = new FileStream(AppConfig, FileMode.Create))
                 {
                     var encoding = Encoding.UTF8;
@@ -205,7 +211,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                         serializer.WriteObject(writer, _OpConfigInfo[groupId]);
                     }
                 }
-
+#if !DEBUG
                 byte[] info = null;
                 using (FileStream fileStream = new FileStream(AppConfig, FileMode.Open, FileAccess.Read, FileShare.None))
                 {
@@ -222,13 +228,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 {
                     fs.Write(info, 0, info.Length);
                 }
+#endif
             }
             catch (Exception ex)
             {
                 CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
             }
         }
-
         public void SaveVersionConfigSerialize()
         {
             var serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));

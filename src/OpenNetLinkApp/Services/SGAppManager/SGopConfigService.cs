@@ -210,11 +210,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 }
             }
 
+            if(!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile"))
+                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile");
+
             _AppConfigInfo = new Dictionary<int, ISGopConfig>();
             var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
             foreach (SGNetwork sgNetwork in listNetworks)
             {
-                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sgNetwork.GroupID}_{sgNetwork.NetPos}.json";
+                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile/AppOPsetting_{sgNetwork.GroupID}_{sgNetwork.NetPos}.json";
 
                 CLog.Here().Information($"- AppOPsetting Path: [{AppConfig}]");
 
@@ -236,6 +239,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                         }
                         catch(Exception ex)
                         {
+                            CLog.Here().Information($"- AppOPsetting Loading... : Decrypt Fail {AppConfig}]");
                             //디크립션 실패
                             isDeCrypt = false;
                         }
@@ -282,6 +286,25 @@ namespace OpenNetLinkApp.Services.SGAppManager
                                 serializer.WriteObject(writer, sgOpConfig);
                             }
                         }
+
+#if !DEBUG
+                        byte[] info = null;
+                        using (FileStream fileStream = new FileStream(AppConfig, FileMode.Open, FileAccess.Read, FileShare.None))
+                        {
+                            using (StreamReader streamReader = new StreamReader(fileStream))
+                            {
+                                string str = streamReader.ReadToEnd();
+                                byte[] byteInput = Encoding.UTF8.GetBytes(str);
+                                byte[] masterKey = SGCrypto.GetMasterKey();
+                                info = SGCrypto.AESEncrypt256(byteInput, masterKey);
+                            }
+                        }
+
+                        using (FileStream fs = File.Create(AppConfig))
+                        {
+                            fs.Write(info, 0, info.Length);
+                        }
+#endif
                     }
                     catch (Exception ex)
                     {
