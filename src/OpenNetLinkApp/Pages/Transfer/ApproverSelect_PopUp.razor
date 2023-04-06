@@ -463,8 +463,6 @@
         actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
 
-        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproverSearchType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproverTree();
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -558,6 +556,9 @@
         if (sgLoginData == null)
             return;
         m_step = sgLoginData.GetApproveStep();    //결재유형 취득
+
+        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproverSearchType();
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproverTree();
 
         // 실제 사용안함
         //HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult); //타부서 조회 결과

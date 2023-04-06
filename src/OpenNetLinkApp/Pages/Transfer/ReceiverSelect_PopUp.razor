@@ -244,8 +244,6 @@
     {
         actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
-        receiverSearchType = SGAppMgrSvc.OpConfigInfoService.GetReceiverSearchType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInReceiverTree();
 
         InitText();
 
@@ -335,6 +333,9 @@
 
     public void BindEvent()
     {
+        receiverSearchType = SGAppMgrSvc.OpConfigInfoService.GetReceiverSearchType();
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInReceiverTree();
+
         if (receiverSearchType == "TREE" && refSGDeptTreeList != null)
             refSGDeptTreeList.BindEvent();
         else

@@ -639,8 +639,7 @@
         actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
 
-        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproveExtSelectType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchApproveExtTree();
+     
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -738,13 +737,16 @@
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;   
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
-        m_step = sgLoginData.GetApproveStep();    //결재유형 취득
+        m_step = sgLoginData.GetApproveStep();    //결재유형 취득        
+        
+        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproveExtSelectType();
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchApproveExtTree();
 
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveExtDeptApprLineResult); //자기부서 조회 결과
 

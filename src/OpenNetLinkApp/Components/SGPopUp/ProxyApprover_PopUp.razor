@@ -410,6 +410,10 @@
     {
         int groupID = 0;
         groupID = SGAppMgrSvc.SideBarUIService.ActiveMenu.GroupId;
+
+        proxySearchType = SGAppMgrSvc.OpConfigInfoService.GetProxySearchType();             
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInProxyTree();    
+
         //*****************************************************************
         //EventBinding : EventBinding DeptApprLine -> DeptApprLineResult
         //*****************************************************************
@@ -538,8 +542,7 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        proxySearchType = SGAppMgrSvc.OpConfigInfoService.GetProxySearchType();
-        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInProxyTree();
+        
 
         actionAssign = AssignProxy;
         actionTargetSelect = SelectTarget;
