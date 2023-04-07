@@ -686,14 +686,13 @@
 
     protected override void OnInitialized()
     {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         int groupID = 0;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
-
 
         CurrentDivSeq = "0";
         CurrentTagetSeq = "0";

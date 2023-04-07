@@ -242,6 +242,7 @@
 
     protected override void OnInitialized()
     {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -254,7 +255,7 @@
 
         InitText();
 
-        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+     
     }
 
     public void SetInitDeptName(string strDeptName)
