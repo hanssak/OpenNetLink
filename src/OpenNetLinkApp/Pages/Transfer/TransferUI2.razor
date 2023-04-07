@@ -1364,7 +1364,7 @@
         if (bAfterApprDisable)
             bAfterCheck = false;
         else
-            bAfterCheck = OpConfigSvc.GetAfterBasicChk(groupID);
+            bAfterCheck = SGAppMgrSvc.AppConfigInfoService.GetAfterBasicChk();
 
         pageService.SetAfterApproveCheck(groupID, bAfterCheck);
         pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);   //매시 정각에 1번씨 동작
@@ -1473,7 +1473,7 @@
 
         CLog.Here().Information($"GetUseUrlRedirectionByUser - groupID : {groupID}");
 
-        return OpConfigSvc.GetURLAutoTrans(groupID);
+        return SGAppMgrSvc.AppConfigInfoService.GetURLAutoTrans(groupID);
 
     }
 
@@ -1784,7 +1784,7 @@
                 }
             }
 
-            if (sgLoginData != null && SGAppMgrSvc.OpConfigInfoService.GetMainPageType(groupID) == PAGE_TYPE.TRANSFER)
+            if (sgLoginData != null && SGAppMgrSvc.AppConfigInfoService.GetMainPageType() == PAGE_TYPE.TRANSFER)
                 CheckClientPatch(sgLoginData, groupID);
 
             pageService.SetLogOutFileListClearEvent(groupID, LogoutClearFileList);
@@ -2045,7 +2045,7 @@
         if (bAfterApprDisable)
             bAfterCheck = false;
         else
-            bAfterCheck = OpConfigSvc.GetAfterBasicChk(groupID);
+            bAfterCheck = SGAppMgrSvc.AppConfigInfoService.GetAfterBasicChk();
 
 
         // 사후결재
@@ -2079,7 +2079,7 @@
         if (bAfterApprChkHIde)       //현재 '사후결재 체크'가 표시되지 않으면 별도 컨트롤 하지 않는다.
             return;
 
-        bAfterCheck = OpConfigSvc.GetAfterBasicChk(groupIDbyParam);
+        bAfterCheck = SGAppMgrSvc.AppConfigInfoService.GetAfterBasicChk();
         pageService.SetAfterApproveCheck(groupID, bAfterCheck);
         StateHasChanged();
     }

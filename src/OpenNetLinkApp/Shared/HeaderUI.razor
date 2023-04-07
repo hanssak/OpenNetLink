@@ -302,9 +302,9 @@
     public bool GetUseUrlSendAgent(int groupid)
     {
 
-        CLog.Here().Information($"GetUseUrlSendAgent : {0}, groupid : {groupid}", OpConfigSvc.GetURLAutoTrans(groupid));
+        CLog.Here().Information($"GetUseUrlSendAgent : {0}, groupid : {groupid}", SGAppMgrSvc.AppConfigInfoService.GetURLAutoTrans(groupid));
 
-        return OpConfigSvc.GetURLAutoTrans(groupid);
+        return SGAppMgrSvc.AppConfigInfoService.GetURLAutoTrans(groupid);
     }
 
     /// <summary>
@@ -851,14 +851,14 @@
 
                                 if (bUseUrlRedirection)
                                 {
-                                    bUseUrlRedirection = OpConfigSvc.GetURLAutoTrans(groupid);
+                                    bUseUrlRedirection = SGAppMgrSvc.AppConfigInfoService.GetURLAutoTrans(groupid);
                                     CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection  Use User policy : {bUseUrlRedirection}");
                                 }
 
                                 // 0x00 : White, 0x01 : Black
                                 // hsNetWork
                                 HsNetWorkSG.HsHttpWatcher.SetUrlList(groupid, bUseUrlRedirection,
-                                    OpConfigSvc.GetURLAutoAfterBrowser(0).ElementAt(0), OpConfigSvc.GetForwardUrl(0),
+                                    SGAppMgrSvc.AppConfigInfoService.GetURLAutoAfterBrowser(0).ElementAt(0), SGAppMgrSvc.AppConfigInfoService.GetForwardUrl(0),
                                     (dicBWpolicy[groupid] ? 0x00 : 0x01), listUrl, listUrlException);
 
                                 CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection policy - SetUrlListis Call !!!");
@@ -950,7 +950,7 @@
         bool bRet = SendUrlData(groupid, strUserID, e.strUrlData);
         if (bRet)
         {
-            if (OpConfigSvc.GetURLAutoAfterMsg(groupid))
+            if (SGAppMgrSvc.AppConfigInfoService.GetURLAutoAfterMsg(groupid))
             {
 
                 string strMsg = "";
@@ -2625,7 +2625,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         if (os_noti == OS_NOTI.WAIT_APPR ||
             os_noti == OS_NOTI.MAIL_APPR)
         {
-            bool bUseApprWaitNoti = OpConfigSvc.GetUseApprWaitNoti(groupID);
+            bool bUseApprWaitNoti = SGAppMgrSvc.AppConfigInfoService.GetUseApprWaitNoti();
             if (!bUseApprWaitNoti)
                 return;
 

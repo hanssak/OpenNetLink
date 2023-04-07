@@ -112,7 +112,7 @@
         CLog.Here().Information($"GetUseUrlRedirectionByUser - groupID : {groupID}");
 
         //return AppConfigSvc.GetURLAutoTrans(groupID);
-        return SGAppMgrSvc.OpConfigInfoService.GetURLAutoTrans(groupID);
+        return SGAppMgrSvc.AppConfigInfoService.GetURLAutoTrans(groupID);
     }
 
     public bool GetUseUrlRedirectionByServer()

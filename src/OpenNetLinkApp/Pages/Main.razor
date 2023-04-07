@@ -1199,7 +1199,7 @@
                             Window.UseClipFirstSendType(groupId);
 
                         // 자동전송기능 위해
-                        if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend(groupId))
+                        if (SGAppMgrSvc.AppConfigInfoService.GetClipCopyAutoSend())
                         {
                             Window.SetNativeClipboardHotKey(groupId,
                                 listModKey[(int)HOTKEY_MOD.ALT],
@@ -1221,7 +1221,7 @@
                     if (!bAfterApprEnable)
                         bAfterCheck = false;
                     else
-                        bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk(groupId);
+                        bAfterCheck = SGAppMgrSvc.AppConfigInfoService.GetAfterBasicChk();
 
                     pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
@@ -1300,7 +1300,7 @@
 
                         // enMainPageType 값이 2 : 파일전송화면, 다른거 : Dash보드 (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
                         //strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-                        strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupId) + "/";
+                        strNavigatePathWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
 
 
                         // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
@@ -1528,7 +1528,7 @@
 
                     // enMainPageType 값이 2 : 파일전송화면, 다른거 : Dash보드 (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
                     //strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-                    strNavigatePathnGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupId) + "/";
+                    strNavigatePathnGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
 
                     // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
                     string strNavigateUrl = strNavigatePathnGroupID.ToLower();
@@ -1818,7 +1818,7 @@
             if (!bAfterApprEnable)
                 bAfterCheck = false;
             else
-                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk(groupId);
+                bAfterCheck = SGAppMgrSvc.AppConfigInfoService.GetAfterBasicChk();
 
             pageService.SetAfterApproveCheck(groupId, bAfterCheck);
             Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
@@ -1978,7 +1978,7 @@
 
             if (srcLoc != "GPKI")
             {
-                strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupId) + "/";
+                strNavigatePathWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
 
 
                 // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
@@ -2100,7 +2100,7 @@
 
                         CLog.Here().Information($"1 to ALL Login, GroupID : {nGroupIDfirst}, First Screen !");
 
-                        string strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(nGroupIDfirst) + "/";
+                        string strNavigatePathWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
 
                         // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
                         string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
@@ -2273,7 +2273,7 @@
                 strRootPath = "/Transfer";*@
 
             // 파일전송화면 이면 저장했던 위치를 찾아서 사용한다. (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
-            string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupid) + "/";
+            string strRootPath = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
             string strNavigateUrl = strRootPath.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
             {

@@ -1019,34 +1019,34 @@
 
     private PAGE_TYPE GetMainPageType()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetMainPageType(0);
+        return SGAppMgrSvc.AppConfigInfoService.GetMainPageType();
     }
     //페이지 타입 String
     private string GetMainPageTypeStr()
     {
-        return Common.CsFunction.GetEnumDescription(SGAppMgrSvc.OpConfigInfoService.GetMainPageType(0));
+        return Common.CsFunction.GetEnumDescription(SGAppMgrSvc.AppConfigInfoService.GetMainPageType());
     }
 
     private bool GetClipCopyAutoSend()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend(0);
+        return SGAppMgrSvc.AppConfigInfoService.GetClipCopyAutoSend();
     }
 
     private bool GetURLAutoTrans(int nGroupID)
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetURLAutoTrans(nGroupID);
+        return SGAppMgrSvc.AppConfigInfoService.GetURLAutoTrans(nGroupID);
     }
 
     private bool GetURLAutoAfterMsg(int nGroupID)
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetURLAutoAfterMsg(nGroupID);
+        return SGAppMgrSvc.AppConfigInfoService.GetURLAutoAfterMsg(nGroupID);
     }
 
     private string GetURLAutoAfterBrowser(int nGroupID)
     {
         string str = String.Empty;
 
-        switch (SGAppMgrSvc.OpConfigInfoService.GetURLAutoAfterBrowser(nGroupID))
+        switch (SGAppMgrSvc.AppConfigInfoService.GetURLAutoAfterBrowser(nGroupID))
         {
             case "C":
                 str = XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FOLD");
@@ -1063,17 +1063,17 @@
 
     private bool GetRMouseFileAddAfterTrans()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetRMouseFileAddAfterTrans(0);
+        return SGAppMgrSvc.AppConfigInfoService.GetRMouseFileAddAfterTrans();
     }
 
     private string GetForwardUrl(int nGroupID)
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetForwardUrl(nGroupID);
+        return SGAppMgrSvc.AppConfigInfoService.GetForwardUrl(nGroupID);
     }
 
     private bool GetAfterBasicChk()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk(0);
+        return SGAppMgrSvc.AppConfigInfoService.GetAfterBasicChk();
     }
 
     private string GetRecvDownPath(int groupId)
@@ -1091,37 +1091,37 @@
 
     private bool GetManualRecvDownChange()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetManualRecvDownChange(0);
+        return SGAppMgrSvc.AppConfigInfoService.GetManualRecvDownChange();
     }
 
     private bool GetFileRecvTrayFix()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetFileRecvTrayFix(0);
+        return SGAppMgrSvc.AppConfigInfoService.GetFileRecvTrayFix();
     }
 
     private bool GetApprTrayFix()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetApprTrayFix(0);
+        return SGAppMgrSvc.AppConfigInfoService.GetApprTrayFix();
     }
 
     private bool GetUserApprActionTrayFix()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetUserApprActionTrayFix(0);
+        return SGAppMgrSvc.AppConfigInfoService.GetUserApprActionTrayFix();
     }
 
     private bool GetUserApprRejectTrayFix()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetUserApprRejectTrayFix(0);
+        return SGAppMgrSvc.AppConfigInfoService.GetUserApprRejectTrayFix();
     }
 
     private bool GetExitTrayMove()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetExitTrayMove(0);
+        return SGAppMgrSvc.AppConfigInfoService.GetExitTrayMove();
     }
 
     private bool GetStartTrayMove()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove(0);
+        return SGAppMgrSvc.AppConfigInfoService.GetStartTrayMove();
     }
 
     private bool GetStartProgramReg()
@@ -1162,7 +1162,7 @@
 
     private bool GetScreenLock()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetUseScreenLock(0);
+        return AppConfigSvc.GetScreenLock();
     }
 
     private int GetScreenTime()
@@ -1215,7 +1215,7 @@
 
     private bool GetUseApprWaitNoti()
     {
-        return SGAppMgrSvc.OpConfigInfoService.GetUseApprWaitNoti(0);
+        return SGAppMgrSvc.AppConfigInfoService.GetUseApprWaitNoti();
     }
 
     /// <summary>
@@ -1271,7 +1271,7 @@
                                         chVKCode);
 
         // Native 쪽에 저장해줌
-        if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend(0))
+        if (SGAppMgrSvc.AppConfigInfoService.GetClipCopyAutoSend())
         {
             Window.SetNativeClipboardHotKey(groupId,
                 listModKey[(int)HOTKEY_MOD.ALT],
@@ -1331,7 +1331,7 @@
                                         chVKCode);
 
         // Native 쪽에 저장해줌
-        if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend(0))
+        if (SGAppMgrSvc.AppConfigInfoService.GetClipCopyAutoSend())
         {
             Window.SetNativeClipboardHotKey(groupId,
                 listModKey[(int)HOTKEY_MOD.ALT],
@@ -1952,7 +1952,7 @@
         }
 
 
-        m_bRecvFolderOpen = SGAppMgrSvc.OpConfigInfoService.GetRecvFolderOpen(0);
+        m_bRecvFolderOpen = SGAppMgrSvc.AppConfigInfoService.GetFileRecvFolderOpen();
 
         if (bManualDown)
             m_bManualDownFolderChange = SGAppMgrSvc.OpConfigInfoService.GetManualDownFolderChange(0);

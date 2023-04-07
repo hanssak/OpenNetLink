@@ -38,6 +38,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         void SaveOpConfigSerialize();
 
+        void SaveOpConfigSerialize(int groupId);
+
         void SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode);
 
         void SetClipBoardHotKeyNetOver(int groupId, int nIDx, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode);
@@ -318,23 +320,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetMainPage(PAGE_TYPE pageType)
         {
-            foreach (ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                OpConfigInfo[sGNetwork.GroupID].enMainPageType = pageType;
-            }
+            (AppConfigInfo as SGAppConfig).enMainPageType = pageType;
 
-            SaveOpConfigSerialize();
+            //SaveOpConfigSerialize();
+            SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
 
         public void SetClipAfterSend(bool clipAfterSend)
         {
-            foreach (ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                OpConfigInfo[sGNetwork.GroupID].bClipCopyAutoSend = clipAfterSend;
-            }
+            (AppConfigInfo as SGAppConfig).bClipCopyAutoSend = clipAfterSend;
 
-            SaveOpConfigSerialize();
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
 
@@ -342,14 +340,17 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             try
             {
-                OpConfigInfo[nGroupID].bURLAutoTrans = urlAutoTrans;
+                (AppConfigInfo as SGAppConfig).bURLAutoTrans ??= new List<bool>();
+                if (AppConfigInfo.bURLAutoTrans.Count >= nGroupID + 1)
+                    (AppConfigInfo as SGAppConfig).bURLAutoTrans[nGroupID] = urlAutoTrans;
             }
             catch(Exception e)
             {
-                CLog.Here().Information($"FindSubMenu-Exception(Msg) : {e.Message}");
+                CLog.Here().Information($"SGCtrlSideUIService-Exception(Msg) : {e.Message}");
             }
 
-            SaveOpConfigSerialize(nGroupID);
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize(nGroupID);
             NotifyStateChangedCtrlSide();
         }
 
@@ -357,52 +358,60 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             try
             {
-                OpConfigInfo[nGroupID].bURLAutoAfterMsg = urlAutoAfterMsg;
+                (AppConfigInfo as SGAppConfig).bURLAutoAfterMsg ??= new List<bool>();
+                if (AppConfigInfo.bURLAutoAfterMsg.Count >= nGroupID + 1)
+                    (AppConfigInfo as SGAppConfig).bURLAutoAfterMsg[nGroupID] = urlAutoAfterMsg;
+                
             }
             catch (Exception e)
             {
                 //e.Message;
-                string strMsg = e.Message;
+                CLog.Here().Information($"SGCtrlSideUIService-Exception(Msg) : {e.Message}");
             }
-
-            SaveOpConfigSerialize(nGroupID);
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize(nGroupID);
             NotifyStateChangedCtrlSide();
         }
 
         public void SetURLAutoAfterBrowser(int nGroupID, string urlAutoAfterBrowser)
         {
-            OpConfigInfo[nGroupID].strURLAutoAfterBrowser = urlAutoAfterBrowser;
+            (AppConfigInfo as SGAppConfig).strURLAutoAfterBrowser ??= new List<string>();
+            if (AppConfigInfo.strURLAutoAfterBrowser.Count >= nGroupID + 1)
+                (AppConfigInfo as SGAppConfig).strURLAutoAfterBrowser[nGroupID] = urlAutoAfterBrowser;
 
-            SaveOpConfigSerialize(nGroupID);
+
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize(nGroupID);
             NotifyStateChangedCtrlSide();
         }
 
         public void SetForwardUrl(int nGroupID, string urlData)
         {
-            OpConfigInfo[nGroupID].strForwardUrl = urlData;
+            (AppConfigInfo as SGAppConfig).strForwardUrl ??= new List<string>();
+            if (AppConfigInfo.strForwardUrl.Count >= nGroupID + 1)
+                (AppConfigInfo as SGAppConfig).strForwardUrl[nGroupID] = urlData;
+            
 
-            SaveOpConfigSerialize(nGroupID);
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize(nGroupID);
             NotifyStateChangedCtrlSide();
         }
 
         public void SetRMouseFileAddAfterTrans(bool rmouseFileAddAfterTrans)
         {
-            foreach(ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                OpConfigInfo[sGNetwork.GroupID].bRMouseFileAddAfterTrans = rmouseFileAddAfterTrans;
-            }
+            (AppConfigInfo as SGAppConfig).bRMouseFileAddAfterTrans = rmouseFileAddAfterTrans;
 
-            SaveOpConfigSerialize();
+            SaveAppConfigSerialize();
+
+            //SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetAfterBasicChk(bool afterBasicChk)
         {
-            foreach (ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                OpConfigInfo[sGNetwork.GroupID].bAfterBasicChk = afterBasicChk;
-            }
-            
-            SaveOpConfigSerialize();
+            (AppConfigInfo as SGAppConfig).bAfterBasicChk = afterBasicChk;
+
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetRecvDownPath(int groupId, string recvDownPath)
@@ -429,79 +438,59 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetManualRecvDownChange(bool manualRecvDownChange)
         {
-            foreach (ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                OpConfigInfo[sGNetwork.GroupID].bManualRecvDownChange = manualRecvDownChange;
-            }
-            
-            SaveOpConfigSerialize();
+            (AppConfigInfo as SGAppConfig).bManualRecvDownChange = manualRecvDownChange;
+
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetFileRecvTrayFix(bool fileRecvTrayFix)
         {
-            foreach (ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                OpConfigInfo[sGNetwork.GroupID].bFileRecvTrayFix = fileRecvTrayFix;
-            }
-            
-            SaveOpConfigSerialize();
+            (AppConfigInfo as SGAppConfig).bFileRecvTrayFix = fileRecvTrayFix;
+
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetApprTrayFix(bool apprTrayFix)
         {
-            foreach (ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                OpConfigInfo[sGNetwork.GroupID].bApprTrayFix = apprTrayFix;
-            }
-            
-            SaveOpConfigSerialize();
+            (AppConfigInfo as SGAppConfig).bApprTrayFix = apprTrayFix;
+
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetUserApprActionTrayFix(bool userApprActionTrayFix)
         {
-            foreach (ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                OpConfigInfo[sGNetwork.GroupID].bUserApprActionTrayFix = userApprActionTrayFix;
-            }
-
-            SaveOpConfigSerialize();
+            (AppConfigInfo as SGAppConfig).bUserApprActionTrayFix = userApprActionTrayFix;
+            
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetUserApprRejectTrayFix(bool userApprRejectTrayFix)
         {
-            foreach (ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                OpConfigInfo[sGNetwork.GroupID].bUserApprRejectTrayFix = userApprRejectTrayFix;
-            }
+            (AppConfigInfo as SGAppConfig).bUserApprRejectTrayFix = userApprRejectTrayFix;
 
-            SaveOpConfigSerialize();
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetExitTrayMove(bool exitTrayMove)
         {
-            foreach (ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                OpConfigInfo[sGNetwork.GroupID].bExitTrayMove = exitTrayMove;
-            }
+            (AppConfigInfo as SGAppConfig).bExitTrayMove = exitTrayMove;
 
-            SaveOpConfigSerialize();
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetStartTrayMove(bool startTrayMove)
         {
-            foreach (ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                OpConfigInfo[sGNetwork.GroupID].bStartTrayMove = startTrayMove;
-            }
+            (AppConfigInfo as SGAppConfig).bStartTrayMove = startTrayMove;
 
-            SaveOpConfigSerialize();
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
-        }
-
-
-        public void GetStartProgramReg()
-        {
-
         }
 
         /// <summary>
@@ -543,12 +532,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetScreenLock(bool screenLock)
         {
-            foreach (ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                OpConfigInfo[sGNetwork.GroupID].bUseScreenLock = screenLock;
-            }
+            (AppConfigInfo as SGAppConfig).bUseScreenLock = screenLock;
 
-            SaveOpConfigSerialize();
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetScreenTime(int screenTime)
@@ -589,12 +576,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetUseApprWaitNoti(bool useApprWaitNoti)
         {
-            foreach (ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                OpConfigInfo[sGNetwork.GroupID].bUseApprWaitNoti = useApprWaitNoti;
-            }
+            (AppConfigInfo as SGAppConfig).bUseApprWaitNoti = useApprWaitNoti;
 
-            SaveOpConfigSerialize();
+            SaveAppConfigSerialize();
+            //SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
 

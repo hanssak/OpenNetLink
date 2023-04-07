@@ -304,7 +304,7 @@
             //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
             if (basicPageType == (int)Enums.EnumBasicPageType.Main)
             {
-                string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupID) + "/";
+                string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
                 string strNavigateUrl = strNavigateWithGroupID.ToLower();
                 if (strNavigateUrl.IndexOf("transfer") > 0)
                 {
@@ -354,7 +354,7 @@
         string strNavigateWithGroupID = String.Empty;
         if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
-            strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupID) + "/";
+            strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
 
             string strNavigateUrl = strNavigateWithGroupID.ToLower();
 
@@ -510,7 +510,7 @@
         if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
 
-            string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupID) + "/";
+            string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
             string strNavigateUrl = strNavigateWithGroupID.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
             {

@@ -299,7 +299,7 @@
         string strNavigateWithGroupID = String.Empty;
         if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
-            strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupID) + "/";
+            strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
             string strNavigateUrl = strNavigateWithGroupID.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
             {

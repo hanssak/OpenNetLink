@@ -879,7 +879,7 @@
             //else
             //    strNavigateWithGroupID = "/Transfer/";
 
-            string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupID) + "/";
+            string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
 
             string strNavigateUrl = strNavigateWithGroupID.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
@@ -1005,7 +1005,7 @@
             if (!bAfterApprEnable)
                 bAfterCheck = false;
             else
-                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk(groupId);
+                bAfterCheck = SGAppMgrSvc.AppConfigInfoService.GetAfterBasicChk();
 
             pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
@@ -1055,7 +1055,7 @@
                 //else
                 //    strNavigateWithGroupID = "/Transfer/";
 
-                string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupId) + "/";
+                string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
                 string strNavigateUrl = strNavigateWithGroupID.ToLower();
                 if (strNavigateUrl.IndexOf("transfer") > 0)
                 {
@@ -1068,7 +1068,7 @@
                 strNavigateWithGroupID += groupId.ToString();
                 MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
-                if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove(0))
+                if (SGAppMgrSvc.AppConfigInfoService.GetStartTrayMove())
                 {
                     if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                     {
@@ -1203,7 +1203,7 @@
                 if (!siteConfig.GetUseDashBoard())
                 strRootPath = "/Transfer";*@
 
-            string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage(groupid) + "/";
+            string strRootPath = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
             string strNavigateUrl = strRootPath.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
             {

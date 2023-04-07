@@ -1195,7 +1195,7 @@
                         Window.UseClipFirstSendType(groupId);
 
                     // 자동전송기능 위해
-                    if (SGAppMgrSvc.OpConfigInfoService.GetClipCopyAutoSend(groupId))
+                    if (SGAppMgrSvc.AppConfigInfoService.GetClipCopyAutoSend())
                     {
                         Window.SetNativeClipboardHotKey(groupId, listModKey[(int)HOTKEY_MOD.ALT],
                                         listModKey[(int)HOTKEY_MOD.CTRL],
@@ -1216,7 +1216,7 @@
                 if (!bAfterApprEnable)
                     bAfterCheck = false;
                 else
-                    bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk(groupId);
+                    bAfterCheck = SGAppMgrSvc.AppConfigInfoService.GetAfterBasicChk();
 
                 pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 

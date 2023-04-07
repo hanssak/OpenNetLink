@@ -32,7 +32,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         CLIPALM_TYPE GetClipAlarmType();
         PAGE_TYPE GetMainPageType();
         string GetMainPage(PAGE_TYPE enSiteMainPage, bool useDashBoard);
-        bool GetClipAfterSend();
+        string GetMainPage();
+        bool GetClipCopyAutoSend();
         bool GetURLAutoTrans(int nGroupID);
         bool GetURLAutoAfterMsg(int nGroupID);
         string GetURLAutoAfterBrowser(int nGroupID);
@@ -43,16 +44,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetAfterBasicChk();
         string GetRecvDownPath(int groupId);
         bool GetFileRecvFolderOpen();
-        //bool GetManualRecvDownChange();
+        bool GetManualRecvDownChange();
         bool GetFileRecvTrayFix();
         bool GetApprTrayFix();
         bool GetUserApprActionTrayFix();
         bool GetUserApprRejectTrayFix();
-        //bool GetExitTrayMove();
+        bool GetExitTrayMove();
         bool GetStartTrayMove();
         bool GetStartProgramReg();
         string GetLanguage();
-        //bool GetUseScreenLock();
         bool GetScreenLock();
         //bool GetScreenLockUserChange();
         int GetScreenTime();
@@ -74,8 +74,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //bool GetUseAppLoginType();
 
         string ConvertRecvDownPath(string DownPath);
-
-        int GetAppLoginType();
 
         int GetUserSelectFirstNet();
     }
@@ -387,7 +385,28 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             return strPage;
         }
-        public bool GetClipAfterSend()
+        public string GetMainPage()
+        {
+            string strPage = "/Welcome";
+            PAGE_TYPE page = GetMainPageType();
+            switch (page)
+            {
+                case PAGE_TYPE.NONE:
+                case PAGE_TYPE.DASHBOARD:
+                    strPage = "/Welcome";
+                    break;
+
+                case PAGE_TYPE.TRANSFER:
+                    strPage = "/Transfer";
+                    break;
+
+                default:
+                    strPage = "/Welcome";
+                    break;
+            }
+            return strPage;
+        }
+        public bool GetClipCopyAutoSend()
         {
             return AppConfigInfo.bClipCopyAutoSend;
         }
@@ -477,10 +496,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bFileRecvFolderOpen;
         }
 
-        /*public bool GetManualRecvDownChange()
+        public bool GetManualRecvDownChange()
         {
             return AppConfigInfo.bManualRecvDownChange;
-        }*/
+        }
         public bool GetFileRecvTrayFix()
         {
             return AppConfigInfo.bFileRecvTrayFix;
@@ -497,10 +516,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bUserApprRejectTrayFix;
         }
-        /*public bool GetExitTrayMove()
+        public bool GetExitTrayMove()
         {
             return AppConfigInfo.bExitTrayMove;
-        }*/
+        }
         public bool GetStartTrayMove()
         {
             return AppConfigInfo.bStartTrayMove;
@@ -519,7 +538,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //}
         public bool GetScreenLock()
         {
-            return AppConfigInfo.bScreenLock;
+            return AppConfigInfo.bUseScreenLock;
         }
         /*public bool GetScreenLockUserChange()
         {
@@ -613,10 +632,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bUseAppLoginType;
         }*/
-        public int GetAppLoginType()
-        {
-            return AppConfigInfo.LoginType;
-        }
 
         public int GetUserSelectFirstNet()
         {

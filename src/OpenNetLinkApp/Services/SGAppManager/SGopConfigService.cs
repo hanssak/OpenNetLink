@@ -54,7 +54,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetRFileAutoSend(int groupId);
 
-        public bool GetRMouseFileAddAfterTrans(int groupId);
+        //public bool GetRMouseFileAddAfterTrans(int groupId);
 
         public bool GetUseNetOverAllsend(int groupId);
 
@@ -67,10 +67,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseTitleDescSameCharCheck(int groupId);
 
         public bool GetUseApprLineChkBlock(int groupId);
-        public bool GetRecvFolderOpen(int groupId);
+        //public bool GetRecvFolderOpen(int groupId);
         public bool GetUseRecvFolderChange(int groupId);
         public bool GetManualDownFolderChange(int groupId);
-        public bool GetManualRecvDownChange(int groupId);
+        //public bool GetManualRecvDownChange(int groupId);
         public bool GetUseUserRecvDownPath(int groupId);
         public bool GetUseDenyPasswordZip(int groupId);
         public bool GetUseFileForward(int groupId);
@@ -87,7 +87,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseFileForwardDownNotRecv(int groupId);
         public bool GetUseClipBoard(int groupId);
         public bool GetUseClipCopyAndSend(int groupId);
-        public bool GetClipCopyAutoSend(int groupId);
+        //public bool GetClipCopyAutoSend(int groupId);
         public bool GetUseClipApprove(int groupId);
         public bool GetUseClipBoardNoApproveButFileTrans(int groupId);
         public int GetClipUseAfterApprove(int groupId);
@@ -98,44 +98,44 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseClipTypeTextFirstSend(int groupId);
         public bool GetUseEmailManageApprove(int groupId);
         public bool GetUseUIdlpData(int groupId);
-        public bool GetURLAutoTrans(int groupId);
+        //public bool GetURLAutoTrans(int groupId);
         public bool GetUseURLRedirectionAlarm(int groupId);
-        public bool GetURLAutoAfterMsg(int groupId);
+        //public bool GetURLAutoAfterMsg(int groupId);
         public bool GetUseURLRedirectionAlarmType(int groupId);
-        public string GetURLAutoAfterBrowser(int groupId);
-        public string GetForwardUrl(int groupId);
+        //public string GetURLAutoAfterBrowser(int groupId);
+        //public string GetForwardUrl(int groupId);
         public bool GetAfterApprAutoCheck(int groupId);
-        public bool GetAfterBasicChk(int groupId);
+        //public bool GetAfterBasicChk(int groupId);
         public bool GetUseApprLineLocalSave(int groupId);
         public bool GetUseApprDeptSearch(int groupId);
         public bool GetViewDlpApproverMyDept(int groupId);
         public bool GetUseOneAClockChangeAgentTimer(int groupId);
         public bool GetFileRecvAlarmRetain(int groupId);
-        public bool GetFileRecvTrayFix(int groupId);
+        //public bool GetFileRecvTrayFix(int groupId);
         public bool GetApprCountAlarmRetain(int groupId);
-        public bool GetApprTrayFix(int groupId);
+        //public bool GetApprTrayFix(int groupId);
         public bool GetApprCompleteAlarmRetain(int groupId);
-        public bool GetUserApprActionTrayFix(int groupId);
+        //public bool GetUserApprActionTrayFix(int groupId);
         public bool GetApprRejectAlarmRetain(int groupId);
-        public bool GetUserApprRejectTrayFix(int groupId);
+        //public bool GetUserApprRejectTrayFix(int groupId);
         public bool GetUseApprCountAlaram(int groupId);
-        public bool GetUseApprWaitNoti(int groupId);
+        //public bool GetUseApprWaitNoti(int groupId);
         public bool GetUseClipAlarmTypeChange(int groupId);
         public bool GetUseInitAlarmPerDay(int groupId);
         public bool GetUseInitMessagePerDay(int groupId);
         public bool GetUseMainPageTypeChange(int groupId);
-        public PAGE_TYPE GetMainPageType(int groupId);
-        public string GetMainPage(int groupId, PAGE_TYPE enInitMainPage, bool useDashBoard);
-        public string GetMainPage(int groupId);
+        //public PAGE_TYPE GetMainPageType(int groupId);
+        //public string GetMainPage(int groupId, PAGE_TYPE enInitMainPage, bool useDashBoard);
+        //public string GetMainPage(int groupId);
         public bool GetUseCloseTrayMove(int groupId);
-        public bool GetExitTrayMove(int groupId);
+        //public bool GetExitTrayMove(int groupId);
         public bool GetUseStartTrayMove(int groupId);
         public bool GetUseLoginAfterTray(int groupId);
-        public bool GetStartTrayMove(int groupId);
+        //public bool GetStartTrayMove(int groupId);
         public bool GetUseStartProgramReg(int groupId);
-        public bool GetStartProgramReg(int groupId);
+        //public bool GetStartProgramReg(int groupId);
         public bool GetScreenLockUserChange(int groupId);
-        public bool GetUseScreenLock(int groupId);
+        //public bool GetUseScreenLock(int groupId);
         public bool GetUseLogLevel(int groupId);
         public bool GetShowAdminInfo(int groupId);
         public bool GetUseFileCheckException(int groupId);
@@ -374,10 +374,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bRFileAutoSend;
         }
-        public bool GetRMouseFileAddAfterTrans(int groupId)
-        {
-            return AppConfigInfo[groupId].bRMouseFileAddAfterTrans;
-        }
+        //public bool GetRMouseFileAddAfterTrans(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bRMouseFileAddAfterTrans;
+        //}
         public bool GetUseNetOverAllsend(int groupId)
         {
             return AppConfigInfo[groupId].bUseNetOverAllsend;
@@ -402,10 +402,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bApprLineChkBlock;
         }
-        public bool GetRecvFolderOpen(int groupId)
-        {
-            return AppConfigInfo[groupId].bRecvFolderOpen;
-        }
+        //public bool GetRecvFolderOpen(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bRecvFolderOpen;
+        //}
         public bool GetUseRecvFolderChange(int groupId)
         {
             return AppConfigInfo[groupId].bRecvFolderChange;
@@ -414,10 +414,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bManualDownFolderChange;
         }
-        public bool GetManualRecvDownChange(int groupId)
-        {
-            return AppConfigInfo[groupId].bManualRecvDownChange;
-        }
+        //public bool GetManualRecvDownChange(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bManualRecvDownChange;
+        //}
         public bool GetUseUserRecvDownPath(int groupId)
         {
             return AppConfigInfo[groupId].bUseUserRecvDownPath;
@@ -482,10 +482,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseClipCopyAndSend;
         }
-        public bool GetClipCopyAutoSend(int groupId)
-        {
-            return AppConfigInfo[groupId].bClipCopyAutoSend;
-        }
+        //public bool GetClipCopyAutoSend(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bClipCopyAutoSend;
+        //}
         public bool GetUseClipApprove(int groupId)
         {
             return AppConfigInfo[groupId].bUseClipApprove;
@@ -526,38 +526,38 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUiDlpShow;    
         }
-        public bool GetURLAutoTrans(int groupId)
-        {
-            return AppConfigInfo[groupId].bURLAutoTrans; 
-        }
+        //public bool GetURLAutoTrans(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bURLAutoTrans; 
+        //}
         public bool GetUseURLRedirectionAlarm(int groupId)
         {
             return AppConfigInfo[groupId].bUseURLRedirectionAlarm;
         }
-        public bool GetURLAutoAfterMsg(int groupId)
-        {
-            return AppConfigInfo[groupId].bURLAutoAfterMsg;   
-        }
+        //public bool GetURLAutoAfterMsg(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bURLAutoAfterMsg;   
+        //}
         public bool GetUseURLRedirectionAlarmType(int groupId)
         {
             return AppConfigInfo[groupId].bUseURLRedirectionAlarmType;   
         }
-        public string GetURLAutoAfterBrowser(int groupId)
-        {
-            return AppConfigInfo[groupId].strURLAutoAfterBrowser;
-        }
-        public string GetForwardUrl(int groupId)
-        {
-            return AppConfigInfo[groupId].strForwardUrl;
-        }
+        //public string GetURLAutoAfterBrowser(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].strURLAutoAfterBrowser;
+        //}
+        //public string GetForwardUrl(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].strForwardUrl;
+        //}
         public bool GetAfterApprAutoCheck(int groupId)
         {
             return AppConfigInfo[groupId].bShowAfterApprAutoCheck;
         }
-        public bool GetAfterBasicChk(int groupId)
-        {
-            return AppConfigInfo[groupId].bAfterBasicChk;
-        }
+        //public bool GetAfterBasicChk(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bAfterBasicChk;
+        //}
         public bool GetUseApprLineLocalSave(int groupId)
         {
             return AppConfigInfo[groupId].bApprLineLocalSave;
@@ -578,42 +578,42 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bFileRecvAlarmRetain;
         }
-        public bool GetFileRecvTrayFix(int groupId)
-        {
-            return AppConfigInfo[groupId].bFileRecvTrayFix;
-        }
+        //public bool GetFileRecvTrayFix(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bFileRecvTrayFix;
+        //}
         public bool GetApprCountAlarmRetain(int groupId)
         {
             return AppConfigInfo[groupId].bApprCountAlarmRetain;
         }
-        public bool GetApprTrayFix(int groupId)
-        {
-            return AppConfigInfo[groupId].bApprTrayFix;
-        }
+        //public bool GetApprTrayFix(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bApprTrayFix;
+        //}
         public bool GetApprCompleteAlarmRetain(int groupId)
         {
             return AppConfigInfo[groupId].bApprCompleteAlarmRetain;
         }
-        public bool GetUserApprActionTrayFix(int groupId)
-        {
-            return AppConfigInfo[groupId].bUserApprActionTrayFix;
-        }
+        //public bool GetUserApprActionTrayFix(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bUserApprActionTrayFix;
+        //}
         public bool GetApprRejectAlarmRetain(int groupId)
         {
             return AppConfigInfo[groupId].bApprRejectAlarmRetain;
         }
-        public bool GetUserApprRejectTrayFix(int groupId)
-        {
-            return AppConfigInfo[groupId].bUserApprRejectTrayFix;
-        }
+        //public bool GetUserApprRejectTrayFix(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bUserApprRejectTrayFix;
+        //}
         public bool GetUseApprCountAlaram(int groupId)
         {
             return AppConfigInfo[groupId].bUseApprCountAlaram;
         }
-        public bool GetUseApprWaitNoti(int groupId)
-        {
-            return AppConfigInfo[groupId].bUseApprWaitNoti;
-        }
+        //public bool GetUseApprWaitNoti(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bUseApprWaitNoti;
+        //}
         public bool GetUseClipAlarmTypeChange(int groupId)
         {
             return AppConfigInfo[groupId].bUseClipAlarmType;
@@ -630,65 +630,65 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseMainPageType;
         }
-        public PAGE_TYPE GetMainPageType(int groupId)
-        {
-            return AppConfigInfo[groupId].enMainPageType;
-        }
-        public string GetMainPage(int groupId, PAGE_TYPE enInitMainPage, bool useDashBoard)
-        {
-            string strPage = "/Welcome";
-            PAGE_TYPE page;
+        //public PAGE_TYPE GetMainPageType(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].enMainPageType;
+        //}
+        //public string GetMainPage(int groupId, PAGE_TYPE enInitMainPage, bool useDashBoard)
+        //{
+        //    string strPage = "/Welcome";
+        //    PAGE_TYPE page;
 
-            //사용자 선택이 NONE(초기값)이라면 프로그램에서 지정된 페이지로 설정
-            page = (AppConfigInfo[groupId].enMainPageType == PAGE_TYPE.NONE) ? enInitMainPage : AppConfigInfo[groupId].enMainPageType;
+        //    //사용자 선택이 NONE(초기값)이라면 프로그램에서 지정된 페이지로 설정
+        //    page = (AppConfigInfo[groupId].enMainPageType == PAGE_TYPE.NONE) ? enInitMainPage : AppConfigInfo[groupId].enMainPageType;
 
-            switch (page)
-            {
-                case PAGE_TYPE.NONE:
-                case PAGE_TYPE.DASHBOARD:
-                    strPage = useDashBoard ? "/Welcome" : "/Transfer";
-                    break;
+        //    switch (page)
+        //    {
+        //        case PAGE_TYPE.NONE:
+        //        case PAGE_TYPE.DASHBOARD:
+        //            strPage = useDashBoard ? "/Welcome" : "/Transfer";
+        //            break;
 
-                case PAGE_TYPE.TRANSFER:
-                    strPage = "/Transfer";
-                    break;
+        //        case PAGE_TYPE.TRANSFER:
+        //            strPage = "/Transfer";
+        //            break;
 
-                default:
-                    strPage = "/Welcome";
-                    break;
-            }
-            return strPage;
-        }
+        //        default:
+        //            strPage = "/Welcome";
+        //            break;
+        //    }
+        //    return strPage;
+        //}
 
-        public string GetMainPage(int groupId)
-        {
-            string strPage = "/Welcome";
-            PAGE_TYPE page = AppConfigInfo[groupId].enMainPageType;
-            switch (page)
-            {
-                case PAGE_TYPE.NONE:
-                case PAGE_TYPE.DASHBOARD:
-                    strPage = "/Welcome";
-                    break;
+        //public string GetMainPage(int groupId)
+        //{
+        //    string strPage = "/Welcome";
+        //    PAGE_TYPE page = AppConfigInfo[groupId].enMainPageType;
+        //    switch (page)
+        //    {
+        //        case PAGE_TYPE.NONE:
+        //        case PAGE_TYPE.DASHBOARD:
+        //            strPage = "/Welcome";
+        //            break;
 
-                case PAGE_TYPE.TRANSFER:
-                    strPage = "/Transfer";
-                    break;
+        //        case PAGE_TYPE.TRANSFER:
+        //            strPage = "/Transfer";
+        //            break;
 
-                default:
-                    strPage = "/Welcome";
-                    break;
-            }
-            return strPage;
-        }
+        //        default:
+        //            strPage = "/Welcome";
+        //            break;
+        //    }
+        //    return strPage;
+        //}
         public bool GetUseCloseTrayMove(int groupId)
         {
             return AppConfigInfo[groupId].bUseCloseTrayMove;
         }
-        public bool GetExitTrayMove(int groupId)
-        {
-            return AppConfigInfo[groupId].bExitTrayMove;
-        }
+        //public bool GetExitTrayMove(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bExitTrayMove;
+        //}
         public bool GetUseStartTrayMove(int groupId)
         {
             return AppConfigInfo[groupId].bUseStartTrayMove;
@@ -697,26 +697,26 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseLoginAfterTray;
         }
-        public bool GetStartTrayMove(int groupId)
-        {
-            return AppConfigInfo[groupId].bStartTrayMove;
-        }
+        //public bool GetStartTrayMove(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bStartTrayMove;
+        //}
         public bool GetUseStartProgramReg(int groupId)
         {
             return AppConfigInfo[groupId].bUseStartProgramReg;
         }
-        public bool GetStartProgramReg(int groupId)
-        {
-            return AppConfigInfo[groupId].bStartProgramReg;
-        }
+        //public bool GetStartProgramReg(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bStartProgramReg;
+        //}
         public bool GetScreenLockUserChange(int groupId)
         {
             return AppConfigInfo[groupId].bScreenLockUserChange;
         }
-        public bool GetUseScreenLock(int groupId)
-        {
-            return AppConfigInfo[groupId].bUseScreenLock;
-        }
+        //public bool GetUseScreenLock(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bUseScreenLock;
+        //}
         public bool GetUseLogLevel(int groupId)
         {
             return AppConfigInfo[groupId].bUseLogLevel;

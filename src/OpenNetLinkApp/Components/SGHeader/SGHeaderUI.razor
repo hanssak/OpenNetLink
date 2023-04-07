@@ -980,7 +980,7 @@ private async void mouseTimer_Elapsed(object sender, System.Timers.ElapsedEventA
         return;
 
     //bool bUseScreenLock = AppConfigSvc.GetScreenLock();
-    bool bUseScreenLock = SGAppMgrSvc.OpConfigInfoService.GetUseScreenLock(0);
+    bool bUseScreenLock = SGAppMgrSvc.AppConfigInfoService.GetScreenLock();
     if (bUseScreenLock)
     {
 
@@ -1918,7 +1918,7 @@ public void ResultUserInfoCheck(int groupId, object[] e)
     if (!bAfterApprEnable)
         bAfterCheck = false;
     else
-        bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk(groupId);
+        bAfterCheck = SGAppMgrSvc.AppConfigInfoService.GetAfterBasicChk();
 
     pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 

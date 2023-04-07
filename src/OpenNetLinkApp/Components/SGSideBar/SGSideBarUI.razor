@@ -290,7 +290,7 @@
         //    strNavigatePathWithGroupID = "/Transfer/";
 
         //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-        string strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(activeMenuPopup.GroupId) + "/";
+        string strNavigatePathWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
         string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
         if (strNavigateUrl.IndexOf("transfer") > 0)
         {
