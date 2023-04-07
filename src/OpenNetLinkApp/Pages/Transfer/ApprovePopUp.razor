@@ -1101,11 +1101,12 @@
 #if true
 
         string strViewerExt = sgLoginData.GetPreViewerExt();
-        if ((strViewerExt?.Length ?? 0) == 0)
-        {
-            CLog.Here().Information($"ViewerExt : Empty!");
-            return false;
-        }
+        //CLIENT_PREVIEW_VIEWER_EXT의 데이터가 값이 없는 경우엔, 하기 다운로드 프로세스를 탈 수 있도록 삭제 처리
+        //if ((strViewerExt?.Length ?? 0) == 0)
+        //{
+        //    CLog.Here().Information($"ViewerExt : Empty!");
+        //    return false;
+        //}
 
         CLog.Here().Information($"ViewerExt : {strViewerExt}");
 
