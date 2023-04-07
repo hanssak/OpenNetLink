@@ -793,6 +793,12 @@
         // 다중망 로그인에서 로그아웃됐을때에 다시 자동로그인 안되게 처리
         if (srcLoc == "Logout")
         {
+            if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
+            {
+                Window.Notification(OS_NOTI.OFFLINE, "로그아웃", "AD로그아웃 되어 종료합니다.");
+                Thread.Sleep(2000);
+            }
+
             if (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1)
                 MyNavigationManager.NavigateTo("/SelectNet");
 
@@ -839,14 +845,6 @@
                 }
                 else
                     doADLogin();
-            }
-        }
-        else //(srcLoc == "Logout")
-        {
-            if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
-            {
-                Window.Notification(OS_NOTI.OFFLINE, "로그아웃", "AD로그아웃 되어 종료합니다.");
-                Thread.Sleep(2000);
             }
         }
 
