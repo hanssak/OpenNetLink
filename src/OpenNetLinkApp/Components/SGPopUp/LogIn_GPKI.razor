@@ -673,7 +673,7 @@
             // ref pSignedData
             if (sgGpkiLib.GetGpkiSignedData(objUserSelectedGpki, ref pDataRandom, ref pSignedData) == false)
             {
-                CLog.Information("sgGpkiLib.GetGpkiSignedData error : 서명된 인증 데이티 가져오기 실패.");
+                CLog.Here().Information("sgGpkiLib.GetGpkiSignedData error : 서명된 인증 데이티 가져오기 실패.");
                 ShowMessage("error", XmlConf.GetErrMsg("E_0229"));
                 bGpkiBtnDisable = false;
                 StateHasChanged();
@@ -682,13 +682,13 @@
 
             // Log로 확인
             strLog = "RESULT: " + strResult;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "REASON: " + strReason;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "SESSIONKEY: " + strSessionKey;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "RANDOM: " + strRandomKey;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
 
             HsCmdCenter.SendSVRGPKICert(groupID, objUserSelectedGpki.m_strUserID, strSessionKey, pSignedData);
 
@@ -741,7 +741,7 @@
             //Debug.WriteLine(ex.Message);
             string strMsg = "Login_Gpki - Exception : ";
             strMsg += ex.Message;
-            CLog.Information(strMsg);
+            CLog.Here().Information(strMsg);
         }
 
 
@@ -756,7 +756,7 @@
     public void GPKICertResult(int groupID)
     {
 
-        CLog.Information("$GPKI_CERT_ACK - Result!!");
+        CLog.Here().Information("$GPKI_CERT_ACK - Result!!");
 
 
         SGData tmpData = null;
@@ -770,11 +770,11 @@
 
             // Log로 확인
             strLog = "RESULT: " + strResult;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "REASON: " + strReason;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "USERID: " + strUserID;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
 
 
             if (strResult != "0")
@@ -784,12 +784,12 @@
                 return;
             }
 
-            CLog.Information("Login_GPKI - 실행!!");
+            CLog.Here().Information("Login_GPKI - 실행!!");
 
             if (Login_GPKI(strUserID) == false)
             {
                 bGpkiBtnDisable = false;
-                CLog.Information("Login_GPKI - 인증 실패!");
+                CLog.Here().Information("Login_GPKI - 인증 실패!");
                 ShowMessage("error", XmlConf.GetErrMsg("E_0230") + "(1)");
                 return;
             }
@@ -806,7 +806,7 @@
     /// <returns></returns>
     public bool RequestGpkiCNregisterNchange()
     {
-        CLog.Information("$CHANGEGPKI_CN - Request!!");
+        CLog.Here().Information("$CHANGEGPKI_CN - Request!!");
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
         string curUserID = "";
@@ -829,7 +829,7 @@
     public void GPKIRegChangeResult(int groupID)
     {
 
-        CLog.Information("CHANGEGPKI_CN_ACK - Result!!");
+        CLog.Here().Information("CHANGEGPKI_CN_ACK - Result!!");
 
 
         SGData tmpData = null;
@@ -844,9 +844,9 @@
 
             // Log로 확인
             strLog = "RESULT: " + strResult;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
             strLog = "REASON: " + strReason;
-            CLog.Information(strLog);
+            CLog.Here().Information(strLog);
 
 
             if (strResult != "0")
@@ -855,7 +855,7 @@
                 return;
             }
 
-            CLog.Information("Register_GPKI - 실행!!");
+            CLog.Here().Information("Register_GPKI - 실행!!");
             ShowMessage("info", XmlConf.GetErrMsg("E_0232"));
 
         }
@@ -874,7 +874,7 @@
     public void GpkiLoginResult(int groupId, PageEventArgs e)
     {
 
-        CLog.Information("Login_Gpki Result 받음!!");
+        CLog.Here().Information("Login_Gpki Result 받음!!");
 
         int ret = e.result;
         if (ret == 0)

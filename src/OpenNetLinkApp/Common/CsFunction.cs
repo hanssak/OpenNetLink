@@ -242,13 +242,13 @@ namespace OpenNetLinkApp.Common
         {
             if (strExtData.Length < 1 || strExtData == ";")
             {
-                Log.Information($"isFileExtinListStr - false (Wrong ExtList) - strFileName : {strFileName}, Ext List : {strExtData}");
+                Log.Logger.Here().Information($"isFileExtinListStr - false (Wrong ExtList) - strFileName : {strFileName}, Ext List : {strExtData}");
                 return false;
             }
                 
             if (strFileName.Length < 1)
             {
-                Log.Information($"isFileExtinListStr - false (Wrong FileExt) - strFileName : {strFileName}, Ext List : {strExtData}");
+                Log.Logger.Here().Information($"isFileExtinListStr - false (Wrong FileExt) - strFileName : {strFileName}, Ext List : {strExtData}");
                 return false;
             }             
             
@@ -504,7 +504,7 @@ namespace OpenNetLinkApp.Common
             }
             catch (Exception e)
             {
-                Log.Information($"SHA256CheckSum - Exception - msg : {e.Message}, path : {filePath}");
+                Log.Logger.Here().Information($"SHA256CheckSum - Exception - msg : {e.Message}, path : {filePath}");
                 //CLog.Here().Information($"FileInfo Get(#####) - Exception - msg : {e.Message}, path : {filePath}");
             }
 
@@ -529,7 +529,7 @@ namespace OpenNetLinkApp.Common
             }
             catch (Exception e)
             {
-                Log.Information($"SHA384BinBase64 - Exception - msg : {e.Message}, path : {filePath}");
+                Log.Logger.Here().Information($"SHA384BinBase64 - Exception - msg : {e.Message}, path : {filePath}");
                 //CLog.Here().Information($"FileInfo Get(#####) - Exception - msg : {e.Message}, path : {filePath}");
             }
 

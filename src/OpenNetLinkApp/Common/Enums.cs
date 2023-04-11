@@ -16,10 +16,12 @@ namespace OpenNetLinkApp.Common
             None = 0,
             [Description("ProgramFiles 위치")]
             ProgramFiles = 1,
-            [Description("ProgramFilesX86 위치")]
-            ProgramFilesX86 = 2,
             [Description("UserData 위치")]
-            UserData = 3
+            UserData = 2,
+            [Description("다른 Volume Drive 위치")]
+            OtherDrive = 3,
+            [Description("ProgramFilesX86 위치")]
+            ProgramFilesX86 = 4
         }
 
         public enum EnumNetWorkType

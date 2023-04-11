@@ -51,9 +51,12 @@
                                             @_stCurrentDrive
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenu1" style="min-width:200px;">
-                                            @foreach (string str in rootDrives)
+                                            @if (rootDrives != null)
                                             {
-                                                <button class="dropdown-item text-xs p-1" style="text-align:left" type="button" @onclick="@(() => SetCurrentDrive(str))">@str</button>
+                                                @foreach (string str in rootDrives)
+                                                {
+                                                    <button class="dropdown-item text-xs p-1" style="text-align:left" type="button" @onclick="@(() => SetCurrentDrive(str))">@str</button>
+                                                }
                                             }
                                         </div>
                                     </div>
@@ -140,7 +143,7 @@
 
     // 격리된 Path내에서만 동작하도록 하기위한 설정값
     public bool bUseisolationMode = false;
-    public string strIsolationPath = "K:\\개인 폴더\\다운로드";
+    public string strIsolationPath = "K:\\개인 폴더"; //"K:\\개인 폴더\\다운로드";
 
     public int nGroupid = 0;
 
@@ -986,7 +989,7 @@
 
     protected override void OnInitialized()
     {
-        GetSavedPath();
+        //GetSavedPath();
     }
 
     public void LoadListFiles(string stPath)

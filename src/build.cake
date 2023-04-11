@@ -610,7 +610,7 @@ Task("PkgWin10")
 				{"NETWORK_FLAG", networkFlag.ToUpper()},
 				{"CUSTOM_NAME", customName.ToUpper()},
 				{"CUSTOM_FILE_NAME", customFileUiName.ToUpper()},
-				{"IS_WITH_SILENCE", isWithSilence.ToString().ToUpper()}
+				{"IS_WITH_SILENCE", "FALSE"}
 			}
 		});
 		Information("NetPos : {0}, NSIS-Make-Done !!!\n\n", networkFlag);

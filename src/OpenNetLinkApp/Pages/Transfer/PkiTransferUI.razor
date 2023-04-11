@@ -57,7 +57,7 @@
 
                         <div class="card card-boder mb-3" style="box-shadow:none;">
                             <div class="card-body clearfix">
-                                <label class="line-label pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_PKI_TRANS_SELECT_POS")</label>
+                                <label class="line-label pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_PKI_TRANS_DETAIL_TXT")</label>
                             </div>
                         </div>
 
@@ -70,7 +70,7 @@
                             </button>
                         </div>
 
-                        <div class="col-md-12 text-right" style="height: 35px; width: 400px; margin: auto; display: block; ">
+                        <div class="col-md-12 text-right" style="height: 30px; width: 400px; margin: auto; display: block; ">
                             <div class="dropdown">
                                 <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:190px">
                                     @strCurSelDriveName
@@ -85,8 +85,8 @@
                         </div>
 
                         <div class="col-md-12 text-left" style="height: 35px; margin: auto; display: block; ">
-                            @XmlConf.GetTitle("T_PKI_TRANS_SELECT_ITEM")
-                            <button type="button" class="btn btn-md btn-green" style="float:right" @onclick="@(e=>SendPkiFiles())"><i class="fas fa-share"></i>@XmlConf.GetTitle("T_PKI_TRANS_BTN")</button>
+                            <!--@XmlConf.GetTitle("T_PKI_TRANS_DETAIL_TXT")-->@* style="float:right"*@
+                            <button type="button" class="btn btn-md btn-green" @onclick="@(e=>SendPkiFiles())"><i class="fas fa-share"></i>@XmlConf.GetTitle("T_PKI_TRANS_BTN")</button>
                         </div>
 
                         <div style="height:280px; overflow: auto;">
@@ -95,45 +95,44 @@
                                 <thead class="text-center">
                                     <tr>
                                         <th style="width:5%;padding-left:0px;text-align:center;">
-                                            <input class="input" type="checkbox" checked=@(true) style="text-align: center; vertical-align: middle;"> <img src="/images/gpki_icon.png" class="p-1">
+                                            <input class="input" type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())" style="text-align: center; vertical-align: middle;"> <img src="/images/gpki_icon.png" class="p-1">
                                         </th>
-                                        <th style="width:23%;text-align:center;">@XmlConf.GetTitle("T_PKI_TRANS_ITEM")</th>
-                                        <th style="width:16%;text-align:center;">@XmlConf.GetTitle("T_PKI_TRANS_USER") </th>
-                                        <th style="width:20%;text-align:center;">@XmlConf.GetTitle("T_PKI_TRANS_EXPIREDATE") </th>
-                                        <th style="width:20%;text-align:center;">@XmlConf.GetTitle("T_PKI_TRANS_ISSUER") </th>
+                                        <th style="width:14%;text-align:center;vertical-align: middle;">@XmlConf.GetTitle("T_PKI_TRANS_ITEM")</th>
+                                        <th style="width:28%;text-align:center;vertical-align: middle;">@XmlConf.GetTitle("T_PKI_TRANS_USER") </th>
+                                        <th style="width:12%;text-align:center;vertical-align: middle;">@XmlConf.GetTitle("T_PKI_TRANS_EXPIREDATE") </th>
+                                        <th style="width:18%;text-align:center;vertical-align: middle;">@XmlConf.GetTitle("T_PKI_TRANS_ISSUER") </th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-center">
-                                    @*@foreach (GPKIFileInfo item in listViewGpkiFileList)
-                                        {
-                                        <tr style="cursor:pointer;" class="@item.m_selected" @onclick="@(e => selectGPKIItem(item.m_strUserID))">
-                                            @if (item.m_nRemainDay > 0)
-                                                {
-                                            <td style="padding-top: 4px; text-align: left; padding-left: 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><img src="/images/gpki_icon.png" class="p-1">@item.m_strUserID</td>
-                                                }
-                                                else
-                                                {
-                                            <td style="padding-top: 4px; text-align: left; padding-left: 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; "><img src="/images/gpki_expired_icon.png" class="p-1">@item.m_strUserID</td>
-                                                }
-                                            <td style="padding-top: 4px;">@item.m_strExpiredDate</td>
-                                            <td style="padding-top: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.m_strKeyUse</td>
-                                            <td style="padding-top: 4px;">@item.m_strOrg</td>
-                                            <td style="padding-top: 4px; padding-right: 0px;">@XmlConf.GetCommon(bGetResponseGpkiCNatServer ? (item.m_bIsRegisteredServer ? "T_YES" : "T_NO") : "T_IDENTIFING")</td>
-                                        </tr>
-                                        }*@
-
-                                    @for (int nDx = 0; nDx < 20; nDx++)
+                                    @foreach (NPKIFileInfo item in listViewNpkiFileList)
                                     {
                                         <tr>
                                             <td style="text-align: center; vertical-align: middle; width: 5%;">
-                                                <input class="input" type="checkbox" checked=@(true) style="text-align: center; vertical-align: middle;"> <img src="/images/gpki_icon.png" class="p-1">
+                                                <input class="input" type="checkbox" disabled="@item.m_bCheckDisable" checked=@(item.m_bCheck)  @onclick="(e => CheckStateUpdate(item))" style="text-align: center; vertical-align: middle;"> <img src=@(item.m_nRemainDay > 0 ? "/images/gpki_icon.png" : "/images/gpki_expired_icon.png") class="p-1">
                                             </td>
-                                            <td style="padding-top: 4px; text-align: left; padding-left: 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">11111</td> @*<img src="/images/gpki_icon.png" class="p-1">*@
-                                            <td style="padding-top: 4px;">2023-03-22</td>
-                                            <td style="padding-top: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">하하하</td>
-                                            <td style="padding-top: 4px;">한싹시스템</td>
+
+                                            <td style="padding-top: 4px; text-align:center;vertical-align: middle;"><font color=@((item.m_nRemainDay > 0) ? "#000000" : "ef4300")>@item.m_strKeyUse</font></td>
+                                            <td style="padding-top: 4px; text-align:center;vertical-align: middle;"><font color=@((item.m_nRemainDay > 0) ? "#000000" : "ef4300")>@item.m_strUserID</font></td>
+                                            <td style="padding-top: 4px; text-align:center;vertical-align: middle;"><font color=@((item.m_nRemainDay > 0) ? "#000000" : "ef4300")>@(item.m_nRemainDay > 0 ? item.m_strExpiredDate : (item.m_strExpiredDate + XmlConf.GetTitle("T_PKI_TRANS_EXPIRED")))</font></td>
+                                            <td style="padding-top: 4px; text-align:center;vertical-align: middle;"><font color=@((item.m_nRemainDay > 0) ? "#000000" : "ef4300")>@item.m_strOrg</font></td>
                                         </tr>
                                     }
+                                    @*white-space: nowrap; text-overflow: ellipsis; overflow: hidden;*@
+
+                                    @* sample *@
+                                    @*@for(int nDx = 0; nDx < 20 ; nDx++)
+                                    {
+                                        <tr>
+                                            <td style="text-align: center; vertical-align: middle; width: 5%;">
+                                                <input class="input" type="checkbox" style="text-align: center; vertical-align: middle;"> <img src="/images/gpki_icon.png" class="p-1">
+                                            </td>
+
+                                            <td style="padding-top: 4px; text-align:center;vertical-align: middle;"><font color="ef4300">11111</font></td>
+                                            <td style="padding-top: 4px; text-align:center;vertical-align: middle;"><font color="ef4300">22222</font></td>
+                                            <td style="padding-top: 4px; text-align:center;vertical-align: middle;"><font color="ef4300">33333</font></td>
+                                            <td style="padding-top: 4px; text-align:center;vertical-align: middle;"><font color="ef4300">44444</font></td>
+                                        </tr>
+                                    }*@
                                 </tbody>
                             </table>
                         </div>
@@ -155,8 +154,8 @@
 
 @code {
 
-
-    SGGpkiLib sgGpkiLib = new SGGpkiLib();
+    CsPkiFile sgPKILib = new CsPkiFile();
+    //SGGpkiLib sgGpkiLib = new SGGpkiLib();
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<PkiTransferUI>();
 
     [Parameter]
@@ -166,6 +165,7 @@
     private List<NPKIFileInfo> listViewNpkiFileList = new List<NPKIFileInfo>();
 
     public bool bUseDiveBtnDisable = false;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
+    public bool bAllCheck = false;
 
     public string strCurSelDriveName = "";              // 현재 사용자가 선택한 드라이브명
     public GPKIFileInfo objUserSelectedGpki;            // 사용자가 선택한 GPKI 인증서 정보
@@ -210,18 +210,64 @@
         }
     }
 
+    public void AllCheckStateUpdate()
+    {
+        bAllCheck = !(bAllCheck);
+        int nCount = listViewNpkiFileList.Count;
+        string strMsg = "";
+        if (nCount <= 0)
+        {
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0243"));
+            return;
+        }
+
+        for (int i = 0; i < nCount; i++)
+        {
+            if (listViewNpkiFileList[i].m_bCheckDisable != true)
+                listViewNpkiFileList[i].m_bCheck = bAllCheck;
+        }
+
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="item"></param>
+    public void CheckStateUpdate(NPKIFileInfo item)
+    {
+        int nCount = listViewNpkiFileList.Count;
+        for (int i = 0; i < nCount; i++)
+        {
+            NPKIFileInfo temp = listViewNpkiFileList[i];
+            if (temp.m_strFileName.Equals(item.m_strFileName))
+            {
+                temp.m_bCheck = !temp.m_bCheck;
+                listViewNpkiFileList[i] = temp;
+                break;
+            }
+        }
+        StateHasChanged();
+
+    }
+
     /// <summary>
     ///
     /// </summary>
     /// <returns></returns>
     protected override void OnInitialized()
     {
-        //InitText();
+
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
 
-        sgGpkiLib.GPKI_Init();
+#if DEBUG
+        ShowMessage("error", "DEBUG Mode에서는 조회 / 전송이 동작하지 않습니다.");
+#endif
+
+        sgPKILib.init();
+
         InitDriveList();
         LocationSelect("hard");
 
@@ -257,34 +303,101 @@
     }
 
 
+    private void SendSelectedPkiFiles(List<NPKIFileInfo> listSelectedPki)
+    {
+
+        // Pcf 파일, 만들기
+        string strPcfFilePath = CsSystemFunc.GetCurrentModulePath();
+        strPcfFilePath += "\\Work";
+        System.IO.Directory.CreateDirectory(strPcfFilePath);
+        strPcfFilePath += "\\SG.pcf";
+
+        CLog.Here().Information($"PCF file Path : {strPcfFilePath}");
+        File.Delete(strPcfFilePath);
+
+        if (sgPcfFile.makeNpkiFIlesToPcf(listSelectedPki, strPcfFilePath) == false)
+        {
+            CLog.Here().Information($"PCF file Make Failed! : {strPcfFilePath}");
+            return;
+        }
+
+        // Pcf 파일, hsz 파일화 및 전송하기
+
+    }
+
+
     /// <summary>
     ///
     /// </summary>
     private void SendPkiFiles()
     {
 
-        CLog.Here().Information($"SendPkiFiles, checked pki File Search!");
+        CLog.Here().Information($"SendPkiFiles, checked pki File Send - Start!");
 
-        //sgPcfFile.makeNpkiFIlesToPcf();
+        if (listViewNpkiFileList.Count < 1)
+        {
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0123"));
+            return;
+        }
+
+        @*var smart =
+            from npkidata in listViewNpkiFileList
+            where npkidata.m_bCheck == true
+            select npkidata;
+        if (smart.Count() < 1)
+        {
+            ShowMessage("info", "체크된항목 0 ㅋㅋㅋㅋ");
+            return;
+        }
+        ShowMessage("info", $"체크된항목 : {smart.Count()} 개");*@
+
+        IEnumerable < NPKIFileInfo > ienum = null;
+        ienum = listViewNpkiFileList.Where(f => f.m_bCheck);
+        if (ienum.Count() < 1)
+        {
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0068"));
+            return;
+        }
+
+        SendSelectedPkiFiles(ienum.ToList());
+
+        CLog.Here().Information($"SendPkiFiles, checked pki File Send - End!");
 
     }
 
-    public void InitNPKIHardDiskFileList()
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="bUseOtherDrive"></param>
+    public void InitNPKIHardDiskFileList(bool bUseOtherDrive = false)
     {
 
         listViewNpkiFileList.Clear();
+        bAllCheck = false;
 
-        List<NPKIFileInfo> listTempPkiinfo = new List<NPKIFileInfo>();
-        if (CsPkiFile.GetNpkiinfoList(listTempPkiinfo, EnumSysPos.UserData))
+        @*List<NPKIFileInfo> listTempPkiinfo = new List<NPKIFileInfo>();
+        if (sgPKILib.GetNpkiinfoList(listTempPkiinfo, EnumSysPos.UserData))
+            listViewNpkiFileList.CopyTo(listTempPkiinfo.ToArray());*@
+
+        if (bUseOtherDrive == false)
+        { 
+            sgPKILib.GetNpkiinfoList(listViewNpkiFileList, EnumSysPos.UserData);
+        }
+        else
+        {            
+            sgPKILib.GetNpkiinfoList(listViewNpkiFileList, EnumSysPos.OtherDrive, strCurSelDriveName);
+        }
+        
+        CLog.Here().Information($"InitNPKIHardDiskFileList - ##### - Item-Count: {listViewNpkiFileList.Count}");
+
+        @*listTempPkiinfo.Clear();
+        if (sgPKILib.GetNpkiinfoList(listTempPkiinfo, EnumSysPos.ProgramFiles))
             listViewNpkiFileList.CopyTo(listTempPkiinfo.ToArray());
 
         listTempPkiinfo.Clear();
-        if (CsPkiFile.GetNpkiinfoList(listTempPkiinfo, EnumSysPos.ProgramFiles))
-            listViewNpkiFileList.CopyTo(listTempPkiinfo.ToArray());
-
-        listTempPkiinfo.Clear();
-        if (CsPkiFile.GetNpkiinfoList(listTempPkiinfo, EnumSysPos.ProgramFilesX86))
-            listViewNpkiFileList.CopyTo(listTempPkiinfo.ToArray());
+        if (sgPKILib.GetNpkiinfoList(listTempPkiinfo, EnumSysPos.ProgramFilesX86))
+            listViewNpkiFileList.CopyTo(listTempPkiinfo.ToArray());*@
 
         StateHasChanged();
     }
@@ -303,12 +416,11 @@
         listViewGpkiFileList.Clear();
         if (stMedia == "hard")
         {
-            //InitGPKIHardDiskFileList();
-            InitNPKIHardDiskFileList();
+            InitNPKIHardDiskFileList(false);
         }
         else if (stMedia == "usb")
         {
-            //InitGPKIMoveDiskFileList();
+            InitNPKIHardDiskFileList(true);
         }
 
         StateHasChanged();
@@ -337,7 +449,7 @@
 
         foreach (NPKIFileInfo item in listViewNpkiFileList)
         {
-            item.m_bselected = false;
+            item.m_bCheck = false;
         }
 
         //objUserSelectedpki = null;

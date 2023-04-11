@@ -3297,12 +3297,12 @@
 			<CN>磁盘</CN>
 		</T_PKI_TRANS_SELECT_POS>
 
-		<T_PKI_TRANS_SELECT_ITEM>
-			<KR>인증서를 선택해주세요</KR>
+		<T_PKI_TRANS_DETAIL_TXT>
+			<KR>인증서는 실시간 전송 됩니다. 전송전에 수신쪽 접속을 확인하세요. 인증서를 선택후 전송하세요.</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN>移动式磁盘</CN>
-		</T_PKI_TRANS_SELECT_ITEM>
+		</T_PKI_TRANS_DETAIL_TXT>
 
 		<T_PKI_TRANS_HDD>
 			<KR>하드디스크</KR>
@@ -3352,6 +3352,13 @@
 			<EN></EN>
 			<CN>出具人</CN>
 		</T_PKI_TRANS_ISSUER>
+
+		<T_PKI_TRANS_EXPIRED>
+			<KR>(기간만료)</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PKI_TRANS_EXPIRED>
 
 		<!-- ********************************************* [END] PKI 인증서 전송화면 (T_PKI_0000) ********************************************* -->
 

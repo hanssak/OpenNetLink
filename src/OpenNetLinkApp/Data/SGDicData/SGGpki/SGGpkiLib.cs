@@ -7,14 +7,15 @@ using Serilog.Events;
 using AgLogManager;
 using System.Collections.Generic;
 using System.Linq;
+using OpenNetLinkApp.Data.SGDicData.SGNpki;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGGpki
 { 
     internal class HsGpkiLib
     {
-    #if _WINDOWS
-        //public const string strGpkiLibName = "E:\\OpenOS\\SRC\\OpenNetLink\\src\\OpenNetLinkApp\\Library\\gpkiapi64.dll";
-        public const string strGpkiLibName = "gpkiapi64.dll";
+#if _WINDOWS
+        public const string strGpkiLibName = "E:\\src_OpenNetLink\\OpenNetLink\\OpenNetLink-analysis\\src\\OpenNetLinkApp\\bin\\Debug\\net5.0\\win-x64\\gpkiapi64.dll";
+        //public const string strGpkiLibName = "gpkiapi64.dll";
     #elif _LINUX
         public const string strGpkiLibName = "libgpkiapi.so";
     #elif _MACOSX
@@ -408,11 +409,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
 
         private Dictionary<string, string> DicGpkiIsser = new Dictionary<string, string>();
         private Dictionary<string, string> DicGpkiOid = new Dictionary<string, string>();
+        private Dictionary<string, string> DicNpkiOid = new Dictionary<string, string>();
+        private Dictionary<string, string> DicNpkiIsser = new Dictionary<string, string>();
 
         public SGGpkiLib()
         {
             GPKIUsageInit();
+            NPKIUsageInit();
             GPKIOidInit();
+            NPKIOidInit();
         }
         ~SGGpkiLib()
         {
@@ -430,21 +435,112 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             DicGpkiOid["1.2.410.100001.2.1.5"] = "공공기관(서버용)";
             DicGpkiOid["1.2.410.100001.2.1.6"] = "공공기관(특수목적용)";
         }
-        public string GetConvGpkiOID(string strOID)
+
+        public void NPKIUsageInit()
+        {
+
+            DicNpkiOid["1.2.410.200004.5.2.1.2"] = "범용(개인)";
+            DicNpkiOid["1.2.410.200004.5.2.1.1"] = "범용(법인)";
+            DicNpkiOid["1.2.410.200004.5.2.1.4"] = "범용(서버)";
+            DicNpkiOid["1.2.410.200004.5.2.1.7.1"] = "금융(개인)";
+            DicNpkiOid["1.2.410.200004.5.2.1.3"] = "임시";
+            DicNpkiOid["1.2.410.200004.5.2.1.5"] = "A(법인)";
+            DicNpkiOid["1.2.410.200004.5.2.1.6"] = "B(법인)";
+            DicNpkiOid["1.2.410.200004.5.2.1.5.140"] = "NEIS(개인)";
+            DicNpkiOid["1.2.410.200004.5.1.1.5"] = "범용(개인)";
+            DicNpkiOid["1.2.410.200004.5.1.1.6"] = "범용(개인)";
+            DicNpkiOid["1.2.410.200004.5.1.1.7"] = "범용(법인)";
+            DicNpkiOid["1.2.410.200004.5.1.1.8"] = "범용(법인)";
+            DicNpkiOid["1.2.410.200004.5.1.1.1"] = "증권(개인)";
+            DicNpkiOid["1.2.410.200004.5.1.1.2"] = "증권(개인)";
+            DicNpkiOid["1.2.410.200004.5.1.1.3"] = "증권(법인)";
+            DicNpkiOid["1.2.410.200004.5.1.1.4"] = "증권(법인)";
+            DicNpkiOid["1.2.410.200004.5.1.1.9"] = "증권(개인)";
+            DicNpkiOid["1.2.410.200004.5.1.1.9.2"] = "증권(개인)";
+            DicNpkiOid["1.2.410.200004.5.1.1.10"] = "증권(법인)";
+            DicNpkiOid["1.2.410.200004.5.1.1.11"] = "증권(개인)";
+            DicNpkiOid["1.2.410.200004.5.1.1.12"] = "증권(법인)";
+            DicNpkiOid["1.2.410.200005.1.1.1"] = "범용(개인)";
+            DicNpkiOid["1.2.410.200005.1.1.5"] = "금융(법인)";
+            DicNpkiOid["1.2.410.200005.1.1.4"] = "금융(개인)";
+            DicNpkiOid["1.2.410.200005.1.1.2"] = "금융(법인)";
+            DicNpkiOid["1.2.410.200005.1.1.6.2"] = "카드(개인)";
+            DicNpkiOid["1.2.410.200005.1.1.6.1"] = "금융(법인)";
+            DicNpkiOid["1.2.410.200005.1.1.6.3"] = "조달청원클릭(법인)";
+            DicNpkiOid["1.2.410.200005.1.1.6.4"] = "퇴직연금용";
+            DicNpkiOid["1.2.410.200005.1.1.6.5"] = "CTR용";
+            DicNpkiOid["1.2.410.200005.1.1.6.8"] = "전자세금용";
+            DicNpkiOid["1.2.410.200005.1.1.3"] = "서버사업자";
+            DicNpkiOid["1.2.410.200004.5.3.1.4"] = "공공기관(개인)";
+            DicNpkiOid["1.2.410.200004.5.3.1.5"] = "공공기관(기관)";
+            DicNpkiOid["1.2.410.200004.5.3.1.7"] = "공공기관(서버)";
+            DicNpkiOid["1.2.410.200004.5.4.1.1"] = "전자거래(개인)";
+            DicNpkiOid["1.2.410.200004.5.4.1.2"] = "전자거래(법인)";
+            DicNpkiOid["1.2.410.200004.5.4.1.3"] = "전자거래(서버)";
+            DicNpkiOid["1.2.410.200004.5.4.1.101"] = "금융(개인)";
+            DicNpkiOid["1.2.410.200004.5.4.1.102"] = "증권(개인)";
+            DicNpkiOid["1.2.410.200004.5.4.1.103"] = "카드(개인)";
+            DicNpkiOid["1.2.410.200004.5.4.1.104"] = "전자민원(개인)";
+            DicNpkiOid["1.2.410.200004.5.4.1.4"] = "특수목적(개인)";
+            DicNpkiOid["1.2.410.200004.5.4.1.5"] = "특수목적(법인)";
+            DicNpkiOid["1.2.410.200012.1.1.1"] = "범용(개인)";
+            DicNpkiOid["1.2.410.200012.1.1.3"] = "범용(법인)";
+            DicNpkiOid["1.2.410.200012.1.1.5"] = "범용(서버)";
+            DicNpkiOid["1.2.410.200012.1.1.101"] = "금융(개인)";
+            DicNpkiOid["1.2.410.200012.1.1.103"] = "증권(개인)";
+            DicNpkiOid["1.2.410.200012.1.1.104"] = "카드(개인)";
+            DicNpkiOid["1.2.410.200012.1.1.7"] = "전자무역(개인)";
+            DicNpkiOid["1.2.410.200012.1.1.9"] = "전자무역(법인)";
+            DicNpkiOid["1.2.410.200012.1.1.11"] = "전자무역(서버)";
+            DicNpkiOid["1.2.410.200012.1.1.13"] = "특수목적(개인)";
+            DicNpkiOid["1.2.410.200012.1.1.15"] = "특수목적(법인)";
+            DicNpkiOid["1.2.410.200012.1.1.16"] = "특수목적(서버)";
+
+            DicNpkiOid["1.2.410.100001.2.2.1"] = "행정기관(개인용)";
+            DicNpkiOid["1.2.410.100001.2.1.1"] = "행정기관(전자관인용)";
+            DicNpkiOid["1.2.410.100001.2.1.2"] = "행정기관(서버용)";
+            DicNpkiOid["1.2.410.100001.2.1.3"] = "행정기관(특수목적용)";
+            DicNpkiOid["1.2.410.100001.2.2.2"] = "공공기관(개인용)";
+            DicNpkiOid["1.2.410.100001.2.1.4"] = "공공기관(전자관인용)";
+            DicNpkiOid["1.2.410.100001.2.1.5"] = "공공기관(서버용)";
+            DicNpkiOid["1.2.410.100001.2.1.6"] = "공공기관(특수목적용)";
+        }
+
+        /// <summary>
+        /// OID를 Display할 용도로 변경<br></br>
+        /// strOID : 인증서에서얻은 Oid값<br></br>
+        /// bIsGpkiType : 값을못찾았을때 어떤형식으로 보낼지 정보, true-Gpki형태, false-Npki형태
+        /// </summary>
+        /// <param name="strOID"></param>
+        /// <param name="bIsGpkiType"></param>
+        /// <returns></returns>
+        public string GetConvOID(string strOID, bool bIsGpkiType=true)
         {
             strOID = strOID.Replace(" ", ".");
             string strTmp = "";
-            if(DicGpkiOid.TryGetValue(strOID, out strTmp)!=true)
+
+            if (bIsGpkiType)
             {
-                return "공무원용";
+                if (DicGpkiOid.TryGetValue(strOID, out strTmp) != true)
+                {
+                    return ("공무원용");
+                }
+                return DicGpkiOid[strOID];
             }
-            return DicGpkiOid[strOID];
+            else
+            {
+                if (DicNpkiOid.TryGetValue(strOID, out strTmp) != true)
+                {
+                    return ("범용(개인)");
+                }
+                return DicNpkiOid[strOID];
+            }
         }
         public void GPKIOidInit()
         {
-            DicGpkiIsser["CertRSA01"] = "한국정보보호진흥원(KISA";
-            DicGpkiIsser["KISA RootCA 1"] = "한국정보보호진흥원(KISA";
-            DicGpkiIsser["KISA RootCA 4"] = "한국정보보호진흥원(KISA";
+            DicGpkiIsser["CertRSA01"] = "한국정보보호진흥원(KISA)";
+            DicGpkiIsser["KISA RootCA 1"] = "한국정보보호진흥원(KISA)";
+            DicGpkiIsser["KISA RootCA 4"] = "한국정보보호진흥원(KISA)";
             DicGpkiIsser["yessignCA"] = "금융결제원";
             DicGpkiIsser["NCASign CA"] = "한국전산원";
             DicGpkiIsser["NCASignCA"] = "한국전산원";
@@ -491,6 +587,56 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             DicGpkiIsser["CA128000032"] = "대검찰청";
             DicGpkiIsser["CA130000031"] = "병무청";
         }
+
+        public void NPKIOidInit()
+        {
+
+            DicNpkiIsser["CERTRSA01"] = "한국정보보호진흥원(KISA)";
+            DicNpkiIsser["KISA"] = "한국정보보호진흥원(KISA)";
+            DicNpkiIsser["YESSIGNCA"] = "금융결제원";
+            DicNpkiIsser["NCASIGN"] = "한국전산원";
+            DicNpkiIsser["NCASIGNCA"] = "한국전산원";
+            DicNpkiIsser["SIGNKOREA"] = "KOSCOM";
+            DicNpkiIsser["SIGNGATE"] = "정보인증";
+            DicNpkiIsser["CROSSCERTCA"] = "전자인증";
+            DicNpkiIsser["CROSSCERT"] = "전자인증";
+            DicNpkiIsser["TRADESIGNCA"] = "한국무역정보통신";
+            DicNpkiIsser["CA131000002"] = "행정안전부";
+            DicNpkiIsser["CA128000002"] = "대검찰청";
+            DicNpkiIsser["CA130000002"] = "병무청";
+            DicNpkiIsser["CA129000001"] = "국방부";
+            DicNpkiIsser["CA131000001"] = "행정안전부";
+            DicNpkiIsser["CA131000005"] = "행정안전부";
+            DicNpkiIsser["CA131000009"] = "행정안전부";
+            DicNpkiIsser["CA131000010"] = "행정안전부";
+            DicNpkiIsser["CA134040001"] = "교육과학기술부";
+            DicNpkiIsser["CA974000001"] = "대법원";
+            DicNpkiIsser["CA134100031"] = "교과부";
+            DicNpkiIsser["CA134040031T"] = "교과부";
+            DicNpkiIsser["CROSSCERTCA2"] = "전자인증";
+            DicNpkiIsser["TRADESIGNCA2"] = "한국무역정보통신";
+            DicNpkiIsser["GPKIROOTCA1 "] = "행정안전부";
+            DicNpkiIsser["GPKIROOTCA"] = "행정안전부";
+            DicNpkiIsser["ROOT"] = "행정안전부";
+            DicNpkiIsser["CLASS"] = "행정안전부";
+            DicNpkiIsser["CA131000001"] = "행정안전부";
+            DicNpkiIsser["CA131100001"] = "행정안전부";
+            DicNpkiIsser["CA131000002"] = "행정안전부";
+            DicNpkiIsser["CA128000001"] = "행정안전부";
+            DicNpkiIsser["CA128000002"] = "행정안전부";
+            DicNpkiIsser["CA128000002"] = "행정안전부";
+            DicNpkiIsser["LGCARE"] = "전자인증";
+            DicNpkiIsser["MND"] = "국방부";
+            DicNpkiIsser["CA131100002"] = "행정안전부";
+            DicNpkiIsser["CA974000002"] = "대법원";
+            DicNpkiIsser["CA974000031"] = "대법원";
+            DicNpkiIsser["CA128000031"] = "대검찰청";
+            DicNpkiIsser["CA128000032"] = "대검찰청";
+            DicNpkiIsser["CA130000031"] = "병무청";
+
+        }
+
+
         public string GetConvGpkiIsser(string strIsser)
         {
             if ( (!strIsser.Contains("CN=")) && (!strIsser.Contains("cn=")) )
@@ -516,6 +662,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         #if _WINDOWS
             int ret = -1;
             m_strWorkDir = Path.Combine(System.IO.Directory.GetCurrentDirectory(), m_strWorkDir);
+            //m_strWorkDir = System.IO.Directory.GetCurrentDirectory();
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 m_strWorkDir = m_strWorkDir.Replace("/", "\\");
@@ -928,7 +1075,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
         *@breif 인증서 정책 식별자의 OID 값을 반환한다.
         *@return 인증서 정책 식별자의 OID 값
         */
-        public string GetGPKIOID()
+        public string GetGPKIOID(bool bGetOriginal = false)
         {
 #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
@@ -943,7 +1090,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
                 return "-";
             }
 
-            string strGPKIOID = GetConvGpkiOID(sb.ToString());
+            string strGPKIOID = (bGetOriginal ? sb.ToString() : GetConvOID(sb.ToString()));
             return strGPKIOID;
 #else
             return "";
@@ -954,7 +1101,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
         *@breif 발급자 이름을 반환한다.
         *@return 발급자 이름
         */
-        public string GetGPKIIssuerName()
+        public string GetGPKIIssuerName(bool bGetOrigial=false)
         {
 #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
@@ -969,7 +1116,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
                 return "-";
             }
 
-            string strIsserName = GetConvGpkiIsser(sb.ToString());
+            string strIsserName = bGetOrigial ? sb.ToString() : GetConvGpkiIsser(sb.ToString());
             return strIsserName;
 #else
             return "";
@@ -1597,6 +1744,154 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
 
             string strSignedDataHex = Convert.ToBase64String(pSignedData);
             CLog.Here().Error($"GetGpkiSignedData - Signed Data - Base64 : {strSignedDataHex}");
+
+            return true;
+        }
+
+
+        /// <summary>
+        /// 저장된 기관명을 찾아냄. Npki 일때에는 대문자화해서 찾아냄
+        /// </summary>
+        /// <param name="strIsser"></param>
+        /// <param name="bGpki"></param>
+        /// <returns></returns>
+        public string GetConvIsser(string strIsser, bool bGpki=false)
+        {            
+            string strTmp = "-";
+
+            if (bGpki)
+            {
+                if (DicGpkiIsser.TryGetValue(strIsser, out strTmp) != true)
+                {
+                    return "-";
+                }
+                return DicGpkiIsser[strIsser];
+            }
+            else
+            {
+                strIsser = strIsser.ToUpper();
+                if (DicNpkiIsser.TryGetValue(strIsser, out strTmp) != true)
+                {
+                    return "-";
+                }
+                return DicNpkiIsser[strIsser];
+            }
+
+        }
+
+
+        /// <summary>
+        /// 기관이름을 찾기 위해서 cn= 다음에 있는 문자를 찾아, 공백' '앞에 문자까지만 찾아줌
+        /// </summary>
+        /// <param name="strIssuerName"></param>
+        /// <returns></returns>
+        string GetConvIssuerName(string strIssuerName)
+        {
+            if (strIssuerName.Length < 1)
+                return "";
+
+            string[] strArrayData = strIssuerName.Split(',');
+
+            if ((strArrayData?.Length ?? 0) < 1)
+                return "";
+
+            string strRet = "";
+            foreach(string strData in strArrayData)
+            {
+                if(strData.Length > 3 && string.Compare(strData, 0, "cn=", 0, 3, true) == 0)
+                {
+                    strRet = strData.Substring(3);
+                    int nPos = -1;
+                    if ((nPos = strRet.IndexOf(' ')) > 0)
+                        strRet = strRet.Substring(0, nPos);
+
+                    break;
+                }
+            }
+
+            return strRet;
+        }
+
+#if DEBUG
+        int nTestCount = 0;
+#endif
+        public unsafe bool LoadDERfileInfo(string strPKIFullPath, NPKIFileInfo pkiFile)
+        {
+
+            CLog.Here().Information($"LoadDERfileInfo, PKI Path : {strPKIFullPath}");
+
+            byte[] byteBinStr = null;
+
+            string strFilename = Path.GetFileName(strPKIFullPath);
+
+            IntPtr ptrBinstr = IntPtr.Zero;
+            byteBinStr = null;
+
+#if !DEBUG
+
+            int nRet = GPKI_STORAGE_ReadCert(strPKIFullPath, ref byteBinStr);
+            if (nRet != (int)eGpkiError.GPKI_OK)
+            {
+                string strErrMsg = GetGpkiError((eGpkiError)nRet);
+                CLog.Here().Error($"LoadDERfileInfo, GPKI_STORAGE_ReadCert (read Fail) - error:{nRet} - msg : {strErrMsg}, File : {strFilename} ");
+                return false;
+            }
+
+            BINSTR binstr = new BINSTR();
+
+            binstr.nLen = byteBinStr.Length;
+            binstr.pData = byteBinStr;
+            IntPtr ptrBinSTRData = IntPtr.Zero;
+
+            if (BINSTR2inPtr(binstr, ref ptrBinSTRData) == false)
+            {
+                CLog.Here().Error($"LoadDERfileInfo, BiNSTR2inPtr error!!");
+                return false;
+            }
+
+            if (!GpkiLoad(ptrBinSTRData))  // ref ptrBinSTRData
+            {
+                CLog.Here().Error($"LoadDERfileInfo, GpkiLoad Fail !!!");
+                return false;
+            }
+
+            int nRemainDay = GetRemainDays(ptrBinSTRData);
+
+            /*GPKIFileInfo gpkiFileInfo = null;
+            gpkiFileInfo = new GPKIFileInfo();
+            gpkiFileInfo.m_strFileName = strPKIFullPath; //DicGpkiFile.ElementAt(i).Key;
+            gpkiFileInfo.m_strKeyFilePath = DicGpkiFile.ElementAt(i).Value;*/
+
+            string strUserID = GetGpkiUserID();
+            string strExpiredDate = GetGpkiValidate();
+            string strOID = GetGPKIOID(true);
+            string strOrg = GetGPKIIssuerName(true);
+
+
+            CLog.Here().Error($"LoadDERfileInfo, # - 1 - GpkiUserID : {strUserID}, strExpiredDate : {strExpiredDate}, OID : {strOID}, Org : {strOrg}, nRemainDay : {nRemainDay}");
+
+            strOID = GetConvOID(strOID, false);
+
+            strOrg = GetConvIssuerName(strOrg);
+            strOrg = GetConvIsser(strOrg);
+
+            CLog.Here().Error($"LoadDERfileInfo, # - 2 - GpkiUserID : {strUserID}, strExpiredDate : {strExpiredDate}, OID : {strOID}, Org : {strOrg}, nRemainDay : {nRemainDay}");
+
+            pkiFile.SetNPKIInfo(strUserID, strExpiredDate, strOID, strOrg, nRemainDay);
+
+#else
+            pkiFile.SetNPKIInfo( (nTestCount % 2 == 0) ? "A" : "B", 
+                                 (nTestCount % 2 == 0) ? "2020-06-15" : "2020-06-16", 
+                                 (nTestCount % 2 == 0) ? "증권(개인)" : "금융(개인)",
+                                 (nTestCount % 2 == 0) ? "KOSCOM" : "금융결제원", 
+                                 0);
+
+            nTestCount++;
+
+#endif
+
+
+            pkiFile.m_strFileName = strPKIFullPath;
 
             return true;
         }

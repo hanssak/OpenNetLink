@@ -134,12 +134,12 @@
 
         foreach (SGFileInfo item in sgFile)
         {
-            CLog.Information("item.Path:" + item.Path);
-            CLog.Information("item.Name:" + item.Name);
-            CLog.Information("dragLabel:" + dragLabel);
-            CLog.Information("item.Type:" + item.Type);
-            CLog.Information("item.getNameStr:" + item.getNameStr(false));
-            CLog.Information("item.getSizeStr:" + item.getSizeStr());
+            CLog.Here().Information("item.Path:" + item.Path);
+            CLog.Here().Information("item.Name:" + item.Name);
+            CLog.Here().Information("dragLabel:" + dragLabel);
+            CLog.Here().Information("item.Type:" + item.Type);
+            CLog.Here().Information("item.getNameStr:" + item.getNameStr(false));
+            CLog.Here().Information("item.getSizeStr:" + item.getSizeStr());
         }
         StateHasChanged();
     }

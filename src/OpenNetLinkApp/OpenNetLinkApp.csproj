@@ -42,6 +42,7 @@
     <!--<PackageReference Include="BlazorInputFile" Version="0.2.0" />-->
     <PackageReference Include="Mime" Version="3.1.0" />
     <PackageReference Include="NetSparkle.New" Version="2.0.0-preview20200906002" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Radzen.Blazor" Version="2.10.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.6">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -1854,7 +1855,10 @@
 <Target Name="PostBuild" AfterTargets="PostBuildEvent">
      <MakeDir Condition="'$(OS)' == 'Windows_NT'" Directories="$(PublishDir)" />
      <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(ProjectDir)Library\* $(PublishDir)" />
-     <Exec Condition="'$(OS)' != 'Windows_NT'" Command="mkdir -p $(PublishDir)" />
+  <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(TargetDir)OpenNetLinkApp.dll C:\HANSSAK\OpenNetLink" />
+  <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(TargetDir)OpenNetLinkApp.exe C:\HANSSAK\OpenNetLink" />
+  <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(ProjectDir)wwwroot\conf\HSText.xml C:\HANSSAK\OpenNetLink\wwwroot\conf" />
+  <Exec Condition="'$(OS)' != 'Windows_NT'" Command="mkdir -p $(PublishDir)" />
      <Exec Condition="'$(OS)' != 'Windows_NT'" Command="/bin/cp -rf $(ProjectDir)Library/* $(PublishDir)" />
 </Target>
 

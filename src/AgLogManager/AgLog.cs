@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -137,7 +137,7 @@ namespace AgLogManager
                             {
                                 // Log 파일들 삭제
                                 System.IO.File.Delete(File.FullName);
-                                Log.Information($"Log File Delete : [{File.FullName}]");
+                                Log.Logger.Here().Information($"Log File Delete : [{File.FullName}]");
                             }
                             // OS별 Log 삭제 : "SecureGate-WinDLL-20220117.log" 형태 Log 파일들 삭제
                             else if (strFileNameOnly.Contains("SecureGate-WinDLL-"))
@@ -147,7 +147,7 @@ namespace AgLogManager
                                 {
                                     // Log 파일들 삭제
                                     System.IO.File.Delete(File.FullName);
-                                    Log.Information($"Log File Delete : [{File.FullName}]");
+                                    Log.Logger.Here().Information($"Log File Delete : [{File.FullName}]");
                                 }
                             }
                         }
@@ -158,7 +158,7 @@ namespace AgLogManager
             catch (DirectoryNotFoundException dirNotFound)
             {
                 // dirNotFound.Message
-                Log.Information($"Log File Delete error try-catch (Message) : [{dirNotFound.Message}]");
+                Log.Logger.Here().Information($"Log File Delete error try-catch (Message) : [{dirNotFound.Message}]");
             }
 
             return true;

@@ -2738,7 +2738,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="btFileData"></param>
         /// <param name="strExt"></param>
         /// <returns></returns>
-        private static bool IsDER(byte[] btFileData, string strExt)
+        public static bool IsDER(byte[] btFileData, string strExt)
         {
             byte[] btHLP_Header = new byte[] { 0x30, 0x82 };
             if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
@@ -3082,7 +3082,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return false;
         }
 
-        private const int MaxBufferSize = 1024 * 64;
+        public const int MaxBufferSize = 1024 * 64;
         private const int MaxBufferSize2 = 1024 * 1024 * 6;
         private static async Task<byte[]> StreamToByteArrayAsync(Stream stInput, int nMaxSize)
         {
