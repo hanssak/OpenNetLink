@@ -3219,7 +3219,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             ["application/atomcat+xml"] = "atomcat",
             ["application/atomsvc+xml"] = "atomsvc",
             ["application/ccxml+xml"] = "ccxml",
-            ["application/CDFV2"] = "db",
+            ["application/CDFV2"] = "db xlsx pptx docx xls ppt doc",
             ["application/cdmi-capability"] = "cdmia",
             ["application/cdmi-container"] = "cdmic",
             ["application/cdmi-domain"] = "cdmid",
@@ -4141,6 +4141,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             ["video/x-smv"] = "smv",
             ["x-conference/x-cooltalk"] = "ice",
             ["x-epoc/x-sisx-app"] = "sisx",
+            ["application/encrypted"] = "xlsx pptx docx",
         });
 
         /// <summary>
