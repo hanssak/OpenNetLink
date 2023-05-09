@@ -275,6 +275,8 @@ public:
 	void SetClipBoard(int groupID, int nType, int nClipSize, void* data);
 
 	void FolderOpen(AutoString strDownPath);
+
+	void AppExitDo();
 	void ProgramExit();
 	void MoveWebWindowToTray();
 	void MoveTrayToWebWindow();

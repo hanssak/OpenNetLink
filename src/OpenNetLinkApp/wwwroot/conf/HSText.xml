@@ -4441,6 +4441,15 @@
 			<EN>Complete</EN>
 			<CN></CN>
 		</T_ETC_PREWORK_END>
+		
+		<T_ETC_RECONNECT_FAILED>
+			<KR>재접속 실패</KR>
+			<JP></JP>
+			<EN>LOGOUT</EN>
+			<CN></CN>
+		</T_ETC_RECONNECT_FAILED>
+		
+		
 		<!-- ********************************************* [END] ETC (T_ETC_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] UNZIP (T_eUNZIP_0000) ********************************************* -->
@@ -5155,6 +5164,14 @@
 			<EN></EN>
 			<CN></CN>
 		</T_APPROVEEXT_SELECT_APPROVER>
+
+		<T_RECONNECT_FAILED_APPEXIT>
+			<KR> 에 재접속이 불가능 하여 Agent를 종료합니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_RECONNECT_FAILED_APPEXIT>		
+
 
 		<!-- ********************************************* [END] Alarm 설정 (T_ALARM_0000) ******************************************** -->
 		
@@ -6888,6 +6905,13 @@
       <EN>There are new mail approval request materials.</EN>
       <CN>件待邮件审批的请求资料。</CN>
     </I_0241>
+
+    <I_0242>
+      <KR>공백없이 </KR>
+      <JP> </JP>
+      <EN> </EN>
+      <CN> </CN>
+    </I_0242>
 
 
     <!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->

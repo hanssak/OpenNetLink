@@ -758,6 +758,7 @@ window.closeAllPopup = () => {
     $("#modal-alert-header").modal("hide");
     $("#modal-alert-header-updatepolicy").modal("hide");
     $("#modal-afterapprovealert-header").modal("hide");
+    $("#modal-alert-AppExit").modal("hide");
     $("#modal-alert-popuplogin").modal("hide");
     $("#ApporveAfterAlert").modal("hide");
     $("#ContinueFileTrans").modal("hide");

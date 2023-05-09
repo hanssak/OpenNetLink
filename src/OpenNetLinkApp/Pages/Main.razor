@@ -61,12 +61,12 @@
                         <div style=" width:310px;">
                             <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.4rem;">@strSystemName <span class="full_txt">@strConNetwork </span></p>
 
-                            <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" @bind="id" tabindex="1" autocomplete="off">
+                            <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" @bind="id" tabindex="1" autocomplete="off"> @* readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)"   *@
 
                             @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
                             {
                                 //AD 로그인은 PW 사용자 입력 불가 (Readonly)
-                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" @bind="pw" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
+                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" @bind="pw" @onkeyup="keyCheck" tabindex="2" autocomplete="off"> @* readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)"   *@
                             }
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
                             {
@@ -88,25 +88,25 @@
                                     @*@if (pageService.m_nLoginType != (int)eLoginType.eLOGINTYPE_AD)*@
                                     @*{*@
 
-                                        @if (bViewBackButton == false)
-                                        {
-                                            <button id="btnLoginViewBack" @onclick="ClickdoLogin" class="full_login_btn btn mb-3" tabindex="5" disabled="@bLoginBtnDisable">LOGIN</button>
-                                        }
-                                        else
-                                        {
-                                            <div class="col-md-12 text-center">
-                                                <table style="width:100%;">
-                                                    <tr>
-                                                        <td>
-                                                            <button id="btnLogin" @onclick="ClickdoLogin" class="full_login_btn btn mb-3" tabindex="6" disabled="@bLoginBtnDisable">LOGIN</button>
-                                                        </td>
-                                                        <td>
-                                                            <button id="btnLoginCancel" @onclick="doBack" class="full_cancel_btn btn mb-3" tabindex="7" disabled="@bLoginBtnDisable">Cancel</button>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                        }
+                                    @if (bViewBackButton == false)
+                                    {
+                                        <button id="btnLoginViewBack" @onclick="ClickdoLogin" class="full_login_btn btn mb-3" tabindex="5" disabled="@bLoginBtnDisable">LOGIN</button>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-md-12 text-center">
+                                            <table style="width:100%;">
+                                                <tr>
+                                                    <td>
+                                                        <button id="btnLogin" @onclick="ClickdoLogin" class="full_login_btn btn mb-3" tabindex="6" disabled="@bLoginBtnDisable">LOGIN</button>
+                                                    </td>
+                                                    <td>
+                                                        <button id="btnLoginCancel" @onclick="doBack" class="full_cancel_btn btn mb-3" tabindex="7" disabled="@bLoginBtnDisable">Cancel</button>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    }
 
                                     @*}*@
                                     <div class="full_copy">COPYRIGHT &copy HANSSAK. ALL RIGHTS RESERVED</div>
@@ -406,7 +406,8 @@
                     //#if false   // 사무실(Office KKW Test) 용도
 
 #if DEBUG  // SITE배포용도
-                    //#if false  // SITE배포용도
+//#if true  // SITE배포용도
+
                     CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
                     strData = "1";
                     stRtn = "1";

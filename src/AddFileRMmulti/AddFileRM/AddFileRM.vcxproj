@@ -288,6 +288,9 @@
   <ItemGroup>
     <Midl Include="AddFileRM.idl" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\SecureGate5_16.bmp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

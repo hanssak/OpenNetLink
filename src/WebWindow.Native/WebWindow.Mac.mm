@@ -746,9 +746,14 @@ void WebWindow::SetClipBoard(int groupID, int nType, int nClipSize, void* data)
     });
 }
 
+void WebWindow::AppExitDo()
+{
+    NTLog(this, Info, "Called : OpenNetLink AppExitDo");
+}
+
 void WebWindow::ProgramExit()
 {
-	NTLog(this, Info, "Called : OpenNetLink Exit");
+	NTLog(this, Info, "Called : OpenNetLink ProgramExit");
 	tray_exit();
 }
 

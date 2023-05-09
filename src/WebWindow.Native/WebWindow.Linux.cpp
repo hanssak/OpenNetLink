@@ -1529,6 +1529,11 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 		_recvclipboardCallback(groupID);
 }
 
+void WebWindow::AppExitDo()
+{
+	NTLog(this, Info, "Called : OpenNetLink AppExitDo");
+}
+
 void WebWindow::ProgramExit()
 {
 	NTLog(this, Info, "Called : OpenNetLink Exit");

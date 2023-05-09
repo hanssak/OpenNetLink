@@ -394,29 +394,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
-			char chBuf[512] = { 0, };
-			GetTempPathA(sizeof(chBuf), chBuf);
-			std::string tempPath = chBuf;
-			std::string filePath = tempPath + "testd.sock";
-
-			if (std::remove(filePath.data()) == 0) // delete file
-				NTLog(SelfThis, Info, "Called : WindowProc, Success: Remove File [%s]", filePath.data());
-			else
-				NTLog(SelfThis, Err, "Called : WindowProc, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
-			
-			tray_exit();
-			printf("Exit!!\n");
-			hwndToWebWindow.erase(hwnd);
-			WinToast::instance()->clear();
-			if (hwnd == messageLoopRootWindowHandle)
+			WebWindow* webWindow = hwndToWebWindow[hwnd];
+			if (webWindow)
 			{
-				PostQuitMessage(0);
-				printf("PostQuitMessage - %s(%d)\n", __FILE__, __LINE__);
+				webWindow->AppExitDo();
 			}
-			DWORD pid = GetCurrentProcessId();
-			KillProcess(pid);
-			if (!pid)
-				KillProcess(pid);
 		}
 		return 0;
 
@@ -434,20 +416,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		// Only terminate the message loop if the window being closed is the one that
 		// started the message loop
 
-		char chBuf[512] = { 0, };
-		GetTempPathA(sizeof(chBuf), chBuf);
-		std::string tempPath = chBuf;
-		std::string filePath = tempPath + "testd.sock";
-
-		if (std::remove(filePath.data()) == 0) // delete file
-			NTLog(SelfThis, Info, "Called : WindowProc, Success: Remove File [%s]", filePath.data());
-		else
-			NTLog(SelfThis, Err, "Called : WindowProc, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
-
-		hwndToWebWindow.erase(hwnd);
-		if (hwnd == messageLoopRootWindowHandle)
+		WebWindow* webWindow = hwndToWebWindow[hwnd];
+		if (webWindow)
 		{
-			PostQuitMessage(0);
+			webWindow->AppExitDo();
 		}
 		return 0;
 	}
@@ -1973,13 +1945,22 @@ bool WebWindow::SaveImage(char* PathName, void* lpBits, int size)
 	return true;
 }
 
-void WebWindow::ProgramExit()
+void WebWindow::AppExitDo()
 {
-	NTLog(this, Info, "Called : OpenNetLink Exit");
+	char chBuf[512] = { 0, };
+	GetTempPathA(sizeof(chBuf), chBuf);
+	std::string tempPath = chBuf;
+	std::string filePath = tempPath + "testd.sock";
+
+	if (std::remove(filePath.data()) == 0) // delete file
+		NTLog(SelfThis, Info, "Called : WindowProc, Success: Remove File [%s]", filePath.data());
+	else
+		NTLog(SelfThis, Err, "Called : WindowProc, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
+
+	tray_exit();
+	printf("Exit!!\n");
 	hwndToWebWindow.erase(hwnd);
-
 	WinToast::instance()->clear();
-
 	if (hwnd == messageLoopRootWindowHandle)
 	{
 		PostQuitMessage(0);
@@ -1989,6 +1970,13 @@ void WebWindow::ProgramExit()
 	KillProcess(pid);
 	if (!pid)
 		KillProcess(pid);
+}
+
+void WebWindow::ProgramExit()
+{
+	NTLog(this, Info, "Called : OpenNetLink Exit");
+
+	AppExitDo();
 }
 
 bool WebWindow::GetTrayUse()

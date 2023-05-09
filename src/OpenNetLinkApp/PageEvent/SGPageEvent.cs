@@ -264,6 +264,9 @@ namespace OpenNetLinkApp.PageEvent
 
     // 부서정보 조회 요청 응답 처리    
     public delegate void DeptInfoNotiEvent(int groupId);
+
+    // Reconnect Count Out 시에 호출하는 event
+    public delegate void ReconnectCountOutEvent(int groupid); // , PageEventArgs e
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -428,9 +431,10 @@ namespace OpenNetLinkApp.PageEvent
 
         public OLEMimeRecvEvent oleMimeRecvEvent = null;
 
-
-
         private Dictionary<int, DeptInfoNotiEvent> _dicDeptInfoEvnet = new Dictionary<int, DeptInfoNotiEvent>();
+
+        public Dictionary<int, ReconnectCountOutEvent> DicReconnectCountEvent = new Dictionary<int, ReconnectCountOutEvent>(); // Reconnect Count Out 횟수이상 발생시
+
 
         public SGPageEvent()
         {
@@ -1582,6 +1586,24 @@ namespace OpenNetLinkApp.PageEvent
 
             return e;
         }
+
+        public void SetReconnectCountOutEventAdd(int groupid, ReconnectCountOutEvent e)
+        {
+            ReconnectCountOutEvent temp = null;
+            if (DicReconnectCountEvent.TryGetValue(groupid, out temp))
+                DicReconnectCountEvent.Remove(groupid);
+            DicReconnectCountEvent[groupid] = e;
+        }
+
+        public ReconnectCountOutEvent GetReconnectCountOutEvent(int groupid)
+        {
+            ReconnectCountOutEvent e = null;
+            if (DicReconnectCountEvent.TryGetValue(groupid, out e) == true)
+                e = DicReconnectCountEvent[groupid];
+            return e;
+        }
+
+
 
     }
 }
