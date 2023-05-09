@@ -167,6 +167,8 @@ namespace OpenNetLinkApp.Services
                     strDownPath = strDownPath.Replace("\\", "/");
                 }
 
+                hsNetwork.nReconnectCountOut = 5;
+
                 if (strTlsVer.Equals("1.2"))
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 else if (strTlsVer.Equals("1.0"))
@@ -324,6 +326,9 @@ namespace OpenNetLinkApp.Services
                         seEvent(groupId, e);
                     }
                     System.Diagnostics.Debug.WriteLine("HsNetWork Session Duplicate Exception Received..");
+                    break;
+                case SgEventType.SG_RECONNECT_COUNTOUT:
+                    ReconnectCountOutEvent(groupId);
                     break;
                 default:
                     break;
@@ -2864,6 +2869,16 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.SendGenericNotiType2(hsNetWork, strUserID, strUserName, strDeptName, strFileName, strPreworkType);
             return -1;
         }
+
+        public void ReconnectCountOutEvent(int groupId)
+        {
+            ReconnectCountOutEvent sgReconnectCountOutEvent = sgPageEvent.GetReconnectCountOutEvent(groupId);
+            if (sgReconnectCountOutEvent != null)
+            {
+                sgReconnectCountOutEvent(groupId);
+            }
+        }
+
 
     }
 }
