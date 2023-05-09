@@ -224,8 +224,13 @@ exit_loop:
 	; 시작프로그램에 등록	미사용(0), 사용(1) - 작업해야함
 	StrCpy $g_UseStartProgram 0
 
-        ; 함께 배포된 edge 삭제후 Patch 할지 여부  미사용(0), 사용(1)
-	StrCpy $g_iPatchEdge 1
+    ; 함께 배포된 edge 삭제후 Patch 할지 여부  미사용(0), 사용(1)
+	; Edge가 없는 Light 배포파일인 경우엔, Edge 삭제처리 안되도록 조건 추가
+	${If} ${IS_LIGHT_PATCH} != 'TRUE'		
+		StrCpy $g_iPatchEdge 1
+	${endif}
+    
+	
 
 	; 망위치 강제 지정 - IN(1) / CN(2) / NCI(4)/ OUT(3) / NotFound(0)
 	StrCpy $g_iNetPos 0
@@ -342,11 +347,6 @@ Function .onInit
 	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db" "$TEMP" 
 	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db" "$TEMP"
 
-	${If} ${IS_LIGHT_PATCH} == 'TRUE'		
-		CopyFiles /SILENT "C:\HANSSAK\OpenNetLink\wwwroot\edge" "$TEMP\HANSSAK\edge"
-	${endif}
-    
-
     Banner::show "Calculating important stuff..."
     Banner::getWindow
     Pop $1
@@ -374,17 +374,35 @@ FunctionEnd
 
 Function .onInstSuccess
   ${If} ${IS_PATCH} == 'TRUE'
-      CopyFiles /SILENT /FILESONLY "$TEMP\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
+	 ; 하위 exist 작업을 위해, 패치본의 json/db는 삭제
+	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json"			
+	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json"			
+	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db"			
+	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db"	
+      
+	  CopyFiles /SILENT /FILESONLY "$TEMP\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
       CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
 	  CopyFiles /FILESONLY "$TEMP\SGNotifyDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"
 	  CopyFiles /FILESONLY "$TEMP\SGSettingsDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"  
 	  
-	${If} ${IS_LIGHT_PATCH} == 'TRUE'		
-		CopyFiles /SILENT "$TEMP\HANSSAK\edge" "C:\HANSSAK\OpenNetLink\wwwroot\edge" 
-	${endif}
-	  
-	  
-	  
+	  ;백업된 json/db 가 복사 완료될때까지, 대기
+	  StrCpy $R0 0
+	  loop:
+		IntCmp $R0 1 endloop
+			${If} ${FileExists} "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json"
+				${If} ${FileExists} "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json"
+					${If} ${FileExists} "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db"
+						${If} ${FileExists} "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db"
+							IntOp $R0 $R0 + 1
+							sleep 2000
+							Goto loop
+						${endif}			
+					${endif}
+				${endif}
+			${endif}
+		sleep 1000
+		Goto loop
+	endloop:
 	  
   ${endif}
 

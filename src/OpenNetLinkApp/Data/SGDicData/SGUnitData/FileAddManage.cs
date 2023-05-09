@@ -3300,6 +3300,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             Log.Logger.Here().Information("[IsValidFileExtInnerZip] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM);
             if (String.Compare(strFileMime, "text/plain") == 0) return eFileAddErr.eFANone;
 
+            // 0kb			
+            if (bEmptyFIleNoCheck && String.Compare(strFileMime, "application/x-empty") == 0) return eFileAddErr.eFANone;
+
             if (String.IsNullOrEmpty(strExt) == true)
             {
                 if (String.Compare(strFileMime, "application/x-executable") == 0) return eFileAddErr.eFANone;
