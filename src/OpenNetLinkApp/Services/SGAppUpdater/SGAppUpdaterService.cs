@@ -886,6 +886,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 CLog.Here().Information($"Self Process Exit to Relaunch after Install and Upgrade: self process is kill (PID:{nProcessId})");
                 Process localById = Process.GetProcessById(nProcessId);
                 localById.Kill();
+
+                // 자체종료code 추가 적용
             });
         }
 

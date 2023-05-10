@@ -94,6 +94,7 @@
                     String.Compare(listNetWork[i].NetPos, "NCI", true) == 0)
             {
                 siteConfig.SetUseOver1auth(listNetWork[i].GroupID, true);
+                // siteConfig.SetUseAccessAllDrive(listNetWork[i].GroupID, true); // 문서중앙화 - Test 및 확인 용도
             }
             else if (String.Compare(listNetWork[i].NetPos, "IN", true) == 0)
             {

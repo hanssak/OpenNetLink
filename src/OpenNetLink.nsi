@@ -234,7 +234,7 @@ exit_loop:
 	StrCpy $g_UseStartProgram 0
 
         ; 함께 배포된 edge 삭제후 Patch 할지 여부  미사용(0), 사용(1)
-	StrCpy $g_iPatchEdge 1
+	StrCpy $g_iPatchEdge 0
 
 	; 망위치 강제 지정 - IN(1) / CN(2) / NCI(4)/ OUT(3) / NotFound(0)
 	StrCpy $g_iNetPos 0
@@ -368,6 +368,9 @@ Function .onInit
 
   ${If} ${IS_PATCH} == 'TRUE'
     SetSilent silent
+    
+    ; V1.0.0.2 로 Patch 진행할때에는 json 파일 backup 및 복귀 동작하지 않는다.
+    /*
         CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP"
         CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP"
         CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppOPsetting.json" "$TEMP" ; 3망구상에 patch 때문에 (필요에 따라서 AppOPsetting.json backup 하고 사용)
@@ -377,7 +380,7 @@ Function .onInit
 	${If} ${IS_LIGHT_PATCH} == 'TRUE'		
 		CopyFiles /SILENT "C:\HANSSAK\OpenNetLink\wwwroot\edge" "$TEMP\HANSSAK\edge"
 	${endif}
-    
+    */
 
     Banner::show "Calculating important stuff..."
     Banner::getWindow
@@ -406,6 +409,8 @@ FunctionEnd
 
 Function .onInstSuccess
 
+; V1.0.0.2 로 Patch 진행할때에는 json 파일 backup 및 복귀 동작하지 않는다.
+/*
   ${If} ${IS_PATCH} == 'TRUE'
   
           CopyFiles /SILENT /FILESONLY "$TEMP\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf"
@@ -419,6 +424,7 @@ Function .onInstSuccess
 	${endif}
 
   ${endif}
+*/
 
   IfSilent 0 +2
     Exec '"$INSTDIR\OpenNetLinkApp.exe"'

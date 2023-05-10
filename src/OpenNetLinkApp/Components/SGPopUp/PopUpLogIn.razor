@@ -60,7 +60,7 @@
                             {
                                 <div class="input-group mb-2">
                                     @*AD 로그인은 PW 사용자 입력 불가 (Readonly)*@
-                                    <input type="password" class="form-control-login" placeholder="Password" readonly="@(eLoginUITypeData== eLoginType.eLOGINTYPE_AD)" @bind="pw" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2">
+                                    <input type="password" class="form-control-login" placeholder="Password" @bind="pw" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2"> @* readonly="@(eLoginUITypeData== eLoginType.eLOGINTYPE_AD)" *@
                                 </div>
                             }
                             @if (eLoginUITypeData == eLoginType.eLOGINTYPE_PW_OTP || eLoginUITypeData == eLoginType.eLOGINTYPE_OTP) //PW_OTP(4), OTP(5)
@@ -488,7 +488,10 @@
     private void keyCheck(KeyboardEventArgs arg)
     {
         if (arg.Key == "Enter")
+        {
+            CLog.Here().Information($"keyCheck-PopupLogin, ENTER Key - ###### - try login");
             doLogIn();
+        }
     }
 
     /// <summary>

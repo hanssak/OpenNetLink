@@ -436,11 +436,14 @@
 <SGAlert @ref="refSGAlert" Guid="modal-alert-header" OnConfirm="SfmLogOut"></SGAlert>
 <SGAlert @ref="refSGAlertUpdatePolicy" Guid="modal-alert-header-updatepolicy" OnConfirm="UpdatPolicyLogOut"></SGAlert>
 <SGAlert @ref="refAfterApproveChangeAlert" Guid="modal-afterapprovealert-header" OnConfirm="StateHasChanged"></SGAlert>
+<SGAlert @ref="refSGAlertAppExit" Guid="modal-alert-AppExit" OnConfirm="OnExitApp" OnCancel="OnExitApp"></SGAlert>
+
 @code
 {
     SGAlert refSGAlert;
     SGAlert refSGAlertUpdatePolicy;
     SGAlert refAfterApproveChangeAlert;
+    SGAlert refSGAlertAppExit;
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
     ISGSiteConfigService siteConfig;
@@ -481,6 +484,7 @@
 
     bool bViewAlarmNotiAllDelMenu = true;                   // 전체삭제메뉴 설정으로 활성화
 
+    bool bViewAppExitMsg = false;
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -1662,6 +1666,7 @@ protected override void OnInitialized()
     {
         HsNetWork hsNetWork = HsCmdCenter.GetConnectNetWork(sgNetWork.GroupID);
         hsNetWork.SGFileInfoSave_EventReg(FileInfoSaveEvent);
+        HsCmdCenter.sgPageEvent.SetReconnectCountOutEventAdd(sgNetWork.GroupID, ReconnectCountOut);
     }
 
     DayTimer = new Timer();
@@ -1669,6 +1674,44 @@ protected override void OnInitialized()
     DayTimer.Elapsed += new ElapsedEventHandler(dayTimer_Elapsed);
     DayTimer.Start();
 }
+
+
+public async void ReconnectCountOut(int groupID)
+{
+
+    CLog.Here().Information($"ReconnectCountOut, Start, ALL - PopupClose, App Exit Popup Do - groupID : {groupID} - #################!");
+
+    if (bViewAppExitMsg)
+    {
+        CLog.Here().Information($"ReconnectCountOut, App Exit Popup Already Done - groupID : {groupID} - #################!");
+        return;
+    }
+    bViewAppExitMsg = true;
+    await JSRuntime.InvokeAsync<object>("closeAllPopup");
+
+    List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+
+    string str = String.Empty;
+    foreach (ISGNetwork netWork in listNetWork)
+    {
+        if (netWork.GroupID == groupID)
+        {
+            str = netWork.FromName;
+        }
+    }
+    str += xmlConf.GetTitle("T_RECONNECT_FAILED_APPEXIT"); //" 에 재접속이 불가능 하여 Agent를 종료합니다.
+
+    refSGAlertAppExit.openPopUp(xmlConf.GetTitle("T_ETC_RECONNECT_FAILED"), str, 1, groupID, groupID.ToString());
+
+    CLog.Here().Information($"ReconnectCountOut, End, ALL - PopupClose, App Exit Popup Do - groupID : {groupID} - #################!");
+}
+
+public void OnExitApp(string strMsg)
+{
+    CLog.Here().Information($"OnExitApp, ALLPopupClose AppExit Popup Do!");
+    Window.ProgramExit();
+}
+
 
 
 /**

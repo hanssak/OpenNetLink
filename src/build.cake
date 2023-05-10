@@ -17,6 +17,7 @@ var configuration = Argument("configuration", "Release");
 var setNetwork = Argument<bool>("setNetwork", true);
 var isPatch = Argument<bool>("isPatch", false);
 var isLightPatch = Argument<bool>("isLightPatch", false);
+var isPatchJsonFiles = Argument<bool>("isPatchJsonFiles", true);
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
 var customName = "KRX";
 var customFileUiName = "K-Link";	// site에서 요구하는 파일이름(OpenNetLink => K-Link)
@@ -490,6 +491,17 @@ Task("PkgWin10")
 			{
 				DeleteDirectory("./artifacts/windows/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
 			}
+		}
+		
+		// JsonFile들 Patch 안함
+		if(isPatchJsonFiles.ToString().ToUpper().Equals("FALSE"))
+		{
+			DeleteFiles("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
+			DeleteFiles("./artifacts/windows/published/wwwroot/conf/AppOPsetting.json");
+			DeleteFiles("./artifacts/windows/published/wwwroot/conf/NetWork.json");
+			Information("Patch - No Json Files!");
+			// json 파일확인
+			Console.ReadKey();			
 		}
 	}
 	Information("5");
