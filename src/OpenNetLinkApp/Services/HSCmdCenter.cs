@@ -1019,8 +1019,6 @@ namespace OpenNetLinkApp.Services
                     CLog.Here().Information($"DeleteTimeOverFiles - Delete Empty Folder : {Dir.FullName}");
                 }
             }
-
-
         }
 
         private void RecvFileDeleteCycleThread(object obj)

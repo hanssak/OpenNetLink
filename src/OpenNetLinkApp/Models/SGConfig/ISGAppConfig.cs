@@ -57,7 +57,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         bool bRMouseFileAddAfterTrans { get; }                      // 마우스 우클릭 파일 추가 후 자동전송 사용 여부 ( true : 사용, false : 미사용 )
         bool bAfterBasicChk { get; }                                // 사후 결재 체크 기본 사용 유무 ( true : 체크, false : 체크 안함 )
         List<string> RecvDownPath { get; }                          // 파일 수신 경로 정보
-        string UpdateSvcIP { get; }                                 // 업데이트 서버 IP
         bool bFileRecvFolderOpen { get; }                           // 파일 수신 후 폴더 자동 열기 ( true : 열기, flase : 열지 않음 )
         public bool bManualRecvDownChange { get; }                   // 수동다운로드 사용 시 수신 폴더 변경 기능 ( true : 사용, false : 미사용)
         bool bFileRecvTrayFix { get; }                              // 파일 수신 알림 트레이 유지 여부 ( true : 유지, false : 유지 안함 )

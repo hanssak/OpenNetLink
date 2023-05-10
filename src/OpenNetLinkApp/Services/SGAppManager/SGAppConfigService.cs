@@ -58,7 +58,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         int GetScreenTime();
         LogEventLevel GetLogLevel();
         bool GetUseApprWaitNoti();
-        string GetUpdateSvcIP();
+        
         //bool GetUseLogLevel();
         //bool GetUseGPKILogin(int groupID);
         //bool GetUseOverNetwork2();
@@ -555,10 +555,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApprWaitNoti()
         {
             return AppConfigInfo.bUseApprWaitNoti;
-        }
-        public string GetUpdateSvcIP()
-        {
-            return AppConfigInfo.UpdateSvcIP;
         }
         /*public bool GetUseLogLevel()
         {
