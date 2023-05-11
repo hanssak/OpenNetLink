@@ -378,6 +378,9 @@
     string webLinkURL = SGAppMgrSvc.SiteConfigInfoService.GetWebLinkPreviewerURL(groupID);
     string webLinkParam = makeParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
 
+    //특수 문자 중 브라우저에 상이하게 인식되는 항목 변경
+    webLinkParam = webLinkParam.Replace("+", "%2B").Replace("/","%2F");
+
     strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
     strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
     }
@@ -1097,7 +1100,7 @@
 
         // 확장자 종류로 Web으로 preview 할지 결정
         string strExtName = Path.GetExtension(sFileName);
-        strExtName =(strExtName.Equals("")) ? "" : strExtName.Substring(1);         //확장자가 없는 파일(text/plain)을 다운로드로 처리
+        strExtName = (strExtName.Equals("")) ? "" : strExtName.Substring(1);         //확장자가 없는 파일(text/plain)을 다운로드로 처리
 
         bool bFind = false;
 
