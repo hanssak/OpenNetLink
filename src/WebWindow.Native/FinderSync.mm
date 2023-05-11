@@ -97,6 +97,7 @@ bool FinderSyncExtensionHelper::reinstall(bool force) {
     // remove all installed plugins
     while(installedPluginPath(plugin_path)) {
         if (!force && bundled_plugin_path.compare(plugin_path) == 0) {
+            setEnable(true);
             NSLog(@"[FinderSync] current plugin detected: %s", bundled_plugin_path.data());
             return true;
         }
@@ -111,6 +112,7 @@ bool FinderSyncExtensionHelper::reinstall(bool force) {
     output = ::execCommand(std::string(kApplePluginkitBinary) + install_arguments, status);
     if (status != 0) return false;
 
+    setEnable(true);
     NSLog(@"[FinderSync] reinstalled");
     return true;
 }
