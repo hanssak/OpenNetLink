@@ -44,6 +44,7 @@ public class AppProperty
 	private JObject VersionJObj { get; }
 	private JObject AppEnvJObj { get; }
 	private JObject NetworkJobj { get; }
+	private string _updateSvcIp = "";
 	
     public AppProperty(ICakeContext context, string propsFile, string gitRepoPath, string versionFile, string appEnvFile, string networkFile, string releaseNoteFile)
     {
@@ -136,11 +137,13 @@ public class AppProperty
 	}
 	public string AppEnvUpdateSvnIP {
 		get {
-			return AppEnvJObj["UpdateSvcIP"].ToString();
+			//return AppEnvJObj["UpdateSvcIP"].ToString();
+			return _updateSvcIp;
 		}
 		set {
-			AppEnvJObj["UpdateSvcIP"] = value;
-			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(AppEnvFile), AppEnvJObj);
+			_updateSvcIp = value;
+			//AppEnvJObj["UpdateSvcIP"] = value;
+			//JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(AppEnvFile), AppEnvJObj);
 		}
 	}
 	public string AppSWCommitId {
