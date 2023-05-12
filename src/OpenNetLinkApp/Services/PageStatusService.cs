@@ -10,11 +10,14 @@ using Microsoft.EntityFrameworkCore.Storage;
 using OpenNetLinkApp.Models.SGSideBar;
 using System.Collections.Concurrent;
 using System.Timers;
+using AgLogManager;
 
 namespace OpenNetLinkApp.Services
 {
     public class PageStatusService
     {
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<PageStatusService>();
+
         public static ConcurrentDictionary<int, PageStatusData> m_DicPageStatusData;
         public static ConcurrentDictionary<int, eLoginType> m_DicGroupIDloginType; // 다중망, m_bMultiLoginDo가 true일때 Server별로그인타입
 
@@ -77,25 +80,51 @@ namespace OpenNetLinkApp.Services
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
             string jsonString = File.ReadAllText(strNetworkFileName);
             List<ISGNetwork> listNetworks = new List<ISGNetwork>();
-            using (JsonDocument document = JsonDocument.Parse(jsonString))
+
+            //ADDomain 이 string 타입인 Network.json은 List<string> 타입으로 수정
+            try { _networkParsing(); }
+            catch (Exception ex)
             {
-                JsonElement root = document.RootElement;
-                JsonElement NetWorkElement = root.GetProperty("NETWORKS");
-                //JsonElement Element;
-                foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
+                CLog.Here().Error($"NetworkParsing err : Change ADDomain Format in Network.json  - {ex.ToString()}");
+                string[] strNetwork = jsonString.Split(Environment.NewLine);
+                for (int i = 0; i < strNetwork.Length; i++)
                 {
-                    SGNetwork sgNet = new SGNetwork();
-                    string strJsonElement = netElement.ToString();
-                    var options = new JsonSerializerOptions
+                    if (strNetwork[i].Contains("ADDomain") && !(strNetwork[i].Contains("[") && strNetwork[i].Contains("]")))
                     {
-                        ReadCommentHandling = JsonCommentHandling.Skip,
-                        AllowTrailingCommas = true,
-                        PropertyNameCaseInsensitive = true,
-                    };
-                    sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
-                    listNetworks.Add(sgNet);
+                        string element = strNetwork[i].Split(':')[0];
+                        string value = strNetwork[i].Split(':')[1];
+                        strNetwork[i] = $"{element}: [ {value} ]";
+                    }
+                }
+                File.WriteAllText(strNetworkFileName, string.Join(Environment.NewLine, strNetwork));
+                jsonString = string.Join(Environment.NewLine, strNetwork);
+                _networkParsing();
+            }
+
+            void _networkParsing()
+            {
+                listNetworks.Clear();
+                using (JsonDocument document = JsonDocument.Parse(jsonString))
+                {
+                    JsonElement root = document.RootElement;
+                    JsonElement NetWorkElement = root.GetProperty("NETWORKS");
+                    //JsonElement Element;
+                    foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
+                    {
+                        SGNetwork sgNet = new SGNetwork();
+                        string strJsonElement = netElement.ToString();
+                        var options = new JsonSerializerOptions
+                        {
+                            ReadCommentHandling = JsonCommentHandling.Skip,
+                            AllowTrailingCommas = true,
+                            PropertyNameCaseInsensitive = true,
+                        };
+                        sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
+                        listNetworks.Add(sgNet);
+                    }
                 }
             }
+
             int count = listNetworks.Count;
             for (int i = 0; i < count; i++)
             {
@@ -525,7 +554,7 @@ namespace OpenNetLinkApp.Services
             {
                 return;
             }
-            m_DicPageStatusData[groupID].SetLogoutFileListClearEvent(Event);            
+            m_DicPageStatusData[groupID].SetLogoutFileListClearEvent(Event);
         }
         public LogOutFileListClearEvent GetLogOutFileListClearEvent(int groupID)
         {

@@ -6,6 +6,7 @@ using System.Text;
 using System.Collections.Generic;
 using HsNetWorkSG;
 using OpenNetLinkApp.Models.SGNetwork;
+using AgLogManager;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -30,8 +31,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bViewFileFilter { get; set; }                                         // (환경설정) 확장자 제한 화면 표시 유무.
         public bool m_bUseForceUpdate { get; set; }                                         // 넘기는 기능 없이 무조건 업데이트 사용 유무
         public bool m_bUseSFMRight { get; set; }
-        public List<ISGSiteConfig> SiteConfigInfo { get;}       
-        
+        public List<ISGSiteConfig> SiteConfigInfo { get; }
+
         public bool GetUseLoginIDSave(int groupID);
         public bool GetUseAutoLogin(int groupID);
         public bool GetUseAutoLoginCheck(int groupID);
@@ -262,6 +263,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
     internal class SGSiteConfigService : ISGSiteConfigService
     {
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGSiteConfigService>();
+
         public bool m_bUseClipAlarmType { get; set; } = true;                               // 클립보드 알림 형식 사용 유무
         public PAGE_TYPE m_enMainPage { get; set; } = PAGE_TYPE.NONE;                       // 메인페이지 설정
         public bool m_bUseMainPageType { get; set; } = true;                                // 메인화면 변경 사용 여부
@@ -320,23 +323,48 @@ namespace OpenNetLinkApp.Services.SGAppManager
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
             string jsonString = File.ReadAllText(strNetworkFileName);
             List<ISGNetwork> listNetworks = new List<ISGNetwork>();
-            using (JsonDocument document = JsonDocument.Parse(jsonString))
+
+            //ADDomain 이 string 타입인 Network.json은 List<string> 타입으로 수정
+            try { _networkParsing(); }
+            catch (Exception ex)
             {
-                JsonElement root = document.RootElement;
-                JsonElement NetWorkElement = root.GetProperty("NETWORKS");
-                //JsonElement Element;
-                foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
+                CLog.Here().Error($"NetworkParsing err : Change ADDomain Format in Network.json  - {ex.ToString()}");
+                string[] strNetwork = jsonString.Split(Environment.NewLine);
+                for (int i = 0; i < strNetwork.Length; i++)
                 {
-                    SGNetwork sgNet = new SGNetwork();
-                    string strJsonElement = netElement.ToString();
-                    var options = new JsonSerializerOptions
+                    if (strNetwork[i].Contains("ADDomain") && !(strNetwork[i].Contains("[") && strNetwork[i].Contains("]")))
                     {
-                        ReadCommentHandling = JsonCommentHandling.Skip,
-                        AllowTrailingCommas = true,
-                        PropertyNameCaseInsensitive = true,
-                    };
-                    sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
-                    listNetworks.Add(sgNet);
+                        string element = strNetwork[i].Split(':')[0];
+                        string value = strNetwork[i].Split(':')[1];
+                        strNetwork[i] = $"{element}: [ {value} ]";
+                    }
+                }
+                File.WriteAllText(strNetworkFileName, string.Join(Environment.NewLine, strNetwork));
+                jsonString = string.Join(Environment.NewLine, strNetwork);
+                _networkParsing();
+            }
+
+            void _networkParsing()
+            {
+                listNetworks.Clear();
+                using (JsonDocument document = JsonDocument.Parse(jsonString))
+                {
+                    JsonElement root = document.RootElement;
+                    JsonElement NetWorkElement = root.GetProperty("NETWORKS");
+                    //JsonElement Element;
+                    foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
+                    {
+                        SGNetwork sgNet = new SGNetwork();
+                        string strJsonElement = netElement.ToString();
+                        var options = new JsonSerializerOptions
+                        {
+                            ReadCommentHandling = JsonCommentHandling.Skip,
+                            AllowTrailingCommas = true,
+                            PropertyNameCaseInsensitive = true,
+                        };
+                        sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
+                        listNetworks.Add(sgNet);
+                    }
                 }
             }
             int count = listNetworks.Count;
@@ -898,7 +926,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="groupID"></param>
         /// <returns></returns>
         public bool GetUseAllProxyAuthority(int groupID)
-        { 
+        {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
                 return listSiteConfig[groupID].m_bUseAllProxyAuthority;

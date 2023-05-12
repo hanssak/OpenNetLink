@@ -378,6 +378,9 @@
     string webLinkURL = SGAppMgrSvc.OpConfigInfoService.GetWebLinkPreviewerURL(groupID);
     string webLinkParam = makeParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
 
+    //특수 문자 중 브라우저에 상이하게 인식되는 항목 변경
+    webLinkParam = webLinkParam.Replace("+", "%2B").Replace("/","%2F");
+
     strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
     strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
     }
@@ -1094,18 +1097,19 @@
 
         // 확장자 종류로 Web으로 preview 할지 결정
         string strExtName = Path.GetExtension(sFileName);
-        strExtName =(strExtName.Equals("")) ? "" : strExtName.Substring(1);         //확장자가 없는 파일(text/plain)을 다운로드로 처리
+        strExtName = (strExtName.Equals("")) ? "" : strExtName.Substring(1);         //확장자가 없는 파일(text/plain)을 다운로드로 처리
 
         bool bFind = false;
 
 #if true
 
         string strViewerExt = sgLoginData.GetPreViewerExt();
-        if ((strViewerExt?.Length ?? 0) == 0)
-        {
-            CLog.Here().Information($"ViewerExt : Empty!");
-            return false;
-        }
+        //CLIENT_PREVIEW_VIEWER_EXT의 데이터가 값이 없는 경우엔, 하기 다운로드 프로세스를 탈 수 있도록 삭제 처리
+        //if ((strViewerExt?.Length ?? 0) == 0)
+        //{
+        //    CLog.Here().Information($"ViewerExt : Empty!");
+        //    return false;
+        //}
 
         CLog.Here().Information($"ViewerExt : {strViewerExt}");
 

@@ -15,7 +15,7 @@
 @inject PageStatusService pageService
 
 
-<div class="modal fade" id="ApproverSelect_PopUp">
+<div class="modal fade" id="ApproverSelect_PopUp" data-backdrop="static">
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline pl-3 pr-3">
@@ -552,6 +552,7 @@
         if (sgLoginData == null)
             return;
         m_step = sgLoginData.GetApproveStep();    //결재유형 취득
+
 
         // 실제 사용안함
         //HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult); //타부서 조회 결과

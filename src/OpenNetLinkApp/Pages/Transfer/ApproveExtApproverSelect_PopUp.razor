@@ -15,7 +15,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
 
-<div class="modal fade" id="ApproveExtApproverSelect_PopUp">
+<div class="modal fade" id="ApproveExtApproverSelect_PopUp" data-backdrop="static">
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline pl-3 pr-3">
@@ -734,14 +734,14 @@
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;   
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
-        m_step = sgLoginData.GetApproveStep();    //결재유형 취득
-
+        m_step = sgLoginData.GetApproveStep();    //결재유형 취득        
+        
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveExtDeptApprLineResult); //자기부서 조회 결과
 
         if (approverSearchType == "TREE" && refSGDeptTreeList != null)
