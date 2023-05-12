@@ -18,6 +18,8 @@ var setNetwork = Argument<bool>("setNetwork", true);
 var isPatch = Argument<bool>("isPatch", false);
 var isLightPatch = Argument<bool>("isLightPatch", false);
 var isPatchJsonFiles = Argument<bool>("isPatchJsonFiles", true);
+var isMakeALL = Argument<bool>("isMakeALL", false);
+
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
 var customName = "KRX";
 var customFileUiName = "K-Link";	// site에서 요구하는 파일이름(OpenNetLink => K-Link)
@@ -314,13 +316,22 @@ Task("SetFileName")
 	.Does(()=>{
 		//customName = Prompt("Custom Name : ");
 		//customFileUiName = Prompt("Site Require File Name : ");	// site에서요구한 이름 입력받아처리할때 사용
-		networkFlag = Prompt("Network Flag (IN/CN/EX/NCI) : ");
-		AppProps.NetworkPos = networkFlag.ToUpper();
+		
+		if(isMakeALL.ToString().ToUpper().Equals("TRUE"))
+		{
+			networkFlag = "ALL";
+		}
+		else
+		{
+			networkFlag = Prompt("Network Flag (IN/CN/EX/NCI) : ");
+			AppProps.NetworkPos = networkFlag.ToUpper();		
+		}
 	});
 
 Task("SetNetwork")
 	.WithCriteria(setNetwork)
 	.WithCriteria(!isPatch)
+	.WithCriteria(!isMakeALL)
 	.Does(() => {		
 		Information($"Current Network infomation : {AppProps.NetworkIPAddress} ({AppProps.NetworkFromName} -> {AppProps.NetworkToName}) / Update IP : {AppProps.AppEnvUpdateSvnIP}");
 			
@@ -482,30 +493,7 @@ Task("PkgWin10")
 	DeleteFiles("./artifacts/windows/published/*.so");
 	DeleteFiles("./artifacts/windows/published/*.pdb");
 
-	//Light Patch 버전일 땐, edge 폴더 배포전에 제거
-	if(isPatch.ToString().ToUpper().Equals("TRUE"))
-	{
-		if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
-		{
-			if(DirectoryExists("./artifacts/windows/published/wwwroot/edge")) 
-			{
-				DeleteDirectory("./artifacts/windows/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
-			}
-		}
-		
-		// JsonFile들 Patch 안함
-		if(isPatchJsonFiles.ToString().ToUpper().Equals("FALSE"))
-		{
-			DeleteFiles("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
-			DeleteFiles("./artifacts/windows/published/wwwroot/conf/AppOPsetting.json");
-			DeleteFiles("./artifacts/windows/published/wwwroot/conf/NetWork.json");
-			Information("Patch - No Json Files!");
-			// json 파일확인
-			Console.ReadKey();			
-		}
-	}
-	Information("5");
-	
+
 	var files = GetFiles("./artifacts/windows/published/*.so.*");
 	foreach(var file in files)
 	{
@@ -529,6 +517,11 @@ Task("PkgWin10")
     
 	if(networkFlag.ToString().ToUpper().Equals("ALL"))
 	{
+		// 전체 build 때에처리
+		if(isMakeALL.ToString().ToUpper().Equals("TRUE"))
+		{
+			isWithSilence=true;
+		}	
 	
 		var Folders = GetDirectories("./json/*");
 		//var dirPath = Directory("./json");
@@ -559,7 +552,7 @@ Task("PkgWin10")
 				CopyFile(strSrcFile, strTargetFile);
 				
 				// json 파일복사 확인
-				//Console.ReadKey();
+				// Console.ReadKey();
 			}			
 			
 			MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
@@ -592,9 +585,53 @@ Task("PkgWin10")
 			}
 
 			// 설치파일 생성확인
-			// Console.ReadKey();
+			// Console.ReadKey();			
+		}
+
+		//isMakeALL 일때에, 앞에 설치파일들 만들고난 후에, Patch 파일 만들기동작 시작, Patch에 사용되지 않는 edge 폴더 / json 파일 제거
+		Information("Delete Unused FileS - for Update !");		
+		if(isMakeALL.ToString().ToUpper().Equals("TRUE"))
+		{
+			isPatch=true;
+			isLightPatch=true;
+			isPatchJsonFiles=false;
+			
+			if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
+			{
+				if(DirectoryExists("./artifacts/windows/published/wwwroot/edge")) 
+				{
+					DeleteDirectory("./artifacts/windows/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
+				}
+			}
+			
+			// JsonFile들 Patch 안함
+			if(isPatchJsonFiles.ToString().ToUpper().Equals("FALSE"))
+			{
+				DeleteFiles("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
+				DeleteFiles("./artifacts/windows/published/wwwroot/conf/AppOPsetting.json");
+				DeleteFiles("./artifacts/windows/published/wwwroot/conf/NetWork.json");
+				Information("Patch - No Json Files!");
+				// json 파일확인
+				// Console.ReadKey();			
+			}
+			
+			Information("Make - Nsis Patch Build !");	
+			MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
+				Defines = new Dictionary<string, string>{
+					{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
+					{"IS_PATCH", isPatch.ToString().ToUpper()},
+					{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
+					{"NETWORK_FLAG", networkFlag.ToUpper()},
+					{"CUSTOM_NAME", customName.ToUpper()},
+					{"CUSTOM_FILE_NAME", customFileUiName.ToUpper()},
+					{"IS_WITH_SILENCE", "FALSE"}
+				}
+			});
+			Information("NetPos : {0}, NSIS-Make-Done !!!\n\n", networkFlag);
 			
 		}
+
+
 
 		/*int nIdex = strSearchFile.LastIndexOf('.');
 		if (nIdex > 0)
@@ -614,6 +651,31 @@ Task("PkgWin10")
 	else
 	{
 	
+		//Light Patch 버전일 땐, edge 폴더 배포전에 제거
+		Information("Delete Unused FileS - for Update !");		
+		if(isPatch.ToString().ToUpper().Equals("TRUE"))
+		{
+			if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
+			{
+				if(DirectoryExists("./artifacts/windows/published/wwwroot/edge")) 
+				{
+					DeleteDirectory("./artifacts/windows/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
+				}
+			}
+			
+			// JsonFile들 Patch 안함
+			if(isPatchJsonFiles.ToString().ToUpper().Equals("FALSE"))
+			{
+				DeleteFiles("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
+				DeleteFiles("./artifacts/windows/published/wwwroot/conf/AppOPsetting.json");
+				DeleteFiles("./artifacts/windows/published/wwwroot/conf/NetWork.json");
+				Information("Patch - No Json Files!");
+				// json 파일확인
+				// Console.ReadKey();			
+			}
+		}
+		
+		Information("Make - Nsis Build !");	
 		MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
 			Defines = new Dictionary<string, string>{
 				{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},

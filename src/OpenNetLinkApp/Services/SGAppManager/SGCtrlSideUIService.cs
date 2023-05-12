@@ -71,6 +71,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetUseApprWaitNoti(bool useApprWaitNoti);
 
         void SetUserSelectFirstNet(int nSelectNet);
+
+        public void SetVersionPatch1do(string strVersion, string strValue);
     }
     public class SGCtrlSideUIService : ISGCtrlSideUIService
     {
@@ -217,6 +219,28 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             if (bAdded == false)
                 (AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver[strGroupIDidx] = strHotKey;
+
+            SaveAppConfigSerialize();
+            NotifyStateChangedCtrlSide();
+        }
+
+
+        public void SetVersionPatch1do(string strVersion, string strValue)
+        {
+
+            if (strVersion.Length < 1 || strValue.Length < 1)
+                return;
+
+            if ((AppConfigInfo as SGAppConfig).dicVersionPatch1do == null)
+                (AppConfigInfo as SGAppConfig).dicVersionPatch1do = new Dictionary<string, string>();
+
+            bool bAdded = false;
+
+            if ((AppConfigInfo as SGAppConfig).dicVersionPatch1do != null)
+                bAdded = (AppConfigInfo as SGAppConfig).dicVersionPatch1do.TryAdd(strVersion, strValue);
+
+            if (bAdded == false)
+                (AppConfigInfo as SGAppConfig).dicVersionPatch1do[strVersion] = strValue;
 
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();

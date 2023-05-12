@@ -1054,10 +1054,20 @@
     /// <param name="groupID"></param>
     public void SetStaticUserNameRecvDownLoad(int groupID)
     {
+
         ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         string strPath = "";
+        strPath = AppConfigSvc.GetRecvDownPath(groupID);
+        string strStaticPath = $@"K:\개인 폴더";
 
-        if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(groupID))
+        if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(groupID)==false &&
+        string.Compare(strStaticPath, 0, strPath, 0, strStaticPath.Length, true) != 0)
+        {
+            strPath = strStaticPath;
+            CLog.Here().Information($"Recv Path - OtherPath To StaticPath : {strStaticPath}");
+        }
+
+        @*if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(groupID))
             strPath = AppConfigSvc.GetRecvDownPath(groupID);
         else
         {
@@ -1066,10 +1076,10 @@
             if (sgUserInfo == null)
                 return;
 
-            strPath = $@"K:\개인 폴더\다운로드";
+            strPath = $@"K:\개인 폴더";
             //strPath = $@"K:\\{sgUserInfo.GetUserName()}\\다운로드";
 
-        }
+        }*@
 
         HSCmdCenter.SetDownLoadPath(groupID, strPath);
         HSCmdCenter.SetBaseDownLoadPath(groupID, strPath);

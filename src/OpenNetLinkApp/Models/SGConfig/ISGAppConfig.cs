@@ -102,12 +102,12 @@ namespace OpenNetLinkApp.Models.SGConfig
         bool bClipCopyAutoSend { get; }                                // 클립보드 복사 후 자동전송 기능 사용 유무 ( true : 사용, false : 미사용 )
 
 
-		
-		// notUse (MoveTo SGSiteConfig.cs)
+
+        // notUse (MoveTo SGSiteConfig.cs)
         //public bool bDenyPasswordZIP { get; set; }                  // 패스워드 걸린압축파일 전송허용 여부
         //public bool bFileForward { get; set; }                      // 파일포워드 사용유무		
         //public bool bClipboardFileTransUse { get; set; }            // 클립보드 파일전송 형태로 사용
         //public bool bClipboardManageUse { get; set; }               // 클립보드 관리/결재 UI 나오게 설정
-
+        public Dictionary<string, string> dicVersionPatch1do { get; }
     }
 }

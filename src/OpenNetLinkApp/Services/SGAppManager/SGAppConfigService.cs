@@ -78,6 +78,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         int GetAppLoginType();
 
         int GetUserSelectFirstNet();
+
+
+        string GetVersionPatch1do(string strVersion);
+
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -147,6 +151,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return strValue;
         }
 
+
+        public string GetVersionPatch1do(string strVersion)
+        {
+            string strValue = "";
+            (AppConfigInfo as SGAppConfig).dicVersionPatch1do ??= new Dictionary<string, string>();
+            if ((AppConfigInfo as SGAppConfig).dicVersionPatch1do.TryGetValue(strVersion, out strValue) == false)
+                return "";
+
+            return strValue;
+        }
 
         public List<bool> GetClipBoardModifier(int groupId)
         {
@@ -396,11 +410,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             //return AppConfigInfo.bURLAutoTrans;
 
             (AppConfigInfo as SGAppConfig).bURLAutoTrans ??= new List<bool>();
-            /*            (AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver ??= new Dictionary<string, Dictionary<string, string>>();
-                        Dictionary<string, string> dicIdxHotKey = new Dictionary<string, string>();
-                        if (dicIdxHotKey.TryAdd(nIdx.ToString(), "N,Y,N,Y,Z"))
-                            AppConfigInfo.ClipBoardHotKeyNetOver.TryAdd(groupId.ToString(), dicIdxHotKey);
-                        return AppConfigInfo.ClipBoardHotKeyNetOver[groupId.ToString()][nIdx.ToString()];*/
 
             if ((AppConfigInfo as SGAppConfig).bURLAutoTrans.Count >= nGroupID + 1)
                 return (AppConfigInfo as SGAppConfig).bURLAutoTrans[nGroupID];

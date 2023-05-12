@@ -1019,7 +1019,6 @@
         }
     }
 
-
     /// <summary>
     /// 수신 다운로드 사용자이름이 포함된 정해진 경로로 설정
     /// </summary>
@@ -1028,8 +1027,45 @@
     {
         ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         string strPath = "";
+        strPath = AppConfigSvc.GetRecvDownPath(groupID);
+        string strStaticPath = $@"K:\개인 폴더";
 
-        if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(groupID))
+        try
+        {
+            if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(groupID) == false)
+            {
+
+                // 각 버전별로 특별한동작 1번만 할 수 있도록 적용 - 수신경로 1번만 "개인 폴더"으로 바꾸도록 수정
+                string strCurCliVersion = SGAppMgrSvc.VersionConfigInfoService.GetSWVersion();
+                if (strCurCliVersion == "1.0.0.2")
+                {
+                    string strVerPatch1do = "";
+                    strVerPatch1do = AppConfigSvc.GetVersionPatch1do(strCurCliVersion);
+                    if (strVerPatch1do.Length < 1)
+                    {
+                        List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+                        foreach (ISGNetwork netlist in listNetWork)
+                        {
+                            CtrlSideUISvc.SetRecvDownPath(netlist.GroupID, strStaticPath);
+                        }
+                        CtrlSideUISvc.SetVersionPatch1do(strCurCliVersion, "1");
+                    }
+                }
+
+                if (string.Compare(strStaticPath, 0, strPath, 0, strStaticPath.Length, true) != 0)
+                {
+                    strPath = strStaticPath;
+                    CLog.Here().Information($"Recv Path - OtherPath To StaticPath : {strStaticPath}");
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            CLog.Here().Error($"SetStaticUserNameRecvDownLoad, Exception : {ex.Message}");
+            strPath = strStaticPath;
+        }
+
+        @*if (SGAppMgrSvc.SiteConfigInfoService.GetUseAccessAllDrive(groupID))
             strPath = AppConfigSvc.GetRecvDownPath(groupID);
         else
         {
@@ -1038,9 +1074,9 @@
             if (sgUserInfo == null)
                 return;
 
-            strPath = $@"K:\개인 폴더\다운로드";
+            strPath = $@"K:\개인 폴더";
             //strPath = $@"K:\\{sgUserInfo.GetUserName()}\\다운로드";
-        }
+        }*@
 
         HSCmdCenter.SetDownLoadPath(groupID, strPath);
         HSCmdCenter.SetBaseDownLoadPath(groupID, strPath);

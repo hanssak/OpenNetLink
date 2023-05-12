@@ -80,5 +80,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         //public bool bClipboardManageUse { get; set; } = false;                     //클립보드 관리/결재 UI 나오게 설정  
         //public bool bEmailApproveUse { get; set; } = false;                         //이메일결재 사용유무
 
+        public Dictionary<string, string> dicVersionPatch1do { get; set; } = null;      // Version Patch이후에 1번만 동작하는 기능 동작유무 저장
     }
 }

@@ -1857,7 +1857,6 @@
      <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(ProjectDir)Library\* $(PublishDir)" />
   <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(TargetDir)OpenNetLinkApp.dll C:\HANSSAK\OpenNetLink" />
   <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(TargetDir)OpenNetLinkApp.exe C:\HANSSAK\OpenNetLink" />
-  <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(ProjectDir)wwwroot\conf\HSText.xml C:\HANSSAK\OpenNetLink\wwwroot\conf" />
   <Exec Condition="'$(OS)' != 'Windows_NT'" Command="mkdir -p $(PublishDir)" />
      <Exec Condition="'$(OS)' != 'Windows_NT'" Command="/bin/cp -rf $(ProjectDir)Library/* $(PublishDir)" />
 </Target>

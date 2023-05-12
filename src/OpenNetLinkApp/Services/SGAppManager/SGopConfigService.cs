@@ -399,14 +399,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public bool GetURLAutoTrans(int nGroupID)
         {
-            //return AppConfigInfo.bURLAutoTrans;
 
             (AppConfigInfo as SGopConfig).bURLAutoTrans ??= new List<bool>();
-            /*            (AppConfigInfo as SGopConfig).ClipBoardHotKeyNetOver ??= new Dictionary<string, Dictionary<string, string>>();
-                        Dictionary<string, string> dicIdxHotKey = new Dictionary<string, string>();
-                        if (dicIdxHotKey.TryAdd(nIdx.ToString(), "N,Y,N,Y,Z"))
-                            AppConfigInfo.ClipBoardHotKeyNetOver.TryAdd(groupId.ToString(), dicIdxHotKey);
-                        return AppConfigInfo.ClipBoardHotKeyNetOver[groupId.ToString()][nIdx.ToString()];*/
 
             if ((AppConfigInfo as SGopConfig).bURLAutoTrans.Count >= nGroupID + 1)
                 return (AppConfigInfo as SGopConfig).bURLAutoTrans[nGroupID];
