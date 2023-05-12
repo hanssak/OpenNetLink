@@ -458,7 +458,13 @@ Task("PubWin10")
     DotNetCorePublish("./PreviewUtil", settings);
     DotNetCorePublish("./ContextTransferClient", settings);
     
-     using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe"))
+     using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = "1 windows" }))
+     {
+		process.WaitForExit();
+		Information("Package windows: Exit code: {0}", process.GetExitCode());
+     }
+
+     using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = "2 windows" }))
      {
 		process.WaitForExit();
 		Information("Package windows: Exit code: {0}", process.GetExitCode());

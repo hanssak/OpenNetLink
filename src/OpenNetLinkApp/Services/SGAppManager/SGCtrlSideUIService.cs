@@ -138,13 +138,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SaveOpConfigSerialize()
         {
-            if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile"))
-                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile");
+            if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
+                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
 
             foreach (ISGNetwork sGNetwork in NetWorkInfo)
             {
                 var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
-                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile/AppOPsetting_{sGNetwork.GroupID}_{sGNetwork.NetPos}.json";
+                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sGNetwork.GroupID}_{sGNetwork.NetPos}.json";
                 try
                 {
                     using (var fs = new FileStream(AppConfig, FileMode.Create))
@@ -190,7 +190,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             foreach(ISGNetwork sGNetwork in NetWorkInfo)
             {
                 if(sGNetwork.GroupID == groupId)
-                    AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile/AppOPsetting_{groupId}_{sGNetwork.NetPos}.json";
+                    AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{groupId}_{sGNetwork.NetPos}.json";
             }
 
             if(AppConfig == String.Empty)
@@ -199,8 +199,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             try
             {
-                if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile"))
-                    Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile");
+                if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
+                    Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
 
                 using (var fs = new FileStream(AppConfig, FileMode.Create))
                 {

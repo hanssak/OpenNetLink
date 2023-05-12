@@ -210,14 +210,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 }
             }
 
-            if(!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile"))
-                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile");
+            if(!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
+                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
 
             _AppConfigInfo = new Dictionary<int, ISGopConfig>();
             var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
             foreach (SGNetwork sgNetwork in listNetworks)
             {
-                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/SiteProfile/AppOPsetting_{sgNetwork.GroupID}_{sgNetwork.NetPos}.json";
+                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sgNetwork.GroupID}_{sgNetwork.NetPos}.json";
 
                 CLog.Here().Information($"- AppOPsetting Path: [{AppConfig}]");
 
