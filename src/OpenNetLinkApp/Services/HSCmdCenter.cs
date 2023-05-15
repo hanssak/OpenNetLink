@@ -147,10 +147,38 @@ namespace OpenNetLinkApp.Services
                     {
                         CLog.Here().Information($"- AppOPsetting Loading... : [{opConfig}]");
                         //Open the stream and read it back.
-                        using (FileStream fs = File.OpenRead(opConfig))
+                        byte[] hsckByte = File.ReadAllBytes(AppConfig);
+                        byte[] masterKey = SGCrypto.GetMasterKey();
+
+                        bool isDeCrypt = true;
+                        string strData = String.Empty;
+                        try
                         {
-                            SGopConfig appConfig = (SGopConfig)serializer.ReadObject(fs);
+                            byte[] dData = SGCrypto.AESDecrypt256(hsckByte, masterKey, System.Security.Cryptography.PaddingMode.PKCS7);
+                            strData = Encoding.UTF8.GetString(dData);
+                        }
+                        catch (Exception ex)
+                        {
+                            CLog.Here().Information($"- AppOPsetting Loading... : Decrypt Fail {AppConfig}]");
+                            //디크립션 실패
+                            isDeCrypt = false;
+                        }
+
+                        if (isDeCrypt)
+                        {
+                            SGopConfig appConfig = JsonSerializer.Deserialize<SGopConfig>(strData);
                             dicOpConfig.Add(sgNetwork.GroupID, appConfig);
+
+                        }
+                        else
+                        {
+                            //Open the stream and read it back.
+                            using (FileStream fs = File.OpenRead(AppConfig))
+                            {
+                                SGopConfig appConfig = (SGopConfig)serializer.ReadObject(fs);
+                                dicOpConfig.Add(sgNetwork.GroupID, appConfig);
+
+                            }
                         }
                         CLog.Here().Information($"- AppOPsetting Load Completed : [{AppConfig}]");
                     }
