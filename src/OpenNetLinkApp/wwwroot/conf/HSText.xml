@@ -3311,6 +3311,13 @@
 			<CN>移动式磁盘</CN>
 		</T_PKI_TRANS_SELECT_ITEM>
 
+		<T_PKI_TRANS_DETAIL_TXT>
+			<KR>인증서는 실시간 전송 됩니다. 전송전에 수신쪽 접속을 확인하세요. 인증서를 선택후 전송하세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>移动式磁盘</CN>
+		</T_PKI_TRANS_DETAIL_TXT>
+
 		<T_PKI_TRANS_HDD>
 			<KR>하드디스크</KR>
 			<JP></JP>
@@ -3359,6 +3366,13 @@
 			<EN></EN>
 			<CN>出具人</CN>
 		</T_PKI_TRANS_ISSUER>
+
+		<T_PKI_TRANS_EXPIRED>
+			<KR>(기간만료)</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PKI_TRANS_EXPIRED>
 
 		<!-- ********************************************* [END] PKI 인증서 전송화면 (T_PKI_0000) ********************************************* -->
 
@@ -4455,6 +4469,15 @@
 			<EN>Complete</EN>
 			<CN></CN>
 		</T_ETC_PREWORK_END>
+		
+		<T_ETC_RECONNECT_FAILED>
+			<KR>재접속 실패</KR>
+			<JP></JP>
+			<EN>LOGOUT</EN>
+			<CN></CN>
+		</T_ETC_RECONNECT_FAILED>
+		
+		
 		<!-- ********************************************* [END] ETC (T_ETC_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] UNZIP (T_eUNZIP_0000) ********************************************* -->
@@ -5169,6 +5192,14 @@
 			<EN></EN>
 			<CN></CN>
 		</T_APPROVEEXT_SELECT_APPROVER>
+
+		<T_RECONNECT_FAILED_APPEXIT>
+			<KR> 에 재접속이 불가능 하여 Agent를 종료합니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_RECONNECT_FAILED_APPEXIT>		
+
 
 		<!-- ********************************************* [END] Alarm 설정 (T_ALARM_0000) ******************************************** -->
 		
@@ -6902,6 +6933,13 @@
       <EN>There are new mail approval request materials.</EN>
       <CN>件待邮件审批的请求资料。</CN>
     </I_0241>
+
+    <I_0242>
+      <KR>공백없이 </KR>
+      <JP> </JP>
+      <EN> </EN>
+      <CN> </CN>
+    </I_0242>
 
 
     <!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
