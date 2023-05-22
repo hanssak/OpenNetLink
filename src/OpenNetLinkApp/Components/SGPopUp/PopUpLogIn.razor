@@ -24,7 +24,7 @@
 @inject PageStatusService pageService
 @inject OSXcmdService OSxCmdService
 
-<div class="modal fade" id="PopUpLogIn" style="z-index:9999;">
+<div class="modal fade" id="PopUpLogIn" style="z-index:9999;" data-backdrop="static">
     <div class="modal-dialog">
         <div class="modal-content">
             <!--s login popup-->
@@ -448,6 +448,8 @@
             pageService.SetGroupIDLoginType(nGroupID, eLoginUITypeData);
 
             bStartedLogin = true;
+
+            CLog.Here().Information($"doLogin, try Login Type : {eLoginUITypeData}");
 
             if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
                 HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginUITypeData);
@@ -979,6 +981,7 @@
                     strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
                     if (strTime.Equals(""))
                     {
+                        // pw 변경날짜 정보가 없는 첫Login시
                         eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
                         pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
                         goToPage.InvokeAsync((int)eLoginUITypeData);
@@ -1146,6 +1149,12 @@
                     strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
                     //strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";       // Table 이름 따로 정해졌음
                     strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
+
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc())
+                    {
+                        strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
+                        strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
+                    }
 
                     string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
                     HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);

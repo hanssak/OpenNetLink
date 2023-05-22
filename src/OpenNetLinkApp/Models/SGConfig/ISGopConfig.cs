@@ -161,5 +161,8 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseCrossPlatformOSforFileName { get; set; } // 파일 선택 삭제 사용 유무        
 
+        public bool bUseTitleDescMinLength { get; set; }              //URL Redirect 정책에 안먹히는 URL forward 기능 사용유무
+        
+
     }
 }

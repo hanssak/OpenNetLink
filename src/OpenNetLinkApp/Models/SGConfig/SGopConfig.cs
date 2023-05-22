@@ -166,6 +166,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseCrossPlatformOSforFileName { get; set; }              // 윈도우에서 파일이름에 사용못하는 문자 막는지 유무
 
         public List<bool> bListUsePKIsendRecv { get; set; } = null;             // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
-        
+
+
+        public bool bUseTitleDescMinLength { get; set; } = false;             //제목,설명 최소길이 제한 사용유무
+
     }
 }

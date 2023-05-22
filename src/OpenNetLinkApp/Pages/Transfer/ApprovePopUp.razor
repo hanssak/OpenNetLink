@@ -17,7 +17,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IJSRuntime jsRuntime
 @inject PageStatusService pageService
-@inject WebWindow window 
+@inject WebWindow window
 <div class="modal fade" id="ApprovePopUp" data-backdrop="static" data-keyboard="false" style="z-index:5000;">
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
         <div class="modal-content">
@@ -52,18 +52,17 @@
                                 <th>@strFilePos</th>  <!--파일위치-->
                                 <td style="text-align:center;">@strDataFilePos</td>
                                 <!--<th>@strReciver</th> -->   <!--수신자-->
-
                                 @if (bUseDlpDataView)
                                 {
                                     <th>@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
                                     <td style="text-align:center;">@stDLP</td>
                                 }
-				                else
-				                {
+                                else
+                                {
                                     <th></th>
-                                    <td style="text-align:center;"></td>				
-				                }
-				
+                                    <td style="text-align:center;"></td>
+                                }
+
 
                             </tr>
 
@@ -78,6 +77,48 @@
                                 <th>@strReqday</th>  <!--승인요청일-->
                                 <td style="text-align:center;">@strDataApprReqDay</td>
                             </tr>
+
+                            @if (m_nDataForwarded == 1)  //파일포워드 사용
+                            {
+                                <tr>
+                                    <th>@strReciver</th>
+                                    @if (listForwaredUserInfo != null && listForwaredUserInfo.Count > 1)
+                                    {
+                                        <td colspan="7">
+                                            @strDataForwardReciver
+                                            <a class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" data-toggle="dropdown" href="#">
+                                                <i class="fas fa-search"></i>
+                                            </a>
+
+                                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style=" right:0px; height:135px; overflow-y:scroll;">
+                                                <table id="table1" class="table table-head-fixed table-bordered table-hover" style="table-layout: fixed;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="text-align:center;width:7%;">@strUserName</th>                         <!--이름-->
+                                                    <th style="text-align:center;width:7%;">@strUserPosition</th>                         <!--직급-->
+                                                    <th style="text-align:center;width:8%;">@strUserDept</th>                        <!--부서-->
+                                                </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (Dictionary<int, string> item in listForwaredUserInfo)
+                                                        {
+                                                            <tr>
+                                                                <td style="text-align:center">@item[0]</td>
+                                                                <td style="text-align:center">@item[1]</td>
+                                                                <td style="text-align:center">@item[2]</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td colspan="7">@strDataForwardReciver</td>
+                                    }
+                                </tr>
+                            }
 
                             <tr>
                                 <th>@strTitle</th>       <!--제목-->
@@ -124,7 +165,6 @@
                                 <th style="text-align: center; width: 7%;">@strFileSize </th>             <!--크기-->
                                 <th style="text-align: center;">@strVirusHist </th>         <!--바이러스내역-->
                                 <th style="text-align: center;">@strVirusCheckDate </th>     <!--바이러스검사-->
-
                                 @if (bUseDlpDataView)
                                 {
                                     <th style="text-align: center;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
@@ -154,7 +194,7 @@
                                     <td style="text-align: center;">@item.strVirusExamDay</td>
 
                                     @if (bUseDlpDataView)
-                                    { 
+                                    {
                                         <td style="text-align: center; width: 20%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.stDLPDesc</td>
                                     }
                                 </tr>
@@ -253,6 +293,12 @@
     ISGNetworkService NetWorkSvc;
     public bool bIsPrivacyApproveDetail = false;
 
+    List<Dictionary<int, string>> listForwaredUserInfo = null;
+
+    /// <summary>데이터 포워딩 여부  0 : 포워딩한 사용자가 없음, 1 : 포워딩한 사용자가 있음. 2 : 포워딩받은 사용자.</summary>
+    public int m_nDataForwarded = -1;
+    public string strDataForwardReciver = "";               //수신자
+
     /// <summary>
     /// 파일미리보기 요청
     /// </summary>
@@ -318,29 +364,32 @@
 
 #if _WINDOWS
 
-        string strArguments = "";
+    string strArguments = "";
 
-        if (!SGAppMgrSvc.SiteConfigInfoService.GetUseWebLinkPreviewer(groupID))
-        {
-            //기존 뷰어 Param
-            strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-            strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
-        }
-        else
-        {
-            //웹링크쪽 뷰어 Param
-            string webLinkURL = SGAppMgrSvc.SiteConfigInfoService.GetWebLinkPreviewerURL(groupID);
-            string webLinkParam = makeParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
+    if (!SGAppMgrSvc.SiteConfigInfoService.GetUseWebLinkPreviewer(groupID))
+    {
+    //기존 뷰어 Param
+    strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+    strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+    }
+    else
+    {
+    //웹링크쪽 뷰어 Param
+    string webLinkURL = SGAppMgrSvc.SiteConfigInfoService.GetWebLinkPreviewerURL(groupID);
+    string webLinkParam = makeParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
 
-            strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
-            strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
-        }
+    //특수 문자 중 브라우저에 상이하게 인식되는 항목 변경
+    webLinkParam = webLinkParam.Replace("+", "%2B").Replace("/","%2F");
+
+    strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
+    strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+    }
 
 #else
 
-ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
-startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-startInfo.WindowStyle = ProcessWindowStyle.Normal;
+        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+        startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+        startInfo.WindowStyle = ProcessWindowStyle.Normal;
 #endif
 
         try
@@ -348,17 +397,17 @@ startInfo.WindowStyle = ProcessWindowStyle.Normal;
 
 #if _WINDOWS
 
-            [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-            static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
-            ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
+    [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
+    ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
 
 #else
 
-// Run the external process & wait for it to finish
-using (Process proc = Process.Start(startInfo))
-{
-//proc.WaitForExit();
-}
+            // Run the external process & wait for it to finish
+            using (Process proc = Process.Start(startInfo))
+            {
+                //proc.WaitForExit();
+            }
 #endif
 
         }
@@ -558,6 +607,10 @@ using (Process proc = Process.Start(startInfo))
     public string strRejectReason = "";
     public string strClose = "";
 
+    public string strUserName = "";                         // 이름
+    public string strUserPosition = "";                     // 직책
+    public string strUserDept = "";                         // 부서
+
     public string strDataTransKind = "";                // 전송구분
     public string strDataTransStatus = "";              // 전송상태
     public string strDataFilePos = "";                      // 파일위치
@@ -634,7 +687,7 @@ using (Process proc = Process.Start(startInfo))
         InitText();
         HsCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FilePrevProgressNoti);
 
-    bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
+        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
     }
 
 
@@ -792,6 +845,7 @@ using (Process proc = Process.Start(startInfo))
             }
         }
 
+        SetForwardInfo(sgDetailData);
         StateHasChanged();
     }
 
@@ -836,6 +890,10 @@ using (Process proc = Process.Start(startInfo))
             strRejectReason = XmlConf.GetTitle("T_APPROVE_REJECTREASON");          // 반려사유
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                             // 닫기
 
+        strUserName = XmlConf.GetTitle("T_COMMON_NAME");                                    // 이름
+        strUserPosition = XmlConf.GetTitle("T_COMMON_RANK");                                // 직책
+        strUserDept = XmlConf.GetTitle("T_COMMON_DEPT");                                    // 부서
+
         string strConNetwork = "UnKnown";
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
@@ -862,9 +920,16 @@ using (Process proc = Process.Start(startInfo))
             else
                 strPrevInfo2 = XmlConf.GetWarnMsg("W_0240");                            // 반입파일만 파일미리보기가 가능합니다.
         }
-
     }
 
+
+    public void SetForwardInfo(SGDetailData sgDetailData)
+    {
+        listForwaredUserInfo = sgDetailData.GetForwardUserInfo();
+        m_nDataForwarded = sgDetailData.m_nDataForwarded;
+        strDataForwardReciver = GetForwardList(listForwaredUserInfo);  //파일 포워딩 수신자 리스트
+        strReciver = sgDetailData.GetFowardTitle();
+    }
 
     public async Task DetailApprove()
     {
@@ -1032,20 +1097,19 @@ using (Process proc = Process.Start(startInfo))
 
         // 확장자 종류로 Web으로 preview 할지 결정
         string strExtName = Path.GetExtension(sFileName);
-        strExtName = strExtName.Substring(1);
-        if (strExtName.Equals(""))
-            return true;
+        strExtName = (strExtName.Equals("")) ? "" : strExtName.Substring(1);         //확장자가 없는 파일(text/plain)을 다운로드로 처리
 
         bool bFind = false;
 
 #if true
-        
+
         string strViewerExt = sgLoginData.GetPreViewerExt();
-        if ( (strViewerExt?.Length ?? 0) == 0)
-        { 
-            CLog.Here().Information($"ViewerExt : Empty!");
-            return false;
-        }
+        //CLIENT_PREVIEW_VIEWER_EXT의 데이터가 값이 없는 경우엔, 하기 다운로드 프로세스를 탈 수 있도록 삭제 처리
+        //if ((strViewerExt?.Length ?? 0) == 0)
+        //{
+        //    CLog.Here().Information($"ViewerExt : Empty!");
+        //    return false;
+        //}
 
         CLog.Here().Information($"ViewerExt : {strViewerExt}");
 
@@ -1055,17 +1119,17 @@ using (Process proc = Process.Start(startInfo))
         }
 
 #else
-        // 
-        string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp", "log" };
-        strExtName = strExtName.ToLower();
-        for (int i = 0; i < strExt.Length; i++)
-        {
-            if (strExt[i].Equals(strExtName))
-            {
-                bFind = true;
-                break;
-            }
-        }
+    //
+    string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp", "log" };
+    strExtName = strExtName.ToLower();
+    for (int i = 0; i < strExt.Length; i++)
+    {
+    if (strExt[i].Equals(strExtName))
+    {
+    bFind = true;
+    break;
+    }
+    }
 #endif
 
         if (!bFind)
@@ -1263,4 +1327,37 @@ using (Process proc = Process.Start(startInfo))
         StateHasChanged();
     }
 
+    private string GetForwardList(List<Dictionary<int, string>> listForwaredUsers)
+    {
+        string strFirstName = "";
+        string strPostion = "";
+        string strText = "";
+        strDataForwardReciver = "";
+        listForwaredUserInfo = listForwaredUsers;
+
+        if (listForwaredUserInfo == null)
+            return "";
+
+        listForwaredUserInfo[0].TryGetValue(0, out strFirstName);
+        listForwaredUserInfo[0].TryGetValue(1, out strPostion);
+
+        //데이터 포워딩 여부  0 : 포워딩한 사용자가 없음, 1 : 포워딩한 사용자가 있음. 2 : 포워딩받은 사용자.
+        if (m_nDataForwarded == 1)
+        {
+            if (listForwaredUserInfo.Count > 1)
+            {
+                strText = String.Format(XmlConf.GetInfoMsg("I_0083"), strFirstName, (listForwaredUserInfo.Count - 1).ToString());
+            }
+            else if (listForwaredUserInfo.Count == 1)
+            {
+                strText = $"{strFirstName} {strPostion}";
+            }
+        }
+        else if (m_nDataForwarded == 2)
+        {
+            strText = strDataApprReqUser;
+        }
+
+        return strText;
+    }
 }

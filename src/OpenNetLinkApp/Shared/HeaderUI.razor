@@ -2723,6 +2723,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 // CLick시에 승인대기 중인 항목들만 기간상관없이 조회되도록 적용
                 if (e.strDummy == "0")
                     naviURI += "/2";    // 결재 - 승인대기 전체조회
+                else if (e.strDummy == "3")
+                    naviURI += "/1";    // 클립보드 결재 - 승인대기 전체조회
                 else if (e.strDummy == "4")
                     naviURI += "/1";    // 메일결재 - 승인대기 전체조회
             }
@@ -3678,7 +3680,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 param[1] = strFromName + " <i class='fas fa-long-arrow-alt-right p-1'></i> " + strToName;
                 param[2] = strFileRecvInfo;
                 pageService.SetFileRecving(true);
-                await Task.Delay(100);
+               // await Task.Delay(100);
                 break;
             case 2:
                 identifier = "updateProgressMessage";
@@ -3686,7 +3688,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 param[0] = strID;
                 param[1] = strFileRecvInfo;
                 param[2] = strProgress;
-                await Task.Delay(500);
+            //    await Task.Delay(500);
                 break;
             case 3:
                 if (pageService.m_bScreenLock == true)
@@ -3696,14 +3698,14 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFileRecving(false);
-                await Task.Delay(1000);
+           //     await Task.Delay(1000);
                 break;
             case 4:             // 파일 수신 중 오류
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFileRecving(false);
-                await Task.Delay(1000);
+             //   await Task.Delay(1000);
                 break;
             default:
                 break;

@@ -286,6 +286,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseCrossPlatformOSforFileName();
 
+
+        public bool GetUseMinLengthTitleDesc();
+
+
     }
 
 
@@ -912,5 +916,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bUseCrossPlatformOSforFileName;
         }
+		
+        public bool GetUseMinLengthTitleDesc()
+        {
+            return AppConfigInfo.bUseTitleDescMinLength;
+        }
+
     }
 }
