@@ -14,50 +14,69 @@ var target = Argument("target", "Default");
 var sitename = Argument("sitename", "hanssak");
 var configuration = Argument("configuration", "Release");
 var setNetwork = Argument<bool>("setNetwork", true);
-var isPatch = Argument<bool>("isPatch", false);
+var isPatch = false;//Argument<bool>("isPatch", false);
 var isLightPatch = Argument<bool>("isLightPatch", false);
+var isEnc = Argument<bool>("isEnc", true);
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
 var customName = "NONE";
-var AppProps = new AppProperty(Context, 
+var AppProps = new AppProperty(Context,
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
-								"../", 													// Path of the Git Local Repository
+								 "../", 													// Path of the Git Local Repository
 								"./OpenNetLinkApp/wwwroot/conf/AppVersion.json",		// Version file Path 
-								"./OpenNetLinkApp/wwwroot/conf/AppEnvSetting.json",		// Env file Path of the Application env settings
-								"./OpenNetLinkApp/wwwroot/conf/NetWork.json",			// Network file Path of the Network settings
-								"./openNetLinkApp/ReleaseNote.md");						// Release Note of Patch File
+								// "./OpenNetLinkApp/wwwroot/conf/AppEnvSetting.json",		// Env file Path of the Application env settings
+								// "./OpenNetLinkApp/wwwroot/conf/NetWork.json",			// Network file Path of the Network settings
+								 "./openNetLinkApp/ReleaseNote.md");						// Release Note of Patch File
 
-string PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppUpdatePlatform);
-string ReleaseNoteDirPath 	= String.Format("artifacts/installer/{0}/release_note", AppProps.AppUpdatePlatform);
-string PackageZipFile 		= String.Format("OpenNetLink-{0}-{1}.hz", AppProps.AppUpdatePlatform, AppProps.PropVersion.ToString());
+string PackageDirPath 		= "NONE";
+string ReleaseNoteDirPath 	= "NONE";
+// string PackageZipFile 		= String.Format("OpenNetLink-{0}-{1}.hz", AppProps.AppUpdatePlatform, AppProps.PropVersion.ToString());
+string siteProfilePath = "./OpenNetLinkApp/wwwroot/SiteProfile";
 ///////////////////////////////////////////////////////////////////////////////
 // CLASSES
 ///////////////////////////////////////////////////////////////////////////////
+
 public class AppProperty
 {
     ICakeContext Context { get; }
+	public string Platform {get;set;}
+
 	public string PropsFile { get; }
 	public string GitRepoPath { get; }
 	public string VersionFile { get; }
 	public string AppEnvFile { get; }
-	public string NetworkFile { get; }
+	//public string NetworkFile { get; }
 	public string ReleaseNoteFile {get;}
-	private JObject VersionJObj { get; }
+	private JObject VersionJObj { get; set;}
 	private JObject AppEnvJObj { get; }
-	private JObject NetworkJobj { get; }
+	//private JObject NetworkJobj { get; }
 	private string _updateSvcIp = "";
 	
-    public AppProperty(ICakeContext context, string propsFile, string gitRepoPath, string versionFile, string appEnvFile, string networkFile, string releaseNoteFile)
-    {
-        Context = context;
+	public AppProperty(ICakeContext context, string propsFile, string gitRepoPath, string versionFile, string releaseNoteFile)
+	{
+		Context = context;
+
 		PropsFile = propsFile;
 		GitRepoPath = gitRepoPath;
 		VersionFile = versionFile;
-		AppEnvFile = appEnvFile;
-		NetworkFile = networkFile;
+		// AppEnvFile = appEnvFile;
+		// NetworkFile = networkFile;
 		ReleaseNoteFile = releaseNoteFile;
+
 		VersionJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(VersionFile));
-		AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(AppEnvFile));
-		NetworkJobj = JsonAliases.ParseJsonFromFile(Context, new FilePath(NetworkFile));
+		// AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(AppEnvFile));
+		// NetworkJobj = JsonAliases.ParseJsonFromFile(Context, new FilePath(NetworkFile));
+	}
+
+	public void ReloadVersionFile()
+	{
+		VersionJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(VersionFile));
+	}
+
+	public string InstallerRootDirPath
+	{
+		get {
+			return $"artifacts/installer/{Platform}";
+		}
 	}
 
 	public Version PropVersion {
@@ -93,6 +112,7 @@ public class AppProperty
 			
 		}
 	}
+
 	public GitCommit GitLastCommit {
 		get {
 			return GitAliases.GitLogTip(Context, GitRepoPath);
@@ -164,56 +184,67 @@ public class AppProperty
 			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(VersionFile), VersionJObj);
 		}
 	}
+
+	public string AppLastUpdated {
+		get {
+			return VersionJObj["LastUpdated"].ToString();
+		}
+		set {
+			VersionJObj["LastUpdated"] = value;
+			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(VersionFile), VersionJObj);
+		}
+	}
+
 	public string AppEnvUpdatePort {
 		get {
 			return "3439";
 		}
 	}
-	public string NetworkFromName {
-		get {
-			return NetworkJobj["NETWORKS"][0]["FROMNAME"].ToString();
-		}
-		set {
-			NetworkJobj["NETWORKS"][0]["FROMNAME"] = value;
-			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
-		}
-	}
+	// public string NetworkFromName {
+	// 	get {
+	// 		return NetworkJobj["NETWORKS"][0]["FROMNAME"].ToString();
+	// 	}
+	// 	set {
+	// 		NetworkJobj["NETWORKS"][0]["FROMNAME"] = value;
+	// 		JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
+	// 	}
+	// }
 
-	public string NetworkToName {
-		get {
-			return NetworkJobj["NETWORKS"][0]["TONAME"].ToString();
-		}
-		set {
-			NetworkJobj["NETWORKS"][0]["TONAME"] = value;
-			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
-		}
-	}
+	// public string NetworkToName {
+	// 	get {
+	// 		return NetworkJobj["NETWORKS"][0]["TONAME"].ToString();
+	// 	}
+	// 	set {
+	// 		NetworkJobj["NETWORKS"][0]["TONAME"] = value;
+	// 		JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
+	// 	}
+	// }
 
-	public string NetworkIPAddress {
-		get {
-			return NetworkJobj["NETWORKS"][0]["IPADDRESS"].ToString();
-		}
-		set {
-			NetworkJobj["NETWORKS"][0]["IPADDRESS"] = value;
-			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
-		}
-	}
+	// public string NetworkIPAddress {
+	// 	get {
+	// 		return NetworkJobj["NETWORKS"][0]["IPADDRESS"].ToString();
+	// 	}
+	// 	set {
+	// 		NetworkJobj["NETWORKS"][0]["IPADDRESS"] = value;
+	// 		JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
+	// 	}
+	// }
 
-	public string NetworkPort {
-		get {
-			return NetworkJobj["NETWORKS"][0]["PORT"].ToString();
-		}		
-	}
+	// public string NetworkPort {
+	// 	get {
+	// 		return NetworkJobj["NETWORKS"][0]["PORT"].ToString();
+	// 	}		
+	// }
 
-	public string NetworkPos {
-		get {
-			return NetworkJobj["NETWORKS"][0]["NETPOS"].ToString();
-		}	
-		set {
-			NetworkJobj["NETWORKS"][0]["NETPOS"] = value;
-			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
-		}	
-	}
+	// public string NetworkPos {
+	// 	get {
+	// 		return NetworkJobj["NETWORKS"][0]["NETPOS"].ToString();
+	// 	}	
+	// 	set {
+	// 		NetworkJobj["NETWORKS"][0]["NETPOS"] = value;
+	// 		JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
+	// 	}	
+	// }
 
 }
 
@@ -228,24 +259,23 @@ Task("Version")
 	var readedVersion = XmlPeek(propsFile, "//Version");
 	var currentVersion = new Version(readedVersion);
 	*/
-
-	var currentVersion = AppProps.PropVersion;
+	//var currentVersion = AppProps.PropVersion;
 	//var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build, currentVersion.Revision + 1);
-	var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build, currentVersion.Revision);
-	var CurAppEnvSWVersion = AppProps.AppSWVersion;
-	var Commit = AppProps.GitLastCommit;
-	var ShaId = AppProps.GitLastShaIdPretty;
-
-	AppProps.PropVersion = semVersion;
+	//var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build, currentVersion.Revision);
+	//var CurAppEnvSWVersion = AppProps.AppSWVersion;
+	 var Commit = AppProps.GitLastCommit;
+	 var ShaId = AppProps.GitLastShaIdPretty;
+	
+	//AppProps.PropVersion = semVersion;
 	AppProps.PropCommitId = ShaId;
-	AppProps.AppSWVersion = semVersion.ToString();
+	//AppProps.AppSWVersion = semVersion.ToString();
 	AppProps.AppSWCommitId = ShaId;
 
 	Information($"- Last Commit Log: [{Commit.ToString()}]");
 	Information($"- CommitId: [{AppProps.PropCommitId}]");
-	Information($"- Version: [{currentVersion} -> {AppProps.PropVersion}]");
+	Information($"- Version: [{AppProps.PropVersion}]");
 	Information($"- AppEnv SWCommitId: [{AppProps.AppSWCommitId}]");
-	Information($"- AppEnv SWVersion: [{CurAppEnvSWVersion} -> {AppProps.AppSWVersion}]");
+	Information($"- AppEnv SWVersion: [{AppProps.AppSWVersion}]");
 });
 
 Task("Clean")
@@ -258,20 +288,22 @@ Task("Clean")
 Task("PkgClean")
     .Does(() =>
 {
-	if(DirectoryExists(PackageDirPath)) {
-    	DeleteDirectory(PackageDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
-		Information($"- Delete: [{PackageDirPath}]");
+	if(DirectoryExists(AppProps.InstallerRootDirPath)) {
+    	DeleteDirectory(AppProps.InstallerRootDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
+		Information($"- Delete: [{AppProps.InstallerRootDirPath}]");
 	}
 
+	/*
 	if(DirectoryExists(ReleaseNoteDirPath)) {
  		DeleteDirectory(ReleaseNoteDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
 		Information($"- Delete: [{ReleaseNoteDirPath}]");
 	}
 
 	if(FileExists(PackageZipFile)) { 
- 		DeleteFile(PackageZipFile);
-		Information($"- Delete: [{PackageZipFile}]");
+ 	 	DeleteFile(PackageZipFile);
+	 	Information($"- Delete: [{PackageZipFile}]");
 	}
+	*/
 });
 
 Task("Build")
@@ -307,6 +339,7 @@ Task("Release")
         DotNetCoreBuild("./OpenNetLinkApp/OpenNetLinkApp.csproj", settings);
 });
 
+/*
 Task("SetFileName")
 	//patch가 아닐 경우만 실행
 	.WithCriteria(!isPatch)
@@ -497,7 +530,6 @@ Task("PkgWin10")
 			}
 		}
 	}
-	Information("5");
 	
 	var files = GetFiles("./artifacts/windows/published/*.so.*");
 	foreach(var file in files)
@@ -702,6 +734,363 @@ Task("Deploy")
 
 });
 
+*/
+Task("PubCrossflatform")
+	.IsDependentOn("Version")
+	.Does(() => {	
+	
+	//AppUpdatePlatform 은 Deploy 시 활용
+	AppProps.AppUpdatePlatform = AppProps.Platform;
+
+	var runtime ="win-x64";
+
+	if(AppProps.Platform == "windows")
+		runtime = "win-x64";
+	else if(AppProps.Platform == "debian" || AppProps.Platform == "redhat")
+		runtime = "linux-x64";
+	else if(AppProps.Platform == "mac")
+		runtime = "osx-x64";
+
+	var settings = new DotNetCorePublishSettings
+	{
+		Framework = "net5.0",
+		Configuration = "Release",
+		Runtime = runtime,
+		OutputDirectory = $"./artifacts/{AppProps.AppUpdatePlatform}/published"
+	};
+	
+	if(DirectoryExists(settings.OutputDirectory)) {
+		DeleteDirectory(settings.OutputDirectory, new DeleteDirectorySettings { Force = true, Recursive = true });
+	}		
+
+	if(AppProps.Platform == "windows")
+	{
+		//Window 에 한하여 추가 작업
+		String strWebViewLibPath 			= "./OpenNetLinkApp/Library/WebView2Loader.dll";
+		if(FileExists(strWebViewLibPath)) { DeleteFile(strWebViewLibPath); }
+
+		String strWebWindowNativeLibPath 	= "./OpenNetLinkApp/Library/WebWindow.Native.dll";
+		if(FileExists(strWebWindowNativeLibPath)) { DeleteFile(strWebWindowNativeLibPath); }
+	}
+
+    DotNetCorePublish("./OpenNetLinkApp", settings);
+	DotNetCorePublish("./PreviewUtil", settings);
+
+	if(AppProps.Platform != "mac")
+		DotNetCorePublish("./ContextTransferClient", settings);
+    
+	//생성전 과거 해시파일 삭제 
+	String hashSqlFile ="./OpenNetLinkApp/VersionHash.txt";
+	if(FileExists(hashSqlFile))	DeleteFile(hashSqlFile);
+
+	Information($"Start MD5HashUtility - isEnc : {isEnc} / Platforms : {AppProps.AppUpdatePlatform}");
+
+	//해시 파일 생성
+	using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = $"1 {AppProps.AppUpdatePlatform}" }))    {
+		process.WaitForExit();
+		Information("Package windows: Exit code: {0}", process.GetExitCode());
+    }
+	//설정 파일 암호화
+	if(isEnc == true)
+	{
+		using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = $"2 {AppProps.AppUpdatePlatform}" }))    {
+			process.WaitForExit();
+			Information("Package windows: Exit code: {0}", process.GetExitCode());
+		}
+	}
+
+	if(!FileExists(hashSqlFile))
+		throw new Exception(String.Format("[Err] Failed to create hash information file. : {0}", hashSqlFile));
+});
+
+Task("PkgCrossflatform")
+.Does(()=>{
+	//SetFileName
+	customName = Prompt("Custom Name : ");				
+	var LastUpdatedTime = DateTime.Now.ToString(@"yyyy\/MM\/dd h\:mm tt");
+
+	if(DirectoryExists(AppProps.InstallerRootDirPath)) {
+		DeleteDirectory(AppProps.InstallerRootDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
+	}
+	System.IO.Directory.CreateDirectory(AppProps.InstallerRootDirPath);
+
+	//[빌드 전] Site 공통 파일 적용 (ex.HSText, 인증서 등)
+	Information($"Copy [Site Unit] Common Files"); 
+
+	CopyFiles($"{siteProfilePath}/HSText.xml", "./OpenNetLinkApp/wwwroot/conf");
+	CopyFiles($"{siteProfilePath}/Sparkling.service", "./OpenNetLinkApp/wwwroot/conf");
+	CopyFiles($"{siteProfilePath}/postgresql.crt", "./OpenNetLinkApp/wwwroot/conf");
+
+	//[빌드 전] 스토리지 공유 단위별 공통 파일 적용 (ex.OP, AppVersion, Release Note 등)
+	Information($"Copy [Storage Unit] Common Files");
+	foreach(var storageUnit in System.IO.Directory.GetDirectories(siteProfilePath))
+	{
+		var storageUnitInfo =new DirectoryInfo(storageUnit);
+		string unitName = storageUnitInfo.Name;
+
+		if(unitName.Substring(0, 1) == ".") 
+			continue;
+
+		PackageDirPath =$"{AppProps.InstallerRootDirPath}/{unitName}/packages";
+		ReleaseNoteDirPath = $"{AppProps.InstallerRootDirPath}/{unitName}/release_note";		
+		System.IO.Directory.CreateDirectory(PackageDirPath);
+		System.IO.Directory.CreateDirectory(ReleaseNoteDirPath);
+		
+		CopyFiles($"{storageUnit}/ReleaseNote.md", ReleaseNoteDirPath);
+		DeleteFiles("./OpenNetLinkApp/wwwroot/conf/AppOPSetting_*.json");
+		
+		CopyFiles($"{storageUnit}/AppOPSetting*.json", "./OpenNetLinkApp/wwwroot/conf");
+		CopyFiles($"{storageUnit}/AppVersion.json", "./OpenNetLinkApp/wwwroot/conf");
+		
+		//Get AppVersion and Set Derectory.Build.props
+		AppProps.ReloadVersionFile();
+		AppProps.PropVersion = new Version(AppProps.AppSWVersion);
+		AppProps.AppLastUpdated = LastUpdatedTime;
+
+
+		Information($"AppPorps.PropVersion : {AppProps.PropVersion}");		
+		
+		//현재 스토리지 기준 Publish
+		RunTarget("PubCrossflatform");
+		CopyFiles("./OpenNetLinkApp/VersionHash.txt", $"{AppProps.InstallerRootDirPath}/{unitName}");
+		
+		//불필요한 Default 폴더/파일 삭제
+		if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile"))		
+			DeleteDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile", new DeleteDirectorySettings {Force = true, Recursive = true });
+			
+		// window에 한하여 필요없는 파일들 배포전에 제거
+		if(AppProps.Platform == "windows")
+		{
+			DeleteFiles("./artifacts/windows/published/*.so");
+			DeleteFiles("./artifacts/windows/published/*.pdb");
+
+			var files = GetFiles("./artifacts/windows/published/*.so.*");
+			foreach(var file in files)
+			{
+				String strSearchFile = (String)file.FullPath;
+				//Information("File: {0}", strSearchFile);
+
+				int nIdex = strSearchFile.LastIndexOf('.');
+				if (nIdex > 0)
+				{
+					String strItem = strSearchFile.Substring(nIdex+1);
+
+					int n=0;
+					bool isNumeric = int.TryParse(strItem, out n);
+					if (isNumeric)
+					{
+						Information("File-Deleted: {0}", strSearchFile);
+						DeleteFile(strSearchFile);
+					}
+				}		
+			}
+		}
+		
+		//[빌드 후] 에이전트 별 파일 적용 (ex.Network.json, AppEnvSetting 등)
+		Information($"Copy [Agent Unit] Files");
+
+		//설치파일 생성
+		foreach(var agentUnit in System.IO.Directory.GetDirectories(storageUnit))
+		{
+			var agentUnitInfo = new DirectoryInfo(agentUnit);
+			string AgentName= agentUnitInfo.Name;
+			
+			if(AgentName.Substring(0, 1) == ".")
+				continue;
+
+			Information($"Make Agent Installer {AgentName}");
+
+			networkFlag = AgentName.ToUpper();
+			
+			
+			CopyFiles($"{agentUnit}/AppEnvSetting.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
+			CopyFiles($"{agentUnit}/NetWork.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
+			
+			isPatch=false;
+			RunTarget("MakeInstaller");		
+		}
+
+		//패치파일 생성			
+		//Light Patch 버전일 땐, edge 폴더 배포전에 제거
+		if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
+		{
+			if(DirectoryExists("./artifacts/windows/published/wwwroot/edge")) 
+			{
+				DeleteDirectory("./artifacts/windows/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
+			}
+		}
+		
+		if(FileExists("./artifacts/windows/published/wwwroot/conf/NetWork.json"))
+			DeleteFile("./artifacts/windows/published/wwwroot/conf/NetWork.json");			
+		if(FileExists("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json"))
+			DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
+		
+		isPatch=true;
+		RunTarget("MakeInstaller");		
+	}
+});
+
+Task("MakeInstaller")
+	.Does(() => {
+
+	//Agent 설치대상 별로 exe 파일 생성 (IN/EX ...)
+	if(AppProps.Platform == "windows")
+	{
+		MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
+			Defines = new Dictionary<string, string>{
+				{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
+				{"IS_PATCH", isPatch.ToString().ToUpper()},
+				{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
+				{"NETWORK_FLAG", networkFlag.ToUpper()},
+				{"CUSTOM_NAME", customName.ToUpper()},
+				{"OUTPUT_DIRECTORY", PackageDirPath}
+			}
+		});			
+	}
+	else if(AppProps.Platform == "debian")
+	{
+		using(var process = StartAndReturnProcess("./PkgDebian.sh", new ProcessSettings
+												{ Arguments = new ProcessArgumentBuilder()
+												.Append(AppProps.PropVersion.ToString())
+												.Append(isPatch.ToString().ToUpper())
+												.Append(networkFlag.ToUpper()) 
+												.Append(customName.ToUpper())
+												.Append(PackageDirPath)//$5	
+												})
+												
+		)
+		{
+			process.WaitForExit();
+			Information("Package Debin: Exit code: {0}", process.GetExitCode());
+		}
+	}
+	else if(AppProps.Platform == "redhat")
+	{
+		using(var process = StartAndReturnProcess("./PkgRedhat.sh", new ProcessSettings
+													{ Arguments = new ProcessArgumentBuilder()
+													.Append(AppProps.PropVersion.ToString())
+													.Append(isPatch.ToString().ToUpper())
+													.Append(networkFlag.ToUpper()) 
+													.Append(customName.ToUpper())
+													.Append(PackageDirPath) //$5
+													})
+		)
+		{
+			process.WaitForExit();
+			Information("Package Redhat: Exit code: {0}", process.GetExitCode());
+		}
+	}
+	else if(AppProps.Platform == "mac")
+	{
+		using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings
+													{ Arguments = new ProcessArgumentBuilder()
+													.Append(AppProps.PropVersion.ToString())
+													.Append(isPatch.ToString().ToUpper())
+													.Append(networkFlag.ToUpper()) 
+													.Append(customName.ToUpper())
+													.Append(PackageDirPath)	//$5 Output
+													})
+		)
+		{
+			process.WaitForExit();
+			Information("Package osx: Exit code: {0}", process.GetExitCode());
+		}
+	}
+});
+
+Task("PkgWin10")
+    .Does(() => {
+		AppProps.Platform = "windows";
+		RunTarget("PkgCrossflatform");
+});
+
+Task("PkgOSX")	
+    .Does(() => {
+		AppProps.Platform = "mac";
+		RunTarget("PkgCrossflatform");	
+});
+
+Task("PkgDebian")
+    .Does(() => {
+	AppProps.Platform = "debian";
+	RunTarget("PkgCrossflatform");
+});
+
+Task("PkgRedhat")
+    .Does(() => {
+		AppProps.Platform = "redhat";
+		RunTarget("PkgCrossflatform");
+
+});
+
+Task("Deploy")
+	//.IsDependentOn("CreateReleaseNote")
+	.IsDependentOn("Install-DotnetCompressor")
+    .Does(() => {
+
+	//패치 파일만드는 Platform 은 마지막 Appversion의 Platform 보고 판단
+	AppProps.Platform = AppProps.AppUpdatePlatform;
+	//스토리피 별 패치 파일 생성
+	foreach(var storageUnit in System.IO.Directory.GetDirectories(AppProps.InstallerRootDirPath))
+	{
+		var storageUnitInfo =new DirectoryInfo(storageUnit);
+		string unitName = storageUnitInfo.Name;
+
+		if(unitName.Substring(0, 1) == ".") 
+			continue;
+
+		if(DirectoryExists($"{storageUnit}/patch")) {
+			DeleteDirectory($"{storageUnit}/patch", new DeleteDirectorySettings { Force = true, Recursive = true });
+		}
+		System.IO.Directory.CreateDirectory($"{storageUnit}/patch/{AppProps.Platform}/packages");
+		System.IO.Directory.CreateDirectory($"{storageUnit}/patch/{AppProps.Platform}/release_note");
+
+		foreach(var exeFile in GetFiles($"{storageUnit}/packages/*.exe"))
+		{	
+			string exeName = System.IO.Path.GetFileName(exeFile.FullPath);
+			
+			if(exeName.Substring(0, 1) == "." || exeName.Substring(0, 1) == "[")
+				continue;
+			
+			//패치 exe 파일만 patch 폴더로 Copy
+			CopyFiles(exeFile.FullPath, $"{storageUnit}/patch/{AppProps.Platform}/packages");
+		}
+
+		string[] packages = System.IO.Directory.GetFiles($"{storageUnit}/patch/{AppProps.Platform}/packages");
+		if(packages.Length != 1)
+			throw new Exception(String.Format("[Err] No exe file or 2 or more exe files exist. : {0}", $"{storageUnit}/patch/{AppProps.Platform}/packages"));
+
+		CopyFiles($"{storageUnit}/release_note/ReleaseNote.md", $"{storageUnit}/patch/{AppProps.Platform}/release_note");
+				
+		string PackagePath = packages[0];
+		string PackagefileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(PackagePath);
+		string PackageZipFile 		= $"{storageUnit}/{PackagefileNameWithoutExtension}.hz";
+		
+		if(!FileExists($"{siteProfilePath}/.HzCompressSeed"))
+			throw new Exception($"[Err] Not Found Hz Compress Password : {siteProfilePath}/.HzCompressSeed");
+
+		string Password = FileReadText($"{siteProfilePath}/.HzCompressSeed");
+
+		Information($"Make hz File - {PackageZipFile}");
+		// 압축 command: dcomp zip c -p %hsckconfigseed$ -b artifacts/packages/ -o test.zip
+		using(var process = StartAndReturnProcess("dcomp"
+							, new ProcessSettings { 
+								Arguments = new ProcessArgumentBuilder()
+												.Append("zip")
+												.Append("c")
+												.Append("-p").AppendQuoted(Password)
+												.Append("-b").AppendQuoted($"{storageUnit}/patch")
+												.Append("-o").AppendQuoted(PackageZipFile)
+								}))
+		{
+			process.WaitForExit();
+		}
+		
+		DeleteDirectory($"{storageUnit}/patch", new DeleteDirectorySettings { Force = true, Recursive = true });
+	}
+});
+
+
 Task("Install-NetSparkleUpdater.Tools.AppCastGenerator")
     .Does(() => {
 
@@ -737,8 +1126,8 @@ Task("Install-DotnetCompressor")
 	}
 });
 
-
 Task("Default")
     .IsDependentOn("Build");
 
 RunTarget(target);
+

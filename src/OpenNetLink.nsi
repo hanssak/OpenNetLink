@@ -45,9 +45,9 @@ Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 ;OutFile ".\artifacts\installer\windows\packages\OpenNetLinkSetup_v${PRODUCT_VERSION}.exe"
 
 !if ${IS_PATCH} == "TRUE"
-  OutFile ".\artifacts\installer\windows\packages\OpenNetLink-Windows-${PRODUCT_VERSION}.exe"
+  OutFile "${OUTPUT_DIRECTORY}\OpenNetLink-Windows-${PRODUCT_VERSION}.exe"
 !else
-  OutFile ".\artifacts\installer\windows\packages\[${CUSTOM_NAME}] OpenNetLink_${NETWORK_FLAG}_Windows_${PRODUCT_VERSION}.exe"
+  OutFile "${OUTPUT_DIRECTORY}\[${CUSTOM_NAME}] OpenNetLink_${NETWORK_FLAG}_Windows_${PRODUCT_VERSION}.exe"
 !endif
 
 InstallDir "C:\HANSSAK\OpenNetLink"

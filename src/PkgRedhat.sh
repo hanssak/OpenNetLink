@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_PACKAGE=artifacts/installer/redhat/packages
+PATH_PACKAGE=$5 #artifacts/installer/redhat/packages
 PKG_NAME=opennetlink
 mkdir -p $PATH_PACKAGE
 
