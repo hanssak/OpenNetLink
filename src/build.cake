@@ -14,9 +14,12 @@ var target = Argument("target", "Default");
 var sitename = Argument("sitename", "hanssak");
 var configuration = Argument("configuration", "Release");
 var setNetwork = Argument<bool>("setNetwork", true);
-var isPatch = false;//Argument<bool>("isPatch", false);
+var isFull = Argument<bool>("isFull", true);	//false로 하면, 설치파일은 만들지 않는다.
+var isPatch = Argument<bool>("isPatch", true);	//false로 하면, 패치파일은 만들지 않는다.
 var isLightPatch = Argument<bool>("isLightPatch", false);
 var isEnc = Argument<bool>("isEnc", true);
+
+var isPatchInstaller = false;
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
 var customName = "NONE";
 var AppProps = new AppProperty(Context,
@@ -790,14 +793,6 @@ Task("PubCrossflatform")
 		process.WaitForExit();
 		Information("Package windows: Exit code: {0}", process.GetExitCode());
     }
-	//설정 파일 암호화
-	if(isEnc == true)
-	{
-		using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = $"2 {AppProps.AppUpdatePlatform}" }))    {
-			process.WaitForExit();
-			Information("Package windows: Exit code: {0}", process.GetExitCode());
-		}
-	}
 
 	if(!FileExists(hashSqlFile))
 		throw new Exception(String.Format("[Err] Failed to create hash information file. : {0}", hashSqlFile));
@@ -806,7 +801,10 @@ Task("PubCrossflatform")
 Task("PkgCrossflatform")
 .Does(()=>{
 	//SetFileName
-	customName = Prompt("Custom Name : ");				
+	
+	if(isFull.ToString().ToUpper() == "TRUE")
+		customName = Prompt("Custom Name : ");			
+
 	var LastUpdatedTime = DateTime.Now.ToString(@"yyyy\/MM\/dd h\:mm tt");
 
 	if(DirectoryExists(AppProps.InstallerRootDirPath)) {
@@ -823,6 +821,8 @@ Task("PkgCrossflatform")
 
 	//[빌드 전] 스토리지 공유 단위별 공통 파일 적용 (ex.OP, AppVersion, Release Note 등)
 	Information($"Copy [Storage Unit] Common Files");
+
+	string lastAppSWVersion ="";
 	foreach(var storageUnit in System.IO.Directory.GetDirectories(siteProfilePath))
 	{
 		var storageUnitInfo =new DirectoryInfo(storageUnit);
@@ -836,25 +836,39 @@ Task("PkgCrossflatform")
 		System.IO.Directory.CreateDirectory(PackageDirPath);
 		System.IO.Directory.CreateDirectory(ReleaseNoteDirPath);
 		
-		CopyFiles($"{storageUnit}/ReleaseNote.md", ReleaseNoteDirPath);
-		DeleteFiles("./OpenNetLinkApp/wwwroot/conf/AppOPSetting_*.json");
-		
-		CopyFiles($"{storageUnit}/AppOPSetting*.json", "./OpenNetLinkApp/wwwroot/conf");
+		CopyFiles($"{storageUnit}/ReleaseNote.md", ReleaseNoteDirPath);		
 		CopyFiles($"{storageUnit}/AppVersion.json", "./OpenNetLinkApp/wwwroot/conf");
 		
 		//Get AppVersion and Set Derectory.Build.props
-		AppProps.ReloadVersionFile();
-		AppProps.PropVersion = new Version(AppProps.AppSWVersion);
-		AppProps.AppLastUpdated = LastUpdatedTime;
-
-
-		Information($"AppPorps.PropVersion : {AppProps.PropVersion}");		
+		AppProps.ReloadVersionFile();				
 		
-		//현재 스토리지 기준 Publish
-		RunTarget("PubCrossflatform");
-		CopyFiles("./OpenNetLinkApp/VersionHash.txt", $"{AppProps.InstallerRootDirPath}/{unitName}");
+		Information($"{lastAppSWVersion} - {AppProps.AppSWVersion}");
+		if(lastAppSWVersion != AppProps.AppSWVersion)	//AppVersion이 이전에 빌드한 스토리지의 버전과 동일하다면, Publish 생략 (해시 파일 통일)
+		{
+			lastAppSWVersion = AppProps.AppSWVersion;
+			AppProps.PropVersion = new Version(AppProps.AppSWVersion);
+			AppProps.AppLastUpdated = LastUpdatedTime;
+
+			Information($"AppPorps.PropVersion : {AppProps.PropVersion}");		
+			
+			//현재 스토리지 기준 Publish
+			RunTarget("PubCrossflatform");
+			CopyFiles("./OpenNetLinkApp/VersionHash.txt", $"{AppProps.InstallerRootDirPath}/{unitName}");
+		}
+
+		//storage의 OP 파일 published 경로에 적용 (+ OP 설정파일 암호화)
+		DeleteFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppOPSetting_*.json");		
+		CopyFiles($"{storageUnit}/AppOPSetting*.json", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf");		
 		
-		//불필요한 Default 폴더/파일 삭제
+		if(isEnc.ToString().ToUpper() == "TRUE")
+		{
+			using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = $"2 {AppProps.AppUpdatePlatform}" }))    {
+				process.WaitForExit();
+				Information("Package windows: Exit code: {0}", process.GetExitCode());
+			}
+		}
+
+		//Delete Default SiteProfile
 		if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile"))		
 			DeleteDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile", new DeleteDirectorySettings {Force = true, Recursive = true });
 			
@@ -890,43 +904,48 @@ Task("PkgCrossflatform")
 		Information($"Copy [Agent Unit] Files");
 
 		//설치파일 생성
-		foreach(var agentUnit in System.IO.Directory.GetDirectories(storageUnit))
+		if(isFull.ToString().ToUpper() == "TRUE")
 		{
-			var agentUnitInfo = new DirectoryInfo(agentUnit);
-			string AgentName= agentUnitInfo.Name;
-			
-			if(AgentName.Substring(0, 1) == ".")
-				continue;
-
-			Information($"Make Agent Installer {AgentName}");
-
-			networkFlag = AgentName.ToUpper();
-			
-			
-			CopyFiles($"{agentUnit}/AppEnvSetting.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
-			CopyFiles($"{agentUnit}/NetWork.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
-			
-			isPatch=false;
-			RunTarget("MakeInstaller");		
-		}
-
-		//패치파일 생성			
-		//Light Patch 버전일 땐, edge 폴더 배포전에 제거
-		if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
-		{
-			if(DirectoryExists("./artifacts/windows/published/wwwroot/edge")) 
+			foreach(var agentUnit in System.IO.Directory.GetDirectories(storageUnit))
 			{
-				DeleteDirectory("./artifacts/windows/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
+				var agentUnitInfo = new DirectoryInfo(agentUnit);
+				string AgentName= agentUnitInfo.Name;
+				
+				if(AgentName.Substring(0, 1) == ".")
+					continue;
+
+				Information($"Make Agent Installer {AgentName}");
+
+				networkFlag = AgentName.ToUpper();			
+				
+				CopyFiles($"{agentUnit}/AppEnvSetting.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
+				CopyFiles($"{agentUnit}/NetWork.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
+				
+				isPatchInstaller=false;
+				RunTarget("MakeInstaller");		
 			}
 		}
-		
-		if(FileExists("./artifacts/windows/published/wwwroot/conf/NetWork.json"))
-			DeleteFile("./artifacts/windows/published/wwwroot/conf/NetWork.json");			
-		if(FileExists("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json"))
-			DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
-		
-		isPatch=true;
-		RunTarget("MakeInstaller");		
+
+		//패치파일 생성
+		if(isPatch.ToString().ToUpper() == "TRUE")
+		{
+			//Light Patch 버전일 땐, edge 폴더 배포전에 제거
+			if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
+			{
+				if(DirectoryExists("./artifacts/windows/published/wwwroot/edge")) 
+				{
+					DeleteDirectory("./artifacts/windows/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
+				}
+			}
+			
+			if(FileExists("./artifacts/windows/published/wwwroot/conf/NetWork.json"))
+				DeleteFile("./artifacts/windows/published/wwwroot/conf/NetWork.json");			
+			if(FileExists("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json"))
+				DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
+			
+			isPatchInstaller=true;
+			RunTarget("MakeInstaller");		
+		}
 	}
 });
 
@@ -939,7 +958,7 @@ Task("MakeInstaller")
 		MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
 			Defines = new Dictionary<string, string>{
 				{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
-				{"IS_PATCH", isPatch.ToString().ToUpper()},
+				{"IS_PATCH", isPatchInstaller.ToString().ToUpper()},
 				{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
 				{"NETWORK_FLAG", networkFlag.ToUpper()},
 				{"CUSTOM_NAME", customName.ToUpper()},
@@ -952,7 +971,7 @@ Task("MakeInstaller")
 		using(var process = StartAndReturnProcess("./PkgDebian.sh", new ProcessSettings
 												{ Arguments = new ProcessArgumentBuilder()
 												.Append(AppProps.PropVersion.ToString())
-												.Append(isPatch.ToString().ToUpper())
+												.Append(isPatchInstaller.ToString().ToUpper())
 												.Append(networkFlag.ToUpper()) 
 												.Append(customName.ToUpper())
 												.Append(PackageDirPath)//$5	
@@ -969,7 +988,7 @@ Task("MakeInstaller")
 		using(var process = StartAndReturnProcess("./PkgRedhat.sh", new ProcessSettings
 													{ Arguments = new ProcessArgumentBuilder()
 													.Append(AppProps.PropVersion.ToString())
-													.Append(isPatch.ToString().ToUpper())
+													.Append(isPatchInstaller.ToString().ToUpper())
 													.Append(networkFlag.ToUpper()) 
 													.Append(customName.ToUpper())
 													.Append(PackageDirPath) //$5
@@ -985,7 +1004,7 @@ Task("MakeInstaller")
 		using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings
 													{ Arguments = new ProcessArgumentBuilder()
 													.Append(AppProps.PropVersion.ToString())
-													.Append(isPatch.ToString().ToUpper())
+													.Append(isPatchInstaller.ToString().ToUpper())
 													.Append(networkFlag.ToUpper()) 
 													.Append(customName.ToUpper())
 													.Append(PackageDirPath)	//$5 Output
@@ -1045,7 +1064,7 @@ Task("Deploy")
 		System.IO.Directory.CreateDirectory($"{storageUnit}/patch/{AppProps.Platform}/packages");
 		System.IO.Directory.CreateDirectory($"{storageUnit}/patch/{AppProps.Platform}/release_note");
 
-		foreach(var exeFile in GetFiles($"{storageUnit}/packages/*.exe"))
+		foreach(var exeFile in GetFiles($"{storageUnit}/packages/*.*"))
 		{	
 			string exeName = System.IO.Path.GetFileName(exeFile.FullPath);
 			
@@ -1058,7 +1077,7 @@ Task("Deploy")
 
 		string[] packages = System.IO.Directory.GetFiles($"{storageUnit}/patch/{AppProps.Platform}/packages");
 		if(packages.Length != 1)
-			throw new Exception(String.Format("[Err] No exe file or 2 or more exe files exist. : {0}", $"{storageUnit}/patch/{AppProps.Platform}/packages"));
+			throw new Exception(String.Format("[Err] No patch file or 2 or more patch files exist. : {0}", $"{storageUnit}/patch/{AppProps.Platform}/packages"));
 
 		CopyFiles($"{storageUnit}/release_note/ReleaseNote.md", $"{storageUnit}/patch/{AppProps.Platform}/release_note");
 				
