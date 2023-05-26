@@ -741,11 +741,7 @@ Task("Deploy")
 Task("MakeHashSqlScript")
 	.Does(()=> {
 		//해시 생성 sql 문 생성 (Arg : 1 + [OS])
-		var arg = "";
-		if(AppProps.Platform == "debian" || AppProps.Platform == "redhat")
-			arg= "1 linux";
-		else 
-			arg = $"1 {AppProps.Platform}";
+		var arg = $"1 {AppProps.Platform}";
 		
 
 		if(AppProps.Platform == "windows")
@@ -1141,7 +1137,7 @@ Task("Deploy")
 		{	
 			string exeName = System.IO.Path.GetFileName(exeFile.FullPath);
 			
-			if(exeName.Substring(0, 1) == "." || exeName.Substring(0, 1) == "[")
+			if(exeName.Substring(0, 1) == "." || exeName.Substring(0, 1) == "[" || exeName.Substring(0,1) == "#")
 				continue;
 			
 			//패치 exe 파일만 patch 폴더로 Copy
@@ -1212,6 +1208,7 @@ Task("Install-DotnetCompressor")
 											.Append("install")
 											.Append("--global")
 											.Append("dotnet-compressor")
+											.Append("--version").AppendQuoted("1.2.0")
 							}))
 	{
 		process.WaitForExit();
