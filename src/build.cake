@@ -736,8 +736,89 @@ Task("Deploy")
 	}
 
 });
-
 */
+
+Task("MakeHashSqlScript")
+	.Does(()=> {
+		//해시 생성 sql 문 생성 (Arg : 1 + [OS])
+		var arg = "";
+		if(AppProps.Platform == "debian" || AppProps.Platform == "redhat")
+			arg= "1 linux";
+		else 
+			arg = $"1 {AppProps.Platform}";
+		
+
+		if(AppProps.Platform == "windows")
+		{
+			using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = arg }))    {
+				process.WaitForExit();
+			}
+		}
+		else if(AppProps.Platform == "debian" || AppProps.Platform == "redhat")
+		{
+			using(var process = StartAndReturnProcess(".HashToolLinux/MD5HashUtility", new ProcessSettings
+												{ Arguments = new ProcessArgumentBuilder()
+												.Append(arg)
+												}))
+			{
+				process.WaitForExit();
+			}
+		}
+		else if(AppProps.Platform == "mac")
+		{
+			using(var process = StartAndReturnProcess(".HashToolOSX/MD5HashUtility", new ProcessSettings
+												{ Arguments = new ProcessArgumentBuilder()
+												.Append(arg)
+												}))
+			{
+				process.WaitForExit();
+			}
+		}
+		else
+		{
+			throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.Platform));
+		}
+
+	});
+
+Task("EncryptConfig")
+	.Does(()=> {
+		//OP 파일 암호화 처리 (Arg : 2 + [publish 생성 OS폴더명])
+		var arg = $"2 {AppProps.Platform};
+
+		if(AppProps.Platform == "windows")
+		{
+			using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = arg }))    {
+				process.WaitForExit();
+			}
+		}
+		else if(AppProps.Platform == "debian" || AppProps.Platform == "redhat")
+		{
+			using(var process = StartAndReturnProcess(".HashToolLinux/MD5HashUtility", new ProcessSettings
+												{ Arguments = new ProcessArgumentBuilder()
+												.Append(arg)
+												}))
+			{
+				process.WaitForExit();
+			}
+		}
+		else if(AppProps.Platform == "mac")
+		{
+			using(var process = StartAndReturnProcess(".HashToolOSX/MD5HashUtility", new ProcessSettings
+												{ Arguments = new ProcessArgumentBuilder()
+												.Append(arg)
+												}))
+			{
+				process.WaitForExit();
+			}
+		}
+		else
+		{
+			throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.Platform));
+		}
+
+	});
+
 Task("PubCrossflatform")
 	.IsDependentOn("Version")
 	.Does(() => {	
@@ -782,17 +863,14 @@ Task("PubCrossflatform")
 	if(AppProps.Platform != "mac")
 		DotNetCorePublish("./ContextTransferClient", settings);
     
-	//생성전 과거 해시파일 삭제 
+	//생성전 과거 해시 SQL문 삭제 
 	String hashSqlFile ="./OpenNetLinkApp/VersionHash.txt";
 	if(FileExists(hashSqlFile))	DeleteFile(hashSqlFile);
 
 	Information($"Start MD5HashUtility - isEnc : {isEnc} / Platforms : {AppProps.AppUpdatePlatform}");
 
-	//해시 파일 생성
-	using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = $"1 {AppProps.AppUpdatePlatform}" }))    {
-		process.WaitForExit();
-		Information("Package windows: Exit code: {0}", process.GetExitCode());
-    }
+	//해시 SQL문 생성
+	RunTarget("MakeHashSqlScript");
 
 	if(!FileExists(hashSqlFile))
 		throw new Exception(String.Format("[Err] Failed to create hash information file. : {0}", hashSqlFile));
@@ -861,12 +939,7 @@ Task("PkgCrossflatform")
 		CopyFiles($"{storageUnit}/AppOPSetting*.json", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf");		
 		
 		if(isEnc.ToString().ToUpper() == "TRUE")
-		{
-			using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = $"2 {AppProps.AppUpdatePlatform}" }))    {
-				process.WaitForExit();
-				Information("Package windows: Exit code: {0}", process.GetExitCode());
-			}
-		}
+			RunTarget("EncryptConfig");
 
 		//Delete Default SiteProfile
 		if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile"))		
