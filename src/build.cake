@@ -756,7 +756,7 @@ Task("MakeHashSqlScript")
 		}
 		else if(AppProps.Platform == "debian" || AppProps.Platform == "redhat")
 		{
-			using(var process = StartAndReturnProcess(".HashToolLinux/MD5HashUtility", new ProcessSettings
+			using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility", new ProcessSettings
 												{ Arguments = new ProcessArgumentBuilder()
 												.Append(arg)
 												}))
@@ -766,7 +766,7 @@ Task("MakeHashSqlScript")
 		}
 		else if(AppProps.Platform == "mac")
 		{
-			using(var process = StartAndReturnProcess(".HashToolOSX/MD5HashUtility", new ProcessSettings
+			using(var process = StartAndReturnProcess("./HashToolOSX/MD5HashUtility", new ProcessSettings
 												{ Arguments = new ProcessArgumentBuilder()
 												.Append(arg)
 												}))
@@ -783,8 +783,8 @@ Task("MakeHashSqlScript")
 
 Task("EncryptConfig")
 	.Does(()=> {
-		//OP 파일 암호화 처리 (Arg : 2 + [publish 생성 OS폴더명])
-		var arg = $"2 {AppProps.Platform};
+		//OP 파일 암호화 처리 (Arg : 2 + [publish 생성 OS폴더명]
+		var arg = $"2 {AppProps.Platform}";
 
 		if(AppProps.Platform == "windows")
 		{
@@ -794,7 +794,7 @@ Task("EncryptConfig")
 		}
 		else if(AppProps.Platform == "debian" || AppProps.Platform == "redhat")
 		{
-			using(var process = StartAndReturnProcess(".HashToolLinux/MD5HashUtility", new ProcessSettings
+			using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility", new ProcessSettings
 												{ Arguments = new ProcessArgumentBuilder()
 												.Append(arg)
 												}))
@@ -804,7 +804,7 @@ Task("EncryptConfig")
 		}
 		else if(AppProps.Platform == "mac")
 		{
-			using(var process = StartAndReturnProcess(".HashToolOSX/MD5HashUtility", new ProcessSettings
+			using(var process = StartAndReturnProcess("./HashToolOSX/MD5HashUtility", new ProcessSettings
 												{ Arguments = new ProcessArgumentBuilder()
 												.Append(arg)
 												}))
@@ -935,8 +935,8 @@ Task("PkgCrossflatform")
 		}
 
 		//storage의 OP 파일 published 경로에 적용 (+ OP 설정파일 암호화)
-		DeleteFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppOPSetting_*.json");		
-		CopyFiles($"{storageUnit}/AppOPSetting*.json", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf");		
+		DeleteFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppOPsetting_*.json");		
+		CopyFiles($"{storageUnit}/AppOPsetting*.json", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf");		
 		
 		if(isEnc.ToString().ToUpper() == "TRUE")
 			RunTarget("EncryptConfig");
