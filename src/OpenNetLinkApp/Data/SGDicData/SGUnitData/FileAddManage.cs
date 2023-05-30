@@ -1669,20 +1669,27 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             if (bMode)
             {
-                str = str.Replace("&", "&amp");
+                str = str.Replace("&", "&amp;");
                 str = str.Replace("<", "&lt;");
                 str = str.Replace(">", "&gt;");
+                str = str.Replace("#", "&#035;");
                 str = str.Replace("\n", "$ET;");
-                str = str.Replace("\"", "&quot");
-                str = str.Replace("\'", "&apos");
+                str = str.Replace("\"", "&quot;");
+                str = str.Replace("\'", "&#039;");
+                str = str.Replace("%", "％");
             }
             else
             {
                 str = str.Replace("&lt;", "<");
                 str = str.Replace("&gt;", ">");
                 str = str.Replace("$ET;", "\n");
+                str = str.Replace("&quot;", "\"");
                 str = str.Replace("&quot", "\"");
+                str = str.Replace("&#039;", "\'");
+                str = str.Replace("&apos;", "\'");
                 str = str.Replace("&apos", "\'");
+                str = str.Replace("&#035;", "#");
+                str = str.Replace("&amp;", "&");
                 str = str.Replace("&amp", "&");
             }
             if (!str.IsNormalized(NormalizationForm.FormC))
