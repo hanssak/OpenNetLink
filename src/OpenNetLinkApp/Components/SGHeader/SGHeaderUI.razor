@@ -479,7 +479,10 @@
     SGLoginData sgLoginData = null;
 
     bool bViewAlarmNotiAllDelMenu = true;                   // 전체삭제메뉴 설정으로 활성화
-
+    /// <summary>
+    /// GroupId 별 서버의 잠금시간 항목 중 최종 시간 값
+    /// </summary>
+    public int m_nSvrTime = 0;
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -979,30 +982,29 @@ private async void mouseTimer_Elapsed(object sender, System.Timers.ElapsedEventA
     if (i == count)
         return;
 
-    //bool bUseScreenLock = AppConfigSvc.GetScreenLock();
-    bool bUseScreenLock = SGAppMgrSvc.AppConfigInfoService.GetScreenLock();
-    if (bUseScreenLock)
+    //현재 접속된 GroupID 망이 AD로그인인 경우 화면잠금 사용하지 않음
+    int groupId = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
+    if (pageService.GetGroupIDLoginType(groupId) == eLoginType.eLOGINTYPE_AD)
+        return;
+    
+    object[] param = { screentime };
+    //object[] param = { 1 };
+    tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
+
+    if (tRtn.Result == "false")
     {
-
-        object[] param = { screentime };
-        //object[] param = { 1 };
-        tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
-
-        if (tRtn.Result == "false")
+        if ((pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true) && (pageService.GetFilePrevRecving() != true)) // && (!bTotalLogOut))
         {
-            if ((pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true) && (pageService.GetFilePrevRecving() != true)) // && (!bTotalLogOut))
-            {
-                pageService.SetScrLocking(true);
-                //화면잠금후에도 파일수신은 되도록 수정 2021/07/15 YKH
-                //HsCmdCenter.SetAllFileRecvPossible(false);
-                HsCmdCenter.SetAllFileRecvPossible(true);
-                await openDisplayLock();
-            }
-            else
-            {
-                await JSRuntime.InvokeAsync<string>("initMouseClick");
-            }
+            pageService.SetScrLocking(true);
+            //화면잠금후에도 파일수신은 되도록 수정 2021/07/15 YKH
+            //HsCmdCenter.SetAllFileRecvPossible(false);
+            HsCmdCenter.SetAllFileRecvPossible(true);
+            await openDisplayLock();
         }
+        else
+        {
+            await JSRuntime.InvokeAsync<string>("initMouseClick");
+        }        
     }
 }
 
@@ -1645,7 +1647,9 @@ protected override void OnInitialized()
 {
     sgSettingProc = SGSettingsDBProc.Instance;
     AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-    HsCmdCenter.sgPageEvent.SetScreenTimeChangeNotiEvent(ScreenTimeChangeNoti);
+    //서버에서 내려온 화면잠금 값으로 고정 (사용자 변경 불가)
+    //HsCmdCenter.sgPageEvent.SetScreenTimeChangeNotiEvent(ScreenTimeChangeNoti);
+    HsCmdCenter.sgPageEvent.SetScreenTimeInitNotiEvent(ScreenLockTimeInitNoti);
     HsCmdCenter.sgPageEvent.SetLoginAfterSGHeaderUIEventAdd(LoginAfterHeaderUI);
     NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
     listNetWorkData = NetWorkSvc.NetWorkInfo;
@@ -1674,8 +1678,19 @@ protected override void OnInitialized()
 /**
 *@brief 화면잠금 시간값 변경 및 재동작
 */
-public void ScreenTimeChangeNoti(int groupID, ConfigArgs e)
+public void ScreenLockTimeInitNoti(int groupID, ConfigArgs e)
 {
+    int time = e.ScreenTime;
+    
+    // logout 까지 고려
+    if (m_nSvrTime == 0)        //다중망 중, 화면잠금을 사용하는 망이 하나라도 있으면 잠금 시간 적용
+        m_nSvrTime = time;
+    else if (time < m_nSvrTime)  //다중망 중, 화면잠금 시간은 최소값으로 적용
+        m_nSvrTime = time;
+    
+    if (time <= 0)
+        return;
+
     screentime = e.ScreenTime;
     if (mouseTimer == null)
     {

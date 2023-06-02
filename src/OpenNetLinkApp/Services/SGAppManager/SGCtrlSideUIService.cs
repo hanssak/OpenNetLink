@@ -66,8 +66,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetStartTrayMove(bool startTrayMove);
         void SetStartProgramReg(bool startProgramReg);
         void SetLanguage(string language);
-        void SetScreenLock(bool screenLock);
-        void SetScreenTime(int screenTime);
+        //void SetScreenLock(bool screenLock);
+        //void SetScreenTime(int screenTime);
         void SetLastUpdated(string lastUPdated);
         void SetSWVersion(string swVersion);
         void SetSWCommitId(string swCommitId);
@@ -530,20 +530,20 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
-        public void SetScreenLock(bool screenLock)
-        {
-            (AppConfigInfo as SGAppConfig).bUseScreenLock = screenLock;
+        //public void SetScreenLock(bool screenLock)
+        //{
+        //    (AppConfigInfo as SGAppConfig).bUseScreenLock = screenLock;
 
-            SaveAppConfigSerialize();
-            //SaveOpConfigSerialize();
-            NotifyStateChangedCtrlSide();
-        }
-        public void SetScreenTime(int screenTime)
-        {
-            (AppConfigInfo as SGAppConfig).tScreenTime = screenTime;
-            SaveAppConfigSerialize();
-            NotifyStateChangedCtrlSide();
-        }
+        //    SaveAppConfigSerialize();
+        //    //SaveOpConfigSerialize();
+        //    NotifyStateChangedCtrlSide();
+        //}
+        //public void SetScreenTime(int screenTime)
+        //{
+        //    (AppConfigInfo as SGAppConfig).tScreenTime = screenTime;
+        //    SaveAppConfigSerialize();
+        //    NotifyStateChangedCtrlSide();
+        //}
         public void SetLastUpdated(string lastUPdated)
         {
             (VersionConfigInfo as SGVersionConfig).LastUpdated = lastUPdated;

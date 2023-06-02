@@ -116,7 +116,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         //public bool bStartTrayMove { get; set; }                               // 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
         public bool bUseStartProgramReg { get; set; }                             // 시작 프로그램 등록 사용 유무.(환경설정)
         //public bool bStartProgramReg { get; set; }                                // 시작 프로그램 등록 ( true : 시작프로그램 등록, false : 시작프로그램 등록 해제 )
-        public bool bScreenLockUserChange { get; set; }                          //스크린 잠금 사용자 임의 변경 가능여부(환경설정)
+        //public bool bScreenLockUserChange { get; set; }                          //스크린 잠금 사용자 임의 변경 가능여부(환경설정)
         //public bool bUseScreenLock { get; set; }                                  // 화면잠금 사용 여부.(체크)
         public bool bUseLogLevel { get; set; }                                    // 로그 레벨 사용 여부
         public bool bShowAdminInfo { get; set; }                                 //대시보드에 관리자 정보 표시 여부 

@@ -134,7 +134,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //public bool GetStartTrayMove(int groupId);
         public bool GetUseStartProgramReg(int groupId);
         //public bool GetStartProgramReg(int groupId);
-        public bool GetScreenLockUserChange(int groupId);
+        //public bool GetScreenLockUserChange(int groupId);
         //public bool GetUseScreenLock(int groupId);
         public bool GetUseLogLevel(int groupId);
         public bool GetShowAdminInfo(int groupId);
@@ -709,10 +709,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //{
         //    return AppConfigInfo[groupId].bStartProgramReg;
         //}
-        public bool GetScreenLockUserChange(int groupId)
-        {
-            return AppConfigInfo[groupId].bScreenLockUserChange;
-        }
+        //public bool GetScreenLockUserChange(int groupId)
+        //{
+        //    return AppConfigInfo[groupId].bScreenLockUserChange;
+        //}
         //public bool GetUseScreenLock(int groupId)
         //{
         //    return AppConfigInfo[groupId].bUseScreenLock;

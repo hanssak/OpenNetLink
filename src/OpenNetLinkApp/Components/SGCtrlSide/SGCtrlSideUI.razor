@@ -503,7 +503,8 @@
         </div>
     }
 
-    @if (m_bUseScreenLock)
+    @*2023.06.01 화면잠금에 대한 표시 및 설정은 사용자 접근 불가로 변경*@
+  @*  @if (m_bUseScreenLock)
     {
         <div class="r_set_sub">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</div> <!--화면잠금-->
         <div class="ml-2 mb-4">
@@ -524,7 +525,7 @@
                 }
             </div>
         </div>
-    }
+    }*@
 
     @if (m_bLogLevelSet)
     {
@@ -590,7 +591,7 @@
     /// <summary>
     /// 화면잠금을 공통환경설정에 표현할지 유무
     /// </summary>
-    public bool m_bUseScreenLock = false;
+    //public bool m_bUseScreenLock = false;
 
     /// <summary>
     ///
@@ -668,7 +669,9 @@
 
     public bool m_bTrayMove = true;
     public bool m_bAlarmTray = true;
-    public bool m_bScreenLockUserChange = false;                                        // 화면잠금을 사용자가 설정변경할수 있음(true), 없음(false)
+    
+    //2023.06.01 화면잠금에 대한 설정 및 확인은 사용자 확인 불가
+    //public bool m_bScreenLockUserChange = false;                                        // 화면잠금을 사용자가 설정변경할수 있음(true), 없음(false)
 
     Dictionary<string, SGNetOverData> m_dicDestSysPos = null;                       // 3망상황일때 정보
 
@@ -732,84 +735,9 @@
 
     protected override void OnInitialized()
     {
-        //ScreenLock 일 경우 다중망일 경우에도 GroupId 0 정책을 따른다.
-        m_bScreenLockUserChange = OpConfigSvc.GetScreenLockUserChange(0);
 
-
-        /*SGLoginData sgLoginData = null;
-
-        foreach (var NetworkInfo in GetSGNetworkList())
-        {
-
-            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(NetworkInfo.GroupID);
-            if (sgLoginData != null && sgLoginData.GetUseOverNetwork2())
-            {
-                dicDestSysPos = pageService.GetTargetSystemList(NetworkInfo.GroupID);
-                if (dicDestSysPos != null && dicDestSysPos.Count > 1)
-                {
-
-                    string strKeyNetGroupIDidx = "";
-
-                    foreach(var item in dicDestSysPos)
-                    {
-                        if (item.Value.nIdx == 1)
-                        {
-                            if (ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
-                            {
-                                ListModKey.RemoveAt(NetworkInfo.GroupID);
-                                ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
-                                ListVKey.RemoveAt(NetworkInfo.GroupID);
-                                ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
-                            }
-                            else
-                            {
-                                ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
-                                ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
-                            }
-                        }
-                        else if(item.Value.nIdx > 1)
-                        {
-                            strKeyNetGroupIDidx = String.Format($"{NetworkInfo.GroupID}-{item.Value.nIdx}");
-
-                            //List<bool> listClipShortKey = new List<bool>();
-                            //List<bool> listClipShortKey = null;
-                            //dicModKeyNetOver.TryGetValue(strKeyNetGroupIDidx, out listClipShortKey);
-                            dicModKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardModifierWhenNetOver(NetworkInfo.GroupID, item.Value.nIdx);
-                        }
-                    }
-
-                    // 수신망전체 전송
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend())
-                    {
-                        strKeyNetGroupIDidx = String.Format($"{NetworkInfo.GroupID}-{0}");
-                        dicModKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardModifierWhenNetOver(NetworkInfo.GroupID, 0);
-                    }
-
-                }
-
-                // Key Data 추가
-
-            }
-            else
-            {
-
-                if (ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
-                {
-                    ListModKey.RemoveAt(NetworkInfo.GroupID);
-                    ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
-                    ListVKey.RemoveAt(NetworkInfo.GroupID);
-                    ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
-                }
-                else
-                {
-                    ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
-                    ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
-                }
-
-            }
-        }*/
-
-
+        @* ScreenLock 일 경우 다중망일 경우에도 GroupId 0 정책을 따른다.
+        m_bScreenLockUserChange = OpConfigSvc.GetScreenLockUserChange(0);      
         m_bUseScreenLock = SGAppMgrSvc.OpConfigInfoService.GetScreenLockUserChange(0);  // siteConfig.GetUseScreenLock()
         if (m_bUseScreenLock)
         {
@@ -824,7 +752,7 @@
                 config.ScreenTime = time;
                 screentimeChgEvent(pageService.m_nCurViewPageGroupID, config);
             }
-        }
+        }*@
 
         HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
         HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
@@ -1160,15 +1088,15 @@
     //    return AppConfigSvc.GetUseScreenLock();
     //}
 
-    private bool GetScreenLock()
-    {
-        return AppConfigSvc.GetScreenLock();
-    }
+    //private bool GetScreenLock()
+    //{
+    //    return AppConfigSvc.GetScreenLock();
+    //}
 
-    private int GetScreenTime()
-    {
-        return AppConfigSvc.GetScreenTime();
-    }
+    //private int GetScreenTime()
+    //{
+    //    return AppConfigSvc.GetScreenTime();
+    //}
 
     private string GetLastUpdated()
     {
@@ -1682,12 +1610,12 @@
         CLog.Here().Information($"Language Set: [{language}]");
         CtrlSideUISvc.SetLanguage(language);
     }
-    private void SetScreenLock(ChangeEventArgs changeEventArg)
-    {
-        bool screenLock = Convert.ToBoolean(changeEventArg.Value);
-        CLog.Here().Information($"ScreenLock Set: [{screenLock}]");
-        CtrlSideUISvc.SetScreenLock(screenLock);
-    }
+    //private void SetScreenLock(ChangeEventArgs changeEventArg)
+    //{
+    //    bool screenLock = Convert.ToBoolean(changeEventArg.Value);
+    //    CLog.Here().Information($"ScreenLock Set: [{screenLock}]");
+    //    CtrlSideUISvc.SetScreenLock(screenLock);
+    //}
 
 
     private void SetAllDownloadPath(int groupId, string stPath)
@@ -1703,7 +1631,7 @@
         CLog.Here().Information($"Set DownLoadPath, BaseDownLoadPath, RecvDownPath Set: [{stPath}] useUserPath : {SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId)}");   // siteConfig
     }
 
-    /// <summary>
+@*    /// <summary>
     /// 화면잠금 시간값 변경 저장 및 전달
     /// </summary>
     /// <param name="changeEventArg"></param>
@@ -1737,7 +1665,7 @@
             config.ScreenTime = screenTime;
             screentimeChgEvent(0, config);
         }
-    }
+    }*@
 
 
     private void SetLogLevel(ChangeEventArgs changeEventArg)
@@ -1792,7 +1720,7 @@
         return NetWorkSvc.NetWorkInfo;
     }
 
-    /// <summary>
+   @* /// <summary>
     /// 서버에서 받은 화면잠금 시간값 설정(받은 값중 최소값으로 설정)
     /// </summary>
     /// <param name="groupID"></param>
@@ -1839,7 +1767,7 @@
                 }
             }
         }
-    }
+    }*@
 
 
     private void ShowMessage(string strType, string strMsg)
@@ -1874,7 +1802,7 @@
         m_bUseFileSend = false;
         bool bManualDown = false;
         bool bAfterCheckHide = false;
-        bool bTmpScreenLock = true;
+        //bool bTmpScreenLock = true;
         SGLoginData sgLoginData = null;
         ISGSideBarUIService SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1912,23 +1840,23 @@
                 bAfterCheckHide = sgLoginData.GetAfterChkHide();
         }
 
-        //AD로그인이 존재하면 화면잠금 미사용
-        foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))
-        {
-            SGSvrData sgSvrData = null;
-            sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(NetworkInfo.GroupID);
-            if (sgSvrData == null)
-                continue;
-
-            eLoginType eLoginTypeData = sgSvrData.GetLoginType();
-
-            if (eLoginTypeData == eLoginType.eLOGINTYPE_AD)
-            {
-                bTmpScreenLock = false;
-                m_bUseScreenLock = bTmpScreenLock;
-                CtrlSideUISvc.SetScreenLock(m_bUseScreenLock);
-            }
-        }
+        ////AD로그인이 존재하면 화면잠금 미사용
+        //foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))
+        //{
+        //    SGSvrData sgSvrData = null;
+        //    sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(NetworkInfo.GroupID);
+        //    if (sgSvrData == null)
+        //        continue;
+        //
+        //    eLoginType eLoginTypeData = sgSvrData.GetLoginType();
+        //
+        //    if (eLoginTypeData == eLoginType.eLOGINTYPE_AD)
+        //    {
+        //        bTmpScreenLock = false;
+        //        m_bUseScreenLock = bTmpScreenLock;
+        //        CtrlSideUISvc.SetScreenLock(m_bUseScreenLock);
+        //    }
+        //}
 
         if (m_bUseClipBoard)
         {

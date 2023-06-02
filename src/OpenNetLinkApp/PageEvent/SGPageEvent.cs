@@ -166,8 +166,8 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void ChangePassWDNotiEvent(int groupid, PageEventArgs e);
     // 화면잠금 초기 설정 노티
     public delegate void ScreenTimeInitNotiEvent(int groupid, ConfigArgs e);
-    // 화면잠금 시간 변경 결과 노티
-    public delegate void ScreenTimeChangeNotiEvent(int groupid, ConfigArgs e);
+    //// 화면잠금 시간 변경 결과 노티
+    //public delegate void ScreenTimeChangeNotiEvent(int groupid, ConfigArgs e);
     // 수신폴더 변경 결과 노티
     public delegate void RecvFolderChangeNotiEvent(int groupid, ConfigArgs e);
     // 오프라인 노티 
@@ -363,7 +363,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, UrlRedirectionPolicySetNotiEvent> DicUrlRedirectionUserPolicyEvent = new Dictionary<int, UrlRedirectionPolicySetNotiEvent>();                       // urlredirection 설정변경에 따른 Change 노티(watcher Thread에게 새정책전달 목적)
 
         public ChangePassWDNotiEvent ChgPassWDEvent;                                                                                                     // 패스워드 변경 결과 노티
-        public ScreenTimeChangeNotiEvent ScrLockTimeChgEvent;                                                                                            // 화면잠금 시간 변경 결과 노티
+        //public ScreenTimeChangeNotiEvent ScrLockTimeChgEvent;                                                                                            // 화면잠금 시간 변경 결과 노티
         public ScreenTimeInitNotiEvent ScrLockTimeInitEvent;                                                                                            // 로그인 후 화면잠금 사용 및 시간 결과 노티
         public RecvFolderChangeNotiEvent RecvFolderChgEvent;                                                                                             // 수신폴더 변경 결과 노티
 
@@ -1236,21 +1236,21 @@ namespace OpenNetLinkApp.PageEvent
             ChgPassWDEvent = ChangePassWDNoti;
         }
 
-        /**
-        *@brief 화면잠금 시간 변경 
-        */
-        public ScreenTimeChangeNotiEvent GetScreenTimeChangeNotiEvent()
-        {
-            return ScrLockTimeChgEvent;
-        }
+        ///**
+        //*@brief 화면잠금 시간 변경 
+        //*/
+        //public ScreenTimeChangeNotiEvent GetScreenTimeChangeNotiEvent()
+        //{
+        //    return ScrLockTimeChgEvent;
+        //}
 
-        /**
-        *@brief 
-        */
-        public void SetScreenTimeChangeNotiEvent(ScreenTimeChangeNotiEvent screenTimeChgNoti)
-        {
-            ScrLockTimeChgEvent = screenTimeChgNoti;
-        }
+        ///**
+        //*@brief 
+        //*/
+        //public void SetScreenTimeChangeNotiEvent(ScreenTimeChangeNotiEvent screenTimeChgNoti)
+        //{
+        //    ScrLockTimeChgEvent = screenTimeChgNoti;
+        //}
 
         /**
         *@brief 

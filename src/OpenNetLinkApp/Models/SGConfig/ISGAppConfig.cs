@@ -67,8 +67,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         bool bStartTrayMove { get; }                                // 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
         bool bStartProgramReg { get; }                              // 시작 프로그램 등록 ( true : 시작프로그램 등록, false : 시작프로그램 등록 해제 )
         string strLanguage { get; }                                 // 다국어 지원 ( KR : 한국어, JP : 일본어, EN : 영어, CN : 중국어 )
-        bool bUseScreenLock { get; }                                  // 화면잠금 사용 여부.(체크)
-        int  tScreenTime { get; }                                   // 화면잠금 시간 설정( 단위 : 분 )
+        //bool bUseScreenLock { get; }                                  // 화면잠금 사용 여부.(체크)
+        //int  tScreenTime { get; }                                   // 화면잠금 시간 설정( 단위 : 분 )
         public LogEventLevel LogLevel { get; }                      // 로그레벨
         bool bUseApprWaitNoti { get; }                              // 승인대기 알림 사용 여부.(체크)
         int nUserSelectFirstNet { get; }
