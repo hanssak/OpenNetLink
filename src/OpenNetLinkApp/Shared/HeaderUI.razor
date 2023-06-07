@@ -3689,7 +3689,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             //    await Task.Delay(500);
                 break;
             case 3:
-                if (pageService.m_bScreenLock == true)
+                if (pageService.GetScrLocking() == true)
                     identifier = "closeProgressMessageOnScreenLock";
                 else
                     identifier = "closeProgressMessage";

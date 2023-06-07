@@ -933,7 +933,7 @@ private void RefreshProfilePhoto()
 private async Task openDisplayLock()
 {
     await JSRuntime.InvokeAsync<object>("closeAllPopup");
-    pageService.m_bScreenLock = true;
+    pageService.SetScrLocking(true);
     object[] param = { "modal-displaylock" };
     await JSRuntime.InvokeAsync<object>("openPopUp", param);
 
@@ -995,11 +995,13 @@ private async void mouseTimer_Elapsed(object sender, System.Timers.ElapsedEventA
     {
         if ((pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true) && (pageService.GetFilePrevRecving() != true)) // && (!bTotalLogOut))
         {
-            pageService.SetScrLocking(true);
+            //pageService.SetScrLocking(true);
             //화면잠금후에도 파일수신은 되도록 수정 2021/07/15 YKH
             //HsCmdCenter.SetAllFileRecvPossible(false);
             HsCmdCenter.SetAllFileRecvPossible(true);
-            await openDisplayLock();
+
+            if(!pageService.GetScrLocking())
+                await openDisplayLock();
         }
         else
         {

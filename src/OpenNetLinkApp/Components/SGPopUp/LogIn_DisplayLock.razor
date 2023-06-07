@@ -66,14 +66,14 @@
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<LogIn_DisplayLock>();
     public async Task openPopUp()
     {
-        pageService.m_bScreenLock = true;
+        pageService.SetScrLocking(true);
         object[] param = { "modal-displaylock" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
     public void closePopUp()
     {
-        pageService.m_bScreenLock = false;
+        pageService.SetScrLocking(false);
         strInputPW = "";
         StateHasChanged();
         object[] param = { "modal-displaylock" };
