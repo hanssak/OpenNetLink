@@ -52,6 +52,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public string GetInitPasswordInfo(int groupId);
 
+        public bool GetUseIDAsInitPassword(int groupId);
+
         public bool GetRFileAutoSend(int groupId);
 
         //public bool GetRMouseFileAddAfterTrans(int groupId);
@@ -370,6 +372,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].strInitPasswd;
         }
+
+        public bool GetUseIDAsInitPassword(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseIDAsInitPassword;
+        }
+
         public bool GetRFileAutoSend(int groupId)
         {
             return AppConfigInfo[groupId].bRFileAutoSend;

@@ -29,6 +29,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public string strPWChangeProhibitLimit { get; set; }        // 패스워드 사용금지 문자열 지정.
         public int nPWChangeApplyCnt { get; set; }                   // 패스워드 변경 시 허용되는 자리수 지정.
         public string strInitPasswd { get; set; }    // 초기 패스워드 정보.(hsck@2301)
+        public bool bUseIDAsInitPassword { get; set; } //ID와 동일한 비밀번호를 초기 PW로 사용할지 여부 (true : ID=PW로 로그인된 경우, 비밀번호 변경 요청)
 
         //파일 전송
         public bool bRFileAutoSend { get; set; }                          // 마우스 우클릭 후 자동전송 사용 유무( 환경설정 체크박스 보이고 안보이고)

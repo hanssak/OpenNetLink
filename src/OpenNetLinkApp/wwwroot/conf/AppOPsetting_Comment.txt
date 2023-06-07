@@ -60,6 +60,7 @@ bEmptyfileTrans : 0kb 파일 전송 가능 유무(true, false)
 strInitPasswd : 암호화된 초기 PW string
 strPWChangeProhibitLimit : 패스워드 사용금지 문자열 [기능 X]
 nPWChangeApplyCnt : 비밀번호 변경때, 새비번의 최소길이 (기본값:9)
+bUseIDAsInitPassword : ID와 동일한 비밀번호를 초기 PW로 사용할지 여부 (true : ID=PW로 로그인된 경우, 비밀번호 변경 요청)
 
 
 // URL자동전환

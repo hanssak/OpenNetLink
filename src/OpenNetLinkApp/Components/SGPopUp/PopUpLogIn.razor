@@ -676,6 +676,9 @@
         sgRSACrypto.ValueEncrypt(pw, out strEncPW);
         if (strEncPW.Equals(strInitPW))
             return true;
+        //옵션에 따라, ID와 동일할 경우 초기 비밀번호로 인지
+        if(SGAppMgrSvc.OpConfigInfoService.GetUseIDAsInitPassword(groupID) && id == pw)
+            return true;
         return false;
     }
 
