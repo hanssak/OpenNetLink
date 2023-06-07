@@ -927,9 +927,11 @@ Task("PkgCrossflatform")
 			
 			//현재 스토리지 기준 Publish
 			RunTarget("PubCrossflatform");
-			CopyFiles("./OpenNetLinkApp/VersionHash.txt", $"{AppProps.InstallerRootDirPath}/{unitName}");
+			
 		}
-
+		
+		CopyFiles("./OpenNetLinkApp/VersionHash.txt", $"{AppProps.InstallerRootDirPath}/{unitName}");
+		
 		//storage의 OP 파일 published 경로에 적용 (+ OP 설정파일 암호화)
 		DeleteFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppOPsetting_*.json");		
 		CopyFiles($"{storageUnit}/AppOPsetting*.json", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf");		
