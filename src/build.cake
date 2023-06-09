@@ -910,13 +910,13 @@ Task("PkgCrossflatform")
 		System.IO.Directory.CreateDirectory(PackageDirPath);
 		System.IO.Directory.CreateDirectory(ReleaseNoteDirPath);
 		
-		CopyFiles($"{storageUnit}/ReleaseNote.md", ReleaseNoteDirPath);		
 		CopyFiles($"{storageUnit}/AppVersion.json", "./OpenNetLinkApp/wwwroot/conf");
 		
 		//Get AppVersion and Set Derectory.Build.props
-		AppProps.ReloadVersionFile();				
+		AppProps.ReloadVersionFile();							
 		
 		Information($"{lastAppSWVersion} - {AppProps.AppSWVersion}");
+
 		if(lastAppSWVersion != AppProps.AppSWVersion)	//AppVersion이 이전에 빌드한 스토리지의 버전과 동일하다면, Publish 생략 (해시 파일 통일)
 		{
 			lastAppSWVersion = AppProps.AppSWVersion;
@@ -926,10 +926,10 @@ Task("PkgCrossflatform")
 			Information($"AppPorps.PropVersion : {AppProps.PropVersion}");		
 			
 			//현재 스토리지 기준 Publish
-			RunTarget("PubCrossflatform");
-			
+			RunTarget("PubCrossflatform");			
 		}
 		
+		CopyFile($"{storageUnit}/ReleaseNote.md", $"{ReleaseNoteDirPath}/{AppProps.PropVersion.ToString()}.md");				
 		CopyFiles("./OpenNetLinkApp/VersionHash.txt", $"{AppProps.InstallerRootDirPath}/{unitName}");
 		
 		//storage의 OP 파일 published 경로에 적용 (+ OP 설정파일 암호화)
@@ -1150,7 +1150,7 @@ Task("Deploy")
 		if(packages.Length != 1)
 			throw new Exception(String.Format("[Err] No patch file or 2 or more patch files exist. : {0}", $"{storageUnit}/patch/{AppProps.Platform}/packages"));
 
-		CopyFiles($"{storageUnit}/release_note/ReleaseNote.md", $"{storageUnit}/patch/{AppProps.Platform}/release_note");
+		CopyFiles($"{storageUnit}/release_note/*.md", $"{storageUnit}/patch/{AppProps.Platform}/release_note");
 				
 		string PackagePath = packages[0];
 		string PackagefileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(PackagePath);
