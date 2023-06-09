@@ -1162,7 +1162,7 @@ Task("Deploy")
 		string Password = FileReadText($"{siteProfilePath}/.HzCompressSeed");
 
 		Information($"Make hz File - {PackageZipFile}");
-		// 압축 command: dcomp zip c -p %hsckconfigseed$ -b artifacts/packages/ -o test.zip
+		// 압축 command: dcomp zip c -p [password] -b artifacts/packages/ -o test.zip
 		using(var process = StartAndReturnProcess("dcomp"
 							, new ProcessSettings { 
 								Arguments = new ProcessArgumentBuilder()
