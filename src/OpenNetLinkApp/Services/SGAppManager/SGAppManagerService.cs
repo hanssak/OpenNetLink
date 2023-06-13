@@ -68,6 +68,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
     {
         public SGAppManagerService()
         {
+            //OP 파일 재 암호화 => 암복호화 실패 시 재설치
+            //Network 파일 재 암호화 => 암복호화 실패 시 재설치
+
+            HsNetWorkSG.SGCrypto.InitKeyGenerate();
+
             HeaderUIService = new SGHeaderUIService();
             FooterUIService = new SGFooterUIService();
             CorpIdUIService = new SGCorpIdUIService();
