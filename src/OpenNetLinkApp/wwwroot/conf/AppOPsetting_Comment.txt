@@ -204,3 +204,10 @@ strNotinListForwardUrl : URLRedirection 하지 않는 URL들 Redirect 할 주소
 bUseFileSelectDelete : 파일 선택 삭제 사용 유무
 
 bUseTitleDescMinLength : 제목 / 설명 글자 최소 글자수 서버 DB에서 받아서 동작하게 설정
+
+bListUsePKIsendRecv : 인증서 전송기능 사용유무
+
+bPkiSendByFileTrans : 인증서 전송 방식(false : 클립보드전송하는 프로토콜사용, true : 파일전송방식-전송관리에서 조회됨)
+
+
+

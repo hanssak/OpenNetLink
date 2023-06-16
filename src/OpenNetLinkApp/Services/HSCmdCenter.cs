@@ -2441,6 +2441,18 @@ namespace OpenNetLinkApp.Services
         public void SendFilePrevCancel()
         {
         }
+
+        /// <summary>
+        /// DataType - 1:Text , 2:Bitmap, 3: 공인인증서
+        /// </summary>
+        /// <param name="groupid"></param>
+        /// <param name="strUserID"></param>
+        /// <param name="TotalCount"></param>
+        /// <param name="CurCount"></param>
+        /// <param name="DataType"></param>
+        /// <param name="ClipboardSize"></param>
+        /// <param name="ClipData"></param>
+        /// <returns></returns>
         public int SendClipboard(int groupid, string strUserID, int TotalCount, int CurCount, int DataType, int ClipboardSize, byte[] ClipData)
         {
             HsNetWork hsNetWork = null;

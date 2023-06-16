@@ -163,6 +163,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileSelectDelete { get; set; } // 파일 선택 삭제 사용 유무
 
         public bool bUseTitleDescMinLength { get; set; }              //URL Redirect 정책에 안먹히는 URL forward 기능 사용유무
-        
+
+        public bool bPkiSendByFileTrans { get; set; }                 // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
+               
+
     }
 }

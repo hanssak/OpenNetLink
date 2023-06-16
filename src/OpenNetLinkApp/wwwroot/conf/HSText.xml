@@ -3112,6 +3112,15 @@
 			<CN></CN>
 		</T_PKI_MENU_NAME>
 
+		<T_PKI_TITLE_DESC>
+			<KR>인증서 전송</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PKI_TITLE_DESC>
+
+
+
 		<!-- ********************************************* [END] 인증서전송 화면 (T_PKI_0000) ********************************************* -->
 
 
@@ -3939,6 +3948,13 @@
 			<CN>Office未安装、转换错误</CN>
 		</T_eFAOfficeNoinstalled>
 
+		<T_eFA_FILENAME_CHAR_ERR>
+			<KR>파일이름, 미지원 문자 오류</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eFA_FILENAME_CHAR_ERR>
+
 		<T_EXCEPTION_REASON>
 			<KR>제외사유</KR>
 			<JP>除外事由</JP>
@@ -4225,6 +4241,13 @@
 			<EN></EN>
 			<CN></CN>
 		</L_eFA_FILE_READ_ERROR>
+
+		<L_eFA_FILE_NAME_ERROR>
+			<KR>파일명 미지원 문자 오류</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</L_eFA_FILE_NAME_ERROR>
 
 		<T_ETC_FAEXCEPTIONCOUNT>
 			<KR>{0} 개</KR>
@@ -6912,6 +6935,21 @@
       <EN> </EN>
       <CN> </CN>
     </I_0242>
+
+    <I_0243>
+      <KR>인증서를 송신 했습니다.</KR>
+      <JP> </JP>
+      <EN> </EN>
+      <CN> </CN>
+    </I_0243>
+
+    <I_0244>
+      <KR>인증서를 수신 했습니다.</KR>
+      <JP> </JP>
+      <EN> </EN>
+      <CN> </CN>
+    </I_0244>
+
 
 
     <!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
@@ -10704,6 +10742,23 @@
       <EN></EN>
       <CN></CN>
     </E_0257>
+
+
+    <E_0258>
+      <KR>인증서를 송신하지 못했습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </E_0258>
+
+
+    <E_0259>
+      <KR>인증서 수신에 실패했습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </E_0259>
+
 
 
   </ERROR>

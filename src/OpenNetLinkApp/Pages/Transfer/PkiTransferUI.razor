@@ -185,6 +185,11 @@
     CsPcfFile sgPcfFile = new CsPcfFile();
 
     /// <summary>
+    /// True : 파일형태로 전송, False : ClipBoard 형태로 전송
+    /// </summary>
+    bool bSendPkiFilebyClipSendType = false;
+
+    /// <summary>
     /// 홈 이동 버튼
     /// </summary>
     private void HomeMove()
@@ -230,6 +235,27 @@
         StateHasChanged();
     }
 
+
+    /// <summary>
+    /// UI 상에서 모든 CheckBox Uncheck 상태로 변경함
+    /// </summary>
+    public void AllCheckStateUnCheckUpdate()
+    {
+        bAllCheck = false;
+        int nCount = listViewNpkiFileList.Count;
+        if (nCount <= 0)
+            return;
+
+        for (int i = 0; i < nCount; i++)
+        {
+            if (listViewNpkiFileList[i].m_bCheckDisable != true)
+                listViewNpkiFileList[i].m_bCheck = bAllCheck;
+        }
+
+        StateHasChanged();
+    }
+
+
     /// <summary>
     /// 
     /// </summary>
@@ -271,6 +297,8 @@
         InitDriveList();
         LocationSelect("hard");
 
+        bSendPkiFilebyClipSendType = SGAppMgrSvc.OpConfigInfoService.GetPKIsendType();
+
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
@@ -306,22 +334,52 @@
     private void SendSelectedPkiFiles(List<NPKIFileInfo> listSelectedPki)
     {
 
-        // Pcf 파일, 만들기
-        string strPcfFilePath = CsSystemFunc.GetCurrentModulePath();
-        strPcfFilePath += "\\Work";
-        System.IO.Directory.CreateDirectory(strPcfFilePath);
-        strPcfFilePath += "\\SG.pcf";
-
-        CLog.Here().Information($"PCF file Path : {strPcfFilePath}");
-        File.Delete(strPcfFilePath);
-
-        if (sgPcfFile.makeNpkiFIlesToPcf(listSelectedPki, strPcfFilePath) == false)
+        try
         {
-            CLog.Here().Information($"PCF file Make Failed! : {strPcfFilePath}");
-            return;
-        }
 
-        // Pcf 파일, hsz 파일화 및 전송하기
+            // Pcf 파일, 만들기
+            string strPcfFilePath = CsSystemFunc.GetCurrentModulePath();
+            strPcfFilePath += "\\Work";
+            System.IO.Directory.CreateDirectory(strPcfFilePath);
+            strPcfFilePath += "\\SG.pcf";
+
+            CLog.Here().Information($"PCF file Path : {strPcfFilePath}");
+            if (File.Exists(strPcfFilePath))
+                File.Delete(strPcfFilePath);
+
+            if (sgPcfFile.makeNpkiFIlesToPcf(listSelectedPki, strPcfFilePath) == false)
+            {
+                CLog.Here().Information($"PCF file Make Failed! : {strPcfFilePath}");
+                return;
+            }
+
+            // Pcf 파일, hsz 파일화 및 전송하기
+
+            CLog.Here().Information($"SendPkiFilesByClipSendType, GroupID: {groupIDbyParam}, PcfFile : {strPcfFilePath}");
+
+            // HeaderUI 쪽에 Clipboard에서 파일 및 Stream 으로 ClipBoard 보내는 방식으로 인증서 파일 보내도록 작업진행
+            SendPkiFileEvent sgEvent = null;
+            sgEvent = HSCmdCenter.sgPageEvent.GetPkiFileSendEvent();
+            if (sgEvent == null)
+            {
+                CLog.Here().Information($"SendSelectedPkiFiles, GetPkiFileSendEvent : null, SendPkiFile Failed!");
+                return;
+            }
+
+            // bSendPkiFilebyClipSendType
+            if (sgEvent(groupIDbyParam, strPcfFilePath, false))
+            {
+                CLog.Here().Information($"SendSelectedPkiFiles, Success!");
+                AllCheckStateUnCheckUpdate();
+            }
+
+            if (File.Exists(strPcfFilePath))
+                File.Delete(strPcfFilePath);
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"SendSelectedPkiFiles, Exception-Msg : {ex.Message}");
+        }
 
     }
 
@@ -382,6 +440,7 @@
 
         if (bUseOtherDrive == false)
         { 
+            // EnumSysPos.UserData 만 현재지원
             sgPKILib.GetNpkiinfoList(listViewNpkiFileList, EnumSysPos.UserData);
         }
         else

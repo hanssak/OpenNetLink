@@ -267,6 +267,9 @@ namespace OpenNetLinkApp.PageEvent
 
     // Reconnect Count Out 시에 호출하는 event
     public delegate void ReconnectCountOutEvent(int groupid); // , PageEventArgs e
+
+    // PkiFile 보내기 위한 Event
+    public delegate bool SendPkiFileEvent(int groupid, string strPcfFilePath, bool bSendPkiByFileTrans);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -435,6 +438,7 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, ReconnectCountOutEvent> DicReconnectCountEvent = new Dictionary<int, ReconnectCountOutEvent>(); // Reconnect Count Out 횟수이상 발생시
 
+        public SendPkiFileEvent PkiFileSendEventFunc = null;   // pki파일전송용
 
         public SGPageEvent()
         {
@@ -1603,6 +1607,14 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
+        public void SetPkiFileSendEventAdd(SendPkiFileEvent e)
+        {
+            PkiFileSendEventFunc = e;
+        }
+        public SendPkiFileEvent GetPkiFileSendEvent()
+        {
+            return PkiFileSendEventFunc;
+        }
 
 
     }

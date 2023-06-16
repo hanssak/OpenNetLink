@@ -1003,9 +1003,10 @@ private async Task CheckApprLine()
         }
 
 
-        // title / Desc 공백 없이 동작
+        // title / Desc 공백 없이 동작()
         strTitle = strTitle.Replace(" ", "");
         strContents = strContents.Replace(" ", "");
+
         // 최소길이 체크 동작 : title / Desc 공백 없이
         if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc())
         {

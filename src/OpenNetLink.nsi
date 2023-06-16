@@ -450,6 +450,9 @@ Section "MainSection" SEC01
 
   ${If} ${IS_PATCH} == 'TRUE'
 
+    ; OA망에서 이미지파일 OverWrite가 안되어 삭제 및 배포 방식으로 변경
+    Delete "${INSTALLPATH}\wwwroot\images\adminlte\logo_s.png"
+    
     Call GetNetPositionByFile
   
     ${If} $g_iPatchEdge == 1

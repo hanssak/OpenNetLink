@@ -76,6 +76,9 @@
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
     private string m_sendedClipboardFilePath = String.Empty;
     List<HsStream> FileList = new List<HsStream>();
+    bool bSendingPki = false;
+
+    CsPcfFile sgPcfFile = new CsPcfFile();
 
     protected override void OnInitialized()
     {
@@ -118,7 +121,7 @@
         HsCmdCenter.sgPageEvent.SetFileRecvProgressMasterEventAdd(FileRecvProgress);
 
         HsCmdCenter.sgPageEvent.SetSkipFileNotiEventAdd(RecvSkipFileServerNoti);
-
+        HsCmdCenter.sgPageEvent.SetPkiFileSendEventAdd(SendPkiFilesByFileTrans);
     }
 
     public void Dispose()
@@ -161,6 +164,64 @@
 
 
     /// <summary>
+    /// ClipboardTxt 로 받은 data를 pcf 파일로 저장하는 함수
+    /// </summary>
+    /// <param name="clipData"></param>
+    /// <param name="strPcfFilePath"></param>
+    /// <returns></returns>
+    public bool GetFilePathfromByteData(byte[] clipData, out string strPcfFilePath)
+    {
+
+        strPcfFilePath = "";
+        strPcfFilePath = CsSystemFunc.GetCurrentModulePath();
+        strPcfFilePath += "\\Work";
+        System.IO.Directory.CreateDirectory(strPcfFilePath);
+        strPcfFilePath += "\\SG.pcf";
+
+        if (File.Exists(strPcfFilePath))
+        {
+            string strFilePath = "";
+            string strCheckFilePath = "";
+            string strCheckFileName = "";
+            strFilePath = CsSystemFunc.GetCurrentModulePath();
+            strFilePath += "\\Work\\";
+
+            int nIdx = 1;
+            for(; nIdx < 10000 ; nIdx++)
+            {
+                //strFileName.Format()
+                strCheckFileName = $"SG ({nIdx}).pcf";
+                strCheckFilePath = strFilePath + strCheckFileName;
+                if (File.Exists(strCheckFilePath) == false)
+                {
+                    strPcfFilePath = strCheckFilePath;
+                    break;
+                }
+            }
+        }
+
+
+        using (FileStream pkifs = File.Create(strPcfFilePath))
+        {
+            try
+            {
+                pkifs.Write(clipData, 0, clipData.Length);
+                Log.Logger.Here().Information($"GetFilePcfFiles, Pki FileData Write!");
+            }
+            catch (Exception ex1)
+            {
+                Log.Logger.Here().Information($"GetFilePcfFiles, File.Create.Write - Exception(MSG) : {ex1.Message}, Path : {strPcfFilePath}");
+            }
+            finally
+            {
+                pkifs?.Dispose();
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
     /// 클립보드 data system에 넣는 함수
     /// </summary>
     /// <param name="groupid"></param>
@@ -177,8 +238,36 @@
         //Array.Copy(e.ClipData, 0, clipData, 0, nClipDataLen);
         byte[] clipData = e.ClipData.ToArray();
 
-        Window.SetClipBoardData(groupid, nType, nClipDataLen, clipData);
+        try
+        {
+            if (nType == 3) // pki(pcf 파일)
+            {
+
+                string strPcfFilePath = "";
+                if (GetFilePathfromByteData(clipData, out strPcfFilePath)== false)
+                {
+                    CLog.Here().Information($"HeaerUI - RecvClipBoard - groupID : {groupid} - Pcf to File, Failed!");
+                }
+
+                bool bRet = sgPcfFile.makePcfToPkiFIles(strPcfFilePath);
+                ShowMessage((bRet ? "info" : "error"), (bRet ? XmlConf.GetInfoMsg("I_0244") : XmlConf.GetErrMsg("E_0259")));
+                File.Delete(strPcfFilePath);
+                CLog.Here().Information($"HeaerUI - RecvClipBoard - groupID : {groupid} - {(bRet ? "Done(Pki Recv)" : "Error!(Pki Recv)")}");
+
+            }
+            else
+                Window.SetClipBoardData(groupid, nType, nClipDataLen, clipData);
+
+        }
+        catch (Exception err)
+        {
+            CLog.Here().Information($"HeaerUI - FileRecvAfterOperation - groupID : {groupid} - Exception(Pki Recv) - Msg : {err.Message}");
+        }
+
+        sgPcfFile.DeleteAllRecvPcfFiles();
+
     }
+
 
 
     /// <summary>
@@ -1663,6 +1752,84 @@
         }
     }
 
+
+    bool SendPkiFilesByClipboard(int nGroupID, string strPcfFilePath)
+    {
+        bool bRet = true;
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
+        if (sgLoginData == null)
+            return false;
+
+        string strUserID = sgLoginData.GetUserID();
+
+        byte[] Buf = null;
+
+        // Pcf File Data Read
+        using (FileStream fsPcf = File.OpenRead(strPcfFilePath))
+        {
+            try
+            {
+                if (fsPcf.Length > 0)
+                {
+                    Buf = new byte[fsPcf.Length];
+                    fsPcf.Seek(0, SeekOrigin.Begin);
+                    fsPcf.Read(Buf, 0, Buf.Length);
+                }
+            }
+            catch (Exception ex1)
+            {
+                bRet = false;
+                Log.Logger.Here().Information($"SendPkiFilesByClipboard, OpenRead - Exception(MSG) : {ex1.Message}");
+            }
+            finally
+            {
+                fsPcf?.Dispose();
+            }
+        }
+
+        int nRet = 0;
+        // 3 : 공인인증서
+        nRet = HsCmdCenter.SendClipboard(nGroupID, strUserID, 1, 1, 3, Buf.Length, Buf);
+        if (nRet < 0)
+            bRet = false;
+
+        CLog.Here().Information($"SendPkiFilesByClipboard, GroupID:{nGroupID}, Ret:{nRet}, Done!");
+
+        if (bRet)
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0243"));
+
+        return bRet;
+    }
+
+    /// <summary>
+    /// NPKI 파일전송을 위해 호출되는 함수
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    /// <param name="strPcfFilePath"></param>
+    /// <returns></returns>
+    public bool SendPkiFilesByFileTrans(int nGroupID, string strPcfFilePath, bool bSendPkiByFileTrans)
+    {
+
+        CLog.Here().Information($"SendPkiFilesByFileTrans(Strart), GroupID : {nGroupID}, SendPki : {(bSendPkiByFileTrans? "FileTransType":"ClipTransType")}, PcfPath : {strPcfFilePath}");
+
+        bool bSendPkiResult = false;
+        bSendingPki = true;
+
+        // KKW-임시
+        if (bSendPkiByFileTrans)
+            bSendPkiResult = FileTrans(nGroupID, MakeStream(strPcfFilePath), false);
+        else
+            bSendPkiResult = SendPkiFilesByClipboard(nGroupID, strPcfFilePath);
+
+        CLog.Here().Information($"SendPkiFilesByFileTrans(End), GroupID : {nGroupID}, SendPki : {(bSendPkiByFileTrans? "FileTransType":"ClipTransType")}, PcfPath : {strPcfFilePath}");
+
+        if (bSendPkiResult == false)
+            ShowMessage("error", XmlConf.GetErrMsg("E_0258"));
+
+        return bSendPkiResult;
+    }
+
     public void ResultApproveAfter(int groupId, object[] e)
     {
         SGData sgData = e[0] as SGData;
@@ -2002,11 +2169,17 @@
         if (e.result != 0)
         {
 
-            CLog.Here().Information($"HeaderUI - FileTransProgress - GroupID:{groupID} - Error(result-number) : {e.result}");
-
+            CLog.Here().Information($"HeaderUI, FileTransProgress, GroupID:{groupID}, Error(result-number) : {e.result}");
             HsCmdCenter.SendFileTransCancel();
-            strMsg = XmlConf.GetErrMsg("E_0239");           // 클립보드 전송 중 오류가 발생되었습니다.
-            ShowClipboardMessage("error", strMsg, groupID, OS_NOTI.CLIPBOARD);
+
+            if (bSendingPki)
+                ShowMessage("error", XmlConf.GetErrMsg("E_0258"));
+            else
+            {
+                strMsg = XmlConf.GetErrMsg("E_0239");           // 클립보드 전송 중 오류가 발생되었습니다.
+                ShowClipboardMessage("error", strMsg, groupID, OS_NOTI.CLIPBOARD);
+            }
+
             if (FileList.Count > 0)
             {
                 FileList[0].stream.Close();
@@ -2014,13 +2187,25 @@
             }
             if (File.Exists(m_sendedClipboardFilePath))
                 File.Delete(m_sendedClipboardFilePath);
+
+            if (bSendingPki)
+                bSendingPki = false;
             return;
         }
+
         if (e.count == -100)
         {
+            CLog.Here().Information($"HeaderUI, FileTransProgress, GroupID:{groupID}, Error(e.count) : {e.count}");
             HsCmdCenter.SendFileTransCancel();
-            strMsg = XmlConf.GetErrMsg("E_0240");           // 클립보드 압축/암호화 도중 오류가 발생하였습니다.
-            ShowClipboardMessage("error", strMsg, groupID, OS_NOTI.CLIPBOARD);
+
+            if (bSendingPki)
+                ShowMessage("error", XmlConf.GetErrMsg("E_0258"));
+            else
+            {
+                strMsg = XmlConf.GetErrMsg("E_0240");           // 클립보드 압축/암호화 도중 오류가 발생하였습니다.
+                ShowClipboardMessage("error", strMsg, groupID, OS_NOTI.CLIPBOARD);
+            }
+
             if (FileList.Count > 0)
             {
                 FileList[0].stream.Close();
@@ -2028,13 +2213,26 @@
             }
             if (File.Exists(m_sendedClipboardFilePath))
                 File.Delete(m_sendedClipboardFilePath);
+
+            if (bSendingPki)
+                bSendingPki = false;
             return;
         }
+
         if (e.count == -200)
         {
+
+            CLog.Here().Information($"HeaderUI, FileTransProgress, GroupID:{groupID}, Error(e.count) : {e.count}");
+
             HsCmdCenter.SendFileTransCancel();
-            strMsg = XmlConf.GetErrMsg("E_0239");           // 클립보드 전송 중 오류가 발생되었습니다.
-            ShowClipboardMessage("error", strMsg, groupID, OS_NOTI.CLIPBOARD);
+            if (bSendingPki)
+                ShowMessage("error", XmlConf.GetErrMsg("E_0258"));
+            else
+            {
+                strMsg = XmlConf.GetErrMsg("E_0239");           // 클립보드 전송 중 오류가 발생되었습니다.
+                ShowClipboardMessage("error", strMsg, groupID, OS_NOTI.CLIPBOARD);
+            }
+
             if (FileList.Count > 0)
             {
                 FileList[0].stream.Close();
@@ -2042,16 +2240,25 @@
             }
             if (File.Exists(m_sendedClipboardFilePath))
                 File.Delete(m_sendedClipboardFilePath);
+
+            if (bSendingPki)
+                bSendingPki = false;
             return;
         }
+
         if (e.count >= 100)
         {
 
-            CLog.Here().Information($"HeaderUI - FileTransProgress - GroupID:{groupID} - Progress : {e.count}");
+            CLog.Here().Information($"HeaderUI, FileTransProgress, GroupID:{groupID}, Progress : {e.count}, DONE : {(bSendingPki?"Pki File":"ClipBoard")}");
 
-            strMsg = XmlConf.GetInfoMsg("I_0032");   // 클립보드를 전송하였습니다.
-            ShowClipboardMessage("info", strMsg, groupID, OS_NOTI.CLIPBOARD);
-            Window.Notification(OS_NOTI.CLIPBOARD, XmlConf.GetInfoMsg("I_0163"), XmlConf.GetInfoMsg("I_0032"));
+            if (bSendingPki)
+                ShowMessage("info", XmlConf.GetInfoMsg("I_0243"));
+            else
+            {
+                strMsg = XmlConf.GetInfoMsg("I_0032");   // 클립보드를 전송하였습니다.
+                ShowClipboardMessage("info", strMsg, groupID, OS_NOTI.CLIPBOARD);
+                Window.Notification(OS_NOTI.CLIPBOARD, XmlConf.GetInfoMsg("I_0163"), XmlConf.GetInfoMsg("I_0032"));
+            }
 
             if (FileList.Count > 0)
             {
@@ -2061,6 +2268,9 @@
 
             if (File.Exists(m_sendedClipboardFilePath))
                 File.Delete(m_sendedClipboardFilePath);
+
+            if (bSendingPki)
+                bSendingPki = false;
         }
         return;
     }
@@ -2069,7 +2279,7 @@
     /// 클립보드 파일형태로 전송하는 함수
     /// </summary>
     /// <param name="stream"></param>
-    private void FileTrans(int groupId, HsStream stream)
+    private bool FileTrans(int groupId, HsStream stream, bool bShowErrMsg = true)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = groupId;
@@ -2081,16 +2291,16 @@
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
-            return;
+            return false;
 
         ISGUserInfo sgUserInfo = UserInfoSvc.GetUserInfo(groupID);
         if (sgUserInfo == null)
-            return;
+            return false;
 
         SGApprLineData sgApprLineData = null;
         sgApprLineData = (SGApprLineData)HsCmdCenter.GetApprLineData(groupID);
         if (sgApprLineData == null)
-            return;
+            return false;
 
         string strUserID = sgLoginData.GetUserID();
         string strMid = sgLoginData.GetTagData("MID");
@@ -2114,6 +2324,12 @@
         {
             strDataType = "2";
             strTitle = XmlConf.GetTitle("T_COMMON_CLIPBOARD_IMAGE");
+        }
+        else if (string.Compare(stream.Type, "pcf", true) == 0)
+        {
+            // pki 파일전송
+            strDataType = "11";
+            strTitle = XmlConf.GetTitle("T_PKI_TITLE_DESC");  //"KKW-인증서";
         }
         else
         {
@@ -2139,7 +2355,6 @@
             SGAppMgrSvc.SiteConfigInfoService.GetUseClipBoardNoApproveButFileTrans()) // OpConfigInfoService
             stApprLineSeq = "";
 
-
         // 클립보드 파일전송의 사후결재 설정
         if (siteConfig.GetClipUseAfterApprove() == 0)             // checkBox 설정따라 - 사용자선택따라(작업진행중...미완료상태)
             bAfterApprove = pageService.GetAfterApproveCheck(groupID);
@@ -2154,6 +2369,13 @@
         if (stApprLineSeq == "" || pageService.GetAfterApprChkHide(groupID))
             bAfterApprove = false;
 
+        // pki전송
+        if (string.Compare(strDataType, "11")==0)
+        {
+            stApprLineSeq = "";
+            bAfterApprove = false;
+            //strDataType = "0";
+        }
 
         FileList.Add(stream);
         Int64 TotalFileSize = stream.Size;
@@ -2170,9 +2392,13 @@
         {
             string strMsg = XmlConf.GetErrMsg("E_0162");
 
-            ShowClipboardMessage("error", strMsg, groupID, OS_NOTI.CLIPBOARD);
-            return;
+            if (bShowErrMsg)
+                ShowClipboardMessage("error", strMsg, groupID, OS_NOTI.CLIPBOARD);
+
+            return false;
         }
+
+        return true;
     }
 
     private void CheckApproveAfterLimit(int groupID)
@@ -3364,14 +3590,15 @@
             return;
         string strUserSeq = sgUserData.GetUserSequence();
 
+        CLog.Here().Information($"####### - BOARD_NOTIFY - groupid : {groupid}, strUserSeq : {strUserSeq}");
+
         AllDeleteDBBoardNoti(groupid, strUserSeq);
 
         SGMsgData sgMsgData = new SGMsgData();
-
         string strResultData = sgData.GetBasicTagData("RECORD");
-
         if (strResultData.Equals(""))
         {
+            CLog.Here().Information($"BoardNotifyResult, RECORD - EMPTY, groupid : {groupid}, strUserSeq : {strUserSeq}");
             return;
         }
         string[] strResult = strResultData.Split('\u0003');
@@ -3384,6 +3611,7 @@
             string strHead = strSubResult[1];                           // 공지사항 제목.
             string strNotiContent = strSubResult[2];                    // 공지사항 내용.
             SQLiteDB.InsertNotiInfo(NOTI_TYPE.SYSTEM, groupid, strUserSeq, strNotiSeq, LSIDEBAR.MENU_CATE_ROOT, "", "", strHead, strNotiContent);
+            CLog.Here().Information($"####### - BOARD_NOTIFY - groupid : {groupid}, NotiSeq : {strNotiSeq}, Head : {strHead}, strNotiContent : {strNotiContent}");
         }
         LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
         loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
@@ -3412,6 +3640,11 @@
         */
     }
 
+    /// <summary>
+    /// SQliteDB에 쌓여 있는 공지사항이 있다면, 1000개만 찾아서 지우는 동작
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="strUserSeq"></param>
     public void AllDeleteDBBoardNoti(int groupID, string strUserSeq)
     {
         int DataCount = 0;
@@ -3424,8 +3657,8 @@
         if ((listNotiData == null) || (listNotiData.Count <= 0))
             return;
 
-        SGMsgData sgMsgData = new SGMsgData();
-        string strHead = sgMsgData.GetConvertMessageTitle(eMsgType.eMsgBoardNoti);
+        //SGMsgData sgMsgData = new SGMsgData();
+        //string strHead = sgMsgData.GetConvertMessageTitle(eMsgType.eMsgBoardNoti);
 
         for (int i = 0; i < listNotiData.Count; i++)
         {
@@ -3549,6 +3782,8 @@
     public void FileRecvAfterOperation(int groupID, RecvDataEventArgs e)
     {
 
+        CLog.Here().Information($"HeaerUI - FileRecvAfterOperation - groupID : {groupID}, DataType : {e.strDataType}, ################### !!!");
+
         if (e.strDataType == ((int)FrameType.CLipTxt).ToString() ||
             e.strDataType == ((int)FrameType.CLipImg).ToString() ||
             e.strDataType == ((int)FrameType.CLipObj).ToString())
@@ -3590,9 +3825,32 @@
             {
                 CLog.Here().Information($"HeaerUI - FileRecvAfterOperation - groupID : {groupID} - Exception(File To Clipboard) - Msg : {err.Message}");
             }
+
+        }
+        else if (e.strDataType == ((int)FrameType.CertFile).ToString())
+        { 
+                
+            CLog.Here().Information($"HeaerUI - FileRecvAfterOperation - groupID : {groupID} - PKI Recv - DataType : {e.strDataType} !!!");
+
+            try
+            {
+                bool bRet = sgPcfFile.makePcfToPkiFIles(e.strFilePath);
+                ShowMessage( (bRet?"info":"error"), (bRet?XmlConf.GetInfoMsg("I_0244") : XmlConf.GetErrMsg("E_0259")) );
+                File.Delete(e.strFilePath);
+
+                CLog.Here().Information($"HeaerUI - FileRecvAfterOperation - groupID : {groupID} - {(bRet?"Done(Pki Recv)":"Error!(Pki Recv)")}");
+            }
+            catch (Exception err)
+            {
+                CLog.Here().Information($"HeaerUI - FileRecvAfterOperation - groupID : {groupID} - Exception(Pki Recv) - Msg : {err.Message}");
+            }
+
+            sgPcfFile.DeleteAllRecvPcfFiles();
+
         }
 
     }
+
     /// <summary>
     /// 파일수신할때 진행상태정보를 통신Lib에서 받는 함수
     /// </summary>

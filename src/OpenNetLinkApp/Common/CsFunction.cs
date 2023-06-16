@@ -414,6 +414,32 @@ namespace OpenNetLinkApp.Common
             return lSize;
         }
 
+        /// <summary>
+        /// strFilePath : [IN] 파일경로(FullPath)
+        /// chSep : [IN] Folder 간의 구분문자( '\\' : 윈도우, '/' : Linux, Mac 등등 )
+        /// strFolderPath : [OUT] 파일경로상에 있는 Path
+        /// bCreateFolder : [IN] 파일경로상에 있는 Path 를 생성할지 유무
+        /// </summary>
+        /// <param name="strFilePath"></param>
+        /// <param name="strFolderPath"></param>
+        /// <param name="bCreateFolder"></param>
+        /// <returns></returns>
+        public static bool GetPathByFilePath(string strFilePath, char chSep, out string strFolderPath, bool bCreateFolder)
+        {
+            strFolderPath = "";
+            int nLastPos = strFilePath.LastIndexOf(chSep);
+            if (nLastPos < 0)
+            {
+                Log.Logger.Here().Information($"GetPathByFilePath, input Path Error : {strFilePath}");
+                return false;
+            }
+
+            strFolderPath = strFilePath.Substring(0, nLastPos);
+            if (bCreateFolder && Directory.Exists(strFolderPath) == false)
+                Directory.CreateDirectory(strFolderPath);
+
+            return true;
+        }
 
         /// <summary>
         /// Windows / Linux / Mac OSx 에서 다 지원하는 파일명인지 확인하는 함수<br></br>
@@ -485,6 +511,53 @@ namespace OpenNetLinkApp.Common
 
             strItem = "";
             return true;
+        }
+
+
+        /// <summary>
+        /// 지정한 Path에 있는 지정한 확장자 및 파일들을 삭제하는 함수
+        /// </summary>
+        /// <param name="strTargetPath"></param>
+        /// <param name="strDelFilePattern"></param>
+        /// <returns></returns>
+        public static bool DeleteFilesByPathExt(string strTargetPath, string strDelFilePattern)
+        {
+            if ( (strDelFilePattern?.Length ?? 0) < 3 )
+            {
+                Log.Logger.Here().Information($"DeleteFilesByPathExt, FilePattern-Error : {strDelFilePattern}");
+                return false;
+            }
+
+            if ((strTargetPath?.Length ?? 0) < 3 || (Directory.Exists(strTargetPath) == false))
+            {
+                Log.Logger.Here().Information($"DeleteFilesByPathExt, Path-Error : {strTargetPath}");
+                return false;
+            }
+
+            bool bRet = true;
+            try
+            {
+                foreach (string filePath in Directory.GetFiles(strTargetPath, strDelFilePattern))
+                {
+                    try
+                    {
+                        System.IO.File.Delete(filePath); // 파일 삭제
+                        Log.Logger.Here().Information($"DeleteFilesByPathExt, DeleteFile : {filePath}");
+                    }
+                    catch (IOException e)
+                    {
+                        Log.Logger.Here().Information($"DeleteFilesByPathExt, DeleteFile(Pcf)(Exception-Msg:{e.Message}) : {filePath}");
+                        bRet = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Information($"DeleteFilesByPathExt, Exception-Msg : {ex.Message}, Ret: {bRet}");
+                bRet = false;
+            }
+
+            return bRet;
         }
 
     }

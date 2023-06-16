@@ -171,5 +171,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseTitleDescMinLength { get; set; } = false;             //제목,설명 최소길이 제한 사용유무
 
+        public bool bPkiSendByFileTrans { get; set; } = false;                // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
+
     }
 }
