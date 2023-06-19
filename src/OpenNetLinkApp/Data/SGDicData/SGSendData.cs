@@ -26,15 +26,16 @@ namespace OpenNetLinkApp.Data.SGDicData
         {
 
         }
+
+        CmdSendParser sendParser = new CmdSendParser();
+
         public int RequestSendEmailCancel(HsNetWork hsNet, int groupid, string strUserID, string emailSeq)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["EMAILSEQ"] = emailSeq;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_EMAIL_SEND_CANCEL", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_EMAIL_SEND_CANCEL", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -43,9 +44,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_USERINFOEX", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_USERINFOEX", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -54,20 +53,16 @@ namespace OpenNetLinkApp.Data.SGDicData
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_USERINFOCHECK", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_USERINFOCHECK", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
-        public int RequestApproveLine(HsNetWork hsNet,int groupid, string strUserID)
+        public int RequestApproveLine(HsNetWork hsNet, int groupid, string strUserID)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPROVELINE", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPROVELINE", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -85,9 +80,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["TEAMCODE"] = strTeamCode;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPRINSTCUR", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPRINSTCUR", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         /// <summary>
@@ -103,9 +96,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DATABASEQUERY", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DATABASEQUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestInstApproveClear(HsNetWork hsNet, string strUserID, string appruserId)
@@ -114,9 +105,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["APPR_USERID"] = appruserId;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPRINSTCLEAR", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPRINSTCLEAR", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSystemEnv(HsNetWork hsNet, int groupid, string strUserID)
@@ -124,9 +113,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_SYSTEMENV", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_SYSTEMENV", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSystemRunEnv(HsNetWork hsNet, int groupid, string strUserID)
@@ -134,9 +121,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_SYSTEMRUNENV", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_SYSTEMRUNENV", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -145,9 +130,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_URLLIST", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_URLLIST", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestChangePasswd(HsNetWork hsNet, int groupid, string strUserID, string strOldPassword, string strNewPassword)
@@ -157,9 +140,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CLIENTID"] = strUserID;
             dic["OLDPASSWORD"] = strOldPassword;
             dic["NEWPASSWORD"] = strNewPassword;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestChangePW("CMD_STR_CHANGEPASSWORD", dic);
+            SGEventArgs args = sendParser.RequestChangePW("CMD_STR_CHANGEPASSWORD", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -169,9 +150,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["OTP"] = otpNumber;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_OTP", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_OTP", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -180,9 +159,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_DEPTINFO", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_DEPTINFO", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -199,9 +176,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["DLP"] = strDlp;
             dic["TITLE"] = strTitle;
             dic["DATATYPE"] = strDataType;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_FILE_TRANSLIST", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_FILE_TRANSLIST", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -221,9 +196,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["DLPAPPROVE"] = strDlpApprove;
             dic["APPROVER"] = strApprover;
             dic["DATATYPE"] = strDataType;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_FILE_APPROVE", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_FILE_APPROVE", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -233,9 +206,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["TRANSSEQ"] = strTransSeq;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANS_DETAIL", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANS_DETAIL", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestDownloadCount(HsNetWork hsNet, int groupid, string strUserID, string strTransSeq)
@@ -244,9 +215,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["TRANSSEQ"] = strTransSeq;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_DOWNLOAD_COUNT", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_DOWNLOAD_COUNT", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -255,9 +224,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSFERDAYSIZE", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSFERDAYSIZE", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestApproveAlway(HsNetWork hsNet, int groupid, string strUserID)
@@ -265,9 +232,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPROVEALWAY", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPROVEALWAY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestApproveBatch(HsNetWork hsNet, int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs, string strApprover, string strApproveUserKind)
@@ -280,9 +245,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPROVESEQS"] = strApproveSeqs;
             dic["APPROVER"] = strApprover;
             dic["APPROVEUSERKIND"] = strApproveUserKind;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPROVEBATCH", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPROVEBATCH", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestEmailApproveBatch(HsNetWork hsNet, int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs)
@@ -293,9 +256,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["PROCID"] = strProcID;
             dic["REASON"] = strReason;
             dic["EMAILAPPROVESEQS"] = strApproveSeqs;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_EMAIL_APPROVE_BATCH", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_EMAIL_APPROVE_BATCH", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -307,9 +268,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["TRANSSEQ"] = strTransSeq;
             dic["ACTION"] = strAction;
             dic["REASON"] = strReason;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_SENDCANCEL", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_SENDCANCEL", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestForwardCancel(HsNetWork hsNet, int groupid, string strUserID, string strTransSeq)
@@ -318,9 +277,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["TRANSSEQ"] = strTransSeq;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_FORWARD_CANCEL", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_FORWARD_CANCEL", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestAutoDownload(HsNetWork hsNet, int groupid, string strUserID, string strTransSeq)
@@ -329,9 +286,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["TRANSSEQ"] = strTransSeq;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_AUTODOWNLOAD", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_AUTODOWNLOAD", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestManualDownload(HsNetWork hsNet, int groupid, string strUserID, string strTransSeq)
@@ -340,9 +295,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["TRANSSEQ"] = strTransSeq;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_MANUALDOWNLOAD", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_MANUALDOWNLOAD", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSendTransListCountQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
@@ -351,9 +304,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILETRANSLISTQUERYCOUNT", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILETRANSLISTQUERYCOUNT", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSendCountQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
@@ -362,9 +313,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_COUNTQUERY", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_COUNTQUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSendListQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
@@ -373,9 +322,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_LISTQUERY", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_LISTQUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSendDetailQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
@@ -384,9 +331,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DETAIL_QUERY", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DETAIL_QUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestRecordExistCheckQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
@@ -395,9 +340,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_RECORDEXISTCHECK_QUERY", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_RECORDEXISTCHECK_QUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSendTransListQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
@@ -406,9 +349,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILETRANSLISTQUERY", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILETRANSLISTQUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSendApprListCountQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
@@ -417,9 +358,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEAPPRLISTQUERYCOUNT", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEAPPRLISTQUERYCOUNT", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSendApprListQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
@@ -428,9 +367,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEAPPRLISTQUERY", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEAPPRLISTQUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -440,9 +377,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILETRANSDETAILQUERY", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILETRANSDETAILQUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -452,9 +387,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEAPPRDETAILQUERY", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEAPPRDETAILQUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -464,9 +397,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DEPTAPPRLINESEARCHQUERY", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DEPTAPPRLINESEARCHQUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSecurityApproverQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
@@ -475,9 +406,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_SECURITY_APPROVER_QUERY", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_SECURITY_APPROVER_QUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -534,12 +463,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["FORWARDUSERID"] = receiver;
             dic["DATATYPE"] = strDataType;
             dic["GROUPID"] = groupid.ToString();
-
-
-
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", dic, hsNet.stCliMem.GetProtectedSeedKey());
 
             // 통신에서 transreq를 보낼때, '/' 문자로 나누어서 망개수 만큼 보냄 
             if (strNetOver3info.Length > 0)
@@ -573,11 +497,9 @@ namespace OpenNetLinkApp.Data.SGDicData
 
         public int RequestContinueSendFileTrans(HsNetWork hsNet, int groupid, Dictionary<string, string> values, string strNetOver3info, string hszFileName, int currentFileSize)
         {
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
             string FILEMD5 = values["FILEMD5"];
             string FILERECORD = values["FILERECORD"];
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", values);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", values, hsNet.stCliMem.GetProtectedSeedKey());
             args.MsgRecode["FILEMD5"] = FILEMD5;
             args.MsgRecode["FILERECORD"] = FILERECORD;
 
@@ -704,10 +626,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["FORWARDUSERID"] = receiver;
             dic["DATATYPE"] = strDataType;
 
-
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", dic, hsNet.stCliMem.GetProtectedSeedKey());
 
             // 통신에서 transreq를 보낼때, '/' 문자로 나누어서 망개수 만큼 보냄 
             if (strNetOver3info.Length > 0)
@@ -754,9 +673,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["FILESEQ"] = strFileSeq;
             dic["ORGDATA"] = strOrgData;
 
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_FILEPREVIEW", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_FILEPREVIEW", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -768,10 +685,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["MID"] = mid;
             dic["TOTALPART"] = totalPart;
             dic["TOTALSIZE"] = totalSize;
-            
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_FILEUPLOAD_INFO", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_FILEUPLOAD_INFO", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -784,9 +698,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["FILENAME"] = sFileName;
             dic["FILEKEY"] = filekey;
             dic["FILESEQ"] = fileseq;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_EMAIL_FILEDOWNLOAD64", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_EMAIL_FILEDOWNLOAD64", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public void RequestSendFilePrevCancel()
@@ -802,11 +714,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["DATATYPE"] = DataType.ToString();
             dic["CLIPBOARDSIZE"] = ClipboardSize.ToString();
             dic["CLIPBOARDDATA"] = "-";
-
-
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_CLIPBOARDTXT", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_CLIPBOARDTXT", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessageClipBoard(args, ClipData);
 
         }
@@ -824,10 +732,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CLIPBOARDDATA"] = "-";
 
             // Clipboard 전송할곳 지정 : str3NetDestSysID
-
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_CLIPBOARDTXT", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_CLIPBOARDTXT", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessageClipBoard(args, ClipData);
 
         }
@@ -852,10 +757,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             // RequestCmd 에서 utf8로 인코딩함
             // Encoding.ASCII.GetByteCount(strUrlData);
             // Encoding.ASCII.GetBytes(strUrlData);
-
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_SUBDATAEXCHANGE", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_SUBDATAEXCHANGE", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -866,10 +768,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["TRANSSEQ"] = strTransSeq;
-
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APT_CONFIRM", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APT_CONFIRM", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSendVirusConfirm(HsNetWork hsNet, string strUserID, string strTransSeq)
@@ -879,9 +778,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CLIENTID"] = strUserID;
             dic["TRANSSEQ"] = strTransSeq;
 
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_VIRUS_CONFIRM", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_VIRUS_CONFIRM", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -891,10 +788,8 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
             //SGEventArgs args = sendParser.RequestCmd("CMD_STR_DATABASEQUERY", dic);
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEADDERROR", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEADDERROR", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -905,9 +800,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_USEDAYFILETRANS", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_USEDAYFILETRANS", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSendUseDayClipboardInfo(HsNetWork hsNet, string strUserID, string strQuery)
@@ -916,9 +809,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_USEDAYCLIPTRANS", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_USEDAYCLIPTRANS", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -928,9 +819,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["REASON"] = "LOGOUT";
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_LOGOUT", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_LOGOUT", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSendScreenLockClear(HsNetWork hsNet, string strUserID, string strPasswd, string strLoginType)
@@ -940,9 +829,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CLIENTID"] = strUserID;
             dic["PASSWORD"] = strPasswd;
             dic["LOGINTYPE"] = strLoginType;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestClientUnlock("CMD_STR_CLIENTUNLOCK", dic);
+            SGEventArgs args = sendParser.RequestClientUnlock("CMD_STR_CLIENTUNLOCK", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -952,9 +839,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_ZIPDEPTHINFO", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_ZIPDEPTHINFO", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSendChangePassWD(HsNetWork hsNet, string strUserID, string strOldPassWD, string strNewPassWD)
@@ -964,9 +849,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CLIENTID"] = strUserID;
             dic["OLDPASSWORD"] = strOldPassWD;
             dic["NEWPASSWORD"] = strNewPassWD;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestChangePW("CMD_STR_CHANGEPASSWORD", dic);
+            SGEventArgs args = sendParser.RequestChangePW("CMD_STR_CHANGEPASSWORD", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -976,9 +859,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DASHBOARDCOUNT", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DASHBOARDCOUNT", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -988,9 +869,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DASHBOARDTRANSREQCOUNT", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DASHBOARDTRANSREQCOUNT", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -1000,9 +879,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DASHBOARDAPPRWAITCOUNT", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DASHBOARDAPPRWAITCOUNT", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSendDashBoardApprConfirmCountQuery(HsNetWork hsNet, string strUserID, string strQuery)
@@ -1011,9 +888,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DASHBOARDAPPRCONFIRMCOUNT", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DASHBOARDAPPRCONFIRMCOUNT", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -1023,9 +898,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DASHBOARDAPPRREJECTCOUNT", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DASHBOARDAPPRREJECTCOUNT", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -1035,9 +908,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_PASSWDCHGDAY", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_PASSWDCHGDAY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSendBoardNotiSearch(HsNetWork hsNet, string strUserID, string strQuery)
@@ -1046,9 +917,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_BOARDNOTIFYSEARCH", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_BOARDNOTIFYSEARCH", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSendBoardNotiConfirm(HsNetWork hsNet, string strUserID, string strQuery)
@@ -1057,9 +926,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_BOARDNOTIFYCONFIRM", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_BOARDNOTIFYCONFIRM", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public void RequestSendSVRGPKIRegInfo(HsNetWork hsNet, string strGPKIList)
@@ -1089,9 +956,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["SIGNLEN"] = byteSignedDataHex.Length.ToString();
             dic["SIGNDATA"] = byteSignedDataHex.ByteToBase64String();   // 정각과장과 협의
 
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_GPKICERT", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_GPKICERT", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -1102,9 +967,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CLIENTID"] = strUserID;
             dic["GPKI_CN"] = strGpkiCN;
 
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_CHANGEGPKI_CN", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_CHANGEGPKI_CN", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
         public int RequestSend_PRIVACY_CONTINUE(HsNetWork hsNet, string strUserID, string transSeq, string dlpApprove, string privacyConfirmSeq, string NetType)
@@ -1117,9 +980,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["PRIVACYCONFIRMID"] = privacyConfirmSeq;
             dic["NETOVERSYSTEM"] = NetType;
 
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_PRIVACY_CONTINUE", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_PRIVACY_CONTINUE", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -1138,10 +999,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["SUBDATASIZE"] = strUrlData.Length.ToString();
             dic["SUBDATA"] = strUrlData;
 
-
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSubDataExchange("SUBDATAEXCHANGE", dic);
+            SGEventArgs args = sendParser.RequestSubDataExchange("SUBDATAEXCHANGE", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -1153,10 +1011,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["QUERY"] = strQuery;
 
             string cmdStr = SGCmdDef.Instance.GetCmdIdToString(eCmd);
-
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery(cmdStr, dic);
+            SGEventArgs args = sendParser.RequestSendQuery(cmdStr, dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 
@@ -1177,9 +1032,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             Dic["PREWORKTYPE"] = strPreworkType;
             Dic["REQDATE"] = DateTime.Now.ToString("yyyy-MM-dd").Base64EncodingStr();
 
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_GENERIC_NOTI", Dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_GENERIC_NOTI", Dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
 
         }
@@ -1190,13 +1043,8 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
-            CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_OLEMIMELISTQUERY", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_OLEMIMELISTQUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
-
-
-
     }
 }
