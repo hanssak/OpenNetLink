@@ -242,13 +242,13 @@ namespace OpenNetLinkApp.Common
         {
             if (strExtData.Length < 1 || strExtData == ";")
             {
-                Log.Information($"isFileExtinListStr - false (Wrong ExtList) - strFileName : {strFileName}, Ext List : {strExtData}");
+                Log.Logger.Here().Information($"isFileExtinListStr - false (Wrong ExtList) - strFileName : {strFileName}, Ext List : {strExtData}");
                 return false;
             }
                 
             if (strFileName.Length < 1)
             {
-                Log.Information($"isFileExtinListStr - false (Wrong FileExt) - strFileName : {strFileName}, Ext List : {strExtData}");
+                Log.Logger.Here().Information($"isFileExtinListStr - false (Wrong FileExt) - strFileName : {strFileName}, Ext List : {strExtData}");
                 return false;
             }             
             
@@ -424,6 +424,32 @@ namespace OpenNetLinkApp.Common
             return lSize;
         }
 
+        /// <summary>
+        /// strFilePath : [IN] 파일경로(FullPath)
+        /// chSep : [IN] Folder 간의 구분문자( '\\' : 윈도우, '/' : Linux, Mac 등등 )
+        /// strFolderPath : [OUT] 파일경로상에 있는 Path
+        /// bCreateFolder : [IN] 파일경로상에 있는 Path 를 생성할지 유무
+        /// </summary>
+        /// <param name="strFilePath"></param>
+        /// <param name="strFolderPath"></param>
+        /// <param name="bCreateFolder"></param>
+        /// <returns></returns>
+        public static bool GetPathByFilePath(string strFilePath, char chSep, out string strFolderPath, bool bCreateFolder)
+        {
+            strFolderPath = "";
+            int nLastPos = strFilePath.LastIndexOf(chSep);
+            if (nLastPos < 0)
+            {
+                Log.Logger.Here().Information($"GetPathByFilePath, input Path Error : {strFilePath}");
+                return false;
+            }
+
+            strFolderPath = strFilePath.Substring(0, nLastPos);
+            if (bCreateFolder && Directory.Exists(strFolderPath) == false)
+                Directory.CreateDirectory(strFolderPath);
+
+            return true;
+        }
 
         /// <summary>
         /// Windows / Linux / Mac OSx 에서 다 지원하는 파일명인지 확인하는 함수<br></br>
@@ -497,6 +523,54 @@ namespace OpenNetLinkApp.Common
             return true;
         }
 
+
+
+        /// <summary>
+        /// 지정한 Path에 있는 지정한 확장자 및 파일들을 삭제하는 함수
+        /// </summary>
+        /// <param name="strTargetPath"></param>
+        /// <param name="strDelFilePattern"></param>
+        /// <returns></returns>
+        public static bool DeleteFilesByPathExt(string strTargetPath, string strDelFilePattern)
+        {
+            if ( (strDelFilePattern?.Length ?? 0) < 3 )
+            {
+                Log.Logger.Here().Information($"DeleteFilesByPathExt, FilePattern-Error : {strDelFilePattern}");
+                return false;
+            }
+
+            if ((strTargetPath?.Length ?? 0) < 3 || (Directory.Exists(strTargetPath) == false))
+            {
+                Log.Logger.Here().Information($"DeleteFilesByPathExt, Path-Error : {strTargetPath}");
+                return false;
+            }
+
+            bool bRet = true;
+            try
+            {
+                foreach (string filePath in Directory.GetFiles(strTargetPath, strDelFilePattern))
+                {
+                    try
+                    {
+                        System.IO.File.Delete(filePath); // 파일 삭제
+                        Log.Logger.Here().Information($"DeleteFilesByPathExt, DeleteFile : {filePath}");
+                    }
+                    catch (IOException e)
+                    {
+                        Log.Logger.Here().Information($"DeleteFilesByPathExt, DeleteFile(Pcf)(Exception-Msg:{e.Message}) : {filePath}");
+                        bRet = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Information($"DeleteFilesByPathExt, Exception-Msg : {ex.Message}, Ret: {bRet}");
+                bRet = false;
+            }
+
+            return bRet;
+        }
+
     }
 
     public class CsHashFunc
@@ -514,7 +588,7 @@ namespace OpenNetLinkApp.Common
             }
             catch (Exception e)
             {
-                Log.Information($"SHA256CheckSum - Exception - msg : {e.Message}, path : {filePath}");
+                Log.Logger.Here().Information($"SHA256CheckSum - Exception - msg : {e.Message}, path : {filePath}");
                 //CLog.Here().Information($"FileInfo Get(#####) - Exception - msg : {e.Message}, path : {filePath}");
             }
 
@@ -539,7 +613,7 @@ namespace OpenNetLinkApp.Common
             }
             catch (Exception e)
             {
-                Log.Information($"SHA384BinBase64 - Exception - msg : {e.Message}, path : {filePath}");
+                Log.Logger.Here().Information($"SHA384BinBase64 - Exception - msg : {e.Message}, path : {filePath}");
                 //CLog.Here().Information($"FileInfo Get(#####) - Exception - msg : {e.Message}, path : {filePath}");
             }
 
@@ -550,6 +624,25 @@ namespace OpenNetLinkApp.Common
 
     public class CsSystemFunc
     {
+
+        public static string GetCurrentModulePath()
+        {
+            string strAgentPath = "";
+            string[] strArgumentArry = System.Environment.GetCommandLineArgs();
+            strAgentPath = strArgumentArry[0];
+
+            int nIdex = strArgumentArry[0].LastIndexOf("\\");
+            if (nIdex > 0)
+            {
+                strAgentPath = strArgumentArry[0].Substring(0, nIdex);
+            }
+
+            Log.Logger.Here().Information($"GetCurrentModulePath : {strAgentPath}");
+
+            return strAgentPath;
+        }
+
+
 
         public static string GetCurrentProcessName(bool bGetExePath = true)
         {
@@ -564,7 +657,7 @@ namespace OpenNetLinkApp.Common
                 strAgentPath += ".exe";
             }
 
-            Log.Information($"GetCurrentProcessName : {strAgentPath}");
+            Log.Logger.Here().Information($"GetCurrentProcessName : {strAgentPath}");
 
             return strAgentPath;
         }
@@ -593,19 +686,19 @@ namespace OpenNetLinkApp.Common
                 if (bStartReg == false)
                     LinkFile.Delete();
 
-                Log.Information($"makeAgentBootStartOSwindow - Lnk File exist : {LinkFullPath},  {(bStartReg?"Lnk Create Skip!":"Lnk Delete Done!")}");
+                Log.Logger.Here().Information($"makeAgentBootStartOSwindow - Lnk File exist : {LinkFullPath},  {(bStartReg?"Lnk Create Skip!":"Lnk Delete Done!")}");
                 return true;
             }
             else
             {
                 if (bStartReg == false)
                 {
-                    Log.Information($"makeAgentBootStartOSwindow - Lnk File isn't exist(Lnk Delete Skip!) : {LinkFullPath}");
+                    Log.Logger.Here().Information($"makeAgentBootStartOSwindow - Lnk File isn't exist(Lnk Delete Skip!) : {LinkFullPath}");
                     return true;
                 }
             }
 
-            Log.Information($"makeAgentBootStartOSwindow - WorkingPath(#####) : {Environment.CurrentDirectory}");
+            Log.Logger.Here().Information($"makeAgentBootStartOSwindow - WorkingPath(#####) : {Environment.CurrentDirectory}");
 
             return CsLnkFunc.makeLnkShortCut(strOrgPath, LinkFullPath, "", Environment.CurrentDirectory);
         }
@@ -655,7 +748,7 @@ namespace OpenNetLinkApp.Common
                 bRet = false;
             }
 
-            Log.Information(@$"makeAgentBootStart OSwindow - Make Lnk File {(bRet?"SUCCESS":("FAILED+ERRmsg:"+ strErrMsg))} : {strLnkPath}");
+            Log.Logger.Here().Information(@$"makeAgentBootStart OSwindow - Make Lnk File {(bRet?"SUCCESS":("FAILED+ERRmsg:"+ strErrMsg))} : {strLnkPath}");
 
             return bRet;
         }
