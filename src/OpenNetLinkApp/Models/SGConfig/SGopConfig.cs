@@ -153,5 +153,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileExceptionDescCheck { get; set; } = false;                           // 파일 예외신청 설명정보 필수 기입여부
         public bool bUsePKIsendRecv { get; set; } = false;             // 인증서 전송 사용 유무 (망별로) ( true : 사용, false : 미사용 )
         
+
+        public bool bPkiSendByFileTrans { get; set; } = false;                // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
+
     }
 }

@@ -264,6 +264,9 @@ namespace OpenNetLinkApp.PageEvent
 
     // 부서정보 조회 요청 응답 처리    
     public delegate void DeptInfoNotiEvent(int groupId);
+
+    // PkiFile 보내기 위한 Event
+    public delegate bool SendPkiFileEvent(int groupid, string strPcfFilePath, bool bSendPkiByFileTrans);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -431,6 +434,8 @@ namespace OpenNetLinkApp.PageEvent
 
 
         private Dictionary<int, DeptInfoNotiEvent> _dicDeptInfoEvnet = new Dictionary<int, DeptInfoNotiEvent>();
+
+        public SendPkiFileEvent PkiFileSendEventFunc = null;   // pki파일전송용
 
         public SGPageEvent()
         {
@@ -1582,6 +1587,17 @@ namespace OpenNetLinkApp.PageEvent
 
             return e;
         }
+
+
+        public void SetPkiFileSendEventAdd(SendPkiFileEvent e)
+        {
+            PkiFileSendEventFunc = e;
+        }
+        public SendPkiFileEvent GetPkiFileSendEvent()
+        {
+            return PkiFileSendEventFunc;
+        }
+
 
     }
 }

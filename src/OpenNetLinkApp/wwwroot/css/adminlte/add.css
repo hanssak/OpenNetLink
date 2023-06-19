@@ -1390,6 +1390,45 @@ line-height:1.1 !important;
 .btn-outline-blue2:hover {border:1px solid #2a40ad; background: #e5ecff url('/images/usb_2.png')96px 15px no-repeat;}
 .active2 {border:1px solid #2a40ad; background: #e5ecff url('/images/usb_2.png')96px 15px no-repeat;}
 
+.btn-outline-blue3 {
+    float: left;
+    width: 50%;
+    height: 100px;
+    text-align: center;
+    border: 1px solid #dbdbdb;
+    background-color: #fff;
+    background: #fff url('/images/hard_1.png')70px 15px no-repeat;
+}
+
+.btn-outline-blue3:hover {
+    border: 1px solid #2a40ad;
+    background: #e5ecff url('/images/hard_2.png')70px 15px no-repeat;
+}
+
+.active3 {
+    border: 1px solid #2a40ad;
+    background: #e5ecff url('/images/hard_2.png')70px 15px no-repeat;
+}
+
+.btn-outline-blue4 {
+    float: left;
+    width: 50%;
+    height: 100px;
+    text-align: center;
+    border: 1px solid #dbdbdb;
+    background-color: #fff;
+    background: #fff url('/images/usb_1.png')84px 15px no-repeat;
+}
+.btn-outline-blue4:hover {
+    border: 1px solid #2a40ad;
+    background: #e5ecff url('/images/usb_2.png')84px 15px no-repeat;
+}
+.active4 {
+    border: 1px solid #2a40ad;
+    background: #e5ecff url('/images/usb_2.png')84px 15px no-repeat;
+}
+
+
 .modal-header2 {
   display: -ms-flexbox;
   display: flex;
