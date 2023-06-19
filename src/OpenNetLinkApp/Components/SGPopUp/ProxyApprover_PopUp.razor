@@ -279,7 +279,9 @@
         SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
         if (sgUserData == null) return false;
 
-        string strQuery = Data.SGQuery.ApproveProxy.GetSFMModify(sgUserData.GetUserSequence(), strFromDay, strToDay, ProxySelect);
+        ApproveProxy approveProxy = new ApproveProxy();
+
+        string strQuery = approveProxy.GetSFMModify(sgUserData.GetUserSequence(), strFromDay, strToDay, ProxySelect);
         HSCmdCenter.sgSendData.RequestInstApproveReg(HSCmdCenter.GetConnectNetWork(groupID), sgLoginData.GetUserID(), strQuery);
 
         return true;
@@ -321,7 +323,8 @@
         SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
         if (sgUserData == null) return;
 
-        string sql = ApproveProxy.GetSFMApprover(sgUserData.GetUserSequence());
+        ApproveProxy approveProxy = new ApproveProxy();
+        string sql = approveProxy.GetSFMApprover(sgUserData.GetUserSequence());
 
         int rtn = HSCmdCenter.SendListQuery(groupID, sgLoginData.GetUserID(), sql);
     }
@@ -339,7 +342,8 @@
         SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
         if (sgUserData == null) return;
 
-        string sql = ApproveProxy.GetSFMDeptCount(sgUserData.GetUserSequence());
+        ApproveProxy approveProxy = new ApproveProxy();
+        string sql = approveProxy.GetSFMDeptCount(sgUserData.GetUserSequence());
 
         int rtn = HSCmdCenter.SendCountQuery(groupID, sgLoginData.GetUserID(), sql);
     }
@@ -540,7 +544,7 @@
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
-        
+
         actionAssign = AssignProxy;
         actionTargetSelect = SelectTarget;
     }

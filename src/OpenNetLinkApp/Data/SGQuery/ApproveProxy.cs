@@ -11,7 +11,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 {
     public class ApproveProxy
     {
-        public static string GetSFMModify(string userSeq, string stStartTime, string stEndTime, List<ApproverInfo> approverInfos)
+        public string GetSFMModify(string userSeq, string stStartTime, string stEndTime, List<ApproverInfo> approverInfos)
         {
             string sql = $@"Hsck_Transaction:DELETE FROM TBL_USER_SFM WHERE USER_SEQ = {userSeq}
 ";
@@ -24,14 +24,14 @@ namespace OpenNetLinkApp.Data.SGQuery
             return CsFunction.GetChangeNewLineToN(sql);
         }
 
-        public static string GetSFMApprover(string userSeq)
+        public string GetSFMApprover(string userSeq)
         {
             string sql = $@"SELECT * FROM FUNC_SFM_APPROVE_SEARCH({userSeq})";
 
             return sql;
         }
 
-        public static string GetSFMDeptCount(string userSeq)
+        public string GetSFMDeptCount(string userSeq)
         {
             string sql = $@"
 SELECT (CASE WHEN D.LIMIT_SFM_NUM IS NULL THEN '3' ELSE D.LIMIT_SFM_NUM END) LIMITCNT
@@ -42,7 +42,7 @@ SELECT (CASE WHEN D.LIMIT_SFM_NUM IS NULL THEN '3' ELSE D.LIMIT_SFM_NUM END) LIM
             return sql;
         }
 
-        public static string GetSFMApporverRight(string userSeq)
+        public string GetSFMApporverRight(string userSeq)
         {
             string sql = $"SELECT * FROM FUNC_SFM_USER_APPROVE_RIGHT({userSeq})";
 

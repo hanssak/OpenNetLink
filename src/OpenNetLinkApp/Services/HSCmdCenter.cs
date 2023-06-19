@@ -2861,7 +2861,8 @@ namespace OpenNetLinkApp.Services
         public int SendUserSFMInfo(int groupId, string userId)
         {
             SGUserData userData = (SGUserData)sgDicRecvData.GetUserData(groupId);
-            string strQuery = ApproveProxy.GetSFMApporverRight(userData.GetUserSequence());
+            ApproveProxy approveProxy = new ApproveProxy();
+            string strQuery = approveProxy.GetSFMApporverRight(userData.GetUserSequence());
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupId);
             if (hsNetWork != null)
