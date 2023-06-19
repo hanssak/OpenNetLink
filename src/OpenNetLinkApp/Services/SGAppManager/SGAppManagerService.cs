@@ -69,6 +69,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
     {
         public SGAppManagerService()
         {
+
+            //HsNetWorkSG.SGCrypto.UseKeyGen = false;
             //OP 파일 재 암호화 => 암복호화 실패 시 재설치
             //Network 파일 재 암호화 => 암복호화 실패 시 재설치
             bool kekGenInit = (!File.Exists("wwwroot/conf/Init/Network.json") && !File.Exists("wwwroot/conf/hsck"));
