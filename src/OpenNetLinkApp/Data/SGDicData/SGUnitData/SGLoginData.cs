@@ -1404,7 +1404,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// [사용중인곳 없음]
+        /// 
         /// </summary>
         /// <param name="data"></param>
         public void AddSystemEnvData(SGData data)
@@ -1417,7 +1417,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// [사용중인곳 없음]
+        /// 
         /// </summary>
         /// <param name="strKey"></param>
         /// <param name="data"></param>
@@ -1440,7 +1440,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         if (dic.TryGetValue(1, out strValue) == true)
                         {
                             strValue = dic[1];
-                             EncAdd(strKey, strValue);
+                            EncAdd(strKey, strValue);
                         }
                     }
 
