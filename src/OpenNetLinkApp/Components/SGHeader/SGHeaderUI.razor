@@ -1911,7 +1911,7 @@ public void ResultUserInfoCheck(int groupId, object[] e)
     //UserinfoCheck에서 받은 정보를 LoginData에 갱신
     foreach (string str in listSetTagName)
     {
-        string strValEnc = strValEnc = SGCrypto.AESEncrypt256(sgData.GetSvrRecordTagData(str), hsNetWork.GetBase64Seedkey()).ByteToBase64String().Base64EncodingStr();
+        string strValEnc = strValEnc = SGCrypto.AESEncrypt256(sgData.GetSvrRecordTagData(str), hsNetWork.GetSeedKey()).ByteToBase64String().Base64EncodingStr();
         sgLoginData.SetTagData(str, strValEnc);
     }
 

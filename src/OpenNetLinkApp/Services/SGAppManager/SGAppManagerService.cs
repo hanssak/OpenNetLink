@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OpenNetLinkApp.Models.SGUserInfo;
 using OpenNetLinkApp.Models.SGNetwork;
 using OpenNetLinkApp.Models.SGConfig;
+using System.IO;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -68,10 +69,24 @@ namespace OpenNetLinkApp.Services.SGAppManager
     {
         public SGAppManagerService()
         {
+
+            //HsNetWorkSG.SGCrypto.UseKeyGen = false;
             //OP 파일 재 암호화 => 암복호화 실패 시 재설치
             //Network 파일 재 암호화 => 암복호화 실패 시 재설치
+            bool kekGenInit = (!File.Exists("wwwroot/conf/Init/Network.json") && !File.Exists("wwwroot/conf/hsck"));
 
-            HsNetWorkSG.SGCrypto.InitKeyGenerate();
+
+            if (kekGenInit)
+            {
+                HsNetWorkSG.SGCrypto.SaveKeyGenerate("wwwroot/conf/hsck");
+                //json파일 재암호화
+            }
+            else
+            {
+                HsNetWorkSG.SGCrypto.LoadKeyGenerate("wwwroot/conf/hsck");
+            }
+
+
 
             HeaderUIService = new SGHeaderUIService();
             FooterUIService = new SGFooterUIService();
