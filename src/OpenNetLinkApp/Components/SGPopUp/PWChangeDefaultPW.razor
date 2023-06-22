@@ -252,7 +252,7 @@
             {
 
                 strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_SAMECHAR_MSG"); // 연속된 문자는 {0}자리까지만 입력이 가능합니다.
-                strInfoMsg = String.Format(strInfoMsg, SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID));
+                strInfoMsg = String.Format(strInfoMsg, SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID)-1);
                 ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
                 CLog.Here().Information($"doChangePW, PW Change Err, SameCharCount : {SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID)}, Msg : {strInfoMsg}");
                 //object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg };
