@@ -246,7 +246,7 @@
                 strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_GUIDE_INFO_EX1");     // 비밀번호를 영문 대문자/소문자/숫자/특수문자 중 {0}가지 이상을 조합하여 {1}자리 이상으로 입력하세요.(스페이스 사용 불가).
                 strInfoMsg = String.Format(strInfoMsg, SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID), MaxLen);
                 ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
-                CLog.Here().Information($"doChangePW, PW Change Err, Rule-Count : {SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID)}, Msg : {strInfoMsg}");
+                CLog.Here().Information($"doChangePW, PW Change Err, Request Rule-Count : {SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID)}, Msg : {strInfoMsg}");
                 //object[] param = { "waring", , strInfoMsg };
                 //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
                 return;
