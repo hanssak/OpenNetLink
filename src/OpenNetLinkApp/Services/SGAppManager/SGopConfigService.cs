@@ -48,7 +48,35 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public string GetPWChangeProhibitLimit(int groupId);
 
+        /// <summary>
+        /// PW변경시, 최소길이자리수
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
         public int GetPWChangeApplyCnt(int groupId);
+
+        /// <summary>
+        /// PW변경시, 키보드상에 연속된 문자 차단숫자
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        public int GetPWkeyBoardLinearCharCnt(int groupId);
+
+        /// <summary>
+        /// PW변경시, 동일문자 연속입력 차단숫자
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        public int GetPWsameCharCnt(int groupId);
+
+        /// <summary>
+        /// PW변경시, 대문자/소문자/숫자/특수문자 조합 최소개수
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        public int GetPWchangeRuleCnt(int groupId);
+
+
 
         public string GetInitPasswordInfo(int groupId);
 
@@ -371,6 +399,22 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].nPWChangeApplyCnt;
         }
+
+        public int GetPWkeyBoardLinearCharCnt(int groupId)
+        {
+            return AppConfigInfo[groupId].nPWkeyBoardLinearCharCnt;
+        }
+        public int GetPWsameCharCnt(int groupId)
+        {
+            return AppConfigInfo[groupId].nPWsameCharCnt;
+        }
+        public int GetPWchangeRuleCnt(int groupId)
+        {
+            return AppConfigInfo[groupId].nPWchangeRuleCnt;
+        }
+
+
+
         public string GetInitPasswordInfo(int groupId)
         {
             return AppConfigInfo[groupId].strInitPasswd;

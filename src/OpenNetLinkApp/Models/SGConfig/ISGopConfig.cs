@@ -27,7 +27,13 @@ namespace OpenNetLinkApp.Models.SGConfig
         //패스워드
         public bool bUserPWChange { get; set; }                   // 사용자 패스워드 변경 사용 여부.
         public string strPWChangeProhibitLimit { get; set; }        // 패스워드 사용금지 문자열 지정.
-        public int nPWChangeApplyCnt { get; set; }                   // 패스워드 변경 시 허용되는 자리수 지정.
+        public int nPWChangeApplyCnt { get; set; }                // 패스워드 변경 시, 최소자리수
+
+        public int nPWkeyBoardLinearCharCnt { get; set; }         // 패스워드 변경 시, 키보드상에 최소자리수
+        public int nPWsameCharCnt { get; set; }                   // 패스워드 변경 시, 연속된 같은 문자수
+        public int nPWchangeRuleCnt { get; set; }                 // 패스워드 변경 시, 대문자/소문자/수/특수문자 중에 최소한 적용되어야할 법칙 개수
+
+
         public string strInitPasswd { get; set; }    // 초기 패스워드 정보.(hsck@2301)
         public bool bUseIDAsInitPassword { get; set; } //ID와 동일한 비밀번호를 초기 PW로 사용할지 여부 (true : ID=PW로 로그인된 경우, 비밀번호 변경 요청)
 

@@ -60,6 +60,12 @@ bEmptyfileTrans : 0kb 파일 전송 가능 유무(true, false)
 strInitPasswd : 암호화된 초기 PW string
 strPWChangeProhibitLimit : 패스워드 사용금지 문자열 [기능 X]
 nPWChangeApplyCnt : 비밀번호 변경때, 새비번의 최소길이 (기본값:9)
+nPWkeyBoardLinearCharCnt : 키보드 상에 연속된 키몇개가 맞으면 안되는지 (기본값:3)
+nPWsameCharCnt : 패스워드 변경 시, 연속된 같은 문자수 (기본값:3)
+nPWchangeRuleCnt : 패스워드 변경 시, 대문자/소문자/수/특수문자 중에 최소한 적용되어야할 법칙 개수 (기본값:4)
+
+
+
 bUseIDAsInitPassword : ID와 동일한 비밀번호를 초기 PW로 사용할지 여부 (true : ID=PW로 로그인된 경우, 비밀번호 변경 요청)
 
 
@@ -203,4 +209,3 @@ bUseFileSelectDelete : 파일 선택 삭제 사용 유무
 bUseCrossPlatformOSforFileName : 파일이름에 OS간에 사용할수 없는 문자 들어간거 차단하는기능 사용유무(Linux 간에만 사용한다든지 할때는 false 해도 무관)
 
 bUseTitleDescMinLength : 제목 / 설명 글자 최소 글자수 서버 DB에서 받아서 동작하게 설정
-

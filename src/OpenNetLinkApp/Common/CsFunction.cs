@@ -20,6 +20,7 @@ using System.IO.Compression;
 using SharpCompress.Common;
 using SharpCompress.Readers;
 using OpenNetLinkApp.Data.SGDicData.SGAlz;
+using System.Text.RegularExpressions;
 
 namespace OpenNetLinkApp.Common
 {
@@ -778,6 +779,183 @@ namespace OpenNetLinkApp.Common
                 strMsg = "사용자 인증과정 중 알수없는 오류가 발생하였습니다.";
 
             return strMsg;
+        }
+
+        public static string stringIDpwJsonString(string strID, string strPW)
+        {
+            string json = "{\n\"id\":\"" + strID + "\",\n\"pw\":\"" + strPW + "\"\n}";
+            return json;
+        }
+
+    }
+
+
+    public class CsPasswdValidCheckfunc
+    {
+        Regex regex = new Regex(@"^.*([ ]+).*$");       //공백체크
+        Regex regex2 = new Regex(@"^.*([A-Z]+).*$");    //대문자 존재 체크
+        Regex regex3 = new Regex(@"^.*([a-z]+).*$");    //소문자 존재 체크
+        Regex regex4 = new Regex(@"^.*([0-9]+).*$");    //숫자 존재 체크
+        Regex regex5 = new Regex(@"^.*([^A-Za-z0-9]+).*$");    //특수문자 존재 체크
+        string[] ArrayStrKeyBoard = new string[] { "`1234567890-=", "~!@#$%^&*()_+", "qwertyuiop[]\\", "QWERTYUIOP{}|",
+            "asdfghjkl;'\"", "ASDFGHJKL:\"", "zxcvbnm,./", "ZXCVBNM<>?",
+            "=-0987654321`", "+_)(*&^%$#@!~", "\\][poiuytrewq", "|}{POIUYTREWQ", 
+            "\"';lkjhgfdsa", "\":LKJHGFDSA", "/.,mnbvcxz", "?><MNBVCXZ"};        
+
+        /// <summary>
+        /// 공백문자가 있는지 체크
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <returns></returns>
+        public bool GetEmptyString(string strData)
+        {
+            if (regex.IsMatch(strData))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// 숫자, 대문자(영문), 소문자(영문), 특수문자가 각항목이 존재하면 +1, (전부다있으면 : 4)
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <returns></returns>
+        public int GetComplexCnt(string strData)
+        {
+            int nComplexCnt = 0;
+            if (regex2.IsMatch(strData))
+                nComplexCnt++;
+            if (regex3.IsMatch(strData))
+                nComplexCnt++;
+            if (regex4.IsMatch(strData))
+                nComplexCnt++;
+            if (regex5.IsMatch(strData))
+                nComplexCnt++;
+
+            return nComplexCnt;
+        }
+
+        /// <summary>
+        /// reture : True - 같은문자가 지정한 개수 만큼 반복되지 않음
+        /// reture : false - 같은문자가 지정한 개수 만큼 반복됨
+        /// </summary>
+        /// <param name="chPasswd"></param>
+        /// <param name="iCount"></param>
+        /// <returns></returns>
+        bool CheckSameChar(string chPasswd, int iCount)
+        {
+
+            bool bFindSameChar = false;
+            int nLength = chPasswd.Length;
+
+            try
+            {
+                for (int n = 0; n < nLength - (iCount - 1); n++)
+                {
+                    if (chPasswd[n] == chPasswd[n + 1])
+                    {
+                        for (int i = 1; i < iCount - 1; i++)
+                        {
+                            if (chPasswd[n + i] != chPasswd[n + i + 1])
+                            {
+                                bFindSameChar = false;
+                                break;
+                            }
+                            bFindSameChar = true;
+                        }
+                    }
+
+                    if (bFindSameChar == true)
+                        return false;
+                }
+
+            }
+            catch(Exception ex)
+            {
+                Log.Logger.Here().Error($"CheckSameChar, exception(MSG) : {ex.Message}");
+            }
+
+            return true;
+        }
+
+
+        /// <summary>
+        /// 동일한 문자·숫자의 연속적인 존재유무(true:존재함,false:존재X) <br></br>
+        /// nCharKeyCount : 연속으로 존재해야하는 문자개수
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <returns></returns>
+        public bool GetSameCharCheck(string strData, int nCharKeyCount)
+        {
+            if (CheckSameChar(strData, nCharKeyCount))
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// true : 키보드상의 연속된 문자 또는 숫자의 순차적 입력이 입력된 문자열에 있음
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <returns></returns>
+        public bool GetKeyBoardContinuousWord(string strData, int nCharKeyCount)
+        {
+
+            try
+            {
+                foreach (string strKeyLine in ArrayStrKeyBoard)
+                {
+                    if (PasswdValiation(strKeyLine, strData, nCharKeyCount) == false)
+                        return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"GetKeyBoardContinuousWord, Exception(MSG) : {ex.Message}");
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// passwd에 지정한 연속된 Key가 존재하는지 파악하는 함수
+        /// </summary>
+        /// <param name="strKeyLine"></param>
+        /// <param name="strPWdata"></param>
+        /// <param name="nCharKeyCount"></param>
+        /// <returns></returns>
+        bool PasswdValiation(string strKeyLine, string strPWdata, int nCharKeyCount)
+        {
+
+            string strTemp = "";
+            int len = 0;
+
+            if (nCharKeyCount > 0)
+                len = strPWdata.Length;
+
+            for (int n = 0; n < len; n++)
+            {
+                strTemp = "";
+                if (nCharKeyCount > 0)
+                {
+                    // C#에서는 확인필요 - exception 발생
+                    if (n + nCharKeyCount > len)
+                        return true;
+
+                    strTemp = strPWdata.Substring(n, nCharKeyCount);
+                    if (strTemp.Length < nCharKeyCount)
+                        return true;
+                }
+                else
+                    strTemp = strPWdata;
+
+
+                int pos = strKeyLine.IndexOf(strTemp);
+                if (pos > -1)
+                    return false;
+            }
+
+            return true;
         }
 
         public static string stringIDpwJsonString(string strID, string strPW)

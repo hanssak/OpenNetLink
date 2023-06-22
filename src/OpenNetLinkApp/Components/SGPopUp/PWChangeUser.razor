@@ -10,6 +10,9 @@
 @using HsNetWorkSG
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using OpenNetLinkApp.Common
+@using AgLogManager
+
 <div class="modal fade" id="modal-pwchangeuser" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
@@ -59,6 +62,11 @@
     ISGSideBarUIService SideBarUISvc;
     SGSettingsDBProc sgSettingProc;
 
+    CsPasswdValidCheckfunc objCheckPWstring = new CsPasswdValidCheckfunc();
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<PWChangeUser>();
+
+
     public async Task openPopUp()
     {
         object[] param = { "modal-pwchangeuser" };
@@ -70,10 +78,12 @@
         object[] param = { "modal-pwchangeuser" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
+
     public async Task doChangePW()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
@@ -85,75 +95,90 @@
         //3.비밀번호 실제 변경 요청 구현 필요
         if (stCurrentPW == null || stCurrentPW.Length == 0)
         {
-            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_OLD_PASSWORD_NEEDED") };            // 기존 비밀번호를 입력하세요.
-            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            strInfoMsg = XmlConf.GetTitle("T_ETC_OLD_PASSWORD_NEEDED"); //  기존 비밀번호를 입력하세요.
+            ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+            CLog.Here().Information($"doChangePW, Now PW is empty, Msg : {strInfoMsg}");
+            // object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_OLD_PASSWORD_NEEDED") };            // 기존 비밀번호를 입력하세요.
+            // await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
             return;
         }
 
         string strCurPW = pageService.GetCurUserPassWD(groupID);
         if (!stCurrentPW.Equals(strCurPW))
         {
-            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetWarnMsg("W_0044") };                     //  현재 비밀번호를 잘못 입력했습니다.
-            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            strInfoMsg = XmlConf.GetWarnMsg("W_0044"); //  현재 비밀번호를 잘못 입력했습니다.
+            ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+            CLog.Here().Information($"doChangePW, incorrect PW, Msg : {strInfoMsg}");
+            //object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetWarnMsg("W_0044") };                     //  현재 비밀번호를 잘못 입력했습니다.
+            //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
             return;
         }
 
         if (stNewPW == null || stNewPW.Length == 0)
         {
-            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_NEW_PASSWORD_NEEDED") };            // 새로운 비밀번호를 입력하세요.
-            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
-            return;
-        }
-        if (stNewPWConfirm == null || stNewPWConfirm.Length == 0)
-        {
-            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_COMFIRM_PASSWORD_NEEDED") };            // 새 비밀번호 확인을 입력하세요.
-            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
-            return;
-        }
-        if (stCurrentPW.Equals(stNewPW))
-        {
-            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetWarnMsg("W_0046") };         // 새로운 비밀번호가 이전 비밀번호와 같습니다.
-            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
-            return;
-        }
-        if (stNewPW != stNewPWConfirm)
-        {
-            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_INCORRECT_FOR_NEW") };         // 새비밀번호화 비밀번호 확인이 일치하지 않습니다.
-            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            strInfoMsg = XmlConf.GetTitle("T_ETC_NEW_PASSWORD_NEEDED"); // 새 비밀번호을 입력하세요.
+            ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+            CLog.Here().Information($"doChangePW, New PW is empty, Msg : {strInfoMsg}");
+            // object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_NEW_PASSWORD_NEEDED") };            // 새로운 비밀번호를 입력하세요.
+            // await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
             return;
         }
 
-        //정규표현식을 이용한 패스워드 복잡도 체크
+        if (stNewPWConfirm == null || stNewPWConfirm.Length == 0)
+        {
+            strInfoMsg = XmlConf.GetTitle("T_ETC_COMFIRM_PASSWORD_NEEDED"); // 새 비밀번호 확인을 입력하세요.
+            ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+            CLog.Here().Information($"doChangePW, New PW confirm is empty, Msg : {strInfoMsg}");
+            //object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_COMFIRM_PASSWORD_NEEDED") };
+            //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
+
+        // "T_ETC_PASSWORD_NOW_PW"
+        if (strCurPW.Equals(stNewPW))
+        {
+            strInfoMsg = XmlConf.GetWarnMsg("W_0046");  // 새로운 비밀번호가 이전 비밀번호와 같습니다.
+            ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+            CLog.Here().Information($"doChangePW, New PW is equre  Now PW, Msg : {strInfoMsg}");
+            //object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetWarnMsg("W_0046") };
+            //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
+
+        if (stNewPW != stNewPWConfirm)
+        {
+            strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_INCORRECT_FOR_NEW");
+            ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+            CLog.Here().Information($"doChangePW, New PW is not equre  New-PW-Confirm, Msg : {strInfoMsg}");
+            //object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"),  };         // 새비밀번호화 비밀번호 확인이 일치하지 않습니다.
+            //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
+
+        // 비밀번호 최소 자리수
         int MaxLen = SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID);
 
         if (stNewPW.Length < MaxLen)                         //길이체크
         {
             strInfoMsg = XmlConf.GetWarnMsg("W_0045");                                              // 비밀번호는 {0}자리 이상 입력해야 합니다.
             strInfoMsg = String.Format(strInfoMsg, MaxLen);
-            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg };
-            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+            CLog.Here().Information($"doChangePW, PW's Length is less {MaxLen}, Msg : {strInfoMsg}");
+            //object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg };
+            //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
             return;
         }
-        Regex regex = new Regex(@"^.*([ ]+).*$");       //공백체크
-        if (regex.IsMatch(stNewPW))
+
+        // 공백문자 불허(우리규칙)
+        if (objCheckPWstring.GetEmptyString(stNewPW))
         {
-            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_BLANK_ERROR") };               // 패스워드는 공백을 포함할 수 없습니다.
-            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_BLANK_ERROR");
+            ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+            CLog.Here().Information($"doChangePW, PW have Empty String, Msg : {strInfoMsg}");
+            //object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_BLANK_ERROR") };               // 패스워드는 공백을 포함할 수 없습니다.
+            //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
             return;
         }
-        int nComplexCnt = 0;
-        Regex regex2 = new Regex(@"^.*([A-Z]+).*$");    //대문자 존재 체크
-        if (regex2.IsMatch(stNewPW))
-            nComplexCnt++;
-        Regex regex3 = new Regex(@"^.*([a-z]+).*$");    //소문자 존재 체크
-        if (regex3.IsMatch(stNewPW))
-            nComplexCnt++;
-        Regex regex4 = new Regex(@"^.*([0-9]+).*$");    //숫자 존재 체크
-        if (regex4.IsMatch(stNewPW))
-            nComplexCnt++;
-        Regex regex5 = new Regex(@"^.*([^A-Za-z0-9]+).*$");    //특수문자 존재 체크
-        if (regex5.IsMatch(stNewPW))
-            nComplexCnt++;
 
         bool bComplexCheck = false;
         SGLoginData sgLoginData = null;
@@ -162,24 +187,84 @@
         {
             bComplexCheck = sgLoginData.GetPasswordRule();                      // 복잡도 확인 설정 여부를 확인한다.
         }
+
+        string strUserID = sgLoginData.GetUserID();
+        // 보안기능 확인서에서 요구한 사항 적용
         if (bComplexCheck)
         {
-            if (nComplexCnt < 3)
+
+            // 사용자ID인지 check
+            if (string.Compare(strUserID, stNewPW) == 0)
             {
-                strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_GUIDE_INFO");                             // 비밀번호를 영문 대문자/소문자/숫자/특수문자 중 3가지 이상을 조합하여 9자리 이상으로 입력하세요.(스페이스 사용 불가).
-                strInfoMsg = String.Format(strInfoMsg, MaxLen);
-                object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg };
-                await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+                strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_NO_ID");
+                ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+                CLog.Here().Information($"doChangePW, PW Change Err, PW is UserID, Msg : {strInfoMsg}");
+                //object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_NO_ID") };               // 패스워드는 공백을 포함할 수 없습니다.
+                //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
                 return;
             }
+
+            // 현재PW인지 check
+            if (string.Compare(strCurPW, stNewPW) == 0)
+            {
+                strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_NOW_PW");
+                ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+                CLog.Here().Information($"doChangePW, PW Change Err, New PW is equre Now PW, Msg : {strInfoMsg}");
+                //object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_NOW_PW") };
+                //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+                return;
+            }
+
+            // 동일한 문자·숫자의 연속적인 반복입력 금지
+            if (objCheckPWstring.GetSameCharCheck(stNewPW, SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID)))
+            {
+
+                strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_SAMECHAR_MSG"); // 연속된 문자는 {0}자리까지만 입력이 가능합니다.
+                strInfoMsg = String.Format(strInfoMsg, SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID));
+                ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+                CLog.Here().Information($"doChangePW, PW Change Err, SameCharCount : {SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID)}, Msg : {strInfoMsg}");
+                //object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg };
+                //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+                return;
+            }
+
+            // 키보드상의 연속된 문자 또는 숫자의 순차적 입력금지
+            if (objCheckPWstring.GetKeyBoardContinuousWord(stNewPW, SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID)))
+            {
+                strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_KEYBOARD_LINEAR_MSG"); // 키보드상의 연속된 문자는 {0}개 이상 사용할 수 없습니다.
+                strInfoMsg = String.Format(strInfoMsg, SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID));
+                ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+                CLog.Here().Information($"doChangePW, PW Change Err, KeyBoardLinearChar-Count : {SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID)}, Msg : {strInfoMsg}");
+                //object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg };
+                //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+                return;
+            }
+
+            // 숫자, 대문자(영문), 소문자(영문), 특수문자가 각 1개 이상 포함
+            if (objCheckPWstring.GetComplexCnt(stNewPW) < SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID))
+            {
+                strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_GUIDE_INFO_EX1");     // 비밀번호를 영문 대문자/소문자/숫자/특수문자 중 {0}가지 이상을 조합하여 {1}자리 이상으로 입력하세요.(스페이스 사용 불가).
+                strInfoMsg = String.Format(strInfoMsg, SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID), MaxLen);
+                ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+                CLog.Here().Information($"doChangePW, PW Change Err, Rule-Count : {SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID)}, Msg : {strInfoMsg}");
+                //object[] param = { "waring", , strInfoMsg };
+                //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+                return;
+            }
+
+            // 직전 사용된 패스워드 재사용 금지 - Server의 결과값으로만 알수 있음
+
         }
+
         //Debug.WriteLine("PW:" + stCurrentPW);
         //Debug.WriteLine("new PW:" + stNewPW);
         //Debug.WriteLine("confirm PW:" + stNewPWConfirm);
         //closePopUp();
-        string strUserID = sgLoginData.GetUserID();
+
         HSCmdCenter.SendChangePasswd(groupID, strUserID, stCurrentPW, stNewPW);
     }
+
+
     public void changeLater()
     {
         closePopUp();
@@ -204,14 +289,52 @@
 
     public void UserPassWordChangeNoti(int groupID, PageEventArgs e)
     {
-        closePopUp();
-        string strMsg = "";
+
+        // Test 필요
         if (e.result != 0)
         {
+
+            string strMsgData = "";
+
+            if (e.result == 2)
+                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_USED"); // 이전 사용된 비밀번호는 사용할 수 없습니다.
+            else if (e.result == 3)
+            {
+                int MaxLen = SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID);
+                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_LENGTH_MSG"); // 비밀번호는 {0}자리 이상 입력해야 합니다.
+                strMsgData = String.Format(strMsgData, MaxLen);
+            }
+            else if (e.result == 5)
+            {
+                // 자리수에 대해 Server와의 interface 생기면 수정필요
+                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_SAMECHAR_MSG"); // 연속된 문자는 {0}자리까지만 입력이 가능합니다.
+                strMsgData = String.Format(strMsgData, SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID)-1);
+            }
+            else if (e.result == 4 || e.result == 6)
+            {
+                // 자리수에 대해 Server와의 interface 생기면 수정필요
+                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_GUIDE_INFO_EX1"); // 비밀번호를 영문 대문자/소문자/숫자/특수문자 중 {0}가지 이상을 조합하여 {1}자리 이상으로 입력하세요.(스페이스 사용 불가).
+                strMsgData = String.Format(strMsgData,
+                    SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID),
+                    SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID));
+            }
+            else if (e.result == 7)
+            {
+                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_KEYBOARD_LINEAR_MSG"); // 키보드상의 연속된 문자는 {0}개 이상 사용할 수 없습니다.
+                strMsgData = String.Format(strMsgData, SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID));
+            }
+            else // 1 : 변경실패와 동일
+                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_CHANGE_ERROR"); // 비밀번호 변경 중 오류가 발생 하였습니다. 잠시후 다시 시도하십시오.
+
+            ShowMessage("waring", strMsgData);
+            CLog.Here().Error($"UserPassWordChangeNoti, groupID : {groupID}, Result : {e.result}, Err-Msg: {strMsgData}");
             return;
         }
-        strMsg = XmlConf.GetInfoMsg("I_0011");              // 비밀번호가 변경되었습니다.
-        ShowMessage("info", strMsg);
+
+        closePopUp();
+        ShowMessage("info", XmlConf.GetInfoMsg("I_0011")); // 비밀번호가 변경되었습니다.
+        CLog.Here().Information($"UserPassWordChangeNoti, PW changed-Success, groupID : {groupID}");
+
         pageService.SetCurUserPassWD(groupID, stNewPW);
         HSCmdCenter.SetPassWord(groupID, stNewPW);
         //if (siteConfig.GetUseAutoLogin(groupID) == true)  // json 설정으로 이동
@@ -229,11 +352,18 @@
         }
     }
 
+
+
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
-        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
-        object[] param = { strType, strSystemName, strMsg };
+        object[] param = { strType, XmlConf.GetTitle("T_SYSTEMNAME2"), strMsg }; // 망연계 솔루션
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    private void ShowMessage(string strType, string strTitle, string strMsg)
+    {
+        object[] param = { strType, strTitle, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
@@ -242,4 +372,5 @@
         stCurrentPW = stNewPW = stNewPWConfirm = "";
         StateHasChanged();
     }
+
 }
