@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace OpenNetLinkApp.Data.SGQuery
 {
+	/// <summary>
+	/// 사용하지마세요~~~~ TransferDao만 사용하세요~~~
+	/// </summary>
     class TransferDao2
     {
 		/// <summary>

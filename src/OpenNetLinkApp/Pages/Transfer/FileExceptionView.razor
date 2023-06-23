@@ -647,8 +647,7 @@
 
         string strsha384 = SHA384CheckSum(m_filePath);
 
-        string strSql = $@"SELECT * FROM func_nl_skipfilelistset('{systemid}', '{g_strFileName}', '{lfileSize}', '{strReasonData}', '{sgUserData.GetUserSequence()}', '{strsha384}', '{g_ninterLockFlag}');";
-
+        string strSql = SGQueryExtend.GetSkipFileList(systemid, g_strFileName, lfileSize, strReasonData, sgUserData.GetUserSequence(), strsha384, g_ninterLockFlag);
         @*string sql = string.Empty;
         sql = " select a.cnt1 + b.cnt2 AS CHKCNT FROM ";
         sql += " (select COUNT(*) AS cnt1 from tbl_skip_file_list ";

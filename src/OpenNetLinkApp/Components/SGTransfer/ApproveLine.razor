@@ -5,6 +5,8 @@
 @using OpenNetLinkApp.Models.SGSettings
 @using HsNetWorkSG
 @using HsNetWorkSGData
+@using OpenNetLinkApp.Data.SGQuery
+
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
 @inject PageStatusService pageService
@@ -327,9 +329,12 @@ else
 
         string strQuery = "";
 
+        SGQueryExtend sgQueryExtend = new SGQueryExtend();
+
+
         for (int i = 0; i < lineDeptName.Count; i++)
         {
-            strQuery = $"SELECT * FROM tbl_dept_info WHERE dept_name = '{lineDeptName[i]}'";
+            strQuery = sgQueryExtend.GetDeptInfo(lineDeptName[i]);
             HSCmdCenter.SendListQuery(groupID, curUserID, strQuery);
         }
     }

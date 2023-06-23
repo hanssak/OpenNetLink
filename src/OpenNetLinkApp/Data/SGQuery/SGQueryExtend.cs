@@ -365,6 +365,13 @@ SELECT * FROM FUNC_NL_GETAFTERAPPROVEWAITUSERCOUNT('{strUserList}')
             return strQuery;
         }
 
+        public string GetDeptInfo(string deptName)
+        {
+            string sql = $"SELECT * FROM TBL_DEPT_INFO WHERE DEPT_NAME = '{deptName}'";
+
+            return sql;
+        }
+
 
         /// <summary>
         /// TRANSFER SEQ를 가지고 개인정보로그를 가져오기
@@ -383,6 +390,12 @@ WHERE A.TRANS_SEQ = '{transSeq}'
             return sql;
         }
 
+        public static string GetSkipFileList(string systemid, string g_strFileName, long lfileSize, string strReasonData, string userSeq, string strsha384, int g_ninterLockFlag)
+        {
+            string sql = $@"SELECT * FROM func_nl_skipfilelistset('{systemid}', '{g_strFileName}', '{lfileSize}', '{strReasonData}', '{userSeq}', '{strsha384}', '{g_ninterLockFlag}');";
+
+            return sql;
+        }
 
 
 

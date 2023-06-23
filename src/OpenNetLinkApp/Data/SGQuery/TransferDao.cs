@@ -524,7 +524,6 @@ LEFT OUTER JOIN TBL_TRANSFER_REQ_SUB_HIS C ON (A.TRANS_SEQ = C.TRANS_SEQ)
 				dateTimeCheckString = $"AND A.REQUEST_TIME >= '{tParam.SearchFromDay}' AND A.REQUEST_TIME <= '{tParam.SearchToDay}'";
 			}
 
-			StringBuilder sb = new StringBuilder();
 			string sql = $@"
 SELECT COUNT(*) FROM ( 
 SELECT A.TRANS_SEQ AS TRANSSEQ, A.DLP AS DLP, CASE WHEN SUBSTRING(A.SYSTEM_ID, 1, 1)='I' THEN '1' ELSE '2' END AS IOTYPE,
