@@ -1048,7 +1048,7 @@ public async Task<int> SendUserSFMInfo(int groupId)
         {
             SGUserInfo userData = (SGUserInfo)SGAppMgrSvc.UserInfoService.GetUserInfo(groupId);
             ApproveProxy approveProxy = new ApproveProxy();
-            string strQuery = approveProxy.GetSFMApporverRight(userData.UserSeq);
+            string strQuery = approveProxy.GetSFMApproverRight(userData.UserSeq);
             HsNetWork hsNetWork = null;
             hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
             if (hsNetWork != null)

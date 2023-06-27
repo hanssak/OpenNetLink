@@ -2,16 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using OpenNetLinkApp.Data.SGDomain;
+using OpenNetLinkApp.Services;
+
 namespace OpenNetLinkApp.Data.SGQuery
 {
     class MailManageDao
     {
 		public string MailDetail(string seq)
         {
-			string sql = String.Empty;
-			sql = "SELECT func_email_detail(" + seq + ")";
-			return sql;
-        }
+			Dictionary<string, string> param = new Dictionary<string, string>() {
+				{ "seq", seq }
+			};
+
+			StringBuilder sb = new StringBuilder();
+			SQLXmlService.Instanse.GetSqlQuery("MailManageDaoDetail", param, ref sb);
+
+			return sb.ToString();
+		}
         public string List(MailParam tParam)
         {
 			string mainCdSecValue = "";
@@ -303,28 +310,28 @@ namespace OpenNetLinkApp.Data.SGQuery
 
 		public string ListDbFunc(MailParam tParam)
         {
+			Dictionary<string, string> param = new Dictionary<string, string>() {
+				{ "UserID", tParam.UserID }, { "SearchStartDate", tParam.SearchStartDate }, { "SearchEndDate", tParam.SearchEndDate }, { "ApproveKind", tParam.GetApproveKindCode() }, { "TransKind", tParam.GetTransKindCode() }, { "ApprStatus", tParam.GetApprStatusCode() }, { "TransStatus", tParam.GetTransStatusCode(false) }, { "Dlp", tParam.GetDlpValue() },
+				{ "Receiver", tParam.Receiver }, { "Title", tParam.Title }, { "PageListCount", tParam.PageListCount.ToString() }, { "ViewPageNo", tParam.ViewPageNo.ToString() }
+			};
 
-			// FUNC_EMAIL_TRANSFERINFO_OPEN
-			// strQuery += @$"'{tParam.Receiver}', '{tParam.Title}', '0', '{tParam.PageListCount}', '{tParam.ViewPageNo}')";
+			StringBuilder sb = new StringBuilder();
+			SQLXmlService.Instanse.GetSqlQuery("MailManageDaoList", param, ref sb);
 
-			string strQuery = @$"SELECT * FROM FUNC_EMAIL_TRANSFERINFO_OPEN('{tParam.UserID}','{tParam.SearchStartDate}','{tParam.SearchEndDate}', ";
-			strQuery += @$"'{tParam.GetApproveKindCode()}', '{tParam.GetTransKindCode()}','{tParam.GetApprStatusCode()}','{tParam.GetTransStatusCode(false)}', '{tParam.GetDlpValue()}',";
-			strQuery += @$"'{tParam.Receiver}', '{tParam.Title}', '0', '{tParam.PageListCount}', '{tParam.ViewPageNo}')";
-
-			return strQuery;
-
-			/*sb.Append(" ORDER BY a.emailSeq desc");
-			sb.Append(" limit " + tParam.PageListCount + " offset (" + tParam.ViewPageNo + "-1) * " + tParam.PageListCount);
-			return sb.ToString();*/
+			return sb.ToString();
 		}
 
 		public string TotalCountDbFunc(MailParam tParam)
         {
-			string strQuery = @$"SELECT COUNT(*) FROM FUNC_EMAIL_TRANSFERINFO_OPEN('{tParam.UserID}','{tParam.SearchStartDate}','{tParam.SearchEndDate}', ";
-			strQuery += @$"'{tParam.GetApproveKindCode()}', '{tParam.GetTransKindCode()}','{tParam.GetApprStatusCode()}','{tParam.GetTransStatusCode(false)}', '{tParam.GetDlpValue()}',";
-			strQuery += @$"'{tParam.Receiver}', '{tParam.Title}', '0', '', '')";
+			Dictionary<string, string> param = new Dictionary<string, string>() {
+				{ "UserID", tParam.UserID }, { "SearchStartDate", tParam.SearchStartDate }, { "SearchEndDate", tParam.SearchEndDate }, { "ApproveKind", tParam.GetApproveKindCode() }, { "TransKind", tParam.GetTransKindCode() }, { "ApprStatus", tParam.GetApprStatusCode() }, { "TransStatus", tParam.GetTransStatusCode(false) }, { "Dlp", tParam.GetDlpValue() },
+				{ "Receiver", tParam.Receiver }, { "Title", tParam.Title }
+			};
 
-			return strQuery;
+			StringBuilder sb = new StringBuilder();
+			SQLXmlService.Instanse.GetSqlQuery("MailManageDaoCount", param, ref sb);
+
+			return sb.ToString();
 		}
 
 	}

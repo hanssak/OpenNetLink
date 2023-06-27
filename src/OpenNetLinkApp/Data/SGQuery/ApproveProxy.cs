@@ -1,5 +1,6 @@
 using OpenNetLinkApp.Common;
 using OpenNetLinkApp.Data.SGDicData.SGUnitData;
+using OpenNetLinkApp.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,40 +14,56 @@ namespace OpenNetLinkApp.Data.SGQuery
     {
         public string GetSFMModify(string userSeq, string stStartTime, string stEndTime, List<ApproverInfo> approverInfos)
         {
-            string sql = $@"Hsck_Transaction:DELETE FROM TBL_USER_SFM WHERE USER_SEQ = {userSeq}
-";
+            Dictionary<string, string> param = new Dictionary<string, string>() { { "userSeq", userSeq } };
+
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("SFMModifyDelete", param, ref sb);
             foreach (ApproverInfo approver in approverInfos)
             {
-                //sb.Append($@"INSERT INTO TBL_USER_SFM VALUES ({userSeq} , {approver.UserSeq}, '{stStartTime.Replace("-", "")}', '{stEndTime.Replace("-", "")}',  CAST (to_char(now(), 'YYYYMMDDHH24MISS') AS VARCHAR), {userSeq} )\n");
-                sql += $@"INSERT INTO TBL_USER_SFM VALUES ({userSeq} , {approver.UserSeq}, '{stStartTime.Replace("-", "")}', '{stEndTime.Replace("-", "")}',  CAST (to_char(now(), 'YYYYMMDDHH24MISS') AS VARCHAR), {userSeq} )
-";                 
+                Dictionary<string, string> subParam = new Dictionary<string, string>() { 
+                    { "userSeq", userSeq }, { "ApprUserSeq", approver.UserSeq}, { "stStartTime", stStartTime.Replace("-", "") },
+                    { "stEndTime", stEndTime.Replace("-", "")}
+                };
+                StringBuilder subSb = new StringBuilder();
+                SQLXmlService.Instanse.GetSqlQuery("SFMModifyInsert", subParam, ref subSb);
+                sb.Append(subSb.ToString());
+                subSb.Clear();
             }
-            return CsFunction.GetChangeNewLineToN(sql);
+            sb.Replace(Environment.NewLine, "");
+            sb.Replace("\t", "");
+            sb.Replace("\\n", "\n");
+            return sb.ToString();
         }
 
         public string GetSFMApprover(string userSeq)
         {
-            string sql = $@"SELECT * FROM FUNC_SFM_APPROVE_SEARCH({userSeq})";
+            Dictionary<string, string> param = new Dictionary<string, string>() { { "userSeq", userSeq } };
 
-            return sql;
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("SFMApprover", param, ref sb);
+
+            return sb.ToString();
         }
 
         public string GetSFMDeptCount(string userSeq)
         {
-            string sql = $@"
-SELECT (CASE WHEN D.LIMIT_SFM_NUM IS NULL THEN '3' ELSE D.LIMIT_SFM_NUM END) LIMITCNT
-					 FROM TBL_DEPT_INFO D, TBL_USER_INFO U
-					 WHERE D.DEPT_SEQ=U.DEPT_SEQ
-					 AND U.USER_SEQ = {userSeq}
-";
-            return sql;
+            Dictionary<string, string> param = new Dictionary<string, string>() { { "userSeq", userSeq } };
+
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("SFMDeptCount", param, ref sb);
+
+            return sb.ToString();
         }
 
-        public string GetSFMApporverRight(string userSeq)
+        public string GetSFMApproverRight(string userSeq)
         {
-            string sql = $"SELECT * FROM FUNC_SFM_USER_APPROVE_RIGHT({userSeq})";
 
-            return sql;
+            Dictionary<string, string> param = new Dictionary<string, string>() { { "userSeq", userSeq } };
+
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("SFMApproverRight", param, ref sb);
+
+            return sb.ToString();
         }
     }
 }

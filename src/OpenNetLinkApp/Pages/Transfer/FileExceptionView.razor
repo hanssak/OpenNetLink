@@ -315,19 +315,19 @@
         //nViewPageNo = pageNumber + 1;
 
         @*if (nViewPageNo != (pageNumber + 1))
-        {
-            nViewPageNo = pageNumber + 1;
-            // UpdateData();
-        }
-        else
-        {
-            nViewPageNo = pageNumber;
-            //mData = ListData.Skip(pageNumber * nPageListCount).Take(nPageListCount).ToList();
-            //mData = ListData.Take(nPageListCount).ToList();
-        }
+            {
+                nViewPageNo = pageNumber + 1;
+                // UpdateData();
+            }
+            else
+            {
+                nViewPageNo = pageNumber;
+                //mData = ListData.Skip(pageNumber * nPageListCount).Take(nPageListCount).ToList();
+                //mData = ListData.Take(nPageListCount).ToList();
+            }
 
-        if (nViewPageNo < 1)
-            nViewPageNo = 1;*@
+            if (nViewPageNo < 1)
+                nViewPageNo = 1;*@
 
         nViewPageNo = pageNumber + 1;
 
@@ -375,8 +375,7 @@
         if (sgUserData == null)
             return;
 
-        string strQueryCount = $@"SELECT COUNT(*) AS count FROM TBL_SKIP_FILE_LIST WHERE USER_SEQ = '{sgUserData.GetUserSequence()}' AND SKIP_FLAG <> '3'";
-
+        string strQueryCount = SGQueryExtend.GetSkipFileCount(sgUserData.GetUserSequence());
         //    "SELECT COUNT(*) AS count FROM tbl_skip_file_list WHERE user_seq=" + sgUserData.GetUserSequence();
 
         HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
@@ -647,17 +646,17 @@
 
         string strsha384 = SHA384CheckSum(m_filePath);
 
-        string strSql = SGQueryExtend.GetSkipFileList(systemid, g_strFileName, lfileSize, strReasonData, sgUserData.GetUserSequence(), strsha384, g_ninterLockFlag);
+        string strSql = SGQueryExtend.GetSkipFileListSet(systemid, g_strFileName, lfileSize, strReasonData, sgUserData.GetUserSequence(), strsha384, g_ninterLockFlag);
         @*string sql = string.Empty;
-        sql = " select a.cnt1 + b.cnt2 AS CHKCNT FROM ";
-        sql += " (select COUNT(*) AS cnt1 from tbl_skip_file_list ";
-        sql += " where system_id='" + systemid + "' and file_name='" + newFileName + "' ";
-        sql += " and checksum_val='" + SHA256CheckSum(m_filePath) + "' ";
-        sql += " and expired_date is null and interlock_flag='" + flag.ToString() + "') a, ";
-        sql += " (select COUNT(*) AS cnt2 from tbl_skip_file_list ";
-        sql += " where system_id='" + systemid + "' and file_name='" + newFileName + "' ";
-        sql += " and checksum_val='" + SHA256CheckSum(m_filePath) + "' ";
-        sql += " and expired_date > to_char(now(), 'yyyymmddhh24miss') and interlock_flag='" + flag + "') b ";*@
+            sql = " select a.cnt1 + b.cnt2 AS CHKCNT FROM ";
+            sql += " (select COUNT(*) AS cnt1 from tbl_skip_file_list ";
+            sql += " where system_id='" + systemid + "' and file_name='" + newFileName + "' ";
+            sql += " and checksum_val='" + SHA256CheckSum(m_filePath) + "' ";
+            sql += " and expired_date is null and interlock_flag='" + flag.ToString() + "') a, ";
+            sql += " (select COUNT(*) AS cnt2 from tbl_skip_file_list ";
+            sql += " where system_id='" + systemid + "' and file_name='" + newFileName + "' ";
+            sql += " and checksum_val='" + SHA256CheckSum(m_filePath) + "' ";
+            sql += " and expired_date > to_char(now(), 'yyyymmddhh24miss') and interlock_flag='" + flag + "') b ";*@
 
         HSCmdCenter.sgPageEvent.SetQueryRecordExistCheckEvent(groupID, RecordCheckResult);
         HSCmdCenter.SendRecordExistCheckQuery(groupID, curUserID, strSql);
@@ -665,7 +664,7 @@
     }
 
     /// <summary>
-       ///  예외신청이 최종적으로 완료되었음을 확인, msg 띄워줌
+    ///  예외신청이 최종적으로 완료되었음을 확인, msg 띄워줌
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -674,14 +673,14 @@
         string result = e.GetTagData("RESULT");
         if (result != null && result.Length > 0 && result == "0")
         {
-                    // 자료 등록성공 : 예외처리 신청이 완료되었습니다.
-            ShowMessage("info", XmlConf.GetInfoMsg("I_0229")); 
+            // 자료 등록성공 : 예외처리 신청이 완료되었습니다.
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0229"));
 
         }
     }
 
     /// <summary>
-       /// 예외신청 sql Query 결과를 받아 이후 동작을 실행하는 함수
+    /// 예외신청 sql Query 결과를 받아 이후 동작을 실행하는 함수
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -694,14 +693,14 @@
         {
             g_RequestProcessing = false;
             return;
-        }            
+        }
 
         string cnt = String.Empty;
         checkData[0].TryGetValue(0, out cnt);
 
         if (cnt == "1")
         {
-                    // 자료중복
+            // 자료중복
             g_RequestProcessing = false;
             ShowMessage("error", XmlConf.GetInfoMsg("I_0219"));
             return;
@@ -719,43 +718,43 @@
             if (sgUserData == null)
                 return;
 
-                    // Server에게 알림
+            // Server에게 알림
             // HSCmdCenter.sgPageEvent.SetEvent(groupID, SendNotiCmdDoneResult);
             HSCmdCenter.sgPageEvent.SetGenericNotiType2EventAdd(groupId, SendNotiCmdDoneResult);
             HSCmdCenter.SendGenericNotiType2(groupId, curUserID, sgUserData.GetUserName(), sgUserData.GetTeamName(), g_strFileName, g_ninterLockFlag.ToString());
 
-                    // 선택한 파일정보 초기화
+            // 선택한 파일정보 초기화
             clearReqInfo();
 
             g_RequestProcessing = false;
 
-                    // 등록된 자료 다시 조회
+            // 등록된 자료 다시 조회
             SearchList();
 
         }
         else
         {
             g_RequestProcessing = false;
-                    // error 상황
+            // error 상황
             ShowMessage("error", XmlConf.GetInfoMsg("E_0251"));
             return;
         }
     }
 
     @*public void DetailResult(int groupId, SGData e)
-    {
-        string result = e.GetTagData("RESULT");
-        if (result == "0")
-            ShowMessage("success", XmlConf.GetTitle("T_INSERT_COMPETE"));
-        else
-            ShowMessage("error", XmlConf.GetTitle("T_INSERT_FAIL"));
+        {
+            string result = e.GetTagData("RESULT");
+            if (result == "0")
+                ShowMessage("success", XmlConf.GetTitle("T_INSERT_COMPETE"));
+            else
+                ShowMessage("error", XmlConf.GetTitle("T_INSERT_FAIL"));
 
-        m_filePath = string.Empty;
-        strReason = string.Empty;
+            m_filePath = string.Empty;
+            strReason = string.Empty;
 
-        SearchList();
-        StateHasChanged();
-    }*@
+            SearchList();
+            StateHasChanged();
+        }*@
 
     public string SHA384CheckSum(string filePath)
     {
@@ -776,7 +775,7 @@
 
 
     /// <summary>
-        /// 파일선택한거 정보, 요청내용 등 제거
+    /// 파일선택한거 정보, 요청내용 등 제거
     /// </summary>
     private void clearReqInfo()
     {
@@ -786,7 +785,7 @@
     }
 
     /// <summary>
-       /// APT Radio 버튼 체크
+    /// APT Radio 버튼 체크
     /// </summary>
     private void doAPTChk()
     {
@@ -798,7 +797,7 @@
     }
 
     /// <summary>
-       /// Virus Radio 버튼 체크
+    /// Virus Radio 버튼 체크
     /// </summary>
     private void doVirusChk()
     {
@@ -810,7 +809,7 @@
     }
 
     /// <summary>
-       /// DRM Radio 버튼 체크
+    /// DRM Radio 버튼 체크
     /// </summary>
     private void doDRMChk()
     {
@@ -822,7 +821,7 @@
     }
 
     /// <summary>
-       /// DLP Radio 버튼 체크
+    /// DLP Radio 버튼 체크
     /// </summary>
     private void doDLPChk()
     {
@@ -834,7 +833,7 @@
     }
 
     /// <summary>
-       /// 파일 선택 화면에서 파일선택했을때
+    /// 파일 선택 화면에서 파일선택했을때
     /// </summary>
     /// <param name="files"></param>
     private void PopUpFileSelectOK(List<string> files)
@@ -965,7 +964,7 @@
     }
 
     /// <summary>
-       /// List를 조회하는 Query를 서버로 전달하는 함수
+    /// List를 조회하는 Query를 서버로 전달하는 함수
     /// </summary>
     private void SearchList()
     {
@@ -1010,13 +1009,7 @@
         // (CASE WHEN APPR_RES_TIME IS NULL THEN '-' WHEN APPR_RES_TIME ='' THEN '-' WHEN APPR_RES_TIME =' ' THEN '-' ELSE APPR_RES_TIME END ) APPR_RES_TIME,
         // (CASE WHEN EXPIRED_DATE IS NULL THEN '-' WHEN EXPIRED_DATE ='' THEN '-' WHEN EXPIRED_DATE =' ' THEN '-' ELSE EXPIRED_DATE END ) EXPIRED_DATE,
 
-        string strQueryList = $@"SELECT FILE_SEQ, SYSTEM_ID, FILE_NAME, FILE_SIZE,
-to_char(to_timestamp(APPR_REQ_TIME,'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH24:MI:SS') as request_time,
-(CASE WHEN APPR_RES_TIME IS NULL THEN '-' WHEN APPR_RES_TIME ='' THEN '-' WHEN APPR_RES_TIME =' ' THEN '-' ELSE to_char(to_timestamp(APPR_RES_TIME,'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH24:MI:SS') END ) APPR_RES_TIME,
-(CASE WHEN EXPIRED_DATE IS NULL THEN '-' WHEN EXPIRED_DATE ='' THEN '-' WHEN EXPIRED_DATE =' ' THEN '-' ELSE to_char(to_timestamp(EXPIRED_DATE,'YYYYMMDDHH24MISS'), 'YYYY-MM-DD') END ) EXPIRED_DATE,
-(CASE WHEN SKIP_DESC IS NULL THEN '-' WHEN SKIP_DESC ='' THEN '-' WHEN SKIP_DESC =' ' THEN '-' ELSE SKIP_DESC END ) SKIP_DESC, INTERLOCK_FLAG, SKIP_FLAG,
-CHECKSUM_VAL FROM TBL_SKIP_FILE_LIST WHERE USER_SEQ = '{sgUserData.GetUserSequence()}' AND SKIP_FLAG <> '3' ORDER BY FILE_SEQ DESC LIMIT {nPageListCount} OFFSET { (nViewPageNo - 1) * nPageListCount}";
-
+        string strQueryList = SGQueryExtend.GetSkipFileList(sgUserData.GetUserSequence(), nPageListCount, nViewPageNo);
         HSCmdCenter.SendListQuery(groupID, curUserID, strQueryList);
 
     }
@@ -1056,7 +1049,7 @@ CHECKSUM_VAL FROM TBL_SKIP_FILE_LIST WHERE USER_SEQ = '{sgUserData.GetUserSequen
     {
 
         int nCount = mData.Count; // listData?.Count??0;
-        //string strMsg = "";
+                                  //string strMsg = "";
         if (nCount <= 0)
         {
             // 체크할 항목이 존재하지 않습니다.
@@ -1097,7 +1090,7 @@ CHECKSUM_VAL FROM TBL_SKIP_FILE_LIST WHERE USER_SEQ = '{sgUserData.GetUserSequen
 
         foreach (string strFileSeq in listCheckditem)
         {
-            strOneQuery = $@"UPDATE TBL_SKIP_FILE_LIST SET SKIP_FLAG='3' WHERE FILE_SEQ={strFileSeq} AND USER_SEQ={sgUserData.GetUserSequence()} 
+            strOneQuery = $@"UPDATE TBL_SKIP_FILE_LIST SET SKIP_FLAG='3' WHERE FILE_SEQ={strFileSeq} AND USER_SEQ={sgUserData.GetUserSequence()}
 ";
             strQuery += strOneQuery;
         }

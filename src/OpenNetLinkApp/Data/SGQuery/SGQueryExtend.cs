@@ -1,3 +1,4 @@
+using OpenNetLinkApp.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -31,9 +32,14 @@ namespace OpenNetLinkApp.Data.SGQuery
             if (bApprPos)
                 strApprPos = "1";
 
-            string strQuery = "";
-            strQuery = String.Format("SELECT * FROM FUNC_USERINFO_SEARCH('{0}', '{1}', '{2}', '{3}', '{4}')", strUserName, strTeamName, strTeamCode, strApprPos, strSysID);
-            return strQuery;
+            Dictionary<string, string> param = new Dictionary<string, string>() { 
+                { "strSysID", strSysID }, { "strUserName", strUserName }, { "strTeamName", strTeamName }, { "strTeamCode", strTeamCode }, { "strApprPos", strApprPos },
+            };
+
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("DeptApprLineSearch", param, ref sb);
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -49,29 +55,26 @@ namespace OpenNetLinkApp.Data.SGQuery
             //일반 사용자도 결재권한을 가진다면 권한 인자 empty로 하여 권한 체크하지 않도록
             string strApprPos = (bApproveProxyRight) ? "" : "1";
 
-            string strQuery = "";
-            strQuery = String.Format("SELECT * FROM func_nl_getuserconfirm_v3('{0}', '{1}', '{2}')", strUserSeq, strTeamCode, strApprPos);
-            return strQuery;
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "strUserSeq", strUserSeq }, { "strTeamCode", strTeamCode }, { "strApprPos", strApprPos }
+            };
+
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("UserConfirm", param, ref sb);
+
+            return sb.ToString();
         }
 
         public string GetReceiverSearchQuery(string stSenderId, string strUserName, string strDeptName, string strDeptSeq)
         {
-            string stQuery = string.Empty;
-            stQuery += " select a.user_id, a.user_name, b.dept_seq, b.dept_name, a.user_position, a.user_rank, a.part_owner, ";
-            stQuery += " a.apprpos, a.user_seq, a.dlp_approve ";
-            stQuery += " from tbl_user_info a ";
-            stQuery += " join tbl_dept_info b on b.dept_seq = a.dept_seq";
-            stQuery += " where a.user_id != '" + stSenderId + "' ";
-            if (strUserName.Length > 0)
-                stQuery += " and a.user_name like '%%" + strUserName + "%%'";
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "stSenderId", stSenderId }, { "strUserName", strUserName }, { "strDeptName", strDeptName }, { "strDeptSeq", strDeptSeq }
+            };
 
-            if (strDeptName.Length > 0)
-                stQuery += " and b.dept_name like '%%" + strDeptName + "%%'";
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("ReceiverSearchQuery", param, ref sb);
 
-            if (strDeptSeq.Length > 0)
-                stQuery += " and b.dept_seq = '" + strDeptSeq + "'";
-            stQuery += " limit 100 ";
-            return stQuery;
+            return sb.ToString();
         }
         /// <summary>
         /// 보안결재자 조회
@@ -84,38 +87,14 @@ namespace OpenNetLinkApp.Data.SGQuery
         /// <returns></returns>
         public string GetSecurityApprover(bool bSFM, string userSeq, bool isDept, string dept, string apprName)
         {
-            string stQuery = $@"
-SELECT AA.USER_ID, AA.USER_NAME,AA.DEPT_SEQ, BB.DEPT_NAME,
-AA.USER_POSITION, AA.USER_RANK, AA.APPRPOS, AA.APPRPOS_EX, AA.USER_SEQ, AA.DLP_APPROVE
-FROM TBL_USER_INFO AA, TBL_DEPT_INFO BB
-WHERE USER_SEQ IN (
-SELECT USER_SEQ AS USER_SEQ FROM TBL_USER_INFO
-WHERE (DLP_APPROVE = '1' AND USER_SEQ != {userSeq})";
-            if (bSFM)
-            {
-                stQuery += $@"
-UNION
-SELECT SFM_USER_SEQ AS USER_SEQ FROM TBL_USER_SFM A
-WHERE A.USER_SEQ IN (SELECT USER_SEQ FROM TBL_USER_INFO WHERE DLP_APPROVE = '1'  AND USER_SEQ != {userSeq}) ";
-            }
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "bSFM", Convert.ToInt32(bSFM).ToString() }, { "userSeq", userSeq }, { "isDept", Convert.ToInt32(isDept).ToString() }, { "dept", dept }, { "apprName", apprName }
+            };
 
-            if (isDept)
-            {
-                stQuery += $@"
-)
-AND AA.DEPT_SEQ = BB.DEPT_SEQ AND AA.USE_STATUS = '1' AND AA.ACCOUNT_EXPIRES > TO_CHAR(NOW(), 'YYYYMMDD')
-AND BB.DEPT_NAME = '{dept}' AND AA.USER_NAME LIKE '%%{apprName}%%'
-";
-            }
-            else
-            {
-                stQuery += $@"
-)
-AND AA.DEPT_SEQ = BB.DEPT_SEQ AND AA.USE_STATUS = '1' AND AA.ACCOUNT_EXPIRES > TO_CHAR(NOW(), 'YYYYMMDD')
-AND BB.DEPT_NAME LIKE '%%{dept}%%' AND AA.USER_NAME LIKE '%%{apprName}%%'
-";
-            }
-            return stQuery;
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("SecurityApprover", param, ref sb);
+
+            return sb.ToString();
         }
 
         //public string GetSecurityApproverMyDept(bool bSFM, string userSeq)
@@ -152,9 +131,14 @@ AND BB.DEPT_NAME LIKE '%%{dept}%%' AND AA.USER_NAME LIKE '%%{apprName}%%'
         /// <returns>쿼리문</returns>
         public string GetAgentBlock(string strUserSeq, string strSystemType, string strBlockType, string strBlockReason)
         {
-            string strQuery = "";
-            strQuery = String.Format("insert into tbl_agent_block values({0},'{1}','{2}','{3}',Now())\n", strUserSeq, strSystemType, strBlockType, strBlockReason);
-            return strQuery;
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "strUserSeq", strUserSeq }, { "strSystemType", strSystemType }, { "strBlockType", strBlockType }, { "strBlockReason", strBlockReason }
+            };
+
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("AgentBlock", param, ref sb);
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -172,35 +156,14 @@ AND BB.DEPT_NAME LIKE '%%{dept}%%' AND AA.USER_NAME LIKE '%%{apprName}%%'
                 strSystem = "E";
             strSystem = strSystem + strConnNetwork;
 
-            string strQuery = $@"
-SELECT U.USER_ID, SUM(F.FILE_SIZE) AS FS, COUNT(*) AS CNT
-FROM ( 
-SELECT 'H' AS TPOS, TRANS_SEQ, REQUEST_TIME, USER_SEQ, TRANS_FLAG, RECV_FLAG, PCTRANS_FLAG,APPROVE_FLAG, SYSTEM_ID
-FROM TBL_TRANSFER_REQ_HIS H 
-WHERE TRANS_SEQ BETWEEN '{strDate}0000000000' AND '{strDate}9999999999'
-AND DATA_TYPE = 0
-UNION ALL
-SELECT 'C' AS TPOS, TRANS_SEQ, REQUEST_TIME, USER_SEQ, TRANS_FLAG, RECV_FLAG, PCTRANS_FLAG,APPROVE_FLAG, SYSTEM_ID
-FROM TBL_TRANSFER_REQ_INFO T 
-WHERE TRANS_SEQ BETWEEN '{strDate}0000000000' AND '{strDate}9999999999'
-AND DATA_TYPE = 0
-) T 
-, TBL_USER_INFO U
-, (
-SELECT TRANS_SEQ, SUM(F.FILE_SIZE) AS FILE_SIZE
-FROM TBL_FILE_LIST_HIS F WHERE FILE_SEQ BETWEEN '{strDate}0000000000' AND '{strDate}9999999999'
-GROUP BY F.TRANS_SEQ
-) F
-WHERE T.TRANS_SEQ=F.TRANS_SEQ
-AND T.REQUEST_TIME BETWEEN '{strDate}0000' AND '{strDate}235959'
-AND U.USER_SEQ=T.USER_SEQ
-AND U.USER_SEQ='{strUserSeq}'
-AND FUNC_TRANSSTATUS(T.TRANS_FLAG, T.RECV_FLAG, T.PCTRANS_FLAG) NOT IN ('C', 'F')
-AND T.APPROVE_FLAG !='3'
-AND SUBSTRING(T.SYSTEM_ID, 1, 2)='{strSystem}'
-GROUP BY U.USER_ID ";
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "strSystem", strSystem }, { "strUserSeq", strUserSeq }, { "strDate", strDate }
+            };
 
-            return strQuery;
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("DayFileTransInfo", param, ref sb);
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -218,18 +181,14 @@ GROUP BY U.USER_ID ";
                 strSystem = "E";
             strSystem = strSystem + strConnNetwork;
 
-            string strQuery = "SELECT USER_ID,  SUM(DATA_SIZE) AS DATA_SIZE, COUNT(*) AS CNT ";
-            strQuery += "FROM TBL_CLIPBOARD_HIS ";
-            strQuery += "WHERE WORK_ID BETWEEN '##DATE##0000000000' AND '##DATE##9999999999' ";
-            strQuery += "AND SUBSTRING(SYSTEM_ID, 1,2)='##SYSID##' ";
-            strQuery += "AND DATA_TYPE IN ('1', '2', '4') ";
-            strQuery += "AND USER_ID = (SELECT USER_ID FROM TBL_USER_INFO WHERE USER_SEQ='##USERSEQ##')";
-            strQuery += "GROUP BY USER_ID";
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "strUserSeq", strUserSeq }, { "strDate", strDate }, { "strSystem", strSystem }
+            };
 
-            strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
-            strQuery = strQuery.Replace("##DATE##", strDate);
-            strQuery = strQuery.Replace("##SYSID##", strSystem);
-            return strQuery;
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("DayClipboardInfo", param, ref sb);
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -238,33 +197,13 @@ GROUP BY U.USER_ID ";
         /// <returns>쿼리문</returns>
         public string GetUnzipCheckDepth()
         {
-            string strQuery = "SELECT CAST(SUBSTRING(SYSTEM_ID, 1, 1)||'_'||TAG AS VARCHAR) TAG, TAG_VALUE ";
-            strQuery += "FROM TBL_SYSTEM_ENV ";
-            strQuery += "WHERE SUBSTRING(SYSTEM_ID, 4, 1)='1' ";
-            strQuery += "	AND TAG IN ('CLIENT_ZIP_DEPTH') ";
-            strQuery += "ORDER BY SYSTEM_ID DESC";
-            return strQuery;
-        }
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+            };
 
-        /// <summary>
-        /// 대쉬보드에서 전송요청,승인대기,승인,반려 카운트를 조회한다.
-        /// </summary>
-        /// <param name="strUserSeq">사용자 Seq</param>
-        /// <param name="strDate">현재 날짜</param>
-        /// <returns>쿼리문</returns>
-        public string GetDashboardCountQuery(string strUserSeq, string strDate)
-        {
-            string strQuery = "SELECT (select A.cnt + B.cnt FROM(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') A, ";
-            strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') B) AS reqcount, ";
-            strQuery += "(select A.cnt + B.cnt FROM (select COUNT(*) cnt from tbl_transfer_req_his where approve_flag = '1' and trans_flag != '5' and user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') A, ";
-            strQuery += "( select COUNT(*) cnt from tbl_transfer_req_his where approve_flag='1' and trans_flag!='5' and user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') B) AS readyapprove, ";
-            strQuery += "(select A.cnt + B.cnt FROM (select COUNT(*) cnt from tbl_transfer_req_his where approve_flag = '2' and user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') A, ";
-            strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where approve_flag='2' and user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') B ) AS approve, ";
-            strQuery += "(select A.cnt + B.cnt FROM (select COUNT(*) cnt from tbl_transfer_req_his where approve_flag='3' and user_seq='##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') A, ";
-            strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where approve_flag='3' and user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') B ) AS deny";
-            strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
-            strQuery = strQuery.Replace("##DATE##", strDate);
-            return strQuery;
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("UnzipCheckDepth", param, ref sb);
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -276,13 +215,14 @@ GROUP BY U.USER_ID ";
         /// <returns></returns>
         public string GetDashboardTransReqCountQuery(string strUserSeq, string strFromDate, string strToDate)
         {
-            //동일쿼리 두번 호출하여 합하는 버그 수정
-            string strQuery = "select COUNT(*) reqcount from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '##FROMDATE##' AND '##TODATE##'";
-            strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
-            //strQuery = strQuery.Replace("##DATE##", strDate);
-            strQuery = strQuery.Replace("##FROMDATE##", strFromDate);
-            strQuery = strQuery.Replace("##TODATE##", strToDate);
-            return strQuery;
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "strUserSeq", strUserSeq }, { "strFromDate", strFromDate }, { "strToDate", strToDate }
+            };
+
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("DashboardTransReqCountQuery", param, ref sb);
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -292,9 +232,14 @@ GROUP BY U.USER_ID ";
         /// <returns>쿼리문</returns>
         public string GetPasswdChgDay(string strUserSeq)
         {
-            string strQuery = "select passwdexpired from tbl_user_info where user_seq='##USERSEQ##'";
-            strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
-            return strQuery;
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "strUserSeq", strUserSeq }
+            };
+
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("PasswdChgDay", param, ref sb);
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -305,9 +250,14 @@ GROUP BY U.USER_ID ";
         /// <returns>쿼리문</returns>
         public string GetSGNotify(string strUserID, string strPreDate = "")
         {
-            string strQuery;
-            strQuery = String.Format("SELECT * FROM FUNC_NL_BOARDNOTIFY('{0}', '{1}')", strUserID, strPreDate);
-            return strQuery;
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "strUserID", strUserID }, { "strPreDate", strPreDate }
+            };
+
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("SGNotify", param, ref sb);
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -321,9 +271,14 @@ GROUP BY U.USER_ID ";
 
             if (enumApproveTime == EnumApproveTime.After)
             {
-                sql = $@"
-SELECT * FROM FUNC_NL_GETAFTERAPPROVEWAITUSERCOUNT('{strUserList}')
-";
+                Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "strUserList", strUserList }
+            };
+
+                StringBuilder sb = new StringBuilder();
+                SQLXmlService.Instanse.GetSqlQuery("ApproveAfterCount", param, ref sb);
+
+                return sb.ToString();
             }
             return sql;
         }
@@ -337,10 +292,14 @@ SELECT * FROM FUNC_NL_GETAFTERAPPROVEWAITUSERCOUNT('{strUserList}')
         /// <returns>공지사항의 읽은 상태를 변경하는 쿼리</returns>
         public string GetSGNotifyStatus(string strNotifySeq, string strUserID, string strNomore)
         {
-            string strQuery;
-            strQuery = String.Format("SELECT * FROM FUNC_NL_BOARDREADSTATUS({0}, '{1}', '{2}')", strNotifySeq, strUserID, strNomore);
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "strNotifySeq", strNotifySeq }, { "strUserID", strUserID }, { "strNomore", strNomore }
+            };
 
-            return strQuery;
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("SGNotifyStatus", param, ref sb);
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -349,10 +308,15 @@ SELECT * FROM FUNC_NL_GETAFTERAPPROVEWAITUSERCOUNT('{strUserList}')
         /// <returns></returns>
         public string GetsystemEnvDataS(string strTagNames)
         {
-            string strQuery = "SELECT CAST(SUBSTRING(SYSTEM_ID, 1, 1)||'_'||TAG AS VARCHAR) TAG, TAG_VALUE FROM TBL_SYSTEM_ENV WHERE SUBSTRING(SYSTEM_ID, 4, 1)='1' AND TAG IN ('||SEARCH_DATA||') ORDER BY SYSTEM_ID DESC";
-            strQuery = strQuery.Replace("'||SEARCH_DATA||'", strTagNames);
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "strTagNames", strTagNames }
+            };
 
-            return strQuery;
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("systemEnvDataS", param, ref sb);
+
+            return sb.ToString();
+
         }
 
         /// <summary>
@@ -361,15 +325,25 @@ SELECT * FROM FUNC_NL_GETAFTERAPPROVEWAITUSERCOUNT('{strUserList}')
         /// <returns></returns>
         public string GetZipDepthSQLsystemEnv()
         {
-            string strQuery = "SELECT CAST(SUBSTRING(SYSTEM_ID, 1, 1)||'_'||TAG AS VARCHAR) TAG, TAG_VALUE FROM TBL_SYSTEM_ENV WHERE SUBSTRING(SYSTEM_ID, 4, 1)='1' AND TAG IN ('CLIENT_ZIP_DEPTH') ORDER BY SYSTEM_ID DESC";
-            return strQuery;
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+            };
+
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("ZipDepthSQLsystemEnv", param, ref sb);
+
+            return sb.ToString();
         }
 
         public string GetDeptInfo(string deptName)
         {
-            string sql = $"SELECT * FROM TBL_DEPT_INFO WHERE DEPT_NAME = '{deptName}'";
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "deptName", deptName}
+            };
 
-            return sql;
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("DeptInfo", param, ref sb);
+
+            return sb.ToString();
         }
 
 
@@ -380,21 +354,50 @@ SELECT * FROM FUNC_NL_GETAFTERAPPROVEWAITUSERCOUNT('{strUserList}')
         /// <returns></returns>
         public static string GetTransferInfoPrivacy(string transSeq)
         {
-            string sql = $@"
-SELECT A.TRANS_SEQ, A.DATA_TYPE,B.FILE_NAME, B.FILE_SIZE, B.FILE_KIND, B.DLP, C.*
-FROM TBL_TRANSFER_REQ_INFO A
-INNER JOIN TBL_FILE_LIST_HIS B ON A.TRANS_SEQ = B.TRANS_SEQ
-INNER JOIN TBL_PRIVACY_HIS C ON B.FILE_SEQ = C.FILE_SEQ AND B.TRANS_SEQ = C.TRANS_SEQ
-WHERE A.TRANS_SEQ = '{transSeq}'
-";
-            return sql;
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "transSeq", transSeq}
+            };
+
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("TransferInfoPrivacy", param, ref sb);
+
+            return sb.ToString();
         }
 
-        public static string GetSkipFileList(string systemid, string g_strFileName, long lfileSize, string strReasonData, string userSeq, string strsha384, int g_ninterLockFlag)
+        public static string GetSkipFileListSet(string systemid, string g_strFileName, long lfileSize, string strReasonData, string userSeq, string strsha384, int g_ninterLockFlag)
         {
-            string sql = $@"SELECT * FROM func_nl_skipfilelistset('{systemid}', '{g_strFileName}', '{lfileSize}', '{strReasonData}', '{userSeq}', '{strsha384}', '{g_ninterLockFlag}');";
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "systemid", systemid}, { "g_strFileName", g_strFileName}, { "lfileSize", lfileSize.ToString()}, { "strReasonData", strReasonData}, { "userSeq", userSeq}, { "strsha384", strsha384}, { "g_ninterLockFlag", g_ninterLockFlag.ToString()}
+            };
 
-            return sql;
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("SkipFileListSet", param, ref sb);
+
+            return sb.ToString();
+        }
+
+        public static string GetSkipFileCount(string userSeq)
+        {
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "userSeq", userSeq}
+            };
+
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("SkipFileCount", param, ref sb);
+
+            return sb.ToString();
+        }
+
+        public static string GetSkipFileList(string userSeq, int pageListCount, int viewPageNo)
+        {
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+                { "userSeq", userSeq}, { "pageListCount", pageListCount.ToString()}, { "viewPageNo", viewPageNo.ToString()}
+            };
+
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("SkipFileList", param, ref sb);
+
+            return sb.ToString();
         }
 
 
@@ -403,7 +406,16 @@ WHERE A.TRANS_SEQ = '{transSeq}'
         /// tbl_file_ole_mimetype 테이블 조회하기
         /// </summary>
         /// <returns></returns>
-        public static string GetOLEMimeList() => "SELECT MIMETYPE, TYPE FROM TBL_FILE_OLE_MIMETYPE";
+        public static string GetOLEMimeList()
+        {
+            Dictionary<string, string> param = new Dictionary<string, string>() {
+            };
+
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("OLEMimeList", param, ref sb);
+
+            return sb.ToString();
+        }
 
 
     }

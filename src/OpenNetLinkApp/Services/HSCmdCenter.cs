@@ -2862,7 +2862,7 @@ namespace OpenNetLinkApp.Services
         {
             SGUserData userData = (SGUserData)sgDicRecvData.GetUserData(groupId);
             ApproveProxy approveProxy = new ApproveProxy();
-            string strQuery = approveProxy.GetSFMApporverRight(userData.GetUserSequence());
+            string strQuery = approveProxy.GetSFMApproverRight(userData.GetUserSequence());
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupId);
             if (hsNetWork != null)

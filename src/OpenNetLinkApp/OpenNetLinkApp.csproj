@@ -84,6 +84,12 @@
     <Content Include="..\PreviewUtil\bin\$(Configuration)\$(TargetFramework)\PreviewUtil*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Compile Remove="Data\SGQuery\ApproveDao2.cs" />
+    <Compile Remove="Data\SGQuery\ClipboardApproveDao.cs" />
+    <Compile Remove="Data\SGQuery\ClipboardTransferDao.cs" />
+    <Compile Remove="Data\SGQuery\SecurityApproveDao.cs" />
+    <Compile Remove="Data\SGQuery\SecurityApproveDao2.cs" />
+    <Compile Remove="Data\SGQuery\TransferDao2.cs" />
     <Compile Remove="Models\SGConfig\ISGSiteConfig.cs" />
     <Compile Remove="Models\SGConfig\SGSiteConfig.cs" />
     <Compile Remove="Services\SGAppManager\SGSiteConfigService.cs" />
@@ -1834,6 +1840,12 @@
 
   <ItemGroup>
     <Folder Include="Migrations\SGNotify\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\conf\SqlQuery.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
