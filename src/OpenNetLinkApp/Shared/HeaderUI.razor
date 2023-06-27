@@ -1638,6 +1638,10 @@
         //if (SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId)) // op..json으로 이동
         if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId))
         {
+
+            // 이전에 보낸 파일들 삭제함
+            ClearClipTempFiles();
+
             //ClipBoard 파일 전송 형태로 저장
             CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{clipData.nGroupId}, FileTrans Type Send !!!");
 
@@ -2468,6 +2472,30 @@
             Task.Delay(1000).Wait(); //서버에서 클립보드 테이블에 언제 Insert 하는지 몰라서 Delay를 주고 조회
             SendDayClipInfo(_curGroupId);
         }
+    }
+
+    /// <summary>
+    /// clipboard 보낸 파일 
+    /// </summary>
+    /// <returns></returns>
+    public bool ClearClipTempFiles()
+    {
+        bool bRet = true;
+        try
+        {
+            string dirPath = Path.Combine(System.Environment.CurrentDirectory, "clipboard");
+            CsFileFunc.DeleteFilesByPathExt(dirPath, "*.txt");
+            CLog.Here().Information($"ClearClipTempFiles, Clear txt Files");
+            CsFileFunc.DeleteFilesByPathExt(dirPath, "*.bmp");
+            CLog.Here().Information($"ClearClipTempFiles, Clear bmp Files");
+        }
+        catch(Exception ex)
+        {
+            bRet = false;
+            CLog.Here().Information($"ClearClipTempFiles, Exception: {ex.Message}");
+        }
+
+        return bRet;
     }
 
     public string SaveClipboardToFile(ClipBoardData clipData, CLIPTYPE eClipUserSelectType)

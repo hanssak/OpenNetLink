@@ -515,7 +515,7 @@ namespace OpenNetLinkApp.Common
 
 
         /// <summary>
-        /// 지정한 Path에 있는 지정한 확장자 및 파일들을 삭제하는 함수
+        /// 지정한 Path에 있는 지정한 확장자 및 파일들을 삭제하는 함수( ex. *.txt
         /// </summary>
         /// <param name="strTargetPath"></param>
         /// <param name="strDelFilePattern"></param>
