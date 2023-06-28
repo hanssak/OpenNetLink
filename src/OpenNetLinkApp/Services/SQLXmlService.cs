@@ -31,7 +31,7 @@ namespace OpenNetLinkApp.Services
         }
         ~SQLXmlService()
         {
-
+            Array.Clear(_sqlContent, 0x0, _sqlContent.Length);
         }
 
         public void GetSqlQuery(string statementId, Dictionary<string, string> param, ref StringBuilder sb)

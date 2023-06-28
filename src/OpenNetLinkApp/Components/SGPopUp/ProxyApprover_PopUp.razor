@@ -31,8 +31,8 @@
                     <div class="box1" style=" width:46%;  float:left;">
                         @if (proxySearchType == "SEARCH")
                         {
-                            <SGDeptSearchList UseInputSearch="@useInputInTree" Height="392" UserDataSource="@ProxySearch" 
-                                                OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
+                            <SGDeptSearchList UseInputSearch="@useInputInTree" Height="392" UserDataSource="@ProxySearch"
+                                              OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                         else        //TREE
                         {
@@ -103,7 +103,7 @@
     private int nActionType = -1;  //1:삭제, 2:등록
 
     /// <summary>
-    /// true 결재자만 검색 / false 모두 검색 
+    /// true 결재자만 검색 / false 모두 검색
     /// /// </br>(대결재자의 '일반사용자 조회 여부' 와 통일)
     /// </summary>
     private bool bApproverOnly = true;
@@ -603,4 +603,4 @@
         stTargetSelect = selectedItem.UserSeq;
         targetClicklastIndex = selectedItem.Index;
     }
-    }
+}

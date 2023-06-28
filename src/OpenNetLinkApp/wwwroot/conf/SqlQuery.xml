@@ -688,7 +688,7 @@ WHERE 1=1
 	</statement>
 	
 	<statement id = "AgentBlock">
-		insert into tbl_agent_block values(#strUserSeq#,'#strSystemType#','#strBlockType#','#strBlockReason#',Now())\n
+		insert into tbl_agent_block values(#strUserSeq#,'#strSystemType#','#strBlockType#','#strBlockReason#',Now())
 	</statement>
 	
 	<statement id = "DayFileTransInfo">

@@ -100,11 +100,6 @@ namespace OpenNetLinkApp.Data.SGQuery
         {
 			string mainCdSecValue = tParam.SystemId.Substring(1, 1);
 
-			//SFM TYPE이 2일 경우 대결재자도 결재가 가능하게 리스트를 보여준다.
-			string sfmString = $@"
-		UNION 
-		SELECT B.USER_SEQ FROM TBL_USER_INFO A, TBL_USER_SFM B WHERE A.USER_ID = '{tParam.UserID}' AND A.USER_SEQ = B.SFM_USER_SEQ AND TO_CHAR(NOW(), 'YYYYMMDD') BETWEEN B.FROMDATE AND B.TODATE";
-
 			//날짜 Serach
 			string apprString = "";
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))

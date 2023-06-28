@@ -1941,7 +1941,7 @@ window.loadFileReaderService = () => {
               var element = this.GetDragTargetElement();
               var entries = element.webkitEntries;
               
-              if (entries != null) {
+              if (entries != null && entries.length > 0 ) {
                   console.log("entry Length : " + entries.length);
                   for (var i = 0; i < entries.length; ++i) {
                       if (entries[i].isDirectory) {
