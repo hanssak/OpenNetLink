@@ -130,7 +130,7 @@
             return;
         }
 
-        string strCurPW = pageService.GetCurUserPassWD(groupID);
+        string strCurPW = HSCmdCenter.GetPassword(groupID);// pageService.GetCurUserPassWD(groupID);
         if (!stCurrentPW.Equals(strCurPW))
         {
             object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetWarnMsg("W_0044") };                     //  현재 비밀번호를 잘못 입력했습니다.
@@ -382,7 +382,7 @@
 
         strMsg = XmlConf.GetInfoMsg("I_0011");              // 비밀번호가 변경되었습니다.
         ShowMessage("info", strMsg);
-        pageService.SetCurUserPassWD(groupID, stNewPW);
+        //pageService.SetCurUserPassWD(groupID, stNewPW);
         HSCmdCenter.SetPassWord(groupID, stNewPW);
 
         // if (siteConfig.GetUseAutoLogin(groupID) == true)  // json 으로 이동

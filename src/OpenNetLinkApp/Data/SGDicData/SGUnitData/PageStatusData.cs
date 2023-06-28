@@ -695,19 +695,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         
 
-        public void SetCurUserPassWD(string strPW)
-        {
-            sgEncData.m_DicTagData.Clear();
-            sgEncData.EncAdd("CURPASSWD", strPW);
-        }
-        public string GetCurUserPassWD()
-        {
-            return sgEncData.GetTagData("CURPASSWD");
-        }
-        public string GetEncCurUserPassWD()
-        {
-            return sgEncData.GetEncTagData("CURPASSWD");
-        }
+        //public void SetCurUserPassWD(string strPW)
+        //{
+        //    sgEncData.m_DicTagData.Clear();
+        //    sgEncData.EncAdd("CURPASSWD", strPW);
+        //}
+        //public string GetCurUserPassWD()
+        //{
+        //    return sgEncData.GetTagData("CURPASSWD");
+        //}
+        //public string GetEncCurUserPassWD()
+        //{
+        //    return sgEncData.GetEncTagData("CURPASSWD");
+        //}
 
         public void SetSessionKey(string strSessionKey)
         {
