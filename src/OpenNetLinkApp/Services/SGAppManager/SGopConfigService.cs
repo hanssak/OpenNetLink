@@ -265,9 +265,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                         bool isDeCrypt = true;
                         string strData = String.Empty;
+                        byte[] dData = null;
                         try
                         {
-                            byte[] dData = SGCrypto.AESDecrypt256(hsckByte, masterKey, PaddingMode.PKCS7);
+                            SGCrypto.AESDecrypt256(hsckByte, masterKey, PaddingMode.PKCS7, ref dData);
                             strData = Encoding.UTF8.GetString(dData);
                         }
                         catch(Exception ex)
@@ -275,6 +276,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
                             CLog.Here().Information($"- AppOPsetting Loading... : Decrypt Fail {AppConfig}]");
                             //디크립션 실패
                             isDeCrypt = false;
+                        }
+                        finally
+                        {
+                            if (dData != null)
+                                dData.hsClear(3);
                         }
 
                         if(isDeCrypt)
