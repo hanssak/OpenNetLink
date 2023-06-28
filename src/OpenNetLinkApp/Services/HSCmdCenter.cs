@@ -1714,8 +1714,8 @@ namespace OpenNetLinkApp.Services
             }
             else
             {
-                sgLoginData.AddData("I_CLIENT_ZIP_DEPTH", "0/0");
-                sgLoginData.AddData("E_CLIENT_ZIP_DEPTH", "0/0");
+                sgLoginData.EncAdd("I_CLIENT_ZIP_DEPTH", "0/0");
+                sgLoginData.EncAdd("E_CLIENT_ZIP_DEPTH", "0/0");
             }
         }
 
@@ -2707,19 +2707,38 @@ namespace OpenNetLinkApp.Services
                 sgSendData.RequestSend_PRIVACY_CONTINUE(hsNetWork, strUserID, transSeq, dlpApprove, privacyConfirmSeq, NetType);
         }
 
+        /// <summary>
+        /// 비밀번호 저장 
+        /// <br/>= stCliMem.SetProtectedPassword
+        /// </summary>
+        /// <param name="groupid"></param>
+        /// <param name="strNewPassWD"></param>
         public void SetPassWord(int groupid, string strNewPassWD)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
             {
-                SGData sgData = new SGData();
-                sgData.SetSessionKey(hsNetWork.GetSeedKey());
-                sgData.SetTagData("NEWPASSWORD", strNewPassWD);
-                string strEncNewPassWD = sgData.GetEncTagData("NEWPASSWORD");
-                hsNetWork.SetPassWord(strNewPassWD);
+                //SGData sgData = new SGData();
+                //sgData.SetSessionKey(hsNetWork.GetSeedKey());
+                //sgData.SetTagData("NEWPASSWORD", strNewPassWD);
+                //string strEncNewPassWD = sgData.GetEncTagData("NEWPASSWORD");
+                hsNetWork.stCliMem.SetProtectedPassword(strNewPassWD);
+                CLog.Here().Information($"UserInfo ChangePw! PwLen:{strNewPassWD.Length}");
             }
             return;
+        }
+
+        /// <summary>
+        /// 비밀번호 원본 호출
+        /// <br/>= stCliMem.GetOriginalPassword
+        /// </summary>
+        public string GetPassword(int groupid)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(0);
+            if(hsNetWork != null)           
+                return hsNetWork.stCliMem.GetOriginalPassword();
+            return string.Empty;
         }
 
         public void SetCliVersion(string strCliVersion)

@@ -22,7 +22,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     public enum ePassWDChgType
     {
         eNone = 0,
+        /// <summary>강제 정책</summary>
         eEnforce = 1,
+        /// <summary>선택 변경</summary>
         eAfterward = 2
     }
 
@@ -1534,15 +1536,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 
 
-        /// <summary>
-        /// value 값을 암호화해서 sgData에 저장
-        /// </summary>
-        /// <param name="strKey"></param>
-        /// <param name="strValue"></param>
-        public void AddData(string strKey, string strValue)
-        {
-            EncAdd(strKey, strValue);
-        }
+        ///// <summary>
+        ///// value 값을 암호화해서 sgData에 저장
+        ///// </summary>
+        ///// <param name="strKey"></param>
+        ///// <param name="strValue"></param>
+        //public void AddData(string strKey, string strValue)
+        //{
+        //    EncAdd(strKey, strValue);
+        //}
 
         /// <summary>
         /// 패스워드 변경 유무 또는 변경 타입을 반환한다.

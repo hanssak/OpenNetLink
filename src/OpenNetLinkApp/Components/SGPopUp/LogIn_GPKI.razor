@@ -1009,7 +1009,8 @@
                 if (tmpData != null)
                 {
                     // gpki_login때는 id 사용
-                    pageService.SetCurUserPassWD(groupId, sgLoginData.GetUserID());
+                    //hsNetWork.SetUserPassword(sgLoginData.GetUserID());
+                    HsCmdCenter.SetPassWord(groupId, sgLoginData.GetUserID());
                 }
 
             }
