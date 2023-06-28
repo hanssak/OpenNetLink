@@ -14,10 +14,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 				{ "seq", seq }
 			};
 
-			StringBuilder sb = new StringBuilder();
-			SQLXmlService.Instanse.GetSqlQuery("MailManageDaoDetail", param, ref sb);
-
-			return sb.ToString();
+			return SQLXmlService.Instanse.GetSqlQuery("MailManageDaoDetail", param);
 		}
         public string List(MailParam tParam)
         {
@@ -315,10 +312,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 				{ "Receiver", tParam.Receiver }, { "Title", tParam.Title }, { "PageListCount", tParam.PageListCount.ToString() }, { "ViewPageNo", tParam.ViewPageNo.ToString() }
 			};
 
-			StringBuilder sb = new StringBuilder();
-			SQLXmlService.Instanse.GetSqlQuery("MailManageDaoList", param, ref sb);
-
-			return sb.ToString();
+			return SQLXmlService.Instanse.GetSqlQuery("MailManageDaoList", param);
 		}
 
 		public string TotalCountDbFunc(MailParam tParam)
@@ -328,10 +322,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 				{ "Receiver", tParam.Receiver }, { "Title", tParam.Title }
 			};
 
-			StringBuilder sb = new StringBuilder();
-			SQLXmlService.Instanse.GetSqlQuery("MailManageDaoCount", param, ref sb);
-
-			return sb.ToString();
+			
+			return SQLXmlService.Instanse.GetSqlQuery("MailManageDaoCount", param);
 		}
 
 	}

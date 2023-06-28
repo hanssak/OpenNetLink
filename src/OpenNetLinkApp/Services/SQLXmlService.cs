@@ -1,3 +1,4 @@
+using HsNetWorkSG;
 using OpenNetLinkApp.Data.SGQuery;
 using System;
 using System.Collections.Generic;
@@ -27,11 +28,24 @@ namespace OpenNetLinkApp.Services
         }
         public SQLXmlService()
         {
-            _sqlContent = System.IO.File.ReadAllBytes("wwwroot/conf/SqlQuery.xml");
+            byte[] sqlContent = System.IO.File.ReadAllBytes("wwwroot/conf/SqlQuery.xml");
+            SGCrypto.AESEncrypt256WithDEK(sqlContent, ref _sqlContent);
+            sqlContent.hsClear(3);
+            int i = 0;
+            //_sqlContent = System.IO.File.ReadAllBytes("wwwroot/conf/SqlQuery.xml");
         }
         ~SQLXmlService()
         {
             Array.Clear(_sqlContent, 0x0, _sqlContent.Length);
+        }
+
+        public string GetSqlQuery(string statementId, Dictionary<string, string> param)
+        {
+            StringBuilder sb = new StringBuilder();
+            SQLMapping.GetSqlQuery(ref _sqlContent, statementId, param, ref sb);
+
+            string sql = sb.ToString();
+            return SGCrypto.AESEncrypt256WithDEK(ref sql);
         }
 
         public void GetSqlQuery(string statementId, Dictionary<string, string> param, ref StringBuilder sb)

@@ -1,3 +1,4 @@
+using HsNetWorkSG;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,28 +20,40 @@ namespace OpenNetLinkApp.Data.SGQuery
         /// <param name="sb"></param>
         public static void GetSqlQuery(ref byte[] xmlContent, string id, Dictionary<string, string> param, ref StringBuilder sb)
         {
+
+            byte[] dXmlContent = null;
+            SGCrypto.AESDecrypt256WithDEK(xmlContent, ref dXmlContent);
+
             XmlDocument xdoc = new XmlDocument();
-            MemoryStream ms = new MemoryStream(xmlContent);
 
             try
             {
-                xdoc.Load(ms);
-
-                XmlNodeList nodes = xdoc.SelectNodes("statements/statement");
-
-                foreach (XmlNode node in nodes)
+                using (MemoryStream ms = new MemoryStream(dXmlContent))
                 {
-                    if (node.Attributes["id"].Value == id)
+                    xdoc.Load(ms);
+
+                    XmlNodeList nodes = xdoc.SelectNodes("statements/statement");
+
+                    foreach (XmlNode node in nodes)
                     {
-                        GetRecursiveNode(node.FirstChild, param, ref sb);
-                        break;
+                        if (node.Attributes["id"].Value == id)
+                        {
+                            GetRecursiveNode(node.FirstChild, param, ref sb);
+                            break;
+                        }
                     }
-                }
 
-                foreach (string str in param.Keys)
-                {
-                    string temp = $"#{str}#";
-                    sb.Replace(temp, param[str]);
+                    foreach (string str in param.Keys)
+                    {
+                        string temp = $"#{str}#";
+                        sb.Replace(temp, param[str]);
+                    }
+
+                    ms.Position = 0;
+                    for(int i = 0; i < ms.Length; i++)
+                    {
+                        ms.WriteByte(0);
+                    }
                 }
             }
             catch(Exception ex)
@@ -49,8 +62,9 @@ namespace OpenNetLinkApp.Data.SGQuery
             }
             finally
             {
+                if(dXmlContent != null)
+                    dXmlContent.hsClear(3);
                 xdoc = null;
-                ms.Dispose();
             }
         }
         /// <summary>

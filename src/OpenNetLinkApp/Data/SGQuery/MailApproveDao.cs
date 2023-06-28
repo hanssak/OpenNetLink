@@ -13,10 +13,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 				{ "seq", seq }
 			};
 
-			StringBuilder sb = new StringBuilder();
-			SQLXmlService.Instanse.GetSqlQuery("MailApproveDaoDetail", param, ref sb);
-
-			return sb.ToString();
+			return SQLXmlService.Instanse.GetSqlQuery("MailApproveDaoDetail", param);
 		}
 
 		public string TotalCount(MailApproveParam tParam)
@@ -363,10 +360,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 				{ "Sender", tParam.Sender }, { "Receiver", tParam.Receiver }, { "Title", tParam.Title }, { "PageListCount", tParam.PageListCount.ToString() }, { "ViewPageNo", tParam.ViewPageNo.ToString() }
 			};
 
-			StringBuilder sb = new StringBuilder();
-			SQLXmlService.Instanse.GetSqlQuery("MailApproveDaoList", param, ref sb);
-
-			return sb.ToString();
+			return SQLXmlService.Instanse.GetSqlQuery("MailApproveDaoList", param);
 		}
 
 		public string TotalCountDbFunc(MailApproveEx1Param tParam)
@@ -377,10 +371,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 				{ "Sender", tParam.Sender }, { "Receiver", tParam.Receiver }, { "Title", tParam.Title } 
 			};
 
-			StringBuilder sb = new StringBuilder();
-			SQLXmlService.Instanse.GetSqlQuery("MailApproveDaoCount", param, ref sb);
+			return SQLXmlService.Instanse.GetSqlQuery("MailApproveDaoCount", param);
 
-			return sb.ToString();
 		}
 
 	}

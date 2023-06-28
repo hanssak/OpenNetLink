@@ -91,10 +91,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			param.Add("SecurityOrderNum", securityOrderNum);
 			param.Add("DataTypeString", dataTypeString);
 
-			StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("ApproveDaoList", param, ref sb);
-
-			return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("ApproveDaoList", param);
 		}
 		public string TotalCount(ApproveParam tParam, bool bNoClipboard, string[] strArrClipDataType = null)
         {
@@ -151,10 +148,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			param.Add("SecurityOrderNum", securityOrderNum);
 			param.Add("DataTypeString", dataTypeString);
 
-			StringBuilder sb = new StringBuilder();
-			SQLXmlService.Instanse.GetSqlQuery("ApproveDaoCount", param, ref sb);
-
-			return sb.ToString();
+			return SQLXmlService.Instanse.GetSqlQuery("ApproveDaoCount", param);
 		}
     }
 }

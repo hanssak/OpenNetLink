@@ -1,3 +1,4 @@
+using HsNetWorkSG;
 using OpenNetLinkApp.Common;
 using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 using OpenNetLinkApp.Services;
@@ -32,27 +33,22 @@ namespace OpenNetLinkApp.Data.SGQuery
             sb.Replace(Environment.NewLine, "");
             sb.Replace("\t", "");
             sb.Replace("\\n", "\n");
-            return sb.ToString();
+            string sql = sb.ToString();
+            return SGCrypto.AESEncrypt256WithDEK(ref sql);
         }
 
         public string GetSFMApprover(string userSeq)
         {
             Dictionary<string, string> param = new Dictionary<string, string>() { { "userSeq", userSeq } };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("SFMApprover", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("SFMApprover", param);
         }
 
         public string GetSFMDeptCount(string userSeq)
         {
             Dictionary<string, string> param = new Dictionary<string, string>() { { "userSeq", userSeq } };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("SFMDeptCount", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("SFMDeptCount", param);
         }
 
         public string GetSFMApproverRight(string userSeq)
@@ -60,10 +56,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 
             Dictionary<string, string> param = new Dictionary<string, string>() { { "userSeq", userSeq } };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("SFMApproverRight", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("SFMApproverRight", param);
         }
     }
 }

@@ -35,11 +35,8 @@ namespace OpenNetLinkApp.Data.SGQuery
             Dictionary<string, string> param = new Dictionary<string, string>() { 
                 { "strSysID", strSysID }, { "strUserName", strUserName }, { "strTeamName", strTeamName }, { "strTeamCode", strTeamCode }, { "strApprPos", strApprPos },
             };
-
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("DeptApprLineSearch", param, ref sb);
-
-            return sb.ToString();
+            
+            return SQLXmlService.Instanse.GetSqlQuery("DeptApprLineSearch", param);
         }
 
         /// <summary>
@@ -59,10 +56,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "strUserSeq", strUserSeq }, { "strTeamCode", strTeamCode }, { "strApprPos", strApprPos }
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("UserConfirm", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("UserConfirm", param);
         }
 
         public string GetReceiverSearchQuery(string stSenderId, string strUserName, string strDeptName, string strDeptSeq)
@@ -71,10 +65,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "stSenderId", stSenderId }, { "strUserName", strUserName }, { "strDeptName", strDeptName }, { "strDeptSeq", strDeptSeq }
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("ReceiverSearchQuery", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("ReceiverSearchQuery", param);
         }
         /// <summary>
         /// 보안결재자 조회
@@ -91,10 +82,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "bSFM", Convert.ToInt32(bSFM).ToString() }, { "userSeq", userSeq }, { "isDept", Convert.ToInt32(isDept).ToString() }, { "dept", dept }, { "apprName", apprName }
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("SecurityApprover", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("SecurityApprover", param);
         }
 
         //public string GetSecurityApproverMyDept(bool bSFM, string userSeq)
@@ -135,10 +123,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "strUserSeq", strUserSeq }, { "strSystemType", strSystemType }, { "strBlockType", strBlockType }, { "strBlockReason", strBlockReason }
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("AgentBlock", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("AgentBlock", param);
         }
 
         /// <summary>
@@ -160,10 +145,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "strSystem", strSystem }, { "strUserSeq", strUserSeq }, { "strDate", strDate }
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("DayFileTransInfo", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("DayFileTransInfo", param);
         }
 
         /// <summary>
@@ -184,11 +166,8 @@ namespace OpenNetLinkApp.Data.SGQuery
             Dictionary<string, string> param = new Dictionary<string, string>() {
                 { "strUserSeq", strUserSeq }, { "strDate", strDate }, { "strSystem", strSystem }
             };
-
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("DayClipboardInfo", param, ref sb);
-
-            return sb.ToString();
+            
+            return SQLXmlService.Instanse.GetSqlQuery("DayClipboardInfo", param);
         }
 
         /// <summary>
@@ -200,10 +179,7 @@ namespace OpenNetLinkApp.Data.SGQuery
             Dictionary<string, string> param = new Dictionary<string, string>() {
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("UnzipCheckDepth", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("UnzipCheckDepth", param);
         }
 
         /// <summary>
@@ -219,10 +195,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "strUserSeq", strUserSeq }, { "strFromDate", strFromDate }, { "strToDate", strToDate }
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("DashboardTransReqCountQuery", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("DashboardTransReqCountQuery", param);
         }
 
         /// <summary>
@@ -236,10 +209,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "strUserSeq", strUserSeq }
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("PasswdChgDay", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("PasswdChgDay", param);
         }
 
         /// <summary>
@@ -254,10 +224,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "strUserID", strUserID }, { "strPreDate", strPreDate }
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("SGNotify", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("SGNotify", param);
         }
 
         /// <summary>
@@ -275,10 +242,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "strUserList", strUserList }
             };
 
-                StringBuilder sb = new StringBuilder();
-                SQLXmlService.Instanse.GetSqlQuery("ApproveAfterCount", param, ref sb);
-
-                return sb.ToString();
+                return SQLXmlService.Instanse.GetSqlQuery("ApproveAfterCount", param); 
             }
             return sql;
         }
@@ -296,10 +260,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "strNotifySeq", strNotifySeq }, { "strUserID", strUserID }, { "strNomore", strNomore }
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("SGNotifyStatus", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("SGNotifyStatus", param);
         }
 
         /// <summary>
@@ -312,11 +273,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "strTagNames", strTagNames }
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("systemEnvDataS", param, ref sb);
-
-            return sb.ToString();
-
+            return SQLXmlService.Instanse.GetSqlQuery("systemEnvDataS", param);
         }
 
         /// <summary>
@@ -328,10 +285,7 @@ namespace OpenNetLinkApp.Data.SGQuery
             Dictionary<string, string> param = new Dictionary<string, string>() {
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("ZipDepthSQLsystemEnv", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("ZipDepthSQLsystemEnv", param);
         }
 
         public string GetDeptInfo(string deptName)
@@ -340,10 +294,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "deptName", deptName}
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("DeptInfo", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService .Instanse.GetSqlQuery("DeptInfo", param);
         }
 
 
@@ -358,10 +309,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "transSeq", transSeq}
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("TransferInfoPrivacy", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("TransferInfoPrivacy", param);
         }
 
         public static string GetSkipFileListSet(string systemid, string g_strFileName, long lfileSize, string strReasonData, string userSeq, string strsha384, int g_ninterLockFlag)
@@ -370,10 +318,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "systemid", systemid}, { "g_strFileName", g_strFileName}, { "lfileSize", lfileSize.ToString()}, { "strReasonData", strReasonData}, { "userSeq", userSeq}, { "strsha384", strsha384}, { "g_ninterLockFlag", g_ninterLockFlag.ToString()}
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("SkipFileListSet", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("SkipFileListSet", param);
         }
 
         public static string GetSkipFileCount(string userSeq)
@@ -382,10 +327,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "userSeq", userSeq}
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("SkipFileCount", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("SkipFileCount", param);
         }
 
         public static string GetSkipFileList(string userSeq, int pageListCount, int viewPageNo)
@@ -394,10 +336,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "userSeq", userSeq}, { "pageListCount", pageListCount.ToString()}, { "viewPageNo", viewPageNo.ToString()}
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("SkipFileList", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("SkipFileList", param);
         }
 
 
@@ -411,10 +350,7 @@ namespace OpenNetLinkApp.Data.SGQuery
             Dictionary<string, string> param = new Dictionary<string, string>() {
             };
 
-            StringBuilder sb = new StringBuilder();
-            SQLXmlService.Instanse.GetSqlQuery("OLEMimeList", param, ref sb);
-
-            return sb.ToString();
+            return SQLXmlService.Instanse.GetSqlQuery("OLEMimeList", param);
         }
 
 
