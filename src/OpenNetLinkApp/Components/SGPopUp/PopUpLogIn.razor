@@ -58,28 +58,28 @@
                             </div>
                             @if (eLoginUITypeData != eLoginType.eLOGINTYPE_OTP) //OTP PW 필요없음
                             {
-                            <div class="input-group mb-2">
-                                @*AD 로그인은 PW 사용자 입력 불가 (Readonly)*@
-                                <input type="password" class="form-control-login" placeholder="Password" readonly="@(eLoginUITypeData== eLoginType.eLOGINTYPE_AD)" value="@pw" @oninput="@(e => pw = e.Value.ToString())" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2">
-                            </div>
+                                <div class="input-group mb-2">
+                                    @*AD 로그인은 PW 사용자 입력 불가 (Readonly)*@
+                                    <input type="password" class="form-control-login" placeholder="Password" readonly="@(eLoginUITypeData== eLoginType.eLOGINTYPE_AD)" value="@pw" @oninput="@(e => pw = e.Value.ToString())" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2">
+                                </div>
                             }
                             @if (eLoginUITypeData == eLoginType.eLOGINTYPE_PW_OTP || eLoginUITypeData == eLoginType.eLOGINTYPE_OTP) //PW_OTP(4), OTP(5)
                             {
-                            <div class="input-group mb-2">
-                                <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" value="@otp" @oninput="@(e => otp= e.Value.ToString())" @onkeyup="keyCheck" tabindex="3" autocomplete="off">
-                            </div>
+                                <div class="input-group mb-2">
+                                    <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" value="@otp" @oninput="@(e => otp= e.Value.ToString())" @onkeyup="keyCheck" tabindex="3" autocomplete="off">
+                                </div>
                             }
                             <div class="row">
                                 @if (nGroupID > -1 && bAutoLogin && eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
                                 {
-                                <div class="col-12 pt-1 pr-4 text-right ">
-                                    <div class="icheck-primary">
-                                        <input type="checkbox" id="remember" @onclick="CheckStateChange" checked=@bAutoLoginCheck disabled=@bUIBtnDisable>
-                                        <label for="remember">
-                                            @XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX")
-                                        </label>
+                                    <div class="col-12 pt-1 pr-4 text-right ">
+                                        <div class="icheck-primary">
+                                            <input type="checkbox" id="remember" @onclick="CheckStateChange" checked=@bAutoLoginCheck disabled=@bUIBtnDisable>
+                                            <label for="remember">
+                                                @XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX")
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
                                 }
                                 <div class="col-12  pt-2">
                                     <button class="btn btn-login btn-block btn_blue" @onclick="doLogInByBtn" disabled=@bUIBtnDisable>LOGIN</button>
@@ -250,7 +250,7 @@
                 strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-            strPW = "HsckAD.com";
+        strPW = "HsckAD.com";
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -343,10 +343,10 @@
             int nData = 0;
 
 #if DEBUG  // SITE배포용도
-            //#if false  // SITE배포용도
-            CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
-            strData = "1";
-            stRtn = "1";
+        //#if false  // SITE배포용도
+        CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
+        strData = "1";
+        stRtn = "1";
 #else
 
             stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
@@ -545,7 +545,7 @@
             if (SGAppMgrSvc.OpConfigInfoService.GetUseAppLoginType(nGroupID))
                 eLoginUITypeData = (eLoginType)SGAppMgrSvc.OpConfigInfoService.GetAppLoginType(nGroupID);
 
-            if(eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
+            if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
             {
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(nGroupID))
                 {
@@ -639,7 +639,7 @@
                     pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-                pw = "HsckAD.com";
+            pw = "HsckAD.com";
 #endif
                 pw = pw.ToLower();
 
@@ -677,7 +677,7 @@
         if (strEncPW.Equals(strInitPW))
             return true;
         //옵션에 따라, ID와 동일할 경우 초기 비밀번호로 인지
-        if(SGAppMgrSvc.OpConfigInfoService.GetUseIDAsInitPassword(groupID) && id == pw)
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseIDAsInitPassword(groupID) && id == pw)
             return true;
         return false;
     }
@@ -698,7 +698,7 @@
         if (hsNetWork != null)
         {
             pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
-            pageService.SetCurUserPassWD(groupId, pw);
+            HSCmdCenter.SetPassWord(groupId, pw); //hsNetWork.SetUserPassword(pw);
         }
 
         if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId))
@@ -882,7 +882,7 @@
         if (hsNetWork != null)
         {
             pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
-            pageService.SetCurUserPassWD(groupId, pw);
+            HSCmdCenter.SetPassWord(groupId, pw); //hsNetWork.SetPassWord(pw);
         }
 
         eResultIdPwAfterJob = eIDPWresultJob.eNone;
@@ -1092,16 +1092,16 @@
                 HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupId, true);
 
                 /*
-	            if (ClientPatch(sgLoginData))
-	            {
-	                string strSvrVersion = sgLoginData.GetServClientVersion();
-	                refUpdate_PopUp.SetVersionText(strSvrVersion);
-	                refUpdate_PopUp.SetType(0);
-	                refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
-	                await refUpdate_PopUp.openPopUp();
-	                return;
-	            }
-	            */
+                if (ClientPatch(sgLoginData))
+                {
+                    string strSvrVersion = sgLoginData.GetServClientVersion();
+                    refUpdate_PopUp.SetVersionText(strSvrVersion);
+                    refUpdate_PopUp.SetType(0);
+                    refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
+                    await refUpdate_PopUp.openPopUp();
+                    return;
+                }
+                */
 
                 SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
                 SGData sfmData = HSCmdCenter.GetSFMListData(groupId);

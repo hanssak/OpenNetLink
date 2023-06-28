@@ -66,7 +66,7 @@
                             @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
                             {
                                 //AD 로그인은 PW 사용자 입력 불가 (Readonly)
-                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)"  value="@pw" @oninput="@(e => pw = e.Value.ToString())"  @onkeyup="keyCheck" tabindex="2" autocomplete="off">
+                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@pw" @oninput="@(e => pw = e.Value.ToString())" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
                             }
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
                             {
@@ -130,20 +130,20 @@
 @code {
     SGAlert refSGAlert;
 
-        [Parameter]
-        public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
+    [Parameter]
+    public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
 
     public string id { get; set; } = "";
 
 
-   // public string _pw = "";
+    // public string _pw = "";
     public string pw;
-   @* private void OnInput(string value)
-    {
+    @* private void OnInput(string value)
+        {
         var newValue = value ?? string.Empty;
 
         pw  = newValue;
-    }*@
+        }*@
 
     public string otp { get; set; }
 
@@ -240,8 +240,8 @@
     private void keyCheck(KeyboardEventArgs arg)
     {
         //Enter 로 인한 로그인은 [로그인] 버튼이 존재하는  AD 외 로그인 타입만 적용토록 변경
-        
-       if (arg.Key == "Enter")
+
+        if (arg.Key == "Enter")
         {
             CLog.Here().Information($"keyCheck, ENTER Key - ###### - try login");
             ClickdoLogin();
@@ -603,7 +603,7 @@
     /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        
+
         object[] param = { "none" };
         await JSRuntime.InvokeAsync<object>("initLogIn", param);
 
@@ -1245,7 +1245,7 @@
                     if (hsNetWork != null)
                     {
                         pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
-                        pageService.SetCurUserPassWD(groupId, pw);
+                        HSCmdCenter.SetPassWord(groupId, pw);
                     }
 
                     SGSettingData sgSettingData = null;
@@ -1841,7 +1841,7 @@
             if (hsNetWork != null)
             {
                 pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
-                pageService.SetCurUserPassWD(groupId, pw);
+                HSCmdCenter.SetPassWord(groupId, pw);
             }
 
             SGSettingData sgSettingData = null;
@@ -2513,7 +2513,7 @@
             return true;
 
         //옵션에 따라, ID와 동일할 경우 초기 비밀번호로 인지
-        if(SGAppMgrSvc.OpConfigInfoService.GetUseIDAsInitPassword(groupID) && id == pw)
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseIDAsInitPassword(groupID) && id == pw)
             return true;
         return false;
     }
@@ -2564,12 +2564,12 @@
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
         {
-        return true;
-            }
-                else
+            return true;
+                }
+                    else
                     return false;
 
-                        }
+    }
     */
 
     }

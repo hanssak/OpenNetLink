@@ -965,34 +965,34 @@ namespace OpenNetLinkApp.Services
             m_DicPageStatusData[groupID].SetUserPassWDCHGEvent(userPasswdChgEvent);
         }
 
-        public void SetCurUserPassWD(int groupID, string strPW)
-        {
-            PageStatusData tmpData = null;
-            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
-            {
-                return;
-            }
-            m_DicPageStatusData[groupID].SetCurUserPassWD(strPW);
-        }
-        public string GetCurUserPassWD(int groupID)
-        {
-            PageStatusData tmpData = null;
-            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
-            {
-                return null;
-            }
-            return m_DicPageStatusData[groupID].GetCurUserPassWD();
-        }
+        //public void SetCurUserPassWD(int groupID, string strPW)
+        //{
+        //    PageStatusData tmpData = null;
+        //    if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+        //    {
+        //        return;
+        //    }
+        //    m_DicPageStatusData[groupID].SetCurUserPassWD(strPW);
+        //}
+        //public string GetCurUserPassWD(int groupID)
+        //{
+        //    PageStatusData tmpData = null;
+        //    if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+        //    {
+        //        return null;
+        //    }
+        //    return m_DicPageStatusData[groupID].GetCurUserPassWD();
+        //}
 
-        public string GetEncCurUserPassWD(int groupID)
-        {
-            PageStatusData tmpData = null;
-            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
-            {
-                return null;
-            }
-            return m_DicPageStatusData[groupID].GetEncCurUserPassWD();
-        }
+        //public string GetEncCurUserPassWD(int groupID)
+        //{
+        //    PageStatusData tmpData = null;
+        //    if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+        //    {
+        //        return null;
+        //    }
+        //    return m_DicPageStatusData[groupID].GetEncCurUserPassWD();
+        //}
 
         public void SetSessionKey(int groupID, string strSessionKey)
         {
