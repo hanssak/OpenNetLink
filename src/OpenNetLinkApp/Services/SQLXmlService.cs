@@ -31,7 +31,6 @@ namespace OpenNetLinkApp.Services
             byte[] sqlContent = System.IO.File.ReadAllBytes("wwwroot/conf/SqlQuery.xml");
             SGCrypto.AESEncrypt256WithDEK(sqlContent, ref _sqlContent);
             sqlContent.hsClear(3);
-            int i = 0;
             //_sqlContent = System.IO.File.ReadAllBytes("wwwroot/conf/SqlQuery.xml");
         }
         ~SQLXmlService()
