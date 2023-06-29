@@ -49,11 +49,11 @@ namespace OpenNetLinkApp.Data.SGQuery
                         sb.Replace(temp, param[str]);
                     }
 
-                    ms.Position = 0;
-                    for(int i = 0; i < ms.Length; i++)
-                    {
-                        ms.WriteByte(0);
-                    }
+                    //ms.Position = 0;
+                    //for(int i = 0; i < ms.Length; i++)
+                    //{
+                    //    ms.WriteByte(0);
+                    //}
                 }
             }
             catch(Exception ex)

@@ -42,9 +42,32 @@ namespace OpenNetLinkApp.Services
         {
             StringBuilder sb = new StringBuilder();
             SQLMapping.GetSqlQuery(ref _sqlContent, statementId, param, ref sb);
-
-            string sql = sb.ToString();
-            return SGCrypto.AESEncrypt256WithDEK(ref sql);
+            byte[] input = null;
+            char[] temp = new char[sb.Length];
+            try
+            {
+                //string sql = sb.ToString();
+                for (int i = 0; i < sb.Length; i++)
+                {
+                    temp[i] = sb[i];
+                }
+                input = ASCIIEncoding.UTF8.GetBytes(temp);
+                return SGCrypto.AESEncrypt256WithDEK(input);
+            }
+            catch(Exception ex)
+            {
+                return "";
+            }
+            finally
+            {
+                for(int i = 0; i < sb.Length; i++)
+                {
+                    sb[i] = '0';
+                    temp[i] = '0';
+                }
+                if (input != null)
+                    input.hsClear();
+            }
         }
 
         public void GetSqlQuery(string statementId, Dictionary<string, string> param, ref StringBuilder sb)
