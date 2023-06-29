@@ -158,6 +158,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUsePKIsendRecv { get; set; }           // 인증서 전송 사용 유무 (망별로) ( true : 사용, false : 미사용 )
 
         public bool bPkiSendByFileTrans { get; set; }                 // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
-
+        public string strInitTransferFileExplorerPathInWindow { get; set; }//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")
     }
 }
