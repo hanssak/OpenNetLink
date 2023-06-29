@@ -204,3 +204,8 @@ bUseCrossPlatformOSforFileName : 파일이름에 OS간에 사용할수 없는 �
 
 bUseTitleDescMinLength : 제목 / 설명 글자 최소 글자수 서버 DB에서 받아서 동작하게 설정
 
+InitTransferFileExplorerDirectoryInWindow : 윈도우에 한하여 전송화면에서 좌측에 초기 표시할 기본 경로 (Default : "")
+											=> "ROOT" : 상위 드라이버를 초기 표시											
+											=> "" : 기본 경로를 표시.
+											=> 그 밖에 사용자가 원하는 경로로 설정 가능
+											

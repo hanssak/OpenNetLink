@@ -149,7 +149,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseInputSearchApproveExtTree { get; set; }      // 결재필수 확장자, 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
         public bool bUseApproveExt { get; set; }                           // 결재필수 확장자 결재하는 기능 사용유무
         public bool bUseFileExceptionDescCheck { get; set; }                     // 파일 예외신청 설명정보 필수 기입여부
-        public bool bUsePKIsendRecv { get; set; }           // 인증서 전송 사용 유무 (망별로) ( true : 사용, false : 미사용 )
-
+        public bool bUsePKIsendRecv { get; set; }           // 인증서 전송 사용 유무 (망별로) ( true : 사용, false : 미사용 )        
+        public string strInitTransferFileExplorerPathInWindow { get; set; }//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")
     }
 }
