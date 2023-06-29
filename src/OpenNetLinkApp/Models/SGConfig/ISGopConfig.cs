@@ -58,6 +58,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseAgentBlockValueChange { get; set; }                   // tbl_agent_block 에 들어가는 Type 값을 WebManager에서 data를 보여줄 수 있는 형태로 변경(WebManager/NetLink와 맞춤)
         public bool bUseOSMaxFilePath { get; set; }                             // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
         public bool bUseFileForwardDownNotRecv { get; set; }                     // 파일 수신되기전에 파일포워드로 다운로드 가능유무
+        public string strInitTransferFileExplorerPathInWindow { get; set; }//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")
+        
 
         //클립보드
         public bool bUseClipBoard { get; set; }                   // 클립보드 사용 여부
@@ -150,6 +152,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseApproveExt { get; set; }                           // 결재필수 확장자 결재하는 기능 사용유무
         public bool bUseFileExceptionDescCheck { get; set; }                     // 파일 예외신청 설명정보 필수 기입여부
         public bool bUsePKIsendRecv { get; set; }           // 인증서 전송 사용 유무 (망별로) ( true : 사용, false : 미사용 )        
-        public string strInitTransferFileExplorerPathInWindow { get; set; }//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")
+        public bool bUseToastInsteadOfOSNotification { get; set; }                        //레지스트리 차단으로 OS 노티 사용 불가한 Site에서 OS노티 대신 Toast 사용 (Default/false) 
     }
 }

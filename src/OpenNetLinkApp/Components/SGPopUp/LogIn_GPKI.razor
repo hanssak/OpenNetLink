@@ -1030,7 +1030,7 @@
 
             // MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
-            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+            HsCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");//Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
 
             CLog.Here().Information($"Login_Gpki 인증 완료!!");
 

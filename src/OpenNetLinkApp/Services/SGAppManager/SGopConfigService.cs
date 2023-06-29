@@ -169,8 +169,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApproveExt(int groupId);
         public bool GetUseFileExceptionDescCheck(int groupId);
         public bool GetUsePKIsendRecv(int groupId);
-        public bool GetUseApprTreeSearch(int groupId);        
+        public bool GetUseApprTreeSearch(int groupId);
         public string GetInitTransferFileExplorerPathInWindow(int groupId);
+        public bool GetUseToastInsteadOfOSNotification(int groupId);
     }
 
 
@@ -180,7 +181,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <summary>
         /// AppOPsetting
         /// </summary>
-        public ref Dictionary<int ,ISGopConfig> AppConfigInfo => ref _AppConfigInfo;
+        public ref Dictionary<int, ISGopConfig> AppConfigInfo => ref _AppConfigInfo;
 
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGopConfigService>();
 
@@ -213,7 +214,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 }
             }
 
-            if(!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
+            if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
                 Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
 
             _AppConfigInfo = new Dictionary<int, ISGopConfig>();
@@ -240,14 +241,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
                             byte[] dData = SGCrypto.AESDecrypt256(hsckByte, masterKey, PaddingMode.PKCS7);
                             strData = Encoding.UTF8.GetString(dData);
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             CLog.Here().Information($"- AppOPsetting Loading... : Decrypt Fail {AppConfig}]");
                             //디크립션 실패
                             isDeCrypt = false;
                         }
 
-                        if(isDeCrypt)
+                        if (isDeCrypt)
                         {
                             SGopConfig appConfig = JsonSerializer.Deserialize<SGopConfig>(strData);
                             _AppConfigInfo.Add(sgNetwork.GroupID, appConfig);
@@ -262,10 +263,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
                                 _AppConfigInfo.Add(sgNetwork.GroupID, appConfig);
                             }
                         }
-                        
+
                         CLog.Here().Information($"- AppOPsetting Load Completed : [{AppConfig}]");
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
                         _AppConfigInfo.Add(sgNetwork.GroupID, new SGopConfig());
@@ -529,11 +530,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public bool GetUseEmailManageApprove(int groupId)
         {
-            return AppConfigInfo[groupId].bUseEmail;    
+            return AppConfigInfo[groupId].bUseEmail;
         }
         public bool GetUseUIdlpData(int groupId)
         {
-            return AppConfigInfo[groupId].bUiDlpShow;    
+            return AppConfigInfo[groupId].bUiDlpShow;
         }
         //public bool GetURLAutoTrans(int groupId)
         //{
@@ -549,7 +550,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //}
         public bool GetUseURLRedirectionAlarmType(int groupId)
         {
-            return AppConfigInfo[groupId].bUseURLRedirectionAlarmType;   
+            return AppConfigInfo[groupId].bUseURLRedirectionAlarmType;
         }
         //public string GetURLAutoAfterBrowser(int groupId)
         //{
@@ -858,6 +859,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetInitTransferFileExplorerPathInWindow(int groupId)
         {
             return AppConfigInfo[groupId].strInitTransferFileExplorerPathInWindow;
+        }
+        /// <summary>레지스트리 차단으로 OS 사용 불가한 경우, OS노티 대신 Toast 사용할지 여부</summary>        
+        public bool GetUseToastInsteadOfOSNotification(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseToastInsteadOfOSNotification;
         }
     }
 }
