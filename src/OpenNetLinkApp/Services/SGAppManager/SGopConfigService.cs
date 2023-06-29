@@ -200,7 +200,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetPKIsendType(int groupId);
 
-        public bool GetUseApprTreeSearch(int groupId);
+        public bool GetUseApprTreeSearch(int groupId);      
+        public string GetInitTransferFileExplorerPathInWindow(int groupId);
     }
 
 
@@ -911,6 +912,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApprTreeSearch(int groupId)
         {
             return false;
+        }
+        /// <summary>전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")</summary>        
+        public string GetInitTransferFileExplorerPathInWindow(int groupId)
+        {
+            return AppConfigInfo[groupId].strInitTransferFileExplorerPathInWindow;
         }
     }
 }

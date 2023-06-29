@@ -161,5 +161,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bPkiSendByFileTrans { get; set; } = false;                // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
 
+        public string strInitTransferFileExplorerPathInWindow { get; set; } = "";//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")
+
     }
 }

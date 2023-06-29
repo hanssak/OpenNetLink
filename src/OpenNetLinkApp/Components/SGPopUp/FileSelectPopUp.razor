@@ -39,12 +39,12 @@
                                     </select>*@
                                 <div class="dropdown">
                                     <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:200px; text-align:left">
-                                        @_stCurrentDrive
+                                        @getDriveTitle(_stCurrentDrive)
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenu1" style="min-width:200px;">
                                         @foreach (string str in drives)
                                         {
-                                            <button class="dropdown-item text-xs p-1" style="text-align:left" type="button" @onclick="@(()=>SetCurrentDrive(str))">@str</button>
+                                            <button class="dropdown-item text-xs p-1" style="text-align:left" type="button" @onclick="@(()=>SetCurrentDrive(str))">@getDriveTitle(str)</button>
                                         }
                                     </div>
                                 </div>
@@ -142,6 +142,15 @@
 
     ISGSideBarUIService SideBarUISvc;
 
+    private string getDriveTitle(string drive)
+    {
+        if (string.IsNullOrEmpty(drive))
+            return string.Empty;
+        DriveInfo rootInfo = new DriveInfo((string)drive);
+        string volume = (string.IsNullOrEmpty(rootInfo.VolumeLabel)) ? "드라이버" : rootInfo.VolumeLabel;
+        return $"{rootInfo.Name} ({volume})";
+    }
+
     private async void selectOK()
     {
         List<string> lstFiles = new List<string>();
@@ -218,23 +227,23 @@
         stCurrentDrive = drives[0];
         actionPopUpLoadFileList = LoadListFiles;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        
+
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
-            
+
 
             @*LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));*@
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 stDisplayPath = Directory.GetDirectoryRoot(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-            else if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                stDisplayPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            stDisplayPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
-            refFileTreeCustom.changeDrive(stCurrentDrive);
-        }
+        refFileTreeCustom.changeDrive(stCurrentDrive);
+    }
         base.OnAfterRender(firstRender);
     }
 

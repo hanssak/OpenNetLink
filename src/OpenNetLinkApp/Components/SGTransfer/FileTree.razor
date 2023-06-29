@@ -6,14 +6,18 @@
 @using Radzen.Blazor
 @using System.Diagnostics
 @using AgLogManager
+@using System.Runtime.InteropServices
+
+@inject ISGAppManagerService SGAppMgrSvc
+@inject IJSRuntime JSRuntime
 
 <div style="width:100%;height:50%;border-bottom:1px solid #ddd; padding:0px;overflow:auto">
-    @if(m_btoTheTop == false)
-    { 
-    <div @onclick="toUpperTree">
-        <i class="fas fa-folder align-items-center" style="padding-left:17px;cursor:pointer;"></i>
-        <span style="cursor:pointer;width:100px;">&nbsp;..</span>
-    </div>
+    @if (m_btoTheTop == false)
+    {
+        <div @onclick="toUpperTree">
+            <i class="fas fa-folder align-items-center" style="padding-left:17px;cursor:pointer;"></i>
+            <span style="cursor:pointer;width:100px;">&nbsp;..</span>
+        </div>
     }
     <div>
         <RadzenTree Change="@OnSelectPath" Data="@entries" Expand="@LoadFiles" Style="width: 100%;height:100%;overflow:auto;">
@@ -27,20 +31,21 @@
     public string[] dirs { get; set; }
     IEnumerable<string> entries = null;
     //Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
-    public string curDir { get; set; }
 
     public bool IsVisible { get; set; }
+
+    private string initDir = string.Empty;
 
     private string stTreeDir = String.Empty;
     private bool m_btoTheTop = false;
 
     [Parameter]
-    public EventCallback<TreeEventArgs> OnSelectPathFromFileTree { get; set; }
+    public EventCallback<string> OnSelectPathFromFileTree { get; set; }
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<FileTree>();
 
     private void toUpperTree()
     {
-        //Debug.WriteLine("DIR:" + stTreeDir);
+        JSRuntime.InvokeAsync<object>("RadzenTreeCollapse", null);
         if (Directory.GetParent(stTreeDir) != null)
         {
             stTreeDir = Directory.GetParent(stTreeDir).FullName;
@@ -51,46 +56,137 @@
         {
             m_btoTheTop = true;
             entries = Directory.GetLogicalDrives();
+            @*  List<string> rootInfo = new List<string>();
+                foreach(DriveInfo info in DriveInfo.GetDrives())
+                {
+                string volume = (string.IsNullOrEmpty(info.VolumeLabel)) ? "드라이버" : info.VolumeLabel;
+                rootInfo.Add($"{info.Name} ({volume})");
+                }
+                entries = rootInfo;*@
+
             StateHasChanged();
         }
     }
 
     protected override void OnInitialized()
     {
-        IsVisible = true;
-        //string[] drives = Directory.GetLogicalDrives();
-        string[] drives = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-        if (drives != null && drives.Length > 0)
-        {
+        @*        ISGSideBarUI sgSideBar = SGAppMgrSvc.SideBarUIService?.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
 
+            IsVisible = true;
+            //기본 디렉토리 설정
+            string initDirType = SGAppMgrSvc.OpConfigInfoService.GetInitTransferSearchType(groupID);
+            if (initDirType == "ROOT")
+            {
+            m_btoTheTop = true;
+            entries = Directory.GetLogicalDrives();
+            }
+            else if (initDirType == "SITE")
+            {
+            string siteDir = SGAppMgrSvc.OpConfigInfoService.GetInitTransferSearchSiteDirectory(groupID);
+            string[] drives = Directory.GetDirectories(siteDir);
+            if (drives != null && drives.Length > 0)
+            {
+            entries = Directory.EnumerateFileSystemEntries(siteDir)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+            stTreeDir = siteDir;
+            }
+            }
+            else
+            {
+            string[] drives = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            if (drives != null && drives.Length > 0)
+            {
             entries = Directory.EnumerateFileSystemEntries(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
-
             stTreeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            }
+            }*@
 
-            //LoadListFiles(stTreeDir);
-            //OnSelectPathFromFileTree.InvokeAsync(args); //부모컴포넌트에 이벤트 전달
-        }
     }
 
-    @*void Log(string eventName, string value)
+    protected override void OnAfterRender(bool firstRender)
     {
+    }
+    @*void Log(string eventName, string value)
+        {
         events.Add(DateTime.Now, $"{eventName}: {value}");
-    }*@
+        }*@
+
+    /// <summary>설정된 옵션에 따라 기본 디렉토리 구성</summary>
+    public void RefreshTree()
+    {
+        ISGSideBarUI sgSideBar = SGAppMgrSvc.SideBarUIService?.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        IsVisible = true;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            //기본 디렉토리 설정
+            string initWindowDir = SGAppMgrSvc.OpConfigInfoService.GetInitTransferFileExplorerPathInWindow(groupID);
+
+            if (initWindowDir == "ROOT")
+            {
+                m_btoTheTop = true;
+                entries = Directory.GetLogicalDrives();
+            }
+            else if (!string.IsNullOrEmpty(initWindowDir))
+            {
+                string[] drives = Directory.GetDirectories(initWindowDir);
+                if (drives != null && drives.Length > 0)
+                {
+                    entries = Directory.EnumerateFileSystemEntries(initWindowDir)
+                    .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+                    .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+                    stTreeDir = initWindowDir;
+                }
+            }
+            else
+            {
+                string userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                string[] drives = Directory.GetDirectories(userDir);
+                if (drives != null && drives.Length > 0)
+                {
+                    entries = Directory.EnumerateFileSystemEntries(userDir)
+                    .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+                    .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+                    stTreeDir = userDir;
+                }
+            }
+        }
+        else
+        {
+            string userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string[] drives = Directory.GetDirectories(userDir);
+            if (drives != null && drives.Length > 0)
+            {
+                entries = Directory.EnumerateFileSystemEntries(userDir)
+                .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+                .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+                stTreeDir = userDir;
+            }
+        }
+
+        if (entries != null && entries.Count() > 0)
+            OnSelectPathFromFileTree.InvokeAsync(entries.First()); //부모컴포넌트에 이벤트 전달
+    }
 
     void OnSelectPath(TreeEventArgs args)
     {
         //Log("Change", $"Item Text: {args.Text}");
         CLog.Here().Information($"OnSelectPath, Item Text: {args.Text}");
-        curDir = args.Text;
+        //    curDir = args.Text;
 
         //LoadListFiles(args.Value as string);
 
-        OnSelectPathFromFileTree.InvokeAsync(args); //부모컴포넌트에 이벤트 전달
+        OnSelectPathFromFileTree.InvokeAsync(args.Value.ToString()); //부모컴포넌트에 이벤트 전달
     }
-
-
 
     void LoadFiles(TreeExpandEventArgs args)
     {
@@ -121,6 +217,14 @@
     string GetTextForNode(object data)
     {
         string name = Path.GetFileName((string)data);
+
+        if (Directory.GetParent((string)data) == null)
+        {
+            DriveInfo rootInfo = new DriveInfo((string)data);
+            string volume = (string.IsNullOrEmpty(rootInfo.VolumeLabel)) ? "드라이버" : rootInfo.VolumeLabel;
+            return $"{rootInfo.Name} ({volume})";
+        }
+
         //Console.WriteLine("FileName : " + name);
         if (name == null || name.Length < 1)
         {

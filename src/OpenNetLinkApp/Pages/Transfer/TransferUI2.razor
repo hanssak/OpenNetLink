@@ -101,7 +101,7 @@
             <div class="col-md-3 pr-0">
                 <div class="card card-navy card-outline card-boder" style="height:65vh;">
 
-                    <FileTree OnSelectPathFromFileTree="changeSelectPath"></FileTree>
+                    <FileTree @ref="refFileTree" OnSelectPathFromFileTree="changeSelectPath"></FileTree>
                     <!-- 파일리스트 -->
                     <div id="divFileList" style="width:100%;height:50%;padding:1px 1px 1px 0px;overflow:auto">
                     </div>
@@ -291,6 +291,7 @@
     public int dragLabel = 1;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferUI2>();
     FileSelectPopUp refFileSelectPopUp;
+    FileTree refFileTree;
 
     public string strFileTrans = "";
     public string strFilePath = "";
@@ -1666,9 +1667,9 @@
         refForwardLine.AssignReceiver(list);
     }
 
-    private void changeSelectPath(TreeEventArgs args)
+    private void changeSelectPath(string args)
     {
-        stSelectPath = args.Value as string;
+        stSelectPath = args;
         LoadListFiles(stSelectPath);
         //StateHasChanged();
     }
@@ -1707,7 +1708,7 @@
         if (firstRender)
         {
 
-            LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            //LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
             //INPUT Target Index 초기화
             JSRuntime.InvokeAsync<string>("initTransferUIPosition");
             JSRuntime.InvokeAsync<string>("initTargetInputNumber");
@@ -1747,6 +1748,7 @@
         // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
         if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
+            refFileTree.RefreshTree();
             nDrawPageGroupID = groupIDbyParam;
             groupID = groupIDbyParam;
 
