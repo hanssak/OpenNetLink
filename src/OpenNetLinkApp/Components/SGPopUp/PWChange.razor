@@ -454,15 +454,15 @@
                 {
                     if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
                     {
-                        Window.Notification(OS_NOTI.ONLINE, XmlConf.GetTitle("T_ETC_TRAYMOVE"), XmlConf.GetInfoMsg("I_0051"));
+                        HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, XmlConf.GetTitle("T_ETC_TRAYMOVE"), XmlConf.GetInfoMsg("I_0051"));
                         Window.MoveWebWindowToTray();
                     }
                     else
-                        Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                        HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
                 }
                 else
                 {
-                    Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                    HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
                 }
                 return;
             }
@@ -472,7 +472,7 @@
             if (sgLoginData == null || sgUserData == null)
             {
                 closePopUp();
-                Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
                 return;
             }
         }
@@ -521,22 +521,22 @@
                 {
                     string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
                     string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
-                    Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                    HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, strTitle, strInfoMsg);
                     Window.MoveWebWindowToTray();
                 }
                 else
-                    Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                    HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
 
             }
             else
             {
-                Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
                 //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
             }
         }
         else
         {
-            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+            HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
         }
 
         pageService.ConnectCountAdd(groupID);
@@ -667,20 +667,20 @@
                 {
                     string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
                     string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
-                    Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                    HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, strTitle, strInfoMsg);
                     Window.MoveWebWindowToTray();
                 }
                 else
-                    Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                    HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
             }
             else
             {
-                Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
             }
         }
         else
         {
-            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+            HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
         }
 
         pageService.ConnectCountAdd(groupID);

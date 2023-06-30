@@ -995,7 +995,7 @@
             }
 
 
-            DateTime dt =(SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer(0)) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
+            DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer(0)) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
             pageService.SetSvrTime(groupId, dt, sgLoginData);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
@@ -1074,18 +1074,18 @@
                     if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                     {
                         // 트레이 이동.
-                        // 트레이 아이콘으로 이동합니다.
-                        Window.Notification(OS_NOTI.ONLINE, XmlConf.GetTitle("T_ETC_TRAYMOVE"), XmlConf.GetInfoMsg("I_0051"));
+                        // 트레이 아이콘으로 이동합니다
+                        HsCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, XmlConf.GetTitle("T_ETC_TRAYMOVE"), XmlConf.GetInfoMsg("I_0051"));
+
                         Window.MoveWebWindowToTray();
                     }
                     else
-                        Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                        HsCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
                 }
                 else
                 {
-                    Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                    HsCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
                 }
-
             }
 
             CtrlSideEvent ctrlSideEvent = null;
@@ -1184,9 +1184,9 @@
             SGUserData sgUserData = null;
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(i);
             sgUserData = (SGUserData)HsCmdCenter.GetUserData(i);
-             ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupid);
+            ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupid);
 
-             if ((sgLoginData != null) && (sgUserData != null))
+            if ((sgLoginData != null) && (sgUserData != null))
             {
                 bFileTransMenuUse = sgLoginData.GetFileTrans();
 

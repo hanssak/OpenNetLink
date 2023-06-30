@@ -718,7 +718,8 @@
 
                 eResultIdPwAfterJob = eIDPWresultJob.eNone;
                 //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
-                Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                HSCmdCenter.sgPageEvent.OSNotification(groupId,OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg);//Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+
                 goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
                 return true;
             }
@@ -782,9 +783,9 @@
 
                 // 완료 처리!!!
                 eResultIdPwAfterJob = eIDPWresultJob.eNone;
-                //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
-                Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-                goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+                HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");//Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                
+                    goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
             }
         }
 
@@ -954,7 +955,7 @@
                     {
                         eResultIdPwAfterJob = eIDPWresultJob.eNone;
                         //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
-                        Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                        HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
                         goToPage.InvokeAsync((int)eLoginUITypeData);
                         return true;
                     }
@@ -1029,7 +1030,7 @@
 
         eResultIdPwAfterJob = eIDPWresultJob.eNone;
         //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
-        Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+        HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
         goToPage.InvokeAsync((int)eLoginUITypeData);
 
         return true;

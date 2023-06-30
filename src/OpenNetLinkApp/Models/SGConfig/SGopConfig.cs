@@ -63,7 +63,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseAgentBlockValueChange { get; set; } = true;                       // tbl_agent_block 에 들어가는 Type 값을 WebManager에서 data를 보여줄 수 있는 형태로 변경(WebManager/NetLink와 맞춤)
         public bool bUseOSMaxFilePath { get; set; } = true;                               // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
         public bool bUseFileForwardDownNotRecv { get; set; } = true;                         // 파일 수신되기전에 파일포워드로 다운로드 가능유무
-
+        public string strInitTransferFileExplorerPathInWindow { get; set; } = "";//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")       
 
 
         //클립보드
@@ -114,6 +114,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseInitAlarmPerDay { get; set; } = false;                              // 일일 이전 날짜 알림 자동 삭제
         public bool bUseInitMessagePerDay { get; set; } = false;                            // 일일 이전 날짜 메세지 자동 삭제
 
+
         //부가 기능 (Tray, 자동 실행 등)
         public bool bUseMainPageType { get; set; } = true;                                  // 메인화면 사용 여부
         //public PAGE_TYPE enMainPageType { get; set; } = PAGE_TYPE.NONE;                     // 메인페이지 리스트 (0 : DASHBOARD, 1 : TRANSFER)
@@ -160,8 +161,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         
 
         public bool bPkiSendByFileTrans { get; set; } = false;                // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
-
-        public string strInitTransferFileExplorerPathInWindow { get; set; } = "";//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")
+        public bool bUseToastInsteadOfOSNotification { get; set; } = false;                        //레지스트리 차단으로 OS 노티 사용 불가한 Site에서 OS노티 대신 Toast 사용 (Default/false) 
 
     }
 }
