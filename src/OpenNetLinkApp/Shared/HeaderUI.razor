@@ -122,6 +122,9 @@
 
         HsCmdCenter.sgPageEvent.SetSkipFileNotiEventAdd(RecvSkipFileServerNoti);
         HsCmdCenter.sgPageEvent.SetPkiFileSendEventAdd(SendPkiFilesByFileTrans);
+
+        HsCmdCenter.sgPageEvent.SetOSNotificationEvent(OSNotification);
+
     }
 
     public void Dispose()
@@ -1175,18 +1178,18 @@
 
 #if _WINDOWS
 
-        try
-        {
-            if (e.strUrlData != null && e.strUrlData.Length > 0)
-            {
-                string url = $"\"{e.strUrlData}\"";
-                System.Diagnostics.Process.Start("explorer", url);
-            }
-        }
-        catch (Exception ex)
-        {
-            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-        }
+    try
+    {
+    if (e.strUrlData != null && e.strUrlData.Length > 0)
+    {
+    string url = $"\"{e.strUrlData}\"";
+    System.Diagnostics.Process.Start("explorer", url);
+    }
+    }
+    catch (Exception ex)
+    {
+    CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+    }
 
 #elif _LINUX
 
@@ -2566,7 +2569,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         string strTitle = strToNet + " → " + strFromNet;
 
         if (HsCmdCenter.GetFileRecvPossible(groupid) == true)
-            Window.Notification(os_noti, strTitle, strText);
+            OSNotification(groupid, os_noti, strTitle, strText);
 
         InsertMessage(NOTI_TYPE.USER, groupid, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgFileWait, "", strText);
     }
@@ -2670,8 +2673,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             // 왼쪽 SideBar Navigate 되는 곳으로 선택되게 적용
             @*nPos = navURI.LastIndexOf('/');
-            if (nPos > 0 && navURI.Length > 3 && nPos < navURI.Length - 1)
-            {
+                if (nPos > 0 && navURI.Length > 3 && nPos < navURI.Length - 1)
+                {
                 strGroupID = navURI.Substring(nPos + 1);
                 nGroupID = Convert.ToInt32(strGroupID);
 
@@ -2684,12 +2687,12 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
                 if (sgLoginData != null && sgUserData != null)
                 {
-                    // if (sgLoginData.GetApprove() == true)   // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
+                // if (sgLoginData.GetApprove() == true)   // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
 
-                    // 3망 정책고려한 결재사용유무 설정
-                    if (pageService.GetUseApproveNetOver(nGroupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
-                        if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
-                            bApprMenuUse = true;
+                // 3망 정책고려한 결재사용유무 설정
+                if (pageService.GetUseApproveNetOver(nGroupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
+                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
+                bApprMenuUse = true;
                 }*/
 
                 KeyboardEventArgs eventArgs = new KeyboardEventArgs();
@@ -2701,34 +2704,34 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
                 if (activeMenu != null)
                 {
-                    if (!activeMenu.Actived)
-                    {
-                        ChangeActiveMenuWrap(eventArgs, activeMenu);
-                        bChangedMenu = true;
-                    }
-                    else
-                    {
-                        PageDataRefreshEvent pgRefreshEvent = null;
-                        if (activeMenu.Path.Contains("transferApprove"))
-                        {
-                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
-                        }
-                        else if (activeMenu.Path.Contains("securityApprove"))
-                        {
-                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.SecurityApproveUI);
-                        }
-                        else if (activeMenu.Path.Contains("clipBoardApprove"))
-                        {
-                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
-                        }
-                        else if (activeMenu.Path.Contains("fileException"))
-                        {
-                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.FileException);
-                        }
+                if (!activeMenu.Actived)
+                {
+                ChangeActiveMenuWrap(eventArgs, activeMenu);
+                bChangedMenu = true;
+                }
+                else
+                {
+                PageDataRefreshEvent pgRefreshEvent = null;
+                if (activeMenu.Path.Contains("transferApprove"))
+                {
+                pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
+                }
+                else if (activeMenu.Path.Contains("securityApprove"))
+                {
+                pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.SecurityApproveUI);
+                }
+                else if (activeMenu.Path.Contains("clipBoardApprove"))
+                {
+                pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
+                }
+                else if (activeMenu.Path.Contains("fileException"))
+                {
+                pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.FileException);
+                }
 
-                        if (pgRefreshEvent != null)
-                            pgRefreshEvent();
-                    }
+                if (pgRefreshEvent != null)
+                pgRefreshEvent();
+                }
                 }
 
                 // 결재관리 확인 - 선택변경
@@ -2766,23 +2769,23 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 // 기능 동작하나 위에 방식 사용
                 /*if (nPos > 0 && pageService.m_approveMenuArray[nGroupID] != null)
                 {
-                    SideBarUISvc.ChgActiveMenu(eventArgs, pageService.m_approveMenuArray[nGroupID]);
-                    bChangedMenu = true;
+                SideBarUISvc.ChgActiveMenu(eventArgs, pageService.m_approveMenuArray[nGroupID]);
+                bChangedMenu = true;
                 }
 
                 if (bChangedMenu == false)
                 {
-                    // 전송관리 확인 - 선택변경
-                    strMenuName = "transManage";
-                    nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
-                    if (nPos > 0 && pageService.m_TransMenuArray[nGroupID] != null)
-                    {
-                        SideBarUISvc.ChgActiveMenu(eventArgs, pageService.m_TransMenuArray[nGroupID]);
-                        bChangedMenu = true;
-                    }
+                // 전송관리 확인 - 선택변경
+                strMenuName = "transManage";
+                nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
+                if (nPos > 0 && pageService.m_TransMenuArray[nGroupID] != null)
+                {
+                SideBarUISvc.ChgActiveMenu(eventArgs, pageService.m_TransMenuArray[nGroupID]);
+                bChangedMenu = true;
+                }
                 }*/
 
-            }*@
+                }*@
 
         }
         catch (Exception e)
@@ -2839,7 +2842,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
         {
             if (HsCmdCenter.GetFileRecvPossible(nGroupId) == true)
-                Window.Notification(eOSNoti, strTitle, strMsg);
+                OSNotification(nGroupId, eOSNoti, strTitle, strMsg);
         }
     }
 
@@ -2976,7 +2979,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = NotiMsgMake(cmd, e);
         if (HsCmdCenter.GetFileRecvPossible(groupID) == true)   // DashBoard 혹은 파일전송 화면이 뜨고 나서 알림 시작
-            Window.Notification(os_noti, strTitle, strMsg, naviURI);
+            OSNotification(groupID, os_noti, strTitle, strMsg, naviURI);
 
         SGMsgData sgMsgData = null;
         sgMsgData = new SGMsgData();
@@ -2988,6 +2991,28 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         InsertAlarm(groupID, sidebar, eAType, "", strMsg);
         //InsertAlarm(groupID, sidebar, eAType, naviURI, strMsg);
+    }
+
+    public void OSNotification(int groupId, OS_NOTI category, string title, string message, string navURI="")
+    {
+        if (OpConfigSvc.GetUseToastInsteadOfOSNotification(groupId))
+        {
+            //OS 사용 불가한 환경인 경우, Toast로 대체
+            string strTitle = title;
+            string strMsg = message.Replace("/r/n", "<br/>");
+            string strType = category switch
+            {
+                OS_NOTI.OFFLINE => "warm",
+                _ => "info"
+            };
+
+            object[] param = { strType, strTitle, strMsg };
+            jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+        }
+        else
+        {
+            Window.Notification(category, title, message, navURI);            
+        }
     }
 
     /// <summary>
@@ -3022,7 +3047,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         eAlarmType eAType = sgMsgData.GetConvertOSNotiAlarmTitle(os_noti);
         LSIDEBAR sidebar = sgMsgData.GetConvertOSNotiMenuCategory(os_noti);
         InsertAlarm(groupID, sidebar, eAType, "", strMsg);
-        Window.Notification(os_noti, strTitle, strMsg, strUrlPath);
+        OSNotification(groupID, os_noti, strTitle, strMsg, strUrlPath);
     }
 
     public void ApprActionNoti(int groupID, eCmdList cmd, ApproveActionEventArgs e)
@@ -3039,7 +3064,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         LSIDEBAR sidebar = sgMsgData.GetConvertOSNotiMenuCategory(os_noti);
         InsertAlarm(groupID, sidebar, eAType, "", strMsg);
         if (HsCmdCenter.GetFileRecvPossible(groupID) == true)
-            Window.Notification(os_noti, strTitle, strMsg);
+            OSNotification(groupID, os_noti, strTitle, strMsg);
     }
 
     void StartPatchNoti(string newVersion)
@@ -3048,7 +3073,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         string patchMsg = string.Format(XmlConf.GetInfoMsg("I_0240"), newVersion); //잠시 후 OpenNetLink 업데이트가 진행됩니다. (version {0})
 
         Task.Run(async () => { await refSGAlertUpdateStart.openPopUp(patchTitle, patchMsg, 0, 0); });
-        Window.Notification(OS_NOTI.NOTICE, patchTitle, patchMsg);
+        OSNotification(0, OS_NOTI.NOTICE, patchTitle, patchMsg);
     }
 
 
@@ -3111,7 +3136,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                                 strMsg = String.Format(strMsg, pEventArgs.count);
                                 break;
                             case "2":   // PCtoURL 결재
-                                //PCtoURL 결재 화면 없음...
+                                        //PCtoURL 결재 화면 없음...
                                 strMsg = XmlConf.GetInfoMsg("I_0222");                      // 새로운 승인 요청자료가 있습니다.
                                 strMsg = String.Format(strMsg, pEventArgs.count);
                                 break;
@@ -3128,8 +3153,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 {
                     // Server 수정후에나 사용
                     @*strMsg = XmlConf.GetInfoMsg("I_0098");                      // 새로운 메일승인 요청자료가 {0}건 존재합니다.
-                    PageEventArgs pEventArgs = (PageEventArgs)e;
-                    strMsg = String.Format(strMsg, pEventArgs.count);*@
+                        PageEventArgs pEventArgs = (PageEventArgs)e;
+                        strMsg = String.Format(strMsg, pEventArgs.count);*@
                     strMsg = XmlConf.GetInfoMsg("I_0241");                      // 새로운 메일승인 요청자료가 존재합니다.
                     break;
                 }
@@ -3386,7 +3411,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = XmlConf.GetInfoMsg("I_0198");               // 오프라인 되었습니다.
         if (HsCmdCenter.GetFileRecvPossible(groupID) == true)
-            Window.Notification(os_noti, strTitle, strMsg, "");
+            OSNotification(groupID, os_noti, strTitle, strMsg, "");
         await jsRuntime.InvokeAsync<object>("closeAllPopup");
 
     }
@@ -3939,7 +3964,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 param[1] = strFromName + " <i class='fas fa-long-arrow-alt-right p-1'></i> " + strToName;
                 param[2] = strFileRecvInfo;
                 pageService.SetFileRecving(true);
-               // await Task.Delay(100);
+                // await Task.Delay(100);
                 break;
             case 2:
                 identifier = "updateProgressMessage";
@@ -3947,7 +3972,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 param[0] = strID;
                 param[1] = strFileRecvInfo;
                 param[2] = strProgress;
-            //    await Task.Delay(500);
+                //    await Task.Delay(500);
                 break;
             case 3:
                 if (pageService.GetScrLocking() == true)
@@ -3957,14 +3982,14 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFileRecving(false);
-           //     await Task.Delay(1000);
+                //     await Task.Delay(1000);
                 break;
             case 4:             // 파일 수신 중 오류
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFileRecving(false);
-             //   await Task.Delay(1000);
+                //   await Task.Delay(1000);
                 break;
             default:
                 break;
