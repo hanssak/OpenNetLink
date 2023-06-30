@@ -1,4 +1,8 @@
 
+window.GetPW = () => {
+    return document.getElementById("loginPw").value;
+}
+
 window.loginCursorChangeDefault = () => {
     $("#divLoginMain").css("cursor", "default");
     $("#loginId").css("cursor", "default");
@@ -902,10 +906,12 @@ window.adJustWindowsize = () => {
         }
     });
 }
+
 //F5 키 눌러서 화면고침 금지(WebView화면고침에러)
 window.addKeyDown = () => {
+    var loginCount = 0;
     document.addEventListener('keydown', function (e) {
-        var kcode = event.keyCode;
+        var kcode = e.keyCode;
         //backspace 방지
         if (kcode == 8) { //backspace
             if (e.target.nodeName != "INPUT" && e.target.nodeName != "TEXTAREA" && e.target.nodeName != "SELECT") {
@@ -923,6 +929,16 @@ window.addKeyDown = () => {
             event.returnValue = false;
         }
     }, false);
+}
+function KeyEventPW() {
+    var keycode = event.keyCode;
+    if (keycode == 13) {
+        //console.log("Enter Key Press");
+        var button = document.getElementById('btnLogin');
+
+        if (button)
+            button.click();
+    }
 }
 
 window.initMouseClick = () => {
