@@ -66,7 +66,7 @@
                             @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
                             {
                                 //AD 로그인은 PW 사용자 입력 불가 (Readonly)
-                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)"  value="@pw" @oninput="@(e => pw = e.Value.ToString())"  @onkeyup="keyCheck" tabindex="2" autocomplete="off">
+                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@pw" @oninput="@(e => pw = e.Value.ToString())" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
                             }
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
                             {
@@ -126,23 +126,26 @@
 <PWChange @ref="refPWChange" Guid="modal-pwchange-main" basicPageType=(int)Enums.EnumBasicPageType.Main></PWChange>
 <PWChangeDefaultPW @ref="refPWChangeDefaultPW" Guid="modal-pwchangedefaultpw-main" basicPageType=(int)Enums.EnumBasicPageType.Main></PWChangeDefaultPW>
 <SGAlert @ref="refSGAlert" Guid="modal-alert-main" OnCancel="SessionAlertCancel" OnConfirm="SessionAlertConfirm"></SGAlert>
+<GoogleOTP @ref="refGoogleOTP" Guid="modal-googleotp-main" OnCancel="GoogleOtpCancel" OnConfirm="GoogleOtpConfirm"></GoogleOTP>
+
 
 @code {
-    SGAlert refSGAlert;
 
-        [Parameter]
-        public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
+    SGAlert refSGAlert;
+    GoogleOTP refGoogleOTP;
+
+    [Parameter]
+    public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
 
     public string id { get; set; } = "";
 
 
-   // public string _pw = "";
+    // public string _pw = "";
     public string pw;
-   @* private void OnInput(string value)
-    {
-        var newValue = value ?? string.Empty;
-
-        pw  = newValue;
+    @* private void OnInput(string value)
+        {
+            var newValue = value ?? string.Empty;
+            pw  = newValue;
     }*@
 
     public string otp { get; set; }
@@ -174,6 +177,44 @@
     private static readonly AsyncLock s_lock = new AsyncLock();
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<Main>();
+
+    CsGoogleQRcode QRcode = new CsGoogleQRcode();
+
+    private void GoogleOtpCancel()
+    {
+        QRcode.Dispose();
+        CLog.Here().Information($"[Main] GoogleOtp, User Cancel - GroupID:{refGoogleOTP.nGroupID} - LogInType: {pageService.m_nLoginType.ToString()}");
+
+        JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+        bStartedLogin = false;
+        bLoginBtnDisable = false;
+        refGoogleOTP.strUserOTP = "";
+    }
+
+    private void GoogleOtpConfirm()
+    {
+        QRcode.Dispose();
+
+        CLog.Here().Information($"[Main] GoogleOtp, User Confirm - GroupID:{refGoogleOTP.nGroupID} - LogInType: {pageService.m_nLoginType.ToString()}");
+        
+        HsNetWork hsNetWork = null;
+        hsNetWork = HSCmdCenter.GetConnectNetWork(refGoogleOTP.nGroupID);
+        if (hsNetWork != null)
+        { 
+            // 구글Otp 값 어느 Tag에 보낼것인지 협의후 동작
+            //hsNetWork.stCliMem.OTP = refGoogleOTP.strUserOTP;
+            hsNetWork.SendBind2FactorAuth();
+        }
+
+        JSRuntime.InvokeAsync<object>("loginCursorChange");
+        //bStartedLogin = true;
+        //bLoginBtnDisable = true;
+
+        hsNetWork.stCliMem.OTP = "";
+        refGoogleOTP.strUserOTP = "";
+    }
+
+
 
     /// <summary>
     /// 세션중복 로그인 포기 처리
@@ -230,8 +271,52 @@
     private async void ShowSessionCountPopup(int groupID, PageEventArgs e)
     {
         bStartedLogin = false;
+        
+    
         await refSGAlert.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
     }
+
+    /// <summary>
+    /// 2Factor 인증이 필요한 시기에 호출됨
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
+    private async void Show2FactorAuth(int groupID, PageEventArgs e)
+    {
+
+
+        if (e.strDummy == "google_otp")
+        { 
+
+            // Server에서 받아서 동작하도록 수정예정
+            string strSecureKey = "";
+            strSecureKey = e.strMsg;
+
+            if (QRcode.GenerateQRsecureKey())
+                strSecureKey = QRcode.strSecureKey; // "MARNVBMEK06VCXXK";
+
+            CLog.Here().Information($"Show2FactorAuth, Otp-Key : {strSecureKey}");
+
+            refGoogleOTP.strKeyMessage = strSecureKey;
+            refGoogleOTP.nGroupID = groupID;
+            bool rWriteQRimg = QRcode.GenerateQRimg("SecureGate", id, strSecureKey);
+            if (rWriteQRimg)
+            {
+                Thread.Sleep(1000);
+                refGoogleOTP.RedrawUI();
+            }
+
+            // login이 가능항 상태로 ui 변경
+            await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+            //bStartedLogin = false;
+            //bLoginBtnDisable = false;
+            StateHasChanged();
+
+            await refGoogleOTP.openPopUp();
+        }
+
+    }
+
 
     /// <summary>
     ///
@@ -240,8 +325,8 @@
     private void keyCheck(KeyboardEventArgs arg)
     {
         //Enter 로 인한 로그인은 [로그인] 버튼이 존재하는  AD 외 로그인 타입만 적용토록 변경
-        
-       if (arg.Key == "Enter")
+
+        if (arg.Key == "Enter")
         {
             CLog.Here().Information($"keyCheck, ENTER Key - ###### - try login");
             ClickdoLogin();
@@ -421,7 +506,7 @@
                 strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-    strPW = "HsckAD.com";
+            strPW = "HsckAD.com";
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -476,7 +561,7 @@
             pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-    pw = "HsckAD.com";
+        pw = "HsckAD.com";
 #endif
 
         pw = pw.ToLower();
@@ -513,7 +598,7 @@
 
 
 #if DEBUG
-    pw = "HsckAD.com";
+            pw = "HsckAD.com";
 #endif
             pw = pw.ToLower();
 
@@ -603,7 +688,7 @@
     /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        
+
         object[] param = { "none" };
         await JSRuntime.InvokeAsync<object>("initLogIn", param);
 
@@ -744,6 +829,7 @@
 
                 // 1 login ALL 적용때에는 중복로그인시 강제 로그인 적용
                 HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(netlist.GroupID, ShowSessionCountPopup);
+                HSCmdCenter.sgPageEvent.Set2FactorAuthEventAdd(netlist.GroupID, Show2FactorAuth);
                 HSCmdCenter.SetAllowSessionDuplicate(netlist.GroupID);
                 HSCmdCenter.sgPageEvent.SetLoginEventAdd(netlist.GroupID, LoginResultOnetoAll);
             }
@@ -751,6 +837,7 @@
         else
         {
             HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(groupid, ShowSessionCountPopup);
+            HSCmdCenter.sgPageEvent.Set2FactorAuthEventAdd(groupid, Show2FactorAuth);
             HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResultOnetoAll);
             //HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         }
@@ -1404,7 +1491,7 @@
                             }
                         }
 
-                            // Login 화면으로 머물러있지 않도록
+                        // Login 화면으로 머물러있지 않도록
                         @*if (nGroupIDfirst < 0)
                             nGroupIDfirst = 0;*@
 
@@ -1453,7 +1540,6 @@
                             await refPWChangeDefaultPW.openPopUp();
                             return;
                         }
-                        //@
                         else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
                         {
                         }
@@ -2513,7 +2599,7 @@
             return true;
 
         //옵션에 따라, ID와 동일할 경우 초기 비밀번호로 인지
-        if(SGAppMgrSvc.OpConfigInfoService.GetUseIDAsInitPassword(groupID) && id == pw)
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseIDAsInitPassword(groupID) && id == pw)
             return true;
         return false;
     }
@@ -2572,4 +2658,4 @@
                         }
     */
 
-    }
+}

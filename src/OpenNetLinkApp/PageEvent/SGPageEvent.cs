@@ -87,6 +87,13 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void LoginEvent(int groupid, PageEventArgs e);
     // 중복로그인 이벤트
     public delegate void SessionDuplicateEvent(int groupid, PageEventArgs e);
+    
+    /// <summary>
+    /// 2Factor 인증(GoogleOtp 인증)
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="e"></param>
+    public delegate void Session2FactorAuthEvent(int groupid, PageEventArgs e);
 
     // 파일 전송 진행 이벤트 
     public delegate void FileSendProgressEvent(int groupid, PageEventArgs e);
@@ -289,6 +296,11 @@ namespace OpenNetLinkApp.PageEvent
         /// 세션 중복 이벤트
         /// </summary>
         public Dictionary<int, SessionDuplicateEvent> DicSessionDuplicateEvent = new Dictionary<int, SessionDuplicateEvent>(); //세션중복 이벤트
+
+        /// <summary>
+        /// 2Factor Auth(google Otp 현재기본)
+        /// </summary>
+        public Dictionary<int, Session2FactorAuthEvent> Dic2FactorAuthEvent = new Dictionary<int, Session2FactorAuthEvent>(); //세션중복 이벤트
 
         public Dictionary<int, FileSendProgressEvent> DicFileSendProgressEvent = new Dictionary<int, FileSendProgressEvent>();          // 파일 전송 Progress 이벤트
         //public Dictionary<int, FileRecvProgressEvent> DicFileRecvProgressEvent = new Dictionary<int, FileRecvProgressEvent>();          // 파일 수신 Progress 이벤트
@@ -603,6 +615,21 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicSessionDuplicateEvent[groupid];
             return e;
         }
+
+        
+        public void Set2FactorAuthEventAdd(int groupid, Session2FactorAuthEvent e)
+        {
+            Dic2FactorAuthEvent[groupid] = e;
+        }
+        public Session2FactorAuthEvent Get2FactorAuthEventAdd(int groupid)
+        {
+            Session2FactorAuthEvent e = null;
+            if (Dic2FactorAuthEvent.TryGetValue(groupid, out e) == true)
+                e = Dic2FactorAuthEvent[groupid];
+            return e;
+        }
+
+
 
         public void SetLoginEventAdd(int groupid, LoginEvent e)
         {

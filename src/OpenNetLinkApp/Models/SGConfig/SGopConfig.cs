@@ -26,6 +26,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         //패스워드
         public bool bUserPWChange { get; set; } = false;                   // 사용자 패스워드 변경 사용 여부.
+        public bool bUseGoogleOtp2FactorAuth { get; set; } = false;        // 구글 Otp를사용한 2차인증기능사용
         public string strPWChangeProhibitLimit { get; set; } = "";        // 패스워드 사용금지 문자열 지정.
         public int nPWChangeApplyCnt { get; set; } = 9;                   // 패스워드 변경 시 허용되는 자리수 지정.
         public string strInitPasswd { get; set; } = "1K27SdexltsW0ubSCJgsZw==";    // 초기 패스워드 정보.(hsck@2301)

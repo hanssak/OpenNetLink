@@ -89,6 +89,15 @@
         //HSCmdCenter.sgPageEvent.SetSvrEventAdd(0, SvrResult);
         HSCmdCenter.Init();
 
+        for (int i = 0; i < listNetWork.Count; i++)
+        {
+            HsNetWork hsNetWork = HSCmdCenter.GetConnectNetWork(listNetWork[i].GroupID);
+            if (hsNetWork != null)
+                hsNetWork.bDo2FatorAuth = OpConfigSvc.GetUseGoogleOtp2FactorAuth(listNetWork[i].GroupID);
+        }
+
+
+
         // Toast에 사용되는 Text
         pageService.m_strLoginToastTitle = XmlConf.GetTitle("T_TOAST_LOGIN");
         pageService.m_strLoginToastMsg = XmlConf.GetInfoMsg("I_0213");

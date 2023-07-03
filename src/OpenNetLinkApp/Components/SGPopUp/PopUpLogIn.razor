@@ -49,7 +49,7 @@
                             </button>
                         </div>
 
-                        <p class="login-box-msg1">파일전송시스템 <i class="fas fa-cloud-download-alt fa-lg ml-1"></i></p>
+                        <p class="login-box-msg1">@XmlConf.GetTitle("T_SYSTEMNAME_POPUPTITLE") <i class="fas fa-cloud-download-alt fa-lg ml-1"></i></p>
 
                         <div class="login_w">
 
@@ -84,7 +84,7 @@
                                 <div class="col-12  pt-2">
                                     <button class="btn btn-login btn-block btn_blue" @onclick="doLogInByBtn" disabled=@bUIBtnDisable>LOGIN</button>
                                 </div>
-                                <div class="col-12 text-center pt-3">Copyright &copy  HANSSAK Corp.  All rights reserved.</div>
+                                <div class="col-12 text-center pt-3">COPYRIGHT &copy HANSSAK. ALL RIGHTS RESERVED</div>
 
                             </div>
                         </div>
@@ -104,10 +104,12 @@
 <PWChangeDefaultPW2 @ref="refPWChangeDefaultPW"></PWChangeDefaultPW2> -->
 
 <SGAlert @ref="refSGloginDuplicate" Guid="modal-alert-popuplogin" OnCancel="SessionAlertCancelpopup" OnConfirm="SessionAlertConfirmpopup"></SGAlert>
+<GoogleOTP @ref="refGoogleOTP" Guid="modal-googleotp-popuplogin" OnCancel="GoogleOtpCancel" OnConfirm="GoogleOtpConfirm"></GoogleOTP>
 
 @code {
 
     SGAlert refSGloginDuplicate;
+    GoogleOTP refGoogleOTP;
 
     [Parameter]
     public EventCallback<int> goToPage { get; set; }
@@ -139,6 +141,91 @@
     public string otp { get; set; }
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<PopUpLogIn>();
+
+    CsGoogleQRcode QRcode = new CsGoogleQRcode();
+
+    private void GoogleOtpCancel()
+    {
+        QRcode.Dispose();
+        CLog.Here().Information($"SGCtrlSideUI, GoogleOtpCancel - GroupID:{refGoogleOTP.nGroupID} - LogInType: {pageService.m_nLoginType.ToString()}");
+
+        JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+        bUIBtnDisable = false;
+        bStartedLogin = false;
+        id = "";
+        pw = "";
+        refGoogleOTP.strUserOTP = "";
+
+        closeUIPopup();
+    }
+
+    private void GoogleOtpConfirm()
+    {
+        QRcode.Dispose();
+
+        CLog.Here().Information($"SGCtrlSideUI, GoogleOtpCancel - GroupID:{refGoogleOTP.nGroupID} - LogInType: {pageService.m_nLoginType.ToString()}");
+
+        HsNetWork hsNetWork = null;
+        hsNetWork = HSCmdCenter.GetConnectNetWork(refGoogleOTP.nGroupID);
+        if (hsNetWork != null)
+        {
+            // 구글Otp 값 어느 Tag에 보낼것인지 협의후 동작
+            //hsNetWork.stCliMem.OTP = refGoogleOTP.strUserOTP;
+            hsNetWork.SendBind2FactorAuth();
+        }
+
+        // 다중망에 맞춰서 작업
+        JSRuntime.InvokeAsync<object>("loginCursorChange");
+        //bStartedLogin = true;
+        //bLoginBtnDisable = true;
+
+        hsNetWork.stCliMem.OTP = "";
+        refGoogleOTP.strUserOTP = "";
+    }
+
+
+
+    /// <summary>
+    /// 2Factor 인증이 필요한 시기에 호출됨
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
+    private async void Show2FactorAuth(int groupID, PageEventArgs e)
+    {
+
+
+        if (e.strDummy == "google_otp")
+        {
+
+            // Server에서 받아서 동작하도록 수정예정
+            string strSecureKey = "";
+            strSecureKey = e.strMsg;
+
+            if (QRcode.GenerateQRsecureKey())
+                strSecureKey = QRcode.strSecureKey; // "MARNVBMEK06VCXXK";
+
+            CLog.Here().Information($"Show2FactorAuth, Otp-Key : {strSecureKey}");
+
+            refGoogleOTP.strKeyMessage = strSecureKey;
+            refGoogleOTP.nGroupID = groupID;
+            bool rWriteQRimg = QRcode.GenerateQRimg("SecureGate", id, strSecureKey);
+            if (rWriteQRimg)
+            {
+                Thread.Sleep(1000);
+                refGoogleOTP.RedrawUI();
+            }
+
+            // login이 가능항 상태로 ui 변경
+            await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+            //bStartedLogin = false;
+            //bUIBtnDisable = false;
+            StateHasChanged();
+
+            await refGoogleOTP.openPopUp();
+        }
+
+    }
+
 
     public async Task openPopUp()
     {
@@ -216,6 +303,8 @@
         bStartedLogin = false;
         await refSGloginDuplicate.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
     }
+
+
 
     /// <summary>
     /// UI상에 로그인 버튼을 눌러서 로그인할때 호출
@@ -349,22 +438,22 @@
     stRtn = "1";
 #else
 
-            stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
-            if (stRtn == null || (1 > stRtn.Length))
-            {
-                CLog.Here().Information($"Result - json, Data is null OR 0 Size");
-                ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
-                return false;
-            }
+        stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
+        if (stRtn == null || (1 > stRtn.Length))
+        {
+            CLog.Here().Information($"Result - json, Data is null OR 0 Size");
+            ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
+            return false;
+        }
 
-            // json으로 온 Data에서 실제 data 뽑아내는 동작
-            using (JsonDocument document = JsonDocument.Parse(stRtn))
-            {
-                JsonElement jroot = document.RootElement;
-                nCode = jroot.GetProperty("code").GetInt32();
-                strMsg = jroot.GetProperty("msg").GetString();
-                strData = jroot.GetProperty("data").GetString();
-            }
+        // json으로 온 Data에서 실제 data 뽑아내는 동작
+        using (JsonDocument document = JsonDocument.Parse(stRtn))
+        {
+            JsonElement jroot = document.RootElement;
+            nCode = jroot.GetProperty("code").GetInt32();
+            strMsg = jroot.GetProperty("msg").GetString();
+            strData = jroot.GetProperty("data").GetString();
+        }
 #endif
 
             CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
@@ -424,6 +513,7 @@
 
             HSCmdCenter.sgPageEvent.SetLoginEventAdd(nGroupID, LoginpopUpResult);
             HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(nGroupID, ShowSessionCountPopup);
+            HSCmdCenter.sgPageEvent.Set2FactorAuthEventAdd(nGroupID, Show2FactorAuth);
 
             ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";

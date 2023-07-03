@@ -20,6 +20,11 @@ using System.IO.Compression;
 using SharpCompress.Common;
 using SharpCompress.Readers;
 using OpenNetLinkApp.Data.SGDicData.SGAlz;
+using System.Text.RegularExpressions;
+using System.Drawing;
+using QRCoder;
+using System.Security.Cryptography;
+using Google.Authenticator;
 
 namespace OpenNetLinkApp.Common
 {
@@ -497,6 +502,70 @@ namespace OpenNetLinkApp.Common
             return true;
         }
 
+
+
+        /// <summary>
+        /// 지정한 Path에 있는 지정한 확장자 및 파일들을 삭제하는 함수
+        /// </summary>
+        /// <param name="strTargetPath"></param>
+        /// <param name="strDelFilePattern"></param>
+        /// <returns></returns>
+        public static bool DeleteFilesByPathExt(string strTargetPath, string strDelFilePattern)
+        {
+            if ( (strDelFilePattern?.Length ?? 0) < 3 )
+            {
+                Log.Logger.Here().Information($"DeleteFilesByPathExt, FilePattern-Error : {strDelFilePattern}");
+                return false;
+            }
+
+            if ((strTargetPath?.Length ?? 0) < 3 || (Directory.Exists(strTargetPath) == false))
+            {
+                Log.Logger.Here().Information($"DeleteFilesByPathExt, Path-Error : {strTargetPath}");
+                return false;
+            }
+
+            bool bRet = true;
+            try
+            {
+                foreach (string filePath in Directory.GetFiles(strTargetPath, strDelFilePattern))
+                {
+                    try
+                    {
+                        System.IO.File.Delete(filePath); // 파일 삭제
+                        Log.Logger.Here().Information($"DeleteFilesByPathExt, DeleteFile : {filePath}");
+                    }
+                    catch (IOException e)
+                    {
+                        Log.Logger.Here().Information($"DeleteFilesByPathExt, DeleteFile(Pcf)(Exception-Msg:{e.Message}) : {filePath}");
+                        bRet = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Information($"DeleteFilesByPathExt, Exception-Msg : {ex.Message}, Ret: {bRet}");
+                bRet = false;
+            }
+
+            return bRet;
+        }
+
+        public static bool DeleteFile(string strDelFilePath)
+        {
+            bool bRet = true;
+            try
+            {
+                System.IO.File.Delete(strDelFilePath);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Information($"DeleteFile, Exception(MSG) : {ex.Message}, TargetFile : {strDelFilePath}");
+                bRet = false;
+            }
+
+            return bRet;
+        }
+
     }
 
     public class CsHashFunc
@@ -550,6 +619,30 @@ namespace OpenNetLinkApp.Common
 
     public class CsSystemFunc
     {
+
+        public static string GetCurrentModulePath()
+        {
+            string strAgentPath = "";
+            string[] strArgumentArry = System.Environment.GetCommandLineArgs();
+            strAgentPath = strArgumentArry[0];
+
+            int nIdex = -1;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                nIdex = strArgumentArry[0].LastIndexOf("\\");
+            else
+                nIdex = strArgumentArry[0].LastIndexOf("/");
+
+            if (nIdex > 0)
+            {
+                strAgentPath = strArgumentArry[0].Substring(0, nIdex);
+            }
+
+            Log.Logger.Here().Information($"GetCurrentModulePath : {strAgentPath}");
+
+            return strAgentPath;
+        }
+
+
 
         public static string GetCurrentProcessName(bool bGetExePath = true)
         {
@@ -691,6 +784,321 @@ namespace OpenNetLinkApp.Common
         {
             string json = "{\n\"id\":\"" + strID + "\",\n\"pw\":\"" + strPW + "\"\n}";
             return json;
+        }
+
+    }
+
+
+    public class CsGoogleQRcode
+    {
+        Bitmap qrCodeImage = null;
+        //Bitmap convertedImage = null;
+
+        public string strSecureKey = "";
+
+        ~CsGoogleQRcode()
+        {
+            Dispose();
+        }
+
+        public bool GenerateQRsecureKey()
+        {
+            // 비밀키 길이 (20바이트)
+            int keyLength = 20;
+            bool bRet = true;
+
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                try
+                {
+                    byte[] secretKeyBytes = new byte[keyLength];
+                    rng.GetBytes(secretKeyBytes);
+
+                    // Base32 인코딩을 사용하여 바이트 배열을 문자열로 변환
+                    strSecureKey = Base32Encoding.ToString(secretKeyBytes);
+                }
+                catch (Exception ex)
+                {
+                    bRet = false;
+                    Log.Logger.Here().Error($"GenerateQRsecureKey, Exception(MSG) : {ex.Message}");
+                }
+            }
+
+            return bRet;
+        }
+
+        Bitmap ConvertTo24Bit(Bitmap image)
+        {
+            // 24 비트로 새로운 이미지 생성
+            Bitmap convertedImage = new Bitmap(image.Width, image.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
+            // 이미지 복사
+            using (Graphics g = Graphics.FromImage(convertedImage))
+            {
+                g.DrawImage(image, 0, 0);
+            }
+
+            return convertedImage;
+        }
+
+        public bool GenerateQRimg(string issuer, string accountName, string secretKey)
+        {
+
+            // OTP URL 생성
+            try
+            {
+                // otpauth://totp/SecureGate:KS0002?secret=JNJTAMBQGJFVGMBQ&issuer=SecureGate
+                // otpauth://totp/{issuer}:{accountName}?secret={secretKey}&issuer={issuer}
+
+                Log.Logger.Here().Information($"GenerateQRimg, GenerateQRimg-Start!");
+
+                string encodedIssuer = Uri.EscapeDataString(issuer);
+                string encodedAccountName = Uri.EscapeDataString(accountName);
+                string encodedSecretKey = Uri.EscapeDataString(secretKey);
+
+                string otpUrl = $"otpauth://totp/{encodedAccountName}?secret={encodedSecretKey}&issuer={encodedIssuer}";
+                //string otpUrl = $"otpauth://totp/{encodedIssuer}:{encodedAccountName}?secret={encodedSecretKey}&issuer={encodedIssuer}";
+
+                // QR 코드 생성
+                QRCodeGenerator qrGenerator = new QRCodeGenerator();
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode(otpUrl, QRCodeGenerator.ECCLevel.Q);
+                QRCode qrCode = new QRCode(qrCodeData);
+                qrCodeImage = qrCode.GetGraphic(10); // 이미지 크기를 조정합니다.
+                //qrCodeImage.SetPixel(240, 240, Color.White);
+
+                // 24 비트로 이미지 변환
+                //convertedImage = ConvertTo24Bit(qrCodeImage);
+
+                string strQRImgPath = CsSystemFunc.GetCurrentModulePath();
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    strQRImgPath += "\\wwwroot\\otp_qrcode.png";
+                else
+                    strQRImgPath += "/wwwroot/otp_qrcode.png";
+
+                // 기존꺼 삭제
+                //CsFileFunc.DeleteFile(strQRImgPath);
+                //Thread.Sleep(500);
+
+                // 32bit 그대로 사용
+                qrCodeImage.Save(strQRImgPath, System.Drawing.Imaging.ImageFormat.Png);
+                qrCodeImage.Dispose();                
+                qrCodeImage = null;
+
+                //convertedImage.Dispose();
+                //convertedImage = null;
+
+                // 5초 TimeOut - 수정필요.(실재이미지 파일이 정상적으로 씌우졌는지 확인필요, File.Exists 요걸로는 아무것도 안됨.)
+                int nIdx = 0;
+                for (; nIdx < 50; nIdx++)
+                {
+                    if (System.IO.File.Exists(strQRImgPath))
+                        if (CsFileFunc.GetFileSize(strQRImgPath) > 15000)
+                            break;
+                    Thread.Sleep(100);
+                }
+                Log.Logger.Here().Information($"GenerateQRimg, GenerateQRimg-End : {((nIdx < 50) ? "Success!" : "Failed!")}");
+
+                // 순서 바꾸면 파일 이미지 안나오기 시작함.
+                // 파일 존재 확인하고도 약간의 sleep 필요
+                //Thread.Sleep(1000);
+                if (nIdx < 50)
+                    return true;
+
+                return false;
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"GenerateQRimg, exception(MSG) : {ex.Message}");
+                return false;
+            }
+            finally
+            {
+            }
+
+        }
+
+        public void Dispose()
+        {
+            strSecureKey = "";
+
+            if (qrCodeImage != null)
+            {
+                qrCodeImage.Dispose();
+                qrCodeImage = null;
+            }
+                
+        }
+
+    }
+
+    public class CsPasswdValidCheckfunc
+    {
+        Regex regex = new Regex(@"^.*([ ]+).*$");       //공백체크
+        Regex regex2 = new Regex(@"^.*([A-Z]+).*$");    //대문자 존재 체크
+        Regex regex3 = new Regex(@"^.*([a-z]+).*$");    //소문자 존재 체크
+        Regex regex4 = new Regex(@"^.*([0-9]+).*$");    //숫자 존재 체크
+        Regex regex5 = new Regex(@"^.*([^A-Za-z0-9]+).*$");    //특수문자 존재 체크
+        string[] ArrayStrKeyBoard = new string[] { "`1234567890-=", "~!@#$%^&*()_+", "qwertyuiop[]\\", "QWERTYUIOP{}|",
+            "asdfghjkl;'\"", "ASDFGHJKL:\"", "zxcvbnm,./", "ZXCVBNM<>?",
+            "=-0987654321`", "+_)(*&^%$#@!~", "\\][poiuytrewq", "|}{POIUYTREWQ", 
+            "\"';lkjhgfdsa", "\":LKJHGFDSA", "/.,mnbvcxz", "?><MNBVCXZ"};        
+
+        /// <summary>
+        /// 공백문자가 있는지 체크
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <returns></returns>
+        public bool GetEmptyString(string strData)
+        {
+            if (regex.IsMatch(strData))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// 숫자, 대문자(영문), 소문자(영문), 특수문자가 각항목이 존재하면 +1, (전부다있으면 : 4)
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <returns></returns>
+        public int GetComplexCnt(string strData)
+        {
+            int nComplexCnt = 0;
+            if (regex2.IsMatch(strData))
+                nComplexCnt++;
+            if (regex3.IsMatch(strData))
+                nComplexCnt++;
+            if (regex4.IsMatch(strData))
+                nComplexCnt++;
+            if (regex5.IsMatch(strData))
+                nComplexCnt++;
+
+            return nComplexCnt;
+        }
+
+        /// <summary>
+        /// reture : True - 같은문자가 지정한 개수 만큼 반복되지 않음
+        /// reture : false - 같은문자가 지정한 개수 만큼 반복됨
+        /// </summary>
+        /// <param name="chPasswd"></param>
+        /// <param name="iCount"></param>
+        /// <returns></returns>
+        bool CheckSameChar(string chPasswd, int iCount)
+        {
+
+            bool bFindSameChar = false;
+            int nLength = chPasswd.Length;
+
+            try
+            {
+                for (int n = 0; n < nLength - (iCount - 1); n++)
+                {
+                    if (chPasswd[n] == chPasswd[n + 1])
+                    {
+                        for (int i = 1; i < iCount - 1; i++)
+                        {
+                            if (chPasswd[n + i] != chPasswd[n + i + 1])
+                            {
+                                bFindSameChar = false;
+                                break;
+                            }
+                            bFindSameChar = true;
+                        }
+                    }
+
+                    if (bFindSameChar == true)
+                        return false;
+                }
+
+            }
+            catch(Exception ex)
+            {
+                Log.Logger.Here().Error($"CheckSameChar, exception(MSG) : {ex.Message}");
+            }
+
+            return true;
+        }
+
+
+        /// <summary>
+        /// 동일한 문자·숫자의 연속적인 존재유무(true:존재함,false:존재X) <br></br>
+        /// nCharKeyCount : 연속으로 존재해야하는 문자개수
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <returns></returns>
+        public bool GetSameCharCheck(string strData, int nCharKeyCount)
+        {
+            if (CheckSameChar(strData, nCharKeyCount))
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// true : 키보드상의 연속된 문자 또는 숫자의 순차적 입력이 입력된 문자열에 있음
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <returns></returns>
+        public bool GetKeyBoardContinuousWord(string strData, int nCharKeyCount)
+        {
+
+            try
+            {
+                foreach (string strKeyLine in ArrayStrKeyBoard)
+                {
+                    if (PasswdValiation(strKeyLine, strData, nCharKeyCount) == false)
+                        return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"GetKeyBoardContinuousWord, Exception(MSG) : {ex.Message}");
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// passwd에 지정한 연속된 Key가 존재하는지 파악하는 함수
+        /// </summary>
+        /// <param name="strKeyLine"></param>
+        /// <param name="strPWdata"></param>
+        /// <param name="nCharKeyCount"></param>
+        /// <returns></returns>
+        bool PasswdValiation(string strKeyLine, string strPWdata, int nCharKeyCount)
+        {
+
+            string strTemp = "";
+            int len = 0;
+
+            if (nCharKeyCount > 0)
+                len = strPWdata.Length;
+
+            for (int n = 0; n < len; n++)
+            {
+                strTemp = "";
+                if (nCharKeyCount > 0)
+                {
+                    // C#에서는 확인필요 - exception 발생
+                    if (n + nCharKeyCount > len)
+                        return true;
+
+                    strTemp = strPWdata.Substring(n, nCharKeyCount);
+                    if (strTemp.Length < nCharKeyCount)
+                        return true;
+                }
+                else
+                    strTemp = strPWdata;
+
+
+                int pos = strKeyLine.IndexOf(strTemp);
+                if (pos > -1)
+                    return false;
+            }
+
+            return true;
         }
 
     }
