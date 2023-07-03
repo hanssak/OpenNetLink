@@ -255,8 +255,9 @@ namespace OpenNetLinkApp.Services
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
 
                 hsNetwork.SGSvr_EventReg(SGSvrRecv);
-                hsNetwork.SGData_EventReg(SGDataRecv);
+                hsNetwork.SGData_EventReg(SGDataRecv);                
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
+                hsNetwork.SGException_EventRegEx(SGExceptionExRecv);
                 hsNetwork.SetGroupID(groupID);
                 hsNetwork.SetFileRecvPossible(false);
                 hsNetwork.SetIsCheckHardSpace(dicOpConfig[groupID].bUseChkHardSpace);
@@ -401,15 +402,80 @@ namespace OpenNetLinkApp.Services
                         PageEventArgs e = new PageEventArgs();
                         e.result = 0;
                         e.strMsg = "SESSIONDUPLICATE";
+                        e.strDummy = "";
                         seEvent(groupId, e);
                     }
                     System.Diagnostics.Debug.WriteLine("HsNetWork Session Duplicate Exception Received..");
+                    break;
+                case SgEventType.SG_2FACTOR_AUTH:
+                    Session2FactorAuthEvent seEvent2Fact = sgPageEvent.Get2FactorAuthEventAdd(groupId);
+                    if (seEvent2Fact != null)
+                    {
+                        PageEventArgs e = new PageEventArgs();
+                        e.result = 0;
+                        e.strMsg = "";
+                        e.strDummy = "google_otp";
+                        seEvent2Fact(groupId, e);
+                    }
+                    System.Diagnostics.Debug.WriteLine("HsNetWork Session 2Factor Auth Do.. Now Default Google Otp");
                     break;
                 default:
                     break;
             }
             return;
         }
+
+        private void SGExceptionExRecv(int groupId, SGEventArgs sgEventType)
+        {
+            SgEventType sgEType = sgEventType.EventType;
+
+            switch (sgEType)
+            {
+                case SgEventType.SG_SOCKET_TAG_EXCEPTION:                       // 오프라인
+                    OffLineAfterSend(groupId);
+                    break;
+                case SgEventType.SG_SESSIONDUPLICATE:
+                    SessionDuplicateEvent seEvent = sgPageEvent.GetSessionDuplicateEvent(groupId);
+                    if (seEvent != null)
+                    {
+                        PageEventArgs e = new PageEventArgs();
+                        e.result = 0;
+                        e.strMsg = "SESSIONDUPLICATE";
+                        e.strDummy = "";
+                        seEvent(groupId, e);
+                    }
+                    System.Diagnostics.Debug.WriteLine("HsNetWork Session Duplicate Exception Received..");
+                    break;
+                case SgEventType.SG_2FACTOR_AUTH:
+                    Session2FactorAuthEvent seEvent2Fact = sgPageEvent.Get2FactorAuthEventAdd(groupId);
+                    if (seEvent2Fact != null)
+                    {
+                        PageEventArgs e = new PageEventArgs();
+                        e.result = 0;
+
+                        string strData = "";
+
+                        if (sgEventType.MsgRecode.TryGetValue("2FACTORAUTHTYPE", out strData))
+                            e.strDummy = strData;
+
+                        strData = "";
+                        if (sgEventType.MsgRecode.TryGetValue("MSGKEY", out strData))
+                            e.strMsg = strData;  // Server에서 받은 Message 전달
+
+                        e.strDummy = "google_otp";      // kkw임시, google_otp 1개만 가짐 - Server 개발될때까지
+                        e.strMsg = "MARNVBMEK06VCXXK";  // kkw임시, 1가지만 존재 - Server 개발될때까지
+
+                        seEvent2Fact(groupId, e);
+                    }
+                    System.Diagnostics.Debug.WriteLine("HsNetWork Session 2Factor Auth Do.. Now Default Google Otp");
+                    break;
+                default:
+                    break;
+            }
+            return;
+        }
+
+
         public void OffLineAfterSend(int groupId)
         {
             OffLineNotiEvent offlineEvent = null;

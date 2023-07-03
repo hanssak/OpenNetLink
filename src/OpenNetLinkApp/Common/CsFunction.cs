@@ -21,6 +21,10 @@ using SharpCompress.Common;
 using SharpCompress.Readers;
 using OpenNetLinkApp.Data.SGDicData.SGAlz;
 using System.Text.RegularExpressions;
+using System.Drawing;
+using QRCoder;
+using System.Security.Cryptography;
+using Google.Authenticator;
 
 namespace OpenNetLinkApp.Common
 {
@@ -572,6 +576,22 @@ namespace OpenNetLinkApp.Common
             return bRet;
         }
 
+        public static bool DeleteFile(string strDelFilePath)
+        {
+            bool bRet = true;
+            try
+            {
+                System.IO.File.Delete(strDelFilePath);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Information($"DeleteFile, Exception(MSG) : {ex.Message}, TargetFile : {strDelFilePath}");
+                bRet = false;
+            }
+
+            return bRet;
+        }
+
     }
 
     public class CsHashFunc
@@ -632,7 +652,12 @@ namespace OpenNetLinkApp.Common
             string[] strArgumentArry = System.Environment.GetCommandLineArgs();
             strAgentPath = strArgumentArry[0];
 
-            int nIdex = strArgumentArry[0].LastIndexOf("\\");
+            int nIdex = -1;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                nIdex = strArgumentArry[0].LastIndexOf("\\");
+            else
+                nIdex = strArgumentArry[0].LastIndexOf("/");
+
             if (nIdex > 0)
             {
                 strAgentPath = strArgumentArry[0].Substring(0, nIdex);
@@ -789,6 +814,150 @@ namespace OpenNetLinkApp.Common
 
     }
 
+
+    public class CsGoogleQRcode
+    {
+        Bitmap qrCodeImage = null;
+        //Bitmap convertedImage = null;
+
+        public string strSecureKey = "";
+
+        ~CsGoogleQRcode()
+        {
+            Dispose();
+        }
+
+        public bool GenerateQRsecureKey()
+        {
+            // 비밀키 길이 (20바이트)
+            int keyLength = 20;
+            bool bRet = true;
+
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                try
+                {
+                    byte[] secretKeyBytes = new byte[keyLength];
+                    rng.GetBytes(secretKeyBytes);
+
+                    // Base32 인코딩을 사용하여 바이트 배열을 문자열로 변환
+                    strSecureKey = Base32Encoding.ToString(secretKeyBytes);
+                }
+                catch (Exception ex)
+                {
+                    bRet = false;
+                    Log.Logger.Here().Error($"GenerateQRsecureKey, Exception(MSG) : {ex.Message}");
+                }
+            }
+
+            return bRet;
+        }
+
+        Bitmap ConvertTo24Bit(Bitmap image)
+        {
+            // 24 비트로 새로운 이미지 생성
+            Bitmap convertedImage = new Bitmap(image.Width, image.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
+            // 이미지 복사
+            using (Graphics g = Graphics.FromImage(convertedImage))
+            {
+                g.DrawImage(image, 0, 0);
+            }
+
+            return convertedImage;
+        }
+
+        public bool GenerateQRimg(string issuer, string accountName, string secretKey)
+        {
+
+            // OTP URL 생성
+            try
+            {
+                // otpauth://totp/SecureGate:KS0002?secret=JNJTAMBQGJFVGMBQ&issuer=SecureGate
+                // otpauth://totp/{issuer}:{accountName}?secret={secretKey}&issuer={issuer}
+
+                Log.Logger.Here().Information($"GenerateQRimg, GenerateQRimg-Start!");
+
+                string encodedIssuer = Uri.EscapeDataString(issuer);
+                string encodedAccountName = Uri.EscapeDataString(accountName);
+                string encodedSecretKey = Uri.EscapeDataString(secretKey);
+
+                string otpUrl = $"otpauth://totp/{encodedAccountName}?secret={encodedSecretKey}&issuer={encodedIssuer}";
+                //string otpUrl = $"otpauth://totp/{encodedIssuer}:{encodedAccountName}?secret={encodedSecretKey}&issuer={encodedIssuer}";
+
+                // QR 코드 생성
+                QRCodeGenerator qrGenerator = new QRCodeGenerator();
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode(otpUrl, QRCodeGenerator.ECCLevel.Q);
+                QRCode qrCode = new QRCode(qrCodeData);
+                qrCodeImage = qrCode.GetGraphic(10); // 이미지 크기를 조정합니다.
+                //qrCodeImage.SetPixel(240, 240, Color.White);
+
+                // 24 비트로 이미지 변환
+                //convertedImage = ConvertTo24Bit(qrCodeImage);
+
+                string strQRImgPath = CsSystemFunc.GetCurrentModulePath();
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    strQRImgPath += "\\wwwroot\\otp_qrcode.png";
+                else
+                    strQRImgPath += "/wwwroot/otp_qrcode.png";
+
+                // 기존꺼 삭제
+                //CsFileFunc.DeleteFile(strQRImgPath);
+                //Thread.Sleep(500);
+
+                // 32bit 그대로 사용
+                qrCodeImage.Save(strQRImgPath, System.Drawing.Imaging.ImageFormat.Png);
+                qrCodeImage.Dispose();                
+                qrCodeImage = null;
+
+                //convertedImage.Dispose();
+                //convertedImage = null;
+
+                // 5초 TimeOut - 수정필요.(실재이미지 파일이 정상적으로 씌우졌는지 확인필요, File.Exists 요걸로는 아무것도 안됨.)
+                int nIdx = 0;
+                for (; nIdx < 50; nIdx++)
+                {
+                    if (System.IO.File.Exists(strQRImgPath))
+                        if (CsFileFunc.GetFileSize(strQRImgPath) > 15000)
+                            break;
+                    Thread.Sleep(100);
+                }
+                Log.Logger.Here().Information($"GenerateQRimg, GenerateQRimg-End : {((nIdx < 50) ? "Success!" : "Failed!")}");
+
+                // 순서 바꾸면 파일 이미지 안나오기 시작함.
+                // 파일 존재 확인하고도 약간의 sleep 필요
+                //Thread.Sleep(1000);
+                if (nIdx < 50)
+                    return true;
+
+                return false;
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"GenerateQRimg, exception(MSG) : {ex.Message}");
+                return false;
+            }
+            finally
+            {
+            }
+
+        }
+
+        public void Dispose()
+        {
+            strSecureKey = "";
+
+            if (qrCodeImage != null)
+            {
+                qrCodeImage.Dispose();
+                qrCodeImage = null;
+            }
+                
+        }
+
+    }
 
     public class CsPasswdValidCheckfunc
     {
@@ -956,12 +1125,6 @@ namespace OpenNetLinkApp.Common
             }
 
             return true;
-        }
-
-        public static string stringIDpwJsonString(string strID, string strPW)
-        {
-            string json = "{\n\"id\":\"" + strID + "\",\n\"pw\":\"" + strPW + "\"\n}";
-            return json;
         }
 
     }
