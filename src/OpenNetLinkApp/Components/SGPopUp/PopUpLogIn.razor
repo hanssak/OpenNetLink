@@ -438,22 +438,22 @@
         stRtn = "1";
 #else
 
-        stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
-        if (stRtn == null || (1 > stRtn.Length))
-        {
-            CLog.Here().Information($"Result - json, Data is null OR 0 Size");
-            ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
-            return false;
-        }
+            stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
+            if (stRtn == null || (1 > stRtn.Length))
+            {
+                CLog.Here().Information($"Result - json, Data is null OR 0 Size");
+                ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
+                return false;
+            }
 
-        // json으로 온 Data에서 실제 data 뽑아내는 동작
-        using (JsonDocument document = JsonDocument.Parse(stRtn))
-        {
-            JsonElement jroot = document.RootElement;
-            nCode = jroot.GetProperty("code").GetInt32();
-            strMsg = jroot.GetProperty("msg").GetString();
-            strData = jroot.GetProperty("data").GetString();
-        }
+            // json으로 온 Data에서 실제 data 뽑아내는 동작
+            using (JsonDocument document = JsonDocument.Parse(stRtn))
+            {
+                JsonElement jroot = document.RootElement;
+                nCode = jroot.GetProperty("code").GetInt32();
+                strMsg = jroot.GetProperty("msg").GetString();
+                strData = jroot.GetProperty("data").GetString();
+            }
 #endif
 
             CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
@@ -788,7 +788,7 @@
         if (hsNetWork != null)
         {
             pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
-            HSCmdCenter.SetPassWord(groupId, pw); //hsNetWork.SetUserPassword(pw);
+            HSCmdCenter.SetOriginalPassWord(groupId, pw); //hsNetWork.SetUserPassword(pw);
         }
 
         if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId))
@@ -973,7 +973,7 @@
         if (hsNetWork != null)
         {
             pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
-            HSCmdCenter.SetPassWord(groupId, pw); //hsNetWork.SetPassWord(pw);
+            HSCmdCenter.SetOriginalPassWord(groupId, pw); //hsNetWork.SetPassWord(pw);
         }
 
         eResultIdPwAfterJob = eIDPWresultJob.eNone;

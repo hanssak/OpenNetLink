@@ -429,7 +429,7 @@
         CLog.Here().Information($"InitPassWordChangeNoti, PW changed-Success, groupID : {groupID}");
 
         //pageService.SetCurUserPassWD(groupID, stNewPW);
-        HSCmdCenter.SetPassWord(groupID, stNewPW);
+        HSCmdCenter.SetOriginalPassWord(groupID, stNewPW);
         if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
             //if (siteConfig.GetUseAutoLogin(groupID) == true)
