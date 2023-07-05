@@ -742,7 +742,8 @@ window.closeAllPopup = () => {
     $("#modal-envloading").modal("hide");
     $("#FileSelectPopUp").modal("hide");
     $("#FileSelectPopUpForSingleSelect").modal("hide");
-    $("#modal-googleotp").modal("hide");
+    $("#modal-googleotp-main").modal("hide");
+    $("#modal-googleotp-popuplogin").modal("hide");
     $("#modal-default").modal("hide");
     $("#hanssak-otp").modal("hide");
     $("#modal-displaylock").modal("hide");

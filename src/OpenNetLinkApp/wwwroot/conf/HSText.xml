@@ -304,12 +304,12 @@
 			<CN>文件传输系统</CN>
 		</T_SYSTEMNAME>
 
-		<T_SYSTEMNAMEEX>
+		<T_SYSTEMNAME_POPUPTITLE>
 			<KR>파일전송시스템</KR>
 			<JP>資料転送システム</JP>
 			<EN>File transmission system</EN>
 			<CN>文件传输系统</CN>
-		</T_SYSTEMNAMEEX>
+		</T_SYSTEMNAME_POPUPTITLE>
 
 		<T_LANGUAGE>
 			<KR>언어</KR>
@@ -3134,7 +3134,28 @@
 
 		<!-- ********************************************* [START] 구글 OTP (T_GOOGLE_OTP_0000) ********************************************* -->
 
-		<T_GOOGLE_OTP_QRCODE>
+    <T_GOOGLE_OTP_TITLE>
+      <KR>OTP 등록 및 인증</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN>二维码</CN>
+    </T_GOOGLE_OTP_TITLE>
+
+    <T_GOOGLE_OTP_DESC>
+      <KR>등록된 사용자는 OTP 인증을 수행하십시오.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN>OTP口令</CN>
+    </T_GOOGLE_OTP_DESC>
+
+    <T_GOOGLE_OTP_BTN_DESC>
+      <KR>QR 코드 및 OTP 등록번호 보기</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN>OTP口令</CN>
+    </T_GOOGLE_OTP_BTN_DESC>
+
+    <T_GOOGLE_OTP_QRCODE>
 			<KR>QR 코드</KR>
 			<JP></JP>
 			<EN></EN>
@@ -3149,11 +3170,20 @@
 		</T_GOOGLE_OTP_REGISTER_NUM>
 
 		<T_GOOGLE_OTP_INPUT_NUM>
-			<KR>OTP 번호</KR>
+			<KR>OTP 인증번호</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN>OTP口令</CN>
 		</T_GOOGLE_OTP_INPUT_NUM>
+
+
+		<T_GOOGLE_OTP_NUM_EMPTY>
+			<KR>OTP 번호를 입력하세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>OTP口令</CN>
+		</T_GOOGLE_OTP_NUM_EMPTY>
+
 
 		<T_OTP_GUIDE>
 			<KR>생생된 OTP번호를 로그인 화면에 등록하세요.</KR>

@@ -874,7 +874,8 @@ private void LogOut(int groupId)
 private void SfmLogOut(string arg)
 {
 
-    if (String.IsNullOrEmpty(arg))
+    // arg : GroupID
+    if (String.IsNullOrEmpty(arg) == false)
         LogOut(Convert.ToInt32(arg));
 
     pageService.SetSFMChecking(false);
@@ -882,8 +883,8 @@ private void SfmLogOut(string arg)
 
 private void UpdatPolicyLogOut(string arg)
 {
-
-    if (String.IsNullOrEmpty(arg))
+    // arg : GroupID
+    if (String.IsNullOrEmpty(arg) == false)
         LogOut(Convert.ToInt32(arg));
 }
 

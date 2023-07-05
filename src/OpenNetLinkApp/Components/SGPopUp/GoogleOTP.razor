@@ -1,10 +1,15 @@
 @inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
 
-<div class="modal fade" id="modal-googleotp" data-backdrop="static" data-keyboard="false">
+@using OpenNetLinkApp.Common
+@using AgLogManager
+@using System.Runtime.InteropServices
+
+<div class="modal fade" id=@Guid data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
             <div class="modal-header2 modal-outline2">
-                <h5 class="modal-title pt-1 text-bold"><i class="fas fa-shield-alt"></i> OTP 등록</h5>
+                <h5 class="modal-title pt-1 text-bold"><i class="fas fa-shield-alt"></i> @XmlConf.GetTitle("T_GOOGLE_OTP_TITLE")</h5>
                 <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>-->
@@ -13,16 +18,33 @@
                 <!-- content -->
 
                 <div class="card-body pt-0">
-                    <div class="OTP-title"> QR코드를 등록하세요.</div>
 
-                    <div class="QR"><img src="/images/QR.png"></div>
+                    <div class="OTP-title"> @XmlConf.GetTitle("T_GOOGLE_OTP_DESC")</div>
 
+                        @if (bshowLoadQRimg)
+                        {
+                            <div class="OTP-title"> @XmlConf.GetTitle("T_GOOGLE_OTP_QRCODE")</div>
 
-                    <div class="OTP-title"> OTP번호를 등록하세요. </div>
+                            <div class="QR">
+                                @if (bLoadQRimg)
+                                {
+                                    <img src="otp_qrcode.png">
+                                }
+                            </div>@*<img src="/images/QR.png"></div>*@
 
-                    <div class="otp_no"> MARNVBMEK06VCXXK </div>
+                            <div class="OTP-title">  @XmlConf.GetTitle("T_GOOGLE_OTP_REGISTER_NUM") </div>
 
+                            <div class="otp_no"> @strKeyMessage </div>
+                        }
+                        else
+                        {
+                            <button @onclick="SHowQRimg" type="button" class="btn btn-md btn-navy mr-0"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_GOOGLE_OTP_BTN_DESC")</button>
+                            <br>
+                        }
+                        <br>
 
+                    <div class="OTP-title">  @XmlConf.GetTitle("T_GOOGLE_OTP_INPUT_NUM") </div>
+                    <input type="text" class="form-control col-md-12" @bind="strUserOTP" @onkeyup="HandleKeyEvent"> @*placeholder=@XmlConf.GetTitle("T_GOOGLE_OTP_INPUT_NUM")*@
 
                 </div>
 
@@ -30,8 +52,8 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer">
-                <button @onclick="closePopUp" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>확인</button>
-                <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>취소</button>
+                <button @onclick="Confirm" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
+                <button @onclick="Cancel" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -40,15 +62,136 @@
 </div>
 
 @code {
+
+    public bool bLoadQRimg = false;
+    public bool bshowLoadQRimg = false;
+
+    public int nGroupID = -1;
+    public string strKeyMessage = "";
+    public string strUserOTP = "";
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<GoogleOTP>();
+
+    public void SHowQRimg()
+    {
+        bshowLoadQRimg = true;
+        StateHasChanged();
+        CLog.Here().Information($"SHowQRimg, USer Select!");
+    }
+
+    public void Confirm()
+    {
+
+        if ((strUserOTP?.Length ?? 0) > 0)
+        {
+            bshowLoadQRimg = false;
+            OnConfirm.InvokeAsync("");
+            closePopUp();
+        }
+        else
+        {
+            ShowMessage("waring", XmlConf.GetTitle("T_SYSTEMNAME"), XmlConf.GetTitle("T_GOOGLE_OTP_NUM_EMPTY"));
+        }
+    }
+
+    public void Cancel()
+    {
+        bshowLoadQRimg = false;
+        OnCancel.InvokeAsync("");
+        closePopUp();
+    }
+
+    [Parameter]
+    public EventCallback<string> OnConfirm { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnCancel { get; set; }
+
+    [Parameter]
+    public string Guid { get; set; }
+
+    [Parameter]
+    public int basicPageType { get; set; }
+
+
     public async Task openPopUp()
     {
-        object[] param = { "modal-googleotp" };
+
+        @*if (basicPageType == (int)Enums.EnumBasicPageType.SideBar)
+        {
+            if (eLoginProcessType == eLoginType.eLOGINTYPE_GPKI)
+            {
+                goToPagePWChgAfter.InvokeAsync((int)eLoginProcessType);
+            }
+        }*@
+
+        StateHasChanged();
+
+        object[] param = { Guid };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void RedrawUI()
+    {
+        bLoadQRimg = true;
+        StateHasChanged();
     }
 
     public void closePopUp()
     {
-        object[] param = { "modal-googleotp" };
+        object[] param = { Guid };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
+
+        // Server에서 동일한 Key값 오면 지울 이유 없음
+        @*string strQRImgPath = CsSystemFunc.GetCurrentModulePath();
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            strQRImgPath += "\\wwwroot\\otp_qrcode.png";
+        else
+            strQRImgPath += "/wwwroot/otp_qrcode.png";
+        CsFileFunc.DeleteFile(strQRImgPath);*@
     }
+
+    private void HandleKeyEvent(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+
+            CLog.Here().Information($"HandleKeyEvent, Enter ");
+
+            if ((strUserOTP?.Length ?? 0) > 0)
+                Confirm();
+
+            // Task.Run(async () => { await TransSearchCount(); });
+        }
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (nGroupID < 0)
+            return;
+
+        if (firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            //StateHasChanged();
+        }
+    }
+
+
+    private void ShowMessage(string strType, string strTitle, string strMsg)
+    {
+        object[] param = { strType, strTitle, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    protected override void OnInitialized()
+    {
+        if (nGroupID < 0)
+            return;
+    }
+
+
+
 }

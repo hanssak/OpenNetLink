@@ -66,7 +66,7 @@
                             @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
                             {
                                 //AD 로그인은 PW 사용자 입력 불가 (Readonly)
-                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" onkeydown="KeyEventPW(this);" tabindex="2" autocomplete="off">
+                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@pw" @oninput="@(e => pw = e.Value.ToString())" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
                             }
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
                             {
@@ -126,9 +126,13 @@
 <PWChange @ref="refPWChange" Guid="modal-pwchange-main" basicPageType=(int)Enums.EnumBasicPageType.Main></PWChange>
 <PWChangeDefaultPW @ref="refPWChangeDefaultPW" Guid="modal-pwchangedefaultpw-main" basicPageType=(int)Enums.EnumBasicPageType.Main></PWChangeDefaultPW>
 <SGAlert @ref="refSGAlert" Guid="modal-alert-main" OnCancel="SessionAlertCancel" OnConfirm="SessionAlertConfirm"></SGAlert>
+<GoogleOTP @ref="refGoogleOTP" Guid="modal-googleotp-main" OnCancel="GoogleOtpCancel" OnConfirm="GoogleOtpConfirm"></GoogleOTP>
+
 
 @code {
+
     SGAlert refSGAlert;
+    GoogleOTP refGoogleOTP;
 
     [Parameter]
     public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
@@ -140,10 +144,9 @@
     public string pw;
     @* private void OnInput(string value)
         {
-        var newValue = value ?? string.Empty;
-
-        pw  = newValue;
-        }*@
+            var newValue = value ?? string.Empty;
+            pw  = newValue;
+    }*@
 
 public string otp { get; set; }
 
@@ -175,341 +178,388 @@ private static readonly AsyncLock s_lock = new AsyncLock();
 
 private static Serilog.ILogger CLog => Serilog.Log.ForContext<Main>();
 
-/// <summary>
-/// 세션중복 로그인 포기 처리
-/// </summary>
-private void SessionAlertCancel()
-{
-    CLog.Here().Information($"[Main] SessionAlertCancel - GroupID:{refSGAlert.groupId} - LogInType: {pageService.m_nLoginType.ToString()}");
+    CsGoogleQRcode QRcode = new CsGoogleQRcode();
 
-    JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
-    bStartedLogin = false;
-    bLoginBtnDisable = false;
-    refSGAlert.closePopUp();
-}
-
-/// <summary>
-/// 세션중복 로그인 진행 처리
-/// </summary>
-private void SessionAlertConfirm()
-{
-    HSCmdCenter.SetAllowSessionDuplicate(refSGAlert.groupId);
-
-    CLog.Here().Information($"[Main] SessionAlertConfirm - GroupID:{refSGAlert.groupId} -  LogInType: {pageService.m_nLoginType.ToString()}");
-
-    ShowMessage("info", XmlConf.GetInfoMsg("I_0237"));
-
-    if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
+    private void GoogleOtpCancel()
     {
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(refSGAlert.groupId))
+        QRcode.Dispose();
+        CLog.Here().Information($"[Main] GoogleOtp, User Cancel - GroupID:{refGoogleOTP.nGroupID} - LogInType: {pageService.m_nLoginType.ToString()}");
+
+        JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+        bStartedLogin = false;
+        bLoginBtnDisable = false;
+        refGoogleOTP.strUserOTP = "";
+    }
+
+    private void GoogleOtpConfirm()
+    {
+        QRcode.Dispose();
+
+        CLog.Here().Information($"[Main] GoogleOtp, User Confirm - GroupID:{refGoogleOTP.nGroupID} - LogInType: {pageService.m_nLoginType.ToString()}");
+        
+        HsNetWork hsNetWork = null;
+        hsNetWork = HSCmdCenter.GetConnectNetWork(refGoogleOTP.nGroupID);
+        if (hsNetWork != null)
+        { 
+            // 구글Otp 값 어느 Tag에 보낼것인지 협의후 동작
+            //hsNetWork.stCliMem.OTP = refGoogleOTP.strUserOTP;
+            hsNetWork.SendBind2FactorAuth();
+        }
+
+        JSRuntime.InvokeAsync<object>("loginCursorChange");
+        //bStartedLogin = true;
+        //bLoginBtnDisable = true;
+
+        hsNetWork.stCliMem.OTP = "";
+        refGoogleOTP.strUserOTP = "";
+    }
+
+
+
+    /// <summary>
+    /// 세션중복 로그인 포기 처리
+    /// </summary>
+    private void SessionAlertCancel()
+    {
+        CLog.Here().Information($"[Main] SessionAlertCancel - GroupID:{refSGAlert.groupId} - LogInType: {pageService.m_nLoginType.ToString()}");
+
+        JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+        bStartedLogin = false;
+        bLoginBtnDisable = false;
+        refSGAlert.closePopUp();
+    }
+
+    /// <summary>
+    /// 세션중복 로그인 진행 처리
+    /// </summary>
+    private void SessionAlertConfirm()
+    {
+        HSCmdCenter.SetAllowSessionDuplicate(refSGAlert.groupId);
+
+        CLog.Here().Information($"[Main] SessionAlertConfirm - GroupID:{refSGAlert.groupId} -  LogInType: {pageService.m_nLoginType.ToString()}");
+
+        ShowMessage("info", XmlConf.GetInfoMsg("I_0237"));
+
+        if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
         {
-            if (doADLoginLocalCheck(refSGAlert.groupId))
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(refSGAlert.groupId))
             {
+                if (doADLoginLocalCheck(refSGAlert.groupId))
+                {
+                    doADLogin(true);
+                }
+                else
+                {
+                    pageService.m_nLoginType = (int)eLoginType.eLOGINTYPE_ORIGIN;
+                    doLogIn();
+                }
+            }
+            else
                 doADLogin(true);
-            }
-            else
-            {
-                pageService.m_nLoginType = (int)eLoginType.eLOGINTYPE_ORIGIN;
-                doLogIn();
-            }
-        }
-        else
-            doADLogin(true);
-    }
-    else
-    {
-        doLogIn();
-    }
-}
-
-/// <summary>
-/// 세션중복시 보여주는 이벤트 팝업
-/// </summary>
-/// <param name="groupID"></param>
-/// <param name="e"></param>
-private async void ShowSessionCountPopup(int groupID, PageEventArgs e)
-{
-    bStartedLogin = false;
-    await refSGAlert.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
-}
-
-/// <summary>
-///
-/// </summary>
-/// <param name="arg"></param>
-private void keyCheck(KeyboardEventArgs arg)
-{
-    //Enter 로 인한 로그인은 [로그인] 버튼이 존재하는  AD 외 로그인 타입만 적용토록 변경
-    if (arg.Key == "Enter")
-    {
-
-        CLog.Here().Information($"keyCheck, ENTER Key - ###### - try login");
-        ClickdoLogin();
-    }
-}
-private void PwOnInput(ChangeEventArgs arg)
-{
-    //Enter 로 인한 로그인은 [로그인] 버튼이 존재하는  AD 외 로그인 타입만 적용토록 변경
-
-    pw = arg.Value.ToString();
-    arg.Value = 0;
-}
-
-/// <summary>
-/// 화면에서 로그인 버튼 눌러서 로그인시도
-/// </summary>
-public async void ClickdoLogin()
-{
-    var test = await JSRuntime.InvokeAsync<object>("GetPW");
-
-    pw = test.ToString();
-    test = 0;
-    int groupid = pageService.m_nCurViewPageGroupID;
-
-    CLog.Here().Information($"ClickdoLogin - login - groupid : {groupid}");
-
-    bLoginBtnDisable = true;
-    StateHasChanged();
-
-    if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
-    {
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupid))
-        {
-            if (doADLoginLocalCheck(groupid))
-            {
-                doADLogin();
-            }
-            else
-            {
-                pageService.m_nLoginType = (int)eLoginType.eLOGINTYPE_ORIGIN;
-                doLogIn();
-            }
-        }
-        else
-            doADLogin();
-    }
-    else
-    {
-        doLogIn();
-    }
-
-    bLoginBtnDisable = false;
-    StateHasChanged();
-
-}
-
-
-/// <summary>
-/// 2번째 이상 로그인을 Page형태로 구현할때 사용하려했으나, 사용않함
-/// </summary>
-private void doBack()
-{
-
-    // 원래 groupID의 Page로 이동
-    pageService.m_nCurViewPageGroupID = pageService.m_nLastViewPageGroupID;
-    //MyNavigationManager.NavigateTo(pageService.m_strLastPage);
-
-    /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-    foreach (var MenuItem in SideBarUISvc.MenuList)
-    {
-        if (MenuItem.Child.Count > 0)
-        {
         }
         else
         {
+            doLogIn();
         }
-    }*/
+    }
 
-}
-
-/// <summary>
-/// 로그인 동작( DoLogin )
-/// </summary>
-private void doLogIn()
-{
-    try
+    /// <summary>
+    /// 세션중복시 보여주는 이벤트 팝업
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
+    private async void ShowSessionCountPopup(int groupID, PageEventArgs e)
     {
-        if (bStartedLogin)
-            return;
+        bStartedLogin = false;
+        await refSGAlert.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
+    }
 
-        if ((id?.Length ?? 0) < 1)
-        {
-            ShowLoginFail(XmlConf.GetWarnMsg("W_0030"));
-            return;
+    /// <summary>
+    /// 2Factor 인증이 필요한 시기에 호출됨
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
+    private async void Show2FactorAuth(int groupID, PageEventArgs e)
+    {
+
+
+        if (e.strDummy == "google_otp")
+        { 
+
+            // Server에서 받아서 동작하도록 수정예정
+            string strSecureKey = "";
+            strSecureKey = e.strMsg;
+
+            if (QRcode.GenerateQRsecureKey())
+                strSecureKey = QRcode.strSecureKey; // "MARNVBMEK06VCXXK";
+
+            CLog.Here().Information($"Show2FactorAuth, Otp-Key : {strSecureKey}");
+
+            refGoogleOTP.strKeyMessage = strSecureKey;
+            refGoogleOTP.nGroupID = groupID;
+            bool rWriteQRimg = QRcode.GenerateQRimg("SecureGate", id, strSecureKey);
+            if (rWriteQRimg)
+            {
+                Thread.Sleep(1000);
+                refGoogleOTP.RedrawUI();
+            }
+
+            // login이 가능항 상태로 ui 변경
+            await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+            //bStartedLogin = false;
+            //bLoginBtnDisable = false;
+            StateHasChanged();
+
+            await refGoogleOTP.openPopUp();
         }
 
-        if ((pw?.Length ?? 0) < 1)
+    }
+
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="arg"></param>
+    private void keyCheck(KeyboardEventArgs arg)
+    {
+        //Enter 로 인한 로그인은 [로그인] 버튼이 존재하는  AD 외 로그인 타입만 적용토록 변경
+
+        if (arg.Key == "Enter")
         {
-            ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
-            return;
+            CLog.Here().Information($"keyCheck, ENTER Key - ###### - try login");
+            ClickdoLogin();
         }
+    }
 
 
-        CLog.Here().Information($"doLogin - ###### -  Start");
+    private void PwOnInput(ChangeEventArgs arg)
+    {
+        //Enter 로 인한 로그인은 [로그인] 버튼이 존재하는  AD 외 로그인 타입만 적용토록 변경
 
+        pw = arg.Value.ToString();
+        arg.Value = 0;
+    }
+
+    /// <summary>
+    /// 화면에서 로그인 버튼 눌러서 로그인시도
+    /// </summary>
+    public async void ClickdoLogin()
+    {
+        var test = await JSRuntime.InvokeAsync<object>("GetPW");
+
+        pw = test.ToString();
+        test = 0;
         int groupid = pageService.m_nCurViewPageGroupID;
 
-        //VAlidation Check  PW_OTP(4), OTP(5)
-        if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5)
+        CLog.Here().Information($"ClickdoLogin - login - groupid : {groupid}");
+
+        bLoginBtnDisable = true;
+        StateHasChanged();
+
+        if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
         {
-            if (otp == null || otp.Length < 6)
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(groupid))
             {
-                ShowLoginFail(XmlConf.GetTitle("T_OTP_GUIDE"));
-                bLoginBtnDisable = false;
-                return;
+                if (doADLoginLocalCheck(groupid))
+                {
+                    doADLogin();
+                }
+                else
+                {
+                    pageService.m_nLoginType = (int)eLoginType.eLOGINTYPE_ORIGIN;
+                    doLogIn();
+                }
             }
-        }
-
-        JSRuntime.InvokeAsync<object>("loginCursorChange");
-        bStartedLogin = true;
-
-        ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
-        string strCurCliVersion = "";
-        string strPlatform = "";
-        if (VersionConfigSvc != null)
-        {
-            strCurCliVersion = VersionConfigSvc.GetSWVersion();
-            strCurCliVersion = "OpenNetLink " + strCurCliVersion;
-
-            strPlatform = VersionConfigSvc.GetUpdatePlatform();
-            strCurCliVersion = strCurCliVersion + ":" + strPlatform;
-        }
-
-        if (strCurCliVersion.Equals(""))
-            return;
-
-        CLog.Here().Information($"[Main] LogIn Type (######) : {pageService.m_nLoginType.ToString()}, GroupIDLoginType : {pageService.GetGroupIDLoginType(groupid)}");
-        HSCmdCenter.SetCliVersion(strCurCliVersion);
-
-
-        List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
-        int count = listNetWork.Count;
-
-        //pageService.m_nCurViewPageGroupID=0;
-
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
-        {
-            foreach (ISGNetwork netlist in listNetWork)
-            {
-                CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
-                HSCmdCenter.Login(netlist.GroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
-                pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
-            }
+            else
+                doADLogin();
         }
         else
         {
-            HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
-            pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
+            doLogIn();
         }
 
+        bLoginBtnDisable = false;
+        StateHasChanged();
+
     }
-    catch (Exception ex)
-    {
-        CLog.Here().Error($"doLogIn - Exception(Msg) : {ex.Message}");
-        Debug.WriteLine(ex.Message);
-    }
-}
-/// <summary>
-///
-/// </summary>
-/// <param name="ngroupid"></param>
-/// <returns></returns>
-private bool doADLoginLocalCheck(int ngroupid)
-{
-    try
+
+
+    /// <summary>
+    /// 2번째 이상 로그인을 Page형태로 구현할때 사용하려했으나, 사용않함
+    /// </summary>
+    private void doBack()
     {
 
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(ngroupid) == false)
-            return false;
+        // 원래 groupID의 Page로 이동
+        pageService.m_nCurViewPageGroupID = pageService.m_nLastViewPageGroupID;
+        //MyNavigationManager.NavigateTo(pageService.m_strLastPage);
 
-        string strPW = "";
-
-        //Linux는 아직 실제값 확인해보지 못함
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            strPW = IPGlobalProperties.GetIPGlobalProperties().DomainName;
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
-
-#if DEBUG
-        strPW = "HsckAD.com";
-#endif
-
-        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-        if (listNetWork[ngroupid].ADDomain == null || listNetWork[ngroupid].ADDomain.Count < 1)
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        foreach (var MenuItem in SideBarUISvc.MenuList)
         {
-            CLog.Here().Information($"doADLoginLocalCheck - Agent ADDomain Data Empty(groupID : {ngroupid}) - Do IDPW!");
-            return false;
-        }
-
-        foreach (string strDomain in listNetWork[ngroupid].ADDomain)
-        {
-            SGRSACrypto sgRSACrypto = new SGRSACrypto();
-            //string strEncID = "";
-            //sgRSACrypto?.ValueEn(strPW, out strDescPW);
-            string strDescPW = "";
-            sgRSACrypto?.ValueDecrypt(strDomain, out strDescPW);
-
-            // hash 값으로 비교하면 대소문자 가려서 비교하게 되므로
-            if (listNetWork.Count > 0 && String.Compare(strPW, strDescPW, true) == 0)
+            if (MenuItem.Child.Count > 0)
             {
-                CLog.Here().Information($"doADLoginLocalCheck - DoLogin(groupID : {ngroupid}) - Do!");
-                return true;
             }
+            else
+            {
+            }
+        }*/
+
+    }
+
+    /// <summary>
+    /// 로그인 동작( DoLogin )
+    /// </summary>
+    private void doLogIn()
+    {
+        try
+        {
+            if (bStartedLogin)
+                return;
+
+            if ((id?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0030"));
+                return;
+            }
+
+            if ((pw?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
+                return;
+            }
+
+
+            CLog.Here().Information($"doLogin - ###### -  Start");
+
+            int groupid = pageService.m_nCurViewPageGroupID;
+
+            //VAlidation Check  PW_OTP(4), OTP(5)
+            if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5)
+            {
+                if (otp == null || otp.Length < 6)
+                {
+                    ShowLoginFail(XmlConf.GetTitle("T_OTP_GUIDE"));
+                    bLoginBtnDisable = false;
+                    return;
+                }
+            }
+
+            JSRuntime.InvokeAsync<object>("loginCursorChange");
+            bStartedLogin = true;
+
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
+            string strCurCliVersion = "";
+            string strPlatform = "";
+            if (VersionConfigSvc != null)
+            {
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
+                strCurCliVersion = "OpenNetLink " + strCurCliVersion;
+
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
+                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
+            }
+
+            if (strCurCliVersion.Equals(""))
+                return;
+
+            CLog.Here().Information($"[Main] LogIn Type (######) : {pageService.m_nLoginType.ToString()}, GroupIDLoginType : {pageService.GetGroupIDLoginType(groupid)}");
+            HSCmdCenter.SetCliVersion(strCurCliVersion);
+
+
+            List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+            int count = listNetWork.Count;
+
+            //pageService.m_nCurViewPageGroupID=0;
+
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
+            {
+                foreach (ISGNetwork netlist in listNetWork)
+                {
+                    CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
+                    HSCmdCenter.Login(netlist.GroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
+                    pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
+                }
+            }
+            else
+            {
+                HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
+                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"doLogIn - Exception(Msg) : {ex.Message}");
+            Debug.WriteLine(ex.Message);
+        }
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="ngroupid"></param>
+    /// <returns></returns>
+    private bool doADLoginLocalCheck(int ngroupid)
+    {
+        try
+        {
+
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(ngroupid) == false)
+                return false;
+
+            string strPW = "";
+
+            //Linux는 아직 실제값 확인해보지 못함
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                strPW = IPGlobalProperties.GetIPGlobalProperties().DomainName;
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
+
+    #if DEBUG
+            strPW = "HsckAD.com";
+    #endif
+
+            List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+            if (listNetWork[ngroupid].ADDomain == null || listNetWork[ngroupid].ADDomain.Count < 1)
+            {
+                CLog.Here().Information($"doADLoginLocalCheck - Agent ADDomain Data Empty(groupID : {ngroupid}) - Do IDPW!");
+                return false;
+            }
+
+            foreach (string strDomain in listNetWork[ngroupid].ADDomain)
+            {
+                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                //string strEncID = "";
+                //sgRSACrypto?.ValueEn(strPW, out strDescPW);
+                string strDescPW = "";
+                sgRSACrypto?.ValueDecrypt(strDomain, out strDescPW);
+
+                // hash 값으로 비교하면 대소문자 가려서 비교하게 되므로
+                if (listNetWork.Count > 0 && String.Compare(strPW, strDescPW, true) == 0)
+                {
+                    CLog.Here().Information($"doADLoginLocalCheck - DoLogin(groupID : {ngroupid}) - Do!");
+                    return true;
+                }
+            }
+
+            CLog.Here().Information($"doADLoginLocalCheck - PC Ad Domain : {strPW} - Can't Login AD TYPE(#####), groupID : {ngroupid}");
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"doADLoginLocalCheck - Exception - Msg : {ex.Message}");
         }
 
-        CLog.Here().Information($"doADLoginLocalCheck - PC Ad Domain : {strPW} - Can't Login AD TYPE(#####), groupID : {ngroupid}");
-
-    }
-    catch (Exception ex)
-    {
-        CLog.Here().Error($"doADLoginLocalCheck - Exception - Msg : {ex.Message}");
+        return false;
     }
 
-    return false;
-}
-
-/// <summary>
-/// AD 로그인에 사용되는 data를 화면상에 표현
-/// </summary>
-private void SetADLoginData()
-{
-
-    CLog.Here().Information($"SetADLoginData - #Start");
-
-    id = Environment.UserName;
-
-    //OSX의 경우 임의로 아래와 같이 처리 추후 objective-c API 찾아볼 예정
-    //Linux는 아직 실제값 확인해보지 못함
-    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
-    else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
-
-#if DEBUG
-    pw = "HsckAD.com";
-#endif
-
-    pw = pw.ToLower();
-
-    CLog.Here().Information($"SetADLoginData - #End");
-
-    StateHasChanged();
-}
-
-/// <summary>
-/// AD로그인 방식으로 로그인동작 진행
-/// </summary>
-private void doADLogin(bool bDoLoginForce = false)
-{
-    try
+    /// <summary>
+    /// AD 로그인에 사용되는 data를 화면상에 표현
+    /// </summary>
+    private void SetADLoginData()
     {
-        if (bDoLoginForce == false)
-            ShowMessage("info", XmlConf.GetInfoMsg("I_0235"));
 
-        CLog.Here().Information($"ADLogin - ###### -  Start");
-
-        JSRuntime.InvokeAsync<object>("loginCursorChange");
-        bStartedLogin = true;
+        CLog.Here().Information($"SetADLoginData - #Start");
 
         id = Environment.UserName;
 
@@ -520,78 +570,113 @@ private void doADLogin(bool bDoLoginForce = false)
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
+    #if DEBUG
+            pw = "HsckAD.com";
+    #endif
 
-
-#if DEBUG
-        pw = "HsckAD.com";
-#endif
         pw = pw.ToLower();
 
-        ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
-        string strCurCliVersion = "";
-        string strPlatform = "";
-        if (VersionConfigSvc != null)
-        {
-            strCurCliVersion = VersionConfigSvc.GetSWVersion();
-            strCurCliVersion = "OpenNetLink " + strCurCliVersion;
+        CLog.Here().Information($"SetADLoginData - #End");
 
-            strPlatform = VersionConfigSvc.GetUpdatePlatform();
-            strCurCliVersion = strCurCliVersion + ":" + strPlatform;
-        }
-
-        if (strCurCliVersion.Equals(""))
-            return;
-
-        CLog.Here().Information("[Main] LogIn Type:" + pageService.m_nLoginType.ToString());
-        HSCmdCenter.SetCliVersion(strCurCliVersion);
-
-
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
-        {
-            List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-            foreach (ISGNetwork netlist in listNetWork)
-            {
-                CLog.Here().Information($"LoginAD - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
-                HSCmdCenter.LoginAD(netlist.GroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
-                pageService.SetGroupIDLoginType(netlist.GroupID, eLoginType.eLOGINTYPE_AD);
-            }
-        }
-        else
-        {
-            CLog.Here().Information($"ADLogin - ###### -  Do");
-            HSCmdCenter.LoginAD(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
-            pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, eLoginType.eLOGINTYPE_AD);
-        }
-
-        CLog.Here().Information($"ADLogin - ###### -  End");
-
+        StateHasChanged();
     }
-    catch (Exception ex)
+
+    /// <summary>
+    /// AD로그인 방식으로 로그인동작 진행
+    /// </summary>
+    private void doADLogin(bool bDoLoginForce = false)
     {
-        CLog.Here().Error($"ADLogin - Exception - Msg : {ex.Message}");
-    }
+        try
+        {
+            if (bDoLoginForce == false)
+                ShowMessage("info", XmlConf.GetInfoMsg("I_0235"));
 
-}
+            CLog.Here().Information($"ADLogin - ###### -  Start");
+
+            JSRuntime.InvokeAsync<object>("loginCursorChange");
+            bStartedLogin = true;
+
+            id = Environment.UserName;
+
+            //OSX의 경우 임의로 아래와 같이 처리 추후 objective-c API 찾아볼 예정
+            //Linux는 아직 실제값 확인해보지 못함
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 
 
-/// <summary>
-///
-/// </summary>
-private void WaitForFocus()
-{
-    Task.Delay(1000);
-        @*if (id.Length == 0)
+    #if DEBUG
+            pw = "HsckAD.com";
+    #endif
+            pw = pw.ToLower();
+
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
+            string strCurCliVersion = "";
+            string strPlatform = "";
+            if (VersionConfigSvc != null)
             {
-            object[] param2 = { "loginId" };
-            JSRuntime.InvokeAsync<object>("changeFocus", param2);
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
+                strCurCliVersion = "OpenNetLink " + strCurCliVersion;
+
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
+                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
+            }
+
+            if (strCurCliVersion.Equals(""))
+                return;
+
+            CLog.Here().Information("[Main] LogIn Type:" + pageService.m_nLoginType.ToString());
+            HSCmdCenter.SetCliVersion(strCurCliVersion);
+
+
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
+            {
+                List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+                foreach (ISGNetwork netlist in listNetWork)
+                {
+                    CLog.Here().Information($"LoginAD - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
+                    HSCmdCenter.LoginAD(netlist.GroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
+                    pageService.SetGroupIDLoginType(netlist.GroupID, eLoginType.eLOGINTYPE_AD);
+                }
             }
             else
             {
-            object[] param3 = { "loginPw" };
-            JSRuntime.InvokeAsync<object>("changeFocus", param3);
-            }*@
+                CLog.Here().Information($"ADLogin - ###### -  Do");
+                HSCmdCenter.LoginAD(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
+                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, eLoginType.eLOGINTYPE_AD);
+            }
+
+            CLog.Here().Information($"ADLogin - ###### -  End");
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"ADLogin - Exception - Msg : {ex.Message}");
+        }
+
     }
+
+
+
+    /// <summary>
+    ///
+    /// </summary>
+    private void WaitForFocus()
+    {
+        Task.Delay(1000);
+            @*if (id.Length == 0)
+                {
+                object[] param2 = { "loginId" };
+                JSRuntime.InvokeAsync<object>("changeFocus", param2);
+                }
+                else
+                {
+                object[] param3 = { "loginPw" };
+                JSRuntime.InvokeAsync<object>("changeFocus", param3);
+                }*@
+        }
 
 
     ///// <summary>
@@ -754,6 +839,7 @@ private void WaitForFocus()
 
                 // 1 login ALL 적용때에는 중복로그인시 강제 로그인 적용
                 HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(netlist.GroupID, ShowSessionCountPopup);
+                HSCmdCenter.sgPageEvent.Set2FactorAuthEventAdd(netlist.GroupID, Show2FactorAuth);
                 HSCmdCenter.SetAllowSessionDuplicate(netlist.GroupID);
                 HSCmdCenter.sgPageEvent.SetLoginEventAdd(netlist.GroupID, LoginResultOnetoAll);
             }
@@ -761,6 +847,7 @@ private void WaitForFocus()
         else
         {
             HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(groupid, ShowSessionCountPopup);
+            HSCmdCenter.sgPageEvent.Set2FactorAuthEventAdd(groupid, Show2FactorAuth);
             HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResultOnetoAll);
             //HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         }
@@ -1414,7 +1501,7 @@ private void WaitForFocus()
                             }
                         }
 
-                            // Login 화면으로 머물러있지 않도록
+                        // Login 화면으로 머물러있지 않도록
                         @*if (nGroupIDfirst < 0)
                             nGroupIDfirst = 0;*@
 
@@ -1452,7 +1539,7 @@ private void WaitForFocus()
                     refPWChange.nGroupID = nGroupIDfirst;
                     refPWChange.Init();
 
-                    //@ 초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거 시작 2021/07/05 YKH
+                    // 초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거 시작 2021/07/05 YKH
                     //패스워드 변경 유무에 따라 패스워드 체크 가능 여부 확인
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId))
                     {
@@ -1463,7 +1550,6 @@ private void WaitForFocus()
                             await refPWChangeDefaultPW.openPopUp();
                             return;
                         }
-                        //@
                         else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
                         {
                         }
@@ -2582,4 +2668,4 @@ private void WaitForFocus()
     }
     */
 
-    }
+}

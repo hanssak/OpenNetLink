@@ -46,6 +46,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseUserPWChange(int groupId);
 
+        public bool GetUseGoogleOtp2FactorAuth(int groupId);
+
         public string GetPWChangeProhibitLimit(int groupId);
 
         /// <summary>
@@ -399,6 +401,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUserPWChange;
         }
+
+        public bool GetUseGoogleOtp2FactorAuth(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseGoogleOtp2FactorAuth;  // 구글 Otp를사용한 2차인증기능사용
+        }
+        
+
         public string GetPWChangeProhibitLimit(int groupId)
         {
             return AppConfigInfo[groupId].strPWChangeProhibitLimit;
