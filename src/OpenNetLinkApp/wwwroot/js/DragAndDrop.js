@@ -1,14 +1,6 @@
 
-window.GetProtectedPW = (elementID, publicKeyStr) => {
-    var crypt = new JSEncrypt({ default_key_size: 2048 });
-    crypt.setPublicKey(publicKeyStr);
-
-    var origin = document.getElementById(elementID).value;
-    var protectedPw = crypt.encrypt(origin);
-    document.getElementById(elementID).value = protectedPw;
-    crypt = null;
-    origin = null;
-    return protectedPw;
+window.GetPW = () => {
+    return document.getElementById("loginPw").value;
 }
 
 window.loginCursorChangeDefault = () => {
@@ -918,6 +910,7 @@ window.adJustWindowsize = () => {
 
 //F5 키 눌러서 화면고침 금지(WebView화면고침에러)
 window.addKeyDown = () => {
+    var loginCount = 0;
     document.addEventListener('keydown', function (e) {
         var kcode = e.keyCode;
         //backspace 방지

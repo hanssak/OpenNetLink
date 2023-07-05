@@ -336,7 +336,7 @@
         CLog.Here().Information($"UserPassWordChangeNoti, PW changed-Success, groupID : {groupID}");
 
         //pageService.SetCurUserPassWD(groupID, stNewPW);
-        HSCmdCenter.SetOriginalPassWord(groupID, stNewPW);
+        HSCmdCenter.SetPassWord(groupID, stNewPW);
         //if (siteConfig.GetUseAutoLogin(groupID) == true)  // json 설정으로 이동
         if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID))
         {

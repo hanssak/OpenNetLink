@@ -14,17 +14,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     public enum eIDPWresultJob
     {
         eNone = 0,
-        /// <summary>
-        /// 강제 변경
-        /// </summary>
         eEnforced = 1,
-        /// <summary>
-        /// 선택 변경
-        /// </summary>
         eAfterWard = 2,
-        /// <summary>
-        /// 초기 비밀번호 설정
-        /// </summary>
         eInitPW = 3
     }
 
@@ -1451,7 +1442,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         if (dic.TryGetValue(1, out strValue) == true)
                         {
                             strValue = dic[1];
-                            EncAdd(strKey, strValue);
+                             EncAdd(strKey, strValue);
                         }
                     }
 
@@ -1494,20 +1485,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="strTagName"></param>
-        /// <returns></returns>
-        public string GetTagDataBySystemEnvName(string strTagName)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="strTagName"></param>
+		/// <returns></returns>
+		public string GetTagDataBySystemEnvName(string strTagName)
         {
-            string strRet = "";
-            string strTagRealName = "";
-            strTagRealName = GetSystemPosition() ? "I_" : "E_";
-            strTagRealName += strTagName.ToUpper();
-            strRet = GetTagData(strTagRealName);
-            return strRet;
-        }
+			string strRet = "";
+			string strTagRealName = "";
+			strTagRealName = GetSystemPosition() ? "I_" : "E_";
+			strTagRealName += strTagName.ToUpper();
+			strRet = GetTagData(strTagRealName);
+			return strRet;
+		}
 
         /// <summary>
         /// 서버 ENV테이블에 설정된 문서파일 내부 검사유형 정보를 반환한다. (서버ENV 테이블에서 GET)
@@ -1804,28 +1795,28 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
 
-        /// <summary>
-        /// 로그인할때 받은 EXCEPTIONEXT 값을 받음
-        /// </summary>
-        /// <returns></returns>
-        public string GetExceptionExt()
-        {
-            string strData = GetTagData("EXCEPTIONEXT");
+		/// <summary>
+		/// 로그인할때 받은 EXCEPTIONEXT 값을 받음
+		/// </summary>
+		/// <returns></returns>
+		public string GetExceptionExt()
+		{
+			string strData = GetTagData("EXCEPTIONEXT");
 
-            if (strData.Equals(""))
-            {
-                SetTagData("EXCEPTIONEXT", ";".Base64EncodingStr());
-                return ";";
-            }
+			if (strData.Equals(""))
+			{
+				SetTagData("EXCEPTIONEXT", ";".Base64EncodingStr());
+				return ";";
+			}
 
-            if (GetApprove())
-                return ";";
+			if (GetApprove())
+				return ";";
 
-            if (string.Compare(strData, "none", true) == 0)
-                return ";";
-            else
-                return strData;
-        }
+			if (string.Compare(strData, "none", true) == 0)
+				return ";";
+			else
+				return strData;
+		}
 
         /// 
         /// </summary>

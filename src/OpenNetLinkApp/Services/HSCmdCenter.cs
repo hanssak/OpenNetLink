@@ -255,7 +255,7 @@ namespace OpenNetLinkApp.Services
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
 
                 hsNetwork.SGSvr_EventReg(SGSvrRecv);
-                hsNetwork.SGData_EventReg(SGDataRecv);
+                hsNetwork.SGData_EventReg(SGDataRecv);                
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
                 hsNetwork.SGException_EventRegEx(SGExceptionExRecv);
                 hsNetwork.SetGroupID(groupID);
@@ -1207,7 +1207,7 @@ namespace OpenNetLinkApp.Services
                     else
                     {
                         // Log 첫출력
-                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , " + $"{ ((bIsLogin && sgLoginData != null) ? $"DELETECYCLE : { nArryDeleteTime[nIdx]} " : "Logout Status!") }");
+                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , " + $"{ ( (bIsLogin && sgLoginData != null) ? $"DELETECYCLE : { nArryDeleteTime[nIdx]} " : "Logout Status!") }");
                         bDisplayCycle = true;
                         nowData = DateTime.Now;
                         nHour = nowData.Hour;
@@ -2155,12 +2155,12 @@ namespace OpenNetLinkApp.Services
                 hsNetWork.bIgnoreSessionDuplicate = bIgnoreSessionDuplicate;
         }
 
-        public int Login(int groupid, string strID, string strProtectedPW, string strCurCliVersion, string otp, int loginType = 0)
+        public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType = 0)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             int ret = 0;
             if (hsNetWork != null)
-                ret = hsNetWork.Login(strID, strProtectedPW, otp, strCurCliVersion, 0, loginType);
+                ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, 0, loginType);
             return 0;
         }
 
@@ -2173,12 +2173,12 @@ namespace OpenNetLinkApp.Services
             return 0;
         }
 
-        public int LoginAD(int groupid, string strID, string strProtectedPW, string strCurCliVersion, string otp, int loginType = 0)
+        public int LoginAD(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType = 0)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             int ret = 0;
             if (hsNetWork != null)
-                ret = hsNetWork.Login(strID, strProtectedPW, otp, strCurCliVersion, 9, loginType);
+                ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, 9, loginType);
             return 0;
         }
 
@@ -2780,12 +2780,12 @@ namespace OpenNetLinkApp.Services
         }
 
         /// <summary>
-        /// 비밀번호를 DEK로 암호화하여 저장 
-        /// <br/>= stCliMem.SetOriginalPassword
+        /// 비밀번호 저장 
+        /// <br/>= stCliMem.SetProtectedPassword
         /// </summary>
         /// <param name="groupid"></param>
         /// <param name="strNewPassWD"></param>
-        public void SetOriginalPassWord(int groupid, string strNewPassWD)
+        public void SetPassWord(int groupid, string strNewPassWD)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
@@ -2795,25 +2795,8 @@ namespace OpenNetLinkApp.Services
                 //sgData.SetSessionKey(hsNetWork.GetSeedKey());
                 //sgData.SetTagData("NEWPASSWORD", strNewPassWD);
                 //string strEncNewPassWD = sgData.GetEncTagData("NEWPASSWORD");
-                hsNetWork.stCliMem.SetOriginalPassword(strNewPassWD);
-                CLog.Here().Information($"UserInfo SetOriginalPassword! PwLen:{strNewPassWD.Length}");
-            }
-            return;
-        }
-        /// <summary>
-        /// (DEK로 암호화된)비밀번호를 저장 
-        /// <br/>= stCliMem.SetProtectedPassword
-        /// </summary>
-        /// <param name="groupid"></param>
-        /// <param name="strNewPassWD"></param>
-        public void SetProtectedPassWord(int groupid, string strProtectedPassWD)
-        {
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-            {
-                hsNetWork.stCliMem.SetProtectedPassword(strProtectedPassWD);
-                CLog.Here().Information($"UserInfo SetProtectedPassword! PwLen:{strProtectedPassWD.Length}");
+                hsNetWork.stCliMem.SetProtectedPassword(strNewPassWD);
+                CLog.Here().Information($"UserInfo ChangePw! PwLen:{strNewPassWD.Length}");
             }
             return;
         }
@@ -2825,7 +2808,7 @@ namespace OpenNetLinkApp.Services
         public string GetPassword(int groupid)
         {
             HsNetWork hsNetWork = GetConnectNetWork(0);
-            if (hsNetWork != null)
+            if(hsNetWork != null)           
                 return hsNetWork.stCliMem.GetOriginalPassword();
             return string.Empty;
         }
