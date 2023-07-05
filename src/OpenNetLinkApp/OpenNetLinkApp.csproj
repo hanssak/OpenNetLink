@@ -1855,6 +1855,12 @@
     <None Update="Library\libbz2.so.1.0">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Library\libcrypto-1_1-x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Library\libssl-1_1-x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Library\UnAlzDll.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -155,7 +155,7 @@ namespace OpenNetLinkApp.Services
                         byte[] dData = null;
                         try
                         {
-                            SGCrypto.AESDecrypt256(hsckByte, masterKey, System.Security.Cryptography.PaddingMode.PKCS7, ref dData);
+                            SGCrypto.AESDecrypt256(hsckByte, ref masterKey, System.Security.Cryptography.PaddingMode.PKCS7, ref dData);
                             strData = Encoding.UTF8.GetString(dData);
                         }
                         catch (Exception ex)

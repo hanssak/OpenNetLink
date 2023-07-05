@@ -270,7 +270,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                         byte[] dData = null;
                         try
                         {
-                            SGCrypto.AESDecrypt256(hsckByte, masterKey, PaddingMode.PKCS7, ref dData);
+                            SGCrypto.AESDecrypt256(hsckByte, ref masterKey, PaddingMode.PKCS7, ref dData);
                             strData = Encoding.UTF8.GetString(dData);
                         }
                         catch (Exception ex)
