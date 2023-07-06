@@ -574,7 +574,13 @@
                         //02. 문서파일 압축해제 후 파일 검사
 
                         //01. 문서파일 내 OLE 개체 검사
-                        if (await GetExamCheckDocument(fileAddManage, topFile, hsStream) != 0)
+                        fileAddManage.m_bIsDrm = await fileAddManage.IsDRMbyStream(hsStream.stream);
+                        if (fileAddManage.m_bIsDrm)
+                        {
+                            fileAddManage.m_bIsDrm = false;
+                            CLog.Here().Information($"OnDropFileAdd, is DRM file - Ole inspection skip!");
+                        }
+                        else if (await GetExamCheckDocument(fileAddManage, topFile, hsStream) != 0)
                         {
                             existErr = true;
                             hsStream.stream = null;
@@ -841,7 +847,13 @@
                             //02. 문서파일 압축해제 후 파일 검사
 
                             //01. 문서파일 내 OLE 개체 검사
-                            if (await GetExamCheckDocument(fileAddManage, childFile, hsStream) != 0)
+                            fileAddManage.m_bIsDrm = await fileAddManage.IsDRMbyStream(hsStream.stream);
+                            if (fileAddManage.m_bIsDrm)
+                            {
+                                fileAddManage.m_bIsDrm = false;
+                                CLog.Here().Information($"OnDropFileAdd, is DRM file - Ole inspection skip!");
+                            }
+                            else if (await GetExamCheckDocument(fileAddManage, childFile, hsStream) != 0)
                             {
                                 existErr = true;
                                 hsStream.stream = null;
@@ -850,6 +862,7 @@
                                 SGFileExamEvent(per, hsStream.FileName);
                                 continue;
                             }
+
                         }
 
                         //HsStreamList.Add(hsStream);
@@ -1163,7 +1176,13 @@ public async Task<(List<HsStream>, bool)> SubFileAddAsync(IEnumerable<IFileRefer
                 //02. 문서파일 압축해제 후 파일 검사
 
                 //01. 문서파일 내 OLE 개체 검사
-                if (await GetExamCheckDocument(fileAddManage, currentFile, hsStream) != 0)
+                fileAddManage.m_bIsDrm = await fileAddManage.IsDRMbyStream(hsStream.stream);
+                if (fileAddManage.m_bIsDrm)
+                {
+                    fileAddManage.m_bIsDrm = false;
+                    CLog.Here().Information($"SubFileAddAsync, is DRM file - Ole inspection skip!");
+                }
+                else if (await GetExamCheckDocument(fileAddManage, currentFile, hsStream) != 0)
                 {
                     existErr = true;
                     hsStream.stream = null;
@@ -2008,12 +2027,12 @@ protected override Task OnAfterRenderAsync(bool firstRender)
         if (sgLoginData == null)
             return -1;
 
-        if (sgLoginData.IsVipUser())
+        //if (sgLoginData.IsVipUser())
+        if (false)
         {
             CLog.Here().Information($"No check OLD for Vip User");
             return 0;
         }
-
 
         string strDocumentExtractType = sgLoginData.GetDocumentExtractType(sgLoginData.GetSystemPosition());        //문서파일 내부 검사유형 (0 : 문서 검사 않함. / 1 : 모듈검사 & OLE객체 마임리스트검사 / 2 : 모듈검사 & 위변조 체크 / 3 : 모듈검사 & OLE마임리스트검사 & 위변조체크 )
         if (string.IsNullOrEmpty(strDocumentExtractType))   //ENV테이블에 해당 항목 없으면 검사X

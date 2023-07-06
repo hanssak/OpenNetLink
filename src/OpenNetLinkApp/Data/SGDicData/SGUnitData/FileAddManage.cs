@@ -529,6 +529,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         public bool bUseCrossPlatformOSforFileName = true;
 
+        /// <summary>
+        /// 검사한 파일이 drm인지 유무
+        /// </summary>
+        public bool m_bIsDrm = false;
 
         /// <summary>
         /// OLE개체 및 압축형식 검사가 필요한 문서 확장자 대상 목록 (보통)
@@ -3140,6 +3144,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return false;
         }
 
+
+        public async Task<bool> IsDRMbyStream(Stream stFile)
+        {
+            byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
+            return IsDRM(btFileData);
+        }
+
         public static bool IsDRM(byte[] btFileData)
         {
             byte[] btHLP_Header;
@@ -3252,10 +3263,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
             //btFileData = (stFile as MemoryStream).ToArray();
             /* Check DRM File */
-            if (IsDRM(btFileData) == true)
+            if (IsDRM(btFileData))
             {
-                if (blAllowDRM == true) return eFileAddErr.eFANone;
-                else return eFileAddErr.eFAUNKNOWN;
+                if (blAllowDRM)
+                    return eFileAddErr.eFANone;
+                else
+                    return eFileAddErr.eFAUNKNOWN;                   
             }
 
             string strFileMime = MimeGuesser.GuessMimeType(btFileData);
