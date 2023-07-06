@@ -339,14 +339,7 @@ FunctionEnd ; end the un.ReMoveAddFileRM
 
 Function .onInit
 
-	;SetSilent silent
-	
-	
-	
-	;Delete "$PROFILE\AppData\LocalLow\HANSSAK\*.*" ; 해당 폴더에 있는 모든 파일 삭제	
-	;RMDir "$PROFILE\AppData\LocalLow\HANSSAK"
-	
-	;Call deleteNetLink
+	SetSilent silent
 	
   ${If} ${IS_PATCH} == 'TRUE'
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
@@ -377,25 +370,6 @@ Function .onInit
   ;ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
   nsExec::Exec '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
   
-  
-	;먼저 NetLink 삭제하기
-	ExecWait '"$SYSDIR\taskkill.exe" /f /im SecureGate.exe'	
-	;ExecShell "open" "C:\HANSSAK\SecureGate\uninstall.exe"
-	HideWindow
-	${If} ${FileExists} "C:\HANSSAK\SecureGate\SecureGate.exe"
-		MessageBox MB_OK "기존 NetLink 삭제 처리가 실행됩니다." ;IDOK true IDCANCEL false
-		;true:
-		ClearErrors
-		ExecWait '"C:\HANSSAK\SecureGate\uninstall.exe'
-		HideWindow
-		IfErrors 0 noError
-		; Handle error here
-		noError:
-		
-		;false:
-		;	Abort				
-	${endif}	
-	
 FunctionEnd
 
 Function .onInstSuccess
