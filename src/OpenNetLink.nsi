@@ -71,11 +71,14 @@ VIAddVersionKey		Comments		"http://hanssak.co.kr"
 Var /GLOBAL g_AddFileRM
 Var /GLOBAL g_AddFileRM0
 Var /GLOBAL g_AddFileRM1
+Var /GLOBAL g_AddFileRM2
+
 Var /GLOBAL g_bAddFileRMFind  
 Var /GLOBAL g_iAddFileRMCount
 Var /GLOBAL g_strAddFileRMCompareStr
 Var /GLOBAL g_strAddFileRM0CompareStr
 Var /GLOBAL g_strAddFileRM1CompareStr
+Var /GLOBAL g_strAddFileRM2CompareStr
 Var /GLOBAL g_iCount
 
 Var /GLOBAL g_strNetPos			; 3망중에 다중망(중간망)인지 여부 확인(NETPOS 값 IN일때:1, CN일때:2, EX일때: 3, NCI일때:4, 없으면 0)
@@ -246,12 +249,14 @@ exit_loop:
 	Delete "${INSTALLPATH}\AddFileRMX64.dll"
         Delete "${INSTALLPATH}\AddFileRMex0X64.dll"
         Delete "${INSTALLPATH}\AddFileRMex1X64.dll"
+        Delete "${INSTALLPATH}\AddFileRMex2X64.dll"
         Delete "${INSTALLPATH}\AddFileRM.dll"
 
 	${If} ${RunningX64}
 	        StrCpy $g_AddFileRM 'AddFileRMX64.dll'
 	        StrCpy $g_AddFileRM0 'AddFileRMex0X64.dll'
 	        StrCpy $g_AddFileRM1 'AddFileRMex1X64.dll'
+	        StrCpy $g_AddFileRM2 'AddFileRMex2X64.dll'
   	${Else}        
         	StrCpy $g_AddFileRM 'AddFileRM.dll'
   	${EndIf}
@@ -307,6 +312,23 @@ exit_loop:
 			StrCpy $g_bAddFileRMFind 1         
 		ENDg_AddFileRM1:
 	${EndWhile}	
+
+	; 다중망 - 'AddFileRMex2X64.dll' 사용
+        StrCpy $g_bAddFileRMFind 0
+	StrCpy $g_iAddFileRMCount 1
+	StrCpy $g_iCount 1
+	${While} $g_bAddFileRMFind < 1
+		StrCpy $g_strAddFileRM1CompareStr $g_AddFileRM2$g_iCount
+
+		IfFileExists ${INSTALLPATH}\$g_strAddFileRM2CompareStr Findg_AddFileRM2 NotFindg_AddFileRM2
+		Findg_AddFileRM2:
+			IntOp $g_iCount $g_iCount + 1
+			goto ENDg_AddFileRM2
+		NotFindg_AddFileRM2:
+			Rename ${INSTALLPATH}\$g_AddFileRM2 ${INSTALLPATH}\$g_strAddFileRM2CompareStr
+			StrCpy $g_bAddFileRMFind 1
+		ENDg_AddFileRM2:
+	${EndWhile}
 	
 !macroend ; end the FUNC_REMOVE_ADD_FILE_RM_DLL
 
@@ -494,6 +516,7 @@ Section "MainSection" SEC01
 		  ;File "artifacts\windows\published\AddFileRMex1X64.dll"
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex1X64.dll"'
+		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex2X64.dll"'
 	  ${ElseIf}  $g_iNetPos == 4
                   ;CreateDirectory "${INSTALLPATH}\44444" ; 확인용
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
@@ -516,6 +539,7 @@ Section "MainSection" SEC01
 	  	  ;CreateDirectory "${INSTALLPATH}\22222" ; 확인용
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex1X64.dll"'
+		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex2X64.dll"'
 	  ${ElseIf}  ${NETWORK_FLAG} == 'NCI'
 	  	  ;CreateDirectory "${INSTALLPATH}\44444" ; 확인용
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
@@ -591,6 +615,7 @@ Section Uninstall
   ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMX64.dll"'
   ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMex0X64.dll"'
   ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMex1X64.dll"'
+  ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMex2X64.dll"'
 
   Delete "$SMPROGRAMS\OpenNetLink\Uninstall.lnk"
   Delete "$SMPROGRAMS\OpenNetLink\Website.lnk"
