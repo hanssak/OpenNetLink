@@ -4,6 +4,9 @@ window.GetProtectedPW = (elementID, publicKeyStr) => {
     crypt.setPublicKey(publicKeyStr);
 
     var origin = document.getElementById(elementID).value;
+    if (origin == '')
+        return '';
+
     var protectedPw = crypt.encrypt(origin);
     document.getElementById(elementID).value = protectedPw;
     crypt = null;
@@ -729,6 +732,7 @@ window.openPopUp = (popUpId) => {
         $("#left-sidebar").css("z-index", 0);
         $("#main-nav").css("z-index", 0);
     }
+
     zIndex = zIndex + 1;
     $("#" + popUpId).css("z-index", zIndex);
     $("#" + popUpId).modal("show");
@@ -938,11 +942,11 @@ window.addKeyDown = () => {
         }
     }, false);
 }
-function KeyEventPW() {
+function KeyEventPW(clickbtnId) {
     var keycode = event.keyCode;
     if (keycode == 13) {
         //console.log("Enter Key Press");
-        var button = document.getElementById('btnLogin');
+        var button = document.getElementById(clickbtnId);
 
         if (button)
             button.click();

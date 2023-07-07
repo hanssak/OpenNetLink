@@ -68,7 +68,7 @@
                             @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
                             {
                                 //AD 로그인은 PW 사용자 입력 불가 (Readonly)
-                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" onkeydown="KeyEventPW(this);" tabindex="2" autocomplete="off">
+                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" onkeydown="KeyEventPW('btnLogin');" tabindex="2" autocomplete="off">
                             }
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
                             {
@@ -147,7 +147,39 @@
     /// DEK로 암호화된 PW(base64)
     /// </summary>
     public string protectedPw;
+    /// <summary>
+    /// 암호화된 PW 변수저장 및 UI 컨트롤에 적용
+    /// </summary>
+    public async void SetProtectedPW(string getProtectedPW)
+    {
+        protectedPw = getProtectedPW;
+        await JSRuntime.InvokeVoidAsync("setElementValue", new object[] { "loginPw", getProtectedPW });
+    }
+    /// <summary>
+    /// UI Element PW를 암호화하여 가지고와서 DEK로 암호화하여 ProtectedPW로 저장
+    /// </summary>
+    public async Task SetProtectedPWFromUI()
+    {
+        byte[] originalPW = new byte[1];
+        OpenSSL.Crypto.RSA rsa = new OpenSSL.Crypto.RSA();
+        try
+        {
+            rsa.GenerateKeys(2048, 3, null, null);
+            var encPW = await JSRuntime.InvokeAsync<object>("GetProtectedPW", new object[] { "loginPw", rsa.PublicKey });
+            originalPW = rsa.PrivateDecrypt(Convert.FromBase64String(encPW.ToString()), OpenSSL.Crypto.RSA.Padding.PKCS1);
 
+            SetProtectedPW(SGCrypto.AESEncrypt256WithDEK(originalPW));
+        }
+        catch(Exception ex)
+        {
+            CLog.Here().Error($"SetProtectedPWFromUI - Exception - Msg : {ex.Message}");
+        }
+        finally
+        {
+            originalPW.hsClear(3);
+            rsa.Dispose();
+        }
+    }
     @* private void OnInput(string value)
         {
         var newValue = value ?? string.Empty;
@@ -349,24 +381,7 @@
     /// </summary>
     public async void ClickdoLogin()
     {
-        byte[] jsEncPW = new byte[1];
-        byte[] originalPW = new byte[1];
-        RSACryptoServiceProvider ras = new RSACryptoServiceProvider(2048);
-        try
-        {
-            var encPW = await JSRuntime.InvokeAsync<object>("GetProtectedPW", new object[] { "loginPw", ras.GetRsaPublicKeyBase64String() });
-
-            jsEncPW = Convert.FromBase64String(encPW.ToString());
-            originalPW = ras.Decrypt(jsEncPW, RSAEncryptionPadding.Pkcs1);
-
-            protectedPw = SGCrypto.AESEncrypt256WithDEK(originalPW);
-            await JSRuntime.InvokeVoidAsync("setElementValue", new object[] { "loginPw", protectedPw });
-        }
-        finally
-        {
-            jsEncPW.hsClear(3);
-            originalPW.hsClear(3);
-        }
+        await SetProtectedPWFromUI();
 
         int groupid = pageService.m_nCurViewPageGroupID;
 
@@ -648,8 +663,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 #if DEBUG
     originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 #endif
-            protectedPw = SGCrypto.AESEncrypt256WithDEK(originalPW);
-            JSRuntime.InvokeVoidAsync("setElementValue", new object[] { "loginPw", protectedPw });
+            SetProtectedPW(SGCrypto.AESEncrypt256WithDEK(originalPW));
 
             ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";
@@ -834,14 +848,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
                 SGRSACrypto sgRSACrypto = new SGRSACrypto();
                 string strID = "";
-                string strProtectedPW = "";
                 sgRSACrypto.ValueDecrypt(strEncID, out strID);
                 id = strID;
                 // Logout 으로 인해 온 상황에서는 PW를 표시하지 않고, 로그인도하지 않음.
                 if (srcLoc != "Logout")
                 {
-                    sgRSACrypto.ValueDecrypt(strEncPW, out protectedPw);
-                    await JSRuntime.InvokeVoidAsync("setElementValue", new object[] { "loginPw", protectedPw });
+                    sgRSACrypto.ValueDecrypt(strEncPW, out string pw);
+                    SetProtectedPW(pw);
                 }
 
                 StateHasChanged();
@@ -2648,15 +2661,16 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             //옵션에 따라, 저장된 '초기비밀번호'와 동일할 경우 초기 비밀번호로 인지
             SGRSACrypto sgRSACrypto = new SGRSACrypto();
             sgRSACrypto.ValueDecrypt(strInitPW, ref initPw);
-            string initPwBase64 = Convert.ToBase64String(initPw);
+            string encInitPW =SGCrypto.AESEncrypt256WithDEK(initPw);
 
-            if (initPwBase64 == protectedPw)
+            if (encInitPW== protectedPw)
                 return true;
 
             //옵션에 따라, ID와 동일할 경우 초기 비밀번호로 인지
             if (SGAppMgrSvc.OpConfigInfoService.GetUseIDAsInitPassword(groupID))
             {
                 string encID = SGCrypto.AESEncrypt256WithDEK(Encoding.UTF8.GetBytes(id));
+                
                 if (encID == protectedPw)
                     return true;
             }
@@ -2718,13 +2732,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-                {
-                    return true;
-                    }
-    else
-        return false;
+                    {
+        return true;
+        }
+            else
+                return false;
 
-            }
+                    }
     */
 
 }

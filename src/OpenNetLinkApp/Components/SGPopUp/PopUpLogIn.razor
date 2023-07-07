@@ -13,6 +13,7 @@
 @using System.Threading
 @using OpenNetLinkApp.Common
 @using System.Text.Json;
+@using System.Text
 
 @inherits LayoutComponentBase
 @inject HSCmdCenter HSCmdCenter
@@ -60,7 +61,7 @@
                             {
                                 <div class="input-group mb-2">
                                     @*AD 로그인은 PW 사용자 입력 불가 (Readonly)*@
-                                    <input type="password" class="form-control-login" placeholder="Password" readonly="@(eLoginUITypeData== eLoginType.eLOGINTYPE_AD)" value="@pw" @oninput="@(e => pw = e.Value.ToString())" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2">
+                                    <input id="popUploginPw" type="password" class="form-control-login" placeholder="Password" readonly="@(eLoginUITypeData== eLoginType.eLOGINTYPE_AD)" onkeydown="KeyEventPW('btnPopUpLogin')" disabled=@bUIBtnDisable tabindex="2">
                                 </div>
                             }
                             @if (eLoginUITypeData == eLoginType.eLOGINTYPE_PW_OTP || eLoginUITypeData == eLoginType.eLOGINTYPE_OTP) //PW_OTP(4), OTP(5)
@@ -82,7 +83,7 @@
                                     </div>
                                 }
                                 <div class="col-12  pt-2">
-                                    <button class="btn btn-login btn-block btn_blue" @onclick="doLogInByBtn" disabled=@bUIBtnDisable>LOGIN</button>
+                                    <button id="btnPopUpLogin" class="btn btn-login btn-block btn_blue" @onclick="doLogInByBtn" disabled=@bUIBtnDisable>LOGIN</button>
                                 </div>
                                 <div class="col-12 text-center pt-3">COPYRIGHT &copy HANSSAK. ALL RIGHTS RESERVED</div>
 
@@ -136,7 +137,44 @@
     SGSettingsDBProc sgSettingProc = null;
 
     public string id { get; set; }
-    public string pw { get; set; }
+    //public string pw { get; set; }
+    /// <summary>
+    /// DEK로 암호화된 PW(base64)
+    /// </summary>
+    public string protectedPw;
+    /// <summary>
+    /// 암호화된 PW 변수저장 및 UI 컨트롤에 적용
+    /// </summary>
+    public async void SetProtectedPW(string getProtectedPW)
+    {
+        protectedPw = getProtectedPW;
+        await JSRuntime.InvokeVoidAsync("setElementValue", new object[] { "popUploginPw", getProtectedPW });
+    }
+     /// <summary>
+    /// UI Element PW를 암호화하여 가지고와서 DEK로 암호화하여 ProtectedPW로 저장
+    /// </summary>
+    public async Task SetProtectedPWFromUI()
+    {
+        byte[] originalPW = new byte[1];
+        OpenSSL.Crypto.RSA rsa = new OpenSSL.Crypto.RSA();
+        try
+        {
+            rsa.GenerateKeys(2048, 3, null, null);
+            var encPW = await JSRuntime.InvokeAsync<object>("GetProtectedPW", new object[] { "popUploginPw", rsa.PublicKey });
+            originalPW = rsa.PrivateDecrypt(Convert.FromBase64String(encPW.ToString()), OpenSSL.Crypto.RSA.Padding.PKCS1);
+
+            SetProtectedPW(SGCrypto.AESEncrypt256WithDEK(originalPW));
+        }
+        catch(Exception ex)
+        {
+            CLog.Here().Error($"SetProtectedPWFromUI - Exception - Msg : {ex.Message}");
+        }
+        finally
+        {
+            originalPW.hsClear(3);
+            rsa.Dispose();
+        }
+    }
     public string url { get; set; }
     public string otp { get; set; }
 
@@ -153,7 +191,8 @@
         bUIBtnDisable = false;
         bStartedLogin = false;
         id = "";
-        pw = "";
+        SetProtectedPW("");
+
         refGoogleOTP.strUserOTP = "";
 
         closeUIPopup();
@@ -238,7 +277,7 @@
     {
         bUIBtnDisable = false;
         id = "";
-        pw = "";
+        SetProtectedPW("");
     }
 
     /// <summary>
@@ -309,8 +348,10 @@
     /// <summary>
     /// UI상에 로그인 버튼을 눌러서 로그인할때 호출
     /// </summary>
-    private void doLogInByBtn()
+    private async void doLogInByBtn()
     {
+       
+        await SetProtectedPWFromUI();
 
         CLog.Here().Information($"PopupLogin - doLogInByBtn - groupid : {nGroupID}");
 
@@ -339,7 +380,7 @@
                 strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-        strPW = "HsckAD.com";
+    strPW = "HsckAD.com";
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -376,7 +417,7 @@
         return false;
     }
 
-
+@*
     /// <summary>
     ///
     /// </summary>
@@ -432,10 +473,10 @@
             int nData = 0;
 
 #if DEBUG  // SITE배포용도
-        //#if false  // SITE배포용도
-        CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
-        strData = "1";
-        stRtn = "1";
+    //#if false  // SITE배포용도
+    CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
+    strData = "1";
+    stRtn = "1";
 #else
 
             stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
@@ -483,7 +524,7 @@
         return bRet;
 
     }
-
+*@
 
     /// <summary>
     /// 로그인 Type 상관없이 2번째 망이상에서는 이함수로 Login 진행
@@ -503,7 +544,7 @@
                 return;
             }
 
-            if ((pw?.Length ?? 0) < 1)
+            if ((protectedPw?.Length ?? 0) < 1)
             {
                 ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
                 return;
@@ -541,9 +582,9 @@
             CLog.Here().Information($"doLogin, try Login Type : {eLoginUITypeData}");
 
             if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
-                HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginUITypeData);
+                HSCmdCenter.LoginAD(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginUITypeData);
             else
-                HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginUITypeData);
+                HSCmdCenter.Login(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginUITypeData);
 
         }
         catch (Exception ex)
@@ -707,7 +748,10 @@
                         sgRSACrypto.ValueDecrypt(strEncID, out strID);
                         sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
                         id = strID;
-                        pw = strPW;
+
+                        sgRSACrypto.ValueDecrypt(strEncPW, out string pw);
+                        SetProtectedPW(pw);
+
                         StateHasChanged();
                         await Task.Delay(500);
                         doLogIn();
@@ -720,29 +764,36 @@
             }
             else if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
             {
-                // AD로그인
-                // Mac Test 결과에 따라 변경
-                id = Environment.UserName;
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                    pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
+                byte[] originalPW = new byte[1];
+                try
+                {
+                    // AD로그인
+                    // Mac Test 결과에 따라 변경
+                    id = Environment.UserName;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                        originalPW = Encoding.UTF8.GetBytes(IPGlobalProperties.GetIPGlobalProperties().DomainName.ToLower());
+                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                        originalPW = Encoding.UTF8.GetBytes(OSxCmdService.GetOSXADConfig("Active Directory Domain").ToLower());
 
 #if DEBUG
-            pw = "HsckAD.com";
+    originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 #endif
-                pw = pw.ToLower();
 
-                // PW 암호화해서 Log남김
-                string strCheckData = "";
-                SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                sgRSACrypto?.ValueEncrypt(pw, out strCheckData);
-                CLog.Here().Information($"PopupLogin(nGroupID :{nGroupID}) - ADLogin - ###### - PWCheck : {strCheckData}");
+                    CLog.Here().Information($"PopupLogin(nGroupID :{nGroupID}) - ADLogin - ###### - PWCheck : {protectedPw}");
 
-                StateHasChanged();
-                await Task.Delay(100);
-                doLogIn();
-                StateHasChanged();
+                    StateHasChanged();
+                    await Task.Delay(100);
+                    doLogIn();
+                    StateHasChanged();
+                }
+                catch (Exception ex)
+                {
+                    CLog.Here().Error($"OnAfterRenderAsync - Exception - Msg : {ex.Message}");
+                }
+                finally
+                {
+                    originalPW.hsClear(3);
+                }
             }
         }
 
@@ -757,19 +808,40 @@
     /// <returns></returns>
     public bool GetInitPWLogin(int groupID)
     {
-        // siteConfig. json으로 이동
-        string strInitPW = SGAppMgrSvc.OpConfigInfoService.GetInitPasswordInfo(groupID);
+        byte[] initPw = new byte[1];
+        try
+        {
+            // siteConfig. json으로 이동
+            string strInitPW = SGAppMgrSvc.OpConfigInfoService.GetInitPasswordInfo(groupID);
 
-        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+            //옵션에 따라, 저장된 '초기비밀번호'와 동일할 경우 초기 비밀번호로 인지
+            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+            sgRSACrypto.ValueDecrypt(strInitPW, ref initPw);
+           string encInitPW =SGCrypto.AESEncrypt256WithDEK(initPw);
 
-        string strEncPW = "";
-        sgRSACrypto.ValueEncrypt(pw, out strEncPW);
-        if (strEncPW.Equals(strInitPW))
-            return true;
-        //옵션에 따라, ID와 동일할 경우 초기 비밀번호로 인지
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseIDAsInitPassword(groupID) && id == pw)
-            return true;
-        return false;
+            if (encInitPW== protectedPw)
+                return true;
+
+            //옵션에 따라, ID와 동일할 경우 초기 비밀번호로 인지
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseIDAsInitPassword(groupID))
+            {
+                string encID = SGCrypto.AESEncrypt256WithDEK(Encoding.UTF8.GetBytes(id));
+
+                if (encID == protectedPw)
+                    return true;
+            }
+            return false;
+
+        }
+        catch (Exception ex)
+        {
+            HsLog.err($"GetInitPWLogin-{ex.ToString()}");
+            throw;
+        }
+        finally
+        {
+            initPw.hsClear(3);
+        }
     }
 
     /// <summary>
@@ -788,7 +860,7 @@
         if (hsNetWork != null)
         {
             pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
-            HSCmdCenter.SetOriginalPassWord(groupId, pw); //hsNetWork.SetUserPassword(pw);
+            HSCmdCenter.SetProtectedPassWord(groupId, protectedPw); //hsNetWork.SetUserPassword(pw);
         }
 
         if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId))
@@ -808,7 +880,7 @@
 
                 eResultIdPwAfterJob = eIDPWresultJob.eNone;
                 //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
-                HSCmdCenter.sgPageEvent.OSNotification(groupId,OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg);//Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg);//Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
 
                 goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
                 return true;
@@ -874,8 +946,8 @@
                 // 완료 처리!!!
                 eResultIdPwAfterJob = eIDPWresultJob.eNone;
                 HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");//Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-                
-                    goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+
+                goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
             }
         }
 
@@ -973,7 +1045,7 @@
         if (hsNetWork != null)
         {
             pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
-            HSCmdCenter.SetOriginalPassWord(groupId, pw); //hsNetWork.SetPassWord(pw);
+            HSCmdCenter.SetProtectedPassWord(groupId, protectedPw); //hsNetWork.SetPassWord(pw);
         }
 
         eResultIdPwAfterJob = eIDPWresultJob.eNone;
@@ -995,10 +1067,10 @@
                     SGRSACrypto sgRSACrypto = new SGRSACrypto();
                     string strEncID = "";
                     string strEncPW = "";
-                    if ((!id.Equals("")) & (id != null) & (!pw.Equals("")) & (pw != null))
+                    if ((!id.Equals("")) & (id != null) & (!protectedPw.Equals("")) & (protectedPw != null))
                     {
                         sgRSACrypto?.ValueEncrypt(id, out strEncID);
-                        sgRSACrypto?.ValueEncrypt(pw, out strEncPW);
+                        sgRSACrypto?.ValueEncrypt(protectedPw, out strEncPW);
 
                         sgSettingProc.SetSettingUID(groupId, strEncID);
                         sgSettingProc.SetSettingUPW(groupId, strEncPW);
@@ -1038,7 +1110,7 @@
                         return false;
                     }
 
-                    pw = "";
+                    //pw = "";
                     bAutoLoginCheck = false;
 
                     if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
@@ -1108,7 +1180,7 @@
             }
             else
             {
-                pw = "";
+                SetProtectedPW("");
                 bAutoLoginCheck = false;
             }
 

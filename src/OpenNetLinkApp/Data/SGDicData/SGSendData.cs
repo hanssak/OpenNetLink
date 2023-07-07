@@ -133,13 +133,13 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_URLLIST", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
-        public int RequestChangePasswd(HsNetWork hsNet, int groupid, string strUserID, string strOldPassword, string strNewPassword)
+        public int RequestChangePasswd(HsNetWork hsNet, int groupid, string strUserID, string strProtectedOldPassword, string strProtectedNewPassword)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
-            dic["OLDPASSWORD"] = strOldPassword;
-            dic["NEWPASSWORD"] = strNewPassword;
+            dic["OLDPASSWORD"] = strProtectedOldPassword;
+            dic["NEWPASSWORD"] = strProtectedNewPassword;
             SGEventArgs args = sendParser.RequestChangePW("CMD_STR_CHANGEPASSWORD", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
@@ -842,16 +842,16 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_ZIPDEPTHINFO", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
-        public int RequestSendChangePassWD(HsNetWork hsNet, string strUserID, string strOldPassWD, string strNewPassWD)
-        {
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            dic["APPID"] = "0x00000000";
-            dic["CLIENTID"] = strUserID;
-            dic["OLDPASSWORD"] = strOldPassWD;
-            dic["NEWPASSWORD"] = strNewPassWD;
-            SGEventArgs args = sendParser.RequestChangePW("CMD_STR_CHANGEPASSWORD", dic, hsNet.stCliMem.GetProtectedSeedKey());
-            return hsNet.SendMessage(args);
-        }
+        //public int RequestSendChangePassWD(HsNetWork hsNet, string strUserID, string strOldPassWD, string strNewPassWD)
+        //{
+        //    Dictionary<string, string> dic = new Dictionary<string, string>();
+        //    dic["APPID"] = "0x00000000";
+        //    dic["CLIENTID"] = strUserID;
+        //    dic["OLDPASSWORD"] = strOldPassWD;
+        //    dic["NEWPASSWORD"] = strNewPassWD;
+        //    SGEventArgs args = sendParser.RequestChangePW("CMD_STR_CHANGEPASSWORD", dic, hsNet.stCliMem.GetProtectedSeedKey());
+        //    return hsNet.SendMessage(args);
+        //}
 
         public int RequestSendDashBoardCountQuery(HsNetWork hsNet, string strUserID, string strQuery)
         {

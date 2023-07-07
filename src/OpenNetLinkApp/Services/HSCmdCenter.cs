@@ -2253,12 +2253,12 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int SendChangePasswd(int groupid, string strUserID, string strOldPasswd, string strNewPasswd)
+        public int SendChangePasswd(int groupid, string strUserID, string strProtectedOldPasswd, string strProtectedNewPasswd)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestChangePasswd(hsNetWork, groupid, strUserID, strOldPasswd, strNewPasswd);
+                return sgSendData.RequestChangePasswd(hsNetWork, groupid, strUserID, strProtectedOldPasswd, strProtectedNewPasswd);
             return -1;
         }
         public int SendOTPNumber(int groupid, string strUserID, string otpNumber)
@@ -2819,6 +2819,18 @@ namespace OpenNetLinkApp.Services
         }
 
         /// <summary>
+        /// (DEK로 암호화된)비밀번호를 반환 
+        /// <br/>= stCliMem.GetProtectedPassword
+        /// </summary>
+        public string GetProtectedPassword(int groupid)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(0);
+            if (hsNetWork != null)
+                return hsNetWork.stCliMem.GetProtectedPassword();
+            return string.Empty;
+        }
+
+        /// <summary>
         /// 비밀번호 원본 호출
         /// <br/>= stCliMem.GetOriginalPassword
         /// </summary>
@@ -2829,6 +2841,7 @@ namespace OpenNetLinkApp.Services
                 return hsNetWork.stCliMem.GetOriginalPassword();
             return string.Empty;
         }
+
 
         public void SetCliVersion(string strCliVersion)
         {
