@@ -318,7 +318,7 @@ exit_loop:
 	StrCpy $g_iAddFileRMCount 1
 	StrCpy $g_iCount 1
 	${While} $g_bAddFileRMFind < 1
-		StrCpy $g_strAddFileRM1CompareStr $g_AddFileRM2$g_iCount
+		StrCpy $g_strAddFileRM2CompareStr $g_AddFileRM2$g_iCount
 
 		IfFileExists ${INSTALLPATH}\$g_strAddFileRM2CompareStr Findg_AddFileRM2 NotFindg_AddFileRM2
 		Findg_AddFileRM2:
