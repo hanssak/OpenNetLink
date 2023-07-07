@@ -166,11 +166,17 @@
         {
             rsa.GenerateKeys(2048, 3, null, null);
             var encPW = await JSRuntime.InvokeAsync<object>("GetProtectedPW", new object[] { "loginPw", rsa.PublicKey });
-            originalPW = rsa.PrivateDecrypt(Convert.FromBase64String(encPW.ToString()), OpenSSL.Crypto.RSA.Padding.PKCS1);
-
-            SetProtectedPW(SGCrypto.AESEncrypt256WithDEK(originalPW));
+            if (string.IsNullOrEmpty(encPW.ToString()))
+            {
+                SetProtectedPW(string.Empty);
+            }
+            else
+            {
+                originalPW = rsa.PrivateDecrypt(Convert.FromBase64String(encPW.ToString()), OpenSSL.Crypto.RSA.Padding.PKCS1);
+                SetProtectedPW(SGCrypto.AESEncrypt256WithDEK(originalPW));
+            }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             CLog.Here().Error($"SetProtectedPWFromUI - Exception - Msg : {ex.Message}");
         }
@@ -2661,16 +2667,16 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             //옵션에 따라, 저장된 '초기비밀번호'와 동일할 경우 초기 비밀번호로 인지
             SGRSACrypto sgRSACrypto = new SGRSACrypto();
             sgRSACrypto.ValueDecrypt(strInitPW, ref initPw);
-            string encInitPW =SGCrypto.AESEncrypt256WithDEK(initPw);
+            string encInitPW = SGCrypto.AESEncrypt256WithDEK(initPw);
 
-            if (encInitPW== protectedPw)
+            if (encInitPW == protectedPw)
                 return true;
 
             //옵션에 따라, ID와 동일할 경우 초기 비밀번호로 인지
             if (SGAppMgrSvc.OpConfigInfoService.GetUseIDAsInitPassword(groupID))
             {
                 string encID = SGCrypto.AESEncrypt256WithDEK(Encoding.UTF8.GetBytes(id));
-                
+
                 if (encID == protectedPw)
                     return true;
             }
@@ -2732,13 +2738,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-                    {
+        {
         return true;
-        }
-            else
-                return false;
+            }
+                else
+                    return false;
 
-                    }
+                        }
     */
 
 }

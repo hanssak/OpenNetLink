@@ -161,9 +161,15 @@
         {
             rsa.GenerateKeys(2048, 3, null, null);
             var encPW = await JSRuntime.InvokeAsync<object>("GetProtectedPW", new object[] { "popUploginPw", rsa.PublicKey });
-            originalPW = rsa.PrivateDecrypt(Convert.FromBase64String(encPW.ToString()), OpenSSL.Crypto.RSA.Padding.PKCS1);
-
-            SetProtectedPW(SGCrypto.AESEncrypt256WithDEK(originalPW));
+            if (string.IsNullOrEmpty(encPW.ToString()))
+            {
+                SetProtectedPW(string.Empty);
+            }
+            else
+            {
+                originalPW = rsa.PrivateDecrypt(Convert.FromBase64String(encPW.ToString()), OpenSSL.Crypto.RSA.Padding.PKCS1);
+                SetProtectedPW(SGCrypto.AESEncrypt256WithDEK(originalPW));
+            }
         }
         catch(Exception ex)
         {
