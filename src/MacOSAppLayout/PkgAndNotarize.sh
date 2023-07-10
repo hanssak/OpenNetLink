@@ -34,8 +34,7 @@ dev_team="L7W5N48H4G"
 
 # the label of the keychain item which contains an app-specific password
 # dev_keychain_label="Developer-altool"
-# dev_keychain_label="eumg-vmam-nluz-ygto"
-dev_keychain_label="sxog-tiki-hjrx-pxfs"
+dev_keychain_label="eumg-vmam-nluz-ygto"
 
 
 # put your project's information into these variables
@@ -98,25 +97,13 @@ notarizefile() { # $1: path to file to notarize, $2: identifier
     # upload file
     echo "## uploading $filepath for notarization"
                                #--password "@keychain:$dev_keychain_label" \
-    # requestUUID=$(xcrun altool --notarize-app \
-    #                           --primary-bundle-id "$identifier" \
-    #                           --username "$dev_account" \
-    #                           --password "$dev_keychain_label" \
-    #                           --asc-provider "$dev_team" \
-    #                           --file "$filepath" 2>&1 \
-    #              | awk '/RequestUUID/ { print $NF; }')
-
-    requestUUID1=$(xcrun altool --notarize-app \
+    requestUUID=$(xcrun altool --notarize-app \
                                --primary-bundle-id "$identifier" \
                                --username "$dev_account" \
                                --password "$dev_keychain_label" \
                                --asc-provider "$dev_team" \
-                               --file "$filepath" 2>&1)
-
-    echo "------------------ vervoses (debug) ----------------"
-    echo $requestUUID1
-
-    requestUUID=$(echo $requestUUID1 | awk '/RequestUUID/ { print $NF; }')    
+                               --file "$filepath" 2>&1 \
+                  | awk '/RequestUUID/ { print $NF; }')
                                
     echo "Notarization RequestUUID: $requestUUID"
     
