@@ -1913,7 +1913,13 @@
     <None Update="Library\libcrypto-1_1-x64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Library\libcrypto.so.1.1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Library\libssl-1_1-x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Library\libssl.so.1.1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Library\UnAlzDll.dll">
