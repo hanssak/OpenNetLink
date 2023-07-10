@@ -57,14 +57,14 @@ InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
 
-; ì„¤ì¹˜íŒŒì¼ì •ë³´
-VIProductVersion	"${PRODUCT_VERSION}"							; íŒŒì¼ë²„ì „
-VIAddVersionKey		FileVersion		"${PRODUCT_VERSION}"				; íŒŒì¼ë²„ì „
-VIAddVersionKey		FileDescription	"PC Data Transmission System"		; íŒŒì¼ì„¤ëª…
-VIAddVersionKey		ProductName		"SecureGate"						; ì œí’ˆì´ë¦„
-VIAddVersionKey		ProductVersion	"3.5.1.0"							; ì œí’ˆë²„ì „
-VIAddVersionKey		LegalCopyright	"Hanssaksystem Co., Ltd."			; ì €ì‘ê¶Œ
-VIAddVersionKey		CompanyName		"Hanssaksystem Co., Ltd."			; íšŒì‚¬ëª…
+; ¼³Ä¡ÆÄÀÏÁ¤º¸
+VIProductVersion	"${PRODUCT_VERSION}"							; ÆÄÀÏ¹öÀü
+VIAddVersionKey		FileVersion		"${PRODUCT_VERSION}"				; ÆÄÀÏ¹öÀü
+VIAddVersionKey		FileDescription	"PC Data Transmission System"		; ÆÄÀÏ¼³¸í
+VIAddVersionKey		ProductName		"SecureGate"						; Á¦Ç°ÀÌ¸§
+VIAddVersionKey		ProductVersion	"3.5.1.0"							; Á¦Ç°¹öÀü
+VIAddVersionKey		LegalCopyright	"Hanssaksystem Co., Ltd."			; ÀúÀÛ±Ç
+VIAddVersionKey		CompanyName		"Hanssaksystem Co., Ltd."			; È¸»ç¸í
 VIAddVersionKey		Comments		"http://hanssak.co.kr"
 
 ; Global Variable
@@ -81,26 +81,26 @@ Var /GLOBAL g_strAddFileRM1CompareStr
 Var /GLOBAL g_strAddFileRM2CompareStr
 Var /GLOBAL g_iCount
 
-Var /GLOBAL g_strNetPos			; 3ë§ì¤‘ì— ë‹¤ì¤‘ë§(ì¤‘ê°„ë§)ì¸ì§€ ì—¬ë¶€ í™•ì¸(NETPOS ê°’ INì¼ë•Œ:1, CNì¼ë•Œ:2, EXì¼ë•Œ: 3, NCIì¼ë•Œ:4, ì—†ìœ¼ë©´ 0)
-Var /GLOBAL g_iNetPos			; 3ë§ì¤‘ì— ë‹¤ì¤‘ë§(ì¤‘ê°„ë§)ì¸ì§€ ì—¬ë¶€ ("IN": ì¤‘ìš”ë‹¨ë§, "CN": ì¤‘ê°„ë§-ë‹¤ì¤‘ë§(ì—…ë¬´ë§), "NCI": ì¤‘ê°„ë§-ì¸í„°ë„·ë§(ì—…ë¬´ë§), "EX" : ì¸í„°ë„·ë§), IN(1) / CN(2) / OUT(3) / NCI(4) / NotFound(0)
-Var /GLOBAL g_iPatchEdge	        ; edge(wwwroot\edge)-patchì§„í–‰ì—¬ë¶€
-Var /GLOBAL g_UseStartProgram	        ; Bootingì‹œì— agent ìë™ì‹œì‘ ë˜ê²Œí•  ì§€ ì—¬ë¶€
+Var /GLOBAL g_strNetPos			; 3¸ÁÁß¿¡ ´ÙÁß¸Á(Áß°£¸Á)ÀÎÁö ¿©ºÎ È®ÀÎ(NETPOS °ª INÀÏ¶§:1, CNÀÏ¶§:2, EXÀÏ¶§: 3, NCIÀÏ¶§:4, ¾øÀ¸¸é 0)
+Var /GLOBAL g_iNetPos			; 3¸ÁÁß¿¡ ´ÙÁß¸Á(Áß°£¸Á)ÀÎÁö ¿©ºÎ ("IN": Áß¿ä´Ü¸», "CN": Áß°£¸Á-´ÙÁß¸Á(¾÷¹«¸Á), "NCI": Áß°£¸Á-ÀÎÅÍ³İ¸Á(¾÷¹«¸Á), "EX" : ÀÎÅÍ³İ¸Á), IN(1) / CN(2) / OUT(3) / NCI(4) / NotFound(0)
+Var /GLOBAL g_iPatchEdge	        ; edge(wwwroot\edge)-patchÁøÇà¿©ºÎ
+Var /GLOBAL g_UseStartProgram	        ; Booting½Ã¿¡ agent ÀÚµ¿½ÃÀÛ µÇ°ÔÇÒ Áö ¿©ºÎ
 
-; ---------------------------- StrContains í•¨ìˆ˜(Start) -----------------------------------
+; ---------------------------- StrContains ÇÔ¼ö(Start) -----------------------------------
 !macro _StrContains un
 	Function ${un}_StrContains
-		Push $R0 # ì°¾ì„ ë¬¸ìì—´
+		Push $R0 # Ã£À» ¹®ÀÚ¿­
 		Exch
 		Pop $R0
-		Push $R1 # ì›ë³¸ ë¬¸ìì—´
+		Push $R1 # ¿øº» ¹®ÀÚ¿­
 		Exch 2
 		Pop $R1
-		Push $R2 # ë¦¬í„´ ë¬¸ìì—´
+		Push $R2 # ¸®ÅÏ ¹®ÀÚ¿­
 		Push $R3
 		Push $R4
 		Push $R5
 		Push $R6
-		;MessageBox MB_OK "ì°¾ì„ ë¬¸ìì—´[$R0], ì›ë³¸ ë¬¸ìì—´[$R1]"
+		;MessageBox MB_OK "Ã£À» ¹®ÀÚ¿­[$R0], ¿øº» ¹®ÀÚ¿­[$R1]"
 		StrCpy $R2 ""
 		StrCpy $R3 -1
 		StrLen $R4 $R0
@@ -139,9 +139,9 @@ Var /GLOBAL g_UseStartProgram	        ; Bootingì‹œì— agent ìë™ì‹œì‘ ë˜ê²Œí
 	Pop "${OUTPUT}"
 !macroend
 !define StrContains "!insertmacro StrContains"
-; ---------------------------- StrContains í•¨ìˆ˜(End) -----------------------------------
+; ---------------------------- StrContains ÇÔ¼ö(End) -----------------------------------
 
-; Patch Mode ì¼ë•Œì—ë§Œ ì‚¬ìš©
+; Patch Mode ÀÏ¶§¿¡¸¸ »ç¿ë
 !macro FUNC_GETNETPOS UN
 
     StrCpy $g_strNetPos ""
@@ -152,26 +152,26 @@ Var /GLOBAL g_UseStartProgram	        ; Bootingì‹œì— agent ìë™ì‹œì‘ ë˜ê²Œí
     LOOP:
     
     ClearErrors
-    FileRead $0 $1		; Line ë‹¨ìœ„ë¡œ ì½ìŒ
+    FileRead $0 $1		; Line ´ÜÀ§·Î ÀĞÀ½
     StrCpy $g_strNetPos $1
     
-    ; í™•ì¸ìš©ë„
+    ; È®ÀÎ¿ëµµ
     ;MessageBox MB_ICONINFORMATION|MB_OK $g_strNetPos
     IfErrors notfoundNETPOS
     
     ${StrContains} $1 "NETPOS" $g_strNetPos    
     StrCmp $1 "" LOOP
     
-    ; í™•ì¸ìš©ë„
-    ;MessageBox MB_ICONINFORMATION|MB_OK "'NETPOS' ë°œê²¬í•¨!"    
+    ; È®ÀÎ¿ëµµ
+    ;MessageBox MB_ICONINFORMATION|MB_OK "'NETPOS' ¹ß°ßÇÔ!"    
 
     ${StrContains} $1 "CN" $g_strNetPos 
     StrCmp $1 "" notfoundCn
     StrCpy $g_iNetPos 2 
     
-    ; í™•ì¸ìš©ë„    
+    ; È®ÀÎ¿ëµµ    
     ;CreateDirectory "${INSTALLPATH}\22222"
-    ;MessageBox MB_ICONINFORMATION|MB_OK "#CN# ë°œê²¬í•¨!"    
+    ;MessageBox MB_ICONINFORMATION|MB_OK "#CN# ¹ß°ßÇÔ!"    
     
     Goto exit_loop    
 
@@ -181,9 +181,9 @@ notfoundCn:
     StrCmp $1 "" notfoundNCI
     StrCpy $g_iNetPos 4
 
-    ; í™•ì¸ìš©ë„
+    ; È®ÀÎ¿ëµµ
     ;CreateDirectory "${INSTALLPATH}\41111"
-    ;MessageBox MB_ICONINFORMATION|MB_OK "#IN# ë°œê²¬í•¨!"
+    ;MessageBox MB_ICONINFORMATION|MB_OK "#IN# ¹ß°ßÇÔ!"
     Goto exit_loop
 
 
@@ -193,16 +193,16 @@ notfoundNCI:
     StrCmp $1 "" notfoundIN
     StrCpy $g_iNetPos 1    
     
-    ; í™•ì¸ìš©ë„    
+    ; È®ÀÎ¿ëµµ    
     ;CreateDirectory "${INSTALLPATH}\11111"
-    ;MessageBox MB_ICONINFORMATION|MB_OK "#IN# ë°œê²¬í•¨!"    
+    ;MessageBox MB_ICONINFORMATION|MB_OK "#IN# ¹ß°ßÇÔ!"    
     Goto exit_loop    
 
 notfoundIN:
 
-    StrCpy $g_iNetPos 3  ; EX(3) ë¡œ íŒë‹¨
+    StrCpy $g_iNetPos 3  ; EX(3) ·Î ÆÇ´Ü
     ;CreateDirectory "${INSTALLPATH}\33333"
-    ;MessageBox MB_ICONINFORMATION|MB_OK "#EX# (CN/IN ë°œê²¬ëª»í•¨)!"
+    ;MessageBox MB_ICONINFORMATION|MB_OK "#EX# (CN/IN ¹ß°ß¸øÇÔ)!"
 
 notfoundNETPOS:
     StrCpy $g_iNetPos 0
@@ -218,33 +218,33 @@ exit_loop:
 
 !macro FUNC_SETCONFIG UN
 
-	; siteConfig - ì„¤ì •
+	; siteConfig - ¼³Á¤
 
 
-	; ê¸°ì¡´ ì„¤ì¹˜ íŒŒì¼ ë®ì–´ì“°ê¸° ë°©ì‹ (0), ê¸°ì¡´ ì„¤ì¹˜ íŒŒì¼ uninstall í›„ ì„¤ì¹˜ (1)
+	; ±âÁ¸ ¼³Ä¡ ÆÄÀÏ µ¤¾î¾²±â ¹æ½Ä (0), ±âÁ¸ ¼³Ä¡ ÆÄÀÏ uninstall ÈÄ ¼³Ä¡ (1)
 	; StrCpy $g_InstallOp 0
 
-	; ì‹œì‘í”„ë¡œê·¸ë¨ì— ë“±ë¡	ë¯¸ì‚¬ìš©(0), ì‚¬ìš©(1) - ì‘ì—…í•´ì•¼í•¨
+	; ½ÃÀÛÇÁ·Î±×·¥¿¡ µî·Ï	¹Ì»ç¿ë(0), »ç¿ë(1) - ÀÛ¾÷ÇØ¾ßÇÔ
 	StrCpy $g_UseStartProgram 0
 
-    ; í•¨ê»˜ ë°°í¬ëœ edge ì‚­ì œí›„ Patch í• ì§€ ì—¬ë¶€  ë¯¸ì‚¬ìš©(0), ì‚¬ìš©(1)
-	; Edgeê°€ ì—†ëŠ” Light ë°°í¬íŒŒì¼ì¸ ê²½ìš°ì—”, Edge ì‚­ì œì²˜ë¦¬ ì•ˆë˜ë„ë¡ ì¡°ê±´ ì¶”ê°€
+    ; ÇÔ²² ¹èÆ÷µÈ edge »èÁ¦ÈÄ Patch ÇÒÁö ¿©ºÎ  ¹Ì»ç¿ë(0), »ç¿ë(1)
+	; Edge°¡ ¾ø´Â Light ¹èÆ÷ÆÄÀÏÀÎ °æ¿ì¿£, Edge »èÁ¦Ã³¸® ¾ÈµÇµµ·Ï Á¶°Ç Ãß°¡
 	${If} ${IS_LIGHT_PATCH} != 'TRUE'		
 		StrCpy $g_iPatchEdge 1
 	${endif}
     
 	
 
-	; ë§ìœ„ì¹˜ ê°•ì œ ì§€ì • - IN(1) / CN(2) / NCI(4)/ OUT(3) / NotFound(0)
+	; ¸ÁÀ§Ä¡ °­Á¦ ÁöÁ¤ - IN(1) / CN(2) / NCI(4)/ OUT(3) / NotFound(0)
 	StrCpy $g_iNetPos 0
-        ; ë‹¨ì¼ë§ì—ì„œ ìš°í´ë¦­ëª¨ë“ˆ ë¬¸êµ¬ ë‹¤ë¥´ê²Œ ë‚˜ì˜¤ê¸¸ ì›í•œë‹¤ë©´, buildí•´ì„œ Library í´ë”ì— ë”°ë¡œ ë‘ê³  Buildí•˜ëŠ”ê±¸ 2ë²ˆ í•´ì¤˜ì•¼í•¨
+        ; ´ÜÀÏ¸Á¿¡¼­ ¿ìÅ¬¸¯¸ğµâ ¹®±¸ ´Ù¸£°Ô ³ª¿À±æ ¿øÇÑ´Ù¸é, buildÇØ¼­ Library Æú´õ¿¡ µû·Î µÎ°í BuildÇÏ´Â°É 2¹ø ÇØÁà¾ßÇÔ
 
 !macroend ; end the FUNC_SETCONFIG
 
 !macro FUNC_REMOVE_ADD_FILE_RM_DLL UN
 ; COM Rename	
 
-        ; ì¤‘ê°„ë§ì¸ì§€ íŒë‹¨í•´ì„œ, AddFileRMX64.dll / AddFileRMex0X64.dll / AddFileRMex1X64.dll ì¤‘ì— ì–´ëŠê±¸ ë³´ë‚¼ ê±´ì§€ë¥¼ í™•ì¸í•˜ëŠ” ë™ì‘
+        ; Áß°£¸ÁÀÎÁö ÆÇ´ÜÇØ¼­, AddFileRMX64.dll / AddFileRMex0X64.dll / AddFileRMex1X64.dll Áß¿¡ ¾î´À°É º¸³¾ °ÇÁö¸¦ È®ÀÎÇÏ´Â µ¿ÀÛ
         
 	Delete "${INSTALLPATH}\AddFileRMX64.dll"
         Delete "${INSTALLPATH}\AddFileRMex0X64.dll"
@@ -262,7 +262,7 @@ exit_loop:
   	${EndIf}
 	
 
-	; ë‹¨ì¼ë§ - 'AddFileRMX64.dll' ì‚¬ìš©
+	; ´ÜÀÏ¸Á - 'AddFileRMX64.dll' »ç¿ë
 	StrCpy $g_bAddFileRMFind 0
 	StrCpy $g_iAddFileRMCount 1
 	StrCpy $g_iCount 1
@@ -279,7 +279,7 @@ exit_loop:
 		ENDg_AddFileRM:
 	${EndWhile}
 
-	; ë‹¤ì¤‘ë§ - 'AddFileRMex0X64.dll' ì‚¬ìš©	
+	; ´ÙÁß¸Á - 'AddFileRMex0X64.dll' »ç¿ë	
         StrCpy $g_bAddFileRMFind 0
 	StrCpy $g_iAddFileRMCount 1
 	StrCpy $g_iCount 1
@@ -296,7 +296,7 @@ exit_loop:
 		ENDg_AddFileRM0:
 	${EndWhile}
 
-	; ë‹¤ì¤‘ë§ - 'AddFileRMex1X64.dll' ì‚¬ìš©	
+	; ´ÙÁß¸Á - 'AddFileRMex1X64.dll' »ç¿ë	
         StrCpy $g_bAddFileRMFind 0
 	StrCpy $g_iAddFileRMCount 1
 	StrCpy $g_iCount 1
@@ -313,7 +313,7 @@ exit_loop:
 		ENDg_AddFileRM1:
 	${EndWhile}	
 
-	; ë‹¤ì¤‘ë§ - 'AddFileRMex2X64.dll' ì‚¬ìš©
+	; ´ÙÁß¸Á - 'AddFileRMex2X64.dll' »ç¿ë
         StrCpy $g_bAddFileRMFind 0
 	StrCpy $g_iAddFileRMCount 1
 	StrCpy $g_iCount 1
@@ -365,7 +365,7 @@ Function .onInit
 	
 	
 	
-	;Delete "$PROFILE\AppData\LocalLow\HANSSAK\*.*" ; í•´ë‹¹ í´ë”ì— ìˆëŠ” ëª¨ë“  íŒŒì¼ ì‚­ì œ	
+	;Delete "$PROFILE\AppData\LocalLow\HANSSAK\*.*" ; ÇØ´ç Æú´õ¿¡ ÀÖ´Â ¸ğµç ÆÄÀÏ »èÁ¦	
 	;RMDir "$PROFILE\AppData\LocalLow\HANSSAK"
 	
 	;Call deleteNetLink
@@ -395,7 +395,7 @@ Function .onInit
     Banner::destroy
   ${EndIf}
   
-  ; OpenNetLink ê°•ì œì¢…ë£Œ
+  ; OpenNetLink °­Á¦Á¾·á
   ;ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
   nsExec::Exec '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
 	
@@ -403,13 +403,13 @@ FunctionEnd
 
 Function .onInstSuccess
   
-    ;ì˜µì…˜ì— ë”°ë¼ ë¨¼ì € NetLink ì‚­ì œí•˜ê¸°
+    ;¿É¼Ç¿¡ µû¶ó ¸ÕÀú NetLink »èÁ¦ÇÏ±â
 	${If} ${DELETE_NETLINK} == 'TRUE'		
 		ExecWait '"$SYSDIR\taskkill.exe" /f /im SecureGate.exe'	
 		
 		;HideWindow
 		${If} ${FileExists} "C:\HANSSAK\SecureGate\SecureGate.exe"
-			;NetLinkë¥¼ Silenceë¡œ ì‚­ì œí•  ìˆ˜ ìˆëŠ” Uninstall ì ìš©
+			;NetLink¸¦ Silence·Î »èÁ¦ÇÒ ¼ö ÀÖ´Â Uninstall Àû¿ë
 			Delete "C:\HANSSAK\SecureGate\uninstall.exe"			
 			CopyFiles /FILESONLY "$INSTDIR\Library\NetLink.Uninstall\uninstall.exe" "C:\HANSSAK\SecureGate" 
 			
@@ -420,7 +420,7 @@ Function .onInstSuccess
   
   
   ${If} ${IS_PATCH} == 'TRUE'
-	 ; í•˜ìœ„ exist ì‘ì—…ì„ ìœ„í•´, íŒ¨ì¹˜ë³¸ì˜ json/dbëŠ” ì‚­ì œ
+	 ; ÇÏÀ§ exist ÀÛ¾÷À» À§ÇØ, ÆĞÄ¡º»ÀÇ json/db´Â »èÁ¦
 	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json"			
 	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json"			
 	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db"			
@@ -431,7 +431,7 @@ Function .onInstSuccess
 	  CopyFiles /FILESONLY "$TEMP\SGNotifyDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"
 	  CopyFiles /FILESONLY "$TEMP\SGSettingsDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"  
 	  
-	  ;ë°±ì—…ëœ json/db ê°€ ë³µì‚¬ ì™„ë£Œë ë•Œê¹Œì§€, ëŒ€ê¸°
+	  ;¹é¾÷µÈ json/db °¡ º¹»ç ¿Ï·áµÉ¶§±îÁö, ´ë±â
 	  StrCpy $R0 0
 	  loop:
 		IntCmp $R0 1 endloop
@@ -461,15 +461,15 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite on
   
-  ; OpenNetLink ê°•ì œì¢…ë£Œ
+  ; OpenNetLink °­Á¦Á¾·á
   ;ExecWait '"$SYSDIR\taskkill.exe" /f /im ContextTransferClient.exe'
   ;ExecWait '"$SYSDIR\taskkill.exe" /f /im PreviewUtil.exe'
   ;ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
   
-  ; Kill ì•ˆë¨¹í˜
+  ; Kill ¾È¸ÔÈû
   ;ExecShell "open" '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe' SW_HIDE
 	
-  ;ì„¤ì¹˜ íŒŒì¼ ì„¤ì •ì„ ë¡œë“œí•œë‹¤
+  ;¼³Ä¡ ÆÄÀÏ ¼³Á¤À» ·ÎµåÇÑ´Ù
   Call SetConfig
   Call ReMoveAddFileRM
 
@@ -483,7 +483,7 @@ Section "MainSection" SEC01
     
   ${Else}
 
-	  ; ì¬ë°°í¬ PackageëŠ” ì„¤ì¹˜ë•Œë§Œ
+	  ; Àç¹èÆ÷ Package´Â ¼³Ä¡¶§¸¸
 	  File "Appcasts\preinstall\windows\VC_redist.x64.exe"
 	  File "Appcasts\preinstall\windows\VC_redist.x86.exe"
 
@@ -497,13 +497,13 @@ Section "MainSection" SEC01
 
   ${EndIf}
 
-  ; í•œêº¼ë²ˆì— ì§€ì •í•˜ëŠ” ë°©ì‹ ì‚¬ìš©
+  ; ÇÑ²¨¹ø¿¡ ÁöÁ¤ÇÏ´Â ¹æ½Ä »ç¿ë
   File /r "artifacts\windows\published\"
 
   SetOutPath "$INSTDIR"
   File "bin_addon\SecureGateChromiumExtension_v1.1.crx"
   
-  ; ë‹¨ì¶•ì•„ì´ì½˜ ìƒì„±
+  ; ´ÜÃà¾ÆÀÌÄÜ »ı¼º
   CreateDirectory "$SMPROGRAMS\OpenNetLink"
   CreateShortCut "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
   CreateShortCut "C:\Users\Public\Desktop\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
@@ -511,22 +511,22 @@ Section "MainSection" SEC01
   ${If} ${IS_PATCH} == 'TRUE'
 
 	  ${If} $g_iNetPos == 2
-	  	  ;CreateDirectory "${INSTALLPATH}\22222" ; í™•ì¸ìš©
+	  	  ;CreateDirectory "${INSTALLPATH}\22222" ; È®ÀÎ¿ë
 		  ;File "artifacts\windows\published\AddFileRMex0X64.dll"
 		  ;File "artifacts\windows\published\AddFileRMex1X64.dll"
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex1X64.dll"'
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex2X64.dll"'
 	  ${ElseIf}  $g_iNetPos == 4
-                  ;CreateDirectory "${INSTALLPATH}\44444" ; í™•ì¸ìš©
+                  ;CreateDirectory "${INSTALLPATH}\44444" ; È®ÀÎ¿ë
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
 	  ${Else}
 
 		  ${If} $g_iNetPos == 1
-	          	;CreateDirectory "${INSTALLPATH}\11111" ; í™•ì¸ìš©
+	          	;CreateDirectory "${INSTALLPATH}\11111" ; È®ÀÎ¿ë
 		  	ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
 		  ${Else}
-		        ;CreateDirectory "${INSTALLPATH}\33333" ; í™•ì¸ìš©
+		        ;CreateDirectory "${INSTALLPATH}\33333" ; È®ÀÎ¿ë
 		  	ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
 		  ${EndIf}
           
@@ -536,19 +536,19 @@ Section "MainSection" SEC01
   ${Else}
 
 	  ${If} ${NETWORK_FLAG} == 'CN'
-	  	  ;CreateDirectory "${INSTALLPATH}\22222" ; í™•ì¸ìš©
+	  	  ;CreateDirectory "${INSTALLPATH}\22222" ; È®ÀÎ¿ë
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex1X64.dll"'
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex2X64.dll"'
 	  ${ElseIf}  ${NETWORK_FLAG} == 'NCI'
-	  	  ;CreateDirectory "${INSTALLPATH}\44444" ; í™•ì¸ìš©
+	  	  ;CreateDirectory "${INSTALLPATH}\44444" ; È®ÀÎ¿ë
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
 	  ${Else}	  	
 		  ${If} ${NETWORK_FLAG} == 'IN'
-	          	;CreateDirectory "${INSTALLPATH}\11111" ; í™•ì¸ìš©
+	          	;CreateDirectory "${INSTALLPATH}\11111" ; È®ÀÎ¿ë
 		  	ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
 		  ${Else}
-		        ;CreateDirectory "${INSTALLPATH}\33333" ; í™•ì¸ìš©
+		        ;CreateDirectory "${INSTALLPATH}\33333" ; È®ÀÎ¿ë
 		  	ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
 		  ${EndIf}
 	  ${EndIf}
@@ -591,25 +591,25 @@ FunctionEnd
 Section Uninstall
 
   /*
-  ; ì‹¤í–‰ì¤‘ì¸ OpenNetLink ì¢…ë£Œ
+  ; ½ÇÇàÁßÀÎ OpenNetLink Á¾·á
   ExecWait '"$INSTDIR\${PRODUCT_KILL_FILE_NAME}"
   Sleep 1000
   ExecWait '"$INSTDIR\${PRODUCT_KILL_FILE_NAME}"
   Sleep 1000
-  ;unicode ë™ì‘ëª»í•¨ - ìˆ˜ì •í•„ìš”
+  ;unicode µ¿ÀÛ¸øÇÔ - ¼öÁ¤ÇÊ¿ä
   ;KillProcDLL::KillProc "${PRODUCT_MAIN_FILE_NAME}"
   */
 
-  ; OpenNetLink ê°•ì œì¢…ë£Œ
+  ; OpenNetLink °­Á¦Á¾·á
   ; ExecWait '"$SYSDIR\taskkill.exe" /f /im ContextTransferClient.exe'
   ;ExecWait '"$SYSDIR\taskkill.exe" /f /im PreviewUtil.exe'
   ;ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
   nsExec::Exec '"$SYSDIR\taskkill.exe" /f /im PreviewUtil.exe'
   nsExec::Exec '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
-  ;ì„¤ì¹˜ íŒŒì¼ ì„¤ì •ì„ ë¡œë“œí•œë‹¤
+  ;¼³Ä¡ ÆÄÀÏ ¼³Á¤À» ·ÎµåÇÑ´Ù
   Call un.SetConfig
   
-  ; IN / CN / EX ì•Œì•„ì•¼í• ë•Œë§Œ ì‚¬ìš©
+  ; IN / CN / EX ¾Ë¾Æ¾ßÇÒ¶§¸¸ »ç¿ë
   ;Call un.GetNetPositionByFile
 
   ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMX64.dll"'
