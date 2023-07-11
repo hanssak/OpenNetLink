@@ -1904,6 +1904,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="libcrypto-1_1-x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libcrypto.1.1.dylib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libcrypto.so.1.1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Library\libbz2.so.1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
