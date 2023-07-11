@@ -361,7 +361,9 @@ FunctionEnd ; end the un.ReMoveAddFileRM
 
 Function .onInit
 
-	;SetSilent silent
+	${If} ${IS_SILENT} == 'TRUE'		
+		SetSilent silent
+	${endif}
 	
 	
 	
@@ -453,7 +455,9 @@ Function .onInstSuccess
   ${endif}
 
   ;;IfSilent 0 +2
-  Exec '"$INSTDIR\OpenNetLinkApp.exe"'
+  ${If} ${STARTAUTO} == 'TRUE'
+  	Exec '"$INSTDIR\OpenNetLinkApp.exe"'
+  ${endif}
   
 FunctionEnd
 
