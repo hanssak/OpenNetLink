@@ -169,7 +169,11 @@
                                         <th style="text-align:center;vertical-align:middle;width:10%;">@strTitle</th>                               <!--제목-->
                                         <th style="text-align:center;vertical-align:middle;width:13%;">@strFileSendDay</th>                        <!--전송요청일-->
                                         <th style="text-align:center;vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>   <!--개인정보-->
-                                        <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_ETC_EXPIRATIONDATE")</th>   <!--파일 만료일-->
+                                        @if (SGAppMgrSvc.OpConfigInfoService.GetUiFileExpiredDateShow(groupIDbyParam))
+                                        {
+                                            <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_ETC_EXPIRATIONDATE")</th>
+                                        }
+                                        <!--파일 만료일-->
                                         <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_ETC_DOWNPOSSIBLECOUNT")</th>   <!--다운로드 횟수-->
                                         <th style="text-align:center;vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_TRANS_MANUAL_DOWNLOAD")</th>   <!--다운로드-->
                                         <th style="text-align:center;vertical-align:middle;width:7%;">@strDetail</th>                         <!--상세보기-->
@@ -178,41 +182,51 @@
                                 <tbody>
                                     @foreach (transData item in mData)
                                     {
-                                        <tr class="TransSearch">
-                                            <td style="text-align:center">
-                                                <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                            </td>
-                                            <td style="text-align:center; vertical-align: middle">@item.ApvType</td>
-                                            <td style="text-align:center; vertical-align: middle">@item.TransferType</td>
-                                            <td style="text-align:center; vertical-align: middle">@item.TransferStatus</td>
-                                            <td style="text-align:center; vertical-align: middle">@item.ApvStatus</td>
-                                            @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward(groupIDbyParam))
-                                            {
-                                                <td style="text-align:center; vertical-align: middle">@item.IsFile</td>
-                                            }
+                                    <tr class="TransSearch">
+                                        <td style="text-align:center">
+                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        </td>
+                                        <td style="text-align:center; vertical-align: middle">@item.ApvType</td>
+                                        <td style="text-align:center; vertical-align: middle">@item.TransferType</td>
+                                        <td style="text-align:center; vertical-align: middle">@item.TransferStatus</td>
+                                        <td style="text-align:center; vertical-align: middle">@item.ApvStatus</td>
+                                        @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward(groupIDbyParam))
+                                        {
+                                            <td style="text-align:center; vertical-align: middle">@item.IsFile</td>
+                                        }
 
-                                            @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                                            {
-                                                <td style="text-align:center; vertical-align: middle">@item.strDestNet</td>
-                                            }
-                                            <td style="vertical-align:middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                            <td style="text-align:center; vertical-align: middle">@item.RequestTime</td>
+                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                        {
+                                            <td style="text-align:center; vertical-align: middle">@item.strDestNet</td>
+                                        }
+                                        <td style="vertical-align:middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="text-align:center; vertical-align: middle">@item.RequestTime</td>
 
-                                            @*@if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpInfoDisplay(groupIDbyParam))*@
-                                            <td style="text-align:center; vertical-align: middle">@item.stDLP</td>
-                                            <td style="text-align:center; vertical-align: middle">@item.expiredDate</td>
-                                            @if (item.isPossibleDownload)
+                                        @*@if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpInfoDisplay(groupIDbyParam))*@
+                                        <td style="text-align:center; vertical-align: middle">@item.stDLP</td>
+                                        @if (SGAppMgrSvc.OpConfigInfoService.GetUiFileExpiredDateShow(groupIDbyParam))
+                                        {
+                                            @if (item.expiredDate == "0001-01-01")
                                             {
-                                                <td style="text-align:center; vertical-align: middle">@item.isPossibleDownloadCount</td>
-                                                <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>RequestManualDownload(item))"><i class="far fa-arrow-alt-circle-down"></i></button></td>
+                                                <td style="text-align:center; vertical-align: middle">-</td>
                                             }
                                             else
                                             {
-                                                <td style="text-align:center; vertical-align: middle">0</td>
-                                                <td style="text-align:center; vertical-align: middle">-</td>
+                                                <td style="text-align:center; vertical-align: middle">@item.expiredDate</td>
                                             }
-                                            <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
-                                        </tr>
+                                        }
+                                        @if (item.isPossibleDownload)
+                                        {
+                                            <td style="text-align:center; vertical-align: middle">@item.isPossibleDownloadCount</td>
+                                            <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>RequestManualDownload(item))"><i class="far fa-arrow-alt-circle-down"></i></button></td>
+                                        }
+                                        else
+                                        {
+                                            <td style="text-align:center; vertical-align: middle">0</td>
+                                            <td style="text-align:center; vertical-align: middle">-</td>
+                                        }
+                                        <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
+                                    </tr>
                                     }
                                 </tbody>
                             </table>

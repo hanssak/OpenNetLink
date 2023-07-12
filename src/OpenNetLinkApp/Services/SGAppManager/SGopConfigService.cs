@@ -174,6 +174,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApprTreeSearch(int groupId);
         public string GetInitTransferFileExplorerPathInWindow(int groupId);
         public bool GetUseToastInsteadOfOSNotification(int groupId);
+        public bool GetUiFileExpiredDateShow(int groupId);
     }
 
 
@@ -873,6 +874,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseToastInsteadOfOSNotification(int groupId)
         {
             return AppConfigInfo[groupId].bUseToastInsteadOfOSNotification;
+        }
+        /// <summary>
+        /// 전송 관리에서 파일 만료일 표시 여부 
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        public bool GetUiFileExpiredDateShow(int groupId)
+        {
+            return AppConfigInfo[groupId].bUiFileExpiredDateShow;
         }
     }
 }

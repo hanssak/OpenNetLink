@@ -61,7 +61,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileForwardDownNotRecv { get; set; } = true;                         // 파일 수신되기전에 파일포워드로 다운로드 가능유무
         public string strInitTransferFileExplorerPathInWindow { get; set; } = "";//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")       
 
-
+        public bool bUiDlpShow { get; set; } = false;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
+        public bool bUiFileExpiredDateShow { get; set; } = true;  // 전송관리 화면에서 파일 만료일 표시 여부
         //클립보드
         public bool bUseClipBoard { get; set; } = true;                  // 클립보드 사용 여부
         public bool bUseClipCopyAndSend { get; set; } = false;    // 클립보드 복사 후 전송 사용 유무 ( 환경설정 체크박스 보이고 안보이고)
@@ -77,8 +78,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         //메일
         public bool bUseEmail { get; set; } = false;               // 메일 관리/결재 사용 유무.
-        public bool bUiDlpShow { get; set; } = false;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
-
+        
         //URL Redirection (URL 반대망 전송)
         //public bool bURLAutoTrans { get; set; } = false;                               // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
         public bool bUseURLRedirectionAlarm { get; set; } = false;                               // URL 자동전환 알림 사용 유무(환경설정)
