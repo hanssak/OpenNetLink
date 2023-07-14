@@ -1583,8 +1583,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public bool GetDaySizeEnable(long FileTransMaxSize, long RemainFileTransSize, long nRegSize)
         {
+
             if (FileTransMaxSize <= 0)
-                return false;
+                return true;
 
             if (RemainFileTransSize < nRegSize)
                 return false;
@@ -1599,6 +1600,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns></returns>
         public bool GetDayCountEnable(int DayFileTransCountStandard, int DayFileTransCountRemain, int RegCount = 1)
         {
+            if (DayFileTransCountStandard <= 0)
+                return true;
+
             if (DayFileTransCountRemain <= 0)
                 return false;
 
