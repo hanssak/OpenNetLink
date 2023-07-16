@@ -74,7 +74,7 @@ namespace OpenNetLinkApp.Common
         {
             get
             {
-                if (_xmlConfInstance != null)
+                if(_xmlConfInstance != null)
                     return _xmlConfInstance;
                 else
                 {
@@ -203,7 +203,7 @@ namespace OpenNetLinkApp.Common
                 values.Add(_xmlConfInstance.GetTitle("T_DATA_TYPE_TEXT"));
                 values.Add(_xmlConfInstance.GetTitle("T_DATA_TYPE_IMAGE"));
             }
-            else if (option == "DestNetwork")
+            else if(option == "DestNetwork")
             {
                 values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
                 if (dic != null)
@@ -250,13 +250,13 @@ namespace OpenNetLinkApp.Common
                 Log.Logger.Here().Information($"isFileExtinListStr - false (Wrong ExtList) - strFileName : {strFileName}, Ext List : {strExtData}");
                 return false;
             }
-
+                
             if (strFileName.Length < 1)
             {
                 Log.Logger.Here().Information($"isFileExtinListStr - false (Wrong FileExt) - strFileName : {strFileName}, Ext List : {strExtData}");
                 return false;
-            }
-
+            }             
+            
             if (bFileNameIsOnlyExt == false)
             {
                 // strFileName 예서 확장자만 구해서 입력하기
@@ -463,7 +463,7 @@ namespace OpenNetLinkApp.Common
         /// <param name="fileName"></param>
         /// <param name="strItem"></param>
         /// <returns></returns>
-        public static bool isSupportFileName(string fileName, out string strItem, bool bIsForRecv = true)
+        public static bool isSupportFileName(string fileName, out string strItem, bool bIsForRecv=true)
         {
 
             Log.Logger.Here().Information($"isSupportFileName - fileName : {fileName}");
@@ -538,7 +538,7 @@ namespace OpenNetLinkApp.Common
         /// <returns></returns>
         public static bool DeleteFilesByPathExt(string strTargetPath, string strDelFilePattern)
         {
-            if ((strDelFilePattern?.Length ?? 0) < 3)
+            if ( (strDelFilePattern?.Length ?? 0) < 3 )
             {
                 Log.Logger.Here().Information($"DeleteFilesByPathExt, FilePattern-Error : {strDelFilePattern}");
                 return false;
@@ -700,19 +700,19 @@ namespace OpenNetLinkApp.Common
         /// <param name="strOrgPath"></param>
         /// <param name="strLnkFIleName"></param>
         /// <returns></returns>
-        public static bool makeAgentBootStartOSwindow(bool bStartReg, bool bUsePublicPath, string strOrgPath, string strLnkFIleName)
+        public static bool makeAgentBootStartOSwindow(bool bStartReg,bool bUsePublicPath, string strOrgPath, string strLnkFIleName)
         {
             bUsePublicPath = false;
 
-            string strStartDir = Environment.GetFolderPath(bUsePublicPath ? Environment.SpecialFolder.CommonStartup : Environment.SpecialFolder.Startup);
+            string strStartDir = Environment.GetFolderPath(bUsePublicPath?Environment.SpecialFolder.CommonStartup:Environment.SpecialFolder.Startup);
             string LinkFullPath = strStartDir.ToString() + @$"\{strLnkFIleName}"; // OpenNetLink.lnk
             FileInfo LinkFile = new FileInfo(LinkFullPath);
             if (LinkFile.Exists)
-            {
+            {                
                 if (bStartReg == false)
                     LinkFile.Delete();
 
-                Log.Logger.Here().Information($"makeAgentBootStartOSwindow - Lnk File exist : {LinkFullPath},  {(bStartReg ? "Lnk Create Skip!" : "Lnk Delete Done!")}");
+                Log.Logger.Here().Information($"makeAgentBootStartOSwindow - Lnk File exist : {LinkFullPath},  {(bStartReg?"Lnk Create Skip!":"Lnk Delete Done!")}");
                 return true;
             }
             else
@@ -746,9 +746,9 @@ namespace OpenNetLinkApp.Common
 
     public class CsLnkFunc
     {
-        public static bool makeLnkShortCut(string strOrgPath,
-            string strLnkPath, string strIconPath = "", string strWorkingPath = "",
-            string Description = "", string strArguments = "")
+        public static bool makeLnkShortCut(string strOrgPath, 
+            string strLnkPath, string strIconPath="", string strWorkingPath="", 
+            string Description="", string strArguments="")
         {
 
             string strErrMsg = "";
@@ -774,7 +774,7 @@ namespace OpenNetLinkApp.Common
                 bRet = false;
             }
 
-            Log.Logger.Here().Information(@$"makeAgentBootStart OSwindow - Make Lnk File {(bRet ? "SUCCESS" : ("FAILED+ERRmsg:" + strErrMsg))} : {strLnkPath}");
+            Log.Logger.Here().Information(@$"makeAgentBootStart OSwindow - Make Lnk File {(bRet?"SUCCESS":("FAILED+ERRmsg:"+ strErrMsg))} : {strLnkPath}");
 
             return bRet;
         }
@@ -908,7 +908,7 @@ namespace OpenNetLinkApp.Common
 
                 // 32bit 그대로 사용
                 qrCodeImage.Save(strQRImgPath, System.Drawing.Imaging.ImageFormat.Png);
-                qrCodeImage.Dispose();
+                qrCodeImage.Dispose();                
                 qrCodeImage = null;
 
                 //convertedImage.Dispose();
@@ -954,7 +954,7 @@ namespace OpenNetLinkApp.Common
                 qrCodeImage.Dispose();
                 qrCodeImage = null;
             }
-
+                
         }
 
     }
@@ -968,8 +968,8 @@ namespace OpenNetLinkApp.Common
         Regex regex5 = new Regex(@"^.*([^A-Za-z0-9]+).*$");    //특수문자 존재 체크
         string[] ArrayStrKeyBoard = new string[] { "`1234567890-=", "~!@#$%^&*()_+", "qwertyuiop[]\\", "QWERTYUIOP{}|",
             "asdfghjkl;'\"", "ASDFGHJKL:\"", "zxcvbnm,./", "ZXCVBNM<>?",
-            "=-0987654321`", "+_)(*&^%$#@!~", "\\][poiuytrewq", "|}{POIUYTREWQ",
-            "\"';lkjhgfdsa", "\":LKJHGFDSA", "/.,mnbvcxz", "?><MNBVCXZ"};
+            "=-0987654321`", "+_)(*&^%$#@!~", "\\][poiuytrewq", "|}{POIUYTREWQ", 
+            "\"';lkjhgfdsa", "\":LKJHGFDSA", "/.,mnbvcxz", "?><MNBVCXZ"};        
 
         /// <summary>
         /// 공백문자가 있는지 체크
@@ -1002,69 +1002,6 @@ namespace OpenNetLinkApp.Common
                 nComplexCnt++;
 
             return nComplexCnt;
-        }
-        /// <summary>
-        /// 숫자, 대문자(영문), 소문자(영문), 특수문자가 각항목이 존재하면 +1, (전부다있으면 : 4)
-        /// </summary>
-        /// <param name="strData"></param>
-        /// <returns></returns>
-        public int GetComplexCnt(ref byte[] strData)
-        {
-            bool[] matchCount = new bool[4] { false, false, false, false };
-            foreach (byte item in strData)
-            {
-                if (regex2.IsMatch(Convert.ToChar(item).ToString()))
-                    matchCount[0] = true;
-                if (regex3.IsMatch(Convert.ToChar(item).ToString()))
-                    matchCount[1] = true;
-                if (regex4.IsMatch(Convert.ToChar(item).ToString()))
-                    matchCount[2] = true;
-                if (regex5.IsMatch(Convert.ToChar(item).ToString()))
-                    matchCount[3] = true;
-            }
-            return matchCount.Count(match => match == true);
-        }
-
-        /// <summary>
-        /// reture : True - 같은문자가 지정한 개수 만큼 반복되지 않음
-        /// reture : false - 같은문자가 지정한 개수 만큼 반복됨
-        /// </summary>
-        /// <param name="chPasswd"></param>
-        /// <param name="iCount"></param>
-        /// <returns></returns>
-        bool CheckSameChar(ref byte[] chPasswd, int iCount)
-        {
-            bool bFindSameChar = false;
-            int nLength = chPasswd.Length;
-
-            try
-            {
-                for (int n = 0; n < nLength - (iCount - 1); n++)
-                {
-                    if (Convert.ToChar(chPasswd[n]) == Convert.ToChar(chPasswd[n + 1]))
-                    {
-                        for (int i = 1; i < iCount - 1; i++)
-                        {
-                            if (Convert.ToChar(chPasswd[n + i]) != Convert.ToChar(chPasswd[n + i + 1]))
-                            {
-                                bFindSameChar = false;
-                                break;
-                            }
-                            bFindSameChar = true;
-                        }
-                    }
-
-                    if (bFindSameChar == true)
-                        return false;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Here().Error($"CheckSameChar, exception(MSG) : {ex.Message}");
-            }
-
-            return true;
         }
 
         /// <summary>
@@ -1102,7 +1039,7 @@ namespace OpenNetLinkApp.Common
                 }
 
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Log.Logger.Here().Error($"CheckSameChar, exception(MSG) : {ex.Message}");
             }
@@ -1120,20 +1057,6 @@ namespace OpenNetLinkApp.Common
         public bool GetSameCharCheck(string strData, int nCharKeyCount)
         {
             if (CheckSameChar(strData, nCharKeyCount))
-                return false;
-
-            return true;
-        }
-
-        /// <summary>
-        /// 동일한 문자·숫자의 연속적인 존재유무(true:존재함,false:존재X) <br></br>
-        /// nCharKeyCount : 연속으로 존재해야하는 문자개수
-        /// </summary>
-        /// <param name="strData"></param>
-        /// <returns></returns>
-        public bool GetSameCharCheck(ref byte[] strData, int nCharKeyCount)
-        {
-            if (CheckSameChar(ref strData, nCharKeyCount))
                 return false;
 
             return true;
@@ -1162,31 +1085,6 @@ namespace OpenNetLinkApp.Common
 
             return false;
         }
-
-        /// <summary>
-        /// true : 키보드상의 연속된 문자 또는 숫자의 순차적 입력이 입력된 문자열에 있음
-        /// </summary>
-        /// <param name="strData"></param>
-        /// <returns></returns>
-        public bool GetKeyBoardContinuousWord(ref byte[] strData, int nCharKeyCount)
-        {
-
-            try
-            {
-                foreach (string strKeyLine in ArrayStrKeyBoard)
-                {
-                    if (PasswdValiation(strKeyLine, ref strData, nCharKeyCount) == false)
-                        return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Here().Error($"GetKeyBoardContinuousWord, Exception(MSG) : {ex.Message}");
-            }
-
-            return false;
-        }
-
 
         /// <summary>
         /// passwd에 지정한 연속된 Key가 존재하는지 파악하는 함수
@@ -1228,66 +1126,7 @@ namespace OpenNetLinkApp.Common
 
             return true;
         }
-        /// <summary>
-        /// passwd에 지정한 연속된 Key가 존재하는지 파악하는 함수
-        /// </summary>
-        /// <param name="strKeyLine"></param>
-        /// <param name="strPWdata"></param>
-        /// <param name="nCharKeyCount"></param>
-        /// <returns></returns>
-        bool PasswdValiation(string strKeyLine, ref byte[] strPWdata, int nCharKeyCount)
-        {
-            byte[] strTemp = new byte[nCharKeyCount];
-            try
-            {
-                int len = 0;
 
-                if (nCharKeyCount > 0)
-                    len = strPWdata.Length;
-
-                for (int n = 0; n < len; n++)
-                {
-                    strTemp.hsClear();
-                    if (nCharKeyCount > 0)
-                    {
-                        // C#에서는 확인필요 - exception 발생
-                        if (n + nCharKeyCount > len)
-                            return true;
-
-                        Array.Copy(strPWdata, n, strTemp, 0, nCharKeyCount);
-                        //strTemp = strPWdata.Substring(n, nCharKeyCount);
-                        if (strTemp.Length < nCharKeyCount)
-                            return true;
-                    }
-                    else
-                        strTemp = strPWdata;
-
-                    byte[] keyLine = Encoding.UTF8.GetBytes(strKeyLine);
-                    byte[] keyLinePart = new byte[nCharKeyCount];
-
-                    for (byte idx = 0; idx < keyLine.Length; idx++)
-                    {
-                        if (idx + nCharKeyCount > keyLine.Length)
-                            break;
-
-                        Array.Copy(keyLine, idx, keyLinePart, 0, nCharKeyCount);
-                        if (strTemp.SequenceEqual(keyLinePart))
-                            return false;
-                    }
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-            finally
-            {
-                strTemp.hsClear(3);
-            }
-        }
     }
 
 }
