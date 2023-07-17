@@ -64,6 +64,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public string strInitTransferFileExplorerPathInWindow { get; set; }//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")
         public bool bUiDlpShow { get; set; }                     //  상세보기 화면에서 DLP 상세사항 보여주는 유무
         public bool bUiFileExpiredDateShow { get; set; }                     //  상세보기 화면에서 DLP 상세사항 보여주는 유무
+
+        public bool bDlpFoundSendContinue { get; set; }         // 개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무
+
         //클립보드
         public bool bUseClipBoard { get; set; }                   // 클립보드 사용 여부
         public bool bUseClipCopyAndSend { get; set; }    // 클립보드 복사 후 전송 사용 유무 ( 환경설정 체크박스 보이고 안보이고)

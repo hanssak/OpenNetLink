@@ -208,4 +208,7 @@ InitTransferFileExplorerDirectoryInWindow : 윈도우에 한하여 전송화면�
 											=> "" : 기본 경로를 표시.
 											=> 그 밖에 사용자가 원하는 경로로 설정 가능
 bUseGoogleOtp2FactorAuth : 구글OTP를 사용한 인증동작 하도록 수정적용
-											
+
+bDlpFoundSendContinue : 개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무(기본값-false)
+
+

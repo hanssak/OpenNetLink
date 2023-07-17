@@ -64,6 +64,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUiDlpShow { get; set; } = false;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
         public bool bUiFileExpiredDateShow { get; set; } = true;  // 전송관리 화면에서 파일 만료일 표시 여부
         //클립보드
+
+        public bool bDlpFoundSendContinue { get; set; } = false;  //  개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무
+
         public bool bUseClipBoard { get; set; } = true;                  // 클립보드 사용 여부
         public bool bUseClipCopyAndSend { get; set; } = false;    // 클립보드 복사 후 전송 사용 유무 ( 환경설정 체크박스 보이고 안보이고)
         //public bool bClipCopyAutoSend { get; set; } = false;                // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )

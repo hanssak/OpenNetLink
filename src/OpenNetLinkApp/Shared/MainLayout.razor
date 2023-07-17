@@ -264,12 +264,21 @@
         string stPrivacy = sgLoginData.GetTagData("PRIVACYAPPROVE");
         string stVIPMode = sgLoginData.GetTagData("PRIVACYAPPROVEVIP");
         string stDuputyMode = sgLoginData.GetTagData("PRIVACYAPPROVEMOD");
+        bool bSendFileContinue = false;
+        bSendFileContinue = SGAppMgrSvc.OpConfigInfoService.GetUseDlpFoundSendContinue(groupid);
 
         //VIP이면 개인정보 노출되어도 바로 전송
         if (stVIPMode == "0" && sgLoginData.IsVipUser() == true) //결재해야 하는데 VIP면 결재안함
         {
             HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
-            "1", "", stNotiNetSystem);    //1 : 전송 진행
+            "1", "NONE", stNotiNetSystem);    //1 : 전송 진행
+        }
+        else if (bSendFileContinue)
+        {
+            CLog.Here().Information($"PrivacyNotifyResult, groupid : {groupid}, OpConfigIn : bDlpFoundSendContinue : {bSendFileContinue}");
+            // DLP 검출되면, 정보보호 결재자 추가없이 전송진행
+            HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
+            "1", "NONE", stNotiNetSystem);    //1 : 전송 진행, NONE
         }
         else
         {
@@ -285,6 +294,7 @@
             SendTransDetail();
         }
     }
+
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
