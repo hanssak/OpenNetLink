@@ -841,6 +841,82 @@ namespace OpenNetLinkApp.Common
             return convertedImage;
         }
 
+        public bool GenerateQRimg(string strOtpUrl)
+        {
+
+            // OTP URL 생성
+            try
+            {
+                // otpauth://totp/SecureGate:KS0002?secret=JNJTAMBQGJFVGMBQ&issuer=SecureGate
+                // otpauth://totp/{issuer}:{accountName}?secret={secretKey}&issuer={issuer}
+                //string otpUrl = $"otpauth://totp/{encodedIssuer}:{encodedAccountName}?secret={encodedSecretKey}&issuer={encodedIssuer}";
+
+                Log.Logger.Here().Information($"GenerateQRimg, GenerateQRimg-Start!");
+
+                if (strOtpUrl.IndexOf("otpauth://") != 0)
+                {
+                    Log.Logger.Here().Information($"GenerateQRimg, GenerateQRimg-End(Error)!");
+                    return false;
+                }
+                
+                // QR 코드 생성
+                QRCodeGenerator qrGenerator = new QRCodeGenerator();
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode(strOtpUrl, QRCodeGenerator.ECCLevel.Q);
+                QRCode qrCode = new QRCode(qrCodeData);
+                qrCodeImage = qrCode.GetGraphic(10); // 이미지 크기를 조정합니다.
+                //qrCodeImage.SetPixel(240, 240, Color.White);
+
+                // 24 비트로 이미지 변환
+                //convertedImage = ConvertTo24Bit(qrCodeImage);
+
+                string strQRImgPath = CsSystemFunc.GetCurrentModulePath();
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    strQRImgPath += "\\wwwroot\\otp_qrcode.png";
+                else
+                    strQRImgPath += "/wwwroot/otp_qrcode.png";
+
+                // 기존꺼 삭제
+                //CsFileFunc.DeleteFile(strQRImgPath);
+                //Thread.Sleep(500);
+
+                // 32bit 그대로 사용
+                qrCodeImage.Save(strQRImgPath, System.Drawing.Imaging.ImageFormat.Png);
+                qrCodeImage.Dispose();
+                qrCodeImage = null;
+
+                //convertedImage.Dispose();
+                //convertedImage = null;
+
+                // 5초 TimeOut
+                int nIdx = 0;
+                for (; nIdx < 50; nIdx++)
+                {
+                    if (System.IO.File.Exists(strQRImgPath))
+                        if (CsFileFunc.GetFileSize(strQRImgPath) > 15000)
+                            break;
+                    Thread.Sleep(100);
+                }
+                Log.Logger.Here().Information($"GenerateQRimg, GenerateQRimg-End : {((nIdx < 50) ? "Success!" : "Failed!")}");
+
+                // 순서 바꾸면 파일 이미지 안나오기 시작함.
+                //Thread.Sleep(1000);
+                if (nIdx < 50)
+                    return true;
+
+                return false;
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"GenerateQRimg, exception(MSG) : {ex.Message}");
+                return false;
+            }
+            finally
+            {
+            }
+
+        }
         public bool GenerateQRimg(string issuer, string accountName, string secretKey)
         {
 
@@ -888,7 +964,7 @@ namespace OpenNetLinkApp.Common
                 //convertedImage.Dispose();
                 //convertedImage = null;
 
-                // 5초 TimeOut - 수정필요.(실재이미지 파일이 정상적으로 씌우졌는지 확인필요, File.Exists 요걸로는 아무것도 안됨.)
+                // 5초 TimeOut
                 int nIdx = 0;
                 for (; nIdx < 50; nIdx++)
                 {
@@ -930,6 +1006,30 @@ namespace OpenNetLinkApp.Common
             }
                 
         }
+
+        public bool GetSecureKeyFromOtpUrl(string strUrl, out string strRet)
+        {
+            strRet = "";
+            if (strUrl.Length > 0)
+            {
+                int nPos = strUrl.IndexOf("?secret=");
+                if (nPos < 0)
+                    nPos = strUrl.IndexOf("&secret=");
+
+                if (nPos > 0)
+                {
+                    // otpauth://totp/SecureGate:KS0002?secret=JNJTAMBQGJFVGMBQ&issuer=SecureGate
+                    strRet = strUrl.Substring(nPos + 8);
+                    nPos = strRet.IndexOf('&');
+                    if (nPos > 0)
+                        strRet = strRet.Substring(0, nPos);
+                }
+
+            }
+
+            return (strRet.Length > 0);
+        }
+
 
     }
 

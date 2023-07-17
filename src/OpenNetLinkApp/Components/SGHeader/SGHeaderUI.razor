@@ -821,7 +821,13 @@ private void LogOut(int groupId)
         DoLogOutSetData(nGroupID);
     }
 
-
+    // sessionCheck 동작하게 적용
+    HsNetWork hsNetWork = null;
+    hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
+    if (hsNetWork != null)
+    {
+        hsNetWork.SetLoginSessionCheckDo();
+    }
 
     // 파일전송에 추가해 놓은 파일목록 정보들 삭제필요
     ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -986,7 +992,7 @@ private async void mouseTimer_Elapsed(object sender, System.Timers.ElapsedEventA
     int groupId = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
     if (pageService.GetGroupIDLoginType(groupId) == eLoginType.eLOGINTYPE_AD)
         return;
-    
+
     object[] param = { screentime };
     //object[] param = { 1 };
     tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
@@ -1006,7 +1012,7 @@ private async void mouseTimer_Elapsed(object sender, System.Timers.ElapsedEventA
         else
         {
             await JSRuntime.InvokeAsync<string>("initMouseClick");
-        }        
+        }
     }
 }
 
@@ -1683,13 +1689,13 @@ protected override void OnInitialized()
 public void ScreenLockTimeInitNoti(int groupID, ConfigArgs e)
 {
     int time = e.ScreenTime;
-    
+
     // logout 까지 고려
     if (m_nSvrTime == 0)        //다중망 중, 화면잠금을 사용하는 망이 하나라도 있으면 잠금 시간 적용
         m_nSvrTime = time;
     else if (time < m_nSvrTime)  //다중망 중, 화면잠금 시간은 최소값으로 적용
         m_nSvrTime = time;
-    
+
     if (time <= 0)
         return;
 

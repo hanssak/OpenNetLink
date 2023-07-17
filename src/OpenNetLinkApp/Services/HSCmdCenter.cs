@@ -436,6 +436,15 @@ namespace OpenNetLinkApp.Services
                         e.result = 0;
                         e.strMsg = "SESSIONDUPLICATE";
                         e.strDummy = "";
+
+                        string strData = "";
+                        if (sgEventType.MsgRecode.TryGetValue("GOTPCODE", out strData))
+                        {
+                            e.strDummy = "google_otp";
+                            e.strMsg = strData;
+                            //e.strMsg = "otpauth://totp/SecureGate:KS0002?secret=JNJTAMBQGJFVGMBQ&issuer=SecureGate";
+                        }
+
                         seEvent(groupId, e);
                     }
                     System.Diagnostics.Debug.WriteLine("HsNetWork Session Duplicate Exception Received..");
@@ -446,19 +455,15 @@ namespace OpenNetLinkApp.Services
                     {
                         PageEventArgs e = new PageEventArgs();
                         e.result = 0;
+                        e.strMsg = "none";
 
                         string strData = "";
-
-                        if (sgEventType.MsgRecode.TryGetValue("2FACTORAUTHTYPE", out strData))
-                            e.strDummy = strData;
-
-                        strData = "";
-                        if (sgEventType.MsgRecode.TryGetValue("MSGKEY", out strData))
-                            e.strMsg = strData;  // Server에서 받은 Message 전달
-
-                        e.strDummy = "google_otp";      // kkw임시, google_otp 1개만 가짐 - Server 개발될때까지
-                        e.strMsg = "MARNVBMEK06VCXXK";  // kkw임시, 1가지만 존재 - Server 개발될때까지
-
+                        if (sgEventType.MsgRecode.TryGetValue("GOTPCODE", out strData))
+                        {
+                            e.strDummy = "google_otp";
+                            //strData = SgMsg.getTagDecString(sgEventType.MsgRecode["GOTPCODE"], MainCtl.Base64Seedkey);
+                            e.strMsg = sgEventType.strDataType;
+                        }
                         seEvent2Fact(groupId, e);
                     }
                     System.Diagnostics.Debug.WriteLine("HsNetWork Session 2Factor Auth Do.. Now Default Google Otp");

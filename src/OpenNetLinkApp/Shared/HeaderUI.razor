@@ -119,6 +119,8 @@
 
         HsCmdCenter.sgPageEvent.SetOSNotificationEvent(OSNotification);
 
+        // $DRM_BLOCK_NOTI 
+        //HsCmdCenter.sgPageEvent.SetLogoutNotiEvent(LogoutAction);
     }
 
     public void Dispose()
@@ -3022,6 +3024,14 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         pageService.SetLogoutStatus(groupID, true);
         HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
         HsCmdCenter.sgDicRecvData.SetLoginDataEmpty(groupID);
+
+        // sessionCheck 동작하게 적용
+        HsNetWork hsNetWork = null;
+        hsNetWork = HsCmdCenter.GetConnectNetWork(groupID);
+        if (hsNetWork != null)
+        {
+            hsNetWork.SetLoginSessionCheckDo();
+        }
 
         // 추가된 파일리스트 제거하는 동작
         LogOutFileListClearEvent LogOutFileListClearEvent = null;

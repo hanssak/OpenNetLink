@@ -143,6 +143,8 @@
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<PopUpLogIn>();
 
     CsGoogleQRcode QRcode = new CsGoogleQRcode();
+    string str2FactorAuthType = "";
+    string strOtpUrlCode = "";
 
     private void GoogleOtpCancel()
     {
@@ -152,11 +154,9 @@
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
         bUIBtnDisable = false;
         bStartedLogin = false;
-        id = "";
-        pw = "";
         refGoogleOTP.strUserOTP = "";
 
-        closeUIPopup();
+        closePopUp();
     }
 
     private void GoogleOtpConfirm()
@@ -169,9 +169,10 @@
         hsNetWork = HSCmdCenter.GetConnectNetWork(refGoogleOTP.nGroupID);
         if (hsNetWork != null)
         {
-            // 구글Otp 값 어느 Tag에 보낼것인지 협의후 동작
-            //hsNetWork.stCliMem.OTP = refGoogleOTP.strUserOTP;
-            hsNetWork.SendBind2FactorAuth();
+            // 구글Otp 값 어느 Tag에 보낼것인지 협의후 동작            
+            hsNetWork.SetGoogleOtp(refGoogleOTP.strUserOTP);
+
+            hsNetWork.SendSeedKeyBindFor2FactorAuth();
         }
 
         // 다중망에 맞춰서 작업
@@ -179,7 +180,6 @@
         //bStartedLogin = true;
         //bLoginBtnDisable = true;
 
-        hsNetWork.stCliMem.OTP = "";
         refGoogleOTP.strUserOTP = "";
     }
 
@@ -197,18 +197,20 @@
         if (e.strDummy == "google_otp")
         {
 
-            // Server에서 받아서 동작하도록 수정예정
+            // Server에서 받아서 동작하도록 수정
             string strSecureKey = "";
-            strSecureKey = e.strMsg;
 
-            if (QRcode.GenerateQRsecureKey())
-                strSecureKey = QRcode.strSecureKey; // "MARNVBMEK06VCXXK";
+            //if (QRcode.GenerateQRsecureKey())
+            //    strSecureKey = QRcode.strSecureKey; // "MARNVBMEK06VCXXK";
+            if (QRcode.GetSecureKeyFromOtpUrl(e.strMsg, out strSecureKey) == false)
+                CLog.Here().Information($"Show2FactorAuth, otpauth Type Error ################## : {e.strMsg}");
 
             CLog.Here().Information($"Show2FactorAuth, Otp-Key : {strSecureKey}");
 
             refGoogleOTP.strKeyMessage = strSecureKey;
             refGoogleOTP.nGroupID = groupID;
-            bool rWriteQRimg = QRcode.GenerateQRimg("SecureGate", id, strSecureKey);
+            //bool rWriteQRimg = QRcode.GenerateQRimg("SecureGate", id, strSecureKey);
+            bool rWriteQRimg = QRcode.GenerateQRimg(e.strMsg);  // Server에서 받은 Url로 바로 생성
             if (rWriteQRimg)
             {
                 Thread.Sleep(1000);
@@ -288,8 +290,20 @@
         HSCmdCenter.SetAllowSessionDuplicate(refSGloginDuplicate.groupId);
         CLog.Here().Information($"[PopupLogin] SessionAlertConfirm - LogInType: {refSGloginDuplicate.groupId.ToString()}");
 
-        doLogIn(true);
+        if (str2FactorAuthType == "google_otp" && strOtpUrlCode.Length > 0)
+        {
+            PageEventArgs e = new PageEventArgs();
+            e.strDummy = str2FactorAuthType;
+            e.strMsg = strOtpUrlCode;
+            str2FactorAuthType = "";
+            strOtpUrlCode = "";
 
+            Show2FactorAuth(refSGloginDuplicate.groupId, e);
+        }
+        else
+        {
+            doLogIn(true);
+        }
         bUIBtnDisable = false;
     }
 
@@ -301,6 +315,11 @@
     private async void ShowSessionCountPopup(int groupID, PageEventArgs e)
     {
         bStartedLogin = false;
+        if (e.strDummy == "google_otp")
+        {
+            str2FactorAuthType = e.strDummy;
+            strOtpUrlCode = e.strMsg;
+        }
         await refSGloginDuplicate.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
     }
 
@@ -339,7 +358,7 @@
                 strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-    strPW = "HsckAD.com";
+            strPW = "HsckAD.com";
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -432,10 +451,10 @@
             int nData = 0;
 
 #if DEBUG  // SITE배포용도
-    //#if false  // SITE배포용도
-    CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
-    strData = "1";
-    stRtn = "1";
+            //#if false  // SITE배포용도
+            CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
+            strData = "1";
+            stRtn = "1";
 #else
 
         stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
@@ -729,7 +748,7 @@
                     pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-        pw = "HsckAD.com";
+                pw = "HsckAD.com";
 #endif
                 pw = pw.ToLower();
 
@@ -874,8 +893,8 @@
                 // 완료 처리!!!
                 eResultIdPwAfterJob = eIDPWresultJob.eNone;
                 HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");//Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-                
-                    goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+
+                goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
             }
         }
 
@@ -1357,6 +1376,15 @@
             else
             {
                 bUIBtnDisable = false;
+
+                // sessionCheck 동작하게 적용
+                HsNetWork hsNetWork = null;
+                hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
+                if (hsNetWork != null)
+                {
+                    hsNetWork.SetLoginSessionCheckDo();
+                }
+
                 string strPopupMsg = "";
                 // 다중망일때에는 실패한 망이름 표현
                 if (pageService.m_bIsMultiNetWork)
