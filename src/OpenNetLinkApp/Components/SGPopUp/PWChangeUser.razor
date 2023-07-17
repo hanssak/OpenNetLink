@@ -99,6 +99,13 @@
         protectedPWNewConfirm = getProtectedNewConfirm;
         await JSRuntime.InvokeVoidAsync("setElementValue", new object[] { newConfirmPW, protectedPWNewConfirm });
     }
+
+    void initPassword()
+    {
+        SetProtectedPWCurrent(string.Empty);
+        SetProtectedPWNew(string.Empty);
+        SetProtectedPWNewConfirm(string.Empty);
+    }
     /// <summary>
     /// UI Element PW를 암호화하여 가지고와서 DEK로 암호화하여 ProtectedPW로 저장
     /// </summary>
@@ -211,44 +218,44 @@
                 }
 
                 // 현재PW인지 check
-            if (string.Compare(protectedPWCurrent, protectedPWNew) == 0)
-            {
-                strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_NOW_PW");
-                ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
-                CLog.Here().Information($"CheckValidationNewPW, PW Change Err, New PW is equre Now PW, Msg : {strInfoMsg}");
-                return false;
-            }
+                if (string.Compare(protectedPWCurrent, protectedPWNew) == 0)
+                {
+                    strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_NOW_PW");
+                    ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+                    CLog.Here().Information($"CheckValidationNewPW, PW Change Err, New PW is equre Now PW, Msg : {strInfoMsg}");
+                    return false;
+                }
 
-            // 동일한 문자·숫자의 연속적인 반복입력 금지
-            if (objCheckPWstring.GetSameCharCheck(ref pwNew, SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID)))
-            {
-                strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_SAMECHAR_MSG"); // 연속된 문자는 {0}자리까지만 입력이 가능합니다.
-                strInfoMsg = String.Format(strInfoMsg, SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID) - 1);
-                ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
-                CLog.Here().Information($"CheckValidationNewPW, PW Change Err, SameCharCount : {SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID)}, Msg : {strInfoMsg}");
-                return false;
-            }
+                // 동일한 문자·숫자의 연속적인 반복입력 금지
+                if (objCheckPWstring.GetSameCharCheck(ref pwNew, SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID)))
+                {
+                    strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_SAMECHAR_MSG"); // 연속된 문자는 {0}자리까지만 입력이 가능합니다.
+                    strInfoMsg = String.Format(strInfoMsg, SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID) - 1);
+                    ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+                    CLog.Here().Information($"CheckValidationNewPW, PW Change Err, SameCharCount : {SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID)}, Msg : {strInfoMsg}");
+                    return false;
+                }
 
-            // 키보드상의 연속된 문자 또는 숫자의 순차적 입력금지
-            if (objCheckPWstring.GetKeyBoardContinuousWord(ref pwNew, SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID)))
-            {
-                strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_KEYBOARD_LINEAR_MSG"); // 키보드상의 연속된 문자는 {0}개 이상 사용할 수 없습니다.
-                strInfoMsg = String.Format(strInfoMsg, SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID));
-                ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
-                CLog.Here().Information($"CheckValidationNewPW, PW Change Err, KeyBoardLinearChar-Count : {SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID)}, Msg : {strInfoMsg}");
-                return false;
-            }
+                // 키보드상의 연속된 문자 또는 숫자의 순차적 입력금지
+                if (objCheckPWstring.GetKeyBoardContinuousWord(ref pwNew, SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID)))
+                {
+                    strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_KEYBOARD_LINEAR_MSG"); // 키보드상의 연속된 문자는 {0}개 이상 사용할 수 없습니다.
+                    strInfoMsg = String.Format(strInfoMsg, SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID));
+                    ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+                    CLog.Here().Information($"CheckValidationNewPW, PW Change Err, KeyBoardLinearChar-Count : {SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID)}, Msg : {strInfoMsg}");
+                    return false;
+                }
 
-            // 숫자, 대문자(영문), 소문자(영문), 특수문자가 각 1개 이상 포함
-            if (objCheckPWstring.GetComplexCnt(ref pwNew) < SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID))
-            {
-                strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_GUIDE_INFO_EX1");     // 비밀번호를 영문 대문자/소문자/숫자/특수문자 중 {0}가지 이상을 조합하여 {1}자리 이상으로 입력하세요.(스페이스 사용 불가).
-                strInfoMsg = String.Format(strInfoMsg, SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID), MaxLen);
-                ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
-                CLog.Here().Information($"CheckValidationNewPW, PW Change Err, Rule-Count : {SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID)}, Msg : {strInfoMsg}");
-                return false;
-            }
-            // 직전 사용된 패스워드 재사용 금지 - Server의 결과값으로만 알수 있음
+                // 숫자, 대문자(영문), 소문자(영문), 특수문자가 각 1개 이상 포함
+                if (objCheckPWstring.GetComplexCnt(ref pwNew) < SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID))
+                {
+                    strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_GUIDE_INFO_EX1");     // 비밀번호를 영문 대문자/소문자/숫자/특수문자 중 {0}가지 이상을 조합하여 {1}자리 이상으로 입력하세요.(스페이스 사용 불가).
+                    strInfoMsg = String.Format(strInfoMsg, SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID), MaxLen);
+                    ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+                    CLog.Here().Information($"CheckValidationNewPW, PW Change Err, Rule-Count : {SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID)}, Msg : {strInfoMsg}");
+                    return false;
+                }
+                // 직전 사용된 패스워드 재사용 금지 - Server의 결과값으로만 알수 있음
 
             }
             return true;
@@ -284,6 +291,8 @@
             strInfoMsg = XmlConf.GetTitle("T_ETC_OLD_PASSWORD_NEEDED"); //  기존 비밀번호를 입력하세요.
             ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
             CLog.Here().Information($"doChangePW, Now PW is empty, Msg : {strInfoMsg}");
+
+            initPassword();
             return;
         }
 
@@ -293,6 +302,8 @@
             strInfoMsg = XmlConf.GetWarnMsg("W_0044"); //  현재 비밀번호를 잘못 입력했습니다.
             ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
             CLog.Here().Information($"doChangePW, incorrect PW, Msg : {strInfoMsg}");
+
+            initPassword();
             return;
         }
 
@@ -301,6 +312,8 @@
             strInfoMsg = XmlConf.GetTitle("T_ETC_NEW_PASSWORD_NEEDED"); // 새 비밀번호을 입력하세요.
             ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
             CLog.Here().Information($"doChangePW, New PW is empty, Msg : {strInfoMsg}");
+
+            initPassword();
             return;
         }
 
@@ -309,6 +322,8 @@
             strInfoMsg = XmlConf.GetTitle("T_ETC_COMFIRM_PASSWORD_NEEDED"); // 새 비밀번호 확인을 입력하세요.
             ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
             CLog.Here().Information($"doChangePW, New PW confirm is empty, Msg : {strInfoMsg}");
+
+            initPassword();
             return;
         }
 
@@ -318,6 +333,8 @@
             strInfoMsg = XmlConf.GetWarnMsg("W_0046");  // 새로운 비밀번호가 이전 비밀번호와 같습니다.
             ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
             CLog.Here().Information($"doChangePW, New PW is equre  Now PW, Msg : {strInfoMsg}");
+
+            initPassword();
             return;
         }
 
@@ -326,10 +343,12 @@
             strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_INCORRECT_FOR_NEW");
             ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
             CLog.Here().Information($"doChangePW, New PW is not equre  New-PW-Confirm, Msg : {strInfoMsg}");
+
+            initPassword();
             return;
         }
 
-          bool bComplexCheck = false;
+        bool bComplexCheck = false;
         string userID = string.Empty;
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -340,7 +359,10 @@
         }
 
         if (!CheckValidationNewPW(groupID, userID, bComplexCheck))
+        {
+            initPassword();
             return;
+        }
 
         //Debug.WriteLine("PW:" + stCurrentPW);
         //Debug.WriteLine("new PW:" + stNewPW);
@@ -375,70 +397,78 @@
 
     public void UserPassWordChangeNoti(int groupID, PageEventArgs e)
     {
-
-        // Test 필요
-        if (e.result != 0)
+        try
         {
+            // Test 필요
+            if (e.result != 0)
+            {
 
-            string strMsgData = "";
+                string strMsgData = "";
 
-            if (e.result == 2)
-                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_USED"); // 이전 사용된 비밀번호는 사용할 수 없습니다.
-            else if (e.result == 3)
-            {
-                int MaxLen = SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID);
-                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_LENGTH_MSG"); // 비밀번호는 {0}자리 이상 입력해야 합니다.
-                strMsgData = String.Format(strMsgData, MaxLen);
-            }
-            else if (e.result == 5)
-            {
-                // 자리수에 대해 Server와의 interface 생기면 수정필요
-                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_SAMECHAR_MSG"); // 연속된 문자는 {0}자리까지만 입력이 가능합니다.
-                strMsgData = String.Format(strMsgData, SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID)-1);
-            }
-            else if (e.result == 4 || e.result == 6)
-            {
-                // 자리수에 대해 Server와의 interface 생기면 수정필요
-                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_GUIDE_INFO_EX1"); // 비밀번호를 영문 대문자/소문자/숫자/특수문자 중 {0}가지 이상을 조합하여 {1}자리 이상으로 입력하세요.(스페이스 사용 불가).
-                strMsgData = String.Format(strMsgData,
-                    SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID),
-                    SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID));
-            }
-            else if (e.result == 7)
-            {
-                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_KEYBOARD_LINEAR_MSG"); // 키보드상의 연속된 문자는 {0}개 이상 사용할 수 없습니다.
-                strMsgData = String.Format(strMsgData, SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID));
-            }
-            else // 1 : 변경실패와 동일
-                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_CHANGE_ERROR"); // 비밀번호 변경 중 오류가 발생 하였습니다. 잠시후 다시 시도하십시오.
+                if (e.result == 2)
+                    strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_USED"); // 이전 사용된 비밀번호는 사용할 수 없습니다.
+                else if (e.result == 3)
+                {
+                    int MaxLen = SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID);
+                    strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_LENGTH_MSG"); // 비밀번호는 {0}자리 이상 입력해야 합니다.
+                    strMsgData = String.Format(strMsgData, MaxLen);
+                }
+                else if (e.result == 5)
+                {
+                    // 자리수에 대해 Server와의 interface 생기면 수정필요
+                    strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_SAMECHAR_MSG"); // 연속된 문자는 {0}자리까지만 입력이 가능합니다.
+                    strMsgData = String.Format(strMsgData, SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID) - 1);
+                }
+                else if (e.result == 4 || e.result == 6)
+                {
+                    // 자리수에 대해 Server와의 interface 생기면 수정필요
+                    strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_GUIDE_INFO_EX1"); // 비밀번호를 영문 대문자/소문자/숫자/특수문자 중 {0}가지 이상을 조합하여 {1}자리 이상으로 입력하세요.(스페이스 사용 불가).
+                    strMsgData = String.Format(strMsgData,
+                        SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID),
+                        SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID));
+                }
+                else if (e.result == 7)
+                {
+                    strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_KEYBOARD_LINEAR_MSG"); // 키보드상의 연속된 문자는 {0}개 이상 사용할 수 없습니다.
+                    strMsgData = String.Format(strMsgData, SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID));
+                }
+                else // 1 : 변경실패와 동일
+                    strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_CHANGE_ERROR"); // 비밀번호 변경 중 오류가 발생 하였습니다. 잠시후 다시 시도하십시오.
 
-            ShowMessage("waring", strMsgData);
-            CLog.Here().Error($"UserPassWordChangeNoti, groupID : {groupID}, Result : {e.result}, Err-Msg: {strMsgData}");
-            return;
+                ShowMessage("waring", strMsgData);
+                CLog.Here().Error($"UserPassWordChangeNoti, groupID : {groupID}, Result : {e.result}, Err-Msg: {strMsgData}");
+                return;
+            }
+
+            closePopUp();
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0011")); // 비밀번호가 변경되었습니다.
+            CLog.Here().Information($"UserPassWordChangeNoti, PW changed-Success, groupID : {groupID}");
+
+            //pageService.SetCurUserPassWD(groupID, stNewPW);
+            HSCmdCenter.SetProtectedPassWord(groupID, protectedPWNew);
+            //if (siteConfig.GetUseAutoLogin(groupID) == true)  // json 설정으로 이동
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID))
+            {
+                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                string strEncPW = "";
+                sgRSACrypto?.ValueEncrypt(protectedPWNew, out strEncPW);
+                SGSettingData sgSettingData = null;
+                sgSettingData = sgSettingProc.SelectSettingData(groupID);
+                if (sgSettingData == null)
+                    sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);    // groupID
+
+                sgSettingProc.SetSettingUPW(groupID, strEncPW);
+            }
         }
-
-        closePopUp();
-        ShowMessage("info", XmlConf.GetInfoMsg("I_0011")); // 비밀번호가 변경되었습니다.
-        CLog.Here().Information($"UserPassWordChangeNoti, PW changed-Success, groupID : {groupID}");
-
-        //pageService.SetCurUserPassWD(groupID, stNewPW);
-        HSCmdCenter.SetProtectedPassWord(groupID, protectedPWNew);
-        //if (siteConfig.GetUseAutoLogin(groupID) == true)  // json 설정으로 이동
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID))
+        catch (Exception ex)
         {
-            SGRSACrypto sgRSACrypto = new SGRSACrypto();
-            string strEncPW = "";
-            sgRSACrypto?.ValueEncrypt(protectedPWNew, out strEncPW);
-            SGSettingData sgSettingData = null;
-            sgSettingData = sgSettingProc.SelectSettingData(groupID);
-            if (sgSettingData == null)
-                sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);    // groupID
-
-            sgSettingProc.SetSettingUPW(groupID, strEncPW);
+            CLog.Here().Error($"UserPassWordChangeNoti- Exception(MSG) :  {ex.Message}");
+        }
+        finally
+        {
+            initPassword();
         }
     }
-
-
 
     private void ShowMessage(string strType, string strMsg)
     {

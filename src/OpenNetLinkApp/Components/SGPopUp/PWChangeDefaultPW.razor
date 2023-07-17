@@ -126,6 +126,13 @@
         protectedPWNewConfirm = getProtectedNewConfirm;
         await JSRuntime.InvokeVoidAsync("setElementValue", new object[] { newConfirmPW, protectedPWNewConfirm });
     }
+
+    void initPassword()
+    {
+        SetProtectedPWCurrent(string.Empty);
+        SetProtectedPWNew(string.Empty);
+        SetProtectedPWNewConfirm(string.Empty);
+    }
     /// <summary>
     /// UI Element PW를 암호화하여 가지고와서 DEK로 암호화하여 ProtectedPW로 저장
     /// </summary>
@@ -314,6 +321,8 @@
             strInfoMsg = XmlConf.GetTitle("T_ETC_OLD_PASSWORD_NEEDED"); //  기존 비밀번호를 입력하세요.
             ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
             CLog.Here().Information($"doChangePW, Now PW is empty, Msg : {strInfoMsg}");
+
+            initPassword();
             return;
         }
 
@@ -323,6 +332,8 @@
             strInfoMsg = XmlConf.GetWarnMsg("W_0044"); //  현재 비밀번호를 잘못 입력했습니다.
             ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
             CLog.Here().Information($"doChangePW, incorrect PW, Msg : {strInfoMsg}");
+
+            initPassword();
             return;
         }
 
@@ -331,6 +342,8 @@
             strInfoMsg = XmlConf.GetTitle("T_ETC_NEW_PASSWORD_NEEDED"); // 새 비밀번호을 입력하세요.
             ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
             CLog.Here().Information($"doChangePW, New PW is empty, Msg : {strInfoMsg}");
+
+            initPassword();
             return;
         }
 
@@ -339,6 +352,8 @@
             strInfoMsg = XmlConf.GetTitle("T_ETC_COMFIRM_PASSWORD_NEEDED"); // 새 비밀번호 확인을 입력하세요.
             ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
             CLog.Here().Information($"doChangePW, New PW confirm is empty, Msg : {strInfoMsg}");
+
+            initPassword();
             return;
         }
 
@@ -348,6 +363,8 @@
             strInfoMsg = XmlConf.GetWarnMsg("W_0046");  // 새로운 비밀번호가 이전 비밀번호와 같습니다.
             ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
             CLog.Here().Information($"doChangePW, New PW is equre  Now PW, Msg : {strInfoMsg}");
+
+            initPassword();
             return;
         }
 
@@ -356,6 +373,8 @@
             strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_INCORRECT_FOR_NEW");
             ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
             CLog.Here().Information($"doChangePW, New PW is not equre  New-PW-Confirm, Msg : {strInfoMsg}");
+
+            initPassword();
             return;
         }
 
@@ -370,7 +389,10 @@
         }
 
         if (!CheckValidationNewPW(groupID, userID, bComplexCheck))
+        {
+            initPassword();
             return;
+        }
 
         if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
         {
@@ -432,120 +454,85 @@
 
     public void InitPassWordChangeNoti(int groupID, PageEventArgs e)
     {
-
-        // Test 필요
-        if (e.result != 0)
+        try
         {
-
-            string strMsgData = "";
-
-            if (e.result == 2)
-                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_USED"); // 이전 사용된 비밀번호는 사용할 수 없습니다.
-            else if (e.result == 3)
+            // Test 필요
+            if (e.result != 0)
             {
-                int MaxLen = SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID);
-                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_LENGTH_MSG"); // 비밀번호는 {0}자리 이상 입력해야 합니다.
-                strMsgData = String.Format(strMsgData, MaxLen);
-            }
-            else if (e.result == 5)
-            {
-                // 자리수에 대해 Server와의 interface 생기면 수정필요
-                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_SAMECHAR_MSG"); // 연속된 문자는 {0}자리까지만 입력이 가능합니다.
-                strMsgData = String.Format(strMsgData, SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID) - 1);
-            }
-            else if (e.result == 4 || e.result == 6)
-            {
-                // 자리수에 대해 Server와의 interface 생기면 수정필요
-                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_GUIDE_INFO_EX1"); // 비밀번호를 영문 대문자/소문자/숫자/특수문자 중 {0}가지 이상을 조합하여 {1}자리 이상으로 입력하세요.(스페이스 사용 불가).
-                strMsgData = String.Format(strMsgData,
-                    SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID),
-                    SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID));
-            }
-            else if (e.result == 7)
-            {
-                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_KEYBOARD_LINEAR_MSG"); // 키보드상의 연속된 문자는 {0}개 이상 사용할 수 없습니다.
-                strMsgData = String.Format(strMsgData, SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID));
-            }
-            else // 1 : 변경실패와 동일
-                strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_CHANGE_ERROR"); // 비밀번호 변경 중 오류가 발생 하였습니다. 잠시후 다시 시도하십시오.
 
-            ShowMessage("waring", strMsgData);
-            CLog.Here().Error($"InitPassWordChangeNoti, groupID : {groupID}, Result : {e.result}, Err-Msg: {strMsgData}");
-            return;
-        }
+                string strMsgData = "";
 
-        closePopUp();
-
-
-        //string strNavigateWithGroupID = "";
-        //if (SGAppMgrSvc.OpConfigInfoService.GetUseDashBoard())
-        //    strNavigateWithGroupID = "/Welcome/";
-        //else
-        //    strNavigateWithGroupID = "/Transfer/";
-
-        //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-
-        string strNavigateWithGroupID = String.Empty;
-        if (basicPageType == (int)Enums.EnumBasicPageType.Main)
-        {
-            strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
-            string strNavigateUrl = strNavigateWithGroupID.ToLower();
-            if (strNavigateUrl.IndexOf("transfer") > 0)
-            {
-                strNavigateUrl = pageService.GetFileTransPage(groupID);
-                if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                    strNavigateWithGroupID = strNavigateUrl;
-                else
-                    strNavigateWithGroupID = "/Transfer/";
-            }
-            strNavigateWithGroupID += groupID.ToString();
-            MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-        }
-
-        MoveSiderBarFocusTogroupid();
-
-        ShowMessage("info", XmlConf.GetInfoMsg("I_0011")); // 비밀번호가 변경되었습니다.
-        CLog.Here().Information($"InitPassWordChangeNoti, PW changed-Success, groupID : {groupID}");
-
-        //pageService.SetCurUserPassWD(groupID, stNewPW);
-        HSCmdCenter.SetProtectedPassWord(groupID, protectedPWNew);
-        if (basicPageType == (int)Enums.EnumBasicPageType.Main)
-        {
-            //if (siteConfig.GetUseAutoLogin(groupID) == true)
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID))
-            {
-                SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                string strEncPW = "";
-                sgRSACrypto?.ValueEncrypt(protectedPWNew, out strEncPW);
-                SGSettingData sgSettingData = null;
-                sgSettingData = sgSettingProc.SelectSettingData(groupID);
-                if (sgSettingData == null)
-                    sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);    // groupID
-
-                sgSettingProc.SetSettingUPW(groupID, strEncPW);
-            }
-
-            //if (AppConfigSvc.GetStartTrayMove())
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray(groupID))
-            {
-                if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
+                if (e.result == 2)
+                    strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_USED"); // 이전 사용된 비밀번호는 사용할 수 없습니다.
+                else if (e.result == 3)
                 {
-                    string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                    string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
-                    HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, strTitle, strInfoMsg);
-                    Window.MoveWebWindowToTray();
+                    int MaxLen = SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID);
+                    strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_LENGTH_MSG"); // 비밀번호는 {0}자리 이상 입력해야 합니다.
+                    strMsgData = String.Format(strMsgData, MaxLen);
                 }
-                else
-                    HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                else if (e.result == 5)
+                {
+                    // 자리수에 대해 Server와의 interface 생기면 수정필요
+                    strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_SAMECHAR_MSG"); // 연속된 문자는 {0}자리까지만 입력이 가능합니다.
+                    strMsgData = String.Format(strMsgData, SGAppMgrSvc.OpConfigInfoService.GetPWsameCharCnt(groupID) - 1);
+                }
+                else if (e.result == 4 || e.result == 6)
+                {
+                    // 자리수에 대해 Server와의 interface 생기면 수정필요
+                    strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_GUIDE_INFO_EX1"); // 비밀번호를 영문 대문자/소문자/숫자/특수문자 중 {0}가지 이상을 조합하여 {1}자리 이상으로 입력하세요.(스페이스 사용 불가).
+                    strMsgData = String.Format(strMsgData,
+                        SGAppMgrSvc.OpConfigInfoService.GetPWchangeRuleCnt(groupID),
+                        SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID));
+                }
+                else if (e.result == 7)
+                {
+                    strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_KEYBOARD_LINEAR_MSG"); // 키보드상의 연속된 문자는 {0}개 이상 사용할 수 없습니다.
+                    strMsgData = String.Format(strMsgData, SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID));
+                }
+                else // 1 : 변경실패와 동일
+                    strMsgData = XmlConf.GetTitle("T_ETC_PASSWORD_CHANGE_ERROR"); // 비밀번호 변경 중 오류가 발생 하였습니다. 잠시후 다시 시도하십시오.
+
+                ShowMessage("waring", strMsgData);
+                CLog.Here().Error($"InitPassWordChangeNoti, groupID : {groupID}, Result : {e.result}, Err-Msg: {strMsgData}");
+                return;
             }
-            else
+
+            closePopUp();
+
+
+            //string strNavigateWithGroupID = "";
+            //if (SGAppMgrSvc.OpConfigInfoService.GetUseDashBoard())
+            //    strNavigateWithGroupID = "/Welcome/";
+            //else
+            //    strNavigateWithGroupID = "/Transfer/";
+
+            //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+
+            string strNavigateWithGroupID = String.Empty;
+            if (basicPageType == (int)Enums.EnumBasicPageType.Main)
             {
-                HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
+                string strNavigateUrl = strNavigateWithGroupID.ToLower();
+                if (strNavigateUrl.IndexOf("transfer") > 0)
+                {
+                    strNavigateUrl = pageService.GetFileTransPage(groupID);
+                    if (strNavigateUrl != null && strNavigateUrl.Length > 0)
+                        strNavigateWithGroupID = strNavigateUrl;
+                    else
+                        strNavigateWithGroupID = "/Transfer/";
+                }
+                strNavigateWithGroupID += groupID.ToString();
+                MyNavigationManager.NavigateTo(strNavigateWithGroupID);
             }
-        }
-        else
-        {
-            if (eLoginProcessType == eLoginType.eLOGINTYPE_GPKI)
+
+            MoveSiderBarFocusTogroupid();
+
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0011")); // 비밀번호가 변경되었습니다.
+            CLog.Here().Information($"InitPassWordChangeNoti, PW changed-Success, groupID : {groupID}");
+
+            //pageService.SetCurUserPassWD(groupID, stNewPW);
+            HSCmdCenter.SetProtectedPassWord(groupID, protectedPWNew);
+            if (basicPageType == (int)Enums.EnumBasicPageType.Main)
             {
                 //if (siteConfig.GetUseAutoLogin(groupID) == true)
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID))
@@ -560,23 +547,68 @@
 
                     sgSettingProc.SetSettingUPW(groupID, strEncPW);
                 }
+
+                //if (AppConfigSvc.GetStartTrayMove())
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray(groupID))
+                {
+                    if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
+                    {
+                        string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                        string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
+                        HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                        Window.MoveWebWindowToTray();
+                    }
+                    else
+                        HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                }
+                else
+                {
+                    HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                }
+            }
+            else
+            {
+                if (eLoginProcessType == eLoginType.eLOGINTYPE_GPKI)
+                {
+                    //if (siteConfig.GetUseAutoLogin(groupID) == true)
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID))
+                    {
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        string strEncPW = "";
+                        sgRSACrypto?.ValueEncrypt(protectedPWNew, out strEncPW);
+                        SGSettingData sgSettingData = null;
+                        sgSettingData = sgSettingProc.SelectSettingData(groupID);
+                        if (sgSettingData == null)
+                            sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);    // groupID
+
+                        sgSettingProc.SetSettingUPW(groupID, strEncPW);
+                    }
+                }
+
+                HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
             }
 
-            HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+            pageService.ConnectCountAdd(groupID);
+            pageService.SetConnectStatus(groupID, true);
+            pageService.SetLogoutStatus(groupID, false);
+
+            CLog.Here().Information($"groupID : {groupID} - User Do Login(PWChangeDefaultPW), UrlRedirection LogIn State ReSet !!!");
+            HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, true);
+
+
+            CtrlSideEvent ctrlSideEvent = null;
+            ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
+            if (ctrlSideEvent != null)
+                ctrlSideEvent();
         }
-
-        pageService.ConnectCountAdd(groupID);
-        pageService.SetConnectStatus(groupID, true);
-        pageService.SetLogoutStatus(groupID, false);
-
-        CLog.Here().Information($"groupID : {groupID} - User Do Login(PWChangeDefaultPW), UrlRedirection LogIn State ReSet !!!");
-        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, true);
-
-
-        CtrlSideEvent ctrlSideEvent = null;
-        ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
-        if (ctrlSideEvent != null)
-            ctrlSideEvent();
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"InitPassWordChangeNoti- Exception(MSG) :  {ex.Message}");
+        }
+        finally
+        {
+            initPassword();
+        }
     }
 
 

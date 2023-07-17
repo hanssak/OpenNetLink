@@ -462,12 +462,14 @@
             if ((id?.Length ?? 0) < 1)
             {
                 ShowLoginFail(XmlConf.GetWarnMsg("W_0030"));
+                SetProtectedPW(string.Empty);
                 return;
             }
 
             if ((protectedPw?.Length ?? 0) < 1)
             {
                 ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
+                SetProtectedPW(string.Empty);
                 return;
             }
 
@@ -483,6 +485,8 @@
                 {
                     ShowLoginFail(XmlConf.GetTitle("T_OTP_GUIDE"));
                     bLoginBtnDisable = false;
+                    
+                    SetProtectedPW(string.Empty);
                     return;
                 }
             }
@@ -1742,6 +1746,8 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         }
         finally
         {
+            SetProtectedPW(string.Empty);
+
             if (!pageService.GetIsPolicyUpdate(groupId))
             {
                 if (!SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0) || dicLoginResult.Count == NetWorkSvc.NetWorkInfo.Count)

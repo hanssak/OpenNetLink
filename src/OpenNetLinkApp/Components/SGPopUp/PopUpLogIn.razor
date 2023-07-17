@@ -150,7 +150,7 @@
         protectedPw = getProtectedPW;
         await JSRuntime.InvokeVoidAsync("setElementValue", new object[] { "popUploginPw", getProtectedPW });
     }
-     /// <summary>
+    /// <summary>
     /// UI Element PW를 암호화하여 가지고와서 DEK로 암호화하여 ProtectedPW로 저장
     /// </summary>
     public async Task SetProtectedPWFromUI()
@@ -171,7 +171,7 @@
                 SetProtectedPW(SGCrypto.AESEncrypt256WithDEK(originalPW));
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             CLog.Here().Error($"SetProtectedPWFromUI - Exception - Msg : {ex.Message}");
         }
@@ -356,7 +356,7 @@
     /// </summary>
     private async void doLogInByBtn()
     {
-       
+
         await SetProtectedPWFromUI();
 
         CLog.Here().Information($"PopupLogin - doLogInByBtn - groupid : {nGroupID}");
@@ -423,19 +423,19 @@
         return false;
     }
 
-@*
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="groupid"></param>
-    /// <returns></returns>
-    bool isWasAuth(int groupid)
-    {
+    @*
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="groupid"></param>
+        /// <returns></returns>
+        bool isWasAuth(int groupid)
+        {
 
         if (groupid < 0)
         {
-            CLog.Here().Error($"isWasAuth - InValid - groupid : {groupid}");
-            return false;
+        CLog.Here().Error($"isWasAuth - InValid - groupid : {groupid}");
+        return false;
         }
 
         bool bRet = false;
@@ -443,94 +443,94 @@
 
         try
         {
-            List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+        List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
 
-            foreach (ISGNetwork netlist in listNetWork)
-            {
-                if (netlist.GroupID == groupid)
-                {
-                    strIP = netlist.IPAddress;
-                    break;
-                }
-            }
+        foreach (ISGNetwork netlist in listNetWork)
+        {
+        if (netlist.GroupID == groupid)
+        {
+        strIP = netlist.IPAddress;
+        break;
+        }
+        }
 
-            if ((strIP?.Length ?? 0) < 1)
-            {
-                CLog.Here().Error($"isWasAuth - InValid - IP");
-                return false;
-            }
+        if ((strIP?.Length ?? 0) < 1)
+        {
+        CLog.Here().Error($"isWasAuth - InValid - IP");
+        return false;
+        }
 
-            // strIP = "172.16.3.250"; // KKW - 사내TEST
-            SessionWebClient web = new SessionWebClient();
-            string strUrl = @$"https://{strIP}:1310/v2/sso/db/login";
-            string strEncID = "";
-            string strEncPW = "";
+        // strIP = "172.16.3.250"; // KKW - 사내TEST
+        SessionWebClient web = new SessionWebClient();
+        string strUrl = @$"https://{strIP}:1310/v2/sso/db/login";
+        string strEncID = "";
+        string strEncPW = "";
 
-            SGCrypto crypt = new SGCrypto();
-            // 실제사용
-            crypt.Aes256EncryptIVkey(id, out strEncID);
-            crypt.Aes256EncryptIVkey(pw, out strEncPW);
+        SGCrypto crypt = new SGCrypto();
+        // 실제사용
+        crypt.Aes256EncryptIVkey(id, out strEncID);
+        crypt.Aes256EncryptIVkey(pw, out strEncPW);
 
-            string strJsonData = CsWASfunc.stringIDpwJsonString(strEncID, strEncPW);
-            string stRtn = "";
-            int nCode = 0;
-            string strMsg = "";
-            string strData = "";
-            int nData = 0;
+        string strJsonData = CsWASfunc.stringIDpwJsonString(strEncID, strEncPW);
+        string stRtn = "";
+        int nCode = 0;
+        string strMsg = "";
+        string strData = "";
+        int nData = 0;
 
-#if DEBUG  // SITE배포용도
-    //#if false  // SITE배포용도
-    CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
-    strData = "1";
-    stRtn = "1";
-#else
+        #if DEBUG  // SITE배포용도
+        //#if false  // SITE배포용도
+        CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
+        strData = "1";
+        stRtn = "1";
+        #else
 
-            stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
-            if (stRtn == null || (1 > stRtn.Length))
-            {
-                CLog.Here().Information($"Result - json, Data is null OR 0 Size");
-                ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
-                return false;
-            }
+        stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
+        if (stRtn == null || (1 > stRtn.Length))
+        {
+        CLog.Here().Information($"Result - json, Data is null OR 0 Size");
+        ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
+        return false;
+        }
 
-            // json으로 온 Data에서 실제 data 뽑아내는 동작
-            using (JsonDocument document = JsonDocument.Parse(stRtn))
-            {
-                JsonElement jroot = document.RootElement;
-                nCode = jroot.GetProperty("code").GetInt32();
-                strMsg = jroot.GetProperty("msg").GetString();
-                strData = jroot.GetProperty("data").GetString();
-            }
-#endif
+        // json으로 온 Data에서 실제 data 뽑아내는 동작
+        using (JsonDocument document = JsonDocument.Parse(stRtn))
+        {
+        JsonElement jroot = document.RootElement;
+        nCode = jroot.GetProperty("code").GetInt32();
+        strMsg = jroot.GetProperty("msg").GetString();
+        strData = jroot.GetProperty("data").GetString();
+        }
+        #endif
 
-            CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
+        CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
 
-            if (stRtn != null && stRtn.Length > 0 && strData == "1")
-            {
-                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(pageService.m_nCurViewPageGroupID) ? eLoginType.eLOGINTYPE_AD : (eLoginType)pageService.m_nLoginType));
-                CLog.Here().Information($"doLogIn - IDPW - Web Certificate Done!");
-                bRet = true;
-            }
-            else
-            {
-                strMsg = CsWASfunc.GetErrorCodeToStr(strData);
-                CLog.Here().Information($"doLogIn - IDPW - Web Certificate(@@@@@@@@@) Failed : {strMsg}");
-                ShowLoginFail(strMsg);
-                bRet = false;
-            }
+        if (stRtn != null && stRtn.Length > 0 && strData == "1")
+        {
+        pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(pageService.m_nCurViewPageGroupID) ? eLoginType.eLOGINTYPE_AD : (eLoginType)pageService.m_nLoginType));
+        CLog.Here().Information($"doLogIn - IDPW - Web Certificate Done!");
+        bRet = true;
+        }
+        else
+        {
+        strMsg = CsWASfunc.GetErrorCodeToStr(strData);
+        CLog.Here().Information($"doLogIn - IDPW - Web Certificate(@@@@@@@@@) Failed : {strMsg}");
+        ShowLoginFail(strMsg);
+        bRet = false;
+        }
 
 
         }
         catch (Exception ex)
         {
-            CLog.Here().Error($"isWasAuth - Exception(MSG) : {ex.Message}");
-            bRet = false;
+        CLog.Here().Error($"isWasAuth - Exception(MSG) : {ex.Message}");
+        bRet = false;
         }
 
         return bRet;
 
-    }
-*@
+        }
+    *@
 
     /// <summary>
     /// 로그인 Type 상관없이 2번째 망이상에서는 이함수로 Login 진행
@@ -547,12 +547,14 @@
             if ((id?.Length ?? 0) < 1)
             {
                 ShowLoginFail(XmlConf.GetWarnMsg("W_0030"));
+                SetProtectedPW(string.Empty);
                 return;
             }
 
             if ((protectedPw?.Length ?? 0) < 1)
             {
                 ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
+                SetProtectedPW(string.Empty);
                 return;
             }
 
@@ -578,7 +580,10 @@
             }
 
             if (strCurCliVersion.Equals(""))
+            {
+                SetProtectedPW(string.Empty);
                 return;
+            }
             HSCmdCenter.SetCliVersion(strCurCliVersion);
 
             pageService.SetGroupIDLoginType(nGroupID, eLoginUITypeData);
@@ -598,8 +603,6 @@
             CLog.Here().Information($"doLogin - Exception(Msg) : {ex.Message}");
             Debug.WriteLine(ex.Message);
         }
-
-
         //MyNavigationManager.NavigateTo(url);
     }
 
@@ -823,9 +826,9 @@
             //옵션에 따라, 저장된 '초기비밀번호'와 동일할 경우 초기 비밀번호로 인지
             SGRSACrypto sgRSACrypto = new SGRSACrypto();
             sgRSACrypto.ValueDecrypt(strInitPW, ref initPw);
-           string encInitPW =SGCrypto.AESEncrypt256WithDEK(initPw);
+            string encInitPW = SGCrypto.AESEncrypt256WithDEK(initPw);
 
-            if (encInitPW== protectedPw)
+            if (encInitPW == protectedPw)
                 return true;
 
             //옵션에 따라, ID와 동일할 경우 초기 비밀번호로 인지
@@ -1461,6 +1464,7 @@
         finally
         {
             bStartedLogin = false;
+            SetProtectedPW(string.Empty);
         }
     }
 
