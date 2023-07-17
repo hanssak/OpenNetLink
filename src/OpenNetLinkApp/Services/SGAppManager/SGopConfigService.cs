@@ -175,6 +175,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetInitTransferFileExplorerPathInWindow(int groupId);
         public bool GetUseToastInsteadOfOSNotification(int groupId);
         public bool GetUiFileExpiredDateShow(int groupId);
+        public string GetScrTimeoutLockType(int groupId);
     }
 
 
@@ -883,6 +884,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUiFileExpiredDateShow(int groupId)
         {
             return AppConfigInfo[groupId].bUiFileExpiredDateShow;
+        }
+
+        public string GetScrTimeoutLockType(int groupId)
+        {
+            return AppConfigInfo[groupId].strScrTimeoutLockType;
         }
     }
 }

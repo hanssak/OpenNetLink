@@ -1001,13 +1001,27 @@ private async void mouseTimer_Elapsed(object sender, System.Timers.ElapsedEventA
     {
         if ((pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true) && (pageService.GetFilePrevRecving() != true)) // && (!bTotalLogOut))
         {
-            //pageService.SetScrLocking(true);
-            //화면잠금후에도 파일수신은 되도록 수정 2021/07/15 YKH
-            //HsCmdCenter.SetAllFileRecvPossible(false);
-            HsCmdCenter.SetAllFileRecvPossible(true);
-
-            if(!pageService.GetScrLocking())
-                await openDisplayLock();
+            string timeoutType = SGAppMgrSvc.OpConfigInfoService.GetScrTimeoutLockType(groupId);
+            if (timeoutType.ToUpper() == "LOGOUT")
+            {
+                CLog.Here().Information($"ScreenLock Timeout({screentime} min)- {timeoutType}");
+                LogOut(groupId);
+            }
+            else if (timeoutType.ToUpper() == "EXIT")
+            {
+                CLog.Here().Information($"ScreenLock Timeout({screentime} min)- {timeoutType}");
+                Window.ProgramExit();
+            }
+            else// (timeoutType.ToUpper() == "SCREENLOCK")
+            {
+                //pageService.SetScrLocking(true);
+                //화면잠금후에도 파일수신은 되도록 수정 2021/07/15 YKH
+                //HsCmdCenter.SetAllFileRecvPossible(false);
+                CLog.Here().Information($"ScreenLock Timeout({screentime} min)- {timeoutType}");
+                HsCmdCenter.SetAllFileRecvPossible(true);
+                if (!pageService.GetScrLocking())
+                    await openDisplayLock();
+            }
         }
         else
         {
