@@ -822,12 +822,12 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_LOGOUT", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
-        public int RequestSendScreenLockClear(HsNetWork hsNet, string strUserID, string strPasswd, string strLoginType)
+        public int RequestSendScreenLockClear(HsNetWork hsNet, string strUserID, string strProtectedPasswd, string strLoginType)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
-            dic["PASSWORD"] = strPasswd;
+            dic["PASSWORD"] = strProtectedPasswd;
             dic["LOGINTYPE"] = strLoginType;
             SGEventArgs args = sendParser.RequestClientUnlock("CMD_STR_CLIENTUNLOCK", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);

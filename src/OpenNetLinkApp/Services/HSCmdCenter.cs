@@ -2655,12 +2655,12 @@ namespace OpenNetLinkApp.Services
             if (hsNetWork != null)
                 hsNetWork.logOut();
         }
-        public int SendScreenLockClear(int groupid, string strUserID, string strPasswd, string strLoginType)
+        public int SendScreenLockClear(int groupid, string strUserID, string strProtectedPasswd, string strLoginType)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestSendScreenLockClear(hsNetWork, strUserID, strPasswd, strLoginType);
+                return sgSendData.RequestSendScreenLockClear(hsNetWork, strUserID, strProtectedPasswd, strLoginType);
             return -1;
         }
 

@@ -1,3 +1,4 @@
+@using HsNetWorkSG
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using AgLogManager
@@ -33,13 +34,13 @@
                         <div class="login_w">
 
                             <div class="input-group mb-2">
-                                <input id="lockPw" type="password" class="form-control-login border-0 lock-pass" placeholder="Password" @bind="strInputPW" @onkeyup="keyCheck">
+                                <input id="lockPw" type="password" class="form-control-login border-0 lock-pass" placeholder="Password" onkeydown="KeyEventPW('btnScreenLockCear');">
                             </div>
 
                             <div class="row">
 
                                 <div class="col-12  pt-2">
-                                    <button type="submit" class="btn btn-login btn-block btn_open" @onclick="ScreenLockCear">@strLockClear</button>
+                                    <button id="btnScreenLockCear" type="button" class="btn btn-login btn-block btn_open" @onclick="ScreenLockCear">@strLockClear</button>
                                     <button type="submit" class="btn btn-login btn-block btn_exit" @onclick="ProgramExit">@strProgramExit</button>
                                 </div>
                                 <div class="col-12 text-center pt-3 copy">Copyright &copy  HANSSAK Corp.  All rights reserved.</div>
@@ -62,7 +63,50 @@
     public string strLockInfo = "";
     public string strLockClear = "";
     public string strProgramExit = "";
-    public string strInputPW = "";
+    //public string strInputPW = "";
+    /// <summary>
+    /// DEK로 암호화된 PW(base64)
+    /// </summary>
+    public string protectedPw;
+    /// <summary>
+    /// 암호화된 PW 변수저장 및 UI 컨트롤에 적용
+    /// </summary>
+    public async void SetProtectedPW(string getProtectedPW)
+    {
+        protectedPw = getProtectedPW;
+        await JSRuntime.InvokeVoidAsync("setElementValue", new object[] { "lockPw", getProtectedPW });
+    }
+    /// <summary>
+    /// UI Element PW를 암호화하여 가지고와서 DEK로 암호화하여 ProtectedPW로 저장
+    /// </summary>
+    public async Task SetProtectedPWFromUI()
+    {
+        byte[] originalPW = new byte[1];
+        OpenSSL.Crypto.RSA rsa = new OpenSSL.Crypto.RSA();
+        try
+        {
+            rsa.GenerateKeys(2048, 3, null, null);
+            var encPW = await JSRuntime.InvokeAsync<object>("GetProtectedPW", new object[] { "lockPw", rsa.PublicKey });
+            if (string.IsNullOrEmpty(encPW.ToString()))
+            {
+                SetProtectedPW(string.Empty);
+            }
+            else
+            {
+                originalPW = rsa.PrivateDecrypt(Convert.FromBase64String(encPW.ToString()), OpenSSL.Crypto.RSA.Padding.PKCS1);
+                SetProtectedPW(SGCrypto.AESEncrypt256WithDEK(originalPW));
+            }
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"SetProtectedPWFromUI - Exception - Msg : {ex.Message}");
+        }
+        finally
+        {
+            originalPW.hsClear(3);
+            rsa.Dispose();
+        }
+    }
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<LogIn_DisplayLock>();
     public async Task openPopUp()
     {
@@ -74,7 +118,7 @@
     public void closePopUp()
     {
         pageService.SetScrLocking(false);
-        strInputPW = "";
+        SetProtectedPW(string.Empty);
         StateHasChanged();
         object[] param = { "modal-displaylock" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
@@ -106,16 +150,21 @@
             ScreenLockCear();
     }
 
-    public void ScreenLockCear()
+    public async void ScreenLockCear()
     {
+        await SetProtectedPWFromUI();
 
-        if (strInputPW.Equals(""))
+        int groupID = 0;
+
+        if (protectedPw.Equals(""))
         {
             string strMsg = XmlConf.GetInfoMsg("I_0043");                       // 비밀번호를 입력하여 주십시오.
             ShowMessage("warn", strMsg);
+
+            SetProtectedPW(string.Empty);
             return;
         }
-        int groupID = 0;
+
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;*/
@@ -125,25 +174,32 @@
             string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
             strMsg = strMsg.Replace("/r/n", "<br>");
             ShowMessage("error", strMsg);
+            SetProtectedPW(string.Empty);
             return;
         }
 
         SGLoginData sGLoginData = null;
         sGLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sGLoginData == null)
+        {
+            SetProtectedPW(string.Empty);
             return;
+        }
         string strUserID = sGLoginData.GetUserID();
 
         SGSvrData sgSvrData = null;
         sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(groupID);
         if (sgSvrData == null)
+        {
+            SetProtectedPW(string.Empty);
             return;
+        }
 
         //string strLoginType = sgSvrData.GetBasicTagData("LOGINTYPE");
         string strLoginType = sgSvrData.GetLoginTypeStr();
 
         CLog.Here().Information("[LogIn_DisplayLock] PageSvcLogIn Type:{0}, SvrDataLogIn Type:{1}", pageService.m_nLoginType.ToString(), strLoginType);
-        HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW, strLoginType);
+        HsCmdCenter.SendScreenLockClear(groupID, strUserID, protectedPw, strLoginType);
         //HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW, pageService.m_nLoginType.ToString());
     }
 
@@ -154,20 +210,32 @@
 
     public void ScreenLockCearNoti(int groupID, OpenNetLinkApp.PageEvent.PageEventArgs e)
     {
-        if (e.result != 0)
+
+        try
         {
-            string strMsg = XmlConf.GetErrMsg("E_0010");    // 화면 잠금 해제가 실패 했습니다./ r / n비밀번호를 다시 입력 해주세요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
+            if (e.result != 0)
+            {
+                string strMsg = XmlConf.GetErrMsg("E_0010");    // 화면 잠금 해제가 실패 했습니다./ r / n비밀번호를 다시 입력 해주세요.
+                strMsg = strMsg.Replace("/r/n", "<br>");
+                ShowMessage("error", strMsg);
+                return;
+            }
+
+            JSRuntime.InvokeAsync<object>("initMouseClick");
+
+            string strReason = e.strMsg;
+            pageService.SetScrLocking(false);
+            HsCmdCenter.SetAllFileRecvPossible(true);
+            closePopUp();
         }
-
-        JSRuntime.InvokeAsync<object>("initMouseClick");
-
-        string strReason = e.strMsg;
-        pageService.SetScrLocking(false);
-        HsCmdCenter.SetAllFileRecvPossible(true);
-        closePopUp();
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"LoginResultOnetoAll - Exception(MSG) :  {ex.Message}");
+        }
+        finally
+        {
+            SetProtectedPW(string.Empty);
+        }
     }
 
     private void ShowMessage(string strType, string strMsg)
