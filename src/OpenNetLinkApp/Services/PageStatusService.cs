@@ -994,14 +994,14 @@ namespace OpenNetLinkApp.Services
         //    return m_DicPageStatusData[groupID].GetEncCurUserPassWD();
         //}
 
-        public void SetSessionKey(int groupID, string strSessionKey)
+        public void SetProtectedSessionKey(int groupID, string strProtectedSessionKey)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
             {
                 return;
             }
-            m_DicPageStatusData[groupID].SetSessionKey(strSessionKey);
+            m_DicPageStatusData[groupID].SetProtectedSessionKey(strProtectedSessionKey);
         }
 
         public int GetConnectCount(int groupID)

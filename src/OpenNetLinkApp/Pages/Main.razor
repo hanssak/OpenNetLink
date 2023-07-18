@@ -1405,7 +1405,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
                     if (hsNetWork != null)
                     {
-                        pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
+                        pageService.SetProtectedSessionKey(groupId, hsNetWork.GetProtectedSeedKey());
                         HSCmdCenter.SetProtectedPassWord(groupId, protectedPw);
                     }
 

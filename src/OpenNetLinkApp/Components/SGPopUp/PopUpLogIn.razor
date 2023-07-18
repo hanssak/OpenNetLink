@@ -868,7 +868,7 @@
         hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
         if (hsNetWork != null)
         {
-            pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
+            pageService.SetProtectedSessionKey(groupId, hsNetWork.GetProtectedSeedKey());
             HSCmdCenter.SetProtectedPassWord(groupId, protectedPw); //hsNetWork.SetUserPassword(pw);
         }
 
@@ -1053,7 +1053,7 @@
         hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
         if (hsNetWork != null)
         {
-            pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
+            pageService.SetProtectedSessionKey(groupId, hsNetWork.GetProtectedSeedKey());
             HSCmdCenter.SetProtectedPassWord(groupId, protectedPw); //hsNetWork.SetPassWord(pw);
         }
 

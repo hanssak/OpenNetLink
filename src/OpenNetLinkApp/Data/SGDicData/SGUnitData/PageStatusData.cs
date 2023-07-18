@@ -693,7 +693,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_logOutFileListClearEvent = userPasswdChgEvent;
         }
 
-        
+
 
         //public void SetCurUserPassWD(string strPW)
         //{
@@ -709,10 +709,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         //    return sgEncData.GetEncTagData("CURPASSWD");
         //}
 
-        public void SetSessionKey(string strSessionKey)
-        {
-            sgEncData.SetSessionKey(strSessionKey);
-        }
+        public void SetProtectedSessionKey(string strProtectedSessionKey) => sgEncData.SetProtectedSessionKey(strProtectedSessionKey);
 
         public int GetConnectCount()
         {

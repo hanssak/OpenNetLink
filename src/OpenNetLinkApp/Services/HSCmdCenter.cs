@@ -2780,27 +2780,6 @@ namespace OpenNetLinkApp.Services
         }
 
         /// <summary>
-        /// 비밀번호를 DEK로 암호화하여 저장 
-        /// <br/>= stCliMem.SetOriginalPassword
-        /// </summary>
-        /// <param name="groupid"></param>
-        /// <param name="strNewPassWD"></param>
-        public void SetOriginalPassWord(int groupid, string strNewPassWD)
-        {
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-            {
-                //SGData sgData = new SGData();
-                //sgData.SetSessionKey(hsNetWork.GetSeedKey());
-                //sgData.SetTagData("NEWPASSWORD", strNewPassWD);
-                //string strEncNewPassWD = sgData.GetEncTagData("NEWPASSWORD");
-                hsNetWork.stCliMem.SetOriginalPassword(strNewPassWD);
-                CLog.Here().Information($"UserInfo SetOriginalPassword! PwLen:{strNewPassWD.Length}");
-            }
-            return;
-        }
-        /// <summary>
         /// (DEK로 암호화된)비밀번호를 저장 
         /// <br/>= stCliMem.SetProtectedPassword
         /// </summary>
@@ -2829,19 +2808,6 @@ namespace OpenNetLinkApp.Services
                 return hsNetWork.stCliMem.GetProtectedPassword();
             return string.Empty;
         }
-
-        /// <summary>
-        /// 비밀번호 원본 호출
-        /// <br/>= stCliMem.GetOriginalPassword
-        /// </summary>
-        public string GetPassword(int groupid)
-        {
-            HsNetWork hsNetWork = GetConnectNetWork(0);
-            if (hsNetWork != null)
-                return hsNetWork.stCliMem.GetOriginalPassword();
-            return string.Empty;
-        }
-
 
         public void SetCliVersion(string strCliVersion)
         {

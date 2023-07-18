@@ -258,7 +258,7 @@
         hsNet = HSCmdCenter.GetConnectNetWork(groupID);
         if (hsNet != null)
         {
-            pageService.SetSessionKey(groupID, hsNet.GetSeedKey());
+            pageService.SetProtectedSessionKey(groupID, hsNet.GetProtectedSeedKey());
         }
         refPWChangeUser.Init();
         await refPWChangeUser.openPopUp();

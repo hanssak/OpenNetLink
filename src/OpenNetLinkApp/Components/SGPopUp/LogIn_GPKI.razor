@@ -1001,7 +1001,7 @@
             hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
             if (hsNetWork != null)
             {
-                pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
+                pageService.SetProtectedSessionKey(groupId, hsNetWork.GetProtectedSeedKey());
 
                 SGData tmpData = null;
                 // tmpData = HsCmdCenter.GetSGSvrData(groupId);
@@ -1010,7 +1010,9 @@
                 {
                     // gpki_login때는 id 사용
                     //hsNetWork.SetUserPassword(sgLoginData.GetUserID());
-                    HsCmdCenter.SetOriginalPassWord(groupId, sgLoginData.GetUserID());
+                    byte[] userId = System.Text.Encoding.UTF8.GetBytes(sgLoginData.GetUserID());
+                    string protectedUserId = SGCrypto.AESEncrypt256WithDEK(userId);
+                    HsCmdCenter.SetProtectedPassWord(groupId, protectedUserId);
                 }
 
             }
