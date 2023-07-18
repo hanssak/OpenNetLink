@@ -123,7 +123,13 @@ namespace OpenNetLinkApp.Data.SGQuery
                 { "strUserSeq", strUserSeq }, { "strSystemType", strSystemType }, { "strBlockType", strBlockType }, { "strBlockReason", strBlockReason }
             };
 
-            return SQLXmlService.Instanse.GetSqlQuery("AgentBlock", param);
+            //바로 암호화 하지 않고 보낼때 암호화
+            StringBuilder sb = new StringBuilder();
+            SQLXmlService.Instanse.GetSqlQuery("AgentBlock", param, ref sb);
+            sb.Replace(Environment.NewLine, "");
+            sb.Replace("\t", "");
+            sb.Replace("\\n", "\n");
+            return sb.ToString();
         }
 
         /// <summary>
@@ -353,6 +359,34 @@ namespace OpenNetLinkApp.Data.SGQuery
             return SQLXmlService.Instanse.GetSqlQuery("OLEMimeList", param);
         }
 
+        public static string GetFileExceptionCancel(string userSeq, List<string> list)
+        {
+            StringBuilder sb = new StringBuilder();
+            int i = 0;
+            foreach (string str in list)
+            {
+                Dictionary<string, string> subParam = new Dictionary<string, string>() {
+                    { "userSeq", userSeq }, { "strFileSeq", str}
+                    
+                };
+                StringBuilder subSb = new StringBuilder();
+                SQLXmlService.Instanse.GetSqlQuery("FileExceptionCancel", subParam, ref subSb);
+                subSb.Replace(Environment.NewLine, "");
+                subSb.Replace("\t", "");
+                subSb.Replace("\\n", "\n");
+                if (i == 0)
+                    sb.Append("Hsck_Transaction:" + subSb.ToString());
+                else
+                    sb.Append(subSb.ToString());
 
+                i++;
+                subSb.Clear();
+            }
+            sb.Replace(Environment.NewLine, "");
+            sb.Replace("\t", "");
+            sb.Replace("\\n", "\n");
+            string sql = sb.ToString();
+            return HsNetWorkSG.SGCrypto.AESEncrypt256WithDEK(ref sql);
+        }
     }
 }

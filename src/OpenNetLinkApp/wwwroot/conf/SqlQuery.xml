@@ -845,4 +845,7 @@ WHERE 1=1
 	<statement id = "MailManageDaoCount">
 		SELECT COUNT(*) FROM FUNC_EMAIL_TRANSFERINFO_OPEN('#UserID#','#SearchStartDate#','#SearchEndDate#', '#ApproveKind#', '#TransKind#','#ApprStatus#','#TransStatus#', '#Dlp#', '#Receiver#', '#Title#', '0', '', '')
 	</statement>
+  <statement id = "FileExceptionCancel">
+		UPDATE TBL_SKIP_FILE_LIST SET SKIP_FLAG='3' WHERE FILE_SEQ=#strFileSeq# AND USER_SEQ=#userSeq#\n
+  </statement>
 </statements>

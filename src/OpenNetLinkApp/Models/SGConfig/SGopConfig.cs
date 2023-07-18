@@ -130,7 +130,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         //public bool bUseScreenLock { get; set; } = false;                                   // 화면잠금 사용 여부.(체크)
         public bool bUseLogLevel { get; set; } = false;                                     // 로그 레벨 사용 여부
         public bool bShowAdminInfo { get; set; } = false;                                   //대시보드에 관리자 정보 표시 여부 
-        public bool bUseFileCheckException { get; set; } = false;                           // 파일검사 예외 신청( Virus / Apt )
+        public bool bUseFileCheckException { get; set; } = true;                           // 파일검사 예외 신청( Virus / Apt )
         public bool bUsePCURL { get; set; } = false;                      // PCURL 사용 유무.
         public bool bUsePublicBoard { get; set; } = false;                // 공지사항 사용 유무.
         public bool bUseCertSend { get; set; } = false;                   // 인증서 전송 사용 유무. (OTP 팝업 메뉴)
