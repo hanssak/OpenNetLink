@@ -847,5 +847,5 @@ WHERE 1=1
 	</statement>
   <statement id = "FileExceptionCancel">
 		UPDATE TBL_SKIP_FILE_LIST SET SKIP_FLAG='3' WHERE FILE_SEQ=#strFileSeq# AND USER_SEQ=#userSeq#\n
-  </statement>
+	</statement>
 </statements>
