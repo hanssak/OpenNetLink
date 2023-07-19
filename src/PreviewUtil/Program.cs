@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using WebWindows;
@@ -9,7 +9,10 @@ namespace PreviewUtil
     {
         static void Main(string[] args)
         {
-            var window = new WebWindow("   PreviewUtilApp", options =>
+            string url = args[0];
+            string title = (args.Length > 1) ? args[1] : "   PreviewUtilApp";
+
+            var window = new WebWindow(title, options =>
             {
                 options.SchemeHandlers.Add("app", (string url, out string contentType) =>
                 {
@@ -23,7 +26,7 @@ namespace PreviewUtil
                 window.SendMessage("Got message: " + message);
             };
 
-            Console.WriteLine("0: {0}", args[0]);
+            // Console.WriteLine("0: {0}", args[0]);
             window.NavigateToUrl(args[0]);
             window.SetTrayStartUse(false);
             window.WaitForExit();
