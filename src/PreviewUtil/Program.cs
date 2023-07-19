@@ -25,11 +25,18 @@ namespace PreviewUtil
             {
                 window.SendMessage("Got message: " + message);
             };
+            
+            window.URLChanged += ChangedURL;
 
             // Console.WriteLine("0: {0}", args[0]);
             window.NavigateToUrl(args[0]);
             window.SetTrayStartUse(false);
             window.WaitForExit();
+        }
+
+        static void ChangedURL(object sender, string URL)
+        {
+            Console.WriteLine(URL);
         }
     }
 }

@@ -1,0 +1,81 @@
+@page "/Login_OKTA"
+
+
+@using System.Diagnostics
+@using OpenNetLinkApp.Services
+@using System.Security.Authentication
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Models.SGNetwork
+@using OpenNetLinkApp.Models.SGSideBar
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using HsNetWorkSGData
+@using HsNetWorkSG
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
+@using OpenNetLinkApp.Common
+@using System.Threading
+@using System.Runtime.InteropServices
+@using NetSparkleUpdater
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
+@using System.Net.NetworkInformation
+@using System.Xml
+@using System.Xml.Linq
+@using OpenNetLinkApp.Common
+@using System.Collections.Concurrent;
+@using System.Text.Json;
+@using System.Text
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager MyNavigationManager
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+@inject WebWindow Window
+@inject PageStatusService pageService
+@inject OSXcmdService OSxCmdService
+
+
+<div id="divLoginMain" class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
+    @*<div class="login-box  p-0 m-0" style="height:413px; width:880px !important;">
+        <iframe src=@url style="width: 100%; height: 500px;"></iframe>
+        </div>
+        <input type="text" @bind="url" style="width:400px;" />*@
+
+    인증 먼저 해주세요.
+    인증 중입니다.
+
+</div>
+
+@code {
+    public string url = "https://192.168.1.71:1300/hrx-api/sso/saml2/net/1234567890123456";
+
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+          //  return;
+            int groupid = pageService.m_nCurViewPageGroupID;
+            ProcessStartInfo startInfo = null;
+
+#if _WINDOWS
+   startInfo = new ProcessStartInfo("PreviewUtil.exe");
+#else
+
+            startInfo = new ProcessStartInfo("PreviewUtil");
+#endif
+            startInfo.Arguments = SGAppMgrSvc.OpConfigInfoService.GetOKTAUrl(groupid);
+            startInfo.WindowStyle = ProcessWindowStyle.Normal;
+            using (Process proc = Process.Start(startInfo))
+            {
+                //proc.WaitForExit();
+            }
+
+        }
+        base.OnAfterRender(firstRender);
+    }
+
+}
