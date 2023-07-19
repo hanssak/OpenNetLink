@@ -16,4 +16,8 @@
     </None>
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy $(TargetDir)$(TargetFileName) $(SolutionDir)src\OpenNetLinkApp\bin\$(ConfigurationName)\net5.0\win-x64\.&#xD;&#xA;copy $(TargetDir)$(TargetFileName) $(SolutionDir)src\OpenNetLinkApp\Library\.&#xD;&#xA;" />
+  </Target>
+
 </Project>
