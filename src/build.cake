@@ -858,6 +858,13 @@ Task("PubCrossflatform")
 		String strNetLinkUninstallPath = "./OpenNetLinkApp/Library/NetLink.Uninstall/uninstall.exe";
 		if(FileExists(strNetLinkUninstallPath) & deleteNetLink.ToString().ToUpper() == "FALSE") { DeleteFile(strNetLinkUninstallPath); }
 	}
+	else
+	{
+		String strNetLinkUninstallDir = "./OpenNetLinkApp/Library/NetLink.Uninstall";		
+		if(DirectoryExists(strNetLinkUninstallDir)) {
+			DeleteDirectory(strNetLinkUninstallDir, new DeleteDirectorySettings { Force = true, Recursive = true });
+		}	
+	}
 
     DotNetCorePublish("./OpenNetLinkApp", settings);
 	DotNetCorePublish("./PreviewUtil", settings);
