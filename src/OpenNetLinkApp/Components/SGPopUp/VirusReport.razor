@@ -73,8 +73,11 @@
     public string m_strVirusContent;
     public bool m_bVirus;
 
+
+
     public async Task openPopUp()
     {
+        SendConfirm();
         object[] param = { "modal-virusreport" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -88,7 +91,6 @@
             ShowMessage("error", strMsg);
             return;
         }
-        SendConfirm();
         object[] param = { "modal-virusreport" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
@@ -135,4 +137,7 @@
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
+
+
+
 }
