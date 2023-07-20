@@ -93,9 +93,9 @@
     webWindow->InvokeMoved(x, y);
 }
 - (void) webView: (WKWebView *) webView didStartProvisionalNavigation: (WKNavigation *) navigation {
-    NSString *myString = webView.URL.absoluteString;  //By this time it's changed
-    NSLog(@"!!!!string :: %@",myString);
-    NTLog(SelfThis, Info, "!!!!!! TEST TEST");
-    ((WebWindow*)(SelfThis))->InvokeURLChangedCallback((AutoString)myString.UTF8String);
+    NSString *myString = webView.URL.absoluteString;
+    std::string strUriText;
+    strUriText = myString.UTF8String;
+    ((WebWindow*)(SelfThis))->InvokeURLChangedCallback(strUriText.data(), strUriText.length());
 }
 @end
