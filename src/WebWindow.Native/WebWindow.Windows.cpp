@@ -249,7 +249,7 @@ void WebWindow::Register(HINSTANCE hInstance)
 }
 
 WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCallback webMessageReceivedCallback)
-{	
+{
 	SelfThis = this;
 
 	// Create the window
@@ -274,31 +274,31 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 	);
 	hwndToWebWindow[_hWnd] = this;
 
-	
-	tray.icon = (char*)TRAY_ICON1;
-	tray.menu = (struct tray_menu *)malloc(sizeof(struct tray_menu)*8);
 
-    /*tray.menu[0] = {(char*)"About",0,0,0,hello_cb,NULL,NULL};
-    tray.menu[1] = {(char*)"-",0,0,0,NULL,NULL,NULL};
-    tray.menu[2] = {(char*)"Hide",0,0,0,toggle_show,NULL,NULL};
-    tray.menu[3] = {(char*)"-",0,0,0,NULL,NULL,NULL};
-    tray.menu[4] = {(char*)"Quit",0,0,0,quit_cb,NULL,NULL};
-    tray.menu[5] = {NULL,0,0,0,NULL,NULL,NULL};*/
+	tray.icon = (char*)TRAY_ICON1;
+	tray.menu = (struct tray_menu*)malloc(sizeof(struct tray_menu) * 8);
+
+	/*tray.menu[0] = {(char*)"About",0,0,0,hello_cb,NULL,NULL};
+	tray.menu[1] = {(char*)"-",0,0,0,NULL,NULL,NULL};
+	tray.menu[2] = {(char*)"Hide",0,0,0,toggle_show,NULL,NULL};
+	tray.menu[3] = {(char*)"-",0,0,0,NULL,NULL,NULL};
+	tray.menu[4] = {(char*)"Quit",0,0,0,quit_cb,NULL,NULL};
+	tray.menu[5] = {NULL,0,0,0,NULL,NULL,NULL};*/
 
 	//tray.menu[0] = { (char*)"About",0,0,0,hello_cb,NULL,NULL };
 	//tray.menu[1] = { (char*)"-",0,0,0,NULL,NULL,NULL };
-	tray.menu[0] = { (char*)(g_bStartTray?"Show":"Hide"),0,g_bStartTray?1:0,0,toggle_show,NULL,NULL };
+	tray.menu[0] = { (char*)(g_bStartTray ? "Show" : "Hide"),0,g_bStartTray ? 1 : 0,0,toggle_show,NULL,NULL };
 	tray.menu[1] = { (char*)"-",0,0,0,NULL,NULL,NULL };
 	tray.menu[2] = { (char*)"Quit",0,0,0,quit_cb,NULL,NULL };
 	tray.menu[3] = { NULL,0,0,0,NULL,NULL,NULL };
 
 	/*
-            {.text = "About", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb},
-            {.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},
-            {.text = "Hide", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = toggle_show},
-            {.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},
-            {.text = "Quit", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb},
-            {.text = NULL, .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL}}
+			{.text = "About", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb},
+			{.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},
+			{.text = "Hide", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = toggle_show},
+			{.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},
+			{.text = "Quit", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb},
+			{.text = NULL, .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL}}
 	*/
 
 	m_nAppNotiID = 0;
@@ -306,11 +306,11 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 }
 
 // Needn't to release the handles.
-WebWindow::~WebWindow() 
-{ 
+WebWindow::~WebWindow()
+{
 	if (g_CustomHandler)
 		free(g_CustomHandler);
-	if(tray.menu) free(tray.menu);
+	if (tray.menu) free(tray.menu);
 }
 
 
@@ -362,19 +362,19 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		mmi->ptMinTrackSize.x = WINDOW_MIN_WIDTH;
 		mmi->ptMinTrackSize.y = WINDOW_MIN_HEIGHT;
 		return 0;
-	//case WM_QUIT:
-	//{
-	//	NTLog(SelfThis, Info, "Called : OpenNetLink - WM_QUIT !!!");
-	//	hwndToWebWindow.erase(hwnd);
-	//	WinToast::instance()->clear();
-	//	DWORD pid = GetCurrentProcessId();
-	//	KillProcess(pid);
-	//	if (!pid)
-	//		KillProcess(pid);
-	//	break;
-	//}
+		//case WM_QUIT:
+		//{
+		//	NTLog(SelfThis, Info, "Called : OpenNetLink - WM_QUIT !!!");
+		//	hwndToWebWindow.erase(hwnd);
+		//	WinToast::instance()->clear();
+		//	DWORD pid = GetCurrentProcessId();
+		//	KillProcess(pid);
+		//	if (!pid)
+		//		KillProcess(pid);
+		//	break;
+		//}
 	case WM_CLOSE:
-		NTLog(SelfThis, Info, "Called : OpenNetLink - WM_CLOSE - TrayUse : %s", g_bDoExit2TrayUse ?"YES":"NO");
+		NTLog(SelfThis, Info, "Called : OpenNetLink - WM_CLOSE - TrayUse : %s", g_bDoExit2TrayUse ? "YES" : "NO");
 		if (g_bDoExit2TrayUse)
 		{
 			if (hwnd == messageLoopRootWindowHandle)
@@ -383,7 +383,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				do
 				{
 					if (strcmp(item->text, "Hide") == 0 ||
-						strcmp(item->text, "Show") == 0) 
+						strcmp(item->text, "Show") == 0)
 					{
 						item->checked = false;
 						toggle_show(item);
@@ -403,7 +403,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				NTLog(SelfThis, Info, "Called : WindowProc, Success: Remove File [%s]", filePath.data());
 			else
 				NTLog(SelfThis, Err, "Called : WindowProc, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
-			
+
 			tray_exit();
 			printf("Exit!!\n");
 			hwndToWebWindow.erase(hwnd);
@@ -423,7 +423,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_WINDOWPOSCHANGING:
 	{
 		//NTLog(SelfThis, Info, "Called : WindowProc, WM_WINDOWPOSCHANGING");
-		WINDOWPOS* lpwndpos = (WINDOWPOS *)lParam;
+		WINDOWPOS* lpwndpos = (WINDOWPOS*)lParam;
 		if (lpwndpos != NULL && g_bStartTray)
 			lpwndpos->flags &= ~SWP_SHOWWINDOW;
 
@@ -498,7 +498,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			prcNewWindow->right - prcNewWindow->left,
 			prcNewWindow->bottom - prcNewWindow->top,
 			SWP_NOZORDER | SWP_NOACTIVATE);
-		
+
 		break;
 	}
 	case WM_SIZE:
@@ -519,7 +519,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			webWindow->RefitContent();
 			webWindow->InvokeResized(width, height);
 
-			printf("webWindow Width = %d, Height = %d\n",width,height);
+			printf("webWindow Width = %d, Height = %d\n", width, height);
 		}
 		return 0;
 	}
@@ -560,7 +560,7 @@ void WebWindow::SetTitle(AutoString title)
 
 void WebWindow::Show()
 {
-	
+
 	ShowWindow(_hWnd, SW_SHOWDEFAULT);
 
 	//MouseDropFilesAccept();
@@ -587,13 +587,13 @@ void WebWindow::WaitForExit()
 		DispatchMessage(&msg);
 	}
 #else
-	
+
 
 	if (tray_init(&tray) < 0)
 	{
 		// printf("failed to create tray\n");
 		NTLog(this, Fatal, "Failed to Create Tray\n");
-		return ;
+		return;
 	}
 	while (tray_loop(1) == 0)
 	{
@@ -724,7 +724,7 @@ void WebWindow::AttachWebView()
 	size_t cn;
 	mbstowcs_s(&cn, wEdgePath, strEdgePath, strlen(strEdgePath) + 1);//Plus null
 	LPWSTR lpEdgeptr = wEdgePath;
-	
+
 	std::atomic_flag flag = ATOMIC_FLAG_INIT;
 	flag.test_and_set();
 
@@ -816,6 +816,42 @@ void WebWindow::AttachWebView()
 							}
 						).Get(), &webResourceRequestedToken);
 
+						// add_NavigationStarting
+						EventRegistrationToken webNavigationStarting;
+						_webviewWindow->add_NavigationStarting(Callback<ICoreWebView2NavigationStartingEventHandler>(
+							[this](ICoreWebView2* sender, ICoreWebView2NavigationStartingEventArgs* args)
+							{
+								wil::unique_cotaskmem_string uri;
+								//WCHAR wUrlData[2 * 1024] = { 0, };
+								if (args->get_Uri(&uri) == S_OK)
+								{
+									BYTE* bUri;
+									wchar_t* wclpstr = (wchar_t*)uri.get();
+									size_t len = wcslen(wclpstr);
+									len = (len + 2) * sizeof(wchar_t);
+									len *= 2;
+
+									BYTE** ppData = NULL;
+									ppData = &bUri;
+									*ppData = new BYTE[len];
+
+									memset(*ppData, 0x00, len);
+									int unicodeLen = (int)wcslen(wclpstr);
+									int lenDe = WideCharToMultiByte(CP_UTF8, 0, wclpstr, unicodeLen, NULL, 0, NULL, NULL);
+									WideCharToMultiByte(CP_UTF8, 0, wclpstr, unicodeLen, (char*)*ppData, lenDe, NULL, NULL);
+
+									//WidecodeToUtf8(wclpstr, (char*)*ppData);
+									int nTotalLen = strlen((char*)*ppData);
+									((WebWindow*)SelfThis)->InvokeURLChangedCallback(bUri, nTotalLen);
+								/*	if (_urlChangedCallback)
+										::MessageBoxW(NULL, uri.get(), L"OKOK URL-add_NavigationStarting", MB_OK);
+									else
+										::MessageBoxW(NULL, uri.get(), L"NONO URL-add_NavigationStarting", MB_OK);*/
+								}
+								return S_OK;
+							}
+						).Get(), &webNavigationStarting);
+
 						RefitContent();
 
 						flag.clear();
@@ -880,7 +916,7 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	bool onlyCreateShortcut = false;
 	WinToastTemplate::AudioOption audioOption = WinToastTemplate::AudioOption::Default;
 
-	imagePath=(LPWSTR)image;
+	imagePath = (LPWSTR)image;
 	//actions.push_back(L"OK");
 	expiration = 0;
 	appName = (LPWSTR)L"OpenNetLink";
@@ -888,7 +924,7 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	wchar_t ModelID[MAX_PATH] = { 0, };
 	wsprintf(ModelID, L"Noti%d", m_nAppNotiID++);
 	//appUserModelID = (LPWSTR)ModelID;
-	
+
 	const auto aumi = WinToast::configureAUMI(L"HANSSAK", L"SecureGate", L"OpenNetLink", ModelID);
 
 	onlyCreateShortcut = false;
@@ -927,7 +963,7 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	//templ.setDuration(WinToastTemplate::Duration::Short);	//	약7초
 	templ.setDuration(WinToastTemplate::Duration::System);	//	약5초
 	//templ.setDuration(WinToastTemplate::Duration::Long);	//	약23초
-	
+
 	for (auto const& action : actions)
 		templ.addAction(action);
 	if (expiration)
@@ -944,7 +980,7 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	//	std::wcerr << "URI : " << navURI << endl;
 	//}
 	CustomHandler* handler = new CustomHandler(this);
-	
+
 	if (handler != NULL)
 	{
 		handler->SetNaviURI(navURI != NULL ? navURI : L"");
@@ -955,7 +991,7 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 		std::wcerr << L"Could not launch your toast notification!";
 		return;
 	}
-	
+
 }
 
 void WebWindow::AddCustomScheme(AutoString scheme, WebResourceRequestedCallback requestHandler)
@@ -1142,7 +1178,7 @@ tstring GetLogPath()
 	::GetModuleFileName(NULL, szPath, sizeof(szPath));
 
 #ifdef _UNICODE
-	_wsplitpath_s(szPath, szDrive, _countof(szDrive), szDir, _countof(szDir), NULL,0, NULL,0);
+	_wsplitpath_s(szPath, szDrive, _countof(szDrive), szDir, _countof(szDir), NULL, 0, NULL, 0);
 	//_tsplitpath(szPath, szDrive, szDir, NULL, NULL);
 #else
 	_splitpath(szPath, szDrive, szDir, NULL, NULL);
@@ -1214,7 +1250,7 @@ void LogWrite(int lvl, tstring strFile, tstring strTime, tstring strLog, tstring
 		size_t pos = 0;
 		pos = strSrc.rfind(_T('\\'));
 		if (tstring::npos != pos)
-			strSrc = strSrc.substr(pos+1);
+			strSrc = strSrc.substr(pos + 1);
 
 		fwrite(" ", 1, strlen(" "), f);
 		fwrite(STR_LOG_SRC, 1, strlen(STR_LOG_SRC), f);
@@ -1236,9 +1272,10 @@ void LogWrite(int lvl, tstring strFile, tstring strTime, tstring strLog, tstring
 /// </summary>
 void RequestMoveTrayToWebWindow()
 {
-	NTLog(SelfThis, Info, "Called : Request OpenNetLink Move To WebWindow using DoubleClick");	
+	NTLog(SelfThis, Info, "Called : Request OpenNetLink Move To WebWindow using DoubleClick");
 	((WebWindow*)SelfThis)->MoveTrayToWebWindow();
 }
+
 
 /**
 *@breif 현재 문제 있음. (@@@@@.사용하면 App 종료됨.)
@@ -1268,7 +1305,7 @@ void WebWindow::WriteLog(int lvl, TCHAR* chFile, int line, TCHAR* chfmt, ...)
 	tstring strLogFile = LogFile(st);
 
 	// 소스 정보
-	TCHAR chSrc[MAX_PATH*2] = { 0, };
+	TCHAR chSrc[MAX_PATH * 2] = { 0, };
 #ifdef _DEBUG
 	TCHAR* chFile2 = _tcsrchr(chFile, '\\');
 	swprintf(chSrc, MAX_PATH * 2, _T("%s(%d)"), chFile2 + 1, line);
@@ -1321,7 +1358,7 @@ size_t WebWindow::SaveTxtDataMem(bool bClearPreMem, bool bClearExPreMem, bool bU
 		nTotalLen = strlen((char*)*ppData);
 
 		GlobalUnlock(hglb);
-		
+
 		return nTotalLen;
 	}
 
@@ -1416,7 +1453,7 @@ size_t WebWindow::SaveImageFile(bool bClearPreMem, bool bClearExPreMem, bool bUs
 	fclose(fd);
 
 	GlobalUnlock(hbm);
-	
+
 	return nTotalLen;
 }
 
@@ -1433,7 +1470,7 @@ void FreeClipHotKey(int nGroupID)
 	wstring strClipHotKey = mapHotKey[nGroupID];
 	if (strClipHotKey.size() == 5)
 	{
-		wstring strWinKey = strClipHotKey.substr(0,1);
+		wstring strWinKey = strClipHotKey.substr(0, 1);
 		wstring strCtrlKey = strClipHotKey.substr(1, 1);
 		wstring strAltKey = strClipHotKey.substr(2, 1);
 		wstring strShiftKey = strClipHotKey.substr(3, 1);
@@ -1508,7 +1545,7 @@ int WebWindow::SendClipBoard(int groupID)
 
 	HWND hwndDesktop = GetDesktopWindow();
 
-	int nType = 0;	
+	int nType = 0;
 	size_t nTotalLen = 0;
 	size_t nTotalExLen = 0;
 
@@ -1533,7 +1570,7 @@ int WebWindow::SendClipBoard(int groupID)
 						//WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - ClipBoard - Bitmap - Size : %d, Text - Size : %d"), nTotalLen, nTotalExLen);
 						nType = 3;
 					}
-				}				
+				}
 			}
 		}
 
@@ -1547,7 +1584,7 @@ int WebWindow::SendClipBoard(int groupID)
 
 			if (bUseClipSelectSend)
 				NTLog(SelfThis, Info, "WebWindow::SendClipBoard - groupID : %d, ClipSelectSend - NOT Status(#######)", groupID);
-				//WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard - groupID : %d, ClipSelectSend - NOT Status(#######)"), groupID);
+			//WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard - groupID : %d, ClipSelectSend - NOT Status(#######)"), groupID);
 
 			if (bUseClipTextFirstSend)
 			{
@@ -1636,7 +1673,7 @@ int WebWindow::SendClipBoard(int groupID)
 		else
 			_clipboardCallback(groupID, nType, (int)nTotalLen, g_ptrByte, (int)0, NULL);
 
-	}		
+	}
 
 	if (nType != 3)
 		g_bDoingSendClipBoard = false;
@@ -1702,7 +1739,7 @@ char* WebWindow::GetModulePath()
 	char szpath[1024], szdrive[64], szdir[512];
 	::GetModuleFileNameA(NULL, szpath, sizeof(szpath));
 
-	_splitpath_s(szpath, szdrive, 64, szdir, 512, NULL,0, NULL,0);
+	_splitpath_s(szpath, szdrive, 64, szdir, 512, NULL, 0, NULL, 0);
 
 	memset(m_chModulePath, 0x00, sizeof(m_chModulePath));
 	sprintf_s(m_chModulePath, "%s%s", szdrive, szdir);
@@ -1717,13 +1754,13 @@ bool WebWindow::GetClipboardBitmap(HBITMAP hbm, char* bmpPath)
 	// 1. 파일 저장
 	sprintf_s(workdirpath, ".\\work");
 	//CreateAppDir(workdirpath, 512,1);
-	CreateDirectoryA(workdirpath,NULL);
-	sprintf_s(filepath, "%swork\\cur_clip.dat",GetModulePath());
+	CreateDirectoryA(workdirpath, NULL);
+	sprintf_s(filepath, "%swork\\cur_clip.dat", GetModulePath());
 	printf("filepath = %s", filepath);
 	MultiByteToWideChar(CP_ACP, 0, filepath, -1, wszBuff, sizeof(filepath));
 	if (SaveBitmapFile(hbm, wszBuff))
 	{
-		strcpy_s(bmpPath, 512,filepath);
+		strcpy_s(bmpPath, 512, filepath);
 		return true;
 	}
 	MessageBox(_hWnd, L"Clipboard image Save Fail!", L"Error Clipboard Img", MB_OK);
@@ -1753,13 +1790,13 @@ size_t WebWindow::LoadClipboardBitmap(char* filePath, BYTE* pByte)
 
 	int rCount = (int)(st.st_size / (1024 * 64)) + ((st.st_size % (1024 * 64)) ? 1 : 0);
 	int len = 0;
-	for (int i = 0, len=st.st_size; i < rCount; i++)
+	for (int i = 0, len = st.st_size; i < rCount; i++)
 	{
 		if (len > (1024 * 64))
 			rSize = (1024 * 64);
 		else
 			rSize = len;
-		if ((nRead = fread(pByte +nTotalLen, 1, rSize, fd)) <= 0)
+		if ((nRead = fread(pByte + nTotalLen, 1, rSize, fd)) <= 0)
 		{
 			fclose(fd);
 			return -1;
@@ -1800,7 +1837,7 @@ void WebWindow::ClipDataBufferClear(bool bClearPreMem, bool bClearPreExMem)
 
 }
 
-void LoadBitmapTest(char* filepath,void* buffer)
+void LoadBitmapTest(char* filepath, void* buffer)
 {
 	FILE* pFile = NULL;
 	errno_t err;
@@ -1822,10 +1859,10 @@ void LoadBitmapTest(char* filepath,void* buffer)
 	fclose(pFile);
 }
 
-void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
+void WebWindow::SetClipBoard(int groupID, int nType, int nClipSize, void* data)
 {
 	char  filepath[512], workdirpath[512];
-	void* buffer=NULL;
+	void* buffer = NULL;
 	if (OpenClipboard(0))
 	{
 		EmptyClipboard();
@@ -1838,7 +1875,7 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 			Utf8ToWidecode((char*)data, chData, nClipSize + 4);
 			hText = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, (wcslen(chData) + 4) * sizeof(wchar_t));
 			wchar_t* ptr = NULL;
-			if(hText!=NULL)
+			if (hText != NULL)
 				ptr = (wchar_t*)GlobalLock(hText);
 			wcscpy_s(ptr, wcslen(chData) + 4, chData);
 			SetClipboardData(CF_UNICODETEXT, hText);
@@ -1864,11 +1901,11 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 			DeleteFileA(filepath);
 			printf("FilePath = %s\n", filepath);
 			printf("nClipSize = %ld\n", nClipSize);
-			SaveImage(filepath , (void*)data, nClipSize);
+			SaveImage(filepath, (void*)data, nClipSize);
 
-		#if 1 // Mac 호환 Code 적용
+#if 1 // Mac 호환 Code 적용
 
-			USES_CONVERSION;			
+			USES_CONVERSION;
 			CImage img;
 			img.Load(A2W(filepath));
 			CDC memDC;
@@ -1882,19 +1919,19 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 			//put the data on the clipboard 
 			GlobalLock(bitmap.GetSafeHandle());
 			SetClipboardData(CF_BITMAP, bitmap.GetSafeHandle());
-			GlobalUnlock(bitmap.GetSafeHandle());			
+			GlobalUnlock(bitmap.GetSafeHandle());
 
 			CloseClipboard();
 
 			memDC.DeleteDC();
 			bitmap.Detach();
-			
+
 			//WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("Recv ClipBoard - Done !"));
 			NTLog(SelfThis, Info, "Recv ClipBoard - Done !");
 
 			DeleteFileA(filepath);
 
-		#else
+#else
 
 			HBITMAP hBitmap = NULL;
 			hBitmap = (HBITMAP)LoadImageA(NULL, filepath, IMAGE_BITMAP,
@@ -1916,10 +1953,10 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 			CloseClipboard();
 			DeleteFileA(filepath);
 
-		#endif
+#endif
 
 		}
-		else 
+		else
 			CloseClipboard();
 	}
 	CloseClipboard();
@@ -1931,7 +1968,7 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 }
 
 
-bool WebWindow::SaveImage(char* PathName, void* lpBits, int size) 
+bool WebWindow::SaveImage(char* PathName, void* lpBits, int size)
 {
 	FILE* pFile = NULL;
 	errno_t err;
@@ -1946,9 +1983,9 @@ bool WebWindow::SaveImage(char* PathName, void* lpBits, int size)
 	/*
 	tagBITMAPFILEHEADER bfh = *(tagBITMAPFILEHEADER*)lpBits;
 	tagBITMAPINFOHEADER bih = *(tagBITMAPINFOHEADER*)((unsigned char*)lpBits + sizeof(tagBITMAPFILEHEADER));
-	
+
 	RGBQUAD             rgb = *(RGBQUAD*)((unsigned char*)lpBits + sizeof(tagBITMAPFILEHEADER) + sizeof(tagBITMAPINFOHEADER));
-	
+
 	printf("BITMAP Width = %d, HEIGHT = %d\n", bih.biWidth, bih.biHeight);
 
 	// Create a new file for writing
@@ -1997,7 +2034,7 @@ bool WebWindow::GetTrayUse()
 void WebWindow::MoveWebWindowToTray()
 {
 	NTLog(this, Info, "Called : OpenNetLink Move To Tray");
-	struct tray_menu *item = tray.menu;
+	struct tray_menu* item = tray.menu;
 	do
 	{
 		if (strcmp(item->text, "Hide") == 0) {
@@ -2022,7 +2059,7 @@ void WebWindow::MoveTrayToWebWindow()
 void WebWindow::MinimizeWebWindow()
 {
 	NTLog(this, Info, "Called : OpenNetLink Minimize WebWindow");
-	struct tray_menu *item = tray.menu;
+	struct tray_menu* item = tray.menu;
 	do
 	{
 		if (strcmp(item->text, "Hide") == 0) {
@@ -2071,7 +2108,7 @@ void WebWindow::SetTrayStartUse(bool bUseStartTray)
 			if (strcmp(item->text, "Hide") == 0 ||
 				strcmp(item->text, "Show") == 0)
 			{
-				item->text = (char*)(g_bStartTray?"Show":"Hide");
+				item->text = (char*)(g_bStartTray ? "Show" : "Hide");
 				item->checked = g_bStartTray;
 				tray_update(&tray);
 				break;
@@ -2095,7 +2132,7 @@ void WebWindow::SetTrayStatus(bool bSetTextShowNchecked)
 		if (strcmp(item->text, "Hide") == 0 ||
 			strcmp(item->text, "Show") == 0)
 		{
-			item->text = (char*)(bSetTextShowNchecked ?"Show":"Hide");
+			item->text = (char*)(bSetTextShowNchecked ? "Show" : "Hide");
 			item->checked = bSetTextShowNchecked;
 			tray_update(&tray);
 			break;
@@ -2127,7 +2164,7 @@ void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, 
 	strTempHotKey += (bShift ? _T("1") : _T("0"));
 	strTempHotKey += chVKCode;
 
-	NTLog(this, Info, "Called - SetNativeClipboardHotKey(###) - GroupID : %d, bAlt : %s, bControl : %s, bShift : %s, bWin : %s, VKCode : %c, nIdx : %d, Sum-Data : %s", 
+	NTLog(this, Info, "Called - SetNativeClipboardHotKey(###) - GroupID : %d, bAlt : %s, bControl : %s, bShift : %s, bWin : %s, VKCode : %c, nIdx : %d, Sum-Data : %s",
 		groupID,
 		(AutoString)(bAlt ? L"Y" : L"N"),
 		(AutoString)(bControl ? L"Y" : L"N"),
@@ -2138,5 +2175,9 @@ void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, 
 
 	mapHotKey[groupID] = strTempHotKey;
 }
+
+
+
+
 
 // End Of File

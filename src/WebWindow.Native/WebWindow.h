@@ -23,16 +23,16 @@ typedef unsigned short mode_t;
 #include <atlimage.h>
 
 #ifdef _UNICODE
-	#define tstring wstring
-	#define tsprintf  swprintf_s
-	#define tvsnprintf _vsnwprintf
-	#define tstat64 _wstat64_s
+#define tstring wstring
+#define tsprintf  swprintf_s
+#define tvsnprintf _vsnwprintf
+#define tstat64 _wstat64_s
 #else
-	//typedef string tstring;
-	#define tstring string
-	#define tsprintf sprintf_s
-	#define tvsnprintf vsnprintf_s
-	#define tstat64 _stat64_s
+//typedef string tstring;
+#define tstring string
+#define tsprintf sprintf_s
+#define tvsnprintf vsnprintf_s
+#define tstat64 _stat64_s
 #endif
 
 #else
@@ -51,7 +51,7 @@ typedef struct stClipBoardParam
 {
 	int nGroupId;
 	char szExt[8];
-	void *self;
+	void* self;
 } ClipBoardParam;
 #elif OS_MAC
 #include <cstddef>
@@ -65,7 +65,7 @@ typedef struct stClipBoardParam
 #endif
 
 typedef char* AutoString;
-extern void *SelfThis;
+extern void* SelfThis;
 #endif
 
 #define WINDOW_MIN_WIDTH 1220
@@ -78,9 +78,9 @@ extern bool g_bClipCopyNsend;
 
 typedef enum enDefineClipType
 {
-	D_CLIP_TEXT 	= 1,
-	D_CLIP_IMAGE 	= 2,
-	D_CLIP_OBJECT 	= 3 //Image Or Text 둘다 가능
+	D_CLIP_TEXT = 1,
+	D_CLIP_IMAGE = 2,
+	D_CLIP_OBJECT = 3 //Image Or Text 둘다 가능
 } D_CLIP_TYPE;
 
 //
@@ -130,9 +130,11 @@ typedef int (*GetAllMonitorsCallback)(const Monitor* monitor);
 typedef void (*ResizedCallback)(int width, int height);
 typedef void (*MovedCallback)(int x, int y);
 typedef void (*NTLogCallback)(int nLevel, AutoString pcMessage);
-typedef void (*ClipBoardCallback)(const int nGroupId, const int nType, const int nLength, const void *pMem, const int nExLength, const void* pExMem);
+typedef void (*ClipBoardCallback)(const int nGroupId, const int nType, const int nLength, const void* pMem, const int nExLength, const void* pExMem);
 typedef void (*RecvClipBoardCallback)(const int nGroupId);
 typedef void (*RequestedNavigateURLCallback)(AutoString navURI);
+typedef void (*URLChangedCallback)(const void* uriMem, const int uriLength);
+
 
 void RequestMoveTrayToWebWindow();
 class WebWindow
@@ -145,9 +147,11 @@ private:
 	ClipBoardCallback _clipboardCallback;
 	RecvClipBoardCallback _recvclipboardCallback;
 	RequestedNavigateURLCallback _requestedNavigateURLCallback;
+	URLChangedCallback _urlChangedCallback;
 
 public:
 #ifdef _WIN32
+	//URLChangedCallback _urlChangedCallback;
 	static HINSTANCE _hInstance;
 	HWND _hWnd;
 	WebWindow* _parent;
@@ -219,13 +223,20 @@ public:
 	void SetClipBoardCallback(ClipBoardCallback callback) { _clipboardCallback = callback; }
 	void SetRecvClipBoardCallback(RecvClipBoardCallback callback) { _recvclipboardCallback = callback; }
 	void SetRequestedNavigateURLCallback(RequestedNavigateURLCallback callback) { _requestedNavigateURLCallback = callback; }
-	void InvokeClipBoard(const int nGroupId, const int nType, const int nLength, const void *pMem, const int nExLength, const void* pExMem) { if (_clipboardCallback) _clipboardCallback(nGroupId, nType, nLength, pMem, nExLength, pExMem); }
+	void InvokeClipBoard(const int nGroupId, const int nType, const int nLength, const void* pMem, const int nExLength, const void* pExMem) { if (_clipboardCallback) _clipboardCallback(nGroupId, nType, nLength, pMem, nExLength, pExMem); }
 	void InvokeRequestedNavigateURL(AutoString navURI) { if (_requestedNavigateURLCallback) _requestedNavigateURLCallback(navURI); }
 	void SetTrayUse(bool useTray);
 	void SetUseClipCopyNsend(bool bUse);
 
 	void SetTrayStartUse(bool bUseStartTray);
 	void SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
+
+	void SetURLChangedCallback(URLChangedCallback callback) {
+		_urlChangedCallback = callback;
+	}
+	void InvokeURLChangedCallback(const void* uriMem, const int uriLength) {
+		if (_urlChangedCallback) _urlChangedCallback(uriMem, uriLength);
+	}
 
 #if OS_LINUX
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
@@ -286,6 +297,6 @@ public:
 	///
 	static void SetTrayStatus(bool bSetTextShowNchecked);
 
-};
+	};
 
 #endif // !WEBWINDOW_H

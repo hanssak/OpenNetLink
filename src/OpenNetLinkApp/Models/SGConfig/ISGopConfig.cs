@@ -158,5 +158,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUsePKIsendRecv { get; set; }           // 인증서 전송 사용 유무 (망별로) ( true : 사용, false : 미사용 )        
         public bool bUseToastInsteadOfOSNotification { get; set; }                        //레지스트리 차단으로 OS 노티 사용 불가한 Site에서 OS노티 대신 Toast 사용 (Default/false) 
         public string strScrTimeoutLockType { get; set; }                      //ScrLockTime의 시간초과로 타임아웃 발생 시, 처리타입(ScreenLock:화면잠금, LogOut:로그아웃, Exit: 프로그램 종료)
+
+        public string strOKTAUrl { get; set; }                             //OKTA 연동 URL
     }
 }

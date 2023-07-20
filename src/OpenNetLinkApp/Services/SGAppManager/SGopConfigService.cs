@@ -180,6 +180,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseDlpFoundSendContinue(int groupId);
 
         public string GetScrTimeoutLockType(int groupId);
+
+        public string GetOKTAUrl(int groupId);
     }
 
 
@@ -889,8 +891,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUiFileExpiredDateShow;
         }
-
-
         /// <summary>
         /// 서버DLP에서 개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무
         /// </summary>
@@ -901,11 +901,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo[groupId].bDlpFoundSendContinue;
         }
 
-
-
         public string GetScrTimeoutLockType(int groupId)
         {
             return AppConfigInfo[groupId].strScrTimeoutLockType;
         }
+        public string GetOKTAUrl(int groupId)
+        {
+            return AppConfigInfo[groupId].strOKTAUrl;
+        }
+
     }
 }

@@ -92,5 +92,10 @@
     webWindow->GetPosition(&x, &y);
     webWindow->InvokeMoved(x, y);
 }
-
+- (void) webView: (WKWebView *) webView didStartProvisionalNavigation: (WKNavigation *) navigation {
+    NSString *myString = webView.URL.absoluteString;
+    std::string strUriText;
+    strUriText = myString.UTF8String;
+    ((WebWindow*)(SelfThis))->InvokeURLChangedCallback(strUriText.data(), strUriText.length());
+}
 @end
