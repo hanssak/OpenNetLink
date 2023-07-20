@@ -132,7 +132,7 @@ typedef void (*MovedCallback)(int x, int y);
 typedef void (*NTLogCallback)(int nLevel, AutoString pcMessage);
 typedef void (*ClipBoardCallback)(const int nGroupId, const int nType, const int nLength, const void* pMem, const int nExLength, const void* pExMem);
 typedef void (*RecvClipBoardCallback)(const int nGroupId);
-typedef void (*RequestedNavigateURLCallback)(AutoString navURI);
+typedef void (*RequestedNavigateURLCallback)(const void* uriMem, const int uriLength);
 typedef void (*URLChangedCallback)(const void* uriMem, const int uriLength);
 
 
@@ -224,7 +224,7 @@ public:
 	void SetRecvClipBoardCallback(RecvClipBoardCallback callback) { _recvclipboardCallback = callback; }
 	void SetRequestedNavigateURLCallback(RequestedNavigateURLCallback callback) { _requestedNavigateURLCallback = callback; }
 	void InvokeClipBoard(const int nGroupId, const int nType, const int nLength, const void* pMem, const int nExLength, const void* pExMem) { if (_clipboardCallback) _clipboardCallback(nGroupId, nType, nLength, pMem, nExLength, pExMem); }
-	void InvokeRequestedNavigateURL(AutoString navURI) { if (_requestedNavigateURLCallback) _requestedNavigateURLCallback(navURI); }
+	void InvokeRequestedNavigateURL(const void* uriMem, const int uriLength) { if (_requestedNavigateURLCallback) _requestedNavigateURLCallback(uriMem, uriLength); }
 	void SetTrayUse(bool useTray);
 	void SetUseClipCopyNsend(bool bUse);
 

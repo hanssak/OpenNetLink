@@ -176,7 +176,7 @@ namespace WebWindows
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void NTLogCallback(int nLevel, string message);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ClipBoardCallback(int nGroupId, int nType, int nLength, IntPtr pMem, int nExLength, IntPtr pExMem);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RecvClipBoardCallback(int nGroupId);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RequestedNavigateURLCallback([MarshalAs(UnmanagedType.LPWStr)] string navURI);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RequestedNavigateURLCallback(IntPtr uriMem, int uriLength);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void URLChangedCallback(IntPtr uriMem, int uriLength);
 
         const string DllName = "WebWindow.Native";
@@ -742,7 +742,7 @@ namespace WebWindows
         private void OnRecvClipBoard(int nGroupId) => RecvClipBoardOccured?.Invoke(this, nGroupId);
         public event EventHandler<int> RecvClipBoardOccured;
 
-        private void OnURLChanged(IntPtr uriMem, int uriLength) => URLChanged?.Invoke(this, new List<object> { uriMem, uriLength });
+        private void OnURLChanged(IntPtr uriMem, int uriLength) => URLChanged?.Invoke(this, new List<object>() { uriMem, uriLength });
         public event EventHandler<List<object>> URLChanged;
 
         public void GenerateHotKey(bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_GenerateHotKey(_nativeWebWindow, bAlt, bControl, bShift, bWin, chVKCode);
@@ -915,8 +915,8 @@ namespace WebWindows
         public void RegStartProgram() => WebWindow_RegStartProgram(_nativeWebWindow);
         public void UnRegStartProgram() => WebWindow_UnRegStartProgram(_nativeWebWindow);
 
-        private void OnRequestedNavigateURL(string navURI) => NavigateURLOccured?.Invoke(this, navURI);
+        private void OnRequestedNavigateURL(IntPtr uriMem, int uriLength) => NavigateURLOccured?.Invoke(this, new List<object>() { uriMem, uriLength });
 
-        public event EventHandler<string> NavigateURLOccured;
+        public event EventHandler<List<object>> NavigateURLOccured;
     }
 }

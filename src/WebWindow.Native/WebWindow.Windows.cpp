@@ -112,7 +112,24 @@ public:
 		{
 			if (strNavi.length() > 0)
 			{
-				((WebWindow*)m_window)->InvokeRequestedNavigateURL(strNavi.c_str());
+				BYTE* bUri;
+				wchar_t* wclpstr = (wchar_t*)strNavi.c_str();
+				size_t len = wcslen(wclpstr);
+				len = (len + 2) * sizeof(wchar_t);
+				len *= 2;
+
+				BYTE** ppData = NULL;
+				ppData = &bUri;
+				*ppData = new BYTE[len];
+
+				memset(*ppData, 0x00, len);
+				int unicodeLen = (int)wcslen(wclpstr);
+				int lenDe = WideCharToMultiByte(CP_UTF8, 0, wclpstr, unicodeLen, NULL, 0, NULL, NULL);
+				WideCharToMultiByte(CP_UTF8, 0, wclpstr, unicodeLen, (char*)*ppData, lenDe, NULL, NULL);
+
+				//WidecodeToUtf8(wclpstr, (char*)*ppData);
+				int nTotalLen = strlen((char*)*ppData);
+				((WebWindow*)m_window)->InvokeRequestedNavigateURL(bUri, nTotalLen);
 			}
 		}
 		//MessageBox(NULL, L"Found", L"Found", MB_OK);
