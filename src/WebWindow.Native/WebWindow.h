@@ -147,11 +147,11 @@ private:
 	ClipBoardCallback _clipboardCallback;
 	RecvClipBoardCallback _recvclipboardCallback;
 	RequestedNavigateURLCallback _requestedNavigateURLCallback;
-	
+	URLChangedCallback _urlChangedCallback;
 
 public:
 #ifdef _WIN32
-	URLChangedCallback _urlChangedCallback;
+	//URLChangedCallback _urlChangedCallback;
 	static HINSTANCE _hInstance;
 	HWND _hWnd;
 	WebWindow* _parent;
