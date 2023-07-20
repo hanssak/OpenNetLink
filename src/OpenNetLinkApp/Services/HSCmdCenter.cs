@@ -147,7 +147,7 @@ namespace OpenNetLinkApp.Services
                     {
                         CLog.Here().Information($"- AppOPsetting Loading... : [{opConfig}]");
                         //Open the stream and read it back.
-                        byte[] hsckByte = File.ReadAllBytes(AppConfig);
+                        byte[] hsckByte = File.ReadAllBytes(opConfig);
                         byte[] masterKey = SGCrypto.GetMasterKey();
 
                         bool isDeCrypt = true;
@@ -159,7 +159,7 @@ namespace OpenNetLinkApp.Services
                         }
                         catch (Exception ex)
                         {
-                            CLog.Here().Information($"- AppOPsetting Loading... : Decrypt Fail {AppConfig}]");
+                            CLog.Here().Information($"- AppOPsetting Loading... : Decrypt Fail {opConfig}]");
                             //디크립션 실패
                             isDeCrypt = false;
                         }
@@ -173,14 +173,14 @@ namespace OpenNetLinkApp.Services
                         else
                         {
                             //Open the stream and read it back.
-                            using (FileStream fs = File.OpenRead(AppConfig))
+                            using (FileStream fs = File.OpenRead(opConfig))
                             {
                                 SGopConfig appConfig = (SGopConfig)serializer.ReadObject(fs);
                                 dicOpConfig.Add(sgNetwork.GroupID, appConfig);
 
                             }
                         }
-                        CLog.Here().Information($"- AppOPsetting Load Completed : [{AppConfig}]");
+                        CLog.Here().Information($"- AppOPsetting Load Completed : [{opConfig}]");
                     }
                     catch (Exception ex)
                     {
