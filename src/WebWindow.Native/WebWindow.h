@@ -133,7 +133,7 @@ typedef void (*NTLogCallback)(int nLevel, AutoString pcMessage);
 typedef void (*ClipBoardCallback)(const int nGroupId, const int nType, const int nLength, const void* pMem, const int nExLength, const void* pExMem);
 typedef void (*RecvClipBoardCallback)(const int nGroupId);
 typedef void (*RequestedNavigateURLCallback)(AutoString navURI);
-typedef void (*URLChangedCallback)(AutoString URI);
+typedef void (*URLChangedCallback)(const void* uriMem, const int uriLength);
 
 
 void RequestMoveTrayToWebWindow();
@@ -234,8 +234,8 @@ public:
 	void SetURLChangedCallback(URLChangedCallback callback) {
 		_urlChangedCallback = callback;
 	}
-	void InvokeURLChangedCallback(AutoString url) {
-		if (_urlChangedCallback) _urlChangedCallback(url);
+	void InvokeURLChangedCallback(const void* uriMem, const int uriLength) {
+		if (_urlChangedCallback) _urlChangedCallback(uriMem, uriLength);
 	}
 
 #if OS_LINUX
