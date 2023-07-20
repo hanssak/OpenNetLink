@@ -12,8 +12,8 @@ namespace PreviewUtil
         private static string strUrl = "http://localhost:9997/";
         static void Main(string[] args)
         {
-            string url = args[0];
-            string utilType = (args.Length > 1) ? args[1] : "   PreviewUtilApp";
+            string url = "https://daum.net";//args[0];
+            string utilType = "OKTA";//(args.Length > 1) ? args[1] : "   PreviewUtilApp";
             utilType = utilType.ToUpper();
 
             string title = "   PreviewUtilApp";
@@ -35,7 +35,7 @@ namespace PreviewUtil
             };
 
             // Console.WriteLine("0: {0}", args[0]);
-            window.NavigateToUrl(args[0]);
+            window.NavigateToUrl("https://daum.net");
             window.SetTrayStartUse(false);
 
             switch (utilType)
@@ -43,9 +43,14 @@ namespace PreviewUtil
                 case "OKTA":
                     window.URLChanged += (sender, url) =>
                     {
-                        window.SendMessage("OKTA Util (Changed URL): " + url);
-                        WaitForURLRedirection(url);
+                        //window.SendMessage("OKTA Util (Changed URL): " + url);
+                        //WaitForURLRedirection(url);
                         //ChangedURL(window, sender, url);
+                        if(url.Contains("daum"))
+                            Console.WriteLine("TESTTESTTEST");
+
+                        Console.WriteLine($"!!!!!!!!!!!!!!!!!!!!!11");    
+                        Console.WriteLine($"URL - {url}");
                     };
                     break;
                 default:        //case "PreviewUtilApp":
@@ -64,7 +69,7 @@ namespace PreviewUtil
         }
 
         ///// <summary>
-        ///// URL ¸®´ÙÀÌ·º¼Ç ÀÌº¥Æ®
+        ///// URL ï¿½ï¿½ï¿½ï¿½ï¿½Ì·ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ®
         ///// </summary>
         //static void _WaitForURLRedirection()
         //{
@@ -102,12 +107,12 @@ namespace PreviewUtil
             try
             {
                 WebRequest wreq = WebRequest.Create(listenrURL);
-                ResendResponse? resp = new ResendResponse();
+                //ResendResponse? resp = new ResendResponse();
                 wreq.Method = "POST";
                 wreq.Timeout = ReqTimeOut * 1000;
                 wreq.ContentType = "application/text; utf-8";
 
-                using (var streamWriter = new StreamWriter(wreq.GetRequestStream())) //Àü¼Û
+                using (var streamWriter = new StreamWriter(wreq.GetRequestStream())) //ï¿½ï¿½ï¿½ï¿½
                 {
                     streamWriter.Write(oktaResultURL);
                 }
