@@ -177,7 +177,7 @@ namespace WebWindows
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ClipBoardCallback(int nGroupId, int nType, int nLength, IntPtr pMem, int nExLength, IntPtr pExMem);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RecvClipBoardCallback(int nGroupId);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RequestedNavigateURLCallback([MarshalAs(UnmanagedType.LPWStr)] string navURI);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void URLChangedCallback([MarshalAs(UnmanagedType.LPWStr)] string URL);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void URLChangedCallback(IntPtr uriMem, int uriLength);
 
         const string DllName = "WebWindow.Native";
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern IntPtr WebWindow_register_win32(IntPtr hInstance);
@@ -742,8 +742,8 @@ namespace WebWindows
         private void OnRecvClipBoard(int nGroupId) => RecvClipBoardOccured?.Invoke(this, nGroupId);
         public event EventHandler<int> RecvClipBoardOccured;
 
-        private void OnURLChanged(string URL) => URLChanged?.Invoke(this, URL);
-        public event EventHandler<string> URLChanged;
+        private void OnURLChanged(IntPtr uriMem, int uriLength) => URLChanged?.Invoke(this, new List<object> { uriMem, uriLength });
+        public event EventHandler<List<object>> URLChanged;
 
         public void GenerateHotKey(bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_GenerateHotKey(_nativeWebWindow, bAlt, bControl, bShift, bWin, chVKCode);
         public void RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_RegClipboardHotKey(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode);

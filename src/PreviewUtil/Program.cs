@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
 using WebWindows;
 
@@ -12,6 +14,7 @@ namespace PreviewUtil
         private static string strUrl = "http://localhost:9997/";
         static void Main(string[] args)
         {
+            List<object> list = null;
             string url = args[0];
             string utilType = (args.Length > 1) ? args[1] : "   PreviewUtilApp";
             utilType = utilType.ToUpper();
@@ -41,10 +44,19 @@ namespace PreviewUtil
             switch (utilType)
             {
                 case "OKTA":
-                    window.URLChanged += (sender, url) =>
+                    window.URLChanged += (sender, list) =>
                     {
+                        IntPtr bUri = (IntPtr)list[0];
+                        int length = (int)list[1];
+                        byte[] data = new byte[length];
+                        
+                        Marshal.Copy(bUri, data, 0, length);
+
+                        string uri = Encoding.UTF8.GetString(data);
+                        Console.WriteLine($"URI --- {uri}");
+
                         window.SendMessage("OKTA Util (Changed URL): " + url);
-                        WaitForURLRedirection(url);
+                        //WaitForURLRedirection(url);
                         //ChangedURL(window, sender, url);
                     };
                     break;
@@ -102,7 +114,7 @@ namespace PreviewUtil
             try
             {
                 WebRequest wreq = WebRequest.Create(listenrURL);
-                ResendResponse? resp = new ResendResponse();
+                //ResendResponse? resp = new ResendResponse();
                 wreq.Method = "POST";
                 wreq.Timeout = ReqTimeOut * 1000;
                 wreq.ContentType = "application/text; utf-8";
