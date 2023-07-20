@@ -330,11 +330,8 @@
             refGoogleOTP.nGroupID = groupID;
             //bool rWriteQRimg = QRcode.GenerateQRimg("SecureGate", id, strSecureKey);
             bool rWriteQRimg = QRcode.GenerateQRimg(e.strMsg);  // Server에서 받은 Url로 바로 생성
-            if (rWriteQRimg)
-            {
-                Thread.Sleep(1000);
-                refGoogleOTP.RedrawUI();
-            }
+            Thread.Sleep(1000);
+            refGoogleOTP.RedrawUI();
 
             // login이 가능항 상태로 ui 변경
             await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");

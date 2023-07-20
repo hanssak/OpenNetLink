@@ -892,9 +892,14 @@ namespace OpenNetLinkApp.Common
                 int nIdx = 0;
                 for (; nIdx < 50; nIdx++)
                 {
+                    
                     if (System.IO.File.Exists(strQRImgPath))
-                        if (CsFileFunc.GetFileSize(strQRImgPath) > 15000)
+                    {
+                        long SizeFile = CsFileFunc.GetFileSize(strQRImgPath);
+                        Log.Logger.Here().Information($"GenerateQRimg, GenerateQRimg-Size : {SizeFile}");
+                        if (SizeFile > 0)
                             break;
+                    }
                     Thread.Sleep(100);
                 }
                 Log.Logger.Here().Information($"GenerateQRimg, GenerateQRimg-End : {((nIdx < 50) ? "Success!" : "Failed!")}");
