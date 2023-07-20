@@ -100,6 +100,8 @@ bUserEmailSearchDlp : email 관리 / 결재 UI에서 개인정보 관련 부분 
 
 bUseForceUpdate : 업데이트할 항목이 있으면 사용자 의사 관계없이 강제 업데이트 진행여부(true,false)
 
+bUseForceBackgroundUpdate : 업데이트할 항목이 있으면 사용자 의사 관계없이 Background로 강제 업데이트 진행여부(true,false)
+
 bUsePCURL : PCUrl 관련 화면 나오게할지 여부 [기능X, 화면만 일부 있음]
 
 bUsePublicBoard : 공지사항 관련 화면 나오게 할지 여부 [기능일부있음]
