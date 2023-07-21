@@ -84,7 +84,7 @@
   "bUseUserSelectFirstServer": false,
   "bUseWebLinkPreviewer": false,
   "bUserIDSave": false,
-  "bUserPWChange": false,
+  "bUserPWChange": true,
   "bUseGoogleOtp2FactorAuth": false,
   "bViewDlpApproverSelectMyDept": false,
   "bViewFileFilter": true,
@@ -109,5 +109,7 @@
   "bUseToastInsteadOfOSNotification": false,
   "bUiFileExpiredDateShow": true,
   "strScrTimeoutLockType": "ScreenLock",
-  "bDlpFoundSendContinue": false
+  "bDlpFoundSendContinue": false,
+  "strOKTAUrl": "",
+  "bVisibleLogOutButton": true
 }
