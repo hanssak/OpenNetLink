@@ -39,29 +39,31 @@
 
 
 <div id="divLoginMain" class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
-    @*<div class="login-box  p-0 m-0" style="height:413px; width:880px !important;">
-        <iframe src=@url style="width: 100%; height: 500px;"></iframe>
-        </div>
-        <input type="text" @bind="url" style="width:400px;" />*@
-    <ul>
-        
-    </ul>
-    인증 먼저 해주세요.
-    인증 중입니다.
+    <div class="login-box  p-0 m-0" style="height:413px; width:880px !important;">
+        <div class="card p-0" style="border-radius:.7rem !important; background-color:rgba(0,0,0,0.7);">
+            <div class="card-body login-card-body  p-0">
 
+                <div style="height:200px; color:darkgray; font-size:20px; text-align:center; padding-top:70px;">
+                    <i class="fas fa-user-alt" />
+                    @XmlConf.GetTitle("T_OKTA_AUTH_REQUEST")
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @code {
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<Login_OKTA>();
+    System.Security.Cryptography.RSACryptoServiceProvider rsa = new System.Security.Cryptography.RSACryptoServiceProvider(2048);
 
+    Process OKTAAuthUtilProcess = null;
 
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
-            //  return;
             int groupid = pageService.m_nCurViewPageGroupID;
-            //HsHttpURLRedirectWatcher.Run(Noti);
-
-         
+            //  return;
+            HsHttpURLRedirectWatcher.Run(OKTAURLDetectNoti);
             ProcessStartInfo startInfo = null;
 
 #if _WINDOWS
@@ -70,22 +72,70 @@
 
             startInfo = new ProcessStartInfo("PreviewUtil");
 #endif
+            string OktaURL = GetOktaAuthURL(groupid);
+            CLog.Here().Information("OKTA Request URL:" + OktaURL);
 
-            //Arguments title 변경 시,
-            startInfo.Arguments = string.Format("{0} OKTA", SGAppMgrSvc.OpConfigInfoService.GetOKTAUrl(groupid));
+            if (OKTAAuthUtilProcess != null) OKTAAuthUtilProcess.Kill();
+
+            HSCmdCenter.sgPageEvent.OSNotification(groupid, OS_NOTI.ONLINE, XmlConf.GetTitle("T_OKTA_AUTH_TITLE"), XmlConf.GetTitle("T_OKTA_AUTH_REQUEST"));
+
+            startInfo.Arguments = string.Format("{0} OKTA {1}", OktaURL, HsHttpURLRedirectWatcher.GetWatcherURL());
             startInfo.WindowStyle = ProcessWindowStyle.Normal;
-            using (Process proc = Process.Start(startInfo))
-            {
-                //proc.WaitForExit();
-            }
-
+            OKTAAuthUtilProcess = Process.Start(startInfo);
         }
         base.OnAfterRender(firstRender);
     }
-
-    public void Noti(object sender, string URL)
+    string GetOktaAuthURL(int groupid)
     {
+        try
+        {
+            string url = SGAppMgrSvc.OpConfigInfoService.GetOKTAUrl(groupid);
+            string urlArg = string.Empty;
 
+            //URL에 함께 보낼 공개키 생성
+            byte[] publicValue = rsa.ExportRSAPublicKey();
+            string publicKey = Convert.ToBase64String(publicValue);
+            string publicKeyURI = System.Web.HttpUtility.UrlEncode(publicKey); //URL에서 인지 가능한 값으로 Encoding
+
+            urlArg += publicKeyURI;
+            return url + urlArg;
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error("GetOktaAuthURL Exception : " + ex.ToString());
+            return string.Empty;
+        }
     }
 
+    public void OKTAURLDetectNoti(object sender, string URL)
+    {
+        try
+        {
+            CLog.Here().Information("OKTAURLDetectNoti URL:" + URL);
+            Console.WriteLine("Login_OKTA : " + URL);
+            string catchString = "#SAML=";
+
+            int catchIndex = URL.LastIndexOf(catchString);
+            if (catchIndex < 0)
+                return;
+
+            HsHttpURLRedirectWatcher.Stop();
+            if (OKTAAuthUtilProcess != null) OKTAAuthUtilProcess.Kill();
+
+            string strEncUserInfo = URL.Substring(catchIndex + catchString.Length);
+            byte[] EncUserInfo = Convert.FromBase64String(strEncUserInfo);
+
+            byte[] userInfo = rsa.Decrypt(EncUserInfo, System.Security.Cryptography.RSAEncryptionPadding.Pkcs1);
+            string strUserInfo = Encoding.UTF8.GetString(userInfo);
+            CLog.Here().Information("OKTAURLDetectNoti User Info Result:" + strUserInfo);
+
+            int groupid = pageService.m_nCurViewPageGroupID;
+            HSCmdCenter.sgPageEvent.OSNotification(groupid, OS_NOTI.ONLINE, XmlConf.GetTitle("T_OKTA_AUTH_TITLE"), XmlConf.GetTitle("T_OKTA_AUTH_COMPLETE"));
+            MyNavigationManager.NavigateTo("/Login");
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error("OKTAURLDetectNoti Exception : " + ex.ToString());
+        }
+    }
 }

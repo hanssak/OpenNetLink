@@ -702,6 +702,10 @@ namespace OpenNetLinkApp.Services
                 case eCmdList.eAPTSCAN:                                                     // APT 노티.
                     VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
                     break;
+                case eCmdList.eDrmBlockNoti:                                                     // DRM Noti
+                    VirusScanNotiAfterSend(nRet, eCmdList.eDrmBlockNoti, groupId, sgData);
+                    break;                   
+
                 case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
                     EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
                     break;
@@ -2616,6 +2620,21 @@ namespace OpenNetLinkApp.Services
                     return sgSendData.RequestSendVirusConfirm(hsNetWork, strUserID, strTransSeq);
                 else
                     return sgSendData.RequestSendAptConfirm(hsNetWork, strUserID, strTransSeq);
+            }
+            return -1;
+        }
+
+        public int SendAPTAndVirusConfirm(int groupid, string strUserID, string strTransSeq, Common.Enums.PreworkType eBlockType)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+            {
+                if (eBlockType == Common.Enums.PreworkType.VIRUS_SCAN)
+                    return sgSendData.RequestSendVirusConfirm(hsNetWork, strUserID, strTransSeq);
+                else if (eBlockType == Common.Enums.PreworkType.APT_SCAN)
+                    return sgSendData.RequestSendAptConfirm(hsNetWork, strUserID, strTransSeq);
+
             }
             return -1;
         }
