@@ -182,6 +182,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetScrTimeoutLockType(int groupId);
 
         public string GetOKTAUrl(int groupId);
+
+        public bool GetVisibleLogOutButton(int groupId);
     }
 
 
@@ -377,7 +379,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseGoogleOtp2FactorAuth;  // 구글 Otp를사용한 2차인증기능사용
         }
-        
+
 
         public string GetPWChangeProhibitLimit(int groupId)
         {
@@ -908,6 +910,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetOKTAUrl(int groupId)
         {
             return AppConfigInfo[groupId].strOKTAUrl;
+        }
+
+        public bool GetVisibleLogOutButton(int groupId)
+        {
+            return AppConfigInfo[groupId].bVisibleLogOutButton;
         }
 
     }
