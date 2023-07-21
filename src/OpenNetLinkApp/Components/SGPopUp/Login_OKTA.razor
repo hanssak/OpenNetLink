@@ -119,6 +119,7 @@
             if (catchIndex < 0)
                 return;
 
+
             HsHttpURLRedirectWatcher.Stop();
             if (OKTAAuthUtilProcess != null) OKTAAuthUtilProcess.Kill();
 
@@ -128,10 +129,9 @@
             byte[] userInfo = rsa.Decrypt(EncUserInfo, System.Security.Cryptography.RSAEncryptionPadding.Pkcs1);
             string strUserInfo = Encoding.UTF8.GetString(userInfo);
             CLog.Here().Information("OKTAURLDetectNoti User Info Result:" + strUserInfo);
-
             int groupid = pageService.m_nCurViewPageGroupID;
             HSCmdCenter.sgPageEvent.OSNotification(groupid, OS_NOTI.ONLINE, XmlConf.GetTitle("T_OKTA_AUTH_TITLE"), XmlConf.GetTitle("T_OKTA_AUTH_COMPLETE"));
-            MyNavigationManager.NavigateTo("/Login");
+            MyNavigationManager.NavigateTo("/Login/OKTA/" + strUserInfo);
         }
         catch (Exception ex)
         {

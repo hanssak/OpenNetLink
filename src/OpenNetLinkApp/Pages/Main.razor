@@ -1,5 +1,6 @@
 @page "/LogIn"
 @page "/LogIn/{srcLoc}"
+@page "/LogIn/{srcLoc}/{srcArgs}"
 
 
 @using System.Diagnostics
@@ -63,7 +64,7 @@
 
                             <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@id" @oninput="@(e => id = e.Value.ToString())" tabindex="1" autocomplete="off">
 
-                            @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
+                            @if (pageService.m_nLoginType != 5 && srcLoc != "OKTA") //OTP PW 필요없음
                             {
                                 //AD 로그인은 PW 사용자 입력 불가 (Readonly)
                                 <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@pw" @oninput="@(e => pw = e.Value.ToString())" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
@@ -137,6 +138,9 @@
     [Parameter]
     public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
 
+    [Parameter]
+    public string srcArgs { get; set; }                    // srcLoc의 추가 인자
+
     public string id { get; set; } = "";
 
 
@@ -144,9 +148,9 @@
     public string pw;
     @* private void OnInput(string value)
         {
-            var newValue = value ?? string.Empty;
-            pw  = newValue;
-    }*@
+        var newValue = value ?? string.Empty;
+        pw  = newValue;
+        }*@
 
     public string otp { get; set; }
 
@@ -198,11 +202,11 @@
         QRcode.Dispose();
 
         CLog.Here().Information($"[Main] GoogleOtp, User Confirm - GroupID:{refGoogleOTP.nGroupID} - LogInType: {pageService.m_nLoginType.ToString()}");
-        
+
         HsNetWork hsNetWork = null;
         hsNetWork = HSCmdCenter.GetConnectNetWork(refGoogleOTP.nGroupID);
         if (hsNetWork != null)
-        { 
+        {
             // 구글Otp 값 어느 Tag에 보낼것인지 협의후 동작
             //hsNetWork.stCliMem.GOTPNUMBER = refGoogleOTP.strUserOTP;
             hsNetWork.SetGoogleOtp(refGoogleOTP.strUserOTP);
@@ -245,7 +249,7 @@
         ShowMessage("info", XmlConf.GetInfoMsg("I_0237"));
 
         if (str2FactorAuthType == "google_otp" && strOtpUrlCode.Length > 0)
-        { 
+        {
             PageEventArgs e = new PageEventArgs();
             e.strDummy = str2FactorAuthType;
             e.strMsg = strOtpUrlCode;
@@ -255,7 +259,7 @@
             Show2FactorAuth(refSGAlert.groupId, e);
         }
         else
-        { 
+        {
 
             if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
             {
@@ -290,7 +294,7 @@
     private async void ShowSessionCountPopup(int groupID, PageEventArgs e)
     {
         bStartedLogin = false;
-        
+
         if (e.strDummy == "google_otp")
         {
             str2FactorAuthType = e.strDummy;
@@ -314,10 +318,10 @@
 
 
         if (e.strDummy == "google_otp")
-        { 
+        {
 
             // Server에서 받아서 동작하도록 수정
-            string strSecureKey = "";            
+            string strSecureKey = "";
 
             //if (QRcode.GenerateQRsecureKey())
             //    strSecureKey = QRcode.strSecureKey; // "MARNVBMEK06VCXXK";
@@ -533,7 +537,7 @@
                 strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-            strPW = "HsckAD.com";
+    strPW = "HsckAD.com";
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -588,7 +592,7 @@
             pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-        pw = "HsckAD.com";
+    pw = "HsckAD.com";
 #endif
 
         pw = pw.ToLower();
@@ -625,7 +629,7 @@
 
 
 #if DEBUG
-            pw = "HsckAD.com";
+    pw = "HsckAD.com";
 #endif
             pw = pw.ToLower();
 
@@ -675,6 +679,66 @@
 
     }
 
+    /// <summary>
+    /// AD로그인 방식으로 로그인동작 진행
+    /// </summary>
+    private void doOKTALogin(string oktaUserId)
+    {
+        try
+        {
+            CLog.Here().Information($"doOKTALogin - ###### -  Start");
+
+            JSRuntime.InvokeAsync<object>("loginCursorChange");
+            bStartedLogin = true;
+
+            id = oktaUserId;
+            pw = oktaUserId;
+
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
+            string strCurCliVersion = "";
+            string strPlatform = "";
+            if (VersionConfigSvc != null)
+            {
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
+                strCurCliVersion = "OpenNetLink " + strCurCliVersion;
+
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
+                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
+            }
+
+            if (strCurCliVersion.Equals(""))
+                return;
+
+            CLog.Here().Information("[Main] LogIn Type:" + pageService.m_nLoginType.ToString());
+            HSCmdCenter.SetCliVersion(strCurCliVersion);
+
+
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
+            {
+                List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+                foreach (ISGNetwork netlist in listNetWork)
+                {
+                    CLog.Here().Information($"doOKTALogin - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
+                    HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
+                    pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
+                }
+            }
+            else
+            {
+                CLog.Here().Information($"doOKTALogin - ###### -  Do");
+                HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
+                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
+            }
+
+            CLog.Here().Information($"doOKTALogin - ###### -  End");
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"ADLogin - Exception - Msg : {ex.Message}");
+        }
+
+    }
 
 
     /// <summary>
@@ -890,14 +954,18 @@
                     HSCmdCenter.SetAllowSessionDuplicate(netlist.GroupID, false);
                 }
             }
+        }
+        else if (srcLoc == "OKTA")
+        {
+            bLoginBtnDisable = true;
+            StateHasChanged();
 
+            doOKTALogin(srcArgs);
         }
         else
         {
-
             if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
             {
-
                 bLoginBtnDisable = true;
                 StateHasChanged();
 
@@ -920,8 +988,6 @@
                     doADLogin();
             }
         }
-
-
     }
 
     /// <summary>
@@ -1526,7 +1592,7 @@
                             }
                         }
 
-                        // Login 화면으로 머물러있지 않도록
+                            // Login 화면으로 머물러있지 않도록
                         @*if (nGroupIDfirst < 0)
                             nGroupIDfirst = 0;*@
 
@@ -1685,15 +1751,15 @@
                         {
                             string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
                             string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
-                            HSCmdCenter.sgPageEvent.OSNotification(groupId,OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                            HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, strTitle, strInfoMsg);
                             Window.MoveWebWindowToTray();
                         }
                         else
-                            HSCmdCenter.sgPageEvent.OSNotification(groupId,OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                            HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
                     }
                     else
                     {
-                        HSCmdCenter.sgPageEvent.OSNotification(groupId,OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                        HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
                     }
 
                     pageService.ConnectCountAdd(nGroupIDfirst);
@@ -2684,13 +2750,13 @@
         //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-        {
-        return true;
-            }
-                else
-                    return false;
+                            {
+                                return true;
+                                    }
+                                        else
+                                            return false;
 
-                        }
+                                                }
     */
 
 }
