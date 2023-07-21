@@ -333,7 +333,7 @@
             refGoogleOTP.strKeyMessage = strSecureKey;
             refGoogleOTP.nGroupID = groupID;
             //bool rWriteQRimg = QRcode.GenerateQRimg("SecureGate", id, strSecureKey);
-            bool rWriteQRimg = QRcode.GenerateQRimg(e.strMsg);  // Server에서 받은 Url로 바로 생성
+            bool rWriteQRimg = QRcode.GenerateQRimg(e.strMsg, true);  // Server에서 받은 Url로 바로 생성
             Thread.Sleep(1000);
             refGoogleOTP.RedrawUI();
 
@@ -369,6 +369,12 @@
     /// </summary>
     public void ClickdoLogin()
     {
+
+        PageEventArgs e = new PageEventArgs();
+        e.strDummy = "google_otp";
+        e.strMsg = "otpauth://totp/SecureGate:KS0002?secret=KPRHRMDWLFF7A3CHVAJTINDA74KM2PCU&issuer=SecureGate";
+        Show2FactorAuth(0, e);
+        return;
 
         int groupid = pageService.m_nCurViewPageGroupID;
 

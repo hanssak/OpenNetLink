@@ -25,6 +25,7 @@ using System.Drawing;
 using QRCoder;
 using System.Security.Cryptography;
 using Google.Authenticator;
+using Net.Codecrete.QrCodeGenerator;
 
 namespace OpenNetLinkApp.Common
 {
@@ -840,6 +841,91 @@ namespace OpenNetLinkApp.Common
 
             return convertedImage;
         }
+
+        public bool GenerateQRimg(string strOtpUrl, bool bUseNotWindowOS)
+        {
+
+            // OTP URL 생성
+            try
+            {
+                // otpauth://totp/SecureGate:KS0002?secret=JNJTAMBQGJFVGMBQ&issuer=SecureGate
+                // otpauth://totp/{issuer}:{accountName}?secret={secretKey}&issuer={issuer}
+                //string otpUrl = $"otpauth://totp/{encodedIssuer}:{encodedAccountName}?secret={encodedSecretKey}&issuer={encodedIssuer}";
+
+                Log.Logger.Here().Information($"GenerateQRimg, GenerateQRimg-Start!");
+
+                if (strOtpUrl.IndexOf("otpauth://") != 0)
+                {
+                    Log.Logger.Here().Information($"GenerateQRimg, GenerateQRimg-End(Error)!");
+                    return false;
+                }
+
+                string strQRImgPath = CsSystemFunc.GetCurrentModulePath();
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    strQRImgPath += "\\wwwroot\\otp_qrcode.png";
+                else
+                    strQRImgPath += "/wwwroot/otp_qrcode.png";
+
+                // 기존꺼 삭제
+                //CsFileFunc.DeleteFile(strQRImgPath);
+                //Thread.Sleep(500);
+
+                if (bUseNotWindowOS)
+                {
+                    var qr = QrCode.EncodeText(strOtpUrl, QrCode.Ecc.Quartile); // Create the QR code symbol
+                    qr.SaveAsPng(strQRImgPath, scale: 5, border: 3);
+                }
+                else
+                {
+                    // QR 코드 생성
+                    QRCodeGenerator qrGenerator = new QRCodeGenerator();
+                    QRCodeData qrCodeData = qrGenerator.CreateQrCode(strOtpUrl, QRCodeGenerator.ECCLevel.Q);
+                    QRCode qrCode = new QRCode(qrCodeData);
+                    qrCodeImage = qrCode.GetGraphic(10); // 이미지 크기를 조정합니다.
+                                                         //qrCodeImage.SetPixel(240, 240, Color.White);
+                    // 32bit 그대로 사용
+                    qrCodeImage.Save(strQRImgPath, System.Drawing.Imaging.ImageFormat.Png);
+                    qrCodeImage.Dispose();
+                    qrCodeImage = null;
+                }
+
+
+                // 5초 TimeOut
+                int nIdx = 0;
+                for (; nIdx < 50; nIdx++)
+                {
+
+                    if (System.IO.File.Exists(strQRImgPath))
+                    {
+                        long SizeFile = CsFileFunc.GetFileSize(strQRImgPath);
+                        Log.Logger.Here().Information($"GenerateQRimg, GenerateQRimg-Size : {SizeFile}");
+                        if (SizeFile > 0)
+                            break;
+                    }
+                    Thread.Sleep(100);
+                }
+                Log.Logger.Here().Information($"GenerateQRimg, GenerateQRimg-End : {((nIdx < 50) ? "Success!" : "Failed!")}");
+
+                // 순서 바꾸면 파일 이미지 안나오기 시작함.
+                //Thread.Sleep(1000);
+                if (nIdx < 50)
+                    return true;
+
+                return false;
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"GenerateQRimg, exception(MSG) : {ex.Message}");
+                return false;
+            }
+            finally
+            {
+            }
+
+        }
+
 
         public bool GenerateQRimg(string strOtpUrl)
         {
