@@ -923,6 +923,7 @@
                 strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
                 //strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";       // Table 이름 따로 정해졌음
                 strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
+                strGetinfoTagName += ", 'FORWARD_AUTODOWN'";
 
                 string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
                 HsCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);

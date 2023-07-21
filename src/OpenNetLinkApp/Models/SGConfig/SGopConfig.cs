@@ -47,8 +47,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         //public bool bManualRecvDownChange { get; set; } = false;          // 수동다운로드 사용 시 수신 폴더 변경 기능 ( true : 사용, false : 미사용)
         public bool bUseUserRecvDownPath { get; set; } = false;           // 로그인 유저별 다운로드 경로 사용 여부
         public bool bUseDenyPasswordZip { get; set; } = true;         // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
-        public bool bUseFileForward { get; set; } = false;          // 파일포워드 기능 사용유무(환경설정)
-        public bool bFileForward { get; set; } = false;               // 파일포워드기능 사용할지 유무
+        public bool bUseFileForward { get; set; } = false;          // 파일포워드 기능 사용유무
+        public bool bFileForward { get; set; } = false;               // 전송관리 화면에서 파일 전송 컬럼 보여줄지 여부
         public bool bUsePartialFileAddInTransfer { get; set; } = false;         //'파일전송' 화면에서 등록시도한 파일목록에 정상파일과 오류파일이 함께 존재할 시 정상 파일에 대한 부분 등록 가능여부(true, false)
         public bool bUseChkHardSpace { get; set; } = true;                      //파일수신시 디바이스 용량 체크 여부
         public bool bUseFileApproveReason { get; set; } = false;                        //파일 승인사유 입력 여부
