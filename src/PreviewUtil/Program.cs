@@ -11,17 +11,29 @@ namespace PreviewUtil
 {
     class Program
     {
-        private static string strUrl = "http://localhost:9997/";
+        enum UtilType
+        {
+            PreviewUtil,
+            OKTA,
+        }
+        private static string strWatcherUrl = "http://localhost:9997/";
         static void Main(string[] args)
         {
-            List<object> list = null;
             string url = args[0];
-            string utilType = (args.Length > 1) ? args[1] : "   PreviewUtilApp";
-            utilType = utilType.ToUpper();
+            UtilType utilType = UtilType.PreviewUtil;
+            if (args.Length > 1 && Enum.TryParse(typeof(UtilType), args[1], out object parObj) == true)
+                utilType = (UtilType)parObj;
 
-            string title = "   PreviewUtilApp";
-            if (utilType == "OKTA")
-                title = "   OKTAAuthentication";
+            string title = string.Empty;
+            if (utilType == UtilType.OKTA)
+            {
+                title = "   OKTA Authentication";
+                strWatcherUrl = (args.Length > 2) ? args[2] : strWatcherUrl;
+            }
+            else //PreviewUtil
+            {
+                title = "   PreviewUtilApp";
+            }
 
             var window = new WebWindow(title, options =>
             {
@@ -37,101 +49,48 @@ namespace PreviewUtil
                 window.SendMessage("Got message: " + message);
             };
 
-            // Console.WriteLine("0: {0}", args[0]);
-            window.NavigateToUrl(args[0]);
+            window.NavigateToUrl(url);
             window.SetTrayStartUse(false);
 
-            switch (utilType)
+            if (utilType == UtilType.OKTA)
             {
-                case "OKTA":
-                    window.URLChanged += (sender, list) =>
-                    {
-                        IntPtr bUri = (IntPtr)list[0];
-                        int length = (int)list[1];
-                        byte[] data = new byte[length];
-                        
-                        Marshal.Copy(bUri, data, 0, length);
+                window.URLChanged += (sender, list) =>
+                {
+                    IntPtr bUri = (IntPtr)list[0];
+                    int length = (int)list[1];
+                    byte[] data = new byte[length];
 
-                        string uri = Encoding.UTF8.GetString(data);
-                        Console.WriteLine($"URI --- {uri}");
+                    Marshal.Copy(bUri, data, 0, length);
 
-                        window.SendMessage("OKTA Util (Changed URL): " + url);
-                        //WaitForURLRedirection(url);
-                        //ChangedURL(window, sender, url);
-                    };
-                    break;
-                default:        //case "PreviewUtilApp":
-                    break;
+                    string urlDetectedValue = Encoding.UTF8.GetString(data);
+
+                    WaitForOKTAURLDetect(urlDetectedValue);
+                };
             }
-
             window.WaitForExit();
-
         }
 
-        static void ChangedURL(WebWindow window, object sender, string URL)
+        static void WaitForOKTAURLDetect(string oktaResultURL, int ReqTimeOut = 2)
         {
-
-
-            Console.WriteLine(URL);
-        }
-
-        ///// <summary>
-        ///// URL ∏Æ¥Ÿ¿Ã∑∫º« ¿Ã∫•∆Æ
-        ///// </summary>
-        //static void _WaitForURLRedirection()
-        //{
-        //    // HttpClient is intended to be instantiated once per application, rather than per-use. See Remarks.
-        //    HttpClient client = new HttpClient();
-        //    try
-        //    {
-        //        // Call asynchronous network methods in a try/catch block to handle exceptions.
-        //        try
-        //        {
-        //            using HttpResponseMessage response = await client.Send("http://www.contoso.com/");
-        //            response.EnsureSuccessStatusCode();
-        //            string responseBody = await response.Content.ReadAsStringAsync();
-        //            // Above three lines can be replaced with new helper method below
-        //            // string responseBody = await client.GetStringAsync(uri);
-
-        //            Console.WriteLine(responseBody);
-        //        }
-        //        catch (HttpRequestException e)
-        //        {
-        //            Console.WriteLine("\nException Caught!");
-        //            Console.WriteLine("Message :{0} ", e.Message);
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-
-        //        throw;
-        //    }
-        //}
-
-        static void WaitForURLRedirection(string oktaResultURL, int ReqTimeOut = 2)
-        {
-            string listenrURL = strUrl;
+            string listenrURL = strWatcherUrl;
+            WebRequest wreq;
             try
             {
-                WebRequest wreq = WebRequest.Create(listenrURL);
-                //ResendResponse? resp = new ResendResponse();
+                wreq = WebRequest.Create(listenrURL);
                 wreq.Method = "POST";
                 wreq.Timeout = ReqTimeOut * 1000;
                 wreq.ContentType = "application/text; utf-8";
 
-                using (var streamWriter = new StreamWriter(wreq.GetRequestStream())) //¿¸º€
+                using (var streamWriter = new StreamWriter(wreq.GetRequestStream())) //Ï†ÑÏÜ°
                 {
                     streamWriter.Write(oktaResultURL);
                 }
-                Console.WriteLine("OKTAUtil => OpenNetLink SendURL");
-
                 var response = wreq.GetResponse();
             }
             catch (System.Exception err)
             {
                 Console.WriteLine(err.ToString());
             }
-
         }
     }
 }
