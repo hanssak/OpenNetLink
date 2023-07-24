@@ -7,8 +7,8 @@
 // https://opensource.org/licenses/MIT
 //
 
-/* - KKW.Test
-using SkiaSharp;*/
+//
+using SkiaSharp;
 using System;
 using System.IO;
 
