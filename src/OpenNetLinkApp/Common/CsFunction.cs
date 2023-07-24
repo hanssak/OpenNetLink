@@ -874,7 +874,9 @@ namespace OpenNetLinkApp.Common
                 if (bUseNotWindowOS)
                 {
                     var qr = QrCode.EncodeText(strOtpUrl, QrCode.Ecc.Quartile); // Create the QR code symbol
-                    qr.SaveAsPng(strQRImgPath, scale: 5, border: 3);
+                    /*KKW.Test
+                                        qr.SaveAsPng(strQRImgPath, scale: 5, border: 3);*/
+
                 }
                 else
                 {

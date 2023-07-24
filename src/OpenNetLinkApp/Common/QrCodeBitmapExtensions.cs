@@ -1,4 +1,4 @@
-﻿//
+//
 // QR code generator library (.NET)
 // https://github.com/manuelbl/QrCodeGenerator
 //
@@ -7,7 +7,8 @@
 // https://opensource.org/licenses/MIT
 //
 
-using SkiaSharp;
+/* - KKW.Test
+using SkiaSharp;*/
 using System;
 using System.IO;
 
@@ -15,7 +16,8 @@ namespace Net.Codecrete.QrCodeGenerator
 {
     public static class QrCodeBitmapExtensions
     {
-        /// <inheritdoc cref="ToBitmap(QrCode, int, int)"/>
+
+/*        /// <inheritdoc cref="ToBitmap(QrCode, int, int)"/>
         /// <param name="background">The background color.</param>
         /// <param name="foreground">The foreground color.</param>
         public static SKBitmap ToBitmap(this QrCode qrCode, int scale, int border, SKColor foreground, SKColor background)
@@ -162,6 +164,6 @@ namespace Net.Codecrete.QrCodeGenerator
         public static void SaveAsPng(this QrCode qrCode, string filename, int scale, int border)
         {
             qrCode.SaveAsPng(filename, scale, border, SKColors.Black, SKColors.White);
-        }
+        }*/
     }
 }
