@@ -45,7 +45,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bNoApproveManageUI { get; set; } = false;                             // 결재관리 No사용 유무 ( true : 결재관리UI / NoTi 없어짐, false : 기존설정대로사용 )
         public bool bEmptyfileTrans { get; set; } = false;                                      // 0kb 파일 송수신 가능 유무
         public bool bTitleDescSameChk { get; set; } = false;                                // 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부
-        public bool bApprLineChkBlock { get; set; } = false;                         // 고정 결재라인 사용 시 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
+        public bool bApprLineChkBlock { get; set; } = true;                         // 고정 결재라인 사용 시 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
         //public bool bRecvFolderOpen { get; set; } = false;                  // 파일 수신 후 폴더 열기 사용 유무
         public bool bRecvFolderChange { get; set; } = false;               // 수신 폴더 변경 사용 여부.
         public bool bManualDownFolderChange { get; set; } = false;    // 수동다운로드로 다운 시 폴더 선택 사용 유무
