@@ -873,14 +873,16 @@ namespace OpenNetLinkApp.Common
 
                 if (bUseNotWindowOS)
                 {
-                    var qr = QrCode.EncodeText(strOtpUrl, QrCode.Ecc.Quartile); // Create the QR code symbol
                     /*KKW.Test
+                    var qr = QrCode.EncodeText(strOtpUrl, QrCode.Ecc.Quartile); // Create the QR code symbol
+                    
                                         qr.SaveAsPng(strQRImgPath, scale: 5, border: 3);*/
 
                 }
                 else
                 {
                     // QR 코드 생성
+                    /* - KKW.Test
                     QRCodeGenerator qrGenerator = new QRCodeGenerator();
                     QRCodeData qrCodeData = qrGenerator.CreateQrCode(strOtpUrl, QRCodeGenerator.ECCLevel.Q);
                     QRCode qrCode = new QRCode(qrCodeData);
@@ -889,7 +891,7 @@ namespace OpenNetLinkApp.Common
                     // 32bit 그대로 사용
                     qrCodeImage.Save(strQRImgPath, System.Drawing.Imaging.ImageFormat.Png);
                     qrCodeImage.Dispose();
-                    qrCodeImage = null;
+                    qrCodeImage = null;*/
                 }
 
 
