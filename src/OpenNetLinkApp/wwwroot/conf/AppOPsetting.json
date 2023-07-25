@@ -41,6 +41,12 @@
 
 
   "bDlpInfoDisplay": false,
+  "blistUiDlpShow": [
+    false,
+    false,
+    false
+  ],  
+  
   "bEmptyfileTrans": true,
   "strInitPasswd": "1K27SdexltsW0ubSCJgsZw==",
   "strPWChangeProhibitLimit": "",
@@ -108,7 +114,7 @@
   "bUseOneToMultiLogin": false,
   "bUseOneByOneLogOut" : false,
   "bApprDeptSearch": true,
-  "bApprLineChkBlock": false,
+  "bApprLineChkBlock": true,
   "bApprLineLocalSave": true,
 
   "bUseClipAlarmType": true,
@@ -149,5 +155,6 @@
     false,
     false
   ],
-  "bUseTitleDescMinLength" : true
+  "bPkiSendByFileTrans": false,
+  "bUseTitleDescMinLength": true
 }
