@@ -205,6 +205,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApprTreeSearch(int groupId);      
         public string GetInitTransferFileExplorerPathInWindow(int groupId);
         public bool GetUseToastInsteadOfOSNotification(int groupId);
+        public string GetScrTimeoutLockType(int groupId);
     }
 
 
@@ -932,6 +933,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseToastInsteadOfOSNotification(int groupId)
         {
             return AppConfigInfo[groupId].bUseToastInsteadOfOSNotification;
+        }
+
+        public string GetScrTimeoutLockType(int groupId)
+        {
+            return AppConfigInfo[groupId].strScrTimeoutLockType;
         }
     }
 }

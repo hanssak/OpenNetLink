@@ -339,7 +339,9 @@ FunctionEnd ; end the un.ReMoveAddFileRM
 
 Function .onInit
 
-	SetSilent silent
+	${If} ${IS_SILENT} == 'TRUE'		
+		SetSilent silent
+	${endif}
 	
   ${If} ${IS_PATCH} == 'TRUE'
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
@@ -407,7 +409,9 @@ Function .onInstSuccess
   ${endif}
 
   ;;IfSilent 0 +2
-  Exec '"$INSTDIR\OpenNetLinkApp.exe"'
+  ${If} ${STARTAUTO} == 'TRUE'
+  	Exec '"$INSTDIR\OpenNetLinkApp.exe"'
+  ${endif}
   
 FunctionEnd
 

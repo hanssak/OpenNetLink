@@ -18,6 +18,9 @@ var isFull = Argument<bool>("isFull", true);	//false로 하면, 설치파일은 
 var isPatch = Argument<bool>("isPatch", true);	//false로 하면, 패치파일은 만들지 않는다.
 var isLightPatch = Argument<bool>("isLightPatch", false);
 var isEnc = Argument<bool>("isEnc", true);
+var deleteNetLink = Argument<bool>("deleteNetLink", false);		//true로 하면, 기존 NetLink Unintall.exe를 붙여넣기 한 후, 기존 NetLink를 삭제한다.
+var isSilent = Argument<bool>("isSilent", false);				//true로 하면, Silent 모드
+var startAuto = Argument<bool>("startAuto", true);				//false 하면, 설치 완료 후 자동 실행 안됨
 
 var isPatchInstaller = false;
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
@@ -852,6 +855,13 @@ Task("PubCrossflatform")
 		String strWebWindowNativeLibPath 	= "./OpenNetLinkApp/Library/WebWindow.Native.dll";
 		if(FileExists(strWebWindowNativeLibPath)) { DeleteFile(strWebWindowNativeLibPath); }
 	}
+	else
+	{
+		String strNetLinkUninstallDir = "./OpenNetLinkApp/Library/NetLink.Uninstall";		
+		if(DirectoryExists(strNetLinkUninstallDir)) {
+			DeleteDirectory(strNetLinkUninstallDir, new DeleteDirectorySettings { Force = true, Recursive = true });
+		}	
+	}
 
     DotNetCorePublish("./OpenNetLinkApp", settings);
 	DotNetCorePublish("./PreviewUtil", settings);
@@ -1033,7 +1043,10 @@ Task("MakeInstaller")
 				{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
 				{"NETWORK_FLAG", networkFlag.ToUpper()},
 				{"CUSTOM_NAME", customName.ToUpper()},
-				{"OUTPUT_DIRECTORY", PackageDirPath}
+				{"OUTPUT_DIRECTORY", PackageDirPath},
+				{"DELETE_NETLINK", deleteNetLink.ToString().ToUpper()},
+				{"IS_SILENT", isSilent.ToString().ToUpper()},
+				{"STARTAUTO", startAuto.ToString().ToUpper()}
 			}
 		});			
 	}
