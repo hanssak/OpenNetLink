@@ -334,7 +334,15 @@
                 tmpFile.virusDesc = arrVal[5];
 
                 if (arrVal.Length > 6)
+                {
                     tmpFile.fileDLPContents = arrVal[6];
+
+                    int nPos = tmpFile.fileDLPContents.LastIndexOf("\")");
+                    if (nPos > 0 && (tmpFile.fileDLPContents.Length - 2) == nPos)
+                        tmpFile.fileDLPContents = tmpFile.fileDLPContents.Replace("\")", "");
+
+                    //tmpFile.fileDLPContents = tmpFile.fileDLPContents.Replace("\")", "");
+                }
 
                 fileList.Add(tmpFile);
             }

@@ -1082,31 +1082,41 @@
     /// <param name="e"></param>
     public void DetailSearchResultEmail(int groupId, SGData e)
     {
-        string result = e.GetTagData("RESULT");
-        string reason = e.GetTagData("REASON");
-        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
-        listTempData = e.GetSvrRecordData2("RECORD");
 
-        if (listTempData == null || listTempData.Count < 1)
-        {
-            CLog.Here().Information("DetailSearchResultEmail - RECORD - empty!");
-            ShowMessage("error", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
-            StateHasChanged();
-            return;
+        try
+        { 
+            string result = e.GetTagData("RESULT");
+            string reason = e.GetTagData("REASON");
+            int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
+            listTempData = e.GetSvrRecordData2("RECORD");
+
+            if (listTempData == null || listTempData.Count < 1)
+            {
+                CLog.Here().Information("DetailSearchResultEmail - RECORD - empty!");
+                ShowMessage("error", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
+                StateHasChanged();
+                return;
+            }
+
+            CLog.Here().Information($"DetailSearchResultEmail - GroupId : {groupId}, Result : {result}, reason : {reason}");
+
+            if (result != "0")
+            {
+                ShowMessage("error", reason);
+                return;
+            }
+
+            // 추가작업
+            refMailManagePopUp.bUseDlpDataView = bUseDlpDataView;
+            refMailManagePopUp.DetailResult(groupId, e);
+            Task.Run(async () => { await refMailManagePopUp.openPopUp(strEmailTranSeq); });
+
+        }
+        catch(Exception ex)
+        { 
+            CLog.Here().Information($"DetailSearchResultEmail, Exception : {ex.Message}");
         }
 
-        CLog.Here().Information($"DetailSearchResultEmail - GroupId : {groupId}, Result : {result}, reason : {reason}");
-
-        if (result != "0")
-        {
-            ShowMessage("error", reason);
-            return;
-        }
-
-        // 추가작업
-        refMailManagePopUp.bUseDlpDataView = bUseDlpDataView;
-        refMailManagePopUp.DetailResult(groupId, e);
-        Task.Run(async () => { await refMailManagePopUp.openPopUp(strEmailTranSeq); });
 
         /*emailtransData tData = null;
         //tData = GetTransListData(strMsg);
