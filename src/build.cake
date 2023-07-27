@@ -34,6 +34,7 @@ string PackageDirPath 		= "NONE";
 string ReleaseNoteDirPath 	= "NONE";
 // string PackageZipFile 		= String.Format("OpenNetLink-{0}-{1}.hz", AppProps.AppUpdatePlatform, AppProps.PropVersion.ToString());
 string siteProfilePath = "./OpenNetLinkApp/wwwroot/SiteProfile";
+string publishInitJsonDirPath ="NONE";	//암호화가 필요한 json 초기 파일 경로
 ///////////////////////////////////////////////////////////////////////////////
 // CLASSES
 ///////////////////////////////////////////////////////////////////////////////
@@ -781,38 +782,79 @@ Task("EncryptConfig")
 	.Does(()=> {
 		//OP 파일 암호화 처리 (Arg : 2 + [publish 생성 OS폴더명]
 		var arg = $"2 {AppProps.Platform}";
-
-		if(AppProps.Platform == "windows")
-		{
-			using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = arg }))    {
-				process.WaitForExit();
-			}
-		}
+		var UtilityFilePath ="";
+		if(AppProps.Platform == "windows")	
+			UtilityFilePath = "./HashTool/MD5HashUtility.exe";
 		else if(AppProps.Platform == "debian" || AppProps.Platform == "redhat")
-		{
-			using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility", new ProcessSettings
-												{ Arguments = new ProcessArgumentBuilder()
-												.Append(arg)
-												}))
-			{
-				process.WaitForExit();
-			}
-		}
+			UtilityFilePath = "./HashToolLinux/MD5HashUtility";
 		else if(AppProps.Platform == "mac")
-		{
-			using(var process = StartAndReturnProcess("./HashToolOSX/MD5HashUtility", new ProcessSettings
+			UtilityFilePath = "./HashToolOSX/MD5HashUtility";
+		else
+			throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.Platform));
+		
+		using(var process = StartAndReturnProcess(UtilityFilePath, new ProcessSettings
 												{ Arguments = new ProcessArgumentBuilder()
 												.Append(arg)
 												}))
-			{
-				process.WaitForExit();
-			}
-		}
-		else
 		{
-			throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.Platform));
+			process.WaitForExit();
 		}
 
+			
+		// if(AppProps.Platform == "windows")
+		// {
+		// 	using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = arg }))    {
+		// 		process.WaitForExit();
+		// 	}
+		// }
+		// else if(AppProps.Platform == "debian" || AppProps.Platform == "redhat")
+		// {
+		// 	using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility", new ProcessSettings
+		// 										{ Arguments = new ProcessArgumentBuilder()
+		// 										.Append(arg)
+		// 										}))
+		// 	{
+		// 		process.WaitForExit();
+		// 	}
+		// }
+		// else if(AppProps.Platform == "mac")
+		// {
+		// 	using(var process = StartAndReturnProcess("./HashToolOSX/MD5HashUtility", new ProcessSettings
+		// 										{ Arguments = new ProcessArgumentBuilder()
+		// 										.Append(arg)
+		// 										}))
+		// 	{
+		// 		process.WaitForExit();
+		// 	}
+		// }
+		// else
+		// {
+		// 	throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.Platform));
+		// }
+
+	});
+
+Task("EncryptInitDirectory")
+	.Does(()=> {
+		//지정 폴더 내 모든 파일 암호화 처리 (Arg : 3 + 폴더경로)
+		var arg = $"3 {publishInitJsonDirPath}";
+		var UtilityFilePath ="";
+		if(AppProps.Platform == "windows")	
+			UtilityFilePath = "./HashTool/MD5HashUtility.exe";
+		else if(AppProps.Platform == "debian" || AppProps.Platform == "redhat")
+			UtilityFilePath = "./HashToolLinux/MD5HashUtility";
+		else if(AppProps.Platform == "mac")
+			UtilityFilePath = "./HashToolOSX/MD5HashUtility";
+		else
+			throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.Platform));
+		
+		using(var process = StartAndReturnProcess(UtilityFilePath, new ProcessSettings
+												{ Arguments = new ProcessArgumentBuilder()
+												.Append(arg)
+												}))
+		{
+			process.WaitForExit();
+		}
 	});
 
 Task("PubCrossflatform")
@@ -932,13 +974,13 @@ Task("PkgCrossflatform")
 		CopyFile($"{storageUnit}/ReleaseNote.md", $"{ReleaseNoteDirPath}/{AppProps.PropVersion.ToString()}.md");				
 		CopyFiles("./OpenNetLinkApp/VersionHash.txt", $"{AppProps.InstallerRootDirPath}/{unitName}");
 		
-		//storage의 OP 파일 published 경로에 적용 (+ OP 설정파일 암호화)
-		DeleteFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppOPsetting_*.json");		
-		CopyFiles($"{storageUnit}/AppOPsetting*.json", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf");		
-		
-		if(isEnc.ToString().ToUpper() == "TRUE")
-			RunTarget("EncryptConfig");
-
+		//published 경로에 설정 관련 json 파일 Copy 전 기존 파일 삭제
+		DeleteFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppOPsetting_*.json");				
+		if(FileExists("./artifacts/windows/published/wwwroot/conf/NetWork.json"))
+			DeleteFile("./artifacts/windows/published/wwwroot/conf/NetWork.json");			
+		if(FileExists("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json"))
+			DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
+			
 		//Delete Default SiteProfile
 		if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile"))		
 			DeleteDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile", new DeleteDirectorySettings {Force = true, Recursive = true });
@@ -973,12 +1015,25 @@ Task("PkgCrossflatform")
 		
 		//[빌드 후] 에이전트 별 파일 적용 (ex.Network.json, AppEnvSetting 등)
 		Information($"Copy [Agent Unit] Files");
-
+		
+		publishInitJsonDirPath = $"./artifacts/{AppProps.Platform}/published/wwwroot/conf/Init";	
 		//설치파일 생성
 		if(isFull.ToString().ToUpper() == "TRUE")
 		{
 			foreach(var agentUnit in System.IO.Directory.GetDirectories(storageUnit))
 			{
+				//설치 패키지: OPSetting.json / Network.json / EnvSetting.json를 Init에 생성
+				if(DirectoryExists(publishInitJsonDirPath))		
+					DeleteDirectory(publishInitJsonDirPath, new DeleteDirectorySettings {Force = true, Recursive = true });
+				System.IO.Directory.CreateDirectory(publishInitJsonDirPath);
+
+				CopyFiles($"{storageUnit}/AppOPsetting*.json", publishInitJsonDirPath);		
+				CopyFiles($"{agentUnit}/AppEnvSetting.json", publishInitJsonDirPath);
+				CopyFiles($"{agentUnit}/NetWork.json", publishInitJsonDirPath);
+
+				if(isEnc.ToString().ToUpper() == "TRUE")
+					RunTarget("EncryptInitDirectory");	// Init 폴더에 존재하는 파일 암호화 처리
+
 				var agentUnitInfo = new DirectoryInfo(agentUnit);
 				string AgentName= agentUnitInfo.Name;
 				
@@ -989,9 +1044,6 @@ Task("PkgCrossflatform")
 
 				networkFlag = AgentName.ToUpper();			
 				
-				CopyFiles($"{agentUnit}/AppEnvSetting.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
-				CopyFiles($"{agentUnit}/NetWork.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
-				
 				isPatchInstaller=false;
 				RunTarget("MakeInstaller");		
 			}
@@ -1000,20 +1052,22 @@ Task("PkgCrossflatform")
 		//패치파일 생성
 		if(isPatch.ToString().ToUpper() == "TRUE")
 		{
+			//패치 패키지의 경우,  OPSetting.json만 Init에 생성
+			if(DirectoryExists(publishInitJsonDirPath))		
+				DeleteDirectory(publishInitJsonDirPath, new DeleteDirectorySettings {Force = true, Recursive = true });
+			System.IO.Directory.CreateDirectory(publishInitJsonDirPath);
+
+			CopyFiles($"{storageUnit}/AppOPsetting*.json", publishInitJsonDirPath);		
+
+			if(isEnc.ToString().ToUpper() == "TRUE")
+				RunTarget("EncryptInitDirectory");	// Init 폴더에 존재하는 파일 암호화 처리
+
 			//Light Patch 버전일 땐, edge 폴더 배포전에 제거
 			if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
 			{
 				if(DirectoryExists("./artifacts/windows/published/wwwroot/edge")) 
-				{
 					DeleteDirectory("./artifacts/windows/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
-				}
 			}
-			
-			if(FileExists("./artifacts/windows/published/wwwroot/conf/NetWork.json"))
-				DeleteFile("./artifacts/windows/published/wwwroot/conf/NetWork.json");			
-			if(FileExists("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json"))
-				DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
-			
 			isPatchInstaller=true;
 			RunTarget("MakeInstaller");		
 		}
