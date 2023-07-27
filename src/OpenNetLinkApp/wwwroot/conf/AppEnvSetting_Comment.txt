@@ -126,4 +126,5 @@ bClipCopyAutoSend : 클립보드 복사 후 전송 체크박스 설정값(true, 
 // APP 트레이 이동 설정
 bUseCloseTrayMove : 공통환경설정에서 종료 시, 트레이로 이동 체크박스가 나오도록 ( true, false )
 bUseStartTrayMove : 공통환경설정에서 시작 시 트레이 이동 체크박스가 나오도록 ( true, false )
-bStartTrayMove : 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 ) [기능X]
+bExitTrayMove : 시스템메뉴에서 X 종료 (true : 트레이 이동, false : 종료 ) [AppEnvSetting]
+bStartTrayMove : 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 ) [AppEnvSetting]

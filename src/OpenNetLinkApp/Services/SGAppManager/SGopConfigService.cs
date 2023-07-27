@@ -199,13 +199,20 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApproveExt(int groupId);
         public bool GetUseFileExceptionDescCheck(int groupId);
         public bool GetUsePKIsendRecv(int groupId);
-
         public bool GetPKIsendType(int groupId);
-
-        public bool GetUseApprTreeSearch(int groupId);      
+        public bool GetUseApprTreeSearch(int groupId);
         public string GetInitTransferFileExplorerPathInWindow(int groupId);
         public bool GetUseToastInsteadOfOSNotification(int groupId);
+        public bool GetUiFileExpiredDateShow(int groupId);
+
+
+        public bool GetUseDlpFoundSendContinue(int groupId);
+
         public string GetScrTimeoutLockType(int groupId);
+
+        public string GetOKTAUrl(int groupId);
+
+        public bool GetVisibleLogOutButton(int groupId);
     }
 
 
@@ -934,10 +941,38 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseToastInsteadOfOSNotification;
         }
+        /// <summary>
+        /// 전송 관리에서 파일 만료일 표시 여부 
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        public bool GetUiFileExpiredDateShow(int groupId)
+        {
+            return AppConfigInfo[groupId].bUiFileExpiredDateShow;
+        }
+        /// <summary>
+        /// 서버DLP에서 개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        public bool GetUseDlpFoundSendContinue(int groupId)
+        {
+            return AppConfigInfo[groupId].bDlpFoundSendContinue;
+        }
 
         public string GetScrTimeoutLockType(int groupId)
         {
             return AppConfigInfo[groupId].strScrTimeoutLockType;
         }
+        public string GetOKTAUrl(int groupId)
+        {
+            return AppConfigInfo[groupId].strOKTAUrl;
+        }
+
+        public bool GetVisibleLogOutButton(int groupId)
+        {
+            return AppConfigInfo[groupId].bVisibleLogOutButton;
+        }
+
     }
 }

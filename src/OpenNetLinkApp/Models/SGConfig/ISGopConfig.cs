@@ -23,6 +23,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseOneToMultiLogin { get; set; }         // 1번에 다중망 로그인 기능 사용유무
         public bool bUseOneByOneLogOut { get; set; }         // 1번에 다중망 로그인 기능 사용때에도 로그아웃은 선택한 망에서 개별 로그아웃적영
         public bool bUseOver1Auth { get; set; }                        // 1단계 이상 인증 사용
+        public bool bVisibleLogOutButton { get; set; }                //상단의 [로그아웃] 버튼 표시 여부
 
         //패스워드
         public bool bUserPWChange { get; set; }                   // 사용자 패스워드 변경 사용 여부.
@@ -67,7 +68,11 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseAgentBlockValueChange { get; set; }                   // tbl_agent_block 에 들어가는 Type 값을 WebManager에서 data를 보여줄 수 있는 형태로 변경(WebManager/NetLink와 맞춤)
         public bool bUseOSMaxFilePath { get; set; }                             // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
         public bool bUseFileForwardDownNotRecv { get; set; }                     // 파일 수신되기전에 파일포워드로 다운로드 가능유무
-        
+        public string strInitTransferFileExplorerPathInWindow { get; set; }//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")
+        public bool bUiDlpShow { get; set; }                     //  상세보기 화면에서 DLP 상세사항 보여주는 유무
+        public bool bUiFileExpiredDateShow { get; set; }                     //  상세보기 화면에서 DLP 상세사항 보여주는 유무
+
+        public bool bDlpFoundSendContinue { get; set; }         // 개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무
 
         //클립보드
         public bool bUseClipBoard { get; set; }                   // 클립보드 사용 여부
@@ -84,8 +89,6 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         //메일
         public bool bUseEmail { get; set; }               // 메일 관리/결재 사용 유무.
-        public bool bUiDlpShow { get; set; } // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
-
         //URL Redirection (URL 반대망 전송)
         //public bool bURLAutoTrans { get; set; }                            // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
         public bool bUseURLRedirectionAlarm { get; set; }                                 // URL 자동전환 알림 사용 유무(환경설정)
@@ -160,10 +163,10 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseApproveExt { get; set; }                           // 결재필수 확장자 결재하는 기능 사용유무
         public bool bUseFileExceptionDescCheck { get; set; }                     // 파일 예외신청 설명정보 필수 기입여부
         public bool bUsePKIsendRecv { get; set; }           // 인증서 전송 사용 유무 (망별로) ( true : 사용, false : 미사용 )        
-        public string strInitTransferFileExplorerPathInWindow { get; set; }//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")
-
-        public bool bPkiSendByFileTrans { get; set; }                 // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
         public bool bUseToastInsteadOfOSNotification { get; set; }                        //레지스트리 차단으로 OS 노티 사용 불가한 Site에서 OS노티 대신 Toast 사용 (Default/false) 
         public string strScrTimeoutLockType { get; set; }                      //ScrLockTime의 시간초과로 타임아웃 발생 시, 처리타입(ScreenLock:화면잠금, LogOut:로그아웃, Exit: 프로그램 종료)
+
+        public string strOKTAUrl { get; set; }                             //OKTA 연동 URL
+        public bool bPkiSendByFileTrans { get; set; }                 // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
     }
 }

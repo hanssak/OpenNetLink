@@ -88,14 +88,17 @@ namespace OpenNetLinkApp.Common
         /// 검사단계표시 타입
         /// <para>포맷 : 전체검사단계/현재검사단계 (INTERLOCKFLAG 값 기준으로 표시) </para>
         /// </summary>
+        [Flags]
         public enum PreworkType : Int32
         {
+            [Description("초기값")]
+            BLOCK_NONE = 0,
             [Description("APT 검사")]
             APT_SCAN = 1,
             [Description("바이러스 검사")]
             VIRUS_SCAN = 2,
             [Description("DRM 검사")]
-            DTM_SCAN = 4,
+            DRM_SCAN = 4,
             [Description("개인정보 검사")]
             PERSONAL_DATA_SCAN = 8,
         }

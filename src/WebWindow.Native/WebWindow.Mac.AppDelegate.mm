@@ -113,10 +113,13 @@
 {
     NSLog(@"Button Actioned");
     NSDictionary *userInfo = notification.userInfo;
-
-	const char *navURI = [userInfo[@"NAVIGATE_URI"] UTF8String];
-	NTLog(SelfThis, Info, "Called : Action Navigate URI->(%s)", (AutoString)navURI);
-	((WebWindow*)SelfThis)->InvokeRequestedNavigateURL((AutoString)navURI);
+    if(userInfo)
+    {
+        std::string strUriText;
+	    strUriText= [userInfo[@"NAVIGATE_URI"] UTF8String];
+	    //NTLog(SelfThis, Info, "Called : Action Navigate URI->(%s)", (AutoString)navURI);
+	    ((WebWindow*)SelfThis)->InvokeRequestedNavigateURL(strUriText.data(), strUriText.length());
+    }
     return ;
 }
 

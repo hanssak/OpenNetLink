@@ -1707,7 +1707,7 @@ window.loadFileReaderService = () => {
           this.ClearValue = function (element) {
               var elementReal = this.GetDragTargetElement();
               if(elementReal == null) return -1;
-
+              
               _this.LogIfNull(elementReal);
               if (elementReal instanceof HTMLInputElement) {
                   //elementReal.value = null;
@@ -1716,13 +1716,15 @@ window.loadFileReaderService = () => {
               else {
                   _this.elementDataTransfers.delete(elementReal);
                   _this.elementDataDir.delete(elementReal);
+                  _this.dragElements.delete(elementReal);
               }
-
+              
               _this.elementDataTransfers = null;
               _this.elementDataTransfers = new Map();
 
               _this.elementDataDir = null;
               _this.elementDataDir = new Map();
+
               return 0;
           };
           this.GetFileInfoFromElement = function (element, index) {

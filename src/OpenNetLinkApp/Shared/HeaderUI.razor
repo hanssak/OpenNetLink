@@ -22,6 +22,7 @@
 @using OpenNetLinkApp.Pages.Transfer
 @using System.Drawing;
 @using OpenNetLinkApp.Common
+@using System.Text;
 
 
 @inject ISGAppManagerService SGAppMgrSvc
@@ -125,6 +126,10 @@
 
         HsCmdCenter.sgPageEvent.SetOSNotificationEvent(OSNotification);
 
+        HsCmdCenter.sgPageEvent.SetOSNotificationEvent(OSNotification);
+
+        // $DRM_BLOCK_NOTI 
+        //HsCmdCenter.sgPageEvent.SetLogoutNotiEvent(LogoutAction);
     }
 
     public void Dispose()
@@ -2588,8 +2593,20 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         SideBarUISvc.ChgActiveMenu(eventArgs, activeMenu);
     }
 
-    public void NavigateURLHandler(object sender, string navURI)
+    public void NavigateURLHandler(object sender, List<object> list)
     {
+        string navURI = "";
+        if (list != null)
+        {
+            IntPtr bUri = (IntPtr)list[0];
+            int length = (int)list[1];
+            byte[] data = new byte[length];
+
+            Marshal.Copy(bUri, data, 0, length);
+
+            navURI = Encoding.UTF8.GetString(data);
+        }
+
         int nGroupID = 0;
         string strGroupID = "";
         string strMenuName = "";
@@ -3255,6 +3272,14 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         pageService.SetLogoutStatus(groupID, true);
         HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
         HsCmdCenter.sgDicRecvData.SetLoginDataEmpty(groupID);
+
+        // sessionCheck 동작하게 적용
+        HsNetWork hsNetWork = null;
+        hsNetWork = HsCmdCenter.GetConnectNetWork(groupID);
+        if (hsNetWork != null)
+        {
+            hsNetWork.SetLoginSessionCheckDo();
+        }
 
         // 추가된 파일리스트 제거하는 동작
         LogOutFileListClearEvent LogOutFileListClearEvent = null;

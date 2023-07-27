@@ -255,7 +255,7 @@ namespace OpenNetLinkApp.Services
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
 
                 hsNetwork.SGSvr_EventReg(SGSvrRecv);
-                hsNetwork.SGData_EventReg(SGDataRecv);
+                hsNetwork.SGData_EventReg(SGDataRecv);                
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
                 hsNetwork.SGException_EventRegEx(SGExceptionExRecv);
                 hsNetwork.SetGroupID(groupID);
@@ -442,6 +442,15 @@ namespace OpenNetLinkApp.Services
                         e.result = 0;
                         e.strMsg = "SESSIONDUPLICATE";
                         e.strDummy = "";
+
+                        string strData = "";
+                        if (sgEventType.MsgRecode.TryGetValue("GOTPCODE", out strData))
+                        {
+                            e.strDummy = "google_otp";
+                            e.strMsg = strData;
+                            //e.strMsg = "otpauth://totp/SecureGate:KS0002?secret=JNJTAMBQGJFVGMBQ&issuer=SecureGate";
+                        }
+
                         seEvent(groupId, e);
                     }
                     System.Diagnostics.Debug.WriteLine("HsNetWork Session Duplicate Exception Received..");
@@ -452,19 +461,15 @@ namespace OpenNetLinkApp.Services
                     {
                         PageEventArgs e = new PageEventArgs();
                         e.result = 0;
+                        e.strMsg = "none";
 
                         string strData = "";
-
-                        if (sgEventType.MsgRecode.TryGetValue("2FACTORAUTHTYPE", out strData))
-                            e.strDummy = strData;
-
-                        strData = "";
-                        if (sgEventType.MsgRecode.TryGetValue("MSGKEY", out strData))
-                            e.strMsg = strData;  // Server에서 받은 Message 전달
-
-                        e.strDummy = "google_otp";      // kkw임시, google_otp 1개만 가짐 - Server 개발될때까지
-                        e.strMsg = "MARNVBMEK06VCXXK";  // kkw임시, 1가지만 존재 - Server 개발될때까지
-
+                        if (sgEventType.MsgRecode.TryGetValue("GOTPCODE", out strData))
+                        {
+                            e.strDummy = "google_otp";
+                            //strData = SgMsg.getTagDecString(sgEventType.MsgRecode["GOTPCODE"], MainCtl.Base64Seedkey);
+                            e.strMsg = sgEventType.strDataType;
+                        }
                         seEvent2Fact(groupId, e);
                     }
                     System.Diagnostics.Debug.WriteLine("HsNetWork Session 2Factor Auth Do.. Now Default Google Otp");
@@ -703,6 +708,10 @@ namespace OpenNetLinkApp.Services
                 case eCmdList.eAPTSCAN:                                                     // APT 노티.
                     VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
                     break;
+                case eCmdList.eDrmBlockNoti:                                                     // DRM Noti
+                    VirusScanNotiAfterSend(nRet, eCmdList.eDrmBlockNoti, groupId, sgData);
+                    break;                   
+
                 case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
                     EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
                     break;
@@ -2617,6 +2626,21 @@ namespace OpenNetLinkApp.Services
                     return sgSendData.RequestSendVirusConfirm(hsNetWork, strUserID, strTransSeq);
                 else
                     return sgSendData.RequestSendAptConfirm(hsNetWork, strUserID, strTransSeq);
+            }
+            return -1;
+        }
+
+        public int SendAPTAndVirusConfirm(int groupid, string strUserID, string strTransSeq, Common.Enums.PreworkType eBlockType)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+            {
+                if (eBlockType == Common.Enums.PreworkType.VIRUS_SCAN)
+                    return sgSendData.RequestSendVirusConfirm(hsNetWork, strUserID, strTransSeq);
+                else if (eBlockType == Common.Enums.PreworkType.APT_SCAN)
+                    return sgSendData.RequestSendAptConfirm(hsNetWork, strUserID, strTransSeq);
+
             }
             return -1;
         }

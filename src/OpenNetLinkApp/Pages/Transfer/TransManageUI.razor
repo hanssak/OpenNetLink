@@ -157,7 +157,7 @@
                                         <th style="text-align: center; vertical-align: middle; width: 6%;">@strTransKind</th>                         <!--전송구분-->
                                         <th style="text-align: center; vertical-align: middle; width: 8%;">@strTransStatus</th>                         <!--전송상태-->
                                         <th style="text-align: center; vertical-align: middle; width: 7%;">@strApprStatus</th>                         <!--승인상태-->
-                                        @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward(groupIDbyParam))
+                                        @if (SGAppMgrSvc.OpConfigInfoService.GetFileForward(groupIDbyParam))
                                         {
                                             <th style="text-align: center; vertical-align: middle; width: 7%; ">@strFileForward</th>
                                             <!--파일전달-->
@@ -169,7 +169,11 @@
                                         <th style="text-align:center;vertical-align:middle;width:10%;">@strTitle</th>                               <!--제목-->
                                         <th style="text-align:center;vertical-align:middle;width:13%;">@strFileSendDay</th>                        <!--전송요청일-->
                                         <th style="text-align:center;vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>   <!--개인정보-->
-                                        <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_ETC_EXPIRATIONDATE")</th>   <!--파일 만료일-->
+                                        @if (SGAppMgrSvc.OpConfigInfoService.GetUiFileExpiredDateShow(groupIDbyParam))
+                                        {
+                                            <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_ETC_EXPIRATIONDATE")</th>
+                                        }
+                                        <!--파일 만료일-->
                                         <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_ETC_DOWNPOSSIBLECOUNT")</th>   <!--다운로드 횟수-->
                                         <th style="text-align:center;vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_TRANS_MANUAL_DOWNLOAD")</th>   <!--다운로드-->
                                         <th style="text-align:center;vertical-align:middle;width:7%;">@strDetail</th>                         <!--상세보기-->
@@ -186,7 +190,7 @@
                                             <td style="text-align:center; vertical-align: middle">@item.TransferType</td>
                                             <td style="text-align:center; vertical-align: middle">@item.TransferStatus</td>
                                             <td style="text-align:center; vertical-align: middle">@item.ApvStatus</td>
-                                            @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward(groupIDbyParam))
+                                            @if (SGAppMgrSvc.OpConfigInfoService.GetFileForward(groupIDbyParam))
                                             {
                                                 <td style="text-align:center; vertical-align: middle">@item.IsFile</td>
                                             }
@@ -200,7 +204,17 @@
 
                                             @*@if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpInfoDisplay(groupIDbyParam))*@
                                             <td style="text-align:center; vertical-align: middle">@item.stDLP</td>
-                                            <td style="text-align:center; vertical-align: middle">@item.expiredDate</td>
+                                            @if (SGAppMgrSvc.OpConfigInfoService.GetUiFileExpiredDateShow(groupIDbyParam))
+                                            {
+                                                @if (item.expiredDate == "0001-01-01")
+                                                {
+                                                    <td style="text-align:center; vertical-align: middle">-</td>
+                                                }
+                                                else
+                                                {
+                                                    <td style="text-align:center; vertical-align: middle">@item.expiredDate</td>
+                                                }
+                                            }
                                             @if (item.isPossibleDownload)
                                             {
                                                 <td style="text-align:center; vertical-align: middle">@item.isPossibleDownloadCount</td>
@@ -513,6 +527,7 @@
             sgDetailData.SetInit(false, sTransSeq, sApprSeq, nDataForwarded, bTransCancel, bApprove, bReject);
             HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
 
+            refTransPopUp.strDataTransStatus = tData.TransferStatus;
             refTransPopUp.m_downloadCount = m_currentDownloadCount;
             refTransPopUp.SetBindingData();
             OpenDetailPopup(sTransSeq).Wait();
@@ -1056,6 +1071,8 @@
         else
             return;
 
+        bool isManualDownLoad = sgLoginData.GetManualDownload();
+        bool isForwardAutoDown = sgLoginData.GetForwardAutoDown() == "1" ? true : false;
 
         ListData.Clear();
 
@@ -1108,7 +1125,18 @@
             tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
             tData.expiredDate = sgData.GetExpiredDate(dic);             //파일저장 만료일
             tData.stDLP = sgData.GetDlp(dic);
-            tData.isPossibleDownload = GetIsPossibleDownLoad(tData, isInner, maxDownloadCount, nowDate, groupId);
+
+            if (tData.IsFile == "수신")
+            {
+                DateTime requestTime = Convert.ToDateTime(tData.RequestTime);
+                tData.expiredDate = requestTime.AddDays(7).ToString("yyyy-MM-dd");
+                maxDownloadCount = 1;
+            }
+            else
+                maxDownloadCount = sgLoginData.GetMaxDownCount();
+
+
+            tData.isPossibleDownload = GetIsPossibleDownLoad(tData, isInner, maxDownloadCount, nowDate, groupId, isManualDownLoad, isForwardAutoDown);
 
             if (maxDownloadCount - tData.downloadCount < 0)
                 tData.isPossibleDownloadCount = 0;
@@ -1124,7 +1152,7 @@
 
     }
 
-    public bool GetIsPossibleDownLoad(transData tData, bool isInner, int maxDownloadCount, int nowDate, int groupId)
+    public bool GetIsPossibleDownLoad(transData tData, bool isInner, int maxDownloadCount, int nowDate, int groupId, bool isManualDownLoad, bool isForwardAutoDown)
     {
         bool isPossibleDownload = false;
         //파일 다운로드 가능여부 판단
@@ -1137,22 +1165,44 @@
         {
             //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
             //if (sgAppConfig.GetFileDownloadBeforeReciving())
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForwardDownNotRecv(groupId))
+            if (tData.IsFile == "수신")
             {
-                if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
-                    isPossibleDownload = true;
+                if (!isForwardAutoDown)
+                {
+                    if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
+                        isPossibleDownload = true;
+                    else
+                        isPossibleDownload = false;
+                }
                 else
-                    isPossibleDownload = false;
+                {
+                    //수동다운로드 이므로 PC수신완료 건만 다운가능
+                    if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
+                        isPossibleDownload = true;
+                    else
+                        isPossibleDownload = false;
+                }
             }
             else
             {
-                //수동다운로드 이므로 PC수신완료 건만 다운가능
-                if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
-                    isPossibleDownload = true;
+                if (isManualDownLoad)
+                {
+                    if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
+                        isPossibleDownload = true;
+                    else
+                        isPossibleDownload = false;
+                }
                 else
-                    isPossibleDownload = false;
+                {
+                    //수동다운로드 이므로 PC수신완료 건만 다운가능
+                    if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
+                        isPossibleDownload = true;
+                    else
+                        isPossibleDownload = false;
+                }
             }
         }
+
         int expireDate = Int32.Parse(tData.expiredDate.Replace("-", ""));
         if (isPossibleDownload)
         {
@@ -1523,14 +1573,24 @@
 
             curTransData.downloadCount++;
             SGLoginData sGLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sGLoginData.GetMaxDownCount() - curTransData.downloadCount <= 0)
+            int maxDownCount = 0;
+            if (curTransData.IsFile == "수신")
+            {
+                maxDownCount = 1;
+            }
+            else
+            {
+                maxDownCount = sGLoginData.GetMaxDownCount();
+            }
+
+            if (maxDownCount - curTransData.downloadCount <= 0)
             {
                 curTransData.isPossibleDownload = false;
                 curTransData.isPossibleDownloadCount = 0;
             }
             else
             {
-                curTransData.isPossibleDownloadCount = sGLoginData.GetMaxDownCount() - curTransData.downloadCount;
+                curTransData.isPossibleDownloadCount = maxDownCount - curTransData.downloadCount;
             }
 
             StateHasChanged();

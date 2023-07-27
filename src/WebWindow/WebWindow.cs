@@ -72,7 +72,7 @@ namespace WebWindows
     /// </summary>
     public enum OS_NOTI : int
     {
-        ONLINE     = 1,
+        ONLINE = 1,
         OFFLINE,
         WAIT_APPR,
         RECV_DONE,
@@ -129,9 +129,9 @@ namespace WebWindows
             this.pMemByte = new byte[nLength];
             this.pExMemByte = new byte[nExLength];
 
-            if(nLength > 0)
+            if (nLength > 0)
                 Marshal.Copy(pMem, pMemByte, 0, nLength);
-            if(nExLength > 0)
+            if (nExLength > 0)
                 Marshal.Copy(pExMem, pExMemByte, 0, nExLength);
         }
 
@@ -146,12 +146,12 @@ namespace WebWindows
             this.pMemByte = new Byte[copyData.nLength];
             this.pExMemByte = new Byte[copyData.nExLength];
 
-            if(copyData.nLength > 0 )
+            if (copyData.nLength > 0)
             {
                 Marshal.Copy(copyData.pMem, this.pMemByte, 0, copyData.nLength);
             }
 
-            if(copyData.nExLength > 0)
+            if (copyData.nExLength > 0)
             {
                 Marshal.Copy(copyData.pExMem, this.pExMemByte, 0, copyData.nExLength);
             }
@@ -176,7 +176,8 @@ namespace WebWindows
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void NTLogCallback(int nLevel, string message);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ClipBoardCallback(int nGroupId, int nType, int nLength, IntPtr pMem, int nExLength, IntPtr pExMem);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RecvClipBoardCallback(int nGroupId);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RequestedNavigateURLCallback([MarshalAs(UnmanagedType.LPWStr)] string navURI);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RequestedNavigateURLCallback(IntPtr uriMem, int uriLength);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void URLChangedCallback(IntPtr uriMem, int uriLength);
 
         const string DllName = "WebWindow.Native";
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern IntPtr WebWindow_register_win32(IntPtr hInstance);
@@ -210,6 +211,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetClipBoardCallback(IntPtr instance, ClipBoardCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetRecvClipBoardCallback(IntPtr instance, RecvClipBoardCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetRequestedNavigateURLCallback(IntPtr instance, RequestedNavigateURLCallback callback);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetURLChangedCallback(IntPtr instance, URLChangedCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_RegClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UnRegClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 
@@ -325,6 +327,10 @@ namespace WebWindows
             _gcHandlesToFree.Add(GCHandle.Alloc(onRequestedNavigateURLDelegate));
             WebWindow_SetRequestedNavigateURLCallback(_nativeWebWindow, onRequestedNavigateURLDelegate);
 
+            var onURLChangedDelegate = (URLChangedCallback)OnURLChanged;
+            _gcHandlesToFree.Add(GCHandle.Alloc(onURLChangedDelegate));
+            WebWindow_SetURLChangedCallback(_nativeWebWindow, onURLChangedDelegate);
+
             // Auto-show to simplify the API, but more importantly because you can't
             // do things like navigate until it has been shown
             Show();
@@ -364,12 +370,12 @@ namespace WebWindows
         public void UseClipBoardSelect(int groupID) => WebWindow_UseClipSelect(_nativeWebWindow, groupID);
 
         public void UseClipFirstSendType(int groupID) => WebWindow_UseClipFirstSendType(_nativeWebWindow, groupID);
-        
+
 
         public void ClipDataFree(int groupID) => WebWindow_ClipMemFree(_nativeWebWindow, groupID);
 
         public void SetClipSendFlag(int groupID) => WebWindow_SetClipBoardSendFlag(_nativeWebWindow, groupID);
-        
+
 
         public void Show() => WebWindow_Show(_nativeWebWindow);
         public void WaitForExit() => WebWindow_WaitForExit(_nativeWebWindow);
@@ -442,7 +448,7 @@ namespace WebWindows
         public void ShowUserNotification(string image, string title, string message, string navURI = null)
         {
             //WebWindow_ShowUserNotification(_nativeWebWindow, image, title, message, navURI);
-            Invoke(() => WebWindow_ShowUserNotification(_nativeWebWindow,image, title, message, navURI));   // KKW
+            Invoke(() => WebWindow_ShowUserNotification(_nativeWebWindow, image, title, message, navURI));   // KKW
         }
 
         public void Notification(OS_NOTI category, string title, string message, string navURI = "")
@@ -736,6 +742,9 @@ namespace WebWindows
         private void OnRecvClipBoard(int nGroupId) => RecvClipBoardOccured?.Invoke(this, nGroupId);
         public event EventHandler<int> RecvClipBoardOccured;
 
+        private void OnURLChanged(IntPtr uriMem, int uriLength) => URLChanged?.Invoke(this, new List<object>() { uriMem, uriLength });
+        public event EventHandler<List<object>> URLChanged;
+
         public void GenerateHotKey(bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_GenerateHotKey(_nativeWebWindow, bAlt, bControl, bShift, bWin, chVKCode);
         public void RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_RegClipboardHotKey(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode);
         public void UnRegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode);
@@ -770,7 +779,7 @@ namespace WebWindows
             Invoke(() => winClip.UnRegHotKeyNetOver(groupID, nIdx));
         }
 
-        public void FolderOpen(string strFileDownPath) => WebWindow_FolderOpen(_nativeWebWindow,strFileDownPath);
+        public void FolderOpen(string strFileDownPath) => WebWindow_FolderOpen(_nativeWebWindow, strFileDownPath);
         public void OpenFolder(string strFileDownPath)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ||
@@ -782,7 +791,7 @@ namespace WebWindows
             {
                 using (Process proc = new Process())
                 {
-                    strFileDownPath = strFileDownPath.Replace("\\","/");
+                    strFileDownPath = strFileDownPath.Replace("\\", "/");
                     try
                     {
 
@@ -791,17 +800,17 @@ namespace WebWindows
                         string[] arrayList = retMsg.Split("\n");
                         List<string> retList = arrayList.Where(item => item.Contains("nemo "))
                                                         .Select(item => item).ToList();
-                        if(strFileDownPath != null) 
+                        if (strFileDownPath != null)
                         {
-                            foreach( var line in retList)
+                            foreach (var line in retList)
                             {
-                                if(line.Contains(strFileDownPath))
+                                if (line.Contains(strFileDownPath))
                                 {
-                                    foreach(var sval in line.Split(" "))
+                                    foreach (var sval in line.Split(" "))
                                     {
                                         int ProcId;
                                         bool result = int.TryParse(sval, out ProcId);
-                                        if(result)
+                                        if (result)
                                         {
                                             CLog.Here().Information($"Before Folder Oepn: previous nemo({ProcId}) process is kill");
                                             Process localById = Process.GetProcessById(ProcId);
@@ -816,7 +825,7 @@ namespace WebWindows
                             RunExternalExe(filename: @strFileDownPath, useShellExcute: true);
                         }
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         CLog.Here().Error($"Exception - MSG : {e.Message}");
                     }
@@ -839,7 +848,7 @@ namespace WebWindows
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             process.StartInfo.UseShellExecute = useShellExcute;
 
-            if(useShellExcute) useRedirectIO = false;
+            if (useShellExcute) useRedirectIO = false;
             process.StartInfo.RedirectStandardError = useRedirectIO;
             process.StartInfo.RedirectStandardOutput = useRedirectIO;
             var stdOutput = new StringBuilder();
@@ -850,7 +859,7 @@ namespace WebWindows
             try
             {
                 process.Start();
-                if(useRedirectIO) 
+                if (useRedirectIO)
                 {
                     process.BeginOutputReadLine();
                     stdError = process.StandardError.ReadToEnd();
@@ -859,7 +868,7 @@ namespace WebWindows
             }
             catch (Exception e)
             {
-                throw new Exception("OS error while executing " + ExceptionFormat(filename, arguments)+ ": " + e.Message, e);
+                throw new Exception("OS error while executing " + ExceptionFormat(filename, arguments) + ": " + e.Message, e);
             }
 
             if (process.ExitCode == 0)
@@ -906,8 +915,8 @@ namespace WebWindows
         public void RegStartProgram() => WebWindow_RegStartProgram(_nativeWebWindow);
         public void UnRegStartProgram() => WebWindow_UnRegStartProgram(_nativeWebWindow);
 
-        private void OnRequestedNavigateURL(string navURI) => NavigateURLOccured?.Invoke(this, navURI);
+        private void OnRequestedNavigateURL(IntPtr uriMem, int uriLength) => NavigateURLOccured?.Invoke(this, new List<object>() { uriMem, uriLength });
 
-        public event EventHandler<string> NavigateURLOccured;
+        public event EventHandler<List<object>> NavigateURLOccured;
     }
 }

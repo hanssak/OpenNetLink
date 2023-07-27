@@ -23,6 +23,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseOneToMultiLogin { get; set; } = false;         // 1번에 다중망 로그인 기능 사용유무
         public bool bUseOneByOneLogOut { get; set; } = false;         // 1번에 다중망 로그인 기능 사용때에도 로그아웃은 선택한 망에서 개별 로그아웃적영
         public bool bUseOver1Auth { get; set; } = false;                        // 1단계 이상 인증 사용
+        public bool bVisibleLogOutButton { get; set; } = true;              //상단의 [로그아웃] 버튼 표시 여부
 
         //패스워드
         public bool bUserPWChange { get; set; } = false;                   // 사용자 패스워드 변경 사용 여부.
@@ -52,8 +53,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         //public bool bManualRecvDownChange { get; set; } = false;          // 수동다운로드 사용 시 수신 폴더 변경 기능 ( true : 사용, false : 미사용)
         public bool bUseUserRecvDownPath { get; set; } = false;           // 로그인 유저별 다운로드 경로 사용 여부
         public bool bUseDenyPasswordZip { get; set; } = true;         // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
-        public bool bUseFileForward { get; set; } = false;          // 파일포워드 기능 사용유무(환경설정)
-        public bool bFileForward { get; set; } = false;               // 파일포워드기능 사용할지 유무
+        public bool bUseFileForward { get; set; } = false;          // 파일포워드 기능 사용유무
+        public bool bFileForward { get; set; } = false;               // 전송관리 화면에서 파일 전송 컬럼 보여줄지 여부
         public bool bUsePartialFileAddInTransfer { get; set; } = false;         //'파일전송' 화면에서 등록시도한 파일목록에 정상파일과 오류파일이 함께 존재할 시 정상 파일에 대한 부분 등록 가능여부(true, false)
         public bool bUseChkHardSpace { get; set; } = true;                      //파일수신시 디바이스 용량 체크 여부
         public bool bUseFileApproveReason { get; set; } = false;                        //파일 승인사유 입력 여부
@@ -64,9 +65,14 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseAgentBlockValueChange { get; set; } = true;                       // tbl_agent_block 에 들어가는 Type 값을 WebManager에서 data를 보여줄 수 있는 형태로 변경(WebManager/NetLink와 맞춤)
         public bool bUseOSMaxFilePath { get; set; } = true;                               // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
         public bool bUseFileForwardDownNotRecv { get; set; } = true;                         // 파일 수신되기전에 파일포워드로 다운로드 가능유무
+        public string strInitTransferFileExplorerPathInWindow { get; set; } = "";//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")       
 
-
+        public bool bUiDlpShow { get; set; } = false;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
+        public bool bUiFileExpiredDateShow { get; set; } = true;  // 전송관리 화면에서 파일 만료일 표시 여부
         //클립보드
+
+        public bool bDlpFoundSendContinue { get; set; } = false;  //  개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무
+
         public bool bUseClipBoard { get; set; } = true;                  // 클립보드 사용 여부
         public bool bUseClipCopyAndSend { get; set; } = false;    // 클립보드 복사 후 전송 사용 유무 ( 환경설정 체크박스 보이고 안보이고)
         //public bool bClipCopyAutoSend { get; set; } = false;                // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
@@ -81,8 +87,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         //메일
         public bool bUseEmail { get; set; } = false;               // 메일 관리/결재 사용 유무.
-        public bool bUiDlpShow { get; set; } = false;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
-
+        
         //URL Redirection (URL 반대망 전송)
         //public bool bURLAutoTrans { get; set; } = false;                               // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
         public bool bUseURLRedirectionAlarm { get; set; } = false;                               // URL 자동전환 알림 사용 유무(환경설정)
@@ -158,13 +163,10 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseApproveExt { get; set; } = false;                            // 결재필수 확장자 결재하는 기능 사용유무
         public bool bUseFileExceptionDescCheck { get; set; } = false;                           // 파일 예외신청 설명정보 필수 기입여부
         public bool bUsePKIsendRecv { get; set; } = false;             // 인증서 전송 사용 유무 (망별로) ( true : 사용, false : 미사용 )
-        
-
-        public bool bPkiSendByFileTrans { get; set; } = false;                // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
         public bool bUseToastInsteadOfOSNotification { get; set; } = false;                        //레지스트리 차단으로 OS 노티 사용 불가한 Site에서 OS노티 대신 Toast 사용 (Default/false) 
         public string strScrTimeoutLockType { get; set; } = "ScreenLock";                      //ScrLockTime의 시간초과로 타임아웃 발생 시, 처리타입(ScreenLock:화면잠금, LogOut:로그아웃, Exit: 프로그램 종료)
 
-        public string strInitTransferFileExplorerPathInWindow { get; set; } = "";//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")
-
+        public string strOKTAUrl { get; set; } = "";
+        public bool bPkiSendByFileTrans { get; set; } = false;                // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
     }
 }

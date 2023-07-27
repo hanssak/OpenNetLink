@@ -27,11 +27,27 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool bCheckDisable = false;                // 체크 가능 상태.
         public string stDLP = "";
         public string stDLPDesc = "";
+        public string stVirusFlag = "0";
 
         public FileInfoData()
         {
             strFileName = strFileType = strFileSize = strVirusHistory = strVirusExamDay = "";
         }
+
+        public FileInfoData(string FileName, string FileType, string FileSize, string VirusHistory, string VirusExamDay, string fileno, string dlp, string dlpdesc, string strVirusFlag)
+        {
+            strFileName = FileName;                     // 파일 이름
+            strFileType = FileType;                     // 파일 유형
+            strFileSize = FileSize;                     // 파일 크기
+            strVirusHistory = VirusHistory;             // 바이러스 내역
+            strVirusExamDay = VirusExamDay;             // 바이러스 검사일
+            fileNo = fileno;
+            stDLP = dlp;                                //DLP 여부
+            stDLPDesc = dlpdesc;                        //DLP 상세 
+            stVirusFlag = strVirusFlag;                 // VirusFlag(0:정상파일, 1: 바이러스 검출, 2: 파일위변조 검출, 5: DRM차단)
+        }
+
+
         public FileInfoData(string FileName, string FileType, string FileSize, string VirusHistory, string VirusExamDay, string fileno, string dlp, string dlpdesc)
         {
             strFileName = FileName;                     // 파일 이름
@@ -899,6 +915,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strVirusExamDay = "-";
             string stDLP = "";
             string stDLPDesc = "";
+            string strVirusFlag = "";
+
             List<FileInfoData> m_ListData = new List<FileInfoData>();
             Dictionary<int, string> data = null;
             for (int i = 0; i < dataCount; i++)
@@ -985,7 +1003,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 else
                     strVirus = "-";
 
-                if (data.TryGetValue(5, out strVirusExamDay))                   // 바이러스 검사일 
+                if (data.TryGetValue(5, out strVirusExamDay))            // 바이러스 검사일 
                 {
                     strVirusExamDay = data[5];
                     if (strVirusExamDay.Equals(""))
@@ -994,7 +1012,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 else
                     strVirusExamDay = "-";
 
-                m_ListData.Add(new FileInfoData(strFileName, strFileType, strFileSize, strVirus, strVirusExamDay, data[6], stDLP, stDLPDesc));
+                strVirusFlag = "";
+                if (data.TryGetValue(8, out strVirusFlag))            // VIRUSFLAG : VIRUS 및 파일 위변조 검출여부
+                {
+                    strVirusFlag = data[8];
+                    if (strVirusFlag.Equals(""))
+                        strVirusFlag = "0";
+                }
+                else
+                    strVirusFlag = "0";
+
+                m_ListData.Add(new FileInfoData(strFileName, strFileType, strFileSize, strVirus, strVirusExamDay, data[6], stDLP, stDLPDesc, strVirusFlag));
             }
             fileListInfo = m_ListData;
             return;

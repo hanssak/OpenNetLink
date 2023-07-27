@@ -187,6 +187,8 @@
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<PopUpLogIn>();
 
     CsGoogleQRcode QRcode = new CsGoogleQRcode();
+    string str2FactorAuthType = "";
+    string strOtpUrlCode = "";
 
     private void GoogleOtpCancel()
     {
@@ -196,12 +198,9 @@
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
         bUIBtnDisable = false;
         bStartedLogin = false;
-        id = "";
-        SetProtectedPW("");
-
         refGoogleOTP.strUserOTP = "";
 
-        closeUIPopup();
+        closePopUp();
     }
 
     private void GoogleOtpConfirm()
@@ -214,9 +213,10 @@
         hsNetWork = HSCmdCenter.GetConnectNetWork(refGoogleOTP.nGroupID);
         if (hsNetWork != null)
         {
-            // 구글Otp 값 어느 Tag에 보낼것인지 협의후 동작
-            //hsNetWork.stCliMem.OTP = refGoogleOTP.strUserOTP;
-            hsNetWork.SendBind2FactorAuth();
+            // 구글Otp 값 어느 Tag에 보낼것인지 협의후 동작            
+            hsNetWork.SetGoogleOtp(refGoogleOTP.strUserOTP);
+
+            hsNetWork.SendSeedKeyBindFor2FactorAuth();
         }
 
         // 다중망에 맞춰서 작업
@@ -224,7 +224,6 @@
         //bStartedLogin = true;
         //bLoginBtnDisable = true;
 
-        hsNetWork.stCliMem.OTP = "";
         refGoogleOTP.strUserOTP = "";
     }
 
@@ -242,23 +241,22 @@
         if (e.strDummy == "google_otp")
         {
 
-            // Server에서 받아서 동작하도록 수정예정
+            // Server에서 받아서 동작하도록 수정
             string strSecureKey = "";
-            strSecureKey = e.strMsg;
 
-            if (QRcode.GenerateQRsecureKey())
-                strSecureKey = QRcode.strSecureKey; // "MARNVBMEK06VCXXK";
+            //if (QRcode.GenerateQRsecureKey())
+            //    strSecureKey = QRcode.strSecureKey; // "MARNVBMEK06VCXXK";
+            if (QRcode.GetSecureKeyFromOtpUrl(e.strMsg, out strSecureKey) == false)
+                CLog.Here().Information($"Show2FactorAuth, otpauth Type Error ################## : {e.strMsg}");
 
             CLog.Here().Information($"Show2FactorAuth, Otp-Key : {strSecureKey}");
 
             refGoogleOTP.strKeyMessage = strSecureKey;
             refGoogleOTP.nGroupID = groupID;
-            bool rWriteQRimg = QRcode.GenerateQRimg("SecureGate", id, strSecureKey);
-            if (rWriteQRimg)
-            {
-                Thread.Sleep(1000);
-                refGoogleOTP.RedrawUI();
-            }
+            //bool rWriteQRimg = QRcode.GenerateQRimg("SecureGate", id, strSecureKey);
+            bool rWriteQRimg = QRcode.GenerateQRimg(e.strMsg, true);  // Server에서 받은 Url로 바로 생성
+            Thread.Sleep(1000);
+            refGoogleOTP.RedrawUI();
 
             // login이 가능항 상태로 ui 변경
             await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
@@ -333,8 +331,20 @@
         HSCmdCenter.SetAllowSessionDuplicate(refSGloginDuplicate.groupId);
         CLog.Here().Information($"[PopupLogin] SessionAlertConfirm - LogInType: {refSGloginDuplicate.groupId.ToString()}");
 
-        doLogIn(true);
+        if (str2FactorAuthType == "google_otp" && strOtpUrlCode.Length > 0)
+        {
+            PageEventArgs e = new PageEventArgs();
+            e.strDummy = str2FactorAuthType;
+            e.strMsg = strOtpUrlCode;
+            str2FactorAuthType = "";
+            strOtpUrlCode = "";
 
+            Show2FactorAuth(refSGloginDuplicate.groupId, e);
+        }
+        else
+        {
+            doLogIn(true);
+        }
         bUIBtnDisable = false;
     }
 
@@ -346,6 +356,11 @@
     private async void ShowSessionCountPopup(int groupID, PageEventArgs e)
     {
         bStartedLogin = false;
+        if (e.strDummy == "google_otp")
+        {
+            str2FactorAuthType = e.strDummy;
+            strOtpUrlCode = e.strMsg;
+        }
         await refSGloginDuplicate.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
     }
 
@@ -488,20 +503,20 @@
         stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
         if (stRtn == null || (1 > stRtn.Length))
         {
-        CLog.Here().Information($"Result - json, Data is null OR 0 Size");
-        ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
-        return false;
+            CLog.Here().Information($"Result - json, Data is null OR 0 Size");
+            ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
+            return false;
         }
 
         // json으로 온 Data에서 실제 data 뽑아내는 동작
         using (JsonDocument document = JsonDocument.Parse(stRtn))
         {
-        JsonElement jroot = document.RootElement;
-        nCode = jroot.GetProperty("code").GetInt32();
-        strMsg = jroot.GetProperty("msg").GetString();
-        strData = jroot.GetProperty("data").GetString();
+            JsonElement jroot = document.RootElement;
+            nCode = jroot.GetProperty("code").GetInt32();
+            strMsg = jroot.GetProperty("msg").GetString();
+            strData = jroot.GetProperty("data").GetString();
         }
-        #endif
+#endif
 
         CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
 
@@ -1322,6 +1337,7 @@
                     strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
                     //strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";       // Table 이름 따로 정해졌음
                     strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
+                    strGetinfoTagName += ", 'FORWARD_AUTODOWN'";
 
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupId))
                     {
@@ -1438,6 +1454,15 @@
             else
             {
                 bUIBtnDisable = false;
+
+                // sessionCheck 동작하게 적용
+                HsNetWork hsNetWork = null;
+                hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
+                if (hsNetWork != null)
+                {
+                    hsNetWork.SetLoginSessionCheckDo();
+                }
+
                 string strPopupMsg = "";
                 // 다중망일때에는 실패한 망이름 표현
                 if (pageService.m_bIsMultiNetWork)

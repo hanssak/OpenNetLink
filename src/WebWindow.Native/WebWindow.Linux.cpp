@@ -238,7 +238,10 @@ activate_navigate_uri(GSimpleAction *simple, GVariant *parameter, gpointer self)
 {
 	const gchar *navURI = g_variant_get_string(parameter, NULL);
 	NTLog(self, Info, "Called : Action Navigate URI->(%s)", (AutoString)navURI);
-	((WebWindow*)self)->InvokeRequestedNavigateURL((AutoString)navURI);
+	if (navURI)
+	{
+		((WebWindow*)self)->InvokeRequestedNavigateURL(navURI, strlen(navURI));
+	}
 }
 
 WebWindow::~WebWindow()

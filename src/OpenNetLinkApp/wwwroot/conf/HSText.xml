@@ -304,19 +304,26 @@
       <CN>文件传输系统</CN>
     </T_SYSTEMNAME>
 
-    <T_SYSTEMNAME_POPUPTITLE>
-      <KR>파일전송시스템</KR>
-      <JP>資料転送システム</JP>
-      <EN>File transmission system</EN>
-      <CN>文件传输系统</CN>
-    </T_SYSTEMNAME_POPUPTITLE>
+		<T_SYSTEMNAMEEX>
+			<KR>파일전송시스템</KR>
+			<JP>資料転送システム</JP>
+			<EN>File transmission system</EN>
+			<CN>文件传输系统</CN>
+		</T_SYSTEMNAMEEX>
+		
+		<T_SYSTEMNAME_POPUPTITLE>
+			<KR>파일전송시스템</KR>
+			<JP>資料転送システム</JP>
+			<EN>File transmission system</EN>
+			<CN>文件传输系统</CN>
+		</T_SYSTEMNAME_POPUPTITLE>		
 
-    <T_LANGUAGE>
-      <KR>언어</KR>
-      <JP>言語</JP>
-      <EN>Language</EN>
-      <CN>语言</CN>
-    </T_LANGUAGE>
+		<T_LANGUAGE>
+			<KR>언어</KR>
+			<JP>言語</JP>
+			<EN>Language</EN>
+			<CN>语言</CN>
+		</T_LANGUAGE>
 
     <T_LANGUAGE_KOREAN>
       <KR>한국어</KR>
@@ -2277,12 +2284,20 @@
       <CN></CN>
     </T_VIRUS_DETAILS>
 
+    <T_DETAIL_DETECT_DRM>
+      <KR>전송 파일에 허용되지 않는 DRM 적용이 되어 있습니다.</KR>
+      <JP></JP>
+      <EN>DRM detected in transfer files.</EN>
+      <CN></CN>
+    </T_DETAIL_DETECT_DRM>
+
+
     <T_DETAIL_BEFORE_APPROVE>
-      <KR>선결</KR>
-      <JP>先決</JP>
-      <EN>Before</EN>
-      <CN>先批</CN>
-    </T_DETAIL_BEFORE_APPROVE>
+			<KR>선결</KR>
+			<JP>先決</JP>
+			<EN>Before</EN>
+			<CN>先批</CN>
+		</T_DETAIL_BEFORE_APPROVE>
 
     <T_DETAIL_AFTER_APPROVE>
       <KR>후결</KR>
@@ -3156,11 +3171,11 @@
     </T_GOOGLE_OTP_BTN_DESC>
 
     <T_GOOGLE_OTP_QRCODE>
-      <KR>QR 코드</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN>二维码</CN>
-    </T_GOOGLE_OTP_QRCODE>
+			<KR>QR 코드</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>二维码</CN>
+		</T_GOOGLE_OTP_QRCODE>
 
     <T_GOOGLE_OTP_REGISTER_NUM>
       <KR>OTP 등록 번호</KR>
@@ -3169,28 +3184,28 @@
       <CN>OTP注册编号</CN>
     </T_GOOGLE_OTP_REGISTER_NUM>
 
-    <T_GOOGLE_OTP_INPUT_NUM>
-      <KR>OTP 인증번호</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN>OTP口令</CN>
-    </T_GOOGLE_OTP_INPUT_NUM>
+		<T_GOOGLE_OTP_INPUT_NUM>
+			<KR>OTP 인증번호</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>OTP口令</CN>
+		</T_GOOGLE_OTP_INPUT_NUM>
 
 
-    <T_GOOGLE_OTP_NUM_EMPTY>
-      <KR>OTP 번호를 입력하세요.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN>OTP口令</CN>
-    </T_GOOGLE_OTP_NUM_EMPTY>
+		<T_GOOGLE_OTP_NUM_EMPTY>
+			<KR>OTP 번호를 입력하세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>OTP口令</CN>
+		</T_GOOGLE_OTP_NUM_EMPTY>
 
 
-    <T_OTP_GUIDE>
-      <KR>생생된 OTP번호를 로그인 화면에 등록하세요.</KR>
-      <JP>생생된 OTP번호를 로그인 화면에 등록하세요.</JP>
-      <EN>생생된 OTP번호를 로그인 화면에 등록하세요.</EN>
-      <CN>생생된 OTP번호를 로그인 화면에 등록하세요.</CN>
-    </T_OTP_GUIDE>
+		<T_OTP_GUIDE>
+			<KR>생생된 OTP번호를 로그인 화면에 등록하세요.</KR>
+			<JP>생생된 OTP번호를 로그인 화면에 등록하세요.</JP>
+			<EN>생생된 OTP번호를 로그인 화면에 등록하세요.</EN>
+			<CN>생생된 OTP번호를 로그인 화면에 등록하세요.</CN>
+		</T_OTP_GUIDE>
 
     <!-- ********************************************* [END] ETC (T_GOOGLE_OTP_0000) ********************************************* -->
 
@@ -3415,8 +3430,28 @@
 
     <!-- ********************************************* [END] PKI 인증서 전송화면 (T_PKI_0000) ********************************************* -->
 
-
-    <!-- ********************************************* [START] ETC (T_ETC_0000) ********************************************* -->
+		<!-- ********************************************* [START] OKTA 인증 화면 (T_OKTA_AUTH_0000) ********************************************* -->
+		<T_OKTA_AUTH_TITLE>
+			<KR>OKTA 인증</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_OKTA_AUTH_TITLE>
+		<T_OKTA_AUTH_REQUEST>
+			<KR>OKTA 인증 페이지에서 인증을 수행하십시오.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_OKTA_AUTH_REQUEST>
+		<T_OKTA_AUTH_COMPLETE>
+			<KR>OKTA 인증이 완료 되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_OKTA_AUTH_COMPLETE>
+		<!-- ********************************************* [END] OKTA 인증 화면 (T_OKTA_AUTH_0000) ********************************************* -->
+		
+		<!-- ********************************************* [START] ETC (T_ETC_0000) ********************************************* -->
 
     <T_ETC_LOGIN>
       <KR>Login</KR>

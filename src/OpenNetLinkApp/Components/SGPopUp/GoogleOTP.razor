@@ -4,6 +4,7 @@
 @using OpenNetLinkApp.Common
 @using AgLogManager
 @using System.Runtime.InteropServices
+@using System.Threading
 
 <div class="modal fade" id=@Guid data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
@@ -76,6 +77,7 @@
     {
         bshowLoadQRimg = true;
         StateHasChanged();
+        Thread.Sleep(1000);
         CLog.Here().Information($"SHowQRimg, USer Select!");
     }
 

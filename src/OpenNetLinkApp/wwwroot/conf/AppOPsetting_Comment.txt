@@ -60,12 +60,6 @@ bEmptyfileTrans : 0kb 파일 전송 가능 유무(true, false)
 strInitPasswd : 암호화된 초기 PW string
 strPWChangeProhibitLimit : 패스워드 사용금지 문자열 [기능 X]
 nPWChangeApplyCnt : 비밀번호 변경때, 새비번의 최소길이 (기본값:9)
-nPWkeyBoardLinearCharCnt : 키보드 상에 연속된 키몇개가 맞으면 안되는지 (기본값:3)
-nPWsameCharCnt : 패스워드 변경 시, 연속된 같은 문자수 (기본값:3)
-nPWchangeRuleCnt : 패스워드 변경 시, 대문자/소문자/수/특수문자 중에 최소한 적용되어야할 법칙 개수 (기본값:4)
-
-
-
 bUseIDAsInitPassword : ID와 동일한 비밀번호를 초기 PW로 사용할지 여부 (true : ID=PW로 로그인된 경우, 비밀번호 변경 요청)
 
 
@@ -106,6 +100,8 @@ bUserEmailSearchDlp : email 관리 / 결재 UI에서 개인정보 관련 부분 
 
 bUseForceUpdate : 업데이트할 항목이 있으면 사용자 의사 관계없이 강제 업데이트 진행여부(true,false)
 
+bUseForceBackgroundUpdate : 업데이트할 항목이 있으면 사용자 의사 관계없이 Background로 강제 업데이트 진행여부(true,false)
+
 bUsePCURL : PCUrl 관련 화면 나오게할지 여부 [기능X, 화면만 일부 있음]
 
 bUsePublicBoard : 공지사항 관련 화면 나오게 할지 여부 [기능일부있음]
@@ -143,7 +139,6 @@ bUseCloseTrayMove : 공통환경설정에서 종료 시, 트레이로 이동 체
 bExitTrayMove : 오른쪽 상단에 종료버튼으로 종료 시도시 Tray로 이동만 할지 여부(true: Tray로 이동, false: 종료)
 
 bUseStartTrayMove : 공통환경설정에서 시작 시 트레이 이동 체크박스가 나오도록 ( true, false )
-bStartTrayMove : 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 ) [기능X]
 
 
 // 파일포워딩 기능
@@ -214,6 +209,8 @@ InitTransferFileExplorerDirectoryInWindow : 윈도우에 한하여 전송화면�
 											=> "ROOT" : 상위 드라이버를 초기 표시											
 											=> "" : 기본 경로를 표시.
 											=> 그 밖에 사용자가 원하는 경로로 설정 가능
-
 bUseGoogleOtp2FactorAuth : 구글OTP를 사용한 인증동작 하도록 수정적용
-											
+
+bDlpFoundSendContinue : 개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무(기본값-false)
+
+

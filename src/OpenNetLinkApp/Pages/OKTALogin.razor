@@ -1,0 +1,82 @@
+@page "/OKTALogin"
+
+@using OpenNetLinkApp.Services
+@using HsNetWorkSG
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
+@using System.Timers
+@using System.Text
+@using System.Diagnostics
+
+@inject NavigationManager MyNavigationManager
+@inject XmlConfService xmlConf
+@inject PageStatusService pageService
+@inject ISGAppManagerService SGAppMgrSvc
+@inject WebWindow Window
+@inject IJSRuntime JSRuntime
+
+
+<iframe src="https://192.168.1.71:1300/hrx-api/sso/saml2/net/1234567890123456" style="width:100%;height:100%;border:0px;top:0px;left:0px;" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture">
+    <p>iframe not Support</p>
+</iframe>
+
+
+@code {
+
+    string strAddr = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        //strAddr = "https://daum.net";
+        strAddr = SGAppMgrSvc.OpConfigInfoService.GetOKTAUrl(0);
+        //MyNavigationManager.NavigateTo("http://daum.net");
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+    private async void PageChange(ProgressEventArgs e)
+    {
+        try
+        {
+            //var window = new WebWindow("   OKTA Login", options =>
+            //{
+            //    options.SchemeHandlers.Add("http", (string url, out string contentType) =>
+            //    {
+            //        contentType = "text/javascript";
+            //        return new MemoryStream(Encoding.UTF8.GetBytes(""));
+            //    });
+            //});
+
+            //window.OnWebMessageReceived += (sender, message) =>
+            //{
+            //    window.SendMessage("Got message: " + message);
+            //};
+
+            ////Console.WriteLine("0: {0}", strAddr);
+            //window.NavigateToUrl("https://google.com");
+            //window.SetTrayStartUse(false);
+            //window.WaitForExit();
+
+            //ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil.exe");
+            //startInfo.Arguments = "https://192.168.1.71:1300/hrx-api/sso/saml2/net/1234567890123456";
+            //startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            //using (Process proc = Process.Start(startInfo))
+            //{
+            //    //proc.WaitForExit();
+            //}
+        }
+        catch (Exception ex)
+        {
+            int i = 0;
+        }
+
+        //int i = 0;
+        //await JSRuntime.InvokeAsync<object>("GetCurrentUrl");
+        //int j = 0;
+    }
+}

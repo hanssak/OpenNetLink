@@ -1526,6 +1526,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public string GetDocumentExtractExt()
             => (GetSystemPosition()) ? GetTagData("I_CLIENT_OLE_EXTRACT_EXT") : GetTagData("E_CLIENT_OLE_EXTRACT_EXT");
+        public string GetForwardAutoDown()
+            => (GetSystemPosition()) ? GetTagData("I_FORWARD_AUTODOWN") : GetTagData("E_FORWARD_AUTODOWN");
 
         /// <summary>
         /// 제목 최소 길이 값

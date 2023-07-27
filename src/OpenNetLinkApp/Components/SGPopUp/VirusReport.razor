@@ -7,6 +7,8 @@
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
+@using AgLogManager;
+@using HsNetWorkSG
 
 <div class="modal fade" id="modal-virusreport" data-backdrop="static">
     <div class="modal-dialog modal-default1">
@@ -67,14 +69,18 @@
     public string strDetailContent = "";
     public string strUserInfo = "";
 
-    public string m_strTransSeq;
-    public int m_GroupID;
-    public string m_strFileTransTitle;
-    public string m_strVirusContent;
-    public bool m_bVirus;
+    public string m_strTransSeq = "";
+    public int m_GroupID = -1;
+    public string m_strFileTransTitle = "";
+    public string m_strVirusContent = "";
+    public bool m_bVirus = false;
+    public Common.Enums.PreworkType m_eBlockType = Common.Enums.PreworkType.BLOCK_NONE;
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<VirusReport>();
 
     public async Task openPopUp()
     {
+        SendConfirm();
         object[] param = { "modal-virusreport" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -88,12 +94,11 @@
             ShowMessage("error", strMsg);
             return;
         }
-        SendConfirm();
         object[] param = { "modal-virusreport" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
-    public void SetInit(int groupID, string transSeq, string title, string virusContent,bool bVirus)
+    public void SetInit(int groupID, string transSeq, string title, string virusContent, bool bVirus)
     {
         m_GroupID = groupID;
         m_strTransSeq = transSeq;
@@ -103,14 +108,40 @@
         StateHasChanged();
     }
 
+    public void SetInit(int groupID, string transSeq, string title, string virusContent, Common.Enums.PreworkType eBlockType)
+    {
+        m_GroupID = groupID;
+        m_strTransSeq = transSeq;
+        m_strFileTransTitle = SgExtFunc.hsFileRename(false, title);    // 파일명. 특수문자 정상처리
+        m_strVirusContent = virusContent;
+        m_eBlockType = eBlockType;
+
+        if (m_eBlockType == Common.Enums.PreworkType.DRM_SCAN)
+        {
+            strInfo = XmlConf.GetTitle("T_DETAIL_DETECT_DRM");                  // 전송 파일에 허용되지 않는 DRM 적용이 되어 있습니다.
+            strVirusContentInfo = XmlConf.GetTitle("T_DETAIL_DESC");              // 설명
+        }
+
+        StateHasChanged();
+    }
+
     public void SendConfirm()
     {
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(m_GroupID);
-        if (sgLoginData == null)
-            return;
-        string strUserID = sgLoginData.GetUserID();
-        HSCmdCenter.SendAPTAndVirusConfirm(m_GroupID, strUserID, m_strTransSeq, m_bVirus);
+        if (m_GroupID > -1)
+        {
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(m_GroupID);
+            if (sgLoginData == null)
+                return;
+            string strUserID = sgLoginData.GetUserID();
+
+            CLog.Here().Information($"SendConfirm, GroupID : {m_GroupID}, BlockType : {m_eBlockType}");
+
+            if (m_eBlockType == Common.Enums.PreworkType.VIRUS_SCAN || m_eBlockType == Common.Enums.PreworkType.APT_SCAN)
+                HSCmdCenter.SendAPTAndVirusConfirm(m_GroupID, strUserID, m_strTransSeq, m_eBlockType);
+            else if (m_eBlockType == Common.Enums.PreworkType.DRM_SCAN)
+                CLog.Here().Information($"SendConfirm, BlockType : {m_eBlockType}, Drm Msg Have No Confirm!");
+        }
     }
 
     protected override void OnInitialized()
@@ -122,7 +153,7 @@
     {
         strSysName = XmlConf.GetTitle("T_SYSTEMNAME2");                         // 망연계솔루션
         strInfo = XmlConf.GetTitle("T_DETAIL_DETECT_VIRUS");                    // 전송파일에 바이러스가 발견되었습니다.
-        strTitle = XmlConf.GetTitle("T_DETAIL_TITLE");                          // 제목
+        strTitle = XmlConf.GetTitle("T_COMMON_FILENAME");                       // 제목 > 파일명
         strVirusContentInfo = XmlConf.GetTitle("T_VIRUS_DETAILS");              // 바이러스 내역
         strDetailContent = XmlConf.GetTitle("T_COMMON_DETAILLIST");             // 상세내용
         strUserInfo = XmlConf.GetTitle("T_COMMON_DETAILLIST_VIEW");             // [전송관리] - [상세보기] 에서 확인하세요.
@@ -135,4 +166,7 @@
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
+
+
+
 }

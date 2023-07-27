@@ -264,12 +264,21 @@
         string stPrivacy = sgLoginData.GetTagData("PRIVACYAPPROVE");
         string stVIPMode = sgLoginData.GetTagData("PRIVACYAPPROVEVIP");
         string stDuputyMode = sgLoginData.GetTagData("PRIVACYAPPROVEMOD");
+        bool bSendFileContinue = false;
+        bSendFileContinue = SGAppMgrSvc.OpConfigInfoService.GetUseDlpFoundSendContinue(groupid);
 
         //VIP이면 개인정보 노출되어도 바로 전송
         if (stVIPMode == "0" && sgLoginData.IsVipUser() == true) //결재해야 하는데 VIP면 결재안함
         {
             HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
-            "1", "", stNotiNetSystem);    //1 : 전송 진행
+            "1", "NONE", stNotiNetSystem);    //1 : 전송 진행
+        }
+        else if (bSendFileContinue)
+        {
+            CLog.Here().Information($"PrivacyNotifyResult, groupid : {groupid}, OpConfigIn : bDlpFoundSendContinue : {bSendFileContinue}");
+            // DLP 검출되면, 정보보호 결재자 추가없이 전송진행
+            HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
+            "1", "NONE", stNotiNetSystem);    //1 : 전송 진행, NONE
         }
         else
         {
@@ -285,6 +294,7 @@
             SendTransDetail();
         }
     }
+
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
@@ -309,10 +319,22 @@
         {
             aptAndvirusNotiDBInsert(groupID, cmd, e);
         }
-        bool bVirus = false;
+
+        @*bool bVirus = false;
         if (cmd == eCmdList.eVIRUSSCAN)
             bVirus = true;
-        refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, bVirus);
+        refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, bVirus);*@
+
+        Common.Enums.PreworkType BlockType = Common.Enums.PreworkType.BLOCK_NONE;
+        if (cmd == eCmdList.eVIRUSSCAN)
+            BlockType = Common.Enums.PreworkType.VIRUS_SCAN;
+        else if (cmd == eCmdList.eAPTSCAN)
+            BlockType = Common.Enums.PreworkType.APT_SCAN;
+        else if (cmd == eCmdList.eDrmBlockNoti)
+            BlockType = Common.Enums.PreworkType.DRM_SCAN;
+
+        refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, BlockType);
+
         await refVirusReport.openPopUp();
 
     }
