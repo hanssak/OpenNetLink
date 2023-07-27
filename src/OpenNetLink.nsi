@@ -47,7 +47,7 @@ Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 !if ${IS_PATCH} == "TRUE"
   OutFile "${OUTPUT_DIRECTORY}\OpenNetLink-Windows-${PRODUCT_VERSION}.exe"
 !else
-  OutFile "${OUTPUT_DIRECTORY}\[${CUSTOM_NAME}] OpenNetLink_${NETWORK_FLAG}_Windows_${PRODUCT_VERSION}.exe"
+  OutFile "${OUTPUT_DIRECTORY}\[${CUSTOM_NAME}] OpenNetLink_${STORAGE_NAME}_${NETWORK_FLAG}_Windows_${PRODUCT_VERSION}.exe"
 !endif
 
 InstallDir "C:\HANSSAK\OpenNetLink"
