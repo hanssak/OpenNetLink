@@ -22,7 +22,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 {
     public interface ISGopConfigService
     {
-        ref Dictionary<int, ISGopConfig> AppConfigInfo { get; }
+        Dictionary<int, ISGopConfig> AppConfigInfo { get { return GetSGopConfigService(); } }
+        Dictionary<int, ISGopConfig> GetSGopConfigService();
 
         public bool GetUseAppLoginType(int groupId);
 
@@ -210,45 +211,34 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
     internal class SGopConfigService : ISGopConfigService
     {
-        private Dictionary<int, ISGopConfig> _AppConfigInfo;
+        /// <summary>ISGopConfigService 에서 사용</summary>
+        public Dictionary<int, ISGopConfig> GetSGopConfigService() => AppConfigInfo;
+
+        private static Dictionary<int, ISGopConfig> _AppConfigInfo;
         /// <summary>
         /// AppOPsetting
         /// </summary>
-        public ref Dictionary<int, ISGopConfig> AppConfigInfo => ref _AppConfigInfo;
+        public static Dictionary<int, ISGopConfig> AppConfigInfo
+        {
+            get
+            {
+                if (_AppConfigInfo == null) LoadFile();
+                return _AppConfigInfo;
+            }
+        }// => ref _AppConfigInfo;
 
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGopConfigService>();
 
-        public SGopConfigService()
-        {
+        private static void LoadFile()
+        { 
             //로그 삭제
             HsLogDel hsLog = new HsLogDel();
             hsLog.Delete(7);    // 7일이전 Log들 삭제
 
-            string strNetworkFileName = "wwwroot/conf/NetWork.json";
-            string jsonString = File.ReadAllText(strNetworkFileName);
-            List<ISGNetwork> listNetworks = new List<ISGNetwork>();
-            using (JsonDocument document = JsonDocument.Parse(jsonString))
-            {
-                JsonElement root = document.RootElement;
-                JsonElement NetWorkElement = root.GetProperty("NETWORKS");
-                //JsonElement Element;
-                foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
-                {
-                    SGNetwork sgNet = new SGNetwork();
-                    string strJsonElement = netElement.ToString();
-                    var options = new JsonSerializerOptions
-                    {
-                        ReadCommentHandling = JsonCommentHandling.Skip,
-                        AllowTrailingCommas = true,
-                        PropertyNameCaseInsensitive = true,
-                    };
-                    sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
-                    listNetworks.Add(sgNet);
-                }
-            }
+            List<ISGNetwork> listNetworks = SGNetworkService.NetWorkInfo;
 
             if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
-                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
+                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");            
 
             _AppConfigInfo = new Dictionary<int, ISGopConfig>();
             var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
@@ -265,44 +255,60 @@ namespace OpenNetLinkApp.Services.SGAppManager
                         CLog.Here().Information($"- AppOPsetting Loading... : [{AppConfig}]");
 
                         byte[] hsckByte = File.ReadAllBytes(AppConfig);
-                        byte[] masterKey = SGCrypto.GetMasterKey();
+                        string strContents = Encoding.UTF8.GetString(hsckByte);
+                        bool isOriFile = strContents.ToUpper().Contains("LoginType");
 
-                        bool isDeCrypt = true;
-                        string strData = String.Empty;
-                        byte[] dData = null;
-                        try
+                        if(isOriFile == false)
                         {
-                            SGCrypto.AESDecrypt256(hsckByte, ref masterKey, PaddingMode.PKCS7, ref dData);
-                            strData = Encoding.UTF8.GetString(dData);
-                        }
-                        catch (Exception ex)
-                        {
-                            CLog.Here().Information($"- AppOPsetting Loading... : Decrypt Fail {AppConfig}]");
-                            //디크립션 실패
-                            isDeCrypt = false;
-                        }
-                        finally
-                        {
-                            if (dData != null)
-                                dData.hsClear(3);
+                            byte[] decContents = new byte[0];
+                            SGCrypto.AESDecrypt256WithDEK(strContents, ref decContents);
+                            strContents = Encoding.UTF8.GetString(decContents);
                         }
 
-                        if (isDeCrypt)
-                        {
-                            SGopConfig appConfig = JsonSerializer.Deserialize<SGopConfig>(strData);
-                            _AppConfigInfo.Add(sgNetwork.GroupID, appConfig);
+                        SGopConfig appConfig = JsonSerializer.Deserialize<SGopConfig>(strContents);
+                        _AppConfigInfo.Add(sgNetwork.GroupID, appConfig);
+                        
+                        #region [주석-master로 복호화]
 
-                        }
-                        else
-                        {
-                            //Open the stream and read it back.
-                            using (FileStream fs = File.OpenRead(AppConfig))
-                            {
-                                SGopConfig appConfig = (SGopConfig)serializer.ReadObject(fs);
-                                _AppConfigInfo.Add(sgNetwork.GroupID, appConfig);
-                            }
-                        }
+                        //byte[] masterKey = SGCrypto.GetMasterKey();
 
+                        //bool isDeCrypt = true;
+                        //string strData = String.Empty;
+                        //byte[] dData = null;
+                        //try
+                        //{
+                        //    SGCrypto.AESDecrypt256(hsckByte, ref masterKey, PaddingMode.PKCS7, ref dData);
+                        //    strData = Encoding.UTF8.GetString(dData);
+                        //}
+                        //catch (Exception ex)
+                        //{
+                        //    CLog.Here().Information($"- AppOPsetting Loading... : Decrypt Fail {AppConfig}]");
+                        //    //디크립션 실패
+                        //    isDeCrypt = false;
+                        //}
+                        //finally
+                        //{
+                        //    if (dData != null)
+                        //        dData.hsClear(3);
+                        //}
+
+                        //if (isDeCrypt)
+                        //{
+                        //    SGopConfig appConfig = JsonSerializer.Deserialize<SGopConfig>(strData);
+                        //    _AppConfigInfo.Add(sgNetwork.GroupID, appConfig);
+
+                        //}
+                        //else
+                        //{
+                        //    //Open the stream and read it back.
+                        //    using (FileStream fs = File.OpenRead(AppConfig))
+                        //    {
+                        //        SGopConfig appConfig = (SGopConfig)serializer.ReadObject(fs);
+                        //        _AppConfigInfo.Add(sgNetwork.GroupID, appConfig);
+                        //    }
+                        //}
+
+                        #endregion
                         CLog.Here().Information($"- AppOPsetting Load Completed : [{AppConfig}]");
                     }
                     catch (Exception ex)

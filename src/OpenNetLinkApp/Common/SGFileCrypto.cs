@@ -38,11 +38,12 @@ namespace OpenNetLinkApp
             byte[] EncSetFile = new byte[0];
             try
             {
-                masterKey = SGCrypto.GetMasterKey();
+                
 
                 //DEK로 재암호화
                 foreach (string setFilePath in Directory.GetFiles(initDirPath))
                 {
+                    masterKey = SGCrypto.GetMasterKey();
                     byte[] contents = File.ReadAllBytes(setFilePath);
                     //Master로 복호화
                     SGCrypto.AESDecrypt256(contents, ref masterKey, System.Security.Cryptography.PaddingMode.PKCS7, ref originalSetFile);
