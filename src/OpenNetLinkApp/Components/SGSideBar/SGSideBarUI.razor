@@ -620,6 +620,8 @@
         bool bUseClipBoardApproveUI = false;
 
         bool bEmailUse = false;
+        bool bEmailUseOnly = false;
+
         bool bPublicBoard = false;
         bool bBasicConf = false;
         bool bDeputyApprove = false;
@@ -701,6 +703,7 @@
         //bEmailUse = AppConfigSvc.GetEmailApproveUse();
 
         bEmailUse = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(activeMenu.GroupId);
+        bEmailUseOnly = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(activeMenu.GroupId);
         bPCURLUse = SGAppMgrSvc.OpConfigInfoService.GetUsePCURL(activeMenu.GroupId);
 
         //bUseClipBoardManageUI = siteConfig.GetUseClipApprove(activeMenu.GroupId);
@@ -756,42 +759,47 @@
         if (SideBarUISvc.FindSubMenu(gID, nParentID, 2) == null)
             pageService.m_approveMenuArray[gID] = SideBarUISvc.AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_APPROVEMANAGE"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bApprMenuUse, strUserSeq: strLoginUserSeq);                              // 결재관리
 
-        // 보안결재관리
-        if (bSecurityApprMenuUse)
+        if (bEmailUseOnly == false)
         {
-            strNavigatePathWithGroupID = "/securityApprove/";
-            strNavigatePathWithGroupID += gID.ToString();
-            if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
-                SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_APPROVESECURITY"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse, strUserSeq: strLoginUserSeq);              // 보안결재관리
+
+            // 보안결재관리
+            if (bSecurityApprMenuUse)
+            {
+                strNavigatePathWithGroupID = "/securityApprove/";
+                strNavigatePathWithGroupID += gID.ToString();
+                if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
+                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_APPROVESECURITY"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse, strUserSeq: strLoginUserSeq);              // 보안결재관리
+            }
+
+            //파일검사 예외신청
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseFileCheckException(gID))
+            {
+                strNavigatePathWithGroupID = "/fileException/";
+                strNavigatePathWithGroupID += gID.ToString();
+                if (SideBarUISvc.FindSubMenu(gID, nParentID, 4) == null)
+                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 4, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_FILE_EXCEPTION"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strLoginUserSeq);              // 파일검사 예외 신청
+            }
+
+            //대결재관리
+            //if (nApproveProxy == 1 && sgUserData.GetUserApprpos() == 1)
+            if (bDeputyApprove && bApprMenuUse)
+            {
+                strNavigatePathWithGroupID = "";    //안씀
+                                                    //strNavigatePathWithGroupID += gID.ToString();
+                if (SideBarUISvc.FindSubMenu(gID, nParentID, 5) == null)
+                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
+            }
+
+            // 인증서전송
+            if (SGAppMgrSvc.OpConfigInfoService.GetUsePKIsendRecv(gID))
+            {
+                strNavigatePathWithGroupID = "/pkiTransfer/";
+                strNavigatePathWithGroupID += gID.ToString();
+                if (SideBarUISvc.FindSubMenu(gID, nParentID, 6) == null)
+                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 6, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_PKI_TRANS"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strLoginUserSeq);
+            }
         }
 
-        //파일검사 예외신청
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseFileCheckException(gID))
-        {
-            strNavigatePathWithGroupID = "/fileException/";
-            strNavigatePathWithGroupID += gID.ToString();
-            if (SideBarUISvc.FindSubMenu(gID, nParentID, 4) == null)
-                SideBarUISvc.AddSubMenu(groupId: gID, Id: 4, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_FILE_EXCEPTION"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strLoginUserSeq);              // 파일검사 예외 신청
-        }
-
-        //대결재관리
-        //if (nApproveProxy == 1 && sgUserData.GetUserApprpos() == 1)
-        if (bDeputyApprove && bApprMenuUse)
-        {
-            strNavigatePathWithGroupID = "";    //안씀
-                                                //strNavigatePathWithGroupID += gID.ToString();
-            if (SideBarUISvc.FindSubMenu(gID, nParentID, 5) == null)
-                SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
-        }
-
-        // 인증서전송
-        if (SGAppMgrSvc.OpConfigInfoService.GetUsePKIsendRecv(gID))
-        {
-            strNavigatePathWithGroupID = "/pkiTransfer/";
-            strNavigatePathWithGroupID += gID.ToString();
-            if (SideBarUISvc.FindSubMenu(gID, nParentID, 6) == null)
-                SideBarUISvc.AddSubMenu(groupId: gID, Id: 6, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_PKI_TRANS"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strLoginUserSeq);
-        }
 
         //
         if (bEmailUse)
@@ -815,6 +823,16 @@
                 if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
                     SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: XmlConf.GetTitle("T_COMMON_EMAILAPPROVE_GAP"), icon: "fas fa-envelope", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bEmailUse & bApprMenuUse), strUserSeq: strLoginUserSeq);
             }
+
+            //대결재관리(3)
+            if (bEmailUseOnly && bDeputyApprove && bApprMenuUse && sgUserInfo.GetUserApprPos(true, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(gID)) > 0)      //일반사용자는 (대결재권한을 가져도) 대결재 관리 사용 불가
+            {
+                strNavigatePathWithGroupID = "";    //안씀
+                                                    //strNavigatePathWithGroupID += gID.ToString();
+                if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
+                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
+            }
+
         }
 
         if (bPCURLUse)

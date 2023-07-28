@@ -101,6 +101,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseClipTypeSelectSend(int groupId);
         public bool GetUseClipTypeTextFirstSend(int groupId);
         public bool GetUseEmailManageApprove(int groupId);
+
+        public bool GetUseEmailManageApproveOnly(int groupId);
         public bool GetUseUIdlpData(int groupId);
         //public bool GetURLAutoTrans(int groupId);
         public bool GetUseURLRedirectionAlarm(int groupId);
@@ -551,6 +553,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseEmail;
         }
+
+        public bool GetUseEmailManageApproveOnly(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseEmailOnly;
+        }        
+
         public bool GetUseUIdlpData(int groupId)
         {
             return AppConfigInfo[groupId].bUiDlpShow;
