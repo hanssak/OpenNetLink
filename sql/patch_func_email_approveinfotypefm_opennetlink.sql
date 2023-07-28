@@ -82,7 +82,7 @@ network : 망구분
 	)  
 	, TBL_EMAIL_APPROVE AS  
 	(  
-		SELECT ''0'' AS APPROVEKIND, ''H'' AS POS, A.* 
+		SELECT A.APPROVE_KIND AS APPROVEKIND, ''H'' AS POS, A.* 
 		FROM TBL_EMAIL_APPROVE_HIS A 
 		WHERE A.APPR_REQ_TIME BETWEEN ''##FROMDATE##000000'' AND ''##TODATE##235959'' 
 
@@ -174,32 +174,61 @@ network : 망구분
 	END IF;
 
 	whand:='WHERE ';
-	-- 결재구분
-	IF apprkind IS NOT NULL AND apprkind!='' THEN
-		sql:=sql||whand||'A.APPROVEKIND='''||apprkind||''''||chr(13);
-		whand:=' AND ';
-	END IF;
-
 	
 	-- 전송구분
 	IF transkind IS NOT NULL AND transkind!='' THEN
 		sql:=sql||whand||'A.TRANSKIND='''||transkind||''''||chr(13);
 		whand:=' AND ';
 	END IF;
-
 	
-	-- 결재상태
-	IF approvestatus IS NOT NULL AND approvestatus!='' THEN
-		sql:=sql||whand||'A.APPROVESTATUS='''||approvestatus||''''||chr(13);
-		whand:=' AND ';
-	END IF;
+	
+	-- 승인대기(전체조회)
+	IF (approvestatus='1' AND transstatus = 'W') THEN
+	
+		-- 결재구분		
+		IF apprkind = '0' THEN	-- 사전			
+			sql:=sql||whand||'A.APPROVEKIND='''||apprkind||''''||chr(13);
+			whand:=' AND ';			
+			sql:=sql||whand||'A.TRANSTATUS='''||transstatus||''''||chr(13);
+			sql:=sql||whand||'A.APPROVESTATUS='''||approvestatus||''''||chr(13);
+		ELSIF apprkind = '1' THEN	-- 사후
+			transstatus := 'S';		
+			sql:=sql||whand||'A.APPROVEKIND='''||apprkind||''''||chr(13);
+			whand:=' AND ';			
+			sql:=sql||whand||'A.TRANSTATUS='''||transstatus||''''||chr(13);
+			sql:=sql||whand||'A.APPROVESTATUS='''||approvestatus||''''||chr(13);
+		ELSE	-- 전체		
+			sql:=sql||whand||'((A.APPROVEKIND=''0'' AND A.TRANSTATUS=''W'' AND A.APPROVESTATUS=''1'') OR ';
 
-	-- 전송상태
-	IF transstatus IS NOT NULL AND transstatus!='' THEN
-		sql:=sql||whand||'A.TRANSTATUS='''||transstatus||''''||chr(13);
-		whand:=' AND ';
-	END IF;
+			--transstatus := 'S';
+			
+			sql:=sql||'(A.APPROVEKIND=''1'' AND A.TRANSTATUS=''S'' AND A.APPROVESTATUS=''1''))';
+			whand:=' AND ';
+		END IF;
 
+	ELSE
+	
+	    -- 사용자가 설정한 혹은 전체 조회
+	
+		-- 결재구분
+		IF apprkind IS NOT NULL AND apprkind!='' THEN
+			sql:=sql||whand||'A.APPROVEKIND='''||apprkind||''''||chr(13);
+			whand:=' AND ';
+		END IF;
+
+		-- 결재상태
+		IF approvestatus IS NOT NULL AND approvestatus!='' THEN
+			sql:=sql||whand||'A.APPROVESTATUS='''||approvestatus||''''||chr(13);
+			whand:=' AND ';
+		END IF;
+
+		-- 전송상태
+		IF transstatus IS NOT NULL AND transstatus!='' THEN
+			sql:=sql||whand||'A.TRANSTATUS='''||transstatus||''''||chr(13);
+			whand:=' AND ';
+		END IF;
+	
+	END IF;
 	
 	-- 개인정보상태
 	IF dlp IS NOT NULL AND dlp!='' THEN
