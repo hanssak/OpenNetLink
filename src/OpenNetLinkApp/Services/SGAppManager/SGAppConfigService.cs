@@ -379,6 +379,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     strPage = "/Transfer";
                     break;
 
+                case PAGE_TYPE.MAILTRANSFER:
+                    strPage = "/mailManage";
+                    break;
+
+                case PAGE_TYPE.MAILAPPROVE:
+                    strPage = "/mailApprove";
+                    break;
+
                 default:
                     strPage = "/Welcome";
                     break;
@@ -398,6 +406,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 case PAGE_TYPE.TRANSFER:
                     strPage = "/Transfer";
+                    break;
+
+                case PAGE_TYPE.MAILTRANSFER:
+                    strPage = "/mailManage";
+                    break;
+
+                case PAGE_TYPE.MAILAPPROVE:
+                    strPage = "/mailApprove";
                     break;
 
                 default:

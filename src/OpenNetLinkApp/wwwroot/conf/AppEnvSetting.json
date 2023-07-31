@@ -27,12 +27,12 @@
   "bStartProgramReg": true,
   "bStartTrayMove": false,
   "bURLAutoAfterMsg": [
-    true,
-    true,
-    true
+    false,
+    false,
+    false
   ],
   "bURLAutoTrans": [
-    true,
+    false,
     false,
     false
   ],
@@ -40,7 +40,7 @@
   "bUserApprActionTrayFix": false,
   "bUserApprRejectTrayFix": false,
   "enClipAlarmType": 2,
-  "enMainPageType": 0,
+  "enMainPageType": 3,
   "nUserSelectFirstNet": 0,
   "strForwardUrl": [
     "file:\/\/\/C:\/HANSSAK\/OpenNetLink\/wwwroot\/Web\/WebLinkInfo.html",

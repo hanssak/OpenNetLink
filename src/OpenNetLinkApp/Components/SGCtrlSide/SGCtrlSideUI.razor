@@ -265,6 +265,8 @@
                     <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.NONE))">초기값</button>
                     <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.DASHBOARD))">대시보드</button>
                     <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.TRANSFER))">파일전송</button>
+                    <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.MAILTRANSFER))">메일전송</button>
+                    <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.MAILAPPROVE))">메일결재</button>
                 </div>
             </div>
         </div>
@@ -952,7 +954,8 @@
     //페이지 타입 String
     private string GetMainPageTypeStr()
     {
-        return Common.CsFunction.GetEnumDescription(SGAppMgrSvc.AppConfigInfoService.GetMainPageType());
+        string strData = Common.CsFunction.GetEnumDescription(SGAppMgrSvc.AppConfigInfoService.GetMainPageType());
+        return strData;
     }
 
     private bool GetClipCopyAutoSend()

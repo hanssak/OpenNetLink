@@ -28,7 +28,11 @@ namespace OpenNetLinkApp.Models.SGConfig
         [Description("대시보드")]
         DASHBOARD = 1,
         [Description("파일전송")]
-        TRANSFER = 2
+        TRANSFER = 2,
+        [Description("메일전송")]
+        MAILTRANSFER = 3,
+        [Description("메일결재")]
+        MAILAPPROVE = 4,
     }
     public enum HOTKEY_MOD: int
     {
@@ -48,7 +52,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         List<string> ClipBoardHotKey { get; }                       // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
         Dictionary<string, string> ClipBoardHotKeyNetOver { get; }  // 클립보드 단축키 정보 ( <nGroupID-Idx, "Win,Ctrl,Alt,Shift,Alphabet"> 3중망Idx(2이상존재) )
         CLIPALM_TYPE enClipAlarmType { get; }                       // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
-        PAGE_TYPE enMainPageType { get; }                           // 메인페이지 (0 : NONE, 1 : DASHBOARD,  2 : TRANSFER)	
+        PAGE_TYPE enMainPageType { get; }                           // 메인페이지 (0 : NONE, 1 : DASHBOARD,  2 : TRANSFER, 3 : emailtransfer, 4 : emailApprove)
         bool bClipCopyAutoSend { get; }                                // 클립보드 복사 후 자동전송 기능 사용 유무 ( true : 사용, false : 미사용 )
         List<bool> bURLAutoTrans { get; }                           // URL 자동전환 사용 유무(groupID별로) ( true : 사용, false : 미사용 )                                                                                         
         List<bool> bURLAutoAfterMsg { get; }                        // URL 자동전환 후 사용자 알림 메시지 사용 여부(groupID별로) ( true : 사용, false : 미사용 )		
