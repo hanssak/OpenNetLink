@@ -116,7 +116,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     CLog.Here().Information($"- AppEnvSetting Loading... : [{AppConfig}]");
 
                     string strContents = Encoding.UTF8.GetString(contents);
-                    bool isOriFile = strContents.ToUpper().Contains("ClipBoardHotKey");
+                    bool isOriFile = strContents.Contains("ClipBoardHotKey");
 
                     if(isOriFile ==false)
                     {
@@ -125,13 +125,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
                         strContents = Encoding.UTF8.GetString(decContents);
                     }
 
-                    var options = new JsonSerializerOptions
+                    using (MemoryStream str = new MemoryStream(Encoding.UTF8.GetBytes(strContents)))
                     {
-                        ReadCommentHandling = JsonCommentHandling.Skip,
-                        AllowTrailingCommas = true,
-                        PropertyNameCaseInsensitive = true,
-                    };
-                    _AppConfigInfo= JsonSerializer.Deserialize<SGAppConfig>(strContents, options);
+                        SGAppConfig appConfig = (SGAppConfig)serializer.ReadObject(str);
+                        _AppConfigInfo = appConfig;
+                    }
 
                     ////Open the stream and read it back.
                     //using (FileStream fs = File.OpenRead(AppConfig))

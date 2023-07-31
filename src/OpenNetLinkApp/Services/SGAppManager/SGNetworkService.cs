@@ -40,7 +40,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             try
             {
                 string strContents = Encoding.UTF8.GetString(contents);
-                bool isOriFile = strContents.ToUpper().Contains("NETWORKS");
+                bool isOriFile = strContents.Contains("NETWORKS");
 
                 if (isOriFile == false)
                 {

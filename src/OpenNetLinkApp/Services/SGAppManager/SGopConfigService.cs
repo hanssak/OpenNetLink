@@ -256,7 +256,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                         byte[] hsckByte = File.ReadAllBytes(AppConfig);
                         string strContents = Encoding.UTF8.GetString(hsckByte);
-                        bool isOriFile = strContents.ToUpper().Contains("LoginType");
+                        bool isOriFile = strContents.Contains("LoginType");
 
                         if(isOriFile == false)
                         {
