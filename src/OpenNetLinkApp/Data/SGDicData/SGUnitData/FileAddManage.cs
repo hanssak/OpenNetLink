@@ -5102,9 +5102,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 try
                 {
-                    string strEncMimeInfo = System.IO.File.ReadAllText(strFileName);
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    string strMimeInfo = sgRSACrypto.MimeConfDecrypt(strEncMimeInfo);
+                    byte[] bEncMimeInfo = System.IO.File.ReadAllBytes(strFileName);
+                    byte[] bMimeInfo = null;
+                    string strEncMimeInfo = Convert.ToBase64String(bEncMimeInfo);
+
+                    string strMimeInfo = "";
+                    SGCrypto.AESDecrypt256WithDEK(bEncMimeInfo, ref bMimeInfo);  //sgRSACrypto.MimeConfDecrypt(strEncMimeInfo);
+                    strMimeInfo = Encoding.UTF8.GetString(bMimeInfo);
 
                     if (strMimeInfo.Equals(""))
                         return;
