@@ -48,11 +48,34 @@ namespace OpenNetLinkApp
                 }
 
                 Directory.SetCurrentDirectory(cwdPath);
-                ComponentsDesktop.Run<Startup>("OpenNetLink", "wwwroot/index.html");
+
+                //HsNetWorkSG.SGCrypto.UseKeyGen = false;
+                //OP 파일 재 암호화 => 암복호화 실패 시 재설치
+                //Network 파일 재 암호화 => 암복호화 실패 시 재설치
+                bool kekGenInit = (!File.Exists("wwwroot/conf/hsck"));
+
+                if (kekGenInit)
+                {
+                    HsNetWorkSG.SGCrypto.SaveKeyGenerate("wwwroot/conf/hsck");
+
+                    //json파일 재암호화
+                    //파일에 저장된 항목 dek 재 암호화
+                    SGFileCrypto.Instance.EncryptSettingFiles();
+                }
+                else
+                {
+                    HsNetWorkSG.SGCrypto.LoadKeyGenerate("wwwroot/conf/hsck");
+                }
+
+                object[] arg = new object[2];
+                arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
+                arg[1] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartTrayMove;
+
+                ComponentsDesktop.Run<Startup>("OpenNetLink", "wwwroot/index.html", arg);
             }
             else
             {
-                int nhWnd = 0;
+                int nhWnd = 0;                
                 nhWnd = FindWindow("WebWindow", "OpenNetLink");
                 if (nhWnd != 0 && IsWindow(nhWnd))
                 {
