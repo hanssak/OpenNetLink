@@ -1747,11 +1747,13 @@
 
                 await JSRuntime.InvokeAsync<object>("closeAllPopup");
                 //if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
+
+                strNavigatePathnGroupID = "/mailManage/0";
                 MyNavigationManager.NavigateTo(strNavigatePathnGroupID);
 
                 if (bEmailUseOnly)
                 {
-                    ActiveSideBarMenu("/mailManage", nGroupIDfirst.ToString());
+                    //ActiveSideBarMenu("/mailManage", nGroupIDfirst.ToString());
                 }
 
                 // SideBarUI 에서 nGroupIDfirst로 지정된 UI로 선택
@@ -2575,10 +2577,14 @@
 
                 // Menu index는 list index가 아니므로, 메뉴 구분용도로 만 사용하면됨.
                 // 파일전송(0)
-                strNavigatePathWithGroupID = "/transfer/";
-                strNavigatePathWithGroupID += gID.ToString();
-                if (SideBarUISvc.FindSubMenu(gID, nParentID, 0) == null)
-                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bFileTransMenuUse, strUserSeq: strUserSeq);
+
+                if (bEmailUseOnly == false)
+                {
+                    strNavigatePathWithGroupID = "/transfer/";
+                    strNavigatePathWithGroupID += gID.ToString();
+                    if (SideBarUISvc.FindSubMenu(gID, nParentID, 0) == null)
+                        SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bFileTransMenuUse, strUserSeq: strUserSeq);
+                }
 
                 // 전송관리(1)
                 strNavigatePathWithGroupID = "/transManage/";
@@ -2619,7 +2625,7 @@
                         strNavigatePathWithGroupID = "";    //안씀
                                                             //strNavigatePathWithGroupID += gID.ToString();
                         if (SideBarUISvc.FindSubMenu(gID, nParentID, 5) == null)
-                            SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
+                            SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
                     }
 
                     // 인증서전송(6)
@@ -2658,7 +2664,7 @@
                         strNavigatePathWithGroupID = "/mailSecurityApprove/";
                         strNavigatePathWithGroupID += gID.ToString();
                         if (SideBarUISvc.FindSubMenu(gID, nParentID, 2) == null)
-                            SideBarUISvc.AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse, strUserSeq: strUserSeq);
+                            SideBarUISvc.AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strSecurityApprManage, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse, strUserSeq: strUserSeq);
                     }
 
                     //대결재관리(3)
@@ -2667,7 +2673,7 @@
                         strNavigatePathWithGroupID = "";    //안씀
                                                             //strNavigatePathWithGroupID += gID.ToString();
                         if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
-                            SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
+                            SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
                     }
 
                 }

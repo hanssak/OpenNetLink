@@ -448,11 +448,21 @@ namespace OpenNetLinkApp.Services.SGAppManager
     {
         public static string GetDescription(Enum value)
         {
-            FieldInfo fi= value.GetType().GetField(value.ToString()); 
-            DescriptionAttribute[] attributes = 
-                    (DescriptionAttribute[])fi.GetCustomAttributes(
-                    typeof(DescriptionAttribute), false);
-            return (attributes.Length>0)?attributes[0].Description:value.ToString();
+            string strRet = "";
+            try
+            {
+                FieldInfo fi = value.GetType().GetField(value.ToString());
+                DescriptionAttribute[] attributes =
+                        (DescriptionAttribute[])fi.GetCustomAttributes(
+                        typeof(DescriptionAttribute), false);
+                strRet = (attributes.Length > 0) ? attributes[0].Description : value.ToString();
+            }
+            catch(Exception ex)
+            {
+                Log.Logger.Here().Information($"GetDescription, input(#######################) : {value}, Exception : {ex.Message}");
+            }
+
+            return strRet;
         }
     }
 }
