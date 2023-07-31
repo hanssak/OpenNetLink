@@ -931,7 +931,7 @@ Task("PkgCrossflatform")
 	//[빌드 전] Site 공통 파일 적용 (ex.HSText, 인증서 등)
 	Information($"Copy [Site Unit] Common Files"); 
 
-	CopyFiles($"{siteProfilePath}/HSText.xml", "./OpenNetLinkApp/wwwroot/conf");
+	//CopyFiles($"{siteProfilePath}/HSText.xml", "./OpenNetLinkApp/wwwroot/conf");
 	CopyFiles($"{siteProfilePath}/Sparkling.service", "./OpenNetLinkApp/wwwroot/conf");
 	CopyFiles($"{siteProfilePath}/postgresql.crt", "./OpenNetLinkApp/wwwroot/conf");
 
@@ -980,7 +980,11 @@ Task("PkgCrossflatform")
 			DeleteFile("./artifacts/windows/published/wwwroot/conf/NetWork.json");			
 		if(FileExists("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json"))
 			DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
-			
+		if(FileExists("./artifacts/windows/published/wwwroot/conf/SqlQuery.xml"))
+			DeleteFile("./artifacts/windows/published/wwwroot/conf/SqlQuery.xml");
+		if(FileExists("./artifacts/windows/published/wwwroot/conf/HSText.xml"))
+			DeleteFile("./artifacts/windows/published/wwwroot/conf/HSText.xml");
+
 		//Delete Default SiteProfile
 		if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile"))		
 			DeleteDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile", new DeleteDirectorySettings {Force = true, Recursive = true });
@@ -1022,17 +1026,19 @@ Task("PkgCrossflatform")
 		{
 			foreach(var agentUnit in System.IO.Directory.GetDirectories(storageUnit))
 			{
-				//설치 패키지: OPSetting.json / Network.json / EnvSetting.json를 Init에 생성
+				//설치 패키지: OPSetting.json / Network.json / EnvSetting.json / SqlQuery.xml을 Init에 생성
 				if(DirectoryExists(publishInitJsonDirPath))		
 					DeleteDirectory(publishInitJsonDirPath, new DeleteDirectorySettings {Force = true, Recursive = true });
 				System.IO.Directory.CreateDirectory(publishInitJsonDirPath);
 
+				CopyFiles($"{siteProfilePath}/HSText.xml", publishInitJsonDirPath);
 				CopyFiles($"{storageUnit}/AppOPsetting*.json", publishInitJsonDirPath);		
+				CopyFiles($"{storageUnit}/SqlQuery.xml", publishInitJsonDirPath);		
 				CopyFiles($"{agentUnit}/AppEnvSetting.json", publishInitJsonDirPath);
-				CopyFiles($"{agentUnit}/NetWork.json", publishInitJsonDirPath);
-
+				CopyFiles($"{agentUnit}/NetWork.json", publishInitJsonDirPath);				
+								
 				if(isEnc.ToString().ToUpper() == "TRUE")
-					RunTarget("EncryptInitDirectory");	// Init 폴더에 존재하는 파일 암호화 처리
+					RunTarget("EncryptInitDirectory");	// Init 폴더(publishInitJsonDirPath)에 존재하는 파일 암호화 처리
 
 				var agentUnitInfo = new DirectoryInfo(agentUnit);
 				string AgentName= agentUnitInfo.Name;

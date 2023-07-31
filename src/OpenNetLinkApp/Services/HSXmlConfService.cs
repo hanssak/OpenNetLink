@@ -8,23 +8,26 @@ using System.IO;
 using OpenNetLinkApp.Models.SGNetwork;
 using System.Text.Json;
 using AgLogManager;
+using HsNetWorkSG;
 
 namespace OpenNetLinkApp.Services
 {
     public class XmlConfService
     {
+        const string xmlFileName = "wwwroot/conf/HSText.xml";
+
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<XmlConfService>();
-        XmlDocument m_Xml;
+        static XmlDocument m_Xml = null;
         string m_StrLanguage;
-        List<ISGNetwork> listNetworks;
+        List<ISGNetwork> listNetworks = SGAppManager.SGNetworkService.NetWorkInfo;
+
+
         public XmlConfService()
         {
-            m_Xml = new XmlDocument();
-            LoadXmlFile("wwwroot/conf/HSText.xml");
+            //m_Xml = new XmlDocument();
+            //LoadXmlFile("wwwroot/conf/HSText.xml");
             m_StrLanguage = "KR";
             // m_StrLanguage = "JP";
-            listNetworks = new List<ISGNetwork>();
-            NetWorkJsonLoad();
         }
         ~XmlConfService()
         {
@@ -33,12 +36,39 @@ namespace OpenNetLinkApp.Services
 
         public void LoadXmlFile(string strFileName)
         {
-            string strXmlData = System.IO.File.ReadAllText(strFileName);
-            m_Xml.LoadXml(strXmlData);
+            byte[] contents = File.ReadAllBytes(strFileName);
+            try
+            {
+                CLog.Here().Information($"- HSXml Loading... : [{strFileName}]");
+
+                string strXmlData = Encoding.UTF8.GetString(contents);
+                bool isOriFile = strXmlData.Contains("<COMMON>");
+
+                if (isOriFile == false)
+                {
+                    byte[] decContents = new byte[0];
+                    SGCrypto.AESDecrypt256WithDEK(contents, ref decContents);
+                    strXmlData = Encoding.UTF8.GetString(decContents);
+                }
+                m_Xml = new XmlDocument();
+                m_Xml.LoadXml(strXmlData);
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Warning($"LoadXmlFile Exception : " + ex.ToString());
+                throw;
+            }
+            finally
+            {
+                contents.hsClear(3);
+            }          
         }
 
         public string GetCommon(string strID)
         {
+            if (m_Xml == null)
+                LoadXmlFile(xmlFileName);
+
             string str = "";
             XmlNodeList xnList = m_Xml.GetElementsByTagName("COMMON");
             if (m_StrLanguage == null)
@@ -52,11 +82,14 @@ namespace OpenNetLinkApp.Services
 
         public string GetTitle(string strID)
         {
+            if (m_Xml == null)
+                LoadXmlFile(xmlFileName);
+
             string str = "";
             XmlNodeList xnList = m_Xml.GetElementsByTagName("TITLE");
             if (m_StrLanguage == null)
                 m_StrLanguage = "KR";
-            foreach(XmlNode xn in xnList)
+            foreach (XmlNode xn in xnList)
             {
                 str = xn[strID][m_StrLanguage].InnerText;
             }
@@ -64,6 +97,8 @@ namespace OpenNetLinkApp.Services
         }
         public string GetInfoMsg(string strID)
         {
+            if (m_Xml == null)
+                LoadXmlFile(xmlFileName);
             string str = "";
             XmlNodeList xnList = m_Xml.GetElementsByTagName("INFO");
             if (m_StrLanguage == null)
@@ -79,6 +114,9 @@ namespace OpenNetLinkApp.Services
         }
         public string GetErrMsg(string strID)
         {
+            if (m_Xml == null)
+                LoadXmlFile(xmlFileName);
+
             string str = "";
             XmlNodeList xnList = m_Xml.GetElementsByTagName("ERROR");
             if (m_StrLanguage == null)
@@ -91,6 +129,9 @@ namespace OpenNetLinkApp.Services
         }
         public string GetWarnMsg(string strID)
         {
+            if (m_Xml == null)
+                LoadXmlFile(xmlFileName);
+
             string str = "";
             XmlNodeList xnList = m_Xml.GetElementsByTagName("WARNING");
             if (m_StrLanguage == null)
@@ -101,17 +142,10 @@ namespace OpenNetLinkApp.Services
             }
             return str;
         }
-        public void SetLangType(string strLanguage)
-        {
-            m_StrLanguage = strLanguage;
-        }
+        public void SetLangType(string strLanguage) => m_StrLanguage = strLanguage;
 
-        public void NetWorkJsonLoad()
-        {
-            listNetworks = SGAppManager.SGNetworkService.NetWorkInfo;           
-        }
 
-        public void GetNetworkTitle(int groupID,out string strFromName, out string strToName)
+        public void GetNetworkTitle(int groupID, out string strFromName, out string strToName)
         {
             string str1 = "-";
             string str2 = "-";
@@ -125,7 +159,7 @@ namespace OpenNetLinkApp.Services
             for (int i = 0; i < count; i++)
             {
                 int gID = listNetworks[i].GroupID;
-                if(gID==groupID)
+                if (gID == groupID)
                 {
                     str1 = listNetworks[i].FromName;
                     str2 = listNetworks[i].ToName;
@@ -159,6 +193,6 @@ namespace OpenNetLinkApp.Services
 
             str1 = str1 + " → " + str2;
             return str1;
-        }      
+        }
     }
 }

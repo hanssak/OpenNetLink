@@ -14,8 +14,10 @@ namespace OpenNetLinkApp.Services
     {
         private byte[] _sqlContent;
         private static SQLXmlService _sqlXmlService = null;
-        public static SQLXmlService Instanse { 
-            get {
+        public static SQLXmlService Instanse
+        {
+            get
+            {
 
                 if (_sqlXmlService != null)
                     return _sqlXmlService;
@@ -24,13 +26,46 @@ namespace OpenNetLinkApp.Services
                     _sqlXmlService = new SQLXmlService();
                     return _sqlXmlService;
                 }
-            } 
+            }
         }
         public SQLXmlService()
         {
-            byte[] sqlContent = System.IO.File.ReadAllBytes("wwwroot/conf/SqlQuery.xml");
-            SGCrypto.AESEncrypt256WithDEK(sqlContent, ref _sqlContent);
-            sqlContent.hsClear(3);
+            byte[] sqlContent = new byte[0];
+            byte[] compare = Encoding.UTF8.GetBytes("<statements>");
+            byte[] find = new byte[compare.Length];
+            try
+            {
+                sqlContent = System.IO.File.ReadAllBytes("wwwroot/conf/SqlQuery.xml");
+                bool isOriFile = false;
+                for (int i = 0; i < (sqlContent.Length / 5); i++)
+                {
+                    Array.Copy(sqlContent, i, find, 0, find.Length);
+                    if (find.SequenceEqual(compare))
+                    {
+                        isOriFile = true;
+                        break;
+                    }
+                }
+
+                if (isOriFile == false)
+                {
+                    _sqlContent = new byte[sqlContent.Length];
+                    Array.Copy(sqlContent, _sqlContent, sqlContent.Length);
+                }
+                else
+                {
+                    SGCrypto.AESEncrypt256WithDEK(sqlContent, ref _sqlContent);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                sqlContent.hsClear(3);
+                find.hsClear(3);
+            }
             //_sqlContent = System.IO.File.ReadAllBytes("wwwroot/conf/SqlQuery.xml");
         }
         ~SQLXmlService()
@@ -54,13 +89,13 @@ namespace OpenNetLinkApp.Services
                 input = ASCIIEncoding.UTF8.GetBytes(temp);
                 return SGCrypto.AESEncrypt256WithDEK(input);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return "";
             }
             finally
             {
-                for(int i = 0; i < sb.Length; i++)
+                for (int i = 0; i < sb.Length; i++)
                 {
                     sb[i] = '0';
                     temp[i] = '0';

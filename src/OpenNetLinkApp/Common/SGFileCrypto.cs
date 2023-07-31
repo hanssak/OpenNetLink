@@ -21,15 +21,7 @@ namespace OpenNetLinkApp
         }
 
         const string initDirPath = "wwwroot/conf/Init";
-        const string saveDirPath = "wwwroot/conf";
-        List<(string, string)> filePathMap = new List<(string, string)>();
-
-        private SGFileCrypto()
-        {
-            filePathMap.Add(new("sdfjlk", "sdfjlsk"));
-        }
-
-
+        const string saveDirPath = "wwwroot/conf";     
 
         public bool EncryptSettingFiles()
         {
@@ -38,8 +30,6 @@ namespace OpenNetLinkApp
             byte[] EncSetFile = new byte[0];
             try
             {
-                
-
                 //DEK로 재암호화
                 foreach (string setFilePath in Directory.GetFiles(initDirPath))
                 {
