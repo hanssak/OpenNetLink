@@ -120,7 +120,7 @@
 
         HsCmdCenter.sgPageEvent.SetOSNotificationEvent(OSNotification);
 
-        // $DRM_BLOCK_NOTI 
+        // $DRM_BLOCK_NOTI
         //HsCmdCenter.sgPageEvent.SetLogoutNotiEvent(LogoutAction);
     }
 
@@ -1089,18 +1089,18 @@
 
 #if _WINDOWS
 
-    try
-    {
-    if (e.strUrlData != null && e.strUrlData.Length > 0)
-    {
-    string url = $"\"{e.strUrlData}\"";
-    System.Diagnostics.Process.Start("explorer", url);
-    }
-    }
-    catch (Exception ex)
-    {
-    CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-    }
+        try
+        {
+            if (e.strUrlData != null && e.strUrlData.Length > 0)
+            {
+                string url = $"\"{e.strUrlData}\"";
+                System.Diagnostics.Process.Start("explorer", url);
+            }
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+        }
 
 #elif _LINUX
 
@@ -2775,7 +2775,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         //InsertAlarm(groupID, sidebar, eAType, naviURI, strMsg);
     }
 
-    public void OSNotification(int groupId, OS_NOTI category, string title, string message, string navURI="")
+    public void OSNotification(int groupId, OS_NOTI category, string title, string message, string navURI = "")
     {
         if (OpConfigSvc.GetUseToastInsteadOfOSNotification(groupId))
         {
@@ -2793,7 +2793,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         }
         else
         {
-            Window.Notification(category, title, message, navURI);            
+            Window.Notification(category, title, message, navURI);
         }
     }
 
@@ -3396,7 +3396,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             string strNotiSeq = strSubResult[0];                        // 공지사항 Seq.
             string strHead = strSubResult[1];                           // 공지사항 제목.
-            string strNotiContent = strSubResult[2];                    // 공지사항 내용.
+            string strNotiContent = strSubResult[2].Replace("%13%10", "\n");                    // 공지사항 내용.
             SQLiteDB.InsertNotiInfo(NOTI_TYPE.SYSTEM, groupid, strUserSeq, strNotiSeq, LSIDEBAR.MENU_CATE_ROOT, "", "", strHead, strNotiContent);
         }
         LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
