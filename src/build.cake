@@ -692,7 +692,9 @@ Task("PkgCrossflatform")
 				DeleteDirectory(publishInitJsonDirPath, new DeleteDirectorySettings {Force = true, Recursive = true });
 			System.IO.Directory.CreateDirectory(publishInitJsonDirPath);
 
+			CopyFiles($"{siteProfilePath}/HSText.xml", publishInitJsonDirPath);			
 			CopyFiles($"{storageUnit}/AppOPsetting*.json", publishInitJsonDirPath);		
+			CopyFiles($"{storageUnit}/SqlQuery.xml", publishInitJsonDirPath);		
 
 			if(isEnc.ToString().ToUpper() == "TRUE")
 				RunTarget("EncryptInitDirectory");	// Init 폴더에 존재하는 파일 암호화 처리

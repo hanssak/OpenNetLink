@@ -514,19 +514,19 @@ Section "MainSection" SEC01
   
   ${If} ${IS_PATCH} == 'TRUE'
 
-	  ${If} $g_iNetPos == 2
+	  ${If} $g_iNetPos == 2 ;CN
 	  	  ;CreateDirectory "${INSTALLPATH}\22222" ; 확인용
 		  ;File "artifacts\windows\published\AddFileRMex0X64.dll"
 		  ;File "artifacts\windows\published\AddFileRMex1X64.dll"
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex1X64.dll"'
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex2X64.dll"'
-	  ${ElseIf}  $g_iNetPos == 4
+	  ${ElseIf}  $g_iNetPos == 4 ;NCI
                   ;CreateDirectory "${INSTALLPATH}\44444" ; 확인용
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
 	  ${Else}
 
-		  ${If} $g_iNetPos == 1
+		  ${If} $g_iNetPos == 1	; IN
 	          	;CreateDirectory "${INSTALLPATH}\11111" ; 확인용
 		  	ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
 		  ${Else}

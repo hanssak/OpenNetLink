@@ -25,6 +25,9 @@ namespace OpenNetLinkApp
 
         public bool EncryptSettingFiles()
         {
+            if (!Directory.Exists(initDirPath))
+                return true;
+
             byte[] masterKey = new byte[0];
             byte[] originalSetFile = new byte[0];
             byte[] EncSetFile = new byte[0];

@@ -57,15 +57,15 @@ namespace OpenNetLinkApp
                 if (kekGenInit)
                 {
                     HsNetWorkSG.SGCrypto.SaveKeyGenerate("wwwroot/conf/hsck");
-
-                    //json파일 재암호화
-                    //파일에 저장된 항목 dek 재 암호화
-                    SGFileCrypto.Instance.EncryptSettingFiles();
                 }
                 else
                 {
                     HsNetWorkSG.SGCrypto.LoadKeyGenerate("wwwroot/conf/hsck");
                 }
+
+                //json파일 재암호화
+                //파일에 저장된 항목 dek 재 암호화
+                SGFileCrypto.Instance.EncryptSettingFiles();
 
                 object[] arg = new object[2];
                 arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
