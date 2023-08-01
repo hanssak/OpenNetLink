@@ -5113,20 +5113,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     if (strMimeInfo.Equals(""))
                         return;
 
-                    string strMimeSavedData = "";
-                    bool bShowMimeLog = false;
-                    if (dicMimeConfData.TryGetValue(groupID, out strMimeSavedData))
-                    {
-                        if (strMimeSavedData != strEncMimeInfo)
-                        {
-                            if (dicMimeConfData.Remove(groupID))
-                                bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
-                        }
-                    }
-                    else
-                    {
-                        bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
-                    }
+                    //string strMimeSavedData = "";
+                    //bool bShowMimeLog = false;
+                    //if (dicMimeConfData.TryGetValue(groupID, out strMimeSavedData))
+                    //{
+                    //    if (strMimeSavedData != strEncMimeInfo)
+                    //    {
+                    //        if (dicMimeConfData.Remove(groupID))
+                    //            bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
+                    //}
 
                     //if (bShowMimeLog == false)
                     //    Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Skip MimeType Display");
@@ -5143,8 +5143,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         if (strSplit.Length < 2)
                             continue;
 
-                        if (bShowMimeLog)
-                            Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Add MimeType : {strSplit[0]}, Ext : {strSplit[1]}");
+                        //if (bShowMimeLog)
+                        //    Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Add MimeType : {strSplit[0]}, Ext : {strSplit[1]}");
 
                         MimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
                     }
