@@ -354,12 +354,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 
 			string strQuery = @$"SELECT * FROM {(tParam.APPROVE_TYPE_SFM != "XXX" ? "FUNC_EMAIL_APPROVEINFO_OPEN" : "FUNC_EMAIL_APPROVEINFOTYPEFM_OPEN")}('{tParam.UserID}','{tParam.SearchStartDate}','{tParam.SearchEndDate}', ";
 			strQuery += @$"'{tParam.GetApproveKindCode()}', '{tParam.GetTransKindCode()}','{tParam.GetApprStatusCode()}','{tParam.GetTransStatusCode(false)}', '{tParam.GetDlpValue()}',";
-			strQuery += @$"'{tParam.Sender}', '{tParam.Receiver}', '{tParam.Title}', '0', '{tParam.PageListCount}', '{tParam.ViewPageNo}')";
+			strQuery += @$"'{tParam.Sender}', '{tParam.Receiver}', '{tParam.Title}', '0', '{(tParam.bIsDlpPrivacyApprove ? "1" : "0")}', '{tParam.PageListCount}', '{tParam.ViewPageNo}')";
 			return strQuery;
-
-			/*sb.Append(" ORDER BY a.emailSeq desc");
-			sb.Append(" limit " + tParam.PageListCount + " offset (" + tParam.ViewPageNo + "-1) * " + tParam.PageListCount);
-			return sb.ToString();*/
 		}
 
 		public string TotalCountDbFunc(MailApproveEx1Param tParam)
@@ -367,7 +363,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 
 			string strQuery = @$"SELECT COUNT(*) FROM {(tParam.APPROVE_TYPE_SFM!="XXX"? "FUNC_EMAIL_APPROVEINFO_OPEN" : "FUNC_EMAIL_APPROVEINFOTYPEFM_OPEN")}('{tParam.UserID}','{tParam.SearchStartDate}','{tParam.SearchEndDate}', ";
 			strQuery += @$"'{tParam.GetApproveKindCode()}', '{tParam.GetTransKindCode()}','{tParam.GetApprStatusCode()}','{tParam.GetTransStatusCode(false)}', '{tParam.GetDlpValue()}',";
-			strQuery += @$"'{tParam.Sender}', '{tParam.Receiver}', '{tParam.Title}', '0', '', '')";
+			strQuery += @$"'{tParam.Sender}', '{tParam.Receiver}', '{tParam.Title}', '0', '{(tParam.bIsDlpPrivacyApprove?"1":"0")}', '', '')";
 
 			return strQuery;
 		}

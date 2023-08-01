@@ -10,6 +10,8 @@
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Components.SGSearchCondition
 @using AgLogManager
+@using System
+@using System.Threading
 
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
@@ -64,9 +66,9 @@
 
                                 <th class="p-2" style="text-align: right; vertical-align: middle; width: 80px;"> @XmlConf.GetTitle("T_COMMON_APPROVE_KIND") </th>   <!-- 결재종류 -->
                                 <td>
-				    @* 후결없음 - "전체"만 사용 *@                                    
+                                    @* 후결없음 - "전체"만 사용 *@
                                     <!--<button type="button" @onclick="@(()=>openCustomSelect("ApproveKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApproveKind<i class="fas fa-angle-down pl-2"></i></button>-->
-				    <button type="button" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@(XmlConf.GetTitle("T_COMMON_ALL"))<i class="fas"></i></button>
+                                    <button type="button" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@(XmlConf.GetTitle("T_COMMON_ALL"))<i class="fas"></i></button>
                                 </td>
 
                                 <th class="p-2" style="text-align: right; vertical-align: middle; width: 80px;">  @XmlConf.GetTitle("T_COMMON_EMAILTRANSKIND") </th> <!--발송구분-->
@@ -85,7 +87,7 @@
                                     <!--<button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransTypeText<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
 
-                                @if (bUseDlpDataView)
+                                @if (false) // 보안결재 에는 모두 개인정보가 있음
                                 {
                                     <th class="p-2" style="width:80px;"> @XmlConf.GetTitle("T_COMMON_PRIVACY") </th>
                                     <!--개인정보-->
@@ -191,7 +193,7 @@
                                         <th style="text-align:center; vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_COMMON_APPROVE_KIND")</th>     <!--결재종류-->
                                         <th style="text-align:center; vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_COMMON_EMAILTRANSKIND")</th>     <!--발송구분-->
 
-                                        @if (bUseDlpDataView)
+                                        @if (false)@* bUseDlpDataView *@
                                         {
                                             <th style="text-align:center; vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
                                             <!-- 개인정보 -->
@@ -218,7 +220,7 @@
                                             </td>
                                             <td style="text-align: center; vertical-align: middle">@item.ApvType</td>
                                             <td style="text-align: center; vertical-align: middle">@item.TransferType</td>
-                                            @if (bUseDlpDataView)
+                                            @if (false)@* bUseDlpDataView *@
                                             {
                                                 <td style="text-align: center; vertical-align: middle">@item.stDLP</td>
                                             }
@@ -810,7 +812,7 @@
         // SetTransStatusCode 이후에 SetApprStatusCode 사용해야함(꼭)
         mailParam.SetApprStatusCode(strSearchApproveStatus);
 
-            mailParam.SetDlpValue(strDlpValue);
+            mailParam.SetDlpValue(XmlConf.GetTitle("T_COMMON_DLP_INCLUSION"));
 
             mailParam.SetSender(strSearchSender);
             mailParam.SetReceiver(strSearchReceiver);
@@ -818,6 +820,7 @@
 
             mailParam.ViewPageNo = nViewPageNo;
             mailParam.PageListCount = nPageListCount;
+            mailParam.bIsDlpPrivacyApprove = true;
 
             MailApproveDao dao = new MailApproveDao();
             string strQuery = dao.ListDbFunc(mailParam);
@@ -825,6 +828,7 @@
 
             HSCmdCenter.SendListQuery(groupID, curUserID, strQuery);
         });
+
     }
 
 
@@ -948,79 +952,95 @@
     /// <returns></returns>
     private async Task doSearch()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
 
-        string strMsg = "";
-        if (pageService.GetConnectStatus(groupID) == false)
+        using (Mutex mutex = new Mutex(true, "MailApproveUI", out bool isNewInstance))
         {
-            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
+            if (isNewInstance)
+            {
+
+                ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+                int groupID = 0;
+                if (sgSideBar != null)
+                    groupID = sgSideBar.GroupId;
+
+                string strMsg = "";
+                if (pageService.GetConnectStatus(groupID) == false)
+                {
+                    strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+                    strMsg = strMsg.Replace("/r/n", "<br>");
+                    ShowMessage("error", strMsg);
+                    return;
+                }
+
+                //LIST 요청응답
+                HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchListResult);
+                //COUNT 요청응답
+                HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCountResult);
+
+                SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                string curUserID = "";
+                if (sgLoginData != null)
+                    curUserID = sgLoginData.GetUserID();
+
+                //await mailParam.SetSearchStartDate("datepicker11");
+                //await mailParam.SetSearchEndDate("datepickoer12");
+                await refPeriodDatePicker.RetriveDateFromJS();
+
+                string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+                string curToDay = refPeriodDatePicker.ToDateSearchValue;
+                curFromDay = curFromDay.Substring(0, 8);
+                curToDay = curToDay.Substring(0, 8);
+
+                // Test용도
+                //curFromDay = "20220101";
+                //curToDay = "20221231";
+
+                mailParam.SetSearchStartDate(curFromDay);
+                mailParam.SetSearchEndDate(curToDay);
+
+                string systemid = (sgLoginData.GetSystemPosition() ? "I" : "E");
+                mailParam.PageListCount = nPageListCount;
+                mailParam.APPROVE_TYPE_SFM = sgLoginData.GetApproveTypeSFM().ToString();    //대결재 방식 지정
+                mailParam.UserID = curUserID;
+                mailParam.SystemId = systemid;
+
+                mailParam.Sender = strSearchSender;
+                mailParam.Receiver = strSearchReceiver;
+                mailParam.Title = strSearchTitle;
+
+                mailParam.SetApprKindCode(strApproveKind);
+                mailParam.SetTransKindCode(strTransTypeText);
+
+                mailParam.SetTransStatusCode(strTransFlag);
+                // SetTransStatusCode 이후에 SetApprStatusCode 사용해야함(꼭)
+                mailParam.SetApprStatusCode(strSearchApproveStatus);
+
+                mailParam.SetDlpValue(XmlConf.GetTitle("T_COMMON_DLP_INCLUSION"));
+
+                mailParam.SetSender(strSearchSender);
+                mailParam.SetReceiver(strSearchReceiver);
+                mailParam.SetTitle(strSearchTitle);
+
+                mailParam.ViewPageNo = nViewPageNo;
+                mailParam.PageListCount = nPageListCount;
+                mailParam.bIsDlpPrivacyApprove = true;
+
+                MailApproveDao dao = new MailApproveDao();
+                // HSCmdCenter.SendCountQuery(groupID, curUserID, dao.TotalCount(mailParam));
+
+                string strQueryCount = dao.TotalCountDbFunc(mailParam);
+                CLog.Here().Information($"Query Approve Count-########## : {strQueryCount}");
+
+                HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
+
+            }
+            else
+            {
+                CLog.Here().Information($"MailSecurityApproveUI - doSearch, Doing ~");
+            }
         }
 
-        //LIST 요청응답
-        HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchListResult);
-        //COUNT 요청응답
-        HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCountResult);
 
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        string curUserID = "";
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-
-        //await mailParam.SetSearchStartDate("datepicker11");
-        //await mailParam.SetSearchEndDate("datepickoer12");
-        await refPeriodDatePicker.RetriveDateFromJS();
-
-        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
-        string curToDay = refPeriodDatePicker.ToDateSearchValue;
-        curFromDay = curFromDay.Substring(0, 8);
-        curToDay = curToDay.Substring(0, 8);
-
-        // Test용도
-        //curFromDay = "20220101";
-        //curToDay = "20221231";
-
-        mailParam.SetSearchStartDate(curFromDay);
-        mailParam.SetSearchEndDate(curToDay);
-
-        string systemid = (sgLoginData.GetSystemPosition() ? "I" : "E");
-        mailParam.PageListCount = nPageListCount;
-        mailParam.APPROVE_TYPE_SFM = sgLoginData.GetApproveTypeSFM().ToString();    //대결재 방식 지정
-        mailParam.UserID = curUserID;
-        mailParam.SystemId = systemid;
-
-        mailParam.Sender = strSearchSender;
-        mailParam.Receiver = strSearchReceiver;
-        mailParam.Title = strSearchTitle;
-
-        mailParam.SetApprKindCode(strApproveKind);
-        mailParam.SetTransKindCode(strTransTypeText);
-
-        mailParam.SetTransStatusCode(strTransFlag);
-        // SetTransStatusCode 이후에 SetApprStatusCode 사용해야함(꼭)
-        mailParam.SetApprStatusCode(strSearchApproveStatus);
-
-        mailParam.SetDlpValue(strDlpValue);
-
-        mailParam.SetSender(strSearchSender);
-        mailParam.SetReceiver(strSearchReceiver);
-        mailParam.SetTitle(strSearchTitle);
-
-        mailParam.ViewPageNo = nViewPageNo;
-        mailParam.PageListCount = nPageListCount;
-
-        MailApproveDao dao = new MailApproveDao();
-        // HSCmdCenter.SendCountQuery(groupID, curUserID, dao.TotalCount(mailParam));
-
-        string strQueryCount = dao.TotalCountDbFunc(mailParam);
-        CLog.Here().Information($"Query Approve Count-########## : {strQueryCount}");
-
-        HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
 
     }
 
@@ -1065,8 +1085,8 @@
     }
 
     @*protected override void OnInitialized()
-    {
-    }*@
+        {
+        }*@
 
     protected override async Task OnInitializedAsync()
     {
@@ -1112,7 +1132,7 @@
             }
             await doSearch();
         }
-        
+
         base.OnAfterRender(firstRender);
     }
 
