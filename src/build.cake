@@ -511,13 +511,6 @@ Task("PubCrossflatform")
 			DeleteDirectory(strNetLinkUninstallDir, new DeleteDirectorySettings { Force = true, Recursive = true });
 		}	
 	}
-	else
-	{
-		String strNetLinkUninstallDir = "./OpenNetLinkApp/Library/NetLink.Uninstall";		
-		if(DirectoryExists(strNetLinkUninstallDir)) {
-			DeleteDirectory(strNetLinkUninstallDir, new DeleteDirectorySettings { Force = true, Recursive = true });
-		}	
-	}
 
     DotNetCorePublish("./OpenNetLinkApp", settings);
 	DotNetCorePublish("./PreviewUtil", settings);
@@ -602,8 +595,8 @@ Task("PkgCrossflatform")
 		DeleteFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppOPsetting_*.json");				
 		if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/NetWork.json"))
 			DeleteFile($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/NetWork.json");			
-		if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppEnvSetting.json"))
-			DeleteFile($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppEnvSetting.json");
+		// if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppEnvSetting.json"))
+		// 	DeleteFile($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppEnvSetting.json");
 		if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/SqlQuery.xml"))
 			DeleteFile($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/SqlQuery.xml");
 		if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/HSText.xml"))
@@ -658,11 +651,21 @@ Task("PkgCrossflatform")
 				CopyFiles($"{siteProfilePath}/HSText.xml", publishInitJsonDirPath);
 				CopyFiles($"{storageUnit}/AppOPsetting*.json", publishInitJsonDirPath);		
 				CopyFiles($"{storageUnit}/SqlQuery.xml", publishInitJsonDirPath);		
-				CopyFiles($"{agentUnit}/AppEnvSetting.json", publishInitJsonDirPath);
+				// CopyFiles($"{agentUnit}/AppEnvSetting.json", publishInitJsonDirPath);
 				CopyFiles($"{agentUnit}/NetWork.json", publishInitJsonDirPath);				
 								
 				if(isEnc.ToString().ToUpper() == "TRUE")
 					RunTarget("EncryptInitDirectory");	// Init 폴더(publishInitJsonDirPath)에 존재하는 파일 암호화 처리
+
+				//Init > InstallInfo
+				JObject networkObj = JsonAliases.ParseJsonFromFile(Context, new FilePath($"{agentUnit}/NetWork.json"));
+				JArray netInfo = (JArray)networkObj["NETWORKS"];
+				int netCount = netInfo.Count -1;
+				foreach(JObject net in netInfo)
+				{
+					var netPos = net["NETPOS"];
+					System.IO.Directory.CreateDirectory($"{publishInitJsonDirPath}/InstallInfo/{netPos}");
+				}
 
 				var agentUnitInfo = new DirectoryInfo(agentUnit);
 				string AgentName= agentUnitInfo.Name;
@@ -673,6 +676,8 @@ Task("PkgCrossflatform")
 				Information($"Make Agent Installer {AgentName}");
 
 				networkFlag = AgentName.ToUpper();			
+				
+				CopyFiles($"{agentUnit}/AppEnvSetting.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
 				
 				isPatchInstaller=false;
 				RunTarget("MakeInstaller");		
@@ -698,6 +703,10 @@ Task("PkgCrossflatform")
 				if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/edge")) 
 					DeleteDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
 			}
+
+			if(FileExists("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json"))
+				DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
+
 			isPatchInstaller=true;
 			RunTarget("MakeInstaller");		
 		}

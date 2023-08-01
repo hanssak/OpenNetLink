@@ -115,17 +115,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 {
                     CLog.Here().Information($"- AppEnvSetting Loading... : [{AppConfig}]");
 
-                    string strContents = Encoding.UTF8.GetString(contents);
-                    bool isOriFile = strContents.Contains("ClipBoardHotKey");
-
-                    if(isOriFile ==false)
-                    {
-                        byte[] decContents = new byte[0];
-                        SGCrypto.AESDecrypt256WithDEK(contents, ref decContents);
-                        strContents = Encoding.UTF8.GetString(decContents);
-                    }
-
-                    using (MemoryStream str = new MemoryStream(Encoding.UTF8.GetBytes(strContents)))
+                    //string strContents = Encoding.UTF8.GetString(contents);
+                    using (MemoryStream str = new MemoryStream(contents))
                     {
                         SGAppConfig appConfig = (SGAppConfig)serializer.ReadObject(str);
                         _AppConfigInfo = appConfig;

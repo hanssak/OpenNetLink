@@ -120,31 +120,25 @@ namespace OpenNetLinkApp.Services.SGAppManager
             string AppConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppEnvSetting.json";
             try
             {
-                //DEK로 암호화하여 재저장
-                var opt = new JsonSerializerOptions() { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
-                byte[] oriContents = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(this, opt);
-                byte[] encContents= new byte[0];
-                SGCrypto.AESEncrypt256WithDEK(oriContents, ref encContents);
-                File.WriteAllBytes(AppConfig, encContents);
+                using (var fs = new FileStream(AppConfig, FileMode.Create))
+                {
+                    var encoding = Encoding.UTF8;
+                    var ownsStream = false;
+                    var indent = true;
 
-                //using (var fs = new FileStream(AppConfig, FileMode.Create))
-                //{
-                //    var encoding = Encoding.UTF8;
-                //    var ownsStream = false;
-                //    var indent = true;
-
-                //    using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
-                //    {
-                //        serializer.WriteObject(writer, (_AppConfigInfo as SGAppConfig));
-                //    }
-                //}
+                    using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
+                    {
+                        serializer.WriteObject(writer, (AppConfigInfo as SGAppConfig));
+                    }
+                }
             }
             catch (Exception ex)
             {
                 CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
             }
         }
-        
+
+
         public void SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode)
         {
             char cWin, cCtrl, cAlt, cShift;
