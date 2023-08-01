@@ -1486,7 +1486,7 @@
                         }
                     }
 
-                    if (srcLoc != "GPKI")
+@*                    if (srcLoc != "GPKI")
                     {
                         //strNavigatePathWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
 
@@ -1507,7 +1507,7 @@
                         }
 
                         strNavigatePathWithGroupID += groupId.ToString();
-                    }
+                    }*@
 
                     // Clipboard 단축키 및 HeaderUI에서 바로 클립보드를 전송할 수 있으므로 사후결재 관련 현재상태값을 로그인후 바로 저장
                     SaveAfterApproveCheckBoxStatus(groupId);
@@ -1749,6 +1749,13 @@
                 //if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
                 MyNavigationManager.NavigateTo(strNavigatePathnGroupID);
 
+                /*
+		// email-PageView
+		if (bEmailUseOnly)
+                {
+                    ActiveSideBarMenu("/mailManage", nGroupIDfirst.ToString());
+                }*/
+
                 // SideBarUI 에서 nGroupIDfirst로 지정된 UI로 선택
                 MoveSiderBarFocusTogroupid(nGroupIDfirst);
 
@@ -1797,6 +1804,39 @@
 
             pageService.SetIsPolicyUpdate(groupId, false);
         }
+    }
+
+    public void ActiveSideBarMenu(string strNavigateUrlPath, string strGroupID)
+    {
+        try
+        {
+            ISGSideBarUI sgSideBarUI = SGAppMgrSvc.SideBarUIService.ActiveMenu;
+            KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+            eventArgs.Key = "Enter";
+
+            ISGSideBarUI activeMenu = SideBarUISvc.FindSubMenu(Convert.ToInt32(strGroupID), $"{strNavigateUrlPath}/{strGroupID}");
+            ChangeActiveMenuWrap(eventArgs, activeMenu);
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"ActiveSideBarMenu, Exception : {ex.Message}");
+        }
+
+        return;
+    }
+
+    // SGSideBarUI 와 동일
+    public void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
+    {
+
+        // ChangeActiveMenuWrap
+        if (pageService.m_nCurViewPageGroupID != activeMenu.GroupId)
+            pageService.m_nLastViewPageGroupID = pageService.m_nCurViewPageGroupID;
+
+        // 이동하는UI 그룹ID 지정
+        pageService.m_nCurViewPageGroupID = activeMenu.GroupId;
+
+        SideBarUISvc.ChgActiveMenu(eventArgs, activeMenu);
     }
 
 
@@ -2518,18 +2558,21 @@
             if (sgUserData != null)
                 strUserSeq = sgUserData.GetUserSequence();
 
+	        strNavigatePathWithGroupID = strRootPath;
+	        strNavigatePathWithGroupID += gID.ToString();
+
+
+
             if (pageService.GetConnectStatus(i) == false)
             {
-                strNavigatePathWithGroupID = strRootPath;
-                strNavigatePathWithGroupID += gID.ToString();
-
                 SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: strNavigatePathWithGroupID, badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand, strUserSeq);
                 nParentID++;
             }
             else
             {
-                strNavigatePathWithGroupID = strRootPath;
-                strNavigatePathWithGroupID += gID.ToString();
+
+                if (bEmailUseOnly)
+                    strNavigatePathWithGroupID = "";
 
                 SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: strNavigatePathWithGroupID, badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand, strUserSeq);
 
@@ -2538,10 +2581,14 @@
 
                 // Menu index는 list index가 아니므로, 메뉴 구분용도로 만 사용하면됨.
                 // 파일전송(0)
-                strNavigatePathWithGroupID = "/transfer/";
-                strNavigatePathWithGroupID += gID.ToString();
-                if (SideBarUISvc.FindSubMenu(gID, nParentID, 0) == null)
-                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bFileTransMenuUse, strUserSeq: strUserSeq);
+
+                if (bEmailUseOnly == false)
+                {
+                    strNavigatePathWithGroupID = "/transfer/";
+                    strNavigatePathWithGroupID += gID.ToString();
+                    if (SideBarUISvc.FindSubMenu(gID, nParentID, 0) == null)
+                        SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bFileTransMenuUse, strUserSeq: strUserSeq);
+                }
 
                 // 전송관리(1)
                 strNavigatePathWithGroupID = "/transManage/";
@@ -2582,7 +2629,7 @@
                         strNavigatePathWithGroupID = "";    //안씀
                                                             //strNavigatePathWithGroupID += gID.ToString();
                         if (SideBarUISvc.FindSubMenu(gID, nParentID, 5) == null)
-                            SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
+                            SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
                     }
 
                     // 인증서전송(6)
@@ -2615,13 +2662,22 @@
                     if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
                         SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailApprManage, icon: "fas fa-envelope", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bEmailUse & bApprMenuUse), strUserSeq: strUserSeq);
 
+                    // 보안결재관리(2)
+                    if (bSecurityApprMenuUse)
+                    {
+                        strNavigatePathWithGroupID = "/mailSecurityApprove/";
+                        strNavigatePathWithGroupID += gID.ToString();
+                        if (SideBarUISvc.FindSubMenu(gID, nParentID, 2) == null)
+                            SideBarUISvc.AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strSecurityApprManage, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse, strUserSeq: strUserSeq);
+                    }
+
                     //대결재관리(3)
-                    if (bEmailUseOnly && bDeputyApprove && bApprMenuUse && sgUserInfo.GetUserApprPos(true, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(gID)) > 0)      //일반사용자는 (대결재권한을 가져도) 대결재 관리 사용 불가
+                    if (bDeputyApprove && bApprMenuUse && sgUserInfo.GetUserApprPos(true, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(gID)) > 0)      //일반사용자는 (대결재권한을 가져도) 대결재 관리 사용 불가
                     {
                         strNavigatePathWithGroupID = "";    //안씀
                                                             //strNavigatePathWithGroupID += gID.ToString();
                         if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
-                            SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
+                            SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
                     }
 
                 }
