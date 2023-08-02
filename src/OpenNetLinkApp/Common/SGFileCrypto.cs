@@ -54,7 +54,7 @@ namespace OpenNetLinkApp
             }
             catch (Exception ex)
             {
-                HsLog.err("AESDecrypt256WithMasterKey Exception : " + ex.ToString());
+                HsLog.err("EncryptSettingFiles Exception : " + ex.ToString());
                 return false;
             }
             finally

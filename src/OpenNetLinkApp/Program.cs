@@ -2,6 +2,7 @@ using WebWindows.Blazor;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using HsNetWorkSG;
 
 //테스트
 namespace OpenNetLinkApp
@@ -20,7 +21,7 @@ namespace OpenNetLinkApp
 
 
         static void Main(string[] args)
-         {
+        {
             string cwdPath = "";
             string CWD = Directory.GetCurrentDirectory();
             Console.WriteLine("==> {0}", CWD);
@@ -37,12 +38,12 @@ namespace OpenNetLinkApp
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
 #if DEBUG
-                        cwdPath = Environment.CurrentDirectory;
+                    cwdPath = Environment.CurrentDirectory;
 #else
                         cwdPath = "/Applications/OpenNetLinkApp.app/Contents/MacOS";
 #endif
                 }
-                else 
+                else
                 {
                     cwdPath = Environment.CurrentDirectory;
                 }
@@ -53,19 +54,16 @@ namespace OpenNetLinkApp
                 //OP 파일 재 암호화 => 암복호화 실패 시 재설치
                 //Network 파일 재 암호화 => 암복호화 실패 시 재설치
                 bool kekGenInit = (!File.Exists("wwwroot/conf/hsck"));
+                SGCrypto.ValidationResult = true;
 
                 if (kekGenInit)
-                {
-                    HsNetWorkSG.SGCrypto.SaveKeyGenerate("wwwroot/conf/hsck");
-                }
+                    SGCrypto.ValidationResult &= SGCrypto.SaveKeyGenerate("wwwroot/conf/hsck");
                 else
-                {
-                    HsNetWorkSG.SGCrypto.LoadKeyGenerate("wwwroot/conf/hsck");
-                }
+                    SGCrypto.ValidationResult &= SGCrypto.LoadKeyGenerate("wwwroot/conf/hsck");
 
                 //json파일 재암호화
                 //파일에 저장된 항목 dek 재 암호화
-                SGFileCrypto.Instance.EncryptSettingFiles();
+                SGCrypto.ValidationResult &= SGFileCrypto.Instance.EncryptSettingFiles();
 
                 object[] arg = new object[2];
                 arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
@@ -75,11 +73,11 @@ namespace OpenNetLinkApp
             }
             else
             {
-                int nhWnd = 0;                
+                int nhWnd = 0;
                 nhWnd = FindWindow("WebWindow", "OpenNetLink");
                 if (nhWnd != 0 && IsWindow(nhWnd))
                 {
-                    PostMessage(nhWnd, 0x0400+0x0003, 0, 0);
+                    PostMessage(nhWnd, 0x0400 + 0x0003, 0, 0);
                 }
 
             }
