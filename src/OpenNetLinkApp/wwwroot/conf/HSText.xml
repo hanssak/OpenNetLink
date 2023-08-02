@@ -1342,6 +1342,19 @@
       <CN></CN>
     </T_COMMON_OS_NOT_FILENAME_CHAR>
 
+	<T_COMMON_CRYPTO_VIOLATION_TITLE>
+		<KR>암호화 키 파일 손상</KR>
+		<JP></JP>
+		<EN></EN>
+		<CN></CN>
+	</T_COMMON_CRYPTO_VIOLATION_TITLE>
+	<T_COMMON_CRYPTO_VIOLATION_MESSAGE>
+		<KR>암호화 키 파일이 손상되었습니다.<![CDATA[<br>]]>프로그램을 종료합니다.<![CDATA[<br>]]>재설치해주세요.</KR>
+		<JP></JP>
+		<EN></EN>
+		<CN></CN>
+	</T_COMMON_CRYPTO_VIOLATION_MESSAGE>
+
 
     <!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
 
@@ -5099,6 +5112,7 @@
       <EN></EN>
       <CN></CN>
     </T_MESSAGE_MAILCANCEL>
+	
 
     <!-- ********************************************* [END] Message 설정 (T_MESSAGE_0000) ******************************************** -->
 

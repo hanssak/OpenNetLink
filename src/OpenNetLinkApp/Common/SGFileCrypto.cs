@@ -25,6 +25,9 @@ namespace OpenNetLinkApp
 
         public bool EncryptSettingFiles()
         {
+            if (!Directory.Exists(initDirPath))
+                return true;
+
             byte[] masterKey = new byte[0];
             byte[] originalSetFile = new byte[0];
             byte[] EncSetFile = new byte[0];
@@ -51,7 +54,7 @@ namespace OpenNetLinkApp
             }
             catch (Exception ex)
             {
-                HsLog.err("AESDecrypt256WithMasterKey Exception : " + ex.ToString());
+                HsLog.err("EncryptSettingFiles Exception : " + ex.ToString());
                 return false;
             }
             finally
