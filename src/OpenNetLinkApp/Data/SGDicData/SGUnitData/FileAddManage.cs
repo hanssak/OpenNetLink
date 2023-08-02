@@ -302,6 +302,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 case eFileAddErr.eFACHG:                                        // 위변조 걸린 파일
                     strMsg = xmlConf.GetWarnMsg("W_0006");                      // {0}파일은 확장자가 변경된 파일입니다.
                     strMsg = String.Format(strMsg, strFileName);
+                    strMsg += $"({strMIMEType})";
                     break;
                 case eFileAddErr.eFAVIRUS:
                     strMsg = xmlConf.GetWarnMsg("W_0184");                      // {0} 파일에서 바이러스가 검출되었습니다.
@@ -1760,12 +1761,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="hsStream"></param>
         /// <returns></returns>
-        public async Task<eFileAddErr> GetExamFileExtChange(HsStream hsStream)
+        public async Task<(eFileAddErr,string)> GetExamFileExtChange(HsStream hsStream)
         {
             eFileAddErr enRet;
             string strExt = Path.GetExtension(hsStream.FileName);
-            enRet = await IsValidFileExt(hsStream.stream, strExt);
-            return enRet;
+            (eFileAddErr, string) validResult=  await IsValidFileExt(hsStream.stream, strExt);            
+            return validResult;
             //if (enRet != eFileAddErr.eFANone)
             //{
             //    //string strFileName = hsStream.FileName;
@@ -3243,32 +3244,33 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="strExt"></param>
         /// <param name="blAllowDRM"></param>
         /// <returns></returns>
-        public async Task<eFileAddErr> IsValidFileExt(Stream stFile, string strExt, bool blAllowDRM = true)
+        public async Task<(eFileAddErr, string)> IsValidFileExt(Stream stFile, string strExt, bool blAllowDRM = true)
         {
+            string strFileMime = string.Empty;
             byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
             //btFileData = (stFile as MemoryStream).ToArray();
             /* Check DRM File */
             if (IsDRM(btFileData) == true)
             {
-                if (blAllowDRM == true) return eFileAddErr.eFANone;
-                else return eFileAddErr.eFAUNKNOWN;
+                if (blAllowDRM == true) return (eFileAddErr.eFANone, strFileMime);
+                else return (eFileAddErr.eFAUNKNOWN, strFileMime);
             }
 
-            string strFileMime = MimeGuesser.GuessMimeType(btFileData);
+            strFileMime = MimeGuesser.GuessMimeType(btFileData);
             Log.Logger.Here().Information("[IsValidFileExt] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM);
 
             // 0kb			
-            if (bEmptyFIleNoCheck && String.Compare(strFileMime, "application/x-empty") == 0) return eFileAddErr.eFANone;
+            if (bEmptyFIleNoCheck && String.Compare(strFileMime, "application/x-empty") == 0) return (eFileAddErr.eFANone, strFileMime);
 
-            if (String.Compare(strFileMime, "text/plain") == 0) return eFileAddErr.eFANone;
+            if (String.Compare(strFileMime, "text/plain") == 0) return (eFileAddErr.eFANone, strFileMime);
 
             if (String.IsNullOrEmpty(strExt) == true)
             {
-                if (String.Compare(strFileMime, "application/x-executable") == 0) return eFileAddErr.eFANone;
-                return eFileAddErr.eFAUNKNOWN;
+                if (String.Compare(strFileMime, "application/x-executable") == 0) return (eFileAddErr.eFANone, strFileMime);
+                return (eFileAddErr.eFAUNKNOWN, strFileMime);
             }
 
-            if (IsValidMimeAndExtension(strFileMime, strExt) == true) return eFileAddErr.eFANone;
+            if (IsValidMimeAndExtension(strFileMime, strExt) == true) return (eFileAddErr.eFANone, strFileMime);
 
             strExt = strExt.Replace(".", "");
             btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize2);
@@ -3277,7 +3279,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             Log.Logger.Here().Information($"[IsValidFileExt] CheckExtForFileByteData, Ext : {strExt}, EXT isChanged : {!bIsExtForFileByteData}");
 
-            return (bIsExtForFileByteData ? eFileAddErr.eFANone : eFileAddErr.eFACHG);
+            eFileAddErr returnErr = (bIsExtForFileByteData ? eFileAddErr.eFANone : eFileAddErr.eFACHG);
+            return (returnErr, strFileMime);
         }
 
         /// <summary>
@@ -5009,9 +5012,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         {
                             oleFileStream.CopyTo(oleValidStream);
                             //위변조 제한, 0KB 체크
-                            if (await IsValidFileExt(oleValidStream, oleExtension) != eFileAddErr.eFANone)//(!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
-                            {
-                                oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_CHANGE;
+                            (eFileAddErr, string) validResult = await IsValidFileExt(oleValidStream, oleExtension);
+                            oleFile.MimeType = validResult.Item2;
+
+                            if (validResult.Item1 != eFileAddErr.eFANone)//(!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
+                            {                                
+                                oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_CHANGE;                                
                                 currentFile.HasChildrenErr = true;
                                 continue;
                             }
