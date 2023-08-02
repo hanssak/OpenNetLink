@@ -1195,7 +1195,7 @@
 
                 //if (sgLoginData.GetApprove() == true)
                 // 3망 정책고려한 결재사용유무 설정
-                if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupid) == false) // 결재관리 UI 않나오는 설정추가
+                if ((pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupid) == false) || SGAppMgrSvc.OpConfigInfoService.GetUseApproveManageUIForce(groupid)) // 결재관리 UI 않나오는 설정추가
                     if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupid)) > 0))
                         bApprMenuUse = true;
 

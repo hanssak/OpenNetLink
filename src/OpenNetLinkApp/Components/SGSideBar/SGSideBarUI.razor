@@ -683,7 +683,7 @@
             //if (sgLoginData.GetApprove() == true)
 
             // 3망 정책고려한 결재사용유무 설정
-            if (pageService.GetUseApproveNetOver(activeMenu.GroupId, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(activeMenu.GroupId) == false)
+            if ((pageService.GetUseApproveNetOver(activeMenu.GroupId, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(activeMenu.GroupId) == false) || SGAppMgrSvc.OpConfigInfoService.GetUseApproveManageUIForce(activeMenu.GroupId))
                 if ((sgLoginData.GetApproveProxyRight()) || (nUserApprPos > 0))
                     bApprMenuUse = true;
 

@@ -65,6 +65,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetFileDownloadBeforeReciving(int groupId);
 
         public bool GetNoApproveManageUI(int groupId);
+        public bool GetUseApproveManageUIForce(int groupId);
 
         public bool GetEmptyfileTrans(int groupId);
 
@@ -420,6 +421,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetNoApproveManageUI(int groupId)
         {
             return AppConfigInfo[groupId].bNoApproveManageUI;
+        }
+        public bool GetUseApproveManageUIForce(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseApproveManageUIForce;
         }
         public bool GetEmptyfileTrans(int groupId)
         {

@@ -132,56 +132,56 @@
         pageService.m_nCurViewPageGroupID = 0;
 
         @*MyNavigationManager.NavigateTo("/fileException");*@
-    if (String.IsNullOrEmpty(SGAppMgrSvc.OpConfigInfoService.GetOKTAUrl(0)))
-        MyNavigationManager.NavigateTo((SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer(0) && NetWorkSvc.NetWorkInfo.Count > 1) ? "/SelectNet" : "/LogIn");
-    else
-    {
-        MyNavigationManager.NavigateTo("/Login_OKTA");
+        if (String.IsNullOrEmpty(SGAppMgrSvc.OpConfigInfoService.GetOKTAUrl(0)))
+            MyNavigationManager.NavigateTo((SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer(0) && NetWorkSvc.NetWorkInfo.Count > 1) ? "/SelectNet" : "/LogIn");
+        else
+        {
+            MyNavigationManager.NavigateTo("/Login_OKTA");
+        }
+
     }
 
-}
 
-
-/// <summary>
-/// loginType : 5 OTP, 3:LDAP
-/// </summary>
-/// <param name="groupId"></param>
-/// <param name="loginType"></param>
-public void SvrResult(int groupId, string loginType)
-{
-    CLog.Here().Information($"SvrResult Init groupID : {groupId} LoginType : {loginType}");
-    pageService.SetGroupIDLoginType(groupId, (eLoginType)Int32.Parse(loginType));
-    CLog.Here().Information($"SvrResult ReSet groupID : {groupId}, LoginType : {loginType}");
-    //pageService.m_DicGroupIDloginType[groupId] = (eLoginType)Int32.Parse(loginType);
-
-    //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
-    //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
-    //if (AppConfigSvc.GetUseAppLoginType())
-    if (OpConfigSvc.GetUseAppLoginType(groupId))
+    /// <summary>
+    /// loginType : 5 OTP, 3:LDAP
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="loginType"></param>
+    public void SvrResult(int groupId, string loginType)
     {
-        loginType = OpConfigSvc.GetAppLoginType(groupId).ToString();
+        CLog.Here().Information($"SvrResult Init groupID : {groupId} LoginType : {loginType}");
+        pageService.SetGroupIDLoginType(groupId, (eLoginType)Int32.Parse(loginType));
+        CLog.Here().Information($"SvrResult ReSet groupID : {groupId}, LoginType : {loginType}");
+        //pageService.m_DicGroupIDloginType[groupId] = (eLoginType)Int32.Parse(loginType);
+
+        //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
+        //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
+        //if (AppConfigSvc.GetUseAppLoginType())
+        if (OpConfigSvc.GetUseAppLoginType(groupId))
+        {
+            loginType = OpConfigSvc.GetAppLoginType(groupId).ToString();
+        }
+
+        conTimer.Stop();
+
+
+        //groupId 별로 AppUpdaterServie 관리
+        string strRipNport = "";
+        HsNetWork hsNetWork = null;
+        hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
+        if (hsNetWork != null)
+        {
+            strRipNport = hsNetWork.GetRealHostInfo();
+        }
+
+        strRipNport += ":3439";
+        SGAppUpdaterSvc.Init(groupId, strRipNport, SGAppMgrSvc.VersionConfigInfoService.GetUpdatePlatform(), HSCmdCenter);
+
+
+        if (groupId == 0)
+        {
+            goLogIn(loginType);
+        }
+
     }
-
-    conTimer.Stop();
-
-
-    //groupId 별로 AppUpdaterServie 관리
-    string strRipNport = "";
-    HsNetWork hsNetWork = null;
-    hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
-    if (hsNetWork != null)
-    {
-        strRipNport = hsNetWork.GetRealHostInfo();
-    }
-
-    strRipNport += ":3439";
-    SGAppUpdaterSvc.Init(groupId, strRipNport, SGAppMgrSvc.VersionConfigInfoService.GetUpdatePlatform(), HSCmdCenter);
-
-
-    if (groupId == 0)
-    {
-        goLogIn(loginType);
-    }
-
-}
 }

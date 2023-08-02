@@ -82,6 +82,7 @@ bScreenLock : 화면잠금 사용 여부.(체크박스값) (true, false)
 // 기타 (1)
 enMainPageType : 로그인후 메인페이지 (나머지 : DASHBOARD, 2 : TRANSFER)
 bNoApproveManageUI : 모든 기능 결재관리 UI 않나오도록함.(보안결재 제외, true : 결재관리UI 들 안나옴, false : 나옴)(siteConfig)
+bUseApproveManageUIForce : 서버 설정과 상관없이 결재관리 페이지가 나오게 설정
 bStartProgramReg : 시작 프로그램 등록 ( true : 부팅때 OpenNetLink 실행, false : 부팅때 OpenNetLink 실행 등록 해제 ) [기능X]
 bTitleDescSameChk : 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부 [기능X]
 
