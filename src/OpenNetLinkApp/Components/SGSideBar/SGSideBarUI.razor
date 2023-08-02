@@ -280,6 +280,8 @@
 
     bool bViewSGSideBarUIBadge = false;                   // 메뉴에 Badge 나오게할지 유무
 
+    bool bEmailUseOnly = false;
+
     private void ChangeSideBarUInNavigate()
     {
         AddMenuAfterLogin(activeMenuPopup);
@@ -303,6 +305,9 @@
             else
                 strNavigatePathWithGroupID = "/Transfer/";
         }
+        bEmailUseOnly = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApproveOnly(activeMenuPopup.GroupId);
+        if (bEmailUseOnly)
+            strNavigatePathWithGroupID = "/Welcome/";  // 설정에 상관없도록
         strNavigatePathWithGroupID += activeMenuPopup.GroupId.ToString();
         MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
@@ -734,18 +739,20 @@
             SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "", icon: "fas fa-copy", path: "", badgeType: "left badge badge-warning", bUse: true, strUserSeq: strLoginUserSeq);
 
         // 파일전송 UI(0)
-        string strNavigateUrl = pageService.GetFileTransPage(gID);
-        if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-            strNavigatePathWithGroupID = strNavigateUrl;
-        else
-            strNavigatePathWithGroupID = "/Transfer/";
-
-        strNavigatePathWithGroupID += gID.ToString();
-        CLog.Here().Information($"groupID : {gID} - SideBar UI, FileTrasn-Url : {strNavigatePathWithGroupID}");
-        if (SideBarUISvc.FindSubMenu(gID, nParentID, 0) == null)
+        if (bEmailUseOnly == false)
         {
-            if (bEmailUseOnly == false)
+            string strNavigateUrl = pageService.GetFileTransPage(gID);
+            if (strNavigateUrl != null && strNavigateUrl.Length > 0)
+                strNavigatePathWithGroupID = strNavigateUrl;
+            else
+                strNavigatePathWithGroupID = "/Transfer/";
+
+            strNavigatePathWithGroupID += gID.ToString();
+            CLog.Here().Information($"groupID : {gID} - SideBar UI, FileTrasn-Url : {strNavigatePathWithGroupID}");
+            if (SideBarUISvc.FindSubMenu(gID, nParentID, 0) == null)
+            {
                 SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_FILETRANS"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bFileTransMenuUse, strUserSeq: strLoginUserSeq);                                 // 파일전송
+            }
         }
 
         // 전송관리(1)

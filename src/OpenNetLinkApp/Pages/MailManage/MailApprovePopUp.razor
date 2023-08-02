@@ -43,7 +43,7 @@
 
                             <tr>
                                 <th>@XmlConf.GetTitle("T_COMMON_APPROVE_KIND")</th> <!-- 결재종류 -->
-                                <td>@GetApproveKindString(stApproveKindValue)</td>
+                                <td>@GetApproveKindString(bIsPrivacyApproveDetail?"0":stApproveKindValue)</td>
                                 <th>@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th> <!--  승인상태 -->
                                 <td>@GetApproveStatusString(stApproveStatusValue, stTransStatusValue)</td>
 
@@ -220,13 +220,13 @@
 
 @code 
 {
-        ISGNetworkService NetWorkSvc;
+    ISGNetworkService NetWorkSvc;
 
-        string stEmailSeq = String.Empty;
-        string stApproveSeq = String.Empty;
-        bool bApproveEnable = false;
+    string stEmailSeq = String.Empty;
+    string stApproveSeq = String.Empty;
+    bool bApproveEnable = false;
 
-        SGReject refSGDetailReject;
+    SGReject refSGDetailReject;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<MailApprovePopUp>();
     List<Dictionary<int, string>> detailData = null;          //DB 데이타 직접 사용하는걸로 수정
     string stTransKindValue = String.Empty;
@@ -247,6 +247,11 @@
     public bool m_bFilePrevOpening = false;
 
     public bool bUseDlpDataView = true;
+
+    /// <summary>
+    /// 정보보호결재 View 상황인지유무
+    /// </summary>
+    public bool bIsPrivacyApproveDetail = false;
 
     public string strPrevInfo1 = "";
     public string strPrevInfo2 = "";
@@ -447,7 +452,7 @@
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, stApproveSeq);
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, stApproveSeq, false, bIsPrivacyApproveDetail);
         closePopUp();
     }
 
@@ -489,7 +494,7 @@
 
             string strProcID = "A";
             string strReason = "Approve";
-            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq);
+            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq, false, bIsPrivacyApproveDetail);
             closePopUp();
         }
         else
@@ -548,9 +553,7 @@
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
-        string strProcID = "R";
-
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq);
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "R", strReason, stApproveSeq, false, bIsPrivacyApproveDetail);
         closePopUp();
     }
 

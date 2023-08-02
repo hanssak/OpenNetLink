@@ -2347,12 +2347,16 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestApproveBatch(hsNetWork, groupid, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
             return -1;
         }
-        public int SendEmailApproveBatch(int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs)
+        public int SendEmailApproveBatch(int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs, bool bUseSfm2Approve=false, bool bUsePrivacyApprove=false)
         {
+            // 정보보안결재는 대결재 없음
+            if (bUsePrivacyApprove)
+                bUseSfm2Approve = false;
+
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestEmailApproveBatch(hsNetWork, groupid, strUserID, strProcID, strReason, strApproveSeqs);
+                return sgSendData.RequestEmailApproveBatch(hsNetWork, groupid, strUserID, strProcID, strReason, strApproveSeqs, bUseSfm2Approve, bUsePrivacyApprove);
             return -1;
         }
         public int SendTransCancel(int groupid, string strUserID, string strTransSeq, string strAction, string strReason)

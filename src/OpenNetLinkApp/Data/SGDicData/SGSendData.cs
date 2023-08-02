@@ -285,7 +285,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPROVEBATCH", dic);
             return hsNet.SendMessage(args);
         }
-        public int RequestEmailApproveBatch(HsNetWork hsNet, int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs)
+        public int RequestEmailApproveBatch(HsNetWork hsNet, int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs, bool bUseSfm2Approve, bool bUsePrivacyApprove)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
@@ -293,6 +293,8 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["PROCID"] = strProcID;
             dic["REASON"] = strReason;
             dic["EMAILAPPROVESEQS"] = strApproveSeqs;
+            dic["APPROVER"] = (bUseSfm2Approve?"1":"0");
+            dic["APPROVEUSERKIND"] = (bUsePrivacyApprove ? "1" : "0");
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_EMAIL_APPROVE_BATCH", dic);

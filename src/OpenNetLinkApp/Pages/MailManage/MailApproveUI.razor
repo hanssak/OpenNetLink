@@ -1086,6 +1086,7 @@
     public async Task OpenDetail(string transSeq, string apvseq, string apvenable, bool bIsAfterApprove, bool bIsCanFilePreview)
     {
         refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
+        refMailApprovePopUp.bIsPrivacyApproveDetail = true;
         //apvenable = "true";
         await refMailApprovePopUp.openPopUp(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
     }

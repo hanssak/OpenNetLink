@@ -466,7 +466,6 @@
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
-        string strProcID = "A";
         string strApproveSeqs = "";
 
         for (int i = 0; i < ListData.Count; i++)
@@ -479,7 +478,7 @@
         }
 
         HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupID, ApproveBatchResult);
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs);
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, strApproveSeqs, false, true);
     }
 
     public async Task ApproveAction()
@@ -514,7 +513,6 @@
             if (sgLoginData != null)
                 strUserID = sgLoginData.GetUserID();
 
-            string strProcID = "A";
             string strReason = "Approve";
             string strApproveSeqs = "";
 
@@ -527,7 +525,7 @@
                 }
             }
 
-            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs);
+            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, strApproveSeqs, false, true);
         }
         else
         {
@@ -585,7 +583,6 @@
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
-        string strProcID = "R";
         string strApproveSeqs = "";
 
         for (int i = 0; i < ListData.Count; i++)
@@ -598,7 +595,7 @@
         }
 
         HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupID, RejectBatchResult);
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs);
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "R", strReason, strApproveSeqs, false, true);
     }
 
     public bool GetCheckRejectPossible()

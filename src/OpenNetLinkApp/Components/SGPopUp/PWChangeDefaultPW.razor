@@ -81,6 +81,8 @@
     ISGAppConfigService AppConfigSvc;
     SGSettingsDBProc sgSettingProc;
 
+    bool bEmailUseOnly = false;
+
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<PWChangeDefaultPW>();
 
     //[Parameter]
@@ -90,6 +92,9 @@
     {
         object[] param = { Guid };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
+
+        if (nGroupID > -1)
+            bEmailUseOnly = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApproveOnly(nGroupID);
     }
 
     public void closePopUp()
@@ -309,6 +314,8 @@
                 else
                     strNavigateWithGroupID = "/Transfer/";
             }
+            if (bEmailUseOnly)
+                strNavigateWithGroupID = "/Welcome/";  // 설정에 상관없도록
             strNavigateWithGroupID += groupID.ToString();
             MyNavigationManager.NavigateTo(strNavigateWithGroupID);
         }
