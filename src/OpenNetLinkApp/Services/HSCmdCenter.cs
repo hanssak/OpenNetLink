@@ -1658,7 +1658,12 @@ namespace OpenNetLinkApp.Services
                 if (!strCount.Equals(""))
                     e.count = Convert.ToInt32(strCount);
                 e.strMsg = "";
-                e.strDummy = "4";
+
+                strCount = data.GetBasicTagData("APPROVEUSERKIND");
+                if (strCount == "1")
+                    e.strDummy = "5";   // UI기준
+                else
+                    e.strDummy = "4";
 
                 sNotiEvent(groupId, cmd, e);
             }

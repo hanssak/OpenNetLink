@@ -719,7 +719,6 @@
     public void SetUrlPolicyDataToNetworkLib(int groupid, bool GetUrlListfromNetLib)
     {
 
-
         mutex.WaitOne();
         bool bListChangSave = false;
 
@@ -2727,6 +2726,11 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 case "4":
                     naviURI = "/mailApprove/";      // mail 결재Noti값이 올때 처리 : mailApprove
                     break;
+
+                case "5":
+                    naviURI = "/mailSecurityApprove/";      // mail 결재Noti값이 올때 처리 : mailApprove
+                    break;
+
             }
             //naviURI = "/transferApprove/";
 
@@ -2742,6 +2746,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     naviURI += "/1";    // 클립보드 결재 - 승인대기 전체조회
                 else if (e.strDummy == "4")
                     naviURI += "/1";    // 메일결재 - 승인대기 전체조회
+                else if (e.strDummy == "5")
+                    naviURI += "/1";    // 메일 정보보안결재 - 승인대기 전체조회
             }
 
 
