@@ -1903,10 +1903,11 @@ protected override Task OnAfterRenderAsync(bool firstRender)
         }
 
         //확장자 위변조 확인
-        eFileAddErr enRet = await fileAddManage.GetExamFileExtChange(hsStream);
-        if (enRet != eFileAddErr.eFANone)
+        (eFileAddErr, string) enRet = await fileAddManage.GetExamFileExtChange(hsStream);
+        currentFile.MimeType = enRet.Item2;
+        if (enRet.Item1 != eFileAddErr.eFANone)
         {
-            currentFile.eErrType = enRet;
+            currentFile.eErrType = enRet.Item1;
             return -1;
         }
         return 0;

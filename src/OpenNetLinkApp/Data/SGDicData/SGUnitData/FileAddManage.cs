@@ -302,6 +302,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 case eFileAddErr.eFACHG:                                        // 위변조 걸린 파일
                     strMsg = xmlConf.GetWarnMsg("W_0006");                      // {0}파일은 확장자가 변경된 파일입니다.
                     strMsg = String.Format(strMsg, strFileName);
+                    strMsg += $"({strMIMEType})";
                     break;
                 case eFileAddErr.eFAVIRUS:
                     strMsg = xmlConf.GetWarnMsg("W_0184");                      // {0} 파일에서 바이러스가 검출되었습니다.
@@ -1552,7 +1553,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if ((ListParsedData?.Count() ?? 0) > 0)
             {
                 int nCount = ListParsedData.Count();
-                foreach(string strItem in ListParsedData)
+                foreach (string strItem in ListParsedData)
                 {
                     if (CsFileFunc.isSupportFileName(strItem, out strNotSupportCharData, false) == false)
                     {
@@ -1772,12 +1773,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="hsStream"></param>
         /// <returns></returns>
-        public async Task<eFileAddErr> GetExamFileExtChange(HsStream hsStream)
+        public async Task<(eFileAddErr, string)> GetExamFileExtChange(HsStream hsStream)
         {
             eFileAddErr enRet;
             string strExt = Path.GetExtension(hsStream.FileName);
-            enRet = await IsValidFileExt(hsStream.stream, strExt);
-            return enRet;
+            (eFileAddErr, string) validResult = await IsValidFileExt(hsStream.stream, strExt);
+            return validResult;
             //if (enRet != eFileAddErr.eFANone)
             //{
             //    //string strFileName = hsStream.FileName;
@@ -1922,7 +1923,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return false;
             }
 
-            Log.Logger.Here().Information($"### - 파일이름 : {hsStream.FileName}, 파일크기 : {hsStream.Size}, 종류 : {(hsStream.IsDir?"폴더":"파일")} - ###");
+            Log.Logger.Here().Information($"### - 파일이름 : {hsStream.FileName}, 파일크기 : {hsStream.Size}, 종류 : {(hsStream.IsDir ? "폴더" : "파일")} - ###");
 
             //빈파일 체크 (0kb 허용)
             if (hsStream.IsDir)
@@ -3262,34 +3263,35 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="strExt"></param>
         /// <param name="blAllowDRM"></param>
         /// <returns></returns>
-        public async Task<eFileAddErr> IsValidFileExt(Stream stFile, string strExt, bool blAllowDRM = true)
+        public async Task<(eFileAddErr, string)> IsValidFileExt(Stream stFile, string strExt, bool blAllowDRM = true)
         {
+            string strFileMime = string.Empty;
             byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
             //btFileData = (stFile as MemoryStream).ToArray();
             /* Check DRM File */
             if (IsDRM(btFileData))
             {
                 if (blAllowDRM)
-                    return eFileAddErr.eFANone;
+                    return (eFileAddErr.eFANone, strFileMime);
                 else
-                    return eFileAddErr.eFAUNKNOWN;                   
+                    return (eFileAddErr.eFAUNKNOWN, strFileMime);
             }
 
-            string strFileMime = MimeGuesser.GuessMimeType(btFileData);
+            strFileMime = MimeGuesser.GuessMimeType(btFileData);
             Log.Logger.Here().Information("[IsValidFileExt] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM);
 
             // 0kb			
-            if (bEmptyFIleNoCheck && String.Compare(strFileMime, "application/x-empty") == 0) return eFileAddErr.eFANone;
+            if (bEmptyFIleNoCheck && String.Compare(strFileMime, "application/x-empty") == 0) return (eFileAddErr.eFANone, strFileMime);
 
-            if (String.Compare(strFileMime, "text/plain") == 0) return eFileAddErr.eFANone;
+            if (String.Compare(strFileMime, "text/plain") == 0) return (eFileAddErr.eFANone, strFileMime);
 
             if (String.IsNullOrEmpty(strExt) == true)
             {
-                if (String.Compare(strFileMime, "application/x-executable") == 0) return eFileAddErr.eFANone;
-                return eFileAddErr.eFAUNKNOWN;
+                if (String.Compare(strFileMime, "application/x-executable") == 0) return (eFileAddErr.eFANone, strFileMime);
+                return (eFileAddErr.eFAUNKNOWN, strFileMime);
             }
 
-            if (IsValidMimeAndExtension(strFileMime, strExt) == true) return eFileAddErr.eFANone;
+            if (IsValidMimeAndExtension(strFileMime, strExt) == true) return (eFileAddErr.eFANone, strFileMime);
 
             strExt = strExt.Replace(".", "");
             btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize2);
@@ -3298,7 +3300,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             Log.Logger.Here().Information($"[IsValidFileExt] CheckExtForFileByteData, Ext : {strExt}, EXT isChanged : {!bIsExtForFileByteData}");
 
-            return (bIsExtForFileByteData ? eFileAddErr.eFANone : eFileAddErr.eFACHG);
+            eFileAddErr returnErr = (bIsExtForFileByteData ? eFileAddErr.eFANone : eFileAddErr.eFACHG);
+            return (returnErr, strFileMime);
         }
 
         /// <summary>
@@ -4436,7 +4439,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 {
                     if (Directory.Exists(strExtractTempZipPath))
                         Directory.Delete(strExtractTempZipPath, true);
-                    
+
                     fiZipFile = new FileInfo(strZipFile);
                     fiZipFile.Delete();
                 }
@@ -4445,7 +4448,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     Log.Logger.Here().Warning("[CheckZipFile] Directory.Delete() " + err.Message + " " + err.GetType().FullName);
                 }
 
-             
+
             }
 
             stStream.Position = 0;
@@ -4605,7 +4608,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     //CheckDocumentFile()
                     //압축해제한 파일의 Stream 필요
                     //Check Document File (압축파일 내 문서검사할 파일이 존재하는 경우)
-                    if (ListCheckableDocumentExtension.Exists(ext => (string.Compare(ext,strNoDotExt,true) == 0)))
+                    if (ListCheckableDocumentExtension.Exists(ext => (string.Compare(ext, strNoDotExt, true) == 0)))
                     {
                         //압축 내부 문서의 압축해제 개체를 보관할 폴더 (Temp/ZipExtract/ZipName/Document_Extract)
                         string strTempDocumentExtractDirPath = Path.Combine(strTempUnzipDirPath, "Document_Extract");
@@ -4618,7 +4621,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         using (Stream oleFileStream = File.OpenRead(extractFile.FullName))
                         {
                             oleHsStream = new HsStream() { stream = oleFileStream, FileName = extractFile.FullName, MemoryType = HsStreamType.FileStream };
-                            scanDocumentFile(oleHsStream, childFile, strTempDocumentExtractDirPath, blWhite, strExtInfo, documentScanDepth, documentExtractType).Wait();                            
+                            scanDocumentFile(oleHsStream, childFile, strTempDocumentExtractDirPath, blWhite, strExtInfo, documentScanDepth, documentExtractType).Wait();
                         }
 
                         if (childFile.eErrType != eFileAddErr.eFANone || childFile.HasChildrenErr)
@@ -5030,7 +5033,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         {
                             oleFileStream.CopyTo(oleValidStream);
                             //위변조 제한, 0KB 체크
-                            if (await IsValidFileExt(oleValidStream, oleExtension) != eFileAddErr.eFANone)//(!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
+                            (eFileAddErr, string) validResult = await IsValidFileExt(oleValidStream, oleExtension);
+                            oleFileMime = validResult.Item2;
+                            if (validResult.Item1 != eFileAddErr.eFANone)//(!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
                             {
                                 oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_CHANGE;
                                 currentFile.HasChildrenErr = true;
