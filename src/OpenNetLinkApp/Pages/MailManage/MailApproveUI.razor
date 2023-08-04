@@ -210,6 +210,12 @@
 
                                         <th style="text-align:center; vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_EMAIL_ATTACHFILE")</th>     <!--파일첨부-->
                                         <th style="text-align:center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_EMAIL_STATUS")</th>         <!--발송상태-->
+
+                                        @if (approveTypesfm == 2)
+                                        { 
+                                            <th style="text-align:center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_DETAIL_APPROVEUSER")</th>  <!--승인자-->
+                                        }
+
                                         <th style="text-align:center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th> <!--승인상태-->
                                         <th style="text-align:center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_EMAIL_SENDER")</th>         <!--발신자-->
                                         <th style="text-align:center; vertical-align:middle;width:10%;">@XmlConf.GetTitle("T_RECV_USER")</th>           <!--수신자-->
@@ -223,26 +229,32 @@
                                     @foreach (emailApproveData item in mData)
                                     {
 
-                                        <tr>
-                                            <td style="text-align:center; vertical-align:middle">
-                                                <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                            </td>
-                                            <td style="text-align: center; vertical-align: middle">@item.ApvType</td>
-                                            <td style="text-align: center; vertical-align: middle">@item.TransferType</td>
-                                            @if (bUseDlpDataView)
-                                            {
-                                                <td style="text-align: center; vertical-align: middle">@item.stDLP</td>
-                                            }
-                                            <td style="text-align: center; vertical-align: middle">@item.strIsFileAdd</td>
-                                            <td style="text-align: center; vertical-align: middle">@item.TransStatusCode</td>
-                                            <td style="text-align: center; vertical-align: middle">@item.ApvStatus</td>
-                                            <td style="text-align: center; vertical-align: middle">@item.strSender</td>
-                                            <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; ">@item.strReceiver</td>
-                                            <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                            <td style="text-align: center; vertical-align: middle">@item.RequestTime</td>
-                                            <td style="text-align: center; vertical-align: middle">@item.ApvTime</td>
-                                            <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq, item.ApprSeq, item.bCanApproveReject?"true":"false", item.bIsAfterApprove, item.bIsCanFilePreview))"><i class="fas fa-search"></i></button></td>
-                                        </tr>
+                                    <tr>
+                                        <td style="text-align:center; vertical-align:middle">
+                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        </td>
+                                        <td style="text-align: center; vertical-align: middle">@item.ApvType</td>
+                                        <td style="text-align: center; vertical-align: middle">@item.TransferType</td>
+                                        @if (bUseDlpDataView)
+                                        {
+                                            <td style="text-align: center; vertical-align: middle">@item.stDLP</td>
+                                        }
+                                        <td style="text-align: center; vertical-align: middle">@item.strIsFileAdd</td>
+                                        <td style="text-align: center; vertical-align: middle">@item.TransStatusCode</td>
+
+                                        @if (approveTypesfm == 2)
+                                        {
+                                            <td style="text-align: center; vertical-align: middle">@item.ApproverName</td>
+                                        }
+
+                                        <td style="text-align: center; vertical-align: middle">@item.ApvStatus</td>
+                                        <td style="text-align: center; vertical-align: middle">@item.strSender</td>
+                                        <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; ">@item.strReceiver</td>
+                                        <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="text-align: center; vertical-align: middle">@item.RequestTime</td>
+                                        <td style="text-align: center; vertical-align: middle">@item.ApvTime</td>
+                                        <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq, item.ApprSeq, item.bCanApproveReject?"true":"false", item.bIsAfterApprove, item.bIsCanFilePreview))"><i class="fas fa-search"></i></button></td>
+                                    </tr>
 
                                     }
 
@@ -315,6 +327,7 @@
     private string strSearchSender;
     //List<Dictionary<int, string>> listData = null;          //DB 데이타 직접 사용하는걸로 수정
 
+    private int approveTypesfm = 0;
 
     /// <summary>
     /// checkBox 등 사용자의 설정 정보가 반영된 LIST data
@@ -923,6 +936,8 @@
                 tData.stDLP = sgData.GetDlp(dic);                           // 개인정보 포함여부
                 tData.strIsFileAdd = sgData.GetFileAdd(dic);                // 파일첨부유무
                 tData.TransStatusCode = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
+
+                tData.ApproverName = sgData.GetQueryApprName(dic);             // 승인자
                 tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
                 tData.strSender = sgData.GetMailSender(dic);                // 송신자
                 tData.strReceiver = sgData.GetRecvUser(dic);                // 수산자
@@ -1117,6 +1132,12 @@
         HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupIDbyParam, ApproveBatchResult);
         HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveUI, UpdateData);
         HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveWaitUI, ApproveWaitSearch);
+
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            approveTypesfm = sgLoginData.GetApproveTypeSFM();
 
         base.OnInitialized();
     }

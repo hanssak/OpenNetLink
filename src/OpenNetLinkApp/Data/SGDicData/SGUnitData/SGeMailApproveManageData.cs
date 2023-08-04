@@ -231,6 +231,28 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strRet;
         }
 
+        /// <summary>
+        /// 대결재(sfm2)에서 실제 승인을 한 승인자 정보를 알려준다.
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetQueryApprName(Dictionary<int, string> dic)
+        {
+            string strApprName = "";
+            if (!dic.ContainsKey(14)) // KKW - 승인자 찾기
+                return "-";
+
+            strApprName = dic[14];
+
+            string strApprStatus = GetApprStaus(dic);
+            string strTempApprStatus1 = xmlConf.GetTitle("T_COMMON_APPROVE");               // 승인
+            string strTempApprStatus2 = xmlConf.GetTitle("T_COMMON_REJECTION");             // 반려
+
+            if ((strApprStatus.Equals(strTempApprStatus1)) || (strApprStatus.Equals(strTempApprStatus2)))
+                return strApprName;
+            else
+                return "-";
+        }
 
         /// <summary>
         /// 결재상태 정보를 반환한다.<br></br>

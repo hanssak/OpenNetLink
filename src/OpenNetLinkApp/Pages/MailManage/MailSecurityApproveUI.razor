@@ -950,7 +950,7 @@
     private async Task doSearch()
     {
 
-        using (Mutex mutex = new Mutex(true, "MailApproveUI", out bool isNewInstance))
+        using (Mutex mutex = new Mutex(true, "MailSecurityApproveUI", out bool isNewInstance))
         {
             if (isNewInstance)
             {
@@ -1105,8 +1105,8 @@
         bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
 
         HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupIDbyParam, ApproveBatchResult);
-        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveUI, UpdateData);
-        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveWaitUI, ApproveWaitSearch);
+        //HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveUI, UpdateData);
+        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailSecurityApproveWaitUI, ApproveWaitSearch);
 
         base.OnInitialized();
     }
@@ -1137,7 +1137,7 @@
     {
 
         refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
-        strDlpValue = XmlConf.GetTitle("T_COMMON_ALL");
+        strDlpValue = XmlConf.GetTitle("T_COMMON_DLP_INCLUSION");
         strApproveKind = XmlConf.GetTitle("T_COMMON_ALL");
         strTransTypeText = XmlConf.GetTitle("T_COMMON_ALL");
         strTransFlag = XmlConf.GetTitle("T_COMMON_ALL");

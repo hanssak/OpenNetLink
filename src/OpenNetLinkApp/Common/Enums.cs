@@ -56,7 +56,9 @@ namespace OpenNetLinkApp.Common
             [Description("메일결재 승인대기조회")]
             MailApproveWaitUI = 7,
             [Description("일반결재 승인대기조회")]
-            ApproveWaitAllUI = 8
+            ApproveWaitAllUI = 8,
+            [Description("메일보안결재 승인대기조회")]
+            MailSecurityApproveWaitUI = 9
         }
         /// <summary>
         /// 승인/반려
