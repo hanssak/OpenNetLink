@@ -548,6 +548,31 @@
                     // 파일송신 버튼, 실행
                     refApproveExtApproverSelect_PopUp.SetFileTransWithApproveEvent(FileTransWithApprover);
 
+                    //(0:미사용 1:제목 2:설명 3:제목,설명모두 / 최소입력자리수)
+                    string strApproveExtPolicy = sgLoginData.GetTagDataBySystemEnvName("CS_EXCEPTION_EXT_REASON_TYPE");
+                    bool useReason = false;
+                    string initReason = "";
+                    string[] policy = strApproveExtPolicy.Split("/");
+                    if (policy.Length > 1)
+                    {
+                        if (string.IsNullOrEmpty(policy[0]) || policy[0] == "0")
+                        {
+                            initReason = "";
+                            useReason = false;
+                        }
+                        else if (policy[0] == "1")
+                        {
+                            initReason = strBindTitle;
+                            useReason = true;
+                        }
+                        else
+                        {
+                            initReason = strBindDesc;
+                            useReason = true;
+                        }
+                    }
+
+                    refApproveExtApproverSelect_PopUp.SetInitReason(useReason, initReason);
                     await refApproveExtApproverSelect_PopUp.openPopUp();
                 }
                 else
@@ -787,7 +812,6 @@
         if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) &&
         isFilesNeedApprove())
         {
-
             if (pageService.GetApproveExtFileTransWithApprove(groupID) == false)
             {
                 // 결재 없는 파일들만 송신 하기로 결정
@@ -811,13 +835,12 @@
                     ShowMessage("warning", XmlConf.GetWarnMsg("W_0284"));
                     return;
                 }
-
             }
-
 
             string strApproveExtPolicy = "";
             if (sgLoginData != null)
             {
+                //(0:미사용 1:제목 2:설명 3:제목,설명모두 / 최소입력자리수)
                 strApproveExtPolicy = sgLoginData.GetTagDataBySystemEnvName("CS_EXCEPTION_EXT_REASON_TYPE");
                 string[] strArray = null;
 
@@ -839,7 +862,6 @@
                     }
                 }
             }
-
         }
 
 
@@ -1057,7 +1079,30 @@
 
                 // 파일송신 버튼, 실행
                 refApproveExtApproverSelect_PopUp.SetFileTransWithApproveEvent(FileTransWithApprover);
-
+                //(0:미사용 1:제목 2:설명 3:제목,설명모두 / 최소입력자리수)
+                string strApproveExtPolicy = sgLoginData.GetTagDataBySystemEnvName("CS_EXCEPTION_EXT_REASON_TYPE");
+                bool useReason = false;
+                string initReason = "";
+                string[] policy = strApproveExtPolicy.Split("/");
+                if (policy.Length > 1)
+                {
+                    if (string.IsNullOrEmpty(policy[0]) || policy[0] == "0")
+                    {
+                        initReason = "";
+                        useReason = false;
+                    }
+                    else if (policy[0] == "1")
+                    {
+                        initReason = strBindTitle;
+                        useReason = true;
+                    }
+                    else
+                    {
+                        initReason = strBindDesc;
+                        useReason = true;
+                    }
+                }
+                refApproveExtApproverSelect_PopUp.SetInitReason(useReason,initReason);
                 await refApproveExtApproverSelect_PopUp.openPopUp();
             }
             else
