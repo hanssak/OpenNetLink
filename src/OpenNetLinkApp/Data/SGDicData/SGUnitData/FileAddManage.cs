@@ -1890,7 +1890,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             else
             {
                 bExtEnable = GetRegExtEnable(bWhite, strFileExtInfo, hsStream.Type);
-                if (!bExtEnable)
+                if (!bExtEnable && hsStream.isNeedApprove)
+                {
+                    Log.Logger.Here().Information($"### - GetRegExtEnable Return false, but Stream is 'isNeedApprove' ([{bWhite} / {strFileExtInfo} / {hsStream.Type}] )");
+                    bExtEnable = true;
+                }
+                else if (!bExtEnable)
                 {
                     currentFile.eErrType = eFileAddErr.eFAEXT;
                     return false;
@@ -4576,7 +4581,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     string strNoDotExt = strExt.Replace(".", "");
                     Log.Logger.Here().Information($"### - ScanZipFile, BlackWhite : {(blWhite ? "WHITE!" : "BLACK!")}, FileExtInfo : {strExtInfo}, FileExt : {strNoDotExt}");
 
-                    if (GetRegExtEnable(blWhite, strExtInfo, strExt.Replace(".", "")) != true)
+                    // 필수결재 확장자인지 확인
+                    if (strApproveExt.Length > 0)
+                    {
+                        if (CsFunction.isFileExtinListStr(false, strExt, strApproveExt))
+                            bIsApproveExt = true;
+                    }
+
+                    bool bExtEnable = GetRegExtEnable(blWhite, strExtInfo, strExt.Replace(".", ""));
+                    if (!bExtEnable && bIsApproveExt)
+                    {
+                        Log.Logger.Here().Information($"### - GetRegExtEnable Return false, but Stream is 'isNeedApprove' ([{blWhite} / {strExtInfo} / {strExt.Replace(".", "")}] )");
+                        bExtEnable = true;
+                    }
+                    if (bExtEnable != true)
                     {
                         enErr = eFileAddErr.eUnZipInnerExt;
                         childFile.eErrType = eFileAddErr.eUnZipInnerExt;
@@ -4632,16 +4650,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
                             continue;
                         }
-
-
-
-                    }
-
-                    // 필수결재 확장자인지 확인
-                    if (strApproveExt.Length > 0)
-                    {
-                        if (CsFunction.isFileExtinListStr(false, strExt, strApproveExt))
-                            bIsApproveExt = true;
                     }
 
                     // Check Zip File  (압축파일 내 압축파일이 또 존재하는 경우.
@@ -5023,12 +5031,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         Log.Logger.Here().Information($"### - scanDocumentFile, BlackWhite : {(isWhite ? "WHITE!" : "BLACK!")}, FileExtInfo : {fileFilterExtInfo}, FileExt : {oleExtension}");
 
                         //File Fileter 체크
-                        if (!GetRegExtEnable(isWhite, fileFilterExtInfo, oleExtension))
+                        bool bExtEnable = GetRegExtEnable(isWhite, fileFilterExtInfo, oleExtension);
+                        if (!bExtEnable && hsStream.isNeedApprove)
+                        {
+                            Log.Logger.Here().Information($"### - GetRegExtEnable Return false, but Stream is 'isNeedApprove' ([{isWhite} / {fileFilterExtInfo} / {oleExtension}] )");
+                            bExtEnable = true;
+                        }
+                        if (!bExtEnable)
                         {
                             oleFile.eErrType = eFileAddErr.eFADOC_EXTRACT_FILEFILTER;
                             currentFile.HasChildrenErr = true;
                             continue;
                         }
+
                         using (Stream oleValidStream = new MemoryStream())
                         {
                             oleFileStream.CopyTo(oleValidStream);
