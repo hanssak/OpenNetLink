@@ -1005,6 +1005,35 @@ Task("PkgCrossflatform")
 				networkFlag = AgentName.ToUpper();			
 				storageName = unitName.ToUpper();
 				
+				if(AppProps.Platform == "windows")
+				{
+					JObject AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"));
+					for(int i = 0; i < AppEnvJObj["strForwardUrl"].Count(); i++)
+					{
+						AppEnvJObj["strForwardUrl"][i] = "file:\\\\\\C:\\HANSSAK\\OpenNetLink\\wwwroot\\Web\\WebLinkInfo.html";
+					}
+					JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"), AppEnvJObj);
+
+				}
+				else if(AppProps.Platform == "mac")
+				{
+					JObject AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"));
+					for(int i = 0; i < AppEnvJObj["strForwardUrl"].Count(); i++)
+					{
+						AppEnvJObj["strForwardUrl"][i] = "file:/Applications/OpenNetLinkApp.app/Contents/MacOS/wwwroot/Web/WebLinkInfo.html";
+					}
+					JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"), AppEnvJObj);
+				}
+				else
+				{
+					JObject AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"));
+					for(int i = 0; i < AppEnvJObj["strForwardUrl"].Count(); i++)
+					{
+						AppEnvJObj["strForwardUrl"][i] = "file:/opt/hanssak/opennetlink/wwwroot/Web/WebLinkInfo.html";
+					}
+					JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"), AppEnvJObj);
+				}
+
 				CopyFiles($"{agentUnit}/AppEnvSetting.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
 				CopyFiles($"{agentUnit}/NetWork.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
 				
