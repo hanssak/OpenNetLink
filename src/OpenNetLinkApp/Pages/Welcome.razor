@@ -80,7 +80,7 @@
                             {
                                 <tr>
                                     <th>@XmlConf.GetTitle("T_DASH_PWPERIOD_DATE")</th> <!--패스워드 유효기간 -->
-                                <td>@strPWChgDate</td>
+                                    <td>@strPWChgDate</td>
                                 </tr>
                             }
                             <tr>
@@ -136,7 +136,7 @@
                                 {
                                     <div class="progress-group text-left">
                                         <!-- 클립보드 용량-->
-                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
+                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
                                         <span class="float-right">
                                             <b>@nDayUseClipSize</b>/@(nDayMaxClipSize==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipSize.ToString())
                                         </span>
@@ -420,7 +420,7 @@
 
                 <div class="quick">
 
-                    
+
                     @if (bFileTransMenuUse && bEmailUseOnly == false)
                     {
                         <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transfer"))">
@@ -930,7 +930,7 @@
     /// <returns></returns>
     public bool SetQuickMenuModify(int groupID)
     {
-
+        bApprMenuUse = false;
         SGLoginData sgLoginData = null;
         SGUserData sgUserData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -1073,7 +1073,7 @@
             StateHasChanged();
 
             CheckContinueFileUpload();
-            
+
             CheckClientPatch(sgLoginData, groupID);
         }
 
@@ -2145,7 +2145,7 @@
         clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
         if (clientUpdateExe != null)
             clientUpdateExe(groupID, true);
-        }
+    }
 
 
     /// <summary>
