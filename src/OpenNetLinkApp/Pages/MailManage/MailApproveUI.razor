@@ -501,7 +501,7 @@
         }
 
         HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupID, ApproveBatchResult);
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs);
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, approveTypesfm==2, false);
     }
 
     public async Task ApproveAction()
@@ -549,7 +549,7 @@
                 }
             }
 
-            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs);
+            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, approveTypesfm==2, false);
         }
         else
         {
@@ -620,7 +620,7 @@
         }
 
         HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupID, RejectBatchResult);
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs);
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, approveTypesfm==2, false);
     }
 
     public bool GetCheckRejectPossible()
@@ -1101,7 +1101,7 @@
     public async Task OpenDetail(string transSeq, string apvseq, string apvenable, bool bIsAfterApprove, bool bIsCanFilePreview)
     {
         refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
-        refMailApprovePopUp.bIsPrivacyApproveDetail = true;
+        refMailApprovePopUp.bIsPrivacyApproveDetail = false;
         //apvenable = "true";
         await refMailApprovePopUp.openPopUp(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
     }

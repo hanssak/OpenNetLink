@@ -351,20 +351,17 @@ namespace OpenNetLinkApp.Data.SGQuery
 
 		public string ListDbFunc(MailApproveEx1Param tParam)
 		{
-
-			string strQuery = @$"SELECT * FROM {(tParam.APPROVE_TYPE_SFM != "XXX" ? "FUNC_EMAIL_APPROVEINFO_OPEN_TEST" : "FUNC_EMAIL_APPROVEINFOTYPEFM_OPEN")}('{tParam.UserID}','{tParam.SearchStartDate}','{tParam.SearchEndDate}', ";
+			string strQuery = @$"SELECT * FROM FUNC_EMAIL_APPROVEINFO_OPEN_TEST('{tParam.UserID}','{tParam.SearchStartDate}','{tParam.SearchEndDate}', ";
 			strQuery += @$"'{tParam.GetApproveKindCode()}', '{tParam.GetTransKindCode()}','{tParam.GetApprStatusCode()}','{tParam.GetTransStatusCode(false)}', '{tParam.GetDlpValue()}',";
-			strQuery += @$"'{tParam.Sender}', '{tParam.Receiver}', '{tParam.Title}', '0', '{(tParam.bIsDlpPrivacyApprove ? "1" : "0")}', '{tParam.PageListCount}', '{tParam.ViewPageNo}')";
+			strQuery += @$"'{tParam.Sender}', '{tParam.Receiver}', '{tParam.Title}', '0', {(tParam.bIsDlpPrivacyApprove ? "TRUE" : "FALSE")}, {(tParam.APPROVE_TYPE_SFM == "2" ? "TRUE" : "FALSE")}, '{tParam.PageListCount}', '{tParam.ViewPageNo}')";
 			return strQuery;
 		}
 
 		public string TotalCountDbFunc(MailApproveEx1Param tParam)
 		{
-
 			string strQuery = @$"SELECT COUNT(*) FROM FUNC_EMAIL_APPROVEINFO_OPEN_TEST('{tParam.UserID}','{tParam.SearchStartDate}','{tParam.SearchEndDate}', ";
 			strQuery += @$"'{tParam.GetApproveKindCode()}', '{tParam.GetTransKindCode()}','{tParam.GetApprStatusCode()}','{tParam.GetTransStatusCode(false)}', '{tParam.GetDlpValue()}',";
-			strQuery += @$"'{tParam.Sender}', '{tParam.Receiver}', '{tParam.Title}', '0', '{(tParam.bIsDlpPrivacyApprove?"1":"0")}', {(tParam.APPROVE_TYPE_SFM=="2"?"TRUE":"FALSE")} ,'', '')";
-
+			strQuery += @$"'{tParam.Sender}', '{tParam.Receiver}', '{tParam.Title}', '0', {(tParam.bIsDlpPrivacyApprove?"TRUE":"FALSE")}, {(tParam.APPROVE_TYPE_SFM=="2"?"TRUE":"FALSE")},'', '')";
 			return strQuery;
 		}
 

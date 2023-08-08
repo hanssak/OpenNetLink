@@ -2372,12 +2372,12 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         }
 
         int nGroupID = 0;
-        string strGroupID = "";
-        string strMenuName = "";
+        //string strGroupID = "";
+        //string strMenuName = "";
 
         CLog.Here().Information("Toast-Click-navURI : {0}", navURI);
 
-        int nPos = -1;
+        //int nPos = -1;
         bool bChangedMenu = false;
 
         try
@@ -2610,7 +2610,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         //클립보드 알람타입 (OS/UI/OSUI)
         CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
 
-        string title = "";
+        //string title = "";
         if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.UI))
             ShowMessage(strType, strMsg);
 

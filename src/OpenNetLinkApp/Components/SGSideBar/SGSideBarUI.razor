@@ -708,7 +708,7 @@
         //bEmailUse = AppConfigSvc.GetEmailApproveUse();
 
         bEmailUse = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(activeMenu.GroupId);
-        bEmailUseOnly = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(activeMenu.GroupId);
+        bEmailUseOnly = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApproveOnly(activeMenu.GroupId);
         bPCURLUse = SGAppMgrSvc.OpConfigInfoService.GetUsePCURL(activeMenu.GroupId);
 
         //bUseClipBoardManageUI = siteConfig.GetUseClipApprove(activeMenu.GroupId);
@@ -825,13 +825,10 @@
                 SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: XmlConf.GetTitle("T_COMMON_EMAILMANAGE_GAP"), icon: "fas fa-envelope", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bEmailUse, strUserSeq: strLoginUserSeq);
 
             // 메일 결재
-            if (nUserApprPos == 1)
-            {
-                strNavigatePathWithGroupID = "/mailApprove/";
-                strNavigatePathWithGroupID += gID.ToString();
-                if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
-                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: XmlConf.GetTitle("T_COMMON_EMAILAPPROVE_GAP"), icon: "fas fa-envelope", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bEmailUse & bApprMenuUse), strUserSeq: strLoginUserSeq);
-            }
+            strNavigatePathWithGroupID = "/mailApprove/";
+            strNavigatePathWithGroupID += gID.ToString();
+            if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: XmlConf.GetTitle("T_COMMON_EMAILAPPROVE_GAP"), icon: "fas fa-envelope", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bEmailUse & bApprMenuUse), strUserSeq: strLoginUserSeq);
 
             // 보안결재관리(2)
             if (bSecurityApprMenuUse)

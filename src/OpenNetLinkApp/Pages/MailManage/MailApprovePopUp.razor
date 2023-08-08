@@ -246,12 +246,20 @@
     ISGSideBarUIService SideBarUISvc;
     public bool m_bFilePrevOpening = false;
 
+    /// <summary>
+    /// 개인정보 검색된 내용 보여주도록 설정
+    /// </summary>
     public bool bUseDlpDataView = true;
 
     /// <summary>
     /// 정보보호결재 View 상황인지유무
     /// </summary>
     public bool bIsPrivacyApproveDetail = false;
+
+    /// <summary>
+    /// 대결재 SFM2 상태인지 유무
+    /// </summary>
+    public bool bIsEmailApproveSfm2Mode = false;
 
     public string strPrevInfo1 = "";
     public string strPrevInfo2 = "";
@@ -452,7 +460,7 @@
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, stApproveSeq, false, bIsPrivacyApproveDetail);
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);
         closePopUp();
     }
 
@@ -494,7 +502,7 @@
 
             string strProcID = "A";
             string strReason = "Approve";
-            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq, false, bIsPrivacyApproveDetail);
+            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);
             closePopUp();
         }
         else
@@ -553,7 +561,7 @@
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "R", strReason, stApproveSeq, false, bIsPrivacyApproveDetail);
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "R", strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);
         closePopUp();
     }
 
@@ -722,7 +730,19 @@
                 tmpFile.virusDesc = arrVal[5];
 
                 if (arrVal.Length > 6)
+                {
                     tmpFile.fileDLPContents = arrVal[6];
+                    if (tmpFile.fileDLPContents.Length > 0)
+                    {
+                        int nPos = tmpFile.fileDLPContents.LastIndexOf("\")");
+                        if (nPos > 0 && nPos == tmpFile.fileDLPContents.Length - 2)
+                        {
+                            tmpFile.fileDLPContents = tmpFile.fileDLPContents.Substring(0, nPos);
+                        }
+                        else
+                            tmpFile.fileDLPContents = "-";
+                    }
+                }
 
                 fileList.Add(tmpFile);
             }
@@ -767,6 +787,9 @@
             curUserID = sgLoginData.GetUserID();
 
         HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑
+
+        if (sgLoginData != null)
+            bIsEmailApproveSfm2Mode = (sgLoginData.GetApproveTypeSFM() == 2);
 
         MailManageDao dao = new MailManageDao();
         string strQuery = dao.MailDetail(seq);
