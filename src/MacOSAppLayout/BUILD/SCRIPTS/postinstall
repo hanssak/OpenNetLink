@@ -12,7 +12,6 @@ chmod -R g+w /Applications/OpenNetLinkApp.app
 cd /Applications/OpenNetLinkApp.app/Contents/PlugIns
 rm -rf /Applications/SecureGate.app
 
-NETWORK_FILE="/tmp/Network.json"
 if [ -e $NETWORK_FILE ]; then    
     cp /tmp/Network.json /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
     rm -rf /tmp/Network.json
@@ -24,30 +23,6 @@ if [ -e $APPENV_FILE ]; then
     rm -rf /tmp/AppEnvSetting.json
 fi
 
-#InstallInfo 이 있는 경우엔, 해당 폴더 내 Netpos 정보로 사용
-INSTALL_INFO="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Init/InstallInfo"
-if [ -e $INSTALL_INFO ]; then    
-    NETPOS_LIST=${ls -d "${INSTALL_INFO}"/*/}
-
-    for NET in ${NETPOS_LIST}
-    do
-        NETPOS=${basename "${NET}"}
-        
-        #NETPOS에는 IN/EX/CN 이 포함되어있음
-        #해당 값 포함여부에 따라 압축 풀 대상 결정
-        if [[ "${NETPOS}" == *"IN"* ]];then
-            tar xvf SGFinderSync_IN.appex.tgz
-        elif [[ "${NETPOS}" == *"EX"* ]];then
-            tar xvf SGFinderSync_EX.appex.tgz
-        elif [[ "${NETPOS}" == *"CN"* ]];then
-            tar xvf SGFinderSync_CN.appex.tgz               
-        #IN/EX/CN 모두 포함되어 있지 않다면 IN으로 실행
-        else 
-            tar xvf SGFinderSync_IN.appex.tgz
-        fi  
-    done
-    rm -r ${INSTALL_INFO}
-else
     NETWORK_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Network.json"
     NETPOS=`cat $NETWORK_FILE | grep "NETPOS"` 
 
@@ -78,8 +53,6 @@ else
             tar xvf SGFinderSync_IN.appex.tgz
         fi  
     fi
-fi
-
 
 #설치종료시 프로그램 바로 실행
 open -a /Applications/OpenNetLinkApp.app
