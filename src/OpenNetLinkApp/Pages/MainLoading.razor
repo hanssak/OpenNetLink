@@ -36,8 +36,9 @@
         </div>
     </section>
 </div>
-
+<ChangeIPPopUp @ref=refChangeIPPopUp Guid="modal-ipchange-mainloading" goToPageNewIPChange="AfterNewIPChange"></ChangeIPPopUp>
 @code {
+    ChangeIPPopUp refChangeIPPopUp;
 
 
     SGSettingsDBProc sgSettingProc;
@@ -55,15 +56,40 @@
         object[] param = { "none" };
         await JSRuntime.InvokeAsync<object>("initLogIn", param);
 
+        if (firstRender)
+        {
+            if (OpConfigSvc.GetPocMode(0) && string.IsNullOrEmpty(NetWorkSvc.NetWorkInfo[0].IPAddress))
+            {
+                await refChangeIPPopUp.openPopUp();
+            }
+        }
         await base.OnAfterRenderAsync(firstRender);
+
+
     }
 
     protected override void OnInitialized()
     {
-
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+
+        if (!string.IsNullOrEmpty(NetWorkSvc.NetWorkInfo[0].IPAddress))
+            loadingProcess();
+    }
+
+    /// <summary>
+    /// Popup에서 입력된 IP로 적용
+    /// </summary>
+    /// <param name="NewIp"></param>
+    public void AfterNewIPChange(string NewIp)
+    {
+        NetWorkSvc.SaveIPAndReload(NewIp);
+        loadingProcess();
+    }
+
+    void loadingProcess()
+    {
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         pageService.listNetWork = NetWorkSvc.NetWorkInfo;
         sgSettingProc = SGSettingsDBProc.Instance;
@@ -72,7 +98,6 @@
             pageService.m_bIsMultiNetWork = true;       // 3망관련 UI 및 동작에 크게 영향줌(다중연결상황으로 파악함. 필요에 따라 설정값변경해서 배포)
 
         SGSettingData sgSettingData = null;
-
         for (int i = 0; i < listNetWork.Count; i++)
         {
             HSCmdCenter.sgPageEvent.SetSvrEventAdd(listNetWork[i].GroupID, SvrResult);
@@ -95,8 +120,6 @@
             if (hsNetWork != null)
                 hsNetWork.bDo2FatorAuth = OpConfigSvc.GetUseGoogleOtp2FactorAuth(listNetWork[i].GroupID);
         }
-
-
 
         // Toast에 사용되는 Text
         pageService.m_strLoginToastTitle = XmlConf.GetTitle("T_TOAST_LOGIN");
@@ -184,4 +207,6 @@
         }
 
     }
+
+
 }

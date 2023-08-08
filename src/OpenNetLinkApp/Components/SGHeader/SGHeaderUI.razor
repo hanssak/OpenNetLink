@@ -555,7 +555,7 @@
             pro.Start();
         *@
 
-        try
+    try
         {
             System.Diagnostics.Process.Start("xdotool", strParameter);
         }
@@ -1252,6 +1252,13 @@
         }
 
         SetClipBoardUI();
+
+        foreach (ISGNetwork sgNetWork in listNetWorkData)
+        {
+            HsNetWork hsNetWork = HsCmdCenter.GetConnectNetWork(sgNetWork.GroupID);            
+            hsNetWork?.SGFileInfoSave_EventReg(FileInfoSaveEvent);
+        }
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
 
         if (sgSideBar != null)
@@ -1683,12 +1690,6 @@
         pageService.SetAlramAndMessageDeleteEvent(DelAllAlramAndMessage);
 
         pageService.SetAfterApprCommonNotiEvent(AfterApproveStatusChange); //사후정책 노티
-
-        foreach (ISGNetwork sgNetWork in listNetWorkData)
-        {
-            HsNetWork hsNetWork = HsCmdCenter.GetConnectNetWork(sgNetWork.GroupID);
-            hsNetWork.SGFileInfoSave_EventReg(FileInfoSaveEvent);
-        }
 
         DayTimer = new Timer();
         DayTimer.Interval = 1000;

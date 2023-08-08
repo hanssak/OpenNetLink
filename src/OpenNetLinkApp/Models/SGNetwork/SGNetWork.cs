@@ -13,7 +13,7 @@ namespace OpenNetLinkApp.Models.SGNetwork
         public int Port { get; set; }                       // Port 정보
         public int ConnectType { get; set; }                // connect type 
         public string TlsVersion { get; set; }              // TLSVersion 정보
-        public string ClientVersion { get; set; }           // ClientVersion 정보
+        //public string ClientVersion { get; set; }           // ClientVersion 정보
         public string NetPos { get; set; }                  // 네트워크 위치
         public List<string> ADDomain { get; set; }                // AD 로그인때 사용하는 Domain정보(암호화된)
     }

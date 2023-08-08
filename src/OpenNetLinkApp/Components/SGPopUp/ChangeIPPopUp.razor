@@ -1,0 +1,139 @@
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
+@inject PageStatusService pageService
+@inject NavigationManager MyNavigationManager
+@inject WebWindow Window
+
+@using System.Diagnostics
+@using System.Text.RegularExpressions
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
+@using OpenNetLinkApp.Common
+@using System.Runtime.InteropServices
+@using HsNetWorkSG
+@using AgLogManager
+
+<div class="modal fade" id=@Guid data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header2 modal-outline2">
+                <h5 class="modal-title pt-1 text-bold"><i class="fas fa-lock-open pr-1"></i>최초 로그인을 수행합니다. / 전송통제서버 IP를 변경합니다.</h5>
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>-->
+            </div>
+            <div class="modal-body pt-0">
+                <!-- content -->
+                <div class="card-body pt-0 pb-0">
+                    <div class="pw_title pt-3 pb-3"> "접속하려는 전송통세버서 IP를 입력하여 주십시요." </div>
+                    <div class="pw_title pt-3 pb-3"> "변경하려는 전송통제서버 IP를 입력하여 주십시요." </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-laptop"></i></span>
+                            </div>
+                            <input type="text" class="form-control" data-inputmask="'alias': 'ip'" data-mask="" inputmode="decimal" value="@strChangeIP" @oninput="@(e=> strChangeIP = e.Value.ToString())">
+                        </div>
+                    </div>
+                </div>
+                <!--/. content -->
+            </div>
+            <div class="modal-footer text-center">
+                <button type="button" class="btn btn-md btn-navy mr-0" @onclick="doChangeIP">IP 설정</button>
+                <button type="button" class="btn btn-md btn-navy mr-0" @onclick="ProgramExit">종료하기</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+
+    [Parameter]
+    public EventCallback<string> goToPageNewIPChange { get; set; }
+
+    [Parameter]
+    public string Guid { get; set; }
+
+    public int nGroupID = 0;                // 현재 사용할 GroupID
+    private string strChangeIP;
+    ISGSideBarUIService SideBarUISvc;
+
+    public string strPWChangeInfo = "";
+    public string strBtnText = "";
+    public bool bBtnHide = false;
+    SGSettingsDBProc sgSettingProc;
+    ISGAppConfigService AppConfigSvc;
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<PWChange>();
+
+    public async Task openPopUp()
+    {
+        object[] param = { Guid };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { Guid };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    public void doChangeIP()
+    {
+        if (nGroupID < 0) return;
+
+        int groupID = nGroupID;
+
+        string NewIP = strChangeIP;
+
+        //연결 체크
+        bool connResult = HSCmdCenter.TrySSLConnect(NewIP, 3435, System.Security.Authentication.SslProtocols.Tls12);
+
+        if(!connResult)
+        {
+            ShowMessage("error", "입력한 IP로 입력이 원활하지 않습니다.\r\nIP 정보를 확인해주세요.");
+            return;
+        }
+        goToPageNewIPChange.InvokeAsync(NewIP);
+        closePopUp();
+    }
+
+    public void ProgramExit() => Window.ProgramExit();
+
+    protected override void OnInitialized()
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        //pageService.SetDayPassWDCHGEvent(nGroupID, DayPassWordChangeNoti);
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        sgSettingProc = SGSettingsDBProc.Instance;
+        Init();
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public void Init()
+    {
+        if (nGroupID < 0) return;
+        int groupID = nGroupID;
+
+        strPWChangeInfo = XmlConf.GetTitle("T_ETC_PASSWORDEX_DAY");  // {0}일 동안
+
+        StateHasChanged();
+    }
+
+
+}

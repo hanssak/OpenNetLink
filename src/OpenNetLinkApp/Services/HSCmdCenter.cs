@@ -59,6 +59,26 @@ namespace OpenNetLinkApp.Services
 
         }
 
+        public bool TrySSLConnect(string TryConnectIP, int TryConnectPort = 3435, SslProtocols TryConnectProtocal = SslProtocols.Tls12)
+        {
+            SslClient connTestClient = null;
+            try
+            {
+                SslContext context = new SslContext(TryConnectProtocal);
+                connTestClient = new SslClient(context, TryConnectIP, TryConnectPort);
+                return connTestClient.Connect();
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"TrySSLConnect err : {ex.ToString()}");
+                return false;
+            }
+            finally
+            {
+                connTestClient?.Dispose();
+            }
+        }
+
         public void Init()
         {
             HsNetWork hsNetwork = null;
@@ -249,7 +269,7 @@ namespace OpenNetLinkApp.Services
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
 
                 hsNetwork.SGSvr_EventReg(SGSvrRecv);
-                hsNetwork.SGData_EventReg(SGDataRecv);                
+                hsNetwork.SGData_EventReg(SGDataRecv);
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
                 hsNetwork.SGException_EventRegEx(SGExceptionExRecv);
                 hsNetwork.SetGroupID(groupID);
@@ -704,7 +724,7 @@ namespace OpenNetLinkApp.Services
                     break;
                 case eCmdList.eDrmBlockNoti:                                                     // DRM Noti
                     VirusScanNotiAfterSend(nRet, eCmdList.eDrmBlockNoti, groupId, sgData);
-                    break;                   
+                    break;
 
                 case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
                     EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
@@ -1210,7 +1230,7 @@ namespace OpenNetLinkApp.Services
                     else
                     {
                         // Log 첫출력
-                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , " + $"{ ( (bIsLogin && sgLoginData != null) ? $"DELETECYCLE : { nArryDeleteTime[nIdx]} " : "Logout Status!") }");
+                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , " + $"{ ((bIsLogin && sgLoginData != null) ? $"DELETECYCLE : { nArryDeleteTime[nIdx]} " : "Logout Status!") }");
                         bDisplayCycle = true;
                         nowData = DateTime.Now;
                         nHour = nowData.Hour;
@@ -2347,7 +2367,7 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestApproveBatch(hsNetWork, groupid, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
             return -1;
         }
-        public int SendEmailApproveBatch(int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs, bool bUseSfm2Approve=false, bool bUsePrivacyApprove=false)
+        public int SendEmailApproveBatch(int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs, bool bUseSfm2Approve = false, bool bUsePrivacyApprove = false)
         {
             // 정보보안결재는 대결재 없음
             if (bUsePrivacyApprove)

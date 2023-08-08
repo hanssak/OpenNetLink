@@ -808,6 +808,8 @@ window.closeAllPopup = () => {
     $("#ViewDetail_PopUp").modal("hide");
     $("#ClipboardApprovePopUp").modal("hide");
     $("#ClipboardManagePopUp").modal("hide");
+
+    $("#modal-ipchange-mainloading").modal("hide");
 }
 
 window.initTransferUIPosition = () => {

@@ -24,6 +24,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
     {
         ref Dictionary<int, ISGopConfig> AppConfigInfo { get; }
 
+        public bool GetPocMode(int groupId);
+
         public bool GetUseAppLoginType(int groupId);
 
         public int GetAppLoginType(int groupId);
@@ -333,6 +335,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
         }
 
+        public bool GetPocMode(int groupId)
+        {
+            return AppConfigInfo[groupId].PocMode;
+        }
+
         public bool GetUseAppLoginType(int groupId)
         {
             return AppConfigInfo[groupId].bUseAppLoginType;
@@ -562,7 +569,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseEmailManageApproveOnly(int groupId)
         {
             return AppConfigInfo[groupId].bUseEmailOnly;
-        }        
+        }
 
         public bool GetUseUIdlpData(int groupId)
         {
