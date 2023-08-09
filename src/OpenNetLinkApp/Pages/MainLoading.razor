@@ -155,7 +155,7 @@
         pageService.m_nCurViewPageGroupID = 0;
 
         @*MyNavigationManager.NavigateTo("/fileException");*@
-        if (String.IsNullOrEmpty(SGAppMgrSvc.OpConfigInfoService.GetOKTAUrl(0)))
+    if (String.IsNullOrEmpty(SGAppMgrSvc.OpConfigInfoService.GetOKTAUrl(0)))
             MyNavigationManager.NavigateTo((SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer(0) && NetWorkSvc.NetWorkInfo.Count > 1) ? "/SelectNet" : "/LogIn");
         else
         {
@@ -167,10 +167,11 @@
 
     /// <summary>
     /// loginType : 5 OTP, 3:LDAP
+    /// </br>1:내부 , 2:외부
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="loginType"></param>
-    public void SvrResult(int groupId, string loginType)
+    public void SvrResult(int groupId, string loginType, string systemID)
     {
         CLog.Here().Information($"SvrResult Init groupID : {groupId} LoginType : {loginType}");
         pageService.SetGroupIDLoginType(groupId, (eLoginType)Int32.Parse(loginType));
@@ -183,6 +184,22 @@
         if (OpConfigSvc.GetUseAppLoginType(groupId))
         {
             loginType = OpConfigSvc.GetAppLoginType(groupId).ToString();
+        }
+        if (OpConfigSvc.GetPocMode(0))
+        {
+            if (NetWorkSvc.NetWorkInfo?.Count > groupId)
+            {
+                if (systemID == "1")//내부
+                {
+                    NetWorkSvc.NetWorkInfo[groupId].FromName = XmlConf.GetTitle("T_COMMON_LOGININNER");
+                    NetWorkSvc.NetWorkInfo[groupId].ToName = XmlConf.GetTitle("T_COMMON_LOGINOUTER");
+                }
+                else if(systemID == "2")//외부
+                {
+                    NetWorkSvc.NetWorkInfo[groupId].FromName = XmlConf.GetTitle("T_COMMON_LOGINOUTER");
+                    NetWorkSvc.NetWorkInfo[groupId].ToName = XmlConf.GetTitle("T_COMMON_LOGININNER");
+                }
+            }
         }
 
         conTimer.Stop();

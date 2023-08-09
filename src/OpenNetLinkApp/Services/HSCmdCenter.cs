@@ -978,7 +978,7 @@ namespace OpenNetLinkApp.Services
                     tmpData.m_DicTagData["SYSTEMID"] = sgData.m_DicTagData["SYSTEMID"].Base64EncodingStr();
                     tmpData.m_DicTagData["TLSVERSION"] = sgData.m_DicTagData["TLSVERSION"].Base64EncodingStr();
 
-                    RecvSvrAfterSend(groupId, sgData.m_DicTagData["LOGINTYPE"]);
+                    RecvSvrAfterSend(groupId, sgData.m_DicTagData["LOGINTYPE"], sgData.m_DicTagData["SYSTEMID"]);
                     //SGSvrData sgTmp = (SGSvrData)sgDicRecvData.GetSvrData(0);
                     //eLoginType e = sgTmp.GetLoginType();
                     break;
@@ -999,12 +999,12 @@ namespace OpenNetLinkApp.Services
             sgDicRecvData.SetSvrData(groupId, tmpData);
 
         }
-        public void RecvSvrAfterSend(int groupId, string loginType)
+        public void RecvSvrAfterSend(int groupId, string loginType, string systemID)
         {
             SvrEvent svEvent = sgPageEvent.GetSvrEvent(groupId);
             if (svEvent != null)
             {
-                svEvent(groupId, loginType);
+                svEvent(groupId, loginType, systemID);
             }
         }
 
