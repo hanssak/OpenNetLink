@@ -1243,7 +1243,7 @@
                     }
                     hsStream.IsDir = false;
                     hsStream.MemoryType = HsStreamType.MemoryStream;
-    
+
                     //[체크하는 위치 이동] - 확장자 제한 체크하기 전에 결재필수 확장자 적용
                     hsStream.isNeedApprove = false;
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI())
@@ -1251,8 +1251,8 @@
                         if (sgLoginData != null && CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
                             hsStream.isNeedApprove = true;
                     }
-    
-    if (!GetRegExamEnable(fileAddManage, currentFile, hsStream, hsStream.Type, false, hsStream.Size))
+
+                    if (!GetRegExamEnable(fileAddManage, currentFile, hsStream, hsStream.Type, false, hsStream.Size))
                     {
                         if (pageService.GetFileExaming() == false)
                         {
@@ -1435,23 +1435,23 @@
                         hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
 
 
-                //[체크하는 위치 이동] - 확장자 제한 체크하기 전에 결재필수 확장자 적용
-                //if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI())
-                //{
-                //    if (sgLoginData != null && CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
-                //        hsStream.isNeedApprove = true;
-                //}
+                    //[체크하는 위치 이동] - 확장자 제한 체크하기 전에 결재필수 확장자 적용
+                    //if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI())
+                    //{
+                    //    if (sgLoginData != null && CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
+                    //        hsStream.isNeedApprove = true;
+                    //}
 
-                listTryHsStream.Add(hsStream);
-                //SGFileExamEvent(per, hsStream.FileName);
-            }
-            else    //디렉토리
-            {
-                hsStream.IsDir = true;
-                hsStream.Size = 0;
-                hsStream.MemoryType = HsStreamType.MemoryStream;
-                hsStream.stream = null;
-                hsStream.isNeedApprove = false;
+                    listTryHsStream.Add(hsStream);
+                    //SGFileExamEvent(per, hsStream.FileName);
+                }
+                else    //디렉토리
+                {
+                    hsStream.IsDir = true;
+                    hsStream.Size = 0;
+                    hsStream.MemoryType = HsStreamType.MemoryStream;
+                    hsStream.stream = null;
+                    hsStream.isNeedApprove = false;
 
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName(groupID))
                         existErr = (!GetRegExamEnable(fileAddManage, currentFile, hsStream, hsStream.Type, false, hsStream.Size));
@@ -1561,84 +1561,84 @@
 
     }
 
-///// <summary>
-///// 폴더 정보를 가져와서 HsStream 으로 변경 (통합되어 사용하지 않음)
-///// </summary>
-///// <param name="files"></param>
-///// <returns></returns>
-//public async Task<List<HsStream>> SubDirAddAsync(IEnumerable<IFileReference> files)
-//{
-//
-//    List<HsStream> hsList = new List<HsStream>();
-//    return hsList;
-//
-//    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-//    int groupID = 0;
-//    if (sgSideBar != null)
-//        groupID = sgSideBar.GroupId;
-//
-//    foreach (var file in files)
-//    {
-//        bAsyncData = true;
-//        //자바스크립트로부터 드래그앤 드롭한 폴더 정보 가져오기
-//        //파일 불러오는데 문제가 있다면 필히 자바스크립트를 확인해야함!!!
-//
-//        var fileInfo = await file.ReadFileInfoDirAsync();
-//
-//        bool isExist = false;
-//        foreach (HsStream hs in HsStreamList)
-//        {
-//            string stListPath = hs.RelativePath.Replace("\\", "").Replace("/", "");
-//            string stNewPath = fileInfo.Path.Replace("\\", "").Replace("/", "");
-//
-//            if (stListPath == stNewPath)
-//            {
-//                isExist = true;
-//                break;
-//            }
-//        }
-//
-//        if (isExist)
-//            continue;
-//
-//
-//        HsStream hsStream = new HsStream();
-//
-//        hsStream.FileName = fileInfo.Name;
-//        hsStream.RelativePath = fileInfo.Path;
-//        DateTime date = DateTime.Now;
-//        hsStream.ModifyTime = date;
-//        string strDate = date.ToShortDateString();
-//        strDate = strDate.Replace("-", "");
-//        string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
-//        hsStream.MTime = strDate + strTime;
-//        hsStream.Type = "DIR";
-//        hsStream.IsDir = true;
-//        hsStream.Size = 0;
-//        hsStream.MemoryType = HsStreamType.MemoryStream;
-//        hsStream.stream = null;
-//        hsStream.isNeedApprove = false;
-//        if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI())
-//        {
-//            SGLoginData sgLoginData = null;
-//            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-//
-//            if (sgLoginData != null && CsFunction.isFileExtinListStr(false, fileInfo.Name, sgLoginData.GetExceptionExt()))
-//                hsStream.isNeedApprove = true;
-//        }
-//
-//        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-//        {
-//            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-//        }
-//        else
-//        {
-//            hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
-//        }
-//        hsList.Add(hsStream);
-//    }
-//    return hsList;
-//}
+    ///// <summary>
+    ///// 폴더 정보를 가져와서 HsStream 으로 변경 (통합되어 사용하지 않음)
+    ///// </summary>
+    ///// <param name="files"></param>
+    ///// <returns></returns>
+    //public async Task<List<HsStream>> SubDirAddAsync(IEnumerable<IFileReference> files)
+    //{
+    //
+    //    List<HsStream> hsList = new List<HsStream>();
+    //    return hsList;
+    //
+    //    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    //    int groupID = 0;
+    //    if (sgSideBar != null)
+    //        groupID = sgSideBar.GroupId;
+    //
+    //    foreach (var file in files)
+    //    {
+    //        bAsyncData = true;
+    //        //자바스크립트로부터 드래그앤 드롭한 폴더 정보 가져오기
+    //        //파일 불러오는데 문제가 있다면 필히 자바스크립트를 확인해야함!!!
+    //
+    //        var fileInfo = await file.ReadFileInfoDirAsync();
+    //
+    //        bool isExist = false;
+    //        foreach (HsStream hs in HsStreamList)
+    //        {
+    //            string stListPath = hs.RelativePath.Replace("\\", "").Replace("/", "");
+    //            string stNewPath = fileInfo.Path.Replace("\\", "").Replace("/", "");
+    //
+    //            if (stListPath == stNewPath)
+    //            {
+    //                isExist = true;
+    //                break;
+    //            }
+    //        }
+    //
+    //        if (isExist)
+    //            continue;
+    //
+    //
+    //        HsStream hsStream = new HsStream();
+    //
+    //        hsStream.FileName = fileInfo.Name;
+    //        hsStream.RelativePath = fileInfo.Path;
+    //        DateTime date = DateTime.Now;
+    //        hsStream.ModifyTime = date;
+    //        string strDate = date.ToShortDateString();
+    //        strDate = strDate.Replace("-", "");
+    //        string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
+    //        hsStream.MTime = strDate + strTime;
+    //        hsStream.Type = "DIR";
+    //        hsStream.IsDir = true;
+    //        hsStream.Size = 0;
+    //        hsStream.MemoryType = HsStreamType.MemoryStream;
+    //        hsStream.stream = null;
+    //        hsStream.isNeedApprove = false;
+    //        if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI())
+    //        {
+    //            SGLoginData sgLoginData = null;
+    //            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+    //
+    //            if (sgLoginData != null && CsFunction.isFileExtinListStr(false, fileInfo.Name, sgLoginData.GetExceptionExt()))
+    //                hsStream.isNeedApprove = true;
+    //        }
+    //
+    //        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+    //        {
+    //            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+    //        }
+    //        else
+    //        {
+    //            hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+    //        }
+    //        hsList.Add(hsStream);
+    //    }
+    //    return hsList;
+    //}
 
     /// <summary>
     /// 폴더와 파일 List를 가져와서 순서에 맞게 배열

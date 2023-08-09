@@ -64,7 +64,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileForwardDownNotRecv { get; set; } = true;                         // 파일 수신되기전에 파일포워드로 다운로드 가능유무
         public string strInitTransferFileExplorerPathInWindow { get; set; } = "";//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")       
 
-        public bool bUiDlpShow { get; set; } = false;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
+        public bool bUiDlpShow { get; set; } = true;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
         public bool bUiFileExpiredDateShow { get; set; } = true;  // 전송관리 화면에서 파일 만료일 표시 여부
         //클립보드
 
