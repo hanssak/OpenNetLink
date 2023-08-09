@@ -810,6 +810,9 @@ window.closeAllPopup = () => {
     $("#ClipboardManagePopUp").modal("hide");
 
     $("#modal-ipchange-mainloading").modal("hide");
+    $("#modal-ipchange-header").modal("hide");
+    $("#modal-alert-header-ipchange").modal("hide");
+    
 }
 
 window.initTransferUIPosition = () => {

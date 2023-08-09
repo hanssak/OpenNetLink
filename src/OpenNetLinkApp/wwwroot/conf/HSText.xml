@@ -310,13 +310,13 @@
 			<EN>File transmission system</EN>
 			<CN>文件传输系统</CN>
 		</T_SYSTEMNAMEEX>
-		
+
 		<T_SYSTEMNAME_POPUPTITLE>
 			<KR>파일전송시스템</KR>
 			<JP>資料転送システム</JP>
 			<EN>File transmission system</EN>
 			<CN>文件传输系统</CN>
-		</T_SYSTEMNAME_POPUPTITLE>		
+		</T_SYSTEMNAME_POPUPTITLE>
 
 		<T_LANGUAGE>
 			<KR>언어</KR>
@@ -546,7 +546,7 @@
 			<EN>Size</EN>
 			<CN>大小</CN>
 		</T_COMMON_SIZE>
-		
+
 		<T_COMMON_KIND>
 			<KR>유형</KR>
 			<JP>タイプ</JP>
@@ -861,7 +861,7 @@
 			<EN>Unused</EN>
 			<CN>未使用</CN>
 		</T_COMMON_DLP_UNUSE>
-		
+
 		<T_COMMON_DLP_CONTENTS>
 			<KR>개인정보검출내용</KR>
 			<JP>未使用</JP>
@@ -1349,7 +1349,7 @@
 		<!-- ********************************************* [START] 메일 (T_MAIL_0000) ********************************************* -->
 
 		<!-- ******************* [START] 메일 (MailTransStatus) ********************** -->
-		
+
 		<T_MAIL_TRANSWAIT>
 			<KR>발송대기</KR>
 			<JP>転送待機</JP>
@@ -1383,8 +1383,8 @@
 			<JP>On Transfering</JP>
 			<EN>On Transfering</EN>
 			<CN>On Transfering</CN>
-		</T_MAIL_INSPECT>		
-		
+		</T_MAIL_INSPECT>
+
 		<!-- ******************* [END] 메일 (MailTransStatus) ********************** -->
 
 		<!-- ********************************************* [END] 메일 (T_MAIL_0000) ********************************************* -->
@@ -1535,14 +1535,14 @@
 			<EN>Clipboard</EN>
 			<CN>剪贴板</CN>
 		</T_TOOL_CLIPBOARD>
-    
-    <T_TOOL_POLICYUPDATE>
-      <KR>정책 업데이트</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </T_TOOL_POLICYUPDATE>
-    
+
+		<T_TOOL_POLICYUPDATE>
+			<KR>정책 업데이트</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_TOOL_POLICYUPDATE>
+
 		<T_TOOL_OPTION>
 			<KR>환경설정</KR>
 			<JP>環境設定</JP>
@@ -1838,19 +1838,19 @@
 			<CN></CN>
 		</T_FILE_PATH>
 
-    <T_FILE_SELECT_DELETE>
-      <KR>선택삭제</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </T_FILE_SELECT_DELETE>
+		<T_FILE_SELECT_DELETE>
+			<KR>선택삭제</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_FILE_SELECT_DELETE>
 
-    <T_FILE_SELECT_DELETE_COMMENT>
-      <KR>※체크박스 선택 후 선택삭제를 클릭해 주세요.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </T_FILE_SELECT_DELETE_COMMENT>
+		<T_FILE_SELECT_DELETE_COMMENT>
+			<KR>※체크박스 선택 후 선택삭제를 클릭해 주세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_FILE_SELECT_DELETE_COMMENT>
 
 		<!-- ********************************************* [END] 파일 전송 화면 (T_FILE_0000) ********************************************* -->
 
@@ -2073,26 +2073,26 @@
 			<CN></CN>
 		</T_DATA_TYPE_CLIP_SELECT_COMMENT>
 
-    <T_DATA_CONTINUE_FILE_TRANS>
-      <KR>파일 전송 도중 중단 된 정보가 존재합니다. 이어 전송하시겠습니까?</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </T_DATA_CONTINUE_FILE_TRANS>
+		<T_DATA_CONTINUE_FILE_TRANS>
+			<KR>파일 전송 도중 중단 된 정보가 존재합니다. 이어 전송하시겠습니까?</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_DATA_CONTINUE_FILE_TRANS>
 
-    <T_DATA_CONTINUE_FILE_TRANS_INFO>
-      <KR>파일 전송 도중 중단 된 정보가 존재합니다.<![CDATA[<br>]]>파일전송 페이지에서 이어전송을 진행해주시기 바랍니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </T_DATA_CONTINUE_FILE_TRANS_INFO>
+		<T_DATA_CONTINUE_FILE_TRANS_INFO>
+			<KR>파일 전송 도중 중단 된 정보가 존재합니다.<![CDATA[<br>]]>파일전송 페이지에서 이어전송을 진행해주시기 바랍니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_DATA_CONTINUE_FILE_TRANS_INFO>
 
-    <T_DATA_CONTINUE_TRANS>
-      <KR>이어전송</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </T_DATA_CONTINUE_TRANS>
+		<T_DATA_CONTINUE_TRANS>
+			<KR>이어전송</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_DATA_CONTINUE_TRANS>
 
 		<!-- ********************************************* [END] 전송 관리 화면 (T_TRANS_0000) ********************************************* -->
 
@@ -2105,12 +2105,12 @@
 			<CN>驳回理由</CN>
 		</T_APPROVE_REJECTREASON>
 
-    <T_APPROVE_APPROVE_REJECT_REASON>
-      <KR>승인/반려사유</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </T_APPROVE_APPROVE_REJECT_REASON>
+		<T_APPROVE_APPROVE_REJECT_REASON>
+			<KR>승인/반려사유</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPROVE_APPROVE_REJECT_REASON>
 
 		<T_APPROVE_DETAIL>
 			<KR>결재 상세보기</KR>
@@ -2284,15 +2284,15 @@
 			<CN></CN>
 		</T_VIRUS_DETAILS>
 
-    <T_DETAIL_DETECT_DRM>
-      <KR>전송 파일에 허용되지 않는 DRM 적용이 되어 있습니다.</KR>
-      <JP></JP>
-      <EN>DRM detected in transfer files.</EN>
-      <CN></CN>
-    </T_DETAIL_DETECT_DRM>
+		<T_DETAIL_DETECT_DRM>
+			<KR>전송 파일에 허용되지 않는 DRM 적용이 되어 있습니다.</KR>
+			<JP></JP>
+			<EN>DRM detected in transfer files.</EN>
+			<CN></CN>
+		</T_DETAIL_DETECT_DRM>
 
 
-    <T_DETAIL_BEFORE_APPROVE>
+		<T_DETAIL_BEFORE_APPROVE>
 			<KR>선결</KR>
 			<JP>先決</JP>
 			<EN>Before</EN>
@@ -2903,13 +2903,13 @@
 			<EN></EN>
 			<CN></CN>
 		</T_INFO_UPDATEPOLICY_LOGOUT>
-    
-    <T_INFO_URL_REDIRECTION_CHECK>
-      <KR>URL Redirection 검사 : </KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </T_INFO_URL_REDIRECTION_CHECK>
+
+		<T_INFO_URL_REDIRECTION_CHECK>
+			<KR>URL Redirection 검사 : </KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_INFO_URL_REDIRECTION_CHECK>
 
 		<!-- ********************************************* [END] 환경 정보 화면 (T_INFO_0000) ********************************************* -->
 
@@ -3140,28 +3140,28 @@
 
 		<!-- ********************************************* [START] 구글 OTP (T_GOOGLE_OTP_0000) ********************************************* -->
 
-    <T_GOOGLE_OTP_TITLE>
-      <KR>OTP 등록 및 인증</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN>二维码</CN>
-    </T_GOOGLE_OTP_TITLE>
+		<T_GOOGLE_OTP_TITLE>
+			<KR>OTP 등록 및 인증</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>二维码</CN>
+		</T_GOOGLE_OTP_TITLE>
 
-    <T_GOOGLE_OTP_DESC>
-      <KR>등록된 사용자는 OTP 인증을 수행하십시오.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN>OTP口令</CN>
-    </T_GOOGLE_OTP_DESC>
+		<T_GOOGLE_OTP_DESC>
+			<KR>등록된 사용자는 OTP 인증을 수행하십시오.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>OTP口令</CN>
+		</T_GOOGLE_OTP_DESC>
 
-    <T_GOOGLE_OTP_BTN_DESC>
-      <KR>QR 코드 및 OTP 등록번호 보기</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN>OTP口令</CN>
-    </T_GOOGLE_OTP_BTN_DESC>
+		<T_GOOGLE_OTP_BTN_DESC>
+			<KR>QR 코드 및 OTP 등록번호 보기</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>OTP口令</CN>
+		</T_GOOGLE_OTP_BTN_DESC>
 
-    <T_GOOGLE_OTP_QRCODE>
+		<T_GOOGLE_OTP_QRCODE>
 			<KR>QR 코드</KR>
 			<JP></JP>
 			<EN></EN>
@@ -3441,7 +3441,7 @@
 			<CN></CN>
 		</T_OKTA_AUTH_COMPLETE>
 		<!-- ********************************************* [END] OKTA 인증 화면 (T_OKTA_AUTH_0000) ********************************************* -->
-		
+
 		<!-- ********************************************* [START] ETC (T_ETC_0000) ********************************************* -->
 
 		<T_ETC_LOGIN>
@@ -4353,7 +4353,7 @@
 			<EN></EN>
 			<CN></CN>
 		</T_ETC_REMIND_ME_LATER>
-		
+
 		<T_ETC_UPDATE_NOW>
 			<KR>업데이트 실행</KR>
 			<JP></JP>
@@ -4374,7 +4374,7 @@
 			<EN></EN>
 			<CN></CN>
 		</T_ETC_INSTALL_AND_RELAUNCH>
-		
+
 		<T_ETC_LOGOUT>
 			<KR>로그아웃</KR>
 			<JP></JP>
@@ -4534,15 +4534,15 @@
 			<EN>Complete</EN>
 			<CN></CN>
 		</T_ETC_PREWORK_END>
-		
+
 		<T_ETC_RECONNECT_FAILED>
 			<KR>재접속 실패</KR>
 			<JP></JP>
 			<EN>LOGOUT</EN>
 			<CN></CN>
 		</T_ETC_RECONNECT_FAILED>
-		
-		
+
+
 		<!-- ********************************************* [END] ETC (T_ETC_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] UNZIP (T_eUNZIP_0000) ********************************************* -->
@@ -4714,21 +4714,21 @@
 			<EN></EN>
 			<CN></CN>
 		</T_EMAIL_APPROVE_FAILED>
-		
-		
+
+
 		<T_EMAIL_REJECT_DONE>
 			<KR>Email 반려작업이 완료 되었습니다.</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
 		</T_EMAIL_REJECT_DONE>
-		
+
 		<T_EMAIL_REJECT_FAILED>
 			<KR>Email 반려작업 실패 했습니다.</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_EMAIL_REJECT_FAILED>				
+		</T_EMAIL_REJECT_FAILED>
 
 		<!-- ********************************************* [END] EMAIL ********************************************* -->
 
@@ -5263,11 +5263,11 @@
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
-		</T_RECONNECT_FAILED_APPEXIT>		
+		</T_RECONNECT_FAILED_APPEXIT>
 
 
 		<!-- ********************************************* [END] Alarm 설정 (T_ALARM_0000) ******************************************** -->
-		
+
 
 		<!-- ********************************************* [START] UPDATE UI 설정 (T_PATCH_0000) ********************************************* -->
 
@@ -5316,8 +5316,8 @@
 
 
 
-		<!-- ********************************************* [END] UPDATE UI  설정 (T_PATCH_0000) ******************************************** -->		
-		
+		<!-- ********************************************* [END] UPDATE UI  설정 (T_PATCH_0000) ******************************************** -->
+
 	</TITLE>
 
 	<INFO>
@@ -6241,10 +6241,10 @@
 		</I_0131>
 
 		<I_0132>
-			<KR>서버 접속 IP가 변경되었습니다.&#10;&#10;변경된 IP로 접속하려면 프로그램을 종료하고 로그인을 다시 수행하셔야 합니다.&#10;&#10;'예' 를 선택하시면 프로그램이 종료됩니다.&#10;&#10;프로그램을 종료하시겠습니까?</KR>
+			<KR>서버 접속 IP가 변경되었습니다.<![CDATA[<br>]]>변경된 IP로 접속하려면 프로그램을 종료하고 로그인을 다시 수행하셔야 합니다.<![CDATA[<br>]]>'예' 를 선택하시면 프로그램이 종료됩니다.<![CDATA[<br>]]>프로그램을 종료하시겠습니까?</KR>
 			<JP></JP>
 			<EN></EN>
-			<CN>已修改服务器访问IP。&#10;&#10;如果要以该IP访问，请退出程序后重新登录运行。&#10;&#10;选择“是”退出程序。&#10;&#10;确定要退出程序吗？</CN>
+			<CN>已修改服务器访问IP。<![CDATA[<br>]]>如果要以该IP访问，请退出程序后重新登录运行。<![CDATA[<br>]]>选择“是”退出程序。<![CDATA[<br>]]>确定要退出程序吗？</CN>
 		</I_0132>
 
 		<I_0133>
@@ -6945,75 +6945,74 @@
 			<CN></CN>
 		</I_0233>
 
-    <I_0234>
-      <KR>정책 업데이트가 완료되었습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </I_0234>
+		<I_0234>
+			<KR>정책 업데이트가 완료되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0234>
 
-    <I_0235>
-      <KR>AD Login을 진행합니다. 잠시 기다려주세요.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </I_0235>
+		<I_0235>
+			<KR>AD Login을 진행합니다. 잠시 기다려주세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0235>
 
-    <I_0236>
-      <KR>IDPW Login을 진행합니다. 잠시 기다려주세요.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </I_0236>
+		<I_0236>
+			<KR>IDPW Login을 진행합니다. 잠시 기다려주세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0236>
 
-    <I_0237>
-      <KR>Login을 계속 진행합니다. 잠시 기다려주세요.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </I_0237>
+		<I_0237>
+			<KR>Login을 계속 진행합니다. 잠시 기다려주세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0237>
 
-    <I_0238>
-      <KR>Login을 진행합니다. 잠시 기다려주세요.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </I_0238>
-	<I_0239>
-		<KR>패치 업데이트 시작</KR>
-		<JP></JP>
-		<EN></EN>
-		<CN></CN>
-	</I_0239>
-	<I_0240>
-		<KR>잠시 후 OpenNetLink 업데이트가 진행됩니다. (version {0})</KR>
-		<JP></JP>
-		<EN></EN>
-		<CN></CN>
-	</I_0240>
+		<I_0238>
+			<KR>Login을 진행합니다. 잠시 기다려주세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0238>
+		<I_0239>
+			<KR>패치 업데이트 시작</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0239>
+		<I_0240>
+			<KR>잠시 후 OpenNetLink 업데이트가 진행됩니다. (version {0})</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0240>
 
-    <I_0241>
-      <KR>새로운 메일승인 요청자료가 존재합니다.</KR>
-      <JP>新しいメール承認要請資料が </JP>
-      <EN>There are new mail approval request materials.</EN>
-      <CN>件待邮件审批的请求资料。</CN>
-    </I_0241>
+		<I_0241>
+			<KR>새로운 메일승인 요청자료가 존재합니다.</KR>
+			<JP>新しいメール承認要請資料が </JP>
+			<EN>There are new mail approval request materials.</EN>
+			<CN>件待邮件审批的请求资料。</CN>
+		</I_0241>
 
-    <I_0242>
-      <KR>공백없이 </KR>
-      <JP> </JP>
-      <EN> </EN>
-      <CN> </CN>
-    </I_0242>
+		<I_0242>
+			<KR>공백없이 </KR>
+			<JP> </JP>
+			<EN> </EN>
+			<CN> </CN>
+		</I_0242>
 
-    <I_0243>
-      <KR>새로운 보안결재 메일승인 요청자료가 존재합니다.</KR>
-      <JP> </JP>
-      <EN> </EN>
-      <CN> </CN>
-    </I_0243>
-
-    <!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
+		<I_0243>
+			<KR>새로운 보안결재 메일승인 요청자료가 존재합니다.</KR>
+			<JP> </JP>
+			<EN> </EN>
+			<CN> </CN>
+		</I_0243>
+		<!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
 	</INFO>
 
@@ -8961,55 +8960,55 @@
 			<CN></CN>
 		</W_0285>
 
-	    <W_0286>
-	      <KR>승인/반려사유를 입력해주십시오.</KR>
-	      <JP></JP>
-	      <EN></EN>
-	      <CN></CN>
-	    </W_0286>
+		<W_0286>
+			<KR>승인/반려사유를 입력해주십시오.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0286>
 
-	  <W_0287>
-	    <KR>검색 결과가 존재하지 않습니다.</KR>
-	    <JP></JP>
-	    <EN></EN>
-	    <CN></CN>
-	  </W_0287>
+		<W_0287>
+			<KR>검색 결과가 존재하지 않습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0287>
 
-	  <W_0288>
-	    <KR>더 높은 상위 경로로 이동할 수 없습니다.</KR>
-	    <JP></JP>
-	    <EN></EN>
-	    <CN></CN>
-	  </W_0288>
+		<W_0288>
+			<KR>더 높은 상위 경로로 이동할 수 없습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0288>
 
-	  <W_0289>
-	    <KR>선택한 경로에 파일을 생성할 수 없어/r/n수신 경로로 지정할 수 없습니다.</KR>
-	    <JP></JP>
-	    <EN></EN>
-	    <CN></CN>
-	  </W_0289>
+		<W_0289>
+			<KR>선택한 경로에 파일을 생성할 수 없어/r/n수신 경로로 지정할 수 없습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0289>
 
 
-	<W_0290>
-		<KR>제목을 {0}자 이상 입력하십시오.</KR>
-		<JP>タイトルを入力して下さい。</JP>
-		<EN>Please enter a title.</EN>
-		<CN>请输入标题。</CN>
-	</W_0290>
+		<W_0290>
+			<KR>제목을 {0}자 이상 입력하십시오.</KR>
+			<JP>タイトルを入力して下さい。</JP>
+			<EN>Please enter a title.</EN>
+			<CN>请输入标题。</CN>
+		</W_0290>
 
-	<W_0291>
-		<KR>설명을 {0}자 이상 입력하십시오.</KR>
-		<JP>説明を入力して下さい。</JP>
-		<EN>Please enter a description.</EN>
-		<CN>请输入说明。</CN>
-	</W_0291>
+		<W_0291>
+			<KR>설명을 {0}자 이상 입력하십시오.</KR>
+			<JP>説明を入力して下さい。</JP>
+			<EN>Please enter a description.</EN>
+			<CN>请输入说明。</CN>
+		</W_0291>
 
 
 	</WARNING>
 
 
 
-  <!-- ********************************************* [END] MSG WARNING (W_0000) ********************************************* -->
+	<!-- ********************************************* [END] MSG WARNING (W_0000) ********************************************* -->
 
 	<!-- ********************************************* [START] MSG ERROR (E_0000) ********************************************* -->
 
@@ -10753,64 +10752,64 @@
 			<CN></CN>
 		</E_0251>
 
-    <E_0252>
-      <KR>파일 전송 중 파일의 정보를 읽어 올 수 없습니다.(파일이 수정되면 정보를 읽어 올 수 없습니다)</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </E_0252>
+		<E_0252>
+			<KR>파일 전송 중 파일의 정보를 읽어 올 수 없습니다.(파일이 수정되면 정보를 읽어 올 수 없습니다)</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</E_0252>
 
-    <E_0253>
-      <KR>파일 송수신 중 정책업데이트를 할 수 없습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </E_0253>
+		<E_0253>
+			<KR>파일 송수신 중 정책업데이트를 할 수 없습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</E_0253>
 
-    <E_0254>
-      <KR>ID/PW 인증을 통해 Login 하셔야 합니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </E_0254>
-	
-	<E_0255>
-		<KR>한글97~3.0 파일은 지원되지 않습니다.<![CDATA[<br>]]>한글 문서 버전을 변경하여 다시 추가해주세요.<![CDATA[<br>]]>파일명:<![CDATA[<br>]]>{0}</KR>
-		<JP></JP>
-		<EN></EN>
-		<CN></CN>
-	</E_0255>
+		<E_0254>
+			<KR>ID/PW 인증을 통해 Login 하셔야 합니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</E_0254>
 
-	<E_0256>
-		<KR>지정한 경로에는 파일다운경로를 설정할 수 없습니다.&#10;다시 설정해 주십시오. [{0}]</KR>
-		<JP>最上位経路にはファイルダウンロード経路を設定することができません。&#10;再度設定してください。 [{0}]</JP>
-		<EN>You can not set the file download path to the top path.&#10;Please set back. [{0}]</EN>
-		<CN>最上级路径无法设置文件下载路径。&#10;请重新设置。[{0}]</CN>
-	</E_0256>
+		<E_0255>
+			<KR>한글97~3.0 파일은 지원되지 않습니다.<![CDATA[<br>]]>한글 문서 버전을 변경하여 다시 추가해주세요.<![CDATA[<br>]]>파일명:<![CDATA[<br>]]>{0}</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</E_0255>
 
-
-    <E_0257>
-      <KR>WAS Server와 원활히 통신하지 못했습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </E_0257>
-
-    <E_0258>
-      <KR>파일이름에 지원하지 않는 문자가 있습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </E_0258>
-
-	<E_0259>
-		<KR>[{0}]님은 이미 [{1}]에 등록되어 있습니다.</KR>
-		<JP></JP>
-		<EN></EN>
-		<CN></CN>
-	</E_0259>
+		<E_0256>
+			<KR>지정한 경로에는 파일다운경로를 설정할 수 없습니다.&#10;다시 설정해 주십시오. [{0}]</KR>
+			<JP>最上位経路にはファイルダウンロード経路を設定することができません。&#10;再度設定してください。 [{0}]</JP>
+			<EN>You can not set the file download path to the top path.&#10;Please set back. [{0}]</EN>
+			<CN>最上级路径无法设置文件下载路径。&#10;请重新设置。[{0}]</CN>
+		</E_0256>
 
 
-  </ERROR>
+		<E_0257>
+			<KR>WAS Server와 원활히 통신하지 못했습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</E_0257>
+
+		<E_0258>
+			<KR>파일이름에 지원하지 않는 문자가 있습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</E_0258>
+
+		<E_0259>
+			<KR>[{0}]님은 이미 [{1}]에 등록되어 있습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</E_0259>
+
+
+	</ERROR>
 	<!-- ********************************************* [END] MSG ERROR (E_0000) ********************************************* -->
 </TEXT>

@@ -428,6 +428,13 @@
             <a class="nav-link white_font" aria-expanded="true" style="cursor:pointer;" title="@xmlConf.GetTitle("T_TOOL_POLICYUPDATE")" @onclick="CurrentNetPolicyUpdate"><i class="fas fa-cloud-download-alt"></i></a>
         </li>
     }
+
+    @if (SGAppMgrSvc.OpConfigInfoService.GetPocMode(0))
+    {
+        <li class="nav-item">
+            <a class="nav-link white_font" aria-expanded="true" style="cursor:pointer;" title="@xmlConf.GetTitle("T_MENU_SERVIP_CHANGE")" @onclick="ChangeIPOpenPopup"><i class="fas fa-laptop"></i></a>
+        </li>
+    }
     <li class="nav-item">
         <a id="toggleRightSideBar" class="nav-link white_font" data-widget="control-sidebar" data-slide="true" href="#" role="button"><i class="fas fa-cog"></i></a>
     </li>
@@ -436,6 +443,9 @@
 <SGAlert @ref="refSGAlert" Guid="modal-alert-header" OnConfirm="SfmLogOut"></SGAlert>
 <SGAlert @ref="refSGAlertUpdatePolicy" Guid="modal-alert-header-updatepolicy" OnConfirm="UpdatPolicyLogOut"></SGAlert>
 <SGAlert @ref="refAfterApproveChangeAlert" Guid="modal-afterapprovealert-header" OnConfirm="StateHasChanged"></SGAlert>
+
+<ChangeIPPopUp @ref=refChangeIPPopUp Guid="modal-ipchange-header" goToPageNewIPChange="AfterNewIPChange" IsInitialMode="false"></ChangeIPPopUp>
+<SGAlert @ref="refSGAlertExitForChangeIP" Guid="modal-alert-header-ipchange" OnConfirm="AferNewIPChangeConfirm"></SGAlert>
 @code
 {
     SGAlert refSGAlert;
@@ -443,6 +453,10 @@
     SGAlert refAfterApproveChangeAlert;
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
+
+    ChangeIPPopUp refChangeIPPopUp;
+    SGAlert refSGAlertExitForChangeIP;
+
 
     [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
     [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
@@ -555,7 +569,7 @@
             pro.Start();
         *@
 
-    try
+        try
         {
             System.Diagnostics.Process.Start("xdotool", strParameter);
         }
@@ -1255,7 +1269,7 @@
 
         foreach (ISGNetwork sgNetWork in listNetWorkData)
         {
-            HsNetWork hsNetWork = HsCmdCenter.GetConnectNetWork(sgNetWork.GroupID);            
+            HsNetWork hsNetWork = HsCmdCenter.GetConnectNetWork(sgNetWork.GroupID);
             hsNetWork?.SGFileInfoSave_EventReg(FileInfoSaveEvent);
         }
 
@@ -2165,4 +2179,21 @@
         }
     }
 
+    private async Task ChangeIPOpenPopup()
+    {
+        await refChangeIPPopUp.openPopUp();
+    }
+
+    /// <summary>
+    /// Popup에서 입력된 IP로 적용
+    /// </summary>
+    /// <param name="NewIp"></param>
+    public async Task AfterNewIPChange(string NewIp) => await refSGAlertExitForChangeIP.openPopUp(xmlConf.GetTitle("T_MENU_SERVIP_CHANGE"), xmlConf.GetInfoMsg("I_0132"), 2, 0, NewIp, xmlConf.GetCommon("T_YES"));
+    public void AferNewIPChangeConfirm(string argNewIP)
+    {
+        NetWorkSvc.SaveIPAndReload(argNewIP);
+
+        //프로그램 종료
+        Window.ProgramExit();
+    }
 }
