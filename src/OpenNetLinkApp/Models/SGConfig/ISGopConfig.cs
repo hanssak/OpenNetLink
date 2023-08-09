@@ -11,6 +11,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 {
     public interface ISGopConfig
     {
+        public bool PocMode { get; set; }                                     //POC여부(첫 실행 시 IP 정보 입력 및 IP전환 기능 활성화)
 
         //로그인 관련 기능
         public bool bUseAppLoginType { get; set; }                       //사용자 지정 로그인타입 사용 여부
