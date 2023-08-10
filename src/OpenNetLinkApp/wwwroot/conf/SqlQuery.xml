@@ -848,4 +848,12 @@ WHERE 1=1
   <statement id = "FileExceptionCancel">
 		UPDATE TBL_SKIP_FILE_LIST SET SKIP_FLAG='3' WHERE FILE_SEQ=#strFileSeq# AND USER_SEQ=#userSeq#\n
 	</statement>
+  <statement id = "SearchURLList">
+    SELECT a.url AS URL, b.codename AS STAT FROM tbl_url_whitelist a
+    LEFT OUTER JOIN tbl_code_info b ON ('C051' = b.basecode and a.stat = b.code)
+    <if test = "strSearchURL != ''">
+      WHERE a.url like '%%#strSearchURL#%%'
+    </if>
+    LIMIT 100
+  </statement>
 </statements>

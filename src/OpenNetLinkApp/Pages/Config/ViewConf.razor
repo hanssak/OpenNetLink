@@ -2,6 +2,7 @@
 @page "/ViewConf/{groupIDbyParam:int}"
 @using HsNetWorkSGData
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
@@ -458,11 +459,7 @@
         //LIST 요청응답
         HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchListResult);
 
-        string sql = " SELECT a.url AS URL, b.codename AS STAT FROM tbl_url_whitelist a ";
-        sql += " LEFT OUTER JOIN tbl_code_info b ON ('C051' = b.basecode and a.stat = b.code) ";
-        if (strSearchURL.Length > 0)
-            sql += " WHERE a.url like '%%" + strSearchURL + "%%'";
-        sql += " LIMIT 100";
+        string sql = SGQueryExtend.SearchURLList(strSearchURL);
         HSCmdCenter.SendListQuery(groupID, curUserID, sql);
     }
 

@@ -388,5 +388,15 @@ namespace OpenNetLinkApp.Data.SGQuery
             string sql = sb.ToString();
             return HsNetWorkSG.SGCrypto.AESEncrypt256WithDEK(ref sql);
         }
+
+        public static string SearchURLList(string strSearchURL)
+        {
+            Dictionary<string, string> param = new Dictionary<string, string>()
+            {
+                {"strSearchURL", strSearchURL }
+            };
+
+            return SQLXmlService.Instanse.GetSqlQuery("SearchURLList", param);
+        }
     }
 }
