@@ -21,7 +21,22 @@ namespace OpenNetLinkApp.Services
         {
             m_Xml = new XmlDocument();
             LoadXmlFile("wwwroot/conf/HSText.xml");
-            m_StrLanguage = "KR";
+
+
+
+            var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(Models.SGConfig.SGAppConfig));
+            string AppConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppEnvSetting.json";
+            if (File.Exists(AppConfig))
+            {
+                using (FileStream fs = File.OpenRead(AppConfig))
+                {
+                    Models.SGConfig.SGAppConfig appConfig = (Models.SGConfig.SGAppConfig)serializer.ReadObject(fs);
+                    m_StrLanguage = appConfig.strLanguage;
+                }
+            }
+            if (string.IsNullOrEmpty(m_StrLanguage))
+                m_StrLanguage = "KR";
+            //m_StrLanguage = "KR";
             // m_StrLanguage = "JP";
             listNetworks = new List<ISGNetwork>();
             NetWorkJsonLoad();
@@ -56,7 +71,7 @@ namespace OpenNetLinkApp.Services
             XmlNodeList xnList = m_Xml.GetElementsByTagName("TITLE");
             if (m_StrLanguage == null)
                 m_StrLanguage = "KR";
-            foreach(XmlNode xn in xnList)
+            foreach (XmlNode xn in xnList)
             {
                 str = xn[strID][m_StrLanguage].InnerText;
             }
@@ -154,7 +169,7 @@ namespace OpenNetLinkApp.Services
                 }
             }
         }
-        public void GetNetworkTitle(int groupID,out string strFromName, out string strToName)
+        public void GetNetworkTitle(int groupID, out string strFromName, out string strToName)
         {
             string str1 = "-";
             string str2 = "-";
@@ -168,7 +183,7 @@ namespace OpenNetLinkApp.Services
             for (int i = 0; i < count; i++)
             {
                 int gID = listNetworks[i].GroupID;
-                if(gID==groupID)
+                if (gID == groupID)
                 {
                     str1 = listNetworks[i].FromName;
                     str2 = listNetworks[i].ToName;
@@ -202,6 +217,6 @@ namespace OpenNetLinkApp.Services
 
             str1 = str1 + " → " + str2;
             return str1;
-        }      
+        }
     }
 }
