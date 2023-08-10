@@ -77,7 +77,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             AppConfigInfoService = new SGAppConfigService();
             OpConfigInfoService = new SGopConfigService();
             VersionConfigInfoService = new SGVersionConfigService();
-            CtrlSideUIService = new SGCtrlSideUIService(ref AppConfigInfoService.AppConfigInfo, ref OpConfigInfoService.AppConfigInfo, ref VersionConfigInfoService.VersionConfigInfo, NetworkInfoService.NetWorkInfo);
+            CtrlSideUIService = new SGCtrlSideUIService(ref VersionConfigInfoService.VersionConfigInfo, NetworkInfoService.NetWorkInfo);
         }
 
         /* To Manage Header State */

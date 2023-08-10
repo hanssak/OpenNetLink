@@ -19,7 +19,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
 {
     public interface ISGAppConfigService
     {
-        ref ISGAppConfig AppConfigInfo { get; }
+        //ref ISGAppConfig AppConfigInfo { get; }
+        /// <summary>AppEnvSetting</summary>
+        ISGAppConfig AppConfigInfo { get { return GetSGAppConfigService(); } }
+        ISGAppConfig GetSGAppConfigService();
+
         string GetClipBoardHotKey(int groupId);
         List<bool> GetClipBoardModifier(int groupId);
 
@@ -79,12 +83,23 @@ namespace OpenNetLinkApp.Services.SGAppManager
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
-        private ISGAppConfig _AppConfigInfo;
-        public ref ISGAppConfig AppConfigInfo => ref _AppConfigInfo;
+        /// <summary>ISGAppConfigService 에서 사용</summary>
+        public ISGAppConfig GetSGAppConfigService() => AppConfigInfo;
+
+        private static ISGAppConfig _AppConfigInfo { get; set; } = null;
+        /// <summary>AppEnvSetting</summary>
+        public static ISGAppConfig AppConfigInfo
+        {
+            get
+            {
+                if (_AppConfigInfo == null) LoadFile();
+                return _AppConfigInfo;
+            }
+        }
 
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGAppConfigService>();
 
-        public SGAppConfigService()
+        private static void LoadFile()
         {
             var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));
             string AppConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppEnvSetting.json";

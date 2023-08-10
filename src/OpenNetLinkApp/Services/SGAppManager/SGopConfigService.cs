@@ -22,7 +22,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
 {
     public interface ISGopConfigService
     {
-        ref Dictionary<int, ISGopConfig> AppConfigInfo { get; }
+        //ref Dictionary<int, ISGopConfig> AppConfigInfo { get; }
+        Dictionary<int, ISGopConfig> AppConfigInfo { get { return GetSGopConfigService(); } }
+        Dictionary<int, ISGopConfig> GetSGopConfigService();
 
         public bool GetPocMode(int groupId);
 
@@ -194,15 +196,31 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
     internal class SGopConfigService : ISGopConfigService
     {
-        private Dictionary<int, ISGopConfig> _AppConfigInfo;
+        /// <summary>ISGopConfigService 에서 사용</summary>
+        public Dictionary<int, ISGopConfig> GetSGopConfigService() => AppConfigInfo;
+
+        private static Dictionary<int, ISGopConfig> _AppConfigInfo;
         /// <summary>
         /// AppOPsetting
         /// </summary>
-        public ref Dictionary<int, ISGopConfig> AppConfigInfo => ref _AppConfigInfo;
+        public static Dictionary<int, ISGopConfig> AppConfigInfo
+        {
+            get
+            {
+                if (_AppConfigInfo == null) LoadFile();
+                return _AppConfigInfo;
+            }
+        }// => ref _AppConfigInfo;
+
+        //private Dictionary<int, ISGopConfig> _AppConfigInfo;
+        ///// <summary>
+        ///// AppOPsetting
+        ///// </summary>
+        //public ref Dictionary<int, ISGopConfig> AppConfigInfo => ref _AppConfigInfo;
 
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGopConfigService>();
 
-        public SGopConfigService()
+        private static void LoadFile()
         {
             //로그 삭제
             HsLogDel hsLog = new HsLogDel();
@@ -210,26 +228,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
             string jsonString = File.ReadAllText(strNetworkFileName);
-            List<ISGNetwork> listNetworks = new List<ISGNetwork>();
-            using (JsonDocument document = JsonDocument.Parse(jsonString))
-            {
-                JsonElement root = document.RootElement;
-                JsonElement NetWorkElement = root.GetProperty("NETWORKS");
-                //JsonElement Element;
-                foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
-                {
-                    SGNetwork sgNet = new SGNetwork();
-                    string strJsonElement = netElement.ToString();
-                    var options = new JsonSerializerOptions
-                    {
-                        ReadCommentHandling = JsonCommentHandling.Skip,
-                        AllowTrailingCommas = true,
-                        PropertyNameCaseInsensitive = true,
-                    };
-                    sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
-                    listNetworks.Add(sgNet);
-                }
-            }
+            List<ISGNetwork> listNetworks = SGNetworkService.NetWorkInfo;
 
             if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
                 Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
