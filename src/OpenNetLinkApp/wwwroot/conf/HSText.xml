@@ -1012,7 +1012,7 @@
 		<T_COMMON_APPROVESECURITY>
 			<KR>보안결재</KR>
 			<JP>保安決裁</JP>
-			<EN>Secure payment</EN>
+			<EN>Secure approval</EN>
 			<CN>安全审批</CN>
 		</T_COMMON_APPROVESECURITY>
 
@@ -3194,7 +3194,7 @@
 		<T_OTP_GUIDE>
 			<KR>생생된 OTP번호를 로그인 화면에 등록하세요.</KR>
 			<JP>생생된 OTP번호를 로그인 화면에 등록하세요.</JP>
-			<EN>생생된 OTP번호를 로그인 화면에 등록하세요.</EN>
+			<EN>Register the vivid OTP number on the login screen.</EN>
 			<CN>생생된 OTP번호를 로그인 화면에 등록하세요.</CN>
 		</T_OTP_GUIDE>
 
@@ -5872,7 +5872,7 @@
 		<I_0079>
 			<KR>&#10;결재를 하려면 여기를 클릭하세요.  </KR>
 			<JP>&#10;決裁をするには、こちらをクリックしてください。</JP>
-			<EN>&#10;To make a payment, click here.</EN>
+			<EN>&#10;To make a approval, click here.</EN>
 			<CN>&#10;如要审批，请点击此处。</CN>
 		</I_0079>
 
@@ -5942,7 +5942,7 @@
 		<I_0089>
 			<KR>최대 100건까지만 일괄결재가 가능합니다.&#10;100건만 결재를 진행 하시겠습니까?</KR>
 			<JP>最大100件まで一括決裁が可能です.&#10;100件までの決裁実行でよろしいでしょうか？</JP>
-			<EN>You can batch payment only up to 100 cases.&#10;100 cases of payment you sure you want to proceed?</EN>
+			<EN>You can batch approval only up to 100 cases.&#10;100 cases of approval you sure you want to proceed?</EN>
 			<CN>最多可同时审批100件。&#10;要同时审批100件吗？</CN>
 		</I_0089>
 
@@ -5984,7 +5984,7 @@
 		<I_0095>
 			<KR>잔여 보안 결재 건수 : %d 건</KR>
 			<JP>残りのセキュリティ決裁件数：％d件</JP>
-			<EN>The remaining payment security number : %d case.</EN>
+			<EN>The remaining approval security number : %d case.</EN>
 			<CN>剩余安全审批件数：%d件</CN>
 		</I_0095>
 
@@ -7662,21 +7662,21 @@
 		<W_0092>
 			<KR>후결은 반려를 할 수 없습니다./r/n다시 확인하십시오.</KR>
 			<JP>事後決裁は返戻することができません./r/n再度ご確認ください。</JP>
-			<EN>After the payment can not be rejected.</EN>
+			<EN>After the approval can not be rejected.</EN>
 			<CN>后批无法驳回。/r/n请重新确认。</CN>
 		</W_0092>
 
 		<W_0093>
 			<KR>결재를 할 수 있는 대상이 없습니다.</KR>
 			<JP>決裁できる対象がありません。</JP>
-			<EN>Not subject to the payment.</EN>
+			<EN>Not subject to the approval.</EN>
 			<CN>无可审批对象。</CN>
 		</W_0093>
 
 		<W_0094>
 			<KR>결재를 할 수 있는 대상이 아닙니다.</KR>
 			<JP>決裁できる対象ではありません</JP>
-			<EN>Not subject to the payment.</EN>
+			<EN>Not subject to the approval.</EN>
 			<CN>非可审批对象。</CN>
 		</W_0094>
 
@@ -7690,7 +7690,7 @@
 		<W_0096>
 			<KR>전송대기 중인 파일에서 개인정보가 검출되었습니다.<![CDATA[<br>]]> 제목 : {0} <![CDATA[<br>]]>개인정보검출 시 후결재 전송은 불가합니다.<![CDATA[<br>]]> 전송을 취소합니다.</KR>
 			<JP>転送待機中のファイルがら個人情報が検出されました<![CDATA[<br>]]>タイトル：{0} <![CDATA[<br>]]>個人情報検出時、後閲の転送はできません.<![CDATA[<br>]]>転送を取消します。</JP>
-			<EN>Personal information has been detected in the file waiting to be sent.<![CDATA[<br>]]> Title : {0}<![CDATA[<br>]]>When personal information is detected after the payment transfer is not possible.<![CDATA[<br>]]>To cancel the transfer.</EN>
+			<EN>Personal information has been detected in the file waiting to be sent.<![CDATA[<br>]]> Title : {0}<![CDATA[<br>]]>When personal information is detected after the approval transfer is not possible.<![CDATA[<br>]]>To cancel the transfer.</EN>
 			<CN>在待传输文件中检出个人信息。<![CDATA[<br>]]> 标题 :{0} <![CDATA[<br>]]>检查出个人信息时无法通过后批方式传输文件。<![CDATA[<br>]]> 取消传输。</CN>
 		</W_0096>
 
@@ -7725,7 +7725,7 @@
 		<W_0101>
 			<KR>결재자는 %d명 이상 추가할 수 없습니다.</KR>
 			<JP>決裁者は、%d名以上追加することはできません。</JP>
-			<EN>Payment shall not be able to add more than %d people.</EN>
+			<EN>approval shall not be able to add more than %d people.</EN>
 			<CN>无法添加%d名以上的审批人。</CN>
 		</W_0101>
 
@@ -9815,7 +9815,7 @@
 		<E_0118>
 			<KR>결재 사용시 자동전송을 할 수 없습니다.</KR>
 			<JP>決裁使用時は自動転送することができません。</JP>
-			<EN>Automatic transfer is not available when using payment.</EN>
+			<EN>Automatic transfer is not available when using approval.</EN>
 			<CN>启用审批时不能自动传输。</CN>
 		</E_0118>
 
