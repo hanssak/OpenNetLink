@@ -811,7 +811,9 @@ window.closeAllPopup = () => {
 
     $("#modal-ipchange-mainloading").modal("hide");
     $("#modal-ipchange-header").modal("hide");
-    $("#modal-alert-header-ipchange").modal("hide");
+    $("#modal-alert-header-ipchange").modal("hide"); 
+    $("#modal-alert-header-language").modal("hide");
+    
     
 }
 

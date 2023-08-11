@@ -446,6 +446,7 @@
 
 <ChangeIPPopUp @ref=refChangeIPPopUp Guid="modal-ipchange-header" goToPageNewIPChange="AfterNewIPChange" IsInitialMode="false"></ChangeIPPopUp>
 <SGAlert @ref="refSGAlertExitForChangeIP" Guid="modal-alert-header-ipchange" OnConfirm="AferNewIPChangeConfirm"></SGAlert>
+<SGAlert @ref="refSGAlertLanguage" Guid="modal-alert-header-language" OnConfirm="SetLanguageConfirm" OnCancel="SetLanguageCancel"></SGAlert>
 @code
 {
     SGAlert refSGAlert;
@@ -456,6 +457,7 @@
 
     ChangeIPPopUp refChangeIPPopUp;
     SGAlert refSGAlertExitForChangeIP;
+    SGAlert refSGAlertLanguage;
 
 
     [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
@@ -1701,6 +1703,8 @@
         HsCmdCenter.sgPageEvent.SetUpdatePolicyEvent(UpdatePolicy);
         HsCmdCenter.sgPageEvent.SetFileMimeRecvEvent(FileMimeRecvEvent);
         HsCmdCenter.sgPageEvent.SetOLEMimeRecvEvent(OLEMimeRecvEvent);
+        HsCmdCenter.sgPageEvent.SetChangeLanguageEvent(ChangeLanguageEvent);
+
         pageService.SetAlramAndMessageDeleteEvent(DelAllAlramAndMessage);
 
         pageService.SetAfterApprCommonNotiEvent(AfterApproveStatusChange); //사후정책 노티
@@ -2195,5 +2199,22 @@
 
         //프로그램 종료
         Window.ProgramExit();
+    }
+
+    public void ChangeLanguageEvent(object sender, string newLanguage)
+    {
+        Task.Run(async() =>  await refSGAlertLanguage.openPopUp(xmlConf.GetTitle("T_APPCONFIG_LANGUAGE_SETTING"), xmlConf.GetInfoMsg("I_0026"), 2, 0, newLanguage, xmlConf.GetTitle("T_COMMON_SAVE")));
+    }
+
+    public void SetLanguageConfirm(string setLanguage)
+    {
+        CLog.Here().Information($"Language Set: [{setLanguage}]");
+        SGAppMgrSvc.CtrlSideUIService.SetLanguage(setLanguage);
+        Window.ProgramExit();
+    }
+    public void SetLanguageCancel(string setLanguage)
+    {
+        //드롭다운 롤백처리
+        StateHasChanged();
     }
 }

@@ -36,7 +36,12 @@ namespace OpenNetLinkApp.Services
         public void LoadXmlFile(string strFileName)
         {
             string strXmlData = System.IO.File.ReadAllText(strFileName);
+            m_Xml = new XmlDocument();
             m_Xml.LoadXml(strXmlData);
+
+            m_StrLanguage = SGAppManager.SGAppConfigService.AppConfigInfo.strLanguage;
+            if (string.IsNullOrEmpty(m_StrLanguage))
+                m_StrLanguage = "KR";
         }
 
         public string GetCommon(string strID)

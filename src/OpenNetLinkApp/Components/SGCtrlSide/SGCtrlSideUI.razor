@@ -504,28 +504,28 @@
     }
 
     @*2023.06.01 화면잠금에 대한 표시 및 설정은 사용자 접근 불가로 변경*@
-  @*  @if (m_bUseScreenLock)
-    {
+    @*  @if (m_bUseScreenLock)
+        {
         <div class="r_set_sub">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</div> <!--화면잠금-->
         <div class="ml-2 mb-4">
-            <div class="mb-1  w-100">
-                @if (m_bScreenLockUserChange == true)
-                {
-                    <input type="checkbox" class="mr-1" checked="@(GetScreenLock())"
-                   @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-1">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
-                    <input type="text" value="@(GetScreenTime())" class="mr-2 col-md-2" style="text-align:right"
-                   @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
-                }
-                else
-                {
-                    <input disabled="disabled" type="checkbox" class="mr-1" checked="@(GetScreenLock())"
-                   @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-1">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
-                    <input readonly="readonly" type="text" value="@(GetScreenTime())" class="mr-2 col-md-2" style="text-align:right"
-                   @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
-                }
-            </div>
+        <div class="mb-1  w-100">
+        @if (m_bScreenLockUserChange == true)
+        {
+        <input type="checkbox" class="mr-1" checked="@(GetScreenLock())"
+        @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-1">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
+        <input type="text" value="@(GetScreenTime())" class="mr-2 col-md-2" style="text-align:right"
+        @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
+        }
+        else
+        {
+        <input disabled="disabled" type="checkbox" class="mr-1" checked="@(GetScreenLock())"
+        @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-1">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
+        <input readonly="readonly" type="text" value="@(GetScreenTime())" class="mr-2 col-md-2" style="text-align:right"
+        @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
+        }
         </div>
-    }*@
+        </div>
+        }*@
 
     @if (m_bLogLevelSet)
     {
@@ -640,7 +640,7 @@
     SGDownloadUpdate refSGDownloadUpdate;
     SGFinishedDownload refSGFinishedDownload;
     SGMessageNotification refSGMessageNotification;
-    
+
 
     public bool m_bUseClipBoard = true;
     public bool m_bUseMainPage = true;
@@ -669,7 +669,7 @@
 
     public bool m_bTrayMove = true;
     public bool m_bAlarmTray = true;
-    
+
     //2023.06.01 화면잠금에 대한 설정 및 확인은 사용자 확인 불가
     //public bool m_bScreenLockUserChange = false;                                        // 화면잠금을 사용자가 설정변경할수 있음(true), 없음(false)
 
@@ -737,10 +737,10 @@
     {
 
         @* ScreenLock 일 경우 다중망일 경우에도 GroupId 0 정책을 따른다.
-        m_bScreenLockUserChange = OpConfigSvc.GetScreenLockUserChange(0);      
-        m_bUseScreenLock = SGAppMgrSvc.OpConfigInfoService.GetScreenLockUserChange(0);  // siteConfig.GetUseScreenLock()
-        if (m_bUseScreenLock)
-        {
+            m_bScreenLockUserChange = OpConfigSvc.GetScreenLockUserChange(0);
+            m_bUseScreenLock = SGAppMgrSvc.OpConfigInfoService.GetScreenLockUserChange(0);  // siteConfig.GetUseScreenLock()
+            if (m_bUseScreenLock)
+            {
             HsCmdCenter.sgPageEvent.SetScreenTimeInitNotiEvent(ScreenLockTimeInitNoti);
 
             ScreenTimeChangeNotiEvent screentimeChgEvent = null;
@@ -748,11 +748,11 @@
             screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
             if (screentimeChgEvent != null)
             {
-                ConfigArgs config = new ConfigArgs();
-                config.ScreenTime = time;
-                screentimeChgEvent(pageService.m_nCurViewPageGroupID, config);
+            ConfigArgs config = new ConfigArgs();
+            config.ScreenTime = time;
+            screentimeChgEvent(pageService.m_nCurViewPageGroupID, config);
             }
-        }*@
+            }*@
 
         HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
         HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
@@ -1449,23 +1449,23 @@
         }
 
         @*bool bFind = false;
-        int count = AppConfigSvc.AppConfigInfo.RecvDownPath.Count;
-        string strPreDownPath = "";
-        for (int i = 0; i < count; i++)
-        {
+            int count = AppConfigSvc.AppConfigInfo.RecvDownPath.Count;
+            string strPreDownPath = "";
+            for (int i = 0; i < count; i++)
+            {
             if (groupId == i)
             {
-                strPreDownPath = GetRecvDownPath(groupId);
-                continue;
+            strPreDownPath = GetRecvDownPath(groupId);
+            continue;
             }
 
             if (stPath.Equals(AppConfigSvc.AppConfigInfo.RecvDownPath[i]))
             {
-                bFind = true;
+            bFind = true;
             }
-        }
-        if (bFind)
-        {
+            }
+            if (bFind)
+            {
             CtrlSideUISvc.SetRecvDownPath(groupId, strPreDownPath);
             await Task.Delay(1);    // flush UI changes
 
@@ -1475,7 +1475,7 @@
             strMsg = strMsg.Replace("/r/n", "<br>");
             ShowMessage("warn", strMsg);
             return;
-        }*@
+            }*@
 
         //HsCmdCenter.SetDownLoadPath(groupId, stPath);
         //HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
@@ -1606,9 +1606,8 @@
     }
     private void SetLanguage(string value)
     {
-        string language = value;//Convert.ToString(changeEventArg.Value);
-        CLog.Here().Information($"Language Set: [{language}]");
-        CtrlSideUISvc.SetLanguage(language);
+        EventHandler<string> change = HsCmdCenter.sgPageEvent.GetChangeLanguageEvent();
+         change(null, value);
     }
     //private void SetScreenLock(ChangeEventArgs changeEventArg)
     //{
@@ -1631,28 +1630,28 @@
         CLog.Here().Information($"Set DownLoadPath, BaseDownLoadPath, RecvDownPath Set: [{stPath}] useUserPath : {SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId)}");   // siteConfig
     }
 
-@*    /// <summary>
-    /// 화면잠금 시간값 변경 저장 및 전달
-    /// </summary>
-    /// <param name="changeEventArg"></param>
-    private async void SetScreenTime(ChangeEventArgs changeEventArg)
-    {
+    @*    /// <summary>
+        /// 화면잠금 시간값 변경 저장 및 전달
+        /// </summary>
+        /// <param name="changeEventArg"></param>
+        private async void SetScreenTime(ChangeEventArgs changeEventArg)
+        {
         int screenTime = Convert.ToInt32(changeEventArg.Value);
         if ((screenTime > m_nSvrTime) && (m_nSvrTime != 0))
         {
-            int PrevScreentTime = GetScreenTime();
-            CtrlSideUISvc.SetScreenTime(screenTime);
-            await Task.Delay(1);    // flush UI changes
+        int PrevScreentTime = GetScreenTime();
+        CtrlSideUISvc.SetScreenTime(screenTime);
+        await Task.Delay(1);    // flush UI changes
 
-            CtrlSideUISvc.SetScreenTime(PrevScreentTime);
-            await Task.Delay(1);    // flush UI changes
+        CtrlSideUISvc.SetScreenTime(PrevScreentTime);
+        await Task.Delay(1);    // flush UI changes
 
-            CLog.Here().Information($"ScreeenTime Set: [{PrevScreentTime}]");
-            await Task.Delay(500);
-            string strMsg = XmlConf.GetWarnMsg("W_0073");
-            strMsg = String.Format(strMsg, m_nSvrTime);
-            ShowMessage("warn", strMsg);
-            return;
+        CLog.Here().Information($"ScreeenTime Set: [{PrevScreentTime}]");
+        await Task.Delay(500);
+        string strMsg = XmlConf.GetWarnMsg("W_0073");
+        strMsg = String.Format(strMsg, m_nSvrTime);
+        ShowMessage("warn", strMsg);
+        return;
         }
         CLog.Here().Information($"ScreeenTime Set: [{screenTime}]");
         CtrlSideUISvc.SetScreenTime(screenTime);
@@ -1661,11 +1660,11 @@
         screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
         if (screentimeChgEvent != null)
         {
-            ConfigArgs config = new ConfigArgs();
-            config.ScreenTime = screenTime;
-            screentimeChgEvent(0, config);
+        ConfigArgs config = new ConfigArgs();
+        config.ScreenTime = screenTime;
+        screentimeChgEvent(0, config);
         }
-    }*@
+        }*@
 
 
     private void SetLogLevel(ChangeEventArgs changeEventArg)
@@ -1720,54 +1719,54 @@
         return NetWorkSvc.NetWorkInfo;
     }
 
-   @* /// <summary>
-    /// 서버에서 받은 화면잠금 시간값 설정(받은 값중 최소값으로 설정)
-    /// </summary>
-    /// <param name="groupID"></param>
-    /// <param name="e"></param>
-    public void ScreenLockTimeInitNoti(int groupID, ConfigArgs e)
-    {
+    @* /// <summary>
+        /// 서버에서 받은 화면잠금 시간값 설정(받은 값중 최소값으로 설정)
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <param name="e"></param>
+        public void ScreenLockTimeInitNoti(int groupID, ConfigArgs e)
+        {
         int time = e.ScreenTime;
         m_bUseScreenLock = (time == 0) ? false : true;
 
         if (!m_bUseScreenLock)
         {
-            CtrlSideUISvc.SetScreenLock(m_bUseScreenLock);
-            CtrlSideUISvc.SetScreenTime(time);
+        CtrlSideUISvc.SetScreenLock(m_bUseScreenLock);
+        CtrlSideUISvc.SetScreenTime(time);
         }
 
         if (m_bUseScreenLock)
         {
-            // logout 까지 고려
-            if (m_nSvrTime == 0)
-                m_nSvrTime = time;
-            else
-            {
-                if (time < m_nSvrTime)
-                    m_nSvrTime = time;
-            }
-
-            if (time > 0)
-            {
-                int nLocalTime = GetScreenTime();
-                if (time < nLocalTime)              // 서버의 화면잠금 시간값보다 크면 서버 화면잠금 시간값으로 저장 / 적용
-                {
-                    nLocalTime = time;
-                    ChangeEventArgs args = new ChangeEventArgs();
-                    args.Value = time;
-                    SetScreenTime(args);
-                    ScreenTimeChangeNotiEvent screentimeChgEvent = null;
-                    screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
-                    if (screentimeChgEvent != null)
-                    {
-                        ConfigArgs config = new ConfigArgs();
-                        config.ScreenTime = time;
-                        screentimeChgEvent(groupID, config);
-                    }
-                }
-            }
+        // logout 까지 고려
+        if (m_nSvrTime == 0)
+        m_nSvrTime = time;
+        else
+        {
+        if (time < m_nSvrTime)
+        m_nSvrTime = time;
         }
-    }*@
+
+        if (time > 0)
+        {
+        int nLocalTime = GetScreenTime();
+        if (time < nLocalTime)              // 서버의 화면잠금 시간값보다 크면 서버 화면잠금 시간값으로 저장 / 적용
+        {
+        nLocalTime = time;
+        ChangeEventArgs args = new ChangeEventArgs();
+        args.Value = time;
+        SetScreenTime(args);
+        ScreenTimeChangeNotiEvent screentimeChgEvent = null;
+        screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
+        if (screentimeChgEvent != null)
+        {
+        ConfigArgs config = new ConfigArgs();
+        config.ScreenTime = time;
+        screentimeChgEvent(groupID, config);
+        }
+        }
+        }
+        }
+        }*@
 
 
     private void ShowMessage(string strType, string strMsg)
@@ -2062,7 +2061,7 @@
         }
 
         //업데이트 진행은 아니지만, Update Cancel 중이면 SKIP
-        if(AppUpdaterSvc.IsCancelRequested)
+        if (AppUpdaterSvc.IsCancelRequested)
         {
             CLog.Here().Information($"[GID:{groupId}] SKIP - Update Canceling...");
             refSGMessageNotification?.OpenPopUp($"We are working on [Canceling] the update.{Environment.NewLine}Please try again in a few minutes. :(");
@@ -2070,10 +2069,10 @@
         }
 
 
-         await Task.Run(() =>
-        {
-            AppUpdaterSvc.CheckUpdatesClick(groupId, refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
-        });
+        await Task.Run(() =>
+       {
+           AppUpdaterSvc.CheckUpdatesClick(groupId, refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
+       });
     }
 
     public async void CheckUpdatesClick(int groupId)
@@ -2100,10 +2099,10 @@
     }
 
     @*private void OpenDownloadUpdate(string downloadInfo)
-    {
+        {
         refSGDownloadUpdate.OpenPopUp(downloadInfo);
-    }
-*@
+        }
+    *@
     private void CancelDownloadUpdate()
     {
         AppUpdaterSvc.RequestCancelFileDownload();
@@ -2132,14 +2131,14 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="isTotalPathch">전체패치 여부 (서버의 PATCHMODE =1 )</param>
     public async void clientUpgradeExe(int groupId, bool isTotalPathch)
     {
         Console.WriteLine("clientUpgradeExe : " + isTotalPathch.ToString());
-        
+
         if (isTotalPathch || SGAppMgrSvc.OpConfigInfoService.GetUseForceBackgroundUpdate(groupId))
         {
             //서버설정의 PATCHMODE = 1 (전체패지) 인 경우, 강제 패치처리
