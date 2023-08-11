@@ -917,7 +917,7 @@
                 tData.strSender = sgData.GetMailSender(dic);                // 송신자
                 tData.strReceiver = sgData.GetRecvUser(dic);                // 수산자
 
-                tData.bCanApproveReject = sgData.GetApproveCanDo(dic);         // 승인대기 상태 인지 유무 값 (true : 승인/반려가능, false:불가능)
+                tData.bCanApproveReject = (sgData.GetApproveCanDo(dic) && sgData.GetApprEnableChk(dic));         // 승인대기 상태 인지 유무 값 (true : 승인/반려가능, false:불가능)
                 tData.bIsCanFilePreview = ((isInner && sgData.GetTransKindRawData(dic) == "1") || (isInner == false && sgData.GetTransKindRawData(dic) == "2"));
 
                 tData.Title = sgData.GetTitle(dic);                         // 제목
@@ -1106,7 +1106,7 @@
         bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
 
         HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupIDbyParam, ApproveBatchResult);
-        //HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveUI, UpdateData);
+        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailSecurityApproveUI, UpdateData);
         HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailSecurityApproveWaitUI, ApproveWaitSearch);
 
         base.OnInitialized();

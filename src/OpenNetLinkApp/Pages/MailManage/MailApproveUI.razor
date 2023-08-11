@@ -52,7 +52,7 @@
 
                             <tr>
                                 <th class="p-2" style="text-align:right; vertical-align:middle;">@XmlConf.GetTitle("T_COMMON_PERIOD")</th>
-                                <td style="width:204px;">
+                                <td style="width:285px;">
                                     @*<input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker11" readonly="readonly" value="@strFromDay">
                                         <span class="float-left col-md-1">-</span>
                                         <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker12" readonly="readonly" value="@strToDay">*@
@@ -64,7 +64,7 @@
 
                             <tr>
 
-                                <th class="p-2" style="text-align: right; vertical-align: middle; width: 80px;"> @XmlConf.GetTitle("T_COMMON_APPROVE_KIND") </th>   <!-- 결재종류 -->
+                                <th class="p-2" style="text-align: right; vertical-align: middle; width: 90px;"> @XmlConf.GetTitle("T_COMMON_APPROVE_KIND") </th>   <!-- 결재종류 -->
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -80,7 +80,7 @@
                                     <!--<button type="button" @onclick="@(()=>openCustomSelect("ApproveKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApproveKind<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
 
-                                <th class="p-2" style="text-align: right; vertical-align: middle; width: 80px;">  @XmlConf.GetTitle("T_COMMON_EMAILTRANSKIND") </th> <!--발송구분-->
+                                <th class="p-2" style="text-align: right; vertical-align: middle; width: 90px;">  @XmlConf.GetTitle("T_COMMON_EMAILTRANSKIND") </th> <!--발송구분-->
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -98,7 +98,7 @@
 
                                 @if (bUseDlpDataView)
                                 {
-                                    <th class="p-2" style="width:80px;"> @XmlConf.GetTitle("T_COMMON_PRIVACY") </th>
+                                    <th class="p-2" style="width:90px;"> @XmlConf.GetTitle("T_COMMON_PRIVACY") </th>
                                     <!--개인정보-->
                                     <td>
                                         <div class="dropdown">
@@ -116,7 +116,7 @@
                                     </td>
                                 }
 
-                                <th class="p-2" style="text-align: right; vertical-align: middle; width: 80px;"> @XmlConf.GetTitle("T_EMAIL_STATUS") </th>  <!--발송상태-->
+                                <th class="p-2" style="text-align: right; vertical-align: middle; width: 90px;"> @XmlConf.GetTitle("T_EMAIL_STATUS") </th>  <!--발송상태-->
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -132,7 +132,7 @@
                                     <!--<button type="button" @onclick="@(()=>openCustomSelect("MailTransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransFlag<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
 
-                                <th class="p-2" style="text-align: right; vertical-align: middle; width: 80px;"> @XmlConf.GetTitle("T_COMMON_APPROVESTATUS") </th> <!--승인상태-->
+                                <th class="p-2" style="text-align: right; vertical-align: middle; width: 90px;"> @XmlConf.GetTitle("T_COMMON_APPROVESTATUS") </th> <!--승인상태-->
                                 <td style="width:210px;">
                                     <div class="dropdown">
                                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -218,7 +218,7 @@
 
                                         <th style="text-align:center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th> <!--승인상태-->
                                         <th style="text-align:center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_EMAIL_SENDER")</th>         <!--발신자-->
-                                        <th style="text-align:center; vertical-align:middle;width:10%;">@XmlConf.GetTitle("T_RECV_USER")</th>           <!--수신자-->
+                                        <th style="text-align:center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_RECV_USER")</th>           <!--수신자-->
                                         <th style="text-align: center; vertical-align: middle;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>     <!--제목-->
                                         <th style="text-align: center; vertical-align: middle; width: 14%;">@XmlConf.GetTitle("T_EMAIL_SENDDATE")</th>              <!--발신일-->
                                         <th style="text-align: center; vertical-align: middle; width: 14%;">@XmlConf.GetTitle("T_COMMON_APPROVEDATE")</th>          <!--승인일-->
@@ -942,7 +942,7 @@
                 tData.strSender = sgData.GetMailSender(dic);                // 송신자
                 tData.strReceiver = sgData.GetRecvUser(dic);                // 수산자
 
-                tData.bCanApproveReject = sgData.GetApproveCanDo(dic);         // 승인대기 상태 인지 유무 값 (true : 승인/반려가능, false:불가능)
+                tData.bCanApproveReject = (sgData.GetApproveCanDo(dic) && sgData.GetApprEnableChk(dic))  ;         // 승인대기 상태 인지 유무 값 (true : 승인/반려가능, false:불가능)
                 tData.bIsCanFilePreview = ((isInner && sgData.GetTransKindRawData(dic) == "1") || (isInner == false && sgData.GetTransKindRawData(dic) == "2"));
 
                 tData.Title = sgData.GetTitle(dic);                         // 제목

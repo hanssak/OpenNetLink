@@ -240,7 +240,7 @@
                                                 <td style="text-align:center; vertical-align: middle">-</td>
                                                 }*@
 
-                                            <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
+                                            <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
 
                                             @*
                                                 <td style="text-align:center">@GetTransTypeText(item[0])</td>
@@ -361,7 +361,7 @@
     ISGSideBarUIService SideBarUISvc;
 
     public bool bUseDlpDataView = true;
-    private string strEmailTranSeq = "";    // 상세보기에서 transSeq 값임시저장용도
+    //private string strEmailTranSeq = "";    // 상세보기에서 transSeq 값임시저장용도
 
     // 목적지 Data
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
@@ -402,64 +402,6 @@
     private string stReceivePlease;         //수신자를 입력해 주세요.
     private string stTitlePlease;           //제목을 입력해 주세요.
 
-    @*public string GetRequestTime(string value)
-    {
-        return value.Substring(0, 10);
-    }
-    public string GetApproveFlagText(string value)
-    {
-        if (value == "1")
-            return XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");  //승인대기
-        else if (value == "2")
-            return XmlConf.GetTitle("T_DASH_APPROVE_COMPLETE"); //승인
-        else if (value == "3")
-            return XmlConf.GetTitle("T_DASH_APPROVE_REJECT"); //거부
-        else
-            return "-";
-    }
-    public string GetTransStatusText(string value)
-    {
-        if (value == "1")
-            return XmlConf.GetTitle("T_COMMON_TRANSWAIT");  //전송대기
-        else if (value == "2" || value == "9")
-            return XmlConf.GetTitle("T_COMMON_TRANSFRING"); //전송중
-        else if (value == "3" || value == "7")
-            return XmlConf.GetTitle("T_COMMON_TRANS_SUCCESS"); //전송성공
-        else if (value == "4" || value == "8")
-            return XmlConf.GetTitle("T_COMMON_TRANSFAIL"); //전송실패
-        else if (value == "5")
-            return XmlConf.GetTitle("T_MESSAGE_TRANSCANCLE"); //전송취소
-        else if (value == "6")
-            return XmlConf.GetTitle("T_COMMON_TRANSCHECKING"); //검사중
-        else
-            return "-";
-    }
-    public string GetAttachFileText(string value)
-    {
-        if (value == "Y")
-            return XmlConf.GetTitle("T_EMAIL_FILEATTACH");
-        else
-            return XmlConf.GetTitle("T_EMAIL_FILENOTATTACH");
-    }
-    public string GetDLPFlagText(string value)
-    {
-        if (value == "0")
-            return XmlConf.GetTitle("T_COMMON_DLP_UNUSE");
-        else if (value == "1")
-            return XmlConf.GetTitle("T_COMMON_DLP_INCLUSION");
-        else if (value == "2")
-            return XmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION"); //미포함
-        else
-            return XmlConf.GetTitle("T_COMMON_DLP_UNKNOWN"); //검출불가
-    }
-    public string GetTransTypeText(string value)
-    {
-        if (value == "S")
-            return XmlConf.GetTitle("T_COMMON_EXPORT"); //반출
-        else
-            return XmlConf.GetTitle("T_COMMON_IMPORT"); //반입
-    }
-*@
 
 
     private void HandleKeyEvent(KeyboardEventArgs e)
@@ -736,17 +678,12 @@
         }
     }
 
-    public async Task OpenDetail(string transSeq)
-    {
-        await refMailManagePopUp.openPopUp(transSeq);
-    }
-
     /// <summary>
     ///
     /// </summary>
     /// <param name="transSeq"></param>
     /// <param name="downCount"></param>
-    public void DetailSearch(string transSeq, int downCount)
+    public async Task OpenDetail(string transSeq, int downCount)
     {
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -762,23 +699,14 @@
             return;
         }
 
-        HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailSearchResultEmail);
-        //HSCmdCenter.sgPageEvent.SetDetailSearchEventAdd(groupID, DetailSearchResult);           // 상세보기 조회 결과
-
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
 
-        string strUserID = sgLoginData.GetUserID();
+        refMailManagePopUp.bUseDlpDataView = bUseDlpDataView;
+        await refMailManagePopUp.openPopUp(transSeq);
 
-        MailManageDao dao = new MailManageDao();
-        string strQuery = dao.MailDetail(transSeq);
-        strEmailTranSeq = transSeq;
-
-        CLog.Here().Information($"QueryDetail-@@@@@@@@@@ : {strQuery}");
-
-        HSCmdCenter.SendDetailQuery(groupID, curUserID, strQuery);
     }
 
     /// <summary>
@@ -928,7 +856,6 @@
         HSCmdCenter.sgPageEvent.SetEmailSendCancelEvent(groupIDbyParam, TransCancelResult);             // 전송 취소 결과.
 
         base.OnInitialized();
-
     }
 
     /// <summary>
@@ -1075,71 +1002,6 @@
         }
     }
 
-    /// <summary>
-    /// 메일전송 상세보기 정보 Query 결과 호출받는 함수
-    /// </summary>
-    /// <param name="groupId"></param>
-    /// <param name="e"></param>
-    public void DetailSearchResultEmail(int groupId, SGData e)
-    {
-
-        try
-        { 
-            string result = e.GetTagData("RESULT");
-            string reason = e.GetTagData("REASON");
-            int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
-            listTempData = e.GetSvrRecordData2("RECORD");
-
-            if (listTempData == null || listTempData.Count < 1)
-            {
-                CLog.Here().Information("DetailSearchResultEmail - RECORD - empty!");
-                ShowMessage("error", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
-                StateHasChanged();
-                return;
-            }
-
-            CLog.Here().Information($"DetailSearchResultEmail - GroupId : {groupId}, Result : {result}, reason : {reason}");
-
-            if (result != "0")
-            {
-                ShowMessage("error", reason);
-                return;
-            }
-
-            // 추가작업
-            refMailManagePopUp.bUseDlpDataView = bUseDlpDataView;
-            refMailManagePopUp.DetailResult(groupId, e);
-            Task.Run(async () => { await refMailManagePopUp.openPopUp(strEmailTranSeq); });
-
-        }
-        catch(Exception ex)
-        { 
-            CLog.Here().Information($"DetailSearchResultEmail, Exception : {ex.Message}");
-        }
-
-
-        /*emailtransData tData = null;
-        //tData = GetTransListData(strMsg);
-        if (tData != null)
-        {
-            string sTransSeq = tData.TransSeq;
-            string sApprSeq = "";
-            // int nDataForwarded = GetForwarded(tData.IsFile);
-            bool bTransCancel = !tData.bCheckDisable;
-            bool bApprove = false;
-            bool bReject = false;
-
-            //sgDetailData.SetInit(false, sTransSeq, sApprSeq, nDataForwarded, bTransCancel, bApprove, bReject);
-            //HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
-
-            // refTransPopUp.m_downloadCount = m_currentDownloadCount;
-            // refTransPopUp.SetBindingData();
-
-            OpenDetailPopup(sTransSeq).Wait();
-
-        }*/
-
-    }
 
     /// <summary>
     /// LIST 검색결과 받는 함수
@@ -1263,7 +1125,8 @@
 
         if (isPossibleDownload)
         {
-            //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
+
+        //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
             @*
             if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForwardDownBeforeRecv())
             {

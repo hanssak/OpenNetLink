@@ -2633,7 +2633,7 @@
                     }
 
                     //대결재관리(3)
-                    if (bEmailUseOnly && bDeputyApprove && bApprMenuUse && sgUserInfo.GetUserApprPos(true, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(gID)) > 0)      //일반사용자는 (대결재권한을 가져도) 대결재 관리 사용 불가
+                    if (bDeputyApprove && bApprMenuUse && sgUserInfo.GetUserApprPos(true, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(gID)) > 0)      //일반사용자는 (대결재권한을 가져도) 대결재 관리 사용 불가
                     {
                         strNavigatePathWithGroupID = "";    //안씀
                                                             //strNavigatePathWithGroupID += gID.ToString();

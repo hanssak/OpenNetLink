@@ -1,8 +1,8 @@
 -- FUNCTION: public.func_email_approveinfo_open(haracter varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, BOOLEAN, BOOLEAN, character varying, character varying)
 
--- DROP FUNCTION IF EXISTS public.func_email_approveinfo_open_test(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, BOOLEAN, BOOLEAN, character varying, character varying);
+-- DROP FUNCTION IF EXISTS public.func_email_approveinfo_open(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, BOOLEAN, BOOLEAN, character varying, character varying);
 
-CREATE OR REPLACE FUNCTION public.func_email_approveinfo_open_test(
+CREATE OR REPLACE FUNCTION public.func_email_approveinfo_open(
 	userid character varying,
 	fromdate character varying,
 	todate character varying,
@@ -19,7 +19,7 @@ CREATE OR REPLACE FUNCTION public.func_email_approveinfo_open_test(
 	sfm2is BOOLEAN,
 	pagelistcount character varying,
 	viewpageno character varying)
-    RETURNS TABLE(email_seq bigint, approve_seq bigint, approvekind character varying, transkind2 character varying, dlpstatus character varying, addfile character varying, transtatus character varying, apprstatus character varying, mailsender character varying, recvuser character varying, recvcount bigint, title_text character varying, transdate character varying, approvedate character varying, approver character varying) 
+    RETURNS TABLE(email_seq bigint, approve_seq bigint, approvekind character varying, transkind2 character varying, dlpstatus character varying, addfile character varying, transtatus character varying, apprstatus character varying, mailsender character varying, recvuser character varying, recvcount bigint, title_text character varying, transdate character varying, approvedate character varying, realapprover character varying) 
     LANGUAGE 'plpgsql'
     COST 100
     -- VOLATILE PARALLEL UNSAFE
@@ -157,30 +157,33 @@ sfm2is : sfm2 대결재 조회 인지 유무
 
 
 	-- 대결재구분
+	sql:=Replace(sql, '##SFM_TBL_REAL_APPROVER_DATA##', '');
+	
 	IF sfm2is IS TRUE THEN
-		sql:=Replace(sql, '##SFM##', ' UNION ALL 
+		sql:=Replace(sql, '##SFM##', ' 
+UNION ALL 
 SELECT A.USER_SEQ, A.USER_ID, A.USER_NAME 
 FROM tbl_user_info A 
 where A.USER_SEQ IN (
 	select B.USER_SEQ 
 	from TBL_USER_SFM B 
-	where B.sfm_user_seq=(
+	where B.sfm_user_seq IN (
 		select M.USER_SEQ 
 		from tbl_user_info M 
-		where M.user_id=''##USERID##'') AND (TO_CHAR(NOW(), ''YYYYMMDD'') BETWEEN B.FROMDATE AND B.TODATE) )');
+		where M.user_id=''##USERID##'') AND (TO_CHAR(NOW(), ''YYYYMMDD'') BETWEEN B.FROMDATE AND B.TODATE) 
+)');
 		sql:=Replace(sql, '##SFM_TBL_REAL_APPROVER##', ', TBL_EMAIL_REAL_APPROVER_TMP AS 
 	(  
-		SELECT EMAIL_SEQ, (APPROVE_REAL_NAME || '' '' || APPROVE_REAL_RANK ) AS R_APPROVER
-		FROM TBL_EMAIL_APPROVE_REAL_HIS T, TBL_APPROVE_USER A 
-		WHERE (T.EMAIL_SEQ BETWEEN ''##FROMDATE##000000000'' AND ''##TODATE##9999999999'') AND (T.APPROVE_USER_SEQ=A.USER_SEQ)
+		SELECT T.REQ_SEQ, T.EMAIL_SEQ, (T.APPROVE_REAL_NAME || '' '' || T.APPROVE_REAL_RANK ) AS R_APPROVER
+		FROM TBL_EMAIL_APPROVE_REAL_HIS T
+		INNER JOIN TBL_APPROVE_USER U ON T.APPROVE_USER_SEQ=U.USER_SEQ
+		WHERE (T.EMAIL_SEQ BETWEEN ''##FROMDATE##000000000'' AND ''##TODATE##9999999999'') AND (T.APPROVE_USER_SEQ=U.USER_SEQ)
 	)'); 
 	-- 나 혹은 나를 결재자로 지정한 사람들에게 실재 결재를 받은 모든 Row Data
-		sql:=Replace(sql, '##SFM_TBL_REAL_APPROVER_DATA##', ', TBL_EMAIL_REAL_APPROVER_TMP D');
-		sql:=Replace(sql, '##SFM_REAL_APPROVER##', '(SELECT D.R_APPROVER FROM TBL_EMAIL_REAL_APPROVER_TMP WHERE D.EMAIL_SEQ=T.EMAIL_SEQ)'); -- TBL_EMAIL_REAL_APPROVER_TMP 를 구한후 변경
+		sql:=Replace(sql, '##SFM_REAL_APPROVER##', '(CASE WHEN (SELECT D.R_APPROVER FROM TBL_EMAIL_REAL_APPROVER_TMP D WHERE D.REQ_SEQ=A.REQ_SEQ AND D.EMAIL_SEQ=A.EMAIL_SEQ LIMIT 1 ) IS NULL THEN ''-'' ELSE (SELECT D.R_APPROVER FROM TBL_EMAIL_REAL_APPROVER_TMP D WHERE D.REQ_SEQ=A.REQ_SEQ AND D.EMAIL_SEQ=A.EMAIL_SEQ LIMIT 1) END)');
 	ELSE
 		sql:=Replace(sql, '##SFM##', '');
-		sql:=Replace(sql, '##SFM_TBL_REAL_APPROVER##', '');		
-		sql:=Replace(sql, '##SFM_TBL_REAL_APPROVER_DATA##', '');
+		sql:=Replace(sql, '##SFM_TBL_REAL_APPROVER##', '');
 		sql:=Replace(sql, '##SFM_REAL_APPROVER##', '''-''');		
 	END IF;
 
@@ -293,5 +296,5 @@ RETURN QUERY EXECUTE
 end;
 $BODY$;
 
-ALTER FUNCTION public.func_email_approveinfo_open_test(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, BOOLEAN, BOOLEAN,character varying, character varying)
+ALTER FUNCTION public.func_email_approveinfo_open(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, BOOLEAN, BOOLEAN,character varying, character varying)
     OWNER TO postgres;

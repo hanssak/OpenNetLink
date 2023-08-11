@@ -1,6 +1,6 @@
 -- FUNCTION: public.func_email_approveinfo_open(haracter varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying)
 
--- DROP FUNCTION IF EXISTS public.func_email_approveinfo_open(haracter varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying);
+-- DROP FUNCTION IF EXISTS public.func_email_approveinfo_open(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying);
 
 CREATE OR REPLACE FUNCTION public.func_email_approveinfo_open(
 	userid character varying,
