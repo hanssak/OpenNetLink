@@ -31,9 +31,9 @@
         <div class="col-md-12">
             <div class="row justify-content-between">
                 <div class="col-md-3"></div>
-                <div class="col-md-4 text-center">
+                <div class="col-md-5 text-center">
                 @*<img src="/images/adminlte/main_title_1.png" class="mt-2 mb-2 img-fluid">*@
-                <p style="font-size:20px; font-weight:bold; color:#044386; margin-top:5px">망연계솔루션 자료연계</p>
+                <p style="font-size:20px; font-weight:bold; color:#044386; margin-top:5px">@XmlConf.GetTitle("T_WELCOME_TITLE")</p>
                 </div>
                 <div class="col-md-3">
                     <div class="m_title01 float-right" style="margin-top:15px;">@strNetFromName <i class="fas fa-long-arrow-alt-right p-1"></i> @strNetToName</div>
@@ -346,10 +346,10 @@
                             <tbody>
                                 <tr>
                                     <th style="width:7%;">NO.</th>
-                                    <th style="width:10%;">@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
+                                    <th style="width:13%;">@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
                                     <th style="width:10%;">@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
                                     <th style="width:14%;">@XmlConf.GetTitle("T_DASH_REQUESTOR")</th>
-                                    <th style="width:40%;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
+                                    <th style="width:37%;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
                                     <th style="width:18%;">@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
 
                                 </tr>
@@ -357,10 +357,10 @@
                                 {
                                     <tr>
                                         <td style="width:7%;">@item.dispNo</td>
-                                        <td style="width:10%;">@item.apvType</td>
+                                        <td style="width:13%;">@item.apvType</td>
                                         <td style="width:10%;">@item.transKind</td>
                                         <td style="width:14%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.requestorName</td>
-                                        <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="width:37%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                         <td style="width:18%;">@item.reqDate</td>
                                     </tr>
                                 }
@@ -385,10 +385,10 @@
                             <tbody>
                                 <tr>
                                     <th style="width:7%;">NO.</th>
-                                    <th style="width:10%;">@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
+                                    <th style="width:13%;">@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
                                     <th style="width:10%;">@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
                                     <th style="width:16%;">@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th>
-                                    <th style="width:40%;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
+                                    <th style="width:37%;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
                                     <th style="width:18%;">@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
 
                                 </tr>
@@ -396,10 +396,10 @@
                                 {
                                     <tr>
                                         <td style="width:7%;">@item.dispNo</td>
-                                        <td style="width:10%;">@item.apvType</td>
+                                        <td style="width:13%;">@item.apvType</td>
                                         <td style="width:10%;">@item.transKind</td>
                                         <td style="width:16%;">@item.approverStatus</td>
-                                        <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="width:37%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                         <td style="width:18%;">@item.reqDate</td>
                                     </tr>
                                 }
@@ -998,7 +998,10 @@
             nDiskTotalSize = nDiskTotalSize / 1024;
 
         //사용량 , 남은용량
-        object[] param4 = { nDiskTotalSize - nDiskFreeSize, nDiskFreeSize };
+        object[] param4 = { nDiskTotalSize - nDiskFreeSize, nDiskFreeSize,
+                            XmlConf.GetTitle("T_CAPA_CHART_USED")
+                           , XmlConf.GetTitle("T_CAPA_CHART_REMAINING")
+                           , XmlConf.GetTitle("T_CAPA_CHART_IN_USED")};
         await JSRuntime.InvokeAsync<object>("initCapaChart", param4);
 
         int groupID = groupIDbyParam;

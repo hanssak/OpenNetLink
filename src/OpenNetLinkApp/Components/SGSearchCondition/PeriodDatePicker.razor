@@ -25,7 +25,7 @@
     /// <summary>
     ///조회를 위한 From 날짜 (포맷:yyyyMMdd00000)
     /// </summary>
-    /// 
+    ///
 
     public string FromDateSearchValue
     {
@@ -80,8 +80,13 @@
     {
         if (firstRender)
         {
+            XmlConfService XmlConf = new XmlConfService();
+            string[] monthNames = XmlConf.GetMonthNamesGroup();
+            string[] dayNameMin = XmlConf.GetDayMinNamesGroup();
+            string[] dayName = XmlConf.GetDayNamesGroup();
+
             //컨트롤 클릭하여 Picker 표시 기능하도록 설정
-            object[] param = { "datepicker3", "datepicker4" };
+            object[] param = { "datepicker3", "datepicker4", monthNames, dayNameMin, dayName };
             jsRuntime.InvokeAsync<object>("initDatePicker", param);
         }
 

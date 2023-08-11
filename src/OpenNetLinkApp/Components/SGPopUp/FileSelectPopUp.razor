@@ -147,7 +147,7 @@
         if (string.IsNullOrEmpty(drive))
             return string.Empty;
         DriveInfo rootInfo = new DriveInfo((string)drive);
-        string volume = (string.IsNullOrEmpty(rootInfo.VolumeLabel)) ? "드라이버" : rootInfo.VolumeLabel;
+        string volume = (string.IsNullOrEmpty(rootInfo.VolumeLabel)) ? XmlConf.GetTitle("T_DRIVE_VOLUMNE_DEFAULT_NAME") : rootInfo.VolumeLabel;
         return $"{rootInfo.Name} ({volume})";
     }
 

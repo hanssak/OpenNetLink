@@ -571,7 +571,7 @@
             pro.Start();
         *@
 
-        try
+    try
         {
             System.Diagnostics.Process.Start("xdotool", strParameter);
         }
@@ -1426,7 +1426,8 @@
 
     private string GetDescription()
     {
-        return MenuNameMapper.GetDescription(SideBarUISvc.ActiveMenu?.CategoryId ?? LSIDEBAR.MENU_CATE_ROOT);
+        string title = MenuNameMapper.GetDescription(SideBarUISvc.ActiveMenu?.CategoryId ?? LSIDEBAR.MENU_CATE_ROOT);
+        return xmlConf.GetTitle(title);
     }
 
     private ISGUserInfo GetUserInfo()

@@ -125,7 +125,11 @@
     {
         if (firstRender)
         {
-            object[] param = { "datepicker", "datepicker2" };
+            string[] monthNames = XmlConf.GetMonthNamesGroup();
+            string[] dayNameMin = XmlConf.GetDayMinNamesGroup();
+            string[] dayName = XmlConf.GetDayNamesGroup();
+
+            object[] param = { "datepicker", "datepicker2",monthNames, dayNameMin, dayName };
             jsRuntime.InvokeAsync<object>("initDatePicker", param);
         }
 

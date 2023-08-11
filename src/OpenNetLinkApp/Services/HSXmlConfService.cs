@@ -16,8 +16,8 @@ namespace OpenNetLinkApp.Services
         const string xmlFileName = "wwwroot/conf/HSText.xml";
 
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<XmlConfService>();
-        static XmlDocument m_Xml =null;
-        string m_StrLanguage ="KR";
+        static XmlDocument m_Xml = null;
+        static string m_StrLanguage = "KR";
         List<ISGNetwork> listNetworks = SGAppManager.SGNetworkService.NetWorkInfo;
         public XmlConfService()
         {
@@ -176,6 +176,22 @@ namespace OpenNetLinkApp.Services
 
             str1 = str1 + " → " + str2;
             return str1;
+        }
+
+        public string[] GetMonthNamesGroup()
+        {
+            string group = GetTitle("T_DATAPICKER_MONTH_GROUP");
+            return group.Split(",");
+        }
+        public string[] GetDayNamesGroup()
+        {
+            string group = GetTitle("T_DATAPICKER_DAY_GROUP");
+            return group.Split(",");
+        }
+        public string[] GetDayMinNamesGroup()
+        {
+            string group = GetTitle("T_DATAPICKER_DAY_MIN_GROUP");
+            return group.Split(",");
         }
     }
 }
