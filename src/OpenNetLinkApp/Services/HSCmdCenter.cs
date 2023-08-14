@@ -82,68 +82,11 @@ namespace OpenNetLinkApp.Services
         public void Init()
         {
             HsNetWork hsNetwork = null;
+            
+            List<ISGNetwork> listNetworks = SGNetworkService.NetWorkInfo;
+            List<string> RecvDownList = SGAppConfigService.AppConfigInfo.RecvDownPath;
 
-            string strNetworkFileName = "wwwroot/conf/NetWork.json";
-            string jsonString = File.ReadAllText(strNetworkFileName);
-            List<ISGNetwork> listNetworks = new List<ISGNetwork>();
-
-            //ADDomain 이 string 타입인 Network.json은 List<string> 타입으로 수정
-            try { _networkParsing(); }
-            catch (Exception ex)
-            {
-                CLog.Here().Error($"NetworkParsing err : Change ADDomain Format in Network.json  - {ex.ToString()}");
-                string[] strNetwork = jsonString.Split(Environment.NewLine);
-                for (int i = 0; i < strNetwork.Length; i++)
-                {
-                    if (strNetwork[i].Contains("ADDomain") && !(strNetwork[i].Contains("[") && strNetwork[i].Contains("]")))
-                    {
-                        string element = strNetwork[i].Split(':')[0];
-                        string value = strNetwork[i].Split(':')[1];
-                        strNetwork[i] = $"{element}: [ {value} ]";
-                    }
-                }
-                File.WriteAllText(strNetworkFileName, string.Join(Environment.NewLine, strNetwork));
-                jsonString = string.Join(Environment.NewLine, strNetwork);
-                _networkParsing();
-            }
-
-            void _networkParsing()
-            {
-                listNetworks.Clear();
-                using (JsonDocument document = JsonDocument.Parse(jsonString))
-                {
-                    JsonElement root = document.RootElement;
-                    JsonElement NetWorkElement = root.GetProperty("NETWORKS");
-                    //JsonElement Element;
-                    foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
-                    {
-                        SGNetwork sgNet = new SGNetwork();
-                        string strJsonElement = netElement.ToString();
-                        var options = new JsonSerializerOptions
-                        {
-                            ReadCommentHandling = JsonCommentHandling.Skip,
-                            AllowTrailingCommas = true,
-                            PropertyNameCaseInsensitive = true,
-                        };
-                        sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
-                        listNetworks.Add(sgNet);
-                    }
-                }
-            }
-
-            List<string> RecvDownList = new List<string>();
-            var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));
-            string AppConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppEnvSetting.json";
-            if (File.Exists(AppConfig))
-            {
-                using (FileStream fs = File.OpenRead(AppConfig))
-                {
-                    SGAppConfig appConfig = (SGAppConfig)serializer.ReadObject(fs);
-                    RecvDownList = appConfig.RecvDownPath;
-                }
-            }
-
-            serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));
+            var serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));
             string VersionConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppVersion.json";
             if (File.Exists(VersionConfig))
             {
@@ -153,66 +96,7 @@ namespace OpenNetLinkApp.Services
                 }
             }
 
-            Dictionary<int, ISGopConfig> dicOpConfig = new Dictionary<int, ISGopConfig>();
-            serializer = new DataContractJsonSerializer(typeof(SGopConfig));
-            foreach (SGNetwork sgNetwork in listNetworks)
-            {
-                string opConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sgNetwork.GroupID}_{sgNetwork.NetPos}.json";
-
-                CLog.Here().Information($"- AppOPsetting Path: [{opConfig}]");
-
-                if (File.Exists(opConfig))
-                {
-                    try
-                    {
-                        CLog.Here().Information($"- AppOPsetting Loading... : [{opConfig}]");
-                        //Open the stream and read it back.
-                        byte[] hsckByte = File.ReadAllBytes(opConfig);
-                        byte[] masterKey = SGCrypto.GetMasterKey();
-
-                        bool isDeCrypt = true;
-                        string strData = String.Empty;
-                        try
-                        {
-                            byte[] dData = SGCrypto.AESDecrypt256(hsckByte, masterKey, System.Security.Cryptography.PaddingMode.PKCS7);
-                            strData = Encoding.UTF8.GetString(dData);
-                        }
-                        catch (Exception ex)
-                        {
-                            CLog.Here().Information($"- AppOPsetting Loading... : Decrypt Fail {opConfig}]");
-                            //디크립션 실패
-                            isDeCrypt = false;
-                        }
-
-                        if (isDeCrypt)
-                        {
-                            SGopConfig appConfig = JsonSerializer.Deserialize<SGopConfig>(strData);
-                            dicOpConfig.Add(sgNetwork.GroupID, appConfig);
-
-                        }
-                        else
-                        {
-                            //Open the stream and read it back.
-                            using (FileStream fs = File.OpenRead(opConfig))
-                            {
-                                SGopConfig appConfig = (SGopConfig)serializer.ReadObject(fs);
-                                dicOpConfig.Add(sgNetwork.GroupID, appConfig);
-
-                            }
-                        }
-                        CLog.Here().Information($"- AppOPsetting Load Completed : [{opConfig}]");
-                    }
-                    catch (Exception ex)
-                    {
-                        CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
-                        dicOpConfig.Add(sgNetwork.GroupID, new SGopConfig());
-                    }
-                }
-                else
-                {
-                    dicOpConfig.Add(sgNetwork.GroupID, new SGopConfig());
-                }
-            }
+            Dictionary<int, ISGopConfig> dicOpConfig = SGopConfigService.AppConfigInfo;
 
             int count = listNetworks.Count;
             SetNetWorkCount(count);

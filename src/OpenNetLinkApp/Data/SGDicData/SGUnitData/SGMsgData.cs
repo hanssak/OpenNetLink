@@ -73,12 +73,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public string getTypeTag()
         {
+            XmlConfService xmlSrv = new XmlConfService();
+
             if (ItemType == 1)
-                return @"<span class='notify_1'>[알람]</span>";
+                return string.Format(@"<span class='notify_1'>{0}</span>", xmlSrv.GetTitle("T_MESSAGE_TAG_ALARM_NAEM"));
             else if (ItemType == 2)
-                return @"<span class='message_1'>[메시지]</span>";
-            else 
-                return @"<span class='notice_1'>[공지]</span>";
+                return string.Format(@"<span class='message_1'>{0}</span>", xmlSrv.GetTitle("T_MESSAGE_TAG_MSG_NAME"));
+            else
+                return string.Format(@"<span class='notice_1'>{0}</span>", xmlSrv.GetTitle("T_MESSAGE_TAG_NOTIFY_NAME"));
         }
 
         public string getNewTag()

@@ -1,11 +1,12 @@
 @using System.Collections.Generic
 
 @inject ISGAppManagerService SGAppMgrSvc
+@inject XmlConfService XmlConf
 
 @implements IDisposable
 
 <!-- Main Footer -->
-<SGFooterUI FooterUISvc="@FooterUISvc" AppConfigSvc="@AppConfigSvc" VersionConfigSvc="@VersionConfigSvc"/>
+<SGFooterUI FooterUISvc="@FooterUISvc" AppConfigSvc="@AppConfigSvc" VersionConfigSvc="@VersionConfigSvc" XmlConfSvc="@XmlConf" />
 <!-- Main Footer End -->
 
 @code
@@ -13,6 +14,7 @@
     ISGFooterUIService FooterUISvc;
     ISGAppConfigService AppConfigSvc;
     ISGVersionConfigService VersionConfigSvc;
+
 
     protected override void OnInitialized()
     {

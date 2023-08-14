@@ -103,8 +103,8 @@
             <div class="modal-footer clearfix pl-4 pr-4 pt-3 pb-3">
                 <div class="col-md-12  p-0">
                     <div class="text-right p-0">
-                        <button type="button" name="popUpOkBtn" class="btn btn-md btn-blue mr-0" @onclick="selectOK"><i class="fas fa-check"></i>확인</button>
-                        <button type="button" class="btn btn-md btn-black mr-0" data-dismiss="modal"><i class="fas fa-times"></i>취소</button>
+                        <button type="button" name="popUpOkBtn" class="btn btn-md btn-blue mr-0" @onclick="selectOK"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
+                        <button type="button" class="btn btn-md btn-black mr-0" data-dismiss="modal"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
                     </div>
                 </div>
             </div>
@@ -147,7 +147,7 @@
         if (string.IsNullOrEmpty(drive))
             return string.Empty;
         DriveInfo rootInfo = new DriveInfo((string)drive);
-        string volume = (string.IsNullOrEmpty(rootInfo.VolumeLabel)) ? "드라이버" : rootInfo.VolumeLabel;
+        string volume = (string.IsNullOrEmpty(rootInfo.VolumeLabel)) ? XmlConf.GetTitle("T_DRIVE_VOLUMNE_DEFAULT_NAME") : rootInfo.VolumeLabel;
         return $"{rootInfo.Name} ({volume})";
     }
 

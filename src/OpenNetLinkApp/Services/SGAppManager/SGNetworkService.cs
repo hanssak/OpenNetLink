@@ -12,15 +12,29 @@ namespace OpenNetLinkApp.Services.SGAppManager
 {
     public interface ISGNetworkService
     {
-        List<ISGNetwork> NetWorkInfo { get { return NetWorkInfo; } }
+        List<ISGNetwork> NetWorkInfo { get { return GetSGNetworkService(); } }
+        List<ISGNetwork> GetSGNetworkService();
         public void SaveIPAndReload(string IP);
     }
     internal class SGNetworkService : ISGNetworkService
     {
-        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGNetworkService>();
-        public List<ISGNetwork> NetWorkInfo { get; set; } = null;
+        /// <summary>ISGNetworkService 에서 사용</summary>
+        public List<ISGNetwork> GetSGNetworkService() => NetWorkInfo;
 
-        public SGNetworkService()
+        private static List<ISGNetwork> _netWorkInfo { get; set; } = null;
+        public static List<ISGNetwork> NetWorkInfo
+        {
+            get
+            {
+                if (_netWorkInfo == null) LoadFile();
+                return _netWorkInfo;
+            }
+        }
+
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGNetworkService>();
+        //public List<ISGNetwork> NetWorkInfo { get; set; } = null;
+
+        public static void LoadFile()
         {
             loadNetworkFile();
         }
@@ -43,7 +57,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             loadNetworkFile();
         }
 
-        private void loadNetworkFile()
+        private static void loadNetworkFile()
         {
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
             string jsonString = File.ReadAllText(strNetworkFileName);
@@ -95,7 +109,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     }
                 }
             }
-            NetWorkInfo = listNetworks;
+            _netWorkInfo = listNetworks;
         }
 
     }

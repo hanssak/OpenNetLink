@@ -10,6 +10,7 @@
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
 
 <div style="width:100%;height:50%;border-bottom:1px solid #ddd; padding:0px;overflow:auto">
     @if (m_btoTheTop == false)
@@ -221,7 +222,7 @@
         if (Directory.GetParent((string)data) == null)
         {
             DriveInfo rootInfo = new DriveInfo((string)data);
-            string volume = (string.IsNullOrEmpty(rootInfo.VolumeLabel)) ? "드라이버" : rootInfo.VolumeLabel;
+            string volume = (string.IsNullOrEmpty(rootInfo.VolumeLabel)) ? XmlConf.GetTitle("T_DRIVE_VOLUMNE_DEFAULT_NAME") : rootInfo.VolumeLabel;
             return $"{rootInfo.Name} ({volume})";
         }
 

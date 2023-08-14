@@ -19,7 +19,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
 {
     public interface ISGAppConfigService
     {
-        ref ISGAppConfig AppConfigInfo { get; }
+        //ref ISGAppConfig AppConfigInfo { get; }
+        /// <summary>AppEnvSetting</summary>
+        ISGAppConfig AppConfigInfo { get { return GetSGAppConfigService(); } }
+        ISGAppConfig GetSGAppConfigService();
+
         string GetClipBoardHotKey(int groupId);
         List<bool> GetClipBoardModifier(int groupId);
 
@@ -58,7 +62,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //int GetScreenTime();
         LogEventLevel GetLogLevel();
         bool GetUseApprWaitNoti();
-        
+
         //bool GetUseLogLevel();
         //bool GetUseGPKILogin(int groupID);
         //bool GetUseOverNetwork2();
@@ -79,12 +83,23 @@ namespace OpenNetLinkApp.Services.SGAppManager
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
-        private ISGAppConfig _AppConfigInfo;
-        public ref ISGAppConfig AppConfigInfo => ref _AppConfigInfo;
+        /// <summary>ISGAppConfigService 에서 사용</summary>
+        public ISGAppConfig GetSGAppConfigService() => AppConfigInfo;
+
+        private static ISGAppConfig _AppConfigInfo { get; set; } = null;
+        /// <summary>AppEnvSetting</summary>
+        public static ISGAppConfig AppConfigInfo
+        {
+            get
+            {
+                if (_AppConfigInfo == null) LoadFile();
+                return _AppConfigInfo;
+            }
+        }
 
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGAppConfigService>();
 
-        public SGAppConfigService()
+        private static void LoadFile()
         {
             var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));
             string AppConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppEnvSetting.json";
@@ -374,7 +389,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 case PAGE_TYPE.DASHBOARD:
                     strPage = useDashBoard ? "/Welcome" : "/Transfer";
                     break;
-               
+
                 case PAGE_TYPE.TRANSFER:
                     strPage = "/Transfer";
                     break;
@@ -452,12 +467,24 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetForwardUrl(int nGroupID)
         {
             //return AppConfigInfo.strForwardUrl;
-            (AppConfigInfo as SGAppConfig).strForwardUrl ??= new List<string>();
+            if (AppConfigInfo.strForwardUrl == null || AppConfigInfo.strForwardUrl.Count < nGroupID + 1)
+            {
+                HsLog.info("GetForwardUrl : strForwardUrl is (Null or Empty)");
+                return "";
+            }
 
-            if ((AppConfigInfo as SGAppConfig).strForwardUrl.Count >= nGroupID + 1)
-                return (AppConfigInfo as SGAppConfig).strForwardUrl[nGroupID];
+            string defaultValue = (AppConfigInfo as SGAppConfig).strForwardUrl[nGroupID];
+            if (!string.IsNullOrEmpty(defaultValue))
+                return defaultValue;
 
-            return "";
+            //OS 별로, 실행 경로 기준 html 파일 경로로 반환
+            string krValue = System.IO.Path.Combine(System.Environment.CurrentDirectory, "wwwroot", "web", "WebLinkInfo.html");
+            string NativeValue = System.IO.Path.Combine(System.Environment.CurrentDirectory, "wwwroot", "web", $"WebLinkInfo_{AppConfigInfo.strLanguage}.html");
+
+            if (File.Exists(NativeValue))
+                return "file://" + NativeValue.Replace(@"\", @"/");
+            else
+                return "file://" + krValue;
         }
 
         public bool GetRMouseFileAddAfterTrans()
@@ -470,7 +497,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public string GetRecvDownPath(int groupId)
         {
-           
+
             (AppConfigInfo as SGAppConfig).RecvDownPath ??= new List<string>(){
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)};
@@ -610,7 +637,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /*public bool GetClipboardManageUse()
         {
             return AppConfigInfo.bClipboardManageUse;
-        }*/        
+        }*/
 
         /*public bool GetShowAdminInfo()
         {

@@ -23,11 +23,11 @@ namespace OpenNetLinkApp.Models.SGConfig
     // MoveTo. ISGopConfig.cs
     public enum PAGE_TYPE : int
     {
-        [Description("초기값")]
+        [Description("T_PAGE_TYPE_INIT")]
         NONE = 0,
-        [Description("대시보드")]
+        [Description("T_PAGE_TYPE_DASHBOARD")]
         DASHBOARD = 1,
-        [Description("파일전송")]
+        [Description("T_PAGE_TYPE_TRNASFER")]
         TRANSFER = 2
     }
     public enum HOTKEY_MOD: int
