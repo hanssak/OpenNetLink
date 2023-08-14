@@ -42,7 +42,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eAlarmApprConfirm,                    // [승인완료]
         eAlarmApprReject,                     // [반려완료]
         eAlarmLogin,                           // [로그인]
-        eAlarmLogout                            // [로그아웃]
+        eAlarmLogout,                            // [로그아웃]
+        eAlarmEMailSecureApprWait            // [메일보안승인대기]
+
     }
     public class BoardItem
     {
@@ -300,6 +302,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     sidebar = LSIDEBAR.MENU_CATE_FILE;
                     break;
                 case OS_NOTI.MAIL_APPR:                                     // 메일결재 승인대기
+                case OS_NOTI.MAIL_SECURE_APPR:                                     // 메일결재 승인대기
                     sidebar = LSIDEBAR.MENU_CATE_MAIL;
                     break;
                 default:
@@ -328,6 +331,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     break;
                 case OS_NOTI.MAIL_APPR:                                     // 메일결재 승인대기
                     eAType = eAlarmType.eAlarmEMailApprWait;
+                    break;
+                case OS_NOTI.MAIL_SECURE_APPR:                                     // 메일 보안결재 승인대기
+                    eAType = eAlarmType.eAlarmEMailSecureApprWait;
                     break;
                 case OS_NOTI.CONFIRM_APPR:                                  // 승인완료
                     eAType = eAlarmType.eAlarmApprConfirm;
@@ -372,6 +378,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     break;
                 case eAlarmType.eAlarmEMailApprWait:
                     strTitle = xconf.GetTitle("T_ALARM_EMAILAPPRWAIT");         // 메일결재 승인대기
+                    break;
+                case eAlarmType.eAlarmEMailSecureApprWait:
+                    strTitle = xconf.GetTitle("T_ALARM_EMAILSECUREAPPRWAIT");         // 메일 보안결재 승인대기
                     break;
                 case eAlarmType.eAlarmApprConfirm:
                     strTitle = xconf.GetTitle("T_ALARM_APPRCONFIRM");           // 결재 승인 완료
