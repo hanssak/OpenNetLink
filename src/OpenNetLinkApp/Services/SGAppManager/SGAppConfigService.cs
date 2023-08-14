@@ -62,7 +62,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //int GetScreenTime();
         LogEventLevel GetLogLevel();
         bool GetUseApprWaitNoti();
-        
+
         //bool GetUseLogLevel();
         //bool GetUseGPKILogin(int groupID);
         //bool GetUseOverNetwork2();
@@ -389,7 +389,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 case PAGE_TYPE.DASHBOARD:
                     strPage = useDashBoard ? "/Welcome" : "/Transfer";
                     break;
-               
+
                 case PAGE_TYPE.TRANSFER:
                     strPage = "/Transfer";
                     break;
@@ -467,12 +467,24 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetForwardUrl(int nGroupID)
         {
             //return AppConfigInfo.strForwardUrl;
-            (AppConfigInfo as SGAppConfig).strForwardUrl ??= new List<string>();
+            if (AppConfigInfo.strForwardUrl == null || AppConfigInfo.strForwardUrl.Count < nGroupID + 1)
+            {
+                HsLog.info("GetForwardUrl : strForwardUrl is (Null or Empty)");
+                return "";
+            }
 
-            if ((AppConfigInfo as SGAppConfig).strForwardUrl.Count >= nGroupID + 1)
-                return (AppConfigInfo as SGAppConfig).strForwardUrl[nGroupID];
+            string defaultValue = (AppConfigInfo as SGAppConfig).strForwardUrl[nGroupID];
+            if (!string.IsNullOrEmpty(defaultValue))
+                return defaultValue;
 
-            return "";
+            //OS 별로, 실행 경로 기준 html 파일 경로로 반환
+            string krValue = System.IO.Path.Combine(System.Environment.CurrentDirectory, "wwwroot", "web", "WebLinkInfo.html");
+            string NativeValue = System.IO.Path.Combine(System.Environment.CurrentDirectory, "wwwroot", "web", $"WebLinkInfo_{AppConfigInfo.strLanguage}.html");
+
+            if (File.Exists(NativeValue))
+                return "file://" + NativeValue.Replace(@"\", @"/");
+            else
+                return "file://" + krValue;
         }
 
         public bool GetRMouseFileAddAfterTrans()
@@ -485,7 +497,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public string GetRecvDownPath(int groupId)
         {
-           
+
             (AppConfigInfo as SGAppConfig).RecvDownPath ??= new List<string>(){
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)};
@@ -625,7 +637,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /*public bool GetClipboardManageUse()
         {
             return AppConfigInfo.bClipboardManageUse;
-        }*/        
+        }*/
 
         /*public bool GetShowAdminInfo()
         {

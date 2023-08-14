@@ -1830,7 +1830,7 @@
 
         int nPassWDExpiredDay = 0;
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
-        string strPassWDExpiredDay = sgLoginData.GetPassWDExpiredDay();
+        string strPassWDExpiredDay = sgLoginData?.GetPassWDExpiredDay();
         if (!strPassWDExpiredDay.Equals(""))
             nPassWDExpiredDay = Convert.ToInt32(strPassWDExpiredDay);
 
