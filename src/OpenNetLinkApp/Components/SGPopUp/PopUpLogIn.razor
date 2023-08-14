@@ -800,7 +800,7 @@
                         originalPW = Encoding.UTF8.GetBytes(OSxCmdService.GetOSXADConfig("Active Directory Domain").ToLower());
 
 #if DEBUG
-    originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
+                    originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 #endif
 
                     CLog.Here().Information($"PopupLogin(nGroupID :{nGroupID}) - ADLogin - ###### - PWCheck : {protectedPw}");
@@ -1471,6 +1471,19 @@
                     string strToNet = "";
                     XmlConf.GetNetworkTitle(groupId, out strFromNet, out strToNet);
                     strPopupMsg = $"{strFromNet}<i class=\"fas fa-long-arrow-alt-right p-1\"></i> {strToNet}<br/>";
+                }
+
+                if (ret == 3) //일시적으로 계정 자금 시간 표시
+                {
+                    SGData sgDate = HSCmdCenter.GetSGSvrData(groupId);
+                    string authUser = sgDate.GetBasicTagData("AUTHUSER");
+                    List<string> list = authUser.Split(',').ToList();
+                    int blockTime = 3;
+                    if (list != null && list.Count == 3)
+                    {
+                        blockTime = Convert.ToInt32(list[2]);
+                    }
+                    e.strMsg = String.Format(e.strMsg, blockTime);
                 }
 
                 strPopupMsg += e.strMsg;

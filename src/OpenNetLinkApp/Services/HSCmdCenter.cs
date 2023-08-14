@@ -840,6 +840,9 @@ namespace OpenNetLinkApp.Services
                     tmpData.m_DicTagData["LOGINTYPE"] = sgData.m_DicTagData["LOGINTYPE"].Base64EncodingStr();
                     tmpData.m_DicTagData["SYSTEMID"] = sgData.m_DicTagData["SYSTEMID"].Base64EncodingStr();
                     tmpData.m_DicTagData["TLSVERSION"] = sgData.m_DicTagData["TLSVERSION"].Base64EncodingStr();
+                    tmpData.m_DicTagData["AUTHUSER"] = sgData.m_DicTagData["AUTHUSER"].Base64EncodingStr();
+                    tmpData.m_DicTagData["SERVERVESION"] = sgData.m_DicTagData["SERVERVESION"].Base64EncodingStr();
+                    tmpData.m_DicTagData["NETLINKVERSION"] = sgData.m_DicTagData["NETLINKVERSION"].Base64EncodingStr();
 
                     RecvSvrAfterSend(groupId, sgData.m_DicTagData["LOGINTYPE"]);
                     //SGSvrData sgTmp = (SGSvrData)sgDicRecvData.GetSvrData(0);

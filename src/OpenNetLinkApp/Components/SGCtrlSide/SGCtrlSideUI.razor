@@ -45,7 +45,7 @@
                                 // 다중접속일때에는 단일망에만 전달가능
                                 // 단일접속일때에는 3중망에 전달가능
                                 @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0 &&
-                               (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                     (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                 {
 
                                     //@if (itemData.Value.nIdx == 1 && ListModKey.Count > 0)
@@ -58,7 +58,7 @@
                                             @*<input type="checkbox" class="mr-1" checked="@(ListModKey[NetworkInfo.GroupID][Index])"
                                                 @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />*@
                                             <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))"
-                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
+                                                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
                                             <span class="mr-2">@Modifier</span>
                                         }
 
@@ -95,7 +95,7 @@
                                         @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
                                         {
                                             <input type="checkbox" class="mr-1" checked="@dicModKeyNetOver[strNetgroupIDidxKey][Index]"
-                   @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, itemData.Value.nIdx, (HOTKEY_MOD)Index, eventArgs); }" />
+                                                   @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, itemData.Value.nIdx, (HOTKEY_MOD)Index, eventArgs); }" />
                                             <span class="mr-2">@Modifier</span>
                                         }
                                         @*<select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
@@ -139,7 +139,7 @@
                                 @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
                                 {
                                     <input type="checkbox" class="mr-1" checked="@dicModKeyNetOver[strNetgroupIDidxKey][Index]"
-                   @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, 0, (HOTKEY_MOD)Index, eventArgs); }" />
+                                           @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, 0, (HOTKEY_MOD)Index, eventArgs); }" />
                                     <span class="mr-2">@Modifier</span>
                                 }
                                 @*<select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
@@ -180,7 +180,7 @@
                                     @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />*@
 
                                 <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))"
-                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
+                                       @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
 
                                 <span class="mr-2">@Modifier</span>
                             }
@@ -224,7 +224,7 @@
                         <option value="@((int)CLIPALM_TYPE.UI)">UI</option>
                     </select>-->
 
-            <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         @GetClipAlarmTypeStr()
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenu2" style="min-width:85px">
@@ -240,9 +240,9 @@
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetClipCopyAutoSend())"
-                   @onchange="eventArgs => { SetClipCopyAutoSend(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPCOPYANDSEND")</span>                <!--클립보드 복사 후 전송 -->
-        </div>
-            }
+                           @onchange="eventArgs => { SetClipCopyAutoSend(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPCOPYANDSEND")</span>                <!--클립보드 복사 후 전송 -->
+                    </div>
+                }
         </div>
     }
 
@@ -291,41 +291,41 @@
                 <br>
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetURLAutoTrans(NetworkInfo.GroupID))"
-                   @onchange="eventArgs => { SetURLAutoTrans(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO")</span>                  <!--URL 자동전환 사용 -->
-        </div>
+                           @onchange="eventArgs => { SetURLAutoTrans(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO")</span>                  <!--URL 자동전환 사용 -->
+                    </div>
 
-                @if (m_bUseURLRedirectionAlarm)
-                {
-                    <div class="mb-1  w-101">
-                        <input type="checkbox" class="mr-1" checked="@(GetURLAutoAfterMsg(NetworkInfo.GroupID))"
-                   @onchange="eventArgs => { SetURLAutoAfterMsg(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM")</span>               <!--URL 자동전환 알림 -->
-        </div>
+                    @if (m_bUseURLRedirectionAlarm)
+                    {
+                        <div class="mb-1  w-101">
+                            <input type="checkbox" class="mr-1" checked="@(GetURLAutoAfterMsg(NetworkInfo.GroupID))"
+                                   @onchange="eventArgs => { SetURLAutoAfterMsg(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM")</span>               <!--URL 자동전환 알림 -->
+                            </div>
+                        }
+
+                    // 1번째 망꺼 설정값으로만 전체 적용
+                    /*@if (m_bUseURLRedirectionAlarmType)
+                    {
+                    <div class="mb-1  w-102">
+                    <span class="pr-2">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM_TYPE")</span>                                                                 <!--URL 자동전환 알림형식-->
+                    <select value="@(GetURLAutoAfterBrowser(NetworkInfo.GroupID))"
+                    @onchange="eventArgs => { SetURLRedirectType(NetworkInfo.GroupID, eventArgs); }">
+                    <option value="C">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FOLD")</option>                                                                               <!--닫기-->
+                    <option value="N">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN")</option>                                                                               <!--유지-->
+                    <option value="F">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</option>                                                                    <!--특정 URL포워딩-->
+                    </select>
+                    </div>
+                    }
+
+                    @if (false)  // 확인용도
+                    {
+                    <div class="mb-1  w-100">
+                    <span class="pr-3">@(XmlConf.GetTitle("T_FORWARD_URL")+" : "+ GetForwardUrl(NetworkInfo.GroupID)) </span>                                                                 <!-- ForWarding 하는 주소 -->
+                    </div>
+                        }*/
+
+                    <br />
+
                 }
-
-                // 1번째 망꺼 설정값으로만 전체 적용
-                /*@if (m_bUseURLRedirectionAlarmType)
-                {
-                <div class="mb-1  w-102">
-                <span class="pr-2">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM_TYPE")</span>                                                                 <!--URL 자동전환 알림형식-->
-                <select value="@(GetURLAutoAfterBrowser(NetworkInfo.GroupID))"
-                @onchange="eventArgs => { SetURLRedirectType(NetworkInfo.GroupID, eventArgs); }">
-                <option value="C">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FOLD")</option>                                                                               <!--닫기-->
-                <option value="N">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN")</option>                                                                               <!--유지-->
-                <option value="F">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</option>                                                                    <!--특정 URL포워딩-->
-                </select>
-                </div>
-                }
-
-                @if (false)  // 확인용도
-                {
-                <div class="mb-1  w-100">
-                <span class="pr-3">@(XmlConf.GetTitle("T_FORWARD_URL")+" : "+ GetForwardUrl(NetworkInfo.GroupID)) </span>                                                                 <!-- ForWarding 하는 주소 -->
-                </div>
-                    }*/
-
-                <br />
-
-            }
 
             @if (m_bUseURLRedirectionAlarmType)
             {
@@ -338,7 +338,7 @@
                     <!--<option value="N">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN")</option>-->                                                                               <!--유지-->
                     <!--<option value="F">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</option>-->                                                                    <!--특정 URL포워딩-->
                     <!--</select>-->
-            <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         @GetURLAutoAfterBrowser(0)
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenu4" style="min-width:105px">
@@ -361,16 +361,16 @@
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetRMouseFileAddAfterTrans())"
-                   @onchange="eventArgs => { SetRMouseFileAddAfterTrans(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RMOUSEAUTOTRNAS")</span>          <!--마우스 우클릭 자동전송-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetRMouseFileAddAfterTrans(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RMOUSEAUTOTRNAS")</span>          <!--마우스 우클릭 자동전송-->
+                    </div>
+                }
             @if (m_bAfterApprAutoCheck)
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetAfterBasicChk())"
-                   @onchange="eventArgs => { SetAfterBasicChk(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK")</span>                            <!--사후결재 체크-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetAfterBasicChk(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK")</span>                            <!--사후결재 체크-->
+                    </div>
+                }
         </div>
     }
 
@@ -389,16 +389,16 @@
         {
             <div class="mb-1 w-100">
                 <input type="checkbox" class="mr-1" checked="@(GetFileRecvFolderOpen())"
-                   @onchange="eventArgs => { SetFileRecvFolderOpen(eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_AFTEROPENFOLDER_FILEDOWN")</span>             <!--파일 수신 후 폴더 열기-->
-        </div>
-        }
+                       @onchange="eventArgs => { SetFileRecvFolderOpen(eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_AFTEROPENFOLDER_FILEDOWN")</span>             <!--파일 수신 후 폴더 열기-->
+                </div>
+            }
         @if (m_bManualDownFolderChange)
         {
             <div class="mb-1  w-100">
                 <input type="checkbox" class="mr-1" checked="@(GetManualRecvDownChange())"
-                   @onchange="eventArgs => { SetManualRecvDownChange(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_MANUALDOWN_FOLDEROPEN")</span>            <!--수동다운로드 폴더 선택-->
-        </div>
-        }
+                       @onchange="eventArgs => { SetManualRecvDownChange(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_MANUALDOWN_FOLDEROPEN")</span>            <!--수동다운로드 폴더 선택-->
+                </div>
+            }
     </div>
 
     @if (m_bAlarmTray)
@@ -409,37 +409,37 @@
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetFileRecvTrayFix())"
-                   @onchange="eventArgs => { SetFileRecvTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RECVALARM_RETAIN")</span>                 <!--수신 완료 후 알림 유지-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetFileRecvTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RECVALARM_RETAIN")</span>                 <!--수신 완료 후 알림 유지-->
+                    </div>
+                }
             @if (m_bApprCountAlarmRetain)
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetApprTrayFix())"
-                   @onchange="eventArgs => { SetApprTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRWAITALARM_RETAIN")</span>                         <!--승인대기 알림 유지-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetApprTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRWAITALARM_RETAIN")</span>                         <!--승인대기 알림 유지-->
+                    </div>
+                }
             @if (m_bApprCompleteAlarmRetain)
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetUserApprActionTrayFix())"
-                   @onchange="eventArgs => { SetUserApprActionTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRCOMPLETEALARM_RETAIN")</span>              <!--승인완료 알림 유지-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetUserApprActionTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRCOMPLETEALARM_RETAIN")</span>              <!--승인완료 알림 유지-->
+                    </div>
+                }
             @if (m_bApprRejectAlarmRetain)
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetUserApprRejectTrayFix())"
-                   @onchange="eventArgs => { SetUserApprRejectTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRREJECTALARM_RETAIN")</span>                    <!--반려 알림 유지-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetUserApprRejectTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRREJECTALARM_RETAIN")</span>                    <!--반려 알림 유지-->
+                    </div>
+                }
             @if (m_bUseApprCountAlaram)
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetUseApprWaitNoti())"
-                   @onchange="eventArgs => { SetUseApprWaitNoti(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRWAITNOTI_USE")</span>                    <!--승인대기 알림설정-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetUseApprWaitNoti(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRWAITNOTI_USE")</span>                    <!--승인대기 알림설정-->
+                    </div>
+                }
         </div>
     }
 
@@ -451,16 +451,16 @@
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetExitTrayMove())"
-                   @onchange="eventArgs => { SetExitTrayMove(eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_EXITKEY_MOVETRAY")</span>                            <!--종료 시, 트레이로 이동-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetExitTrayMove(eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_EXITKEY_MOVETRAY")</span>                            <!--종료 시, 트레이로 이동-->
+                    </div>
+                }
             @if (m_bUseStartTrayMove)
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetStartTrayMove())"
-                   @onchange="eventArgs => { SetStartTrayMove(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_PROGRAMSTART_MOVETRAY")</span>                       <!--프로그램 시작 시, 트레이 이동-->
-        </div>
-            }
+                           @onchange="eventArgs => { SetStartTrayMove(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_PROGRAMSTART_MOVETRAY")</span>                       <!--프로그램 시작 시, 트레이 이동-->
+                    </div>
+                }
         </div>
     }
 
@@ -470,10 +470,10 @@
         <div class="ml-2 mb-4">
             <div class="mb-1  w-100">
                 <input type="checkbox" class="mr-1" checked="@(GetStartProgramReg())"
-                   @onchange="eventArgs => { SetStartProgramReg(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_PROGRAMSTART_REG")</span>                           <!--시작 프로그램에 등록-->
-        </div>
-        </div>
-    }
+                       @onchange="eventArgs => { SetStartProgramReg(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_PROGRAMSTART_REG")</span>                           <!--시작 프로그램에 등록-->
+                </div>
+            </div>
+        }
 
     @if (m_bUseLanguageSet)
     {
@@ -489,7 +489,7 @@
                 <!--<option value="CN">@XmlConf.GetTitle("T_LANGUAGE_CHINA")</option>-->                                                                                             <!--중국어-->
                 <!--<option value="EN">@XmlConf.GetTitle("T_LANGUAGE_ENGLISH")</option>-->                                                                                             <!--영어-->
                 <!--</select>-->
-            <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     @GetLanguage()
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenu5" style="min-width:85px">
@@ -504,28 +504,28 @@
     }
 
     @*2023.06.01 화면잠금에 대한 표시 및 설정은 사용자 접근 불가로 변경*@
-  @*  @if (m_bUseScreenLock)
-    {
-        <div class="r_set_sub">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</div> <!--화면잠금-->
-        <div class="ml-2 mb-4">
-            <div class="mb-1  w-100">
-                @if (m_bScreenLockUserChange == true)
-                {
-                    <input type="checkbox" class="mr-1" checked="@(GetScreenLock())"
-                   @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-1">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
-                    <input type="text" value="@(GetScreenTime())" class="mr-2 col-md-2" style="text-align:right"
-                   @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
-                }
-                else
-                {
-                    <input disabled="disabled" type="checkbox" class="mr-1" checked="@(GetScreenLock())"
-                   @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-1">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
-                    <input readonly="readonly" type="text" value="@(GetScreenTime())" class="mr-2 col-md-2" style="text-align:right"
-                   @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
-                }
+    @*  @if (m_bUseScreenLock)
+        {
+            <div class="r_set_sub">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</div> <!--화면잠금-->
+            <div class="ml-2 mb-4">
+                <div class="mb-1  w-100">
+                    @if (m_bScreenLockUserChange == true)
+                    {
+                        <input type="checkbox" class="mr-1" checked="@(GetScreenLock())"
+                       @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-1">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
+                        <input type="text" value="@(GetScreenTime())" class="mr-2 col-md-2" style="text-align:right"
+                       @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
+                    }
+                    else
+                    {
+                        <input disabled="disabled" type="checkbox" class="mr-1" checked="@(GetScreenLock())"
+                       @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-1">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
+                        <input readonly="readonly" type="text" value="@(GetScreenTime())" class="mr-2 col-md-2" style="text-align:right"
+                       @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
+                    }
+                </div>
             </div>
-        </div>
-    }*@
+        }*@
 
     @if (m_bLogLevelSet)
     {
@@ -543,7 +543,7 @@
                 <!--<option value="@LogEventLevel.Error">@XmlConf.GetTitle("T_LOGLEVEL_ERROR")</option>-->                                                                                             <!--영어-->
                 <!--<option value="@LogEventLevel.Fatal">@XmlConf.GetTitle("T_LOGLEVEL_FATAL")</option>-->                                                                                             <!--영어-->
                 <!--</select>-->
-            <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu6" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu6" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     @GetLogLevel()
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenu6" style="min-width:105px">
@@ -558,6 +558,23 @@
         </div>
     }
 
+<div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_AGENT_INFO") <span @onclick="@(async () => VersionView())" class="fas fa-arrow-circle-right ml-1" style="cursor: pointer;"></span></div>
+@*<div class="r_set_sub" @onclick="@(async () => VersionView())" style="cursor: pointer;">@XmlConf.GetTitle("T_APPCONFIG_AGENT_INFO")</div>*@
+    @if (versionView)
+    {
+        <div class="ml-2 mb-4" style="display:block">
+            <div class="mb-1  w-100">@GetServerVersion()</div>
+            <div class="mb-1  w-100">@GetNetLinkVersion()</div>
+        </div>
+    }
+    @if (!versionView)
+    {
+        <div class="ml-2 mb-4" style="display:none">
+            <div class="mb-1  w-100">@GetServerVersion()</div>
+            <div class="mb-1  w-100">@GetNetLinkVersion()</div>
+        </div>
+    }
+
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_UPDATE")</div>                                                                                                       <!--업데이트-->
     <div class="ml-2 mb-5 updates">
         <ul class="mb-1  w-100 ">
@@ -567,8 +584,9 @@
         </ul>
 
     </div>
-
 </div>
+
+
 
 <!-- /.Control Sidebar -->
 <SelectSaveFolder @ref="refSelectSaveFolder" OnSaveDirPath="SaveDownloadDir"></SelectSaveFolder>
@@ -640,7 +658,7 @@
     SGDownloadUpdate refSGDownloadUpdate;
     SGFinishedDownload refSGFinishedDownload;
     SGMessageNotification refSGMessageNotification;
-    
+
 
     public bool m_bUseClipBoard = true;
     public bool m_bUseMainPage = true;
@@ -669,7 +687,9 @@
 
     public bool m_bTrayMove = true;
     public bool m_bAlarmTray = true;
-    
+
+    private bool versionView = false;
+
     //2023.06.01 화면잠금에 대한 설정 및 확인은 사용자 확인 불가
     //public bool m_bScreenLockUserChange = false;                                        // 화면잠금을 사용자가 설정변경할수 있음(true), 없음(false)
 
@@ -737,22 +757,22 @@
     {
 
         @* ScreenLock 일 경우 다중망일 경우에도 GroupId 0 정책을 따른다.
-        m_bScreenLockUserChange = OpConfigSvc.GetScreenLockUserChange(0);      
-        m_bUseScreenLock = SGAppMgrSvc.OpConfigInfoService.GetScreenLockUserChange(0);  // siteConfig.GetUseScreenLock()
-        if (m_bUseScreenLock)
-        {
-            HsCmdCenter.sgPageEvent.SetScreenTimeInitNotiEvent(ScreenLockTimeInitNoti);
-
-            ScreenTimeChangeNotiEvent screentimeChgEvent = null;
-            int time = GetScreenTime();
-            screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
-            if (screentimeChgEvent != null)
+            m_bScreenLockUserChange = OpConfigSvc.GetScreenLockUserChange(0);
+            m_bUseScreenLock = SGAppMgrSvc.OpConfigInfoService.GetScreenLockUserChange(0);  // siteConfig.GetUseScreenLock()
+            if (m_bUseScreenLock)
             {
-                ConfigArgs config = new ConfigArgs();
-                config.ScreenTime = time;
-                screentimeChgEvent(pageService.m_nCurViewPageGroupID, config);
-            }
-        }*@
+                HsCmdCenter.sgPageEvent.SetScreenTimeInitNotiEvent(ScreenLockTimeInitNoti);
+
+                ScreenTimeChangeNotiEvent screentimeChgEvent = null;
+                int time = GetScreenTime();
+                screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
+                if (screentimeChgEvent != null)
+                {
+                    ConfigArgs config = new ConfigArgs();
+                    config.ScreenTime = time;
+                    screentimeChgEvent(pageService.m_nCurViewPageGroupID, config);
+                }
+            }*@
 
         HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
         HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
@@ -802,7 +822,7 @@
 
     /**
     *@brief 3망연계 설정때, 추가망들 단축키 - groupId, nIdx
-    */
+*/
     void CheckBoxModifierClickedNetOver(int groupId, int nIdx, HOTKEY_MOD modifier, ChangeEventArgs changeEventArg)
     {
         bool bMod = Convert.ToBoolean(changeEventArg.Value);
@@ -1101,6 +1121,28 @@
     private string GetLastUpdated()
     {
         return VersionConfigSvc.GetLastUpdated();
+    }
+
+    private string GetServerVersion()
+    {
+        HsNetWorkSGData.SGData sgData = HsCmdCenter.GetSGSvrData(0);
+        if (sgData != null)
+        {
+            string str = sgData.GetBasicTagData("SERVERVESION");
+            return str;
+        }
+        return "";
+    }
+
+    private string GetNetLinkVersion()
+    {
+        HsNetWorkSGData.SGData sgData = HsCmdCenter.GetSGSvrData(0);
+        if (sgData != null)
+        {
+            string str = sgData.GetBasicTagData("NETLINKVERSION");
+            return str;
+        }
+        return "";
     }
 
     private string GetSWVersion()
@@ -1449,33 +1491,33 @@
         }
 
         @*bool bFind = false;
-        int count = AppConfigSvc.AppConfigInfo.RecvDownPath.Count;
-        string strPreDownPath = "";
-        for (int i = 0; i < count; i++)
-        {
-            if (groupId == i)
+            int count = AppConfigSvc.AppConfigInfo.RecvDownPath.Count;
+            string strPreDownPath = "";
+            for (int i = 0; i < count; i++)
             {
-                strPreDownPath = GetRecvDownPath(groupId);
-                continue;
-            }
+                if (groupId == i)
+                {
+                    strPreDownPath = GetRecvDownPath(groupId);
+                    continue;
+                }
 
-            if (stPath.Equals(AppConfigSvc.AppConfigInfo.RecvDownPath[i]))
+                if (stPath.Equals(AppConfigSvc.AppConfigInfo.RecvDownPath[i]))
+                {
+                    bFind = true;
+                }
+            }
+            if (bFind)
             {
-                bFind = true;
-            }
-        }
-        if (bFind)
-        {
-            CtrlSideUISvc.SetRecvDownPath(groupId, strPreDownPath);
-            await Task.Delay(1);    // flush UI changes
+                CtrlSideUISvc.SetRecvDownPath(groupId, strPreDownPath);
+                await Task.Delay(1);    // flush UI changes
 
-            CLog.Here().Information($"RecvDownPath Set: [{strPreDownPath}]");
-            await Task.Delay(500);
-            string strMsg = XmlConf.GetWarnMsg("W_0244");                                   // 설정하려는 수신폴더는 다른망의 수신폴더와 동일합니다./r/n다시 설정하여 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("warn", strMsg);
-            return;
-        }*@
+                CLog.Here().Information($"RecvDownPath Set: [{strPreDownPath}]");
+                await Task.Delay(500);
+                string strMsg = XmlConf.GetWarnMsg("W_0244");                                   // 설정하려는 수신폴더는 다른망의 수신폴더와 동일합니다./r/n다시 설정하여 주십시요.
+                strMsg = strMsg.Replace("/r/n", "<br>");
+                ShowMessage("warn", strMsg);
+                return;
+            }*@
 
         //HsCmdCenter.SetDownLoadPath(groupId, stPath);
         //HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
@@ -1631,41 +1673,41 @@
         CLog.Here().Information($"Set DownLoadPath, BaseDownLoadPath, RecvDownPath Set: [{stPath}] useUserPath : {SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId)}");   // siteConfig
     }
 
-@*    /// <summary>
-    /// 화면잠금 시간값 변경 저장 및 전달
-    /// </summary>
-    /// <param name="changeEventArg"></param>
-    private async void SetScreenTime(ChangeEventArgs changeEventArg)
-    {
-        int screenTime = Convert.ToInt32(changeEventArg.Value);
-        if ((screenTime > m_nSvrTime) && (m_nSvrTime != 0))
+    @*    /// <summary>
+        /// 화면잠금 시간값 변경 저장 및 전달
+        /// </summary>
+        /// <param name="changeEventArg"></param>
+        private async void SetScreenTime(ChangeEventArgs changeEventArg)
         {
-            int PrevScreentTime = GetScreenTime();
+            int screenTime = Convert.ToInt32(changeEventArg.Value);
+            if ((screenTime > m_nSvrTime) && (m_nSvrTime != 0))
+            {
+                int PrevScreentTime = GetScreenTime();
+                CtrlSideUISvc.SetScreenTime(screenTime);
+                await Task.Delay(1);    // flush UI changes
+
+                CtrlSideUISvc.SetScreenTime(PrevScreentTime);
+                await Task.Delay(1);    // flush UI changes
+
+                CLog.Here().Information($"ScreeenTime Set: [{PrevScreentTime}]");
+                await Task.Delay(500);
+                string strMsg = XmlConf.GetWarnMsg("W_0073");
+                strMsg = String.Format(strMsg, m_nSvrTime);
+                ShowMessage("warn", strMsg);
+                return;
+            }
+            CLog.Here().Information($"ScreeenTime Set: [{screenTime}]");
             CtrlSideUISvc.SetScreenTime(screenTime);
-            await Task.Delay(1);    // flush UI changes
 
-            CtrlSideUISvc.SetScreenTime(PrevScreentTime);
-            await Task.Delay(1);    // flush UI changes
-
-            CLog.Here().Information($"ScreeenTime Set: [{PrevScreentTime}]");
-            await Task.Delay(500);
-            string strMsg = XmlConf.GetWarnMsg("W_0073");
-            strMsg = String.Format(strMsg, m_nSvrTime);
-            ShowMessage("warn", strMsg);
-            return;
-        }
-        CLog.Here().Information($"ScreeenTime Set: [{screenTime}]");
-        CtrlSideUISvc.SetScreenTime(screenTime);
-
-        ScreenTimeChangeNotiEvent screentimeChgEvent = null;
-        screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
-        if (screentimeChgEvent != null)
-        {
-            ConfigArgs config = new ConfigArgs();
-            config.ScreenTime = screenTime;
-            screentimeChgEvent(0, config);
-        }
-    }*@
+            ScreenTimeChangeNotiEvent screentimeChgEvent = null;
+            screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
+            if (screentimeChgEvent != null)
+            {
+                ConfigArgs config = new ConfigArgs();
+                config.ScreenTime = screenTime;
+                screentimeChgEvent(0, config);
+            }
+        }*@
 
 
     private void SetLogLevel(ChangeEventArgs changeEventArg)
@@ -1720,54 +1762,54 @@
         return NetWorkSvc.NetWorkInfo;
     }
 
-   @* /// <summary>
-    /// 서버에서 받은 화면잠금 시간값 설정(받은 값중 최소값으로 설정)
-    /// </summary>
-    /// <param name="groupID"></param>
-    /// <param name="e"></param>
-    public void ScreenLockTimeInitNoti(int groupID, ConfigArgs e)
-    {
-        int time = e.ScreenTime;
-        m_bUseScreenLock = (time == 0) ? false : true;
-
-        if (!m_bUseScreenLock)
+    @* /// <summary>
+        /// 서버에서 받은 화면잠금 시간값 설정(받은 값중 최소값으로 설정)
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <param name="e"></param>
+        public void ScreenLockTimeInitNoti(int groupID, ConfigArgs e)
         {
-            CtrlSideUISvc.SetScreenLock(m_bUseScreenLock);
-            CtrlSideUISvc.SetScreenTime(time);
-        }
+            int time = e.ScreenTime;
+            m_bUseScreenLock = (time == 0) ? false : true;
 
-        if (m_bUseScreenLock)
-        {
-            // logout 까지 고려
-            if (m_nSvrTime == 0)
-                m_nSvrTime = time;
-            else
+            if (!m_bUseScreenLock)
             {
-                if (time < m_nSvrTime)
-                    m_nSvrTime = time;
+                CtrlSideUISvc.SetScreenLock(m_bUseScreenLock);
+                CtrlSideUISvc.SetScreenTime(time);
             }
 
-            if (time > 0)
+            if (m_bUseScreenLock)
             {
-                int nLocalTime = GetScreenTime();
-                if (time < nLocalTime)              // 서버의 화면잠금 시간값보다 크면 서버 화면잠금 시간값으로 저장 / 적용
+                // logout 까지 고려
+                if (m_nSvrTime == 0)
+                    m_nSvrTime = time;
+                else
                 {
-                    nLocalTime = time;
-                    ChangeEventArgs args = new ChangeEventArgs();
-                    args.Value = time;
-                    SetScreenTime(args);
-                    ScreenTimeChangeNotiEvent screentimeChgEvent = null;
-                    screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
-                    if (screentimeChgEvent != null)
+                    if (time < m_nSvrTime)
+                        m_nSvrTime = time;
+                }
+
+                if (time > 0)
+                {
+                    int nLocalTime = GetScreenTime();
+                    if (time < nLocalTime)              // 서버의 화면잠금 시간값보다 크면 서버 화면잠금 시간값으로 저장 / 적용
                     {
-                        ConfigArgs config = new ConfigArgs();
-                        config.ScreenTime = time;
-                        screentimeChgEvent(groupID, config);
+                        nLocalTime = time;
+                        ChangeEventArgs args = new ChangeEventArgs();
+                        args.Value = time;
+                        SetScreenTime(args);
+                        ScreenTimeChangeNotiEvent screentimeChgEvent = null;
+                        screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
+                        if (screentimeChgEvent != null)
+                        {
+                            ConfigArgs config = new ConfigArgs();
+                            config.ScreenTime = time;
+                            screentimeChgEvent(groupID, config);
+                        }
                     }
                 }
             }
-        }
-    }*@
+        }*@
 
 
     private void ShowMessage(string strType, string strMsg)
@@ -2043,6 +2085,11 @@
         });
     }
     */
+    public async void VersionView()
+    {
+        versionView = !versionView;
+        StateHasChanged();
+    }
 
     public async void CheckUpdatesControlClick()
     {
@@ -2062,7 +2109,7 @@
         }
 
         //업데이트 진행은 아니지만, Update Cancel 중이면 SKIP
-        if(AppUpdaterSvc.IsCancelRequested)
+        if (AppUpdaterSvc.IsCancelRequested)
         {
             CLog.Here().Information($"[GID:{groupId}] SKIP - Update Canceling...");
             refSGMessageNotification?.OpenPopUp($"We are working on [Canceling] the update.{Environment.NewLine}Please try again in a few minutes. :(");
@@ -2070,7 +2117,7 @@
         }
 
 
-         await Task.Run(() =>
+        await Task.Run(() =>
         {
             AppUpdaterSvc.CheckUpdatesClick(groupId, refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
         });
@@ -2100,10 +2147,10 @@
     }
 
     @*private void OpenDownloadUpdate(string downloadInfo)
-    {
-        refSGDownloadUpdate.OpenPopUp(downloadInfo);
-    }
-*@
+        {
+            refSGDownloadUpdate.OpenPopUp(downloadInfo);
+        }
+    *@
     private void CancelDownloadUpdate()
     {
         AppUpdaterSvc.RequestCancelFileDownload();
@@ -2132,14 +2179,14 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="isTotalPathch">전체패치 여부 (서버의 PATCHMODE =1 )</param>
     public async void clientUpgradeExe(int groupId, bool isTotalPathch)
     {
         Console.WriteLine("clientUpgradeExe : " + isTotalPathch.ToString());
-        
+
         if (isTotalPathch || SGAppMgrSvc.OpConfigInfoService.GetUseForceBackgroundUpdate(groupId))
         {
             //서버설정의 PATCHMODE = 1 (전체패지) 인 경우, 강제 패치처리
