@@ -121,7 +121,7 @@
                                     <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_TRANS_TITLE")</label>
                                     <div class="col-sm-11 pr-0 pl-0">
                                         <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@strCurTitle" @bind="strBindTitle" autocomplete="off">
-                                        <input type="text" hidden="hidden"/>
+                                        <input type="text" hidden="hidden" />
                                     </div>
                                 </div>
 
@@ -558,8 +558,9 @@
                     {
                         if (string.IsNullOrEmpty(policy[0]) || policy[0] == "0")
                         {
-                            initReason = "";
-                            useReason = false;
+                            //Default
+                            initReason = strBindDesc;
+                            useReason = true;
                         }
                         else if (policy[0] == "1")
                         {
@@ -571,6 +572,11 @@
                             initReason = strBindDesc;
                             useReason = true;
                         }
+                    }
+                    else
+                    {
+                        initReason = strBindDesc;
+                        useReason = true;
                     }
 
                     refApproveExtApproverSelect_PopUp.SetInitReason(useReason, initReason);
@@ -681,7 +687,7 @@
                         cntSendQuery++;
                         }*@
 
-                    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
+    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
                     SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "", sgLoginData.GetApproveProxyRight());
                     cntSendQuery++;
                 }
@@ -862,6 +868,11 @@
                         strContents = strTitle;
                     }
                 }
+                else
+                {
+                    strContents = refApproveExtApproverSelect_PopUp.strBindTitle;
+                }
+
             }
         }
 
@@ -1089,8 +1100,9 @@
                 {
                     if (string.IsNullOrEmpty(policy[0]) || policy[0] == "0")
                     {
-                        initReason = "";
-                        useReason = false;
+                        //Default
+                        initReason = strBindDesc;
+                        useReason = true;
                     }
                     else if (policy[0] == "1")
                     {
@@ -1103,7 +1115,12 @@
                         useReason = true;
                     }
                 }
-                refApproveExtApproverSelect_PopUp.SetInitReason(useReason,initReason);
+                else
+                {
+                    initReason = strBindDesc;
+                    useReason = true;                    
+                }
+                refApproveExtApproverSelect_PopUp.SetInitReason(useReason, initReason);
                 await refApproveExtApproverSelect_PopUp.openPopUp();
             }
             else
