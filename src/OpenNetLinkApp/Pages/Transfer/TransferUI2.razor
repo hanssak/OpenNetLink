@@ -458,6 +458,26 @@
                 }
             }
 
+            if(!strBindTitle.ValidationSqlInjection())
+            {
+                string strMsg = XmlConf.GetWarnMsg("W_0292");                //제목에 사용할 수 없는 문자가 입력되었습니다.\r\n제목을 다시 입력해 주십시요.
+                ShowMessage("warn", strMsg);
+                strBindTitle = "";
+                strBindDesc = "";
+                StateHasChanged();
+                return;
+            }
+
+            if(!strBindDesc.ValidationSqlInjection())
+            {
+                string strMsg = XmlConf.GetWarnMsg("W_0293");            //설명에 사용할 수 없는 문자가 입력되었습니다.\r\n설명을 다시 입력해 주십시요.
+                ShowMessage("warn", strMsg);
+                strBindTitle = "";
+                strBindDesc = "";
+                StateHasChanged();
+                return;
+            }
+
 	        // 최소길이 체크 동작
             if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupID))
             {
