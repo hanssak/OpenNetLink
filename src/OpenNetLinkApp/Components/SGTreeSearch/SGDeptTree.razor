@@ -1,3 +1,4 @@
+@using HsNetWorkSG
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.PageEvent
@@ -164,6 +165,17 @@
 
     void callBackSearch()
     {
+        if(!strInputDept.ValidationSqlInjection())
+        {
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
+            return;
+        }
+        
+        if(!strInputName.ValidationSqlInjection())
+        {
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
+            return;
+        }
         OnSearchClick.InvokeAsync(new string[] { strInputDept, strInputName });
     }
 

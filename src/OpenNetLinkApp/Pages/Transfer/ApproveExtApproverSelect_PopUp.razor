@@ -533,6 +533,12 @@
             return;
         }
 
+        if(!strBindTitle.ValidationSqlInjection())
+        {
+             ShowMessage("warning", XmlConf.GetWarnMsg("W_0294"));
+            return;
+        }
+
         string strApproveExtPolicy = "";
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)

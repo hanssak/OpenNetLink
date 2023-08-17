@@ -573,6 +573,13 @@
                 return;
             }
 
+            if(!id.ValidationSqlInjection())
+            {
+                ShowLoginFail(XmlConf.GetErrMsg("E_0119"));
+                SetProtectedPW(string.Empty);
+                return;
+            }
+
             ShowMessage("info", XmlConf.GetInfoMsg(DoLoginForce ? "I_0237" : "I_0238"));
 
             HSCmdCenter.sgPageEvent.SetLoginEventAdd(nGroupID, LoginpopUpResult);

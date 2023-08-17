@@ -2,6 +2,7 @@
 @page "/transferApprove/{groupIDbyParam:int}"
 @page "/transferApprove/{groupIDbyParam:int}/{menuMode:int}"
 
+@using HsNetWorkSG
 @using OpenNetLinkApp.Services
 @using HsNetWorkSGData;
 @using OpenNetLinkApp.Models.SGNetwork
@@ -864,6 +865,18 @@
             strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
             strMsg = strMsg.Replace("/r/n", "<br>");
             ShowMessage("error", strMsg);
+            return;
+        }
+
+         if(!strReqUserValue.ValidationSqlInjection())
+        {
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
+            return;
+        }
+
+        if(!strTitleValue.ValidationSqlInjection())
+        {
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
             return;
         }
 

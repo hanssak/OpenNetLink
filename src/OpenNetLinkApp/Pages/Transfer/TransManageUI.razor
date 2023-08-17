@@ -568,7 +568,7 @@
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
-        if (sgSideBar != null)
+            if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
         HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
@@ -712,6 +712,12 @@
             strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
             strMsg = strMsg.Replace("/r/n", "<br>");
             ShowMessage("error", strMsg);
+            return;
+        }
+
+        if(!strTitleValue.ValidationSqlInjection())
+        {
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
             return;
         }
         //int groupID = 0;

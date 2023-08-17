@@ -1,3 +1,4 @@
+@using HsNetWorkSG
 @using OpenNetLinkApp.Common
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery
@@ -156,6 +157,19 @@
 
     void callBackSearch()
     {
+        if(!strInputDept.ValidationSqlInjection())
+        {
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
+            return;
+        }
+        
+        if(!strInputName.ValidationSqlInjection())
+        {
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
+            return;
+        }
+
+
         if (OnSearchClick.HasDelegate)
             OnSearchClick.InvokeAsync(new string[] { strInputDept, strInputName });
     }
@@ -186,5 +200,18 @@
         }
         currentSelectKey = selectedItem.UserSeq;
         lastIndex = selectedItem.Index;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="strType"></param>
+    /// <param name="strMsg"></param>
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string  strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 }
