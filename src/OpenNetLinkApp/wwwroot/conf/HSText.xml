@@ -1310,7 +1310,7 @@
 			<EN>File list is needed approval.</EN>
 			<CN></CN>
 		</T_COMMON_APPROVE_EXT>
-		
+
 
 		<T_COMMON_REMARK>
 			<KR>비고</KR>
@@ -1318,7 +1318,7 @@
 			<EN>Note</EN>
 			<CN></CN>
 		</T_COMMON_REMARK>
-		
+
 
 		<T_COMMON_APPROVE_EXT_ITEM>
 			<KR>결재필요(제한파일)</KR>
@@ -1341,6 +1341,19 @@
 			<EN>'{0}', This character is not supported.</EN>
 			<CN></CN>
 		</T_COMMON_OS_NOT_FILENAME_CHAR>
+
+		<T_COMMON_CRYPTO_VIOLATION_TITLE>
+			<KR>암호화 키 파일 손상</KR>
+			<JP></JP>
+			<EN>The file used for the encryption key is broken.</EN>
+			<CN></CN>
+		</T_COMMON_CRYPTO_VIOLATION_TITLE>
+		<T_COMMON_CRYPTO_VIOLATION_MESSAGE>
+			<KR>암호화 키 파일이 손상되었습니다.<![CDATA[<br>]]>프로그램을 종료합니다.<![CDATA[<br>]]>재설치해주세요.</KR>
+			<JP></JP>
+			<EN>The file used for the encryption key is broken.<![CDATA[<br>]]>The program will be closed.<![CDATA[<br>]]>Please reinstall the program.</EN>
+			<CN></CN>
+		</T_COMMON_CRYPTO_VIOLATION_MESSAGE>
 
 
 		<!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
@@ -1855,7 +1868,7 @@
 		<!-- ********************************************* [END] 파일 전송 화면 (T_FILE_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] 전송 관리 화면 (T_TRANS_0000) ********************************************* -->
-	
+
 		<T_TRANS_COMPLETE>
 			<KR>PC수신완료</KR>
 			<JP>PC受信完了</JP>
@@ -2564,14 +2577,14 @@
 		<T_INFO_USER_APPROVE_RIGHT>
 			<KR>결재 권한</KR>
 			<JP></JP>
-			<EN>Approval authority</EN>
+			<EN>Appr.Auth</EN>
 			<CN></CN>
 		</T_INFO_USER_APPROVE_RIGHT>
 
 		<T_INFO_USER_PRIVACY_APPROVE_RIGHT>
 			<KR>보안 결재 권한</KR>
 			<JP></JP>
-			<EN>Secure approval authority</EN>
+			<EN>Secure Appr.Auth.</EN>
 			<CN></CN>
 		</T_INFO_USER_PRIVACY_APPROVE_RIGHT>
 
@@ -2704,7 +2717,7 @@
 		<T_INFO_LIMMIT_FILE>
 			<KR>전송최대용량</KR>
 			<JP>転送最大サイズ</JP>
-			<EN>The maximum transmission capacity</EN>
+			<EN>Max. transfer capacity</EN>
 			<CN>最大传输容量</CN>
 		</T_INFO_LIMMIT_FILE>
 
@@ -2809,7 +2822,7 @@
 		<T_COMMON_SIZELIMMIT_CLIPBOARD>
 			<KR>클립보드 최대용량</KR>
 			<JP></JP>
-			<EN>Maximum size of Clipboard</EN>
+			<EN>Max. Size of Clipboard</EN>
 			<CN>剪贴板最大容量</CN>
 		</T_COMMON_SIZELIMMIT_CLIPBOARD>
 
@@ -2830,21 +2843,21 @@
 		<T_INFO_ONEDAY_TRANCE_COUNTLIMIT>
 			<KR>일일 전송횟수 제한</KR>
 			<JP></JP>
-			<EN>Limit the number of transmissions</EN>
+			<EN>Limit the Num. of transfer</EN>
 			<CN>传输次数限制</CN>
 		</T_INFO_ONEDAY_TRANCE_COUNTLIMIT>
 
 		<T_INFO_ONEDAY_TRANCE_SIZELIMIT>
 			<KR>일일 전송용량 제한</KR>
 			<JP></JP>
-			<EN>Transmission capacity limit</EN>
+			<EN>transfer capacity limit</EN>
 			<CN>传输容量限制</CN>
 		</T_INFO_ONEDAY_TRANCE_SIZELIMIT>
 
 		<T_INFO_APPROVEEXCEPTION_SIZELIMIT>
 			<KR>전송가능 용량</KR>
 			<JP></JP>
-			<EN>Transmission capacity</EN>
+			<EN>transfer capacity</EN>
 			<CN></CN>
 		</T_INFO_APPROVEEXCEPTION_SIZELIMIT>
 
@@ -3015,7 +3028,7 @@
 		<!-- ********************************************* [END] 대결재 관련 화면 (T_PROXY_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] 메일관련 화면 (T_EMAIL_0000) ********************************************* -->
-		
+
 		<T_EMAIL_RECEIVER_NEEDED>
 			<KR>수신자를 입력해 주세요.</KR>
 			<JP></JP>
@@ -3126,7 +3139,7 @@
 
 
 		<!-- ********************************************* [START] 인증서전송 화면 (T_PKI_0000) ********************************************* -->
-		
+
 		<T_PKI_MENU_NAME>
 			<KR>인증서전송</KR>
 			<JP></JP>
@@ -3134,12 +3147,21 @@
 			<CN></CN>
 		</T_PKI_MENU_NAME>
 
+		<T_PKI_TITLE_DESC>
+			<KR>인증서 전송</KR>
+			<JP></JP>
+			<EN>Certificates transfer</EN>
+			<CN></CN>
+		</T_PKI_TITLE_DESC>
+
+
+
 		<!-- ********************************************* [END] 인증서전송 화면 (T_PKI_0000) ********************************************* -->
 
 
 
 		<!-- ********************************************* [START] 구글 OTP (T_GOOGLE_OTP_0000) ********************************************* -->
-		
+
 		<T_GOOGLE_OTP_TITLE>
 			<KR>OTP 등록 및 인증</KR>
 			<JP></JP>
@@ -3201,7 +3223,7 @@
 		<!-- ********************************************* [END] ETC (T_GOOGLE_OTP_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] GPKI 인증서 화면 (T_GPKI_0000) ********************************************* -->
-		
+
 		<T_GPKI_TITLE>
 			<KR>인증서 선택</KR>
 			<JP></JP>
@@ -3322,7 +3344,7 @@
 			<EN>Start logging in with your credentials.</EN>
 			<CN>登录证书</CN>
 		</T_GPKI_LOGIN_DO>
-		
+
 
 
 
@@ -3420,7 +3442,7 @@
 		</T_PKI_TRANS_EXPIRED>
 
 		<!-- ********************************************* [END] PKI 인증서 전송화면 (T_PKI_0000) ********************************************* -->
-		
+
 		<!-- ********************************************* [START] OKTA 인증 화면 (T_OKTA_AUTH_0000) ********************************************* -->
 		<T_OKTA_AUTH_TITLE>
 			<KR>OKTA 인증</KR>
@@ -3443,7 +3465,7 @@
 		<!-- ********************************************* [END] OKTA 인증 화면 (T_OKTA_AUTH_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] ETC (T_ETC_0000) ********************************************* -->
-		
+
 		<T_ETC_LOGIN>
 			<KR>Login</KR>
 			<JP>ログイン</JP>
@@ -3528,6 +3550,75 @@
 			<CN></CN>
 		</T_ETC_PASSWORD_GUIDE_INFO>
 
+		<T_ETC_PASSWORD_GUIDE_INFO_EX1>
+			<KR>비밀번호를 영문 대문자/소문자/숫자/특수문자 중 {0}가지 이상을 조합하여 {1}자리 이상으로 입력하세요.(스페이스 사용 불가).</KR>
+			<JP></JP>
+			<EN>Please enter a password with at least {1} digits in combination of {0} or more of uppercase/lowercase letters/numbers/special characters in English. (Blank not allowed)</EN>
+			<CN></CN>
+		</T_ETC_PASSWORD_GUIDE_INFO_EX1>
+
+		<T_ETC_PASSWORD_NO_ID>
+			<KR>아이디를 비밀번호로 지정할 수 없습니다.</KR>
+			<JP></JP>
+			<EN>The password cannot be the same as the ID.</EN>
+			<CN></CN>
+		</T_ETC_PASSWORD_NO_ID>
+
+		<T_ETC_PASSWORD_NOW_PW>
+			<KR>현재 비밀번호와 동일하게 지정할 수 없습니다.</KR>
+			<JP></JP>
+			<EN>The new password cannot be the same as the current password.</EN>
+			<CN></CN>
+		</T_ETC_PASSWORD_NOW_PW>
+
+		<T_ETC_PASSWORD_SAMECHAR>
+			<KR>동일한 문자가 연속되게 지정할 수 없습니다.</KR>
+			<JP></JP>
+			<EN>A new password cannot contain consecutive identical characters.</EN>
+			<CN></CN>
+		</T_ETC_PASSWORD_SAMECHAR>
+
+		<T_ETC_PASSWORD_KEYBOARD_LINEAR>
+			<KR>키보드상의 연속된 문자 또는 숫자를 순차적으로 지정할 수 없습니다.</KR>
+			<JP></JP>
+			<EN>The new password cannot be a sequence of letters or numbers on the keyboard.</EN>
+			<CN></CN>
+		</T_ETC_PASSWORD_KEYBOARD_LINEAR>
+
+		<T_ETC_PASSWORD_USED>
+			<KR>이전 사용된 비밀번호는 사용할 수 없습니다.</KR>
+			<JP></JP>
+			<EN>The new password is the same as the old password.</EN>
+			<CN></CN>
+		</T_ETC_PASSWORD_USED>
+
+		<T_ETC_PASSWORD_LENGTH_MSG>
+			<KR>비밀번호는 {0}자리 이상 입력해야 합니다.</KR>
+			<JP></JP>
+			<EN>Password must be at least {0} digits.</EN>
+			<CN></CN>
+		</T_ETC_PASSWORD_LENGTH_MSG>
+
+		<T_ETC_PASSWORD_SAMECHAR_MSG>
+			<KR>연속된 문자는 {0}자리까지만 입력이 가능합니다.</KR>
+			<JP></JP>
+			<EN>Consecutive characters can be entered only up to {0} digits.</EN>
+			<CN></CN>
+		</T_ETC_PASSWORD_SAMECHAR_MSG>
+
+		<T_ETC_PASSWORD_KEYBOARD_LINEAR_MSG>
+			<KR>키보드상의 연속된 문자는 {0}개 이상 사용할 수 없습니다.</KR>
+			<JP></JP>
+			<EN>You cannot use more than {0} consecutive characters on the keyboard.</EN>
+			<CN></CN>
+		</T_ETC_PASSWORD_KEYBOARD_LINEAR_MSG>
+
+		<T_ETC_PASSWORD_CHANGE_ERROR>
+			<KR>비밀번호 변경 중 오류가 발생 하였습니다. 잠시후 다시 시도하십시오.</KR>
+			<JP></JP>
+			<EN>An error occurred while changing your password. Please try again later.</EN>
+			<CN></CN>
+		</T_ETC_PASSWORD_CHANGE_ERROR>
 		<T_ETC_LOGIN_USERID>
 			<KR>아이디</KR>
 			<JP>ＩＤ</JP>
@@ -4399,7 +4490,7 @@
 		<T_ETC_TOTALALARMLOOK>
 			<KR>전체 알림 보기</KR>
 			<JP></JP>
-			<EN>LOGOUT</EN>
+			<EN>View All</EN>
 			<CN></CN>
 		</T_ETC_TOTALALARMLOOK>
 
@@ -4542,7 +4633,7 @@
 			<CN></CN>
 		</T_ETC_RECONNECT_FAILED>
 
-		
+
 		<!-- ********************************************* [END] ETC (T_ETC_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] UNZIP (T_eUNZIP_0000) ********************************************* -->
@@ -4662,7 +4753,7 @@
 		<!-- ********************************************* [END] UNZIP (T_eUNZIP_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] PC URL TITLE ********************************************* -->
-		
+
 		<T_PCURL_SUBSTRITION>
 			<KR>URL 신청</KR>
 			<JP></JP>
@@ -4697,11 +4788,11 @@
 			<EN>Add Receiver</EN>
 			<CN>수신자 추가</CN>
 		</T_FILE_RECEIVER_ADD>
-		
+
 		<!-- ********************************************* [END] PC URL TITLE ********************************************* -->
 
 		<!-- ********************************************* [START] App 설정 (T_APPCONFIG_0000) ********************************************* -->
-			<T_EMAIL_APPROVE_DONE>
+		<T_EMAIL_APPROVE_DONE>
 			<KR>Email 승인작업이 완료 되었습니다.</KR>
 			<JP></JP>
 			<EN>Email Approval is complete.</EN>
@@ -4734,7 +4825,7 @@
 
 
 		<!-- ********************************************* [START] App 설정 (T_APPCONFIG_0000) ********************************************* -->
-		
+
 		<T_APPCONFIG_COMMON>
 			<KR>공통환경설정</KR>
 			<JP></JP>
@@ -4780,7 +4871,7 @@
 		<T_APPCONFIG_URLAUTOTRANS_FORWARD>
 			<KR>특정 URL 포워딩</KR>
 			<JP></JP>
-			<EN>specific URL forwarding</EN>
+			<EN>Specific URL forwarding</EN>
 			<CN></CN>
 		</T_APPCONFIG_URLAUTOTRANS_FORWARD>
 
@@ -4931,10 +5022,16 @@
 			<CN></CN>
 		</T_APPCONFIG_SOFTWARE_VERSION>
 
+		<T_APPCONFIG_AGENT_INFO>
+			<KR>제품정보</KR>
+			<JP></JP>
+			<EN>Solution Information</EN>
+			<CN></CN>
+		</T_APPCONFIG_AGENT_INFO>
 		<!-- ********************************************* [END] App 설정 (T_APPCONFIG_0000) ******************************************** -->
 
 		<!-- ********************************************* [START] Message 설정 (T_MESSAGE_0000) ********************************************* -->
-		
+
 		<T_MESSAGE_BOARDNOTI>
 			<KR>[공지사항]</KR>
 			<JP></JP>
@@ -5022,7 +5119,7 @@
 		<!-- ********************************************* [END] Message 설정 (T_MESSAGE_0000) ******************************************** -->
 
 		<!-- ********************************************* [START] Alarm 설정 (T_ALARM_0000) ********************************************* -->
-		
+
 		<T_ALARM_VIRUS>
 			<KR>바이러스 검출</KR>
 			<JP></JP>
@@ -5064,6 +5161,13 @@
 			<EN>Under Mail Approval</EN>
 			<CN></CN>
 		</T_ALARM_EMAILAPPRWAIT>
+
+		<T_ALARM_EMAILSECUREAPPRWAIT>
+			<KR>메일 보안결재 승인대기</KR>
+			<JP></JP>
+			<EN>Under Mail security Approval</EN>
+			<CN></CN>
+		</T_ALARM_EMAILSECUREAPPRWAIT>
 
 		<T_ALARM_APPRCONFIRM>
 			<KR>결재 승인 완료</KR>
@@ -5265,7 +5369,7 @@
 			<CN></CN>
 		</T_RECONNECT_FAILED_APPEXIT>
 
-		
+
 		<!-- ********************************************* [END] Alarm 설정 (T_ALARM_0000) ******************************************** -->
 
 
@@ -5346,8 +5450,8 @@
 			<JP></JP>
 			<EN>Default</EN>
 			<CN></CN>
-		</T_PAGE_TYPE_INIT>		
-			
+		</T_PAGE_TYPE_INIT>
+
 		<T_PAGE_TYPE_DASHBOARD>
 			<KR>대시보드</KR>
 			<JP></JP>
@@ -5375,7 +5479,7 @@
 			<EN>Drive</EN>
 			<CN></CN>
 		</T_DRIVE_VOLUMNE_DEFAULT_NAME>
-		
+
 		<T_MESSAGE_TAG_ALARM_NAEM>
 			<KR>[알람]</KR>
 			<JP></JP>
@@ -5401,7 +5505,7 @@
 			<EN>USED</EN>
 			<CN></CN>
 		</T_CAPA_CHART_USED>
-		
+
 		<!-- ********************************************* [END] UPDATE UI  설정 (T_PATCH_0000) ******************************************** -->
 		<T_CAPA_CHART_REMAINING>
 			<KR>남은용량</KR>
@@ -5437,12 +5541,12 @@
 			<EN>Mon.,Tue.,Wed.,Thu.,Fri.,Sat.,Sun.</EN>
 			<CN></CN>
 		</T_DATAPICKER_DAY_MIN_GROUP>
-		
+
 	</TITLE>
 
 	<INFO>
 		<!-- ********************************************* [START] MSG INFO (I_0000) ********************************************* -->
-		
+
 		<I_0001>
 			<KR>%s ~ %s 동안 %s가 대결재자로 지정됩니다.&#10;%s를 대결재자로 지정하시겠습니까?</KR>
 			<JP>%s ~ %sの間、%sが代決裁者として指定されます。&#10;%sを代決裁者に指定しますか？</JP>
@@ -6931,7 +7035,7 @@
 			<KR>로그인 되었습니다.</KR>
 			<JP></JP>
 			<EN>Login to SecureGate Server.</EN>
-			
+
 			<CN></CN>
 		</I_0213>
 
@@ -7127,19 +7231,26 @@
 		</I_0242>
 
 		<I_0243>
-			<KR>새로운 보안결재 메일승인 요청자료가 존재합니다.</KR>
+			<KR>인증서를 송신 했습니다.</KR>
 			<JP> </JP>
-			<EN>There are new security mail approval request data.</EN>
+			<EN> </EN>
 			<CN> </CN>
 		</I_0243>
+
+		<I_0244>
+			<KR>인증서를 수신 했습니다.</KR>
+			<JP> </JP>
+			<EN> </EN>
+			<CN> </CN>
+		</I_0244>
 		<!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
-		
+
 	</INFO>
 
 	<WARNING>
 
 		<!-- ********************************************* [START] MSG WARNING (W_0000) ********************************************* -->
-		
+
 		<W_0001>
 			<KR>{0} 파일은 전송이 제한된 파일입니다.</KR>
 			<JP>{0} ファイルは送信が制限されたファイルです。</JP>
@@ -9118,7 +9229,7 @@
 
 
 	</WARNING>
-	
+
 
 
 	<!-- ********************************************* [END] MSG WARNING (W_0000) ********************************************* -->
@@ -10921,6 +11032,20 @@
 			<EN>[{0}] is already enrolled in [{1}].</EN>
 			<CN></CN>
 		</E_0259>
+		<E_0260>
+			<KR>인증서를 송신하지 못했습니다.</KR>
+			<JP></JP>
+			<EN>Failed to send certificate.</EN>
+			<CN></CN>
+		</E_0260>
+
+
+		<E_0261>
+			<KR>인증서 수신에 실패했습니다.</KR>
+			<JP></JP>
+			<EN>Failed to receive certificate.</EN>
+			<CN></CN>
+		</E_0261>
 
 
 	</ERROR>
