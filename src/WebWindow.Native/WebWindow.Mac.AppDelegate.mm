@@ -232,7 +232,13 @@
                 [img drawInRect:newImageRect];
                 [newImage unlockFocus];
 
-                pClipData = [newImage TIFFRepresentation];
+                [newImage lockFocus];
+                NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, newImage.size.width, newImage.size.height)];
+                [newImage unlockFocus];
+                
+                [newImage addRepresentation:rep];
+                pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
+                //pClipData = [newImage TIFFRepresentation];
                 NSLog(@"copy image\n");
                 ((WebWindow*)(SelfThis))->InvokeClipBoard([nsNumbGuId intValue], nDataType, pClipData.length, (const char*)[pClipData bytes], 0, nullptr); 
             }
@@ -274,7 +280,13 @@
                 [img drawInRect:newImageRect];
                 [newImage unlockFocus];
 
-                pClipData = [newImage TIFFRepresentation];
+                [newImage lockFocus];
+                NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, newImage.size.width, newImage.size.height)];
+                [newImage unlockFocus];
+                
+                [newImage addRepresentation:rep];
+
+                pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
                 NSLog(@"copy image\n");
 
                 std::string strClipText;

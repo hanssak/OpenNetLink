@@ -7231,9 +7231,9 @@
 		</I_0242>
 
 		<I_0243>
-			<KR>인증서를 송신 했습니다.</KR>
+			<KR>새로운 보안결재 메일승인 요청자료가 존재합니다.</KR>
 			<JP> </JP>
-			<EN> </EN>
+			<EN>There are new security mail approval request data.</EN>
 			<CN> </CN>
 		</I_0243>
 
@@ -7243,6 +7243,13 @@
 			<EN> </EN>
 			<CN> </CN>
 		</I_0244>
+
+		<I_0245>
+			<KR>인증서를 송신 했습니다.</KR>
+			<JP> </JP>
+			<EN> </EN>
+			<CN> </CN>
+		</I_0245>
 		<!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
 	</INFO>
@@ -9227,6 +9234,33 @@
 			<CN>请输入说明。</CN>
 		</W_0291>
 
+		<W_0292>
+			<KR>제목에 사용할 수 없는 문자가 입력되었습니다.<![CDATA[<br>]]>제목을 다시 입력해 주십시요.</KR>
+			<JP></JP>
+			<EN>There are characters that cannot be used in titles.<![CDATA[<br>]]>Please re-enter the title.</EN>
+			<CN></CN>
+		</W_0292>
+
+		<W_0293>
+			<KR>설명에 사용할 수 없는 문자가 입력되었습니다.<![CDATA[<br>]]>설명을 다시 입력해 주십시요.</KR>
+			<JP></JP>
+			<EN>There are characters that cannot be used in the description.<![CDATA[<br>]]>Please re-enter the description.</EN>
+			<CN></CN>
+		</W_0293>
+
+		<W_0294>
+			<KR>사유에 사용할 수 없는 문자가 입력되었습니다.<![CDATA[<br>]]>사유를 다시 입력해 주십시요.</KR>
+			<JP></JP>
+			<EN>There are characters that cannot be used in the reason.<![CDATA[<br>]]>Please re-enter the reason.</EN>
+			<CN></CN>
+		</W_0294>
+
+		<W_0295>
+			<KR>사용할 수 없는 문자가 입력되었습니다.<![CDATA[<br>]]>다시 입력하십시오.</KR>
+			<JP></JP>
+			<EN>A character that cannot be used has been entered.<![CDATA[<br>]]>Please input again.</EN>
+			<CN></CN>
+		</W_0295>
 
 	</WARNING>
 
