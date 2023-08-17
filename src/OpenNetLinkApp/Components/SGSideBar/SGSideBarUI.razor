@@ -793,7 +793,7 @@
 
             //대결재관리
             //if (nApproveProxy == 1 && sgUserData.GetUserApprpos() == 1)
-            if (bDeputyApprove && bApprMenuUse)
+            if (bDeputyApprove && bApprMenuUse && sgUserInfo.GetUserApprPos(true, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(gID)) > 0)
             {
                 strNavigatePathWithGroupID = "";    //안씀
                                                     //strNavigatePathWithGroupID += gID.ToString();
