@@ -1794,7 +1794,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         CLog.Here().Information($"SendPkiFilesByClipboard, GroupID:{nGroupID}, Ret:{nRet}, Done!");
 
         if (bRet)
-            ShowMessage("info", XmlConf.GetInfoMsg("I_0243"));
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0245"));
 
         return bRet;
     }
@@ -2248,7 +2248,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             CLog.Here().Information($"HeaderUI, FileTransProgress, GroupID:{groupID}, Progress : {e.count}, DONE : {(bSendingPki?"Pki File":"ClipBoard")}");
 
             if (bSendingPki)
-                ShowMessage("info", XmlConf.GetInfoMsg("I_0243"));
+                ShowMessage("info", XmlConf.GetInfoMsg("I_0245"));
             else
             {
                 strMsg = XmlConf.GetInfoMsg("I_0032");   // 클립보드를 전송하였습니다.
