@@ -155,7 +155,7 @@
         pageService.m_nCurViewPageGroupID = 0;
 
         @*MyNavigationManager.NavigateTo("/fileException");*@
-    if (String.IsNullOrEmpty(SGAppMgrSvc.OpConfigInfoService.GetOKTAUrl(0)))
+        if (String.IsNullOrEmpty(SGAppMgrSvc.OpConfigInfoService.GetOKTAUrl(0)))
             MyNavigationManager.NavigateTo((SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer(0) && NetWorkSvc.NetWorkInfo.Count > 1) ? "/SelectNet" : "/LogIn");
         else
         {
@@ -189,15 +189,18 @@
         {
             if (NetWorkSvc.NetWorkInfo?.Count > groupId)
             {
-                if (systemID == "1")//내부
+                if (String.IsNullOrEmpty(NetWorkSvc.NetWorkInfo[groupId].FromName))
                 {
-                    NetWorkSvc.NetWorkInfo[groupId].FromName = XmlConf.GetTitle("T_COMMON_LOGININNER");
-                    NetWorkSvc.NetWorkInfo[groupId].ToName = XmlConf.GetTitle("T_COMMON_LOGINOUTER");
-                }
-                else if(systemID == "2")//외부
-                {
-                    NetWorkSvc.NetWorkInfo[groupId].FromName = XmlConf.GetTitle("T_COMMON_LOGINOUTER");
-                    NetWorkSvc.NetWorkInfo[groupId].ToName = XmlConf.GetTitle("T_COMMON_LOGININNER");
+                    if (systemID == "1")//내부
+                    {
+                        NetWorkSvc.NetWorkInfo[groupId].FromName = XmlConf.GetTitle("T_COMMON_LOGININNER");
+                        NetWorkSvc.NetWorkInfo[groupId].ToName = XmlConf.GetTitle("T_COMMON_LOGINOUTER");
+                    }
+                    else if (systemID == "2")//외부
+                    {
+                        NetWorkSvc.NetWorkInfo[groupId].FromName = XmlConf.GetTitle("T_COMMON_LOGINOUTER");
+                        NetWorkSvc.NetWorkInfo[groupId].ToName = XmlConf.GetTitle("T_COMMON_LOGININNER");
+                    }
                 }
             }
         }
