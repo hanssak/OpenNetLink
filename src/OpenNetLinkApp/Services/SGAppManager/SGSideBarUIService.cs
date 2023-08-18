@@ -15,14 +15,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
     {
         List<ISGSideBarUI> MenuList { get; }
         ISGSideBarUIService AddRoot(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path,
-                                string badgeType = "", string badgeValue = "", string tooltip = "", 
+                                string badgeType = "", string badgeValue = "", string tooltip = "",
                                 bool actived = false, bool expanded = false, string strUserSeq = "");
-        ISGSideBarUIService AddMenu(int groupId, int Id, LSIDEBAR categoryId, string name, string icon, string path, 
-                                string badgeType = "", string badgeValue = "", string tooltip = "", 
-                                bool actived = false, bool expanded = false, bool bUse=true, string strUserSeq = "");
-        ISGSideBarUI AddSubMenu(int groupId, int Id, int parentId, LSIDEBAR categoryId, string name, string icon, string path, 
-                                string badgeType = "", string badgeValue = "", string tooltip = "", 
-                                bool actived = false, bool expanded = false, bool bUse=true, string strUserSeq = "");
+        ISGSideBarUIService AddMenu(int groupId, int Id, LSIDEBAR categoryId, string name, string icon, string path,
+                                string badgeType = "", string badgeValue = "", string tooltip = "",
+                                bool actived = false, bool expanded = false, bool bUse = true, string strUserSeq = "");
+        ISGSideBarUI AddSubMenu(int groupId, int Id, int parentId, LSIDEBAR categoryId, string name, string icon, string path,
+                                string badgeType = "", string badgeValue = "", string tooltip = "",
+                                bool actived = false, bool expanded = false, bool bUse = true, string strUserSeq = "");
 
         ISGSideBarUI FindSubMenu(int groupId, int parentId, int Id);
 
@@ -41,7 +41,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <summary>
         /// Current Active Menu Info, Selected by user.
         /// </summary>
-        ISGSideBarUI ActiveMenu { get; set; } 
+        ISGSideBarUI ActiveMenu { get; set; }
         /// <summary>
         /// Current Active Menu Event Delegate, Selected by User.
         /// </summary>
@@ -70,8 +70,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
 
         public ISGSideBarUIService AddRoot(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path,
-                                        string badgeType = "", string badgeValue = "", string tooltip = "", 
-                                        bool actived = false, bool expanded = false, string strUserSeq="")
+                                        string badgeType = "", string badgeValue = "", string tooltip = "",
+                                        bool actived = false, bool expanded = false, string strUserSeq = "")
         {
             ISGSideBarUI menuItem = new SGSideBarUI
             {
@@ -99,9 +99,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             return this;
         }
-        public ISGSideBarUIService AddMenu(int groupId, int Id, LSIDEBAR categoryId, string name, string icon, string path, 
-                                           string badgeType = "", string badgeValue = "", string tooltip = "", 
-                                           bool actived = false, bool expanded = false, bool bUse=true, string strUserSeq = "")
+        public ISGSideBarUIService AddMenu(int groupId, int Id, LSIDEBAR categoryId, string name, string icon, string path,
+                                           string badgeType = "", string badgeValue = "", string tooltip = "",
+                                           bool actived = false, bool expanded = false, bool bUse = true, string strUserSeq = "")
         {
             if (!bUse)
                 return this;
@@ -132,20 +132,21 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             return this;
         }
-        public ISGSideBarUI AddSubMenu(int groupId, int Id, int parentId, LSIDEBAR categoryId, string name, string icon, string path, 
-                                           string badgeType = "", string badgeValue = "", string tooltip = "", 
-                                           bool actived = false, bool expanded = false, bool bUse=true, string strUserSeq = "")
+        public ISGSideBarUI AddSubMenu(int groupId, int Id, int parentId, LSIDEBAR categoryId, string name, string icon, string path,
+                                           string badgeType = "", string badgeValue = "", string tooltip = "",
+                                           bool actived = false, bool expanded = false, bool bUse = true, string strUserSeq = "")
         {
             if (!bUse)
                 return null;
 
+            ISGSideBarUI parent = MenuList[groupId]?.Child?.Find(child => child.Idx == parentId);
             ISGSideBarUI menuItem = new SGSideBarUI
             {
                 GroupId = groupId,
                 Idx = Id,
                 ParentId = parentId,
                 CategoryId = categoryId,
-                Parent = MenuList[groupId].Child[parentId],
+                Parent = parent,
                 FromName = "",
                 ToName = name,
                 Icon = icon,
@@ -161,8 +162,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
             };
             // Same: MenuList[groupId].Child.add(menuItem);
 
-            (MenuList[groupId].Child[parentId] as SGSideBarUI).Child ??= new List<ISGSideBarUI>();
-            MenuList[groupId].Child[parentId].Child?.Add(menuItem);
+            (parent as SGSideBarUI).Child ??= new List<ISGSideBarUI>();
+            parent.Child?.Add(menuItem);
 
             return menuItem;
         }
@@ -186,7 +187,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 return null;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 CLog.Here().Information($"FindSubMenu-Exception(Msg) : {e.Message}");
                 return null;
@@ -228,9 +229,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     MenuList[groupId].Child.Count < 1)
                     return null;
 
-                foreach(ISGSideBarUI ui in MenuList[groupId].Child)
+                foreach (ISGSideBarUI ui in MenuList[groupId].Child)
                 {
-                    foreach(ISGSideBarUI childUi in ui.Child)
+                    foreach (ISGSideBarUI childUi in ui.Child)
                     {
                         if (childUi.Path.ToUpper().Equals(path.ToUpper()))
                             return childUi;
@@ -272,7 +273,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 int nIdx = 0;
                 int nCount = MenuList[groupId].Child[parentId].Child.Count;
 
-                for (; nIdx < nCount ; nIdx++ )
+                for (; nIdx < nCount; nIdx++)
                 {
                     if (MenuList[groupId].Child[parentId].Child[nIdx].Idx == Id)
                     {
@@ -299,9 +300,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     return false;
 
                 MenuList[groupId].Child?.Clear();
-/*                if (MenuList[groupId].Child != null)
-                    MenuList[groupId].Child.Clear();
-*/
+                /*                if (MenuList[groupId].Child != null)
+                                    MenuList[groupId].Child.Clear();
+                */
                 NotifyStateChangedActMenu();
 
                 return true;
@@ -321,33 +322,33 @@ namespace OpenNetLinkApp.Services.SGAppManager
         private void NotifyStateChangedActMenu() => OnChangeActMenu?.Invoke();
 
         public void ChgActiveMenu(EventArgs eventArgs, ISGSideBarUI activeMenu)
-        {   
-            ISGSideBarUI        Node;
-            MouseEventArgs      EventMouse;
-            KeyboardEventArgs   EventKeyboard;
-            if((eventArgs as KeyboardEventArgs) == null) 
+        {
+            ISGSideBarUI Node;
+            MouseEventArgs EventMouse;
+            KeyboardEventArgs EventKeyboard;
+            if ((eventArgs as KeyboardEventArgs) == null)
             {
                 EventMouse = eventArgs as MouseEventArgs;
-                if(EventMouse.Button != 0) return ;
+                if (EventMouse.Button != 0) return;
             }
             else
             {
                 EventKeyboard = eventArgs as KeyboardEventArgs;
-                if (EventKeyboard.Key != "Enter" && EventKeyboard.Key != " " && EventKeyboard.Key != "Spacebar") return ;
+                if (EventKeyboard.Key != "Enter" && EventKeyboard.Key != " " && EventKeyboard.Key != "Spacebar") return;
             }
 
             /* Initialized */
-            if (ActiveMenu == null) 
+            if (ActiveMenu == null)
             {
-                foreach(var RootItem in this.MenuList)
+                foreach (var RootItem in this.MenuList)
                 {
                     (RootItem as SGSideBarUI).Actived = false;
                     (RootItem as SGSideBarUI).Expanded = false;
-                    foreach(var MenuItem in RootItem.Child)
+                    foreach (var MenuItem in RootItem.Child)
                     {
                         (MenuItem as SGSideBarUI).Actived = false;
                         (MenuItem as SGSideBarUI).Expanded = false;
-                        foreach(var SubMenuItem in MenuItem.Child)
+                        foreach (var SubMenuItem in MenuItem.Child)
                         {
                             (SubMenuItem as SGSideBarUI).Actived = false;
                             (SubMenuItem as SGSideBarUI).Expanded = false;
@@ -355,9 +356,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     }
                 }
             }
-            
+
             /* If two object is not same, changed value of previous ActiveMenu with off */
-            if(ActiveMenu != null && !Object.ReferenceEquals(ActiveMenu, activeMenu))
+            if (ActiveMenu != null && !Object.ReferenceEquals(ActiveMenu, activeMenu))
             {
                 (ActiveMenu as SGSideBarUI).Actived = false;
                 (ActiveMenu as SGSideBarUI).Expanded = false;
@@ -376,22 +377,22 @@ namespace OpenNetLinkApp.Services.SGAppManager
                To Swapping Value When two object is same, 
                buf if object is submenu, change only actived value with unactive (Expected Expanded Vaule)
             */
-            if(Object.ReferenceEquals(ActiveMenu, activeMenu))
+            if (Object.ReferenceEquals(ActiveMenu, activeMenu))
             {
                 (activeMenu as SGSideBarUI).Actived = !activeMenu.Actived;
                 (activeMenu as SGSideBarUI).Expanded = !activeMenu.Expanded;
             }
             /* Different from before menu */
-            if(!Object.ReferenceEquals(ActiveMenu, activeMenu))
+            if (!Object.ReferenceEquals(ActiveMenu, activeMenu))
             {
                 /* When Root, My son */
-                if(!activeMenu.IsSubMenu && Object.ReferenceEquals(ActiveMenu.Parent, activeMenu))
+                if (!activeMenu.IsSubMenu && Object.ReferenceEquals(ActiveMenu.Parent, activeMenu))
                 {
                     (activeMenu as SGSideBarUI).Actived = false;
                     (activeMenu as SGSideBarUI).Expanded = false;
                 }
                 /* When Root, Son of another Parent */
-                else if(!activeMenu.IsSubMenu && !Object.ReferenceEquals(ActiveMenu.Parent, activeMenu))
+                else if (!activeMenu.IsSubMenu && !Object.ReferenceEquals(ActiveMenu.Parent, activeMenu))
                 {
                     (activeMenu as SGSideBarUI).Actived = true;
                     (activeMenu as SGSideBarUI).Expanded = true;
@@ -405,14 +406,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
 
             /* To Change Parents's value with son's value When selected node's value is active */
-            if(activeMenu.Actived)
+            if (activeMenu.Actived)
             {
                 Node = activeMenu;
                 while (Node.Parent != null)
                 {
                     {
-                        (Node.Parent as SGSideBarUI).Actived = activeMenu.Actived; 
-                        (Node.Parent as SGSideBarUI).Expanded = activeMenu.Expanded; 
+                        (Node.Parent as SGSideBarUI).Actived = activeMenu.Actived;
+                        (Node.Parent as SGSideBarUI).Expanded = activeMenu.Expanded;
                     }
                     Node = Node.Parent;
                 }
@@ -448,11 +449,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
     {
         public static string GetDescription(Enum value)
         {
-            FieldInfo fi= value.GetType().GetField(value.ToString()); 
-            DescriptionAttribute[] attributes = 
+            FieldInfo fi = value.GetType().GetField(value.ToString());
+            DescriptionAttribute[] attributes =
                     (DescriptionAttribute[])fi.GetCustomAttributes(
                     typeof(DescriptionAttribute), false);
-            return (attributes.Length>0)?attributes[0].Description:value.ToString();
+            return (attributes.Length > 0) ? attributes[0].Description : value.ToString();
         }
     }
 }
