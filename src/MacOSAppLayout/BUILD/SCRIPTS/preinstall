@@ -13,4 +13,13 @@ if [ -e $APPENV_FILE ]; then
     cp /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/AppEnvSetting.json /tmp
 fi
 
+UPDATE_CHECK=true
+INSTALL_PATH="/Applications/OpenNetLinkApp.app"
+
+if [ ! $UPDATE_CHECK ]; then
+    if [ -d "$INSTALL_PATH" ]; then
+        cp -r $INSTALL_PATH /tmp
+    fi
+fi
+
 exit 0

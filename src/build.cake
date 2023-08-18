@@ -21,6 +21,7 @@ var isEnc = Argument<bool>("isEnc", true);
 var deleteNetLink = Argument<bool>("deleteNetLink", false);		//true로 하면, 기존 NetLink Unintall.exe를 붙여넣기 한 후, 기존 NetLink를 삭제한다.
 var isSilent = Argument<bool>("isSilent", false);				//true로 하면, Silent 모드
 var startAuto = Argument<bool>("startAuto", true);				//false 하면, 설치 완료 후 자동 실행 안됨
+var isUpdateCheck = Argument<bool>("isUpdateCheck", false);				//false 하면 업데이트 체크 안함
 
 var isPatchInstaller = false;
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
@@ -770,13 +771,17 @@ Task("MakeInstaller")
 	}
 	else if(AppProps.Platform == "mac")
 	{
+
+
 		using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings
 													{ Arguments = new ProcessArgumentBuilder()
 													.Append(AppProps.PropVersion.ToString())
 													.Append(isPatchInstaller.ToString().ToUpper())
 													.Append(networkFlag.ToUpper()) 
 													.Append(customName.ToUpper())
-													.Append(PackageDirPath)	//$5 Output
+													.Append(PackageDirPath)
+													.Append(startAuto.ToString().ToUpper())
+													.Append(isUpdateCheck.ToString().ToUpper())	//$7 Output
 													})
 		)
 		{

@@ -38,8 +38,8 @@ dev_team="L7W5N48H4G"
 dev_keychain_label="sxog-tiki-hjrx-pxfs"
 
 # put your project's information into these variables
-if [ $# -ne 5 ]; then
-	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5"
+if [ $# -ne 7 ]; then
+	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {startauto} $6 {isupdatecheck} $7"
 	exit -1
 fi;
 version=$1
@@ -49,6 +49,8 @@ ispatch=$2
 networkflag=$3
 customname=$4
 outputpath=$5
+startauto=$6
+isupdatecheck=$7
 
 # code starts here
 projectdir=$(dirname $0)
@@ -253,6 +255,28 @@ codesignapp "$APP_PATH" "$appledevsig" "$ENT_PATH"
 
 echo "##############################################################################################"
 ## build the pkg
+#postinstall value change startAuto
+filepostinstall="$SCRIPT_PATH/postinstall"
+filepreinstall="$SCRIPT_PATH/preinstall"
+
+if [[ $ispatch != "TRUE" ]]; then
+    isupdatecheck="FALSE"
+fi
+
+if [[ $startauto == "FALSE" ]]; then 
+    sed -i '' -e 's/START_AUTO=true/START_AUTO=false/g' $filepostinstall
+else
+    sed -i '' -e 's/START_AUTO=false/START_AUTO=true/g' $filepostinstall
+fi
+
+if [[ $isupdatecheck == "FALSE" ]]; then 
+    sed -i '' -e 's/UPDATE_CHECK=true/UPDATE_CHECK=false/g' $filepostinstall
+    sed -i '' -e 's/UPDATE_CHECK=true/UPDATE_CHECK=false/g' $filepreinstall
+else
+    sed -i '' -e 's/UPDATE_CHECK=false/UPDATE_CHECK=true/g' $filepostinstall
+    sed -i '' -e 's/UPDATE_CHECK=false/UPDATE_CHECK=true/g' $filepreinstall
+fi
+
 
 if [[ $ispatch == "TRUE" ]]; then 
     #for patch
