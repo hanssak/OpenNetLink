@@ -1648,6 +1648,7 @@ window.loadFileReaderService = () => {
 
                   if (ev.target instanceof HTMLElement) {
                       var list = ev.dataTransfer.files;
+                      console.log(list);
 
                       /*if (additive) {
                           var existing = _this.elementDataTransfers.get(elementReal);
@@ -1655,7 +1656,7 @@ window.loadFileReaderService = () => {
                               list = new FileReaderComponent.ConcatFileList(existing, list);
                           }
                       }*/
-                      //_this.elementDataTransfers.set(elementReal, list);
+                      _this.elementDataTransfers.set(elementReal, list);
                   }
               };
               _this.dragElements.set(elementReal, handler);
@@ -1942,7 +1943,8 @@ window.loadFileReaderService = () => {
               DirSubFiles.dirUses = [];
               var element = this.GetDragTargetElement();
               var entries = element.webkitEntries;
-
+              console.log(entries);
+              console.log(element.dataTransfer);
               if (entries != null && entries.length > 0) {
                   console.log("entry Length : " + entries.length);
                   for (var i = 0; i < entries.length; ++i) {
