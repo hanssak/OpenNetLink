@@ -484,7 +484,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (File.Exists(NativeValue))
                 return "file://" + NativeValue.Replace(@"\", @"/");
             else
-                return "file://" + krValue;
+                return "file://" + krValue.Replace(@"\", @"/");
         }
 
         public bool GetRMouseFileAddAfterTrans()
