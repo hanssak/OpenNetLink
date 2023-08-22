@@ -1644,6 +1644,10 @@ namespace OpenNetLinkApp.Services
             if (nRet == 0)
             {
                 sgLoginData.AddZipDepthInfo(sgData);
+
+                SystemEnvQueryNotiEvent SCClear_Event = sgPageEvent.GetSystemEnvQueryResultEvent();
+                if (SCClear_Event != null)
+                    SCClear_Event(groupId);
             }
             else
             {

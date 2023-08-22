@@ -270,6 +270,14 @@ namespace OpenNetLinkApp.PageEvent
 
     // PkiFile 보내기 위한 Event
     public delegate bool SendPkiFileEvent(int groupid, string strPcfFilePath, bool bSendPkiByFileTrans);
+
+    /// <summary>
+    /// SystemEnv Client Query 결과 Event
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="e"></param>
+    public delegate void SystemEnvQueryNotiEvent(int groupid);
+
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -439,6 +447,8 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, ReconnectCountOutEvent> DicReconnectCountEvent = new Dictionary<int, ReconnectCountOutEvent>(); // Reconnect Count Out 횟수이상 발생시
 
         public SendPkiFileEvent PkiFileSendEventFunc = null;   // pki파일전송용
+
+        public SystemEnvQueryNotiEvent SystemEnvEventFunc = null;
 
         public SGPageEvent()
         {
@@ -1616,6 +1626,14 @@ namespace OpenNetLinkApp.PageEvent
             return PkiFileSendEventFunc;
         }
 
+        public SystemEnvQueryNotiEvent GetSystemEnvQueryResultEvent()
+        {
+            return SystemEnvEventFunc;
+        }
+        public void SetSystemEnvQueryResultEvent(SystemEnvQueryNotiEvent SystemEnvNoti)
+        {
+            SystemEnvEventFunc = SystemEnvNoti;
+        }
 
     }
 }

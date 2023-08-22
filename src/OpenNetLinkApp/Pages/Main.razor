@@ -1112,6 +1112,87 @@
         }
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="groupId"></param>
+    public void GetUrlRedirectionInfoData(int groupId)
+    {
+
+        CLog.Here().Information($"GetUrlRedirectionInfoData, Get SystemEnv ClientInfo !");
+
+        try
+        {
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+            if (sgLoginData.GetURLRedirect() == false)
+            {
+                CLog.Here().Information($"GetUrlRedirectionInfoData, Policy do not Use UrlRedirection!");
+                return;
+            }
+
+            string strForwardInfo = "";
+            strForwardInfo = sgLoginData.GetURLforwardTextInfo();
+            if ( (strForwardInfo?.Length ?? 0) < 1 )
+            {
+                CLog.Here().Information($"GetUrlRedirectionInfoData, CLIENT_URLREDIRECTION_F_INFO Empty!");
+                return;
+            }
+
+            string strForwardUrlFile = SGAppMgrSvc.OpConfigInfoService.GetForwardUrl(groupId);
+            strForwardUrlFile = strForwardUrlFile.Replace("file:///", "");
+            strForwardUrlFile = strForwardUrlFile.Replace("/", "\\");
+
+            string strData = "";
+            if (CsFileFunc.GetFileStrData(strForwardUrlFile, out strData) == false)
+            {
+                CLog.Here().Information($"GetUrlRedirectionInfoData, UrlRedirection FileInfo Failed!");
+            }
+
+            int nPos = -1;
+            nPos = strData.IndexOf(strForwardInfo);
+            if (nPos > 0)
+            {
+                CLog.Here().Information($"GetUrlRedirectionInfoData, Forward File have CLIENT_URLREDIRECTION_F_INFO info : {strForwardInfo}");
+                return;
+            }
+
+            string strPreSubString = "";
+            string strPostSubString = "";
+
+            nPos = strData.IndexOf("문의사항 : ");
+            if (nPos > 0)
+            {
+                int nSubStrIndex = nPos+6;
+                strPreSubString = strData.Substring(0, nSubStrIndex+1);
+
+                nSubStrIndex = strData.IndexOf("<br>", nPos+1);
+                if (nSubStrIndex >= nPos+1)
+                    strPostSubString = strData.Substring(nSubStrIndex);
+            }
+
+            if (strPreSubString.Length > 0 && strPostSubString.Length > 0)
+            {
+                strForwardInfo = strPreSubString + strForwardInfo + strPostSubString;
+
+                bool bRet = CsFileFunc.SetFileStrData(strForwardUrlFile, strForwardInfo);
+                CLog.Here().Information($"GetUrlRedirectionInfoData, UrlRedirection FileInfo Change : {bRet}");
+
+            }
+            else
+            {
+                CLog.Here().Information($"GetUrlRedirectionInfoData, CLIENT_URLREDIRECTION_F_INFO info pos Not Found, Pre-Text.Length : {strPreSubString.Length}, Post-Text.Length:{strPostSubString.Length}");
+            }
+
+        }
+        catch(Exception ex)
+        {
+            CLog.Here().Information($"GetUrlRedirectionInfoData, Exception-MSG : {ex.Message}");
+        }
+
+    }
+
+
     /// <summary>
     /// 로그인 완료후 호출(한번에 다중망 로그인 가능하도록 수정됨)
     /// </summary>
@@ -1198,6 +1279,12 @@
                         {
                             strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
                             strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
+                        }
+
+                        if (sgLoginData.GetURLRedirect())
+                        {
+                            strGetinfoTagName += ", 'CLIENT_URLREDIRECTION_F_INFO'";
+                            HSCmdCenter.sgPageEvent.SetSystemEnvQueryResultEvent(GetUrlRedirectionInfoData);
                         }
 
                         string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
@@ -1548,7 +1635,7 @@
                             }
                         }
 
-                        // Login 화면으로 머물러있지 않도록
+                    // Login 화면으로 머물러있지 않도록
                     @*if (nGroupIDfirst < 0)
                         nGroupIDfirst = 0;*@
 

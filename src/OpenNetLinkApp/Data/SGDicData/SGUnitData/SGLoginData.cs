@@ -1543,6 +1543,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             => (GetSystemPosition()) ? GetTagData("I_CLIENT_DESC_MIN_LENGTH") : GetTagData("E_CLIENT_DESC_MIN_LENGTH");
 
 
+        /// <summary>
+        /// UrlRedirection에 표현할 정보 일부
+        /// </summary>
+        /// <returns></returns>
+        public string GetURLforwardTextInfo()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_URLREDIRECTION_F_INFO") : GetTagData("E_CLIENT_URLREDIRECTION_F_INFO");
 
         /// <summary>
         /// value 값을 암호화해서 sgData에 저장

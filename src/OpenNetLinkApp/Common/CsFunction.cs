@@ -389,6 +389,79 @@ namespace OpenNetLinkApp.Common
 
     public class CsFileFunc
     {
+
+        public static bool GetFileStrData(string filePath, out string strData)
+        {
+            strData = "";
+            bool bRet = false;
+
+            using (FileStream fileStream = System.IO.File.OpenRead(filePath))
+            {
+                try
+                {
+                    long lSize = fileStream.Length;
+                    if (lSize < 1)
+                    {
+                        bRet = false;
+                        Log.Logger.Here().Information($"GetFileStrData - Size(Error) : {lSize}, path : {filePath}");
+                    }
+                    else
+                    {
+                        bRet = true;
+
+                        byte[] pbyte = null;
+                        pbyte = new byte[lSize];
+                        fileStream.Read(pbyte, 0, (int)lSize);
+                        strData = Encoding.UTF8.GetString(pbyte);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Logger.Here().Information($"GetFileStrData - Exception - msg : {e.Message}, path : {filePath}");
+                }
+                finally
+                {
+                    fileStream?.Dispose();
+                }
+            }
+
+            return bRet;
+        }
+
+        public static bool SetFileStrData(string filePath, string strData)
+        {
+
+            if (strData.Length < 1)
+            {
+                Log.Logger.Here().Information($"SetFileStrData, Write Data Empty!");
+                return false;
+            }
+
+            bool bRet = false;
+
+            using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            {
+                try
+                {
+                    byte[] utf8Bytes = Encoding.UTF8.GetBytes(strData);
+                    fileStream.Write(utf8Bytes, 0, utf8Bytes.Length);
+                    bRet = true;
+                }
+                catch (Exception e)
+                {
+                    Log.Logger.Here().Information($"SetFileStrData - Exception - msg : {e.Message}, path : {filePath}");
+                    bRet = false;
+                }
+                finally
+                {
+                    fileStream?.Dispose();
+                }
+            }
+
+            return bRet;
+        }
+
+
         public static long GetFileSize(string filePath)
         {
             long lSize = 0;
