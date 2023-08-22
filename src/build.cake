@@ -894,7 +894,7 @@ Task("PkgCrossflatform")
 	if(isFull.ToString().ToUpper() == "TRUE")
 		customName = Prompt("Custom Name : ");			
 
-	var LastUpdatedTime = DateTime.Now.ToString(@"yyyy\/MM\/dd h\:mm tt");
+	var LastUpdatedTime = DateTime.Now.ToString(@"yyyy\/MM\/dd H\:mm");
 
 	if(DirectoryExists(AppProps.InstallerRootDirPath)) {
 		DeleteDirectory(AppProps.InstallerRootDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });

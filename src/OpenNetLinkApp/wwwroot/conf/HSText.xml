@@ -641,14 +641,14 @@
 		<T_COMMON_APPROVESEARCH>
 			<KR>결재자 조회</KR>
 			<JP>決裁者照会</JP>
-			<EN>Views gyeoljaeja</EN>
+			<EN>Views approver</EN>
 			<CN>查找审批人</CN>
 		</T_COMMON_APPROVESEARCH>
 
 		<T_COMMON_SECURESEARCH>
 			<KR>보안결재자 조회</KR>
 			<JP>保安決裁者照会</JP>
-			<EN>Security gyeoljaeja Views</EN>
+			<EN>Security approver Views</EN>
 			<CN>查找安全审批人</CN>
 		</T_COMMON_SECURESEARCH>
 
@@ -1812,7 +1812,7 @@
 		<T_APPROVE_PRIVACY>
 			<KR>보안결재자</KR>
 			<JP>保安決裁者</JP>
-			<EN>Security gyeoljaeja.</EN>
+			<EN>Security approver.</EN>
 			<CN>安全审批人</CN>
 		</T_APPROVE_PRIVACY>
 
@@ -3699,14 +3699,14 @@
 		<T_ETC_BOTTOM>
 			<KR>맨아래</KR>
 			<JP>最下</JP>
-			<EN>The most bottom</EN>
+			<EN>Lowest</EN>
 			<CN>底端</CN>
 		</T_ETC_BOTTOM>
 
 		<T_ETC_TOP>
 			<KR> 맨위</KR>
 			<JP>トップへ</JP>
-			<EN>The most top</EN>
+			<EN>Highest</EN>
 			<CN>顶端</CN>
 		</T_ETC_TOP>
 
@@ -7921,7 +7921,7 @@
 		<W_0095>
 			<KR>전송대기 중인 파일에서 <![CDATA[<font color='red'>]]>개인정보<![CDATA[</font>]]>가 검출되었습니다.<![CDATA[<br>]]>추가로 보안결재자에게 승인받아야 파일전송이 가능합니다.<![CDATA[<br>]]>제목 :  {0}<![CDATA[<br>]]>파일 전송을 계속 진행하시겠습니까?</KR>
 			<JP>転送待機中のファイルから個人情報が検出されました<![CDATA[<br>]]>追加に保安決裁者による承認を行った上で、ファイル転送が可能です.<![CDATA[<br>]]>タイトル： {0} <![CDATA[<br>]]>ファイルの転送を続行しますか？</JP>
-			<EN>Personal information has been detected in the file waiting to be sent.<![CDATA[<br>]]>Add security to be approved by gyeoljaeja Files can be transferred.<![CDATA[<br>]]>Title :  {0}<![CDATA[<br>]]>Do you want to continue the file transfer?</EN>
+			<EN>Personal information has been detected in the file waiting to be sent.<![CDATA[<br>]]>Add security to be approved by approver Files can be transferred.<![CDATA[<br>]]>Title :  {0}<![CDATA[<br>]]>Do you want to continue the file transfer?</EN>
 			<CN>在待传输文件中检出个人信息。<![CDATA[<br>]]>须在获得安全审批人的批准后才能传输文件。<![CDATA[<br>]]>标题 :  {0}<![CDATA[<br>]]>确定要继续传输文件吗？</CN>
 		</W_0095>
 
@@ -9954,7 +9954,7 @@
 		<E_0100>
 			<KR>사용정지 및 기간 만료된 결재자가 있습니다.</KR>
 			<JP>使用停止および使用期限が切れた決裁者がいます。</JP>
-			<EN>Use the expired period and stopped gyeoljaeja.</EN>
+			<EN>Use the expired period and stopped approver.</EN>
 			<CN>存在已停用或到期的审批人。</CN>
 		</E_0100>
 
@@ -9975,7 +9975,7 @@
 		<E_0103>
 			<KR>계정이 삭제된 결재자가 있습니다.</KR>
 			<JP>アカウントが削除された決裁者がいます。</JP>
-			<EN>There is an account is deleted gyeoljaeja.</EN>
+			<EN>There is an account is deleted approver.</EN>
 			<CN>存在账号已被删除的审批人。</CN>
 		</E_0103>
 
