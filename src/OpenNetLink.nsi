@@ -16,6 +16,7 @@
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
 !include "x64.nsh"
+!include "FileFunc.nsh"
 
 ; MUI Settings
 !define MUI_ABORTWARNING
@@ -80,11 +81,23 @@ Var /GLOBAL g_strAddFileRM0CompareStr
 Var /GLOBAL g_strAddFileRM1CompareStr
 Var /GLOBAL g_strAddFileRM2CompareStr
 Var /GLOBAL g_iCount
+Var /GLOBAL g_UpdateFilePath
+Var /Global g_UpdateResult
+Var /Global g_UpdateReason
 
 Var /GLOBAL g_strNetPos			; 3망중에 다중망(중간망)인지 여부 확인(NETPOS 값 IN일때:1, CN일때:2, EX일때: 3, NCI일때:4, 없으면 0)
 Var /GLOBAL g_iNetPos			; 3망중에 다중망(중간망)인지 여부 ("IN": 중요단말, "CN": 중간망-다중망(업무망), "NCI": 중간망-인터넷망(업무망), "EX" : 인터넷망), IN(1) / CN(2) / OUT(3) / NCI(4) / NotFound(0)
 Var /GLOBAL g_iPatchEdge	        ; edge(wwwroot\edge)-patch진행여부
 Var /GLOBAL g_UseStartProgram	        ; Booting시에 agent 자동시작 되게할 지 여부
+
+
+Var /GLOBAL out_day 		; "01"      day
+Var /GLOBAL out_month		; "04"      month
+Var /GLOBAL out_year		; "2005"    year
+Var /GLOBAL out_dayName	; "Friday"  day of week name	
+Var /GLOBAL out_hour		; "16"      hour
+Var /GLOBAL out_min		; "05"      minute
+Var /GLOBAL out_sec		; "50"      seconds
 
 ; ---------------------------- StrContains 함수(Start) -----------------------------------
 !macro _StrContains un
@@ -140,6 +153,74 @@ Var /GLOBAL g_UseStartProgram	        ; Booting시에 agent 자동시작 되게할 지 여�
 !macroend
 !define StrContains "!insertmacro StrContains"
 ; ---------------------------- StrContains 함수(End) -----------------------------------
+
+; ---------------------------- trim 함수(Start) -----------------------------------
+
+ 
+!macro Trim ResultVar String
+  Push "${String}"
+  Call Trim
+  Pop "${ResultVar}"
+!macroend
+
+Function Trim
+	Exch $R1 ; Original string
+	Push $R2
+ 
+	Loop:
+		StrCpy $R2 "$R1" 1
+		StrCmp "$R2" " " TrimLeft
+		StrCmp "$R2" "$\r" TrimLeft
+		StrCmp "$R2" "$\n" TrimLeft
+		StrCmp "$R2" "$\t" TrimLeft
+		GoTo Loop2
+	TrimLeft:	
+		StrCpy $R1 "$R1" "" 1
+		Goto Loop
+	 
+	Loop2:
+		StrCpy $R2 "$R1" 1 -1
+		StrCmp "$R2" " " TrimRight
+		StrCmp "$R2" "$\r" TrimRight
+		StrCmp "$R2" "$\n" TrimRight
+		StrCmp "$R2" "$\t" TrimRight
+		GoTo Done
+	TrimRight:	
+		StrCpy $R1 "$R1" -1
+		Goto Loop2
+	 
+	Done:
+		Pop $R2
+		Exch $R1
+FunctionEnd
+!define Trim "!insertmacro Trim"
+; ---------------------------- trim 함수(End) -----------------------------------
+
+; ---------------------------- SetPatchLog 함수(Start) -----------------------------------
+!macro SetPatchLog ResultVar Reason
+  StrCpy $g_UpdateResult "${ResultVar}"
+  StrCpy $g_UpdateReason "${Reason}"
+  
+  Call SetPatchLog
+!macroend
+
+Function SetPatchLog 
+	;패치 결과 포맷 : UPDATE_RESULT:SUCCESS(FAIL)/2023.08.23 13:50:59/reason
+	${GetTime} "" "L" $out_day $out_month $out_year $out_dayName $out_hour $out_min $out_sec
+	
+	FileOpen $9 "C:\HANSSAK\OpenNetLink\wwwroot\conf\UpdateResult.txt" a ;Append File and fills it
+	FileSeek $9 0 END
+	; FileOpen $9 "C:\HANSSAK\OpenNetLink\wwwroot\conf\UpdateResult.txt" w ;Append File and fills it
+	
+	${If} $g_UpdateResult == "TRUE"
+		FileWrite $9 "UPDATE_RESULT:SUCCESS/$out_year.$out_month.$out_day $out_hour:$out_min:$out_sec $\r$\n"
+	${Else}
+		FileWrite $9 "UPDATE_RESULT:FAIL/$out_year.$out_month.$out_day $out_hour:$out_min:$out_sec/$g_UpdateReason $\r$\n"
+	${EndIf}
+	FileClose $9 ;Closes the filled file
+FunctionEnd
+!define SetPatchLog "!insertmacro SetPatchLog"
+; ---------------------------- SetPatchLog 함수(End) -----------------------------------
 
 ; Patch Mode 일때에만 사용
 !macro FUNC_GETNETPOS UN
@@ -359,25 +440,56 @@ Function un.ReMoveAddFileRM
  	!insertmacro FUNC_REMOVE_ADD_FILE_RM_DLL "un."
 FunctionEnd ; end the un.ReMoveAddFileRM
 
-Function .onInit
 
+Function .onInit
 	${If} ${IS_SILENT} == 'TRUE'		
 		SetSilent silent
 	${endif}
 	
-	
-	
 	;Delete "$PROFILE\AppData\LocalLow\HANSSAK\*.*" ; 해당 폴더에 있는 모든 파일 삭제	
+	;RMDir "$PROFILE\AppData\LocalLow\HANSSAK"
 	;RMDir "$PROFILE\AppData\LocalLow\HANSSAK"
 	
 	;Call deleteNetLink
 	
+	;OpenNetLink 강제종료
+	nsExec::Exec '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
   ${If} ${IS_PATCH} == 'TRUE'
-    CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
-    CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
-	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db" "$TEMP" 
-	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db" "$TEMP"
-
+	${If} ${UPDATECHECK} == 'TRUE'
+		;롤백 기능을 위해 폴더 통째로 이동 처리
+		${If} ${FileExists} "$TEMP\OpenNetLink\*.*"
+			;Delete "$TEMP\OpenNetLink\*.*"
+			;RMDir "$TEMP\OpenNetLink"
+			RMDir /r "$TEMP\OpenNetLink\"
+		${EndIf}				
+		
+		CopyFiles "C:\HANSSAK\OpenNetLink\*.*" "$TEMP\OpenNetLink"
+		
+		RMDir /r "C:\HANSSAK\OpenNetLink\"	;설치 전 기존 파일들 삭제		
+		
+		;삭제 후 남아있는 파일들은 백업
+		FindFirst $2 $3 "C:\HANSSAK\OpenNetLink\*"
+		loop:
+			StrCmp $3 "" done			
+			
+			;다른 프로세스로 인해 삭제가 불가한 파일은 이동처리
+			${If} ${FileExists} "$TEMP\OpenNetLink_Patch"
+				Delete "$TEMP\OpenNetLink_Patch\*.*"
+			${Else}				
+				CreateDirectory "$TEMP\OpenNetLink_Patch" ; 확인용
+			${EndIf}							
+			Rename "C:\HANSSAK\OpenNetLink\$3" "$TEMP\OpenNetLink_Patch\$3" ; 파일 이동			
+			FindNext $2 $3
+			Goto loop
+		done:
+		FindClose $2			
+	${Else}        
+		CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
+		CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
+		CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db" "$TEMP" 
+		CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db" "$TEMP"	
+	${EndIf}
+	
     Banner::show "Calculating important stuff..."
     Banner::getWindow
     Pop $1
@@ -404,7 +516,6 @@ Function .onInit
 FunctionEnd
 
 Function .onInstSuccess
-  
     ;옵션에 따라 먼저 NetLink 삭제하기
 	${If} ${DELETE_NETLINK} == 'TRUE'		
 		ExecWait '"$SYSDIR\taskkill.exe" /f /im SecureGate.exe'	
@@ -422,20 +533,30 @@ Function .onInstSuccess
   
   
   ${If} ${IS_PATCH} == 'TRUE'
-	 ; 하위 exist 작업을 위해, 패치본의 json/db는 삭제
-	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json"			
-	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json"			
-	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db"			
-	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db"	
-      
-	  CopyFiles /SILENT /FILESONLY "$TEMP\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
-          CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf"
-	  CopyFiles /FILESONLY "$TEMP\SGNotifyDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"
-	  CopyFiles /FILESONLY "$TEMP\SGSettingsDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"  
-	  
-	  ;백업된 json/db 가 복사 완료될때까지, 대기
-	  StrCpy $R0 0
-	  loop:
+	${If} ${UPDATECHECK} == 'TRUE'
+		CopyFiles /SILENT /FILESONLY "$TEMP\OpenNetLink\wwwroot\conf\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
+		CopyFiles /SILENT /FILESONLY "$TEMP\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf"
+		CopyFiles /FILESONLY "$TEMP\OpenNetLink\wwwroot\db\SGNotifyDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"
+		CopyFiles /FILESONLY "$TEMP\OpenNetLink\wwwroot\db\SGSettingsDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"  	
+		CopyFiles /FILESONLY "$TEMP\OpenNetLink\wwwroot\conf\UpdateResult.txt" "C:\HANSSAK\OpenNetLink\wwwroot\conf\UpdateResult.txt"  	
+		Rename "$TEMP\OpenNetLink\wwwroot\Log" "C:\HANSSAK\OpenNetLink\wwwroot\Log"  ; 로그 이동
+		
+		${If} ${IS_LIGHT_PATCH} == 'TRUE'
+			Rename "$TEMP\OpenNetLink\wwwroot\edge" "C:\HANSSAK\OpenNetLink\wwwroot\edge"  ; edge 이동
+		${EndIf}
+		
+		${SetPatchLog} "TRUE" ""
+		
+	${Else}
+		; 하위 exist 작업을 위해, 패치본의 json/db는 삭제	                                                       		
+		CopyFiles /SILENT /FILESONLY "$TEMP\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
+		CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf"
+		CopyFiles /FILESONLY "$TEMP\SGNotifyDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"
+		CopyFiles /FILESONLY "$TEMP\SGSettingsDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"  
+		
+		;백업된 json/db 가 복사 완료될때까지, 대기
+		StrCpy $R0 0
+		loop:
 		IntCmp $R0 1 endloop
 			${If} ${FileExists} "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json"
 				${If} ${FileExists} "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json"
@@ -450,9 +571,20 @@ Function .onInstSuccess
 			${endif}
 		sleep 1000
 		Goto loop
-	endloop:
-	  
+		endloop:
+	${endif}
   ${endif}
+  
+  ;(위치이동) 설치 성공시에 프로그램 정보 등록
+  WriteUninstaller "$INSTDIR\uninst.exe"
+  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\ContextTransferClient.exe"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\OpenNetLinkApp.exe"
+  
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 
   ;;IfSilent 0 +2
   ${If} ${STARTAUTO} == 'TRUE'
@@ -507,36 +639,75 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   File "bin_addon\SecureGateChromiumExtension_v1.1.crx"
   
-  ; 단축아이콘 생성
-  CreateDirectory "$SMPROGRAMS\OpenNetLink"
-  CreateShortCut "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
-  CreateShortCut "C:\Users\Public\Desktop\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
-  
   ${If} ${IS_PATCH} == 'TRUE'
-
-	  ${If} $g_iNetPos == 2 ;CN
+		${If} $g_iNetPos == 2 ;CN
 	  	  ;CreateDirectory "${INSTALLPATH}\22222" ; 확인용
 		  ;File "artifacts\windows\published\AddFileRMex0X64.dll"
 		  ;File "artifacts\windows\published\AddFileRMex1X64.dll"
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex1X64.dll"'
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex2X64.dll"'
-	  ${ElseIf}  $g_iNetPos == 4 ;NCI
-                  ;CreateDirectory "${INSTALLPATH}\44444" ; 확인용
+		${ElseIf}  $g_iNetPos == 4 ;NCI
+				  ;CreateDirectory "${INSTALLPATH}\44444" ; 확인용
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
-	  ${Else}
+		${Else}
 
 		  ${If} $g_iNetPos == 1	; IN
-	          	;CreateDirectory "${INSTALLPATH}\11111" ; 확인용
-		  	ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
+				;CreateDirectory "${INSTALLPATH}\11111" ; 확인용
+			ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
 		  ${Else}
-		        ;CreateDirectory "${INSTALLPATH}\33333" ; 확인용
-		  	ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
+				;CreateDirectory "${INSTALLPATH}\33333" ; 확인용
+			ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
 		  ${EndIf}
-          
-	  ${EndIf}
-
-
+		  
+		${EndIf}
+		
+		${If} ${UPDATECHECK} == 'TRUE'
+			;패치파일 내 들어있는 UpdateFilelist.txt가 있다면, 목록과 패치 파일 비교
+			${If} ${FileExists} "C:\HANSSAK\OpenNetLink\wwwroot\conf\temp\UpdataFileList.txt"
+				FileOpen $0 "C:\HANSSAK\OpenNetLink\wwwroot\conf\temp\UpdataFileList.txt" r
+			
+				LOOP_CHECK: 
+				IfErrors exit_loop
+				FileRead $0 $1
+				;패치파일 중 존재하는지 확인
+				${Trim} $g_UpdateFilePath $1
+				StrCmp $g_UpdateFilePath "" exit_loop
+				
+				IfFileExists ${INSTALLPATH}\$g_UpdateFilePath FileFind FileNotFind
+					FileFind:
+						Goto LOOP_CHECK
+					FileNotFind:
+						FileClose $0
+						
+						MessageBox MB_OK|MB_TOPMOST "Patch failed.$\r$\nFile['$g_UpdateFilePath'] is missing.$\r$\nRoll back the program."
+						RMDir /r "C:\HANSSAK\OpenNetLink\"	;설치하던것 삭제
+						
+						;삭제 후 남아있는 파일들은 백업
+						FindFirst $2 $3 "C:\HANSSAK\OpenNetLink\*"
+						loop:
+							StrCmp $3 "" done
+							
+							;다른 프로세스로 인해 삭제가 불가한 파일은 이동처리
+							${If} ${FileExists} "$TEMP\OpenNetLink_Patch"
+								Delete "$TEMP\OpenNetLink_Patch\*.*"
+							${Else}				
+								CreateDirectory "$TEMP\OpenNetLink_Patch" ; 확인용
+							${EndIf}							
+							Rename "C:\HANSSAK\OpenNetLink\$3" "$TEMP\OpenNetLink_Patch\$3" ; 파일 이동
+							
+							FindNext $2 $3
+							Goto loop
+						done:
+						FindClose $2				
+						CopyFiles "$TEMP\OpenNetLink\*.*" "C:\HANSSAK\OpenNetLink";기존 설치본 원복
+						${SetPatchLog} "FALSE" "File['$g_UpdateFilePath'] is missing."						
+						Quit
+				
+				exit_loop:
+				FindClose $0								
+			${endif}
+		${endif}
   ${Else}
 
 	  ${If} ${NETWORK_FLAG} == 'CN'
@@ -558,9 +729,12 @@ Section "MainSection" SEC01
 	  ${EndIf}
 
   ${EndIf} ; ${IS_PATCH} == 'TRUE'
-
   
   
+  ; 단축아이콘 생성
+  CreateDirectory "$SMPROGRAMS\OpenNetLink"
+  CreateShortCut "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
+  CreateShortCut "C:\Users\Public\Desktop\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"  
 SectionEnd
 
 Section -AdditionalIcons
@@ -569,17 +743,18 @@ Section -AdditionalIcons
   CreateShortCut "$SMPROGRAMS\OpenNetLink\Uninstall.lnk" "$INSTDIR\uninst.exe"
 SectionEnd
 
-Section -Post
-  WriteUninstaller "$INSTDIR\uninst.exe"
-  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\ContextTransferClient.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\OpenNetLinkApp.exe"
+;설치 성공시에 프로그램 정보 등록하도록 이동
+; Section -Post
+  ; WriteUninstaller "$INSTDIR\uninst.exe"
+  ; WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\ContextTransferClient.exe"
+  ; WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
+  ; WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
+  ; WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\OpenNetLinkApp.exe"
   
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
-SectionEnd
+  ; WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
+  ; WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
+  ; WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
+; SectionEnd
 
 
 Function un.onUninstSuccess

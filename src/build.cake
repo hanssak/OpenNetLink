@@ -732,7 +732,8 @@ Task("MakeInstaller")
 				{"OUTPUT_DIRECTORY", PackageDirPath},
 				{"DELETE_NETLINK", deleteNetLink.ToString().ToUpper()},
 				{"IS_SILENT", isSilent.ToString().ToUpper()},
-				{"STARTAUTO", startAuto.ToString().ToUpper()}
+				{"STARTAUTO", startAuto.ToString().ToUpper()},
+				{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()}
 			}
 		});			
 	}
