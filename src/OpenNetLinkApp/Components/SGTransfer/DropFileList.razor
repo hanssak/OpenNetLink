@@ -99,7 +99,7 @@
             </p>
 
         }
-        <input type="file" id="fileInputTrans" style="display:block;" onclick="stopClickOpen(event);" multiple="multiple" />
+        @*<input type="file" id="fileInputTrans" style="display:block;" onclick="stopClickOpen(event);" multiple="multiple" />*@
     </div>
     <a hidden data-toggle="modal" data-target="modal-dropprogress"></a>
     <a hidden data-toggle="modal" data-target="Transfer_Denied"></a>
@@ -348,6 +348,7 @@
 
         int dropNdrop = await SubFileAddAsync(); //내부에서 드랍한 것인지 외부에서 드랍한 것인지 판단하기 위해 외부에서 들어온 것인지 먼저 판단
 
+        //int dropNdrop = 0;
         CLog.Here().Information($"");
 
         if (dropNdrop != 0)

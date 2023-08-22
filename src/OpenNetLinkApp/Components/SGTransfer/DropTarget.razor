@@ -1,7 +1,7 @@
 @using OpenNetLinkApp.Services;
 @inject DragAndDropService DragAndDropService
 
-<div ondragover="event.preventDefault()" @ondrop="OnDrop" style="height:100%;">
+<div id= "fileInput" ondragover="event.preventDefault()" @ondrop="OnDrop" style="height:100%;">
     @ChildContent
 </div>
 @functions {
@@ -14,9 +14,9 @@
     [Parameter]
     public Action<List<string>> Drop { get; set; }
 
-    void OnDrop()
+    void OnDrop(DragEventArgs args)
     {
-        
+        var files = args.DataTransfer.Files;
         List<string> stList = DragAndDropService.getDataList();
         Drop(stList);
         //DragAndDropService.clearDataList();

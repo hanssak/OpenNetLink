@@ -501,19 +501,19 @@ function setDropzonSize() {
     var divDropFileHeight = $("#divDropFile").css("height");
     var divDropFileHeightint = parseInt(divDropFileHeight.replace("px", ""));
     var divDropzoneTableHeight = $("#DropzoneTable").css("height");
-    if (divDropzoneTableHeight != null) {
+    //if (divDropzoneTableHeight != null) {
 
-        var divDropzoneTableHeightint = parseInt(divDropzoneTableHeight.replace("px", ""))
-        if (divDropFileHeightint >= divDropzoneTableHeightint) {
-            $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
-        }
-        else {
-            $('#fileInputTrans').css("height", divDropzoneTableHeight);
-        }
-    }
-    else {
-        $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
-    }
+    //    var divDropzoneTableHeightint = parseInt(divDropzoneTableHeight.replace("px", ""))
+    //    if (divDropFileHeightint >= divDropzoneTableHeightint) {
+    //        $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
+    //    }
+    //    else {
+    //        $('#fileInputTrans').css("height", divDropzoneTableHeight);
+    //    }
+    //}
+    //else {
+    //    $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
+    //}
 }
 
 window.appendHtml = (id, val) => {
@@ -1418,7 +1418,7 @@ window.preventDragStart = () => {
         e = e || event;
         if (e.target.id.indexOf("fileInput") == -1) {
             // check which element is our target 
-            e.preventDefault();
+            //e.preventDefault();
         }
     }, false);
 }
@@ -1428,7 +1428,7 @@ window.preventDrop = () => {
         e = e || event;
         if (e.target.id.indexOf("fileInput") == -1) {
             // check which element is our target 
-            e.preventDefault();
+            //e.preventDefault();
         }
     }, false);
 }

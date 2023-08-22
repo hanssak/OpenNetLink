@@ -792,7 +792,17 @@ void WebWindow::AttachWebView()
 								_webMessageReceivedCallback(message.get());
 								return S_OK;
 							}).Get(), &webMessageToken);
-
+						EventRegistrationToken webNewWindowRequested;
+						_webviewWindow->add_NewWindowRequested(Callback<ICoreWebView2NewWindowRequestedEventHandler>(
+							[this](ICoreWebView2* sender, ICoreWebView2NewWindowRequestedEventArgs* args)
+							{
+								wil::unique_cotaskmem_string uri;
+								
+								args->put_Handled(TRUE);
+								NTLog(SelfThis, Info, "WebWindow::NewWindowRequested !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+								return S_OK;
+							}
+						).Get(), &webNewWindowRequested);
 						EventRegistrationToken webResourceRequestedToken;
 						_webviewWindow->AddWebResourceRequestedFilter(L"*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL);
 						_webviewWindow->add_WebResourceRequested(Callback<ICoreWebView2WebResourceRequestedEventHandler>(
@@ -838,6 +848,7 @@ void WebWindow::AttachWebView()
 						_webviewWindow->add_NavigationStarting(Callback<ICoreWebView2NavigationStartingEventHandler>(
 							[this](ICoreWebView2* sender, ICoreWebView2NavigationStartingEventArgs* args)
 							{
+								NTLog(SelfThis, Info, "WebWindow::NavigationStarting : ");
 								wil::unique_cotaskmem_string uri;
 								//WCHAR wUrlData[2 * 1024] = { 0, };
 								if (args->get_Uri(&uri) == S_OK)
@@ -868,7 +879,6 @@ void WebWindow::AttachWebView()
 								return S_OK;
 							}
 						).Get(), &webNavigationStarting);
-
 						RefitContent();
 
 						flag.clear();
