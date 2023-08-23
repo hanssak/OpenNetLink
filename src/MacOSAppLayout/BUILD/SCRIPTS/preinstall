@@ -3,22 +3,35 @@
 #WHOAREYOU=`env | grep SUDO_USER | awk -F= '{print $2}'`
 #echo $WHOAREYOU > /tmp/whoareyou-OpenNetLinkApp.log
 
-NETWORK_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Network.json"
-if [ -e $NETWORK_FILE ]; then
-    cp /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Network.json /tmp
-fi
 
-APPENV_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/AppEnvSetting.json"
-if [ -e $APPENV_FILE ]; then
-    cp /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/AppEnvSetting.json /tmp
-fi
 
 UPDATE_CHECK=true
 INSTALL_PATH="/Applications/OpenNetLinkApp.app"
 
-if [ ! $UPDATE_CHECK ]; then
+if [ $UPDATE_CHECK ]; then
     if [ -d "$INSTALL_PATH" ]; then
         cp -r $INSTALL_PATH /tmp
+        rm -rf $INSTALL_PATH
+    fi
+else
+    NETWORK_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Network.json"
+    if [ -e $NETWORK_FILE ]; then
+    cp /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Network.json /tmp
+    fi
+    
+    APPENV_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/AppEnvSetting.json"
+    if [ -e $APPENV_FILE ]; then
+    cp /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/AppEnvSetting.json /tmp
+    fi
+    
+    NOTIDB_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/db/SGNotifyDB.db"
+    if [ -e $NOTIDB_FILE ]; then
+    cp $NOTIDB_FILE /tmp
+    fi
+
+    SETTINGDB_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/db/SGSettingsDB.db"
+    if [ -e $NOTIDB_FILE ]; then
+    cp $SETTINGDB_FILE /tmp
     fi
 fi
 

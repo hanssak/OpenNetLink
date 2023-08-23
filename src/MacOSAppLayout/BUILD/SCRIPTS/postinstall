@@ -5,17 +5,23 @@
 
 #Update Confirm 
 UPDATE_CHECK=true
-START_AUTO=false
+START_AUTO=true
 INSTALL_PATH="/Applications/OpenNetLinkApp.app"
 FILE_INSTALL_PATH="/Applications/OpenNetLinkApp.app/Contents/MacOS"
 file="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/temp/UpdateFileList.txt"
 
-if [ ! $UPDATE_CHECK ]; then
+WHOAREYOU=`last | head -1 | awk -F' ' '{ print $1 }'`
+mkdir /Applications/OpenNetLinkApp.app/Contents/MacOS/wapprove
+
+cd /Applications/OpenNetLinkApp.app/Contents/PlugIns
+rm -rf /Applications/SecureGate.app
+
+if [ $UPDATE_CHECK ]; then
     while read -r line
     do
         if [ ! -e "$FILE_INSTALL_PATH/$line" ]; then
-            #echo "FilePath $FILE_INSTALL_PATH/$line"
-            printf "Update Fail $FILE_INSTALL_PATH/$line" > /tmp/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/UpdateResult.txt
+            
+            printf "FAIL/$(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)/FILE['$line'] is missing." > /tmp/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/UpdateResult.txt
             rm -rf "$INSTALL_PATH/Contents"
             cp -rf /tmp/OpenNetLinkApp.app/Contents /Applications/OpenNetLinkApp.app
             if [ -d "$INSTALL_PATH/Contents/MacOS/wwwroot" ]; then
@@ -28,68 +34,86 @@ if [ ! $UPDATE_CHECK ]; then
         fi 
     done <"$file"
 
-    rm -rf "/tmp/OpenNetLinkApp.app"
-    printf "Update Good!!" > /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/UpdateResult.txt
+    #성공한 경우, Network/Env/DB/Log 는 기존 데이터로 복원
+    LOG_DIR="/tmp/OpenNetLinkApp.app/Contents/Resources/wwwroot/Log"
+    NETWORK_FILE="/tmp/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Network.json"
+    APPENV_FILE="/tmp/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/AppEnvSetting.json"
+    NOTIDB_FILE="/tmp/OpenNetLinkApp.app/Contents/Resources/wwwroot/db/SGNotifyDB.db"
+    SETTINGDB_FILE="/tmp/OpenNetLinkApp.app/Contents/Resources/wwwroot/db/SGSettingsDB.db"
+    printf "SUCCESS/$(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" > /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/UpdateResult.txt
+else
+    LOG_DIR=""
+    NETWORK_FILE="/tmp/Network.json"
+    APPENV_FILE="/tmp/AppEnvSetting.json"
+    NOTIDB_FILE="/tmp/SGNotifyDB.db"
+    SETTINGDB_FILE="/tmp/SGSettingsDB.db"
+fi
 
+#Network/Env/DB/Log 는 기존 데이터로 복원
+if [ -e $LOG_DIR ]; then    
+    cp -r $LOG_DIR /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot
+fi
+
+if [ -e $NETWORK_FILE ]; then    
+    cp $NETWORK_FILE /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
+    rm -rf $NETWORK_FILE
+fi
+
+if [ -e $APPENV_FILE ]; then    
+    cp $APPENV_FILE /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
+    rm -rf $APPENV_FILE
+fi
+
+if [ -e $NOTIDB_FILE ]; then
+    cp $NOTIDB_FILE /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/db/
+    rm -rf $NOTIDB_FILE
+fi
+
+if [ -e $SETTINGDB_FILE ]; then
+    cp $SETTINGDB_FILE /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/db/
+    rm -rf $SETTINGDB_FILE
 fi
 
 if [ -d "/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/temp" ]; then
     rm -rf "/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/temp"
 fi
 
-
-
-WHOAREYOU=`last | head -1 | awk -F' ' '{ print $1 }'`
-mkdir /Applications/OpenNetLinkApp.app/Contents/MacOS/wapprove
-
 chown -R $WHOAREYOU /Applications/OpenNetLinkApp.app
 chown -R :staff /Applications/OpenNetLinkApp.app
 chmod -R g+w /Applications/OpenNetLinkApp.app
 
-cd /Applications/OpenNetLinkApp.app/Contents/PlugIns
-rm -rf /Applications/SecureGate.app
+rm -rf "/tmp/OpenNetLinkApp.app"
 
-if [ -e $NETWORK_FILE ]; then    
-    cp /tmp/Network.json /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
-    rm -rf /tmp/Network.json
+NETWORK_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Network.json"
+NETPOS=`cat $NETWORK_FILE | grep "NETPOS"` 
+
+#NETPOS가 없는 Network.json의 경우에는 GroupID 개수로 파악
+if [ -z "$NETPOS" ]; then
+    NUMGROUPID=`cat $NETWORK_FILE | grep "GROUPID" | wc -l` 
+    INT=$((NUMGROUPID))
+
+    #그룹ID 개수가 1개 => 단일망 
+    if [ ${INT} -le 1 ];then
+        tar xvf SGFinderSync_IN.appex.tgz
+    #그룹ID 개수가 2개 => 다중망
+    else 
+        tar xvf SGFinderSync_CN.appex.tgz
+    fi  
+else
+    #NETPOS에는 IN/EX/CN 이 포함되어있음
+    #해당 값 포함여부에 따라 압축 풀 대상 결정
+    if [[ "${NETPOS}" == *"IN"* ]];then
+        tar xvf SGFinderSync_IN.appex.tgz
+    elif [[ "${NETPOS}" == *"EX"* ]];then
+        tar xvf SGFinderSync_EX.appex.tgz
+    elif [[ "${NETPOS}" == *"CN"* ]];then
+        tar xvf SGFinderSync_CN.appex.tgz   
+        
+    #IN/EX/CN 모두 포함되어 있지 않다면 IN으로 실행
+    else 
+        tar xvf SGFinderSync_IN.appex.tgz
+    fi  
 fi
-
-APPENV_FILE="/tmp/AppEnvSetting.json"
-if [ -e $APPENV_FILE ]; then
-    cp /tmp/AppEnvSetting.json /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
-    rm -rf /tmp/AppEnvSetting.json
-fi
-
-    NETWORK_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Network.json"
-    NETPOS=`cat $NETWORK_FILE | grep "NETPOS"` 
-
-    #NETPOS가 없는 Network.json의 경우에는 GroupID 개수로 파악
-    if [ -z "$NETPOS" ]; then
-        NUMGROUPID=`cat $NETWORK_FILE | grep "GROUPID" | wc -l` 
-        INT=$((NUMGROUPID))
-
-        #그룹ID 개수가 1개 => 단일망 
-        if [ ${INT} -le 1 ];then
-            tar xvf SGFinderSync_IN.appex.tgz
-        #그룹ID 개수가 2개 => 다중망
-        else 
-            tar xvf SGFinderSync_CN.appex.tgz
-        fi  
-    else
-        #NETPOS에는 IN/EX/CN 이 포함되어있음
-        #해당 값 포함여부에 따라 압축 풀 대상 결정
-        if [[ "${NETPOS}" == *"IN"* ]];then
-            tar xvf SGFinderSync_IN.appex.tgz
-        elif [[ "${NETPOS}" == *"EX"* ]];then
-            tar xvf SGFinderSync_EX.appex.tgz
-        elif [[ "${NETPOS}" == *"CN"* ]];then
-            tar xvf SGFinderSync_CN.appex.tgz   
-            
-        #IN/EX/CN 모두 포함되어 있지 않다면 IN으로 실행
-        else 
-            tar xvf SGFinderSync_IN.appex.tgz
-        fi  
-    fi
 
 #설치종료시 프로그램 바로 실행
 if [ ! $START_AUTO ]; then
