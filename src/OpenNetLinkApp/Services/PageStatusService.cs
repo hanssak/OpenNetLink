@@ -63,6 +63,8 @@ namespace OpenNetLinkApp.Services
 
         public string m_str3NetDestSysID = "";                  // 3망 연계에서 보낼 정보저장
 
+        public string m_strDragNDropFilePath = "";
+
         public bool m_bIsMultiNetWork = false;                    // 다중접속상황 유무
 
         public ISGSideBarUI[] m_approveMenuArray = null;            // nGroupID 순서대로 결재관리 메뉴들 저장
@@ -271,6 +273,15 @@ namespace OpenNetLinkApp.Services
             return false;
         }
 
+        public void SetDragNDropFilePath(string filePath)
+        {
+            this.m_strDragNDropFilePath = filePath;
+        }
+
+        public string GetDragNDropFilePath()
+        {
+            return this.m_strDragNDropFilePath;
+        }
 
         public FileAddManage GetFileAddManage(int groupID)
         {

@@ -799,7 +799,27 @@ void WebWindow::AttachWebView()
 								wil::unique_cotaskmem_string uri;
 								
 								args->put_Handled(TRUE);
-								NTLog(SelfThis, Info, "WebWindow::NewWindowRequested !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+								if (args->get_Uri(&uri) == S_OK)
+								{
+									BYTE* bUri;
+									wchar_t* wclpstr = (wchar_t*)uri.get();
+									size_t len = wcslen(wclpstr);
+									len = (len + 2) * sizeof(wchar_t);
+									len *= 2;
+
+									BYTE** ppData = NULL;
+									ppData = &bUri;
+									*ppData = new BYTE[len];
+
+									memset(*ppData, 0x00, len);
+									int unicodeLen = (int)wcslen(wclpstr);
+									int lenDe = WideCharToMultiByte(CP_UTF8, 0, wclpstr, unicodeLen, NULL, 0, NULL, NULL);
+									WideCharToMultiByte(CP_UTF8, 0, wclpstr, unicodeLen, (char*)*ppData, lenDe, NULL, NULL);
+
+									//WidecodeToUtf8(wclpstr, (char*)*ppData);
+									int nTotalLen = strlen((char*)*ppData);
+									((WebWindow*)SelfThis)->InvokeDragNDropChangedCallback(bUri, nTotalLen);
+								}
 								return S_OK;
 							}
 						).Get(), &webNewWindowRequested);

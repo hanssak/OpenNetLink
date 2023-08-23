@@ -134,6 +134,7 @@ typedef void (*ClipBoardCallback)(const int nGroupId, const int nType, const int
 typedef void (*RecvClipBoardCallback)(const int nGroupId);
 typedef void (*RequestedNavigateURLCallback)(const void* uriMem, const int uriLength);
 typedef void (*URLChangedCallback)(const void* uriMem, const int uriLength);
+typedef void (*DragNDropCallback)(const void* filePathMem, const int filePathLength);
 
 
 void RequestMoveTrayToWebWindow();
@@ -148,6 +149,7 @@ private:
 	RecvClipBoardCallback _recvclipboardCallback;
 	RequestedNavigateURLCallback _requestedNavigateURLCallback;
 	URLChangedCallback _urlChangedCallback;
+	DragNDropCallback _dragNDropCallback;
 
 public:
 #ifdef _WIN32
@@ -236,6 +238,14 @@ public:
 	}
 	void InvokeURLChangedCallback(const void* uriMem, const int uriLength) {
 		if (_urlChangedCallback) _urlChangedCallback(uriMem, uriLength);
+	}
+
+	void SetDragNDropCallback(DragNDropCallback callback) {
+		_dragNDropCallback = callback;
+	}
+
+	void InvokeDragNDropChangedCallback(const void* filePathMem, const int filePathLength) {
+		if (_dragNDropCallback) _dragNDropCallback(filePathMem, filePathLength);
 	}
 
 #if OS_LINUX
