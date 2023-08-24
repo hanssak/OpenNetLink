@@ -19,7 +19,7 @@ CREATE OR REPLACE FUNCTION public.func_email_approveinfo_open(
 	sfm2is BOOLEAN,
 	pagelistcount character varying,
 	viewpageno character varying)
-    RETURNS TABLE(email_seq bigint, approve_seq bigint, approvekind character varying, transkind2 character varying, dlpstatus character varying, addfile character varying, transtatus character varying, apprstatus character varying, mailsender character varying, recvuser character varying, recvcount bigint, title_text character varying, transdate character varying, approvedate character varying, realapprover character varying) 
+    RETURNS TABLE(email_seq bigint, approve_seq bigint, approvekind character varying, transkind2 character varying, dlpstatus character varying, addfile character varying, transtatus character varying, apprstatus character varying, mailsender character varying, recvuser character varying, recvcount bigint, title_text character varying, transdate character varying, approvedate character varying, realapprover character varying, approvepossable character varying) 
     LANGUAGE 'plpgsql'
     COST 100
     -- VOLATILE PARALLEL UNSAFE
@@ -58,17 +58,23 @@ sfm2is : sfm2 대결재 조회 인지 유무
 		FROM   TBL_USER_INFO  
 		WHERE USER_ID=''##USERID##''##SFM##
 	)
+	, TBL_EMAIL_APPROVE_PRE_TMP AS  
+	(  
+		SELECT CAST(''0'' AS CHARACTER(1)) AS APPROVEKIND, CAST(''C'' AS CHARACTER(1)) AS POS, A.* 
+		FROM TBL_EMAIL_APPROVE_INFO A
+		WHERE ((A.APPR_REQ_TIME BETWEEN ''##FROMDATE##000000'' AND ''##TODATE##235959'') AND (A.APPROVE_USER_SEQ <> A.USER_SEQ)) 
+	)  		
+	, TBL_EMAIL_APPROVE_POST_TMP AS  
+	(  
+		SELECT CAST(A.APPROVE_KIND  AS CHARACTER(1)) AS APPROVEKIND, CAST(''H'' AS CHARACTER(1)) AS POS, A.* 
+		FROM TBL_EMAIL_APPROVE_HIS A
+		WHERE ((A.APPR_REQ_TIME BETWEEN ''##FROMDATE##000000'' AND ''##TODATE##235959'' ) AND (A.APPROVE_USER_SEQ <> A.USER_SEQ))
+	)  			
 	, TBL_EMAIL_APPROVE AS  
 	(  
-		SELECT A.APPROVE_KIND AS APPROVEKIND, ''H'' AS POS, A.* 
-		FROM TBL_EMAIL_APPROVE_HIS A, TBL_APPROVE_USER U
-		WHERE ((A.APPR_REQ_TIME BETWEEN ''##FROMDATE##000000'' AND ''##TODATE##235959'' ) AND (A.APPROVE_USER_SEQ IN (U.USER_SEQ) AND A.APPROVE_USER_SEQ <> A.USER_SEQ) AND (##ISSECURITY##))
-
-		UNION ALL 
-
-		SELECT ''0''  AS APPROVEKIND, ''C'' AS POS, A.* 
-		FROM TBL_EMAIL_APPROVE_INFO A, TBL_APPROVE_USER U
-		WHERE ((A.APPR_REQ_TIME BETWEEN ''##FROMDATE##000000'' AND ''##TODATE##235959'') AND (A.APPROVE_USER_SEQ IN (U.USER_SEQ) AND A.APPROVE_USER_SEQ <> A.USER_SEQ) AND (##ISSECURITY##)) 
+		SELECT * FROM TBL_EMAIL_APPROVE_PRE_TMP A, TBL_APPROVE_USER U WHERE (A.APPROVE_USER_SEQ IN (U.USER_SEQ)) AND (##ISSECURITY##)
+		UNION ALL
+		SELECT * FROM TBL_EMAIL_APPROVE_POST_TMP A, TBL_APPROVE_USER U WHERE (A.APPROVE_USER_SEQ IN (U.USER_SEQ)) AND (##ISSECURITY##)
 	)  	
 	, TBL_EMAIL_TRANSFER AS 
 	(  
@@ -100,7 +106,7 @@ sfm2is : sfm2 대결재 조회 인지 유무
 		SELECT ''C'' UPOS, USER_SEQ, USER_ID, USER_NAME, DEPT_SEQ 
 		FROM TBL_USER_INFO 
 	) 
-	SELECT EMAIL_SEQ, APPROVE_SEQ, APPROVEKIND, TRANSKIND, DLP, ADDFILE, TRANSTATUS, APPROVESTATUS, MAILSENDER, RECVUSER, RECVCOUNT, TITLE, TRANSDATE, APPROVEDATE, REAL_APPROVER
+	SELECT EMAIL_SEQ, APPROVE_SEQ, APPROVEKIND, TRANSKIND, DLP, ADDFILE, TRANSTATUS, APPROVESTATUS, MAILSENDER, RECVUSER, RECVCOUNT, TITLE, TRANSDATE, APPROVEDATE, REAL_APPROVER, APPROVE_POSSABLE
 	FROM ( 
 		SELECT T.EMAIL_SEQ 
 			, A.REQ_SEQ AS APPROVE_SEQ 
@@ -132,6 +138,7 @@ sfm2is : sfm2 대결재 조회 인지 유무
 			, CAST(T.REQUEST_TIME AS VARCHAR) AS TRANSDATE 
 			, CAST((CASE WHEN A.APPROVE_FLAG = ''1'' THEN ''-'' ELSE A.APPR_RES_TIME END) AS VARCHAR) AS APPROVEDATE 
 			, CAST ( ##SFM_REAL_APPROVER## AS VARCHAR) AS REAL_APPROVER
+			, CAST( (SELECT COUNT(*) FROM TBL_EMAIL_APPROVE_PRE_TMP S WHERE S.EMAIL_SEQ=T.EMAIL_SEQ  AND S.REQ_SEQ != A.REQ_SEQ AND S.APPROVE_ORDER < A.APPROVE_ORDER) AS VARCHAR ) AS APPROVE_POSSABLE
 		FROM TBL_EMAIL_APPROVE A 
 			, TBL_EMAIL_TRANSFER T 
 			, TBL_APPROVE_USER U 
@@ -287,7 +294,8 @@ where A.USER_SEQ IN (
 		sql:=sql||'ORDER BY A.TRANSDATE DESC LIMIT '|| PageListCount || ' OFFSET (' || ViewPageNo || '-1) *' || PageListCount;
 	END IF;
 
---	RAISE NOTICE 'Quantity here is %', sql;  -- Prints 50
+--	RAISE NOTICE 'Query is : %', sql;  -- Prints 50
+	
 --	RAISE NOTICE 'Quantity Title %', title;  -- Prints 50
 	
 RETURN QUERY EXECUTE
@@ -297,4 +305,4 @@ end;
 $BODY$;
 
 ALTER FUNCTION public.func_email_approveinfo_open(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, BOOLEAN, BOOLEAN,character varying, character varying)
-    OWNER TO postgres;
+    OWNER TO hsck;
