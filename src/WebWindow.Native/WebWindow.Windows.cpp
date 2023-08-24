@@ -1164,6 +1164,10 @@ void WebWindow::ClipFirstSendTypeText(int groupID)
 {
 	m_mapBoolClipSendTextFirst[groupID] = true;
 }
+void WebWindow::SetDragNDropFilePath()
+{
+
+}
 
 void WebWindow::ClipMemFree(int groupID)
 {

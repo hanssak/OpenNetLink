@@ -289,6 +289,7 @@ public:
 	void OnHotKey(int groupID);
 	void ClipTypeSelect(int groupID);
 	void ClipFirstSendTypeText(int groupID);
+	void SetDragNDropFilePath();
 
 	void ClipMemFree(int groupID);
 	void SetClipBoardSendFlag(int groupID);

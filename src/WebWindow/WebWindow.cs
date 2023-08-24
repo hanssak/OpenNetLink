@@ -224,6 +224,8 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_FolderOpen(IntPtr instance, string strFileDownPath);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetDragNDropFilePath(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardData(IntPtr instance, int nGroupID, int nType, int nClipSize, byte[] data);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardSendFlag(IntPtr instance, int groupID);
@@ -373,6 +375,8 @@ namespace WebWindows
         }
 
         public void WinOnHotKey(int groupID) => WebWindow_OnHotKey(_nativeWebWindow, groupID);
+
+        public void SetDragNDropFilePath() => WebWindow_SetDragNDropFilePath(_nativeWebWindow);
 
         public void UseClipBoardSelect(int groupID) => WebWindow_UseClipSelect(_nativeWebWindow, groupID);
 
