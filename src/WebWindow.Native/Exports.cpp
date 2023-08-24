@@ -259,6 +259,10 @@ extern "C"
 	{
 		instance->SetClipBoardSendFlag(groupID);
 	}
+	EXPORTED void WebWindow_SetDragNDropFilePath(WebWindow* instance)
+	{
+		instance->SetDragNDropFilePath();
+	}
 }
 
 extern "C" void _NTLog_(const void *Self, int nLevel, const char *pszFuncName, const char *pszFileName, const int nLineNo, const char *pszFormat, ...)
