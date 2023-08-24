@@ -11,7 +11,7 @@
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
 var target = Argument("target", "Default");
-var sitename = Argument("sitename", "hanssak");
+var customName = Argument("customName", "");
 var configuration = Argument("configuration", "Release");
 var setNetwork = Argument<bool>("setNetwork", true);
 var isFull = Argument<bool>("isFull", true);	//false로 하면, 설치파일은 만들지 않는다.
@@ -25,7 +25,7 @@ var isUpdateCheck = Argument<bool>("isUpdateCheck", false);				//false 하면 �
 
 var isPatchInstaller = false;
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
-var customName = "NONE";
+// var customName = "NONE";
 var AppProps = new AppProperty(Context,
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								 "../", 													// Path of the Git Local Repository
@@ -537,7 +537,11 @@ Task("PkgCrossflatform")
 	//SetFileName
 	
 	if(isFull.ToString().ToUpper() == "TRUE")
-		customName = Prompt("Custom Name : ");			
+	{
+		if(customName == "")
+			customName = Prompt("Custom Name : ");			
+	}
+		
 
 	var LastUpdatedTime = DateTime.Now.ToString(@"yyyy\/MM\/dd h\:mm tt");
 
@@ -636,7 +640,7 @@ Task("PkgCrossflatform")
 		}
 		
 		//[빌드 후] 에이전트 별 파일 적용 (ex.Network.json, AppEnvSetting 등)
-		Information($"Copy [Agent Unit] Files");
+		Information($"Copy [Agent Unit] Files - " + storageUnit);
 		
 		publishInitJsonDirPath = $"./artifacts/{AppProps.Platform}/published/wwwroot/conf/Init";	
 		//설치파일 생성
@@ -644,6 +648,12 @@ Task("PkgCrossflatform")
 		{
 			foreach(var agentUnit in System.IO.Directory.GetDirectories(storageUnit))
 			{
+				var agentUnitInfo = new DirectoryInfo(agentUnit);
+				string AgentName= agentUnitInfo.Name;
+				
+				if(AgentName.Substring(0, 1) == ".")
+					continue;
+
 				//설치 패키지: OPSetting.json / Network.json / EnvSetting.json / SqlQuery.xml을 Init에 생성
 				if(DirectoryExists(publishInitJsonDirPath))		
 					DeleteDirectory(publishInitJsonDirPath, new DeleteDirectorySettings {Force = true, Recursive = true });
@@ -668,12 +678,7 @@ Task("PkgCrossflatform")
 					System.IO.Directory.CreateDirectory($"{publishInitJsonDirPath}/InstallInfo/{netPos}");
 				}
 
-				var agentUnitInfo = new DirectoryInfo(agentUnit);
-				string AgentName= agentUnitInfo.Name;
-				
-				if(AgentName.Substring(0, 1) == ".")
-					continue;
-
+			
 				Information($"Make Agent Installer {AgentName}");
 
 				networkFlag = AgentName.ToUpper();			

@@ -65,6 +65,10 @@ namespace OpenNetLinkApp
                 //파일에 저장된 항목 dek 재 암호화
                 SGCrypto.ValidationResult &= SGFileCrypto.Instance.EncryptSettingFiles();
 
+
+                //SP1 테스트를 위해 처리
+                //SGFileCrypto.Instance.EncryptSettingFiles("wwwroot/conf/SP1_DEBUG");
+
                 object[] arg = new object[2];
                 arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
                 arg[1] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartTrayMove;

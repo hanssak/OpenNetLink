@@ -269,7 +269,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                         if(isOriFile == false)
                         {
                             byte[] decContents = new byte[0];
-                            SGCrypto.AESDecrypt256WithDEK(strContents, ref decContents);
+                            SGCrypto.AESDecrypt256WithDEK(hsckByte, ref decContents);
                             strContents = Encoding.UTF8.GetString(decContents);
                         }
 
