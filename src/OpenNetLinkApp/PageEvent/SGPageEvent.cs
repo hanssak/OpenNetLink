@@ -276,6 +276,12 @@ namespace OpenNetLinkApp.PageEvent
     public delegate bool SendPkiFileEvent(int groupid, string strPcfFilePath, bool bSendPkiByFileTrans);
 
     public delegate void OSNotificationEvent(int groupId, WebWindows.OS_NOTI category, string title, string message, string navURI = "");
+    
+    /// <summary>
+    /// 패치 업데이트 기록 전송 응답 처리 Event
+    /// </summary>
+    /// <param name="groupId"></param>
+    public delegate void AuditOriRecvEvent(int groupId, SGData e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -450,6 +456,9 @@ namespace OpenNetLinkApp.PageEvent
         public SendPkiFileEvent PkiFileSendEventFunc = null;   // pki파일전송용
 
         public OSNotificationEvent oSNotificationEvent = null;
+
+        public AuditOriRecvEvent auditOriEvent = null;
+
         public SGPageEvent()
         {
 
@@ -1632,6 +1641,9 @@ namespace OpenNetLinkApp.PageEvent
             if (oSNotificationEvent != null)
                 oSNotificationEvent(groupId, category, title, message, navURI);
         }
+
+        public void SetAuditOriEvent(AuditOriRecvEvent e) => auditOriEvent = e;
+        public AuditOriRecvEvent GetAuditOriEvent() => auditOriEvent;
 
     }
 }

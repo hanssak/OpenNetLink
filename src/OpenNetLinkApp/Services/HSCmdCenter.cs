@@ -806,6 +806,14 @@ namespace OpenNetLinkApp.Services
                 case eCmdList.eOLEMIMELISTQUERY:
                     OLEMimeListAfterSend(groupId, sgData);
                     break;
+                case eCmdList.eAUDITORI:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        AuditOriRecvEvent auditOriRecvEvent = sgPageEvent.GetAuditOriEvent();
+                        if (auditOriRecvEvent != null) auditOriRecvEvent(groupId, sgData);
+                    }
+                    break;
                 default:
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
@@ -2926,6 +2934,15 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.SendGenericNotiType2(hsNetWork, strUserID, strUserName, strDeptName, strFileName, strPreworkType);
+            return -1;
+        }
+
+        public int SendPatchHistory(int groupid, int strStatus, string strReason)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.SendPatchHistory(hsNetWork, strStatus, hsNetWork.GetLocalIP(), strReason);
             return -1;
         }
 

@@ -425,10 +425,10 @@
         await SetProtectedPWFromUI();
 
         @*PageEventArgs e = new PageEventArgs();
-        e.strDummy = "google_otp";
-        e.strMsg = "otpauth://totp/SecureGate:KS0002?secret=KPRHRMDWLFF7A3CHVAJTINDA74KM2PCU&issuer=SecureGate";
-        Show2FactorAuth(0, e);
-        return;*@
+            e.strDummy = "google_otp";
+            e.strMsg = "otpauth://totp/SecureGate:KS0002?secret=KPRHRMDWLFF7A3CHVAJTINDA74KM2PCU&issuer=SecureGate";
+            Show2FactorAuth(0, e);
+            return;*@
 
         int groupid = pageService.m_nCurViewPageGroupID;
 
@@ -514,7 +514,7 @@
                 return;
             }
 
-            if(!id.ValidationSqlInjection())
+            if (!id.ValidationSqlInjection())
             {
                 ShowLoginFail(XmlConf.GetErrMsg("E_0119"));
                 SetProtectedPW(string.Empty);
@@ -532,7 +532,7 @@
                 {
                     ShowLoginFail(XmlConf.GetTitle("T_OTP_GUIDE"));
                     bLoginBtnDisable = false;
-                    
+
                     SetProtectedPW(string.Empty);
                     return;
                 }
@@ -884,6 +884,11 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
         if (firstRender)
         {
+            if (srcLoc != "Logout" && CheckPatchHistoryFile(out bool patchResult, out string patchTime, out string patchReason))
+            {
+                if (!patchResult)
+                    ShowMessage("waring", string.Format(XmlConf.GetWarnMsg("W_0296"), patchTime));
+            }
             //if (AppConfigSvc.GetUseGPKILogin(groupID))
             if (SGAppMgrSvc.OpConfigInfoService.GetUseGPKILogin(groupID))
             {
@@ -900,9 +905,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 {
                     SetIdPwLogin(groupID);
                 }
-
             }
-
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -1109,7 +1112,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         *@
 
 
-        // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
+    // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
         {
@@ -1288,6 +1291,18 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
                     CLog.Here().Information($"LoginResultOnetoAll, groupID : {groupId}, User Do Login, UrlRedirection LogIn State ReSet !!!");
                     HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupId, true);
+
+                    //패치기록 파일 확인 후 서버 전송
+                    if (CheckPatchHistoryFile(out bool patchResult, out string patchTime, out string patchReason))
+                    {
+                        CLog.Here().Information($"CheckPatchHistoryFile, groupID : {groupId}, PatchResult : {patchResult}, PatchTime : {patchTime}, patchReason : {patchReason}");
+
+                        string localIP = HSCmdCenter.GetConnectNetWork(groupId)?.GetLocalIP();
+                        if(patchResult)
+                            HSCmdCenter.SendPatchHistory(groupId, 2, string.Format(XmlConf.GetWarnMsg("W_0297"), localIP,patchTime));
+                        else 
+                            HSCmdCenter.SendPatchHistory(groupId, -2, string.Format(XmlConf.GetWarnMsg("W_0298"), localIP,patchTime));
+                    }
 
                     SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
                     SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
@@ -1633,13 +1648,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         strPopupMsg = $"{strFromNet}<i class=\"fas fa-long-arrow-alt-right p-1\"></i> {strToNet}<br/>";
                     }
 
-                    if(ret == 3) //일시적으로 계정 자금 시간 표시
+                    if (ret == 3) //일시적으로 계정 자금 시간 표시
                     {
                         SGData sgDate = HSCmdCenter.GetSGSvrData(groupId);
                         string authUser = sgDate.GetBasicTagData("AUTHUSER");
                         List<string> list = authUser.Split(',').ToList();
                         int blockTime = 3;
-                        if(list != null && list.Count == 3)
+                        if (list != null && list.Count == 3)
                         {
                             blockTime = Convert.ToInt32(list[2]);
                         }
@@ -1693,7 +1708,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                             }
                         }
 
-                        // Login 화면으로 머물러있지 않도록
+                            // Login 화면으로 머물러있지 않도록
                         @*if (nGroupIDfirst < 0)
                             nGroupIDfirst = 0;*@
 
@@ -1892,11 +1907,11 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
     }
 
 
-    /// <summary>
-    /// 로그인 완료후 호출되는 곳(BACKUP용)
-    /// </summary>
-    /// <param name="groupId"></param>
-    /// <param name="e"></param>
+    ///// <summary>
+    ///// 로그인 완료후 호출되는 곳(BACKUP용)
+    ///// </summary>
+    ///// <param name="groupId"></param>
+    ///// <param name="e"></param>
     //public async void LoginResult(int groupId, PageEventArgs e)
     //{
     //    await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
@@ -2844,9 +2859,39 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
     /// <param name="groupID"></param>
     public void SaveAfterApproveCheckBoxStatus(int groupID)
     {
-
         // Service 쪽에 groupID 별로 사후결재 설정상태값 저장하고 있어야함.
 
+    }
+
+    /// <summary>
+    /// 롤백기능 ON 시 패치 결과 반환
+    /// </summary>
+    /// <param name="Result">파일에 기록된 패치 결과</param>
+    /// <param name="PatchDatetime">파일에 기록된 패치 시간</param>
+    /// <param name="Reason">파일에 기록된 실패 사유</param>
+    /// <returns>true:패치파일 있음<br>false:패치파일 없음</returns>
+    public bool CheckPatchHistoryFile(out bool Result, out string PatchDatetime, out string Reason)
+    {
+        Result = false;
+        PatchDatetime = string.Empty;
+        Reason = string.Empty;
+
+        string patchHistoryPath = "wwwroot/conf/UpdateResult.txt";
+        if (!File.Exists(patchHistoryPath))
+            return false;
+
+        //format : SUCCESS/2023.08.22 18:39:27
+        //format : FAIL/2023.08.22 18:39:27/['file'] is missing.
+        string patchResult = File.ReadAllText(patchHistoryPath).Trim();
+
+        if (string.IsNullOrEmpty(patchResult))
+            return false;
+
+        string[] result = patchResult.Split("/");
+        Result = (result[0] == "SUCCESS");
+        PatchDatetime = (result.Length > 1) ? result[1] : "";
+        Reason = (result.Length > 2) ? result[2] : "";
+        return true;
     }
 
     /*
@@ -2872,13 +2917,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-                            {
-                                return true;
-                                    }
-                                        else
-                                            return false;
-
+                                        {
+                                            return true;
                                                 }
+                                                    else
+                                                        return false;
+
+                                                            }
     */
 
 }

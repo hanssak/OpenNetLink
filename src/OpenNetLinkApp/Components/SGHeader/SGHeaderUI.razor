@@ -557,7 +557,7 @@
             pro.Start();
         *@
 
-        try
+    try
         {
             System.Diagnostics.Process.Start("xdotool", strParameter);
         }
@@ -1702,6 +1702,9 @@
         HsCmdCenter.sgPageEvent.SetUpdatePolicyEvent(UpdatePolicy);
         HsCmdCenter.sgPageEvent.SetFileMimeRecvEvent(FileMimeRecvEvent);
         HsCmdCenter.sgPageEvent.SetOLEMimeRecvEvent(OLEMimeRecvEvent);
+        HsCmdCenter.sgPageEvent.SetAuditOriEvent(AuditOriRecvEvent);
+
+
         pageService.SetAlramAndMessageDeleteEvent(DelAllAlramAndMessage);
 
         pageService.SetAfterApprCommonNotiEvent(AfterApproveStatusChange); //사후정책 노티
@@ -1936,13 +1939,13 @@
             return;
 
         List<string> listReLoginTagName = new List<string>(){
-        "POLICYFLAG", "APPROVEPROXYRIGHT",
-        "APPROVEUSETYPE", "CLIPPOLICYFLAG", "OTP", "MANUALDOWNLOAD"
+    "POLICYFLAG", "APPROVEPROXYRIGHT",
+    "APPROVEUSETYPE", "CLIPPOLICYFLAG", "OTP", "MANUALDOWNLOAD"
     };
         List<string> listSetTagName = new List<string>(){
-        "FILEFILTER", "FILELIMITSIZE", "FILEFILTERTYPE", "DAYFILETRANSFERLIMITSIZE", "DAYFILETRANSFERLIMITCOUNT", "DAYCLIPBOARDCOUNT",
-        "DAYCLIPBOARDSIZE", "CLIPBOARDSIZE", "MAXFILETRANSFERCOUNT", "AFTERAPPROVE", "DELETECYCLE", "FILEPARTSIZE", "FILEBANDWIDTH",
-        "SCRLOCK","HOLIDAY"
+    "FILEFILTER", "FILELIMITSIZE", "FILEFILTERTYPE", "DAYFILETRANSFERLIMITSIZE", "DAYFILETRANSFERLIMITCOUNT", "DAYCLIPBOARDCOUNT",
+    "DAYCLIPBOARDSIZE", "CLIPBOARDSIZE", "MAXFILETRANSFERCOUNT", "AFTERAPPROVE", "DELETECYCLE", "FILEPARTSIZE", "FILEBANDWIDTH",
+    "SCRLOCK","HOLIDAY"
     };
 
         //ReLoginTagName 해당하는 데이터가 수정됬을 경우 ReLogin 필요
@@ -2096,6 +2099,24 @@
         List<Dictionary<int, string>> oleMimeList = e.GetSvrRecordData("RECORD");
         statusData.fileAddManage.SetOLEMimeList(groupId, oleMimeList);
     }
+
+    /// <summary>
+    /// 패치 업데이트 히스토리 전송 응답 후 동작
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
+    public void AuditOriRecvEvent(int groupId, SGData e)
+    {
+        string Result = e?.GetTagData("RESULT");
+        string Reason = e?.GetTagData("REASON");
+        CLog.Here().Information($"AuditOriRecvEvent RESULT- {Result} , REASON - {Reason}");
+
+        //패치기록 완료 시 파일 삭제
+        string patchHistoryPath = "wwwroot/conf/UpdateResult.txt";
+        if(Result == "0" && File.Exists(patchHistoryPath))
+            File.Delete(patchHistoryPath);
+    }
+
     public void AfterApproveStatusChange()
     {
         int groupID = nGroupID;

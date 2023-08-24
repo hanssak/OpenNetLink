@@ -761,6 +761,24 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.SendMessage(args);
         }
 
+        /// <summary>
+        /// 업데이트 이력 전송
+        /// </summary>
+        /// <param name="clientInfo"></param>
+        /// <param name="getStatus"></param>
+        /// <param name="getClientIP"></param>
+        /// <param name="getReason"></param>
+        public int SendPatchHistory(HsNetWork hsNet, int getStatus, string getClientIP, string getReason)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["STATUS"] = getStatus.ToString();
+            dic["CLIENTIP"] = getClientIP;
+            dic["REASON"] = getReason;
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_AUDITORI", dic, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.SendMessage(args);
+        }
+
 
         public int RequestSendAptConfirm(HsNetWork hsNet, string strUserID, string strTransSeq)
         {
