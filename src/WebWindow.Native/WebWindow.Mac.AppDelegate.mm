@@ -11,13 +11,18 @@
     if (self = [super init]) {
         // allocate and initialize window and stuff here ..
     }
-
     return self;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
     [window makeKeyAndOrderFront:nil];
     [NSApp activateIgnoringOtherApps:YES];
+    //[window registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, nil]];
+    //[NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskLeftMouseUp handler:^NSEvent * (NSEvent * theEvent) {
+    //    NSPasteboard* pb = [NSPasteboard pasteboardWithName:NSDragPboard];
+    //    NSLog(@"%@", [pb propertyListForType:NSFilenamesPboardType]);
+    //    return theEvent;
+    //}];
     NSLog(@"applicationDidFinishLaunching");
     NTLog(SelfThis, Info, "!! ----- aLaucgubg");
     // Show extensions, if FinderUtilities is not approved
@@ -58,6 +63,8 @@
     NSLog(@"Will terminate....");
     return ;
 }
+
+
 
 - (BOOL)windowShouldClose:(NSWindow *)sender {
 
@@ -359,5 +366,60 @@
     CFRelease(src);
 
     return ;
+}
+-(NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
+{
+    NSLog(@"123123");
+    return NSDragOperationGeneric;
+}
+-(BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
+{
+    NSPasteboard* pbrd = [sender draggingPasteboard];
+    // Do something here.
+    NSLog(@"123123");
+    return YES;
+}
+- (NSDragOperation)draggingSession:(NSDraggingSession *)session sourceOperationMaskForDraggingContext:(NSDraggingContext)context {
+    NSLog(@"123123");
+    switch (context) {
+        case NSDraggingContextOutsideApplication:
+            return NSDragOperationCopy;
+            
+        case NSDraggingContextWithinApplication:
+            
+        default:
+            return NSDragOperationCopy;
+            break;
+    }
+}
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+    NSLog(@"123123");
+    NSPasteboard *pboard = [sender draggingPasteboard];
+ 
+    if ( [[pboard types] containsObject:NSURLPboardType] ) {
+        NSURL *fileURL = [NSURL URLFromPasteboard:pboard];
+        // Perform operation using the file’s URL
+    }
+    return YES;
+}
+
+
+- (void)pasteboard:(NSPasteboard *)pasteboard item:(NSPasteboardItem *)item provideDataForType:(NSString *)type {
+    NSLog(@"123123");
+    
+}
+- (BOOL)hasFileURLOrPromisedFileURLWithDraggingInfo:(id <NSDraggingInfo>)sender
+{
+    NSLog(@"123123");
+    NSArray *relevantTypes = @[@"com.apple.pasteboard.promised-file-url", @"public.file-url"];
+    for(NSPasteboardItem *item in [[sender draggingPasteboard] pasteboardItems])
+    {
+        if ([item availableTypeFromArray:relevantTypes] != nil)
+        {
+            return YES;
+        }
+    }
+    return NO;
 }
 @end

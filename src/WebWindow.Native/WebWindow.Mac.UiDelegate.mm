@@ -96,6 +96,25 @@
     NSString *myString = webView.URL.absoluteString;
     std::string strUriText;
     strUriText = myString.UTF8String;
+    NSLog(@"%@\n", myString);
     ((WebWindow*)(SelfThis))->InvokeURLChangedCallback(strUriText.data(), strUriText.length());
+}
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+	NSString *myString = navigationAction.request.URL.absoluteString;
+    NSRange rangeString = [myString rangeOfString:@"file://"];
+    NSInteger index = rangeString.location;
+    if((int)index == 0)
+    {
+        std::string strUriText;
+        strUriText = myString.UTF8String;
+        ((WebWindow*)(SelfThis))->InvokeDragNDropChangedCallback(strUriText.data(), strUriText.length());
+
+        decisionHandler(WKNavigationActionPolicyCancel);
+    }
+    else
+    {
+        decisionHandler(WKNavigationActionPolicyAllow);
+    }
+    NSLog(@"%@\n", myString);
 }
 @end
