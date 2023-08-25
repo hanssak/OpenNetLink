@@ -1122,7 +1122,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         *@
 
 
-        // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
+    // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
         {
@@ -1668,7 +1668,8 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         {
                             blockTime = Convert.ToInt32(list[2]);
                         }
-                        e.strMsg = String.Format(e.strMsg, blockTime);
+                        //3분 -> {n}분으로 메세지 변경
+                        e.strMsg = string.Format(XmlConf.GetWarnMsg("W_0299"), blockTime); //e.strMsg = String.Format(e.strMsg, blockTime);                        
                     }
                     strPopupMsg += e.strMsg;
                     strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");

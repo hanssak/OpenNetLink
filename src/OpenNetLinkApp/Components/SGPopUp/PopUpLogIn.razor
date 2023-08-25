@@ -1502,7 +1502,8 @@
                     {
                         blockTime = Convert.ToInt32(list[2]);
                     }
-                    e.strMsg = String.Format(e.strMsg, blockTime);
+                    //3분 -> {n}분으로 메세지 변경
+                    e.strMsg = string.Format(XmlConf.GetWarnMsg("W_0299"), blockTime); //e.strMsg = String.Format(e.strMsg, blockTime);                  
                 }
 
                 strPopupMsg += e.strMsg;
