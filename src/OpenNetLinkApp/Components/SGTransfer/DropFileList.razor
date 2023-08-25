@@ -346,7 +346,7 @@
     {
 
         CLog.Here().Information($"OnDrop-Start, recvlist-count : {recvlist.Count}");
-
+        Window.SetDragNDropFilePath();
         List<string> list = await SubFileAddAsync(); //내부에서 드랍한 것인지 외부에서 드랍한 것인지 판단하기 위해 외부에서 들어온 것인지 먼저 판단
 
         if (list.Count <= 0)
@@ -2453,7 +2453,7 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-
+        
         await Task.Delay(100);
         List<string> fileList = new List<string>();
         //int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumber");

@@ -943,4 +943,21 @@ void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, 
 
 }
 
+void WebWindow::SetDragNDropFilePath()
+{
+    NSPasteboard* pb = [NSPasteboard pasteboardWithName:NSDragPboard];
+    for (NSPasteboardItem *item in [pb pasteboardItems]) {
+        NSString *draggedURLString = [item stringForType:@"public.file-url"];
+        if (draggedURLString != nil) {
+            NSURL *draggedURL = [NSURL URLWithString:draggedURLString];
+            NSString *draggedPath = [draggedURL path];
+
+            NSLog(@"pathname: %@", draggedPath);
+            std::string strUriText;
+            strUriText = draggedPath.UTF8String;
+            ((WebWindow*)(SelfThis))->InvokeDragNDropChangedCallback(strUriText.data(), strUriText.length());
+            break;
+        }
+    }
+}
 #endif
