@@ -308,11 +308,11 @@ void WebWindow::Show()
 	webkit_settings_set_default_font_size (settings, webkit_settings_get_default_font_size (settings)-3);
 
 	/* Load some data or reload to be able to inspect the page*/
-	if (!access("./debug-inspector", F_OK))
-	{
-		webkit_settings_set_enable_developer_extras(settings, TRUE);
-		webkit_web_view_load_uri(WEBKIT_WEB_VIEW(_webview), "http://www.gnome.org");
-	}
+	//if (!access("./debug-inspector", F_OK))
+	//{
+	//	webkit_settings_set_enable_developer_extras(settings, TRUE);
+	//	webkit_web_view_load_uri(WEBKIT_WEB_VIEW(_webview), "http://www.gnome.org");
+	//}
 
 	/* Show the inspector */
 	WebKitWebInspector* inspector = webkit_web_view_get_inspector(WEBKIT_WEB_VIEW(_webview));
