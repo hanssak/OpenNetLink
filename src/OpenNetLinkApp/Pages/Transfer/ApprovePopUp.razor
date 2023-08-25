@@ -159,7 +159,7 @@
                     <table class="table table-head-fixed table-bordered table-hover white" style="table-layout: fixed;">
                         <thead>
                             <tr>
-                                <th style="text-align: center;width: 5%;">선택 </th>
+                                <th style="text-align: center;width: 5%;">@strColumnSelect</th>
                                 <th style="text-align:center;">@strFileName </th>           <!--파일명-->
                                 <th style="text-align: center; width: 7%;">@strFileType </th>             <!--유형-->
                                 <th style="text-align: center; width: 7%;">@strFileSize </th>             <!--크기-->
@@ -592,6 +592,8 @@
     public string strFileInfo = "";
     public string strPrevInfo1 = "";
     public string strPrevInfo2 = "";
+    
+    public string strColumnSelect = "";
     public string strFileName = "";
     public string strFileType = "";
     public string strFileSize = "";
@@ -872,6 +874,8 @@
         strFilePrev = XmlConf.GetTitle("T_DETAIL_FILEPREVIEW");                 // 파일미리보기
         strDesc = XmlConf.GetTitle("T_DETAIL_DESC");                            // 설명
                                                                                 //strPrevInfo = XmlConf.GetWarnMsg("W_0077");                             // &nbsp;&nbsp;업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
+        
+        strColumnSelect = XmlConf.GetTitle("T_COMMON_SELECT2");                  //선택                                                                        
         strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                    // 파일명
         strFileType = XmlConf.GetTitle("T_COMMON_KIND");                        // 유형
         strFileSize = XmlConf.GetTitle("T_COMMON_SIZE");                        // 크기
