@@ -214,6 +214,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetOKTAUrl(int groupId);
 
         public bool GetVisibleLogOutButton(int groupId);
+
+        public bool GetSessionDuplicateBlock(int groupId);
     }
 
 
@@ -238,7 +240,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGopConfigService>();
 
         private static void LoadFile()
-        { 
+        {
             //로그 삭제
             HsLogDel hsLog = new HsLogDel();
             hsLog.Delete(7);    // 7일이전 Log들 삭제
@@ -246,7 +248,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             List<ISGNetwork> listNetworks = SGNetworkService.NetWorkInfo;
 
             if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
-                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");            
+                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
 
             _AppConfigInfo = new Dictionary<int, ISGopConfig>();
             var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
@@ -266,7 +268,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                         string strContents = Encoding.UTF8.GetString(hsckByte);
                         bool isOriFile = strContents.Contains("LoginType");
 
-                        if(isOriFile == false)
+                        if (isOriFile == false)
                         {
                             byte[] decContents = new byte[0];
                             SGCrypto.AESDecrypt256WithDEK(hsckByte, ref decContents);
@@ -275,7 +277,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                         SGopConfig appConfig = JsonSerializer.Deserialize<SGopConfig>(strContents);
                         _AppConfigInfo.Add(sgNetwork.GroupID, appConfig);
-                        
+
                         #region [주석-master로 복호화]
 
                         //byte[] masterKey = SGCrypto.GetMasterKey();
@@ -420,7 +422,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseGoogleOtp2FactorAuth;  // 구글 Otp를사용한 2차인증기능사용
         }
-        
+
 
         public string GetPWChangeProhibitLimit(int groupId)
         {
@@ -978,6 +980,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetVisibleLogOutButton(int groupId)
         {
             return AppConfigInfo[groupId].bVisibleLogOutButton;
+        }
+
+        public bool GetSessionDuplicateBlock(int groupId)
+        {
+            return AppConfigInfo[groupId].bSessionDuplicateBlock;        // 세션중복일때 사용자에게 강제 접속 여부를 묻지 않고, 바로 차단
         }
 
     }

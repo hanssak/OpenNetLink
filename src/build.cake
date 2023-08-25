@@ -668,17 +668,6 @@ Task("PkgCrossflatform")
 				if(isEnc.ToString().ToUpper() == "TRUE")
 					RunTarget("EncryptInitDirectory");	// Init 폴더(publishInitJsonDirPath)에 존재하는 파일 암호화 처리
 
-				//Init > InstallInfo
-				JObject networkObj = JsonAliases.ParseJsonFromFile(Context, new FilePath($"{agentUnit}/NetWork.json"));
-				JArray netInfo = (JArray)networkObj["NETWORKS"];
-				int netCount = netInfo.Count -1;
-				foreach(JObject net in netInfo)
-				{
-					var netPos = net["NETPOS"];
-					System.IO.Directory.CreateDirectory($"{publishInitJsonDirPath}/InstallInfo/{netPos}");
-				}
-
-			
 				Information($"Make Agent Installer {AgentName}");
 
 				networkFlag = AgentName.ToUpper();			

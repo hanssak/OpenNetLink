@@ -51,11 +51,15 @@ namespace OpenNetLinkApp
                     File.Move(setFilePath, Path.Combine(saveDirPath, name), true);
                 }
 
-                //Directory.Delete(initDirPath);
                 foreach(string fileList in Directory.GetFiles(initDirPath))
                 {
                     File.Delete(fileList);
                 }
+                foreach (string dirList in Directory.GetDirectories(initDirPath))
+                {
+                    Directory.Delete(dirList);
+                }
+                Directory.Delete(initDirPath);
 
                 return true;
             }
@@ -102,6 +106,11 @@ namespace OpenNetLinkApp
                 {
                     File.Delete(fileList);
                 }
+                foreach (string dirList in Directory.GetDirectories(SP1Path))
+                {
+                    Directory.Delete(dirList);
+                }
+                Directory.Delete(SP1Path);
 
                 return true;
             }

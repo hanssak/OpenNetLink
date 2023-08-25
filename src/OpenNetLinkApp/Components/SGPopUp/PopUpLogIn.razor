@@ -356,6 +356,18 @@
     private async void ShowSessionCountPopup(int groupID, PageEventArgs e)
     {
         bStartedLogin = false;
+
+        if (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupID))
+        {
+            ShowLoginFail(XmlConf.GetWarnMsg("W_0039"));
+            
+            await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+            bUIBtnDisable = false;
+            bStartedLogin = false;
+            return;
+        }
+
+
         if (e.strDummy == "google_otp")
         {
             str2FactorAuthType = e.strDummy;
