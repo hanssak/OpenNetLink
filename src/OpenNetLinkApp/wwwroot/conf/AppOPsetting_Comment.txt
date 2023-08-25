@@ -40,7 +40,7 @@ bAfterBasicChk : 사후 결재 체크 기본 사용 유무 ( true : 체크, fals
 bFileRecvAlarmRetain : 파일 수신후 알림 유지 체크박스 나오도록 (true,false) [기능X, 체크박스만동작]
 bFileRecvTrayFix : 파일 수신 알림 트레이 유지 설정값 ( true, false )
 bApprCompleteAlarmRetain : 승인완료 알림 유지 체크박스가 나오도록 (true,false) [기능X, 체크박스만동작]
-bUserApprActionTrayFix : 승인려료 알림 유지 설정값 (true,false)
+bUserApprActionTrayFix : 승인완료 알림 유지 설정값 (true,false)
 bApprRejectAlarmRetain : 반려완료 알림 유지 체크박스가 나오도록 (true,false) [기능X, 체크박스만동작]
 bUserApprRejectTrayFix : 반려완료 알림 유지 설정값 (true,false)
 bApprCountAlarmRetain : 결재자 승인대기 알림 유지 체크박스가 나오도록 ( true, false ) [기능X, 체크박스만동작]
@@ -82,6 +82,7 @@ bScreenLock : 화면잠금 사용 여부.(체크박스값) (true, false)
 // 기타 (1)
 enMainPageType : 로그인후 메인페이지 (나머지 : DASHBOARD, 2 : TRANSFER)
 bNoApproveManageUI : 모든 기능 결재관리 UI 않나오도록함.(보안결재 제외, true : 결재관리UI 들 안나옴, false : 나옴)(siteConfig)
+bUseApproveManageUIForce : 서버 설정과 상관없이 결재관리 페이지가 나오게 설정
 bStartProgramReg : 시작 프로그램 등록 ( true : 부팅때 OpenNetLink 실행, false : 부팅때 OpenNetLink 실행 등록 해제 ) [기능X]
 bTitleDescSameChk : 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부 [기능X]
 
@@ -97,6 +98,7 @@ bUseCertSend : 공인인증서 전송기능 사용유무 (true,false) [기능X]
 
 bUseEmail : email 관리 / 결재 UI 나오도록 할지 여부 (true, false)
 bUserEmailSearchDlp : email 관리 / 결재 UI에서 개인정보 관련 부분 표현 및 검색되게할지 유무 (true, false)
+bUseEmailOnly : email 관리 / 결재 UI 를 중점적으로 사용하도록 UI 메뉴 수정 여부 (true, false)
 
 bUseForceUpdate : 업데이트할 항목이 있으면 사용자 의사 관계없이 강제 업데이트 진행여부(true,false)
 

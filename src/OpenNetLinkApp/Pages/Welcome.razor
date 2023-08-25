@@ -31,7 +31,10 @@
         <div class="col-md-12">
             <div class="row justify-content-between">
                 <div class="col-md-3"></div>
-                <div class="col-md-4 text-center"><img src="/images/adminlte/main_title_1.png" class="mt-2 mb-2 img-fluid"></div>
+                <div class="col-md-5 text-center">
+                @*<img src="/images/adminlte/main_title_1.png" class="mt-2 mb-2 img-fluid">*@
+                <p style="font-size:20px; font-weight:bold; color:#044386; margin-top:5px">@XmlConf.GetTitle("T_WELCOME_TITLE")</p>
+                </div>
                 <div class="col-md-3">
                     <div class="m_title01 float-right" style="margin-top:15px;">@strNetFromName <i class="fas fa-long-arrow-alt-right p-1"></i> @strNetToName</div>
                 </div>
@@ -80,7 +83,7 @@
                             {
                                 <tr>
                                     <th>@XmlConf.GetTitle("T_DASH_PWPERIOD_DATE")</th> <!--패스워드 유효기간 -->
-                                <td>@strPWChgDate</td>
+                                    <td>@strPWChgDate</td>
                                 </tr>
                             }
                             <tr>
@@ -106,34 +109,37 @@
                 <table class="m_chart col-md-12 .table-responsive">
                     <tbody>
                         <tr>
-                            <td style="width:33%;font-weight:bold">@XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT")</td>
+                            <td style="width:33%;font-weight:bold">@(bEmailUseOnly==false?XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT"):"")</td>
                             <td style="width:33%;font-weight:bold">@(bUseClipBoard?XmlConf.GetTitle("T_COMMON_CLIPBOARD"):"")</td>
                             <td style="width:33%;font-weight:bold">@XmlConf.GetTitle("T_DASH_RECEIVE_DIR_AMOUNT")</td>
                         </tr>
                         <tr>
                             <td style="padding:5px 15px 5px 5px;">
-                                <div class="progress-group text-left">
-                                    <!--파일전송용량-->
-                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
-                                    <span class="float-right"><b>@(nDayUseFileSize)</b>/@(nDayMaxFileSize==0?XmlConf.GetTitle("T_ETC_UNLIMITED"):nDayMaxFileSize.ToString())</span>
-                                    <div class="progress progress-sm">
-                                        @if (nDayMaxFileSize == 0)
-                                        {
-                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="width: 100%;background-color:#f4a925"></div>
-                                        }
-                                        else
-                                        {
-                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #f4a925;width: @((nDayUseFileSize*100/nDayMaxFileSize))%"></div>
-                                        }
+                                @if (bEmailUseOnly == false)
+                                {
+                                    <div class="progress-group text-left">
+                                        <!--파일전송용량-->
+                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
+                                        <span class="float-right"><b>@(nDayUseFileSize)</b>/@(nDayMaxFileSize == 0 ? XmlConf.GetTitle("T_ETC_UNLIMITED") : nDayMaxFileSize.ToString())</span>
+                                        <div class="progress progress-sm">
+                                            @if (nDayMaxFileSize == 0)
+                                            {
+                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="width: 100%;background-color:#f4a925"></div>
+                                            }
+                                            else
+                                            {
+                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #f4a925;width: @((nDayUseFileSize * 100 / nDayMaxFileSize))%"></div>
+                                            }
+                                        </div>
                                     </div>
-                                </div>
+                                }
                             </td>
                             <td style="padding:5px 15px 5px 5px;">
-                                @if (bUseClipBoard)
+                                @if (bUseClipBoard && bEmailUseOnly == false)
                                 {
                                     <div class="progress-group text-left">
                                         <!-- 클립보드 용량-->
-                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
+                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
                                         <span class="float-right">
                                             <b>@nDayUseClipSize</b>/@(nDayMaxClipSize==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipSize.ToString())
                                         </span>
@@ -161,28 +167,31 @@
                         </tr>
                         <tr>
                             <td style="padding: 5px 15px 5px 5px; text-align: center;">
-                                <div class="progress-group text-left">
-                                    <!--파일전송건수-->
-                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
-                                    <span class="float-right"><b>@(nDayUseFileCount)</b>/@(nDayMaxFileCount==0? XmlConf.GetTitle("T_ETC_UNLIMITED"):nDayMaxFileCount.ToString())</span>
-                                    <div class="progress progress-sm">
-                                        @if (nDayMaxFileCount == 0)
-                                        {
-                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #d36300; width: 100% "></div>
-                                        }
-                                        else
-                                        {
-                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #d36300; width: @((nDayUseFileCount*100/nDayMaxFileCount))%"></div>
-                                        }
+                                @if (bEmailUseOnly == false)
+                                {
+                                    <div class="progress-group text-left">
+                                        <!--파일전송건수-->
+                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
+                                        <span class="float-right"><b>@(nDayUseFileCount)</b>/@(nDayMaxFileCount == 0 ? XmlConf.GetTitle("T_ETC_UNLIMITED") : nDayMaxFileCount.ToString())</span>
+                                        <div class="progress progress-sm">
+                                            @if (nDayMaxFileCount == 0)
+                                            {
+                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #d36300; width: 100% "></div>
+                                            }
+                                            else
+                                            {
+                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #d36300; width: @((nDayUseFileCount * 100 / nDayMaxFileCount))%"></div>
+                                            }
+                                        </div>
                                     </div>
-                                </div>
+                                }
                             </td>
                             <td style="padding: 5px 15px 5px 5px; text-align: center;">
-                                @if (bUseClipBoard)
+                                @if (bUseClipBoard && bEmailUseOnly == false)
                                 {
                                     <div class="progress-group text-left">
                                         <!-- 클립보드 건수-->
-                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
+                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
                                         <span class="float-right">
                                             <b>@nDayUseClipCount</b>/@(nDayMaxClipCount==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipCount.ToString())
                                         </span>
@@ -337,10 +346,10 @@
                             <tbody>
                                 <tr>
                                     <th style="width:7%;">NO.</th>
-                                    <th style="width:10%;">@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
+                                    <th style="width:13%;">@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
                                     <th style="width:10%;">@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
                                     <th style="width:14%;">@XmlConf.GetTitle("T_DASH_REQUESTOR")</th>
-                                    <th style="width:40%;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
+                                    <th style="width:37%;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
                                     <th style="width:18%;">@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
 
                                 </tr>
@@ -348,10 +357,10 @@
                                 {
                                     <tr>
                                         <td style="width:7%;">@item.dispNo</td>
-                                        <td style="width:10%;">@item.apvType</td>
+                                        <td style="width:13%;">@item.apvType</td>
                                         <td style="width:10%;">@item.transKind</td>
                                         <td style="width:14%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.requestorName</td>
-                                        <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="width:37%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                         <td style="width:18%;">@item.reqDate</td>
                                     </tr>
                                 }
@@ -376,10 +385,10 @@
                             <tbody>
                                 <tr>
                                     <th style="width:7%;">NO.</th>
-                                    <th style="width:10%;">@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
+                                    <th style="width:13%;">@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
                                     <th style="width:10%;">@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
                                     <th style="width:16%;">@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th>
-                                    <th style="width:40%;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
+                                    <th style="width:37%;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
                                     <th style="width:18%;">@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
 
                                 </tr>
@@ -387,10 +396,10 @@
                                 {
                                     <tr>
                                         <td style="width:7%;">@item.dispNo</td>
-                                        <td style="width:10%;">@item.apvType</td>
+                                        <td style="width:13%;">@item.apvType</td>
                                         <td style="width:10%;">@item.transKind</td>
                                         <td style="width:16%;">@item.approverStatus</td>
-                                        <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="width:37%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                         <td style="width:18%;">@item.reqDate</td>
                                     </tr>
                                 }
@@ -414,12 +423,13 @@
 
                 <div class="quick">
 
-                    @if (bFileTransMenuUse)
+
+                    @if (bFileTransMenuUse && bEmailUseOnly == false)
                     {
                         <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transfer"))">
                             <div class="text-center"><img src="/images/adminlte/quick_01.png"></div>
                             <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_FILESEND")</font>  <!--파일전송-->
-                    </button>
+                        </button>
                     }
 
                     <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transManage"))">
@@ -427,12 +437,12 @@
                         <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_TRANSMANAGE")</font> <!--전송관리-->
                     </button>
 
-                    @if (bApprMenuUse)
+                    @if (bApprMenuUse && bEmailUseOnly == false)
                     {
                         <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transferApprove"))">
                             <div class="text-center"><img src="/images/adminlte/quick_03.png"></div>
                             <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_APPROVEMANAGE")</font> <!--결재관리-->
-                    </button>
+                        </button>
                     }
 
                     <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/viewConf"))">
@@ -445,12 +455,10 @@
                         <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/netConf"))">
                             <div class="text-center"><img src="/images/adminlte/quick_05.png"></div>
                             <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_BASICSET_TITLE")</font> <!--기본설정-->
-                    </button>
+                        </button>
                     }
 
                 </div>
-
-
             </div>
 
             <div class="main_box1" style="height:103px;display:@stShowAdminInfo;">
@@ -504,6 +512,8 @@
 
     int nDrawPageGroupID = -1;
     @*string strCurrentSeedKey = "";*@
+
+    bool bEmailUseOnly = false;
 
     // 목적지 Data
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
@@ -826,6 +836,8 @@
         else
             stShowAdminInfo = "none";
 
+        if (groupIDbyParam > -1)
+            bEmailUseOnly = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApproveOnly(groupIDbyParam);
 
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -921,7 +933,7 @@
     /// <returns></returns>
     public bool SetQuickMenuModify(int groupID)
     {
-
+        bApprMenuUse = false;
         SGLoginData sgLoginData = null;
         SGUserData sgUserData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -940,7 +952,7 @@
             // if (sgLoginData.GetApprove() == true)                        // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
 
             // 3망 정책고려한 결재사용유무 설정 && 설정상 결재관리 UI 사용
-            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupID) == false)
+            if ((pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupID) == false) || SGAppMgrSvc.OpConfigInfoService.GetUseApproveManageUIForce(groupID))
                 if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupID)) > 0))
                     bApprMenuUse = true;
         }
@@ -986,7 +998,10 @@
             nDiskTotalSize = nDiskTotalSize / 1024;
 
         //사용량 , 남은용량
-        object[] param4 = { nDiskTotalSize - nDiskFreeSize, nDiskFreeSize };
+        object[] param4 = { nDiskTotalSize - nDiskFreeSize, nDiskFreeSize,
+                            XmlConf.GetTitle("T_CAPA_CHART_USED")
+                           , XmlConf.GetTitle("T_CAPA_CHART_REMAINING")
+                           , XmlConf.GetTitle("T_CAPA_CHART_IN_USED")};
         await JSRuntime.InvokeAsync<object>("initCapaChart", param4);
 
         int groupID = groupIDbyParam;
@@ -1064,7 +1079,7 @@
             StateHasChanged();
 
             CheckContinueFileUpload();
-            
+
             CheckClientPatch(sgLoginData, groupID);
         }
 
@@ -1815,7 +1830,7 @@
 
         int nPassWDExpiredDay = 0;
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
-        string strPassWDExpiredDay = sgLoginData.GetPassWDExpiredDay();
+        string strPassWDExpiredDay = sgLoginData?.GetPassWDExpiredDay();
         if (!strPassWDExpiredDay.Equals(""))
             nPassWDExpiredDay = Convert.ToInt32(strPassWDExpiredDay);
 
@@ -2136,7 +2151,7 @@
         clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
         if (clientUpdateExe != null)
             clientUpdateExe(groupID, true);
-        }
+    }
 
 
     /// <summary>
@@ -2415,7 +2430,7 @@
             // if (sgLoginData.GetApprove() == true)                        // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
 
             // 3망 정책고려한 결재사용유무 설정
-            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupID) == false)
+            if ((pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupID) == false) || SGAppMgrSvc.OpConfigInfoService.GetUseApproveManageUIForce(groupID))
                 if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupID)) > 0))
                     return true;
         }

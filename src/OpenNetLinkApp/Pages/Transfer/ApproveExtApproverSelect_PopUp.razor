@@ -76,19 +76,22 @@
 
                     <br>
 
-                    @* 사유정보 입력란 *@
-                    <div class="col-md-12">
+                    @if (UseReason)
+                    {
+                        @* 사유정보 입력란 *@
+                        <div class="col-md-12">
 
-                        <div class="form-group row mb-0" style="padding:.45rem;">
-                            <label for="1" class="col-sm-1 col-form-label text-center" style="border:1px solid #c7d6e9;background-color:#eff8ff;">@XmlConf.GetTitle("T_APPROVEEXT_TITLE_WHY")</label>
-                            <div class="col-sm-11 pr-0 pl-0" style="padding:.05rem;">
-                                <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@XmlConf.GetTitle("T_APPROVEEXT_TITLE_WHYDATA")" @bind="strBindTitle" autocomplete="off">
+                            <div class="form-group row mb-0" style="padding:.45rem;">
+                                <label for="1" class="col-sm-1 col-form-label text-center" style="border:1px solid #c7d6e9;background-color:#eff8ff;">@XmlConf.GetTitle("T_APPROVEEXT_TITLE_WHY")</label>
+                                <div class="col-sm-11 pr-0 pl-0" style="padding:.05rem;">
+                                    <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@XmlConf.GetTitle("T_APPROVEEXT_TITLE_WHYDATA")" @bind="strBindTitle" autocomplete="off">
+                                </div>
                             </div>
+
                         </div>
+                        <br>
+                    }
 
-                    </div>
-
-                    <br>
 
                     @* 결재자를 조회하여 선택하십시오. 문구*@
                     <div class="modal-sub-title mb-2 text-bold">
@@ -217,6 +220,7 @@
     SGSettingsDBProc sgSettingProc;
 
     public List<HsStream> FileList = null;
+    private bool UseReason = false;
     public string strBindTitle = "";
     public string strTeamName = "";
 
@@ -492,13 +496,15 @@
 
     public async Task openPopUp()
     {
+        StateHasChanged();
         object[] param = { "ApproveExtApproverSelect_PopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
 
     /// <summary>
-    /// 결재가 필요없는 파일들만 송신
+    /// [파일 제외 전송] 버튼
+    ///</br>결재가 필요없는 파일들만 송신
     /// </summary>
     public void SelectNoApproveFilesOnlyTrans()
     {
@@ -518,7 +524,8 @@
 
 
     /// <summary>
-    /// 선택한 결재자에게 결재받도록 송신
+    /// [결재 사용] 버튼
+    /// </br>선택한 결재자에게 결재받도록 송신
     /// </summary>
     public void SelectUseApprove()
     {
@@ -537,6 +544,7 @@
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
         {
+            //(0:미사용 1:제목 2:설명 3:제목,설명모두 / 최소입력자리수)
             strApproveExtPolicy = sgLoginData.GetTagDataBySystemEnvName("CS_EXCEPTION_EXT_REASON_TYPE");
             string[] strArray = null;
 
@@ -631,6 +639,12 @@
         eventFileTransWithApprove = fileTransWithApprove;
     }
 
+    public void SetInitReason(bool useReason, string getReason)
+    {
+        UseReason = useReason;
+        strBindTitle = getReason;
+    }
+
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -645,7 +659,7 @@
         approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproveExtSelectType(groupID);
         useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchApproveExtTree(groupID);
         InitText();
-                
+
         sgSettingProc = SGSettingsDBProc.Instance;
 
         bEditDeptName = SGAppMgrSvc.OpConfigInfoService.GetUseApprDeptSearch(groupID);
@@ -734,14 +748,14 @@
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;   
+            groupID = sgSideBar.GroupId;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
-        m_step = sgLoginData.GetApproveStep();    //결재유형 취득        
-        
+        m_step = sgLoginData.GetApproveStep();    //결재유형 취득
+
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveExtDeptApprLineResult); //자기부서 조회 결과
 
         if (approverSearchType == "TREE" && refSGDeptTreeList != null)

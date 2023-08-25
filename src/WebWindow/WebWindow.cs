@@ -92,6 +92,7 @@ namespace WebWindows
         CHECK_VIRUS,
         SKIPFILE_REJECT_APPR,
         SKIPFILE_CONFIRM_APPR,
+        MAIL_SECURE_APPR
     }
 
     public enum CLIPTYPE : int

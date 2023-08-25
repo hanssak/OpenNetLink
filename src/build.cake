@@ -25,6 +25,8 @@ var startAuto = Argument<bool>("startAuto", true);				//false 하면, 설치 완
 var isPatchInstaller = false;
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
 var customName = "NONE";
+var storageName ="NONE";
+
 var AppProps = new AppProperty(Context,
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								 "../", 													// Path of the Git Local Repository
@@ -892,7 +894,7 @@ Task("PkgCrossflatform")
 	if(isFull.ToString().ToUpper() == "TRUE")
 		customName = Prompt("Custom Name : ");			
 
-	var LastUpdatedTime = DateTime.Now.ToString(@"yyyy\/MM\/dd h\:mm tt");
+	var LastUpdatedTime = DateTime.Now.ToString(@"yyyy\/MM\/dd H\:mm");
 
 	if(DirectoryExists(AppProps.InstallerRootDirPath)) {
 		DeleteDirectory(AppProps.InstallerRootDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
@@ -1001,7 +1003,38 @@ Task("PkgCrossflatform")
 				Information($"Make Agent Installer {AgentName}");
 
 				networkFlag = AgentName.ToUpper();			
+				storageName = unitName.ToUpper();
 				
+				if(AppProps.Platform == "windows")
+				{
+					JObject AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"));
+					for(int i = 0; i < AppEnvJObj["strForwardUrl"].Count(); i++)
+					{
+						//AppEnvJObj["strForwardUrl"][i] = "file:\\\\\\C:\\HANSSAK\\OpenNetLink\\wwwroot\\Web\\WebLinkInfo.html";
+						AppEnvJObj["strForwardUrl"][i] = "";
+					}
+					JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"), AppEnvJObj);
+
+				}
+				else if(AppProps.Platform == "mac")
+				{
+					JObject AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"));
+					for(int i = 0; i < AppEnvJObj["strForwardUrl"].Count(); i++)
+					{
+						AppEnvJObj["strForwardUrl"][i] = "file:/Applications/OpenNetLinkApp.app/Contents/MacOS/wwwroot/Web/WebLinkInfo.html";
+					}
+					JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"), AppEnvJObj);
+				}
+				else
+				{
+					JObject AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"));
+					for(int i = 0; i < AppEnvJObj["strForwardUrl"].Count(); i++)
+					{
+						AppEnvJObj["strForwardUrl"][i] = "file:/opt/hanssak/opennetlink/wwwroot/Web/WebLinkInfo.html";
+					}
+					JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"), AppEnvJObj);
+				}
+
 				CopyFiles($"{agentUnit}/AppEnvSetting.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
 				CopyFiles($"{agentUnit}/NetWork.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
 				
@@ -1049,7 +1082,8 @@ Task("MakeInstaller")
 				{"OUTPUT_DIRECTORY", PackageDirPath},
 				{"DELETE_NETLINK", deleteNetLink.ToString().ToUpper()},
 				{"IS_SILENT", isSilent.ToString().ToUpper()},
-				{"STARTAUTO", startAuto.ToString().ToUpper()}
+				{"STARTAUTO", startAuto.ToString().ToUpper()},
+				{"STORAGE_NAME", storageName.ToUpper()},
 			}
 		});			
 	}
@@ -1062,6 +1096,7 @@ Task("MakeInstaller")
 												.Append(networkFlag.ToUpper()) 
 												.Append(customName.ToUpper())
 												.Append(PackageDirPath)//$5	
+												.Append(storageName.ToUpper())//$6	
 												})
 												
 		)
@@ -1079,6 +1114,7 @@ Task("MakeInstaller")
 													.Append(networkFlag.ToUpper()) 
 													.Append(customName.ToUpper())
 													.Append(PackageDirPath) //$5
+													.Append(storageName.ToUpper())//$6	
 													})
 		)
 		{
@@ -1095,6 +1131,7 @@ Task("MakeInstaller")
 													.Append(networkFlag.ToUpper()) 
 													.Append(customName.ToUpper())
 													.Append(PackageDirPath)	//$5 Output
+													.Append(storageName.ToUpper())//$6	
 													})
 		)
 		{

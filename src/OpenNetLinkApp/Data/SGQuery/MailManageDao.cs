@@ -6,10 +6,10 @@ namespace OpenNetLinkApp.Data.SGQuery
 {
     class MailManageDao
     {
-		public string MailDetail(string seq)
+		public string MailDetail(string seq, bool bUseSfm2 = false)
         {
 			string sql = String.Empty;
-			sql = "SELECT func_email_detail(" + seq + ")";
+			sql = $"SELECT func_email_detail_open({seq}, {(bUseSfm2?"TRUE":"FALSE")})";
 			return sql;
         }
         public string List(MailParam tParam)

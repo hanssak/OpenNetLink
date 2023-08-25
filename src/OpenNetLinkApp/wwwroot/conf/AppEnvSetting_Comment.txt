@@ -10,7 +10,6 @@ RecvDownPath : 수신할 폴더 경로
 UpdateSvcIP : patch Server IP
 bFileRecvFolderOpen : 파일수신후 해당 Folder 열기 유무
 strLanguage : 선택한 언어
-tScreenTime : 화면잠금시간값
 nUserSelectFirstNet : 선택망 index 저장
 
 //////////////////////////////////////////////////////
@@ -73,8 +72,8 @@ strForwardUrl : URL 자동전환 후 브라우저 창 Forward 할 주소 저장 
 bUseClipBoardFileTrans : 파일형태로 클립보드를 송신할지유무, (true : 파일전송기능으로 클립보드 내용 전달, false : 예전에 실시간 클립보드 전송기능 사용)
 bUseFileClipManageUI : 파일형태로 클립보드를 송수신할때, 클립보드 관리 UI를 나오도록할지 유무(true: 클립보드 전송관리UI 있음, false : 없음)
 
-// 화면잠금
-bScreenLock : 화면잠금 사용 여부.(체크박스값) (true, false)
+// 화면잠금 - 서버 설정만 사용함
+bScreenLock : 화면잠금 사용 여부.(체크박스값) (true, false) (사용 X)
 
 
 // 기타

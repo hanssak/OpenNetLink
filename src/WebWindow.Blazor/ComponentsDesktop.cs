@@ -31,7 +31,7 @@ namespace WebWindows.Blazor
         internal static DesktopRenderer DesktopRenderer { get; private set; }
         internal static WebWindow WebWindow { get; private set; }
 
-        public static void Run<TStartup>(string windowTitle, string hostHtmlPath)
+        public static void Run<TStartup>(string windowTitle, string hostHtmlPath, object[] arg)
         {
             DesktopSynchronizationContext.UnhandledException += (sender, exception) =>
             {
@@ -82,24 +82,27 @@ namespace WebWindows.Blazor
             try
             {
 
-                //json에서 초기 시작을 tray 인지 아닌지 판단하여 셋팅
-                //현재는 AppOpSetting.json에서 가져오는데 추후 AppEnvSetting으로 변경시 여기 json 파일 위치도 변경 필요.
-                var contentRootAbsolute = Path.GetDirectoryName(Path.GetFullPath(hostHtmlPath));
-                //json에서 초기 시작을 startProgramReg 인지 아닌지 판단하여 셋팅
-                //현재는 AppEnvSetting.json에서 가져오는데 추후 AppOpSetting으로 변경시 여기 json 파일 위치도 변경 필요.
-                var envJsonPath = Path.Combine(contentRootAbsolute, "conf", "AppEnvSetting.json");
-                string contentsEnv = System.IO.File.ReadAllText(envJsonPath);
-                using (JsonDocument document = JsonDocument.Parse(contentsEnv))
-                {
-                    JsonElement jroot = document.RootElement;
-                    bool value = jroot.GetProperty("bStartProgramReg").GetBoolean();
-                    if(value)
-                        WebWindow.RegStartProgram();
+                ////json에서 초기 시작을 tray 인지 아닌지 판단하여 셋팅
+                ////현재는 AppOpSetting.json에서 가져오는데 추후 AppEnvSetting으로 변경시 여기 json 파일 위치도 변경 필요.
+                //var contentRootAbsolute = Path.GetDirectoryName(Path.GetFullPath(hostHtmlPath));
+                ////json에서 초기 시작을 startProgramReg 인지 아닌지 판단하여 셋팅
+                ////현재는 AppEnvSetting.json에서 가져오는데 추후 AppOpSetting으로 변경시 여기 json 파일 위치도 변경 필요.
+                //var envJsonPath = Path.Combine(contentRootAbsolute, "conf", "AppEnvSetting.json");
+                //string contentsEnv = System.IO.File.ReadAllText(envJsonPath);
+                //using (JsonDocument document = JsonDocument.Parse(contentsEnv))
+                //{
+                //    JsonElement jroot = document.RootElement;
+                //    bool value = jroot.GetProperty("bStartProgramReg").GetBoolean();
+                //    if(value)
+                //        WebWindow.RegStartProgram();
 
-                    value = jroot.GetProperty("bStartTrayMove").GetBoolean();
-                    WebWindow.SetTrayStartUse(value);
-                }
+                //    value = jroot.GetProperty("bStartTrayMove").GetBoolean();
+                //    WebWindow.SetTrayStartUse(value);
+                //}
 
+                if ((bool)arg[0] == true)
+                    WebWindow.RegStartProgram();
+                WebWindow.SetTrayStartUse((bool)arg[1]);
                 WebWindow.NavigateToUrl(BlazorAppScheme + "://app/");
                 WebWindow.WaitForExit();
             }

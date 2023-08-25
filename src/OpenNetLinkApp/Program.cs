@@ -48,7 +48,11 @@ namespace OpenNetLinkApp
                 }
 
                 Directory.SetCurrentDirectory(cwdPath);
-                ComponentsDesktop.Run<Startup>("OpenNetLink", "wwwroot/index.html");
+                object[] arg = new object[2];
+                arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
+                arg[1] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartTrayMove;
+                
+                ComponentsDesktop.Run<Startup>("OpenNetLink", "wwwroot/index.html", arg);
             }
             else
             {

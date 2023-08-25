@@ -13,18 +13,20 @@ namespace OpenNetLinkApp.Services
 {
     public class XmlConfService
     {
+        const string xmlFileName = "wwwroot/conf/HSText.xml";
+
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<XmlConfService>();
-        XmlDocument m_Xml;
-        string m_StrLanguage;
-        List<ISGNetwork> listNetworks;
+        static XmlDocument m_Xml = null;
+        static string m_StrLanguage = "KR";
+        List<ISGNetwork> listNetworks = SGAppManager.SGNetworkService.NetWorkInfo;
         public XmlConfService()
         {
-            m_Xml = new XmlDocument();
-            LoadXmlFile("wwwroot/conf/HSText.xml");
-            m_StrLanguage = "KR";
+            //m_Xml = new XmlDocument();
+            //LoadXmlFile("wwwroot/conf/HSText.xml");
+            //m_StrLanguage = "KR";
             // m_StrLanguage = "JP";
-            listNetworks = new List<ISGNetwork>();
-            NetWorkJsonLoad();
+            //listNetworks = new List<ISGNetwork>();
+            //NetWorkJsonLoad();
         }
         ~XmlConfService()
         {
@@ -34,11 +36,19 @@ namespace OpenNetLinkApp.Services
         public void LoadXmlFile(string strFileName)
         {
             string strXmlData = System.IO.File.ReadAllText(strFileName);
+            m_Xml = new XmlDocument();
             m_Xml.LoadXml(strXmlData);
+
+            m_StrLanguage = SGAppManager.SGAppConfigService.AppConfigInfo.strLanguage;
+            if (string.IsNullOrEmpty(m_StrLanguage))
+                m_StrLanguage = "KR";
         }
 
         public string GetCommon(string strID)
         {
+            if (m_Xml == null)
+                LoadXmlFile(xmlFileName);
+
             string str = "";
             XmlNodeList xnList = m_Xml.GetElementsByTagName("COMMON");
             if (m_StrLanguage == null)
@@ -52,11 +62,14 @@ namespace OpenNetLinkApp.Services
 
         public string GetTitle(string strID)
         {
+            if (m_Xml == null)
+                LoadXmlFile(xmlFileName);
+
             string str = "";
             XmlNodeList xnList = m_Xml.GetElementsByTagName("TITLE");
             if (m_StrLanguage == null)
                 m_StrLanguage = "KR";
-            foreach(XmlNode xn in xnList)
+            foreach (XmlNode xn in xnList)
             {
                 str = xn[strID][m_StrLanguage].InnerText;
             }
@@ -64,6 +77,9 @@ namespace OpenNetLinkApp.Services
         }
         public string GetInfoMsg(string strID)
         {
+            if (m_Xml == null)
+                LoadXmlFile(xmlFileName);
+
             string str = "";
             XmlNodeList xnList = m_Xml.GetElementsByTagName("INFO");
             if (m_StrLanguage == null)
@@ -79,6 +95,9 @@ namespace OpenNetLinkApp.Services
         }
         public string GetErrMsg(string strID)
         {
+            if (m_Xml == null)
+                LoadXmlFile(xmlFileName);
+
             string str = "";
             XmlNodeList xnList = m_Xml.GetElementsByTagName("ERROR");
             if (m_StrLanguage == null)
@@ -91,6 +110,9 @@ namespace OpenNetLinkApp.Services
         }
         public string GetWarnMsg(string strID)
         {
+            if (m_Xml == null)
+                LoadXmlFile(xmlFileName);
+
             string str = "";
             XmlNodeList xnList = m_Xml.GetElementsByTagName("WARNING");
             if (m_StrLanguage == null)
@@ -106,55 +128,7 @@ namespace OpenNetLinkApp.Services
             m_StrLanguage = strLanguage;
         }
 
-        public void NetWorkJsonLoad()
-        {
-            string strNetworkFileName = "wwwroot/conf/NetWork.json";
-            string jsonString = File.ReadAllText(strNetworkFileName);
-
-            //ADDomain 이 string 타입인 Network.json은 List<string> 타입으로 수정
-            try { _networkParsing(); }
-            catch (Exception ex)
-            {
-                CLog.Here().Error($"NetworkParsing err : Change ADDomain Format in Network.json  - {ex.ToString()}");
-                string[] strNetwork = jsonString.Split(Environment.NewLine);
-                for (int i = 0; i < strNetwork.Length; i++)
-                {
-                    if (strNetwork[i].Contains("ADDomain") && !(strNetwork[i].Contains("[") && strNetwork[i].Contains("]")))
-                    {
-                        string element = strNetwork[i].Split(':')[0];
-                        string value = strNetwork[i].Split(':')[1];
-                        strNetwork[i] = $"{element}: [ {value} ]";
-                    }
-                }
-                File.WriteAllText(strNetworkFileName, string.Join(Environment.NewLine, strNetwork));
-                jsonString = string.Join(Environment.NewLine, strNetwork);
-                _networkParsing();
-            }
-
-            void _networkParsing()
-            {
-                using (JsonDocument document = JsonDocument.Parse(jsonString))
-                {
-                    JsonElement root = document.RootElement;
-                    JsonElement NetWorkElement = root.GetProperty("NETWORKS");
-                    //JsonElement Element;
-                    foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
-                    {
-                        SGNetwork sgNet = new SGNetwork();
-                        string strJsonElement = netElement.ToString();
-                        var options = new JsonSerializerOptions
-                        {
-                            ReadCommentHandling = JsonCommentHandling.Skip,
-                            AllowTrailingCommas = true,
-                            PropertyNameCaseInsensitive = true,
-                        };
-                        sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
-                        listNetworks.Add(sgNet);
-                    }
-                }
-            }
-        }
-        public void GetNetworkTitle(int groupID,out string strFromName, out string strToName)
+        public void GetNetworkTitle(int groupID, out string strFromName, out string strToName)
         {
             string str1 = "-";
             string str2 = "-";
@@ -168,7 +142,7 @@ namespace OpenNetLinkApp.Services
             for (int i = 0; i < count; i++)
             {
                 int gID = listNetworks[i].GroupID;
-                if(gID==groupID)
+                if (gID == groupID)
                 {
                     str1 = listNetworks[i].FromName;
                     str2 = listNetworks[i].ToName;
@@ -202,6 +176,22 @@ namespace OpenNetLinkApp.Services
 
             str1 = str1 + " → " + str2;
             return str1;
-        }      
+        }
+
+        public string[] GetMonthNamesGroup()
+        {
+            string group = GetTitle("T_DATAPICKER_MONTH_GROUP");
+            return group.Split(",");
+        }
+        public string[] GetDayNamesGroup()
+        {
+            string group = GetTitle("T_DATAPICKER_DAY_GROUP");
+            return group.Split(",");
+        }
+        public string[] GetDayMinNamesGroup()
+        {
+            string group = GetTitle("T_DATAPICKER_DAY_MIN_GROUP");
+            return group.Split(",");
+        }
     }
 }

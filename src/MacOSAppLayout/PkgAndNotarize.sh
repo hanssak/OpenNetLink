@@ -38,8 +38,8 @@ dev_team="L7W5N48H4G"
 dev_keychain_label="sxog-tiki-hjrx-pxfs"
 
 # put your project's information into these variables
-if [ $# -ne 5 ]; then
-	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5"
+if [ $# -ne 6 ]; then
+	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {storagename} $6"
 	exit -1
 fi;
 version=$1
@@ -49,6 +49,7 @@ ispatch=$2
 networkflag=$3
 customname=$4
 outputpath=$5
+storagename=$6
 
 # code starts here
 projectdir=$(dirname $0)
@@ -259,7 +260,7 @@ if [[ $ispatch == "TRUE" ]]; then
     pkgpath="$OUTPUT_PATH/OpenNetLink-Mac-"$version".pkg"
 else
     #for setup
-    pkgpath="$OUTPUT_PATH/["$customname"] OpenNetLink_"$networkflag"_Mac_"$version".pkg"
+    pkgpath="$OUTPUT_PATH/["$customname"] OpenNetLink_"$storagename"_"$networkflag"_Mac_"$version".pkg"
 fi
 
 echo "## building pkg: $pkgpath"

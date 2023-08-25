@@ -13,7 +13,7 @@ namespace OpenNetLinkApp.Models.SGNetwork
         public int Port { get; set; }
         public int ConnectType { get; set; }
         public string TlsVersion { get; set; }
-        public string ClientVersion { get; set; }
+        //public string ClientVersion { get; set; }
         public string NetPos { get; set; }
         public List<string> ADDomain { get; set; }
     }

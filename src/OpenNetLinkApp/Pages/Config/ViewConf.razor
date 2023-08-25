@@ -35,15 +35,15 @@
 
 
 
-                        <div class="col-md-10">
+                        <div class="col-md-10" style="max-width:100%">
                             <div class="table-responsive">
                                 <div class="title_set"><i class="fas fa-cog mr-1"></i>@strBasicInfo</div>                       <!--기본정보-->
                                 <table class="table_set">
                                     <colgroup>
-                                        <col width="20%">
-                                        <col width="30%">
-                                        <col width="20%">
-                                        <col width="30%">
+                                        <col width="22%">
+                                        <col width="27%">
+                                        <col width="22%">
+                                        <col width="27%">
                                     </colgroup>
                                     <tr>
                                         <th>@strVersionInfo</th>                                                                   <!--버전정보-->
@@ -82,10 +82,10 @@
                                     <div class="title_set"><i class="fas fa-cog mr-1"></i>@strDayTransMaxSize</div>             <!--일일 파일 전송 제한-->
                                     <table class="table_set">
                                         <colgroup>
-                                            <col width="20%">
-                                            <col width="30%">
-                                            <col width="20%">
-                                            <col width="30%">
+                                            <col width="22%">
+                                            <col width="27%">
+                                            <col width="22%">
+                                            <col width="27%">
                                         </colgroup>
                                         <tr>
                                             <th>@strTransMaxCount</th>                                                             <!--전송횟수제한-->
@@ -99,10 +99,10 @@
                                         <div class="title_set"><i class="fas fa-cog mr-1"></i>@strDayClipboardMaxSize</div>       <!--일일 클립보드 전송 제한-->
                                         <table class="table_set">
                                             <colgroup>
-                                                <col width="20%">
-                                                <col width="30%">
-                                                <col width="20%">
-                                                <col width="30%">
+                                                <col width="22%">
+                                                <col width="27%">
+                                                <col width="22%">
+                                                <col width="27%">
                                             </colgroup>
                                             <tr>
                                                 <th>@strTransMaxCount</th>                                                         <!--전송횟수제한-->
@@ -325,11 +325,16 @@
         temp = XmlConf.GetTitle("T_INFO_LIMMIT_SIZE");                                                 // {0} MB 까지 전송
         nTemp64 = sgLoginData.GetFileLimitSize();
         strDataMaxTransSize = String.Format(temp, nTemp64);                                 // 15,000MB까지 전송
+        if(!sgLoginData.GetFileTrans())
+            strDataMaxTransSize = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                //사용안함
 
         // 한번에 전송 가능한 파일 개수
         temp = XmlConf.GetInfoMsg("I_0129");                                                           // {0} 개까지 전송
         nTemp = sgLoginData.GetFileLimitCount();
         strDataFileMaxCount = String.Format(temp, nTemp);                                   // 2000개까지 전송
+
+        if (!sgLoginData.GetFileTrans())
+            strDataFileMaxCount = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                //사용안함
 
         // 결재 사용 여부
         strDataApprManage = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                                 // 사용안함
@@ -357,7 +362,11 @@
         // 한번에 전송 가능힌 클립보드 최대 용량
         temp = XmlConf.GetTitle("T_INFO_LIMMIT_SIZE");
         nTemp64 = sgLoginData.GetClipboardLimitSize();
-        if (nTemp64 <= 0)
+        if (!sgLoginData.GetClipboard())
+        {
+            strDataClipboardMaxSize = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                         //사용안함
+        }
+        else if (nTemp64 <= 0)
             strDataClipboardMaxSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
         else
             strDataClipboardMaxSize = String.Format(temp, nTemp64);                                         // 1024MB까지 전송
@@ -375,7 +384,11 @@
         // 일일 파일 전송 최대 회수
         temp = XmlConf.GetInfoMsg("I_0130");                                                           // {0} 회까지 전송
         nTemp = sgLoginData.GetDayFileTransferLimitCount();
-        if (nTemp <= 0)
+        if (!sgLoginData.GetFileTrans())
+        {
+            strDataDayFileTransMaxCount = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");
+        }
+        else if (nTemp <= 0)
             strDataDayFileTransMaxCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
         else
             strDataDayFileTransMaxCount = String.Format(temp, nTemp);                                      // 2000개까지 전송
@@ -383,7 +396,11 @@
         // 일일 파일 전송 최대 용량
         temp = XmlConf.GetTitle("T_INFO_LIMMIT_SIZE");                                                 // {0} MB 까지 전송
         nTemp64 = sgLoginData.GetDayFileTransferLimitSize();
-        if (nTemp64 <= 0)
+        if (!sgLoginData.GetFileTrans())
+        {
+            strDataDayFileTransMaxSize = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");
+        }
+        else if (nTemp64 <= 0)
             strDataDayFileTransMaxSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
         else
             strDataDayFileTransMaxSize = String.Format(temp, nTemp64);                                 // 15,000MB까지 전송
@@ -391,7 +408,11 @@
         // 일일 클립보드 전송 최대 회수
         temp = XmlConf.GetInfoMsg("I_0130");                                                           // {0} 회까지 전송
         nTemp = sgLoginData.GetDayClipboardLimitCount();
-        if (nTemp <= 0)
+        if(!sgLoginData.GetClipboard())
+        {
+            strDataDayClipboardMaxCount = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");
+        }
+        else if (nTemp <= 0)
             strDataDayClipboardMaxCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
         else
             strDataDayClipboardMaxCount = String.Format(temp, nTemp);                                      // 2000개까지 전송
@@ -399,7 +420,11 @@
         // 일일 클립보드 전송 최대 용량
         temp = XmlConf.GetTitle("T_INFO_LIMMIT_SIZE");                                                 // {0} MB 까지 전송
         nTemp64 = sgLoginData.GetDayClipboardLimitSize();
-        if (nTemp64 <= 0)
+        if (!sgLoginData.GetClipboard())
+        {
+            strDataDayClipboardMaxSize = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");
+        }
+        else if (nTemp64 <= 0)
             strDataDayClipboardMaxSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
         else
             strDataDayClipboardMaxSize = String.Format(temp, nTemp64);                                 // 15,000MB까지 전송

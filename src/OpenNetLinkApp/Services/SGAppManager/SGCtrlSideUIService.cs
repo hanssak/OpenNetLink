@@ -28,7 +28,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <summary>
         /// Application Environment Config Info.
         /// </summary>
-        ref ISGAppConfig AppConfigInfo { get; }
+        ISGAppConfig AppConfigInfo { get; }
         /// <summary>
         /// Control Right SideBar Menu Delegate, Related App Environment Setting.
         /// </summary>
@@ -36,9 +36,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void EmitNotifyStateChangedCtrlSide();
         void SaveAppConfigSerialize();
 
-        void SaveOpConfigSerialize();
+        //void SaveOpConfigSerialize();
 
-        void SaveOpConfigSerialize(int groupId);
+        //void SaveOpConfigSerialize(int groupId);
 
         void SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode);
 
@@ -68,9 +68,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetLanguage(string language);
         //void SetScreenLock(bool screenLock);
         //void SetScreenTime(int screenTime);
-        void SetLastUpdated(string lastUPdated);
-        void SetSWVersion(string swVersion);
-        void SetSWCommitId(string swCommitId);
+        //void SetLastUpdated(string lastUPdated);
+        //void SetSWVersion(string swVersion);
+        //void SetSWCommitId(string swCommitId);
         void SetLogLevel(LogEventLevel logLevel);
         void SetUseApprWaitNoti(bool useApprWaitNoti);
 
@@ -78,15 +78,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
     }
     public class SGCtrlSideUIService : ISGCtrlSideUIService
     {
-        private ISGAppConfig _AppConfigInfo;
-        private Dictionary<int , ISGopConfig> _OpConfigInfo;
+        //private ISGAppConfig _AppConfigInfo;
+        //private Dictionary<int , ISGopConfig> _OpConfigInfo;
         private ISGVersionConfig _VersionConfigInfo;
         private List<ISGNetwork> _NetWorkInfo;
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUIService>();
-        public SGCtrlSideUIService(ref ISGAppConfig appConfigInfo, ref Dictionary<int , ISGopConfig> opConfigInfo, ref ISGVersionConfig verConfigInfo, List<ISGNetwork> netWorkInfo)
+        public SGCtrlSideUIService(ref ISGVersionConfig verConfigInfo, List<ISGNetwork> netWorkInfo)
         {
-            _AppConfigInfo = appConfigInfo;
-            _OpConfigInfo = opConfigInfo;
+            //_AppConfigInfo = appConfigInfo;
+            //_OpConfigInfo = opConfigInfo;
             _VersionConfigInfo = verConfigInfo;
             _NetWorkInfo = netWorkInfo;
             SetLogLevel(AppConfigInfo.LogLevel);
@@ -96,9 +96,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <summary>
         /// Application Environment Config Info.
         /// </summary>
-        public ref ISGAppConfig AppConfigInfo => ref _AppConfigInfo;
+        public ISGAppConfig AppConfigInfo => SGAppConfigService.AppConfigInfo;
 
-        public ref Dictionary<int, ISGopConfig> OpConfigInfo => ref _OpConfigInfo;
+        public Dictionary<int, ISGopConfig> OpConfigInfo => SGopConfigService.AppConfigInfo;
 
         public ref ISGVersionConfig VersionConfigInfo => ref _VersionConfigInfo;
 
@@ -127,7 +127,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
     
                     using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
                     {
-                        serializer.WriteObject(writer, (_AppConfigInfo as SGAppConfig));
+                        serializer.WriteObject(writer, (AppConfigInfo as SGAppConfig));
                     }
                 }
             }
@@ -136,130 +136,130 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
             }
         }
-        public void SaveOpConfigSerialize()
-        {
-            if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
-                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
+//        public void SaveOpConfigSerialize()
+//        {
+//            if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
+//                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
 
-            foreach (ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
-                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sGNetwork.GroupID}_{sGNetwork.NetPos}.json";
-                try
-                {
-                    using (var fs = new FileStream(AppConfig, FileMode.Create))
-                    {
-                        var encoding = Encoding.UTF8;
-                        var ownsStream = false;
-                        var indent = true;
+//            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+//            {
+//                var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
+//                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sGNetwork.GroupID}_{sGNetwork.NetPos}.json";
+//                try
+//                {
+//                    using (var fs = new FileStream(AppConfig, FileMode.Create))
+//                    {
+//                        var encoding = Encoding.UTF8;
+//                        var ownsStream = false;
+//                        var indent = true;
 
-                        using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
-                        {
-                            serializer.WriteObject(writer, _OpConfigInfo[sGNetwork.GroupID]);
-                        }
-                    }
-#if !DEBUG
-                    byte[] info = null;
-                    using (FileStream fileStream = new FileStream(AppConfig, FileMode.Open, FileAccess.Read, FileShare.None))
-                    {
-                        using (StreamReader streamReader = new StreamReader(fileStream))
-                        {
-                            string str = streamReader.ReadToEnd();
-                            byte[] byteInput = Encoding.UTF8.GetBytes(str);
-                            byte[] masterKey = SGCrypto.GetMasterKey();
-                            info = SGCrypto.AESEncrypt256(byteInput, masterKey);
-                        }
-                    }
+//                        using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
+//                        {
+//                            serializer.WriteObject(writer, OpConfigInfo[sGNetwork.GroupID]);
+//                        }
+//                    }
+//#if !DEBUG
+//                    byte[] info = null;
+//                    using (FileStream fileStream = new FileStream(AppConfig, FileMode.Open, FileAccess.Read, FileShare.None))
+//                    {
+//                        using (StreamReader streamReader = new StreamReader(fileStream))
+//                        {
+//                            string str = streamReader.ReadToEnd();
+//                            byte[] byteInput = Encoding.UTF8.GetBytes(str);
+//                            byte[] masterKey = SGCrypto.GetMasterKey();
+//                            info = SGCrypto.AESEncrypt256(byteInput, masterKey);
+//                        }
+//                    }
 
-                    using (FileStream fs = File.Create(AppConfig))
-                    {
-                        fs.Write(info, 0, info.Length);
-                    }
-#endif
-                }
-                catch (Exception ex)
-                {
-                    CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
-                }
-            }
-        }
-        public void SaveOpConfigSerialize(int groupId)
-        {
-            var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
-            string AppConfig = String.Empty;
-            foreach(ISGNetwork sGNetwork in NetWorkInfo)
-            {
-                if(sGNetwork.GroupID == groupId)
-                    AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{groupId}_{sGNetwork.NetPos}.json";
-            }
+//                    using (FileStream fs = File.Create(AppConfig))
+//                    {
+//                        fs.Write(info, 0, info.Length);
+//                    }
+//#endif
+//                }
+//                catch (Exception ex)
+//                {
+//                    CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+//                }
+//            }
+//        }
+//        public void SaveOpConfigSerialize(int groupId)
+//        {
+//            var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
+//            string AppConfig = String.Empty;
+//            foreach(ISGNetwork sGNetwork in NetWorkInfo)
+//            {
+//                if(sGNetwork.GroupID == groupId)
+//                    AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{groupId}_{sGNetwork.NetPos}.json";
+//            }
 
-            if(AppConfig == String.Empty)
-            {
-                return;
-            }
-            try
-            {
-                if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
-                    Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
+//            if(AppConfig == String.Empty)
+//            {
+//                return;
+//            }
+//            try
+//            {
+//                if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
+//                    Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
 
-                using (var fs = new FileStream(AppConfig, FileMode.Create))
-                {
-                    var encoding = Encoding.UTF8;
-                    var ownsStream = false;
-                    var indent = true;
+//                using (var fs = new FileStream(AppConfig, FileMode.Create))
+//                {
+//                    var encoding = Encoding.UTF8;
+//                    var ownsStream = false;
+//                    var indent = true;
 
-                    using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
-                    {
-                        serializer.WriteObject(writer, _OpConfigInfo[groupId]);
-                    }
-                }
-#if !DEBUG
-                byte[] info = null;
-                using (FileStream fileStream = new FileStream(AppConfig, FileMode.Open, FileAccess.Read, FileShare.None))
-                {
-                    using (StreamReader streamReader = new StreamReader(fileStream))
-                    {
-                        string str = streamReader.ReadToEnd();
-                        byte[] byteInput = Encoding.UTF8.GetBytes(str);
-                        byte[] masterKey = SGCrypto.GetMasterKey();
-                        info = SGCrypto.AESEncrypt256(byteInput, masterKey);
-                    }
-                }
+//                    using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
+//                    {
+//                        serializer.WriteObject(writer, OpConfigInfo[groupId]);
+//                    }
+//                }
+//#if !DEBUG
+//                byte[] info = null;
+//                using (FileStream fileStream = new FileStream(AppConfig, FileMode.Open, FileAccess.Read, FileShare.None))
+//                {
+//                    using (StreamReader streamReader = new StreamReader(fileStream))
+//                    {
+//                        string str = streamReader.ReadToEnd();
+//                        byte[] byteInput = Encoding.UTF8.GetBytes(str);
+//                        byte[] masterKey = SGCrypto.GetMasterKey();
+//                        info = SGCrypto.AESEncrypt256(byteInput, masterKey);
+//                    }
+//                }
 
-                using (FileStream fs = File.Create(AppConfig))
-                {
-                    fs.Write(info, 0, info.Length);
-                }
-#endif
-            }
-            catch (Exception ex)
-            {
-                CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
-            }
-        }
-        public void SaveVersionConfigSerialize()
-        {
-            var serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));
-            string VersionConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppVersion.json";
-            try
-            {
-                using (var fs = new FileStream(VersionConfig, FileMode.Create))
-                {
-                    var encoding = Encoding.UTF8;
-                    var ownsStream = false;
-                    var indent = true;
+//                using (FileStream fs = File.Create(AppConfig))
+//                {
+//                    fs.Write(info, 0, info.Length);
+//                }
+//#endif
+//            }
+//            catch (Exception ex)
+//            {
+//                CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+//            }
+//        }
+        //public void SaveVersionConfigSerialize()
+        //{
+        //    var serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));
+        //    string VersionConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppVersion.json";
+        //    try
+        //    {
+        //        using (var fs = new FileStream(VersionConfig, FileMode.Create))
+        //        {
+        //            var encoding = Encoding.UTF8;
+        //            var ownsStream = false;
+        //            var indent = true;
 
-                    using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
-                    {
-                        serializer.WriteObject(writer, (_VersionConfigInfo as SGVersionConfig));
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
-            }
-        }
+        //            using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
+        //            {
+        //                serializer.WriteObject(writer, (_VersionConfigInfo as SGVersionConfig));
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+        //    }
+        //}
         public void SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode)
         {
             char cWin, cCtrl, cAlt, cShift;
@@ -544,24 +544,24 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //    SaveAppConfigSerialize();
         //    NotifyStateChangedCtrlSide();
         //}
-        public void SetLastUpdated(string lastUPdated)
-        {
-            (VersionConfigInfo as SGVersionConfig).LastUpdated = lastUPdated;
-            SaveVersionConfigSerialize();
-            NotifyStateChangedCtrlSide();
-        }
-        public void SetSWVersion(string swVersion)
-        {
-            (VersionConfigInfo as SGVersionConfig).SWVersion = swVersion;
-            SaveVersionConfigSerialize();
-            NotifyStateChangedCtrlSide();
-        }
-        public void SetSWCommitId(string swCommitId)
-        {
-            (VersionConfigInfo as SGVersionConfig).SWCommitId = swCommitId;
-            SaveVersionConfigSerialize();
-            NotifyStateChangedCtrlSide();
-        }
+        //public void SetLastUpdated(string lastUPdated)
+        //{
+        //    (VersionConfigInfo as SGVersionConfig).LastUpdated = lastUPdated;
+        //    SaveVersionConfigSerialize();
+        //    NotifyStateChangedCtrlSide();
+        //}
+        //public void SetSWVersion(string swVersion)
+        //{
+        //    (VersionConfigInfo as SGVersionConfig).SWVersion = swVersion;
+        //    SaveVersionConfigSerialize();
+        //    NotifyStateChangedCtrlSide();
+        //}
+        //public void SetSWCommitId(string swCommitId)
+        //{
+        //    (VersionConfigInfo as SGVersionConfig).SWCommitId = swCommitId;
+        //    SaveVersionConfigSerialize();
+        //    NotifyStateChangedCtrlSide();
+        //}
         private void ChangeLogLevel(LogEventLevel logLevel)
         {
             AgLog.LogLevelSwitch.MinimumLevel = logLevel;

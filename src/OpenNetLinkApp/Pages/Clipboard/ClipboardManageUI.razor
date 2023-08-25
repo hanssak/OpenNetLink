@@ -547,8 +547,6 @@
     {
         if (firstRender)
         {
-            @*   object[] param = { "datepicker13", "datepicker14" };
-                jsRuntime.InvokeAsync<object>("initDatePicker", param);*@
             jsRuntime.InvokeAsync<object>("initPageLeft");
             await TransSearchCount();
         }

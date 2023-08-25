@@ -59,71 +59,34 @@ namespace OpenNetLinkApp.Services
 
         }
 
+        public bool TrySSLConnect(string TryConnectIP, int TryConnectPort = 3435, SslProtocols TryConnectProtocal = SslProtocols.Tls12)
+        {
+            SslClient connTestClient = null;
+            try
+            {
+                SslContext context = new SslContext(TryConnectProtocal);
+                connTestClient = new SslClient(context, TryConnectIP, TryConnectPort);
+                return connTestClient.Connect();
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"TrySSLConnect err : {ex.ToString()}");
+                return false;
+            }
+            finally
+            {
+                connTestClient?.Dispose();
+            }
+        }
+
         public void Init()
         {
             HsNetWork hsNetwork = null;
+            
+            List<ISGNetwork> listNetworks = SGNetworkService.NetWorkInfo;
+            List<string> RecvDownList = SGAppConfigService.AppConfigInfo.RecvDownPath;
 
-            string strNetworkFileName = "wwwroot/conf/NetWork.json";
-            string jsonString = File.ReadAllText(strNetworkFileName);
-            List<ISGNetwork> listNetworks = new List<ISGNetwork>();
-
-            //ADDomain 이 string 타입인 Network.json은 List<string> 타입으로 수정
-            try { _networkParsing(); }
-            catch (Exception ex)
-            {
-                CLog.Here().Error($"NetworkParsing err : Change ADDomain Format in Network.json  - {ex.ToString()}");
-                string[] strNetwork = jsonString.Split(Environment.NewLine);
-                for (int i = 0; i < strNetwork.Length; i++)
-                {
-                    if (strNetwork[i].Contains("ADDomain") && !(strNetwork[i].Contains("[") && strNetwork[i].Contains("]")))
-                    {
-                        string element = strNetwork[i].Split(':')[0];
-                        string value = strNetwork[i].Split(':')[1];
-                        strNetwork[i] = $"{element}: [ {value} ]";
-                    }
-                }
-                File.WriteAllText(strNetworkFileName, string.Join(Environment.NewLine, strNetwork));
-                jsonString = string.Join(Environment.NewLine, strNetwork);
-                _networkParsing();
-            }
-
-            void _networkParsing()
-            {
-                listNetworks.Clear();
-                using (JsonDocument document = JsonDocument.Parse(jsonString))
-                {
-                    JsonElement root = document.RootElement;
-                    JsonElement NetWorkElement = root.GetProperty("NETWORKS");
-                    //JsonElement Element;
-                    foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
-                    {
-                        SGNetwork sgNet = new SGNetwork();
-                        string strJsonElement = netElement.ToString();
-                        var options = new JsonSerializerOptions
-                        {
-                            ReadCommentHandling = JsonCommentHandling.Skip,
-                            AllowTrailingCommas = true,
-                            PropertyNameCaseInsensitive = true,
-                        };
-                        sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
-                        listNetworks.Add(sgNet);
-                    }
-                }
-            }
-
-            List<string> RecvDownList = new List<string>();
-            var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));
-            string AppConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppEnvSetting.json";
-            if (File.Exists(AppConfig))
-            {
-                using (FileStream fs = File.OpenRead(AppConfig))
-                {
-                    SGAppConfig appConfig = (SGAppConfig)serializer.ReadObject(fs);
-                    RecvDownList = appConfig.RecvDownPath;
-                }
-            }
-
-            serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));
+            var serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));
             string VersionConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppVersion.json";
             if (File.Exists(VersionConfig))
             {
@@ -133,66 +96,7 @@ namespace OpenNetLinkApp.Services
                 }
             }
 
-            Dictionary<int, ISGopConfig> dicOpConfig = new Dictionary<int, ISGopConfig>();
-            serializer = new DataContractJsonSerializer(typeof(SGopConfig));
-            foreach (SGNetwork sgNetwork in listNetworks)
-            {
-                string opConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sgNetwork.GroupID}_{sgNetwork.NetPos}.json";
-
-                CLog.Here().Information($"- AppOPsetting Path: [{opConfig}]");
-
-                if (File.Exists(opConfig))
-                {
-                    try
-                    {
-                        CLog.Here().Information($"- AppOPsetting Loading... : [{opConfig}]");
-                        //Open the stream and read it back.
-                        byte[] hsckByte = File.ReadAllBytes(opConfig);
-                        byte[] masterKey = SGCrypto.GetMasterKey();
-
-                        bool isDeCrypt = true;
-                        string strData = String.Empty;
-                        try
-                        {
-                            byte[] dData = SGCrypto.AESDecrypt256(hsckByte, masterKey, System.Security.Cryptography.PaddingMode.PKCS7);
-                            strData = Encoding.UTF8.GetString(dData);
-                        }
-                        catch (Exception ex)
-                        {
-                            CLog.Here().Information($"- AppOPsetting Loading... : Decrypt Fail {opConfig}]");
-                            //디크립션 실패
-                            isDeCrypt = false;
-                        }
-
-                        if (isDeCrypt)
-                        {
-                            SGopConfig appConfig = JsonSerializer.Deserialize<SGopConfig>(strData);
-                            dicOpConfig.Add(sgNetwork.GroupID, appConfig);
-
-                        }
-                        else
-                        {
-                            //Open the stream and read it back.
-                            using (FileStream fs = File.OpenRead(opConfig))
-                            {
-                                SGopConfig appConfig = (SGopConfig)serializer.ReadObject(fs);
-                                dicOpConfig.Add(sgNetwork.GroupID, appConfig);
-
-                            }
-                        }
-                        CLog.Here().Information($"- AppOPsetting Load Completed : [{opConfig}]");
-                    }
-                    catch (Exception ex)
-                    {
-                        CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
-                        dicOpConfig.Add(sgNetwork.GroupID, new SGopConfig());
-                    }
-                }
-                else
-                {
-                    dicOpConfig.Add(sgNetwork.GroupID, new SGopConfig());
-                }
-            }
+            Dictionary<int, ISGopConfig> dicOpConfig = SGopConfigService.AppConfigInfo;
 
             int count = listNetworks.Count;
             SetNetWorkCount(count);
@@ -249,7 +153,7 @@ namespace OpenNetLinkApp.Services
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
 
                 hsNetwork.SGSvr_EventReg(SGSvrRecv);
-                hsNetwork.SGData_EventReg(SGDataRecv);                
+                hsNetwork.SGData_EventReg(SGDataRecv);
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
                 hsNetwork.SGException_EventRegEx(SGExceptionExRecv);
                 hsNetwork.SetGroupID(groupID);
@@ -704,7 +608,7 @@ namespace OpenNetLinkApp.Services
                     break;
                 case eCmdList.eDrmBlockNoti:                                                     // DRM Noti
                     VirusScanNotiAfterSend(nRet, eCmdList.eDrmBlockNoti, groupId, sgData);
-                    break;                   
+                    break;
 
                 case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
                     EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
@@ -958,7 +862,7 @@ namespace OpenNetLinkApp.Services
                     tmpData.m_DicTagData["SYSTEMID"] = sgData.m_DicTagData["SYSTEMID"].Base64EncodingStr();
                     tmpData.m_DicTagData["TLSVERSION"] = sgData.m_DicTagData["TLSVERSION"].Base64EncodingStr();
 
-                    RecvSvrAfterSend(groupId, sgData.m_DicTagData["LOGINTYPE"]);
+                    RecvSvrAfterSend(groupId, sgData.m_DicTagData["LOGINTYPE"], sgData.m_DicTagData["SYSTEMID"]);
                     //SGSvrData sgTmp = (SGSvrData)sgDicRecvData.GetSvrData(0);
                     //eLoginType e = sgTmp.GetLoginType();
                     break;
@@ -979,12 +883,12 @@ namespace OpenNetLinkApp.Services
             sgDicRecvData.SetSvrData(groupId, tmpData);
 
         }
-        public void RecvSvrAfterSend(int groupId, string loginType)
+        public void RecvSvrAfterSend(int groupId, string loginType, string systemID)
         {
             SvrEvent svEvent = sgPageEvent.GetSvrEvent(groupId);
             if (svEvent != null)
             {
-                svEvent(groupId, loginType);
+                svEvent(groupId, loginType, systemID);
             }
         }
 
@@ -1210,7 +1114,7 @@ namespace OpenNetLinkApp.Services
                     else
                     {
                         // Log 첫출력
-                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , " + $"{ ( (bIsLogin && sgLoginData != null) ? $"DELETECYCLE : { nArryDeleteTime[nIdx]} " : "Logout Status!") }");
+                        CLog.Here().Information($"Recv File Delete Cycle - Thread - groupid : {nIdx} , " + $"{ ((bIsLogin && sgLoginData != null) ? $"DELETECYCLE : { nArryDeleteTime[nIdx]} " : "Logout Status!") }");
                         bDisplayCycle = true;
                         nowData = DateTime.Now;
                         nHour = nowData.Hour;
@@ -1658,7 +1562,12 @@ namespace OpenNetLinkApp.Services
                 if (!strCount.Equals(""))
                     e.count = Convert.ToInt32(strCount);
                 e.strMsg = "";
-                e.strDummy = "4";
+
+                strCount = data.GetBasicTagData("APPROVEUSERKIND");
+                if (strCount == "1")
+                    e.strDummy = "5";   // UI기준
+                else
+                    e.strDummy = "4";
 
                 sNotiEvent(groupId, cmd, e);
             }
@@ -2342,12 +2251,16 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestApproveBatch(hsNetWork, groupid, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
             return -1;
         }
-        public int SendEmailApproveBatch(int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs)
+        public int SendEmailApproveBatch(int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs, bool bUseSfm2Approve = false, bool bUsePrivacyApprove = false)
         {
+            // 정보보안결재는 대결재 없음
+            if (bUsePrivacyApprove)
+                bUseSfm2Approve = false;
+
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestEmailApproveBatch(hsNetWork, groupid, strUserID, strProcID, strReason, strApproveSeqs);
+                return sgSendData.RequestEmailApproveBatch(hsNetWork, groupid, strUserID, strProcID, strReason, strApproveSeqs, bUseSfm2Approve, bUsePrivacyApprove);
             return -1;
         }
         public int SendTransCancel(int groupid, string strUserID, string strTransSeq, string strAction, string strReason)

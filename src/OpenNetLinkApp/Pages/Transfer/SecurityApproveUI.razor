@@ -574,7 +574,11 @@
     {
         if (firstRender)
         {
-            object[] param = { "datepicker7", "datepicker8" };
+            string[] monthNames = XmlConf.GetMonthNamesGroup();
+            string[] dayNameMin = XmlConf.GetDayMinNamesGroup();
+            string[] dayName = XmlConf.GetDayNamesGroup();
+
+            object[] param = { "datepicker7", "datepicker8", monthNames, dayNameMin, dayName };
             jsRuntime.InvokeAsync<object>("initDatePicker", param);
             jsRuntime.InvokeAsync<object>("initPageLeft");
         }

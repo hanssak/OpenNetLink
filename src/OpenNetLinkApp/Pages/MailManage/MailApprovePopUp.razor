@@ -43,7 +43,7 @@
 
                             <tr>
                                 <th>@XmlConf.GetTitle("T_COMMON_APPROVE_KIND")</th> <!-- 결재종류 -->
-                                <td>@GetApproveKindString(stApproveKindValue)</td>
+                                <td>@GetApproveKindString(bIsPrivacyApproveDetail?"0":stApproveKindValue)</td>
                                 <th>@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th> <!--  승인상태 -->
                                 <td>@GetApproveStatusString(stApproveStatusValue, stTransStatusValue)</td>
 
@@ -220,13 +220,13 @@
 
 @code 
 {
-        ISGNetworkService NetWorkSvc;
+    ISGNetworkService NetWorkSvc;
 
-        string stEmailSeq = String.Empty;
-        string stApproveSeq = String.Empty;
-        bool bApproveEnable = false;
+    string stEmailSeq = String.Empty;
+    string stApproveSeq = String.Empty;
+    bool bApproveEnable = false;
 
-        SGReject refSGDetailReject;
+    SGReject refSGDetailReject;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<MailApprovePopUp>();
     List<Dictionary<int, string>> detailData = null;          //DB 데이타 직접 사용하는걸로 수정
     string stTransKindValue = String.Empty;
@@ -246,7 +246,20 @@
     ISGSideBarUIService SideBarUISvc;
     public bool m_bFilePrevOpening = false;
 
+    /// <summary>
+    /// 개인정보 검색된 내용 보여주도록 설정
+    /// </summary>
     public bool bUseDlpDataView = true;
+
+    /// <summary>
+    /// 정보보호결재 View 상황인지유무
+    /// </summary>
+    public bool bIsPrivacyApproveDetail = false;
+
+    /// <summary>
+    /// 대결재 SFM2 상태인지 유무
+    /// </summary>
+    public bool bIsEmailApproveSfm2Mode = false;
 
     public string strPrevInfo1 = "";
     public string strPrevInfo2 = "";
@@ -447,7 +460,7 @@
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, stApproveSeq);
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);
         closePopUp();
     }
 
@@ -489,7 +502,7 @@
 
             string strProcID = "A";
             string strReason = "Approve";
-            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq);
+            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);
             closePopUp();
         }
         else
@@ -548,9 +561,7 @@
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
-        string strProcID = "R";
-
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq);
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "R", strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);
         closePopUp();
     }
 
@@ -701,27 +712,50 @@
                 string[] arrVal = listFile[i + 1].Split("|");
                 // 0 : EmailSeq, 1:개인정보 검출(유무등정보), 2:파일 이름, 3 :파일 Type, 4:파일 크기, 5:파일위변조 및 바이러스 검출내용, 6:개인정보 검출내용
 
-                emailFile tmpFile = new emailFile();
-                tmpFile.fileDLP = strDisplayData.GetDlpDisplayData(arrVal[1]);
-                tmpFile.fileDLPContents = "-";
+                if (arrVal.Length >= 6)
+                {
 
-                tmpFile.fileSeq = arrVal[0].Split("\"")[1];
-                tmpFile.fileName = arrVal[2];
-                tmpFile.fileKind = arrVal[3];
+                    emailFile tmpFile = new emailFile();
 
-                // 정각차장이 작업 완료하면 확인해보고 "메일 본문", "메일 원본", "첨부 파일" 모두 다운로드 되게끔 나갈건지 결정
-                if (tmpFile.fileKind != "첨부 파일")    // "메일 본문", "메일 원본", "첨부 파일" : 서버에서 만드는 Text임
-                    tmpFile.bFilePreviewPossiable = false;
+                    tmpFile.fileDLP = strDisplayData.GetDlpDisplayData(arrVal[1]);
+                    tmpFile.fileDLPContents = "-";
 
-                tmpFile.bFilePreviewPossiable = true;
-                tmpFile.fileKey = arrVal[4];
-                tmpFile.fileSize = GetFileSizeString(arrVal[4]);
-                tmpFile.virusDesc = arrVal[5];
+                    tmpFile.fileSeq = arrVal[0].Split("\"")[1];
+                    tmpFile.fileName = arrVal[2];
+                    tmpFile.fileKind = arrVal[3];
 
-                if (arrVal.Length > 6)
-                    tmpFile.fileDLPContents = arrVal[6];
+                    // 정각차장이 작업 완료하면 확인해보고 "메일 본문", "메일 원본", "첨부 파일" 모두 다운로드 되게끔 나갈건지 결정
+                    if (tmpFile.fileKind != "첨부 파일")    // "메일 본문", "메일 원본", "첨부 파일" : 서버에서 만드는 Text임
+                        tmpFile.bFilePreviewPossiable = false;
 
-                fileList.Add(tmpFile);
+                    tmpFile.bFilePreviewPossiable = true;
+                    tmpFile.fileKey = arrVal[4];
+                    tmpFile.fileSize = GetFileSizeString(arrVal[4]);
+                    tmpFile.virusDesc = arrVal[5];
+
+                    if (arrVal.Length > 6)
+                    {
+                        tmpFile.fileDLPContents = arrVal[6];
+                        if (tmpFile.fileDLPContents.Length > 0)
+                        {
+                            int nPos = tmpFile.fileDLPContents.LastIndexOf("\")");
+                            if (nPos > 0 && nPos == tmpFile.fileDLPContents.Length - 2)
+                            {
+                                tmpFile.fileDLPContents = tmpFile.fileDLPContents.Substring(0, nPos);
+                            }
+                            else
+                                tmpFile.fileDLPContents = "-";
+                        }
+                    }
+
+                    fileList.Add(tmpFile);
+
+                }
+                else
+                {
+                    CLog.Here().Error($@"DetailResult - FileData Empty!");
+                }
+
             }
 
         }
@@ -748,6 +782,7 @@
         else
             bApproveEnable = false;
 
+        m_bReject = true;
         if (bIsAfterApprove)
             m_bReject = false;
 
@@ -765,10 +800,13 @@
 
         HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑
 
-        MailManageDao dao = new MailManageDao();
-        string strQuery = dao.MailDetail(seq);
+        if (sgLoginData != null)
+            bIsEmailApproveSfm2Mode = (sgLoginData.GetApproveTypeSFM() == 2);
 
-        CLog.Here().Information($@"QueryDetail-@@@@@@@@@@ : {strQuery}");
+        MailManageDao dao = new MailManageDao();
+        string strQuery = dao.MailDetail(seq, bIsEmailApproveSfm2Mode);
+
+        CLog.Here().Information($@"MailApprove - QueryDetail-@@@@@@@@@@ : {strQuery}");
 
         HSCmdCenter.SendDetailQuery(groupID, curUserID, strQuery);
 

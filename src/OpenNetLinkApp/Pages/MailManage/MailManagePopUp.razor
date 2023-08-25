@@ -209,6 +209,29 @@
         closePopUp();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="strData"></param>
+    /// <returns></returns>
+    public string GetApproveRejectReasonText(string strData)
+    {
+        string strOnlyData = strData;
+        int nIdx = strOnlyData.LastIndexOf(')');
+        if (nIdx < 1)
+            return "";
+        else
+        {
+            strOnlyData = strOnlyData.Substring(0, nIdx);
+            return strOnlyData;
+        }
+    }
+
+    /// <summary>
+    /// 상세내용 실제 조회된 data 
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void DetailResult(int groupId, SGData e)
     {
         stTransKindValue = String.Empty;
@@ -269,6 +292,9 @@
             stApproveKindValue = arrData[4].Split(":")[1];
             stApproveStatusValue = arrData[5].Split(":")[1];
 
+            bool bViewOnlyReject = true;
+            bViewOnlyReject = !SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupId);
+
             for (int i = 0; i < listApprover.Count - 1; i++)
             {
                 string[] arrVal = listApprover[i + 1].Split("|");
@@ -287,8 +313,16 @@
                     tmpApv.approveResTime = "-";
 
                 tmpApv.apprRejectReason = "-";
-                if (arrVal[4] == "3")   // 반려일때에만 - 사유정보 표현
-                    tmpApv.apprRejectReason = arrVal[6];
+                if (bViewOnlyReject)
+                {
+                    if (arrVal[4] == "3")   // 반려일때에만 - 사유정보 표현
+                        tmpApv.apprRejectReason = GetApproveRejectReasonText(arrVal[6]);
+                }
+                else
+                {
+                    if (arrVal[4] == "2" || arrVal[4] == "3")   // 승인-반려일때에 사유정보 표현
+                        tmpApv.apprRejectReason = GetApproveRejectReasonText(arrVal[6]);
+                }
 
                 apvList.Add(tmpApv);
             }
@@ -323,20 +357,49 @@
                 string[] arrVal = listFile[i + 1].Split("|");
                 // 0 : EmailSeq, 1:개인정보 검출(유무등정보), 2:파일 이름, 3 :파일 Type, 4:파일 크기, 5:파일위변조 및 바이러스 검출내용, 6:개인정보 검출내용
 
-                emailFile tmpFile = new emailFile();
-                tmpFile.fileDLP = strDisplayData.GetDlpDisplayData(arrVal[1]);
-                tmpFile.fileDLPContents = "-";
+                if (arrVal.Length >= 6)
+                {
 
-                tmpFile.fileName = arrVal[2];
-                tmpFile.fileKind = arrVal[3];
+                    emailFile tmpFile = new emailFile();
 
-                tmpFile.fileSize = GetFileSizeString(arrVal[4]);
-                tmpFile.virusDesc = arrVal[5];
+                    tmpFile.fileDLP = strDisplayData.GetDlpDisplayData(arrVal[1]);
+                    tmpFile.fileDLPContents = "-";
 
-                if (arrVal.Length > 6)
-                    tmpFile.fileDLPContents = arrVal[6];
+                    tmpFile.fileSeq = arrVal[0].Split("\"")[1];
+                    tmpFile.fileName = arrVal[2];
+                    tmpFile.fileKind = arrVal[3];
 
-                fileList.Add(tmpFile);
+                    // 정각차장이 작업 완료하면 확인해보고 "메일 본문", "메일 원본", "첨부 파일" 모두 다운로드 되게끔 나갈건지 결정
+                    if (tmpFile.fileKind != "첨부 파일")    // "메일 본문", "메일 원본", "첨부 파일" : 서버에서 만드는 Text임
+                        tmpFile.bFilePreviewPossiable = false;
+
+                    tmpFile.bFilePreviewPossiable = true;
+                    tmpFile.fileKey = arrVal[4];
+                    tmpFile.fileSize = GetFileSizeString(arrVal[4]);
+                    tmpFile.virusDesc = arrVal[5];
+
+                    if (arrVal.Length > 6)
+                    {
+                        tmpFile.fileDLPContents = arrVal[6];
+                        if (tmpFile.fileDLPContents.Length > 0)
+                        {
+                            int nPos = tmpFile.fileDLPContents.LastIndexOf("\")");
+                            if (nPos > 0 && nPos == tmpFile.fileDLPContents.Length - 2)
+                            {
+                                tmpFile.fileDLPContents = tmpFile.fileDLPContents.Substring(0, nPos);
+                            }
+                            else
+                                tmpFile.fileDLPContents = "-";
+                        }
+                    }
+
+                    fileList.Add(tmpFile);
+                }
+                else
+                {
+                    CLog.Here().Error($@"DetailResult - FileData Empty!");
+                }
+
             }
 
             if (stApproveStatusValue == "1" && (stTransStatusValue == "W" || stTransStatusValue == "V"))
@@ -345,11 +408,10 @@
         }
         catch (Exception ex)
         {
-            CLog.Here().Error($@"Exception - Msg : {ex.Message}, StackTrace : {ex.StackTrace}");
+            CLog.Here().Error($@"DetailResult - Exception - Msg : {ex.Message}, StackTrace : {ex.StackTrace}");
             CLog.Error(ex.StackTrace);
             System.Diagnostics.Debug.WriteLine(ex.Message);
         }
-
         StateHasChanged();
     }
 
@@ -463,11 +525,12 @@
 
         HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑
 
-        //HSCmdCenter.sgPageEvent.SetEmailSendCancelEvent(groupID, CancelResult);
-
+        bTransCancelVisuable = false;
         MailManageDao dao = new MailManageDao();
-        string strQuery = dao.MailDetail(seq);
-        Debug.WriteLine(strQuery);
+        string strQuery = dao.MailDetail(seq, (sgLoginData.GetApproveTypeSFM() == 2));
+
+        CLog.Here().Information($@"QueryDetail-@@@@@@@@@@ : {strQuery}");
+
         HSCmdCenter.SendDetailQuery(groupID, curUserID, strQuery);
 
         object[] param = { "MailManagePopUp" };

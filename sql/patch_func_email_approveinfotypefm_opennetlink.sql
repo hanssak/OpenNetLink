@@ -1,8 +1,8 @@
--- FUNCTION: public.func_email_approveinfo_open(haracter varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying)
+-- FUNCTION: public.func_email_approveinfotypefm_open(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying)
 
--- DROP FUNCTION IF EXISTS public.func_email_approveinfo_open(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying);
+-- DROP FUNCTION IF EXISTS public.func_email_approveinfotypefm_open(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying);
 
-CREATE OR REPLACE FUNCTION public.func_email_approveinfo_open(
+CREATE OR REPLACE FUNCTION public.func_email_approveinfotypefm_open(
 	userid character varying,
 	fromdate character varying,
 	todate character varying,
@@ -28,6 +28,7 @@ DECLARE
 	sql varchar;	-- 쿼리
 	recvuser varchar; -- 수신자 검색조검
 	whand varchar;	-- 검색조건이 있을때의 연결(Where or and)
+	nowdate varchar;
 begin
 /* -- 함수 파라미터 
 userid : 사용자 아이디
@@ -43,6 +44,9 @@ reciever : 수신자
 title : 제목
 network : 망구분 
 */
+  nowdate:=To_CHAR(now(), 'YYYYMMDD');
+  
+	
 			
   sql:='WITH TBL_EMAIL_TRANSFER AS 
 	(  
@@ -63,6 +67,18 @@ network : 망구분
 		SELECT USER_SEQ, USER_ID, USER_NAME 
 		FROM   TBL_USER_INFO  
 		WHERE USER_ID=''##USERID##''
+		
+		UNION  ALL
+		
+		SELECT B.USER_SEQ, C.USER_ID, C.USER_NAME
+		FROM TBL_USER_INFO A
+		, TBL_USER_SFM B
+		, TBL_USER_INFO C
+		WHERE A.USER_SEQ = B.SFM_USER_SEQ 
+		AND A.USER_ID=''##USERID##''
+		AND ''##NOWDATE##'' BETWEEN B.FROMDATE AND B.TODATE
+		AND B.USER_SEQ=C.USER_SEQ
+        	
 	)  
 	, TBL_EMAIL_APPROVE AS  
 	(  
@@ -72,7 +88,7 @@ network : 망구분
 
 		UNION ALL  
 
-		SELECT ''0''  AS APPROVEKIND, ''C'' AS POS, A.* 
+		SELECT ''0'' AS APPROVEKIND, ''C'' AS POS, A.* 
 		FROM TBL_EMAIL_APPROVE_INFO A 
 		WHERE A.APPR_REQ_TIME BETWEEN ''##FROMDATE##000000'' AND ''##TODATE##235959'' 
 	)  
@@ -110,7 +126,7 @@ network : 망구분
 				WHEN T.TRANS_FLAG = ''3''  THEN ''S'' 
 				WHEN T.TRANS_FLAG = ''4''  THEN ''F'' 
 				WHEN T.TRANS_FLAG = ''5''  THEN ''C'' 
-				WHEN T.TRANS_FLAG = ''6''  THEN ''V'' 
+				WHEN T.TRANS_FLAG = ''6''  THEN ''V''
 				WHEN T.TRANS_FLAG = ''7''  THEN ''S'' 
 				WHEN T.TRANS_FLAG = ''8''  THEN ''F'' 
 				WHEN T.TRANS_FLAG = ''9''  THEN ''W'' 
@@ -140,6 +156,7 @@ network : 망구분
 	sql:=Replace(sql, '##USERID##', userid);
 	sql:=Replace(sql, '##FROMDATE##', fromdate);
 	sql:=Replace(sql, '##TODATE##', todate);
+	sql:=Replace(sql, '##NOWDATE##', nowdate);
 
 	IF network IS NULL AND network='' THEN 
 		network:='0';
@@ -236,7 +253,9 @@ network : 망구분
 	END IF;
 
 --	RAISE NOTICE 'Quantity here is %', sql;  -- Prints 50
---	RAISE NOTICE 'Quantity Title %', title;  -- Prints 50
+
+--	RAISE NOTICE 'Quantity date %', nowdate;  -- Prints 50
+
 	
 RETURN QUERY EXECUTE
 	sql;
@@ -244,5 +263,5 @@ RETURN QUERY EXECUTE
 end;
 $BODY$;
 
-ALTER FUNCTION public.func_email_approveinfo_open(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying)
-    OWNER TO postgres;
+ALTER FUNCTION public.func_email_approveinfotypefm_open(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying)
+    OWNER TO hsck;

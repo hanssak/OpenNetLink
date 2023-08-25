@@ -77,7 +77,7 @@ namespace OpenNetLinkApp.PageEvent
         public string strDummy { get; set; }
     }
 
-    public delegate void SvrEvent(int groupid, string loginType);
+    public delegate void SvrEvent(int groupid, string loginType, string systemID);
     public delegate void SvrGPKIEvent(int groupid);
     public delegate void SvrGPKIRandomKeyEvent(int groupid);
     public delegate void SvrGPKICertEvent(int groupid);
@@ -87,7 +87,7 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void LoginEvent(int groupid, PageEventArgs e);
     // 중복로그인 이벤트
     public delegate void SessionDuplicateEvent(int groupid, PageEventArgs e);
-    
+
     /// <summary>
     /// 2Factor 인증(GoogleOtp 인증)
     /// </summary>
@@ -442,6 +442,8 @@ namespace OpenNetLinkApp.PageEvent
 
         public OLEMimeRecvEvent oleMimeRecvEvent = null;
 
+        public EventHandler<string> changeLanguageEvent = null;
+
         private Dictionary<int, DeptInfoNotiEvent> _dicDeptInfoEvnet = new Dictionary<int, DeptInfoNotiEvent>();
 
         public OSNotificationEvent oSNotificationEvent = null;
@@ -511,6 +513,9 @@ namespace OpenNetLinkApp.PageEvent
                 _dicPageDataRefreshEvent.Add(ePageView, pageDataRefreshEvent);
             }
         }
+
+        public void SetChangeLanguageEvent(EventHandler<string> e) => changeLanguageEvent = e;
+        public EventHandler<string> GetChangeLanguageEvent() => changeLanguageEvent;
 
         public CommonQueryReciveEvent GetQueryReciveEvent(int groupId, eCmdList eCmd)
         {
@@ -616,7 +621,7 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
-        
+
         public void Set2FactorAuthEventAdd(int groupid, Session2FactorAuthEvent e)
         {
             Dic2FactorAuthEvent[groupid] = e;

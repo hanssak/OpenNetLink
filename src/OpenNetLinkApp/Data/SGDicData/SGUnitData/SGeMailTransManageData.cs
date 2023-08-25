@@ -402,9 +402,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             else if (strDlp == "1")
                 strRet = xmlConf.GetTitle("T_COMMON_DLP_INCLUSION");            // 포함
             else if (strDlp == "2")
-                strRet = xmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION");            // 포함
+                strRet = xmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION");            // 미포함
             else if (strDlp == "3")
-                strRet = xmlConf.GetTitle("T_COMMON_DLP_UNKNOWN");            // 포함
+                strRet = xmlConf.GetTitle("T_COMMON_DLP_UNKNOWN");            // 알수없음
             else
                 strRet = "-";
 

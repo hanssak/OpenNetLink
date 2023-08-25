@@ -7,13 +7,13 @@ namespace OpenNetLinkApp.Models.SGSideBar
 {
     public enum LSIDEBAR : int
     {
-       [Description("HOME")]            MENU_CATE_ROOT      = 0,
-       [Description("자료전송")]          MENU_CATE_FILE,
-       [Description("메일")]             MENU_CATE_MAIL,
-       [Description("PCURL")]           MENU_CATE_PCURL,
-       [Description("클립보드")]          MENU_CATE_CLIP,
-       [Description("환경설정")]          MENU_CATE_ENVSET,
-       [Description("마지막카테고리")]     MENU_CATE_MAX,
+       [Description("T_LSIDEBAR_MENU_HOME_NAME")]           MENU_CATE_ROOT      = 0,
+       [Description("T_COMMON_FILETRANS_BASIC")]            MENU_CATE_FILE,
+       [Description("T_COMMON_EMAIL")]                      MENU_CATE_MAIL,
+       [Description("T_COMMON_URL")]                        MENU_CATE_PCURL,
+       [Description("T_TOOL_CLIPBOARD")]                    MENU_CATE_CLIP,
+       [Description("T_COMMON_OPTION")]                     MENU_CATE_ENVSET,
+       [Description("T_LSIDEBAR_MENU_LAST_NAME")]           MENU_CATE_MAX,
     }
 
     public interface ISGSideBarUI
