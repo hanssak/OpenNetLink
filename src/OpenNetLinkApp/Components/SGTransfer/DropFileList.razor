@@ -2471,10 +2471,16 @@
             {
                 path = path.Substring(5);
             }
-
-            string dirPath = Path.GetDirectoryName(path);
+            string dirPath = "";
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            { 
+                dirPath = "/" + Path.GetDirectoryName(path);
+            }
+            else
+            {
+                dirPath = Path.GetDirectoryName(path);
+            }
             var fileListtemp = await _dropReference.EnumerateFilesAsync();
-
             foreach (var file in fileListtemp)
             {
                 var fileinfo = await file.ReadFileInfoAsync();

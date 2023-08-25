@@ -14,9 +14,8 @@
     [Parameter]
     public Action<List<string>> Drop { get; set; }
 
-    void OnDrop(DragEventArgs args)
+    void OnDrop()
     {
-        var files = args.DataTransfer.Files;
         List<string> stList = DragAndDropService.getDataList();
         Drop(stList);
         //DragAndDropService.clearDataList();

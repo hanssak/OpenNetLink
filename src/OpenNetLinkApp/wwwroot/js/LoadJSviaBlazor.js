@@ -1630,23 +1630,6 @@ window.loadFileReaderService = () => {
               _this.LogIfNull(elementReal);
               var handler = function (ev) {
                   //_this.PreventDefaultHandler(ev);
-                  var items = ev.dataTransfer.items;
-                                    
-                  for (var i = 0, item; item = items[i]; ++i) {
-                      //var entry = item.webkitGetAsEntry();
-                      //if (entry.isDirectory) {
-
-                      if (item.kind != "file") {
-                          var folder = item.getAsString();
-                          console.log("[JS OnDrop Folder] folder name:" + folder);
-                      }
-                      else
-                      {
-                          var file = item.getAsFile();
-                          console.log("[JS OnDrop File] file name:" + file.name);
-                      }
-                  }
-
                   if (ev.target instanceof HTMLElement) {
                       var list = ev.dataTransfer.files;
                       console.log(list);
