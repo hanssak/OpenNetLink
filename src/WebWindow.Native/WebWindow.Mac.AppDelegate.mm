@@ -11,13 +11,18 @@
     if (self = [super init]) {
         // allocate and initialize window and stuff here ..
     }
-
     return self;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
     [window makeKeyAndOrderFront:nil];
     [NSApp activateIgnoringOtherApps:YES];
+    //[window registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, nil]];
+    //[NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskLeftMouseUp handler:^NSEvent * (NSEvent * theEvent) {
+    //    NSPasteboard* pb = [NSPasteboard pasteboardWithName:NSDragPboard];
+    //    NSLog(@"%@", [pb propertyListForType:NSFilenamesPboardType]);
+    //    return theEvent;
+    //}];
     NSLog(@"applicationDidFinishLaunching");
     NTLog(SelfThis, Info, "!! ----- aLaucgubg");
     // Show extensions, if FinderUtilities is not approved
@@ -58,6 +63,8 @@
     NSLog(@"Will terminate....");
     return ;
 }
+
+
 
 - (BOOL)windowShouldClose:(NSWindow *)sender {
 

@@ -101,6 +101,7 @@
         Window.ClipBoardOccured += ClipBoardHandler;
         Window.RecvClipBoardOccured += RecvClipBoardHandler;
         Window.NavigateURLOccured += NavigateURLHandler;
+        Window.DragNDrop += DragNDropHandler;
 
         HsCmdCenter.sgPageEvent.SetServerNotiEvent(RecvServerNoti);
         HsCmdCenter.sgPageEvent.SetApproveActionNotiEvent(ApprActionNoti);
@@ -2582,6 +2583,23 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         if (bChangedMenu)
             MyNavigationManager.NavigateTo(navURI);
+    }
+
+    public void DragNDropHandler(object sender, List<object> list)
+    {
+        string filePath = "";
+        if (list != null)
+        {
+            IntPtr bUri = (IntPtr)list[0];
+            int length = (int)list[1];
+            byte[] data = new byte[length];
+
+            Marshal.Copy(bUri, data, 0, length);
+
+            filePath = Encoding.UTF8.GetString(data);
+
+            pageService.SetDragNDropFilePath(filePath);
+        }
     }
 
     public void LocationChangeHandler(object sender, System.Drawing.Point point)

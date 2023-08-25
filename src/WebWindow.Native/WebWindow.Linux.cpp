@@ -133,6 +133,7 @@ void on_size_allocate(GtkWidget* widget, GdkRectangle* allocation, gpointer self
 gboolean on_configure_event(GtkWidget* widget, GdkEvent* event, gpointer self);
 gboolean on_window_state_event(GtkWidget* widget, GdkEventWindowState* event, gpointer self);
 static void load_finished_cb(WebKitWebView* web_view, WebKitLoadEvent load_event, gpointer user_data);
+static gboolean decide_policy_cb(WebKitWebView *web_view, WebKitPolicyDecision *decision, WebKitPolicyDecisionType type, gpointer user_data);
 static gboolean webViewLoadFailed(WebKitWebView* webView,
 	WebKitLoadEvent loadEvent,
 	const char* failingURI,
@@ -280,6 +281,7 @@ void WebWindow::Show()
 		g_signal_connect(WEBKIT_WEB_VIEW(_webview), "load-failed-with-tls-errors", G_CALLBACK(loadFailedWithTLSerrors), this);
 
 		g_signal_connect(WEBKIT_WEB_VIEW(_webview), "load-changed", G_CALLBACK(load_finished_cb), this);
+		g_signal_connect(WEBKIT_WEB_VIEW(_webview), "decide-policy", G_CALLBACK(decide_policy_cb), this);
 
 		WebKitUserScript* script = webkit_user_script_new(
 			"window.__receiveMessageCallbacks = [];"
@@ -332,7 +334,7 @@ static gboolean webViewLoadFailed(WebKitWebView* webView, WebKitLoadEvent loadEv
 
 static void load_finished_cb(WebKitWebView* web_view, WebKitLoadEvent load_event, gpointer user_data)
 {
-	const char* provisional_uri = webkit_web_view_get_uri(web_view);
+	//const char* provisional_uri = webkit_web_view_get_uri(web_view);
 
 	if (load_event == WebKitLoadEvent::WEBKIT_LOAD_FINISHED)
 	{
@@ -368,6 +370,45 @@ static void load_finished_cb(WebKitWebView* web_view, WebKitLoadEvent load_event
 	// 	printf("WEBKIT_LOAD_FINISHED");
 	//     break;
 	// }
+}
+
+static gboolean decide_policy_cb (WebKitWebView *web_view, WebKitPolicyDecision *decision, WebKitPolicyDecisionType type ,gpointer user_data)
+{
+    switch (type) {
+    case WebKitPolicyDecisionType::WEBKIT_POLICY_DECISION_TYPE_NAVIGATION_ACTION:
+        {
+			WebKitNavigationAction* action = webkit_navigation_policy_decision_get_navigation_action(
+				WEBKIT_NAVIGATION_POLICY_DECISION(decision));
+			WebKitURIRequest* request = webkit_navigation_action_get_request(action);
+
+			const char* uri = webkit_uri_request_get_uri(request);
+
+			if(g_str_has_prefix(uri, "file://"))
+			{
+				printf("filePath : %s\n", uri);
+				webkit_policy_decision_ignore(decision);
+				int nTotalLen = strlen(uri);
+				((WebWindow*)SelfThis)->InvokeDragNDropChangedCallback(uri, nTotalLen);
+				
+				return FALSE;
+			}
+			break;
+		}
+    case WebKitPolicyDecisionType::WEBKIT_POLICY_DECISION_TYPE_NEW_WINDOW_ACTION:
+        //WebKitNavigationPolicyDecision *navigation_decision = WEBKIT_NAVIGATION_POLICY_DECISION (decision);
+        /* Make a policy decision here. */
+		
+        break;
+    case WebKitPolicyDecisionType::WEBKIT_POLICY_DECISION_TYPE_RESPONSE:
+        //WebKitResponsePolicyDecision *response = WEBKIT_RESPONSE_POLICY_DECISION (decision);
+        /* Make a policy decision here. */
+		
+        break;
+    default:
+        /* Making no decision results in webkit_policy_decision_use(). */
+        return FALSE;
+    }
+    return TRUE;
 }
 
 gboolean loadFailedWithTLSerrors(WebKitWebView* web_view,
@@ -466,6 +507,10 @@ void WebWindow::ClipTypeSelect(int groupID)
 void WebWindow::ClipFirstSendTypeText(int groupID)
 {
 	m_mapBoolClipSendTextFirst[groupID] = true;
+}
+void WebWindow::SetDragNDropFilePath()
+{
+	
 }
 
 void WebWindow::WaitForExit()

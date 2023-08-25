@@ -166,6 +166,10 @@ extern "C"
 	{
 		instance->SetURLChangedCallback(callback);
 	}
+	EXPORTED void WebWindow_SetDragNDropCallback(WebWindow* instance, DragNDropCallback callback)
+	{
+		instance->SetDragNDropCallback(callback);
+	}
 	
 	EXPORTED void WebWindow_RegClipboardHotKey(WebWindow* instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
 	{
@@ -254,6 +258,10 @@ extern "C"
 	EXPORTED void WebWindow_SetClipBoardSendFlag(WebWindow* instance, int groupID)
 	{
 		instance->SetClipBoardSendFlag(groupID);
+	}
+	EXPORTED void WebWindow_SetDragNDropFilePath(WebWindow* instance)
+	{
+		instance->SetDragNDropFilePath();
 	}
 }
 
