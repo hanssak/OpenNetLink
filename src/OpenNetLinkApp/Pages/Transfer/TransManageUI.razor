@@ -1139,7 +1139,17 @@
                 maxDownloadCount = 1;
             }
             else
+            {
+                if(tData.expiredDate == "0001-01-01")
+                {
+                    if(!string.IsNullOrEmpty(sgLoginData.GetSystemPeriod()) && sgLoginData.GetSystemPeriod() != "0")
+                    {
+                        DateTime requestTime = Convert.ToDateTime(tData.RequestTime);
+                        tData.expiredDate = requestTime.AddDays(Convert.ToInt64(sgLoginData.GetSystemPeriod())).ToString("yyyy-MM-dd");
+                    }
+                }
                 maxDownloadCount = sgLoginData.GetMaxDownCount();
+            }
 
 
             tData.isPossibleDownload = GetIsPossibleDownLoad(tData, isInner, maxDownloadCount, nowDate, groupId, isManualDownLoad, isForwardAutoDown);
