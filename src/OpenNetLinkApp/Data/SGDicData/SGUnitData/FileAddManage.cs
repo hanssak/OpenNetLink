@@ -1666,6 +1666,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             else
                 return false;
         }
+
+
+        /// <summary>
+        /// bMode : TRUE - 특수문자를 변경해서 전달 , FALSE - 변경된 문자 원래 특수문자로 변경
+        /// </summary>
+        /// <param name="bMode"></param>
+        /// <param name="strFileName"></param>
+        /// <returns></returns>
         public string GetFileRename(bool bMode, string strFileName)
         {
 
