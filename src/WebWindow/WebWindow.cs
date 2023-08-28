@@ -92,6 +92,7 @@ namespace WebWindows
         CHECK_VIRUS,
         SKIPFILE_REJECT_APPR,
         SKIPFILE_CONFIRM_APPR,
+        MAIL_SECURE_APPR
     }
 
     public enum CLIPTYPE : int
@@ -178,6 +179,7 @@ namespace WebWindows
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RecvClipBoardCallback(int nGroupId);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RequestedNavigateURLCallback(IntPtr uriMem, int uriLength);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void URLChangedCallback(IntPtr uriMem, int uriLength);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void DragNDropCallback(IntPtr filePathMem, int filePathLength);
 
         const string DllName = "WebWindow.Native";
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern IntPtr WebWindow_register_win32(IntPtr hInstance);
@@ -212,6 +214,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetRecvClipBoardCallback(IntPtr instance, RecvClipBoardCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetRequestedNavigateURLCallback(IntPtr instance, RequestedNavigateURLCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetURLChangedCallback(IntPtr instance, URLChangedCallback callback);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetDragNDropCallback(IntPtr instance, DragNDropCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_RegClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UnRegClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 
@@ -221,6 +224,8 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_FolderOpen(IntPtr instance, string strFileDownPath);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetDragNDropFilePath(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardData(IntPtr instance, int nGroupID, int nType, int nClipSize, byte[] data);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardSendFlag(IntPtr instance, int groupID);
@@ -331,6 +336,10 @@ namespace WebWindows
             _gcHandlesToFree.Add(GCHandle.Alloc(onURLChangedDelegate));
             WebWindow_SetURLChangedCallback(_nativeWebWindow, onURLChangedDelegate);
 
+            var onDragNDropDelegate = (DragNDropCallback)OnDragNDrop;
+            _gcHandlesToFree.Add(GCHandle.Alloc(onDragNDropDelegate));
+            WebWindow_SetDragNDropCallback(_nativeWebWindow, onDragNDropDelegate);
+
             // Auto-show to simplify the API, but more importantly because you can't
             // do things like navigate until it has been shown
             Show();
@@ -366,6 +375,8 @@ namespace WebWindows
         }
 
         public void WinOnHotKey(int groupID) => WebWindow_OnHotKey(_nativeWebWindow, groupID);
+
+        public void SetDragNDropFilePath() => WebWindow_SetDragNDropFilePath(_nativeWebWindow);
 
         public void UseClipBoardSelect(int groupID) => WebWindow_UseClipSelect(_nativeWebWindow, groupID);
 
@@ -744,6 +755,9 @@ namespace WebWindows
 
         private void OnURLChanged(IntPtr uriMem, int uriLength) => URLChanged?.Invoke(this, new List<object>() { uriMem, uriLength });
         public event EventHandler<List<object>> URLChanged;
+
+        private void OnDragNDrop(IntPtr filePathMem, int filePathLength) => DragNDrop?.Invoke(this, new List<object>() { filePathMem, filePathLength });
+        public event EventHandler<List<object>> DragNDrop;
 
         public void GenerateHotKey(bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_GenerateHotKey(_nativeWebWindow, bAlt, bControl, bShift, bWin, chVKCode);
         public void RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_RegClipboardHotKey(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode);

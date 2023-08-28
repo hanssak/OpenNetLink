@@ -12,6 +12,9 @@ namespace OpenNetLinkApp.Models.SGConfig
 {
     public class SGopConfig : ISGopConfig
     {
+        //공통 기능
+        public bool PocMode { get; set; } = false;                                    //POC여부(첫 실행 시 IP 정보 입력 및 IP전환 기능 활성화)
+
         //로그인 관련 기능
         public bool bUseAppLoginType { get; set; } = false;                         //사용자 지정 로그인타입 사용 여부
         public int LoginType { get; set; } = 0;                                   //사용자 지정 로그인타입 지정
@@ -45,6 +48,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseNetOverAllsend { get; set; } = false;                        //3망 전송에서 전체 사용자에게 보내는 기능 사용유무
         public bool bFileDownloadBeforeReciving { get; set; } = false;              //파일포워드 사용시 PC 미수신한 상태에서도 다운로드 가능 유무
         public bool bNoApproveManageUI { get; set; } = false;                             // 결재관리 No사용 유무 ( true : 결재관리UI / NoTi 없어짐, false : 기존설정대로사용 )
+
+        public bool bUseApproveManageUIForce { get; set; } = false;                       // 결재UI 서버 결재 사용과 상관없이 무조건 보이게 설정
         public bool bEmptyfileTrans { get; set; } = false;                                      // 0kb 파일 송수신 가능 유무
         public bool bTitleDescSameChk { get; set; } = false;                                // 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부
         public bool bApprLineChkBlock { get; set; } = true;                         // 고정 결재라인 사용 시 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
@@ -68,7 +73,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileForwardDownNotRecv { get; set; } = true;                         // 파일 수신되기전에 파일포워드로 다운로드 가능유무
         public string strInitTransferFileExplorerPathInWindow { get; set; } = "";//전송화면에서 초기 표시할 기본 경로 ("ROOT" / 명시된 경로 / "")       
 
-        public bool bUiDlpShow { get; set; } = false;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
+        public bool bUiDlpShow { get; set; } = true;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
         public bool bUiFileExpiredDateShow { get; set; } = true;  // 전송관리 화면에서 파일 만료일 표시 여부
         //클립보드
 
@@ -88,7 +93,10 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         //메일
         public bool bUseEmail { get; set; } = false;               // 메일 관리/결재 사용 유무.
+
+        public bool bUseEmailOnly { get; set; } = false;               // 메일 관리/결재 만 사용하는 UI 사용 유무.
         
+
         //URL Redirection (URL 반대망 전송)
         //public bool bURLAutoTrans { get; set; } = false;                               // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
         public bool bUseURLRedirectionAlarm { get; set; } = false;                               // URL 자동전환 알림 사용 유무(환경설정)

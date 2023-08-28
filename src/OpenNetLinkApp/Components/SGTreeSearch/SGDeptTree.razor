@@ -16,9 +16,9 @@
     {
         <div class="d-inline-flex  w-100 mb-2 " style="height:29px;">
             <label class="p-1">@strDept</label>                                                       <!--부서-->
-            <input type="text" class="form-control col-md-3" @onkeyup="HandleKeyEvent" placeholder="@strDeptPlaceHolder" value="@strInputDept" @oninput="@(e => strInputDept = e.Value.ToString())">
+            <input type="text" class="form-control col-md-3" @onkeyup="HandleKeyEvent" placeholder="@strDeptPlaceHolder" value="@strInputDept" @oninput="@(e => strCurrentInputDept = e.Value.ToString())">
             <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
-            <input type="text" class="form-control col-md-3" @onkeyup="HandleKeyEvent" placeholder="@strNamePlaceHolder" value="@strInputName" @oninput="@(e => strInputName = e.Value.ToString())">
+            <input type="text" class="form-control col-md-3" @onkeyup="HandleKeyEvent" placeholder="@strNamePlaceHolder" value="@strInputName" @oninput="@(e => strCurrentInputName = e.Value.ToString())">
             <div style="flex:1 0 auto"/>    
             <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="callBackSearch"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>  <!--조회-->
     </div>
@@ -82,6 +82,8 @@
 
     string strInputDept = "";
     string strInputName = "";
+    string strCurrentInputDept = "";
+    string strCurrentInputName = "";
 
     string currentSelectKey = "";
 
@@ -142,7 +144,7 @@
             strDown = XmlConf.GetTitle("T_ETC_DOWN");                                   // 아래
             strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
             strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기*@
-        strDeptPlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       // 부서입력
+    strDeptPlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       // 부서입력
         strNamePlaceHolder = XmlConf.GetTitle("T_INPUT_NAME");                       // 이름입력
     }
 
@@ -205,7 +207,12 @@
         strInputDept = selectedDept.DeptName;
         strInputName = "";
 
+        strCurrentInputDept = strInputDept;
+        strCurrentInputName = strInputName;
+
         callBackSearch();
+
+        StateHasChanged();
     }
 
     /// <summary>

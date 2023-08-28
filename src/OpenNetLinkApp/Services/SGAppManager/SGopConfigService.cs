@@ -25,6 +25,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         Dictionary<int, ISGopConfig> AppConfigInfo { get { return GetSGopConfigService(); } }
         Dictionary<int, ISGopConfig> GetSGopConfigService();
 
+        public bool GetPocMode(int groupId);
+
         public bool GetUseAppLoginType(int groupId);
 
         public int GetAppLoginType(int groupId);
@@ -94,6 +96,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetFileDownloadBeforeReciving(int groupId);
 
         public bool GetNoApproveManageUI(int groupId);
+        public bool GetUseApproveManageUIForce(int groupId);
 
         public bool GetEmptyfileTrans(int groupId);
 
@@ -130,6 +133,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseClipTypeSelectSend(int groupId);
         public bool GetUseClipTypeTextFirstSend(int groupId);
         public bool GetUseEmailManageApprove(int groupId);
+
+        public bool GetUseEmailManageApproveOnly(int groupId);
         public bool GetUseUIdlpData(int groupId);
         //public bool GetURLAutoTrans(int groupId);
         public bool GetUseURLRedirectionAlarm(int groupId);
@@ -237,6 +242,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
         }// => ref _AppConfigInfo;
 
+        //private Dictionary<int, ISGopConfig> _AppConfigInfo;
+        ///// <summary>
+        ///// AppOPsetting
+        ///// </summary>
+        //public ref Dictionary<int, ISGopConfig> AppConfigInfo => ref _AppConfigInfo;
+
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGopConfigService>();
 
         private static void LoadFile()
@@ -246,6 +257,101 @@ namespace OpenNetLinkApp.Services.SGAppManager
             hsLog.Delete(7);    // 7일이전 Log들 삭제
 
             List<ISGNetwork> listNetworks = SGNetworkService.NetWorkInfo;
+            using (JsonDocument document = JsonDocument.Parse(jsonString))
+            {
+                JsonElement root = document.RootElement;
+                JsonElement NetWorkElement = root.GetProperty("NETWORKS");
+                //JsonElement Element;
+                foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
+                {
+                    SGNetwork sgNet = new SGNetwork();
+                    string strJsonElement = netElement.ToString();
+                    var options = new JsonSerializerOptions
+                    {
+                        ReadCommentHandling = JsonCommentHandling.Skip,
+                        AllowTrailingCommas = true,
+                        PropertyNameCaseInsensitive = true,
+                    };
+                    sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
+                    listNetworks.Add(sgNet);
+                }
+            }
+            using (JsonDocument document = JsonDocument.Parse(jsonString))
+            {
+                JsonElement root = document.RootElement;
+                JsonElement NetWorkElement = root.GetProperty("NETWORKS");
+                //JsonElement Element;
+                foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
+                {
+                    SGNetwork sgNet = new SGNetwork();
+                    string strJsonElement = netElement.ToString();
+                    var options = new JsonSerializerOptions
+                    {
+                        ReadCommentHandling = JsonCommentHandling.Skip,
+                        AllowTrailingCommas = true,
+                        PropertyNameCaseInsensitive = true,
+                    };
+                    sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
+                    listNetworks.Add(sgNet);
+                }
+            }
+            using (JsonDocument document = JsonDocument.Parse(jsonString))
+            {
+                JsonElement root = document.RootElement;
+                JsonElement NetWorkElement = root.GetProperty("NETWORKS");
+                //JsonElement Element;
+                foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
+                {
+                    SGNetwork sgNet = new SGNetwork();
+                    string strJsonElement = netElement.ToString();
+                    var options = new JsonSerializerOptions
+                    {
+                        ReadCommentHandling = JsonCommentHandling.Skip,
+                        AllowTrailingCommas = true,
+                        PropertyNameCaseInsensitive = true,
+                    };
+                    sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
+                    listNetworks.Add(sgNet);
+                }
+            }
+            using (JsonDocument document = JsonDocument.Parse(jsonString))
+            {
+                JsonElement root = document.RootElement;
+                JsonElement NetWorkElement = root.GetProperty("NETWORKS");
+                //JsonElement Element;
+                foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
+                {
+                    SGNetwork sgNet = new SGNetwork();
+                    string strJsonElement = netElement.ToString();
+                    var options = new JsonSerializerOptions
+                    {
+                        ReadCommentHandling = JsonCommentHandling.Skip,
+                        AllowTrailingCommas = true,
+                        PropertyNameCaseInsensitive = true,
+                    };
+                    sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
+                    listNetworks.Add(sgNet);
+                }
+            }
+            using (JsonDocument document = JsonDocument.Parse(jsonString))
+            {
+                JsonElement root = document.RootElement;
+                JsonElement NetWorkElement = root.GetProperty("NETWORKS");
+                //JsonElement Element;
+                foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
+                {
+                    SGNetwork sgNet = new SGNetwork();
+                    string strJsonElement = netElement.ToString();
+                    var options = new JsonSerializerOptions
+                    {
+                        ReadCommentHandling = JsonCommentHandling.Skip,
+                        AllowTrailingCommas = true,
+                        PropertyNameCaseInsensitive = true,
+                    };
+                    sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
+                    listNetworks.Add(sgNet);
+                }
+            }
 
             if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
                 Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
@@ -373,6 +479,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
         }
 
+        public bool GetPocMode(int groupId)
+        {
+            return AppConfigInfo[groupId].PocMode;
+        }
+
         public bool GetUseAppLoginType(int groupId)
         {
             return AppConfigInfo[groupId].bUseAppLoginType;
@@ -477,6 +588,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetNoApproveManageUI(int groupId)
         {
             return AppConfigInfo[groupId].bNoApproveManageUI;
+        }
+        public bool GetUseApproveManageUIForce(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseApproveManageUIForce;
         }
         public bool GetEmptyfileTrans(int groupId)
         {
@@ -610,6 +725,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseEmail;
         }
+
+        public bool GetUseEmailManageApproveOnly(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseEmailOnly;
+        }
+
         public bool GetUseUIdlpData(int groupId)
         {
             return AppConfigInfo[groupId].bUiDlpShow;

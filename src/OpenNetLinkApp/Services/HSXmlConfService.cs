@@ -18,16 +18,16 @@ namespace OpenNetLinkApp.Services
 
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<XmlConfService>();
         static XmlDocument m_Xml = null;
-        string m_StrLanguage;
+        static string m_StrLanguage = "KR";
         List<ISGNetwork> listNetworks = SGAppManager.SGNetworkService.NetWorkInfo;
-
-
         public XmlConfService()
         {
             //m_Xml = new XmlDocument();
             //LoadXmlFile("wwwroot/conf/HSText.xml");
-            m_StrLanguage = "KR";
+            //m_StrLanguage = "KR";
             // m_StrLanguage = "JP";
+            //listNetworks = new List<ISGNetwork>();
+            //NetWorkJsonLoad();
         }
         ~XmlConfService()
         {
@@ -61,7 +61,11 @@ namespace OpenNetLinkApp.Services
             finally
             {
                 contents.hsClear(3);
-            }          
+            }
+
+            m_StrLanguage = SGAppManager.SGAppConfigService.AppConfigInfo.strLanguage;
+            if (string.IsNullOrEmpty(m_StrLanguage))
+                m_StrLanguage = "KR";
         }
 
         public string GetCommon(string strID)
@@ -193,6 +197,22 @@ namespace OpenNetLinkApp.Services
 
             str1 = str1 + " → " + str2;
             return str1;
+        }
+
+        public string[] GetMonthNamesGroup()
+        {
+            string group = GetTitle("T_DATAPICKER_MONTH_GROUP");
+            return group.Split(",");
+        }
+        public string[] GetDayNamesGroup()
+        {
+            string group = GetTitle("T_DATAPICKER_DAY_GROUP");
+            return group.Split(",");
+        }
+        public string[] GetDayMinNamesGroup()
+        {
+            string group = GetTitle("T_DATAPICKER_DAY_MIN_GROUP");
+            return group.Split(",");
         }
     }
 }

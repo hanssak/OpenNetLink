@@ -29,10 +29,12 @@ All rights reserved. -->
     [Parameter] public ISGFooterUIService FooterUISvc { get; set; }
     [Parameter] public ISGAppConfigService AppConfigSvc { get; set; }
     [Parameter] public ISGVersionConfigService VersionConfigSvc { get; set; }
+    [Parameter] public XmlConfService XmlConfSvc { get; set; }
 
     private string GetCorpName()
     {
-        return FooterUISvc.Footer.CorpName;
+        return XmlConfSvc.GetTitle("T_CORPERATION_NAME");
+        @*return FooterUISvc.Footer.CorpName;*@
     }
 
     private List<string> GetAddress()

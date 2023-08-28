@@ -13,6 +13,6 @@ if [[ $2 == "TRUE" ]]; then
     mv $PKG_NAME"_$1_amd64.deb" "OpenNetLink-Debian-$1.deb"
 else
     #for setup
-    mv $PKG_NAME"_$1_amd64.deb" "[$4] OpenNetLink_"$3"_Debian_"$1".deb"
+    mv $PKG_NAME"_$1_amd64.deb" "[$4] OpenNetLink_"$6"_"$3"_Debian_"$1".deb"
 fi
 

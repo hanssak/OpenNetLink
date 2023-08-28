@@ -600,11 +600,6 @@
         {
             jsRuntime.InvokeAsync<object>("initPageLeft");
 
-            @*object[] param = { "datepicker5", "datepicker6" };
-                jsRuntime.InvokeAsync<object>("initDatePicker", param);
-                jsRuntime.InvokeAsync<object>("initApproveUIPosition");
-            *@
-
             if (menuMode == 1)
             {
                 refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));

@@ -792,7 +792,37 @@ void WebWindow::AttachWebView()
 								_webMessageReceivedCallback(message.get());
 								return S_OK;
 							}).Get(), &webMessageToken);
+						EventRegistrationToken webNewWindowRequested;
+						_webviewWindow->add_NewWindowRequested(Callback<ICoreWebView2NewWindowRequestedEventHandler>(
+							[this](ICoreWebView2* sender, ICoreWebView2NewWindowRequestedEventArgs* args)
+							{
+								wil::unique_cotaskmem_string uri;
+								
+								args->put_Handled(TRUE);
+								if (args->get_Uri(&uri) == S_OK)
+								{
+									BYTE* bUri;
+									wchar_t* wclpstr = (wchar_t*)uri.get();
+									size_t len = wcslen(wclpstr);
+									len = (len + 2) * sizeof(wchar_t);
+									len *= 2;
 
+									BYTE** ppData = NULL;
+									ppData = &bUri;
+									*ppData = new BYTE[len];
+
+									memset(*ppData, 0x00, len);
+									int unicodeLen = (int)wcslen(wclpstr);
+									int lenDe = WideCharToMultiByte(CP_UTF8, 0, wclpstr, unicodeLen, NULL, 0, NULL, NULL);
+									WideCharToMultiByte(CP_UTF8, 0, wclpstr, unicodeLen, (char*)*ppData, lenDe, NULL, NULL);
+
+									//WidecodeToUtf8(wclpstr, (char*)*ppData);
+									int nTotalLen = strlen((char*)*ppData);
+									((WebWindow*)SelfThis)->InvokeDragNDropChangedCallback(bUri, nTotalLen);
+								}
+								return S_OK;
+							}
+						).Get(), &webNewWindowRequested);
 						EventRegistrationToken webResourceRequestedToken;
 						_webviewWindow->AddWebResourceRequestedFilter(L"*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL);
 						_webviewWindow->add_WebResourceRequested(Callback<ICoreWebView2WebResourceRequestedEventHandler>(
@@ -838,6 +868,7 @@ void WebWindow::AttachWebView()
 						_webviewWindow->add_NavigationStarting(Callback<ICoreWebView2NavigationStartingEventHandler>(
 							[this](ICoreWebView2* sender, ICoreWebView2NavigationStartingEventArgs* args)
 							{
+								NTLog(SelfThis, Info, "WebWindow::NavigationStarting : ");
 								wil::unique_cotaskmem_string uri;
 								//WCHAR wUrlData[2 * 1024] = { 0, };
 								if (args->get_Uri(&uri) == S_OK)
@@ -868,7 +899,6 @@ void WebWindow::AttachWebView()
 								return S_OK;
 							}
 						).Get(), &webNavigationStarting);
-
 						RefitContent();
 
 						flag.clear();
@@ -1133,6 +1163,10 @@ void WebWindow::ClipTypeSelect(int groupID)
 void WebWindow::ClipFirstSendTypeText(int groupID)
 {
 	m_mapBoolClipSendTextFirst[groupID] = true;
+}
+void WebWindow::SetDragNDropFilePath()
+{
+
 }
 
 void WebWindow::ClipMemFree(int groupID)

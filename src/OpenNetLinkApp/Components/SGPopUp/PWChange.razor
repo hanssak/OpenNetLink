@@ -103,7 +103,7 @@
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<PWChange>();
 
     CsPasswdValidCheckfunc objCheckPWstring = new CsPasswdValidCheckfunc();
-
+    bool bEmailUseOnly = false;
 
     //[Parameter]
     //public EventCallback<int> goToPage { get; set; }
@@ -198,6 +198,9 @@
     {
         object[] param = { Guid };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
+
+        if (nGroupID > -1)
+            bEmailUseOnly = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApproveOnly(nGroupID);
     }
 
 
@@ -496,6 +499,10 @@
                     else
                         strNavigateWithGroupID = "/Transfer/";
                 }
+
+                if (bEmailUseOnly)
+                    strNavigateWithGroupID = "/Welcome/";  // 설정에 상관없도록
+
                 strNavigateWithGroupID += groupID.ToString();
                 MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
@@ -548,6 +555,10 @@
                 else
                     strNavigateWithGroupID = "/Transfer/";
             }
+
+            if (bEmailUseOnly)
+                strNavigateWithGroupID = "/Welcome/";  // 설정에 상관없도록
+
             strNavigateWithGroupID += groupID.ToString();
 
             if (sgLoginData == null || sgUserData == null)
@@ -621,6 +632,13 @@
 
         if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
+
+            if (bEmailUseOnly)
+            {
+                strNavigateWithGroupID = "/Welcome/";  // 설정에 상관없도록
+                strNavigateWithGroupID += groupID.ToString();
+            }
+
             MyNavigationManager.NavigateTo(strNavigateWithGroupID);
             MoveSiderBarFocusTogroupid();
             //if (AppConfigSvc.GetStartTrayMove())
@@ -739,6 +757,10 @@
                     else
                         strNavigateWithGroupID = "/Transfer/";
                 }
+
+                if (bEmailUseOnly)
+                strNavigateWithGroupID = "/Welcome/";  // 설정에 상관없도록
+
                 strNavigateWithGroupID += groupID.ToString();
                 MyNavigationManager.NavigateTo(strNavigateWithGroupID);
             }

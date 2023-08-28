@@ -262,9 +262,9 @@
                     @GetMainPageTypeStr()
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenu3" style="min-width:85px">
-                    <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.NONE))">초기값</button>
-                    <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.DASHBOARD))">대시보드</button>
-                    <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.TRANSFER))">파일전송</button>
+                    <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.NONE))">@XmlConf.GetTitle("T_PAGE_TYPE_INIT")</button>
+                    <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.DASHBOARD))">@XmlConf.GetTitle("T_PAGE_TYPE_DASHBOARD")</button>
+                    <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.TRANSFER))">@XmlConf.GetTitle("T_PAGE_TYPE_TRNASFER")</button>
                 </div>
             </div>
         </div>
@@ -972,7 +972,8 @@
     //페이지 타입 String
     private string GetMainPageTypeStr()
     {
-        return Common.CsFunction.GetEnumDescription(SGAppMgrSvc.AppConfigInfoService.GetMainPageType());
+        string title =Common.CsFunction.GetEnumDescription(SGAppMgrSvc.AppConfigInfoService.GetMainPageType());
+        return XmlConf.GetTitle(title);
     }
 
     private bool GetClipCopyAutoSend()
@@ -1648,9 +1649,8 @@
     }
     private void SetLanguage(string value)
     {
-        string language = value;//Convert.ToString(changeEventArg.Value);
-        CLog.Here().Information($"Language Set: [{language}]");
-        CtrlSideUISvc.SetLanguage(language);
+        EventHandler<string> change = HsCmdCenter.sgPageEvent.GetChangeLanguageEvent();
+         change(null, value);
     }
     //private void SetScreenLock(ChangeEventArgs changeEventArg)
     //{

@@ -1,4 +1,5 @@
 {
+  "PocMode": false,
   "LoginType": 0,
   "bApprCompleteAlarmRetain": false,
   "bApprCountAlarmRetain": false,
@@ -15,6 +16,7 @@
   "bFileRecvAlarmRetain": false,
   "bManualDownFolderChange": false,
   "bNoApproveManageUI": false,
+  "bUseApproveManageUIForce": false,
   "bRFileAutoSend": false,
   "bRecvFolderChange": false,
   "bShowAdminInfo": false,
@@ -43,6 +45,7 @@
   "bUseCrossPlatformOSforFileName": false,
   "bUseDenyPasswordZip": true,
   "bUseEmail": false,
+  "bUseEmailOnly": false,
   "bUseFileApproveReason": false,
   "bUseFileCheckException": false,
   "bUseFileClipApproveUI": false,

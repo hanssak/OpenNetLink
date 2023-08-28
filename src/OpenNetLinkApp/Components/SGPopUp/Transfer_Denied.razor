@@ -226,7 +226,7 @@
 
             if (listFileErrorLevel[i].eErrType != eFileAddErr.eFANone)
             {
-                strReason = listFileErrorLevel[i].GetFileAddErrContent(strFileName, listFileErrorLevel[i].eErrType);
+                strReason = listFileErrorLevel[i].GetFileAddErrContent(strFileName, listFileErrorLevel[i].eErrType, listFileErrorLevel[i].MimeType);
                 CLog.Here().Information($"### - 파일추가 실패 원인(추가한파일-Depth:{nDepth}) - FileAddErr : {listFileErrorLevel[i].eErrType}, " +
                     $"ParentFileName : {listFileErrorLevel[i].ParentFileName}, FileName : {listFileErrorLevel[i].FileName}, Reason : {strReason}");
             }

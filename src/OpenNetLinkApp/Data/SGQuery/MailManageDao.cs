@@ -8,7 +8,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 {
     class MailManageDao
     {
-		public string MailDetail(string seq)
+		public string MailDetail(string seq, bool bUseSfm2 = false)
         {
 			Dictionary<string, string> param = new Dictionary<string, string>() {
 				{ "seq", seq }

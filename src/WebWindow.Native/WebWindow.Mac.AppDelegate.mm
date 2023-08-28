@@ -11,13 +11,18 @@
     if (self = [super init]) {
         // allocate and initialize window and stuff here ..
     }
-
     return self;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
     [window makeKeyAndOrderFront:nil];
     [NSApp activateIgnoringOtherApps:YES];
+    //[window registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, nil]];
+    //[NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskLeftMouseUp handler:^NSEvent * (NSEvent * theEvent) {
+    //    NSPasteboard* pb = [NSPasteboard pasteboardWithName:NSDragPboard];
+    //    NSLog(@"%@", [pb propertyListForType:NSFilenamesPboardType]);
+    //    return theEvent;
+    //}];
     NSLog(@"applicationDidFinishLaunching");
     NTLog(SelfThis, Info, "!! ----- aLaucgubg");
     // Show extensions, if FinderUtilities is not approved
@@ -58,6 +63,8 @@
     NSLog(@"Will terminate....");
     return ;
 }
+
+
 
 - (BOOL)windowShouldClose:(NSWindow *)sender {
 
@@ -232,7 +239,13 @@
                 [img drawInRect:newImageRect];
                 [newImage unlockFocus];
 
-                pClipData = [newImage TIFFRepresentation];
+                [newImage lockFocus];
+                NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, newImage.size.width, newImage.size.height)];
+                [newImage unlockFocus];
+                
+                [newImage addRepresentation:rep];
+                pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
+                //pClipData = [newImage TIFFRepresentation];
                 NSLog(@"copy image\n");
                 ((WebWindow*)(SelfThis))->InvokeClipBoard([nsNumbGuId intValue], nDataType, pClipData.length, (const char*)[pClipData bytes], 0, nullptr); 
             }
@@ -274,7 +287,13 @@
                 [img drawInRect:newImageRect];
                 [newImage unlockFocus];
 
-                pClipData = [newImage TIFFRepresentation];
+                [newImage lockFocus];
+                NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, newImage.size.width, newImage.size.height)];
+                [newImage unlockFocus];
+                
+                [newImage addRepresentation:rep];
+
+                pClipData = [rep representationUsingType:NSBitmapImageFileTypeBMP properties:@{NSImageInterlaced: @NO}];
                 NSLog(@"copy image\n");
 
                 std::string strClipText;

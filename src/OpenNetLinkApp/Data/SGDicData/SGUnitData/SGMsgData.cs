@@ -42,7 +42,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eAlarmApprConfirm,                    // [승인완료]
         eAlarmApprReject,                     // [반려완료]
         eAlarmLogin,                           // [로그인]
-        eAlarmLogout                            // [로그아웃]
+        eAlarmLogout,                            // [로그아웃]
+        eAlarmEMailSecureApprWait            // [메일보안승인대기]
+
     }
     public class BoardItem
     {
@@ -71,12 +73,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public string getTypeTag()
         {
+            XmlConfService xmlSrv = new XmlConfService();
+
             if (ItemType == 1)
-                return @"<span class='notify_1'>[알람]</span>";
+                return string.Format(@"<span class='notify_1'>{0}</span>", xmlSrv.GetTitle("T_MESSAGE_TAG_ALARM_NAEM"));
             else if (ItemType == 2)
-                return @"<span class='message_1'>[메시지]</span>";
-            else 
-                return @"<span class='notice_1'>[공지]</span>";
+                return string.Format(@"<span class='message_1'>{0}</span>", xmlSrv.GetTitle("T_MESSAGE_TAG_MSG_NAME"));
+            else
+                return string.Format(@"<span class='notice_1'>{0}</span>", xmlSrv.GetTitle("T_MESSAGE_TAG_NOTIFY_NAME"));
         }
 
         public string getNewTag()
@@ -300,6 +304,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     sidebar = LSIDEBAR.MENU_CATE_FILE;
                     break;
                 case OS_NOTI.MAIL_APPR:                                     // 메일결재 승인대기
+                case OS_NOTI.MAIL_SECURE_APPR:                                     // 메일결재 승인대기
                     sidebar = LSIDEBAR.MENU_CATE_MAIL;
                     break;
                 default:
@@ -328,6 +333,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     break;
                 case OS_NOTI.MAIL_APPR:                                     // 메일결재 승인대기
                     eAType = eAlarmType.eAlarmEMailApprWait;
+                    break;
+                case OS_NOTI.MAIL_SECURE_APPR:                                     // 메일 보안결재 승인대기
+                    eAType = eAlarmType.eAlarmEMailSecureApprWait;
                     break;
                 case OS_NOTI.CONFIRM_APPR:                                  // 승인완료
                     eAType = eAlarmType.eAlarmApprConfirm;
@@ -372,6 +380,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     break;
                 case eAlarmType.eAlarmEMailApprWait:
                     strTitle = xconf.GetTitle("T_ALARM_EMAILAPPRWAIT");         // 메일결재 승인대기
+                    break;
+                case eAlarmType.eAlarmEMailSecureApprWait:
+                    strTitle = xconf.GetTitle("T_ALARM_EMAILSECUREAPPRWAIT");         // 메일 보안결재 승인대기
                     break;
                 case eAlarmType.eAlarmApprConfirm:
                     strTitle = xconf.GetTitle("T_ALARM_APPRCONFIRM");           // 결재 승인 완료

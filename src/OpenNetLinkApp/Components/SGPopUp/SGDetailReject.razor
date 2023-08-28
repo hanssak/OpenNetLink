@@ -5,7 +5,7 @@
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
             <div class="modal-header-default">
-                <div class="modal-title"><i class="fas fa-ban mr-2 blue-txt"></i>반려사유</div>
+                <div class="modal-title"><i class="fas fa-ban mr-2 blue-txt"></i>@XmlConf.GetTitle("T_APPROVE_REJECTREASON")</div>
                 <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>-->
@@ -22,8 +22,8 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer-default">
-                <button @onclick="closeOK" type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-0  float-right">확인</button>               <!--확인-->
-                <button @onclick="closeCancel" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">취소</button>          <!--취소-->
+                <button @onclick="closeOK" type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-0  float-right">@XmlConf.GetTitle("T_COMMON_OK")</button>               <!--확인-->
+                <button @onclick="closeCancel" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">@XmlConf.GetTitle("T_COMMON_CANCEL")</button>          <!--취소-->
             </div>
         </div>
         <!-- /.modal-content -->

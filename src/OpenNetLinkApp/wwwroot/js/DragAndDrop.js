@@ -39,13 +39,13 @@ window.loginCursorChange = () => {
 
 }
 
-window.initCapaChart = (nUse, nRest) => {
+window.initCapaChart = (nUse, nRest, usedLabel, remainLabel, usedPercentLabel ) => {
 
     var capaChartData = {
-        labels: ['사용량', '남은용량'],
+        labels: [usedLabel, remainLabel],
         datasets: [
             {
-                label: '사용량',
+                label: usedLabel,
                 backgroundColor: ['#13bef5', '#dfdfdf', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de'],
                 data: [nUse, nRest]
             }
@@ -77,7 +77,7 @@ window.initCapaChart = (nUse, nRest) => {
                     meta.data.forEach(function (bar, index) {
                         var data = parseInt((dataset.data[0] * 100) / (dataset.data[0] + dataset.data[1]));
                         if (index == 0)
-                            ctx.fillText(data + "% 사용중", bar._model.x, bar._model.y + 5);
+                            ctx.fillText(data + "% " + usedPercentLabel, bar._model.x, bar._model.y + 5);
                     });
                 });
             }
@@ -516,19 +516,19 @@ function setDropzonSize() {
     var divDropFileHeight = $("#divDropFile").css("height");
     var divDropFileHeightint = parseInt(divDropFileHeight.replace("px", ""));
     var divDropzoneTableHeight = $("#DropzoneTable").css("height");
-    if (divDropzoneTableHeight != null) {
+    //if (divDropzoneTableHeight != null) {
 
-        var divDropzoneTableHeightint = parseInt(divDropzoneTableHeight.replace("px", ""))
-        if (divDropFileHeightint >= divDropzoneTableHeightint) {
-            $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
-        }
-        else {
-            $('#fileInputTrans').css("height", divDropzoneTableHeight);
-        }
-    }
-    else {
-        $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
-    }
+    //    var divDropzoneTableHeightint = parseInt(divDropzoneTableHeight.replace("px", ""))
+    //    if (divDropFileHeightint >= divDropzoneTableHeightint) {
+    //        $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
+    //    }
+    //    else {
+    //        $('#fileInputTrans').css("height", divDropzoneTableHeight);
+    //    }
+    //}
+    //else {
+    //    $('#fileInputTrans').css("height", divDropFileHeightint - 2 + "px");
+    //}
 }
 
 window.appendHtml = (id, val) => {
@@ -825,6 +825,13 @@ window.closeAllPopup = () => {
     $("#ViewDetail_PopUp").modal("hide");
     $("#ClipboardApprovePopUp").modal("hide");
     $("#ClipboardManagePopUp").modal("hide");
+
+    $("#modal-ipchange-mainloading").modal("hide");
+    $("#modal-ipchange-header").modal("hide");
+    $("#modal-alert-header-ipchange").modal("hide"); 
+    $("#modal-alert-header-language").modal("hide");
+    
+    
 }
 
 window.initTransferUIPosition = () => {
@@ -842,18 +849,18 @@ window.initTransManageUIPosition = () => {
     $("#selectTransKindValue").css("top", "0px");
 }
 
-window.initDatePicker = (sId, eId) => {
+window.initDatePicker = (sId, eId, monthGroup, dayMinGroup, dayGroup) => {
     $("#" + sId).datepicker({
-        monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-        dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
-        dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+        monthNames: monthGroup,//['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+        dayNamesMin: dayMinGroup,//['일', '월', '화', '수', '목', '금', '토'],
+        dayNames: dayGroup,//['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
         autoclose: true,
         dateFormat: 'yy-mm-dd'
     })
     $("#" + eId).datepicker({
-        monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-        dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
-        dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+        monthNames: monthGroup,//['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+        dayNamesMin: dayMinGroup,//['일', '월', '화', '수', '목', '금', '토'],
+        dayNames: dayGroup,//['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
         autoclose: true,
         dateFormat: "yy-mm-dd"
     })
@@ -1439,7 +1446,7 @@ window.preventDragStart = () => {
         e = e || event;
         if (e.target.id.indexOf("fileInput") == -1) {
             // check which element is our target 
-            e.preventDefault();
+            //e.preventDefault();
         }
     }, false);
 }
@@ -1449,7 +1456,7 @@ window.preventDrop = () => {
         e = e || event;
         if (e.target.id.indexOf("fileInput") == -1) {
             // check which element is our target 
-            e.preventDefault();
+            //e.preventDefault();
         }
     }, false);
 }

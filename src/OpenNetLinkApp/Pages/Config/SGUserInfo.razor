@@ -44,9 +44,8 @@
                                 </div>
                                 <table class="table_set1">
                                     <colgroup>
-                                        <col width="15%">
-                                        <col width="">
-                                        <col width="35%">
+                                        <col width="22%">
+                                        <col width="78%">
                                     </colgroup>
                                     <tr>
                                         <th>@XmlConf.GetTitle("T_COMMON_USER_NAME")</th>
@@ -54,7 +53,7 @@
                                             @(GetUserInfo()?.UserName) &nbsp;&nbsp;&nbsp;
                                             @if (pageService.GetGroupIDLoginType(groupIDbyParam) != eLoginType.eLOGINTYPE_AD && SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupIDbyParam))
                                             {
-                                                <button type="button" class="btn bg-gradient-secondary btn-xs col-md-3" @onclick="openPWChangePopUp">@XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</button>
+                                                <button type="button" class="btn bg-gradient-secondary btn-xs col-md-3" style="width:500px;" @onclick="openPWChangePopUp">@XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</button>
                                             }
                                         </td>
                                         <!-- <td rowspan="4" class="p-0 text-center align-middle">
@@ -87,10 +86,10 @@
                                     <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleApvRight </div>
                                     <table class="table_set1">
                                         <colgroup>
-                                            <col width="15%">
-                                            <col width="35%">
-                                            <col width="15%">
-                                            <col width="35%">
+                                            <col width="22%">
+                                            <col width="28%">
+                                            <col width="22%">
+                                            <col width="28%">
                                         </colgroup>
                                         <tr>
                                             <th>@stTitleApvRight</th>
@@ -105,10 +104,10 @@
                                         <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleTransDayLimit</div>
                                         <table class="table_set1">
                                             <colgroup>
-                                                <col width="15%">
-                                                <col width="35%">
-                                                <col width="15%">
-                                                <col width="35%">
+                                                <col width="22%">
+                                                <col width="28%">
+                                                <col width="22%">
+                                                <col width="28%">
                                             </colgroup>
                                             <tr>
                                                 <th>@stTitleTransCountLimit</th>
@@ -122,10 +121,10 @@
                                             <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleDayClipboardMaxSize</div>
                                             <table class="table_set1">
                                                 <colgroup>
-                                                    <col width="15%">
-                                                    <col width="35%">
-                                                    <col width="15%">
-                                                    <col width="35%">
+                                                    <col width="22%">
+                                                    <col width="28%">
+                                                    <col width="22%">
+                                                    <col width="28%">
                                                 </colgroup>
                                                 <tr>
                                                     <th>@stTitleTransCountLimit</th>
@@ -308,29 +307,47 @@
         int nCount = 0;
         Int64 nSize = 0;
 
-        nCount = sgLoginData.GetDayFileTransferLimitCount();
-        if (nCount > 0)
-            strDataDayFileTransMaxCount = String.Format(XmlConf.GetInfoMsg("I_0130"), nCount);
-        else
-            strDataDayFileTransMaxCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
 
-        nSize = sgLoginData.GetDayFileTransferLimitSize();
-        if (nSize > 0)
-            strDataDayFileTransMaxSize = String.Format(XmlConf.GetTitle("T_INFO_LIMMIT_SIZE"), nSize);
-        else
-            strDataDayFileTransMaxSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
+        if (sgLoginData.GetFileTrans())
+        {
+            nCount = sgLoginData.GetDayFileTransferLimitCount();
+            if (nCount > 0)
+                strDataDayFileTransMaxCount = String.Format(XmlConf.GetInfoMsg("I_0130"), nCount);
+            else
+                strDataDayFileTransMaxCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
 
-        nCount = sgLoginData.GetDayClipboardLimitCount();
-        if (nCount > 0)
-            strDataDayClipboardMaxCount = String.Format(XmlConf.GetInfoMsg("I_0130"), nCount);                                      // 2000개까지 전송
+            nSize = sgLoginData.GetDayFileTransferLimitSize();
+            if (nSize > 0)
+                strDataDayFileTransMaxSize = String.Format(XmlConf.GetTitle("T_INFO_LIMMIT_SIZE"), nSize);
+            else
+                strDataDayFileTransMaxSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
+        }
         else
-            strDataDayClipboardMaxCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
+        {
+            strDataDayFileTransMaxCount = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");
+            strDataDayFileTransMaxSize = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");
+        }
 
-        nSize = sgLoginData.GetDayClipboardLimitSize();
-        if (nSize > 0)
-            strDataDayClipboardMaxSize = String.Format(XmlConf.GetTitle("T_INFO_LIMMIT_SIZE"), nSize);                                 // 15,000MB까지 전송
+        if (sgLoginData.GetClipboard())
+        {
+
+            nCount = sgLoginData.GetDayClipboardLimitCount();
+            if (nCount > 0)
+                strDataDayClipboardMaxCount = String.Format(XmlConf.GetInfoMsg("I_0130"), nCount);                                      // 2000개까지 전송
+            else
+                strDataDayClipboardMaxCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
+
+            nSize = sgLoginData.GetDayClipboardLimitSize();
+            if (nSize > 0)
+                strDataDayClipboardMaxSize = String.Format(XmlConf.GetTitle("T_INFO_LIMMIT_SIZE"), nSize);                                 // 15,000MB까지 전송
+            else
+                strDataDayClipboardMaxSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
+        }
         else
-            strDataDayClipboardMaxSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
+        {
+            strDataDayClipboardMaxCount = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");
+            strDataDayClipboardMaxSize = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");
+        }
 
         // 확장자 제한 타입
         if (sgLoginData.GetFileFilterType())

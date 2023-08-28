@@ -231,6 +231,28 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strRet;
         }
 
+        /// <summary>
+        /// 대결재(sfm2)에서 실제 승인을 한 승인자 정보를 알려준다.
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetQueryApprName(Dictionary<int, string> dic)
+        {
+            string strApprName = "";
+            if (!dic.ContainsKey(14)) // KKW - 승인자 찾기
+                return "-";
+
+            strApprName = dic[14];
+
+            string strApprStatus = GetApprStaus(dic);
+            string strTempApprStatus1 = xmlConf.GetTitle("T_COMMON_APPROVE");               // 승인
+            string strTempApprStatus2 = xmlConf.GetTitle("T_COMMON_REJECTION");             // 반려
+
+            if ((strApprStatus.Equals(strTempApprStatus1)) || (strApprStatus.Equals(strTempApprStatus2)))
+                return strApprName;
+            else
+                return "-";
+        }
 
         /// <summary>
         /// 결재상태 정보를 반환한다.<br></br>
@@ -541,6 +563,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strTransSeq;
         }
 
+
         /// <summary>
         /// 승인 / 반려가 가능한 항목인지를 검사하는 함수
         /// Return false : 승인/반려불가능, true : 승인/반려가능
@@ -551,6 +574,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             //if (GetRequestCancelChk(dic) != 0)
             //  return false;
+
+            string strApprPossible = "";
+            string strApprStepStatus = "";
 
             string strTransStatus = "";
             string strApprStatus = "";
@@ -566,7 +592,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             strApprStatus = dic[7];                             // 결재상태 (1:승인대기,2:승인,3:반려)
             strApprKind = dic[2];                               // , 결재 데이터 위치 (C:결재테이블, H:결재 이력 테이블)
 
+
+            if (dic.TryGetValue(15, out strApprPossible) != true)   // AND 사전결재, STEP별 결재가능유무 파악 data, 없으면 일단 결재하게 적용
+                strApprPossible = "0";
+
             if (strTransStatus.Equals("C") && strApprStatus.Equals("1"))     // 사용자가 전송취소, 요청취소 
+                return false;
+
+            if (strApprStatus.Equals("1") && strApprPossible != "0")    // 승인대기 && 승인불가능
                 return false;
 
             if (strApprKind=="1")   // 사후결재
@@ -577,6 +610,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             {
                 return (strApprStatus.Equals("1") && (strTransStatus.Equals("W"))); //  || strTransStatus.Equals("V")
             }
+
         }
 
 

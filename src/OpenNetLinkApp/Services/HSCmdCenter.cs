@@ -59,12 +59,33 @@ namespace OpenNetLinkApp.Services
 
         }
 
+        public bool TrySSLConnect(string TryConnectIP, int TryConnectPort = 3435, SslProtocols TryConnectProtocal = SslProtocols.Tls12)
+        {
+            SslClient connTestClient = null;
+            try
+            {
+                SslContext context = new SslContext(TryConnectProtocal);
+                connTestClient = new SslClient(context, TryConnectIP, TryConnectPort);
+                return connTestClient.Connect();
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"TrySSLConnect err : {ex.ToString()}");
+                return false;
+            }
+            finally
+            {
+                connTestClient?.Dispose();
+            }
+        }
+
         public void Init()
         {
             HsNetWork hsNetwork = null;
+            
             List<ISGNetwork> listNetworks = SGNetworkService.NetWorkInfo;
             List<string> RecvDownList = SGAppConfigService.AppConfigInfo.RecvDownPath;
-            
+
             var serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));
             string VersionConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppVersion.json";
             if (File.Exists(VersionConfig))
@@ -132,7 +153,7 @@ namespace OpenNetLinkApp.Services
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
 
                 hsNetwork.SGSvr_EventReg(SGSvrRecv);
-                hsNetwork.SGData_EventReg(SGDataRecv);                
+                hsNetwork.SGData_EventReg(SGDataRecv);
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
                 hsNetwork.SGException_EventRegEx(SGExceptionExRecv);
                 hsNetwork.SetGroupID(groupID);
@@ -587,7 +608,7 @@ namespace OpenNetLinkApp.Services
                     break;
                 case eCmdList.eDrmBlockNoti:                                                     // DRM Noti
                     VirusScanNotiAfterSend(nRet, eCmdList.eDrmBlockNoti, groupId, sgData);
-                    break;                   
+                    break;
 
                 case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
                     EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
@@ -852,7 +873,7 @@ namespace OpenNetLinkApp.Services
                     tmpData.m_DicTagData["SERVERVESION"] = sgData.m_DicTagData["SERVERVESION"].Base64EncodingStr();
                     tmpData.m_DicTagData["NETLINKVERSION"] = sgData.m_DicTagData["NETLINKVERSION"].Base64EncodingStr();
 
-                    RecvSvrAfterSend(groupId, sgData.m_DicTagData["LOGINTYPE"]);
+                    RecvSvrAfterSend(groupId, sgData.m_DicTagData["LOGINTYPE"], sgData.m_DicTagData["SYSTEMID"]);
                     //SGSvrData sgTmp = (SGSvrData)sgDicRecvData.GetSvrData(0);
                     //eLoginType e = sgTmp.GetLoginType();
                     break;
@@ -873,12 +894,12 @@ namespace OpenNetLinkApp.Services
             sgDicRecvData.SetSvrData(groupId, tmpData);
 
         }
-        public void RecvSvrAfterSend(int groupId, string loginType)
+        public void RecvSvrAfterSend(int groupId, string loginType, string systemID)
         {
             SvrEvent svEvent = sgPageEvent.GetSvrEvent(groupId);
             if (svEvent != null)
             {
-                svEvent(groupId, loginType);
+                svEvent(groupId, loginType, systemID);
             }
         }
 
@@ -1552,7 +1573,12 @@ namespace OpenNetLinkApp.Services
                 if (!strCount.Equals(""))
                     e.count = Convert.ToInt32(strCount);
                 e.strMsg = "";
-                e.strDummy = "4";
+
+                strCount = data.GetBasicTagData("APPROVEUSERKIND");
+                if (strCount == "1")
+                    e.strDummy = "5";   // UI기준
+                else
+                    e.strDummy = "4";
 
                 sNotiEvent(groupId, cmd, e);
             }
@@ -2236,12 +2262,16 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestApproveBatch(hsNetWork, groupid, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
             return -1;
         }
-        public int SendEmailApproveBatch(int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs)
+        public int SendEmailApproveBatch(int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs, bool bUseSfm2Approve = false, bool bUsePrivacyApprove = false)
         {
+            // 정보보안결재는 대결재 없음
+            if (bUsePrivacyApprove)
+                bUseSfm2Approve = false;
+
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestEmailApproveBatch(hsNetWork, groupid, strUserID, strProcID, strReason, strApproveSeqs);
+                return sgSendData.RequestEmailApproveBatch(hsNetWork, groupid, strUserID, strProcID, strReason, strApproveSeqs, bUseSfm2Approve, bUsePrivacyApprove);
             return -1;
         }
         public int SendTransCancel(int groupid, string strUserID, string strTransSeq, string strAction, string strReason)
