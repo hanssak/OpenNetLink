@@ -895,6 +895,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strTime;
         }
 
+        public string GetSystemPeriod()
+        {
+            string strPeriod = GetTagData("SYSTEMPERIOD");
+            return strPeriod; 
+        }
+
         /// <summary>
         /// 
         /// </summary>
