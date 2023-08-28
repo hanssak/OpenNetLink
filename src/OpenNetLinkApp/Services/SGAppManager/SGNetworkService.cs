@@ -36,6 +36,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         private static void LoadFile()
         {
+            LoadNetWorkFile();
+        }
+
+        public static void LoadNetWorkFile()
+        {
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
             byte[] contents = File.ReadAllBytes(strNetworkFileName);
             try
@@ -104,7 +109,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             File.WriteAllText(strNetworkFileName, jsonString);
 
-            //loadNetworkFile();
+            LoadNetWorkFile();
         }
         static List<ISGNetwork> networkParsing(string jsonString)
         {
