@@ -5,6 +5,10 @@
 	*** 로 나눔선 추가 가능
 -->
 
+### OpenNetLink v1.0.0.3
+- URLRedirection, Page Guide 문구 변경적용
+
+
 ### OpenNetLink v1.0.0.2
 - 버그를 수정하였습니다.
 - 요청사항을 반영했습니다.

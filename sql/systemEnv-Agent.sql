@@ -39,6 +39,12 @@ INSERT INTO tbl_system_env (system_id, tag, tag_value, tag_desc, writer) VALUES 
 INSERT INTO tbl_system_env (system_id, tag, tag_value, tag_desc, writer) VALUES ('I001', 'CLIENT_DESC_MIN_LENGTH', '6', '설명 최소길이', '201004010800000001');
 INSERT INTO tbl_system_env (system_id, tag, tag_value, tag_desc, writer) VALUES ('E001', 'CLIENT_DESC_MIN_LENGTH', '6', '설명 최소길이', '201004010800000001');
 
+-------------------------------------------------------------------------------
+-- tbl_system_env : URLRedirection에 나오는 문구 정보 변경
+-------------------------------------------------------------------------------
 
+delete from tbl_system_env where tag='CLIENT_URLREDIRECTION_F_INFO';
 
+INSERT INTO tbl_system_env (system_id, tag, tag_value, tag_desc, writer) VALUES ('I001', 'CLIENT_URLREDIRECTION_F_INFO', 'IT 보안팀(☎8708)', '포워딩된 Page에 표시할 부서이름 / 전화번호', '201004010800000001');
+INSERT INTO tbl_system_env (system_id, tag, tag_value, tag_desc, writer) VALUES ('E001', 'CLIENT_URLREDIRECTION_F_INFO', 'IT 보안팀(☎8708)', '포워딩된 Page에 표시할 부서이름 / 전화번호', '201004010800000001');
 

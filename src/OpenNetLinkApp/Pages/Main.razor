@@ -1037,7 +1037,7 @@
 
                 // 각 버전별로 특별한동작 1번만 할 수 있도록 적용 - 수신경로 1번만 "개인 폴더"으로 바꾸도록 수정
                 string strCurCliVersion = SGAppMgrSvc.VersionConfigInfoService.GetSWVersion();
-                if (strCurCliVersion == "1.0.0.2")
+                if (strCurCliVersion == "1.0.0.2")  // V1.0.0.2 일때에만 한 동작
                 {
                     string strVerPatch1do = "";
                     strVerPatch1do = AppConfigSvc.GetVersionPatch1do(strCurCliVersion);
@@ -1139,7 +1139,9 @@
                 return;
             }
 
-            string strForwardUrlFile = SGAppMgrSvc.OpConfigInfoService.GetForwardUrl(groupId);
+
+            //string strForwardUrlFile = SGAppMgrSvc.OpConfigInfoService.GetForwardUrl(groupId);    // 망마다 달라
+            string strForwardUrlFile = "C:\\HANSSAK\\OpenNetLink\\wwwroot\\Web\\WebLinkInfo.html";            
             strForwardUrlFile = strForwardUrlFile.Replace("file:///", "");
             strForwardUrlFile = strForwardUrlFile.Replace("/", "\\");
 
