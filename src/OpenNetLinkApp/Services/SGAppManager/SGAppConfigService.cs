@@ -97,17 +97,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
         }
 
-        private static ISGAppConfig _AppConfigInfo { get; set; } = null;
-        /// <summary>AppEnvSetting</summary>
-        public static ISGAppConfig AppConfigInfo
-        {
-            get
-            {
-                if (_AppConfigInfo == null) LoadFile();
-                return _AppConfigInfo;
-            }
-        }
-
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGAppConfigService>();
 
         private static void LoadFile()
