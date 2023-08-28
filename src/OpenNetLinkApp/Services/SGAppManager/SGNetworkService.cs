@@ -13,6 +13,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
     {
         List<ISGNetwork> NetWorkInfo { get { return GetSGNetworkService(); } }
         List<ISGNetwork> GetSGNetworkService();
+        public void SaveIPAndReload(string IP);
     }
     internal class SGNetworkService : ISGNetworkService
     {
@@ -88,7 +89,23 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
         }
 
+        public void SaveIPAndReload(string IP)
+        {
+            string strNetworkFileName = "wwwroot/conf/NetWork.json";
+            NetWorkInfo[0].IPAddress = IP;
 
+            SGNetworkForSave saveFormat = new SGNetworkForSave();
+            saveFormat.NETWORKS = NetWorkInfo;
+
+            var opt = new JsonSerializerOptions() { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            var json = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes<SGNetworkForSave>(saveFormat, opt);
+
+            string jsonString = Encoding.UTF8.GetString(json);
+
+            File.WriteAllText(strNetworkFileName, jsonString);
+
+            //loadNetworkFile();
+        }
         static List<ISGNetwork> networkParsing(string jsonString)
         {
             List<ISGNetwork> listNetworks = new List<ISGNetwork>();
