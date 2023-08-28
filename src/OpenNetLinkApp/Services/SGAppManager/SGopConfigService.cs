@@ -226,8 +226,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             HsLogDel hsLog = new HsLogDel();
             hsLog.Delete(7);    // 7일이전 Log들 삭제
 
-            string strNetworkFileName = "wwwroot/conf/NetWork.json";
-            string jsonString = File.ReadAllText(strNetworkFileName);
             List<ISGNetwork> listNetworks = SGNetworkService.NetWorkInfo;
 
             if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
