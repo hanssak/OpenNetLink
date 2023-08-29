@@ -26,6 +26,7 @@ var isUpdateCheck = Argument<bool>("isUpdateCheck", false);				//false 하면 �
 var isPatchInstaller = false;
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
 // var customName = "NONE";
+var storageName ="NONE";
 var AppProps = new AppProperty(Context,
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								 "../", 													// Path of the Git Local Repository
@@ -543,7 +544,7 @@ Task("PkgCrossflatform")
 	}
 		
 
-	var LastUpdatedTime = DateTime.Now.ToString(@"yyyy\/MM\/dd h\:mm tt");
+	var LastUpdatedTime = DateTime.Now.ToString(@"yyyy\/MM\/dd H\:mm");
 
 	if(DirectoryExists(AppProps.InstallerRootDirPath)) {
 		DeleteDirectory(AppProps.InstallerRootDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
@@ -590,8 +591,14 @@ Task("PkgCrossflatform")
 			Information($"AppPorps.PropVersion : {AppProps.PropVersion}");		
 			
 			//현재 스토리지 기준 Publish
-			RunTarget("PubCrossflatform");			
+			RunTarget("PubCrossflatform");	
+
+			//UpdateListList.txt는 잠시 백업
+			if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp/UpdataFileList.txt"))
+				CopyFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp/UpdataFileList.txt", $"{storageUnit}");						
 		}
+
+
 		
 		CopyFile($"{storageUnit}/ReleaseNote.md", $"{ReleaseNoteDirPath}/{AppProps.PropVersion.ToString()}.md");				
 		CopyFiles("./OpenNetLinkApp/VersionHash.txt", $"{AppProps.InstallerRootDirPath}/{unitName}");
@@ -646,6 +653,10 @@ Task("PkgCrossflatform")
 		//설치파일 생성
 		if(isFull.ToString().ToUpper() == "TRUE")
 		{
+			//UpdataFileList 삭제
+			if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp"))
+				DeleteDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp", new DeleteDirectorySettings {Force = true, Recursive = true });
+
 			foreach(var agentUnit in System.IO.Directory.GetDirectories(storageUnit))
 			{
 				var agentUnitInfo = new DirectoryInfo(agentUnit);
@@ -653,25 +664,35 @@ Task("PkgCrossflatform")
 				
 				if(AgentName.Substring(0, 1) == ".")
 					continue;
-
-				//설치 패키지: OPSetting.json / Network.json / EnvSetting.json / SqlQuery.xml을 Init에 생성
+				
 				if(DirectoryExists(publishInitJsonDirPath))		
 					DeleteDirectory(publishInitJsonDirPath, new DeleteDirectorySettings {Force = true, Recursive = true });
-				System.IO.Directory.CreateDirectory(publishInitJsonDirPath);
-
-				CopyFiles($"{siteProfilePath}/HSText.xml", publishInitJsonDirPath);
-				CopyFiles($"{storageUnit}/AppOPsetting*.json", publishInitJsonDirPath);		
-				CopyFiles($"{storageUnit}/SqlQuery.xml", publishInitJsonDirPath);		
-				// CopyFiles($"{agentUnit}/AppEnvSetting.json", publishInitJsonDirPath);
-				CopyFiles($"{agentUnit}/NetWork.json", publishInitJsonDirPath);				
-								
+				
 				if(isEnc.ToString().ToUpper() == "TRUE")
-					RunTarget("EncryptInitDirectory");	// Init 폴더(publishInitJsonDirPath)에 존재하는 파일 암호화 처리
-
+				{
+					//설치 패키지: OPSetting.json  / HSText.xml / Network.json / SqlQuery.xml을 Init에 생성
+					System.IO.Directory.CreateDirectory(publishInitJsonDirPath);
+					CopyFiles($"{siteProfilePath}/HSText.xml", publishInitJsonDirPath);
+					CopyFiles($"{storageUnit}/AppOPsetting*.json", publishInitJsonDirPath);		
+					CopyFiles($"{storageUnit}/SqlQuery.xml", publishInitJsonDirPath);		
+					// CopyFiles($"{agentUnit}/AppEnvSetting.json", publishInitJsonDirPath);
+					CopyFiles($"{agentUnit}/NetWork.json", publishInitJsonDirPath);				
+					
+					RunTarget("EncryptInitDirectory");	// Init 폴더(publishInitJsonDirPath)에 존재하는 파일 암호화 처리				
+				}
+				else
+				{
+					CopyFiles($"{siteProfilePath}/HSText.xml", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf");	
+					CopyFiles($"{storageUnit}/AppOPsetting*.json", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf");						
+					CopyFiles($"{storageUnit}/SqlQuery.xml", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf");	
+					CopyFiles($"{agentUnit}/NetWork.json", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf");										
+				}
+				
 				Information($"Make Agent Installer {AgentName}");
 
 				networkFlag = AgentName.ToUpper();			
-				
+				storageName = unitName.ToUpper();
+								
 				CopyFiles($"{agentUnit}/AppEnvSetting.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
 				
 				isPatchInstaller=false;
@@ -682,17 +703,30 @@ Task("PkgCrossflatform")
 		//패치파일 생성
 		if(isPatch.ToString().ToUpper() == "TRUE")
 		{
-			//패치 패키지의 경우,  OPSetting.json만 Init에 생성
 			if(DirectoryExists(publishInitJsonDirPath))		
 				DeleteDirectory(publishInitJsonDirPath, new DeleteDirectorySettings {Force = true, Recursive = true });
-			System.IO.Directory.CreateDirectory(publishInitJsonDirPath);
 
-			CopyFiles($"{siteProfilePath}/HSText.xml", publishInitJsonDirPath);			
-			CopyFiles($"{storageUnit}/AppOPsetting*.json", publishInitJsonDirPath);		
-			CopyFiles($"{storageUnit}/SqlQuery.xml", publishInitJsonDirPath);		
+			//UpdataFileList 이동
+			if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp") == false)						
+				System.IO.Directory.CreateDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp");
+			CopyFiles($"{storageUnit}/UpdataFileList.txt", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp");			
 
 			if(isEnc.ToString().ToUpper() == "TRUE")
+			{
+				//패치 패키지의 경우,  OPSetting.json / HSText.xml / SqlQuery.xml을 Init에 생성
+				System.IO.Directory.CreateDirectory(publishInitJsonDirPath);
+				CopyFiles($"{siteProfilePath}/HSText.xml", publishInitJsonDirPath);			
+				CopyFiles($"{storageUnit}/AppOPsetting*.json", publishInitJsonDirPath);		
+				CopyFiles($"{storageUnit}/SqlQuery.xml", publishInitJsonDirPath);		
+				
 				RunTarget("EncryptInitDirectory");	// Init 폴더에 존재하는 파일 암호화 처리
+			}
+			else
+			{
+				CopyFiles($"{siteProfilePath}/HSText.xml", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf");	
+				CopyFiles($"{storageUnit}/AppOPsetting*.json", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf");					
+				CopyFiles($"{storageUnit}/SqlQuery.xml", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf");	
+			}
 
 			//Light Patch 버전일 땐, edge 폴더 배포전에 제거
 			if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
@@ -703,6 +737,8 @@ Task("PkgCrossflatform")
 
 			if(FileExists("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json"))
 				DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
+			if(FileExists("./artifacts/windows/published/wwwroot/conf/Network.json"))
+				DeleteFile("./artifacts/windows/published/wwwroot/conf/Network.json");
 
 			isPatchInstaller=true;
 			RunTarget("MakeInstaller");		
@@ -727,6 +763,7 @@ Task("MakeInstaller")
 				{"DELETE_NETLINK", deleteNetLink.ToString().ToUpper()},
 				{"IS_SILENT", isSilent.ToString().ToUpper()},
 				{"STARTAUTO", startAuto.ToString().ToUpper()},
+				{"STORAGE_NAME", storageName.ToUpper()},
 				{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()}
 			}
 		});			
@@ -740,7 +777,8 @@ Task("MakeInstaller")
 												.Append(networkFlag.ToUpper()) 
 												.Append(customName.ToUpper())
 												.Append(PackageDirPath)//$5	
-												})
+												.Append(storageName.ToUpper())//$6	
+																								})
 												
 		)
 		{
@@ -757,6 +795,7 @@ Task("MakeInstaller")
 													.Append(networkFlag.ToUpper()) 
 													.Append(customName.ToUpper())
 													.Append(PackageDirPath) //$5
+													.Append(storageName.ToUpper())//$6	
 													})
 		)
 		{
@@ -776,6 +815,7 @@ Task("MakeInstaller")
 													.Append(customName.ToUpper())
 													.Append(PackageDirPath)
 													.Append(startAuto.ToString().ToUpper())
+													.Append(storageName.ToUpper())//$6	
 													.Append(isUpdateCheck.ToString().ToUpper())	//$7 Output
 													})
 		)
