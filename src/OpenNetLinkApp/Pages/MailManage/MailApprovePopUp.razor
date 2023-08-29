@@ -267,6 +267,7 @@
     public bool m_bCanFilePreView = false;                     // 파일 미리보기 가능유무
 
     SGeMailTransManageData strDisplayData = new SGeMailTransManageData();
+    FileAddManage fileAddManage = new FileAddManage();
 
     /// <summary>
     /// 첨부파일 다운로드 요청
@@ -288,11 +289,15 @@
             strUserID = sgLoginData.GetUserID();
 
         //pageService.SetFilePrevRecving(true);
-        FileAddManage fileAddManage = new FileAddManage();
         //string sFileName = fileAddManage.GetFileRename(true, filename);
         ShowProgress(groupID, 1, 0, filename);
         HSCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FileDownloadProgressNoti);
         //Task.Delay(1000);
+
+
+        // Server 쪽에서 파일이름에서 특수문자 치완해서 찾는거 안함. 동작할때 적용
+        // filename = fileAddManage.GetFileRename(true, filename);
+
         HSCmdCenter.SendEmailDownload(groupID, strUserID, stEmailSeq, filename, filekey, fileseq);
     }
 
