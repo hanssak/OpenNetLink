@@ -421,7 +421,7 @@
             int nMaxStep = 1;
             foreach (ApproverHist data in apprListHist)
             {
-                if (nMaxStep > data.m_nApprStep)
+                if (nMaxStep < data.m_nApprStep)
                     nMaxStep = data.m_nApprStep;
             }
             //각 스텝별 승인여부 확인
