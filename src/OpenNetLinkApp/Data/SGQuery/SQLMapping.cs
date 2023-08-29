@@ -158,7 +158,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                         break;
                 }
 
-            } while (childNode.NextSibling != null);
+            } while (childNode != null);
         }
         /// <summary>
         /// 조건식 처리
