@@ -594,8 +594,8 @@ Task("PkgCrossflatform")
 			RunTarget("PubCrossflatform");	
 
 			//UpdateListList.txt는 잠시 백업
-			if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp/UpdataFileList.txt"))
-				CopyFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp/UpdataFileList.txt", $"{storageUnit}");						
+			if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp/UpdateFileList.txt"))
+				CopyFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp/UpdateFileList.txt", $"{storageUnit}");						
 		}
 
 
@@ -653,7 +653,7 @@ Task("PkgCrossflatform")
 		//설치파일 생성
 		if(isFull.ToString().ToUpper() == "TRUE")
 		{
-			//UpdataFileList 삭제
+			//UpdateFileList 삭제
 			if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp"))
 				DeleteDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp", new DeleteDirectorySettings {Force = true, Recursive = true });
 
@@ -706,10 +706,10 @@ Task("PkgCrossflatform")
 			if(DirectoryExists(publishInitJsonDirPath))		
 				DeleteDirectory(publishInitJsonDirPath, new DeleteDirectorySettings {Force = true, Recursive = true });
 
-			//UpdataFileList 이동
+			//UpdateFileList 이동
 			if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp") == false)						
 				System.IO.Directory.CreateDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp");
-			CopyFiles($"{storageUnit}/UpdataFileList.txt", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp");			
+			CopyFiles($"{storageUnit}/UpdateFileList.txt", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp");			
 
 			if(isEnc.ToString().ToUpper() == "TRUE")
 			{
