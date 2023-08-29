@@ -1144,9 +1144,13 @@
                 }
                 maxDownloadCount = sgLoginData.GetMaxDownCount();
             }
-
-
-            tData.isPossibleDownload = GetIsPossibleDownLoad(tData, isInner, maxDownloadCount, nowDate, groupId, isManualDownLoad, isForwardAutoDown);
+            bool isQueryDownPosible = false;
+            if (sgData.GetDownloadPossible(dic) == "0")
+                isQueryDownPosible = false;
+            else
+                isQueryDownPosible = true;
+                
+            tData.isPossibleDownload = GetIsPossibleDownLoad(tData, isInner, maxDownloadCount, nowDate, groupId, isManualDownLoad, isForwardAutoDown, isQueryDownPosible);
 
             if (maxDownloadCount - tData.downloadCount < 0)
                 tData.isPossibleDownloadCount = 0;
@@ -1162,7 +1166,7 @@
 
     }
 
-    public bool GetIsPossibleDownLoad(transData tData, bool isInner, int maxDownloadCount, int nowDate, int groupId, bool isManualDownLoad, bool isForwardAutoDown)
+    public bool GetIsPossibleDownLoad(transData tData, bool isInner, int maxDownloadCount, int nowDate, int groupId, bool isManualDownLoad, bool isForwardAutoDown, bool queryDownPossible)
     {
         bool isPossibleDownload = false;
         //파일 다운로드 가능여부 판단
@@ -1170,6 +1174,9 @@
             isPossibleDownload = true;
         else if (isInner && tData.TransferType == XmlConf.GetTitle("T_COMMON_IMPORT"))
             isPossibleDownload = true;
+
+        if (isPossibleDownload)
+            isPossibleDownload = queryDownPossible;
 
         if (isPossibleDownload)
         {

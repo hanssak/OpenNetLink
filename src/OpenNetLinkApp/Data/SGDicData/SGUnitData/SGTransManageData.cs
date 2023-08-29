@@ -341,6 +341,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
+        /// 수신가능한 다운로드 횟수를 반환한다.<br></br>
+        /// 다운로드 횟수
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetDownloadPossible(Dictionary<int, string> dic)
+        {
+            string strDownloadCount = "0";
+            if (dic.TryGetValue(10, out strDownloadCount) != true)
+                return strDownloadCount;
+            strDownloadCount = dic[10];
+            return strDownloadCount;
+        }
+
+        /// <summary>
         /// 파일 만료일 반환
         /// </summary>
         /// <param name="dic"></param>
