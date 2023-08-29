@@ -86,7 +86,7 @@
     */
     [Parameter] public LinkedList<ApproverInfo> UserSearchList { get; set; } = new LinkedList<ApproverInfo>();   //좌측 검색결과
 
-    
+
     /// <summary>
     /// 조회 시, 일반사용자 조회 유무 (default : true)
     ///</br>true : 결재자/전결자만 / false : 일반사용자 및 결재자,전결자
@@ -137,13 +137,13 @@
         }
     }
 
-    private ISGSideBarUIService SideBarUISvc;    
+    private ISGSideBarUIService SideBarUISvc;
     string strInputDept = "";
     string strInputName = "";
-    
+
     string strCurrentInputDept = "";
     string strCurrentInputName = "";
-    
+
     string currentSelectKey = "";
 
     private string strDept = "";
@@ -264,14 +264,17 @@
 
         HsCmdCenter.sgPageEvent.SetDeptInfoEventAdd(activedGroupID, setDeptTree);
         if (activedSGLogin != null)
+        {
+            IsApproverOnly = !activedSGLogin.GetApproveProxyRight();
             HsCmdCenter.SendDeptInfo(activedGroupID, activedSGLogin.GetUserID());
+        }
 
         if (activeSGUserData != null)
             strSelectedDeptCode = activeSGUserData.GetTeamCode();
 
         @*updateDeptApprLine(strSelectedDeptCode);*@
 
-    timeInterval = DateTime.Now;
+        timeInterval = DateTime.Now;
     }
 
     /// <summary>
