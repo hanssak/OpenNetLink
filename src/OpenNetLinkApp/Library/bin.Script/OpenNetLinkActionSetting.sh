@@ -6,6 +6,10 @@ PATH_BIN_SCRIPT=$PATH_OPENNETLINK/bin.Script
 PATH_APPLICATIONS=/usr/share/applications/
 PATH_NEMO=/usr/share/nemo/actions/
 
+UPDATE_CHECK=false
+START_AUTO=false
+file=$PATH_OPENNETLINK/wwwroot/conf/temp/UpdateFileList.txt
+
 # directory authority setting
 USERNAME=`users | xargs -n1 | uniq`
 GROUPNAME=`id -gn ${USERNAME}`
@@ -48,33 +52,82 @@ chown -R ${USERNAME}:${GROUPNAME} $PATH_HANSSAK
 # OpenNetLink shell authority setting
 chmod 777 ${PATH_OPENNETLINK}/OpenNetLinkApp.sh
 
-#Move Network.json, AppEnvSetting.json not to change thoes information
-NETWORK_FILE="$PATH_HANSSAK/opennetlink/wwwroot/conf/NetWork.json"
-BACKUP_NETWORK_FILE=/tmp/Network.json
-if [ -e $BACKUP_NETWORK_FILE ] ; then
-    cp /tmp/NetWork.json ${PATH_OPENNETLINK}/wwwroot/conf/
-    rm -rf /tmp/NetWork.json
+#Check Patch List File
+if [ $UPDATE_CHECK == true ]; then    
+    if [ ! -e $file ]; then
+        echo "FAIL/$(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)/FILE['$file'] is missing." > /tmp/opennetlink/wwwroot/conf/UpdateResult.txt
+        rm -rf $PATH_OPENNETLINK
+        cp -rf /tmp/opennetlink $PATH_OPENNETLINK          
+        rm -rf "/tmp/opennetlink"
+
+        chown -R ${USERNAME}:${GROUPNAME} $PATH_HANSSAK
+        chmod 777 ${PATH_OPENNETLINK}/OpenNetLinkApp.sh
+        exit 0;
+    fi
+    while read -r line
+    do
+        if [ ! -e "$PATH_OPENNETLINK/$line" ]; then
+            echo "FAIL/$(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)/FILE['$line'] is missing." > /tmp/opennetlink/wwwroot/conf/UpdateResult.txt
+            rm -rf $PATH_OPENNETLINK
+            cp -rf /tmp/opennetlink $PATH_OPENNETLINK          
+            rm -rf "/tmp/opennetlink"
+            chown -R ${USERNAME}:${GROUPNAME} $PATH_HANSSAK
+            chmod 777 ${PATH_OPENNETLINK}/OpenNetLinkApp.sh
+            exit 0;
+        fi 
+    done <"$file"
+
+    #성공한 경우, Network/Env/DB/Log 는 기존 데이터로 복원
+    BACKUP_LOG_DIR="/tmp/opennetlink/wwwroot/Log"
+    if [ -e $BACKUP_LOG_DIR ]; then    
+        cp -r $BACKUP_LOG_DIR ${PATH_OPENNETLINK}/wwwroot
+        rm -rf $BACKUP_LOG_DIR
+    fi
+
+    BACKUP_NETWORK_FILE="/tmp/opennetlink/wwwroot/conf/NetWork.json"
+    BACKUP_APPENV_FILE="/tmp/opennetlink/wwwroot/conf/AppEnvSetting.json"
+    BACKUP_NOTIDB_FILE="/tmp/opennetlink/wwwroot/db/SGNotifyDB.db"
+    BACKUP_SETTINGDB_FILE="/tmp/opennetlink/wwwroot/db/SGSettingsDB.db"
+    BACKUP_HSCK_FILE="/tmp/opennetlink/wwwroot/conf/hsck"
+    echo "SUCCESS/$(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" > $PATH_OPENNETLINK/wwwroot/conf/UpdateResult.txt
+else
+    #BACKUP_LOG_DIR=""
+    BACKUP_NETWORK_FILE="/tmp/NetWork.json"
+    BACKUP_APPENV_FILE="/tmp/AppEnvSetting.json"
+    BACKUP_NOTIDB_FILE="/tmp/SGNotifyDB.db"
+    BACKUP_SETTINGDB_FILE="/tmp/SGSettingsDB.db"
+    BACKUP_HSCK_FILE="/tmp/hsck"
 fi
 
-APPENV_FILE="$PATH_HANSSAK/opennetlink/wwwroot/conf/AppEnvSetting.json"
-BACKUP_APPENV_FILE=/tmp/AppEnvSetting.json
+#Network/Env/DB/Log 는 기존 데이터로 복원
+if [ -e $BACKUP_NETWORK_FILE ] ; then
+    cp $BACKUP_NETWORK_FILE ${PATH_OPENNETLINK}/wwwroot/conf/
+    rm -rf $BACKUP_NETWORK_FILE
+fi
+
 if [ -e $BACKUP_APPENV_FILE ] ; then
-    cp /tmp/AppEnvSetting.json ${PATH_OPENNETLINK}/wwwroot/conf/
-    rm -rf /tmp/AppEnvSetting.json
+    cp $BACKUP_APPENV_FILE ${PATH_OPENNETLINK}/wwwroot/conf/
+    rm -rf $BACKUP_APPENV_FILE
 fi
 
 #로그인 정보 및 노티 정보가 있는 DB 파일도 백업하여 유지
-BACKUP_SGNOTIFY_FILE=/tmp/SGNotifyDB.db
-if [ -e $BACKUP_SGNOTIFY_FILE ] ; then
-    cp ${BACKUP_SGNOTIFY_FILE} ${PATH_OPENNETLINK}/wwwroot/db/
-    rm -rf ${BACKUP_SGNOTIFY_FILE}
+if [ -e $BACKUP_NOTIDB_FILE ] ; then
+    cp ${BACKUP_NOTIDB_FILE} ${PATH_OPENNETLINK}/wwwroot/db/
+    rm -rf ${BACKUP_NOTIDB_FILE}
 fi
 
-BACKUP_SGSETTING_FILE=/tmp/SGSettingsDB.db
- if [ -e $BACKUP_SGSETTING_FILE ] ; then
-    cp ${BACKUP_SGSETTING_FILE} ${PATH_OPENNETLINK}/wwwroot/db/
-    rm -rf ${BACKUP_SGSETTING_FILE}
+if [ -e $BACKUP_SETTINGDB_FILE ] ; then
+    cp ${BACKUP_SETTINGDB_FILE} ${PATH_OPENNETLINK}/wwwroot/db/
+    rm -rf ${BACKUP_SETTINGDB_FILE}
 fi
+
+#키 관련 파일 복원
+if [ -e $BACKUP_HSCK_FILE ] ; then
+    cp ${BACKUP_HSCK_FILE} ${PATH_OPENNETLINK}/wwwroot/conf/
+    rm -rf ${BACKUP_HSCK_FILE}
+fi
+
+rm -rf "/tmp/opennetlink"
 
 #####<마임체크에 필요한 libbz2에 대한 so파일 확인>########
 #libgtk를 이용하여 해당 OS에 라이브러리 폴더 경로 추출한다. (필수 요소인 GTK 사용)
@@ -95,3 +148,8 @@ fi;
 if [ ! -f $LIBBZ2_2_FILE ] ; then   #libbz2.so.1.0 파일이 존재하진 않으면, 라이브러리에 복사   
     cp ${PATH_OPENNETLINK}/Library/libbz2.so.1 $LIBBZ2_2_FILE
 fi;
+
+chown -R ${USERNAME}:${GROUPNAME} $PATH_HANSSAK
+
+# OpenNetLink shell authority setting
+chmod 777 ${PATH_OPENNETLINK}/OpenNetLinkApp.sh

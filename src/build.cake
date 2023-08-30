@@ -617,6 +617,10 @@ Task("PkgCrossflatform")
 		//Delete Default SiteProfile
 		if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile"))		
 			DeleteDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile", new DeleteDirectorySettings {Force = true, Recursive = true });
+
+		//Delete Log Directory
+		if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/Log"))		
+			DeleteDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/Log", new DeleteDirectorySettings {Force = true, Recursive = true });
 			
 		// window에 한하여 필요없는 파일들 배포전에 제거
 		if(AppProps.Platform == "windows")
@@ -777,7 +781,9 @@ Task("MakeInstaller")
 												.Append(networkFlag.ToUpper()) 
 												.Append(customName.ToUpper())
 												.Append(PackageDirPath)//$5	
-												.Append(storageName.ToUpper())//$6	
+												.Append(startAuto.ToString().ToUpper())//$6
+												.Append(storageName.ToUpper())//$7
+												.Append(isUpdateCheck.ToString().ToUpper())	//$8 Output
 																								})
 												
 		)
@@ -795,7 +801,9 @@ Task("MakeInstaller")
 													.Append(networkFlag.ToUpper()) 
 													.Append(customName.ToUpper())
 													.Append(PackageDirPath) //$5
+													.Append(startAuto.ToString().ToUpper())
 													.Append(storageName.ToUpper())//$6	
+													.Append(isUpdateCheck.ToString().ToUpper())	//$7 Output
 													})
 		)
 		{
