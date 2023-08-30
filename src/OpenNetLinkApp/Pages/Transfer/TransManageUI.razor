@@ -1192,7 +1192,7 @@
             {
                 if (!isForwardAutoDown)
                 {
-                    if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
+                    if ((tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT")) && tData.ApvStatus == XmlConf.GetTitle("T_COMMON_APPROVE"))
                         isPossibleDownload = true;
                     else
                         isPossibleDownload = false;
@@ -1210,7 +1210,7 @@
             {
                 if (isManualDownLoad)
                 {
-                    if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
+                    if ((tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT")) && tData.ApvStatus == XmlConf.GetTitle("T_COMMON_APPROVE"))
                         isPossibleDownload = true;
                     else
                         isPossibleDownload = false;
