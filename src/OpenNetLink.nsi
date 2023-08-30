@@ -485,6 +485,7 @@ Function .onInit
 			CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
 			CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db" "$TEMP" 
 			CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db" "$TEMP"	
+			CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\hsck" "$TEMP"	
 		${EndIf}
 	
 		Banner::show "Calculating important stuff..."
@@ -533,6 +534,7 @@ Function .onInstSuccess
 			CopyFiles /FILESONLY "$TEMP\OpenNetLink\wwwroot\db\SGNotifyDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"
 			CopyFiles /FILESONLY "$TEMP\OpenNetLink\wwwroot\db\SGSettingsDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"  	
 			CopyFiles /FILESONLY "$TEMP\OpenNetLink\wwwroot\conf\UpdateResult.txt" "C:\HANSSAK\OpenNetLink\wwwroot\conf\UpdateResult.txt"  	
+			CopyFiles /FILESONLY "$TEMP\OpenNetLink\wwwroot\conf\hsck" "C:\HANSSAK\OpenNetLink\wwwroot\conf\hsck"  	
 			Rename "$TEMP\OpenNetLink\wwwroot\Log" "C:\HANSSAK\OpenNetLink\wwwroot\Log"  ; 로그 이동
 			
 			${If} ${IS_LIGHT_PATCH} == 'TRUE'
@@ -546,6 +548,7 @@ Function .onInstSuccess
 			CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf"
 			CopyFiles /FILESONLY "$TEMP\SGNotifyDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"
 			CopyFiles /FILESONLY "$TEMP\SGSettingsDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"  
+			CopyFiles /FILESONLY "$TEMP\hsck" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
 			
 			;백업된 json/db 가 복사 완료될때까지, 대기
 			StrCpy $R0 0
