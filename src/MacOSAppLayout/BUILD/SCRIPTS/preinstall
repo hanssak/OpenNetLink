@@ -30,9 +30,16 @@ else
     fi
 
     SETTINGDB_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/db/SGSettingsDB.db"
-    if [ -e $NOTIDB_FILE ]; then
+    if [ -e $SETTINGDB_FILE ]; then
     cp $SETTINGDB_FILE /tmp
     fi
+    
+    HSCK_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/hsck"
+    if [ -e $HSCK_FILE ]; then
+    cp $HSCK_FILE /tmp
+    fi
+
+
 fi
 
 exit 0

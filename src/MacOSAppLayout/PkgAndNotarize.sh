@@ -38,7 +38,7 @@ dev_team="L7W5N48H4G"
 dev_keychain_label="sxog-tiki-hjrx-pxfs"
 
 # put your project's information into these variables
-if [ $# -ne 7 ]; then
+if [ $# -ne 8 ]; then
 	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {startauto} $6 {isupdatecheck} $7"
 	exit -1
 fi;

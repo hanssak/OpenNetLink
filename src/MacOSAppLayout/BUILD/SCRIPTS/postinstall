@@ -5,7 +5,7 @@
 
 #Update Confirm 
 UPDATE_CHECK=true
-START_AUTO=true
+START_AUTO=false
 INSTALL_PATH="/Applications/OpenNetLinkApp.app"
 FILE_INSTALL_PATH="/Applications/OpenNetLinkApp.app/Contents/MacOS"
 file="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/temp/UpdateFileList.txt"
@@ -40,6 +40,7 @@ if [ $UPDATE_CHECK ]; then
     APPENV_FILE="/tmp/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/AppEnvSetting.json"
     NOTIDB_FILE="/tmp/OpenNetLinkApp.app/Contents/Resources/wwwroot/db/SGNotifyDB.db"
     SETTINGDB_FILE="/tmp/OpenNetLinkApp.app/Contents/Resources/wwwroot/db/SGSettingsDB.db"
+    HSCK_FILE="/tmp/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/hsck"
     printf "SUCCESS/$(date +%Y)-$(date +%m)-$(date +%d) $(date +%H):$(date +%M):$(date +%S)" > /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/UpdateResult.txt
 else
     LOG_DIR=""
@@ -47,11 +48,13 @@ else
     APPENV_FILE="/tmp/AppEnvSetting.json"
     NOTIDB_FILE="/tmp/SGNotifyDB.db"
     SETTINGDB_FILE="/tmp/SGSettingsDB.db"
+    HSCK_FILE="/tmp/hsck"
 fi
 
 #Network/Env/DB/Log 는 기존 데이터로 복원
 if [ -e $LOG_DIR ]; then    
     cp -r $LOG_DIR /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot
+    rm -rf $LOG_DIR
 fi
 
 if [ -e $NETWORK_FILE ]; then    
@@ -72,6 +75,11 @@ fi
 if [ -e $SETTINGDB_FILE ]; then
     cp $SETTINGDB_FILE /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/db/
     rm -rf $SETTINGDB_FILE
+fi
+
+if [ -e $HSCK_FILE ]; then
+    cp $HSCK_FILE /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
+    rm -rf $HSCK_FILE
 fi
 
 if [ -d "/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/temp" ]; then
