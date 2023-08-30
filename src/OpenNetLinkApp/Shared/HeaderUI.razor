@@ -2253,7 +2253,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             {
                 strMsg = XmlConf.GetInfoMsg("I_0032");   // 클립보드를 전송하였습니다.
                 ShowClipboardMessage("info", strMsg, groupID, OS_NOTI.CLIPBOARD);
-                Window.Notification(OS_NOTI.CLIPBOARD, XmlConf.GetInfoMsg("I_0163"), XmlConf.GetInfoMsg("I_0032"));
+                //Window.Notification(OS_NOTI.CLIPBOARD, XmlConf.GetInfoMsg("I_0163"), XmlConf.GetInfoMsg("I_0032"));
             }
 
             if (FileList.Count > 0)
@@ -2552,7 +2552,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         string strText = XmlConf.GetInfoMsg("I_0193");                         // 클립보드를 수신받았습니다.
         ShowClipboardMessage("info", strText, groupID, OS_NOTI.CLIPBOARD);
         InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipRecv, "", strText);
-        Window.Notification(OS_NOTI.CLIPBOARD, XmlConf.GetInfoMsg("I_0164"), XmlConf.GetInfoMsg("I_0193"));
+        //Window.Notification(OS_NOTI.CLIPBOARD, XmlConf.GetInfoMsg("I_0164"), XmlConf.GetInfoMsg("I_0193"));
 
     }
 
