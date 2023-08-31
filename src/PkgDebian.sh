@@ -18,17 +18,17 @@ fi
 echo "ISPATCH : $ISPATCH / ISUPDATECHECK : $ISUPDATECHECK"
 
 if [ $STARTAUTO == "FALSE" ]; then 
-    sed -i '' -e 's/START_AUTO=true/START_AUTO=false/g' $AFTERINSTALL
+    sed -i 's/START_AUTO=true/START_AUTO=false/g' $AFTERINSTALL
 else
-    sed -i '' -e 's/START_AUTO=false/START_AUTO=true/g' $AFTERINSTALL
+    sed -i 's/START_AUTO=false/START_AUTO=true/g' $AFTERINSTALL
 fi
 
 if [ $ISUPDATECHECK == "FALSE" ]; then 
-    sed -i '' -e 's/UPDATE_CHECK=true/UPDATE_CHECK=false/g' $AFTERINSTALL
-    sed -i '' -e 's/UPDATE_CHECK=true/UPDATE_CHECK=false/g' $BEFOREINSTALL
+    sed -i 's/UPDATE_CHECK=true/UPDATE_CHECK=false/g' $AFTERINSTALL
+    sed -i 's/UPDATE_CHECK=true/UPDATE_CHECK=false/g' $BEFOREINSTALL
 else
-    sed -i '' -e 's/UPDATE_CHECK=false/UPDATE_CHECK=true/g' $AFTERINSTALL
-    sed -i '' -e 's/UPDATE_CHECK=false/UPDATE_CHECK=true/g' $BEFOREINSTALL
+    sed -i 's/UPDATE_CHECK=false/UPDATE_CHECK=true/g' $AFTERINSTALL
+    sed -i 's/UPDATE_CHECK=false/UPDATE_CHECK=true/g' $BEFOREINSTALL
 fi
 
 
