@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,8 +13,8 @@ namespace OpenNetLinkApp.Services
         private List<string> dataList = new List<string>();
 
         public List<string> getDataList()
-        {
-            return dataList;
+        {            
+            return new List<string>(dataList);
         }
         public void AddDataList(string str, string type)
         {
