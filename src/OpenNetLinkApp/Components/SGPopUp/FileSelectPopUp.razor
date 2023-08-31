@@ -237,7 +237,7 @@
 
 
             @*LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));*@
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 stDisplayPath = Directory.GetDirectoryRoot(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             stDisplayPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -356,6 +356,10 @@
     append:
         stDisplayPath = (string.IsNullOrEmpty(stPath)) ? stCurrentDrive : stPath;
         string listHtml = makeSubFileList();
+
+        //우측 리스트 갱신 전 선택되어 있던 selectionsItem클리어
+        JSRuntime.InvokeAsync<object>("clearSelections");
+
         object[] param = { "divPopUpFileList", listHtml };
         JSRuntime.InvokeAsync<object>("appendHtml", param);
         StateHasChanged();
