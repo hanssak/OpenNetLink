@@ -856,4 +856,7 @@ WHERE 1=1
     </if>
     LIMIT 100
   </statement>
+  <statement id = "AgentHashFailLog">
+    INSERT INTO TBL_ALARM_HIS VALUES(0, '#systemId#', '1005', '#version#', TO_CHAR(NOW(), 'YYYYMMDDHH24MISS'), '1', 'CLIENT AGENT 무결성 오류입니다. CLIENT ID=#strUserID#,   IP ADDRESS=#ipAddr#(#ipAddr#)')
+  </statement>
 </statements>

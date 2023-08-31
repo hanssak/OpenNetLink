@@ -120,7 +120,7 @@ bViewSGHeaderUIAlarmNoriAllDel : 알람 / 노티 한번에 삭제하는 기능 �
 
 bViewSGSideBarUIBadge : 왼쪽 siteBar에 BadgeUI 나오게할지 여부(true,false) [기능을 사용할때마다 나와서 보통false사용]
 
-nClipAfterApproveUseType : 클립보드 파일전송 형태때, 0:CheckBox 및 사용자 설정 설정대로, 1:사전, 2:사후 로 전송되게 적용
+nClipAfterApproveUseType : 클립보드 파일전송 형태때, 0:CheckBox 및 사용자 설정 설정대로, 1:사전, 2:사후 로 전송되게 적용 (사후결재 체크여부를 확인한다.)
 
 bUseOneToMultiLogin : 1번에 다중망 로그인 기능 사용유무
 bUseOneByOneLogOut : 1번에 다중망 로그인 기능 사용중일때, 로그아웃은 선택한 망에 대해서 1곳만 진행(true)
@@ -215,4 +215,5 @@ bUseGoogleOtp2FactorAuth : 구글OTP를 사용한 인증동작 하도록 수정�
 
 bDlpFoundSendContinue : 개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무(기본값-false)
 
+bUseAllProxyAuthority : 대결재자로서, 원결재자의 모든 권한을 위임받아 사용할지 유무
 

@@ -398,5 +398,15 @@ namespace OpenNetLinkApp.Data.SGQuery
 
             return SQLXmlService.Instanse.GetSqlQuery("SearchURLList", param);
         }
+
+        public static string AgentHashFailLog(string systemId, string version, string strUserID, string ipAddr)
+        {
+            Dictionary<string, string> param = new Dictionary<string, string>()
+            {
+                {"systemId", systemId }, {"version", version }, {"strUserID", strUserID }, {"ipAddr", ipAddr }
+            };
+
+            return SQLXmlService.Instanse.GetSqlQuery("AgentHashFailLog", param);
+        }
     }
 }

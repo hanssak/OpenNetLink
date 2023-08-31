@@ -99,6 +99,15 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DATABASEQUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
+        public int RequestInstAgentHashLog(HsNetWork hsNet, string strUserID, string strQuery)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["QUERY"] = strQuery;
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DATABASEQUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.SendMessage(args);
+        }
         public int RequestInstApproveClear(HsNetWork hsNet, string strUserID, string appruserId)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
