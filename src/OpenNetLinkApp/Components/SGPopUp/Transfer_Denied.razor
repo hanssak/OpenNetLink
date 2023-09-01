@@ -46,6 +46,18 @@
                                             <td>@item.FilePath</td>
                                         </tr>
                                     }
+                                    @if (bShowInnerFileErr)
+                                    {
+                                        @foreach (FileAddErr item in listInnerErr)
+                                        {
+                                            @*<tr class="@(item.bSub == false ? "filezip" : "")">*@
+                                            <tr>
+                                                <td>@item.FileName</td>
+                                                <td>@((item.eErrType == eFileAddErr.eFANone && item.HasChildrenErr) ? strInnerErrorInfoMsg : item.ExceptionReason)</td>
+                                                <td>@item.FilePath</td>
+                                            </tr>
+                                        }
+                                    }
                                 </tbody>
                             </table>
                         </div>
@@ -111,6 +123,7 @@
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<Transfer_Denied>();
     public List<FileAddErr> listDenied = new List<FileAddErr>();
+    public List<FileAddErr> listInnerErr = new List<FileAddErr>();
 
     @*public List<FileAddErr> listTreeDenied = new List<FileAddErr>();*@
 
@@ -128,6 +141,7 @@
     private string strErrorReasonSummary = "";
     private string strErrorTotalCountSummary = "";
     private string strInnerErrorInfoMsg = "";
+    private bool bShowInnerFileErr = false;
 
 
     ISGSideBarUIService SideBarUISvc;
@@ -142,21 +156,21 @@
 
         string style = "";
         if (errInfo.eErrType != eFileAddErr.eFANone)    //오류난 항목은 빨간색
-        {
+    {
             builder.AddAttribute(1, "Icon", "cancel");
             style += "color: #D44867;";
         }
-        else if(errInfo.ChildrenFiles != null && errInfo.ChildrenFiles.Count > 0)        //하위항목이 있는 항목은 폴더아이콘
-        {
+        else if (errInfo.ChildrenFiles != null && errInfo.ChildrenFiles.Count > 0)        //하위항목이 있는 항목은 폴더아이콘
+    {
             builder.AddAttribute(1, "Icon", "folder");
         }
-        //else if (errInfo.HasChildrenErr)                
-        //{
-        //    builder.AddAttribute(1, "Icon", "info");
-        //    style += "color: #FFAA54;";
-        //}
-        else        //정상
-        {
+    //else if (errInfo.HasChildrenErr)
+    //{
+    //    builder.AddAttribute(1, "Icon", "info");
+    //    style += "color: #FFAA54;";
+    //}
+    else        //정상
+    {
             builder.AddAttribute(1, "Icon", "check_circle");
             style += "color: #327AD9;";
 
@@ -168,7 +182,7 @@
         builder.AddAttribute(3, "Style", style);
         builder.CloseComponent();
 
-        @*builder.AddContent(3, context.Text);*@
+    @*builder.AddContent(3, context.Text);*@
         string htmlString = "<div class=\"p-0 m-0\" style=\"width:100%;\">" +
                                                 "<div class=\"p-0 m-0\" style=\"width:60%;float:left;\">" + context.Text + "</div>"
                                                 +
@@ -236,10 +250,28 @@
         }
     }
 
+    private void GetInnerFileErr(List<FileAddErr> list, ref List<FileAddErr> errList)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+
+            if (list[i].eErrType != eFileAddErr.eFANone)
+            {
+                errList.Add(list[i]);
+            }
+
+            if (list[i].HasChildrenErr && (list[i].ChildrenFiles?.Count ?? 0) > 0)
+            {
+                GetInnerFileErr(list[i].ChildrenFiles, ref errList);
+            }
+        }
+    }
+
 
     public async Task openPopUp()
     {
         FileAddFailLog();
+
 
         object[] param = { "Transfer_Denied" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
@@ -255,29 +287,6 @@
 
     protected override void OnInitialized()
     {
-        /*
-        listDenied.Add(new DeniedFile(1, "11111111111.zip", "확장자 제한 파일", "/root/sdfsaaa/dddddddddddddddddddddddddddddddsfsfsfsdfsdfsdfsdfsdbbb/11111111.zip", false, 0));
-        listDenied.Add(new DeniedFile(2, "1@@1111111111.zip", "확장자 제한 파일", "/root/sdfsdfdsfsdaaa/bbb/11111111.zip", true, 1));
-        listDenied.Add(new DeniedFile(3, "11111@@111111.zip", "확장자 제한 파일", "/root/sdfsdaaa/bsdfsdfsdfsdfsdfsdfsdbb/11111111.zip", true, 1));
-        listDenied.Add(new DeniedFile(4, "11111@@@111111.zip", "확장자 제한 파일", "/root/sdfsdaaa/bbb/11111111.zip", true, 1));
-        listDenied.Add(new DeniedFile(5, "111@@11111111.zip", "확장자 제한 파일", "/root/sdfsdaaa/bbb/11111111.zip", true, 1));
-        listDenied.Add(new DeniedFile(6, "111111@@11111.zip", "확장자 제한 파일", "/root/sdfsdaaa/bbb/11111111.zip", true, 1));
-        listDenied.Add(new DeniedFile(7, "1111dd1111111.zip", "확장자 제한 파일", "/root/sdfsdaaa/bbb/11111111.zip", true, 1));
-        listDenied.Add(new DeniedFile(8, "1111sdf1111111.zip", "확장자 제한 파일", "/root/sdfsdaaa/bbb/11111111.zip", true, 1));
-        listDenied.Add(new DeniedFile(9, "1111sdf1111111.zip", "확장자 제한 파일", "/root/sdfsdfsdfsdfsdfsdfsdfaaa/dddddddddddddddddddddddddddddddddddbbb/11111111.zip", true, 1));
-        listDenied.Add(new DeniedFile(10, "111sdf11111111.zip", "확장자 제한 파일", "/root/asdfsdfsdfsdfsdaa/bbb/11111111.zip", true, 1));
-        listDenied.Add(new DeniedFile(11, "111sd11111111.zip", "확장자 제한 파일", "/root/aaa/sdfsdfsdfbbb/11111111.zip", true, 1));
-        listDenied.Add(new DeniedFile(12, "1111sdf1111111.zip", "확장자 제한 파일", "/root/aaa/sdfsdddddddddddddddddddddddddddddddddddddddddddddddddddfsdbbb/11111111.zip", true, 1));
-        listDenied.Add(new DeniedFile(13, "1111sdf1111111.zip", "확장자 제한 파일", "/root/asdfsdaa/bbb/11111111.zip", true, 1));
-        listDenied.Add(new DeniedFile(14, "1111sdf1111111.zip", "확장자 제한 파일", "/root/asdfsdfsdaa/bbb/11111111.zip", true, 1));
-        listDenied.Add(new DeniedFile(15, "1111sd1111111.zip", "확장자 제한 파일", "/root/asdfsdaa/bbb/11111111.zip", true, 1));
-        listDenied.Add(new DeniedFile(16, "1sd1111111111.zip", "확장자 제한 파일", "/root/asdfsdfsdfsdfsdfaa/bbb/11111111.zip", true, 1));
-
-
-        listDeniedReason.Add("압축파일내 검사가 불가능한 파일 1개");
-        listDeniedReason.Add("압축파일내 확장자 변경 포함 1623개");
-        listDeniedReason.Add("압축파일내 알수 없는 형식 포함 132개");
-        */
         base.OnInitialized();
 
         InitText();
@@ -299,6 +308,16 @@
         listDeniedReason.Clear();
         listDeniedReason = new List<(string, string)>(list);
         StateHasChanged();
+    }
+
+    public void SetInnerFileErr(int groupId)
+    {
+        listInnerErr.Clear();
+        GetInnerFileErr(listDenied, ref listInnerErr);
+
+        bShowInnerFileErr = SGAppMgrSvc.OpConfigInfoService.GetShowInnerFileErrDetail(groupId);
+        StateHasChanged();
+
     }
 
     public void SendFileAddList()
