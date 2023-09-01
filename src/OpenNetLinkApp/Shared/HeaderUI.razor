@@ -1550,6 +1550,11 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             _curFileName = clipFilePath;
             _curGroupId = clipData.nGroupId;
 
+            if(pageService.GetClipboardSending())
+            {
+                ShowMessage("warn", "클립보드 전송 중입니다");
+                return;
+            }
 
             if (OpConfigSvc.GetUseClipBoardApproveAfterLimit(clipData.nGroupId))
             {
@@ -2005,6 +2010,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             }
             if (File.Exists(m_sendedClipboardFilePath))
                 File.Delete(m_sendedClipboardFilePath);
+
+            pageService.SetClipboardSending(false);
             return;
         }
         if (e.count == -100)
@@ -2019,6 +2026,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             }
             if (File.Exists(m_sendedClipboardFilePath))
                 File.Delete(m_sendedClipboardFilePath);
+            pageService.SetClipboardSending(false);
             return;
         }
         if (e.count == -200)
@@ -2033,6 +2041,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             }
             if (File.Exists(m_sendedClipboardFilePath))
                 File.Delete(m_sendedClipboardFilePath);
+            pageService.SetClipboardSending(false);
             return;
         }
         if (e.count >= 100)
@@ -2051,6 +2060,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             if (File.Exists(m_sendedClipboardFilePath))
                 File.Delete(m_sendedClipboardFilePath);
+            pageService.SetClipboardSending(false);
         }
         return;
     }
@@ -2152,12 +2162,14 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         //수신자 목록체크(철자틀림)
         string stReceiver = "";
         string strDestNetOverData = "";
+        pageService.SetClipboardSending(true);
         int ret = HsCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strTitle, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
         if (ret == -2)
         {
             string strMsg = XmlConf.GetErrMsg("E_0162");
 
             ShowClipboardMessage("error", strMsg, groupID, OS_NOTI.CLIPBOARD);
+            pageService.SetClipboardSending(false);
             return;
         }
     }
