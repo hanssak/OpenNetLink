@@ -211,6 +211,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseToastInsteadOfOSNotification(int groupId);
         public bool GetUiFileExpiredDateShow(int groupId);
 
+        public bool GetShowInnerFileErrDetail(int groupId);
+
 
         public bool GetUseDlpFoundSendContinue(int groupId);
 
@@ -983,6 +985,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUiFileExpiredDateShow(int groupId)
         {
             return AppConfigInfo[groupId].bUiFileExpiredDateShow;
+        }
+        /// <summary>
+        /// 파일 추가에 제외된 파일 리스트에 내부에 걸린 파일 리스트 전부 보여주기 
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        public bool GetShowInnerFileErrDetail(int groupId)
+        {
+            return AppConfigInfo[groupId].bShowInnerFileErrDetail;
         }
         /// <summary>
         /// 서버DLP에서 개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무

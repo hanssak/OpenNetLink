@@ -55,6 +55,7 @@ bAutoLogin : IDPW 자동로그인 기능 사용유무 ( true : 사용, false : �
 bAutoLoginCheck : IDPW 자동로그인 체크박스 기본 체크되어 있게 설정 ( true : 사용, false : 유지 안함 )
 bUserPWChange : 사용자pw 변경 기능 사용, PW 검증기능 동시 사용 ( true, false ) ( true, false )
 bEmptyfileTrans : 0kb 파일 전송 가능 유무(true, false)
+bSessionDuplicateBlock : 세션중복일때 신규 접속 사용자 차단 여부 (true : 차단, false : 사용자에게 강제 접속 여부 팝업 표시) - Default:false
 
 // IDPW - 관련 기타(siteConfig)
 strInitPasswd : 암호화된 초기 PW string
@@ -77,6 +78,7 @@ bUseFileClipApproveUI : 파일형태로 클립보드 송수신할때, 클립보�
 // 화면잠금
 bScreenLockUserChange : 스크린 잠금 사용자가 설정가능 체크박스 나오도록 ( true, false )
 bScreenLock : 화면잠금 사용 여부.(체크박스값) (true, false)
+strScrTimeoutLockType : ScrLockTime의 시간초과로 타임아웃 발생 시, 처리타입 (ScreenLock:화면잠금, LogOut:로그아웃, Exit: 프로그램 종료) - Default:ScreenLock
 
 
 // 기타 (1)
@@ -151,6 +153,7 @@ bFileDownloadBeforeReciving : 파일포워드, 송신자가 수신PC에 미수�
 // 기타 (2)
 bRecvFolderOpen : 파일 수신후 폴더 열기 사용유무
 bUseAgentTime1aClock : 정책값대로 시간단위 사후결재 정책, 자정에  검색화면 검색날짜 UI / 일일 송순가능수 UI 변경되는거 Server 시간이 아니라 agent 시간기준으로 동작함(true:사용,false:않함) - Test 목적(siteConfig)
+strOKTAUrl : OKTA 연동 URL (URL 입력 시, 인증 화면으로 해당 URL 브라우저 표시 및 리다이렉션 된 사용자정보로 인증)
 
 // 부서별 사용자 조회 방식 설정 기능(siteConfig)
 strApproverSearchType :	'파일전송' 화면에서 결재자 선택 시 사용자 조회 방식을 결정 

@@ -1899,6 +1899,7 @@
             {
                 refTransferDenied.CopyData(listErr);
                 refTransferDenied.CopyReason(listReason);
+                refTransferDenied.SetInnerFileErr(_groupId);
                 fileAddManage.RestoreFileSizeLimit();   //전송량 원복 2021/04/23 YKH
                 await refTransferDenied.openPopUp();
 

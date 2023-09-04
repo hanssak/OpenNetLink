@@ -45,7 +45,7 @@
                                 // 다중접속일때에는 단일망에만 전달가능
                                 // 단일접속일때에는 3중망에 전달가능
                                 @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0 &&
-                     (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                            (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                 {
 
                                     //@if (itemData.Value.nIdx == 1 && ListModKey.Count > 0)
@@ -57,7 +57,7 @@
                                         {
                                             @*<input type="checkbox" class="mr-1" checked="@(ListModKey[NetworkInfo.GroupID][Index])"
                                                 @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />*@
-                                            <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))"
+                                            <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))" @onclick:preventDefault="@GetPreventDefault(NetworkInfo.GroupID, Index)"
                                                    @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
                                             <span class="mr-2">@Modifier</span>
                                         }
@@ -179,7 +179,7 @@
                                 @*<input type="checkbox" class="mr-1" checked="@ListModKey[NetworkInfo.GroupID][Index]"
                                     @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />*@
 
-                                <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))"
+                                <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))" @onclick:preventDefault="@GetPreventDefault(NetworkInfo.GroupID, Index)"
                                        @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
 
                                 <span class="mr-2">@Modifier</span>
@@ -289,6 +289,7 @@
                 <span class="@("net"+(Idx+50).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span> <!-- @(NetworkInfo.ToName + ":" + GetForwardUrl(NetworkInfo.GroupID)) -->
 
                 <br>
+
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetURLAutoTrans(NetworkInfo.GroupID))"
                            @onchange="eventArgs => { SetURLAutoTrans(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO")</span>                  <!--URL 자동전환 사용 -->
@@ -625,6 +626,7 @@
     /// groupID별 단축키<win,ctrl,...> 저장 Dic
     /// </summary>
     private Dictionary<int, List<bool>> DicModKey = new Dictionary<int, List<bool>>();
+    private Dictionary<int, List<bool>> DicModPreventDefault = new Dictionary<int, List<bool>>();
 
     /// <summary>
     /// 3망연계,groupID-Idx별 단축키<win,ctrl,...> 저장 List
@@ -816,7 +818,20 @@
 
         listKey[(int)modifier] = bMod;
 
+        SetPreventDefault(groupId, listKey);
+
         SetClipBoardHotKey(groupId, ref listKey, chVkey);
+    }
+
+    bool GetPreventDefault(int groupId, int modifier)
+    {
+        List<bool> listKey = null;
+        if (DicModPreventDefault.TryGetValue(groupId, out listKey) == false)
+        {
+            return false;
+        }
+
+        return DicModPreventDefault[groupId][(int)modifier];
     }
 
 
@@ -972,7 +987,7 @@
     //페이지 타입 String
     private string GetMainPageTypeStr()
     {
-        string title =Common.CsFunction.GetEnumDescription(SGAppMgrSvc.AppConfigInfoService.GetMainPageType());
+        string title = Common.CsFunction.GetEnumDescription(SGAppMgrSvc.AppConfigInfoService.GetMainPageType());
         return XmlConf.GetTitle(title);
     }
 
@@ -1650,7 +1665,7 @@
     private void SetLanguage(string value)
     {
         EventHandler<string> change = HsCmdCenter.sgPageEvent.GetChangeLanguageEvent();
-         change(null, value);
+        change(null, value);
     }
     //private void SetScreenLock(ChangeEventArgs changeEventArg)
     //{
@@ -2259,6 +2274,8 @@
             }
 
             DicModKey.Add(nGroupId, listKey);
+
+            SetPreventDefault(nGroupId, listKey);
         }
         catch (Exception ex)
         {
@@ -2269,6 +2286,50 @@
         return bRet;
     }
 
+
+    public void SetPreventDefault(int groupId, List<bool> listKey)
+    {
+        List<bool> prevent = null;
+        int count = 0;
+        foreach (bool value in listKey)
+        {
+            if (value)
+                count++;
+        }
+        if (DicModPreventDefault.TryGetValue(groupId, out prevent) == false)
+        {
+            prevent = new List<bool>();
+            if (count == 1)
+            {
+                foreach (bool value in listKey)
+                {
+                    prevent.Add(value);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < listKey.Count; i++)
+                    prevent.Add(false);
+            }
+            DicModPreventDefault.Add(groupId, prevent);
+        }
+        else
+        {
+            if (count == 1)
+            {
+                for (int i = 0; i < listKey.Count; i++)
+                {
+                    prevent[i] = listKey[i];
+                }
+            }
+            else
+            {
+                for (int i = 0; i < listKey.Count; i++)
+                    prevent[i] = false;
+            }
+            DicModPreventDefault[groupId] = prevent;
+        }
+    }
     /// <summary>
     /// 클립보드 단축키 설정값 얻는 함수
     /// </summary>

@@ -48,6 +48,18 @@
                                             <td>@item.FilePath</td>
                                         </tr>
                                     }
+                                    @if (bShowInnerFileErr)
+                                    {
+                                        @foreach (FileAddErr item in listInnerErr)
+                                        {
+                                            @*<tr class="@(item.bSub == false ? "filezip" : "")">*@
+                                            <tr>
+                                                <td>@item.FileName</td>
+                                                <td>@((item.eErrType == eFileAddErr.eFANone && item.HasChildrenErr) ? strInnerErrorInfoMsg : item.ExceptionReason)</td>
+                                                <td>@item.FilePath</td>
+                                            </tr>
+                                        }
+                                    }
                                 </tbody>
                             </table>
                         </div>
@@ -113,6 +125,7 @@
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<Transfer_Denied>();
     public List<FileAddErr> listDenied = new List<FileAddErr>();
+    public List<FileAddErr> listInnerErr = new List<FileAddErr>();
 
     @*public List<FileAddErr> listTreeDenied = new List<FileAddErr>();*@
 
@@ -130,6 +143,7 @@
     private string strErrorReasonSummary = "";
     private string strErrorTotalCountSummary = "";
     private string strInnerErrorInfoMsg = "";
+    private bool bShowInnerFileErr = false;
 
 
     ISGSideBarUIService SideBarUISvc;
@@ -238,10 +252,28 @@
         }
     }
 
+    private void GetInnerFileErr(List<FileAddErr> list, ref List<FileAddErr> errList)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+
+            if (list[i].eErrType != eFileAddErr.eFANone)
+            {
+                errList.Add(list[i]);
+            }
+
+            if (list[i].HasChildrenErr && (list[i].ChildrenFiles?.Count ?? 0) > 0)
+            {
+                GetInnerFileErr(list[i].ChildrenFiles, ref errList);
+            }
+        }
+    }
+
 
     public async Task openPopUp()
     {
         FileAddFailLog();
+
 
         object[] param = { "Transfer_Denied" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
@@ -278,6 +310,16 @@
         listDeniedReason.Clear();
         listDeniedReason = new List<(string, string)>(list);
         StateHasChanged();
+    }
+
+    public void SetInnerFileErr(int groupId)
+    {
+        listInnerErr.Clear();
+        GetInnerFileErr(listDenied, ref listInnerErr);
+
+        bShowInnerFileErr = SGAppMgrSvc.OpConfigInfoService.GetShowInnerFileErrDetail(groupId);
+        StateHasChanged();
+
     }
 
     public void SendFileAddList()

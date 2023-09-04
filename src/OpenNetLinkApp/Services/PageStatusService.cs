@@ -1042,6 +1042,14 @@ namespace OpenNetLinkApp.Services
         {
             return m_bFileSending;
         }
+        public bool GetClipboardSending()
+        {
+            return m_bClipBoardSending;
+        }
+        public void SetClipboardSending(bool bClipboardSending)
+        {
+            m_bClipBoardSending = bClipboardSending;
+        }
         public void SetFilePrevRecving(bool bFilePrevRecving)
         {
             m_bFilePrevRecving = bFilePrevRecving;
