@@ -544,7 +544,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             string strData = GetTagData("AUTHUSER");
             strData = strData.Substring(0, 1);
-            if (strData.Equals("Y"))
+            if (strData.Equals("Y") || strData.Equals("C"))
                 return true;
             return false;
         }
