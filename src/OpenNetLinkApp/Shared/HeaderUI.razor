@@ -1342,7 +1342,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             ShowClipboardMessage("info", strText, clipData.nGroupId, OS_NOTI.CLIPBOARD);
             SendDayClipInfo(clipData.nGroupId);
             InsertMessage(NOTI_TYPE.USER, clipData.nGroupId, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipSend, "", strText);
-            Window.Notification(OS_NOTI.CLIPBOARD, XmlConf.GetInfoMsg("I_0163"), XmlConf.GetInfoMsg("I_0032"));
+            //Window.Notification(OS_NOTI.CLIPBOARD, XmlConf.GetInfoMsg("I_0163"), XmlConf.GetInfoMsg("I_0032"));
         }
 
     }
