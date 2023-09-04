@@ -46,7 +46,9 @@
 
                             <tr>
                                 <th>@strApprKind</th>                                                       <!--승인구분-->
-                                <td style="text-align:center;">@strDataApprKind</td>
+                                @*<td style="text-align:center;">@strDataApprKind</td> //  Site요청으로 '결재'로 통일 *@
+                                <td style="text-align:center;">@XmlConf.GetTitle("T_DASH_APPROVAL")</td>
+
                                 <th>@strApprStatus</th>                                                       <!--승인상태-->
                                 <td style="text-align:center;">@strDataApprStatus</td>
 
@@ -74,9 +76,9 @@
                                                         <thead>
                                                             <tr>
                                                                 <th style="text-align:center;width:7%;">@strUserName</th>                         <!--이름-->
-                                                    <th style="text-align:center;width:7%;">@strUserPosition</th>                         <!--직급-->
-                                                    <th style="text-align:center;width:8%;">@strUserDept</th>                        <!--부서-->
-                                                </tr>
+                                                                <th style="text-align:center;width:7%;">@strUserPosition</th>                         <!--직급-->
+                                                                <th style="text-align:center;width:8%;">@strUserDept</th>                        <!--부서-->
+                                                            </tr>
                                                         </thead>
                                                         <tbody>
                                                             @foreach (Dictionary<int, string> item in listForwaredUserInfo)

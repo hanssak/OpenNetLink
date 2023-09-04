@@ -191,48 +191,49 @@
                                 <tbody>
                                     @foreach (transData item in mData)
                                     {
-                                        <tr class="TransSearch">
-                                            <td style="text-align:center">
-                                                <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                            </td>
-                                            <td style="text-align:center; vertical-align: middle">@item.ApvType</td>
-                                            <td style="text-align:center; vertical-align: middle">@item.TransferType</td>
-                                            <td style="text-align:center; vertical-align: middle">@item.TransferStatus</td>
-                                            <td style="text-align:center; vertical-align: middle">@item.ApvStatus</td>
-                                            @if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForward())
+                                    <tr class="TransSearch">
+                                        <td style="text-align:center">
+                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        </td>
+                                        @*<td style="text-align:center; vertical-align: middle">@item.ApvType</td> // Site요청으로 '결재'로 통일 *@
+                                        <td style="text-align:center; vertical-align: middle">@XmlConf.GetTitle("T_DASH_APPROVAL")</td>
+                                        <td style="text-align:center; vertical-align: middle">@item.TransferType</td>
+                                        <td style="text-align:center; vertical-align: middle">@item.TransferStatus</td>
+                                        <td style="text-align:center; vertical-align: middle">@item.ApvStatus</td>
+                                        @if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForward())
+                                        {
+                                            <td style="text-align:center; vertical-align: middle">@item.IsFile</td>
+                                        }
+
+                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                        {
+                                            <td style="text-align:center; vertical-align: middle">@item.strDestNet</td>
+                                        }
+                                        <td style="vertical-align:middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="text-align:center; vertical-align: middle">@item.RequestTime</td>
+
+                                        @if (bUseDlpDataView)
+                                        {
+                                            <td style="text-align:center; vertical-align: middle">@item.stDLP</td>
+                                        }
+
+                                        @if (false)
+                                        {
+                                            <td style="text-align:center; vertical-align: middle">@item.expiredDate</td>
+                                            @if (item.isPossibleDownload)
                                             {
-                                                <td style="text-align:center; vertical-align: middle">@item.IsFile</td>
+                                                <td style="text-align:center; vertical-align: middle">@item.isPossibleDownloadCount</td>
+                                                <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>RequestManualDownload(item))"><i class="far fa-arrow-alt-circle-down"></i></button></td>
                                             }
-
-                                            @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                            else
                                             {
-                                                <td style="text-align:center; vertical-align: middle">@item.strDestNet</td>
+                                                <td style="text-align:center; vertical-align: middle">0</td>
+                                                <td style="text-align:center; vertical-align: middle">-</td>
                                             }
-                                            <td style="vertical-align:middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                            <td style="text-align:center; vertical-align: middle">@item.RequestTime</td>
+                                        }
 
-                                            @if (bUseDlpDataView)
-                                            { 
-                                                <td style="text-align:center; vertical-align: middle">@item.stDLP</td>
-                                            }
-
-                                            @if (false)
-                                            { 
-                                                <td style="text-align:center; vertical-align: middle">@item.expiredDate</td>
-                                                @if (item.isPossibleDownload)
-                                                {
-                                                    <td style="text-align:center; vertical-align: middle">@item.isPossibleDownloadCount</td>
-                                                    <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>RequestManualDownload(item))"><i class="far fa-arrow-alt-circle-down"></i></button></td>
-                                                }
-                                                else
-                                                {
-                                                    <td style="text-align:center; vertical-align: middle">0</td>
-                                                    <td style="text-align:center; vertical-align: middle">-</td>
-                                                }
-                                            }
-
-                                            <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
-                                        </tr>
+                                        <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
+                                    </tr>
                                     }
                                 </tbody>
                             </table>
