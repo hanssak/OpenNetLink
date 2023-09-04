@@ -443,6 +443,42 @@
     private void UpdateData()
     {
         TransSearchData(nViewPageNo);
+
+        //전송 취소 시에, 전송 수량 다시 갱신처리
+        SendDayFileInfo();
+    }
+
+    /// <summary>
+    /// 일일파일전송, 클립보드 전송 요청
+    /// </summary>
+    /// <param name="groupId"></param>
+    public void SendDayFileInfo()
+    {
+         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HSCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
     }
 
 
