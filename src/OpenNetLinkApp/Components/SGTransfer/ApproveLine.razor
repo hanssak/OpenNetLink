@@ -203,6 +203,11 @@ else
             for (int i = 0; i < nApprLineCount; i++)
             {
                 int order = Convert.ToInt32(listApprLineOrder[i]);
+
+                //중복체크 - ApproveLine에 다른 Order에라도 동일 seq가 중복해서 들어오는 것을 막는다. (ex. SFM1)
+                if (approverList.Exists(apr => apr.Seq == listApprLineSeq[i]))
+                    continue;
+                
                 //중복체크 필요... ApproveLine에 같은 Order일 경우 중복해서 들어오는것을 막는다..
                 if (checkUserSeqByOrder.ContainsKey(order))
                 {
@@ -313,6 +318,10 @@ else
                 strApprLineOrder = item.nApvOrder.ToString();
             else
                 strApprLineOrder = item.Index;
+
+             //중복체크 - ApproveLine에 동일 seq가 중복해서 들어오는 것을 막는다. (ex. SFM1) 
+             if (approverList.Exists(apr => apr.Seq == strApprLineSeq)) 
+                continue;
 
             approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder));
         }
