@@ -9,6 +9,21 @@ namespace OpenNetLinkApp.Common
 {
     public class Enums
     {
+        [Flags]
+        public enum EnumSysPos
+        {
+            [Description("None")]
+            None = 0,
+            [Description("ProgramFiles 위치")]
+            ProgramFiles = 1,
+            [Description("UserData 위치")]
+            UserData = 2,
+            [Description("다른 Volume Drive 위치")]
+            OtherDrive = 3,
+            [Description("ProgramFilesX86 위치")]
+            ProgramFilesX86 = 4
+        }
+
         public enum EnumNetWorkType
         {
             [Description("None")]

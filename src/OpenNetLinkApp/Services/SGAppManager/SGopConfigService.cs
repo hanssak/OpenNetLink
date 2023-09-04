@@ -178,6 +178,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApproveExt(int groupId);
         public bool GetUseFileExceptionDescCheck(int groupId);
         public bool GetUsePKIsendRecv(int groupId);
+        public bool GetPKIsendType(int groupId);
         public bool GetUseApprTreeSearch(int groupId);
         public string GetInitTransferFileExplorerPathInWindow(int groupId);
         public bool GetUseToastInsteadOfOSNotification(int groupId);
@@ -889,6 +890,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUsePKIsendRecv;    // 기본값
         }
+
+        public bool GetPKIsendType(int groupId)
+        {
+            return AppConfigInfo[groupId].bPkiSendByFileTrans;
+        }
+
         public bool GetUseApprTreeSearch(int groupId)
         {
             return false;

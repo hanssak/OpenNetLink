@@ -171,5 +171,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public string strScrTimeoutLockType { get; set; } = "ScreenLock";                      //ScrLockTime의 시간초과로 타임아웃 발생 시, 처리타입(ScreenLock:화면잠금, LogOut:로그아웃, Exit: 프로그램 종료)
 
         public string strOKTAUrl { get; set; } = "";
+        public bool bPkiSendByFileTrans { get; set; } = false;                // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
     }
 }

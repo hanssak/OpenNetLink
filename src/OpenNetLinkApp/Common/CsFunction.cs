@@ -248,16 +248,16 @@ namespace OpenNetLinkApp.Common
         {
             if (strExtData.Length < 1 || strExtData == ";")
             {
-                Log.Information($"isFileExtinListStr - false (Wrong ExtList) - strFileName : {strFileName}, Ext List : {strExtData}");
+                Log.Logger.Here().Information($"isFileExtinListStr - false (Wrong ExtList) - strFileName : {strFileName}, Ext List : {strExtData}");
                 return false;
             }
-                
+
             if (strFileName.Length < 1)
             {
-                Log.Information($"isFileExtinListStr - false (Wrong FileExt) - strFileName : {strFileName}, Ext List : {strExtData}");
+                Log.Logger.Here().Information($"isFileExtinListStr - false (Wrong FileExt) - strFileName : {strFileName}, Ext List : {strExtData}");
                 return false;
-            }             
-            
+            }
+
             if (bFileNameIsOnlyExt == false)
             {
                 // strFileName 예서 확장자만 구해서 입력하기
@@ -430,6 +430,32 @@ namespace OpenNetLinkApp.Common
             return lSize;
         }
 
+        /// <summary>
+        /// strFilePath : [IN] 파일경로(FullPath)
+        /// chSep : [IN] Folder 간의 구분문자( '\\' : 윈도우, '/' : Linux, Mac 등등 )
+        /// strFolderPath : [OUT] 파일경로상에 있는 Path
+        /// bCreateFolder : [IN] 파일경로상에 있는 Path 를 생성할지 유무
+        /// </summary>
+        /// <param name="strFilePath"></param>
+        /// <param name="strFolderPath"></param>
+        /// <param name="bCreateFolder"></param>
+        /// <returns></returns>
+        public static bool GetPathByFilePath(string strFilePath, char chSep, out string strFolderPath, bool bCreateFolder)
+        {
+            strFolderPath = "";
+            int nLastPos = strFilePath.LastIndexOf(chSep);
+            if (nLastPos < 0)
+            {
+                Log.Logger.Here().Information($"GetPathByFilePath, input Path Error : {strFilePath}");
+                return false;
+            }
+
+            strFolderPath = strFilePath.Substring(0, nLastPos);
+            if (bCreateFolder && Directory.Exists(strFolderPath) == false)
+                Directory.CreateDirectory(strFolderPath);
+
+            return true;
+        }
 
         /// <summary>
         /// Windows / Linux / Mac OSx 에서 다 지원하는 파일명인지 확인하는 함수<br></br>
@@ -584,7 +610,7 @@ namespace OpenNetLinkApp.Common
             }
             catch (Exception e)
             {
-                Log.Information($"SHA256CheckSum - Exception - msg : {e.Message}, path : {filePath}");
+                Log.Logger.Here().Information($"SHA256CheckSum - Exception - msg : {e.Message}, path : {filePath}");
                 //CLog.Here().Information($"FileInfo Get(#####) - Exception - msg : {e.Message}, path : {filePath}");
             }
 
@@ -609,7 +635,7 @@ namespace OpenNetLinkApp.Common
             }
             catch (Exception e)
             {
-                Log.Information($"SHA384BinBase64 - Exception - msg : {e.Message}, path : {filePath}");
+                Log.Logger.Here().Information($"SHA384BinBase64 - Exception - msg : {e.Message}, path : {filePath}");
                 //CLog.Here().Information($"FileInfo Get(#####) - Exception - msg : {e.Message}, path : {filePath}");
             }
 
@@ -658,7 +684,7 @@ namespace OpenNetLinkApp.Common
                 strAgentPath += ".exe";
             }
 
-            Log.Information($"GetCurrentProcessName : {strAgentPath}");
+            Log.Logger.Here().Information($"GetCurrentProcessName : {strAgentPath}");
 
             return strAgentPath;
         }
@@ -687,19 +713,19 @@ namespace OpenNetLinkApp.Common
                 if (bStartReg == false)
                     LinkFile.Delete();
 
-                Log.Information($"makeAgentBootStartOSwindow - Lnk File exist : {LinkFullPath},  {(bStartReg?"Lnk Create Skip!":"Lnk Delete Done!")}");
+                Log.Logger.Here().Information($"makeAgentBootStartOSwindow - Lnk File exist : {LinkFullPath},  {(bStartReg ? "Lnk Create Skip!" : "Lnk Delete Done!")}");
                 return true;
             }
             else
             {
                 if (bStartReg == false)
                 {
-                    Log.Information($"makeAgentBootStartOSwindow - Lnk File isn't exist(Lnk Delete Skip!) : {LinkFullPath}");
+                    Log.Logger.Here().Information($"makeAgentBootStartOSwindow - Lnk File isn't exist(Lnk Delete Skip!) : {LinkFullPath}");
                     return true;
                 }
             }
 
-            Log.Information($"makeAgentBootStartOSwindow - WorkingPath(#####) : {Environment.CurrentDirectory}");
+            Log.Logger.Here().Information($"makeAgentBootStartOSwindow - WorkingPath(#####) : {Environment.CurrentDirectory}");
 
             return CsLnkFunc.makeLnkShortCut(strOrgPath, LinkFullPath, "", Environment.CurrentDirectory);
         }
@@ -749,7 +775,7 @@ namespace OpenNetLinkApp.Common
                 bRet = false;
             }
 
-            Log.Information(@$"makeAgentBootStart OSwindow - Make Lnk File {(bRet?"SUCCESS":("FAILED+ERRmsg:"+ strErrMsg))} : {strLnkPath}");
+            Log.Logger.Here().Information(@$"makeAgentBootStart OSwindow - Make Lnk File {(bRet ? "SUCCESS" : ("FAILED+ERRmsg:" + strErrMsg))} : {strLnkPath}");
 
             return bRet;
         }
@@ -1171,6 +1197,69 @@ namespace OpenNetLinkApp.Common
 
             return nComplexCnt;
         }
+        /// <summary>
+        /// 숫자, 대문자(영문), 소문자(영문), 특수문자가 각항목이 존재하면 +1, (전부다있으면 : 4)
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <returns></returns>
+        public int GetComplexCnt(ref byte[] strData)
+        {
+            bool[] matchCount = new bool[4] { false, false, false, false };
+            foreach (byte item in strData)
+            {
+                if (regex2.IsMatch(Convert.ToChar(item).ToString()))
+                    matchCount[0] = true;
+                if (regex3.IsMatch(Convert.ToChar(item).ToString()))
+                    matchCount[1] = true;
+                if (regex4.IsMatch(Convert.ToChar(item).ToString()))
+                    matchCount[2] = true;
+                if (regex5.IsMatch(Convert.ToChar(item).ToString()))
+                    matchCount[3] = true;
+            }
+            return matchCount.Count(match => match == true);
+        }
+
+        /// <summary>
+        /// reture : True - 같은문자가 지정한 개수 만큼 반복되지 않음
+        /// reture : false - 같은문자가 지정한 개수 만큼 반복됨
+        /// </summary>
+        /// <param name="chPasswd"></param>
+        /// <param name="iCount"></param>
+        /// <returns></returns>
+        bool CheckSameChar(ref byte[] chPasswd, int iCount)
+        {
+            bool bFindSameChar = false;
+            int nLength = chPasswd.Length;
+
+            try
+            {
+                for (int n = 0; n < nLength - (iCount - 1); n++)
+                {
+                    if (Convert.ToChar(chPasswd[n]) == Convert.ToChar(chPasswd[n + 1]))
+                    {
+                        for (int i = 1; i < iCount - 1; i++)
+                        {
+                            if (Convert.ToChar(chPasswd[n + i]) != Convert.ToChar(chPasswd[n + i + 1]))
+                            {
+                                bFindSameChar = false;
+                                break;
+                            }
+                            bFindSameChar = true;
+                        }
+                    }
+
+                    if (bFindSameChar == true)
+                        return false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"CheckSameChar, exception(MSG) : {ex.Message}");
+            }
+
+            return true;
+        }
 
         /// <summary>
         /// reture : True - 같은문자가 지정한 개수 만큼 반복되지 않음
@@ -1225,6 +1314,20 @@ namespace OpenNetLinkApp.Common
         public bool GetSameCharCheck(string strData, int nCharKeyCount)
         {
             if (CheckSameChar(strData, nCharKeyCount))
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// 동일한 문자·숫자의 연속적인 존재유무(true:존재함,false:존재X) <br></br>
+        /// nCharKeyCount : 연속으로 존재해야하는 문자개수
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <returns></returns>
+        public bool GetSameCharCheck(ref byte[] strData, int nCharKeyCount)
+        {
+            if (CheckSameChar(ref strData, nCharKeyCount))
                 return false;
 
             return true;
@@ -1295,6 +1398,7 @@ namespace OpenNetLinkApp.Common
             return true;
         }
 
-    }
 
+
+    }
 }
