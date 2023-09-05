@@ -193,6 +193,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetOKTAUrl(int groupId);
 
         public bool GetVisibleLogOutButton(int groupId);
+
+        public bool GetAllowDRM(int groupId);
     }
 
 
@@ -943,6 +945,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetVisibleLogOutButton(int groupId)
         {
             return AppConfigInfo[groupId].bVisibleLogOutButton;
+        }
+
+        public bool GetAllowDRM(int groupId)
+        {
+            return AppConfigInfo[groupId].bAllowDRM;
         }
 
     }
