@@ -923,7 +923,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 case eFileAddErr.eUnZipInnerDRM:                                // zip파일에 내부의 DRM 파일
                     /* TODO */
-                    str = xmlConf.GetTitle("T_eUnZipInnerDRM");                 // T_eUNZIP_INNER_DRMFILE 
+                    str = xmlConf.GetTitle("T_eUNZIP_INNER_DRMFILE");                 // T_eUNZIP_INNER_DRMFILE 
                                                                                 //str = "ZIP파일 내부 DRM 파일";
                     break;
 
@@ -1781,11 +1781,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="hsStream"></param>
         /// <returns></returns>
-        public async Task<(eFileAddErr, string)> GetExamFileExtChange(HsStream hsStream)
+        public async Task<(eFileAddErr, string)> GetExamFileExtChange(HsStream hsStream, bool bAllowDRM)
         {
             eFileAddErr enRet;
             string strExt = Path.GetExtension(hsStream.FileName);
-            (eFileAddErr, string) validResult = await IsValidFileExt(hsStream.stream, strExt);
+            (eFileAddErr, string) validResult = await IsValidFileExt(hsStream.stream, strExt, bAllowDRM);
             return validResult;
             //if (enRet != eFileAddErr.eFANone)
             //{
@@ -3276,7 +3276,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="strExt"></param>
         /// <param name="blAllowDRM"></param>
         /// <returns></returns>
-        public async Task<(eFileAddErr, string)> IsValidFileExt(Stream stFile, string strExt, bool blAllowDRM = true)
+        public async Task<(eFileAddErr, string)> IsValidFileExt(Stream stFile, string strExt, bool blAllowDRM)
         {
             string strFileMime = string.Empty;
             byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
@@ -3287,7 +3287,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if (blAllowDRM)
                     return (eFileAddErr.eFANone, strFileMime);
                 else
-                    return (eFileAddErr.eFAUNKNOWN, strFileMime);
+                    return (eFileAddErr.eFADRM, strFileMime);
             }
 
             strFileMime = MimeGuesser.GuessMimeType(btFileData);
@@ -4390,7 +4390,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="nOption">CLIENT_ZIP_DEPTH의 2번값(0: 1번째 zip depth에 또 zip이 발견되면 차단, 1 : 허용)</param>
         /// <param name="blAllowDRM"> drm 파일 허용유무(true:허용)</param>
         /// <returns></returns>
-        public async Task<int> CheckZipFile(HsStream hsStream, FileAddErr currentFile, bool bDenyPasswordZIP, bool blWhite, string strExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, string documentExtractType, int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true, string strApproveExt = "")
+        public async Task<int> CheckZipFile(HsStream hsStream, FileAddErr currentFile, bool bDenyPasswordZIP, bool blWhite, string strExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, string documentExtractType, bool blAllowDRM, int nMaxDepth = 3, int nOption = 0, string strApproveExt = "")
         {
             int nTotalErrCount = 0;
             eFileAddErr enRet;
@@ -4634,6 +4634,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     //CheckDocumentFile()
                     //압축해제한 파일의 Stream 필요
                     //Check Document File (압축파일 내 문서검사할 파일이 존재하는 경우)
+                    
                     if (ListCheckableDocumentExtension.Exists(ext => (string.Compare(ext, strNoDotExt, true) == 0)))
                     {
                         //압축 내부 문서의 압축해제 개체를 보관할 폴더 (Temp/ZipExtract/ZipName/Document_Extract)
@@ -4643,16 +4644,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         //압축해제한 파일의 Stream 필요
                         HsStream oleHsStream = null;
 
-
                         using (Stream oleFileStream = File.OpenRead(extractFile.FullName))
                         {
-                            oleHsStream = new HsStream() { stream = oleFileStream, FileName = extractFile.FullName, MemoryType = HsStreamType.FileStream };
-                            scanDocumentFile(oleHsStream, childFile, strTempDocumentExtractDirPath, blWhite, strExtInfo, documentScanDepth, documentExtractType).Wait();
+                            m_bIsDrm = Task.Run<bool>(async () => {return await IsDRMbyStream(oleFileStream); }).Result;
+                            if (m_bIsDrm)
+                            {
+                                m_bIsDrm = false;
+                                Log.Logger.Here().Information($"file in ScanZipFile, is DRM file - Ole inspection skip!");
+                            }
+                            else
+                            {
+                                oleHsStream = new HsStream() { stream = oleFileStream, FileName = extractFile.FullName, MemoryType = HsStreamType.FileStream };
+                                scanDocumentFile(oleHsStream, childFile, strTempDocumentExtractDirPath, blWhite, strExtInfo, documentScanDepth, documentExtractType, blAllowDRM).Wait();
+                            }
                         }
 
                         if (childFile.eErrType != eFileAddErr.eFANone || childFile.HasChildrenErr)
                         {
-                            childFile.eErrType = enErr;
+                            //childFile.eErrType = enErr;
                             currentFile.HasChildrenErr = true;
                             nCurErrCount++;
                             //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
@@ -4841,7 +4850,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="isWhite">기본 파일확장자 제한 타입</param>
         /// <param name="fileFilterExtInfo">기본 파일확장자 제한</param>
         /// <returns></returns>
-        public async Task<int> CheckDocumentFile(HsStream hsStream, FileAddErr currentFile, string documentExtractType, bool isWhite, string fileFilterExtInfo)
+        public async Task<int> CheckDocumentFile(HsStream hsStream, FileAddErr currentFile, string documentExtractType, bool isWhite, string fileFilterExtInfo, bool bAllowDRM)
         {
             string strDocumentExtractRootPath = Path.Combine("Temp", "Document_Extract");
 
@@ -4865,7 +4874,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 //bool usecheckOLE_Extension = true;  //OLE 검사 옵션1 - OLE개체 마임리스트 검사 여부
                 int scanDepth = 1;               //OLE개체 검사 하위 범위 (0인 상태에서도 개체 검출 시 Block)
 
-                await scanDocumentFile(hsStream, currentFile, strDocumentExtractRootPath, isWhite, fileFilterExtInfo, scanDepth, documentExtract);
+                await scanDocumentFile(hsStream, currentFile, strDocumentExtractRootPath, isWhite, fileFilterExtInfo, scanDepth, documentExtract, bAllowDRM);
                 if (currentFile.eErrType == eFileAddErr.eFANone && currentFile.HasChildrenErr == false)
                     return 0;
 
@@ -4902,7 +4911,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="scanDepth">엑셀문서에 한하여, 하위 검사 횟수 (default =1)</param>
         /// <param name="documentExtractType">서버에서 받아온 추출파일 검사 설정값 (1:OLE개체형식 검사 / 2:압축형식 검사 / 3: 모두 검사)</param>
         /// <returns></returns>
-        async Task<int> scanDocumentFile(HsStream hsStream, FileAddErr currentFile, string currentRootPath, bool isWhite, string fileFilterExtInfo, int scanDepth, DocumentExtractType documentExtractType)
+        async Task<int> scanDocumentFile(HsStream hsStream, FileAddErr currentFile, string currentRootPath, bool isWhite, string fileFilterExtInfo, int scanDepth, DocumentExtractType documentExtractType, bool bAllowDRM)
         {
             string strExtractFilePath = Path.Combine(currentRootPath, Path.GetFileNameWithoutExtension(hsStream.FileName));                              //Temp에 Copy된 문서의 OLE 개체를 보관할 폴더
             DirectoryInfo extractFileDir = new DirectoryInfo(strExtractFilePath);
@@ -5007,7 +5016,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             {
                                 //추출 개체가 엑셀인 경우, 한번 더 검사 허용
                                 HsStream oleHsStream = new HsStream() { stream = oleFileStream, FileName = extractFile.FullName, MemoryType = HsStreamType.FileStream };
-                                int extractResult = await scanDocumentFile(oleHsStream, oleFile, strExtractFilePath, isWhite, fileFilterExtInfo, (scanDepth - 1), documentExtractType);
+                                int extractResult = await scanDocumentFile(oleHsStream, oleFile, strExtractFilePath, isWhite, fileFilterExtInfo, (scanDepth - 1), documentExtractType, bAllowDRM);
 
                                 if (extractResult != 0)
                                 {
@@ -5056,7 +5065,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         {
                             oleFileStream.CopyTo(oleValidStream);
                             //위변조 제한, 0KB 체크
-                            (eFileAddErr, string) validResult = await IsValidFileExt(oleValidStream, oleExtension);
+                            (eFileAddErr, string) validResult = await IsValidFileExt(oleValidStream, oleExtension, bAllowDRM);
                             oleFileMime = validResult.Item2;
                             if (validResult.Item1 != eFileAddErr.eFANone)//(!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
                             {
