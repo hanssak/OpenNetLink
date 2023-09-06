@@ -687,7 +687,7 @@
                         cntSendQuery++;
                         }*@
 
-    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
+                    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
                     SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "", sgLoginData.GetApproveProxyRight());
                     cntSendQuery++;
                 }
@@ -916,6 +916,41 @@
         await refTransProgress.openPopUp();
         await Task.Delay(1000);
 
+        //Hash 체크
+        foreach (HsStream hsStream in FileList)
+        {
+            if (!hsStream.IsDir)
+            {
+                try
+                {
+                    string fileHash = SgExtFunc.GetFileSHA384HexString(hsStream.FilePullPath);
+                    if (hsStream.FileHash != fileHash)
+                    {
+                        string strMsg = "";
+                        strMsg = XmlConf.GetErrMsg("E_0262");
+                        ShowMessage("error", strMsg);
+                        refTransProgress.CancelClosePopUp();
+                        return;
+                    }
+
+
+                    FileStream stream = File.OpenRead(hsStream.FilePullPath);
+                    if (hsStream.stream != null)
+                    {
+                        hsStream.stream.Dispose();
+                    }
+                    hsStream.stream = stream;
+                }
+                catch (Exception ex)
+                {
+                    string strMsg = "";
+                    strMsg = XmlConf.GetErrMsg("E_0263");
+                    ShowMessage("error", strMsg);
+                    refTransProgress.CancelClosePopUp();
+                }
+            }
+        }
+
         //수신자 목록체크(철자틀림)
         string stReceiver = "";
         if (refForwardLine != null && refForwardLine.GetReceiver().Count > 0)
@@ -1118,7 +1153,7 @@
                 else
                 {
                     initReason = strBindDesc;
-                    useReason = true;                    
+                    useReason = true;
                 }
                 refApproveExtApproverSelect_PopUp.SetInitReason(useReason, initReason);
                 await refApproveExtApproverSelect_PopUp.openPopUp();

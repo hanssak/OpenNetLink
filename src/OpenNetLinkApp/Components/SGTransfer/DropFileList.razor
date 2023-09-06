@@ -78,7 +78,7 @@
                                     </td>
                                 }
                                 <td style="width:60%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left:5px;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
-                                <td style="text-align:right;vertical-align:middle;width:10%;">@(file.IsDir? "" : CsFunction.GetSizeStr(file.Length))</td>
+                                <td style="text-align:right;vertical-align:middle;width:10%;">@(file.IsDir? "" : CsFunction.GetSizeStr(file.FileLength))</td>
                                 <td style="text-align:center;vertical-align:middle;width:10%;">@file.Type</td>
                                 @if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(_groupId) && isUserNeedApproveExtUI())
                                 {
@@ -197,7 +197,10 @@
             foreach (HsStream stream in HsStreamList)
             {
                 if (!stream.IsDir)
-                    stream.stream.Dispose();
+                {
+                    if (stream.stream != null)
+                        stream.stream.Dispose();
+                }
             }
             HsStreamList.Clear();
         }
@@ -223,7 +226,10 @@
                         fileAddManage.m_nTransCurCount = fileAddManage.m_nTransCurCount - 1;
 
                         if (!HsStreamList[i - 1].IsDir)
-                            HsStreamList[i - 1].stream.Dispose();
+                        {
+                            if (HsStreamList[i - 1].stream != null)
+                                HsStreamList[i - 1].stream.Dispose();
+                        }
                         HsStreamList.RemoveAt(i - 1);
                     }
                 }
@@ -1040,6 +1046,20 @@
                     }
                 }
             }
+
+            foreach (HsStream hs in listTryHsStream)
+            {
+                if (!hs.IsDir)
+                {
+                    FileStream fileStream = hs.stream as FileStream;
+                    hs.FileHash = SgExtFunc.GetFileSHA384HexString(fileStream.Name);
+                    hs.FilePullPath = fileStream.Name;
+                    hs.FileLength = fileStream.Length;
+                    hs.stream.Close();
+                    hs.stream.Dispose();
+                    hs.stream = null;
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -1727,7 +1747,7 @@
         InitText();
         @*action1 = HandleFileInputChange;
             action2 = HandleFileInputChange;*@
-    //SGFileExamEvent = FileExamResult;
+        //SGFileExamEvent = FileExamResult;
         HSCmdCenter.sgPageEvent.SetFileExamNotiEventAdd(groupID, FileExamResult);
         PageStatusData pageSData = pageService.GetPageStatus(groupID);
         HsStreamList = pageSData.GetFileDragListData();
@@ -2458,7 +2478,7 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        
+
         await Task.Delay(100);
         List<string> fileList = new List<string>();
         //int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumber");
@@ -2477,8 +2497,8 @@
                 path = path.Substring(5);
             }
             string dirPath = "";
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            { 
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
                 dirPath = "/" + Path.GetDirectoryName(path);
             }
             else
