@@ -80,6 +80,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUiDlpShow { get; set; } = true;    // 메일 관리/결재 에서 개인정보 검색항목 View 및 Search 기능 display 유무
         public bool bUiFileExpiredDateShow { get; set; } = true;  // 전송관리 화면에서 파일 만료일 표시 여부
         public bool bShowInnerFileErrDetail { get; set; } = false; //파일 추가에 제외된 파일 리스트에 내부에 걸린 파일 리스트 전부 보여주기
+        public bool bAllowDRM { get; set; } = true;                 //DRM 파일 전송 허용 여부 (true : 전송, false : 차단) - Default : true
+
         //클립보드
 
         public bool bDlpFoundSendContinue { get; set; } = false;  //  개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무

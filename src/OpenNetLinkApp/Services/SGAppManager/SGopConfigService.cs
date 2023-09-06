@@ -228,6 +228,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="groupId"></param>
         /// <returns></returns>
         public int GetSessionDuplicateBlock(int groupId);
+
+        public bool GetAllowDRM(int groupId);
     }
 
 
@@ -1028,6 +1030,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public int GetSessionDuplicateBlock(int groupId)
         {
             return AppConfigInfo[groupId].nSessionDuplicate;        // 세션중복일때 사용자에게 강제 접속 여부를 묻지 않고, 바로 차단
+        }
+
+        public bool GetAllowDRM(int groupId)
+        {
+            return AppConfigInfo[groupId].bAllowDRM;
         }
 
     }

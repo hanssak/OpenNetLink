@@ -4378,6 +4378,7 @@ input[type="button"].btn-block {
 .nav-link {
   display: block;
   padding:.4rem 1.5rem ;
+  cursor:pointer;
 }
 
 .nav-link:hover, .nav-link:focus {

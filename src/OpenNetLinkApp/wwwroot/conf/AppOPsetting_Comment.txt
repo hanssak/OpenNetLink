@@ -126,7 +126,7 @@ nClipAfterApproveUseType : 클립보드 파일전송 형태때, 0:CheckBox 및 �
 
 bUseOneToMultiLogin : 1번에 다중망 로그인 기능 사용유무
 bUseOneByOneLogOut : 1번에 다중망 로그인 기능 사용중일때, 로그아웃은 선택한 망에 대해서 1곳만 진행(true)
-
+bAllowDRM : DRM 파일 전송 허용 여부 (true : 전송, false : 차단) - Default : true
 
 // 결재자 및 결재 관련
 bApprDeptSearch : 결재자 검색 창의 타부서 수정 가능 여부. ( true, false )(siteConfig)

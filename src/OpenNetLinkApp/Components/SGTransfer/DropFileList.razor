@@ -1727,7 +1727,7 @@
         InitText();
         @*action1 = HandleFileInputChange;
             action2 = HandleFileInputChange;*@
-        //SGFileExamEvent = FileExamResult;
+    //SGFileExamEvent = FileExamResult;
         HSCmdCenter.sgPageEvent.SetFileExamNotiEventAdd(groupID, FileExamResult);
         PageStatusData pageSData = pageService.GetPageStatus(groupID);
         HsStreamList = pageSData.GetFileDragListData();
@@ -2137,8 +2137,10 @@
             return 0;
         }
 
+        bool allowDRM = SGAppMgrSvc.OpConfigInfoService.GetAllowDRM(groupID);
+
         //확장자 위변조 확인
-        (eFileAddErr, string) enRet = await fileAddManage.GetExamFileExtChange(hsStream);
+        (eFileAddErr, string) enRet = await fileAddManage.GetExamFileExtChange(hsStream, allowDRM);
         currentFile.MimeType = enRet.Item2;
         if (enRet.Item1 != eFileAddErr.eFANone)
         {
@@ -2214,13 +2216,14 @@
         }
 
         bool bDenyPasswordZIP = SGAppMgrSvc.OpConfigInfoService.GetUseDenyPasswordZip(groupID);
-        CLog.Here().Information($"압축(Zip) 파일 passwd 있을때 차단 : [{bDenyPasswordZIP.ToString()}]");
+        bool bAllowDRM = SGAppMgrSvc.OpConfigInfoService.GetAllowDRM(groupID);
+        CLog.Here().Information($"압축(Zip) 파일 passwd 있을때 차단 : [{bDenyPasswordZIP.ToString()}] / 압축(Zip) 파일 DRM파일 있을떄 차단 : [{bAllowDRM}]");
 
         //문서파일 내부 검사유형 (0 : 문서 검사 않함. / 1 : 모듈검사 & OLE객체 마임리스트검사 / 2 : 모듈검사 & 위변조 체크 / 3 : 모듈검사 & OLE마임리스트검사 & 위변조체크 )
         string strDocumentExtractType = sgLoginData.GetDocumentExtractType(sgLoginData.GetSystemPosition());
 
         int nRet = 0;
-        nRet = await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, strDocumentExtractType, MaxDepth, Option, true,
+        nRet = await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, strDocumentExtractType, bAllowDRM, MaxDepth, Option,
             ((SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI()) ? sgLoginData.GetExceptionExt() : ""));
         // if (await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option) != 0)
 
@@ -2305,9 +2308,10 @@
 
         bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
         string strFileExtInfo = sgLoginData.GetFileFilter();
+        bool bAllowDRM = SGAppMgrSvc.OpConfigInfoService.GetAllowDRM(groupID);
 
         //bool bDenyPasswordZIP = SGAppMgrSvc.AppConfigInfoService.GetDenyPasswordZIP();
-        if (await fileAddManager.CheckDocumentFile(hsStream, currentFile, strDocumentExtractType, bWhite, strFileExtInfo) != 0)
+        if (await fileAddManager.CheckDocumentFile(hsStream, currentFile, strDocumentExtractType, bWhite, strFileExtInfo, bAllowDRM) != 0)
             return -1;
 
         return 0;

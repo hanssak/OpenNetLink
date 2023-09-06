@@ -35,7 +35,7 @@
                     <li class="nav-item has-treeview @(MenuItem.MenuOpenClass)">
                         @if (!String.IsNullOrEmpty(MenuItem.Path))
                         {
-                            <a href="@MenuItem.Path" class="nav-link m-0 @(MenuItem.ActiveClass)"
+                            <a class="nav-link m-0 @(MenuItem.ActiveClass)"
                style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
                @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))"
                @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))">
@@ -89,7 +89,7 @@
                                     <li class="nav-item has-treeview pt-2 @SubMenuList.MenuOpenClass">
                                         @if (!String.IsNullOrEmpty(SubMenuList.Path))
                                         {
-                                            <a href="@SubMenuList.Path" class="nav-link"
+                                            <a class="nav-link"
                        @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))"
                        @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))">
                                                 <i class="nav-icon @(SubMenuList.Icon)"></i>
@@ -149,7 +149,7 @@
                                                 <li class="nav-item">
                                                     @if (SubMenuItem.Path.IndexOf("POPUP") == -1)  //일반메뉴
                                                     {
-                                                        <a href="@SubMenuItem.Path" class="nav-link @(SubMenuItem.ActiveClass)"
+                                                        <a class="nav-link @(SubMenuItem.ActiveClass)"
                                @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))"
                                @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))">
                                                             <span class="logo-xs ">&middot;</span>
@@ -187,7 +187,7 @@
                                 else
                                 {
                                     <li class="nav-item">
-                                        <a href="@SubMenuList.Path" class="nav-link "
+                                        <a class="nav-link "
                        @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))"
                        @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))">
                                             <i class="nav-icon @(SubMenuList.Icon)"></i>
@@ -225,7 +225,7 @@
                     <!-- SideBarUISvc.ChgActiveMenu -->
                     /* Not Exist SubMenu */
                     <li class="nav-item">
-                        <a href='javascript:void(0);' class="nav-link m-0 @(MenuItem.ActiveClass)"
+                        <a class="nav-link m-0 @(MenuItem.ActiveClass)"
                style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
                @onclick="@(async eventArgs =>  await ChangeActiveMenuWrapPopup(eventArgs, MenuItem))"
                @onkeydown="@(async eventArgs => await ChangeActiveMenuWrapPopup(eventArgs, MenuItem))">
@@ -562,7 +562,10 @@
 
             refProxyApprover_PopUp.BindEvent();
             await refProxyApprover_PopUp.openPopUp();
-
+        }
+        else if(activeMenu.IsSubMenu && !string.IsNullOrEmpty(activeMenu.Path))
+        {
+           MyNavigationManager.NavigateTo(activeMenu.Path); 
         }
     }
 

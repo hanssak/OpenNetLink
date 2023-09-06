@@ -125,6 +125,7 @@
         HsCmdCenter.sgPageEvent.SetSkipFileNotiEventAdd(RecvSkipFileServerNoti);
         HsCmdCenter.sgPageEvent.SetPkiFileSendEventAdd(SendPkiFilesByFileTrans);
 
+
         HsCmdCenter.sgPageEvent.SetOSNotificationEvent(OSNotification);
 
         HsCmdCenter.sgPageEvent.SetOSNotificationEvent(OSNotification);
@@ -171,6 +172,64 @@
         }
     }
 
+
+    /// <summary>
+    /// ClipboardTxt 로 받은 data를 pcf 파일로 저장하는 함수
+    /// </summary>
+    /// <param name="clipData"></param>
+    /// <param name="strPcfFilePath"></param>
+    /// <returns></returns>
+    public bool GetFilePathfromByteData(byte[] clipData, out string strPcfFilePath)
+    {
+
+        strPcfFilePath = "";
+        strPcfFilePath = CsSystemFunc.GetCurrentModulePath();
+        strPcfFilePath += "\\Work";
+        System.IO.Directory.CreateDirectory(strPcfFilePath);
+        strPcfFilePath += "\\SG.pcf";
+
+        if (File.Exists(strPcfFilePath))
+        {
+            string strFilePath = "";
+            string strCheckFilePath = "";
+            string strCheckFileName = "";
+            strFilePath = CsSystemFunc.GetCurrentModulePath();
+            strFilePath += "\\Work\\";
+
+            int nIdx = 1;
+            for(; nIdx < 10000 ; nIdx++)
+            {
+                //strFileName.Format()
+                strCheckFileName = $"SG ({nIdx}).pcf";
+                strCheckFilePath = strFilePath + strCheckFileName;
+                if (File.Exists(strCheckFilePath) == false)
+                {
+                    strPcfFilePath = strCheckFilePath;
+                    break;
+                }
+            }
+        }
+
+
+        using (FileStream pkifs = File.Create(strPcfFilePath))
+        {
+            try
+            {
+                pkifs.Write(clipData, 0, clipData.Length);
+                Log.Logger.Here().Information($"GetFilePcfFiles, Pki FileData Write!");
+            }
+            catch (Exception ex1)
+            {
+                Log.Logger.Here().Information($"GetFilePcfFiles, File.Create.Write - Exception(MSG) : {ex1.Message}, Path : {strPcfFilePath}");
+            }
+            finally
+            {
+                pkifs?.Dispose();
+            }
+        }
+
+        return true;
+    }
 
     /// <summary>
     /// ClipboardTxt 로 받은 data를 pcf 파일로 저장하는 함수
@@ -1752,6 +1811,83 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             SendDayClipInfo(_curGroupId);
             return;
         }
+    }
+
+
+    bool SendPkiFilesByClipboard(int nGroupID, string strPcfFilePath)
+    {
+        bool bRet = true;
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
+        if (sgLoginData == null)
+            return false;
+
+        string strUserID = sgLoginData.GetUserID();
+
+        byte[] Buf = null;
+
+        // Pcf File Data Read
+        using (FileStream fsPcf = File.OpenRead(strPcfFilePath))
+        {
+            try
+            {
+                if (fsPcf.Length > 0)
+                {
+                    Buf = new byte[fsPcf.Length];
+                    fsPcf.Seek(0, SeekOrigin.Begin);
+                    fsPcf.Read(Buf, 0, Buf.Length);
+                }
+            }
+            catch (Exception ex1)
+            {
+                bRet = false;
+                Log.Logger.Here().Information($"SendPkiFilesByClipboard, OpenRead - Exception(MSG) : {ex1.Message}");
+            }
+            finally
+            {
+                fsPcf?.Dispose();
+            }
+        }
+
+        int nRet = 0;
+        // 3 : 공인인증서
+        nRet = HsCmdCenter.SendClipboard(nGroupID, strUserID, 1, 1, 3, Buf.Length, Buf);
+        if (nRet < 0)
+            bRet = false;
+
+        CLog.Here().Information($"SendPkiFilesByClipboard, GroupID:{nGroupID}, Ret:{nRet}, Done!");
+
+        if (bRet)
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0245"));
+
+        return bRet;
+    }
+
+    /// <summary>
+    /// NPKI 파일전송을 위해 호출되는 함수
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    /// <param name="strPcfFilePath"></param>
+    /// <returns></returns>
+    public bool SendPkiFilesByFileTrans(int nGroupID, string strPcfFilePath, bool bSendPkiByFileTrans)
+    {
+
+        CLog.Here().Information($"SendPkiFilesByFileTrans(Strart), GroupID : {nGroupID}, SendPki : {(bSendPkiByFileTrans? "FileTransType":"ClipTransType")}, PcfPath : {strPcfFilePath}");
+
+        bool bSendPkiResult = false;
+        bSendingPki = true;
+
+        if (bSendPkiByFileTrans)
+            bSendPkiResult = FileTrans(nGroupID, MakeStream(strPcfFilePath), false);
+        else
+            bSendPkiResult = SendPkiFilesByClipboard(nGroupID, strPcfFilePath);
+
+        CLog.Here().Information($"SendPkiFilesByFileTrans(End), GroupID : {nGroupID}, SendPki : {(bSendPkiByFileTrans? "FileTransType":"ClipTransType")}, PcfPath : {strPcfFilePath}");
+
+        if (bSendPkiResult == false)
+            ShowMessage("error", XmlConf.GetErrMsg("E_0260"));
+
+        return bSendPkiResult;
     }
 
 
