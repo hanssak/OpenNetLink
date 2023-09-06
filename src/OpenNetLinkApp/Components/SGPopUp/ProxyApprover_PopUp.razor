@@ -36,7 +36,7 @@
                         }
                         else        //TREE
                         {
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="392" TreeHeight="160" UserSearchList="@ProxySearch" IsApproverOnly="@bApproverOnly"
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="392" TreeHeight="160" UserSearchList="@ProxySearch"
                                             OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                     </div>
@@ -102,11 +102,11 @@
 
     private int nActionType = -1;  //1:삭제, 2:등록
 
-    /// <summary>
-    /// true 결재자만 검색 / false 모두 검색 
-    /// /// </br>(대결재자의 '일반사용자 조회 여부' 와 통일)
-    /// </summary>
-    private bool bApproverOnly = true;
+    ///// <summary>
+    ///// true 결재자만 검색 / false 모두 검색 
+    ///// /// </br>(대결재자의 '일반사용자 조회 여부' 와 통일)
+    ///// </summary>
+    //private bool bApproverOnly = true;
 
     private void deleteProxyApprover(ApproverInfo apvInfo)
     {
@@ -137,8 +137,8 @@
         int groupID = (sgSideBar != null) ? sgSideBar.GroupId : 0;
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData != null)
-            bApproverOnly = !sgLoginData.GetApproveProxyRight();
+        //if (sgLoginData != null)
+        //    bApproverOnly = !sgLoginData.GetApproveProxyRight();
 
 
         base.OnAfterRender(firstRender);
@@ -398,6 +398,7 @@
         if (sgUserData == null)
             return;
 
+        bool bApproverOnly = !sgLoginData.GetApproveProxyRight();
         string strSysID = sgLoginData.GetSysID();
         string strUserID = sgLoginData.GetUserID();
         string strUserName = strCurName;
@@ -413,6 +414,8 @@
     {
         int groupID = 0;
         groupID = SGAppMgrSvc.SideBarUIService.ActiveMenu.GroupId;
+
+       
 
         proxySearchType = SGAppMgrSvc.OpConfigInfoService.GetProxySearchType(groupID);
         useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInProxyTree(groupID);
@@ -433,8 +436,14 @@
         HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, ProxySearchResult);
         HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, ResultPossibleCount);
 
+         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+         if(sgLoginData == null)
+            return;
+        
+         bool bApproverOnly = !sgLoginData.GetApproveProxyRight();
+
         if (proxySearchType == "TREE" && refSGDeptTreeList != null)
-            refSGDeptTreeList.BindEvent();
+            refSGDeptTreeList.BindEvent(bApproverOnly);
         else
             DeptApprLine(true);
     }

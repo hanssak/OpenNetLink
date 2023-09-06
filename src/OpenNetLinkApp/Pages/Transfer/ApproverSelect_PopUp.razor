@@ -42,7 +42,7 @@
                         }
                         else    //TREE
                         {
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="359" TreeHeight="160" UserSearchList="@ApproverSearch" IsApproverOnly="@bApproverOnly"
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="359" TreeHeight="160" UserSearchList="@ApproverSearch"
                                             OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                     </div>
@@ -139,11 +139,10 @@
 
     SGSettingsDBProc sgSettingProc;
 
-    /// <summary>
-    /// true 결재자만 검색 / false 모두 검색
-    /// /// </br>(대결재자의 '일반사용자 조회 여부' 와 통일)
-    /// </summary>
-    private bool bApproverOnly = true;
+    ///// <summary>
+    ///// true 결재자만 검색 (결재자 라인 추가는 APPROVERPROXYRIGHT와 상관없이 일반사용자는 미노출)
+    ///// </summary>
+    //private bool bApproverOnly = true;
 
     private void moveToTop()
     {
@@ -534,8 +533,9 @@
         int groupID = (sgSideBar != null) ? sgSideBar.GroupId : 0;
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData != null)
-            bApproverOnly = !sgLoginData.GetApproveProxyRight();
+        //결재자 라인 추가는 APPROVERPROXYRIGHT와 상관없이 일반사용자는 미노출
+        //if (sgLoginData != null)
+        //    bApproverOnly = !sgLoginData.GetApproveProxyRight();
 
         base.OnAfterRender(firstRender);
     }
@@ -558,7 +558,7 @@
         //HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult); //타부서 조회 결과
 
         if (approverSearchType == "TREE" && refSGDeptTreeList != null)
-            refSGDeptTreeList.BindEvent();
+            refSGDeptTreeList.BindEvent(true); //결재자 라인 추가는 APPROVERPROXYRIGHT와 상관없이 일반사용자 미노출
         else
         {
             HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprLineResult);
@@ -760,7 +760,7 @@
         string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
 
         SGQueryExtend sgQuery = new SGQueryExtend();
-        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
+        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
         HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
     }
     //public void DeptApprLineResult(int groupid, PageEventArgs e)

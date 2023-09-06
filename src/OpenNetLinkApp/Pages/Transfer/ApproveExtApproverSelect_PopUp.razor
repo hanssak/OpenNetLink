@@ -111,7 +111,7 @@
                                 }
                                 else    //TREE
                                 {
-                                    <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="@(useInputInTree?180:216)" TreeHeight="@(useInputInTree?70:87)" UserSearchList="@ApproverSearch" IsApproverOnly="@bApproverOnly"
+                                    <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="@(useInputInTree?180:216)" TreeHeight="@(useInputInTree?70:87)" UserSearchList="@ApproverSearch"
                                                 OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                                 }
                             </div>
@@ -225,11 +225,10 @@
     public string strTeamName = "";
 
 
-    /// <summary>
-    /// true 결재자만 검색 / false 모두 검색
-    /// /// </br>(대결재자의 '일반사용자 조회 여부' 와 통일)
-    /// </summary>
-    private bool bApproverOnly = true;
+    ///// <summary>
+    ///// true 결재자만 검색 (결재필수 확장자는 APPROVERPROXYRIGHT와 상관없이 일반사용자는 미노출)
+    ///// </summary>
+    //private bool bApproverOnly = true;
 
     public void Refresh()
     {
@@ -732,8 +731,10 @@
         int groupID = (sgSideBar != null) ? sgSideBar.GroupId : 0;
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData != null)
-            bApproverOnly = !sgLoginData.GetApproveProxyRight();
+
+        //결재필수 확장자는 APPROVERPROXYRIGHT와 상관없이 일반사용자는 미노출
+        //if (sgLoginData != null)
+        //    bApproverOnly = !sgLoginData.GetApproveProxyRight();
 
         base.OnAfterRender(firstRender);
     }
@@ -759,7 +760,7 @@
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveExtDeptApprLineResult); //자기부서 조회 결과
 
         if (approverSearchType == "TREE" && refSGDeptTreeList != null)
-            refSGDeptTreeList.BindEvent();
+            refSGDeptTreeList.BindEvent(true);  //결재필수 확장자는 APPROVERPROXYRIGHT와 상관없이 일반사용자 미노출
         else
             SearchApprover(true);
     }
@@ -971,7 +972,7 @@
         string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
 
         SGQueryExtend sgQuery = new SGQueryExtend();
-        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
+        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
         HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
     }
 
