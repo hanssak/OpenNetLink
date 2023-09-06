@@ -55,7 +55,7 @@ bAutoLogin : IDPW 자동로그인 기능 사용유무 ( true : 사용, false : �
 bAutoLoginCheck : IDPW 자동로그인 체크박스 기본 체크되어 있게 설정 ( true : 사용, false : 유지 안함 )
 bUserPWChange : 사용자pw 변경 기능 사용, PW 검증기능 동시 사용 ( true, false ) ( true, false )
 bEmptyfileTrans : 0kb 파일 전송 가능 유무(true, false)
-bSessionDuplicateBlock : 세션중복일때 신규 접속 사용자 차단 여부 (true : 차단, false : 사용자에게 강제 접속 여부 팝업 표시) - Default:false
+nSessionDuplicate : 로그인시도때 세션중복일때 (-1 : 차단(기본), 0 : 사용자 접속 여부 팝업 표시, 1 : 강제 접속 진행) - Default:-1
 
 // IDPW - 관련 기타(siteConfig)
 strInitPasswd : 암호화된 초기 PW string

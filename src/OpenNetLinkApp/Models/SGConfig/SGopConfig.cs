@@ -27,7 +27,11 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseOneByOneLogOut { get; set; } = false;         // 1번에 다중망 로그인 기능 사용때에도 로그아웃은 선택한 망에서 개별 로그아웃적영
         public bool bUseOver1Auth { get; set; } = false;                        // 1단계 이상 인증 사용
         public bool bVisibleLogOutButton { get; set; } = true;              //상단의 [로그아웃] 버튼 표시 여부
-        public bool bSessionDuplicateBlock { get; set; } = false;           // 세션중복일때 사용자에게 강제 접속 여부를 묻지 않고, 바로 차단
+
+        /// <summary>
+        /// -1 : 바로 차단, 0 : 접속유무를 사용자에게 문의, 1 : 강제 접속 진행
+        /// </summary>
+        public int nSessionDuplicate { get; set; } = -1;           // 로그인때, 세션중복시 동작값(-1 : 강제 접속 여부를 묻지 않고, 바로 차단
 
         //패스워드
         public bool bUserPWChange { get; set; } = false;                   // 사용자 패스워드 변경 사용 여부.

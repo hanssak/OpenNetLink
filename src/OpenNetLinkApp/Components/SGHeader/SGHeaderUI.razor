@@ -826,6 +826,8 @@
                     LogOutFileListClearEvent();
 
                 DoLogOutSetData(Net.GroupID);
+
+                HsCmdCenter.SetAllowSessionDuplicate(Net.GroupID, (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(Net.GroupID) == 1));
             }
         }
         else
@@ -837,6 +839,8 @@
                 LogOutFileListClearEvent();
 
             DoLogOutSetData(nGroupID);
+
+            HsCmdCenter.SetAllowSessionDuplicate(nGroupID, (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(nGroupID) == 1));
         }
 
         // sessionCheck 동작하게 적용
@@ -845,6 +849,7 @@
         if (hsNetWork != null)
         {
             hsNetWork.SetLoginSessionCheckDo();
+            hsNetWork.SetReconnectStop();
         }
 
         // 파일전송에 추가해 놓은 파일목록 정보들 삭제필요

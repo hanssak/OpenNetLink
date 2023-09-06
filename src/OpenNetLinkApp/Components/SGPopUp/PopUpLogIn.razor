@@ -272,7 +272,7 @@
 
     public async Task openPopUp()
     {
-        HSCmdCenter.SetAllowSessionDuplicate(nGroupID, false);
+        HSCmdCenter.SetAllowSessionDuplicate(nGroupID, (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(nGroupID) == 1));
         object[] param = { "PopUpLogIn" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -328,7 +328,7 @@
     /// </summary>
     private void SessionAlertConfirmpopup()
     {
-        HSCmdCenter.SetAllowSessionDuplicate(refSGloginDuplicate.groupId);
+        HSCmdCenter.SetAllowSessionDuplicate(refSGloginDuplicate.groupId); // 강제로그인 진행
         CLog.Here().Information($"[PopupLogin] SessionAlertConfirm - LogInType: {refSGloginDuplicate.groupId.ToString()}");
 
         if (str2FactorAuthType == "google_otp" && strOtpUrlCode.Length > 0)
@@ -357,13 +357,14 @@
     {
         bStartedLogin = false;
 
-        if (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupID))
+        if (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupID) == -1)
         {
             ShowLoginFail(XmlConf.GetWarnMsg("W_0039"));
             
             await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
             bUIBtnDisable = false;
             bStartedLogin = false;
+            StateHasChanged();
             return;
         }
 

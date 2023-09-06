@@ -3327,6 +3327,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             hsNetWork.SetLoginSessionCheckDo();
         }
 
+        HsCmdCenter.SetAllowSessionDuplicate(groupID, (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupID) == 1));
+
         // 추가된 파일리스트 제거하는 동작
         LogOutFileListClearEvent LogOutFileListClearEvent = null;
         LogOutFileListClearEvent = pageService.GetLogOutFileListClearEvent(groupID);

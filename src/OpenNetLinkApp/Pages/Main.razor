@@ -342,12 +342,13 @@
     {
         bStartedLogin = false;
 
-        if (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupID))
+        if (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupID) == -1)
         {
             ShowLoginFail(XmlConf.GetWarnMsg("W_0039"));
             await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
             bStartedLogin = false;
             bLoginBtnDisable = false;
+            StateHasChanged();
             return;
         }
 
@@ -1027,7 +1028,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 // 1 login ALL 적용때에는 중복로그인시 강제 로그인 적용
                 HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(netlist.GroupID, ShowSessionCountPopup);
                 HSCmdCenter.sgPageEvent.Set2FactorAuthEventAdd(netlist.GroupID, Show2FactorAuth);
-                HSCmdCenter.SetAllowSessionDuplicate(netlist.GroupID);
+                HSCmdCenter.SetAllowSessionDuplicate(netlist.GroupID);  // 강제로그인
                 HSCmdCenter.sgPageEvent.SetLoginEventAdd(netlist.GroupID, LoginResultOnetoAll);
             }
         }
@@ -1036,6 +1037,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(groupid, ShowSessionCountPopup);
             HSCmdCenter.sgPageEvent.Set2FactorAuthEventAdd(groupid, Show2FactorAuth);
             HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResultOnetoAll);
+            HSCmdCenter.SetAllowSessionDuplicate(groupid, (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupid) == 1));
             //HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         }
 
@@ -1053,15 +1055,14 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 SetADLoginData();
             }
 
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0) == false)
+            // 중복로그인된거 확인하고 강제로그인후, 다음부터도 확인하고 강제로그인 하도록 적용
+            List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+            foreach (ISGNetwork netlist in listNetWork)
             {
-                // 중복로그인된거 확인하고 강제로그인후, 다음부터도 확인하고 강제로그인 하도록 적용
-                List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-                foreach (ISGNetwork netlist in listNetWork)
-                {
-                    HSCmdCenter.SetAllowSessionDuplicate(netlist.GroupID, false);
-                }
+                HSCmdCenter.SetAllowSessionDuplicate(netlist.GroupID,
+                    (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0) ? true : (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupid) == 1)));
             }
+
         }
         else if (srcLoc == "OKTA")
         {
@@ -1127,7 +1128,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         *@
 
 
-    // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
+        // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
         {
@@ -1319,6 +1320,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                             HSCmdCenter.SendPatchHistory(groupId, -2, string.Format(XmlConf.GetWarnMsg("W_0298"), localIP, patchTime));
                     }
 
+                    CLog.Here().Information($"LoginResultOnetoAll, groupID : {groupId}, Get Sfm Data !!!");
                     SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
                     SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
                     while (true)
@@ -1724,7 +1726,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                             }
                         }
 
-                            // Login 화면으로 머물러있지 않도록
+                        // Login 화면으로 머물러있지 않도록
                         @*if (nGroupIDfirst < 0)
                             nGroupIDfirst = 0;*@
 
