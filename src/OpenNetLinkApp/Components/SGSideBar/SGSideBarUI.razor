@@ -37,8 +37,8 @@
                         {
                             <a class="nav-link m-0 @(MenuItem.ActiveClass)"
                style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-               @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))"
-               @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))">
+               @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem, true))"
+               @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem, true))">
                                 <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
                                 <p style="font-size:1rem;" class="p-2">
                                     @(MenuItem.FromName /*Dashboard*/)
@@ -539,7 +539,7 @@
     }
 
 
-    public async void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
+    public async void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu, bool isMainMenu = false)
     {
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(activeMenu.GroupId);
@@ -570,7 +570,11 @@
             refProxyApprover_PopUp.BindEvent();
             await refProxyApprover_PopUp.openPopUp();
         }
-        else if(activeMenu.IsSubMenu && !string.IsNullOrEmpty(activeMenu.Path))
+        else if(isMainMenu) //대메뉴는 클릭 시 Welcome으로 이동
+        {
+            MyNavigationManager.NavigateTo(activeMenu.Path);
+        }
+        else if(activeMenu.IsSubMenu && !string.IsNullOrEmpty(activeMenu.Path))     //하위 메뉴는 클릭 시, 해당 Path로 이동
         {
             MyNavigationManager.NavigateTo(activeMenu.Path);
         }
