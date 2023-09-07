@@ -123,7 +123,7 @@ namespace OpenNetLinkApp.Data.SGQuery
             {
                 if (node.NextSibling != null)
                 {
-                    if (node.Name == "else")
+                    if (node.NextSibling.Name == "else")
                     {
                         GetRecursiveNode(node.NextSibling.FirstChild, param, ref sb);
                     }
