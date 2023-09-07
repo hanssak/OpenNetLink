@@ -37,6 +37,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseIDAsInitPassword { get; set; } //ID와 동일한 비밀번호를 초기 PW로 사용할지 여부 (true : ID=PW로 로그인된 경우, 비밀번호 변경 요청)
 
         //파일 전송
+        public bool bUseFileTrans { get; set; }                          //파일 전송 사용 유무 (좌측 메뉴 사용 유무)
         public bool bRFileAutoSend { get; set; }                          // 마우스 우클릭 후 자동전송 사용 유무( 환경설정 체크박스 보이고 안보이고)
         //public bool bRMouseFileAddAfterTrans { get; set; }               // 마우스 우클릭 파일 추가 후 자동전송 사용 여부 ( true : 사용, false : 미사용 )
         public bool bUseNetOverAllsend { get; set; }                   //3망 전송에서 전체 사용자에게 보내는 기능 사용유무
