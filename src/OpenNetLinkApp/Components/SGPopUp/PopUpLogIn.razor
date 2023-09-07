@@ -359,8 +359,8 @@
 
         if (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupID) == -1)
         {
+            await JSRuntime.InvokeVoidAsync("setElementValue", new object[] { "popUploginPw", "" });
             ShowLoginFail(XmlConf.GetWarnMsg("W_0039"));
-            
             await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
             bUIBtnDisable = false;
             bStartedLogin = false;
@@ -414,7 +414,7 @@
                 strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-    strPW = "HsckAD.com";
+            strPW = "HsckAD.com";
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;

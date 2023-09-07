@@ -2729,6 +2729,14 @@ namespace OpenNetLinkApp.Services
         /// <param name="strNewPassWD"></param>
         public void SetProtectedPassWord(int groupid, string strProtectedPassWD)
         {
+
+            if ((strProtectedPassWD?.Length ?? 0) < 1)
+            {
+                // Reconnect 때에 passwd 날아감
+                CLog.Here().Information($"UserInfo SetProtectedPassword Stop, PwLen less than 1");
+                return;
+            }
+
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)

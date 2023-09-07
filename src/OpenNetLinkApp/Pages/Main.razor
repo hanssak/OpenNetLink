@@ -269,8 +269,6 @@
         refGoogleOTP.strUserOTP = "";
     }
 
-
-
     /// <summary>
     /// 세션중복 로그인 포기 처리
     /// </summary>
@@ -344,10 +342,11 @@
 
         if (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupID) == -1)
         {
+            await JSRuntime.InvokeVoidAsync("setElementValue", new object[] { "loginPw", "" });
             ShowLoginFail(XmlConf.GetWarnMsg("W_0039"));
             await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
             bStartedLogin = false;
-            bLoginBtnDisable = false;
+            bLoginBtnDisable = false;            
             StateHasChanged();
             return;
         }
