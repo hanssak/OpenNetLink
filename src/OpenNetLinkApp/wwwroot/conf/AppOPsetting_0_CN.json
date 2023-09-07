@@ -39,8 +39,8 @@
   "bUseClipBoardApproveReason": false,
   "bUseClipBoardFileTrans": true,
   "bUseClipCopyAndSend": false,
-  "bUseClipTypeSelectSend": true,
-  "bUseClipTypeTextFirstSend": false,
+  "bUseClipTypeSelectSend": false,
+  "bUseClipTypeTextFirstSend": true,
   "bUseCloseTrayMove": false,
   "bUseCrossPlatformOSforFileName": false,
   "bUseDenyPasswordZip": true,
@@ -118,6 +118,8 @@
   "bSessionDuplicateBlock": false,
   "bShowInnerFileErrDetail": false,
   "bAllowDRM": true,
-  "bUseFileTrans": true
+  "bUseFileTrans": true,
+  "bUseClipTypeText": true,
+  "bUseClipTypeImage" :  false
 
 }
