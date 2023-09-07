@@ -458,7 +458,9 @@ WHERE 1=1
 		AND (TRANSSTATUS = '#TransStatus#' OR  APPROVEFLAG = '3' )	
 		</if>
 		<else>
-		AND TRANSSTATUS = '#TransStatus#'
+      <if test = "TransStatus != ''">
+        AND TRANSSTATUS = '#TransStatus#'
+      </if>
 		</else>
 		<case>
 			<when test = "ApprStatus == '4'">
@@ -589,7 +591,9 @@ WHERE 1=1
 		AND (TRANSSTATUS = '#TransStatus#' OR  APPROVEFLAG = '3' )	
 		</if>
 		<else>
-		AND TRANSSTATUS = '#TransStatus#'
+      <if test = "TransStatus != ''">
+        AND TRANSSTATUS = '#TransStatus#'
+      </if>
 		</else>
 		<case>
 			<when test = "ApprStatus == '4'">
