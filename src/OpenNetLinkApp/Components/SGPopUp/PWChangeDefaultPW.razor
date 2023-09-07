@@ -95,7 +95,7 @@
     ISGAppConfigService AppConfigSvc;
     SGSettingsDBProc sgSettingProc;
 
-    bool bEmailUseOnly = false;
+    bool bFileTransUse = false;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<PWChangeDefaultPW>();
 
@@ -193,7 +193,12 @@
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
 
         if (nGroupID > -1)
-            bEmailUseOnly = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApproveOnly(nGroupID);
+        {
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupID);
+
+            bFileTransUse = sgLoginData.GetFileTrans();
+        }
     }
 
     public void closePopUp()
@@ -513,21 +518,20 @@
 
             //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
 
-            string strNavigateWithGroupID = String.Empty;
-            if (basicPageType == (int)Enums.EnumBasicPageType.Main)
+        string strNavigateWithGroupID = String.Empty;
+        if (basicPageType == (int)Enums.EnumBasicPageType.Main)
+        {
+            strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
+            string strNavigateUrl = strNavigateWithGroupID.ToLower();
+            if (strNavigateUrl.IndexOf("transfer") > 0)
             {
-                strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
-                string strNavigateUrl = strNavigateWithGroupID.ToLower();
-                if (strNavigateUrl.IndexOf("transfer") > 0)
-                {
-                    strNavigateUrl = pageService.GetFileTransPage(groupID);
-                    if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                        strNavigateWithGroupID = strNavigateUrl;
-                    else
-                        strNavigateWithGroupID = "/Transfer/";
-                }
-
-                if (bEmailUseOnly)
+                strNavigateUrl = pageService.GetFileTransPage(groupID);
+                if (strNavigateUrl != null && strNavigateUrl.Length > 0)
+                    strNavigateWithGroupID = strNavigateUrl;
+                else
+                    strNavigateWithGroupID = "/Transfer/";
+            }
+            if (!bFileTransUse)
                 strNavigateWithGroupID = "/Welcome/";  // 설정에 상관없도록
 
                 strNavigateWithGroupID += groupID.ToString();

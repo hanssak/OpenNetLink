@@ -134,7 +134,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseClipTypeTextFirstSend(int groupId);
         public bool GetUseEmailManageApprove(int groupId);
 
-        public bool GetUseEmailManageApproveOnly(int groupId);
         public bool GetUseUIdlpData(int groupId);
         //public bool GetURLAutoTrans(int groupId);
         public bool GetUseURLRedirectionAlarm(int groupId);
@@ -178,6 +177,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetShowAdminInfo(int groupId);
         public bool GetUseFileCheckException(int groupId);
         public bool GetUsePCURL(int groupId);
+        public bool GetUseFileTrans(int groupId);
         public bool GetUsePublicBoard(int groupId);
         public bool GetUseCertSend(int groupId);
         public bool GetUseApproveAfterLimit(int groupId);
@@ -530,6 +530,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetManualDownFolderChange(int groupId)
         {
             return AppConfigInfo[groupId].bManualDownFolderChange;
+        }
+
+        public bool GetUseFileTrans(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseFileTrans;
         }
         //public bool GetManualRecvDownChange(int groupId)
         //{

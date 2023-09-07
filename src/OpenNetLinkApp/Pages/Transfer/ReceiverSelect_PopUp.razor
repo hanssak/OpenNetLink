@@ -30,7 +30,7 @@
                         }
                         else //Tree
                         {
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="359" TreeHeight="170" UserSearchList="@ReceiverSearch" IsApproverOnly="false"
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="359" TreeHeight="170" UserSearchList="@ReceiverSearch"
                                         OnItemClick="(approve) => AssignApprover(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                     </div>
@@ -342,7 +342,7 @@
     public void BindEvent()
     {
         if (receiverSearchType == "TREE" && refSGDeptTreeList != null)
-            refSGDeptTreeList.BindEvent();
+            refSGDeptTreeList.BindEvent(false);  //수신자 라인 추가는 무조건 일반사용자 노출
         else
             DeptApprLine(true);
     }

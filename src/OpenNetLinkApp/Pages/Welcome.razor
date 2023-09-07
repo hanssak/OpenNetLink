@@ -32,8 +32,8 @@
             <div class="row justify-content-between">
                 <div class="col-md-3"></div>
                 <div class="col-md-5 text-center">
-                @*<img src="/images/adminlte/main_title_1.png" class="mt-2 mb-2 img-fluid">*@
-                <p style="font-size:20px; font-weight:bold; color:#044386; margin-top:5px">@XmlConf.GetTitle("T_WELCOME_TITLE")</p>
+                    @*<img src="/images/adminlte/main_title_1.png" class="mt-2 mb-2 img-fluid">*@
+                    <p style="font-size:20px; font-weight:bold; color:#044386; margin-top:5px">@XmlConf.GetTitle("T_WELCOME_TITLE")</p>
                 </div>
                 <div class="col-md-3">
                     <div class="m_title01 float-right" style="margin-top:15px;">@strNetFromName <i class="fas fa-long-arrow-alt-right p-1"></i> @strNetToName</div>
@@ -109,13 +109,13 @@
                 <table class="m_chart col-md-12 .table-responsive">
                     <tbody>
                         <tr>
-                            <td style="width:33%;font-weight:bold">@(bEmailUseOnly==false?XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT"):"")</td>
+                            <td style="width:33%;font-weight:bold">@(bFileTransMenuUse?XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT"):"")</td>
                             <td style="width:33%;font-weight:bold">@(bUseClipBoard?XmlConf.GetTitle("T_COMMON_CLIPBOARD"):"")</td>
                             <td style="width:33%;font-weight:bold">@XmlConf.GetTitle("T_DASH_RECEIVE_DIR_AMOUNT")</td>
                         </tr>
                         <tr>
                             <td style="padding:5px 15px 5px 5px;">
-                                @if (bEmailUseOnly == false)
+                                @if (bFileTransMenuUse)
                                 {
                                     <div class="progress-group text-left">
                                         <!--파일전송용량-->
@@ -135,7 +135,7 @@
                                 }
                             </td>
                             <td style="padding:5px 15px 5px 5px;">
-                                @if (bUseClipBoard && bEmailUseOnly == false)
+                                @if (bUseClipBoard)
                                 {
                                     <div class="progress-group text-left">
                                         <!-- 클립보드 용량-->
@@ -167,7 +167,7 @@
                         </tr>
                         <tr>
                             <td style="padding: 5px 15px 5px 5px; text-align: center;">
-                                @if (bEmailUseOnly == false)
+                                @if (bFileTransMenuUse)
                                 {
                                     <div class="progress-group text-left">
                                         <!--파일전송건수-->
@@ -187,7 +187,7 @@
                                 }
                             </td>
                             <td style="padding: 5px 15px 5px 5px; text-align: center;">
-                                @if (bUseClipBoard && bEmailUseOnly == false)
+                                @if (bUseClipBoard)
                                 {
                                     <div class="progress-group text-left">
                                         <!-- 클립보드 건수-->
@@ -423,26 +423,28 @@
 
                 <div class="quick">
 
-
-                    @if (bFileTransMenuUse && bEmailUseOnly == false)
+                    @if (bFileTransUse)
                     {
-                        <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transfer"))">
-                            <div class="text-center"><img src="/images/adminlte/quick_01.png"></div>
-                            <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_FILESEND")</font>  <!--파일전송-->
-                        </button>
-                    }
+                        @if (bFileTransMenuUse)
+                        {
+                            <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transfer"))">
+                                <div class="text-center"><img src="/images/adminlte/quick_01.png"></div>
+                                <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_FILESEND")</font>  <!--파일전송-->
+                            </button>
+                        }
 
-                    <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transManage"))">
-                        <div class="text-center"><img src="/images/adminlte/quick_02.png"></div>
-                        <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_TRANSMANAGE")</font> <!--전송관리-->
-                    </button>
-
-                    @if (bApprMenuUse && bEmailUseOnly == false)
-                    {
-                        <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transferApprove"))">
-                            <div class="text-center"><img src="/images/adminlte/quick_03.png"></div>
-                            <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_APPROVEMANAGE")</font> <!--결재관리-->
+                        <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transManage"))">
+                            <div class="text-center"><img src="/images/adminlte/quick_02.png"></div>
+                            <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_TRANSMANAGE")</font> <!--전송관리-->
                         </button>
+
+                        @if (bApprMenuUse)
+                        {
+                            <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transferApprove"))">
+                                <div class="text-center"><img src="/images/adminlte/quick_03.png"></div>
+                                <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_APPROVEMANAGE")</font> <!--결재관리-->
+                            </button>
+                        }
                     }
 
                     <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/viewConf"))">
@@ -512,8 +514,6 @@
 
     int nDrawPageGroupID = -1;
     @*string strCurrentSeedKey = "";*@
-
-    bool bEmailUseOnly = false;
 
     // 목적지 Data
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
@@ -605,6 +605,8 @@
     private string stShowAdminInfo = "none";
 
     bool bUseClipBoard = false;
+    bool bFileTransUse = false; //자료전송탭 사용유무
+
 
     /// <summary>
     /// 자동로그인 설정 화면 나오게 할지 유무
@@ -837,7 +839,7 @@
             stShowAdminInfo = "none";
 
         if (groupIDbyParam > -1)
-            bEmailUseOnly = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApproveOnly(groupIDbyParam);
+            bFileTransUse = SGAppMgrSvc.OpConfigInfoService.GetUseFileTrans(groupIDbyParam);
 
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;

@@ -37,8 +37,8 @@
                         {
                             <a class="nav-link m-0 @(MenuItem.ActiveClass)"
                style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-               @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))"
-               @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))">
+               @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem, true))"
+               @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem, true))">
                                 <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
                                 <p style="font-size:1rem;" class="p-2">
                                     @(MenuItem.FromName /*Dashboard*/)
@@ -280,7 +280,7 @@
 
     bool bViewSGSideBarUIBadge = false;                   // 메뉴에 Badge 나오게할지 유무
 
-    bool bEmailUseOnly = false;
+    bool bFileTransUse = false;
 
     private void ChangeSideBarUInNavigate()
     {
@@ -305,9 +305,17 @@
             else
                 strNavigatePathWithGroupID = "/Transfer/";
         }
-        bEmailUseOnly = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApproveOnly(activeMenuPopup.GroupId);
-        if (bEmailUseOnly)
-            strNavigatePathWithGroupID = "/Welcome/";  // 설정에 상관없도록
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(activeMenuPopup.GroupId);
+        {
+            if(sgLoginData != null)
+            {
+                bool bFileTrans = sgLoginData.GetFileTrans();
+                if (!bFileTrans)
+                    strNavigatePathWithGroupID = "/Welcome/";  // 파일 전송을 사용 하지 않으면 무조건 Welcome 으로 이동
+            }
+        }
+
         strNavigatePathWithGroupID += activeMenuPopup.GroupId.ToString();
         MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
@@ -532,7 +540,7 @@
     }
 
 
-    public async void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
+    public async void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu, bool isMainMenu = false)
     {
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(activeMenu.GroupId);
@@ -563,9 +571,13 @@
             refProxyApprover_PopUp.BindEvent();
             await refProxyApprover_PopUp.openPopUp();
         }
-        else if(activeMenu.IsSubMenu && !string.IsNullOrEmpty(activeMenu.Path))
+        else if(isMainMenu) //대메뉴는 클릭 시 Welcome으로 이동
         {
-           MyNavigationManager.NavigateTo(activeMenu.Path); 
+            MyNavigationManager.NavigateTo(activeMenu.Path);
+        }
+        else if(activeMenu.IsSubMenu && !string.IsNullOrEmpty(activeMenu.Path))     //하위 메뉴는 클릭 시, 해당 Path로 이동
+        {
+            MyNavigationManager.NavigateTo(activeMenu.Path);
         }
     }
 
@@ -631,7 +643,7 @@
         bool bUseClipBoardApproveUI = false;
 
         bool bEmailUse = false;
-        bool bEmailUseOnly = false;
+        bool bFileTransUse = false;
 
         bool bPublicBoard = false;
         bool bBasicConf = false;
@@ -714,7 +726,7 @@
         //bEmailUse = AppConfigSvc.GetEmailApproveUse();
 
         bEmailUse = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(activeMenu.GroupId);
-        bEmailUseOnly = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApproveOnly(activeMenu.GroupId);
+        bFileTransUse = SGAppMgrSvc.OpConfigInfoService.GetUseFileTrans(activeMenu.GroupId);
         bPCURLUse = SGAppMgrSvc.OpConfigInfoService.GetUsePCURL(activeMenu.GroupId);
 
         //bUseClipBoardManageUI = siteConfig.GetUseClipApprove(activeMenu.GroupId);
@@ -741,13 +753,13 @@
             strLoginUserSeq = sgUserData.GetUserSequence(); //  sgLoginData.GetUserID();
 
         // 파일전송 UI(0)
-        if (bEmailUseOnly == false)
+        if (bFileTransUse)
         {
             // GroupID 별로 넘어가도록 수정
             if (SideBarUISvc.FindMenu(gID, nParentID) == null)
                 SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "", icon: "fas fa-copy", path: "", badgeType: "left badge badge-warning", bUse: true, strUserSeq: strLoginUserSeq);
 
-        
+
             string strNavigateUrl = pageService.GetFileTransPage(gID);
             if (strNavigateUrl != null && strNavigateUrl.Length > 0)
                 strNavigatePathWithGroupID = strNavigateUrl;
@@ -766,7 +778,7 @@
             strNavigatePathWithGroupID += gID.ToString();
             if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
                 pageService.m_TransMenuArray[gID] = SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_TRANSMANAGE"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", strUserSeq: strLoginUserSeq);                                                     // 전송관리
-        
+
 
             // 결재관리(2)
             strNavigatePathWithGroupID = "/transferApprove/";
@@ -810,14 +822,12 @@
                 if (SideBarUISvc.FindSubMenu(gID, nParentID, 6) == null)
                     SideBarUISvc.AddSubMenu(groupId: gID, Id: 6, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_PKI_TRANS"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strLoginUserSeq);
             }
+            nParentID++;
         }
-
-
         //
         if (bEmailUse)
         {
             // 메일 관리
-            nParentID++;
             if (SideBarUISvc.FindMenu(gID, nParentID) == null)
                 SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: "", icon: "fas fa-envelope", path: "", badgeType: "left badge badge-warning", bUse: bEmailUse, strUserSeq: strLoginUserSeq);
 
@@ -850,13 +860,12 @@
                 if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
                     SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
             }
-
+            nParentID++;
         }
 
         if (bPCURLUse)
         {
             // PCURL 관리
-            nParentID++;
             if (SideBarUISvc.FindMenu(gID, nParentID) == null)
                 SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: "", icon: "fas fa-globe", path: "", badgeType: "right badge badge-warning", bUse: bPCURLUse, strUserSeq: strLoginUserSeq);
 
@@ -874,12 +883,12 @@
                 if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
                     SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: XmlConf.GetTitle("T_COMMON_URLAPPROVE"), icon: "fas fa-globe", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bPCURLUse & bApprMenuUse), strUserSeq: strLoginUserSeq);
             }
+            nParentID++;
         }
 
         if (bUseClipBoardManageUI)
         {
             // 클립보드 관리
-            nParentID++;
             if (SideBarUISvc.FindMenu(gID, nParentID) == null)
                 SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: "", icon: "fas fa-object-ungroup", path: "", badgeType: "right badge badge-warning", bUse: bUseClipBoardManageUI, strUserSeq: strLoginUserSeq);
 
@@ -897,10 +906,10 @@
                 if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
                     SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: XmlConf.GetTitle("T_COMMON_CLIPAPPR"), icon: "fas fa-object-ungroup", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bUseClipBoardApproveUI & bApprMenuUse), strUserSeq: strLoginUserSeq);
             }
+            nParentID++;
         }
 
         // 접속환경
-        nParentID++;
         strNavigatePathWithGroupID = "/viewConf/";
         strNavigatePathWithGroupID += gID.ToString();
         if (SideBarUISvc.FindMenu(gID, nParentID) == null)

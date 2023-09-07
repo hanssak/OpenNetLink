@@ -87,11 +87,11 @@
     [Parameter] public LinkedList<ApproverInfo> UserSearchList { get; set; } = new LinkedList<ApproverInfo>();   //좌측 검색결과
 
 
-    /// <summary>
-    /// 조회 시, 일반사용자 조회 유무 (default : true)
-    ///</br>true : 결재자/전결자만 / false : 일반사용자 및 결재자,전결자
-    /// </summary>
-    [Parameter]
+    ///// <summary>
+    ///// 조회 시, 일반사용자 조회 유무 (default : true)
+    /////</br>true : 결재자/전결자만 / false : 일반사용자 및 결재자,전결자
+    ///// </summary>
+    //[Parameter]
     public bool IsApproverOnly { get; set; } = true;
 
     private int SearchListHeight
@@ -236,7 +236,7 @@
             strDown = XmlConf.GetTitle("T_ETC_DOWN");                                   // 아래
             strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
             strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기*@
-        strDeptPlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       // 부서입력
+    strDeptPlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       // 부서입력
         strNamePlaceHolder = XmlConf.GetTitle("T_INPUT_NAME");                       // 이름입력
     }
 
@@ -256,8 +256,15 @@
         }
     }
 
-    public void BindEvent()
+    /// <summary>
+    /// //Tree 및 리스트 재정렬
+    /// </summary>
+    /// <param name="getIsApproverOnly"></param>
+    public void BindEvent(bool getIsApproverOnly)
     {
+        //사용되는 Popup에 따라 설정
+        IsApproverOnly = getIsApproverOnly;
+
         //Tree 및 리스트 재정렬
         deptTreeInfoValues = null;
         currentSelectKey = "";
@@ -265,7 +272,7 @@
         HsCmdCenter.sgPageEvent.SetDeptInfoEventAdd(activedGroupID, setDeptTree);
         if (activedSGLogin != null)
         {
-            IsApproverOnly = !activedSGLogin.GetApproveProxyRight();
+            //IsApproverOnly = !activedSGLogin.GetApproveProxyRight();
             HsCmdCenter.SendDeptInfo(activedGroupID, activedSGLogin.GetUserID());
         }
 

@@ -230,9 +230,6 @@
     string str2FactorAuthType = "";
     string strOtpUrlCode = "";
 
-    bool bEmailUseOnly = false;
-
-
     private void GoogleOtpCancel()
     {
         QRcode.Dispose();
@@ -1039,8 +1036,6 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             HSCmdCenter.SetAllowSessionDuplicate(groupid, (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupid) == 1));
             //HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         }
-
-        bEmailUseOnly = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApproveOnly(groupid);
 
         // 다중망 로그인에서 로그아웃됐을때에 다시 자동로그인 안되게 처리
         if (srcLoc == "Logout")
@@ -1861,9 +1856,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                             strNavigatePathnGroupID = "/Transfer/";
                     }
 
-                    if (bEmailUseOnly)
-                        strNavigatePathnGroupID = "/Welcome/";  // 설정에 상관없도록
+                    if (sgLoginData != null)
+                    {
+                        bool bFileTransUse = sgLoginData.GetFileTrans();
 
+                        if (!bFileTransUse)
+                            strNavigatePathnGroupID = "/Welcome/";  // 설정에 상관없도록
+                    }
                     strNavigatePathnGroupID += nGroupIDfirst.ToString();
                 }
 
@@ -2503,6 +2502,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         bool bUseClipBoardManageUI = false;
         bool bUseClipBoardApproveUI = false;
         bool bEmailUse = false;
+        bool bFileTransUse = false;
 
         bool bPublicBoard = false;
         bool bBasicConf = false;
@@ -2610,6 +2610,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     strRootPath = "/Transfer/";
             }
 
+            bFileTransUse = SGAppMgrSvc.OpConfigInfoService.GetUseFileTrans(groupid);
             // siteConfig. json으로 이동
             bEmailUse = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(groupid);
             //bEmailUse = AppConfigSvc.GetEmailApproveUse();
@@ -2660,14 +2661,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
                 SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: strNavigatePathWithGroupID, badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand, strUserSeq);
 
-                if (bEmailUseOnly == false)
+                if (bFileTransUse)
                 {
                     if (SideBarUISvc.FindMenu(gID, nParentID) == null)
                         SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "", icon: "fas fa-copy", path: "", badgeType: "left badge badge-warning", bUse: true, strUserSeq: strUserSeq);
 
                     // Menu index는 list index가 아니므로, 메뉴 구분용도로 만 사용하면됨.
                     // 파일전송(0)
-
 
                     strNavigatePathWithGroupID = "/transfer/";
                     strNavigatePathWithGroupID += gID.ToString();
@@ -2679,7 +2679,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     strNavigatePathWithGroupID += gID.ToString();
                     if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
                         pageService.m_TransMenuArray[gID] = SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strTransManage, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", strUserSeq: strUserSeq);
-                
+
                     // 결재관리(2)
                     strNavigatePathWithGroupID = "/transferApprove/";
                     strNavigatePathWithGroupID += gID.ToString();
@@ -2721,13 +2721,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         if (SideBarUISvc.FindSubMenu(gID, nParentID, 6) == null)
                             SideBarUISvc.AddSubMenu(groupId: gID, Id: 6, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_PKI_TRANS"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strUserSeq);
                     }
-
+                    nParentID++;
                 }
 
                 if (bEmailUse)
                 {
                     // 메일 관리
-                    nParentID++;
+
                     if (SideBarUISvc.FindMenu(gID, nParentID) == null)
                         SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: "", icon: "fas fa-envelope", path: "", badgeType: "left badge badge-warning", bUse: bEmailUse, strUserSeq: strUserSeq);
 
@@ -2760,13 +2760,11 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
                             SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
                     }
-
+                    nParentID++;
                 }
 
                 if (bPCURLUse)
                 {
-                    // PCURL 관리
-                    nParentID++;
                     if (SideBarUISvc.FindMenu(gID, nParentID) == null)
                         SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: "", icon: "fas fa-globe", path: "", badgeType: "right badge badge-warning", bUse: bPCURLUse, strUserSeq: strUserSeq);
 
@@ -2781,12 +2779,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     strNavigatePathWithGroupID += gID.ToString();
                     if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
                         SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLApprManage, icon: "fas fa-globe", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bPCURLUse & bApprMenuUse), strUserSeq: strUserSeq);
+
+                    nParentID++;
                 }
 
                 if (bUseClipBoardManageUI)
                 {
                     // 클립보드 관리
-                    nParentID++;
                     if (SideBarUISvc.FindMenu(gID, nParentID) == null)
                         SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: "", icon: "fas fa-object-ungroup", path: "", badgeType: "right badge badge-warning", bUse: bUseClipBoardManageUI, strUserSeq: strUserSeq);
 
@@ -2805,11 +2804,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
                             SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardApprManage, icon: "fas fa-object-ungroup", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bUseClipBoardApproveUI & bApprMenuUse), strUserSeq: strUserSeq);
                     }
-
+                    nParentID++;
                 }
 
                 // 접속환경
-                nParentID++;
                 strNavigatePathWithGroupID = "/viewConf/";
                 strNavigatePathWithGroupID += gID.ToString();
                 if (SideBarUISvc.FindMenu(gID, nParentID) == null)

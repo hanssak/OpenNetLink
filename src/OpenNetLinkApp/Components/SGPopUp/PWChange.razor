@@ -104,6 +104,7 @@
 
     CsPasswdValidCheckfunc objCheckPWstring = new CsPasswdValidCheckfunc();
     bool bEmailUseOnly = false;
+    bool bFileTransUse = false;
 
     //[Parameter]
     //public EventCallback<int> goToPage { get; set; }
@@ -200,7 +201,11 @@
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
 
         if (nGroupID > -1)
-            bEmailUseOnly = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApproveOnly(nGroupID);
+        {
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupID);
+            bFileTransUse = sgLoginData.GetFileTrans();
+        }
     }
 
 
@@ -500,7 +505,7 @@
                         strNavigateWithGroupID = "/Transfer/";
                 }
 
-                if (bEmailUseOnly)
+                if (!bFileTransUse)
                     strNavigateWithGroupID = "/Welcome/";  // 설정에 상관없도록
 
                 strNavigateWithGroupID += groupID.ToString();
@@ -556,7 +561,7 @@
                     strNavigateWithGroupID = "/Transfer/";
             }
 
-            if (bEmailUseOnly)
+            if (!bFileTransUse)
                 strNavigateWithGroupID = "/Welcome/";  // 설정에 상관없도록
 
             strNavigateWithGroupID += groupID.ToString();
@@ -633,7 +638,7 @@
         if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
 
-            if (bEmailUseOnly)
+            if (!bFileTransUse)
             {
                 strNavigateWithGroupID = "/Welcome/";  // 설정에 상관없도록
                 strNavigateWithGroupID += groupID.ToString();
@@ -758,7 +763,7 @@
                         strNavigateWithGroupID = "/Transfer/";
                 }
 
-                if (bEmailUseOnly)
+            if (!bFileTransUse)
                 strNavigateWithGroupID = "/Welcome/";  // 설정에 상관없도록
 
                 strNavigateWithGroupID += groupID.ToString();
