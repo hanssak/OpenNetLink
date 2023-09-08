@@ -1046,6 +1046,7 @@ namespace OpenNetLinkApp.Services
         {
             m_bFileSending = bFileSending;
         }
+
         public bool GetFileSending()
         {
             return m_bFileSending;
@@ -1058,7 +1059,14 @@ namespace OpenNetLinkApp.Services
         {
             return m_bFilePrevRecving;
         }
-
+        public bool GetClipboardSending()
+        {
+            return m_bClipBoardSending;
+        }
+        public void SetClipboardSending(bool bClipboardSending)
+        {
+            m_bClipBoardSending = bClipboardSending;
+        }
         public void SetFileExaming(bool bFileExaming)
         {
             m_bFileExaming = bFileExaming;

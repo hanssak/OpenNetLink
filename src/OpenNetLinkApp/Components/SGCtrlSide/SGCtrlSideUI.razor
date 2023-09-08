@@ -45,7 +45,7 @@
                                 // 다중접속일때에는 단일망에만 전달가능
                                 // 단일접속일때에는 3중망에 전달가능
                                 @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0 &&
-                              (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                             (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                 {
 
                                     //@if (itemData.Value.nIdx == 1 && ListModKey.Count > 0)
@@ -57,7 +57,7 @@
                                         {
                                             @*<input type="checkbox" class="mr-1" checked="@(ListModKey[NetworkInfo.GroupID][Index])"
                                                 @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />*@
-                                            <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))"
+                                            <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))" @onclick:preventDefault="@GetPreventDefault(NetworkInfo.GroupID, Index)"
                                                    @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
                                             <span class="mr-2">@Modifier</span>
                                         }
@@ -179,7 +179,7 @@
                                 @*<input type="checkbox" class="mr-1" checked="@ListModKey[NetworkInfo.GroupID][Index]"
                                     @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />*@
 
-                                <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))"
+                                <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))" @onclick:preventDefault="@GetPreventDefault(NetworkInfo.GroupID, Index)"
                                        @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
 
                                 <span class="mr-2">@Modifier</span>
@@ -606,7 +606,7 @@
     /// groupID별 단축키<win,ctrl,...> 저장 Dic
     /// </summary>
     private Dictionary<int, List<bool>> DicModKey = new Dictionary<int, List<bool>>();
-
+    private Dictionary<int, List<bool>> DicModPreventDefault = new Dictionary<int, List<bool>>();
     /// <summary>
     /// 3망연계,groupID-Idx별 단축키<win,ctrl,...> 저장 List
     /// </summary>
@@ -869,9 +869,21 @@
 
         listKey[(int)modifier] = bMod;
 
+        SetPreventDefault(groupId, listKey);
+
         SetClipBoardHotKey(groupId, ref listKey, chVkey);
     }
 
+    bool GetPreventDefault(int groupId, int modifier)
+    {
+        List<bool> listKey = null;
+        if (DicModPreventDefault.TryGetValue(groupId, out listKey) == false)
+        {
+            return false;
+        }
+
+        return DicModPreventDefault[groupId][(int)modifier];
+    }
 
     /**
     *@brief 3망연계 설정때, 추가망들 단축키 - groupId, nIdx
@@ -1522,33 +1534,33 @@
         }
 
         @*bool bFind = false;
-        int count = AppConfigSvc.AppConfigInfo.RecvDownPath.Count;
-        string strPreDownPath = "";
-        for (int i = 0; i < count; i++)
-        {
-            if (groupId == i)
+            int count = AppConfigSvc.AppConfigInfo.RecvDownPath.Count;
+            string strPreDownPath = "";
+            for (int i = 0; i < count; i++)
             {
-                strPreDownPath = GetRecvDownPath(groupId);
-                continue;
-            }
+                if (groupId == i)
+                {
+                    strPreDownPath = GetRecvDownPath(groupId);
+                    continue;
+                }
 
-            if (stPath.Equals(AppConfigSvc.AppConfigInfo.RecvDownPath[i]))
+                if (stPath.Equals(AppConfigSvc.AppConfigInfo.RecvDownPath[i]))
+                {
+                    bFind = true;
+                }
+            }
+            if (bFind)
             {
-                bFind = true;
-            }
-        }
-        if (bFind)
-        {
-            CtrlSideUISvc.SetRecvDownPath(groupId, strPreDownPath);
-            await Task.Delay(1);    // flush UI changes
+                CtrlSideUISvc.SetRecvDownPath(groupId, strPreDownPath);
+                await Task.Delay(1);    // flush UI changes
 
-            CLog.Here().Information($"RecvDownPath Set: [{strPreDownPath}]");
-            await Task.Delay(500);
-            string strMsg = XmlConf.GetWarnMsg("W_0244");                                   // 설정하려는 수신폴더는 다른망의 수신폴더와 동일합니다./r/n다시 설정하여 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("warn", strMsg);
-            return;
-        }*@
+                CLog.Here().Information($"RecvDownPath Set: [{strPreDownPath}]");
+                await Task.Delay(500);
+                string strMsg = XmlConf.GetWarnMsg("W_0244");                                   // 설정하려는 수신폴더는 다른망의 수신폴더와 동일합니다./r/n다시 설정하여 주십시요.
+                strMsg = strMsg.Replace("/r/n", "<br>");
+                ShowMessage("warn", strMsg);
+                return;
+            }*@
 
         //HsCmdCenter.SetDownLoadPath(groupId, stPath);
         //HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
@@ -2103,9 +2115,9 @@
         // 마핀의 경우 고정
 
 
-        foreach(var sgNetWork in GetSGNetworkList())
+        foreach (var sgNetWork in GetSGNetworkList())
         {
-            if(sgNetWork.GroupID == groupID)
+            if (sgNetWork.GroupID == groupID)
             {
                 if (sgNetWork.NetPos == "IN")
                     return false;
@@ -2152,7 +2164,7 @@
         }
 
         //업데이트 진행은 아니지만, Update Cancel 중이면 SKIP
-        if(AppUpdaterSvc.IsCancelRequested)
+        if (AppUpdaterSvc.IsCancelRequested)
         {
             CLog.Here().Information($"[GID:{groupId}] SKIP - Update Canceling...");
             refSGMessageNotification?.OpenPopUp($"We are working on [Canceling] the update.{Environment.NewLine}Please try again in a few minutes. :(");
@@ -2160,10 +2172,10 @@
         }
 
 
-         await Task.Run(() =>
-        {
-            AppUpdaterSvc.CheckUpdatesClick(groupId, refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
-        });
+        await Task.Run(() =>
+       {
+           AppUpdaterSvc.CheckUpdatesClick(groupId, refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
+       });
     }
 
     public async void CheckUpdatesClick(int groupId)
@@ -2190,10 +2202,10 @@
     }
 
     @*private void OpenDownloadUpdate(string downloadInfo)
-    {
-        refSGDownloadUpdate.OpenPopUp(downloadInfo);
-    }
-*@
+        {
+            refSGDownloadUpdate.OpenPopUp(downloadInfo);
+        }
+    *@
     private void CancelDownloadUpdate()
     {
         AppUpdaterSvc.RequestCancelFileDownload();
@@ -2222,14 +2234,14 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="isTotalPathch">전체패치 여부 (서버의 PATCHMODE =1 )</param>
     public async void clientUpgradeExe(int groupId, bool isTotalPathch)
     {
         Console.WriteLine("clientUpgradeExe : " + isTotalPathch.ToString());
-        
+
         if (isTotalPathch || SGAppMgrSvc.OpConfigInfoService.GetUseForceBackgroundUpdate())
         {
             //서버설정의 PATCHMODE = 1 (전체패지) 인 경우, 강제 패치처리
@@ -2302,6 +2314,8 @@
             }
 
             DicModKey.Add(nGroupId, listKey);
+
+            SetPreventDefault(nGroupId, listKey);
         }
         catch (Exception ex)
         {
@@ -2310,6 +2324,50 @@
         }
 
         return bRet;
+    }
+
+    public void SetPreventDefault(int groupId, List<bool> listKey)
+    {
+        List<bool> prevent = null;
+        int count = 0;
+        foreach (bool value in listKey)
+        {
+            if (value)
+                count++;
+        }
+        if (DicModPreventDefault.TryGetValue(groupId, out prevent) == false)
+        {
+            prevent = new List<bool>();
+            if (count == 1)
+            {
+                foreach (bool value in listKey)
+                {
+                    prevent.Add(value);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < listKey.Count; i++)
+                    prevent.Add(false);
+            }
+            DicModPreventDefault.Add(groupId, prevent);
+        }
+        else
+        {
+            if (count == 1)
+            {
+                for (int i = 0; i < listKey.Count; i++)
+                {
+                    prevent[i] = listKey[i];
+                }
+            }
+            else
+            {
+                for (int i = 0; i < listKey.Count; i++)
+                    prevent[i] = false;
+            }
+            DicModPreventDefault[groupId] = prevent;
+        }
     }
 
     /// <summary>
