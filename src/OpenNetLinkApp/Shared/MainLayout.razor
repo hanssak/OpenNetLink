@@ -241,8 +241,14 @@
         string stVIPMode = sgLoginData.GetTagData("PRIVACYAPPROVEVIP");
         string stDuputyMode = sgLoginData.GetTagData("PRIVACYAPPROVEMOD");
 
+        bool bSendFileContinue = true;
         //VIP이면 개인정보 노출되어도 바로 전송
         if (stVIPMode == "0" && sgLoginData.IsVipUser() == true) //결재해야 하는데 VIP면 결재안함
+        {
+            HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
+            "1", "", stNotiNetSystem);    //1 : 전송 진행
+        }
+        else if(bSendFileContinue)
         {
             HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
             "1", "", stNotiNetSystem);    //1 : 전송 진행
@@ -331,7 +337,7 @@
             //업데이트 진행은 아니지만, Update Cancel 중이면 SKIP
             if(AppUpdaterSvc.IsCancelRequested)
             {
-                CLog.Here().Information($"groupId : {groupId} SKIP - Update Canceling...");            
+                CLog.Here().Information($"groupId : {groupId} SKIP - Update Canceling...");
                 return;
             }
 
@@ -350,11 +356,11 @@
             }
             else
             {
-                
+
                 //업데이트 노티 팝업 사용 가능여부 반환
                 //다른 망에서 이미 해당 노티 팝업을 표시하였다면, 노티 패스
                 if (refUpdate_NotiPopUp.popUpGroupID < 0)
-                        await refUpdate_NotiPopUp.openPopUp(groupId);
+                    await refUpdate_NotiPopUp.openPopUp(groupId);
                 else
                     CLog.Here().Information($"nowUpdateInfo.groupId : {groupId} - Update Noti Popup Already Started By GroupID[{refUpdate_NotiPopUp.popUpGroupID}]");
             }
