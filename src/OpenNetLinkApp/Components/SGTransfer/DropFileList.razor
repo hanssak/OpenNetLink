@@ -635,13 +635,7 @@
                         //02. 문서파일 압축해제 후 파일 검사
 
                         //01. 문서파일 내 OLE 개체 검사
-                        fileAddManage.m_bIsDrm = await fileAddManage.IsDRMbyStream(hsStream.stream);
-                        if (fileAddManage.m_bIsDrm)
-                        {
-                            fileAddManage.m_bIsDrm = false;
-                            CLog.Here().Information($"OnDropFileAdd, is DRM file - Ole inspection skip!");
-                        }
-                        else if (await GetExamCheckDocument(fileAddManage, topFile, hsStream) != 0)
+                        if (await GetExamCheckDocument(fileAddManage, topFile, hsStream) != 0)
                         {
                             if (pageService.GetFileExaming() == false)
                             {
@@ -1000,13 +994,7 @@
                                 //02. 문서파일 압축해제 후 파일 검사
 
                                 //01. 문서파일 내 OLE 개체 검사
-                                fileAddManage.m_bIsDrm = await fileAddManage.IsDRMbyStream(hsStream.stream);
-                                if (fileAddManage.m_bIsDrm)
-                                {
-                                    fileAddManage.m_bIsDrm = false;
-                                    CLog.Here().Information($"OnDropFileAdd, is DRM file - Ole inspection skip!");
-                                }
-                                else if (await GetExamCheckDocument(fileAddManage, childFile, hsStream) != 0)
+                                if (await GetExamCheckDocument(fileAddManage, childFile, hsStream) != 0)
                                 {
                                     if (pageService.GetFileExaming() == false)
                                     {
@@ -1416,13 +1404,7 @@
                     //02. 문서파일 압축해제 후 파일 검사
 
                     //01. 문서파일 내 OLE 개체 검사
-                    fileAddManage.m_bIsDrm = await fileAddManage.IsDRMbyStream(hsStream.stream);
-                    if (fileAddManage.m_bIsDrm)
-                    {
-                        fileAddManage.m_bIsDrm = false;
-                        CLog.Here().Information($"SubFileAddAsync, is DRM file - Ole inspection skip!");
-                    }
-                    else if (await GetExamCheckDocument(fileAddManage, currentFile, hsStream) != 0)
+                    if (await GetExamCheckDocument(fileAddManage, currentFile, hsStream) != 0)
                     {
                         if (pageService.GetFileExaming() == false)
                         {
