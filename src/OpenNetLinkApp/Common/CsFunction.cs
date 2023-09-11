@@ -625,11 +625,15 @@ namespace OpenNetLinkApp.Common
                 {
                     using (FileStream fileStream = System.IO.File.OpenRead(filePath))
                     {
-                        byte[] pbyte = null;
-                        pbyte = new byte[fileStream.Length];
-                        fileStream.Read(pbyte, 0, (int)fileStream.Length);
+                        //byte[] pbyte = null;
+                        //pbyte = new byte[fileStream.Length];
+                        //fileStream.Read(pbyte, 0, (int)fileStream.Length);
+                        //return Convert.ToBase64String(SHA384.HashData(pbyte));
 
-                        return Convert.ToBase64String(SHA384.HashData(pbyte));
+                        //2023-09-11 smkoo 
+                        //sha384 object 를 생성하고 활용 안함... 그리고 메모리에 올려놓고 하면 메모리 사용량이 증가..
+                        //FileStream에서 바로 읽으면서 hash 추출 
+                        return Convert.ToBase64String(sha384.ComputeHash(fileStream));
                     }
                 }
             }
