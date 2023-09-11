@@ -113,7 +113,7 @@
     GoogleOTP refGoogleOTP;
 
     [Parameter]
-    public EventCallback<int> goToPage { get; set; }
+    public EventCallback<string> goToPage { get; set; }
 
     public bool bStartedLogin = false;//중복으로 로그인버튼 클릭 방지에 사용하는 상태
 
@@ -909,11 +909,18 @@
 
         if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId))
         {
+
+            string strInvokeSendParam = "";
+            strInvokeSendParam += groupId.ToString();
+            strInvokeSendParam += ":";
+            strInvokeSendParam += ((int)eLoginType.eLOGINTYPE_GPKI).ToString();
+
             if (GetInitPWLogin(groupId) == true)
             {
                 eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
                 pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
-                goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+                // goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);                
+                goToPage.InvokeAsync(strInvokeSendParam);
                 closePopUp();
                 return false;
             }
@@ -925,15 +932,15 @@
                 eResultIdPwAfterJob = eIDPWresultJob.eNone;
                 //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
                 HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg);//Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-
-                goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+                                                                                                                                                  //goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+                goToPage.InvokeAsync(strInvokeSendParam);
                 return true;
             }
             else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
             {
                 eResultIdPwAfterJob = eIDPWresultJob.eEnforced;
                 pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+                goToPage.InvokeAsync(strInvokeSendParam);
                 closePopUp();
                 return false;
             }
@@ -947,7 +954,7 @@
                 {
                     eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
                     pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                    goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+                    goToPage.InvokeAsync(strInvokeSendParam);
                     closePopUp();
                     return false;
                 }
@@ -957,7 +964,7 @@
                 {
                     eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
                     pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                    goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+                    goToPage.InvokeAsync(strInvokeSendParam);
                     closePopUp();
                     return false;
                 }
@@ -970,7 +977,7 @@
                 {
                     eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
                     pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                    goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+                    goToPage.InvokeAsync(strInvokeSendParam);
                     closePopUp();
                     return false;
                 }
@@ -982,7 +989,7 @@
                 {
                     eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
                     pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                    goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+                    goToPage.InvokeAsync(strInvokeSendParam);
                     closePopUp();
                     return false;
                 }
@@ -990,8 +997,7 @@
                 // 완료 처리!!!
                 eResultIdPwAfterJob = eIDPWresultJob.eNone;
                 HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");//Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-
-                goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+                goToPage.InvokeAsync(strInvokeSendParam);
             }
         }
 
@@ -1099,6 +1105,11 @@
         if (sgSettingData == null)
             sgSettingProc.InsertSettingData(groupId, "", "", "", "", 0);
 
+        string strInvokeSendParam = "";
+        strInvokeSendParam += groupId.ToString();
+        strInvokeSendParam += ":";
+        strInvokeSendParam += ((int)eLoginUITypeData).ToString();
+
         // IDPW UI 형태일때에만 사용
         if (eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
         {
@@ -1145,11 +1156,13 @@
             {
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId))
                 {
+
                     if (GetInitPWLogin(groupId) == true)
                     {
                         pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
                         eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
-                        goToPage.InvokeAsync((int)eLoginUITypeData);
+                        // goToPage.InvokeAsync(groupId, (int)eLoginUITypeData);
+                        goToPage.InvokeAsync(strInvokeSendParam);
                         closePopUp();
                         return false;
                     }
@@ -1162,14 +1175,14 @@
                         eResultIdPwAfterJob = eIDPWresultJob.eNone;
                         //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
                         HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-                        goToPage.InvokeAsync((int)eLoginUITypeData);
+                        goToPage.InvokeAsync(strInvokeSendParam);
                         return true;
                     }
                     else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
                     {
                         eResultIdPwAfterJob = eIDPWresultJob.eEnforced;
                         pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        goToPage.InvokeAsync((int)eLoginUITypeData);
+                        goToPage.InvokeAsync(strInvokeSendParam);
                         closePopUp();
                         return false;
                     }
@@ -1181,7 +1194,7 @@
                     {
                         eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
                         pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        goToPage.InvokeAsync((int)eLoginUITypeData);
+                        goToPage.InvokeAsync(strInvokeSendParam);
                         closePopUp();
                         return false;
                     }
@@ -1192,7 +1205,7 @@
                         // pw 변경날짜 정보가 없는 첫Login시
                         eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
                         pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        goToPage.InvokeAsync((int)eLoginUITypeData);
+                        goToPage.InvokeAsync(strInvokeSendParam);
                         closePopUp();
                         return false;
                     }
@@ -1204,7 +1217,7 @@
                     {
                         eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
                         pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        goToPage.InvokeAsync((int)eLoginUITypeData);
+                        goToPage.InvokeAsync(strInvokeSendParam);
                         closePopUp();
                         return false;
                     }
@@ -1216,7 +1229,7 @@
                     {
                         eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
                         pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        goToPage.InvokeAsync((int)eLoginUITypeData);
+                        goToPage.InvokeAsync(strInvokeSendParam);
                         closePopUp();
                         return false;
                     }
@@ -1237,7 +1250,7 @@
         eResultIdPwAfterJob = eIDPWresultJob.eNone;
         //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
         HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-        goToPage.InvokeAsync((int)eLoginUITypeData);
+        goToPage.InvokeAsync(strInvokeSendParam);
 
         return true;
 
@@ -1271,6 +1284,21 @@
                 HSCmdCenter.SetBaseDownLoadPath(groupID, strPath);
                 //CtrlSideUISvc.SetRecvDownPath(groupID, strPath);
             }
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="groupId"></param>
+    public void SetReconnectStart(int groupId)
+    {
+        // Reconnect 동작하게 적용
+        HsNetWork hsNetWork = null;
+        hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
+        if (hsNetWork != null)
+        {
+            hsNetWork.SetReconnectStop(false);
         }
     }
 
@@ -1454,6 +1482,7 @@
                 //    eLoginUITypeData = eLoginType.eLOGINTYPE_AD;
                 //}
 
+                SetReconnectStart(groupId);
 
                 // 이후 동작 처리
                 if (ProcessLoginResultAll(groupId) == false)

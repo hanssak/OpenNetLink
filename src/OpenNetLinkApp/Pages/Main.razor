@@ -1040,6 +1040,9 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         // 다중망 로그인에서 로그아웃됐을때에 다시 자동로그인 안되게 처리
         if (srcLoc == "Logout")
         {
+
+            pageService.SetStatusSideMenuReBuildTime(groupid, true);            
+
             if (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer(0) && NetWorkSvc.NetWorkInfo.Count > 1)
                 MyNavigationManager.NavigateTo("/SelectNet");
 
@@ -1268,6 +1271,21 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 HSCmdCenter.SetBaseDownLoadPath(groupID, strPath);
                 //CtrlSideUISvc.SetRecvDownPath(groupID, strPath);
             }
+        }
+    }
+
+    /// <summary>
+    /// Reconnect 동작할 수 있게 설정변경
+    /// </summary>
+    /// <param name="groupId"></param>
+    public void SetReconnectStart(int groupId)
+    {
+        // sessionCheck 동작하게 적용
+        HsNetWork hsNetWork = null;
+        hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
+        if (hsNetWork != null)
+        {
+            hsNetWork.SetReconnectStop(false);
         }
     }
 
@@ -1622,6 +1640,9 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     if (ctrlSideEvent != null)
                         ctrlSideEvent();
 
+
+                    SetReconnectStart(groupId);
+
                     // Move WebWindow To Tray.
                     //if (AppConfigSvc.GetStartTrayMove()) Window.MoveWebWindowToTray();
                 }
@@ -1721,8 +1742,8 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         }
 
                         // Login 화면으로 머물러있지 않도록
-                        @*if (nGroupIDfirst < 0)
-                            nGroupIDfirst = 0;*@
+                        //if (nGroupIDfirst < 0)
+                        //  nGroupIDfirst = 0;
 
                     } // if (dicLoginResult.Count == NetWorkSvc.NetWorkInfo.Count)
 
@@ -1759,8 +1780,9 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     refPWChange.Init();
 
                     // 초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거 시작 2021/07/05 YKH
-                    //패스워드 변경 유무에 따라 패스워드 체크 가능 여부 확인
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId))
+                    //패스워드 변경 유무에 따라 패스워드 체크 가능 여부 확인                    
+
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId) && pageService.GetStatusSideMenuReBuildTime(groupId))
                     {
                         if (GetInitPWLogin(groupId))
                         {
@@ -1900,7 +1922,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     pageService.ConnectCountAdd(nGroupIDfirst);
                 }
 
-            } // if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && nGroupIDfirst > -1 && groupId == nGroupIDfirst)
+            } // if (nGroupIDfirst > -1)
+
+            pageService.SetStatusSideMenuReBuildTime(groupId, false);
+
         }
         catch (Exception ex)
         {
@@ -2468,8 +2493,18 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
+
     public void InitSideMenu(int groupid)
     {
+
+        if (pageService.GetStatusSideMenuReBuildTime(groupid) == false)
+        {
+            //Reconnect 이상현상
+            CLog.Here().Information($"InitSideMenu, groupid : {groupid}, SideBar Build Skip!");
+            SideBarUISvc.EmitNotifyStateChangedActMenu();
+            return;
+        }
+
         string strDataTrans = XmlConf.GetTitle("T_COMMON_FILETRANS_BASIC");                     // 자료전송
         string strFileTrans = XmlConf.GetTitle("T_COMMON_FILETRANS");                           // 파일전송
         string strTransManage = XmlConf.GetTitle("T_COMMON_TRANSMANAGE");                       // 전송관리
@@ -2489,7 +2524,9 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         string strBasicSetInfo = XmlConf.GetTitle("T_ETC_BASICSET_TITLE");                      // 기본설정.
         string strBoardNotiInfo = XmlConf.GetTitle("T_COMMON_NOTIFY");                          // 공지사항
 
+
         SideBarUISvc.DeleteAllItem();
+
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         int count = listNetWork.Count;
 

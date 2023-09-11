@@ -831,6 +831,9 @@
                 DoLogOutSetData(Net.GroupID);
 
                 HsCmdCenter.SetAllowSessionDuplicate(Net.GroupID, (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(Net.GroupID) == 1));
+
+                // Reconnect
+                pageService.SetStatusSideMenuReBuildTime(Net.GroupID, true);
             }
         }
         else
@@ -844,6 +847,10 @@
             DoLogOutSetData(nGroupID);
 
             HsCmdCenter.SetAllowSessionDuplicate(nGroupID, (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(nGroupID) == 1));
+
+            // Reconnect
+            pageService.SetStatusSideMenuReBuildTime(nGroupID, true);
+
         }
 
         // sessionCheck 동작하게 적용
@@ -869,6 +876,7 @@
         {
 
             if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
+            if (pageService.GetStatusSideMenuReBuildTime(listNetWork[i].GroupID) == false)
             {
 
                 KeyboardEventArgs eventArgs = new KeyboardEventArgs();

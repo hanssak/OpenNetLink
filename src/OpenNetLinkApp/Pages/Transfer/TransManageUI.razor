@@ -12,6 +12,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using System.Text
 @using System.Diagnostics
+@using AgLogManager
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -329,8 +330,10 @@
     public string strTransInspect = "";
     public string strTitleInputInfo = "";
 
-    @*public string strFromDay = "";
-        public string strToDay = "";*@
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransManageUI>();
+
+    //public string strFromDay = "";
+    //   public string strToDay = "";
     private int m_currentDownloadCount = 0;
 
     ISGSideBarUIService SideBarUISvc;
@@ -454,7 +457,7 @@
     /// <param name="groupId"></param>
     public void SendDayFileInfo()
     {
-         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
@@ -604,7 +607,7 @@
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
-            if (sgSideBar != null)
+        if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
         HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
@@ -614,12 +617,18 @@
         strDestNetWork = strTotal;
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+        {
+            CLog.Here().Information($"OnInitialized, groupid : {groupID}, SideBar Build Skip!");
+            return;
+        }
+
         if (sgLoginData.GetUseOverNetwork2())
         {
             dicDestSysPos = pageService.GetTargetSystemList(groupID);
         }
 
-        @*GetInitDateTime();*@
+        //GetInitDateTime();
 
         base.OnInitialized();
 
@@ -751,7 +760,7 @@
             return;
         }
 
-        if(!strTitleValue.ValidationSqlInjection())
+        if (!strTitleValue.ValidationSqlInjection())
         {
             ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
             return;
@@ -1176,9 +1185,9 @@
             }
             else
             {
-                if(tData.expiredDate == "0001-01-01")
+                if (tData.expiredDate == "0001-01-01")
                 {
-                    if(!string.IsNullOrEmpty(sgLoginData.GetSystemPeriod()) && sgLoginData.GetSystemPeriod() != "0")
+                    if (!string.IsNullOrEmpty(sgLoginData.GetSystemPeriod()) && sgLoginData.GetSystemPeriod() != "0")
                     {
                         DateTime requestTime = Convert.ToDateTime(tData.RequestTime);
                         tData.expiredDate = requestTime.AddDays(Convert.ToInt64(sgLoginData.GetSystemPeriod())).ToString("yyyy-MM-dd");
@@ -1191,7 +1200,7 @@
                 isQueryDownPosible = false;
             else
                 isQueryDownPosible = true;
-                
+
             tData.isPossibleDownload = GetIsPossibleDownLoad(tData, isInner, maxDownloadCount, nowDate, groupId, isManualDownLoad, isForwardAutoDown, isQueryDownPosible);
 
             if (maxDownloadCount - tData.downloadCount < 0)

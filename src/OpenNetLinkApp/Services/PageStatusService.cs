@@ -32,6 +32,8 @@ namespace OpenNetLinkApp.Services
 
         public bool m_bMultiLoginDo = true;                             // 0각서버 로그인타입대로 로그인 진행할지 유무 (true : 각서버별 설정대로 로그인함-사용자가클릭했을때로그인진행, false: 0 번 GroupID 정보대로 1,2번에도 로그인함(추가해야함) )
 
+        //public bool m_bSideMenuReBuildTime = true;
+        public ConcurrentDictionary<int, bool> m_DicbSideMenuReBuildTime = new ConcurrentDictionary<int, bool>();
 
         static Timer timer = null;
         static DateTime svrTime;
@@ -1162,6 +1164,36 @@ namespace OpenNetLinkApp.Services
                 return "";
             }
             return m_DicPageStatusData[groupID].GetCurFileSendInfo();
+        }
+
+        /// <summary>
+        /// SideBarMenu를 생성해도 되는 시점인지 유무 확인(사용자가클릭해서 로그인한시점=true, Reconnect시점=false)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetStatusSideMenuReBuildTime(int nGroupID)
+        {
+            bool bRet = true;
+            if (m_DicbSideMenuReBuildTime.TryGetValue(nGroupID, out bRet))
+            {
+                return bRet;
+            }
+            else
+                return true;
+        }
+
+        /// <summary>
+        /// SideBarMenu를 생성해도 되는 시점인지 유무 설정
+        /// </summary>
+        /// <param name="bSetValue"></param>
+        public void SetStatusSideMenuReBuildTime(int nGroupID, bool bSetValue)
+        {
+            bool bRet = true;
+            if (m_DicbSideMenuReBuildTime.TryGetValue(nGroupID, out bRet))
+            {
+                m_DicbSideMenuReBuildTime.TryUpdate(nGroupID, bSetValue, bRet);
+            }
+            else
+                m_DicbSideMenuReBuildTime.TryAdd(nGroupID, bSetValue);
         }
 
         public bool GetLogoutStatus(int groupID)
