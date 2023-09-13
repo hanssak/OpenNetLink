@@ -362,54 +362,52 @@
         string strIP = sgDetailData.GetFilePreviewIP();
         string param = makeParamOfServerViewer();
 
+        //SP1 버전은 뷰어 통일
+        string webLinkParam = makeParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());    
+        webLinkParam = webLinkParam.Replace("+", "%2B").Replace("/","%2F");
+        
+        string strArguments = $"https://{strIP}:1300/weblink/AP001_Docs_Viewer_Enc.do?" + webLinkParam;
+        
 #if _WINDOWS
-
-    string strArguments = "";
-
-    if (!SGAppMgrSvc.OpConfigInfoService.GetUseWebLinkPreviewer(groupID))
-    {
-    //기존 뷰어 Param
-    strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-    strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
-    }
-    else
-    {
-    //웹링크쪽 뷰어 Param
-    string webLinkURL = SGAppMgrSvc.OpConfigInfoService.GetWebLinkPreviewerURL(groupID);
-    string webLinkParam = makeParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
-
-    //특수 문자 중 브라우저에 상이하게 인식되는 항목 변경
-    webLinkParam = webLinkParam.Replace("+", "%2B").Replace("/","%2F");
-
-    strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
-    strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
-    }
-
+    
+    //string strArguments = "";
+    //
+    //if (!SGAppMgrSvc.OpConfigInfoService.GetUseWebLinkPreviewer(groupID))
+    //{
+    ////기존 뷰어 Param
+    //strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+    //strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+    //}
+    //else
+    //{
+    ////웹링크쪽 뷰어 Param
+    //string webLinkURL = SGAppMgrSvc.OpConfigInfoService.GetWebLinkPreviewerURL(groupID);
+    //string webLinkParam = makeParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
+    //
+    ////특수 문자 중 브라우저에 상이하게 인식되는 항목 변경
+    //webLinkParam = webLinkParam.Replace("+", "%2B").Replace("/","%2F");
+    //
+    //strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
+    //strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+    //}
+    ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil.exe");
 #else
 
         ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
-        startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-        startInfo.WindowStyle = ProcessWindowStyle.Normal;
+        //startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+        //startInfo.WindowStyle = ProcessWindowStyle.Normal;
 #endif
 
         try
         {
-
-#if _WINDOWS
-
-    [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
-    ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
-
-#else
+            startInfo.Arguments = strArguments;
+            startInfo.WindowStyle = ProcessWindowStyle.Normal;
 
             // Run the external process & wait for it to finish
             using (Process proc = Process.Start(startInfo))
             {
                 //proc.WaitForExit();
             }
-#endif
-
         }
         catch (Exception e)
         {
