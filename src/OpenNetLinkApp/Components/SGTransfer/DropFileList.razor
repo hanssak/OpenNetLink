@@ -2478,6 +2478,12 @@
             {
                 path = path.Substring(5);
             }
+            else if (path.IndexOf("http") == 0)
+            {
+                await _dropReference.ClearValue();
+                pageService.SetDragNDropFilePath("");
+                return fileList;
+            }
             string dirPath = "";
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {

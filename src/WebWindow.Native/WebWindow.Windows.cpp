@@ -249,8 +249,6 @@ static wchar_t* Utf8ToWidecode(char* strUtf8, wchar_t* chWide, int nLen)
 	return chWide;
 }
 
-
-
 void WebWindow::Register(HINSTANCE hInstance)
 {
 	_hInstance = hInstance;
@@ -275,7 +273,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 
 	_parent = parent;
 	_hWnd = CreateWindowEx(
-		0,                              // Optional window styles.
+		WS_EX_ACCEPTFILES,                              // Optional window styles.
 		CLASS_NAME,                     // Window class
 		title,							// Window text
 		WS_OVERLAPPEDWINDOW,            // Window style
@@ -466,6 +464,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			PostQuitMessage(0);
 		}
+		return 0;
+	}
+	case WM_DROPFILES:
+	{
+		printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		return 0;
 	}
 	case WM_USER_SHOWMESSAGE:
@@ -797,7 +800,7 @@ void WebWindow::AttachWebView()
 							[this](ICoreWebView2* sender, ICoreWebView2NewWindowRequestedEventArgs* args)
 							{
 								wil::unique_cotaskmem_string uri;
-								
+
 								args->put_Handled(TRUE);
 								if (args->get_Uri(&uri) == S_OK)
 								{
@@ -928,11 +931,13 @@ void WebWindow::AttachWebView()
 
 void WebWindow::NavigateToUrl(AutoString url)
 {
+	printf("%ls", url);
 	_webviewWindow->Navigate(url);
 }
 
 void WebWindow::NavigateToString(AutoString content)
 {
+	printf("%ls", content);
 	_webviewWindow->NavigateToString(content);
 }
 
@@ -1163,10 +1168,6 @@ void WebWindow::ClipTypeSelect(int groupID)
 void WebWindow::ClipFirstSendTypeText(int groupID)
 {
 	m_mapBoolClipSendTextFirst[groupID] = true;
-}
-void WebWindow::SetDragNDropFilePath()
-{
-
 }
 
 void WebWindow::ClipMemFree(int groupID)
@@ -1732,6 +1733,49 @@ int WebWindow::SendClipBoard(int groupID)
 	return 0;
 }
 
+void WebWindow::SetDragNDropFilePath()
+{
+	HWND hwndDesktop = GetDesktopWindow();
+	TCHAR   lpszFileName[MAX_PATH];
+	CString csFile = "";
+	if (OpenClipboard(hwndDesktop))
+	{
+		HGLOBAL hGlobalText = (HGLOBAL)GetClipboardData(CF_UNICODETEXT);
+		if (hGlobalText)
+		{
+			wchar_t* wclpstr = (wchar_t*)GlobalLock(hGlobalText);
+			GlobalUnlock(hGlobalText);
+			printf("%ls\n", wclpstr);
+		}
+		HGLOBAL hGlobal = (HGLOBAL)GetClipboardData(CF_HDROP);
+		if (hGlobal)
+		{
+			HDROP hDrop = (HDROP)GlobalLock(hGlobal);
+			if (hDrop)
+			{
+				UINT fileCount = DragQueryFile(hDrop, 0xFFFFFFFF, 0, 0);
+				UINT filenameLength;
+				for (UINT i = 0; i < fileCount; ++i)
+				{
+					filenameLength = DragQueryFile(hDrop, i, 0, 0);
+					DragQueryFile(hDrop, i, lpszFileName, filenameLength + 1);
+					csFile = (CString)lpszFileName;
+					printf("%ls\n", lpszFileName);
+				}
+			}
+			GlobalUnlock(hGlobal);
+		}
+		else
+		{
+			NTLog(SelfThis, Info, "WebWindow:: Error %d", GetLastError());
+		}
+	}
+
+	CloseClipboard();
+
+	NTLog(SelfThis, Info, "WebWindow:: : SetDragNDropFilePath !!!!!!!!!!!!");
+}
+
 bool WebWindow::SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName)
 {
 	// 파일 생성
@@ -1797,6 +1841,35 @@ char* WebWindow::GetModulePath()
 	return m_chModulePath;
 }
 
+LRESULT CALLBACK StaticWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+{
+	if (uMsg == WM_DROPFILES)
+	{
+		printf("1111111111111111");
+		HDROP hDrop = reinterpret_cast<HDROP>(wParam);
+
+		// extract files here
+		vector<string> files;
+		string filename;
+
+		UINT count = DragQueryFileA(hDrop, -1, NULL, 0);
+		for (UINT i = 0; i < count; ++i)
+		{
+			UINT size = DragQueryFileA(hDrop, i, NULL, 0);
+			if (size > 0)
+			{
+				filename.resize(size);
+				DragQueryFileA(hDrop, i, &filename[0], size + 1);
+				files.push_back(filename);
+			}
+		}
+
+		DragFinish(hDrop);
+		return 0;
+	}
+
+	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+}
 bool WebWindow::GetClipboardBitmap(HBITMAP hbm, char* bmpPath)
 {
 	char  filepath[512], workdirpath[512];

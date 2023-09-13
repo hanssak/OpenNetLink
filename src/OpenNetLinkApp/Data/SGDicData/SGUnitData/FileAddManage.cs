@@ -4832,12 +4832,103 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
         }
 
-        void scanDecompressedFile()
+
+        public bool unzipFile(string fileFullName, string destFullPath)
+        {
+            try
+            {
+                //2022.10.06 BY kYH sharpPress 버전업하며, WriteToDirectory 호출 시 존재하지 않는 폴더는 오류가 발생하여 추가
+                DirectoryInfo destPath = new DirectoryInfo(destFullPath);
+                if (destPath.Exists == false) destPath.Create();
+
+                string fileName = Path.GetFileName(fileFullName);
+                string extType = Path.GetExtension(fileFullName).Substring(1).ToUpper();
+
+                switch (extType)
+                {
+                    case "ZIP":
+                    case "7Z":
+                        #region [ZIP/7Z 형식 검사]        
+                        var opts = new SharpCompress.Readers.ReaderOptions();
+                        var encoding = Encoding.Default;
+
+                        byte[] buff = null;
+                        using (FileStream fsSource = new FileStream(fileFullName, FileMode.Open, FileAccess.Read))
+                        {
+                            BinaryReader br = new BinaryReader(fsSource);
+                            long numBytes = 8;
+                            buff = br.ReadBytes((int)numBytes);
+
+                            //Zip File Foramt : Local File Header 구조 바이트 차트
+                            //Signature 4byte / Version 2Byte / Flags 2Byte / => Flags Bit가 서로 다름 Mac의 경우 8 그 이외는 0
+                            encoding = (buff[6] == 0x08) ? Encoding.Default : Encoding.GetEncoding(949);
+                        }
+
+                        opts.ArchiveEncoding = new SharpCompress.Common.ArchiveEncoding();
+                        opts.ArchiveEncoding.CustomDecoder = (data, x, y) =>
+                        {
+                            return encoding.GetString(data);
+                        };
+
+                        try
+                        {
+                            using (var archi = ArchiveFactory.Open(fileFullName, opts))
+                            {
+                                foreach (var entry in archi.Entries)
+                                {
+                                    // Check Password
+                                    // 암호가 걸려있으면 압축해제 불가	
+                                    if (entry.IsEncrypted == true)
+                                    {
+                                        destPath.Delete();
+                                        return false;
+                                    }
+
+                                    //그냥 만들고 시작하는게 나을 거 같다.
+                                    // Extract File in Zip 
+                                    entry.WriteToDirectory(destFullPath, new ExtractionOptions()
+                                    {
+                                        ExtractFullPath = true,
+                                        Overwrite = true,
+                                    });
+                                }
+                            }
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            destPath.Delete();
+                            return false;
+                        }
+                        #endregion [ZIP/7Z 형식 검사]
+                        break;
+                    case "TAR":
+                    case "GZ":
+                    case "TGZ":
+                    case "BZ2":
+                        #region [TAR 형식 검사]        
+                        try
+                        {
+                            CsFunction.TarFileDecompress(fileFullName, destFullPath);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                        }
+                        #endregion [TAR 형식 검사]
+                        break;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+        public void UnZipFileForTransfer(string zipFileName, string destFullPath, int maxDepth)
         {
 
         }
-
-
 
 
         /// <summary>
