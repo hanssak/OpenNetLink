@@ -5097,7 +5097,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             //OLE 마임리스트 테이블에 데이터가 없으면 파일 허용
             if (gOLEMimeTypeMap.Value.Count <= 0)
             {
-                Log.Logger.Here().Information($"IsValidOLEMimeType, No Check OLE MimeType. There is no OLEMimeType List (File[{fileName}] FileMimeType[{mime}])");
+               // Log.Logger.Here().Information($"IsValidOLEMimeType, No Check OLE MimeType. There is no OLEMimeType List (File[{fileName}] FileMimeType[{mime}])");
                 return true;
             }
 
@@ -5105,7 +5105,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             int index = gOLEMimeTypeMap.Value.IndexOf(mime);
             if (index >= 0)
             {
-                Log.Logger.Here().Information($"Find OLE MimeList MimeList[{gOLEMimeTypeMap.Value[index]}] MimeBlockType[{oleMimeBlockType}] of File[{fileName}]");
+                //Log.Logger.Here().Information($"Find OLE MimeList MimeList[{gOLEMimeTypeMap.Value[index]}] MimeBlockType[{oleMimeBlockType}] of File[{fileName}]");
                 existsInMimeList = true;
                 //string[] exts = result.Split(' ');
                 //foreach (var ext in exts)
@@ -5181,7 +5181,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             continue;
 
                         //if (bShowMimeLog)
-                        //    Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Add MimeType : {strSplit[0]}, Ext : {strSplit[1]}");
+                        Log.Logger.Here().Debug($"LoadMimeConf, GroupID:{groupID}, Add MimeType : {(HsNetWork.UseHiddenLog ? strSplit[0] : "xxx")}, Ext : {(HsNetWork.UseHiddenLog ? strSplit[1] : "xxx")}");
 
                         MimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
                     }

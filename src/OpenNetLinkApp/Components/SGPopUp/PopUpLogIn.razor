@@ -193,7 +193,7 @@
     private void GoogleOtpCancel()
     {
         QRcode.Dispose();
-        CLog.Here().Information($"SGCtrlSideUI, GoogleOtpCancel - GroupID:{refGoogleOTP.nGroupID} - LogInType: {pageService.m_nLoginType.ToString()}");
+        CLog.Here().Information($"SGCtrlSideUI, GoogleOtpCancel - GroupID:{refGoogleOTP.nGroupID} - LogInType: {(HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx")}");
 
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
         bUIBtnDisable = false;
@@ -207,7 +207,7 @@
     {
         QRcode.Dispose();
 
-        CLog.Here().Information($"SGCtrlSideUI, GoogleOtpCancel - GroupID:{refGoogleOTP.nGroupID} - LogInType: {pageService.m_nLoginType.ToString()}");
+        CLog.Here().Information($"SGCtrlSideUI, GoogleOtpConfirm - GroupID:{refGoogleOTP.nGroupID} - LogInType: {(HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx")}");
 
         HsNetWork hsNetWork = null;
         hsNetWork = HSCmdCenter.GetConnectNetWork(refGoogleOTP.nGroupID);
@@ -305,7 +305,7 @@
     /// </summary>
     private void SessionAlertCancelpopup()
     {
-        CLog.Here().Information($"[PopupLogin] SessionAlertCancelpopup - GroupID:{refSGloginDuplicate.groupId} - LogInType: {pageService.GetGroupIDLoginType(nGroupID).ToString()}");
+        CLog.Here().Information($"[PopupLogin] SessionAlertCancelpopup - GroupID:{refSGloginDuplicate.groupId} - LogInType: {(HsNetWork.UseHiddenLog ? pageService.GetGroupIDLoginType(nGroupID).ToString() :"xxx")}");
 
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
         bUIBtnDisable = false;
@@ -625,7 +625,7 @@
 
             bStartedLogin = true;
 
-            CLog.Here().Information($"doLogin, try Login Type : {eLoginUITypeData}");
+            CLog.Here().Information($"doLogin, try Login Type : {(HsNetWork.UseHiddenLog ? eLoginUITypeData : "xxx")}");
 
             if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
                 HSCmdCenter.LoginAD(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginUITypeData);
@@ -803,7 +803,7 @@
                     }
                 }
 
-                CLog.Here().Information($"PopupLogin, nGroupID :{nGroupID}, ###### - Use LoginType : {eLoginUITypeData}");
+                CLog.Here().Information($"PopupLogin, nGroupID :{nGroupID}, ###### - Use LoginType : {(HsNetWork.UseHiddenLog ? eLoginUITypeData : "xxx")}");
 
             }
             else if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
@@ -823,7 +823,7 @@
                     originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 #endif
 
-                    CLog.Here().Information($"PopupLogin(nGroupID :{nGroupID}) - ADLogin - ###### - PWCheck : {protectedPw}");
+                    CLog.Here().Information($"PopupLogin(nGroupID :{nGroupID}) - ADLogin - ###### - PWCheck : {(HsNetWork.UseHiddenLog ? Encoding.UTF8.GetString(originalPW) : "xxx")}");
 
                     StateHasChanged();
                     await Task.Delay(100);

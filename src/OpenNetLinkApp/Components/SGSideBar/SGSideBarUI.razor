@@ -1080,14 +1080,14 @@
 
                 eLoginType tmpLoginType = sgSvrData.GetLoginType();
 
-                CLog.Here().Information($"SGSidebar multi logintype : {tmpLoginType}   group ID : {refPopUpLogIn.nGroupID}");
+                CLog.Here().Information($"SGSidebar multi logintype : {(HsNetWork.UseHiddenLog ? tmpLoginType : "xxx")}   group ID : {refPopUpLogIn.nGroupID}");
                 refPopUpLogIn.eLoginUITypeData = tmpLoginType;
             }
             else
             {
 
                 refPopUpLogIn.eLoginUITypeData = (eLoginType)pageService.m_nLoginType;
-                CLog.Here().Information($"SGSidebar single pageService.m_nLoginType : {pageService.m_nLoginType} refPopUpLogIn.eLoginUITypeData : { refPopUpLogIn.eLoginUITypeData}");
+                CLog.Here().Information($"SGSidebar single pageService.m_nLoginType : {(HsNetWork.UseHiddenLog ? pageService.m_nLoginType : "xxx")} refPopUpLogIn.eLoginUITypeData : {(HsNetWork.UseHiddenLog ? refPopUpLogIn.eLoginUITypeData : "xxx")}");
                 // groupID 중 현재 연결되어 있는 가장 0이랑가까운 망의 ID/PW를 가져다가 사용
                 @*                foreach ()
                     {

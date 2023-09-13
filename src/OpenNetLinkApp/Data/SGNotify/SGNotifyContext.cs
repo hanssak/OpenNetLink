@@ -251,7 +251,7 @@ namespace OpenNetLinkApp.Data.SGNotify
                     .Where(x => x.GROUPID == groupId && x.USERSEQ == userSeq && x.ISEND == false)
                     .OrderByDescending(x => x.RESENDID).FirstOrDefault();
             
-            Log.Logger.Here().Information("Querying for a ReSendInfo");
+            Log.Logger.Here().Debug("Querying for a ReSendInfo");
             mut.ReleaseMutex();
             return reSendData;
         }
@@ -265,7 +265,7 @@ namespace OpenNetLinkApp.Data.SGNotify
                     .Where(x => x.RESENDID == reSendDataId)
                     .FirstOrDefault();
 
-            Log.Logger.Here().Information("Querying for a ReSendInfo");
+            Log.Logger.Here().Debug("Querying for a ReSendInfo");
             mut.ReleaseMutex();
             return reSendData;
         }
@@ -375,7 +375,7 @@ namespace OpenNetLinkApp.Data.SGNotify
                     .OrderByDescending(x => x.Time).Take(nLimit)
                     .ToList();
             }
-            Log.Logger.Here().Information($"Querying for a NotiInfo Limit {nLimit}");
+            Log.Logger.Here().Debug($"Querying for a NotiInfo Limit {nLimit}");
             mut.ReleaseMutex();
             return NotiList;
         }
@@ -395,7 +395,7 @@ namespace OpenNetLinkApp.Data.SGNotify
                     .Where(x => x.Type == type && x.GroupId == groupId && x.UserSeq == userSeq)
                     .Count();
             }
-            Log.Logger.Here().Information($"Querying for a NotiInfo Count {nCount}");
+            Log.Logger.Here().Debug($"Querying for a NotiInfo Count {nCount}");
             mut.ReleaseMutex();
             return nCount;
         }
@@ -487,7 +487,7 @@ namespace OpenNetLinkApp.Data.SGNotify
                 .Where(x => x.GroupId == groupId && x.UserSeq == userSeq)
                 .OrderByDescending(x => x.Time).Take(nLimit)
                 .ToList();
-            Log.Logger.Here().Information($"Querying for a AlarmInfo Limit {nLimit}");
+            Log.Logger.Here().Debug($"Querying for a AlarmInfo Limit {nLimit}");
             mut.ReleaseMutex();
             return AlarmList;
         }
@@ -500,7 +500,7 @@ namespace OpenNetLinkApp.Data.SGNotify
             nCount = DBCtx.Alarms
                 .Where(x => x.GroupId == groupId && x.UserSeq == userSeq)
                 .Count();
-            Log.Logger.Here().Information($"Querying for a AlarmInfo Count {nCount}");
+            Log.Logger.Here().Debug($"Querying for a AlarmInfo Count {nCount}");
             mut.ReleaseMutex();
             return nCount;
         }

@@ -524,7 +524,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
         public void Init(int groupId, string updateSvcIP, string updatePlatform, HSCmdCenter hSCmdCenter)
         {
-            CLog.Here().Information($"[GID:{groupId}]- AppUpdaterService Initializing... : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
+            CLog.Here().Debug($"[GID:{groupId}]- AppUpdaterService Initializing... : [UpdateSvcIP({(HsNetWorkSG.HsNetWork.UseHiddenLog ? updateSvcIP : "xxx.xxx.xxx.xxx")}), UpdatePlatform({updatePlatform})]");
             //SparkleInst = new SparkleUpdater($"https://{updateSvcIP}/NetSparkle/files/sample-app/appcast.xml", new DSAChecker(SecurityMode.Strict))
 
             AppUpdaterManager updaterManager = new AppUpdaterManager(groupId);
@@ -546,7 +546,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             //파일 송수신 상태를 알기 위해 참조
             if (_HSCmdCenter == null) _HSCmdCenter = hSCmdCenter;
 
-            CLog.Here().Information($"[GID:{groupId}]- AppUpdaterService Initializing...Done : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
+            CLog.Here().Debug($"[GID:{groupId}]- AppUpdaterService Initializing...Done");
         }
 
 

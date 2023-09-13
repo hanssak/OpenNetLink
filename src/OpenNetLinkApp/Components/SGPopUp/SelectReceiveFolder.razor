@@ -279,7 +279,7 @@
             }
         }
 
-        CLog.Here().Information($"SelectReceiveFolder Send Query : {strQuery}");
+        //CLog.Here().Information($"SelectReceiveFolder Send Query : {strQuery}");
         HsCmdCenter.sgPageEvent.SetQueryDetailEvent(groupid, DetailResult); //결과 이벤트 메핑
         HsCmdCenter.SendDetailQuery(groupid, sgLoginData.GetUserID(), strQuery);
     }

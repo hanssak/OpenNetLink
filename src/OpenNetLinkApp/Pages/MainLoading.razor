@@ -181,9 +181,9 @@
     /// <param name="loginType"></param>
     public void SvrResult(int groupId, string loginType, string systemID)
     {
-        CLog.Here().Information($"SvrResult Init groupID : {groupId} LoginType : {loginType}");
+        //CLog.Here().Information($"SvrResult Init groupID : {groupId} LoginType : {loginType}");
         pageService.SetGroupIDLoginType(groupId, (eLoginType)Int32.Parse(loginType));
-        CLog.Here().Information($"SvrResult ReSet groupID : {groupId}, LoginType : {loginType}");
+        CLog.Here().Information($"SvrResult ReSet groupID : {groupId}, LoginType : {(HsNetWork.UseHiddenLog ? loginType : "xxx")}");
         //pageService.m_DicGroupIDloginType[groupId] = (eLoginType)Int32.Parse(loginType);
 
         //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨

@@ -560,14 +560,14 @@
                     strLowItem = item.ToLower();
                     if (strLowItem == strCompareUrl)
                     {
-                        CLog.Here().Information($"groupID : {nGroupID} - isinUrlExceptionList Found : {strCompareUrl}");
+                        CLog.Here().Information($"groupID : {nGroupID} - isinUrlExceptionList Found : {(HsNetWork.UseHiddenLog ? strCompareUrl : "xxx")}");
                         return true;
                     }
                 }
 
             }
 
-            CLog.Here().Information($"groupID : {nGroupID} - isinUrlExceptionList Not Found : {strTempUrl}");
+            CLog.Here().Information($"groupID : {nGroupID} - isinUrlExceptionList Not Found : {(HsNetWork.UseHiddenLog ? strTempUrl : "xxx")}");
 
         }
 
@@ -751,7 +751,7 @@
         if (sgLoginData == null)
             return false;
 
-        CLog.Here().Information($"groupID : {nGroupID} - isSendUrlList Check : {strUrlData}");
+        CLog.Here().Information($"groupID : {nGroupID} - isSendUrlList Check : {(HsNetWork.UseHiddenLog ? strUrlData : "xxx")}");
 
         SGUrlListData sgUrlData = null;
         sgUrlData = (SGUrlListData)HsCmdCenter.GetURLlistData(nGroupID);
@@ -793,7 +793,7 @@
     /// <param name="e"></param>
     public void UrlListDatafromServer(int groupid, PageEventArgs e)
     {
-        CLog.Here().Information($"groupID : {groupid} - Recv UrlList from Server - result : {e.result}");
+        CLog.Here().Information($"groupID : {groupid} - Recv UrlList from Server - result : {(HsNetWork.UseHiddenLog ? e.result : "xxx")}");
 
         if (e.result != 0)
         {
@@ -1013,7 +1013,6 @@
     /// <param name="e"></param>
     public void RecvUrlDatafromBrowser(int groupid, RecvUrlEventArgs e)
     {
-
         CLog.Here().Information($"groupID : {groupid} - Recv Url from Browser : {e.strUrlData}");
 
         // 서버에 접속되어 있는지 확인

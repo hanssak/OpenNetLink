@@ -465,7 +465,7 @@ namespace WebWindows
         public void Notification(OS_NOTI category, string title, string message, string navURI = "")
         {
             string image = String.Format($"wwwroot/images/noti/{(int)category}.png");
-            CLog.Here().Information("ImageString: " + image);
+            //CLog.Here().Information("ImageString: " + image);
 
             /*
             switch(category)
