@@ -225,7 +225,9 @@ namespace OpenNetLinkApp.Data.SGNotify
         {
             // Create
             mut.WaitOne();
-            Log.Logger.Here().Information("Inserting a ReSendInfo, {userSeq}, {clientId}, {mid}", userSeq, clientId, mid);
+            Log.Logger.Here().Information("Inserting a ReSendInfo, {userSeq}, {clientId}, {mid}", userSeq
+                                                                                                , HsNetWorkSG.HsNetWork.UseHiddenLog ? clientId : "xxx"
+                                                                                                , HsNetWorkSG.HsNetWork.UseHiddenLog ? mid : "xxx");
             DBCtx.Add(new SGReSendData
             {
                 RESENDID = 0,

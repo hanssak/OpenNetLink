@@ -4856,7 +4856,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             try
             {
-                Log.Logger.Here().Information($"[CheckDocumentFile] DocumentFile[{Path.GetFileName(hsStream.FileName)}] Ext[White({isWhite})-Info({fileFilterExtInfo})] documentExtractType[{documentExtractType}]");
+                Log.Logger.Here().Information($"[CheckDocumentFile] DocumentFile[{Path.GetFileName(hsStream.FileName)}] Ext[White({isWhite})-Info({(HsNetWork.UseHiddenLog ? fileFilterExtInfo : "xxx")})] documentExtractType[{(documentExtractType)}]");
 
                 DocumentExtractType documentExtract = DocumentExtractType.NONE;
                 if (Enum.TryParse(documentExtractType, out documentExtract) == false || documentExtract == DocumentExtractType.NONE)
