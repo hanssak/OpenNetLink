@@ -33,7 +33,14 @@
         </div>
         <!-- <div class="loading_title" @onclick="goLogIn"> -->
         <div class="loading_title">
-            @XmlConf.GetInfoMsg(bConnectServerTimeOut ? "I_0232" : "I_0212")
+            @if (bConnectInfoError)
+            {
+                @XmlConf.GetErrMsg("E_0266")
+            }
+            else
+            {
+                @XmlConf.GetInfoMsg(bConnectServerTimeOut ? "I_0232" : "I_0212")
+            }                
         </div>
     </section>
 </div>
@@ -52,6 +59,7 @@
 
     Timer conTimer = new Timer();
     private bool bConnectServerTimeOut = false;
+    private bool bConnectInfoError = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -72,8 +80,6 @@
             }
         }
         await base.OnAfterRenderAsync(firstRender);
-
-
     }
 
     protected override void OnInitialized()
@@ -84,6 +90,8 @@
 
         if (!string.IsNullOrEmpty(NetWorkSvc.NetWorkInfo[0].IPAddress))
             loadingProcess();
+        else
+            bConnectInfoError = true;
     }
 
     /// <summary>

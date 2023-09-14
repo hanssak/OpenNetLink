@@ -1774,9 +1774,12 @@
         foreach (ISGNetwork sgNetWork in listNetWorkData)
         {
             HsNetWork hsNetWork = HsCmdCenter.GetConnectNetWork(sgNetWork.GroupID);
-            hsNetWork.SGFileInfoSave_EventReg(FileInfoSaveEvent);
-            if (String.IsNullOrEmpty(agentHash))
-                agentHash = hsNetWork.GetAgentHash(true);
+            if (hsNetWork != null)
+            { 
+                hsNetWork.SGFileInfoSave_EventReg(FileInfoSaveEvent);
+                if (String.IsNullOrEmpty(agentHash))
+                    agentHash = hsNetWork.GetAgentHash(true);
+            }
         }
 
         DayTimer = new Timer();

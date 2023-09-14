@@ -89,8 +89,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             catch (Exception ex)
             {
-                HsLog.err("Load Exception : " + ex.ToString());
-                throw;
+                HsLog.err("Load NetWorkFile info Exception : " + ex.ToString());
+                _netWorkInfo = networkParsing("");
+                //throw;
             }
         }
 
@@ -114,25 +115,42 @@ namespace OpenNetLinkApp.Services.SGAppManager
         static List<ISGNetwork> networkParsing(string jsonString)
         {
             List<ISGNetwork> listNetworks = new List<ISGNetwork>();
-            using (JsonDocument document = JsonDocument.Parse(jsonString))
+
+            if ((jsonString?.Length ?? 0) > 0)
             {
-                JsonElement root = document.RootElement;
-                JsonElement NetWorkElement = root.GetProperty("NETWORKS");
-                //JsonElement Element;
-                foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
+                using (JsonDocument document = JsonDocument.Parse(jsonString))
                 {
-                    SGNetwork sgNet = new SGNetwork();
-                    string strJsonElement = netElement.ToString();
-                    var options = new JsonSerializerOptions
+                    JsonElement root = document.RootElement;
+                    JsonElement NetWorkElement = root.GetProperty("NETWORKS");
+                    //JsonElement Element;
+                    foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
                     {
-                        ReadCommentHandling = JsonCommentHandling.Skip,
-                        AllowTrailingCommas = true,
-                        PropertyNameCaseInsensitive = true,
-                    };
-                    sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
-                    listNetworks.Add(sgNet);
+                        SGNetwork sgNet = new SGNetwork();
+                        string strJsonElement = netElement.ToString();
+                        var options = new JsonSerializerOptions
+                        {
+                            ReadCommentHandling = JsonCommentHandling.Skip,
+                            AllowTrailingCommas = true,
+                            PropertyNameCaseInsensitive = true,
+                        };
+                        sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
+                        listNetworks.Add(sgNet);
+                    }
                 }
             }
+            else
+            {
+                SGNetwork sgNet = new SGNetwork();
+                sgNet.Port = 0;
+                sgNet.IPAddress = "";
+                sgNet.GroupID = 0;
+                sgNet.FromName = "UnKnown";
+                sgNet.ConnectType = 0;
+                sgNet.NetPos = "IN";
+                sgNet.TlsVersion = "1.2";
+                listNetworks.Add(sgNet);
+            }
+
             return listNetworks;
         }
 
