@@ -39,23 +39,29 @@
 @inject OSXcmdService OSxCmdService
 
 <div id="divLoginMain" class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
-    <div class="login-box  p-0 m-0" style="height:413px; width:880px !important;">
+
+        <div class="login-box  p-0 m-0" style="height:413px; width:@(bUseLoginUIsimpleMode?440:880)px !important;">
+
         <div class="card p-0" style="border-radius:.7rem !important; background-color:rgba(0,0,0,0.7);">
             <div class="card-body login-card-body  p-0">
                 <div class="row1">
-                    <div class="col-md-6 login-card-body  pt-0 pb-0" style="border-radius:.7rem 0rem 0rem .7rem !important;">
-                        <ul class="full_login_left">
-                            <li> <img src="/images/adminlte/SecureGate_logo.png" class="logo"></li>
-                            <li>
-                                <span>
-                                    This is a solution providing the data transmission service <br>
-                                    among networks with the highest level of security <br>
-                                    in the separated network environment.
-                                </span>
-                            </li>
-                            <li><img src="/images/adminlte/login_full_1.png" class="bg"></li>
-                        </ul>
-                    </div>
+
+                    @if (bUseLoginUIsimpleMode==false)
+                    {
+                        <div class="col-md-6 login-card-body  pt-0 pb-0" style="border-radius:.7rem 0rem 0rem .7rem !important;">
+                            <ul class="full_login_left">
+                                <li> <img src="/images/adminlte/SecureGate_logo.png" class="logo"></li>
+                                <li>
+                                    <span>
+                                        This is a solution providing the data transmission service <br>
+                                        among networks with the highest level of security <br>
+                                        in the separated network environment.
+                                    </span>
+                                </li>
+                                <li><img src="/images/adminlte/login_full_1.png" class="bg"></li>
+                            </ul>
+                        </div>
+                    }
 
                     <div id="loginCard" class="col-md-6 login-card-body" style="height:413px; border-radius:0rem .7rem .7rem 0rem !important;">
 
@@ -185,6 +191,8 @@
     CsGoogleQRcode QRcode = new CsGoogleQRcode();
     string str2FactorAuthType = "";
     string strOtpUrlCode = "";
+
+    bool bUseLoginUIsimpleMode = false;
 
     private void GoogleOtpCancel()
     {
@@ -916,6 +924,8 @@
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
         InitText();
+
+        bUseLoginUIsimpleMode = SGAppMgrSvc.OpConfigInfoService.GetUseMainLoginSimpleMode(0);
 
         if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
         {

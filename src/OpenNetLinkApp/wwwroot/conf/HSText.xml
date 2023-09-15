@@ -5542,6 +5542,28 @@
 			<CN></CN>
 		</T_DATAPICKER_DAY_MIN_GROUP>
 
+
+		<T_FILETRANS_USE_TIME_TITLE>
+			<KR>자료전송 가능시간</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>Data transmission time</CN>
+		</T_FILETRANS_USE_TIME_TITLE>
+
+		<T_FILETRANS_USE_TIME_DASHBOARD>
+			<KR>일:{0} 월:{1} 화:{2} 수:{3} 목:{4} 금:{5} 토:{6} 공휴일:{7}</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>Sun:{0} Mon:{1} Tue:{2} Wed:{3} Thu:{4} Fri:{5} Sat:{6} Holi:{7}</CN>
+		</T_FILETRANS_USE_TIME_DASHBOARD>
+
+		<T_FILETRANS_USE_TIME_TRANSFER>
+			<KR>사용가능 시간(일:{0} 월:{1} 화:{2} 수:{3} 목:{4} 금:{5} 토:{6} 공휴일:{7})</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>Available time(Sun:{0} Mon:{1} Tue:{2} Wed:{3} Thu:{4} Fri:{5} Sat:{6} Holi:{7})</CN>
+		</T_FILETRANS_USE_TIME_TRANSFER>
+
 	</TITLE>
 
 	<INFO>
@@ -9261,34 +9283,42 @@
 			<EN>A character that cannot be used has been entered.<![CDATA[<br>]]>Please input again.</EN>
 			<CN></CN>
 		</W_0295>
-
+		
 		<W_0296>
 			<KR>업데이트를 실패하였습니다.<![CDATA[<br>]]>업데이트를 다시 시도해주세요.<![CDATA[<br>]]>업데이트 시간:{0}</KR>
 			<JP></JP>
 			<EN>Update failed.<![CDATA[<br>]]>Please try updating again.<![CDATA[<br>]]>Update Time:{0}</EN>
 			<CN></CN>
 		</W_0296>
-
+		
 		<W_0297>
 			<KR>현재 Client({0})의 업데이트 설치가 성공 되었습니다. (업데이트 시간:{1})</KR>
 			<JP></JP>
 			<EN>Update installation of the current Client({0}) has been successful.(Update Time : {1})</EN>
 			<CN></CN>
 		</W_0297>
-
+		
 		<W_0298>
 			<KR>현재 Client({0})의 업데이트 설치가 실패 되었습니다. (업데이트 시간:{1})</KR>
 			<JP></JP>
 			<EN>Update installation of the current Client({0}) has failed.(Update Time : {1})</EN>
 			<CN></CN>
 		</W_0298>
-
+		
 		<W_0299>
 			<KR>사용자 계정이 일시적으로 잠겼습니다./r/n{0}분후 다시 시도하여 주십시요.</KR>
 			<JP></JP>
 			<EN>User account is temporarily locked.\r\nPlease try again in {0} minutes.</EN>
 			<CN></CN>
 		</W_0299>
+
+		<W_0300>
+			<KR>자료전송을 사용할 수 없는 시간입니다.</KR>
+			<JP></JP>
+			<EN>Data transmission is not available at this time.</EN>
+			<CN></CN>
+		</W_0300>
+
 
 	</WARNING>
 
@@ -11100,6 +11130,8 @@
 			<EN>Failed to send certificate.</EN>
 			<CN></CN>
 		</E_0260>
+
+
 		<E_0261>
 			<KR>인증서 수신에 실패했습니다.</KR>
 			<JP></JP>
@@ -11130,14 +11162,19 @@
       <EN>You can't transfer Text clipboard.</EN>
       <CN></CN>
     </E_0265>
+    <E_0266>
+      <KR>환경정보 파일에 문제가 발생 했습니다. 다시 설치하세요.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </E_0266>
     <E_0267>
       <KR>Url 파일은 드래그앤드랍으로 파일을 올릴 수 없습니다.<![CDATA[<br>]]>우클릭 파일 전송을 이용해 주세요.</KR>
       <JP></JP>
       <EN>URL files cannot be uploaded by dragging and dropping.<![CDATA[<br>]]>Please use right-click file transfer.</EN>
       <CN></CN>
     </E_0267>
-
-
+    
 	</ERROR>
 	<!-- ********************************************* [END] MSG ERROR (E_0000) ********************************************* -->
 </TEXT>
