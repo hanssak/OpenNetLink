@@ -56,7 +56,15 @@
                     <li class="breadcrumb-item active">@strFileTrans</li>
                 </ol>
             </div><!-- /.col -->
-        </div><!-- /.row -->
+        </div>
+        @if(bUseFileTransForTime)
+        {
+        <div class="row">
+            <div class="col-sm-12 text-dark" style="margin-left: 1.5rem">
+                <i class="far fa-clock mr-1"></i><span style="margin-left: 0.5rem">사용가능 시간(일:0~3,9~18 월:0~3,9~18 화:0~3,9~18 수:0~3,9~18 목:0~3,9~18 금:0~3,9~18 토:0~3,9~18 공휴일:0~3,9~18)</span>
+            </div>
+        </div>
+        }
     </div><!-- /.container-fluid -->
 </div>
 
@@ -383,6 +391,9 @@
 
     // 파일목록 임시 받는 용도
     List<HsStream> FileList = null;
+
+
+    bool bUseFileTransForTime = false;
 
 
     private void PopUpFileSelectOK(List<string> files)
@@ -763,6 +774,20 @@
         sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
         if (sgApprLineData == null)
             return;
+
+        // 시간에 의한 파일전송 기능 사용 확인
+        //bool bUseFileTrans = true; //sgLoginData.GetFileTrans();
+        if (sgLoginData.GetUseFileTransForTimeMode())
+        {
+            if (sgLoginData.GetUseFileTransForTime() == false)
+            {
+                // 자료전송이 허락된 시간이 아닙니다.
+                CLog.Here().Information($"FileTrans,  This is not the permitted time to transmit data!!!");
+                ShowMessage("warning", XmlConf.GetWarnMsg("W_0300"));
+                return;
+            }
+        }
+
 
         string strUserID = sgLoginData.GetUserID();
         string strMid = sgLoginData.GetTagData("MID");
