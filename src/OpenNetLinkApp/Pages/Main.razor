@@ -40,13 +40,13 @@
 
 <div id="divLoginMain" class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
 
-        <div class="login-box  p-0 m-0" style="height:413px; width:@(bHiddenLogoMode?440:880)px !important;">
+        <div class="login-box  p-0 m-0" style="height:413px; width:@(bUseLoginUIsimpleMode?440:880)px !important;">
 
         <div class="card p-0" style="border-radius:.7rem !important; background-color:rgba(0,0,0,0.7);">
             <div class="card-body login-card-body  p-0">
                 <div class="row1">
 
-                    @if (bHiddenLogoMode==false)
+                    @if (bUseLoginUIsimpleMode==false)
                     {
                         <div class="col-md-6 login-card-body  pt-0 pb-0" style="border-radius:.7rem 0rem 0rem .7rem !important;">
                             <ul class="full_login_left">
@@ -192,7 +192,7 @@
     string str2FactorAuthType = "";
     string strOtpUrlCode = "";
 
-    bool bHiddenLogoMode = false;
+    bool bUseLoginUIsimpleMode = false;
 
     private void GoogleOtpCancel()
     {
@@ -925,7 +925,7 @@
 
         InitText();
 
-        bHiddenLogoMode = SGAppMgrSvc.OpConfigInfoService.GetHiddenLoginLogo(0);
+        bUseLoginUIsimpleMode = SGAppMgrSvc.OpConfigInfoService.GetUseMainLoginSimpleMode(0);
 
         if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
         {

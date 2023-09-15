@@ -72,8 +72,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bShowInnerFileErrDetail { get; set; }            //파일 추가에 제외된 파일 리스트에 내부에 걸린 파일 리스트 전부 보여주기
         public bool bAllowDRM { get; set; }                           //DRM 파일 전송 허용 여부 (true : 전송, false : 차단) - Default : true
 
-        public bool bHiddenLoginLogo { get; set; }           // Main Login 창 좌측 로고 숨김 처리
-
+        public bool bUseLoginMainUIsimpleMode { get; set; }           // Main Login UI 크기 작게 줄여서 표현할지 유무
+        
 
         //클립보드
         public bool bUseClipBoard { get; set; }                   // 클립보드 사용 여부
