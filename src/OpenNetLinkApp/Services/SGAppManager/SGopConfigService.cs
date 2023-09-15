@@ -199,7 +199,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetAllowDRM(int groupId);
 
-        public bool GetUseMainLoginSimpleMode(int groupId);
+        public bool GetHiddenLoginLogo(int groupId);
     }
 
 
@@ -976,9 +976,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo[groupId].bAllowDRM;
         }
 
-        public bool GetUseMainLoginSimpleMode(int groupId)
+        public bool GetHiddenLoginLogo(int groupId)
         {
-            return AppConfigInfo[groupId].bUseLoginMainUIsimpleMode;
+            return AppConfigInfo[groupId].bHiddenLoginLogo;
         }        
 
     }
