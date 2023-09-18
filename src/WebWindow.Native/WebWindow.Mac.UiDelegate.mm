@@ -103,14 +103,27 @@
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
 	NSString *myString = navigationAction.request.URL.absoluteString;
     NSRange rangeString = [myString rangeOfString:@"file://"];
-    NSInteger index = rangeString.location;
-    if((int)index == 0)
-    {   
-        decisionHandler(WKNavigationActionPolicyCancel);
+    NSRange rangeStringHttp = [myString rangeOfString:@"http"];
+    NSInteger indexHttp = rangeStringHttp.location;
+    if((int)indexHttp == 0)
+    {
+        NSLog(@"gUseHttpUrl Value : %d", gUseHttpUrl);
+        if(gUseHttpUrl == 1)
+            decisionHandler(WKNavigationActionPolicyAllow);
+        else
+            decisionHandler(WKNavigationActionPolicyCancel);
     }
     else
     {
-        decisionHandler(WKNavigationActionPolicyAllow);
+        NSInteger index = rangeString.location;
+        if((int)index == 0)
+        {   
+            decisionHandler(WKNavigationActionPolicyCancel);
+        }
+        else
+        {
+            decisionHandler(WKNavigationActionPolicyAllow);
+        }
     }
     NSLog(@"%@\n", myString);
 }

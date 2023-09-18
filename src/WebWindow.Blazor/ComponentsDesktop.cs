@@ -102,6 +102,7 @@ namespace WebWindows.Blazor
 
                 if ((bool)arg[0] == true)
                     WebWindow.RegStartProgram();
+                WebWindow.SetUseHttpUrl(false);
                 WebWindow.SetTrayStartUse((bool)arg[1]);
                 WebWindow.NavigateToUrl(BlazorAppScheme + "://app/");
                 WebWindow.WaitForExit();
