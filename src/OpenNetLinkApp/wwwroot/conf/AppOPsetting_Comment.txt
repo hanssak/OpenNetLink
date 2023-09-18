@@ -35,6 +35,9 @@ bRMouseFileAddAfterTrans : 마우스 우클릭 파일 추가 후 자동전송 �
 // 사후결재
 bShowAfterApprAutoCheck : 사후결재 기본 체크 사용유무 체크박스가 나오도록 (true,false)
 bAfterBasicChk : 사후 결재 체크 기본 사용 유무 ( true : 체크, false : 체크 안함 )
+bUseApproveAfterLimit : 사후결재 요청에 대한 결재 누적유무 확인해서 차단 ( true : 체크, false : 체크 안함 )
+
+
 
 // 트레이 알림 설정
 bFileRecvAlarmRetain : 파일 수신후 알림 유지 체크박스 나오도록 (true,false) [기능X, 체크박스만동작]
@@ -76,8 +79,8 @@ bUseFileClipManageUI : 파일형태로 클립보드 송수신할때, 클립보�
 bUseFileClipApproveUI : 파일형태로 클립보드 송수신할때, 클립보드 결재 UI를 나오도록할지 유무(true: 클립보드 결재관리UI 있음, false : 없음)
 
 // 화면잠금
-bScreenLockUserChange : 스크린 잠금 사용자가 설정가능 체크박스 나오도록 ( true, false )
-bScreenLock : 화면잠금 사용 여부.(체크박스값) (true, false)
+// bScreenLockUserChange : 스크린 잠금 사용자가 설정가능 체크박스 나오도록 ( true, false )(사용안함)
+// bScreenLock : 화면잠금 사용 여부.(체크박스값) (true, false)(사용안함)
 strScrTimeoutLockType : ScrLockTime의 시간초과로 타임아웃 발생 시, 처리타입 (ScreenLock:화면잠금, LogOut:로그아웃, Exit: 프로그램 종료) - Default:ScreenLock
 
 
@@ -224,4 +227,7 @@ bUseFileTrans : 자료 전송 대메뉴 사용 여부
 bUseClipTypeText : TEXT로 클립보드 전송 사용 유무
 
 bUseClipTypeImage : IMAGE로 클립보드 전송 사용 유무
+
+bHiddenLoginLogo : Main Login 창 좌측 로고 숨김 처리
+
 

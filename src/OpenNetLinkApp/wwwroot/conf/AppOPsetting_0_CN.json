@@ -16,7 +16,7 @@
   "bFileRecvAlarmRetain": false,
   "bManualDownFolderChange": false,
   "bNoApproveManageUI": false,
-  "bUseApproveManageUIForce": false,
+  "bUseApproveManageUIForce": true,
   "bRFileAutoSend": false,
   "bRecvFolderChange": false,
   "bShowAdminInfo": false,
@@ -120,6 +120,8 @@
   "bAllowDRM": true,
   "bUseFileTrans": true,
   "bUseClipTypeText": true,
-  "bUseClipTypeImage" :  false
+  "bUseClipTypeImage": true,
+  "bHiddenLoginLogo": false,
+  "bUseLoginMainUIsimpleMode": false
 
 }
