@@ -693,6 +693,121 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
+        /// 요일별 시간에 따른 자료전송 제약하는 기능 사용
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseFileTransForTimeMode()
+        {
+            string strData = GetTagData("FILEUPLOADTIME");
+            if ( (strData?.Length ?? 0) > 0)
+            {
+                strData = strData.Substring(0, 1);
+                if (strData == "1" || strData == "2")
+                    return true;
+            }
+
+            return false;
+        }
+
+
+        /// <summary>
+        /// 현재(서버시간 기준) 자료전송을 사용할 수 있는 시간대인지 유무를 확인하는 함수
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseFileTransForTime()
+        {
+            bool m_bFileTansUseTime = false;
+            string strPolicy = GetTagData("FILEUPLOADTIME");
+            string strHoliday = GetTagData("HOLIDAY");
+
+            Log.Logger.Here().Information($"FILEUPLOADTIME : {strPolicy}, HOLIDAY : {strHoliday}");
+
+            if ( (strPolicy?.Length ?? 0) == 0)
+            {
+                Log.Logger.Here().Error($"error - Tag : FILEUPLOADTIME, Value : empty! ");
+                return false;
+            }
+
+            string strData = strPolicy.Substring(0, 1);
+            if (strData != "0" && strData != "1" && strData != "2")
+            {
+                Log.Logger.Here().Error($"error - Tag : FILEUPLOADTIME, Value : {strData} ");
+                return false;
+            }
+
+            if (strData == "0")
+                return true;
+
+
+            DateTime dtNow = GetSvrTimeConvert();
+            dtNow = System.DateTime.Now;
+
+            if (strData == "1")
+            {
+                // ex) 1/all/all
+                if (strPolicy.Length < 4)
+                {
+                    Log.Logger.Here().Error($"error(data Type error : less than 4) - Tag : FILEUPLOADTIME, Value : {strData} ");
+                    return false;
+                }
+
+                // ex) 1/none/none
+                m_bFileTansUseTime = IsFileTransTimeBy1(dtNow, strPolicy, strHoliday);
+
+            }
+            else if (strData == "2")
+            {
+
+                if (strPolicy.Length < 33)
+                {
+                    Log.Logger.Here().Error($"error(data Type error : less than 33) - Tag : FILEUPLOADTIME, Value : {strData} ");
+                    return false;
+                }
+
+                // ex) 2/0|0|1|-1|2|-1|3|7~8.17~23|4|0|5|0~24|6|1~23|7|1~18
+                m_bFileTansUseTime = IsFileTransTimeBy2(dtNow, strPolicy, strHoliday);
+            }
+
+            return true;
+        }
+
+        bool IsFileTransTimeBy1(DateTime dtNow, string strPolicy, string strHoliday)
+        {
+
+
+            int nPos = -1;
+            if ( (nPos = strPolicy.IndexOf("/none/none")) > 0)
+            {
+                Log.Logger.Here().Information($"FILEUPLOADTIME, Type 1 - Found /none/none"); // 초기값인지에 따라 계산
+                return true;
+            }
+
+            if ((nPos = strPolicy.IndexOf("/all")) > 0)
+            {
+                Log.Logger.Here().Information($"FILEUPLOADTIME, Type 1 - Found /all"); // 초기값인지에 따라 계산
+                return true;
+            }
+
+            if ( (strHoliday?.Length ?? 0) > 0 && strHoliday != "0")
+            {
+                Log.Logger.Here().Information($"FILEUPLOADTIME, Type 1 - Found Holiday : {strHoliday}"); // Holiday 인지에 따라 계산
+                return true;
+            }
+
+            //
+
+            return true;
+        }
+
+        bool IsFileTransTimeBy2(DateTime dtNow, string strPolicy, string strHoliday)
+        {
+
+
+            return true;
+        }
+
+
+        /// <summary>
         /// OTP 번호 발급 가능 여부를 반환한다.
         /// </summary>
         /// <returns>true : OTP 번호 발급 가능</returns>
