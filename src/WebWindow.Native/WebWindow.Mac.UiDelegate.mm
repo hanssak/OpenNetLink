@@ -105,11 +105,7 @@
     NSRange rangeString = [myString rangeOfString:@"file://"];
     NSInteger index = rangeString.location;
     if((int)index == 0)
-    {
-        //std::string strUriText;
-        //strUriText = myString.UTF8String;
-        //((WebWindow*)(SelfThis))->InvokeDragNDropChangedCallback(strUriText.data(), strUriText.length());
-
+    {   
         decisionHandler(WKNavigationActionPolicyCancel);
     }
     else
@@ -117,5 +113,15 @@
         decisionHandler(WKNavigationActionPolicyAllow);
     }
     NSLog(@"%@\n", myString);
+}
+- (void) SetUseHttpUrl:(bool)value
+{
+    NSLog(@"SetUseHttpUrl");
+    if(value)
+        gUseHttpUrl = 1;
+    else
+        gUseHttpUrl = 0;
+
+    //NSLog(@"gCopyAndSend Value Change : %d", gCopyAndSend);
 }
 @end
