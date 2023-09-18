@@ -219,6 +219,10 @@ extern "C"
 	{
 		instance->SetUseClipCopyNsend(bUse);
 	}
+	EXPORTED void WebWindow_SetUseHttpUrl(WebWindow* instance, bool bUse)
+	{
+		instance->SetUseHttpUrl(bUse);
+	}
 	EXPORTED void WebWindow_SetNativeClipboardHotKey(WebWindow* instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
 	{
 		instance->SetNativeClipboardHotKey(groupID, bAlt, bControl, bShift, bWin, chVKCode, nIdx);

@@ -58,6 +58,7 @@ bool g_bDoingSendClipBoard = false;
 bool g_bDoExit2TrayUse = false;
 bool g_bStartTray = true;
 bool g_bClipCopyNsend = false;
+bool g_bUseHttpUrl = false;
 
 std::map<int, wstring> mapHotKey;
 void RequestMoveTrayToWebWindow();
@@ -2203,6 +2204,10 @@ void WebWindow::SetUseClipCopyNsend(bool bUseCopyNsend)
 {
 	g_bClipCopyNsend = bUseCopyNsend;
 	//NTLog(this, Info, "Called : SetUseClipCopyNsend(################) : %s", (AutoString)(bUseCopyNsend ? "Yes" : "No"));
+}
+void WebWindow::SetUseHttpUrl(bool bUse)
+{
+	g_bUseHttpUrl = bUse;
 }
 
 void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)

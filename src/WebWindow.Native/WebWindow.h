@@ -75,6 +75,7 @@ extern void* SelfThis;
 extern bool g_bDoExit2TrayUse;
 extern bool g_bStartTray;
 extern bool g_bClipCopyNsend;
+extern bool g_bUseHttpUrl;
 
 typedef enum enDefineClipType
 {
