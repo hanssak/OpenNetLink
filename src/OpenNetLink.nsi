@@ -587,10 +587,10 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 
 
-  ${If} ${REG_CRX} == 'TRUE'
+  ${If} ${REG_CRX} == "TRUE"
   
 	  ; CRX 파일 - 강제등록
-	  ${If} ${NETWORK_FLAG} == 'IN'
+	  ${If} ${NETWORK_FLAG} == "IN"
 	  
 		  ; edge
 		  WriteRegStr HKLM "SOFTWARE\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
