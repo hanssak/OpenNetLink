@@ -3605,6 +3605,13 @@
 			<EN>Consecutive characters can be entered only up to {0} digits.</EN>
 			<CN></CN>
 		</T_ETC_PASSWORD_SAMECHAR_MSG>
+    
+    <T_ETC_PASSWORD_PROHIBIT_MSG>
+      <KR>비밀번호에 금지된 문자열이 포함되어 있습니다. ({0})</KR>
+      <JP></JP>
+      <EN>Your password contains a prohibited string. ({0})</EN>
+      <CN></CN>
+    </T_ETC_PASSWORD_PROHIBIT_MSG>
 
 		<T_ETC_PASSWORD_KEYBOARD_LINEAR_MSG>
 			<KR>키보드상의 연속된 문자는 {0}개 이상 사용할 수 없습니다.</KR>

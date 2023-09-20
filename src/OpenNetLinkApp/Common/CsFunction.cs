@@ -1333,6 +1333,37 @@ namespace OpenNetLinkApp.Common
             return true;
         }
 
+        public bool GetProhibitLimit(ref byte[] bytePW, string strProhibit)
+        {
+            byte[] byteProhibit = Encoding.UTF8.GetBytes(strProhibit);
+            int index = IndexOf(ref bytePW, byteProhibit, 0);
+
+            if (index == -1)
+                return false;
+            else
+                return true;
+        }
+
+        private static int IndexOf(ref byte[] input, byte[] pattern, int startIndex)
+        {
+            var firstByte = pattern[0];
+            int index;
+
+            if ((index = Array.IndexOf(input, firstByte, startIndex)) >= 0)
+            {
+                for (var i = 0; i < pattern.Length; i++)
+                {
+                    if (index + i >= input.Length)
+                        return -1;
+
+                    if (pattern[i] == input[index + i]) continue;
+                    index += i;
+                    IndexOf(ref input, pattern, index);
+                }
+            }
+            return index;
+        }
+
         /// <summary>
         /// true : 키보드상의 연속된 문자 또는 숫자의 순차적 입력이 입력된 문자열에 있음
         /// </summary>

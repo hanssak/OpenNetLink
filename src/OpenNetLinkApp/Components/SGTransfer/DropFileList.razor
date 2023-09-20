@@ -565,6 +565,11 @@
                             @*fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);*@
                             topFile.eErrType = eFileAddErr.eFA_FILE_READ_ERROR;
                             CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
+                            if (hsStream.stream != null)
+                            {
+                                hsStream.stream.Close();
+                                hsStream.stream = null;
+                            }
                             hsStream.stream = null;
                             nExamCount++;
                             per = (nExamCount * 100) / nTotalCount;
@@ -583,7 +588,12 @@
                                 return;
                             }
                             existErr = true;
-                            hsStream.stream = null;
+                            if (hsStream.stream != null)
+                            {
+                                hsStream.stream.Close();
+                                hsStream.stream = null;
+                            }
+
                             nExamCount++;
                             per = (nExamCount * 100) / nTotalCount;
                             SGFileExamEvent(per, hsStream.FileName);
@@ -615,7 +625,11 @@
                             }
 
                             existErr = true;
-                            hsStream.stream = null;
+                            if (hsStream.stream != null)
+                            {
+                                hsStream.stream.Close();
+                                hsStream.stream = null;
+                            }
                             nExamCount++;
                             per = (nExamCount * 100) / nTotalCount;
                             SGFileExamEvent(per, hsStream.FileName);
@@ -652,7 +666,11 @@
                                 return;
                             }
                             existErr = true;
-                            hsStream.stream = null;
+                            if (hsStream.stream != null)
+                            {
+                                hsStream.stream.Close();
+                                hsStream.stream = null;
+                            }
                             nExamCount++;
                             per = (nExamCount * 100) / nTotalCount;
                             SGFileExamEvent(per, hsStream.FileName);
@@ -947,7 +965,11 @@
                                         return;
                                     }
                                     existErr = true;
-                                    hsStream.stream = null;
+                                    if (hsStream.stream != null)
+                                    {
+                                        hsStream.stream.Close();
+                                        hsStream.stream = null;
+                                    }
                                     nExamCount++;
                                     per = (nExamCount * 100) / nTotalCount;
                                     SGFileExamEvent(per, hsStream.FileName);
@@ -979,7 +1001,11 @@
                                     }
 
                                     existErr = true;
-                                    hsStream.stream = null;
+                                    if (hsStream.stream != null)
+                                    {
+                                        hsStream.stream.Close();
+                                        hsStream.stream = null;
+                                    }
                                     nExamCount++;
                                     per = (nExamCount * 100) / nTotalCount;
                                     SGFileExamEvent(per, hsStream.FileName);
@@ -1018,7 +1044,11 @@
                                     }
 
                                     existErr = true;
-                                    hsStream.stream = null;
+                                    if (hsStream.stream != null)
+                                    {
+                                        hsStream.stream.Close();
+                                        hsStream.stream = null;
+                                    }
                                     nExamCount++;
                                     per = (nExamCount * 100) / nTotalCount;
                                     SGFileExamEvent(per, hsStream.FileName);
@@ -1095,34 +1125,8 @@
         bViewDropFileAddError = false; // SGAppMgrSvc.OpConfigInfoService.GetUseDropErrorUI();
     }
 
-    private void onDrop()
-    {
-        //Console.WriteLine("OnDrop Event Occured");
-    }
-
-    private void HandleDrop()
-    {
-        //Console.WriteLine("HandleDrop Event Occured");
-    }
-
-    private void HandleClick()
-    {
-        // Console.WriteLine("Click Event Occured");
-        //SGSubFileAddEvent.Invoke();
-        //SubFileAddAsync();
-    }
-
-    private void HandleDragEnter()
-    {
-        //dropClass = "dropzone-drag";
-    }
-
-    private void HandleDragLeave()
-    {
-        //dropClass = "";
-    }
-
     /// <summary>
+    /// 사용하지 않는다~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     /// file 정보를 가져와서 HsStream 으로 변경
     /// </br>드래그앤드롭 파일 (선택된 모든 디렉토리와 하위파일들이 각 List의 항목으로 구성)
     /// </summary>

@@ -289,6 +289,16 @@
                     return false;
                 }
 
+                // 금지된 문자열 포함
+                if (objCheckPWstring.GetProhibitLimit(ref pwNew, SGAppMgrSvc.OpConfigInfoService.GetPWChangeProhibitLimit(groupID)))
+                {
+                    strInfoMsg = XmlConf.GetTitle("T_ETC_PASSWORD_PROHIBIT_MSG"); // 비밀번호에 금지된 문자열이 포함되어 있습니다.({0})
+                    strInfoMsg = String.Format(strInfoMsg, SGAppMgrSvc.OpConfigInfoService.GetPWChangeProhibitLimit(groupID));
+                    ShowMessage("waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), strInfoMsg);
+                    CLog.Here().Information($"CheckValidationNewPW, PW Change Err, Prohibit");
+                    return false;
+                }
+
                 // 키보드상의 연속된 문자 또는 숫자의 순차적 입력금지
                 if (objCheckPWstring.GetKeyBoardContinuousWord(ref pwNew, SGAppMgrSvc.OpConfigInfoService.GetPWkeyBoardLinearCharCnt(groupID)))
                 {
@@ -763,8 +773,8 @@
                         strNavigateWithGroupID = "/Transfer/";
                 }
 
-            if (!bFileTransUse)
-                strNavigateWithGroupID = "/Welcome/";  // 설정에 상관없도록
+                if (!bFileTransUse)
+                    strNavigateWithGroupID = "/Welcome/";  // 설정에 상관없도록
 
                 strNavigateWithGroupID += groupID.ToString();
                 MyNavigationManager.NavigateTo(strNavigateWithGroupID);
