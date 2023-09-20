@@ -649,8 +649,8 @@ Section "MainSection" SEC01
 		
 		${If} ${UPDATECHECK} == 'TRUE'
 			;패치파일 내 들어있는 UpdateFilelist.txt가 있다면, 목록과 패치 파일 비교
-			${If} ${FileExists} "C:\HANSSAK\OpenNetLink\wwwroot\conf\temp\UpdataFileList.txt"
-				FileOpen $0 "C:\HANSSAK\OpenNetLink\wwwroot\conf\temp\UpdataFileList.txt" r
+			${If} ${FileExists} "C:\HANSSAK\OpenNetLink\wwwroot\conf\temp\UpdateFileList.txt"
+				FileOpen $0 "C:\HANSSAK\OpenNetLink\wwwroot\conf\temp\UpdateFileList.txt" r
 			
 				LOOP_CHECK: 
 				IfErrors exit_loop
