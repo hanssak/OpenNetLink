@@ -551,13 +551,17 @@
             if (strRecvDownPath.Equals(""))
                 return;
 
-            ProcessStartInfo pi = new ProcessStartInfo(strRecvDownPath);
-            pi.Arguments = Path.GetFileName(strRecvDownPath);
-            pi.UseShellExecute = true;
-            pi.WorkingDirectory = Path.GetDirectoryName(strRecvDownPath);
-            pi.FileName = strRecvDownPath;
-            pi.Verb = "OPEN";
-            Process.Start(pi);
+            bool bOpen = SGAppMgrSvc.AppConfigInfoService.GetFileRecvFolderOpen();
+            if (bOpen)
+            {
+                ProcessStartInfo pi = new ProcessStartInfo(strRecvDownPath);
+                pi.Arguments = Path.GetFileName(strRecvDownPath);
+                pi.UseShellExecute = true;
+                pi.WorkingDirectory = Path.GetDirectoryName(strRecvDownPath);
+                pi.FileName = strRecvDownPath;
+                pi.Verb = "OPEN";
+                Process.Start(pi);
+            }
             m_bFileDownloading = false;
 
             //다운로드 완료후 다운로드 카운트 재요청

@@ -730,7 +730,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             {
                 SetInitUpdateStatus();
 
-                string DownloadLog = string.Format($"{item.AppName} {item.Version}, We had an error during the download process :( -- {exception.Message}");
+                string DownloadLog = string.Format($"{item?.AppName} {item?.Version}, We had an error during the download process :( -- {exception.Message}");
                 CLog.Here().Error(DownloadLog);
                 DownloadUpdate?.ClosePopUp();
                 File.Delete(path);

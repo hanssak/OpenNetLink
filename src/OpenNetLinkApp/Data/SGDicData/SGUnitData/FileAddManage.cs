@@ -4646,17 +4646,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                         using (Stream oleFileStream = File.OpenRead(extractFile.FullName))
                         {
-                            m_bIsDrm = Task.Run<bool>(async () => {return await IsDRMbyStream(oleFileStream); }).Result;
-                            if (m_bIsDrm)
-                            {
-                                m_bIsDrm = false;
-                                Log.Logger.Here().Information($"file in ScanZipFile, is DRM file - Ole inspection skip!");
-                            }
-                            else
-                            {
-                                oleHsStream = new HsStream() { stream = oleFileStream, FileName = extractFile.FullName, MemoryType = HsStreamType.FileStream };
-                                scanDocumentFile(oleHsStream, childFile, strTempDocumentExtractDirPath, blWhite, strExtInfo, documentScanDepth, documentExtractType, blAllowDRM).Wait();
-                            }
+                            oleHsStream = new HsStream() { stream = oleFileStream, FileName = extractFile.FullName, MemoryType = HsStreamType.FileStream };
+                            scanDocumentFile(oleHsStream, childFile, strTempDocumentExtractDirPath, blWhite, strExtInfo, documentScanDepth, documentExtractType, blAllowDRM).Wait();
                         }
 
                         if (childFile.eErrType != eFileAddErr.eFANone || childFile.HasChildrenErr)

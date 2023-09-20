@@ -733,10 +733,31 @@ SectionEnd
   ; WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
   ; WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\OpenNetLinkApp.exe"
   
-  ; WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
-  ; WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
-  ; WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
-; SectionEnd
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
+
+
+  ${If} ${REG_CRX} == "TRUE"
+  
+	  ; CRX 파일 - 강제등록
+	  ${If} ${NETWORK_FLAG} == "IN"
+	  
+		  ; edge
+		  WriteRegStr HKLM "SOFTWARE\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		  ;WriteRegStr HKLM "SOFTWARE\WOW6432Node\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		  ;WriteRegStr HKCU "Software\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		  
+		  ; chrome
+		  WriteRegStr HKLM "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"
+		  ;WriteRegStr HKLM "SOFTWARE\WOW6432Node\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"
+		  ;WriteRegStr HKCU "Software\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"	  
+		  
+	  ${EndIf}  
+
+  ${EndIf}  
+
+SectionEnd
 
 
 Function un.onUninstSuccess
@@ -790,5 +811,20 @@ Section Uninstall
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
+
+	${If} ${REG_CRX} == 'TRUE'
+
+	  ; CRX강제등록 제거
+	  DeleteRegKey HKLM "SOFTWARE\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
+	  ;DeleteRegKey HKLM "SOFTWARE\WOW6432Node\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
+	  ;DeleteRegKey HKCU "SOFTWARE\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"  
+
+	  DeleteRegKey HKLM "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
+	  ;DeleteRegKey HKLM "SOFTWARE\WOW6432Node\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
+	  ;DeleteRegKey HKCU "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
+
+	${EndIf}  
+  
   SetAutoClose true
+  
 SectionEnd

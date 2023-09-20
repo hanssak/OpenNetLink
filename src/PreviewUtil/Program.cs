@@ -48,7 +48,7 @@ namespace PreviewUtil
             {
                 window.SendMessage("Got message: " + message);
             };
-
+            window.SetUseHttpUrl(true);
             window.NavigateToUrl(url);
             window.SetTrayStartUse(false);
 

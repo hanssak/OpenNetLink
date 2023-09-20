@@ -95,9 +95,9 @@
                                                     <thead>
                                                         <tr>
                                                             <th style="text-align:center;width:7%;">@strUserName</th>                         <!--이름-->
-                                                    <th style="text-align:center;width:7%;">@strUserPosition</th>                         <!--직급-->
-                                                    <th style="text-align:center;width:8%;">@strUserDept</th>                        <!--부서-->
-                                                </tr>
+                                                            <th style="text-align:center;width:7%;">@strUserPosition</th>                         <!--직급-->
+                                                            <th style="text-align:center;width:8%;">@strUserDept</th>                        <!--부서-->
+                                                        </tr>
                                                     </thead>
                                                     <tbody>
                                                         @foreach (Dictionary<int, string> item in listForwaredUserInfo)
@@ -291,7 +291,7 @@
 {
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<ApprovePopUp>();
     ISGNetworkService NetWorkSvc;
-    public bool bIsPrivacyApproveDetail = false;
+    public bool bIsPrivacyApproveDetail = false; //보안결재 일때 true
 
     List<Dictionary<int, string>> listForwaredUserInfo = null;
 
@@ -590,7 +590,7 @@
     public string strFileInfo = "";
     public string strPrevInfo1 = "";
     public string strPrevInfo2 = "";
-    
+
     public string strColumnSelect = "";
     public string strFileName = "";
     public string strFileType = "";
@@ -705,7 +705,6 @@
 
         strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
         strDataTransStatus = sgDetailData.GetTransStatus();                                 // 전송상태
-
 
         Dictionary<string, SGNetOverData> dicDestSysPos = null;
         dicDestSysPos = pageService.GetTargetSystemList(groupID);
@@ -872,8 +871,8 @@
         strFilePrev = XmlConf.GetTitle("T_DETAIL_FILEPREVIEW");                 // 파일미리보기
         strDesc = XmlConf.GetTitle("T_DETAIL_DESC");                            // 설명
                                                                                 //strPrevInfo = XmlConf.GetWarnMsg("W_0077");                             // &nbsp;&nbsp;업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
-        
-        strColumnSelect = XmlConf.GetTitle("T_COMMON_SELECT2");                  //선택                                                                        
+
+        strColumnSelect = XmlConf.GetTitle("T_COMMON_SELECT2");                  //선택
         strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                    // 파일명
         strFileType = XmlConf.GetTitle("T_COMMON_KIND");                        // 유형
         strFileSize = XmlConf.GetTitle("T_COMMON_SIZE");                        // 크기
@@ -982,6 +981,8 @@
             string strApproveSeq = sgDetailData.GetApprSeq();
             string strApprover = "1";
             string strApproveUserKind = "0";
+            if (bIsPrivacyApproveDetail)
+                strApproveUserKind = "1";
 
             HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
 
@@ -1036,6 +1037,10 @@
         string strApprover = "1";
         string strApproveUserKind = "0";
 
+        if (bIsPrivacyApproveDetail)
+            strApproveUserKind = "1";
+
+
         HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
         closePopUp();
     }
@@ -1056,6 +1061,9 @@
         string strApproveSeq = sgDetailData.GetApprSeq();
         string strApprover = "1";
         string strApproveUserKind = "0";
+
+        if (bIsPrivacyApproveDetail)
+            strApproveUserKind = "1";
 
         HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
         closePopUp();
@@ -1121,17 +1129,17 @@
         }
 
 #else
-    //
-    string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp", "log" };
-    strExtName = strExtName.ToLower();
-    for (int i = 0; i < strExt.Length; i++)
-    {
-    if (strExt[i].Equals(strExtName))
-    {
-    bFind = true;
-    break;
-    }
-    }
+//
+string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp", "log" };
+strExtName = strExtName.ToLower();
+for (int i = 0; i < strExt.Length; i++)
+{
+if (strExt[i].Equals(strExtName))
+{
+bFind = true;
+break;
+}
+}
 #endif
 
         if (!bFind)

@@ -36,7 +36,9 @@ using namespace std;
 bool g_bStartTray = true;
 bool g_bDoExit2TrayUse = false;
 bool g_bClipCopyNsend = false;
+bool g_bUseHttpUrl = false;
 static id _appDelegate;
+static id _uiDelegate;
 
 map<NSWindow*, WebWindow*> nsWindowToWebWindow;
 
@@ -174,6 +176,7 @@ void WebWindow::AttachWebView()
     [[NSNotificationCenter defaultCenter] addObserver:uiDelegate selector:@selector(windowDidResize:) name:NSWindowDidResizeNotification object:window];
     [[NSNotificationCenter defaultCenter] addObserver:uiDelegate selector:@selector(windowDidMove:) name:NSWindowDidMoveNotification object:window];
 
+    _uiDelegate = uiDelegate;
     _webview = webView;
 }
 
@@ -613,7 +616,7 @@ void WebWindow::UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl,
 		strModifiers += "<Super>";			 // Window 키 조합 (0x0008)
 
 	strModifiers += strKeyCode; // Key Code
-
+    
     NSUInteger uKeyMask = GetKeyMask(bWin, bAlt, bControl, bShift);
     unsigned short usKeyCode = GetCharKeyCode([NSString stringWithUTF8String:strKeyCode.c_str()]);
 
@@ -936,6 +939,12 @@ void WebWindow::SetUseClipCopyNsend(bool bUse)
 	g_bClipCopyNsend = bUse;
     [_appDelegate SetCopyAndSend:g_bClipCopyNsend];
 	//NTLog(this, Info, "Called : SetUseClipCopyNsend(@@@@@@@@@@) : %s", (AutoString)(bUse ? "Yes" : "No"));
+}
+
+void WebWindow::SetUseHttpUrl(bool bUse)
+{
+    g_bUseHttpUrl = bUse;
+    [_uiDelegate SetUseHttpUrl:g_bUseHttpUrl];
 }
 
 void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)

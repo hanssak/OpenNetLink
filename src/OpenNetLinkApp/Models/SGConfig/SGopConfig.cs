@@ -83,6 +83,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bShowInnerFileErrDetail { get; set; } = false; //파일 추가에 제외된 파일 리스트에 내부에 걸린 파일 리스트 전부 보여주기
         public bool bAllowDRM { get; set; } = true;                 //DRM 파일 전송 허용 여부 (true : 전송, false : 차단) - Default : true
 
+        public bool bHiddenLoginLogo { get; set; } = false;  // Main Login UI  좌측 로고 숨김 처리
+
+
         //클립보드
 
         public bool bDlpFoundSendContinue { get; set; } = false;  //  개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무
@@ -98,6 +101,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileClipApproveUI { get; set; } = false;          // 파일형태로보내는 클립보드 결재UI 나오게할지 유무
         public bool bUseClipTypeSelectSend { get; set; } = true;         // 클립보드를 보낼때, 이미지 / Text를 사용자가 선택해서 보내는 기능 사용유무
         public bool bUseClipTypeTextFirstSend { get; set; } = false;         // 클립보드를 보낼때, Text 및 image Mixed 상태일때 Text를 우선적으로 보내도록 설정
+        public bool bUseClipTypeText { get; set; } = true;          //TEXT로 클립보드 전송 사용 유무
+
+        public bool bUseClipTypeImage { get; set; } = true;            //IMAGE로 클립보드 전송 사용 유무
 
         //메일
         public bool bUseEmail { get; set; } = false;               // 메일 관리/결재 사용 유무.

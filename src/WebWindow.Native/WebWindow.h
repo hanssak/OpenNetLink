@@ -75,6 +75,7 @@ extern void* SelfThis;
 extern bool g_bDoExit2TrayUse;
 extern bool g_bStartTray;
 extern bool g_bClipCopyNsend;
+extern bool g_bUseHttpUrl;
 
 typedef enum enDefineClipType
 {
@@ -229,6 +230,7 @@ public:
 	void InvokeRequestedNavigateURL(const void* uriMem, const int uriLength) { if (_requestedNavigateURLCallback) _requestedNavigateURLCallback(uriMem, uriLength); }
 	void SetTrayUse(bool useTray);
 	void SetUseClipCopyNsend(bool bUse);
+	void SetUseHttpUrl(bool bUse);
 
 	void SetTrayStartUse(bool bUseStartTray);
 	void SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);

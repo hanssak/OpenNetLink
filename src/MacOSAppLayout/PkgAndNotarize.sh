@@ -38,8 +38,8 @@ dev_team="L7W5N48H4G"
 dev_keychain_label="sxog-tiki-hjrx-pxfs"
 
 # put your project's information into these variables
-if [ $# -ne 8 ]; then
-	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {startauto} $6 {isupdatecheck} $7"
+if [ $# -ne 10 ]; then
+	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {startauto} $6 {isupdatecheck} $7 {storagename} $8 {regcrxforce} $9"
 	exit -1
 fi;
 version=$1
@@ -51,6 +51,8 @@ customname=$4
 outputpath=$5
 startauto=$6
 isupdatecheck=$7
+storagename=$8
+regcrxforce=$9
 
 # code starts here
 projectdir=$(dirname $0)
@@ -261,6 +263,11 @@ filepreinstall="$SCRIPT_PATH/preinstall"
 
 if [[ $ispatch != "TRUE" ]]; then
     isupdatecheck="FALSE"
+fi
+if [[ $regcrxforce == "FALSE" ]]; then 
+    sed -i '' -e 's/REG_CRX=true/REG_CRX=false/g' $filepostinstall
+else
+    sed -i '' -e 's/REG_CRX=false/REG_CRX=true/g' $filepostinstall
 fi
 
 if [[ $startauto == "FALSE" ]]; then 

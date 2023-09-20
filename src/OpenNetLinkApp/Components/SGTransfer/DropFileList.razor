@@ -355,18 +355,21 @@
         Window.SetDragNDropFilePath();
         List<string> list = await SubFileAddAsync(); //내부에서 드랍한 것인지 외부에서 드랍한 것인지 판단하기 위해 외부에서 들어온 것인지 먼저 판단
 
-        if (list.Count <= 0)
+        if (list != null)
         {
-            if (recvlist.Count <= 0)
-                return;
+            if (list.Count <= 0)
+            {
+                if (recvlist.Count <= 0)
+                    return;
+                else
+                {
+                    OnDropFileAdd(recvlist, false);
+                }
+            }
             else
             {
-                OnDropFileAdd(recvlist, false);
+                OnDropFileAdd(list, false);
             }
-        }
-        else
-        {
-            OnDropFileAdd(list, false);
         }
     }
 
@@ -649,13 +652,7 @@
                         //02. 문서파일 압축해제 후 파일 검사
 
                         //01. 문서파일 내 OLE 개체 검사
-                        fileAddManage.m_bIsDrm = await fileAddManage.IsDRMbyStream(hsStream.stream);
-                        if (fileAddManage.m_bIsDrm)
-                        {
-                            fileAddManage.m_bIsDrm = false;
-                            CLog.Here().Information($"OnDropFileAdd, is DRM file - Ole inspection skip!");
-                        }
-                        else if (await GetExamCheckDocument(fileAddManage, topFile, hsStream) != 0)
+                        if (await GetExamCheckDocument(fileAddManage, topFile, hsStream) != 0)
                         {
                             if (pageService.GetFileExaming() == false)
                             {
@@ -947,7 +944,11 @@
                                     @*fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);*@
                                     childFile.eErrType = eFileAddErr.eFA_FILE_READ_ERROR;
                                     CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
-                                    hsStream.stream = null;
+                                    if (hsStream.stream != null)
+                                    {
+                                        hsStream.stream.Close();
+                                        hsStream.stream = null;
+                                    }
                                     nExamCount++;
                                     per = (nExamCount * 100) / nTotalCount;
                                     SGFileExamEvent(per, hsStream.FileName);
@@ -1026,13 +1027,7 @@
                                 //02. 문서파일 압축해제 후 파일 검사
 
                                 //01. 문서파일 내 OLE 개체 검사
-                                fileAddManage.m_bIsDrm = await fileAddManage.IsDRMbyStream(hsStream.stream);
-                                if (fileAddManage.m_bIsDrm)
-                                {
-                                    fileAddManage.m_bIsDrm = false;
-                                    CLog.Here().Information($"OnDropFileAdd, is DRM file - Ole inspection skip!");
-                                }
-                                else if (await GetExamCheckDocument(fileAddManage, childFile, hsStream) != 0)
+                                if (await GetExamCheckDocument(fileAddManage, childFile, hsStream) != 0)
                                 {
                                     if (pageService.GetFileExaming() == false)
                                     {
@@ -1420,13 +1415,7 @@
                     //02. 문서파일 압축해제 후 파일 검사
 
                     //01. 문서파일 내 OLE 개체 검사
-                    fileAddManage.m_bIsDrm = await fileAddManage.IsDRMbyStream(hsStream.stream);
-                    if (fileAddManage.m_bIsDrm)
-                    {
-                        fileAddManage.m_bIsDrm = false;
-                        CLog.Here().Information($"SubFileAddAsync, is DRM file - Ole inspection skip!");
-                    }
-                    else if (await GetExamCheckDocument(fileAddManage, currentFile, hsStream) != 0)
+                    if (await GetExamCheckDocument(fileAddManage, currentFile, hsStream) != 0)
                     {
                         if (pageService.GetFileExaming() == false)
                         {
@@ -2499,6 +2488,16 @@
             else if (path.IndexOf("file://") == 0)
             {
                 path = path.Substring(5);
+            }
+            else if (path.IndexOf("http") == 0)
+            {
+                string strMsg = XmlConf.GetErrMsg("E_0267");    // Url 파일은 드래그앤드랍으로 파일을 올릴 수 없습니다. 우클릭 파일 전송을 이용해 주세요.
+                ShowMessage("error", strMsg);
+
+                CLog.Here().Error($"URL-File Detect - URL : {path}");
+                await _dropReference.ClearValue();
+                pageService.SetDragNDropFilePath("");
+                return null;
             }
             string dirPath = "";
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))

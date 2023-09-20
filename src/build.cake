@@ -21,7 +21,10 @@ var isEnc = Argument<bool>("isEnc", true);
 var deleteNetLink = Argument<bool>("deleteNetLink", false);		//true로 하면, 기존 NetLink Unintall.exe를 붙여넣기 한 후, 기존 NetLink를 삭제한다.
 var isSilent = Argument<bool>("isSilent", false);				//true로 하면, Silent 모드
 var startAuto = Argument<bool>("startAuto", true);				//false 하면, 설치 완료 후 자동 실행 안됨
+var isSilentShowAll = Argument<bool>("isSilentShowAll", false);	//true로 하면, Silent / Show 모드 설치파일 모두 만듬
+var regCrxForce = Argument<bool>("regCrxForce", false);					//true로 하면, NetPos가 "IN"인 Case
 var isUpdateCheck = Argument<bool>("isUpdateCheck", false);				//false 하면 업데이트 체크 안함
+
 
 var isPatchInstaller = false;
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
@@ -756,21 +759,66 @@ Task("MakeInstaller")
 	//Agent 설치대상 별로 exe 파일 생성 (IN/EX ...)
 	if(AppProps.Platform == "windows")
 	{
-		MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
-			Defines = new Dictionary<string, string>{
-				{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
-				{"IS_PATCH", isPatchInstaller.ToString().ToUpper()},
-				{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
-				{"NETWORK_FLAG", networkFlag.ToUpper()},
-				{"CUSTOM_NAME", customName.ToUpper()},
-				{"OUTPUT_DIRECTORY", PackageDirPath},
-				{"DELETE_NETLINK", deleteNetLink.ToString().ToUpper()},
-				{"IS_SILENT", isSilent.ToString().ToUpper()},
-				{"STARTAUTO", startAuto.ToString().ToUpper()},
-				{"STORAGE_NAME", storageName.ToUpper()},
-				{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()}
-			}
-		});			
+
+		if (isSilentShowAll.ToString().ToUpper() == "TRUE")
+		{
+			Information("Package windows: Silent Mode !");
+			MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
+				Defines = new Dictionary<string, string>{
+					{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
+					{"IS_PATCH", isPatchInstaller.ToString().ToUpper()},
+					{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
+					{"NETWORK_FLAG", networkFlag.ToUpper()},
+					{"CUSTOM_NAME", customName.ToUpper()},
+					{"OUTPUT_DIRECTORY", PackageDirPath},
+					{"DELETE_NETLINK", deleteNetLink.ToString().ToUpper()},
+					{"IS_SILENT", "TRUE"},
+					{"STARTAUTO", startAuto.ToString().ToUpper()},
+					{"STORAGE_NAME", storageName.ToUpper()},
+					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
+					{"REG_CRX", regCrxForce.ToString().ToUpper()}
+				}
+			});			
+
+			Information("Package windows: Show Mode!");
+			MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
+				Defines = new Dictionary<string, string>{
+					{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
+					{"IS_PATCH", isPatchInstaller.ToString().ToUpper()},
+					{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
+					{"NETWORK_FLAG", networkFlag.ToUpper()},
+					{"CUSTOM_NAME", customName.ToUpper()},
+					{"OUTPUT_DIRECTORY", PackageDirPath},
+					{"DELETE_NETLINK", deleteNetLink.ToString().ToUpper()},
+					{"IS_SILENT", "FALSE"},
+					{"STARTAUTO", startAuto.ToString().ToUpper()},
+					{"STORAGE_NAME", storageName.ToUpper()},
+					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
+					{"REG_CRX", regCrxForce.ToString().ToUpper()}
+				}
+			});
+
+		}
+		else
+		{
+			MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
+				Defines = new Dictionary<string, string>{
+					{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
+					{"IS_PATCH", isPatchInstaller.ToString().ToUpper()},
+					{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
+					{"NETWORK_FLAG", networkFlag.ToUpper()},
+					{"CUSTOM_NAME", customName.ToUpper()},
+					{"OUTPUT_DIRECTORY", PackageDirPath},
+					{"DELETE_NETLINK", deleteNetLink.ToString().ToUpper()},
+					{"IS_SILENT", isSilent.ToString().ToUpper()},
+					{"STARTAUTO", startAuto.ToString().ToUpper()},
+					{"STORAGE_NAME", storageName.ToUpper()},
+					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
+					{"REG_CRX", regCrxForce.ToString().ToUpper()}
+					
+				}
+			});			
+		}
 	}
 	else if(AppProps.Platform == "debian")
 	{
@@ -784,6 +832,7 @@ Task("MakeInstaller")
 												.Append(startAuto.ToString().ToUpper())//$6
 												.Append(storageName.ToUpper())//$7
 												.Append(isUpdateCheck.ToString().ToUpper())	//$8 Output
+												.Append(regCrxForce.ToString().ToUpper())//$9
 																								})
 												
 		)

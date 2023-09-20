@@ -386,13 +386,12 @@
                 <a class="file_dw" @onclick="@(e => openSaveDirPopup(Idx, GetRecvDownPath(Idx)))" hidden="@(GetRecvDownPathChangeHide(Idx))"><i class="fas fa-folder-open pl-1"></i></a>
             </div>
         }
-        @if (m_bRecvFolderOpen)
-        {
-            <div class="mb-1 w-100">
-                <input type="checkbox" class="mr-1" checked="@(GetFileRecvFolderOpen())"
-                       @onchange="eventArgs => { SetFileRecvFolderOpen(eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_AFTEROPENFOLDER_FILEDOWN")</span>             <!--파일 수신 후 폴더 열기-->
-                </div>
-            }
+        
+        <div class="mb-1 w-100">
+            <input type="checkbox" class="mr-1" checked="@(GetFileRecvFolderOpen())"
+                    @onchange="eventArgs => { SetFileRecvFolderOpen(eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_AFTEROPENFOLDER_FILEDOWN")</span>             <!--파일 수신 후 폴더 열기-->
+        </div>
+            
         @if (m_bManualDownFolderChange)
         {
             <div class="mb-1  w-100">

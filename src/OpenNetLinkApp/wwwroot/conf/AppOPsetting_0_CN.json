@@ -16,7 +16,7 @@
   "bFileRecvAlarmRetain": false,
   "bManualDownFolderChange": false,
   "bNoApproveManageUI": false,
-  "bUseApproveManageUIForce": false,
+  "bUseApproveManageUIForce": true,
   "bRFileAutoSend": false,
   "bRecvFolderChange": false,
   "bShowAdminInfo": false,
@@ -39,8 +39,8 @@
   "bUseClipBoardApproveReason": false,
   "bUseClipBoardFileTrans": true,
   "bUseClipCopyAndSend": false,
-  "bUseClipTypeSelectSend": true,
-  "bUseClipTypeTextFirstSend": false,
+  "bUseClipTypeSelectSend": false,
+  "bUseClipTypeTextFirstSend": true,
   "bUseCloseTrayMove": false,
   "bUseCrossPlatformOSforFileName": false,
   "bUseDenyPasswordZip": true,
@@ -118,6 +118,10 @@
   "nSessionDuplicate": -1,
   "bShowInnerFileErrDetail": false,
   "bAllowDRM": true,
-  "bUseFileTrans": true
+  "bUseFileTrans": true,
+  "bUseClipTypeText": true,
+  "bUseClipTypeImage": true,
+  "bHiddenLoginLogo": false,
+  "bUseLoginMainUIsimpleMode": false
 
 }

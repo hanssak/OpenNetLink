@@ -9,6 +9,8 @@ typedef void (*WebMessageReceivedCallback) (char* message);
     @public
     NSWindow * window;
     WebWindow * webWindow;
+    int gUseHttpUrl;
     WebMessageReceivedCallback webMessageReceivedCallback;
 }
+- (void) SetUseHttpUrl:(bool)value;
 @end

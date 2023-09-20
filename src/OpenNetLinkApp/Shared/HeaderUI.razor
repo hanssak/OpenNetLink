@@ -197,7 +197,7 @@
             strFilePath += "\\Work\\";
 
             int nIdx = 1;
-            for(; nIdx < 10000 ; nIdx++)
+            for (; nIdx < 10000; nIdx++)
             {
                 //strFileName.Format()
                 strCheckFileName = $"SG ({nIdx}).pcf";
@@ -254,7 +254,7 @@
             {
 
                 string strPcfFilePath = "";
-                if (GetFilePathfromByteData(clipData, out strPcfFilePath)== false)
+                if (GetFilePathfromByteData(clipData, out strPcfFilePath) == false)
                 {
                     CLog.Here().Information($"HeaerUI - RecvClipBoard - groupID : {groupid} - Pcf to File, Failed!");
                 }
@@ -1633,6 +1633,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         //Clipboard 실제 전송(HSCmdCenter)  2021/06/08 YKH 클립보드 승인이 켜져 있는 경우는 클립보드 내용을 파일로 남기고 그파일을 전송하는 옵션이 추가됨
 
         //if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId)) // op..json으로 이동
+
         if (SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId))
         {
             //ClipBoard 파일 전송 형태로 저장
@@ -1645,7 +1646,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             _curFileName = clipFilePath;
             _curGroupId = clipData.nGroupId;
 
-            if(pageService.GetClipboardSending())
+            if (pageService.GetClipboardSending())
             {
                 ShowMessage("warn", "클립보드 전송 중입니다");
                 return;
@@ -1813,7 +1814,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
     public bool SendPkiFilesByFileTrans(int nGroupID, string strPcfFilePath, bool bSendPkiByFileTrans)
     {
 
-        CLog.Here().Information($"SendPkiFilesByFileTrans(Strart), GroupID : {nGroupID}, SendPki : {(bSendPkiByFileTrans? "FileTransType":"ClipTransType")}, PcfPath : {strPcfFilePath}");
+        CLog.Here().Information($"SendPkiFilesByFileTrans(Strart), GroupID : {nGroupID}, SendPki : {(bSendPkiByFileTrans ? "FileTransType" : "ClipTransType")}, PcfPath : {strPcfFilePath}");
 
         bool bSendPkiResult = false;
         bSendingPki = true;
@@ -1823,7 +1824,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         else
             bSendPkiResult = SendPkiFilesByClipboard(nGroupID, strPcfFilePath);
 
-        CLog.Here().Information($"SendPkiFilesByFileTrans(End), GroupID : {nGroupID}, SendPki : {(bSendPkiByFileTrans? "FileTransType":"ClipTransType")}, PcfPath : {strPcfFilePath}");
+        CLog.Here().Information($"SendPkiFilesByFileTrans(End), GroupID : {nGroupID}, SendPki : {(bSendPkiByFileTrans ? "FileTransType" : "ClipTransType")}, PcfPath : {strPcfFilePath}");
 
         if (bSendPkiResult == false)
             ShowMessage("error", XmlConf.GetErrMsg("E_0260"));
@@ -2089,6 +2090,30 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             if (CheckClipBoardSendSize(clipData.nGroupId, nClipSize) < 0)
                 return;
 
+            //클립보드 TEXT, Image 전송 여부
+            if (clipData.nType == CLIPTYPE.IMAGE)
+            {
+                if (!OpConfigSvc.GetUseClipTypeImage(clipData.nGroupId))
+                {
+                    CLog.Here().Information($"ClipBoard - Can't transfer Image Clip");
+                    // Native에 할된 Memory 제거
+                    Window.ClipDataFree(clipData.nGroupId);
+                    ShowClipboardMessage("error", XmlConf.GetErrMsg("E_0264"), clipData.nGroupId, OS_NOTI.CLIPBOARD);   // 빈 클립보드를 보낼 수 없습니다.
+                    return;
+                }
+            }
+            else if (clipData.nType == CLIPTYPE.TEXT)
+            {
+                if (!OpConfigSvc.GetUseClipTypeText(clipData.nGroupId))
+                {
+                    CLog.Here().Information($"ClipBoard - Can't transfer Text Clip");
+                    // Native에 할된 Memory 제거
+                    Window.ClipDataFree(clipData.nGroupId);
+                    ShowClipboardMessage("error", XmlConf.GetErrMsg("E_0265"), clipData.nGroupId, OS_NOTI.CLIPBOARD);   // 빈 클립보드를 보낼 수 없습니다.
+                    return;
+                }
+            }
+
             SendClipBoardTry(clipData, eClipType, nClipSize);
         }
 
@@ -2255,7 +2280,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         if (e.count >= 100)
         {
 
-            CLog.Here().Information($"HeaderUI, FileTransProgress, GroupID:{groupID}, Progress : {e.count}, DONE : {(bSendingPki?"Pki File":"ClipBoard")}");
+            CLog.Here().Information($"HeaderUI, FileTransProgress, GroupID:{groupID}, Progress : {e.count}, DONE : {(bSendingPki ? "Pki File" : "ClipBoard")}");
 
             if (bSendingPki)
                 ShowMessage("info", XmlConf.GetInfoMsg("I_0245"));
@@ -2375,7 +2400,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             bAfterApprove = false;
 
         // pki전송
-        if (string.Compare(strDataType, "11")==0)
+        if (string.Compare(strDataType, "11") == 0)
         {
             stApprLineSeq = "";
             bAfterApprove = false;
@@ -3901,17 +3926,17 @@ public async void OffLineNoti(int groupID)
 
         }
         else if (e.strDataType == ((int)FrameType.CertFile).ToString())
-        { 
-                
+        {
+
             CLog.Here().Information($"HeaerUI - FileRecvAfterOperation - groupID : {groupID} - PKI Recv - DataType : {e.strDataType} !!!");
 
             try
             {
                 bool bRet = sgPcfFile.makePcfToPkiFIles(e.strFilePath);
-                ShowMessage( (bRet?"info":"error"), (bRet?XmlConf.GetInfoMsg("I_0244") : XmlConf.GetErrMsg("E_0261")) );
+                ShowMessage((bRet ? "info" : "error"), (bRet ? XmlConf.GetInfoMsg("I_0244") : XmlConf.GetErrMsg("E_0261")));
                 File.Delete(e.strFilePath);
 
-                CLog.Here().Information($"HeaerUI - FileRecvAfterOperation - groupID : {groupID} - {(bRet?"Done(Pki Recv)":"Error!(Pki Recv)")}");
+                CLog.Here().Information($"HeaerUI - FileRecvAfterOperation - groupID : {groupID} - {(bRet ? "Done(Pki Recv)" : "Error!(Pki Recv)")}");
             }
             catch (Exception err)
             {

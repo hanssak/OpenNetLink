@@ -497,6 +497,7 @@
                     bReject = false;
             }
 
+            
             sgDetailData.SetInit(true, sTransSeq, sApprSeq, nDataForwarded, bTransCancel, bApprove, bReject);
 
             HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
@@ -665,7 +666,7 @@
                 }
             }
             string strApprover = "1";
-            string strApproveUserKind = "0";
+            string strApproveUserKind = "1";
 
             HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
         }
@@ -695,7 +696,7 @@
             }
         }
         string strApprover = "1";
-        string strApproveUserKind = "0";
+        string strApproveUserKind = "1";
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
     }
@@ -753,7 +754,7 @@
             }
         }
         string strApprover = "1";
-        string strApproveUserKind = "0";
+        string strApproveUserKind = "1";
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
     }
