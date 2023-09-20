@@ -22,6 +22,7 @@ var deleteNetLink = Argument<bool>("deleteNetLink", false);		//true로 하면, �
 var isSilent = Argument<bool>("isSilent", false);				//true로 하면, Silent 모드
 var startAuto = Argument<bool>("startAuto", true);				//false 하면, 설치 완료 후 자동 실행 안됨
 var isSilentShowAll = Argument<bool>("isSilentShowAll", false);	//true로 하면, Silent / Show 모드 설치파일 모두 만듬
+var regCrxForce = Argument<bool>("regCrxForce", false);					//true로 하면, NetPos가 "IN"인 Case
 
 
 var isPatchInstaller = false;
@@ -1090,6 +1091,7 @@ Task("MakeInstaller")
 					{"IS_SILENT", "TRUE"},
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
+					{"REG_CRX", regCrxForce.ToString().ToUpper()},
 				}
 			});			
 
@@ -1106,6 +1108,7 @@ Task("MakeInstaller")
 					{"IS_SILENT", "FALSE"},
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
+					{"REG_CRX", regCrxForce.ToString().ToUpper()},
 				}
 			});
 
@@ -1124,6 +1127,7 @@ Task("MakeInstaller")
 					{"IS_SILENT", isSilent.ToString().ToUpper()},
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
+					{"REG_CRX", regCrxForce.ToString().ToUpper()},
 				}
 			});			
 		}
@@ -1138,6 +1142,7 @@ Task("MakeInstaller")
 												.Append(customName.ToUpper())
 												.Append(PackageDirPath)//$5	
 												.Append(storageName.ToUpper())//$6	
+												.Append(regCrxForce.ToString().ToUpper())//$7
 												})
 												
 		)

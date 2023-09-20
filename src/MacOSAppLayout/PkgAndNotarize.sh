@@ -38,8 +38,8 @@ dev_team="L7W5N48H4G"
 dev_keychain_label="sxog-tiki-hjrx-pxfs"
 
 # put your project's information into these variables
-if [ $# -ne 6 ]; then
-	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {storagename} $6"
+if [ $# -ne 7 ]; then
+	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {storagename} $6 {regcrxforce} $7"
 	exit -1
 fi;
 version=$1
@@ -50,6 +50,7 @@ networkflag=$3
 customname=$4
 outputpath=$5
 storagename=$6
+regcrxforce=$7
 
 # code starts here
 projectdir=$(dirname $0)
@@ -254,6 +255,15 @@ codesignapp "$APP_PATH" "$appledevsig" "$ENT_PATH"
 
 echo "##############################################################################################"
 ## build the pkg
+filepostinstall="$SCRIPT_PATH/postinstall"
+filepreinstall="$SCRIPT_PATH/preinstall"
+
+
+if [[ $regcrxforce == "FALSE" ]]; then 
+    sed -i '' -e 's/REG_CRX=true/REG_CRX=false/g' $filepostinstall
+else
+    sed -i '' -e 's/REG_CRX=false/REG_CRX=true/g' $filepostinstall
+fi
 
 if [[ $ispatch == "TRUE" ]]; then 
     #for patch
