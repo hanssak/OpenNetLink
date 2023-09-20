@@ -2145,6 +2145,8 @@
             return;
 
         //업데이트는 롤백 기능으로도 사용될 수있기 때문에, 이전 버전에 대한 값이 내려와도 처리 되도록 주석처리 (차후 netSparkle에서도 추가 처리 필요)
+        if(strSvrCliVersion == strCliVersion)
+            return;
         //if (!versionConfigSvc.isUpperVersion(strSvrCliVersion, strCliVersion))
         //    return;
 
