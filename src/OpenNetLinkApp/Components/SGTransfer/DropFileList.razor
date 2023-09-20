@@ -568,7 +568,11 @@
                             @*fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);*@
                             topFile.eErrType = eFileAddErr.eFA_FILE_READ_ERROR;
                             CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
-                            hsStream.stream = null;
+                            if (hsStream.stream != null)
+                            {
+                                hsStream.stream.Close();
+                                hsStream.stream = null;
+                            }
                             nExamCount++;
                             per = (nExamCount * 100) / nTotalCount;
                             SGFileExamEvent(per, hsStream.FileName);
@@ -586,7 +590,11 @@
                                 return;
                             }
                             existErr = true;
-                            hsStream.stream = null;
+                            if (hsStream.stream != null)
+                            {
+                                hsStream.stream.Close();
+                                hsStream.stream = null;
+                            }
                             nExamCount++;
                             per = (nExamCount * 100) / nTotalCount;
                             SGFileExamEvent(per, hsStream.FileName);
@@ -618,7 +626,11 @@
                             }
 
                             existErr = true;
-                            hsStream.stream = null;
+                            if (hsStream.stream != null)
+                            {
+                                hsStream.stream.Close();
+                                hsStream.stream = null;
+                            }
                             nExamCount++;
                             per = (nExamCount * 100) / nTotalCount;
                             SGFileExamEvent(per, hsStream.FileName);
@@ -649,7 +661,11 @@
                                 return;
                             }
                             existErr = true;
-                            hsStream.stream = null;
+                            if (hsStream.stream != null)
+                            {
+                                hsStream.stream.Close();
+                                hsStream.stream = null;
+                            }
                             nExamCount++;
                             per = (nExamCount * 100) / nTotalCount;
                             SGFileExamEvent(per, hsStream.FileName);
@@ -926,7 +942,11 @@
                                     @*fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);*@
                                     childFile.eErrType = eFileAddErr.eFA_FILE_READ_ERROR;
                                     CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
-                                    hsStream.stream = null;
+                                    if (hsStream.stream != null)
+                                    {
+                                        hsStream.stream.Close();
+                                        hsStream.stream = null;
+                                    }
                                     nExamCount++;
                                     per = (nExamCount * 100) / nTotalCount;
                                     SGFileExamEvent(per, hsStream.FileName);
@@ -944,7 +964,11 @@
                                         return;
                                     }
                                     existErr = true;
-                                    hsStream.stream = null;
+                                    if (hsStream.stream != null)
+                                    {
+                                        hsStream.stream.Close();
+                                        hsStream.stream = null;
+                                    }
                                     nExamCount++;
                                     per = (nExamCount * 100) / nTotalCount;
                                     SGFileExamEvent(per, hsStream.FileName);
@@ -976,7 +1000,11 @@
                                     }
 
                                     existErr = true;
-                                    hsStream.stream = null;
+                                    if (hsStream.stream != null)
+                                    {
+                                        hsStream.stream.Close();
+                                        hsStream.stream = null;
+                                    }
                                     nExamCount++;
                                     per = (nExamCount * 100) / nTotalCount;
                                     SGFileExamEvent(per, hsStream.FileName);
@@ -1009,7 +1037,11 @@
                                     }
 
                                     existErr = true;
-                                    hsStream.stream = null;
+                                    if (hsStream.stream != null)
+                                    {
+                                        hsStream.stream.Close();
+                                        hsStream.stream = null;
+                                    }
                                     nExamCount++;
                                     per = (nExamCount * 100) / nTotalCount;
                                     SGFileExamEvent(per, hsStream.FileName);
