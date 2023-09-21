@@ -268,7 +268,7 @@
     ISGopConfigService siteConfig;
 
     // 목적지 Data
-        Dictionary<string, SGNetOverData> dicDestSysPos = null;
+    Dictionary<string, SGNetOverData> dicDestSysPos = null;
     public string strDestNetWork = "";
     public string _strDestNetWork
     {
@@ -330,8 +330,8 @@
     public string strTitleValue = "";
     public string strSystemName = "";
     public string curUserID = "";
-    @*public string curFromDay = "";
-        public string curToDay = "";*@
+    //　public string curFromDay = "";
+    //  public string curToDay = "";
     public string curTransKind = "";
     public string curTransStatus = "";
     public string curApprStatus = "";
@@ -483,8 +483,8 @@
         {
             string sTransSeq = tData.TransSeq;
             string sApprSeq = "";
-            int nDataForwarded = 0; // GetForwarded(tData.IsFile);
-            bool bTransCancel = false;  //!tData.bCheckDisable;
+            int nDataForwarded = 0; //GetForwarded(tData.IsFile);
+            bool bTransCancel = !tData.bCheckDisable;
             bool bApprove = false;
             bool bReject = false;
 
@@ -519,7 +519,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-            // 조회방식변경
+        // 조회방식변경
         @*HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchResult);           // 조회 데이터 결과.
             HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCount);           // 조회 데이터 수 결과.*@
 
