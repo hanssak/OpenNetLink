@@ -131,7 +131,7 @@
                                     // 다중접속일때에는 단일망에만 전달가능
                                     // 단일접속일때에는 3중망에 전달가능
                                     @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx != 0 &&
-                                   (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                                  (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                     {
 
                                         @if (bAddedClipBoardItem)
@@ -146,7 +146,7 @@
                                         <a style="cursor:pointer;" class="dropdown-item" @onclick="(e => ClipboardSend(Netitem.GroupID, itemData))">
                                             @*href="#" *@
                                             <!-- Message Start -->
-                <div class="media p-2">
+                                            <div class="media p-2">
                                                 <div class="media-body">
                                                     <h3 class="dropdown-item-title font-weight-bold mb-2">
                                                         <i class="fas fa-copy mr-2"></i>
@@ -158,21 +158,21 @@
                                                 </div>
                                             </div>
                                             <!-- Message End -->
-            </a>
+                                        </a>
 
                                         bAddedClipBoardItem = true;
                                     }
 
                                 }
 
-            // 클립보드 전체망으로 전송하는 기능
+                                // 클립보드 전체망으로 전송하는 기능
                                 @if (IsCanTransferClipBoardAllNet())
                                 {
                                     <div class="dropdown-divider"></div>
                                     <a style="cursor:pointer;" class="dropdown-item" @onclick="(e => ClipboardSendAllNet(Netitem.GroupID))">
                                         @*href="#" *@
                                         <!-- Message Start -->
-                <div class="media p-2">
+                                        <div class="media p-2">
                                             <div class="media-body">
                                                 <h3 class="dropdown-item-title font-weight-bold mb-2">
                                                     <i class="fas fa-copy mr-2"></i>
@@ -184,7 +184,7 @@
                                             </div>
                                         </div>
                                         <!-- Message End -->
-            </a>
+                                    </a>
                                 }
 
                             }
@@ -193,7 +193,7 @@
                                 // 목적망이 1곳일때
                                 <a style="cursor:pointer;" class="dropdown-item" @onclick="(e => ClipboardSend(Netitem.GroupID))">
                                     <!-- Message Start -->
-                <div class="media p-2">
+                                    <div class="media p-2">
                                         <div class="media-body">
                                             <h3 class="dropdown-item-title font-weight-bold mb-2">
                                                 <i class="fas fa-copy mr-2"></i>
@@ -205,7 +205,7 @@
                                         </div>
                                     </div>
                                     <!-- Message End -->
-            </a>
+                                </a>
 
                                 bAddedClipBoardItem = true;
                             }
@@ -257,10 +257,10 @@
                     {
                         <a class="dropdown-item">
                             <!-- Message Start -->
-                <div class="media p-2">
+                            <div class="media p-2">
                                 <!-- 아바타 이미지 사용안함 -->
                                 <!-- <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle"> -->
-                    <div class="media-body">
+                                <div class="media-body">
                                     <h3 class="dropdown-item-title font-weight-bold mb-2">
                                         <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))" style="cursor:pointer"><i class="fas fa-times fa-lg"></i></a></span>
                                         @NotiViewHead
@@ -271,16 +271,16 @@
                                 </div>
                             </div>
                             <!-- Message End -->
-            </a>
+                        </a>
                     }
                     else
                     {
                         <a @onclick="@(()=> MyNavigationManager.NavigateTo(NotiItem.Path))" class="nav-link dropdown-item">
                             <!-- Message Start -->
-                <div class="media p-2">
+                            <div class="media p-2">
                                 <!-- 아바타 이미지 사용안함 -->
                                 <!-- <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle"> -->
-                    <div class="media-body">
+                                <div class="media-body">
                                     <h3 class="dropdown-item-title font-weight-bold mb-2">
                                         <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))" style="cursor:pointer"><i class="fas fa-times fa-lg"></i></a></span>
                                         @NotiViewHead
@@ -291,7 +291,7 @@
                                 </div>
                             </div>
                             <!-- Message End -->
-            </a>
+                        </a>
                     }
                     <div class="dropdown-divider"></div>
                 }
@@ -361,7 +361,7 @@
 
                         <a class="dropdown-item">
                             <!-- Notification Start -->
-                <div class="media p-2">
+                            <div class="media p-2">
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title font-weight-bold mb-2">
                                         <span class="float-left"><i class="fas fa-bell"></i></span>&nbsp;
@@ -373,14 +373,14 @@
                                 </div>
                             </div>
                             <!-- Notification End -->
-            </a>
+                        </a>
 
                     }
                     else
                     {
                         <a @onclick="@(()=> MyNavigationManager.NavigateTo(AlarmItem.Path))" class="nav-link dropdown-item p-2">
                             <!-- Notification Start -->
-                <div class="media-body">
+                            <div class="media-body">
                                 <h3 class="dropdown-item-title font-weight-bold mb-2">
                                     <span class="float-left"><i class="fas fa-bell"></i></span>&nbsp;
                                     @AlarmViewHead
@@ -574,7 +574,7 @@
             pro.Start();
         *@
 
-    try
+        try
         {
             System.Diagnostics.Process.Start("xdotool", strParameter);
         }
@@ -1013,11 +1013,11 @@
             return;
 
         //잠금시간이 0이면 화면 잠금 사용하지 않음
-        if(screentime <= 0)
+        if (screentime <= 0)
             return;
 
         object[] param = { screentime };
-        
+
         //object[] param = { 1 };
         tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
 
@@ -1749,10 +1749,10 @@
         var activeTimes = m_nSvrTime.Where(svr => svr.Value > 0);
 
         if (activeTimes.Count() <= 0)   //모든 망에 대한 잠금시간이 0이면 0으로 설정
-            newScreenTime = 0;                
+            newScreenTime = 0;
         else                            //잠금을 사용하는 망이 하나라도 있으면 0 제외하고 최소값으로 적용
             newScreenTime = activeTimes.Min(svr => svr.Value);
-        
+
         if (newScreenTime == screentime)  //기존 값과 동일할 경우 Skip
             return;
 

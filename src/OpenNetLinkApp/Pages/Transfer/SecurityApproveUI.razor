@@ -68,7 +68,7 @@
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
                                             @foreach (string str in Common.CsFunction.GetOptionValue("TransKind"))
                                             {
-                                            <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransKindValue, str, ApproveSearchCount))">@str</button>
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransKindValue, str, ApproveSearchCount))">@str</button>
                                             }
                                         </div>
                                     </div>
@@ -83,7 +83,7 @@
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
                                             @foreach (string str in Common.CsFunction.GetOptionValue("ApproveStatus"))
                                             {
-                                            <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strApprStatusValue, str, ApproveSearchCount))">@str</button>
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strApprStatusValue, str, ApproveSearchCount))">@str</button>
                                             }
                                         </div>
                                     </div>
@@ -98,21 +98,21 @@
 
                                 @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                 {
-                                <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
-                                <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            @strDestNetWork
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
-                                            @foreach (string str in Common.CsFunction.GetOptionValue("DestNetwork", dicDestSysPos))
+                                    <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                @strDestNetWork
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
+                                                @foreach (string str in Common.CsFunction.GetOptionValue("DestNetwork", dicDestSysPos))
                                                 {
-                                            <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDestNetWork, str, ApproveSearchCount))">@str</button>
+                                                    <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDestNetWork, str, ApproveSearchCount))">@str</button>
                                                 }
+                                            </div>
                                         </div>
-                                    </div>
-                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>-->
-                                </td>
+                                        <!--<button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>-->
+                                    </td>
                                 }
                                 <th class="p-2" style="width:80px;"> @strReqApprover </th>             <!--승인요청자-->
                                 <td>
@@ -159,8 +159,8 @@
                                     <!-- <th style="text-align: center;width:8%">@strFileForward</th> -->                            <!--파일전달-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                     {
-                                    <th style="text-align:center; vertical-align:middle;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
- <!--목적지-->
+                                        <th style="text-align:center; vertical-align:middle;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                        <!--목적지-->
                                     }
                                     <th style="text-align:center; vertical-align:middle;width:15%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
                                     <th style="text-align:center; vertical-align:middle;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
@@ -171,24 +171,24 @@
                             <tbody>
                                 @foreach (approveData item in mData)
                                 {
-                                <tr>
-                                    <td style="text-align:center; vertical-align:middle">
-                                        <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                    </td>
-                                    <td style="text-align:center; vertical-align:middle">@item.ApvType</td>
-                                    <td style="text-align:center; vertical-align:middle">@item.TransferType</td>
-                                    <td style="text-align:center; vertical-align:middle">@item.RequesterName</td>
-                                    <td style="text-align:center; vertical-align:middle">@item.ApvStatus</td>
-                                    <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
-                                    @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                    <tr>
+                                        <td style="text-align:center; vertical-align:middle">
+                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        </td>
+                                        <td style="text-align:center; vertical-align:middle">@item.ApvType</td>
+                                        <td style="text-align:center; vertical-align:middle">@item.TransferType</td>
+                                        <td style="text-align:center; vertical-align:middle">@item.RequesterName</td>
+                                        <td style="text-align:center; vertical-align:middle">@item.ApvStatus</td>
+                                        <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
+                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                         {
-                                    <th style="text-align:center; vertical-align:middle;width:11%;">@item.strDestNet</th>
+                                            <th style="text-align:center; vertical-align:middle;width:11%;">@item.strDestNet</th>
                                         }
-                                    <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                    <td style="text-align: center; vertical-align:middle">@item.RequestTime</td>
-                                    <td style="text-align:center; vertical-align:middle">@item.ApvTime</td>
-                                    <td style="text-align:center; vertical-align:middle"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                </tr>
+                                        <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="text-align: center; vertical-align:middle">@item.RequestTime</td>
+                                        <td style="text-align:center; vertical-align:middle">@item.ApvTime</td>
+                                        <td style="text-align:center; vertical-align:middle"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -968,16 +968,16 @@
         string strValue = "";
         return strValue;            // 전체만 검색되게 강제
 
-    @*if (strApprKindValue.Equals(strTotal))                         // 전체
-            strValue = "";
-        else if (strApprKindValue.Equals(strPreAppr))                  // 선결
-            strValue = "0";
-        else if (strApprKindValue.Equals(strAfterAppr))                // 후결
-            strValue = "1";
-        else
-            strValue = "";
+        @*if (strApprKindValue.Equals(strTotal))                         // 전체
+                strValue = "";
+            else if (strApprKindValue.Equals(strPreAppr))                  // 선결
+                strValue = "0";
+            else if (strApprKindValue.Equals(strAfterAppr))                // 후결
+                strValue = "1";
+            else
+                strValue = "";
 
-        return strValue;*@
+            return strValue;*@
     }
 
 
@@ -1115,8 +1115,8 @@
 
             aData.ApvType = sgData.GetApprKind(dic);                       // 결재종류 (선결/후결)
 
-    @*if (aData.ApvType == XmlConf.GetTitle("T_COMMON_APPROVE_AFTER"))
-        aData.ApvType = "후선결";*@    // 후결인거 보기용도
+            @*if (aData.ApvType == XmlConf.GetTitle("T_COMMON_APPROVE_AFTER"))
+                aData.ApvType = "후선결";*@// 후결인거 보기용도
             aData.ApvType = XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE");    // 보안결재는 "선결"만 나오도록 처리
 
             aData.TransferType = sgData.GetTransKind(dic);                 // 전송구분 (반출/반입)
