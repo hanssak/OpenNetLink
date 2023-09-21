@@ -186,6 +186,7 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-md btn-red mr-0" disabled="@m_bTransCancel" @onclick="DetailTransCancel"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_COMMON_TRANSCANCLE")</button>
                 <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_FILE_FOLD")</button>
             </div>
         </div>
@@ -464,7 +465,7 @@
             }
         }
 
-        m_bTransCancel = (!sgDetailData.GetTransCancelEnable());
+        m_bTransCancel = !(sgDetailData.GetTransCancelEnable());
         StateHasChanged();
     }
 
@@ -682,4 +683,39 @@
             }
         }
     }
+
+    public void DetailTransCancel()
+    {
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+        string curTransSeq = sgDetailData.GetTransSeq();
+        string curAction = "2";
+        string curReason = "사유";
+
+        HSCmdCenter.SendTransCancel(groupID, curUserID, curTransSeq, curAction, curReason);
+
+        closePopUp();
+    }
+
 }
