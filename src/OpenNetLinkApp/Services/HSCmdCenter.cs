@@ -600,6 +600,9 @@ namespace OpenNetLinkApp.Services
                 case eCmdList.eAPPROVECOUNT:                                                // 승인대기 노티.
                     ApproveCountNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId, sgData);
                     break;
+                case eCmdList.ePRIVACYAPPROVENOTIFY:
+                    PrivacyApproveCountNotiAfterSend(nRet, eCmdList.ePRIVACYAPPROVENOTIFY, groupId, sgData);
+                    break;
                 case eCmdList.eVIRUSSCAN:                                                   // 바이러스 검출 노티.
                     VirusScanNotiAfterSend(nRet, eCmdList.eVIRUSSCAN, groupId, sgData);
                     break;
@@ -1532,6 +1535,20 @@ namespace OpenNetLinkApp.Services
                 e.strMsg = "";
                 e.count = Convert.ToInt32(data.GetBasicTagData("APPROVECOUNT"));
                 e.strDummy = data.GetBasicTagData("APPROVEUSERKIND");
+
+                sNotiEvent(groupId, cmd, e);
+            }
+        }
+        public void PrivacyApproveCountNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData data)
+        {
+            ServerNotiEvent sNotiEvent = sgPageEvent.GetServerNotiEvent();
+            if (sNotiEvent != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = "";
+                e.count = Convert.ToInt32(data.GetBasicTagData("PRIVACYAPPROVECOUNT"));
+                e.strDummy = "1";
 
                 sNotiEvent(groupId, cmd, e);
             }

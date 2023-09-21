@@ -3034,6 +3034,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 // CLick시에 승인대기 중인 항목들만 기간상관없이 조회되도록 적용
                 if (e.strDummy == "0")
                     naviURI += "/2";    // 결재 - 승인대기 전체조회
+                else if (e.strDummy == "1")
+                    naviURI += "/1";
                 else if (e.strDummy == "3")
                     naviURI += "/1";    // 클립보드 결재 - 승인대기 전체조회
                 else if (e.strDummy == "4")
@@ -3181,6 +3183,10 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 os_noti = OS_NOTI.NOTICE;
                 break;
 
+            case eCmdList.ePRIVACYAPPROVENOTIFY:
+                os_noti = OS_NOTI.WAIT_APPR;
+                break;
+
             default:
                 break;
         }
@@ -3228,7 +3234,16 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     }
                     break;
                 }
-
+            case eCmdList.ePRIVACYAPPROVENOTIFY:
+                {
+                    PageEventArgs pEventArgs = (PageEventArgs)e;
+                    if (pEventArgs != null)
+                    {
+                        strMsg = XmlConf.GetInfoMsg("I_0223");                      // 새로운 보안결재승인 요청자료가 {0}건 존재합니다.
+                        strMsg = String.Format(strMsg, pEventArgs.count);
+                    }
+                }
+                break;
             case eCmdList.eEMAILAPPROVENOTIFY:
                 {
                     // 정확하게 숫자 알려줄 수 있도록 Server 수정후에 사용
