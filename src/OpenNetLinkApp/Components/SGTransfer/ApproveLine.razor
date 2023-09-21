@@ -72,8 +72,24 @@ else
             groupID = sgSideBar.GroupId;
         if (pageService.GetInitApprLine(groupID) == false)
         {
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+            {
+                ApproveLineChange();
+                base.OnInitialized();
+                return;
+            }
+
+            if (!sgLoginData.GetApprove())
+            {
+                InitApproveLine();
+                pageService.SetInitApprLine(groupID, true);
+                base.OnInitialized();
+            }
+            int nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY");
+
             bool bLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID);  // siteConfig   json으로 설정이동
-            if (bLocalSave)
+            if (bLocalSave && nApproveProxy > 1)
             {
                 bool bApprLineExist = false;
                 SGSettingData sgSettingData = null;
@@ -96,7 +112,6 @@ else
 
                     string strUserSeq = sgUserData.GetUserSequence();
 
-                    SGLoginData sgLoginData= (SGLoginData)HSCmdCenter.GetLoginData(groupID);
                     int approveStep = (sgLoginData != null) ? sgLoginData.GetApproveStep() : 0;
 
                     SGApprLineData sgApprLineData = null;
@@ -207,7 +222,7 @@ else
                 //중복체크 - ApproveLine에 다른 Order에라도 동일 seq가 중복해서 들어오는 것을 막는다. (ex. SFM1)
                 if (approverList.Exists(apr => apr.Seq == listApprLineSeq[i]))
                     continue;
-                
+
                 //중복체크 필요... ApproveLine에 같은 Order일 경우 중복해서 들어오는것을 막는다..
                 if (checkUserSeqByOrder.ContainsKey(order))
                 {
@@ -319,8 +334,8 @@ else
             else
                 strApprLineOrder = item.Index;
 
-             //중복체크 - ApproveLine에 동일 seq가 중복해서 들어오는 것을 막는다. (ex. SFM1) 
-             if (approverList.Exists(apr => apr.Seq == strApprLineSeq)) 
+            //중복체크 - ApproveLine에 동일 seq가 중복해서 들어오는 것을 막는다. (ex. SFM1) 
+            if (approverList.Exists(apr => apr.Seq == strApprLineSeq))
                 continue;
 
             approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder));

@@ -806,8 +806,13 @@
 
         HSCmdCenter.SetApprLineList(groupID, ApproverSelect);
 
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        int nApproveProxy = 0;
+        if (sgLoginData != null)
+            nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY");
+
         bool bApprLineLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID); // siteConfig. json으로 이동
-        if (bApprLineLocalSave)
+        if (bApprLineLocalSave && nApproveProxy > 1)
         {
             SGSettingData sgSettingData = null;
             sgSettingData = sgSettingProc.SelectSettingData(groupID);
@@ -829,7 +834,6 @@
 
             string strUserSeq = sgUserData.GetUserSequence();
             int step = 0;
-            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
             if (sgLoginData != null)
                 step = sgLoginData.GetApproveStep();
 
