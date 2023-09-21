@@ -1733,7 +1733,7 @@
 		</T_FILE_TITLE>
 
 		<T_FILE_EMPTYTITLE>
-			<KR>제목을 입력하십시오. (최대 한글 80자, 영문 250자).</KR>
+			<KR>제목을 입력하십시오. (최대 한글 42자, 영문 128자).</KR>
 			<JP>タイトルを入力して下さい。 最大ハングル60字まで入力することができます。</JP>
 			<EN>Please enter a title. You can enter up to 60 characters.</EN>
 			<CN>请输入标题。最多可输入60字。</CN>
@@ -1747,7 +1747,7 @@
 		</T_FILE_DESC>
 
 		<T_FILE_EMPTYDESC>
-			<KR>설명을 입력하십시오. (최대 한글 80자, 영문 250자)</KR>
+			<KR>설명을 입력하십시오. (최대 한글 83자, 영문 250자)</KR>
 			<JP>説明を入力して下さい。 最大80字まで入力することができます。</JP>
 			<EN>Please enter a description. You can enter up to 80 characters.</EN>
 			<CN>请输入说明。最多可输入80字。</CN>
@@ -3605,6 +3605,13 @@
 			<EN>Consecutive characters can be entered only up to {0} digits.</EN>
 			<CN></CN>
 		</T_ETC_PASSWORD_SAMECHAR_MSG>
+
+    <T_ETC_PASSWORD_PROHIBIT_MSG>
+      <KR>비밀번호에 금지된 문자열이 포함되어 있습니다. ({0})</KR>
+      <JP></JP>
+      <EN>Your password contains a prohibited string. ({0})</EN>
+      <CN></CN>
+    </T_ETC_PASSWORD_PROHIBIT_MSG>
 
 		<T_ETC_PASSWORD_KEYBOARD_LINEAR_MSG>
 			<KR>키보드상의 연속된 문자는 {0}개 이상 사용할 수 없습니다.</KR>
@@ -7414,7 +7421,7 @@
 		</W_0019>
 
 		<W_0020>
-			<KR>제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다.</KR>
+			<KR>제목은 최대 한글 42자, 영문 128자 / 설명은 최대 한글 83자, 영문 250자까지 입력할 수 있습니다.</KR>
 			<JP>タイトルおよび説明は最大ハングル80字、英語250字まで入力できます。</JP>
 			<EN>Hangul titles and descriptions up to 80 characters , you can enter up to 250 characters in English.</EN>
 			<CN>标题和说明最多可输入80字，英文250个字母。</CN>
@@ -9283,28 +9290,28 @@
 			<EN>A character that cannot be used has been entered.<![CDATA[<br>]]>Please input again.</EN>
 			<CN></CN>
 		</W_0295>
-		
+
 		<W_0296>
 			<KR>업데이트를 실패하였습니다.<![CDATA[<br>]]>업데이트를 다시 시도해주세요.<![CDATA[<br>]]>업데이트 시간:{0}</KR>
 			<JP></JP>
 			<EN>Update failed.<![CDATA[<br>]]>Please try updating again.<![CDATA[<br>]]>Update Time:{0}</EN>
 			<CN></CN>
 		</W_0296>
-		
+
 		<W_0297>
 			<KR>현재 Client({0})의 업데이트 설치가 성공 되었습니다. (업데이트 시간:{1})</KR>
 			<JP></JP>
 			<EN>Update installation of the current Client({0}) has been successful.(Update Time : {1})</EN>
 			<CN></CN>
 		</W_0297>
-		
+
 		<W_0298>
 			<KR>현재 Client({0})의 업데이트 설치가 실패 되었습니다. (업데이트 시간:{1})</KR>
 			<JP></JP>
 			<EN>Update installation of the current Client({0}) has failed.(Update Time : {1})</EN>
 			<CN></CN>
 		</W_0298>
-		
+
 		<W_0299>
 			<KR>사용자 계정이 일시적으로 잠겼습니다./r/n{0}분후 다시 시도하여 주십시요.</KR>
 			<JP></JP>
@@ -9318,8 +9325,6 @@
 			<EN>Data transmission is not available at this time.</EN>
 			<CN></CN>
 		</W_0300>
-
-
 	</WARNING>
 
 
@@ -11138,43 +11143,43 @@
 			<EN>Failed to receive certificate.</EN>
 			<CN></CN>
 		</E_0261>
-    <E_0262>
-      <KR>파일 전송을 위해 등록된 파일이 변경되었습니다.</KR>
-      <JP></JP>
-      <EN>Files registered for file transfer have changed.</EN>
-      <CN></CN>
-    </E_0262>
-    <E_0263>
-      <KR>파일 전송을 위해 등록된 파일을 여는데 에러가 발생했습니다.</KR>
-      <JP></JP>
-      <EN>An error occurred while opening the files registered for file transfer.</EN>
-      <CN></CN>
-    </E_0263>
-    <E_0264>
-      <KR>이미지 클립보드는 전송할 수 없습니다.</KR>
-      <JP></JP>
-      <EN>You can't transfer Image clipboard.</EN>
-      <CN></CN>
-    </E_0264>
-    <E_0265>
-      <KR>TEXT 클립보드는 전송할 수 없습니다.</KR>
-      <JP></JP>
-      <EN>You can't transfer Text clipboard.</EN>
-      <CN></CN>
-    </E_0265>
-    <E_0266>
-      <KR>환경정보 파일에 문제가 발생 했습니다. 다시 설치하세요.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </E_0266>
-    <E_0267>
-      <KR>Url 파일은 드래그앤드랍으로 파일을 올릴 수 없습니다.<![CDATA[<br>]]>우클릭 파일 전송을 이용해 주세요.</KR>
-      <JP></JP>
-      <EN>URL files cannot be uploaded by dragging and dropping.<![CDATA[<br>]]>Please use right-click file transfer.</EN>
-      <CN></CN>
-    </E_0267>
-    
+		<E_0262>
+			<KR>파일 전송을 위해 등록된 파일이 변경되었습니다.</KR>
+			<JP></JP>
+			<EN>Files registered for file transfer have changed.</EN>
+			<CN></CN>
+		</E_0262>
+		<E_0263>
+			<KR>파일 전송을 위해 등록된 파일을 여는데 에러가 발생했습니다.</KR>
+			<JP></JP>
+			<EN>An error occurred while opening the files registered for file transfer.</EN>
+			<CN></CN>
+		</E_0263>
+		<E_0264>
+			<KR>이미지 클립보드는 전송할 수 없습니다.</KR>
+			<JP></JP>
+			<EN>You can't transfer Image clipboard.</EN>
+			<CN></CN>
+		</E_0264>
+		<E_0265>
+			<KR>TEXT 클립보드는 전송할 수 없습니다.</KR>
+			<JP></JP>
+			<EN>You can't transfer Text clipboard.</EN>
+			<CN></CN>
+		</E_0265>
+		<E_0266>
+			<KR>환경정보 파일에 문제가 발생 했습니다. 다시 설치하세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</E_0266>
+		<E_0267>
+			<KR>Url 파일은 드래그앤드랍으로 파일을 올릴 수 없습니다.<![CDATA[<br>]]>우클릭 파일 전송을 이용해 주세요.</KR>
+			<JP></JP>
+			<EN>URL files cannot be uploaded by dragging and dropping.<![CDATA[<br>]]>Please use right-click file transfer.</EN>
+			<CN></CN>
+		</E_0267>
+
 	</ERROR>
 	<!-- ********************************************* [END] MSG ERROR (E_0000) ********************************************* -->
 </TEXT>
