@@ -664,13 +664,13 @@ Section Uninstall
 	${If} ${REG_CRX} == 'TRUE'
 
 	  ; CRX강제등록 제거
-	  DeleteRegKey HKLM "SOFTWARE\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
-	  ;DeleteRegKey HKLM "SOFTWARE\WOW6432Node\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
-	  ;DeleteRegKey HKCU "SOFTWARE\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"  
+	  DeleteRegKey HKLM "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei"
+	  ;DeleteRegKey HKLM "SOFTWARE\WOW6432Node\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei"
+	  DeleteRegKey HKCU "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei"  
 
 	  DeleteRegKey HKLM "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
 	  ;DeleteRegKey HKLM "SOFTWARE\WOW6432Node\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
-	  ;DeleteRegKey HKCU "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
+	  DeleteRegKey HKCU "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
 
 	${EndIf}  
   
