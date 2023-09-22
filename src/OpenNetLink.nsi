@@ -593,14 +593,14 @@ Section -Post
 	  ${If} ${NETWORK_FLAG} == "IN"
 	  
 		  ; edge
-		  WriteRegStr HKLM "SOFTWARE\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		  WriteRegStr HKLM "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
 		  ;WriteRegStr HKLM "SOFTWARE\WOW6432Node\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
-		  ;WriteRegStr HKCU "Software\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		  WriteRegStr HKCU "Software\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
 		  
 		  ; chrome
 		  WriteRegStr HKLM "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"
 		  ;WriteRegStr HKLM "SOFTWARE\WOW6432Node\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"
-		  ;WriteRegStr HKCU "Software\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"	  
+		  WriteRegStr HKCU "Software\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"	  
 		  
 	  ${EndIf}  
 
