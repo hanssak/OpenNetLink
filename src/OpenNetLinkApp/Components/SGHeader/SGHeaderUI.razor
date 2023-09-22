@@ -1897,6 +1897,8 @@ protected override void OnInitialized()
         //UserinfoCheck에서 받은 정보를 LoginData에 갱신
         foreach (string str in listSetTagName)
         {
+            if(str == "AFTERAPPROVE")
+                CLog.Here().Information($"ResultUserInfoCheck - 사후결재 정책 업데이트 확인 ## - {str} : {sgData.GetSvrRecordTagData(str)}");
             string strValEnc = strValEnc = SGCrypto.AESEncrypt256(sgData.GetSvrRecordTagData(str), hsNetWork.GetBase64Seedkey()).ByteToBase64String().Base64EncodingStr();
             sgLoginData.SetTagData(str, strValEnc);
         }
@@ -2041,6 +2043,7 @@ public void OLEMimeRecvEvent(int groupId, SGData e)
 }
 public void AfterApproveStatusChange()
 {
+    CLog.Here().Information($"AfterApproveStatusChange - 정책 변경 감지 ##");
     int groupID = nGroupID;
 
         SGLoginData sgLoginData = null;
@@ -2055,13 +2058,17 @@ public void AfterApproveStatusChange()
             DateTime dt = pageService.GetAfterApprTime(groupID);
             pageService.SetSvrTime(groupID, dt, sgLoginData);
         *@
-        bool bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
+    bool bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
+    
+        CLog.Here().Information($"AfterApproveStatusChange - bAfterApprChkHIde 최신 Value: {bAfterApprChkHIde}");
         if (!dicCurrentAfterChkHide.ContainsKey(groupID))
-        {
+        {            
             dicCurrentAfterChkHide.Add(groupID, bAfterApprChkHIde);
+            CLog.Here().Information($"AfterApproveStatusChange - 변경 사항 있음 : {bAfterApprChkHIde}");
         }
         else if (dicCurrentAfterChkHide[groupID] == bAfterApprChkHIde)
         {
+            CLog.Here().Information($"AfterApproveStatusChange - 변경 사항 없음 : {bAfterApprChkHIde}");
             return;
         }
 
@@ -2069,6 +2076,8 @@ public void AfterApproveStatusChange()
         CtrlSideEvent ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
         if (ctrlSideEvent != null)
             ctrlSideEvent();
+
+        CLog.Here().Information("AfterApproveStatusChange - Change : 메세지 발생");
 
         //파일 송수신 중 사후결재 여부가 변경되었다면 메세지 표시
         if (pageService.GetFileSending() || pageService.GetFileRecving())
