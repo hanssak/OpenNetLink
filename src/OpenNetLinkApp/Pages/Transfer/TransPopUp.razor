@@ -758,6 +758,9 @@
         CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (expireDate : {expireDate.ToString()}, nowDate : {nowDate})");
         m_downMaxCurr = $"{XmlConf.GetTitle("T_ETC_DOWNLOADCOUNT")} : {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
         //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
+        if (sgLoginData.GetMaxDownCount() == 0)
+            m_bNetDownloadable = false;
+
         if (m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
         {
             if (m_downloadCount < sgLoginData.GetMaxDownCount())
