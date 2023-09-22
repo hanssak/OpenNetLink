@@ -1168,7 +1168,8 @@ Task("MakeInstaller")
 			Information("Package Redhat: Exit code: {0}", process.GetExitCode());
 		}
 	}
-	else if(AppProps.Platform == "mac")
+	// else if( AppProps.Platform == "mac" && (networkFlag == "IN"))
+	else if( AppProps.Platform == "mac" )
 	{
 		using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings
 													{ Arguments = new ProcessArgumentBuilder()
@@ -1177,7 +1178,8 @@ Task("MakeInstaller")
 													.Append(networkFlag.ToUpper()) 
 													.Append(customName.ToUpper())
 													.Append(PackageDirPath)	//$5 Output
-													.Append(storageName.ToUpper())//$6	
+													.Append(storageName.ToUpper())//$6
+													.Append(regCrxForce.ToString().ToUpper())//$7														
 													})
 		)
 		{

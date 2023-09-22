@@ -2,6 +2,11 @@
 
 #WHOAREYOU=`env | grep SUDO_USER | awk -F= '{print $2}'`
 #echo $WHOAREYOU > /tmp/whoareyou-OpenNetLinkApp.log
+
+
+REG_CRX=true
+NAME_CRX="gbbehmiepgfmmnifjbnknjaebgmnpbam.json"
+
 WHOAREYOU=`last | head -1 | awk -F' ' '{ print $1 }'`
 mkdir /Applications/OpenNetLinkApp.app/Contents/MacOS/wapprove
 
@@ -53,6 +58,56 @@ else
         tar xvf SGFinderSync_IN.appex.tgz
     fi  
 fi
+
+# json 파일복사로 Crx 파일 자동설치
+testVal=-1 # 1 : 동작, -1 : 미동작
+if [ $testVal -gt 0 ] && [[ "${NETPOS}" == *"IN"* ]]; then
+
+    #mkdir "$HOME/Library/Application Support/Google/Chrome/REG_CRX_TRUE_IN"
+    #chown -R $WHOAREYOU "$HOME/Library/Application Support/Google/Chrome/REG_CRX_TRUE_IN"
+    #chown -R :staff "$HOME/Library/Application Support/Google/Chrome/REG_CRX_TRUE_IN"
+    #chmod -R g+w "$HOME/Library/Application Support/Google/Chrome/REG_CRX_TRUE_IN"
+
+    if [ ! -d "$HOME/Library/Application Support/Google" ]; then
+        mkdir "$HOME/Library/Application Support/Google"
+        chown -R $WHOAREYOU "$HOME/Library/Application Support/Google"
+        chown -R :staff "$HOME/Library/Application Support/Google"
+        chmod -R g+w "$HOME/Library/Application Support/Google"
+    fi
+
+    if [ ! -d "$HOME/Library/Application Support/Google/Chrome" ]; then
+        mkdir "$HOME/Library/Application Support/Google/Chrome"
+        chown -R $WHOAREYOU "$HOME/Library/Application Support/Google/Chrome"
+        chown -R :staff "$HOME/Library/Application Support/Google/Chrome"
+        chmod -R g+w "$HOME/Library/Application Support/Google/Chrome"
+    fi
+
+    if [ ! -d "$HOME/Library/Application Support/Google/Chrome" ]; then
+        mkdir "$HOME/Library/Application Support/Google/Chrome"
+        chown -R $WHOAREYOU "$HOME/Library/Application Support/Google/Chrome"
+        chown -R :staff "$HOME/Library/Application Support/Google/Chrome"
+        chmod -R g+w "$HOME/Library/Application Support/Google/Chrome"
+    fi
+
+    mkdir "$HOME/Library/Application Support/Google/Chrome/External Extensions"
+    chown -R $WHOAREYOU "$HOME/Library/Application Support/Google/Chrome/External Extensions"
+    chown -R :staff "$HOME/Library/Application Support/Google/Chrome/External Extensions"
+    chmod -R g+w "$HOME/Library/Application Support/Google/Chrome/External Extensions"
+
+    #if [ ! -d "$HOME/Library/Application Support/Google/Chrome/External Extensions" ]; then
+    #    mkdir "$HOME/Library/Application Support/Google/Chrome/External Extensions"
+    #fi
+
+    if [ ! -e "$HOME/Library/Application Support/Google/Chrome/External Extensions/$NAME_CRX" ]; then
+        cp -f /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/bin_addon/chrome/$NAME_CRX "$HOME/Library/Application Support/Google/Chrome/External Extensions/$NAME_CRX"
+        chown -R $WHOAREYOU "$HOME/Library/Application Support/Google/Chrome/External Extensions/$NAME_CRX"
+        chown -R :staff "$HOME/Library/Application Support/Google/Chrome/External Extensions/$NAME_CRX"
+        chmod -R g+w "$HOME/Library/Application Support/Google/Chrome/External Extensions/$NAME_CRX"
+    fi
+fi
+
+
+
 
 #설치종료시 프로그램 바로 실행
 open -a /Applications/OpenNetLinkApp.app

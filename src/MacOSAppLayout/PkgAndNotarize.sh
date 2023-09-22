@@ -260,10 +260,14 @@ filepreinstall="$SCRIPT_PATH/preinstall"
 
 
 if [[ $regcrxforce == "FALSE" ]]; then 
+    # echo "Check regcrxforce : FALSE"
     sed -i '' -e 's/REG_CRX=true/REG_CRX=false/g' $filepostinstall
 else
+    # echo "Check regcrxforce : TRUE"
     sed -i '' -e 's/REG_CRX=false/REG_CRX=true/g' $filepostinstall
 fi
+
+#read -n 1 -s -r -p "계속하려면 아무 키나 누르세요.(KKW)"   # package 생성 error
 
 if [[ $ispatch == "TRUE" ]]; then 
     #for patch
