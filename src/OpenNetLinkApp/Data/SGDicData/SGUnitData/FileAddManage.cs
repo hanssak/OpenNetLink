@@ -4402,7 +4402,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strTempZipPath;
             string strExtractTempZipPath;
             string strOrgZipFileRelativePath;
-            string strOverMaxDepthInnerZipFile;
+            //string strOverMaxDepthInnerZipFile;
             string strZipFile;
 
             ////빈파일 체크 (0kb 허용)
@@ -4819,6 +4819,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             catch (Exception ex)
             {
+                Log.Logger.Here().Error($"unzipFile, Exception - MSG : {ex.Message}");
                 throw;
             }
         }
