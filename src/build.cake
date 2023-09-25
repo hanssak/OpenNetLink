@@ -476,6 +476,10 @@ Task("PkgWin10")
 	// window 쪽에 필요없는 파일들 배포전에 제거
 	DeleteFiles("./artifacts/windows/published/*.so");
 	DeleteFiles("./artifacts/windows/published/*.pdb");
+	if(DirectoryExists("./artifacts/windows/published/wwwroot/SiteProfile")) 
+	{
+		DeleteDirectory("./artifacts/windows/published/wwwroot/SiteProfile", new DeleteDirectorySettings { Force = true, Recursive = true });
+	}
 
 	//Light Patch 버전일 땐, edge 폴더 배포전에 제거
 	if(isPatch.ToString().ToUpper().Equals("TRUE"))
@@ -488,7 +492,6 @@ Task("PkgWin10")
 			}
 		}
 	}
-	Information("5");
 	
 	var files = GetFiles("./artifacts/windows/published/*.so.*");
 	foreach(var file in files)
@@ -549,6 +552,10 @@ Task("PkgOSX")
     .IsDependentOn("PubOSX")
     .Does(() => {
 
+	if(DirectoryExists($"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/SiteProfile")) 
+	{
+		DeleteDirectory($"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/SiteProfile", new DeleteDirectorySettings { Force = true, Recursive = true });
+	}
 	if(DirectoryExists(PackageDirPath)) {
 		DeleteDirectory(PackageDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
 	}

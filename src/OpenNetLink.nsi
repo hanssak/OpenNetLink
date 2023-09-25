@@ -372,7 +372,7 @@ Function .onInit
   
 FunctionEnd
 
-Function .onInstSuccess
+Function .onInstSuccess  
   ${If} ${IS_PATCH} == 'TRUE'
 	 ; 하위 exist 작업을 위해, 패치본의 json/db는 삭제
 	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json"			
@@ -405,7 +405,7 @@ Function .onInstSuccess
 	endloop:
 	  
   ${endif}
-
+  RMDir /r "C:\HANSSAK\OpenNetLink\wwwroot\SiteProfile"			
   ;;IfSilent 0 +2
   Exec '"$INSTDIR\OpenNetLinkApp.exe"'
   
