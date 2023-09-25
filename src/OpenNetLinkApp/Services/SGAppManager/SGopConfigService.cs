@@ -200,6 +200,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetAllowDRM(int groupId);
 
         public bool GetHiddenLoginLogo(int groupId);
+        public bool GetUseLoginCI(int groupId);
     }
 
 
@@ -979,7 +980,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetHiddenLoginLogo(int groupId)
         {
             return AppConfigInfo[groupId].bHiddenLoginLogo;
-        }        
-
+        }
+        
+        public bool GetUseLoginCI(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseLoginCI;
+        }
     }
 }

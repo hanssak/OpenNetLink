@@ -64,9 +64,17 @@
                     }
 
                     <div id="loginCard" class="col-md-6 login-card-body" style="height:413px; border-radius:0rem .7rem .7rem 0rem !important;">
-
+                        
                         <div style=" width:310px;">
-                            <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.4rem;">@strSystemName <span class="full_txt">@strConNetwork </span></p>
+                            @if(bUseLoginCI)
+                            {
+                                <img src="/images/ci/sitelogo.png" style="width:60px; height:60px; margin-right:auto; margin-left:auto; display:block">    
+                            }
+                            
+                            <p class="login-box-msg1" style="padding-top:@(bUseLoginCI ? 20 : 50)px;color:#fff; font-size:1.4rem;">
+                            @*<img src="/images/ci/sitelogo.png" style="width:50px; height:50px; margin-right:auto; margin-left:auto; display:block">*@
+                            @strSystemName <span class="full_txt">@strConNetwork </span>
+                            </p>
 
                             <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@id" @oninput="@(e => id = e.Value.ToString())" tabindex="1" autocomplete="off">
 
@@ -193,6 +201,7 @@
     string strOtpUrlCode = "";
 
     bool bHiddenLogoMode = false;
+    bool bUseLoginCI = false;
 
     private void GoogleOtpCancel()
     {
@@ -926,6 +935,7 @@
         InitText();
 
         bHiddenLogoMode = SGAppMgrSvc.OpConfigInfoService.GetHiddenLoginLogo(0);
+        bUseLoginCI = SGAppMgrSvc.OpConfigInfoService.GetUseLoginCI(0);
 
         if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
         {

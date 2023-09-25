@@ -27,6 +27,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseOneByOneLogOut { get; set; } = false;         // 1번에 다중망 로그인 기능 사용때에도 로그아웃은 선택한 망에서 개별 로그아웃적영
         public bool bUseOver1Auth { get; set; } = false;                        // 1단계 이상 인증 사용
         public bool bVisibleLogOutButton { get; set; } = true;              //상단의 [로그아웃] 버튼 표시 여부
+        public bool bUseLoginCI { get; set; } = false;                      //로그인 화면 상단에 CI 이미지 표시 여부
 
         //패스워드
         public bool bUserPWChange { get; set; } = false;                   // 사용자 패스워드 변경 사용 여부.

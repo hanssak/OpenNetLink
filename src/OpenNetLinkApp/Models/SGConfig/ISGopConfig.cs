@@ -25,6 +25,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseOneByOneLogOut { get; set; }         // 1번에 다중망 로그인 기능 사용때에도 로그아웃은 선택한 망에서 개별 로그아웃적영
         public bool bUseOver1Auth { get; set; }                        // 1단계 이상 인증 사용
         public bool bVisibleLogOutButton { get; set; }                //상단의 [로그아웃] 버튼 표시 여부
+        public bool bUseLoginCI { get; set; }                      //로그인 화면 상단에 CI 이미지 표시 여부
 
         //패스워드
         public bool bUserPWChange { get; set; }                   // 사용자 패스워드 변경 사용 여부.
@@ -175,6 +176,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public string strOKTAUrl { get; set; }                             //OKTA 연동 URL
         public bool bPkiSendByFileTrans { get; set; }                 // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
+
 
     }
 }
