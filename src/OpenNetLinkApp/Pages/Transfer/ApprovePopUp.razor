@@ -359,14 +359,15 @@
         if (sgLoginData == null)
             return;
 
+        //SP1 버전은 뷰어 통일
         string strIP = sgDetailData.GetFilePreviewIP();
         string param = makeParamOfServerViewer();
 
-        //SP1 버전은 뷰어 통일
+        
         string webLinkParam = makeParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());    
         webLinkParam = webLinkParam.Replace("+", "%2B").Replace("/","%2F");
         
-        string strArguments = $"https://{strIP}:1300/weblink/AP001_Docs_Viewer_Enc.do?" + webLinkParam;
+        string strArguments = $"https://{strIP}:1300/weblink/AP001_Docs_Viewer_Enc.do?params=" + param;
         
 #if _WINDOWS
     
