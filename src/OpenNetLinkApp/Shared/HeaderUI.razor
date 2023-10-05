@@ -3247,9 +3247,9 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             case eCmdList.eEMAILAPPROVENOTIFY:
                 {
                     // 정확하게 숫자 알려줄 수 있도록 Server 수정후에 사용
-                    @*strMsg = XmlConf.GetInfoMsg("I_0098");                      // 새로운 메일승인 요청자료가 {0}건 존재합니다.
-                        PageEventArgs pEventArgs = (PageEventArgs)e;
-                        strMsg = String.Format(strMsg, pEventArgs.count);*@
+                    //strMsg = XmlConf.GetInfoMsg("I_0098");                      // 새로운 메일승인 요청자료가 {0}건 존재합니다.
+                    //    PageEventArgs pEventArgs = (PageEventArgs)e;
+                    //    strMsg = String.Format(strMsg, pEventArgs.count);*@
                     strMsg = XmlConf.GetInfoMsg("I_0241");                      // 새로운 메일승인 요청자료가 존재합니다.
                     PageEventArgs pageArgs = (PageEventArgs)e;
                     if (pageArgs.strDummy == "5")
@@ -3354,13 +3354,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
         HsCmdCenter.sgDicRecvData.SetLoginDataEmpty(groupID);
 
-        // sessionCheck 동작하게 적용
-        HsNetWork hsNetWork = null;
-        hsNetWork = HsCmdCenter.GetConnectNetWork(groupID);
-        if (hsNetWork != null)
-        {
-            hsNetWork.SetLoginSessionCheckDo();
-        }
+        HsCmdCenter.SetAllowSessionDuplicate(groupID, (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupID) == 1));
 
         // 추가된 파일리스트 제거하는 동작
         LogOutFileListClearEvent LogOutFileListClearEvent = null;
@@ -3380,13 +3374,26 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         if (ctrlSideEvent != null)
             ctrlSideEvent();
 
+        // Reconnect, 메뉴 재생성동작하게 
+        pageService.SetStatusSideMenuReBuildTime(groupID, true);
+
+        // sessionCheck 동작하게 적용
+        HsNetWork hsNetWork = null;
+        hsNetWork = HsCmdCenter.GetConnectNetWork(groupID);
+        if (hsNetWork != null)
+        {
+            hsNetWork.SetLoginSessionCheckDo();
+            hsNetWork.SetReconnectStop();
+        }
+
         // Page 이동
         int i = 0;
         ISGSideBarUI activeMenu = null;
         for (; i < count; i++)
         {
 
-            if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
+            //if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
+            if (pageService.GetStatusSideMenuReBuildTime(listNetWork[i].GroupID) == false)
             {
 
                 KeyboardEventArgs eventArgs = new KeyboardEventArgs();

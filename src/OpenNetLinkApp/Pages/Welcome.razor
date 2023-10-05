@@ -1499,6 +1499,12 @@
             curToDay = curToDay + "235959";
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+        { 
+            CLog.Here().Information($"ApproveSearchData, sgLoginData is null");
+            return;
+        }
+
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 

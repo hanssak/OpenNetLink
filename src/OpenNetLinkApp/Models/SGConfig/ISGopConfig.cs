@@ -177,6 +177,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public string strOKTAUrl { get; set; }                             //OKTA 연동 URL
         public bool bPkiSendByFileTrans { get; set; }                 // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
 
-
+        public int nSessionDuplicate { get; set; }              // 로그인때, 세션중복시 동작값
     }
 }

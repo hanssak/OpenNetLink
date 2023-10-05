@@ -28,7 +28,8 @@
             {
                 /* Processing each Menu */
                 @if (MenuItem.Actived) SideBarUISvc.ActiveMenu = MenuItem;
-                @if (MenuItem.Child?.Count > 0)
+                @*@if (MenuItem.Child?.Count > 0)*@
+                @if ( (MenuItem.Child?.Count ?? 0) > 0 )
                 {
                     /* Exist SubMenu */
                     // s./ 업무망-인터넷망
@@ -282,10 +283,20 @@
 
     bool bFileTransUse = false;
 
-    private void ChangeSideBarUInNavigate()
+
+    /// <summary>
+    /// SideBar에 Menu추가 및 화면이동
+    /// </summary>
+    private void ChangeSideBarUInNavigate(int nGroupID)
     {
-        AddMenuAfterLogin(activeMenuPopup);
-        SideBarUISvc.ChgActiveMenu(eventArgsPopup, activeMenuPopup);
+
+        // 일반Login / Reconnect 고려
+        if (pageService.GetStatusSideMenuReBuildTime(nGroupID))
+        {
+            AddMenuAfterLogin(activeMenuPopup);
+            pageService.SetStatusSideMenuReBuildTime(nGroupID, false);
+            SideBarUISvc.ChgActiveMenu(eventArgsPopup, activeMenuPopup);
+        }
 
         //string strNavigatePathWithGroupID = "";
 
@@ -299,14 +310,14 @@
         string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
         if (strNavigateUrl.IndexOf("transfer") > 0)
         {
-            strNavigateUrl = pageService.GetFileTransPage(activeMenuPopup.GroupId);
+            strNavigateUrl = pageService.GetFileTransPage(nGroupID);
             if (strNavigateUrl != null && strNavigateUrl.Length > 0)
                 strNavigatePathWithGroupID = strNavigateUrl;
             else
                 strNavigatePathWithGroupID = "/Transfer/";
         }
         SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(activeMenuPopup.GroupId);
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
         {
             if(sgLoginData != null)
             {
@@ -316,81 +327,116 @@
             }
         }
 
-        strNavigatePathWithGroupID += activeMenuPopup.GroupId.ToString();
+        strNavigatePathWithGroupID += nGroupID.ToString();
         MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
     }
 
 
-    /**
-    *@param nLoginUITypeData IDPW Login Popup의 eLoginUITypeData 값
-    *@brief IDPW Popup 로그인후 callback 호출해주는 함수
-    */
-    public async void LoginIDPWAfterMenuAdd(int nLoginUITypeData)
+    /// <summary>
+    /// param nLoginUITypeData IDPW Login Popup의 eLoginUITypeData 값<br></br>
+    /// IDPW Popup 로그인후 callback 호출해주는 함수
+    /// </summary>
+    /// <param name="nLoginUITypeData"></param>
+    public async void LoginIDPWAfterMenuAdd(string strinterFace)
     {
 
-        // IDPW 로그인 Type의 로그인 UI 및 로그인 type에서 온 결과
-        if (nLoginUITypeData == (int)eLoginType.eLOGINTYPE_ORIGIN)                                           // eLoginUITypeData (eLOGINTYPE_ORIGIN) : IDPW 로그인 완료 - 후속작업진행
+        if (strinterFace.Length < 3)
         {
-            if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eInitPW)
-            {
-                refPWChangeDefaultPW.nGroupID = activeMenuPopup.GroupId;
-                await refPWChangeDefaultPW.openPopUp();
-            }
-            else if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eEnforced ||
-                refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eAfterWard)
-            {
-                refPWChange.nGroupID = activeMenuPopup.GroupId;
-                refPWChange.Init();
-                await refPWChange.openPopUp();
-            }
-            else
-            {
-                // eIDPWresultJob.eNone
-                // 로그인 성공!
-
-            }
-
+            CLog.Here().Information($"LoginIDPWAfterMenuAdd, input - invalid");
+            return;
         }
-        else if (nLoginUITypeData == (int)eLoginType.eLOGINTYPE_GPKI)                                         // // eLoginUITypeData (eLOGINTYPE_GPKI) : IDPW 로그인 완료 - 후속작업진행
+
+        int nGroupID = -1;
+        int nLoginUITypeData = 0;
+
+        try
+        {
+            string[] strParam = strinterFace.Split(':');
+
+            if ( (strParam?.Length ?? 0 ) != 2)
+            {
+                CLog.Here().Information($"LoginIDPWAfterMenuAdd, input Parsing - invalid");
+                return;
+            }
+
+            nGroupID = Convert.ToInt32(strParam[0]);
+            nLoginUITypeData = Convert.ToInt32(strParam[1]);
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"LoginIDPWAfterMenuAdd, Exception : {ex.Message}, input string - invalid");
+            return;
+        }
+
+        // activeMenuPopup.GroupId = nGroupID;
+
+        if (pageService.GetStatusSideMenuReBuildTime(nGroupID))
         {
 
-            if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eNone)
+            // IDPW 로그인 Type의 로그인 UI 및 로그인 type에서 온 결과
+            if (nLoginUITypeData == (int)eLoginType.eLOGINTYPE_ORIGIN)                                           // eLoginUITypeData (eLOGINTYPE_ORIGIN) : IDPW 로그인 완료 - 후속작업진행
             {
-                // Gpki 등록 Popup
-                refPopUpGpkiLogIn.nGroupID = activeMenuPopup.GroupId;
-                refPopUpGpkiLogIn.Mode = "2"; // 등록모드
-                await refPopUpGpkiLogIn.openPopUp();
-            }
-            else if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eInitPW)
-            {
-                refPWChangeDefaultPW.nGroupID = activeMenuPopup.GroupId;
-                refPWChangeDefaultPW.eLoginProcessType = eLoginType.eLOGINTYPE_GPKI;
-                await refPWChangeDefaultPW.openPopUp();
-            }
-            else if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eEnforced ||
+                if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eInitPW)
+                {
+                    refPWChangeDefaultPW.nGroupID = activeMenuPopup.GroupId;
+                    await refPWChangeDefaultPW.openPopUp();
+                }
+                else if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eEnforced ||
                     refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eAfterWard)
-            {
-                refPWChange.nGroupID = activeMenuPopup.GroupId;
-                refPWChange.eLoginProcessType = eLoginType.eLOGINTYPE_GPKI;
-                refPWChange.Init();
-                await refPWChange.openPopUp();
+                {
+                    refPWChange.nGroupID = activeMenuPopup.GroupId;
+                    refPWChange.Init();
+                    await refPWChange.openPopUp();
+                }
+                else
+                {
+                    // eIDPWresultJob.eNone
+                    // 로그인 성공!
+
+                }
+
             }
-            else
+            else if (nLoginUITypeData == (int)eLoginType.eLOGINTYPE_GPKI)                                         // // eLoginUITypeData (eLOGINTYPE_GPKI) : IDPW 로그인 완료 - 후속작업진행
             {
-                // Not Define ...
+
+                if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eNone)
+                {
+                    // Gpki 등록 Popup
+                    refPopUpGpkiLogIn.nGroupID = activeMenuPopup.GroupId;
+                    refPopUpGpkiLogIn.Mode = "2"; // 등록모드
+                    await refPopUpGpkiLogIn.openPopUp();
+                }
+                else if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eInitPW)
+                {
+                    refPWChangeDefaultPW.nGroupID = activeMenuPopup.GroupId;
+                    refPWChangeDefaultPW.eLoginProcessType = eLoginType.eLOGINTYPE_GPKI;
+                    await refPWChangeDefaultPW.openPopUp();
+                }
+                else if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eEnforced ||
+                        refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eAfterWard)
+                {
+                    refPWChange.nGroupID = activeMenuPopup.GroupId;
+                    refPWChange.eLoginProcessType = eLoginType.eLOGINTYPE_GPKI;
+                    refPWChange.Init();
+                    await refPWChange.openPopUp();
+                }
+                else
+                {
+                    // Not Define ...
+                }
+
             }
 
         }
 
-        ChangeSideBarUInNavigate();
-
+        ChangeSideBarUInNavigate(nGroupID);
     }
 
-
-    /**
-    *@brief GPKI로그인창에서 등록선택> IDPW로그인> PW변경 에서 작업후 callback GPKI로그인창 등록모드로 Popup
-    */
+    /// <summary>
+    /// GPKI로그인창에서 등록선택> IDPW로그인> PW변경 에서 작업후 callback GPKI로그인창 등록모드로 Popup
+    /// </summary>
+    /// <param name="nResult"></param>
     public async void pwChgAfterGpkiPopup(int nResult)
     {
         // Gpki 등록 Popup
@@ -400,9 +446,10 @@
     }
 
 
-    /**
-    *@brief GPKI로그인창에서 등록선택> IDPW로그인> PW초기화창 에서 작업후 callback GPKI로그인창 등록모드로 Popup
-    */
+    /// <summary>
+    /// GPKI로그인창에서 등록선택> IDPW로그인> PW초기화창 에서 작업후 callback GPKI로그인창 등록모드로 Popup
+    /// </summary>
+    /// <param name="nResult"></param>
     public async void pwInitAfterGpkiPopup(int nResult)
     {
         // Gpki 등록 Popup
@@ -412,18 +459,48 @@
     }
 
 
-    /**
-    *@brief GPKI Popup 로그인창에서 callback 호출해주는 함수
-    */
-    public async void LoginGpkiAfterMenuAdd(int nResult)
+    /// <summary>
+    /// GPKI Popup 로그인창에서 callback 호출해주는 함수
+    /// </summary>
+    /// <param name="nGroupId"></param>
+    /// <param name="nResult"></param>
+    public async void LoginGpkiAfterMenuAdd(string strinterFace)
     {
 
+        if (strinterFace.Length < 3)
+        {
+            CLog.Here().Information($"LoginGpkiAfterMenuAdd, input - invalid");
+            return;
+        }
+
+        int nGroupId = -1;
+        int nResult = 0;
+
+        try
+        {
+            string[] strParam = strinterFace.Split(':');
+
+            if ((strParam?.Length ?? 0) != 2)
+            {
+                CLog.Here().Information($"LoginGpkiAfterMenuAdd, Parsing - invalid");
+                return;
+            }
+
+            nGroupId = Convert.ToInt32(strParam[0]);
+            nResult = Convert.ToInt32(strParam[1]);
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"LoginGpkiAfterMenuAdd, Exception : {ex.Message}, input string - invalid");
+            return;
+        }
+
         if (nResult == 1)                   // GPKI 로그인창에서 로그인 완료함
-            ChangeSideBarUInNavigate();
+            ChangeSideBarUInNavigate(nGroupId);
         else if (nResult == 2)              // GPKI 로그인창에서 등록모드로 넘어감
         {
             // ID / PW 로그인 Popup
-            refPopUpLogIn.nGroupID = activeMenuPopup.GroupId;
+            refPopUpLogIn.nGroupID = nGroupId;
             refPopUpLogIn.eLoginUITypeData = eLoginType.eLOGINTYPE_GPKI;
             await refPopUpLogIn.openPopUp();
         }
@@ -439,6 +516,7 @@
         //SetUpEvent();
     }
 
+    //삭제 예정
     //private void SetUpEvent()
     //{
     //    //Network 세팅을 보고 Event를 설정한다.
@@ -654,10 +732,15 @@
         dicSysIdName = new Dictionary<string, SGNetOverData>();
 
         ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(activeMenu.GroupId);
-        bool bSFMManageUse = sgUserInfo.UserInfoAdded.IsMySelfSFM;
-        int nUserApprPos = sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(activeMenu.GroupId)); //화면 메뉴를 구성하는 항목의 권한
+        bool bSFMManageUse = false;
+        int nUserApprPos = 0;
+        if (sgUserInfo != null && sgUserInfo.UserInfoAdded != null)
+        {
+            bSFMManageUse = sgUserInfo.UserInfoAdded.IsMySelfSFM;
+            nUserApprPos = sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(activeMenu.GroupId)); //화면 메뉴를 구성하는 항목의 권한
+        }
 
-        if (sgLoginData.GetUseOverNetwork2())
+        if (sgLoginData != null && sgLoginData.GetUseOverNetwork2())
         {
             if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName, pageService.m_bIsMultiNetWork))
             {

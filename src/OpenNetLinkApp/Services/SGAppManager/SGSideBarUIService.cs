@@ -73,6 +73,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
                                         string badgeType = "", string badgeValue = "", string tooltip = "",
                                         bool actived = false, bool expanded = false, string strUserSeq = "")
         {
+
+            foreach (ISGSideBarUI Item in MenuList)
+            {
+                if (Item.GroupId == groupId && Item.CategoryId == categoryId)
+                {
+                    ISGSideBarUI menuItem2 = null;
+                    return this;
+                }
+            }
+
             ISGSideBarUI menuItem = new SGSideBarUI
             {
                 GroupId = groupId,
@@ -433,10 +443,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public void DeleteItem()
         {
             //MenuList.RemoveAt();
-
-
-
-
         }
 
         public void DeleteItemRange()

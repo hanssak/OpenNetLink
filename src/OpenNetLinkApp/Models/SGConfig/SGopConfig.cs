@@ -29,6 +29,11 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bVisibleLogOutButton { get; set; } = true;              //상단의 [로그아웃] 버튼 표시 여부
         public bool bUseLoginCI { get; set; } = false;                      //로그인 화면 상단에 CI 이미지 표시 여부
 
+        /// <summary>
+        /// -1 : 바로 차단, 0 : 접속유무를 사용자에게 문의, 1 : 강제 접속 진행
+        /// </summary>
+        public int nSessionDuplicate { get; set; } = 0;
+
         //패스워드
         public bool bUserPWChange { get; set; } = false;                   // 사용자 패스워드 변경 사용 여부.
         public bool bUseGoogleOtp2FactorAuth { get; set; } = false;        // 구글 Otp를사용한 2차인증기능사용
