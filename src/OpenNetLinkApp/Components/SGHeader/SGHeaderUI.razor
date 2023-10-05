@@ -815,6 +815,7 @@
         //pageService.m_nCurViewPageGroupID=0;
 
         LogOutFileListClearEvent LogOutFileListClearEvent = null;
+        HsNetWork hsNetWork = null;
 
 
         if (isAllLogout || (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0) &&
@@ -834,6 +835,15 @@
 
                 // Reconnect
                 pageService.SetStatusSideMenuReBuildTime(Net.GroupID, true);
+
+                // sessionCheck 동작하게 적용                
+                hsNetWork = HsCmdCenter.GetConnectNetWork(Net.GroupID);
+                if (hsNetWork != null)
+                {
+                    hsNetWork.SetLoginSessionCheckDo();
+                    hsNetWork.SetReconnectStop();
+                }
+
             }
         }
         else
@@ -851,16 +861,15 @@
             // Reconnect
             pageService.SetStatusSideMenuReBuildTime(nGroupID, true);
 
+            // sessionCheck 동작하게 적용
+            hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
+            if (hsNetWork != null)
+            {
+                hsNetWork.SetLoginSessionCheckDo();
+                hsNetWork.SetReconnectStop();
+            }
         }
 
-        // sessionCheck 동작하게 적용
-        HsNetWork hsNetWork = null;
-        hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
-        if (hsNetWork != null)
-        {
-            hsNetWork.SetLoginSessionCheckDo();
-            hsNetWork.SetReconnectStop();
-        }
 
         // 파일전송에 추가해 놓은 파일목록 정보들 삭제필요
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -875,7 +884,7 @@
         for (; i < count; i++)
         {
 
-            if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
+            //if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false) // Disconnect만 되어도 LogoutStatus True됨
             if (pageService.GetStatusSideMenuReBuildTime(listNetWork[i].GroupID) == false)
             {
 
