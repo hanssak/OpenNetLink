@@ -5473,7 +5473,29 @@
 			<CN></CN>
 		</T_PAGE_TYPE_TRNASFER>
 
-		<T_DROP_PROGRESS_STATUS>
+    <T_PAGE_TYPE_FILE_TRANSMANAGER>
+      <KR>파일전송관리</KR>
+      <JP></JP>
+      <EN>Transfer</EN>
+      <CN></CN>
+    </T_PAGE_TYPE_FILE_TRANSMANAGER>
+
+    <T_PAGE_TYPE_CLIP_TRANSMANAGER>
+      <KR>클립보드전송관리</KR>
+      <JP></JP>
+      <EN>Transfer</EN>
+      <CN></CN>
+    </T_PAGE_TYPE_CLIP_TRANSMANAGER>
+
+    <T_PAGE_TYPE_EMAIL_TRANSMANAGER>
+      <KR>이메일전송관리</KR>
+      <JP></JP>
+      <EN>Transfer</EN>
+      <CN></CN>
+    </T_PAGE_TYPE_EMAIL_TRANSMANAGER>
+
+
+    <T_DROP_PROGRESS_STATUS>
 			<KR>파일처리 현황</KR>
 			<JP></JP>
 			<EN>Status</EN>
@@ -7422,8 +7444,8 @@
 
 		<W_0020>
 			<KR>제목은 최대 한글 42자, 영문 128자 / 설명은 최대 한글 83자, 영문 250자까지 입력할 수 있습니다.</KR>
-			<JP>タイトルおよび説明は最大ハングル80字、英語250字まで入力できます。</JP>
-			<EN>Hangul titles and descriptions up to 80 characters , you can enter up to 250 characters in English.</EN>
+			<JP>タイトルおよび説明は最大ハングル80字、英語250字まで入力できます。</JP>			
+			<EN>The title can be up to 42 Korean characters and 128 English characters, and the description can be up to 83 Korean characters and 250 English characters.</EN>
 			<CN>标题和说明最多可输入80字，英文250个字母。</CN>
 		</W_0020>
 
@@ -9325,6 +9347,8 @@
 			<EN>Data transmission is not available at this time.</EN>
 			<CN></CN>
 		</W_0300>
+
+
 	</WARNING>
 
 
