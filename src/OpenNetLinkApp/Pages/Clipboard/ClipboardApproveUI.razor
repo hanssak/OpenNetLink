@@ -339,8 +339,8 @@
     public string strTitleInputInfo = "";
     public string strTotalPage = "";
 
-    @*public string strFromDay = "";
-        public string strToDay = "";*@
+    // public string strFromDay = "";
+    //  public string strToDay = "";
 
     ISGAppConfigService AppConfigSvc;
     ISGNetworkService NetWorkSvc;
@@ -415,8 +415,8 @@
 
 
     public string curUserID = "";
-    @*public string curFromDay = "";
-        public string curToDay = "";*@
+    // public string curFromDay = "";
+    //  public string curToDay = "";
     public string curApprKind = "";
     public string curTransKind = "";
     public string curApprStatus = "";
@@ -582,7 +582,7 @@
 
         bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
 
-        @*GetInitDateTime(out strFromDay, out strToDay);*@
+        // GetInitDateTime(out strFromDay, out strToDay);
 
         base.OnInitialized();
     }
@@ -814,6 +814,7 @@
         }
         return tdata;
     }
+
     public bool GetCheckRejectPossible()
     {
         string strApprKind = "";
@@ -857,7 +858,7 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
-        @*await GetDateTime();*@
+        // await GetDateTime();
         curApprKind = GetApprKind();
         curTransKind = GetTransKind();
         curApprStatus = GetApprStatus();
@@ -1130,9 +1131,11 @@
         return strValue;
     }
 
-    /**
-    *@brief 목적지(망)에서 선택한 망의 system_ID 값을 넘겨준다. 전체를 선택했을때에는 "" 공백리턴
-*/
+
+    /// <summary>
+    /// 목적지(망)에서 선택한 망의 system_ID 값을 넘겨준다. 전체를 선택했을때에는 "" 공백리턴
+    /// </summary>
+    /// <returns></returns>
     public string GetDestNetWorkSysID()
     {
         string strValue = "";
@@ -1159,11 +1162,14 @@
     }
 
 
-    /**
-    *@brief ApproveSearchCount 결과 이벤트 함수
-*/
+    /// <summary>
+    /// ApproveSearchCount 결과 이벤트 함수
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void SearchCount(int groupId, PageEventArgs e)
     {
+
         string strMsg = e.strMsg;
         if (e.result != 0)
         {
@@ -1187,9 +1193,12 @@
         UpdateData();
     }
 
-    /**
-    *@brief  ApproveSearchData 의 결과 이벤트 함수
-*/
+
+    /// <summary>
+    /// ApproveSearchData 의 결과 이벤트 함수
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void SearchResult(int groupId, PageEventArgs e)
     {
         int ret = e.result;
@@ -1407,9 +1416,8 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        string strNavigateWithGroupID = "/Welcome/";
+        string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
         strNavigateWithGroupID += groupID.ToString();
-
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
         foreach (var MenuItem in SideBarUISvc.MenuList)
@@ -1422,4 +1430,5 @@
         }
 
     }
+
 }

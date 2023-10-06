@@ -1539,20 +1539,8 @@
 
                         // enMainPageType 값이 2 : 파일전송화면, 다른거 : Dash보드 (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
                         //strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+
                         strNavigatePathWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
-
-
-                        // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
-                        string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
-                        if (strNavigateUrl.IndexOf("transfer") > 0)
-                        {
-                            strNavigateUrl = pageService.GetFileTransPage(groupId);
-                            if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                                strNavigatePathWithGroupID = strNavigateUrl;
-                            else
-                                strNavigatePathWithGroupID = "/Transfer/";
-                        }
-
                         strNavigatePathWithGroupID += groupId.ToString();
                     }
 
@@ -1777,26 +1765,8 @@
 
                     // enMainPageType 값이 2 : 파일전송화면, 다른거 : Dash보드 (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
                     //strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+
                     strNavigatePathnGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
-
-                    // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
-                    string strNavigateUrl = strNavigatePathnGroupID.ToLower();
-                    if (strNavigateUrl.IndexOf("transfer") > 0)
-                    {
-                        strNavigateUrl = pageService.GetFileTransPage(nGroupIDfirst);
-                        if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                            strNavigatePathnGroupID = strNavigateUrl;
-                        else
-                            strNavigatePathnGroupID = "/Transfer/";
-                    }
-
-                    if (sgLoginData != null)
-                    {
-                        bool bFileTransUse = sgLoginData.GetFileTrans();
-
-                        if (!bFileTransUse)
-                            strNavigatePathnGroupID = "/Welcome/";  // 설정에 상관없도록
-                    }
                     strNavigatePathnGroupID += nGroupIDfirst.ToString();
                 }
 
@@ -2238,19 +2208,6 @@
             if (srcLoc != "GPKI")
             {
                 strNavigatePathWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
-
-
-                // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
-                string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
-                if (strNavigateUrl.IndexOf("transfer") > 0)
-                {
-                    strNavigateUrl = pageService.GetFileTransPage(groupId);
-                    if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                        strNavigatePathWithGroupID = strNavigateUrl;
-                    else
-                        strNavigatePathWithGroupID = "/Transfer/";
-                }
-
                 strNavigatePathWithGroupID += groupId.ToString();
             }
             //else if (siteConfig.GetUseDashBoard())
@@ -2360,18 +2317,6 @@
                         CLog.Here().Information($"1 to ALL Login, GroupID : {nGroupIDfirst}, First Screen !");
 
                         string strNavigatePathWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
-
-                        // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
-                        string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
-                        if (strNavigateUrl.IndexOf("transfer") > 0)
-                        {
-                            strNavigateUrl = pageService.GetFileTransPage(nGroupIDfirst);
-                            if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                                strNavigatePathWithGroupID = strNavigateUrl;
-                            else
-                                strNavigatePathWithGroupID = "/Transfer/";
-                        }
-
                         strNavigatePathWithGroupID += nGroupIDfirst.ToString();
                         MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
@@ -2538,21 +2483,8 @@
                     bFileTransMenuUse = true;
             }
 
-            @*string strRootPath = "/Welcome";
-                if (!siteConfig.GetUseDashBoard())
-                strRootPath = "/Transfer";*@
-
             // 파일전송화면 이면 저장했던 위치를 찾아서 사용한다. (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
             string strRootPath = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
-            string strNavigateUrl = strRootPath.ToLower();
-            if (strNavigateUrl.IndexOf("transfer") > 0)
-            {
-                strNavigateUrl = pageService.GetFileTransPage(groupid);
-                if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                    strRootPath = strNavigateUrl;
-                else
-                    strRootPath = "/Transfer/";
-            }
 
             bFileTransUse = SGAppMgrSvc.OpConfigInfoService.GetUseFileTrans(groupid);
             // siteConfig. json으로 이동

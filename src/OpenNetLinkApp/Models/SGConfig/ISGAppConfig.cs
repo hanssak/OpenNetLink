@@ -28,7 +28,13 @@ namespace OpenNetLinkApp.Models.SGConfig
         [Description("T_PAGE_TYPE_DASHBOARD")]
         DASHBOARD = 1,
         [Description("T_PAGE_TYPE_TRNASFER")]
-        TRANSFER = 2
+        TRANSFER = 2,
+        [Description("T_PAGE_TYPE_FILE_TRANSMANAGER")]
+        TRANSMANAGER_FILE = 3,
+        [Description("T_PAGE_TYPE_CLIP_TRANSMANAGER")]
+        TRANSMANAGER_CLIP = 4,
+        [Description("T_PAGE_TYPE_EMAIL_TRANSMANAGER")]
+        TRANSMANAGER_EMAIL = 5
     }
     public enum HOTKEY_MOD: int
     {

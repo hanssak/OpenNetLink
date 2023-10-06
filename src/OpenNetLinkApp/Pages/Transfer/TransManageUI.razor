@@ -1194,7 +1194,7 @@
                 isQueryDownPosible = false;
             else
                 isQueryDownPosible = true;
-                
+
             tData.isPossibleDownload = GetIsPossibleDownLoad(tData, isInner, maxDownloadCount, nowDate, groupId, isManualDownLoad, isForwardAutoDown, isQueryDownPosible);
 
             if (maxDownloadCount - tData.downloadCount < 0)
@@ -1446,9 +1446,8 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        string strNavigateWithGroupID = "/Welcome/";
+        string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
         strNavigateWithGroupID += groupID.ToString();
-
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
         foreach (var MenuItem in SideBarUISvc.MenuList)

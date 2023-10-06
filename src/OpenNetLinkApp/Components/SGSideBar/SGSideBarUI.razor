@@ -298,35 +298,7 @@
             SideBarUISvc.ChgActiveMenu(eventArgsPopup, activeMenuPopup);
         }
 
-        //string strNavigatePathWithGroupID = "";
-
-        //if (siteConfig.GetUseDashBoard())
-        //    strNavigatePathWithGroupID = "/Welcome/";
-        //else
-        //    strNavigatePathWithGroupID = "/Transfer/";
-
-        //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         string strNavigatePathWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
-        string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
-        if (strNavigateUrl.IndexOf("transfer") > 0)
-        {
-            strNavigateUrl = pageService.GetFileTransPage(nGroupID);
-            if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                strNavigatePathWithGroupID = strNavigateUrl;
-            else
-                strNavigatePathWithGroupID = "/Transfer/";
-        }
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
-        {
-            if(sgLoginData != null)
-            {
-                bool bFileTrans = sgLoginData.GetFileTrans();
-                if (!bFileTrans)
-                    strNavigatePathWithGroupID = "/Welcome/";  // 파일 전송을 사용 하지 않으면 무조건 Welcome 으로 이동
-            }
-        }
-
         strNavigatePathWithGroupID += nGroupID.ToString();
         MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
