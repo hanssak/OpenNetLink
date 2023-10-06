@@ -112,7 +112,7 @@
                                  OnChangeAfterCheck="@GetAfterChk"
                                  OnBasicSelectOpenPopup="@openBasicSelect"
                                  OnOpenFileDialogOpenPopup="@OpenFileDialog"
-                                 OnCheckApprLine="@CheckApprLine" />
+                                 OnCheckApprLine="@CheckApprLine"/>
 
         <div id="divRightBottomSide" class="card-footer clearfix" style="padding:.5rem 1.25rem !important; font-size:.8rem !important;">
             <div class="float-left">
@@ -208,7 +208,7 @@
     ISGVersionConfigService versionConfigSvc;
     Update_PopUp refUpdate_PopUp;
     ForwardLine refForwardLine;
-    SGBasicSelect refSGBasicSelect;    
+    SGBasicSelect refSGBasicSelect;
 
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
     public int dragLabel = 1;
@@ -286,6 +286,9 @@
     int m_apvStep = 0;                  //결재유형(0:and, 1:or, 2:and+or)
     bool UseUrlRedirectionByServer = false;
 
+    /// <summary>JS에서 받아서 템플릿에게 전달할 하위 탐색기 Load 액션</summary>
+    private static Action<string> actionLoadFileList; 
+
     private static Action<List<string>> ActionFileSelectOK;
     private static Action<string, string> actionAddDataList;
     private static Action<string> actionRemoveDataList;
@@ -307,6 +310,12 @@
 
 
     bool bUseFileTransForTime = false;
+
+    [JSInvokable("JSLoadListFiles")]    //좌측 하위 리스트에서, 폴더 더블클릭 시 호출
+    public static void JSLoadListFiles(string path)
+    {
+        actionLoadFileList?.Invoke(path);
+    }
 
     private void PopUpFileSelectOK(List<string> files)
     {
@@ -1775,10 +1784,10 @@
         // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
         if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
-
-
             //지정된 템플릿의 DropFileList
-            dropFile = refTransferTemplateDefault?.GetDropFileList();
+            dropFile = refTransferTemplateDefault.GetDropFileList();
+            actionLoadFileList = refTransferTemplateDefault.LoadListFiles;
+
 
             nDrawPageGroupID = groupIDbyParam;
             groupID = groupIDbyParam;
