@@ -631,13 +631,17 @@ window.exitLogIn = () => {
 
     var dirRightHeight = $("#divRightContent").css("height");
     var divRightUpper = $("#divRightUpperSide").css("height");
-    var divRightBottom = $("#divRightBottomSide").css("height");
-    if (divRightUpper != null && divRightBottom != null) {
-        var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
-        $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
+    //var divRightBottom = $("#divRightBottomSide").css("height");
+    if (divRightUpper != null ) {
+        /*var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));*/
+        var divRest = parseInt(divRightUpper.replace("px", ""));
+        $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 3)) + "px");
         //Window 사이즈 조절 시 divDropFile Height 도 함께 조절
         setDropzonSize();
     }
+
+    //로그인 후 햄버거 메뉴 축소화 나중에 사용 예정
+    //$('[data-widget="pushmenu"]').PushMenu('collapse');
 }
 
 window.closeProgressMessageOnScreenLock = (id) => {
@@ -901,11 +905,12 @@ window.adJustWindowsize = () => {
     $(window).resize(function () {
         var dirRightHeight = $("#divRightContent").css("height");
         var divRightUpper = $("#divRightUpperSide").css("height");
-        var divRightBottom = $("#divRightBottomSide").css("height");
+        //var divRightBottom = $("#divRightBottomSide").css("height");
         var dirRightWidth = $("#divDropFile").css("width");
-        if (divRightUpper != null && divRightBottom != null) {
-            var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
-            $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
+        if (divRightUpper != null) {
+            /*var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));*/
+            var divRest = parseInt(divRightUpper.replace("px", ""));
+            $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 3)) + "px");
             setDropzonSize();
         }
     });
