@@ -229,5 +229,7 @@ bUseClipTypeText : TEXT로 클립보드 전송 사용 유무
 bUseClipTypeImage : IMAGE로 클립보드 전송 사용 유무
 
 bHiddenLoginLogo : Main Login 창 좌측 로고 숨김 처리
+bUseDrmAfterFileReceive :           //파일 수신 완료 후 DRM 사용 여부
+nDrmType :                          //DRM 종류 - 1. SoftCamp, 2.Fasso
 
 

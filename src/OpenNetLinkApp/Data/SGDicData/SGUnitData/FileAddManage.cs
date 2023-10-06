@@ -302,7 +302,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 case eFileAddErr.eFACHG:                                        // 위변조 걸린 파일
                     strMsg = xmlConf.GetWarnMsg("W_0006");                      // {0}파일은 확장자가 변경된 파일입니다.
                     strMsg = String.Format(strMsg, strFileName);
-                    strMsg += $"({strMIMEType})";
+                    strMsg += $"({strMIMEType.TrimEnd()})";
                     break;
                 case eFileAddErr.eFAVIRUS:
                     strMsg = xmlConf.GetWarnMsg("W_0184");                      // {0} 파일에서 바이러스가 검출되었습니다.
