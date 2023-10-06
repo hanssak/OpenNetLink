@@ -148,5 +148,14 @@ namespace OpenNetLinkApp.Common
             /// </summary>
             INSTALLING =4,
         }
+
+        public enum EnumDrmType : Int32
+        {
+            [Description("SoftCamp")]
+            SoftCamp = 1,
+            [Description("Fasso")]
+            Fasso = 2,
+
+        }
     }
 }

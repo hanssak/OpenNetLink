@@ -3161,9 +3161,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             return false;
         }
+        public static bool IsDRMFilePath(string path)
+        {
+            using(FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
+                byte[] btFileData = new byte[MaxBufferSize];
+                stream.Read(btFileData, 0, MaxBufferSize);
+                return IsDRM(btFileData);
+            }
+        }
 
-
-        public async Task<bool> IsDRMbyStream(Stream stFile)
+        public static async Task<bool> IsDRMbyStream(Stream stFile)
         {
             byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
             return IsDRM(btFileData);

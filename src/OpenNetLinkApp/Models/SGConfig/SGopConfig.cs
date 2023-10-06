@@ -183,5 +183,9 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public string strOKTAUrl { get; set; } = "";
         public bool bPkiSendByFileTrans { get; set; } = false;                // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
+
+        public bool bUseDrmAfterFileReceive { get; set; } = false;          //파일 수신 완료 후 DRM 사용 여부
+
+        public int nDrmType { get; set; } = 1;                          //DRM 종류 - 1. SoftCamp
     }
 }
