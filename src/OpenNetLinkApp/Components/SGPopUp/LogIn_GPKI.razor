@@ -123,7 +123,7 @@
     //[Parameter]
     public string Mode { get; set; } //1:로그인 모드 2: 인증서 등록모드
     [Parameter]
-    public EventCallback<int> goToPageGPKI { get; set; }
+    public EventCallback<string> goToPageGPKI { get; set; }
 
     public int nGroupID = -1;                // 현재 사용할 GroupID
     public int nDrawPageGroupID = -1;               // Draw하는 GroupID
@@ -273,8 +273,13 @@
 
             CLog.Here().Information("인증 모드에서 GPKI 등록버튼 누름 - IDPW 로그인부터 진행!");
 
+            string strInvokeSendParam = "";
+            strInvokeSendParam += nGroupID.ToString();
+            strInvokeSendParam += ":";
+            strInvokeSendParam += (2).ToString();
+
             // Login 인증모드 창으로 떴을때
-            goToPageGPKI.InvokeAsync(2);
+            goToPageGPKI.InvokeAsync(strInvokeSendParam);
 
             // 종료 처리
             closePopUp();
@@ -1013,6 +1018,8 @@
                     pageService.SetCurUserPassWD(groupId, sgLoginData.GetUserID());
                 }
 
+                // Reconnect동작하게 설정
+                hsNetWork.SetReconnectStop(false);
             }
 
             // 이미 Navigate되어 있음
@@ -1035,8 +1042,13 @@
 
             CLog.Here().Information($"Login_Gpki 인증 완료!!");
 
+            string strInvokeSendParam = "";
+            strInvokeSendParam += nGroupID.ToString();
+            strInvokeSendParam += ":";
+            strInvokeSendParam += (1).ToString();
+
             // Login 인증 완료!
-            goToPageGPKI.InvokeAsync(1);
+            goToPageGPKI.InvokeAsync(strInvokeSendParam);
 
             // 종료 처리
             closePopUp();

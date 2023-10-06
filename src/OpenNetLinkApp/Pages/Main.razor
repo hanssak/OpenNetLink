@@ -312,6 +312,18 @@
     {
         bStartedLogin = false;
 
+        if (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupID) == -1)
+        {
+            await JSRuntime.InvokeVoidAsync("setElementValue", new object[] { "loginPw", "" });
+            ShowLoginFail(XmlConf.GetWarnMsg("W_0039"));
+            await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+            bStartedLogin = false;
+            bLoginBtnDisable = false;            
+            StateHasChanged();
+            return;
+        }
+
+
         if (e.strDummy == "google_otp")
         {
             str2FactorAuthType = e.strDummy;
@@ -395,7 +407,9 @@
 
         int groupid = pageService.m_nCurViewPageGroupID;
 
-        CLog.Here().Information($"ClickdoLogin - login - groupid : {groupid}");
+        CLog.Here().Information($"ClickdoLogin - login - groupid : {groupid} (bLoginBtnDisable:{bLoginBtnDisable})");
+        if (bLoginBtnDisable)   //버튼이 비활성화 되어 있다면, 이후 처리 불가(js에서 호출되는 경우에 체크 필요)
+            return;
 
         bLoginBtnDisable = true;
         StateHasChanged();
@@ -947,7 +961,7 @@
                 // 1 login ALL 적용때에는 중복로그인시 강제 로그인 적용
                 HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(netlist.GroupID, ShowSessionCountPopup);
                 HSCmdCenter.sgPageEvent.Set2FactorAuthEventAdd(netlist.GroupID, Show2FactorAuth);
-                HSCmdCenter.SetAllowSessionDuplicate(netlist.GroupID);
+                HSCmdCenter.SetAllowSessionDuplicate(netlist.GroupID);  // 강제로그인
                 HSCmdCenter.sgPageEvent.SetLoginEventAdd(netlist.GroupID, LoginResultOnetoAll);
             }
         }
@@ -956,12 +970,16 @@
             HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(groupid, ShowSessionCountPopup);
             HSCmdCenter.sgPageEvent.Set2FactorAuthEventAdd(groupid, Show2FactorAuth);
             HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResultOnetoAll);
+            HSCmdCenter.SetAllowSessionDuplicate(groupid, (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupid) == 1));
             //HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         }
 
         // 다중망 로그인에서 로그아웃됐을때에 다시 자동로그인 안되게 처리
         if (srcLoc == "Logout")
         {
+
+            pageService.SetStatusSideMenuReBuildTime(groupid, true);            
+
             if (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer(0) && NetWorkSvc.NetWorkInfo.Count > 1)
                 MyNavigationManager.NavigateTo("/SelectNet");
 
@@ -971,15 +989,14 @@
                 SetADLoginData();
             }
 
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0) == false)
+            // 중복로그인된거 확인하고 강제로그인후, 다음부터도 확인하고 강제로그인 하도록 적용
+            List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+            foreach (ISGNetwork netlist in listNetWork)
             {
-                // 중복로그인된거 확인하고 강제로그인후, 다음부터도 확인하고 강제로그인 하도록 적용
-                List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-                foreach (ISGNetwork netlist in listNetWork)
-                {
-                    HSCmdCenter.SetAllowSessionDuplicate(netlist.GroupID, false);
-                }
+                HSCmdCenter.SetAllowSessionDuplicate(netlist.GroupID,
+                    (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0) ? true : (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupid) == 1)));
             }
+
         }
         else if (srcLoc == "OKTA")
         {
@@ -1191,6 +1208,21 @@
                 HSCmdCenter.SetBaseDownLoadPath(groupID, strPath);
                 //CtrlSideUISvc.SetRecvDownPath(groupID, strPath);
             }
+        }
+    }
+
+    /// <summary>
+    /// Reconnect 동작할 수 있게 설정변경
+    /// </summary>
+    /// <param name="groupId"></param>
+    public void SetReconnectStart(int groupId)
+    {
+        // sessionCheck 동작하게 적용
+        HsNetWork hsNetWork = null;
+        hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
+        if (hsNetWork != null)
+        {
+            hsNetWork.SetReconnectStop(false);
         }
     }
 
@@ -1532,6 +1564,9 @@
                     if (ctrlSideEvent != null)
                         ctrlSideEvent();
 
+
+                    SetReconnectStart(groupId);
+
                     // Move WebWindow To Tray.
                     //if (AppConfigSvc.GetStartTrayMove()) Window.MoveWebWindowToTray();
                 }
@@ -1618,9 +1653,9 @@
                             }
                         }
 
-                            // Login 화면으로 머물러있지 않도록
-                        @*if (nGroupIDfirst < 0)
-                            nGroupIDfirst = 0;*@
+                        // Login 화면으로 머물러있지 않도록
+                        //if (nGroupIDfirst < 0)
+                        //  nGroupIDfirst = 0;
 
                     } // if (dicLoginResult.Count == NetWorkSvc.NetWorkInfo.Count)
 
@@ -1656,9 +1691,10 @@
                     refPWChange.nGroupID = nGroupIDfirst;
                     refPWChange.Init();
 
-                    //@ 초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거 시작 2021/07/05 YKH
-                    //패스워드 변경 유무에 따라 패스워드 체크 가능 여부 확인
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId))
+                    // 초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거 시작 2021/07/05 YKH
+                    //패스워드 변경 유무에 따라 패스워드 체크 가능 여부 확인                    
+
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId) && pageService.GetStatusSideMenuReBuildTime(groupId))
                     {
                         if (GetInitPWLogin(groupId))
                         {
@@ -1798,7 +1834,10 @@
                     pageService.ConnectCountAdd(nGroupIDfirst);
                 }
 
-            } // if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && nGroupIDfirst > -1 && groupId == nGroupIDfirst)
+            } // if (nGroupIDfirst > -1)
+
+            pageService.SetStatusSideMenuReBuildTime(groupId, false);
+
         }
         catch (Exception ex)
         {
@@ -2366,6 +2405,15 @@
 
     public void InitSideMenu(int groupid)
     {
+
+        if (pageService.GetStatusSideMenuReBuildTime(groupid) == false)
+        {
+            //Reconnect 이상현상
+            CLog.Here().Information($"InitSideMenu, groupid : {groupid}, SideBar Build Skip!");
+            SideBarUISvc.EmitNotifyStateChangedActMenu();
+            return;
+        }
+
         string strDataTrans = XmlConf.GetTitle("T_COMMON_FILETRANS_BASIC");                     // 자료전송
         string strFileTrans = XmlConf.GetTitle("T_COMMON_FILETRANS");                           // 파일전송
         string strTransManage = XmlConf.GetTitle("T_COMMON_TRANSMANAGE");                       // 전송관리

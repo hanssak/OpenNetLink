@@ -12,6 +12,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using System.Text
 @using System.Diagnostics
+@using AgLogManager
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -329,8 +330,10 @@
     public string strTransInspect = "";
     public string strTitleInputInfo = "";
 
-    @*public string strFromDay = "";
-        public string strToDay = "";*@
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransManageUI>();
+
+    //public string strFromDay = "";
+    //   public string strToDay = "";
     private int m_currentDownloadCount = 0;
 
     ISGSideBarUIService SideBarUISvc;
@@ -614,12 +617,18 @@
         strDestNetWork = strTotal;
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+        {
+            CLog.Here().Information($"OnInitialized, groupid : {groupID}, SideBar Build Skip!");
+            return;
+        }
+
         if (sgLoginData.GetUseOverNetwork2())
         {
             dicDestSysPos = pageService.GetTargetSystemList(groupID);
         }
 
-        @*GetInitDateTime();*@
+        //GetInitDateTime();
 
         base.OnInitialized();
 

@@ -804,7 +804,7 @@
     }
 
 
-    private void LogOut(int groupId)
+    private void LogOut(int groupId, bool isAllLogout = false)
     {
 
         List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
@@ -814,10 +814,11 @@
         //pageService.m_nCurViewPageGroupID=0;
 
         LogOutFileListClearEvent LogOutFileListClearEvent = null;
+        HsNetWork hsNetWork = null;
 
 
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0) &&
-            SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLoginButoneBYoneLogout(0) == false)
+        if (isAllLogout || (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0) &&
+            SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLoginButoneBYoneLogout(0) == false))
         {
             foreach (ISGNetwork Net in listNetWork)
             {
@@ -828,6 +829,20 @@
                     LogOutFileListClearEvent();
 
                 DoLogOutSetData(Net.GroupID);
+
+                HsCmdCenter.SetAllowSessionDuplicate(Net.GroupID, (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(Net.GroupID) == 1));
+
+                // Reconnect
+                pageService.SetStatusSideMenuReBuildTime(Net.GroupID, true);
+
+                // sessionCheck 동작하게 적용                
+                hsNetWork = HsCmdCenter.GetConnectNetWork(Net.GroupID);
+                if (hsNetWork != null)
+                {
+                    hsNetWork.SetLoginSessionCheckDo();
+                    hsNetWork.SetReconnectStop();
+                }
+
             }
         }
         else
@@ -839,15 +854,21 @@
                 LogOutFileListClearEvent();
 
             DoLogOutSetData(nGroupID);
+
+            HsCmdCenter.SetAllowSessionDuplicate(nGroupID, (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(nGroupID) == 1));
+
+            // Reconnect
+            pageService.SetStatusSideMenuReBuildTime(nGroupID, true);
+
+            // sessionCheck 동작하게 적용
+            hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
+            if (hsNetWork != null)
+            {
+                hsNetWork.SetLoginSessionCheckDo();
+                hsNetWork.SetReconnectStop();
+            }
         }
 
-        // sessionCheck 동작하게 적용
-        HsNetWork hsNetWork = null;
-        hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
-        if (hsNetWork != null)
-        {
-            hsNetWork.SetLoginSessionCheckDo();
-        }
 
         // 파일전송에 추가해 놓은 파일목록 정보들 삭제필요
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -862,7 +883,8 @@
         for (; i < count; i++)
         {
 
-            if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
+            //if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false) // Disconnect만 되어도 LogoutStatus True됨
+            if (pageService.GetStatusSideMenuReBuildTime(listNetWork[i].GroupID) == false)
             {
 
                 KeyboardEventArgs eventArgs = new KeyboardEventArgs();
@@ -900,6 +922,7 @@
     private void SfmLogOut(string arg)
     {
 
+        // arg : GroupID
         if (String.IsNullOrEmpty(arg) == false)
             LogOut(Convert.ToInt32(arg));
 
@@ -908,7 +931,7 @@
 
     private void UpdatPolicyLogOut(string arg)
     {
-
+        // arg : GroupID
         if (String.IsNullOrEmpty(arg) == false)
             LogOut(Convert.ToInt32(arg));
     }
@@ -1067,6 +1090,9 @@
             int curGroupId = sgSideBar.GroupId;
 
             if (count == 0)
+                return;
+
+            if (!pageService.GetConnectStatus(curGroupId))
                 return;
 
             //SFM Refresh 매일 정각 0시에 실행 -- HeaderUI쪽에 있음....

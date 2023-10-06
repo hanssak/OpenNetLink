@@ -197,6 +197,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetVisibleLogOutButton(int groupId);
 
+        /// <summary>
+        /// -1 : 로그인때 session중복시 강제차단, 0 : 사용자가 Msg에서 결정, 1 : 강제로그인 진행
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        public int GetSessionDuplicateBlock(int groupId);
+
         public bool GetAllowDRM(int groupId);
 
         public bool GetHiddenLoginLogo(int groupId);
@@ -974,6 +981,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetVisibleLogOutButton(int groupId)
         {
             return AppConfigInfo[groupId].bVisibleLogOutButton;
+        }
+
+
+        public int GetSessionDuplicateBlock(int groupId)
+        {
+            return AppConfigInfo[groupId].nSessionDuplicate;        // 세션중복일때 사용자에게 강제 접속 여부를 묻지 않고, 바로 차단
         }
 
         public bool GetAllowDRM(int groupId)
