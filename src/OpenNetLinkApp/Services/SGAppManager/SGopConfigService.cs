@@ -212,6 +212,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseDrmAfterFileReceive(int groupId);
 
         public int GetDrmType(int groupId);
+
+
+        public bool GetUseHideApprLine(int groupId);
+
+
+        public bool GetUseHideTitleDesc(int groupId);
     }
 
 
@@ -1012,5 +1018,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].nDrmType;
         }
+
+
+        public bool GetUseHideApprLine(int groupId)
+        {
+            return AppConfigInfo[groupId].bHideApprLine;
+        }
+
+        public bool GetUseHideTitleDesc(int groupId)
+        {
+            return AppConfigInfo[groupId].bHideTitleDesc;
+        }
+
+
     }
+
 }

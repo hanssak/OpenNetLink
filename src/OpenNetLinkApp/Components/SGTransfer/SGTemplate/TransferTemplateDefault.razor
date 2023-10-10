@@ -35,7 +35,7 @@
 
 <div class="row">
     <div class="col-md-3 pr-0">
-        <div class="card card-navy card-outline card-boder" style="height:60vh;">
+        <div class="card card-navy card-outline card-boder" style="height:@(bHideApprLine?73:60)vh;">
 
             <FileTree @ref="refFileTree" OnSelectPathFromFileTree="changeSelectPath"></FileTree>
             <!-- 파일리스트 -->
@@ -47,12 +47,13 @@
 
 
     <div class="col-md-9">
-        <div id="divRightContent" class="card card-navy card-outline card-boder1" style="background-color: #e9eef7;height:60vh;">
+        <div id="divRightContent" class="card card-navy card-outline card-boder1" style="background-color: #e9eef7;height:@(bHideApprLine?73:60)vh;">
 
             <form class="form-horizontal">
 
                 <div id="divRightUpperSide" class="card-body">
-                    <div class="col-md-12">
+
+                    <div class="col-md-12" hidden="@bHideTitleDesc">
                         <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
                             <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_TRANS_TITLE")</label>
                             <div class="col-sm-11 pr-0 pl-0">
@@ -133,9 +134,9 @@
     [Parameter] public int groupIDbyParam { get; set; }
 
     [Parameter] public string strInitTitle { get; set; }
-    [Parameter] public string strInitDesc { get; set; }    
+    [Parameter] public string strInitDesc { get; set; }
 
-    [Parameter] public EventCallback<string> TitleValueChanged { get; set; }    
+    [Parameter] public EventCallback<string> TitleValueChanged { get; set; }
     [Parameter] public EventCallback<string> DescValueChanged { get; set; }
 
     [Parameter] public bool bAfterCheck { get; set; } = false;
@@ -184,6 +185,12 @@
     /// </summary>
     public bool bFileSelectDeleteBtn = false;
     FileTree refFileTree;
+
+    /// <summary>
+    /// 제목 / 설명 표현 유무
+    /// </summary>
+    public bool bHideTitleDesc = false;
+    bool bHideApprLine = false;
 
     private static Action<List<string>> ActionFileSelectOK;
     private static Action<string> actionLoadFileList;
@@ -285,6 +292,8 @@
         bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
         bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
         bFileSelectDeleteBtn = !OpConfigSvc.GetUseFileSelectDelete(groupID);
+        bHideTitleDesc = OpConfigSvc.GetUseHideTitleDesc(groupID);
+        bHideApprLine = OpConfigSvc.GetUseHideApprLine(groupID);
     }
 
     public void LoadListFiles(string stPath)

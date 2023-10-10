@@ -408,6 +408,7 @@
             @if (m_bFileRecvAlarmRetain)
             {
                 <div class="mb-1  w-100">
+                    @*수신 완료 후 알림 유지*@
                     <input type="checkbox" class="mr-1" checked="@(GetFileRecvTrayFix())"
                            @onchange="eventArgs => { SetFileRecvTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RECVALARM_RETAIN")</span>                 <!--수신 완료 후 알림 유지-->
                     </div>
@@ -415,6 +416,7 @@
             @if (m_bApprCountAlarmRetain)
             {
                 <div class="mb-1  w-100">
+                    @*승인대기 알림 유지*@
                     <input type="checkbox" class="mr-1" checked="@(GetApprTrayFix())"
                            @onchange="eventArgs => { SetApprTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRWAITALARM_RETAIN")</span>                         <!--승인대기 알림 유지-->
                     </div>
@@ -422,6 +424,7 @@
             @if (m_bApprCompleteAlarmRetain)
             {
                 <div class="mb-1  w-100">
+                    @*승인완료 알림 유지*@
                     <input type="checkbox" class="mr-1" checked="@(GetUserApprActionTrayFix())"
                            @onchange="eventArgs => { SetUserApprActionTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRCOMPLETEALARM_RETAIN")</span>              <!--승인완료 알림 유지-->
                     </div>
@@ -429,6 +432,7 @@
             @if (m_bApprRejectAlarmRetain)
             {
                 <div class="mb-1  w-100">
+                    @*반려 알림 유지*@
                     <input type="checkbox" class="mr-1" checked="@(GetUserApprRejectTrayFix())"
                            @onchange="eventArgs => { SetUserApprRejectTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRREJECTALARM_RETAIN")</span>                    <!--반려 알림 유지-->
                     </div>
@@ -436,6 +440,7 @@
             @if (m_bUseApprCountAlaram)
             {
                 <div class="mb-1  w-100">
+                    @*승인대기 알림 설정*@
                     <input type="checkbox" class="mr-1" checked="@(GetUseApprWaitNoti())"
                            @onchange="eventArgs => { SetUseApprWaitNoti(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRWAITNOTI_USE")</span>                    <!--승인대기 알림설정-->
                     </div>

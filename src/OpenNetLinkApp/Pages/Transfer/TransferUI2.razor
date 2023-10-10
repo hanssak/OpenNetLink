@@ -37,6 +37,7 @@
 
 <div class="content-header">
     <div class="container-fluid">
+
         <div class="row">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark">@strFileTrans</h1>
@@ -53,11 +54,13 @@
                             <option id="30">한싹OTP</option>
                         </select>
                     </li>-->
-                    <li class="breadcrumb-item" style="color:blue;cursor:pointer;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
+                    <li class="breadcrumb-item" style="color:blue;cursor:pointer;" @onclick="(e => HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
                     <li class="breadcrumb-item active">@strFileTrans</li>
                 </ol>
             </div><!-- /.col -->
         </div>
+
+
         @if (bUseFileTransForTime)
         {
             <div class="row">
@@ -72,7 +75,7 @@
 <section class="content">
     <div class="container-fluid">
         <!-- Info boxes -->
-        <div class="row">
+        <div class="row" hidden="@bHideApprLine">
             <div class="col-md-12">
                 <div class="card card-boder mb-3" style="box-shadow:none;">
                     <div class="card-body clearfix">
@@ -307,6 +310,8 @@
 
 
     bool bUseFileTransForTime = false;
+
+    bool bHideApprLine = false;
 
     private void PopUpFileSelectOK(List<string> files)
     {
@@ -1395,6 +1400,8 @@
         bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
         bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
         bFileSelectDeleteBtn = !OpConfigSvc.GetUseFileSelectDelete(groupID);
+        bHideApprLine = OpConfigSvc.GetUseHideApprLine(groupIDbyParam);
+        
 
         if (bAfterApprChkHIde)
             strAfterApprove = "";

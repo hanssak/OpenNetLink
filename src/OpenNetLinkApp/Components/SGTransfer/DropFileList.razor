@@ -95,7 +95,11 @@
         {
 
             <p style="font-size:13px;">
-                <br /><br /><br /><br />
+                <br /><br /><br /><br /><br /><br />
+                @if (bHideTitleDesc)
+                {
+                    <br /><br />
+                }
                 @((MarkupString)strFileDragInfo)         <!--파일을 이곳으로 드래그 하세요.-->
             </p>
 
@@ -160,6 +164,8 @@
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<DropFileList>();
     public bool bHandleFileFlag = false;
+
+    bool bHideTitleDesc = false;
 
     private async Task fileSelectOpen()
     {
@@ -1117,6 +1123,15 @@
 
         bViewDropFileAddError = false; // SGAppMgrSvc.OpConfigInfoService.GetUseDropErrorUI();
         InitText();
+
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        if (groupID > -1)
+            bHideTitleDesc = SGAppMgrSvc.OpConfigInfoService.GetUseHideTitleDesc(groupID);
     }
 
     private void onDrop()
@@ -1684,9 +1699,9 @@
         //2022.10.28 이동 - 다중망 접속 시 초기화면이 [파일전송] 화면인 경우, 해당 망의 이벤트와 리스트로 재배치
         HSCmdCenter.sgPageEvent.SetRMouseFileAddEventAdd(groupID, RMouseFileAction);
         InitText();
-        @*action1 = HandleFileInputChange;
-            action2 = HandleFileInputChange;*@
-    //SGFileExamEvent = FileExamResult;
+        //action1 = HandleFileInputChange;
+        //action2 = HandleFileInputChange;
+        //SGFileExamEvent = FileExamResult;
         HSCmdCenter.sgPageEvent.SetFileExamNotiEventAdd(groupID, FileExamResult);
         PageStatusData pageSData = pageService.GetPageStatus(groupID);
         HsStreamList = pageSData.GetFileDragListData();
@@ -2466,7 +2481,7 @@
         return fileList;
     }
 
-    
+
     //드래그앤드랍 전용코드
     public async Task DropClear()
     {

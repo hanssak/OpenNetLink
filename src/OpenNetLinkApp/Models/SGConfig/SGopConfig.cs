@@ -192,5 +192,12 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseDrmAfterFileReceive { get; set; } = false;          //파일 수신 완료 후 DRM 사용 여부
 
         public int nDrmType { get; set; } = 1;                          //DRM 종류 - 1. SoftCamp
+
+        public bool bHideApprLine { get; set; } = false;           // 결재라인 표현유무
+
+        public bool bHideTitleDesc { get; set; } = false;           // 제목 및 설명 표현유무
+
+
+
     }
 }
