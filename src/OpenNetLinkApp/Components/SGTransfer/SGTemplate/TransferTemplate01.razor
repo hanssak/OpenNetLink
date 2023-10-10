@@ -33,96 +33,87 @@
 @inject IFileReaderService fileReaderService
 @inject ISGAppUpdaterService AppUpdaterSvc;
 
-<div class="row">
+<div class="row" id="divUpperContent">
     <div class="col-md-3 pr-0">
-        <div class="card card-navy card-outline card-boder" style="height:60vh;">
+        <div class="card card-navy card-outline card-boder1">
+            <div id="divLeftUpperSide">
 
-            <FileTree @ref="refFileTree" OnSelectPathFromFileTree="changeSelectPath"></FileTree>
-            <!-- 파일리스트 -->
-            <div id="divFileList" style="width:100%;height:50%;padding:1px 1px 1px 0px;overflow:auto">
             </div>
-            <!-- 파일리스트 -->
         </div>
     </div>
-
-
     <div class="col-md-9">
-        <div id="divRightContent" class="card card-navy card-outline card-boder1" style="background-color: #e9eef7;height:60vh;">
+        <div id="divRightUpperSide">
+            @*제목과 설명은 삭제*@
+            <div class="form-group  clearfix mb-2">
+                <div class="float-left pt-1">
+                    <div class="form-check">
+                        <table>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(OnChangeAfterCheck.InvokeAsync)" hidden="@bAfterApprChkHIde" disabled="@bAfterApprDisable">
+                                </td>
+                                <td>
+                                    <label class="form-check-label" for="exampleCheck2" hidden="@bAfterApprChkHIde"><b>@strAfterApprove</b></label>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileSelectDelete(groupIDbyParam))
+                    {
+                        <div>
+                            <label><font color="red">@strSelectFileDelComment</font></label>
+                        </div>
+                    }
+                </div>
+                <div class="float-right">
+                    <div class="float-right">
+                        <table>
+                            <tr>
+                                @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                {
+                                    <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                    <td class="pr-2">
+                                        <button type="button" @onclick="@(OnBasicSelectOpenPopup.InvokeAsync)" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
+                                    </td>
+                                }
+                                <td>
+                                    <button type="button" class="btn btn-md btn-green" @onclick="@(OnCheckApprLine.InvokeAsync)"><i class="fas fa-share"></i>@strFileSend</button>
+                                    <button type="button" class="btn btn-md btn-blue" @onclick="@(OnOpenFileDialogOpenPopup.InvokeAsync)"><i class="fas fa-file-upload"></i>@strFileReg</button>
+                                    <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
+                                    <button type="button" class="btn btn-md btn-red" @onclick="@(e => RemoveSelectFile())" hidden="@bFileSelectDeleteBtn"><i class="fas fa-times"></i>@strSelectFileDel</button>
 
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="divDropFile" class="card-body p-0" style="height:25vh">
+                <DropFileList @ref="refDropFileList"></DropFileList>
+            </div>
+        </div>
+    </div>
+@*    <div class="col-md-12">
+        <div id="divUpperContent">
             <form class="form-horizontal">
-
-                <div id="divRightUpperSide" class="card-body">
-                    <div class="col-md-12">
-                        <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
-                            <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_TRANS_TITLE")</label>
-                            <div class="col-sm-11 pr-0 pl-0">
-                                <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@strCurTitle" value="@strInitTitle" @onchange="@(e=>TitleValueChanged.InvokeAsync(e.Value.ToString()))" autocomplete="off">
-                                <input type="text" hidden="hidden" />
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-3" style="border:1px solid #c7d6e9;">
-                            <label for="2" class="col-sm-1 col-form-label text-center " style="background-color:#eff8ff;">@XmlConf.GetTitle("T_DETAIL_DESC")</label>
-                            <div class="col-sm-11 pr-0 pl-0">
-                                <textarea class="form-control p-2 border-0 " rows="2" placeholder="@strCurDesc" value="@strInitDesc" @onchange="@(e=>DescValueChanged.InvokeAsync(e.Value.ToString()))"></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="form-group  clearfix mb-2">
-                        <div class="float-left pt-1">
-                            <div class="form-check">
-                                <table>
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(OnChangeAfterCheck.InvokeAsync)" hidden="@bAfterApprChkHIde" disabled="@bAfterApprDisable">
-                                        </td>
-                                        <td>
-                                            <label class="form-check-label" for="exampleCheck2" hidden="@bAfterApprChkHIde"><b>@strAfterApprove</b></label>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                            @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileSelectDelete(groupIDbyParam))
-                            {
-                                <div>
-                                    <label><font color="red">@strSelectFileDelComment</font></label>
-                                </div>
-                            }
-                        </div>
-                        <div class="float-right">
-                            <div class="float-right">
-                                <table>
-                                    <tr>
-                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                                        {
-                                            <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
-                                            <td class="pr-2">
-                                                <button type="button" @onclick="@(OnBasicSelectOpenPopup.InvokeAsync)" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
-                                            </td>
-                                        }
-                                        <td>
-                                            <button type="button" class="btn btn-md btn-green" @onclick="@(OnCheckApprLine.InvokeAsync)"><i class="fas fa-share"></i>@strFileSend</button>
-                                            <button type="button" class="btn btn-md btn-blue" @onclick="@(OnOpenFileDialogOpenPopup.InvokeAsync)"><i class="fas fa-file-upload"></i>@strFileReg</button>
-                                            <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
-                                            <button type="button" class="btn btn-md btn-red" @onclick="@(e => RemoveSelectFile())" hidden="@bFileSelectDeleteBtn"><i class="fas fa-times"></i>@strSelectFileDel</button>
-
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
+                <div id="divUpperContent" class="card card-navy card-outline card-boder1" style="background-color: #e9eef7">
+                     
                 </div>
-
-                <div id="divDropFile" class="card-body p-0" style="height:100%;">
-                    <DropFileList @ref="refDropFileList"></DropFileList>
-                </div>
-
             </form>
         </div>
+    </div>*@
+</div>
+<div class="row" id="divBottomContent">
+    <div class="col-md-3 pr-0">
+        <div id="divFileTree" class="card card-navy card-outline card-boder1">
+                <FileTree @ref="refFileTree" Height="100%" OnSelectPathFromFileTree="changeSelectPath"></FileTree>
+        </div>
+    </div>
+    <div class="col-md-9">
+    <!-- 파일리스트 -->
+        <div id="divFileList"  class="card card-navy card-outline card-boder1" style="overflow:auto">
+        </div>
+        <!-- 파일리스트 -->                  
     </div>
 
 </div>
@@ -131,13 +122,7 @@
 @code
 {
     [Parameter] public int groupIDbyParam { get; set; }
-
-    [Parameter] public string strInitTitle { get; set; }
-    [Parameter] public string strInitDesc { get; set; }    
-
-    [Parameter] public EventCallback<string> TitleValueChanged { get; set; }    
-    [Parameter] public EventCallback<string> DescValueChanged { get; set; }
-
+    
     [Parameter] public bool bAfterCheck { get; set; } = false;
 
     [Parameter] public string strDestNetWork { get; set; }
@@ -161,15 +146,9 @@
     
     public string stSelectPath { get; set; }
 
-    private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferTemplate01_DropAtTheTop>();
-
-    private string strCurrentTitleValue;
-    private string strCurrentDescValue;
-
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferTemplate01>();
     public string strAfterApprove = "";
-    public string strCurTitle = "";
-    public string strCurDesc = "";
-
+    
     public string strFromName = "-";
     public string strToName = "-";
     public string strSelectFileDel = "";
@@ -272,9 +251,6 @@
         strSelectFileDel = XmlConf.GetTitle("T_FILE_SELECT_DELETE");                    // 선택 삭제
         strSelectFileDelComment = XmlConf.GetTitle("T_FILE_SELECT_DELETE_COMMENT");     // ※체크박스 선택 후 선택삭제를 클릭해 주세요.
         strFileReg = XmlConf.GetTitle("T_FILE_FILEREG");                                // 파일등록
-
-        strCurTitle = XmlConf.GetTitle("T_FILE_EMPTYTITLE");                                // 제목을 입력하십시오. (최대 60자)
-        strCurDesc = XmlConf.GetTitle("T_FILE_EMPTYDESC");                                // 설명을 입력하십시오. (최대 80자)
     }
 
     protected void OnSettingByGroupID(int groupID)

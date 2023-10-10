@@ -621,25 +621,41 @@ window.initPageLeft = () => {
     $("#main-body").css("margin-left", "250px");
 }
 
-window.exitLogIn = () => {
+window.exitLogIn = (trensferTemplate) => {
     $("#main-nav").css("display", "");
     $("#left-sidebar").css("display", "");
     $("#main-body").css("margin-left", "250px");
     $("#main-body").css("margin-top", "calc(3rem)");
     $("#main-footer").css("display", "");
     //$("#main-body").css("height", "630px");
-
     var dirRightHeight = $("#divRightContent").css("height");
     var divRightUpper = $("#divRightUpperSide").css("height");
-    //var divRightBottom = $("#divRightBottomSide").css("height");
-    if (divRightUpper != null ) {
-        /*var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));*/
-        var divRest = parseInt(divRightUpper.replace("px", ""));
-        $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 3)) + "px");
-        //Window 사이즈 조절 시 divDropFile Height 도 함께 조절
-        setDropzonSize();
-    }
 
+
+    if (trensferTemplate == 0) {
+        //var divRightBottom = $("#divRightBottomSide").css("height");
+        if (divRightUpper != null) {
+            /*var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));*/
+            var divRest = parseInt(divRightUpper.replace("px", ""));
+            $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 3)) + "px");
+            //Window 사이즈 조절 시 divDropFile Height 도 함께 조절
+            setDropzonSize();
+        }
+    }
+    else
+    {        
+        if (divRightUpper != null) {
+            $("#divLeftUpperSide").css("height", divRightUpper);
+
+            //하위 div의 컨트롤이 모두 overflow가 가능하므로, 템플릿 영역에서 상단 Div 높이를 제한 값으로 설정
+            var divTemplateHeight = $("#divTransferTemplate").css("height");
+            var divUpperHeight = $("#divUpperContent").css("height");
+
+            var divRest = parseInt(divTemplateHeight.replace("px", "") - divUpperHeight.replace("px", ""));
+            $("#divFileTree").css("height", divRest + "px");
+            $("#divFileList").css("height", divRest + "px");
+        }
+    }
     //로그인 후 햄버거 메뉴 축소화 나중에 사용 예정
     //$('[data-widget="pushmenu"]').PushMenu('collapse');
 }
@@ -900,19 +916,36 @@ window.mouseDownIntervalCheck = (minuteTime) => {
         return "true";
 }
 
-window.adJustWindowsize = () => {
+window.adJustWindowsize = (trensferTemplate) => {
 
     $(window).resize(function () {
         var dirRightHeight = $("#divRightContent").css("height");
         var divRightUpper = $("#divRightUpperSide").css("height");
-        //var divRightBottom = $("#divRightBottomSide").css("height");
-        var dirRightWidth = $("#divDropFile").css("width");
-        if (divRightUpper != null) {
-            /*var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));*/
-            var divRest = parseInt(divRightUpper.replace("px", ""));
-            $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 3)) + "px");
-            setDropzonSize();
+        if (trensferTemplate == 0) {
+            //var divRightBottom = $("#divRightBottomSide").css("height");
+            var dirRightWidth = $("#divDropFile").css("width");
+            if (divRightUpper != null) {
+                /*var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));*/
+                var divRest = parseInt(divRightUpper.replace("px", ""));
+                $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 3)) + "px");
+                setDropzonSize();
+            }
         }
+        else {
+            
+            if (divRightUpper != null) {
+                $("#divLeftUpperSide").css("height", divRightUpper);
+
+                //하위 div의 컨트롤이 모두 overflow가 가능하므로, 템플릿 영역에서 상단 Div 높이를 제한 값으로 설정
+                var divTemplateHeight = $("#divTransferTemplate").css("height");
+                var divUpperHeight = $("#divUpperContent").css("height");
+
+                var divRest = parseInt(divTemplateHeight.replace("px", "") - divUpperHeight.replace("px", ""));
+                $("#divFileTree").css("height", divRest + "px");
+                $("#divFileList").css("height", divRest + "px");
+            }            
+        }
+
     });
 }
 //F5 키 눌러서 화면고침 금지(WebView화면고침에러)

@@ -104,7 +104,10 @@
         </div>
         <!-- /.row -->
         <!-- list -->
-        <TransferTemplateDefault @ref="refTransferTemplateDefault" groupIDbyParam="@groupIDbyParam"
+        <div id="divTransferTemplate" style="height:60vh">
+        @if (SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam) == 0)
+        {
+            <TransferTemplateDefault @ref="refTransferTemplateDefault" groupIDbyParam="@groupIDbyParam"
                                  bAfterCheck="@bAfterCheck" bAfterApprChkHIde="@bAfterApprChkHIde" bAfterApprDisable="@bAfterApprDisable"
                                  strDestNetWork="@strDestNetWork" dicDestSysPos="@dicDestSysPos"
                                  strInitTitle="@strBindTitle" TitleValueChanged="@(value=> strCurrentTitle=value)"
@@ -112,8 +115,19 @@
                                  OnChangeAfterCheck="@GetAfterChk"
                                  OnBasicSelectOpenPopup="@openBasicSelect"
                                  OnOpenFileDialogOpenPopup="@OpenFileDialog"
-                                 OnCheckApprLine="@CheckApprLine"/>
-
+                                 OnCheckApprLine="@CheckApprLine" />
+        }
+        else
+        {
+            <TransferTemplate01 @ref="refTemplate01" groupIDbyParam="@groupIDbyParam"
+                    bAfterCheck="@bAfterCheck" bAfterApprChkHIde="@bAfterApprChkHIde" bAfterApprDisable="@bAfterApprDisable"
+                    strDestNetWork="@strDestNetWork" dicDestSysPos="@dicDestSysPos"
+                    OnChangeAfterCheck="@GetAfterChk"
+                    OnBasicSelectOpenPopup="@openBasicSelect"
+                    OnOpenFileDialogOpenPopup="@OpenFileDialog"
+                    OnCheckApprLine="@CheckApprLine" />
+        }
+        </div>
         <div id="divRightBottomSide" class="card-footer clearfix" style="padding:.5rem 1.25rem !important; font-size:.8rem !important;">
             <div class="float-left">
                 @if (UseUrlRedirectionByServer)
@@ -190,6 +204,7 @@
     const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
 
     TransferTemplateDefault refTransferTemplateDefault;
+    TransferTemplate01 refTemplate01;
     DropFileList dropFile;  //템플릿 내부의 DropFileList 태그
 
     //Transfer_Denied refTransferDenied;
@@ -277,6 +292,9 @@
     public bool bFileSelectDeleteBtn = false;
 
     public bool bURLRedirection = true;
+
+    public int nTransferTemplate = 0;
+
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
     // 3망 - 클립보드 전송 UI
@@ -287,7 +305,7 @@
     bool UseUrlRedirectionByServer = false;
 
     /// <summary>JS에서 받아서 템플릿에게 전달할 하위 탐색기 Load 액션</summary>
-    private static Action<string> actionLoadFileList; 
+    private static Action<string> actionLoadFileList;
 
     private static Action<List<string>> ActionFileSelectOK;
     private static Action<string, string> actionAddDataList;
@@ -298,16 +316,13 @@
     private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction1;
     private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction2;
 
-
     //결재라인
     List<Dictionary<int, string>> detailData = null;
     int cntSendQuery = 0;   //쿼리 전송 횟수
     int cntRecvQuery = 0;   //쿼리 조회 결과 수신 횟수
 
-
     // 파일목록 임시 받는 용도
     List<HsStream> FileList = null;
-
 
     bool bUseFileTransForTime = false;
 
@@ -1784,13 +1799,21 @@
         // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
         if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
-            //지정된 템플릿의 DropFileList
-            dropFile = refTransferTemplateDefault.GetDropFileList();
-            actionLoadFileList = refTransferTemplateDefault.LoadListFiles;
-
-
             nDrawPageGroupID = groupIDbyParam;
             groupID = groupIDbyParam;
+
+            nTransferTemplate =  SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupID);
+            //지정된 템플릿의 DropFileList
+            if (nTransferTemplate == 0)
+            {
+                dropFile = refTransferTemplateDefault.GetDropFileList();
+                actionLoadFileList = refTransferTemplateDefault.LoadListFiles;
+            }
+            else
+            {
+                dropFile = refTemplate01.GetDropFileList();
+                actionLoadFileList = refTemplate01.LoadListFiles;
+            }
 
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -1878,9 +1901,9 @@
         //DropZone 클릭방지코드
         //await JSRuntime.InvokeAsync<object>("stopClick");
 
-        await JSRuntime.InvokeAsync<object>("exitLogIn");
+        await JSRuntime.InvokeAsync<object>("exitLogIn", new object[] { nTransferTemplate });
 
-        await JSRuntime.InvokeAsync<object>("adJustWindowsize");
+        await JSRuntime.InvokeAsync<object>("adJustWindowsize", new object[] { nTransferTemplate });
     }
     private void stopClickSync()
     {
@@ -1888,9 +1911,9 @@
         //DropZone 클릭방지코드
         //await JSRuntime.InvokeAsync<object>("stopClick");
 
-        JSRuntime.InvokeAsync<object>("exitLogIn");
+        JSRuntime.InvokeAsync<object>("exitLogIn", new object[] { nTransferTemplate });
 
-        JSRuntime.InvokeAsync<object>("adJustWindowsize");
+        JSRuntime.InvokeAsync<object>("adJustWindowsize", new object[] { nTransferTemplate });
     }
 
     private void AddDataList(string str, string type)

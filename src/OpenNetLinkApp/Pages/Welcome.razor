@@ -990,8 +990,9 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         //await JSRuntime.InvokeAsync<object>("initWelcome");
-        await JSRuntime.InvokeAsync<object>("exitLogIn");
-        await JSRuntime.InvokeAsync<object>("adJustWindowsize");
+        int transferTemplate = SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam);
+        await JSRuntime.InvokeAsync<object>("exitLogIn",new object[] {transferTemplate});
+        await JSRuntime.InvokeAsync<object>("adJustWindowsize",new object[] {transferTemplate});
 
         /*
         object[] param = { nDayMaxFileSize, nDayUseFileSize };

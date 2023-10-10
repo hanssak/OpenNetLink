@@ -212,6 +212,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseDrmAfterFileReceive(int groupId);
 
         public int GetDrmType(int groupId);
+
+        public int GetTransferTemplate(int groupId);
     }
 
 
@@ -1011,6 +1013,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public int GetDrmType(int groupId)
         {
             return AppConfigInfo[groupId].nDrmType;
+        }
+
+        public int GetTransferTemplate(int groupId)
+        {
+            return AppConfigInfo[groupId].nTransferTemplate;
         }
     }
 }
