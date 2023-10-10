@@ -14,13 +14,11 @@ namespace OpenNetLinkApp.Data.SGDicData.DRM
     {
         public const string strSoftCampDrmLibName = "C:\\Windows\\DSCSLink.dll";
         [DllImport(strSoftCampDrmLibName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int DSCSGradeEncryptFileV2(string stSource, string grade);
+        public static extern int DSCSGradeEncryptFileV2(string stSource);
 
         public int DrmEncrypt(string source)
         {
-            string grade = "0000001";
-
-            int ret = DSCSGradeEncryptFileV2(source, grade);
+            int ret = DSCSGradeEncryptFileV2(source);
 
             //ret == 0 암호화 실패
             //ret == 1 암호화 성공
