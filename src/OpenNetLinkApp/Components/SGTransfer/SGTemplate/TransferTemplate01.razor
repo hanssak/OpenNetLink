@@ -20,7 +20,6 @@
 @using Data.SGDicData.SGAlz;
 @using OpenNetLinkApp.Components.SGTransfer.SGTemplate;
 
-
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
@@ -37,7 +36,6 @@
     <div class="col-md-3 pr-0">
         <div class="card card-navy card-outline">
             <div id="divLeftUpperSide">
-
             </div>
         </div>
     </div>
@@ -97,58 +95,58 @@
 <div class="row" id="divBottomContent">
     <div class="col-md-3 pr-0">
         <div id="divFileTree" class="card card-navy card-outline">
-                <FileTree @ref="refFileTree" Height="100%" OnSelectPathFromFileTree="changeSelectPath"></FileTree>
+            <FileTree @ref="refFileTree" Height="100%" OnSelectPathFromFileTree="changeSelectPath"></FileTree>
         </div>
     </div>
     <div class="col-md-9">
-    <!-- 파일리스트 -->
-        <div id="divFileList"  class="card" style="overflow:auto;">
+        <!-- 파일리스트 -->
+        <div id="divFileList" class="card" style="overflow:auto;">
             <table id="tableFileList" class="table table-hover table-head-fixed">
                 <thead>
                     <tr>
-                       @* <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Name: activate to sort column ascending" style="position:sticky; top:0px;">
+                        @* <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Name: activate to sort column ascending" style="position:sticky; top:0px;">
                             이름
-                        </th>
-                        <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Size: activate to sort column ascending" style="position:sticky; top:0px; width:70px;">
+                            </th>
+                            <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Size: activate to sort column ascending" style="position:sticky; top:0px; width:70px;">
                             크기
-                        </th>
-                        <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Type: activate to sort column ascending" style="position:sticky; top:0px; width:70px;">
+                            </th>
+                            <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Type: activate to sort column ascending" style="position:sticky; top:0px; width:70px;">
                             유형
-                        </th>*@
+                            </th>*@
                         <th>
                             <div style="float:left;width:100%">
-                                <label>@strFileName</label>
+                                <button @onclick="@(()=> OnClickHeader("Name"))" style="width:calc(100% - 160px); text-align:left">@strFileName</button>
                                 <div style="float:right">
-                                    <label  style="width:70px;text-align:right;margin-right:10px;">@strFileSize</label>
-                                    <label style="width:70px;text-align:left">@strFileType</label>
+                                    <button @onclick="@(()=> OnClickHeader("Size"))" style="width:70px;text-align:right;margin-right:10px;">@strFileSize</button>
+                                    <button @onclick="@(()=> OnClickHeader("Ext"))" style="width:70px;text-align:left">@strFileType</button>
                                 </div>
                             </div>
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-@*
-                    @foreach (SGFileInfo file in sgFile)
-                    {
+                    @*
+                        @foreach (SGFileInfo file in sgFile)
+                        {
                         <tr>
-                            <td colspan=3>
-                            <div>@("Name:" + file.Name + " Size:" + file.Size + " Type:" + file.Type)</div>
-                            </td>
-                     
+                        <td colspan=3>
+                        <div>@("Name:" + file.Name + " Size:" + file.Size + " Type:" + file.Type)</div>
+                        </td>
+
                         </tr>
-                    }*@
-              @*      <tr>
-                            <div data-draggable='item' draggable='true' aria-grabbed='false' style="border:none; margin:0" title='aaa'>
-                                <i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;
-                                AAA
-                            </div>
-                        
-                    </tr>*@
-                    
+                        }*@
+                    @*      <tr>
+                        <div data-draggable='item' draggable='true' aria-grabbed='false' style="border:none; margin:0" title='aaa'>
+                        <i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;
+                        AAA
+                        </div>
+
+                        </tr>*@
+
                 </tbody>
             </table>
         </div>
-        <!-- 파일리스트 -->                  
+        <!-- 파일리스트 -->
     </div>
 
 </div>
@@ -157,7 +155,7 @@
 @code
 {
     [Parameter] public int groupIDbyParam { get; set; }
-    
+
     [Parameter] public bool bAfterCheck { get; set; } = false;
 
     [Parameter] public string strDestNetWork { get; set; }
@@ -173,17 +171,17 @@
     /// 사후결재 checkBox Disable 설정유무(By:서버정책, true : 사용못함, false : 사용함)
     /// </summary>
     [Parameter] public bool bAfterApprDisable { get; set; }
-    
+
     [Parameter] public EventCallback OnChangeAfterCheck { get; set; }
     [Parameter] public EventCallback OnBasicSelectOpenPopup { get; set; }
     [Parameter] public EventCallback OnOpenFileDialogOpenPopup { get; set; }
     [Parameter] public EventCallback OnCheckApprLine { get; set; }
-    
+
     public string stSelectPath { get; set; }
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferTemplate01>();
     public string strAfterApprove = "";
-    
+
     public string strFromName = "-";
     public string strToName = "-";
     public string strSelectFileDel = "";
@@ -227,6 +225,20 @@
     public DropFileList GetDropFileList() => refDropFileList;
 
 
+    private void OnClickHeader(string header)
+    {
+        if (sgFile == null || sgFile.Count <= 0)
+            return;
+        
+        var infoType = typeof(SGFileInfo);
+        var sortProperty = infoType.GetProperty(header);
+
+        string listHtml = makeSubFileList(sgFile.OrderBy(p => sortProperty.GetValue(p, null)).ToList());
+        object[] param = { "tableFileList > tbody", listHtml };
+        JSRuntime.InvokeAsync<object>("appendHtml", param);
+
+        StateHasChanged();
+    }
 
     private void changeSelectPath(string args)
     {
@@ -270,7 +282,7 @@
     int nDrawPageGroupID = -1;          // 전달받은 groupID 별로 화면구성 - 다중접속화면구성
     protected override void OnAfterRender(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             base.OnAfterRenderAsync(firstRender);
         }
@@ -390,7 +402,7 @@
             CLog.Here().Error("LoadListFiles, Exception:" + ex3.Message);
         }
 
-        string listHtml = makeSubFileList();
+        string listHtml = makeSubFileList(sgFile);
         object[] param = { "tableFileList > tbody", listHtml };
         JSRuntime.InvokeAsync<object>("appendHtml", param);
 
@@ -400,34 +412,35 @@
     }
 
     public int dragLabel = 1;
-    private string makeSubFileList()
+    private string makeSubFileList(List<SGFileInfo> subFileList)
     {
         StringBuilder stRtn = new StringBuilder();
-        if (sgFile != null && sgFile.Count > 0)
+
+        if (subFileList != null && subFileList.Count > 0)
         {
             //드래그 가능한 div 하위 요소에 draggable 옵션을 주어서
             //mousedown 이벤트에서 부요요소인 div를 target으로 삼을 수 있게 구성
             if (dragLabel > 0) { dragLabel = 1; }
-            foreach (SGFileInfo item in sgFile)
+            foreach (SGFileInfo item in subFileList)
             {
                 stRtn.Append(@"<tr>");
                 stRtn.Append(@" <td>");
-                
+
                 if (item.Type == 1) //파일 목록
                 {
                     stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""margin:0"" title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "'>");
                     stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
-                        
+
                     stRtn.Append(@"<label draggable='true' style=""font-style: normal;font-weight: normal;"">");
                     stRtn.Append(item.getNameStr(false));
                     stRtn.Append(@"</label>");
-                    
+
                     //크기/유형 항목 구성
                     stRtn.Append(@"<div draggable='true' style=""float:right"">");
                     stRtn.Append(@"     <label draggable='true' style=""font-style: normal;font-weight:normal; width:70px;text-align:right;margin-right:10px;"">");
                     stRtn.Append(CsFunction.GetSizeStr(item.Size));
                     stRtn.Append(@"     </label>");
-                    
+
                     stRtn.Append(@"     <label draggable='true' style=""font-style: normal;font-weight:normal; width:70px;text-align:left;"">");
                     stRtn.Append(item.Ext.Replace(".", "").ToUpper());
                     stRtn.Append(@"     </label>");
@@ -435,13 +448,13 @@
                 }
                 else    //최상위 버튼 및 폴더 목록
                 {
-                    if(item.Type == 3) //최상위 이동 버튼
-                        stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""margin:0""  title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                    if (item.Type == 3) //최상위 이동 버튼
+                        stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""margin:0"" title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                     else
                         stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""margin:0"" title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
-                               
+
                     stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
-                
+
                     stRtn.Append(@"<label draggable='true' style=""font-style: normal;font-weight: normal;"">");
                     stRtn.Append(item.getNameStr(false));
                     stRtn.Append(@"</label>");
@@ -449,7 +462,7 @@
                 stRtn.Append(@"</div>");
                 stRtn.Append(@" </td>");
                 stRtn.Append(@"</tr>");
-                
+
                 if (dragLabel > 0) { dragLabel++; }
             }
         }
