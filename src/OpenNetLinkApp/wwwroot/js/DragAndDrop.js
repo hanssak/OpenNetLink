@@ -981,8 +981,11 @@ window.addMouseDown = (message) => {
     document.addEventListener('mousedown', function (e) {
 
 
-        if (MouseTime == Math.floor(+ new Date() / 1000))
+        if (MouseTime == Math.floor(+ new Date() / 1000)) {
+            console.log("MOUSE DOWN EVENT -Return /" + MouseTime + "/" + new Date() + "/" + Math.floor(+ new Date() / 1000));
             return;
+        }
+            
         MouseTime = Math.floor(+ new Date() / 1000);
         console.log("MOUSE DOWN EVENT " + e.target.getAttribute('name') + " MouseTime:" + MouseTime);
 
@@ -1127,20 +1130,30 @@ window.addMouseDown = (message) => {
         }
         //기본파일선택
         if (e.target.getAttribute('draggable')) {
+
+            var eventTarget = e.target;
+
+            //드래그할 요소의 하위 요소(draggable속성을 가짐)를 클릭하였을 때, 부모요소를 찾아서 target으로 지정
+            if (e.target.getAttribute('aria-grabbed') == null) {
+                var parentTarget = searchParentDragTarget(e.target);
+                if (parentTarget != null)
+                    eventTarget = parentTarget;
+            }            
+
             //if the multiple selection modifier is not pressed 
             //and the item's grabbed state is currently false
-            if (!hasModifier(e) && e.target.getAttribute('aria-grabbed') == 'false') {
+            if (!hasModifier(e) && eventTarget.getAttribute('aria-grabbed') == 'false') {
                 //clear all existing selections
                 clearSelections();
                 //then add this new selection
-                addSelection(e.target);
-                firstShift = e.target.getAttribute('label');
+                addSelection(eventTarget);
+                firstShift = eventTarget.getAttribute('label');
                 console.log("First SHIFT KEY:" + firstShift);
                 return;
             }
 
-            if (hasShitfKey(e) == true && e.target.getAttribute('aria-grabbed') == 'false') {
-                secondShift = e.target.getAttribute('label');
+            if (hasShitfKey(e) == true && eventTarget.getAttribute('aria-grabbed') == 'false') {
+                secondShift = eventTarget.getAttribute('label');
                 console.log("Second SHIFT KEY:" + secondShift);
                 if ((firstShift != secondShift) && firstShift > 0 && secondShift > 0) {
                     clearSelections();
@@ -1168,6 +1181,15 @@ window.addMouseDown = (message) => {
     }, false);
 }
 
+function searchParentDragTarget(child) {
+    if (child.getAttribute('aria-grabbed') != null)
+        return child;
+    else if (child.parentElement != null)
+        return searchParentDragTarget(child.parentElement);
+    else
+        null;
+}
+
 function ShiftPopSelection(firstShift, secondShift) {
     console.log("ShiftPopSelection start");
     var tempFirst = firstShift;
@@ -1193,7 +1215,6 @@ function ShiftPopSelection(firstShift, secondShift) {
 }
 
 function ShiftSelection(firstShift, secondShift) {
-
     var tempFirst = firstShift;
     var tempSecond = secondShift;
 

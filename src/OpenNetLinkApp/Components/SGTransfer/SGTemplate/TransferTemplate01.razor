@@ -106,7 +106,7 @@
             <table id="tableFileList" class="table table-hover table-head-fixed">
                 <thead>
                     <tr>
-                        <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Name: activate to sort column ascending" style="position:sticky; top:0px;">
+                       @* <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Name: activate to sort column ascending" style="position:sticky; top:0px;">
                             이름
                         </th>
                         <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Size: activate to sort column ascending" style="position:sticky; top:0px; width:70px;">
@@ -114,17 +114,20 @@
                         </th>
                         <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Type: activate to sort column ascending" style="position:sticky; top:0px; width:70px;">
                             유형
-                        </th>
-                     @*   <th>
-                            <div style="float:left">
-                                <label>이름</label>
-                                <label>크기</label>
-                                <label>유형</label>
-                            </div>
                         </th>*@
+                        <th>
+                            <div style="float:left;width:100%">
+                                <label>이름</label>
+                                <div style="float:right">
+                                    <label  style="width:70px;text-align:right;margin-right:10px;">크기</label>
+                                    <label style="width:70px;text-align:left">유형</label>
+                                </div>
+                            </div>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
+@*
                     @foreach (SGFileInfo file in sgFile)
                     {
                         <tr>
@@ -133,7 +136,7 @@
                             </td>
                      
                         </tr>
-                    }
+                    }*@
               @*      <tr>
                             <div data-draggable='item' draggable='true' aria-grabbed='false' style="border:none; margin:0" title='aaa'>
                                 <i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;
@@ -394,17 +397,21 @@
         StringBuilder stRtn = new StringBuilder();
         if (sgFile != null && sgFile.Count > 0)
         {
+            //드래그 가능한 div 하위 요소에 draggable 옵션을 주어서
+            //mousedown 이벤트에서 부요요소인 div를 target으로 삼을 수 있게 구성
             if (dragLabel > 0) { dragLabel = 1; }
             foreach (SGFileInfo item in sgFile)
             {
                 stRtn.Append(@"<tr>");
                 stRtn.Append(@" <td colspan=3>");
-                if (item.Type == 3)
+                if (item.Type == 3) //최상위 이동 버튼
                 {
                     stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""border:none; margin:0""  title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                     stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
+                
+                    stRtn.Append(@"<label draggable='true' style=""font-style: normal;font-weight: normal;"">");
                     stRtn.Append(item.getNameStr(false));
-                    stRtn.Append(@"</div>");
+                    stRtn.Append(@"</label>");
                 }
                 else
                 {
@@ -418,10 +425,23 @@
                         stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""border:none; margin:0"" title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                         stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
                     }
-                    stRtn.Append(item.getNameStr(false) + " " + item.getSizeStr());
+                    //stRtn.Append(item.getNameStr(false) + " " + item.getSizeStr());
+                    stRtn.Append(@"<label draggable='true' style=""font-style: normal;font-weight: normal;"">");
+                    stRtn.Append(item.getNameStr(false));
+                    stRtn.Append(@"</label>");
+                    
+                    //크기/유형 항목 구성
+                    stRtn.Append(@"<div draggable='true' style=""float:right"">");
+                    stRtn.Append(@"     <label draggable='true' style=""font-style: normal;font-weight:normal; width:70px;text-align:right;margin-right:10px;"">");
+                    stRtn.Append(CsFunction.GetSizeStr(item.Size));
+                    stRtn.Append(@"     </label>");
+                    
+                    stRtn.Append(@"     <label draggable='true' style=""font-style: normal;font-weight:normal; width:70px;text-align:left;"">");
+                    stRtn.Append(item.Ext);
+                    stRtn.Append(@"     </label>");
                     stRtn.Append(@"</div>");
                 }
-
+                stRtn.Append(@"</div>");
                 stRtn.Append(@" </td>");
                 stRtn.Append(@"</tr>");
                 
