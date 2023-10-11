@@ -117,10 +117,10 @@
                         </th>*@
                         <th>
                             <div style="float:left;width:100%">
-                                <label>이름</label>
+                                <label>@strFileName</label>
                                 <div style="float:right">
-                                    <label  style="width:70px;text-align:right;margin-right:10px;">크기</label>
-                                    <label style="width:70px;text-align:left">유형</label>
+                                    <label  style="width:70px;text-align:right;margin-right:10px;">@strFileSize</label>
+                                    <label style="width:70px;text-align:left">@strFileType</label>
                                 </div>
                             </div>
                         </th>
@@ -192,6 +192,10 @@
     public string strFileSend = "";
     public string strFileDel = "";
     public string strFileReg = "";
+
+    string strFileName = "";
+    string strFileSize = "";
+    string strFileType = "";
 
     /// <summary>
     /// 선택 삭제 버튼 사용 유무
@@ -286,6 +290,10 @@
         strSelectFileDel = XmlConf.GetTitle("T_FILE_SELECT_DELETE");                    // 선택 삭제
         strSelectFileDelComment = XmlConf.GetTitle("T_FILE_SELECT_DELETE_COMMENT");     // ※체크박스 선택 후 선택삭제를 클릭해 주세요.
         strFileReg = XmlConf.GetTitle("T_FILE_FILEREG");                                // 파일등록
+
+        strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                   // 파일명
+        strFileSize = XmlConf.GetTitle("T_COMMON_SIZE");                       // 크기
+        strFileType = XmlConf.GetTitle("T_COMMON_KIND");                       // 유형
     }
 
     protected void OnSettingByGroupID(int groupID)
@@ -403,29 +411,13 @@
             foreach (SGFileInfo item in sgFile)
             {
                 stRtn.Append(@"<tr>");
-                stRtn.Append(@" <td colspan=3>");
-                if (item.Type == 3) //최상위 이동 버튼
-                {
-                    stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""border:none; margin:0""  title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
-                    stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
+                stRtn.Append(@" <td>");
                 
-                    stRtn.Append(@"<label draggable='true' style=""font-style: normal;font-weight: normal;"">");
-                    stRtn.Append(item.getNameStr(false));
-                    stRtn.Append(@"</label>");
-                }
-                else
+                if (item.Type == 1) //파일 목록
                 {
-                    if (item.Type == 1)
-                    {
-                        stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""border:none; margin:0"" title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "'>");
-                        stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
-                    }
-                    else
-                    {
-                        stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""border:none; margin:0"" title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
-                        stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
-                    }
-                    //stRtn.Append(item.getNameStr(false) + " " + item.getSizeStr());
+                    stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""margin:0"" title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "'>");
+                    stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
+                        
                     stRtn.Append(@"<label draggable='true' style=""font-style: normal;font-weight: normal;"">");
                     stRtn.Append(item.getNameStr(false));
                     stRtn.Append(@"</label>");
@@ -437,9 +429,22 @@
                     stRtn.Append(@"     </label>");
                     
                     stRtn.Append(@"     <label draggable='true' style=""font-style: normal;font-weight:normal; width:70px;text-align:left;"">");
-                    stRtn.Append(item.Ext);
+                    stRtn.Append(item.Ext.Replace(".", "").ToUpper());
                     stRtn.Append(@"     </label>");
                     stRtn.Append(@"</div>");
+                }
+                else    //최상위 버튼 및 폴더 목록
+                {
+                    if(item.Type == 3) //최상위 이동 버튼
+                        stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""margin:0""  title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                    else
+                        stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""margin:0"" title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                               
+                    stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
+                
+                    stRtn.Append(@"<label draggable='true' style=""font-style: normal;font-weight: normal;"">");
+                    stRtn.Append(item.getNameStr(false));
+                    stRtn.Append(@"</label>");
                 }
                 stRtn.Append(@"</div>");
                 stRtn.Append(@" </td>");
