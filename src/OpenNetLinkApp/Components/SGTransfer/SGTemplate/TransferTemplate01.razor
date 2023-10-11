@@ -93,15 +93,6 @@
             </div>
         </div>
     </div>
-@*    <div class="col-md-12">
-        <div id="divUpperContent">
-            <form class="form-horizontal">
-                <div id="divUpperContent" class="card card-navy card-outline card-boder1" style="background-color: #e9eef7">
-                     
-                </div>
-            </form>
-        </div>
-    </div>*@
 </div>
 <div class="row" id="divBottomContent">
     <div class="col-md-3 pr-0">
@@ -111,7 +102,48 @@
     </div>
     <div class="col-md-9">
     <!-- 파일리스트 -->
-        <div id="divFileList"  class="card card-navy card-outline" style="overflow:auto">
+        <div id="divFileList"  class="card" style="overflow:auto;">
+            <table id="tableFileList" class="table table-hover table-head-fixed">
+                <thead>
+                    <tr>
+                        <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Name: activate to sort column ascending" style="position:sticky; top:0px;">
+                            이름
+                        </th>
+                        <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Size: activate to sort column ascending" style="position:sticky; top:0px; width:70px;">
+                            크기
+                        </th>
+                        <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Type: activate to sort column ascending" style="position:sticky; top:0px; width:70px;">
+                            유형
+                        </th>
+                     @*   <th>
+                            <div style="float:left">
+                                <label>이름</label>
+                                <label>크기</label>
+                                <label>유형</label>
+                            </div>
+                        </th>*@
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (SGFileInfo file in sgFile)
+                    {
+                        <tr>
+                            <td colspan=3>
+                            <div>@("Name:" + file.Name + " Size:" + file.Size + " Type:" + file.Type)</div>
+                            </td>
+                     
+                        </tr>
+                    }
+              @*      <tr>
+                            <div data-draggable='item' draggable='true' aria-grabbed='false' style="border:none; margin:0" title='aaa'>
+                                <i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;
+                                AAA
+                            </div>
+                        
+                    </tr>*@
+                    
+                </tbody>
+            </table>
         </div>
         <!-- 파일리스트 -->                  
     </div>
@@ -348,13 +380,57 @@
         }
 
         string listHtml = makeSubFileList();
-        object[] param = { "divFileList", listHtml };
+        object[] param = { "tableFileList > tbody", listHtml };
         JSRuntime.InvokeAsync<object>("appendHtml", param);
+
+        //object[] param = { "divFileList", listHtml };
+        //JSRuntime.InvokeAsync<object>("appendHtml", param);
         StateHasChanged();
     }
 
     public int dragLabel = 1;
     private string makeSubFileList()
+    {
+        StringBuilder stRtn = new StringBuilder();
+        if (sgFile != null && sgFile.Count > 0)
+        {
+            if (dragLabel > 0) { dragLabel = 1; }
+            foreach (SGFileInfo item in sgFile)
+            {
+                stRtn.Append(@"<tr>");
+                stRtn.Append(@" <td colspan=3>");
+                if (item.Type == 3)
+                {
+                    stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""border:none; margin:0""  title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                    stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
+                    stRtn.Append(item.getNameStr(false));
+                    stRtn.Append(@"</div>");
+                }
+                else
+                {
+                    if (item.Type == 1)
+                    {
+                        stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""border:none; margin:0"" title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "'>");
+                        stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
+                    }
+                    else
+                    {
+                        stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""border:none; margin:0"" title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                        stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
+                    }
+                    stRtn.Append(item.getNameStr(false) + " " + item.getSizeStr());
+                    stRtn.Append(@"</div>");
+                }
+
+                stRtn.Append(@" </td>");
+                stRtn.Append(@"</tr>");
+                
+                if (dragLabel > 0) { dragLabel++; }
+            }
+        }
+        return stRtn.ToString();
+    }
+    private string _makeSubFileList()
     {
         StringBuilder stRtn = new StringBuilder();
         if (sgFile != null && sgFile.Count > 0)
