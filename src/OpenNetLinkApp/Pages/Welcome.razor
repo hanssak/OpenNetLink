@@ -809,19 +809,8 @@
     {
 
         int groupID = groupIDbyParam;
-
         path += $"/{groupID}";
 
-        string strNavigateUrl = path.ToLower();
-
-        if (strNavigateUrl.IndexOf("transfer") > 0 && strNavigateUrl.IndexOf("transferapprove") < 0)
-        {
-            strNavigateUrl = pageService.GetFileTransPage(groupID);
-            if (strNavigateUrl == null || strNavigateUrl.Length < 1)
-                strNavigateUrl = "/Transfer/";
-            strNavigateUrl += groupID.ToString();
-            path = strNavigateUrl;
-        }
 
         KeyboardEventArgs eventArgs = new KeyboardEventArgs();
         eventArgs.Key = "Enter";

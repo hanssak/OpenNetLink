@@ -457,7 +457,7 @@
     /// <param name="groupId"></param>
     public void SendDayFileInfo()
     {
-         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
@@ -637,6 +637,9 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await jsRuntime.InvokeAsync<object>("exitLogIn");
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize");
+
         if (firstRender)
         {
             await TransSearchCount();
@@ -1179,9 +1182,9 @@
             }
             else
             {
-                if(tData.expiredDate == "0001-01-01")
+                if (tData.expiredDate == "0001-01-01")
                 {
-                    if(!string.IsNullOrEmpty(sgLoginData.GetSystemPeriod()) && sgLoginData.GetSystemPeriod() != "0")
+                    if (!string.IsNullOrEmpty(sgLoginData.GetSystemPeriod()) && sgLoginData.GetSystemPeriod() != "0")
                     {
                         DateTime requestTime = Convert.ToDateTime(tData.RequestTime);
                         tData.expiredDate = requestTime.AddDays(Convert.ToInt64(sgLoginData.GetSystemPeriod())).ToString("yyyy-MM-dd");
