@@ -1550,7 +1550,7 @@
                     CtrlSideEvent ctrlSideEvent = null;
                     ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
                     if (ctrlSideEvent != null)
-                        ctrlSideEvent();
+                        ctrlSideEvent(groupId);
 
 
                     SetReconnectStart(groupId);
@@ -2249,7 +2249,7 @@
             CtrlSideEvent ctrlSideEvent = null;
             ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
             if (ctrlSideEvent != null)
-                ctrlSideEvent();
+                ctrlSideEvent(groupId);
 
             // Move WebWindow To Tray.
             //if (AppConfigSvc.GetStartTrayMove()) Window.MoveWebWindowToTray();

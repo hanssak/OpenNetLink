@@ -3372,7 +3372,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         // 로그아웃에 따른 공통환경설정 UI조정
         CtrlSideEvent ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
         if (ctrlSideEvent != null)
-            ctrlSideEvent();
+            ctrlSideEvent(groupID);
 
         // Reconnect, 메뉴 재생성동작하게 
         pageService.SetStatusSideMenuReBuildTime(groupID, true);

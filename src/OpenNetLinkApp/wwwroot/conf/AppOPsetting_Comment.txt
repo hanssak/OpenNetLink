@@ -86,7 +86,7 @@ strScrTimeoutLockType : ScrLockTime의 시간초과로 타임아웃 발생 시, 
 
 
 // 기타 (1)
-enMainPageType : 로그인후 메인페이지 (나머지 : DASHBOARD, 2 : TRANSFER)
+enMainPageType : 로그인후 메인페이지 (0,1 : DASHBOARD, 2 : TRANSFER | 파일전송 , 3 : TRANSMANAGER_FILE | 파일전송관리, 4 : TRANSMANAGER_CLIP | 클립보드관리, 5 : TRANSMANAGER_EMAIL | 메일관리)
 bNoApproveManageUI : 모든 기능 결재관리 UI 않나오도록함.(보안결재 제외, true : 결재관리UI 들 안나옴, false : 나옴)(siteConfig)
 bUseApproveManageUIForce : 서버 설정과 상관없이 결재관리 페이지가 나오게 설정
 bStartProgramReg : 시작 프로그램 등록 ( true : 부팅때 OpenNetLink 실행, false : 부팅때 OpenNetLink 실행 등록 해제 ) [기능X]
