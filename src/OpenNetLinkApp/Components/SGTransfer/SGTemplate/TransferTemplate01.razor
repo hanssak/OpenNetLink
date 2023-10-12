@@ -359,6 +359,9 @@
     private void LoadListFiles(string stPath, string changeSortingKey)
     {
         sgFile.Clear();
+        //우측 리스트 갱신 전 선택되어 있던 selectionsItem클리어
+        JSRuntime.InvokeAsync<object>("clearSelections");
+        
         List<SGFileInfo> fileList = new List<SGFileInfo>();
 
         IEnumerable<string> fList = null;
