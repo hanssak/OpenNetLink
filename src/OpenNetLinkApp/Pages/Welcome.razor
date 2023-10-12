@@ -1100,7 +1100,6 @@
 
             CheckContinueFileUpload();
 
-            CheckClientPatch(sgLoginData, groupID);
         }
 
         pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);          //매일 자정 데이터 새로고침
@@ -2122,60 +2121,6 @@
         }
         InitDBInfo();
         StateHasChanged();
-    }
-
-    /// <summary>
-    /// Server와 Local의 Client version 버전 비교 후 자동 업데이트 (PATCHMODE= 1 일때 기능함)
-    /// </summary>
-    /// <param name="sgLoginData"></param>
-    /// <returns></returns>
-    public void CheckClientPatch(SGLoginData sgLoginData, int groupID)
-    {
-        //return false;
-        if (sgLoginData == null)
-            return;
-        if (!sgLoginData.GetClientUpgrade())
-            return;
-
-        //PATCHMODE가 1 일때, 서버에 업데이트 대기중인 버전 정보가 반환됨
-        string strSvrCliVersion = sgLoginData.GetServClientVersion().ToUpper();
-
-        if (strSvrCliVersion.Equals(""))
-            return;
-
-        CLog.Here().Information("groupID : {0} - DashBoard Server Client Version {1}", groupID, strSvrCliVersion);
-
-        string strCliVersion = HsCmdCenter.GetCliVersion().ToUpper();
-
-        if (strCliVersion.Equals(""))
-            return;
-
-        if (!versionConfigSvc.isUpperVersion(strSvrCliVersion, strCliVersion))
-            return;
-
-        CLog.Here().Information("groupID : {0} - WelCome Server Client Version {1}", groupID, strSvrCliVersion);
-        CLog.Here().Information("groupID : {0} - WelCome Local Client Version {1}", groupID, strCliVersion);
-
-        //업데이트  진행중이면 SKIP 하도록 처리 (KYH)
-        (Enums.UpdateStatusType status, int groupId) nowUpdateInfo = AppUpdaterSvc.GetNowUpdateInfo();
-        if (nowUpdateInfo.status != Enums.UpdateStatusType.NONE && nowUpdateInfo.groupId > -1)
-        {
-            CLog.Here().Information($"nowUpdateInfo.groupId : {groupID} - Update Already Started By GroupID[{nowUpdateInfo.groupId}] / Status[{nowUpdateInfo.status.ToString()}]");
-            return;
-        }
-
-        //다른망에 Update Cancel 중이면 SKIP
-        if (AppUpdaterSvc.IsCancelRequested)
-        {
-            CLog.Here().Information($"groupId : {groupID} SKIP - Update Canceling...");
-            return;
-        }
-
-        //ForceUpdate와 상관없이, PatchMode가 1이면 무조건 강제 업데이트 처리
-        ClientUpgradeExeEvent clientUpdateExe = null;
-        clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
-        if (clientUpdateExe != null)
-            clientUpdateExe(groupID, true);
     }
 
 

@@ -1824,9 +1824,6 @@
                 }
             }
 
-            if (sgLoginData != null && SGAppMgrSvc.AppConfigInfoService.GetMainPageType() == PAGE_TYPE.TRANSFER)
-                CheckClientPatch(sgLoginData, groupID);
-
             pageService.SetLogOutFileListClearEvent(groupID, LogoutClearFileList);
 
             StateHasChanged();
@@ -2637,58 +2634,6 @@
     public static void NotifyChange2(FileListEntryImpl[] files)
     {
         HandleFileInputChangeAction2.Invoke(files, false);
-    }
-
-    /// <summary>
-    /// Server와 Local의 Client version 버전 비교 후 자동 업데이트 (PATCHMODE= 1 일때 기능함)
-    /// </summary>
-    /// <param name="sgLoginData"></param>
-    /// <returns></returns>
-    public void CheckClientPatch(SGLoginData sgLoginData, int groupID)
-    {
-        if (sgLoginData == null)
-            return;
-        if (!sgLoginData.GetClientUpgrade())
-            return;
-
-        string strSvrCliVersion = sgLoginData.GetServClientVersion().ToUpper();
-
-        if (strSvrCliVersion.Equals(""))
-            return;
-
-        CLog.Here().Information("groupID : {0} - TransferUI Server Client Version {0}", groupID, strSvrCliVersion);
-
-        string strCliVersion = HSCmdCenter.GetCliVersion().ToUpper();
-        if (strCliVersion.Equals(""))
-            return;
-
-        if (!versionConfigSvc.isUpperVersion(strSvrCliVersion, strCliVersion))
-            return;
-
-        CLog.Here().Information("groupID : {0} - TransferUI Server Client Version {1}", groupID, strSvrCliVersion);
-        CLog.Here().Information("groupID : {0} - TransferUI Local Client Version {1}", groupID, strCliVersion);
-
-        //업데이트  진행중이면 SKIP 하도록 처리 (KYH)
-        (Enums.UpdateStatusType status, int groupId) nowUpdateInfo = AppUpdaterSvc.GetNowUpdateInfo();
-        if (nowUpdateInfo.status != Enums.UpdateStatusType.NONE && nowUpdateInfo.groupId > -1)
-        {
-            CLog.Here().Information($"nowUpdateInfo.groupId : {groupID} - Update Already Started By GroupID[{nowUpdateInfo.groupId}] / Status[{nowUpdateInfo.status.ToString()}]");
-            return;
-        }
-
-        //다른망에 Update Cancel 중이면 SKIP
-        if (AppUpdaterSvc.IsCancelRequested)
-        {
-            CLog.Here().Information($"groupId : {groupID} SKIP - Update Canceling...");
-            return;
-        }
-
-        //ForceUpdate와 상관없이, PatchMode가 1이면 무조건 강제 업데이트 처리
-        ClientUpgradeExeEvent clientUpdateExe = null;
-        clientUpdateExe = HSCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
-        if (clientUpdateExe != null)
-            clientUpdateExe(groupID, true);
-
     }
 
     public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgType eMType, string path, string body)
