@@ -145,7 +145,7 @@
                                 <td>
                                     @if (item.Type == 3) //최상위 이동 버튼
                                     {
-                                        <div data-draggable="item" draggable="true" aria-grabbed="false" style="margin:0" title=@item.Name value=@item.Path label=@(item.dispIndex+1) onclick="refreshList('@(item.Path.Replace(@"\", @"\\"))')">
+                                        <div data-draggable="item" draggable="true" aria-grabbed="false" class="m-0 pt-0" title=@item.Name value=@item.Path label=@(item.dispIndex+1) onclick="refreshList('@(item.Path.Replace(@"\", @"\\"))')">
                                             <i class="fas fa-folder" style="color:#f0cb00;"></i>&nbsp;
                                             <label draggable="true" style="font-style: normal;font-weight: normal;">
                                                 @(item.getNameStr(true))
@@ -154,7 +154,7 @@
                                     }
                                     else if (item.Type == 2) //디렉토리
                                     {
-                                        <div data-draggable="item" draggable="true" aria-grabbed="false" style="margin:0" title=@item.Name value=@item.Path label=@(item.dispIndex+1) ondblclick="refreshList('@(item.Path.Replace(@"\", @"\\"))')">
+                                        <div data-draggable="item" draggable="true" aria-grabbed="false" class="m-0 pt-0" title=@item.Name value=@item.Path label=@(item.dispIndex+1) ondblclick="refreshList('@(item.Path.Replace(@"\", @"\\"))')">
                                             <i class="fas fa-folder" style="color:#f0cb00;"></i>&nbsp;
                                             <label draggable="true" style="font-style: normal;font-weight: normal;">
                                                 @(item.getNameStr(true))
@@ -163,7 +163,7 @@
                                     }
                                     else if (item.Type == 1) //파일목록
                                     {
-                                        <div data-draggable="item" draggable="true" aria-grabbed="false" style="margin:0" title=@item.Name value=@item.Path label=@(item.dispIndex+1)>
+                                        <div data-draggable="item" draggable="true" aria-grabbed="false" class="m-0 pt-0" title=@item.Name value=@item.Path label=@(item.dispIndex+1)>
                                             <i class="fas fa-file" style="color:#8a8a8a;"></i>&nbsp;
                                             <label draggable="true" style="font-style: normal;font-weight: normal;">
                                                 @(item.getNameStr(true))
@@ -171,11 +171,11 @@
 
                                             @*크기/유형 항목 구성*@
                                             <div draggable="true" style="float:right">
-                                                <label draggable="true" style="font-style: normal;font-weight:normal; width:70px;text-align:right;margin-right:10px;">
+                                                <label draggable="true" class="text-truncate" style="font-style: normal;font-weight:normal; width:70px;text-align:right;margin-right:10px;">
                                                     @(CsFunction.GetSizeStr(item.Size))
                                                 </label>
-                                                <label draggable="true" style="font-style: normal;font-weight:normal; width:70px;text-align:left;">
-                                                    @(item.Ext.Replace(".", "").ToUpper())
+                                                <label draggable="true" class="text-truncate" style="font-style: normal;font-weight:normal; width:70px;text-align:left;">
+                                                    @(item.Ext.Replace(".", ""))
                                                 </label>
                                             </div>
                                         </div>
