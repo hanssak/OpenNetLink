@@ -104,45 +104,86 @@
             <table id="tableFileList" class="table table-hover table-head-fixed">
                 <thead>
                     <tr>
-                        @* <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Name: activate to sort column ascending" style="position:sticky; top:0px;">
-                            이름
-                            </th>
-                            <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Size: activate to sort column ascending" style="position:sticky; top:0px; width:70px;">
-                            크기
-                            </th>
-                            <th class="sorting" tabindex="0" rowspan="1" colspan="1" aria-label="Type: activate to sort column ascending" style="position:sticky; top:0px; width:70px;">
-                            유형
-                            </th>*@
                         <th>
                             <div style="float:left;width:100%">
-                                <button @onclick="@(()=> OnClickHeader("Name"))" style="width:calc(100% - 160px); text-align:left">@strFileName</button>
+                                <label @onclick="@(()=> OnClickHeader("Name"))" style="width:calc(100% - 180px); text-align:left">
+                                @strFileName  
+                                @if(SortingKey == "Name")
+                                {
+                                    <i class=@((SortingAesc ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down") + " ml-1") />
+                                }  
+                                </label>                                
+
                                 <div style="float:right">
-                                    <button @onclick="@(()=> OnClickHeader("Size"))" style="width:70px;text-align:right;margin-right:10px;">@strFileSize</button>
-                                    <button @onclick="@(()=> OnClickHeader("Ext"))" style="width:70px;text-align:left">@strFileType</button>
+                                    <label @onclick="@(()=> OnClickHeader("Size"))" style="width:70px;text-align:right;margin-right:10px;">
+                                    @strFileSize  
+                                    @if(SortingKey == "Size")
+                                    {
+                                        <i class=@((SortingAesc ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down") + " ml-1") />
+                                    } 
+                                    </label>                                     
+
+                                    <label @onclick="@(()=> OnClickHeader("Ext"))" style="width:70px;text-align:left">
+                                    @strFileType
+                                    @if(SortingKey == "Ext")
+                                    {
+                                        <i class=@((SortingAesc ? "fas fa-arrow-circle-up" : "fas fa-arrow-circle-down") + " ml-1") />
+                                    }  
+                                    </label>
+                                     
                                 </div>
                             </div>
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    @*
-                        @foreach (SGFileInfo file in sgFile)
+                    @if (sgFile != null && sgFile.Count > 0)
+                    {
+                        @foreach (SGFileInfo item in sgFile)
                         {
-                        <tr>
-                        <td colspan=3>
-                        <div>@("Name:" + file.Name + " Size:" + file.Size + " Type:" + file.Type)</div>
-                        </td>
+                            <tr>
+                                <td>
+                                    @if (item.Type == 3) //최상위 이동 버튼
+                                    {
+                                        <div data-draggable="item" draggable="true" aria-grabbed="false" style="margin:0" title=@item.Name value=@item.Path label=@(item.dispIndex+1) onclick="refreshList('@(item.Path.Replace(@"\", @"\\"))')">
+                                            <i class="fas fa-folder" style="color:#f0cb00;"></i>&nbsp;
+                                            <label draggable="true" style="font-style: normal;font-weight: normal;">
+                                                @(item.getNameStr(true))
+                                            </label>
+                                        </div>
+                                    }
+                                    else if (item.Type == 2) //디렉토리
+                                    {
+                                        <div data-draggable="item" draggable="true" aria-grabbed="false" style="margin:0" title=@item.Name value=@item.Path label=@(item.dispIndex+1) ondblclick="refreshList('@(item.Path.Replace(@"\", @"\\"))')">
+                                            <i class="fas fa-folder" style="color:#f0cb00;"></i>&nbsp;
+                                            <label draggable="true" style="font-style: normal;font-weight: normal;">
+                                                @(item.getNameStr(true))
+                                            </label>
+                                        </div>
+                                    }
+                                    else if (item.Type == 1) //파일목록
+                                    {
+                                        <div data-draggable="item" draggable="true" aria-grabbed="false" style="margin:0" title=@item.Name value=@item.Path label=@(item.dispIndex+1)>
+                                            <i class="fas fa-file" style="color:#8a8a8a;"></i>&nbsp;
+                                            <label draggable="true" style="font-style: normal;font-weight: normal;">
+                                                @(item.getNameStr(true))
+                                            </label>
 
-                        </tr>
-                        }*@
-                    @*      <tr>
-                        <div data-draggable='item' draggable='true' aria-grabbed='false' style="border:none; margin:0" title='aaa'>
-                        <i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;
-                        AAA
-                        </div>
-
-                        </tr>*@
-
+                                            @*크기/유형 항목 구성*@
+                                            <div draggable="true" style="float:right">
+                                                <label draggable="true" style="font-style: normal;font-weight:normal; width:70px;text-align:right;margin-right:10px;">
+                                                    @(CsFunction.GetSizeStr(item.Size))
+                                                </label>
+                                                <label draggable="true" style="font-style: normal;font-weight:normal; width:70px;text-align:left;">
+                                                    @(item.Ext.Replace(".", "").ToUpper())
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
         </div>
@@ -178,6 +219,7 @@
     [Parameter] public EventCallback OnCheckApprLine { get; set; }
 
     public string stSelectPath { get; set; }
+    public string stCurrentSubPath { get; set; }
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferTemplate01>();
     public string strAfterApprove = "";
@@ -194,6 +236,9 @@
     string strFileName = "";
     string strFileSize = "";
     string strFileType = "";
+
+    string SortingKey = "";
+    bool SortingAesc = true;
 
     /// <summary>
     /// 선택 삭제 버튼 사용 유무
@@ -224,19 +269,9 @@
 
     public DropFileList GetDropFileList() => refDropFileList;
 
-
-    private void OnClickHeader(string header)
+    private void OnClickHeader(string headerKey)
     {
-        if (sgFile == null || sgFile.Count <= 0)
-            return;
-        
-        var infoType = typeof(SGFileInfo);
-        var sortProperty = infoType.GetProperty(header);
-
-        string listHtml = makeSubFileList(sgFile.OrderBy(p => sortProperty.GetValue(p, null)).ToList());
-        object[] param = { "tableFileList > tbody", listHtml };
-        JSRuntime.InvokeAsync<object>("appendHtml", param);
-
+        LoadListFiles(stCurrentSubPath, headerKey);
         StateHasChanged();
     }
 
@@ -317,34 +352,18 @@
 
     public void LoadListFiles(string stPath)
     {
+        stCurrentSubPath=stPath;
+        LoadListFiles(stPath, "");
+    }
+
+    private void LoadListFiles(string stPath, string changeSortingKey)
+    {
         sgFile.Clear();
-        try
-        {
-            if (Directory.GetParent(stPath) != null)
-            {
-                string strUpperPath = Directory.GetParent(stPath).FullName;
-                if (strUpperPath != null && strUpperPath.Length > 0)
-                {
-                    SGFileInfo fileEntry = new SGFileInfo();
-                    fileEntry.Name = "..";
-                    fileEntry.Size = 0;
-                    fileEntry.Path = strUpperPath;
-                    fileEntry.Ext = "";
-                    fileEntry.Type = 3;         //상위디렉토리 버튼
-                    sgFile.Add(fileEntry);
-                }
-            }
-        }
-        catch (Exception ex0)
-        {
-            CLog.Here().Error("LoadListFiles, GetParentError:" + ex0.Message);
-        }
+        List<SGFileInfo> fileList = new List<SGFileInfo>();
 
         IEnumerable<string> fList = null;
         try
         {
-            //EnumerationOptions opt = new EnumerationOptions { IgnoreInaccessible = true };
-
             fList = Directory.EnumerateFileSystemEntries(stPath)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
         }
@@ -367,7 +386,7 @@
                 {
                     System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
                     FileAttributes attr = fInfo.Attributes;
-                    if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                    if ((attr & FileAttributes.Directory) == FileAttributes.Directory)  //디렉토리 구성
                     {
                         SGFileInfo fileEntry = new SGFileInfo();
                         fileEntry.Name = fInfo.Name;
@@ -375,16 +394,15 @@
                         fileEntry.Path = fInfo.FullName;
                         fileEntry.Ext = "";
                         fileEntry.Type = 2;
-                        sgFile.Add(fileEntry);
+                        fileList.Add(fileEntry);
                     }
-
                 }
 
                 foreach (string fname in fList)
                 {
                     System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
                     FileAttributes attr = fInfo.Attributes;
-                    if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
+                    if ((attr & FileAttributes.Directory) != FileAttributes.Directory)  //파일 구성
                     {
                         SGFileInfo fileEntry = new SGFileInfo();
                         fileEntry.Name = fInfo.Name;
@@ -392,7 +410,7 @@
                         fileEntry.Path = fInfo.FullName;
                         fileEntry.Ext = fInfo.Extension;
                         fileEntry.Type = 1;
-                        sgFile.Add(fileEntry);
+                        fileList.Add(fileEntry);
                     }
                 }
             }
@@ -402,72 +420,61 @@
             CLog.Here().Error("LoadListFiles, Exception:" + ex3.Message);
         }
 
-        string listHtml = makeSubFileList(sgFile);
-        object[] param = { "tableFileList > tbody", listHtml };
-        JSRuntime.InvokeAsync<object>("appendHtml", param);
+        //정렬 필요 시 정렬 작업
+        if (string.IsNullOrEmpty(changeSortingKey))
+        {
+            SortingKey = string.Empty;
+            SortingAesc = true;
 
-        //object[] param = { "divFileList", listHtml };
-        //JSRuntime.InvokeAsync<object>("appendHtml", param);
+            sgFile.AddRange(fileList);
+        }
+        else
+        {
+            var infoType = typeof(SGFileInfo);
+            var sortProperty = infoType?.GetProperty(changeSortingKey);
+
+            if (SortingKey == changeSortingKey)
+                SortingAesc = !SortingAesc;
+            else
+            {
+                SortingKey = changeSortingKey;
+                SortingAesc = true;
+            }
+            sgFile.AddRange((sortProperty == null) ? fileList : (SortingAesc ? fileList.OrderBy(p => sortProperty.GetValue(p, null)).ToList()
+                                                                                : fileList.OrderByDescending(p => sortProperty.GetValue(p, null)).ToList()));
+        }
+
+        try
+        {
+            if (Directory.GetParent(stPath) != null)
+            {
+                string strUpperPath = Directory.GetParent(stPath).FullName;
+                if (strUpperPath != null && strUpperPath.Length > 0)
+                {
+                    SGFileInfo fileEntry = new SGFileInfo();
+                    fileEntry.Name = "..";
+                    fileEntry.Size = 0;
+                    fileEntry.Path = strUpperPath;
+                    fileEntry.Ext = "";
+                    fileEntry.Type = 3;         //상위디렉토리 버튼
+                    sgFile.Insert(0, fileEntry);
+                }
+            }
+        }
+        catch (Exception ex0)
+        {
+            CLog.Here().Error("LoadListFiles, GetParentError:" + ex0.Message);
+        }
+        
+        for(int idx= 0; idx < sgFile.Count; idx++)
+        {
+            sgFile[idx].dispIndex = idx;
+        }
+
         StateHasChanged();
     }
 
     public int dragLabel = 1;
-    private string makeSubFileList(List<SGFileInfo> subFileList)
-    {
-        StringBuilder stRtn = new StringBuilder();
-
-        if (subFileList != null && subFileList.Count > 0)
-        {
-            //드래그 가능한 div 하위 요소에 draggable 옵션을 주어서
-            //mousedown 이벤트에서 부요요소인 div를 target으로 삼을 수 있게 구성
-            if (dragLabel > 0) { dragLabel = 1; }
-            foreach (SGFileInfo item in subFileList)
-            {
-                stRtn.Append(@"<tr>");
-                stRtn.Append(@" <td>");
-
-                if (item.Type == 1) //파일 목록
-                {
-                    stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""margin:0"" title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "'>");
-                    stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
-
-                    stRtn.Append(@"<label draggable='true' style=""font-style: normal;font-weight: normal;"">");
-                    stRtn.Append(item.getNameStr(false));
-                    stRtn.Append(@"</label>");
-
-                    //크기/유형 항목 구성
-                    stRtn.Append(@"<div draggable='true' style=""float:right"">");
-                    stRtn.Append(@"     <label draggable='true' style=""font-style: normal;font-weight:normal; width:70px;text-align:right;margin-right:10px;"">");
-                    stRtn.Append(CsFunction.GetSizeStr(item.Size));
-                    stRtn.Append(@"     </label>");
-
-                    stRtn.Append(@"     <label draggable='true' style=""font-style: normal;font-weight:normal; width:70px;text-align:left;"">");
-                    stRtn.Append(item.Ext.Replace(".", "").ToUpper());
-                    stRtn.Append(@"     </label>");
-                    stRtn.Append(@"</div>");
-                }
-                else    //최상위 버튼 및 폴더 목록
-                {
-                    if (item.Type == 3) //최상위 이동 버튼
-                        stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""margin:0"" title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
-                    else
-                        stRtn.Append(@"<div data-draggable='item' draggable='true' aria-grabbed='false' style=""margin:0"" title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
-
-                    stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
-
-                    stRtn.Append(@"<label draggable='true' style=""font-style: normal;font-weight: normal;"">");
-                    stRtn.Append(item.getNameStr(false));
-                    stRtn.Append(@"</label>");
-                }
-                stRtn.Append(@"</div>");
-                stRtn.Append(@" </td>");
-                stRtn.Append(@"</tr>");
-
-                if (dragLabel > 0) { dragLabel++; }
-            }
-        }
-        return stRtn.ToString();
-    }
     private string _makeSubFileList()
     {
         StringBuilder stRtn = new StringBuilder();

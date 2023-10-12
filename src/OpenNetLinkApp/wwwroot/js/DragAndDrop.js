@@ -1246,12 +1246,22 @@ window.addMouseUp = (message) => {
         //console.log("MOUSE UP EVENT");
 
         if (e.target.getAttribute('draggable') && hasModifier(e)) {
+
+            var eventTarget = e.target;
+
+            //드래그할 요소의 하위 요소(draggable속성을 가짐)를 클릭하였을 때, 부모요소를 찾아서 target으로 지정
+            if (e.target.getAttribute('aria-grabbed') == null) {
+                var parentTarget = searchParentDragTarget(e.target);
+                if (parentTarget != null)
+                    eventTarget = parentTarget;
+            }
+
             //if the item's grabbed state is currently true
             //console.log("MOUSE UP EVENT");
-            if (e.target.getAttribute('aria-grabbed') == 'true') {
+            if (eventTarget.getAttribute('aria-grabbed') == 'true') {
                 //unselect this item
                 if (hasShitfKey(e) != true && hasCtrlKey(e) != true) {
-                    removeSelection(e.target);
+                    removeSelection(eventTarget);
                     //if that was the only selected item 
                     //then reset the owner container reference			
                     if (!selections.items.length) {
@@ -1263,7 +1273,7 @@ window.addMouseUp = (message) => {
             else {
                 //add this additional selection
                 //console.log("MOUSE UP EVENT");
-                addSelection(e.target);
+                addSelection(eventTarget);
             }
         }
     }, false);
