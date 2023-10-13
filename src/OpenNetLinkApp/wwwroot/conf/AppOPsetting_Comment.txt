@@ -66,7 +66,7 @@ strInitPasswd : 암호화된 초기 PW string
 strPWChangeProhibitLimit : 패스워드 사용금지 문자열 [기능 X]
 nPWChangeApplyCnt : 비밀번호 변경때, 새비번의 최소길이 (기본값:9)
 bUseIDAsInitPassword : ID와 동일한 비밀번호를 초기 PW로 사용할지 여부 (true : ID=PW로 로그인된 경우, 비밀번호 변경 요청)
-
+bUseLoginCI : 로그인 화면 상단에 CI 이미지 표시 여부 (Default : false)
 
 // URL자동전환
 bURLAutoTrans : URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
@@ -86,7 +86,7 @@ strScrTimeoutLockType : ScrLockTime의 시간초과로 타임아웃 발생 시, 
 
 
 // 기타 (1)
-enMainPageType : 로그인후 메인페이지 (나머지 : DASHBOARD, 2 : TRANSFER)
+enMainPageType : 로그인후 메인페이지 (0,1 : DASHBOARD, 2 : TRANSFER | 파일전송 , 3 : TRANSMANAGER_FILE | 파일전송관리, 4 : TRANSMANAGER_CLIP | 클립보드관리, 5 : TRANSMANAGER_EMAIL | 메일관리)
 bNoApproveManageUI : 모든 기능 결재관리 UI 않나오도록함.(보안결재 제외, true : 결재관리UI 들 안나옴, false : 나옴)(siteConfig)
 bUseApproveManageUIForce : 서버 설정과 상관없이 결재관리 페이지가 나오게 설정
 bStartProgramReg : 시작 프로그램 등록 ( true : 부팅때 OpenNetLink 실행, false : 부팅때 OpenNetLink 실행 등록 해제 ) [기능X]
@@ -234,6 +234,10 @@ bUseDrmAfterFileReceive :           //파일 수신 완료 후 DRM 사용 여부
 nDrmType :                          //DRM 종류 - 1. SoftCamp, 2.Fasso
 bHideApprLine : 파일전송에 결재라인 UI상에 숨길지 유무 (true:숨김, 기본값: false)
 bHideTitleDesc : 파일전송에 제목/설명 UI상에 숨길지 유무 (true:숨김, 기본값: false)
+
+nTransferTemplate : 파일전송 UI 템플릿 지정 (Default : 0)
+								=> 0 : 기존 전송 템플릿
+								=> 1 : 제목/설명입력항목이 없고, 상단에는 드래그 리스트/ 하단에는 정렬가능한 파일목록 표시
 
 
 

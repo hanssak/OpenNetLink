@@ -1031,7 +1031,7 @@
             CtrlSideEvent ctrlSideEvent = null;
             ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
             if (ctrlSideEvent != null)
-                ctrlSideEvent();
+                ctrlSideEvent(groupId);
 
             // Move WebWindow To Tray.
             //if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove()) Window.MoveWebWindowToTray();

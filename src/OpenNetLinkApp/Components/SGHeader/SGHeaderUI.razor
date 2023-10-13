@@ -2175,7 +2175,7 @@
         //공통환경설정의 '사후결재 관리' 부분 화면 표시 여부 갱신
         CtrlSideEvent ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
         if (ctrlSideEvent != null)
-            ctrlSideEvent();
+            ctrlSideEvent(groupID);
 
         //파일 송수신 중 사후결재 여부가 변경되었다면 메세지 표시
         if (pageService.GetFileSending() || pageService.GetFileRecving())

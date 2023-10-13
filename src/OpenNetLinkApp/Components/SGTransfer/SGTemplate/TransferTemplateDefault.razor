@@ -37,7 +37,7 @@
     <div class="col-md-3 pr-0">
         <div class="card card-navy card-outline card-boder" style="height:@(bHideApprLine?73:60)vh;">
 
-            <FileTree @ref="refFileTree" OnSelectPathFromFileTree="changeSelectPath"></FileTree>
+            <FileTree @ref="refFileTree" Height="50%" OnSelectPathFromFileTree="changeSelectPath"></FileTree>
             <!-- 파일리스트 -->
             <div id="divFileList" style="width:100%;height:50%;padding:1px 1px 1px 0px;overflow:auto">
             </div>
@@ -154,12 +154,12 @@
     /// 사후결재 checkBox Disable 설정유무(By:서버정책, true : 사용못함, false : 사용함)
     /// </summary>
     [Parameter] public bool bAfterApprDisable { get; set; }
-
+    
     [Parameter] public EventCallback OnChangeAfterCheck { get; set; }
     [Parameter] public EventCallback OnBasicSelectOpenPopup { get; set; }
     [Parameter] public EventCallback OnOpenFileDialogOpenPopup { get; set; }
     [Parameter] public EventCallback OnCheckApprLine { get; set; }
-
+    
     public string stSelectPath { get; set; }
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferTemplateDefault>();
@@ -193,13 +193,13 @@
     bool bHideApprLine = false;
 
     private static Action<List<string>> ActionFileSelectOK;
-    private static Action<string> actionLoadFileList;
+    //private static Action<string> actionLoadFileList;
 
-    [JSInvokable("JSLoadListFiles")]    //좌측 하위 리스트에서, 폴더 더블클릭 시 호출
-    public static void JSLoadListFiles(string path)
-    {
-        actionLoadFileList.Invoke(path);
-    }
+    //[JSInvokable("JSLoadListFiles")]    //좌측 하위 리스트에서, 폴더 더블클릭 시 호출
+    //public static void JSLoadListFiles(string path)
+    //{
+    //    actionLoadFileList.Invoke(path);
+    //}
 
 
     //Drag&Drop 관련 액션
@@ -247,15 +247,12 @@
 
     protected override void OnInitialized()
     {
-        actionLoadFileList = LoadListFiles;
-
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
         versionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
         OnSettingByGroupID(groupIDbyParam);
         InitText();
-        Console.WriteLine($"[20231006] bAfterApprChkHIde:{bAfterApprChkHIde}");
         base.OnInitialized();
     }
 

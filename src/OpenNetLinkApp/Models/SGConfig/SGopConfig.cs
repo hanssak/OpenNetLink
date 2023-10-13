@@ -80,7 +80,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bAllowDRM { get; set; } = true;                 //DRM 파일 전송 허용 여부 (true : 전송, false : 차단) - Default : true
 
         public bool bHiddenLoginLogo { get; set; } = false;  // Main Login UI  좌측 로고 숨김 처리
-
+        public int nTransferTemplate { get; set; } = 0;      //파일전송 UI 템플릿 지정
 
         //클립보드
 

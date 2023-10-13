@@ -182,7 +182,7 @@ namespace OpenNetLinkApp.PageEvent
     // 파일 검사 delegate
     public delegate void FileExamEvent(int per, string strFileName);
     // 로그인 후 오른쪽 사이드바 환경설정 노티
-    public delegate void CtrlSideEvent();
+    public delegate void CtrlSideEvent(int ngroupid);
     // 업데이트 노티
     public delegate void ClientUpgradeEvent(int groupid, PageEventArgs e);
     // 업데이트 실행

@@ -545,6 +545,10 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+
+        await jsRuntime.InvokeAsync<object>("exitLogIn");
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize");
+
         if (firstRender)
         {
             jsRuntime.InvokeAsync<object>("initPageLeft");
