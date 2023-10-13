@@ -821,15 +821,16 @@
         await JSRuntime.InvokeAsync<object>("initLogIn", param);
 
         await JSRuntime.InvokeAsync<object>("InitDragAndDrop");
-        await JSRuntime.InvokeAsync<object>("addMouseDown");
-        await JSRuntime.InvokeAsync<object>("addMouseUp");
-        await JSRuntime.InvokeAsync<object>("addDragStart");
-        await JSRuntime.InvokeAsync<object>("addKeyDown");
 
         int groupID = pageService.m_nCurViewPageGroupID;
 
         if (firstRender)
         {
+            await JSRuntime.InvokeAsync<object>("addMouseUp");
+            await JSRuntime.InvokeAsync<object>("addMouseDown");
+            await JSRuntime.InvokeAsync<object>("addDragStart");
+            await JSRuntime.InvokeAsync<object>("addKeyDown");
+
             //if (AppConfigSvc.GetUseGPKILogin(groupID))
             if (SGAppMgrSvc.OpConfigInfoService.GetUseGPKILogin(groupID))
             {

@@ -75,6 +75,8 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bHiddenLoginLogo { get; set; }           // Main Login 창 좌측 로고 숨김 처리
 
+        public int nTransferTemplate { get; set; }            //파일전송 UI 템플릿 지정
+
 
         //클립보드
         public bool bUseClipBoard { get; set; }                   // 클립보드 사용 여부
