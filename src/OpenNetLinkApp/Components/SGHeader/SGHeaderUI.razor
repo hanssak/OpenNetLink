@@ -132,7 +132,7 @@
                                     // 다중접속일때에는 단일망에만 전달가능
                                     // 단일접속일때에는 3중망에 전달가능
                                     @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx != 0 &&
-                              (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                             (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                     {
 
                                         @if (bAddedClipBoardItem)
@@ -835,7 +835,7 @@
                 // Reconnect
                 pageService.SetStatusSideMenuReBuildTime(Net.GroupID, true);
 
-                // sessionCheck 동작하게 적용                
+                // sessionCheck 동작하게 적용
                 hsNetWork = HsCmdCenter.GetConnectNetWork(Net.GroupID);
                 if (hsNetWork != null)
                 {
@@ -2262,6 +2262,10 @@
                                         //DRM 걸기
                                         int ret = lib.DrmEncrypt(key);
                                         CLog.Here().Information($"{key} DRM Result  : {ret}");
+                                    }
+                                    else
+                                    {
+                                        CLog.Here().Information($"{key} is DRM already!!!");
                                     }
                                 }
                             }
