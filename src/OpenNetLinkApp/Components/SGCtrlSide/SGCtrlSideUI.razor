@@ -262,9 +262,37 @@
                     @GetMainPageTypeStr()
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenu3" style="min-width:85px">
-                    <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.NONE))">@XmlConf.GetTitle("T_PAGE_TYPE_INIT")</button>
-                    <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.DASHBOARD))">@XmlConf.GetTitle("T_PAGE_TYPE_DASHBOARD")</button>
-                    <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.TRANSFER))">@XmlConf.GetTitle("T_PAGE_TYPE_TRNASFER")</button>
+                    @* DashBoard *@
+                    @if (bUseDashBoardUI)
+                    {
+                        <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.NONE))">@XmlConf.GetTitle("T_PAGE_TYPE_INIT")</button>
+                        <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.DASHBOARD))">@XmlConf.GetTitle("T_PAGE_TYPE_DASHBOARD")</button>
+                    }
+
+                    @* 파일전송 *@
+                    @if (bUseFileTransUI)
+                    {
+                        <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.TRANSFER))">@XmlConf.GetTitle("T_PAGE_TYPE_TRNASFER")</button>
+                    }
+
+                    @* 파일전송관리 *@
+                    @if (bUseFileTransManageUI)
+                    {
+                        <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.TRANSMANAGER_FILE))">@XmlConf.GetTitle("T_PAGE_TYPE_FILE_TRANSMANAGER")</button>
+                    }
+
+                    @* 클립보드전송관리 *@
+                    @if (bUseFileClipManageUI)
+                    {
+                        <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.TRANSMANAGER_CLIP))">@XmlConf.GetTitle("T_PAGE_TYPE_CLIP_TRANSMANAGER")</button>
+                    }
+
+                    @* 이메일전송관리 *@
+                    @if (bUseEmailTransManageUI)
+                    {
+                        <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SetMainPageType((int)PAGE_TYPE.TRANSMANAGER_EMAIL))">@XmlConf.GetTitle("T_PAGE_TYPE_EMAIL_TRANSMANAGER")</button>
+                    }
+
                 </div>
             </div>
         </div>
@@ -681,8 +709,24 @@
 
     Dictionary<string, SGNetOverData> m_dicDestSysPos = null;                       // 3망상황일때 정보
 
-    //ISGVersionConfigService versionConfigSvc;
+    // 첫 Page 설정 List 나오게할지 유무 값
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// 
+
+    bool bUseDashBoardUI = true;
+
+    bool bUseFileTransUI = true;
+
+    bool bUseFileTransManageUI = true;
+
+    bool bUseFileClipManageUI = true;
+
+    bool bUseEmailTransManageUI = true;
+
+    
     private void SaveDownloadDir(string dir)
     {
         string[] arrDir = dir.Split("|");
@@ -774,6 +818,20 @@
         // 클립보드 자동전송 상태 설정
         if (GetClipCopyAutoSend())
             Window.SetUseClipCopyNsend(true);
+
+        // 첫Page 설정가능유무 Check, 다중망일때에는 모든 망에서 접속 할 수 있는 화면만 첫Page로 선택가능
+
+        List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+        foreach (ISGNetwork netlist in listNetWork)
+        {            
+            bUseDashBoardUI  &= SGAppMgrSvc.OpConfigInfoService.GetUseDashBoard(netlist.GroupID);
+
+            bUseFileTransUI &= SGAppMgrSvc.OpConfigInfoService.GetUseFileTrans(netlist.GroupID);
+            bUseFileTransManageUI &= SGAppMgrSvc.OpConfigInfoService.GetUseFileTrans(netlist.GroupID);
+
+            bUseFileClipManageUI &= SGAppMgrSvc.OpConfigInfoService.GetUseFileClipManageUI(netlist.GroupID);
+            bUseEmailTransManageUI &= SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(netlist.GroupID);
+        }        
 
     }
 

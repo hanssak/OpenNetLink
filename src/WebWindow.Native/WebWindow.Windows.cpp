@@ -967,13 +967,20 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	imagePath = (LPWSTR)image;
 	//actions.push_back(L"OK");
 	expiration = 0;
-	appName = (LPWSTR)L"OpenNetLink";
 
 	wchar_t ModelID[MAX_PATH] = { 0, };
 	wsprintf(ModelID, L"Noti%d", m_nAppNotiID++);
-	//appUserModelID = (LPWSTR)ModelID;
 
+
+#ifdef DEBUG
+	appName = (LPWSTR)L"KKW";
+	//appUserModelID = (LPWSTR)ModelID;
+	const auto aumi = WinToast::configureAUMI(L"KKW", L"Test", L"Kwkim", ModelID);
+#else
+	appName = (LPWSTR)L"OpenNetLink";
+	//appUserModelID = (LPWSTR)ModelID;
 	const auto aumi = WinToast::configureAUMI(L"HANSSAK", L"SecureGate", L"OpenNetLink", ModelID);
+#endif
 
 	onlyCreateShortcut = false;
 

@@ -1006,6 +1006,17 @@
 
             pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
+            // 로그인후 각 Page에서 호출하지 않게 
+            LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+            loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+            if (loginAfterSGHeaderUI != null)
+                loginAfterSGHeaderUI(groupId);
+
+            LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
+            loginAfterSGSideBar = HsCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
+            if (loginAfterSGSideBar != null)
+                loginAfterSGSideBar(groupId);
+
             Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
             int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
             Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();

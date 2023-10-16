@@ -1316,21 +1316,24 @@
         }
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-
         if (sgSideBar != null)
         {
             bViewAlarmNotiAllDelMenu = SGAppMgrSvc.OpConfigInfoService.GetViewSGHeaderUIAlarmNoriAllDel(sgSideBar.GroupId);
 
             if (dicCurrentAfterChkHide.ContainsKey(sgSideBar.GroupId))
-                dicCurrentAfterChkHide[nGroupID] = pageService.GetAfterApprChkHide(sgSideBar.GroupId);
+            {
+                if (dicCurrentAfterChkHide[nGroupID] != pageService.GetAfterApprChkHide(sgSideBar.GroupId))
+                    dicCurrentAfterChkHide[nGroupID] = pageService.GetAfterApprChkHide(sgSideBar.GroupId);
+            }
             else
                 dicCurrentAfterChkHide.Add(sgSideBar.GroupId, pageService.GetAfterApprChkHide(sgSideBar.GroupId));
         }
+
     }
 
-    /**
-    *@brief clipboard전송 버튼 view유무(bUseClipBoardui), List 형태로 표현유무(bClipboardMultiItem)를 확정짓기 위한 함수
-*/
+    /// <summary>
+    /// clipboard전송 버튼 view유무(bUseClipBoardui), List 형태로 표현유무(bClipboardMultiItem)를 확정짓기 위한 함수
+    /// </summary>
     private void SetClipBoardUI()
     {
 
@@ -1813,6 +1816,16 @@
         {
             strUserSeq = sgUserData.GetUserSequence();
 
+            // login 이후에 사후결재 관련 설정값
+            bViewAlarmNotiAllDelMenu = SGAppMgrSvc.OpConfigInfoService.GetViewSGHeaderUIAlarmNoriAllDel(groupid);
+            if (dicCurrentAfterChkHide.ContainsKey(groupid))
+            {
+                if (dicCurrentAfterChkHide[nGroupID] != pageService.GetAfterApprChkHide(groupid))
+                    dicCurrentAfterChkHide[nGroupID] = pageService.GetAfterApprChkHide(groupid);
+            }                
+            else
+                dicCurrentAfterChkHide.Add(groupid, pageService.GetAfterApprChkHide(groupid));
+
             StateHasChanged();
         }
     }
@@ -2086,6 +2099,7 @@
         string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
         HsCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
     }
+
     /// <summary>
     /// 정책 변경시 로그아웃 처리
     /// </summary>

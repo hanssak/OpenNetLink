@@ -316,7 +316,7 @@
         if (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupID) == -1)
         {
             // await JSRuntime.InvokeVoidAsync("setElementValue", new object[] { "popUploginPw", "" });
-	    pw = "";
+            pw = "";
             ShowLoginFail(XmlConf.GetWarnMsg("W_0039"));
             await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
             bUIBtnDisable = false;
@@ -1372,6 +1372,17 @@
                     bAfterCheck = SGAppMgrSvc.AppConfigInfoService.GetAfterBasicChk();
 
                 pageService.SetAfterApproveCheck(groupId, bAfterCheck);
+
+                // 
+                LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+                loginAfterSGHeaderUI = HSCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+                if (loginAfterSGHeaderUI != null)
+                    loginAfterSGHeaderUI(groupId);
+
+                LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
+                loginAfterSGSideBar = HSCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
+                if (loginAfterSGSideBar != null)
+                    loginAfterSGSideBar(groupId);
 
                 Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
                 int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
