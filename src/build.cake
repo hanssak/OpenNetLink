@@ -23,6 +23,7 @@ var isSilent = Argument<bool>("isSilent", false);				//true로 하면, Silent �
 var startAuto = Argument<bool>("startAuto", true);				//false 하면, 설치 완료 후 자동 실행 안됨
 var isSilentShowAll = Argument<bool>("isSilentShowAll", false);	//true로 하면, Silent / Show 모드 설치파일 모두 만듬
 var regCrxForce = Argument<bool>("regCrxForce", false);					//true로 하면, NetPos가 "IN"인 Case
+var inkFileName = Argument("inkFileName", "OpenNetLink");      // 바탕화면 Ink 파일 이름 설정 
 
 
 var isPatchInstaller = false;
@@ -569,7 +570,8 @@ Task("PkgWin10")
 			{"IS_PATCH", isPatch.ToString().ToUpper()},
 			{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
 			{"NETWORK_FLAG", networkFlag.ToUpper()},
-			{"CUSTOM_NAME", customName.ToUpper()}			
+			{"CUSTOM_NAME", customName.ToUpper()},
+			{"INK_NAME", $"\"{inkFileName}\""}	
 		}
 	});
 });
@@ -1092,6 +1094,7 @@ Task("MakeInstaller")
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"INK_NAME", $"\"{inkFileName}\""}
 				}
 			});			
 
@@ -1109,6 +1112,7 @@ Task("MakeInstaller")
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"INK_NAME", $"\"{inkFileName}\""}
 				}
 			});
 
@@ -1128,6 +1132,7 @@ Task("MakeInstaller")
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"INK_NAME", $"\"{inkFileName}\""}
 				}
 			});			
 		}

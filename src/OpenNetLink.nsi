@@ -5,7 +5,6 @@
 !define PRODUCT_MAIN_FILE_NAME "OpenNetLinkApp.exe"
 !define PRODUCT_KILL_FILE_NAME "SGClean.exe"
 
-
 ; !define PRODUCT_VERSION "1.0.0"
 !define PRODUCT_PUBLISHER "Hanssak, Inc."
 !define PRODUCT_WEB_SITE "http://www.hanssak.co.kr"
@@ -512,11 +511,11 @@ Section "MainSection" SEC01
 
   SetOutPath "$INSTDIR"
   File "bin_addon\SecureGateChromiumExtension_v1.1.crx"
-  
+
   ; 단축아이콘 생성
   CreateDirectory "$SMPROGRAMS\OpenNetLink"
-  CreateShortCut "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
-  CreateShortCut "C:\Users\Public\Desktop\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
+  CreateShortCut "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
+  CreateShortCut "C:\Users\Public\Desktop\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
   
   ${If} ${IS_PATCH} == 'TRUE'
 
@@ -650,8 +649,8 @@ Section Uninstall
 
   Delete "$SMPROGRAMS\OpenNetLink\Uninstall.lnk"
   Delete "$SMPROGRAMS\OpenNetLink\Website.lnk"
-  Delete "C:\Users\Public\Desktop\OpenNetLink.lnk"
-  Delete "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk"
+  Delete "C:\Users\Public\Desktop\${INK_NAME}.lnk"
+  Delete "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk"
 
   RMDir "$SMPROGRAMS\OpenNetLink"
   RMDir /r "$INSTDIR"
