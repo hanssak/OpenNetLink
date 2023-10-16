@@ -1112,14 +1112,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         //파라미터 핸들링 클래스 초기화
         mailParam.XmlConf = XmlConf;
         mailParam.jsRuntime = jsRuntime;
 
         InitText();
-
-        @*GetInitDateTime();*@
 
         //Email 배치 승인,반려 요청에 응답 이벤트
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1231,8 +1230,15 @@
         if (firstRender)
         {
             jsRuntime.InvokeAsync<object>("initPageLeft");
-            Task.Run(async () => { await doSearch(); });
+
+            if (groupIDbyParam >=0 && SGAppMgrSvc.OpConfigInfoService.GetUseEmailApprUIwait(groupIDbyParam))
+                ApproveWaitSearch();
+            else
+            {
+                Task.Run(async () => { await doSearch(); });
+            }
         }
+
         // pageService.SetDayInfoRefreshEvent(groupIDbyParam, DayInfoRefreshResult);
         base.OnAfterRender(firstRender);
     }

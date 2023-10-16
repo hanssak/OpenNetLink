@@ -887,16 +887,6 @@
         InitDBInfo();
         InitAdministrator();
 
-        LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
-        loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
-        if (loginAfterSGHeaderUI != null)
-            loginAfterSGHeaderUI(groupID);
-
-        LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
-        loginAfterSGSideBar = HsCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
-        if (loginAfterSGSideBar != null)
-            loginAfterSGSideBar(groupID);
-
         SendDayFileInfo();*/
 
     }
@@ -1070,15 +1060,6 @@
             InitAdministrator();
             InitTransApprList();
 
-            LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
-            loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
-            if (loginAfterSGHeaderUI != null)
-                loginAfterSGHeaderUI(groupID);
-
-            LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
-            loginAfterSGSideBar = HsCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
-            if (loginAfterSGSideBar != null)
-                loginAfterSGSideBar(groupID);
 
             GetUsePasswordUseDay();
 

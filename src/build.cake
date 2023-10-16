@@ -23,6 +23,7 @@ var isSilent = Argument<bool>("isSilent", false);				//true로 하면, Silent �
 var startAuto = Argument<bool>("startAuto", true);				//false 하면, 설치 완료 후 자동 실행 안됨
 var isSilentShowAll = Argument<bool>("isSilentShowAll", false);	//true로 하면, Silent / Show 모드 설치파일 모두 만듬
 var regCrxForce = Argument<bool>("regCrxForce", false);					//true로 하면, NetPos가 "IN"인 Case
+var patchAppEnv = Argument<bool>("patchAppEnv", false);					//true로 하면, patch때에 AppEnvSetting.json 파일을 덮어씌우는 동작함(win)
 
 
 var isPatchInstaller = false;
@@ -1059,9 +1060,13 @@ Task("PkgCrossflatform")
 			}
 			
 			if(FileExists("./artifacts/windows/published/wwwroot/conf/NetWork.json"))
-				DeleteFile("./artifacts/windows/published/wwwroot/conf/NetWork.json");			
-			if(FileExists("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json"))
-				DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
+				DeleteFile("./artifacts/windows/published/wwwroot/conf/NetWork.json");		
+
+			if (patchAppEnv.ToString().ToUpper() == "FALSE")
+			{
+				if(FileExists("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json"))
+					DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
+			}
 			
 			isPatchInstaller=true;
 			RunTarget("MakeInstaller");		
@@ -1092,6 +1097,7 @@ Task("MakeInstaller")
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 				}
 			});			
 
@@ -1109,6 +1115,7 @@ Task("MakeInstaller")
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},					
 				}
 			});
 
@@ -1128,6 +1135,7 @@ Task("MakeInstaller")
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},					
 				}
 			});			
 		}

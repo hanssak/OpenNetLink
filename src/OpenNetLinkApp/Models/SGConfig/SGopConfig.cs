@@ -197,7 +197,11 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bHideTitleDesc { get; set; } = false;           // 제목 및 설명 표현유무
 
+        public bool bUseDashBoard { get; set; } = true;           // DashBoard를 사용하게 할지 유무
+
+        public bool bUseEmailApprUIwait { get; set; } = false;    // Email 결재UI가 열리면 승인대기중인 화면으로 조회되게할지 유무
 
 
+        public string strVirusAptDetailCustomMsg { get; set; } = "";
     }
 }

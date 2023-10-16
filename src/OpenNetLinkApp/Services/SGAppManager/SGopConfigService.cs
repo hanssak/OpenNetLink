@@ -220,6 +220,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseHideTitleDesc(int groupId);
 
         public int GetTransferTemplate(int groupId);
+
+        public bool GetUseDashBoard(int groupId);
+
+        public bool GetUseEmailApprUIwait(int groupId);
+
+        public string GetVirusAptDetailCustomMsg(int groupId);
+
     }
 
 
@@ -1030,6 +1037,21 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseHideTitleDesc(int groupId)
         {
             return AppConfigInfo[groupId].bHideTitleDesc;
+        }
+
+        public bool GetUseDashBoard(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseDashBoard;
+        }
+
+        public bool GetUseEmailApprUIwait(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseEmailApprUIwait;
+        }
+
+        public string GetVirusAptDetailCustomMsg(int groupId)
+        {
+            return AppConfigInfo[groupId].strVirusAptDetailCustomMsg;
         }
 
 

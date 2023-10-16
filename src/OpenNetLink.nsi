@@ -380,7 +380,11 @@ Function .onInit
 	
   ${If} ${IS_PATCH} == 'TRUE'
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
-    CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
+	
+	${If} ${PATCH_APPENV} == 'FALSE'
+		CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
+	${EndIf}
+	
 	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db" "$TEMP" 
 	CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db" "$TEMP"
 
@@ -430,12 +434,18 @@ Function .onInstSuccess
   ${If} ${IS_PATCH} == 'TRUE'
 	 ; 하위 exist 작업을 위해, 패치본의 json/db는 삭제
 	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json"			
-	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json"			
+	  
+	  ${If} ${PATCH_APPENV} == 'FALSE'
+		Delete "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json"
+	  ${EndIf}
+	  
 	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db"			
 	  Delete "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db"	
       
-	  CopyFiles /SILENT /FILESONLY "$TEMP\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
-          CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf"
+	  CopyFiles /SILENT /FILESONLY "$TEMP\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 	  
+	  ${If} ${PATCH_APPENV} == 'FALSE'
+		CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf"
+	  ${EndIf}	  
 	  CopyFiles /FILESONLY "$TEMP\SGNotifyDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"
 	  CopyFiles /FILESONLY "$TEMP\SGSettingsDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"  
 	  

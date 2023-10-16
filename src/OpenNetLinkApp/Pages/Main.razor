@@ -1465,6 +1465,17 @@
 
                     pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
+                    // 
+                    LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+                    loginAfterSGHeaderUI = HSCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+                    if (loginAfterSGHeaderUI != null)
+                        loginAfterSGHeaderUI(groupId);
+
+                    LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
+                    loginAfterSGSideBar = HSCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
+                    if (loginAfterSGSideBar != null)
+                        loginAfterSGSideBar(groupId);
+
                     Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
                     int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
                     Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
@@ -1775,6 +1786,7 @@
                 SaveAfterApproveCheckBoxStatus(nGroupIDfirst);
 
                 await JSRuntime.InvokeAsync<object>("closeAllPopup");
+
                 //if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
                 MyNavigationManager.NavigateTo(strNavigatePathnGroupID);
 
@@ -2051,6 +2063,18 @@
                 bAfterCheck = SGAppMgrSvc.AppConfigInfoService.GetAfterBasicChk();
 
             pageService.SetAfterApproveCheck(groupId, bAfterCheck);
+
+            // 
+            LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+            loginAfterSGHeaderUI = HSCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+            if (loginAfterSGHeaderUI != null)
+                loginAfterSGHeaderUI(groupId);
+
+            LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
+            loginAfterSGSideBar = HSCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
+            if (loginAfterSGSideBar != null)
+                loginAfterSGSideBar(groupId);
+
             Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
             int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
             Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();

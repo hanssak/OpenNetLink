@@ -902,7 +902,6 @@
                 return;
             }*/
 
-
             SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupId);
             SGData sfmData = HsCmdCenter.GetSFMListData(groupId);
 
@@ -985,6 +984,18 @@
                 bAfterCheck = SGAppMgrSvc.AppConfigInfoService.GetAfterBasicChk();
 
             pageService.SetAfterApproveCheck(groupId, bAfterCheck);
+
+
+            // 
+            LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+            loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+            if (loginAfterSGHeaderUI != null)
+                loginAfterSGHeaderUI(groupId);
+
+            LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
+            loginAfterSGSideBar = HsCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
+            if (loginAfterSGSideBar != null)
+                loginAfterSGSideBar(groupId);
 
             Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
             int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();

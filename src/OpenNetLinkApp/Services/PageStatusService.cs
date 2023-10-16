@@ -413,6 +413,7 @@ namespace OpenNetLinkApp.Services
             svrTime = svrTime.AddSeconds(1);
 
             if ((svrTime.Minute == 00) && (svrTime.Second == 0))
+            // if (svrTime.Second % 10 == 0) // Test
             {
                 //매시간 정각마다 실행
                 GC.Collect();

@@ -24,7 +24,7 @@
 
                 <div class="alert_txt">
                     <label class="mb-3 pl-2 pr-2" style="background-color:#e20000; color:#fff;"><i class="fas fa-virus mr-2"></i>@strInfo</label>
-                    <table class="table table-boarder table_virus">
+                    <table class="table table-boarder table_virus">                        
                         <colgroup>
                             <col width="25%">
                             <col width="75%">
@@ -42,7 +42,8 @@
                         <tr>
                             <th>@strDetailContent</th>
                             <td>
-                                @strUserInfo
+                                @((MarkupString)strUserInfo)
+                                @*@strUserInfo*@
                             </td>
                         </tr>
                     </table>
@@ -73,7 +74,6 @@
     public int m_GroupID = -1;
     public string m_strFileTransTitle = "";
     public string m_strVirusContent = "";
-    public bool m_bVirus = false;
     public Common.Enums.PreworkType m_eBlockType = Common.Enums.PreworkType.BLOCK_NONE;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<VirusReport>();
@@ -104,7 +104,6 @@
         m_strTransSeq = transSeq;
         m_strFileTransTitle = title;
         m_strVirusContent = virusContent;
-        m_bVirus = bVirus;
         StateHasChanged();
     }
 
@@ -120,6 +119,14 @@
         {
             strInfo = XmlConf.GetTitle("T_DETAIL_DETECT_DRM");                  // 전송 파일에 허용되지 않는 DRM 적용이 되어 있습니다.
             strVirusContentInfo = XmlConf.GetTitle("T_DETAIL_DESC");              // 설명
+        }
+        else if(m_eBlockType == Common.Enums.PreworkType.APT_SCAN ||
+            m_eBlockType == Common.Enums.PreworkType.VIRUS_SCAN)
+        {
+            // 상세메세지 custom Msg
+            strUserInfo = SGAppMgrSvc.OpConfigInfoService.GetVirusAptDetailCustomMsg(m_GroupID);
+            if (strUserInfo.Length < 1)
+                strUserInfo = XmlConf.GetTitle("T_COMMON_DETAILLIST_VIEW");             // [전송관리] - [상세보기] 에서 확인하세요.
         }
 
         StateHasChanged();
@@ -157,6 +164,7 @@
         strVirusContentInfo = XmlConf.GetTitle("T_VIRUS_DETAILS");              // 바이러스 내역
         strDetailContent = XmlConf.GetTitle("T_COMMON_DETAILLIST");             // 상세내용
         strUserInfo = XmlConf.GetTitle("T_COMMON_DETAILLIST_VIEW");             // [전송관리] - [상세보기] 에서 확인하세요.
+
     }
 
     private void ShowMessage(string strType, string strMsg)
