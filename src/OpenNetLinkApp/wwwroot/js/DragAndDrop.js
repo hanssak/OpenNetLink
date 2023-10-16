@@ -645,13 +645,14 @@ window.exitLogIn = (trensferTemplate) => {
     else
     {        
         if (divRightUpper != null) {
-            $("#divLeftUpperSide").css("height", divRightUpper);
+            //$("#divLeftUpperSide").css("height", divRightUpper);
 
-            //하위 div의 컨트롤이 모두 overflow가 가능하므로, 템플릿 영역에서 상단 Div 높이를 제한 값으로 설정
+            //중간 div의 컨트롤이 모두 overflow가 가능하므로, 템플릿 영역에서 상단/하단 Div 높이를 제한 값으로 설정
             var divTemplateHeight = $("#divTransferTemplate").css("height");
             var divUpperHeight = $("#divUpperContent").css("height");
+            var divBottomHeight = $("#divBottomContent").css("height");
 
-            var divRest = parseInt(divTemplateHeight.replace("px", "") - divUpperHeight.replace("px", ""));
+            var divRest = parseInt(divTemplateHeight.replace("px", "") - divUpperHeight.replace("px", "") - divBottomHeight.replace("px", ""));
             $("#divFileTree").css("height", divRest + "px");
             $("#divFileList").css("height", divRest + "px");
         }
@@ -934,13 +935,14 @@ window.adJustWindowsize = (trensferTemplate) => {
         else {
             
             if (divRightUpper != null) {
-                $("#divLeftUpperSide").css("height", divRightUpper);
+                //$("#divLeftUpperSide").css("height", divRightUpper);
 
-                //하위 div의 컨트롤이 모두 overflow가 가능하므로, 템플릿 영역에서 상단 Div 높이를 제한 값으로 설정
+                //중간 div의 컨트롤이 모두 overflow가 가능하므로, 템플릿 영역에서 상단/하단 Div 높이를 제한 값으로 설정
                 var divTemplateHeight = $("#divTransferTemplate").css("height");
                 var divUpperHeight = $("#divUpperContent").css("height");
+                var divBottomHeight = $("#divBottomContent").css("height");
 
-                var divRest = parseInt(divTemplateHeight.replace("px", "") - divUpperHeight.replace("px", ""));
+                var divRest = parseInt(divTemplateHeight.replace("px", "") - divUpperHeight.replace("px", "") - divBottomHeight.replace("px", ""));
                 $("#divFileTree").css("height", divRest + "px");
                 $("#divFileList").css("height", divRest + "px");
             }            
