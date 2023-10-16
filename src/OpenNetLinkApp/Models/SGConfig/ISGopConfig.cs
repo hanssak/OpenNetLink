@@ -186,5 +186,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bHideTitleDesc { get; set; }             // 제목 및 설명 표현유무
 
+        public string strWindowTitle { get; set; }            // 윈도우 창 이름
+
     }
 }

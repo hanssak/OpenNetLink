@@ -51,8 +51,12 @@ namespace OpenNetLinkApp
                 object[] arg = new object[2];
                 arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
                 arg[1] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartTrayMove;
-                
-                ComponentsDesktop.Run<Startup>("OpenNetLink", "wwwroot/index.html", arg);
+
+                string windowTitle = Services.SGAppManager.SGopConfigService.AppConfigInfo[0].strWindowTitle;
+                if (String.IsNullOrEmpty(windowTitle))
+                    windowTitle = "OpenNetLink";
+
+                ComponentsDesktop.Run<Startup>(windowTitle, "wwwroot/index.html", arg);
             }
             else
             {
