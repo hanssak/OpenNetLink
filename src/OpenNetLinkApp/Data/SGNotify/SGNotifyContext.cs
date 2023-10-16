@@ -45,12 +45,14 @@ namespace OpenNetLinkApp.Data.SGNotify
                         .Property(c => c.Id).IsRequired()
                         .HasAnnotation("Sqlite:Autoincrement", true)
                         .ValueGeneratedOnAdd();
+            
             modelBuilder.Entity<SGAlarmData>()
                         .Property(c => c.GroupId).IsRequired();
             modelBuilder.Entity<SGAlarmData>()
                         .Property(c => c.UserSeq).IsRequired();
             modelBuilder.Entity<SGAlarmData>()
                         .Property(c => c.CategoryId).IsRequired();
+            
             modelBuilder.Entity<SGAlarmData>()
                         .HasKey(k => k.Id).HasName("PK_T_SG_ALARM_ID");
             modelBuilder.Entity<SGAlarmData>()

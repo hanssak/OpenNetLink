@@ -43,6 +43,7 @@
     <PackageReference Include="Mime" Version="3.1.0" />
     <PackageReference Include="Net.Codecrete.QrCodeGenerator" Version="2.0.3" />
     <PackageReference Include="NetSparkle.New" Version="2.0.0-preview20200906002" />
+    <PackageReference Include="QRCoder" Version="1.4.3" />
     <PackageReference Include="Radzen.Blazor" Version="2.10.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.6">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -90,6 +91,12 @@
     <Content Include="..\PreviewUtil\bin\$(Configuration)\$(TargetFramework)\PreviewUtil*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Compile Remove="Data\SGQuery\ApproveDao2.cs" />
+    <Compile Remove="Data\SGQuery\ClipboardApproveDao.cs" />
+    <Compile Remove="Data\SGQuery\ClipboardTransferDao.cs" />
+    <Compile Remove="Data\SGQuery\SecurityApproveDao.cs" />
+    <Compile Remove="Data\SGQuery\SecurityApproveDao2.cs" />
+    <Compile Remove="Data\SGQuery\TransferDao2.cs" />
     <Compile Remove="Models\SGConfig\ISGSiteConfig.cs" />
     <Compile Remove="Models\SGConfig\SGSiteConfig.cs" />
     <Compile Remove="Services\SGAppManager\SGSiteConfigService.cs" />
@@ -100,6 +107,56 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\js\jsencrypt\jsbin\jsencrypt.js" />
+    <None Include="wwwroot\js\jsencrypt\jsbin\jsencrypt.min.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\index.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\lib\index.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\JSEncrypt.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\lib\JSEncrypt.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\JSEncryptRSAKey.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\lib\JSEncryptRSAKey.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\asn1js\asn1.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\asn1js\asn1.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\asn1js\base64.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\asn1js\base64.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\asn1js\hex.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\asn1js\hex.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\asn1js\int10.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\asn1js\int10.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\asn1js\oids.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\asn1js\oids.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\jsbn\base64.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\jsbn\base64.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\jsbn\jsbn.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\jsbn\jsbn.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\jsbn\prng4.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\jsbn\prng4.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\jsbn\rng.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\jsbn\rng.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\jsbn\rsa.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\jsbn\rsa.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\jsbn\util.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\jsbn\util.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\jsrsasign\asn1-1.0.js" />
+    <None Include="wwwroot\js\jsencrypt\lib\lib\jsrsasign\yahoo.js" />
+    <None Include="wwwroot\js\jsencrypt\src\index.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\JSEncrypt.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\JSEncryptRSAKey.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\asn1js\asn1.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\asn1js\base64.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\asn1js\hex.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\asn1js\int10.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\asn1js\oids.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\jsbn\base64.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\jsbn\jsbn.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\jsbn\prng4.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\jsbn\README.md" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\jsbn\rng.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\jsbn\rsa.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\jsbn\util.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\jsrsasign\asn1-1.0.d.ts" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\jsrsasign\asn1-1.0.js" />
+    <None Include="wwwroot\js\jsencrypt\src\lib\jsrsasign\yahoo.js" />
     <None Include="wwwroot\plugins\bootstrap-switch\.DS_Store" />
     <None Include="wwwroot\plugins\bootstrap-switch\js\bootstrap-switch.js" />
     <None Include="wwwroot\plugins\bootstrap-switch\js\bootstrap-switch.min.js" />
@@ -1836,6 +1893,9 @@
     <Reference Include="Interop.IWshRuntimeLibrary">
       <HintPath>Library\Interop.IWshRuntimeLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="OpenSslLibrary">
+      <HintPath>Library\OpenSslLibrary.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -1843,10 +1903,31 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="wwwroot\conf\SqlQuery.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="libcrypto-1_1-x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libcrypto.1.1.dylib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libcrypto.so.1.1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Library\libbz2.so.1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Library\libbz2.so.1.0">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Library\libcrypto-1_1-x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Library\libssl-1_1-x64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Library\NetLink.Uninstall\uninstall.exe">
