@@ -4914,6 +4914,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         catch (System.Exception ex)
                         {
                             Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            return false;
                         }
                         #endregion [TAR 형식 검사]
                         break;
@@ -4925,9 +4926,29 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 throw;
             }
         }
-        public void UnZipFileForTransfer(string zipFileName, string destFullPath, int maxDepth)
+        public bool UnZipFileForTransfer(string zipFileName, string destFullPath)
         {
+            List<string> zipExt = new List<string>() {"ZIP","7Z","TAR","GZ","TGZ","BZ2" };
+            bool result = unzipFile(zipFileName, destFullPath);
+            if (result)
+            {
+                File.Delete(zipFileName);
+                string[] files = Directory.GetFiles(destFullPath, "*", SearchOption.AllDirectories);
+                foreach (string file in files)
+                {
+                    string extType = Path.GetExtension(file).Substring(1).ToUpper();
 
+                    if (zipExt.Contains(extType))
+                    {
+                        string destPath = file.Substring(0, file.Length - extType.Length - 1);
+                        DirectoryInfo destDir = new DirectoryInfo(destPath);
+                        if (destDir.Exists == false) destDir.Create();
+                        UnZipFileForTransfer(file, destPath);
+                    }
+                }
+            }
+
+            return result;
         }
 
 

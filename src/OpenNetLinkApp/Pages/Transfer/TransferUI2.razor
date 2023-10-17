@@ -951,6 +951,27 @@
             }
         }
 
+        foreach (HsStream hsStream in FileList)
+        {
+            if (!hsStream.IsDir)
+            {
+                string extType = Path.GetExtension(hsStream.FileName).Substring(1).ToUpper();
+                if (fileAddManage.ListCheckableCompressExtension.Contains(extType))
+                {
+                    string tempPath = "Temp";
+                    string zipTemp = Path.Combine(tempPath, hsStream.FileName);
+
+                    File.Copy(hsStream.FilePullPath, zipTemp);
+
+                    string destPath = zipTemp.Substring(0, zipTemp.Length - extType.Length - 1);
+                    DirectoryInfo destDir = new DirectoryInfo(destPath);
+                    if (destDir.Exists == false) destDir.Create();
+
+                    fileAddManage.UnZipFileForTransfer(zipTemp, destPath);
+                }
+            }
+        }
+
         //수신자 목록체크(철자틀림)
         string stReceiver = "";
         if (refForwardLine != null && refForwardLine.GetReceiver().Count > 0)
