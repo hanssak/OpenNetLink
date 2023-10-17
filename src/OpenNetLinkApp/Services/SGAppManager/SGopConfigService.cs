@@ -227,6 +227,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public string GetVirusAptDetailCustomMsg(int groupId);
 
+        public bool GetUseHideToastPopup(int groupId);
+
+
     }
 
 
@@ -1054,12 +1057,17 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo[groupId].strVirusAptDetailCustomMsg;
         }
 
-
-
         public int GetTransferTemplate(int groupId)
         {
             return AppConfigInfo[groupId].nTransferTemplate;
         }
+
+        public bool GetUseHideToastPopup(int groupId)
+        {
+            return AppConfigInfo[groupId].bHideMoveTrayMsgPopup;
+        }
+
+
     }
 
 }

@@ -194,5 +194,8 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public string strWindowTitle { get; set; }            // 윈도우 창 이름
 
+        public bool bHideMoveTrayMsgPopup { get; set; }       // Tray로 보낼때,
+
+
     }
 }

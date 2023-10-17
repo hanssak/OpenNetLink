@@ -205,5 +205,9 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public string strWindowTitle { get; set; } = "";            // 윈도우 창 이름
 
+        public bool bHideMoveTrayMsgPopup { get; set; } = false;    // 로그인직후 Tray로 이동하면 뜨는 메세지를 숨길지 유무
+
+        
+
     }
 }

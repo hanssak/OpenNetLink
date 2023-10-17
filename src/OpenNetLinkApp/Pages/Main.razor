@@ -1801,9 +1801,13 @@
                     {
                         if (pageService.GetConnectCount(nGroupIDfirst) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                         {
-                            string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                            string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
-                            HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                            if (SGAppMgrSvc.OpConfigInfoService.GetUseHideToastPopup(0) == false)
+                            {
+                                string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                                string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
+                                HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                            }
+
                             Window.MoveWebWindowToTray();
                         }
                         else
@@ -2258,9 +2262,14 @@
             {
                 if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                 {
-                    string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                    string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
-                    HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, strTitle, strInfoMsg);
+
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseHideToastPopup(0) == false)
+                    {
+                        string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                        string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
+                        HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                    }
+
                     Window.MoveWebWindowToTray();
                 }
                 else

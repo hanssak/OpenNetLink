@@ -3606,13 +3606,13 @@
 			<CN></CN>
 		</T_ETC_PASSWORD_SAMECHAR_MSG>
 
-    <T_ETC_PASSWORD_PROHIBIT_MSG>
-      <KR>비밀번호에 금지된 문자열이 포함되어 있습니다. ({0})</KR>
-      <JP></JP>
-      <EN>Your password contains a prohibited string. ({0})</EN>
-      <CN></CN>
-    </T_ETC_PASSWORD_PROHIBIT_MSG>
-
+	    <T_ETC_PASSWORD_PROHIBIT_MSG>
+	      <KR>비밀번호에 금지된 문자열이 포함되어 있습니다. ({0})</KR>
+	      <JP></JP>
+	      <EN>Your password contains a prohibited string. ({0})</EN>
+	      <CN></CN>
+	    </T_ETC_PASSWORD_PROHIBIT_MSG>
+    
 		<T_ETC_PASSWORD_KEYBOARD_LINEAR_MSG>
 			<KR>키보드상의 연속된 문자는 {0}개 이상 사용할 수 없습니다.</KR>
 			<JP></JP>
@@ -5473,29 +5473,28 @@
 			<CN></CN>
 		</T_PAGE_TYPE_TRNASFER>
 
-    <T_PAGE_TYPE_FILE_TRANSMANAGER>
-      <KR>파일전송관리</KR>
-      <JP></JP>
-      <EN>Transfer</EN>
-      <CN></CN>
-    </T_PAGE_TYPE_FILE_TRANSMANAGER>
+		    <T_PAGE_TYPE_FILE_TRANSMANAGER>
+		      <KR>파일전송관리</KR>
+		      <JP></JP>
+		      <EN>Transfer</EN>
+		      <CN></CN>
+		    </T_PAGE_TYPE_FILE_TRANSMANAGER>
 
-    <T_PAGE_TYPE_CLIP_TRANSMANAGER>
-      <KR>클립보드전송관리</KR>
-      <JP></JP>
-      <EN>Transfer</EN>
-      <CN></CN>
-    </T_PAGE_TYPE_CLIP_TRANSMANAGER>
+		    <T_PAGE_TYPE_CLIP_TRANSMANAGER>
+		      <KR>클립보드전송관리</KR>
+		      <JP></JP>
+		      <EN>Transfer</EN>
+		      <CN></CN>
+		    </T_PAGE_TYPE_CLIP_TRANSMANAGER>
 
-    <T_PAGE_TYPE_EMAIL_TRANSMANAGER>
-      <KR>이메일전송관리</KR>
-      <JP></JP>
-      <EN>Transfer</EN>
-      <CN></CN>
-    </T_PAGE_TYPE_EMAIL_TRANSMANAGER>
+		    <T_PAGE_TYPE_EMAIL_TRANSMANAGER>
+		      <KR>이메일전송관리</KR>
+		      <JP></JP>
+		      <EN>Transfer</EN>
+		      <CN></CN>
+		    </T_PAGE_TYPE_EMAIL_TRANSMANAGER>
 
-
-    <T_DROP_PROGRESS_STATUS>
+		<T_DROP_PROGRESS_STATUS>
 			<KR>파일처리 현황</KR>
 			<JP></JP>
 			<EN>Status</EN>
@@ -5571,7 +5570,6 @@
 			<CN></CN>
 		</T_DATAPICKER_DAY_MIN_GROUP>
 
-
 		<T_FILETRANS_USE_TIME_TITLE>
 			<KR>자료전송 가능시간</KR>
 			<JP></JP>
@@ -5592,7 +5590,7 @@
 			<EN></EN>
 			<CN>Available time(Sun:{0} Mon:{1} Tue:{2} Wed:{3} Thu:{4} Fri:{5} Sat:{6} Holi:{7})</CN>
 		</T_FILETRANS_USE_TIME_TRANSFER>
-
+		
 	</TITLE>
 
 	<INFO>
@@ -7294,13 +7292,14 @@
 			<EN> </EN>
 			<CN> </CN>
 		</I_0244>
-
+		
 		<I_0245>
 			<KR>인증서를 송신 했습니다.</KR>
 			<JP> </JP>
 			<EN> </EN>
 			<CN> </CN>
 		</I_0245>
+
 		<!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
 	</INFO>
@@ -11167,6 +11166,7 @@
 			<EN>Failed to receive certificate.</EN>
 			<CN></CN>
 		</E_0261>
+
 		<E_0262>
 			<KR>파일 전송을 위해 등록된 파일이 변경되었습니다.</KR>
 			<JP></JP>
