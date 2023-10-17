@@ -3606,12 +3606,12 @@
 			<CN></CN>
 		</T_ETC_PASSWORD_SAMECHAR_MSG>
 
-    <T_ETC_PASSWORD_PROHIBIT_MSG>
-      <KR>비밀번호에 금지된 문자열이 포함되어 있습니다. ({0})</KR>
-      <JP></JP>
-      <EN>Your password contains a prohibited string. ({0})</EN>
-      <CN></CN>
-    </T_ETC_PASSWORD_PROHIBIT_MSG>
+		<T_ETC_PASSWORD_PROHIBIT_MSG>
+			<KR>비밀번호에 금지된 문자열이 포함되어 있습니다. ({0})</KR>
+			<JP></JP>
+			<EN>Your password contains a prohibited string. ({0})</EN>
+			<CN></CN>
+		</T_ETC_PASSWORD_PROHIBIT_MSG>
 
 		<T_ETC_PASSWORD_KEYBOARD_LINEAR_MSG>
 			<KR>키보드상의 연속된 문자는 {0}개 이상 사용할 수 없습니다.</KR>
@@ -5473,29 +5473,29 @@
 			<CN></CN>
 		</T_PAGE_TYPE_TRNASFER>
 
-    <T_PAGE_TYPE_FILE_TRANSMANAGER>
-      <KR>파일전송관리</KR>
-      <JP></JP>
-      <EN>Transfer</EN>
-      <CN></CN>
-    </T_PAGE_TYPE_FILE_TRANSMANAGER>
+		<T_PAGE_TYPE_FILE_TRANSMANAGER>
+			<KR>파일전송관리</KR>
+			<JP></JP>
+			<EN>Transfer</EN>
+			<CN></CN>
+		</T_PAGE_TYPE_FILE_TRANSMANAGER>
 
-    <T_PAGE_TYPE_CLIP_TRANSMANAGER>
-      <KR>클립보드전송관리</KR>
-      <JP></JP>
-      <EN>Transfer</EN>
-      <CN></CN>
-    </T_PAGE_TYPE_CLIP_TRANSMANAGER>
+		<T_PAGE_TYPE_CLIP_TRANSMANAGER>
+			<KR>클립보드전송관리</KR>
+			<JP></JP>
+			<EN>Transfer</EN>
+			<CN></CN>
+		</T_PAGE_TYPE_CLIP_TRANSMANAGER>
 
-    <T_PAGE_TYPE_EMAIL_TRANSMANAGER>
-      <KR>이메일전송관리</KR>
-      <JP></JP>
-      <EN>Transfer</EN>
-      <CN></CN>
-    </T_PAGE_TYPE_EMAIL_TRANSMANAGER>
+		<T_PAGE_TYPE_EMAIL_TRANSMANAGER>
+			<KR>이메일전송관리</KR>
+			<JP></JP>
+			<EN>Transfer</EN>
+			<CN></CN>
+		</T_PAGE_TYPE_EMAIL_TRANSMANAGER>
 
 
-    <T_DROP_PROGRESS_STATUS>
+		<T_DROP_PROGRESS_STATUS>
 			<KR>파일처리 현황</KR>
 			<JP></JP>
 			<EN>Status</EN>
@@ -5593,6 +5593,36 @@
 			<CN>Available time(Sun:{0} Mon:{1} Tue:{2} Wed:{3} Thu:{4} Fri:{5} Sat:{6} Holi:{7})</CN>
 		</T_FILETRANS_USE_TIME_TRANSFER>
 
+		<T_LOG_DB_ADDFILE>
+			<KR>파일 리스트 추가</KR>
+			<JP></JP>
+			<EN>Add file list</EN>
+			<CN></CN>
+		</T_LOG_DB_ADDFILE>
+		<T_LOG_DB_ADDFILE_COMPLETE>
+			<KR>파일 리스트 추가된 파일 : {0} 개</KR>
+			<JP></JP>
+			<EN>File list added files : {0}</EN>
+			<CN></CN>
+		</T_LOG_DB_ADDFILE_COMPLETE>
+		<T_LOG_DB_FILETRANSFER>
+			<KR>파일 전송 ({0} 개)</KR>
+			<JP></JP>
+			<EN>File Transfer(files : {0})</EN>
+			<CN></CN>
+		</T_LOG_DB_FILETRANSFER>
+		<T_LOG_DB_FILETRANSFER_SUCCESS>
+			<KR>파일 전송 성공</KR>
+			<JP></JP>
+			<EN>File transfer successful</EN>
+			<CN></CN>
+		</T_LOG_DB_FILETRANSFER_SUCCESS>
+		<T_LOG_DB_FILETRANSFER_FAIL>
+			<KR>파일 전송 실패 (코드 : {0})</KR>
+			<JP></JP>
+			<EN>File transfer failed (Code : {0})</EN>
+			<CN></CN>
+		</T_LOG_DB_FILETRANSFER_FAIL>
 	</TITLE>
 
 	<INFO>
@@ -7444,7 +7474,7 @@
 
 		<W_0020>
 			<KR>제목은 최대 한글 42자, 영문 128자 / 설명은 최대 한글 83자, 영문 250자까지 입력할 수 있습니다.</KR>
-			<JP>タイトルおよび説明は最大ハングル80字、英語250字まで入力できます。</JP>			
+			<JP>タイトルおよび説明は最大ハングル80字、英語250字まで入力できます。</JP>
 			<EN>The title can be up to 42 Korean characters and 128 English characters, and the description can be up to 83 Korean characters and 250 English characters.</EN>
 			<CN>标题和说明最多可输入80字，英文250个字母。</CN>
 		</W_0020>

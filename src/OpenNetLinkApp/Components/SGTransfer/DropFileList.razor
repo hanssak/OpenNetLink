@@ -387,9 +387,7 @@
     /// <param name="isRMouseAdd"></param>
     async Task OnDropFileAdd(List<string> recvList, bool isRMouseAdd)
     {
-
         CLog.Here().Information($"OnDropFileAdd, --------------------- ");
-
 
         FileExamEvent SGFileExamEvent = null;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -402,6 +400,10 @@
         if (sgLoginData != null && sgLoginData.GetFileTrans() == false)
             return;
 
+        ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+        if (sgUserData == null)
+            return;
+
         SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
         if (SGFileExamEvent == null)
             return;
@@ -411,7 +413,7 @@
         bool existErr = false;      //검사 파일 중 에러 발생 여부
         int per = 0;
         int nExamCount = 0;
-
+        SetLogDB(groupID, sgUserData.UserSeq, XmlConf.GetTitle("T_LOG_DB_ADDFILE"));   //파일 리스트 추가
         try
         {
 
@@ -946,7 +948,7 @@
                                 {
                                     existErr = true;
                                     @*fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);*@
-                                    childFile.eErrType = eFileAddErr.eFA_FILE_READ_ERROR;
+    childFile.eErrType = eFileAddErr.eFA_FILE_READ_ERROR;
                                     CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
                                     if (hsStream.stream != null)
                                     {
@@ -1862,9 +1864,14 @@
             if (per < 1000 || string.Compare(strFileName, "complete!", true) != 0)
                 return;
 
+            
             await Task.Delay(500);
             await refProgress.closePopUp();
             int nErrCount = fileAddManage.GetAddErrCount();
+
+            ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(_groupId);
+            if (sgUserData != null)                    
+                SetLogDB(_groupId, sgUserData.UserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_ADDFILE_COMPLETE") ,pageService.GetPageStatus(_groupId).GetFileDragListData().Count)); // "파일 리스트 추가된 파일 : {0} 개");
 
             List<(string reason, string count)> listReason;
             List<FileAddErr> listErr;
@@ -1891,7 +1898,8 @@
             }
             else
                 fileAddManage.m_nCurRegisteringSize = 0;
-
+            
+           
             return;
         }
         refProgress.SetProgressText(false);
@@ -2492,5 +2500,22 @@
         await jsRuntime.InvokeAsync<object>("removeAllFileList", param);
 
         CLog.Here().Information("[CLEAR] 삭제");
+    }
+
+    /// <summary>
+    /// Local DB에 전송이력 저장
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="userSeq"></param>
+    /// <param name="log"></param>
+    public void SetLogDB(int groupID, string userSeq, string log)
+    {
+        if(SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupID) != 1)
+            return;
+        Data.SGLogData.SGLogDBProc.Instance.InsertTransferLogInfo(groupID, userSeq, DateTime.Now, log);
+        
+        PageDataRefreshEvent pgRefreshEvent = HSCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.TransferTemplate01);
+        if (pgRefreshEvent != null)
+            pgRefreshEvent();
     }
 }

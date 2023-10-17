@@ -642,7 +642,7 @@
                         cntSendQuery++;
                         }*@
 
-                    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
+    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
                     SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "", sgLoginData.GetApproveProxyRight());
                     cntSendQuery++;
                 }
@@ -934,10 +934,9 @@
             }
         }
 
-
+        dropFile.SetLogDB(groupID, strUserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_FILETRANSFER"), FileList.Count)); //$"파일 전송 ({FileList.Count} 건)");        
         int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
-
-        //
+        
         if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID))
         {
             pageService.SetApproveExtFileTransWithApprove(groupID, false);
@@ -1319,6 +1318,10 @@
             HSCmdCenter.SendFileTransCancel();
             strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
+            ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+            if (sgUserInfo != null)
+                dropFile.SetLogDB(groupID, sgUserInfo.UserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_FILETRANSFER_FAIL"), e.result));
+
             await refTransProgress.closePopUp();
             return;
         }
@@ -1328,6 +1331,10 @@
             HSCmdCenter.SendFileTransCancel();
             strMsg = XmlConf.GetErrMsg("E_0092");           // 파일 압축/암호화 도중 오류가 발생하였습니다.
             ShowMessage("error", strMsg);
+            ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+            if (sgUserInfo != null)
+                dropFile.SetLogDB(groupID, sgUserInfo.UserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_FILETRANSFER_FAIL"), e.count));
+
             await refTransProgress.closePopUp();
             return;
         }
@@ -1336,6 +1343,9 @@
             HSCmdCenter.SendFileTransCancel();
             strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
+            ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+            if (sgUserInfo != null)
+                dropFile.SetLogDB(groupID, sgUserInfo.UserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_FILETRANSFER_FAIL"), e.count));
             await refTransProgress.closePopUp();
             return;
         }
@@ -1344,6 +1354,9 @@
             HSCmdCenter.SendFileTransCancel();
             strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 파일 정보를 읽어 올 수 없습니다.
             ShowMessage("error", strMsg);
+            ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+            if (sgUserInfo != null)
+                dropFile.SetLogDB(groupID, sgUserInfo.UserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_FILETRANSFER_FAIL"), e.count));
             await refTransProgress.closePopUp();
             return;
         }
@@ -1373,7 +1386,10 @@
                 // error
                 CLog.Here().Error($"dropFile.DataClear - error:{err.Source} - Msg : {err.Message}");
             }
-
+             ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+            if (sgUserInfo != null)
+                dropFile.SetLogDB(groupID, sgUserInfo.UserSeq, XmlConf.GetTitle("T_LOG_DB_FILETRANSFER_SUCCESS"));
+            
             strBindTitle = strCurrentTitle = "";
             strBindDesc = strCurrentDesc = "";
             SendDayFileInfo();

@@ -5,6 +5,7 @@ using AgLogManager;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace OpenNetLinkApp.Data.SGLogData
 {
@@ -148,165 +149,16 @@ namespace OpenNetLinkApp.Data.SGLogData
         {
             mut.WaitOne();
 
+            string now = DateTime.Now.ToString("yyyy-MM-dd");
+
             // Read
             List<SGTransferLogData> SDataList = DBSDataCtx.TransferLog
-                                                .Where(x=>x.GroupId == groupId && x.UserSeq == userSeq;
-            
+                                                .Where(x => x.GroupId == groupId && x.UserSeq == userSeq && x.LogDate == now)
+                                                .OrderBy(x=>x.Id).ToList();
 
-
-            lock (_locker)
-            {
-                SDataList = DBSDataCtx.setting
-                .Where(x => x.GROUPID == groupId).Take(nLimit)
-                .ToList();
-            }
-
-            Log.Logger.Here().Information($"Querying for a SGSettingData Limit {nLimit}");
+            Log.Logger.Here().Debug($"Querying for a SGTransferLogData UserSeq {userSeq}");
+            mut.ReleaseMutex();
             return SDataList;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="groupId"></param>
-        /// <returns></returns>
-        public SGSettingData SelectSettingData(int groupId)
-        {
-            SGSettingData SData;
-            // Read
-
-            lock (_locker)
-            {
-                SData = DBSDataCtx.setting
-                .Where(x => x.GROUPID == groupId)
-                .FirstOrDefault();
-            }
-            Log.Logger.Here().Information($"Querying for a SGSettingData {SData}");
-            return SData;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="groupId"></param>
-        /// <returns></returns>
-        public string GetSettingUID(int groupId)
-        {
-            string strUID;
-
-            lock (_locker)
-            {
-                // Read
-                strUID = DBSDataCtx.setting
-                .Where(x => x.GROUPID == groupId)
-                .Select(x => x.UID)
-                .FirstOrDefault();
-            }
-
-            Log.Logger.Here().Information($"Get for a SGSettingData, GroupId({groupId})=>UID({strUID})");
-            return strUID;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="groupId"></param>
-        /// <returns></returns>
-        public string GetSettingUPW(int groupId)
-        {
-            string strUPW;
-
-            lock (_locker)
-            {
-                // Read
-                strUPW = DBSDataCtx.setting
-                .Where(x => x.GROUPID == groupId)
-                .Select(x => x.UPW)
-                .FirstOrDefault();
-            }
-
-            Log.Logger.Here().Information($"Get for a SGSettingData, GroupId({groupId})=>UPW({strUPW})");
-            return strUPW;
-        }
-
-        public string GetSettingApprLine(int groupId)
-        {
-            string strApprLine;
-            // Read
-
-            lock (_locker)
-            {
-                strApprLine = DBSDataCtx.setting
-                .Where(x => x.GROUPID == groupId)
-                .Select(x => x.APPRLINE)
-                .FirstOrDefault();
-            }
-
-            Log.Logger.Here().Information($"Get for a SGSettingData, GroupId({groupId})=>APPRLINE({strApprLine})");
-            return strApprLine;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="groupId"></param>
-        /// <returns></returns>
-        public string GetSettingDelayDspPw(int groupId)
-        {
-            string strDelayDspPw;
-
-            lock (_locker)
-            {
-                // Read
-                strDelayDspPw = DBSDataCtx.setting
-                .Where(x => x.GROUPID == groupId)
-                .Select(x => x.DELAYDISPLAYPW)
-                .FirstOrDefault();
-            }
-
-            Log.Logger.Here().Information($"Get for a SGSettingData, GroupId({groupId})=>DELAYDISPLAYPW({strDelayDspPw})");
-            return strDelayDspPw;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="groupId"></param>
-        /// <returns></returns>
-        public bool GetSettingAutoLogin(int groupId)
-        {
-            int nAutoLogin;
-
-            lock (_locker)
-            {
-                // Read
-                nAutoLogin = DBSDataCtx.setting
-                .Where(x => x.GROUPID == groupId)
-                .Select(x => x.AUTOLOGINING)
-                .FirstOrDefault();
-            }
-
-            bool bAutoLogin = nAutoLogin == 1 ? true : false;
-            Log.Logger.Here().Information($"Get for a SGSettingData, GroupId({groupId})=>DELAYDISPLAYPW({bAutoLogin})");
-            return bAutoLogin;
-        }
-
-        /// <summary>
-        /// Delete from SGSettingData
-        /// </summary>
-        /// <param name="settingData"></param>
-        /// <returns></returns>
-        public bool DeleteSettingData(SGSettingData settingData)
-        {
-            // Delete
-            lock (_locker)
-            {
-                DBSDataCtx.Remove(settingData);
-                DBSDataCtx.SaveChanges();
-            }
-            Log.Logger.Here().Information($"Delete the SGSettingData, {settingData}");
-
-            return true;
         }
     }
 }
