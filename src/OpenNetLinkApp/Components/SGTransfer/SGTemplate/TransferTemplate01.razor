@@ -38,7 +38,7 @@
     <div class="col-md-12">
         <div id="divRightUpperSide">
             <div id="divDropFile" class="card-body p-0" style="height:20vh">
-                <DropFileList @ref="refDropFileList"></DropFileList>
+                <DropFileList @ref="refDropFileList" OnCompleteDragFileExam="RequestFileSendAlert"></DropFileList>
             </div>
             @*제목과 설명은 삭제*@
             <div class="form-group  clearfix mt-1 mb-1">
@@ -217,6 +217,8 @@
     </div>
 </div>
 
+<SGAlert @ref="refSGAlertRequestFileSend" OnConfirm="@(OnCheckApprLine.InvokeAsync)" Guid="RequestFileSendAlert"></SGAlert>
+
 @code
 {
     [Parameter] public int groupIDbyParam { get; set; }
@@ -241,6 +243,8 @@
     [Parameter] public EventCallback OnCheckApprLine { get; set; }
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferTemplate01>();
+
+    SGAlert refSGAlertRequestFileSend;
 
     public string stSelectPath { get; set; }
     public string stCurrentSubPath { get; set; }
@@ -514,8 +518,24 @@
         {
             sgFile[idx].dispIndex = idx;
         }
-
         StateHasChanged();
     }
 
+    async void RequestFileSendAlert((int groupId ,int count) DragValue)
+    {
+        try
+        {
+            if (HSCmdCenter.GetFileRecving(DragValue.groupId) || HSCmdCenter.GetFileSending(DragValue.groupId))
+            {
+                CLog.Here().Information("RequestFileSendAlert, 송/수신 중으로 Request Popup Skip");
+                return;
+            }                
+
+            await refSGAlertRequestFileSend.openPopUp(XmlConf.GetTitle("T_REQUEST_FILE_SEND"), string.Format(XmlConf.GetInfoMsg("I_0246"), DragValue.count), 2, DragValue.groupId, "", XmlConf.GetTitle("T_COMMON_FILETRANS"));
+        } 
+        catch(Exception ex)
+        {
+            CLog.Here().Error("CheckFileSendNotiPopup Exception - " + ex.ToString());
+        }
+    }
 }

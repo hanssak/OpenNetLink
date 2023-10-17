@@ -835,7 +835,7 @@ window.closeAllPopup = () => {
     $("#modal-alert-header-ipchange").modal("hide"); 
     $("#modal-alert-header-language").modal("hide");
     
-    
+    $("#RequestFileSendAlert").modal("hide");
 }
 
 window.initTransferUIPosition = () => {
