@@ -251,7 +251,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 case 13: // 등록되지 않은 MAC
                     strLoginFailMsg = xmlConf.GetWarnMsg("W_0204");                                         // 등록되지 않은 MAC 정보입니다.
                     break;
-
+                case 14: //  장기 미접속 차단
+                    strLoginFailMsg = xmlConf.GetWarnMsg("W_0301");                                         // 장기간 접속하지 않아 차단되었습니다./r/n접속 차단을 해제하시려면 관리자에게 요청하시기 바랍니다.
+                    break;
                 default: //사용자 인증에 실패
                     strLoginFailMsg = xmlConf.GetWarnMsg("W_0037");                                         // 사용자 인증에 실패 하였습니다.
                     break;
