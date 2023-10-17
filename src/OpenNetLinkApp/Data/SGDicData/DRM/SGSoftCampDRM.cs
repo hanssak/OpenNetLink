@@ -12,7 +12,7 @@ namespace OpenNetLinkApp.Data.SGDicData.DRM
 {
     class SGSoftCampDRM
     {
-        public const string strSoftCampDrmLibName = "C:\\Windows\\DSCSLink.dll";
+        public const string strSoftCampDrmLibName = "C:\\Windows\\DSCSLink64.dll";
         [DllImport(strSoftCampDrmLibName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         public static extern int DSCSGradeEncryptFileV2(string stSource);
 
