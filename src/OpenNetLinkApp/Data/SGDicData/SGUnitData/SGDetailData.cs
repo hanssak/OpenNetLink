@@ -900,6 +900,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public void GetFileInfo(out List<FileInfoData> fileListInfo)
         {
             List<Dictionary<int, string>> listDicdata = GetRecordData("FILERECORD");
+            if (listDicdata == null)
+            {
+                fileListInfo = null;
+                HsLog.err($"GetFileInfo, FILERECORD null !");
+                return;
+            }
+
 
             int dataCount = listDicdata.Count;
             if (dataCount <= 0)
@@ -1031,6 +1038,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public List<Dictionary<int, string>> GetApproverInfo()
         {
             List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
+            if (listDicdata == null)
+            {
+                HsLog.err($"GetApproverInfo, APPROVERECORD null !");
+                return null;
+            }
 
             int dataCount = listDicdata.Count;
             if (dataCount <= 0)
@@ -1041,6 +1053,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public List<Dictionary<int, string>> GetForwardUserInfo()
         {
             List<Dictionary<int, string>> listDicdata = GetRecordData("FORWARDUSERRECORD");
+            if (listDicdata == null)
+            {
+                HsLog.err($"GetForwardUserInfo, FORWARDUSERRECORD null !");
+                return null;
+            }
 
             int dataCount = listDicdata.Count;
             if (dataCount <= 0)
