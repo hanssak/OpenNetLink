@@ -243,6 +243,8 @@ strWindowTitle : webView 윈도우 타이틀 변경 (타이틀 이름 입력)
 bUseDashBoard : 공통환경설정에서 dashboard 를 첫화면으로 사용하지 못하게 함(true:사용, 기본값:true)
 bUseEmailApprUIwait : Email결재관리 화면으로 이동하면 승인대기 조건으로 검색하게 할지 유무(true:사용, 기본값:false)
 strVirusAptDetailCustomMsg : 바이러스 / APT 검사결과의 상세설명에 나오게할 커스텀 문구(html 형태로 표현가능), 없으면 기본문구표현
+bUseAskFileSendAlert : 파일리스트 추가 후 전송을 묻는 팝업표시 기능 활성화 여부 (Default : false)
+
 
 
 

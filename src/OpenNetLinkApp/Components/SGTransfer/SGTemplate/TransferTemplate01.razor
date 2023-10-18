@@ -32,13 +32,12 @@
 @inject NavigationManager MyNavigationManager
 @inject PageStatusService pageService
 @inject IFileReaderService fileReaderService
-@inject ISGAppUpdaterService AppUpdaterSvc;
 
 <div class="row" id="divUpperContent">
     <div class="col-md-12">
         <div id="divRightUpperSide">
             <div id="divDropFile" class="card-body p-0" style="height:20vh">
-                <DropFileList @ref="refDropFileList"></DropFileList>
+                <DropFileList @ref="refDropFileList" OnCompleteDragFileExam="AskFileSendAlert"></DropFileList>
             </div>
             @*제목과 설명은 삭제*@
             <div class="form-group  clearfix mt-1 mb-1">
@@ -217,6 +216,8 @@
     </div>
 </div>
 
+<SGAlert @ref="refSGAlertAskFileSend" OnConfirm="@(arg=> AskFileSendAlertResult(arg, true))" OnCancel="@(arg=> AskFileSendAlertResult(arg, false))" Guid="AskFileSendAlert"></SGAlert>
+
 @code
 {
     [Parameter] public int groupIDbyParam { get; set; }
@@ -241,6 +242,8 @@
     [Parameter] public EventCallback OnCheckApprLine { get; set; }
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferTemplate01>();
+
+    SGAlert refSGAlertAskFileSend;
 
     public string stSelectPath { get; set; }
     public string stCurrentSubPath { get; set; }
@@ -280,6 +283,8 @@
     ISGSideBarUIService SideBarUISvc;
     ISGAppConfigService AppConfigSvc;
     ISGopConfigService OpConfigSvc;
+    ISGCtrlSideUIService CtrlSideUISvc;
+
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
     DropFileList refDropFileList;
 
@@ -325,6 +330,8 @@
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
         versionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
+        CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
+
         OnSettingByGroupID(groupIDbyParam);
         InitText();
 
@@ -352,7 +359,7 @@
         }
 
         //날짜 변경 시 이력 초기화
-        if(strCurrentDate != DateTime.Now.ToString("yyyy-MM-dd"))
+        if (strCurrentDate != DateTime.Now.ToString("yyyy-MM-dd"))
         {
             SGLogDBProc.Instance.DeleteAllInfo(DateTime.Now, true);
             strCurrentDate = DateTime.Now.ToString("yyyy-MM-dd");
@@ -514,8 +521,49 @@
         {
             sgFile[idx].dispIndex = idx;
         }
-
         StateHasChanged();
     }
 
+    async void AskFileSendAlert((int groupId, int count) DragValue)
+    {
+        try
+        {
+            if(!OpConfigSvc.GetUseAskFileSendAlert(DragValue.groupId))
+                return;
+            
+            if (HSCmdCenter.GetFileRecving(DragValue.groupId) || HSCmdCenter.GetFileSending(DragValue.groupId))
+            {
+                CLog.Here().Information("AskFileSendAlert, 송/수신 중으로 Ask Popup Skip");
+                return;
+            }
+
+            bool useChk = true;
+            bool chkAskState = AppConfigSvc.GetAskFileSend(DragValue.groupId);
+            bool chkDontShowState = !chkAskState;
+            string chkMessage = XmlConf.GetTitle("T_COMMON_ALLDAYCLOSE");
+            
+            if(chkDontShowState)
+            {
+                CLog.Here().Information("AskFileSendAlert, CtrlSideUI Checkbox Off로 Ask Popup Skip");
+                return;
+            }
+            await refSGAlertAskFileSend.openPopUp(XmlConf.GetTitle("T_ASK_FILE_SEND"), string.Format(XmlConf.GetInfoMsg("I_0246"), DragValue.count), 2, DragValue.groupId, useChk, chkDontShowState, chkMessage, DragValue.groupId.ToString(), XmlConf.GetTitle("T_COMMON_FILETRANS"));
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error("AskFileSendAlert Exception - " + ex.ToString());
+        }
+    }
+
+    void AskFileSendAlertResult(string arg, bool isConfirm)
+    {
+        if (int.TryParse(arg, out int groupId))
+        {
+            bool chkAskState = !refSGAlertAskFileSend.CheckboxState;
+            CtrlSideUISvc.SetAskFileSend(groupId, chkAskState);
+            
+            if(isConfirm)
+                OnCheckApprLine.InvokeAsync(groupId);
+        }
+    }
 }

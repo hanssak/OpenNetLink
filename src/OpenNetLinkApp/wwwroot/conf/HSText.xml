@@ -1173,7 +1173,7 @@
 		<T_COMMON_ALLDAYCLOSE>
 			<KR>다시 보지 않기</KR>
 			<JP></JP>
-			<EN>Hide until today</EN>
+			<EN>Don't show again</EN>
 			<CN>不再显示</CN>
 		</T_COMMON_ALLDAYCLOSE>
 
@@ -5035,6 +5035,13 @@
 			<EN>Solution Information</EN>
 			<CN></CN>
 		</T_APPCONFIG_AGENT_INFO>
+
+		<T_APPCONFIG_ASK_FILESEND>
+			<KR>파일추가 후 전송팝업 표시</KR>
+			<JP></JP>
+			<EN>Run transfer pop-up after adding file</EN>
+			<CN></CN>
+		</T_APPCONFIG_ASK_FILESEND>
 		<!-- ********************************************* [END] App 설정 (T_APPCONFIG_0000) ******************************************** -->
 
 		<!-- ********************************************* [START] Message 설정 (T_MESSAGE_0000) ********************************************* -->
@@ -5623,6 +5630,13 @@
 			<EN>File transfer failed (Code : {0})</EN>
 			<CN></CN>
 		</T_LOG_DB_FILETRANSFER_FAIL>
+
+		<T_ASK_FILE_SEND>
+			<KR>파일 전송 안내</KR>
+			<JP></JP>
+			<EN>File transfer instructions</EN>
+			<CN></CN>
+		</T_ASK_FILE_SEND>
 	</TITLE>
 
 	<INFO>
@@ -7331,6 +7345,13 @@
 			<EN> </EN>
 			<CN> </CN>
 		</I_0245>
+
+		<I_0246>
+			<KR>파일 리스트에 추가된 {0} 개의 파일을 전송하시겠습니까?</KR>
+			<JP></JP>
+			<EN>Would you like to transfer the {0} files added to the file list?</EN>
+			<CN></CN>
+		</I_0246>
 		<!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
 	</INFO>

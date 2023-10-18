@@ -80,6 +80,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         string ConvertRecvDownPath(string DownPath);
 
         int GetUserSelectFirstNet();
+        bool GetAskFileSend(int nGroupID);
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -653,7 +654,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.nUserSelectFirstNet;
         }
 
+        public bool GetAskFileSend(int nGroupID)
+        {
+            (AppConfigInfo as SGAppConfig).bAskFileSend ??= new List<bool>();
 
+            if ((AppConfigInfo as SGAppConfig).bAskFileSend.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGAppConfig).bAskFileSend[nGroupID];
 
+            return false;
+        }
     }
 }

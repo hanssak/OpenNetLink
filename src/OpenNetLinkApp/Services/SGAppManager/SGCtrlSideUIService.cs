@@ -75,6 +75,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetUseApprWaitNoti(bool useApprWaitNoti);
 
         void SetUserSelectFirstNet(int nSelectNet);
+
+        void SetAskFileSend(int nGroupID, bool askFileSend);
     }
     public class SGCtrlSideUIService : ISGCtrlSideUIService
     {
@@ -116,7 +118,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public void SaveAppConfigSerialize()
         {
             var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));
-            string AppConfig = Environment.CurrentDirectory+"/wwwroot/conf/AppEnvSetting.json";
+            string AppConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppEnvSetting.json";
             try
             {
                 using (var fs = new FileStream(AppConfig, FileMode.Create))
@@ -124,119 +126,119 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     var encoding = Encoding.UTF8;
                     var ownsStream = false;
                     var indent = true;
-    
+
                     using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
                     {
                         serializer.WriteObject(writer, (AppConfigInfo as SGAppConfig));
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
             }
         }
-//        public void SaveOpConfigSerialize()
-//        {
-//            if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
-//                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
+        //        public void SaveOpConfigSerialize()
+        //        {
+        //            if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
+        //                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
 
-//            foreach (ISGNetwork sGNetwork in NetWorkInfo)
-//            {
-//                var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
-//                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sGNetwork.GroupID}_{sGNetwork.NetPos}.json";
-//                try
-//                {
-//                    using (var fs = new FileStream(AppConfig, FileMode.Create))
-//                    {
-//                        var encoding = Encoding.UTF8;
-//                        var ownsStream = false;
-//                        var indent = true;
+        //            foreach (ISGNetwork sGNetwork in NetWorkInfo)
+        //            {
+        //                var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
+        //                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sGNetwork.GroupID}_{sGNetwork.NetPos}.json";
+        //                try
+        //                {
+        //                    using (var fs = new FileStream(AppConfig, FileMode.Create))
+        //                    {
+        //                        var encoding = Encoding.UTF8;
+        //                        var ownsStream = false;
+        //                        var indent = true;
 
-//                        using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
-//                        {
-//                            serializer.WriteObject(writer, OpConfigInfo[sGNetwork.GroupID]);
-//                        }
-//                    }
-//#if !DEBUG
-//                    byte[] info = null;
-//                    using (FileStream fileStream = new FileStream(AppConfig, FileMode.Open, FileAccess.Read, FileShare.None))
-//                    {
-//                        using (StreamReader streamReader = new StreamReader(fileStream))
-//                        {
-//                            string str = streamReader.ReadToEnd();
-//                            byte[] byteInput = Encoding.UTF8.GetBytes(str);
-//                            byte[] masterKey = SGCrypto.GetMasterKey();
-//                            info = SGCrypto.AESEncrypt256(byteInput, masterKey);
-//                        }
-//                    }
+        //                        using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
+        //                        {
+        //                            serializer.WriteObject(writer, OpConfigInfo[sGNetwork.GroupID]);
+        //                        }
+        //                    }
+        //#if !DEBUG
+        //                    byte[] info = null;
+        //                    using (FileStream fileStream = new FileStream(AppConfig, FileMode.Open, FileAccess.Read, FileShare.None))
+        //                    {
+        //                        using (StreamReader streamReader = new StreamReader(fileStream))
+        //                        {
+        //                            string str = streamReader.ReadToEnd();
+        //                            byte[] byteInput = Encoding.UTF8.GetBytes(str);
+        //                            byte[] masterKey = SGCrypto.GetMasterKey();
+        //                            info = SGCrypto.AESEncrypt256(byteInput, masterKey);
+        //                        }
+        //                    }
 
-//                    using (FileStream fs = File.Create(AppConfig))
-//                    {
-//                        fs.Write(info, 0, info.Length);
-//                    }
-//#endif
-//                }
-//                catch (Exception ex)
-//                {
-//                    CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
-//                }
-//            }
-//        }
-//        public void SaveOpConfigSerialize(int groupId)
-//        {
-//            var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
-//            string AppConfig = String.Empty;
-//            foreach(ISGNetwork sGNetwork in NetWorkInfo)
-//            {
-//                if(sGNetwork.GroupID == groupId)
-//                    AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{groupId}_{sGNetwork.NetPos}.json";
-//            }
+        //                    using (FileStream fs = File.Create(AppConfig))
+        //                    {
+        //                        fs.Write(info, 0, info.Length);
+        //                    }
+        //#endif
+        //                }
+        //                catch (Exception ex)
+        //                {
+        //                    CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+        //                }
+        //            }
+        //        }
+        //        public void SaveOpConfigSerialize(int groupId)
+        //        {
+        //            var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
+        //            string AppConfig = String.Empty;
+        //            foreach(ISGNetwork sGNetwork in NetWorkInfo)
+        //            {
+        //                if(sGNetwork.GroupID == groupId)
+        //                    AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{groupId}_{sGNetwork.NetPos}.json";
+        //            }
 
-//            if(AppConfig == String.Empty)
-//            {
-//                return;
-//            }
-//            try
-//            {
-//                if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
-//                    Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
+        //            if(AppConfig == String.Empty)
+        //            {
+        //                return;
+        //            }
+        //            try
+        //            {
+        //                if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
+        //                    Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
 
-//                using (var fs = new FileStream(AppConfig, FileMode.Create))
-//                {
-//                    var encoding = Encoding.UTF8;
-//                    var ownsStream = false;
-//                    var indent = true;
+        //                using (var fs = new FileStream(AppConfig, FileMode.Create))
+        //                {
+        //                    var encoding = Encoding.UTF8;
+        //                    var ownsStream = false;
+        //                    var indent = true;
 
-//                    using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
-//                    {
-//                        serializer.WriteObject(writer, OpConfigInfo[groupId]);
-//                    }
-//                }
-//#if !DEBUG
-//                byte[] info = null;
-//                using (FileStream fileStream = new FileStream(AppConfig, FileMode.Open, FileAccess.Read, FileShare.None))
-//                {
-//                    using (StreamReader streamReader = new StreamReader(fileStream))
-//                    {
-//                        string str = streamReader.ReadToEnd();
-//                        byte[] byteInput = Encoding.UTF8.GetBytes(str);
-//                        byte[] masterKey = SGCrypto.GetMasterKey();
-//                        info = SGCrypto.AESEncrypt256(byteInput, masterKey);
-//                    }
-//                }
+        //                    using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
+        //                    {
+        //                        serializer.WriteObject(writer, OpConfigInfo[groupId]);
+        //                    }
+        //                }
+        //#if !DEBUG
+        //                byte[] info = null;
+        //                using (FileStream fileStream = new FileStream(AppConfig, FileMode.Open, FileAccess.Read, FileShare.None))
+        //                {
+        //                    using (StreamReader streamReader = new StreamReader(fileStream))
+        //                    {
+        //                        string str = streamReader.ReadToEnd();
+        //                        byte[] byteInput = Encoding.UTF8.GetBytes(str);
+        //                        byte[] masterKey = SGCrypto.GetMasterKey();
+        //                        info = SGCrypto.AESEncrypt256(byteInput, masterKey);
+        //                    }
+        //                }
 
-//                using (FileStream fs = File.Create(AppConfig))
-//                {
-//                    fs.Write(info, 0, info.Length);
-//                }
-//#endif
-//            }
-//            catch (Exception ex)
-//            {
-//                CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
-//            }
-//        }
+        //                using (FileStream fs = File.Create(AppConfig))
+        //                {
+        //                    fs.Write(info, 0, info.Length);
+        //                }
+        //#endif
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+        //            }
+        //        }
         //public void SaveVersionConfigSerialize()
         //{
         //    var serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));
@@ -264,11 +266,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             char cWin, cCtrl, cAlt, cShift;
             (AppConfigInfo as SGAppConfig).ClipBoardHotKey ??= new List<string>();
-            cWin    = bWin?'Y':'N';
-            cCtrl   = bCtrl?'Y':'N';
-            cAlt    = bAlt?'Y':'N';
-            cShift  = bShift?'Y':'N';
-            if(AppConfigInfo.ClipBoardHotKey.ElementAtOrDefault(groupId) != null)
+            cWin = bWin ? 'Y' : 'N';
+            cCtrl = bCtrl ? 'Y' : 'N';
+            cAlt = bAlt ? 'Y' : 'N';
+            cShift = bShift ? 'Y' : 'N';
+            if (AppConfigInfo.ClipBoardHotKey.ElementAtOrDefault(groupId) != null)
             {
                 AppConfigInfo.ClipBoardHotKey.RemoveAt(groupId);
                 AppConfigInfo.ClipBoardHotKey.Insert(groupId, String.Format($"{cWin},{cCtrl},{cAlt},{cShift},{chVKCode}"));
@@ -277,7 +279,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             {
                 AppConfigInfo.ClipBoardHotKey.Insert(groupId, String.Format($"{cWin},{cCtrl},{cAlt},{cShift},{chVKCode}"));
             }
-            
+
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
@@ -344,7 +346,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 if (AppConfigInfo.bURLAutoTrans.Count >= nGroupID + 1)
                     (AppConfigInfo as SGAppConfig).bURLAutoTrans[nGroupID] = urlAutoTrans;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 CLog.Here().Information($"SGCtrlSideUIService-Exception(Msg) : {e.Message}");
             }
@@ -361,7 +363,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 (AppConfigInfo as SGAppConfig).bURLAutoAfterMsg ??= new List<bool>();
                 if (AppConfigInfo.bURLAutoAfterMsg.Count >= nGroupID + 1)
                     (AppConfigInfo as SGAppConfig).bURLAutoAfterMsg[nGroupID] = urlAutoAfterMsg;
-                
+
             }
             catch (Exception e)
             {
@@ -390,7 +392,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             (AppConfigInfo as SGAppConfig).strForwardUrl ??= new List<string>();
             if (AppConfigInfo.strForwardUrl.Count >= nGroupID + 1)
                 (AppConfigInfo as SGAppConfig).strForwardUrl[nGroupID] = urlData;
-            
+
 
             SaveAppConfigSerialize();
             //SaveOpConfigSerialize(nGroupID);
@@ -417,7 +419,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public void SetRecvDownPath(int groupId, string recvDownPath)
         {
             (AppConfigInfo as SGAppConfig).RecvDownPath ??= new List<string>();
-            if(AppConfigInfo.RecvDownPath.ElementAtOrDefault(groupId) != null)
+            if (AppConfigInfo.RecvDownPath.ElementAtOrDefault(groupId) != null)
             {
                 AppConfigInfo.RecvDownPath.RemoveAt(groupId);
                 AppConfigInfo.RecvDownPath.Insert(groupId, recvDownPath);
@@ -463,7 +465,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public void SetUserApprActionTrayFix(bool userApprActionTrayFix)
         {
             (AppConfigInfo as SGAppConfig).bUserApprActionTrayFix = userApprActionTrayFix;
-            
+
             SaveAppConfigSerialize();
             //SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
@@ -508,11 +510,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                
+
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                
+
             }
             else
             {
@@ -590,5 +592,22 @@ namespace OpenNetLinkApp.Services.SGAppManager
             NotifyStateChangedCtrlSide();
         }
 
+        public void SetAskFileSend(int nGroupID, bool askFileSend)
+        {
+            (AppConfigInfo as SGAppConfig).bAskFileSend ??= new List<bool>();
+
+            List<bool> groupAskFileSend = (AppConfigInfo as SGAppConfig).bAskFileSend;
+            if (groupAskFileSend.Count < nGroupID + 1)
+            {
+                int initCnt = groupAskFileSend.Count;
+                for (int idx = initCnt; idx <= nGroupID; idx++)
+                {
+                    groupAskFileSend.Add(false);
+                }
+            }
+            groupAskFileSend[nGroupID] = askFileSend;
+            SaveAppConfigSerialize();
+            NotifyStateChangedCtrlSide();
+        }
     }
 }

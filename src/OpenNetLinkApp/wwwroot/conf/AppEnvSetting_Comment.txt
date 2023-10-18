@@ -116,6 +116,7 @@ strInitPasswd : 암호화된 초기 PW string
 
 strPWChangeProhibitLimit : 패스워드 사용금지 문자열 [기능 X]
 
+bAskFileSend : 파일리스트 추가 후 전송을 묻는 팝업표시 여부 설정 (Default : false)
 
 // 클립보드 - 기타
 bUseClipAlarmType : 공통환경설정에서 클립보드 송수신 알림형식 수정가능 유무 (true,false)
