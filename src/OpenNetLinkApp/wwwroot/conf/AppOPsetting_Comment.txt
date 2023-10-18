@@ -239,6 +239,8 @@ nTransferTemplate : 파일전송 UI 템플릿 지정 (Default : 0)
 								=> 0 : 기존 전송 템플릿
 								=> 1 : 제목/설명입력항목이 없고, 상단에는 드래그 리스트/ 하단에는 정렬가능한 파일목록 표시
 
+bUseAskFileSendAlert : 파일리스트 추가 후 전송을 묻는 팝업표시 기능 활성화 여부 (Default : false)
+
 
 
 
