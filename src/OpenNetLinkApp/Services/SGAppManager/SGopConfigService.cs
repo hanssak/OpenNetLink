@@ -220,6 +220,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseHideTitleDesc(int groupId);
 
         public int GetTransferTemplate(int groupId);
+        public bool GetUseAskFileSendAlert(int groupId);
     }
 
 
@@ -1032,11 +1033,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo[groupId].bHideTitleDesc;
         }
 
-
-
         public int GetTransferTemplate(int groupId)
         {
             return AppConfigInfo[groupId].nTransferTemplate;
+        }
+
+        public bool GetUseAskFileSendAlert(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseAskFileSendAlert;
         }
     }
 

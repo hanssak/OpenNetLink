@@ -372,6 +372,14 @@
                            @onchange="eventArgs => { SetAfterBasicChk(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK")</span>                            <!--사후결재 체크-->
                     </div>
                 }
+
+            @if(m_bUseAskFileSendAlert)
+            {
+                <div class="mb-1  w-100">
+                    <input type="checkbox" class="mr-1" checked="@(GetAskFileSend())"
+                           @onchange="eventArgs => { SetAskFileSend(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_ASK_FILESEND")</span>                            <!--파일추가 후 전송 팝업 표시-->
+                       </div>
+            }
         </div>
     }
 
@@ -653,7 +661,6 @@
     public bool m_bUseURLRedirection = true;
     public bool m_bUseFileSend = true;
 
-
     public bool m_bUseClipAlarmType = true;                                             // 클립보드 알림 형식 사용 유무
     public bool m_bUseClipCopyAndSend = false;                                           // 클립보드 복사 후 전송 사용 유무
     public bool m_bUseURLRedirectionAlarm = true;                                       // URL 자동전환 알림 사용 유무
@@ -672,6 +679,7 @@
     public bool m_bUseStartProgramReg = true;                                           // 시작 프로그램 등록 사용 유무.
     public bool m_bUseLanguageSet = true;                                               // 언어설정 사용 유무.
     public bool m_bLogLevelSet = true;                                                  // 로그 레벨 설정 사용 유무.
+    public bool m_bUseAskFileSendAlert = false;                                          //파일리스트 추가 후 전송을 묻는 팝업표시 여부(파일전송 템플릿01에서만 사용)
 
     public bool m_bTrayMove = true;
     public bool m_bAlarmTray = true;
@@ -762,7 +770,7 @@
             }
             }*@
 
-        HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
+    HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
         HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
         SGAppMgrSvc.SideBarUIService.OnChangeActMenu += CtrlSideUILoginAfterOnChange;
         //versionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
@@ -1169,6 +1177,14 @@
         return SGAppMgrSvc.AppConfigInfoService.GetUseApprWaitNoti();
     }
 
+    private bool GetAskFileSend()
+    {
+        ISGSideBarUI sgSideBar = SGAppMgrSvc.SideBarUIService.ActiveMenu;
+        if (sgSideBar != null)
+            return SGAppMgrSvc.AppConfigInfoService.GetAskFileSend(sgSideBar.GroupId);
+        else
+            return false;
+    }
     /// <summary>
     /// 단축키 지정한값 OS에 등록하는 함수
     /// </summary>
@@ -1500,7 +1516,7 @@
             return;
             }*@
 
-        //HsCmdCenter.SetDownLoadPath(groupId, stPath);
+    //HsCmdCenter.SetDownLoadPath(groupId, stPath);
         //HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
         //CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
         SetAllDownloadPath(groupId, stPath);
@@ -1653,43 +1669,6 @@
         CLog.Here().Information($"Set DownLoadPath, BaseDownLoadPath, RecvDownPath Set: [{stPath}] useUserPath : {SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId)}");   // siteConfig
     }
 
-    @*    /// <summary>
-        /// 화면잠금 시간값 변경 저장 및 전달
-        /// </summary>
-        /// <param name="changeEventArg"></param>
-        private async void SetScreenTime(ChangeEventArgs changeEventArg)
-        {
-        int screenTime = Convert.ToInt32(changeEventArg.Value);
-        if ((screenTime > m_nSvrTime) && (m_nSvrTime != 0))
-        {
-        int PrevScreentTime = GetScreenTime();
-        CtrlSideUISvc.SetScreenTime(screenTime);
-        await Task.Delay(1);    // flush UI changes
-
-        CtrlSideUISvc.SetScreenTime(PrevScreentTime);
-        await Task.Delay(1);    // flush UI changes
-
-        CLog.Here().Information($"ScreeenTime Set: [{PrevScreentTime}]");
-        await Task.Delay(500);
-        string strMsg = XmlConf.GetWarnMsg("W_0073");
-        strMsg = String.Format(strMsg, m_nSvrTime);
-        ShowMessage("warn", strMsg);
-        return;
-        }
-        CLog.Here().Information($"ScreeenTime Set: [{screenTime}]");
-        CtrlSideUISvc.SetScreenTime(screenTime);
-
-        ScreenTimeChangeNotiEvent screentimeChgEvent = null;
-        screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
-        if (screentimeChgEvent != null)
-        {
-        ConfigArgs config = new ConfigArgs();
-        config.ScreenTime = screenTime;
-        screentimeChgEvent(0, config);
-        }
-        }*@
-
-
     private void SetLogLevel(ChangeEventArgs changeEventArg)
     {
         LogEventLevel logLevel = LogEventLevel.Information;
@@ -1731,6 +1710,20 @@
         CtrlSideUISvc.SetUseApprWaitNoti(useApprWaitNoti);
     }
 
+    private void SetAskFileSend(ChangeEventArgs changeEventArgs)
+    {
+        bool askFilesSend = Convert.ToBoolean(changeEventArgs.Value);
+        ISGSideBarUI sgSideBar = SGAppMgrSvc.SideBarUIService.ActiveMenu;
+        if (sgSideBar != null)
+        {
+            
+            CtrlSideUISvc.SetAskFileSend(sgSideBar.GroupId, askFilesSend);
+            CLog.Here().Information($"AskFileSend Set: [GID:{sgSideBar.GroupId}][{askFilesSend}]");
+        }
+        else
+            CLog.Here().Information($"AskFileSend Set: [GID:ActiveManu is null][{askFilesSend}]");        
+    }
+
     private int GetCountSGNetwork()
     {
         return NetWorkSvc.NetWorkInfo.Count;
@@ -1741,56 +1734,6 @@
     {
         return NetWorkSvc.NetWorkInfo;
     }
-
-    @* /// <summary>
-        /// 서버에서 받은 화면잠금 시간값 설정(받은 값중 최소값으로 설정)
-        /// </summary>
-        /// <param name="groupID"></param>
-        /// <param name="e"></param>
-        public void ScreenLockTimeInitNoti(int groupID, ConfigArgs e)
-        {
-        int time = e.ScreenTime;
-        m_bUseScreenLock = (time == 0) ? false : true;
-
-        if (!m_bUseScreenLock)
-        {
-        CtrlSideUISvc.SetScreenLock(m_bUseScreenLock);
-        CtrlSideUISvc.SetScreenTime(time);
-        }
-
-        if (m_bUseScreenLock)
-        {
-        // logout 까지 고려
-        if (m_nSvrTime == 0)
-        m_nSvrTime = time;
-        else
-        {
-        if (time < m_nSvrTime)
-        m_nSvrTime = time;
-        }
-
-        if (time > 0)
-        {
-        int nLocalTime = GetScreenTime();
-        if (time < nLocalTime)              // 서버의 화면잠금 시간값보다 크면 서버 화면잠금 시간값으로 저장 / 적용
-        {
-        nLocalTime = time;
-        ChangeEventArgs args = new ChangeEventArgs();
-        args.Value = time;
-        SetScreenTime(args);
-        ScreenTimeChangeNotiEvent screentimeChgEvent = null;
-        screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
-        if (screentimeChgEvent != null)
-        {
-        ConfigArgs config = new ConfigArgs();
-        config.ScreenTime = time;
-        screentimeChgEvent(groupID, config);
-        }
-        }
-        }
-        }
-        }*@
-
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -1878,10 +1821,10 @@
         int loginDataCount = HsCmdCenter.GetNetWorkCount();
         m_bUseClipBoard = false;
         m_bUseURLRedirection = false;
-        m_bUseFileSend = false;
+        m_bUseFileSend = false;        
         bool bManualDown = false;
         bool bAfterCheckHide = false;
-        //bool bTmpScreenLock = true;
+        
         SGLoginData sgLoginData = null;
         ISGSideBarUIService SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1928,7 +1871,7 @@
 
             if (i == sgSideBar.GroupId) //GroupID 별 표시 여부가 상이할 수 있으므로 해당 Groupid에 대한 설정값만 적용
                 bAfterCheckHide = sgLoginData.GetAfterChkHide();
-        }
+            }                
 
         ////AD로그인이 존재하면 화면잠금 미사용
         //foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))
@@ -1964,9 +1907,11 @@
             // siteConfig. json으로 이동
             m_bRFileAutoSend = SGAppMgrSvc.OpConfigInfoService.GetRFileAutoSend(0);
             m_bAfterApprAutoCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterApprAutoCheck(0);
+            m_bUseAskFileSendAlert = SGAppMgrSvc.OpConfigInfoService.GetUseAskFileSendAlert(sgSideBar.GroupId);
+
             if (bAfterCheckHide)
                 m_bAfterApprAutoCheck = false;
-            m_bUseFileSend = (m_bRFileAutoSend | m_bAfterApprAutoCheck);
+            m_bUseFileSend = (m_bRFileAutoSend | m_bAfterApprAutoCheck | m_bUseAskFileSendAlert);
         }
 
 
