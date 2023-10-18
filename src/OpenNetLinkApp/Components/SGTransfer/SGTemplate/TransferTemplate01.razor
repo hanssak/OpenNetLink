@@ -1,4 +1,6 @@
 @using Microsoft.JSInterop
+@using OpenNetLinkApp.Data.SGLogData
+@using OpenNetLinkApp.Models.SGLogData
 @using Radzen
 @using Radzen.Blazor
 @using OpenNetLinkApp.Services
@@ -201,20 +203,13 @@
             <div class="card-body clearfix" style="height:12vh; overflow:auto;">
                 <div id="divLeftUpperSide">
                     <ul class="list-unstyled" style="font-size:11px;">
-                        <li>[2023-10-13 18:26:30] 파일 업로드 시작 (수량 : 10)</li>
-                        <li>[2023-10-13 18:26:45] 파일 업로드 종료 (수량 : 10)</li>
-                        <li>[2023-10-13 18:26:30] 파일 업로드 시작 (수량 : 10)</li>
-                        <li>[2023-10-13 18:26:45] 파일 업로드 종료 (수량 : 10)</li>
-                        <li>[2023-10-13 18:26:30] 파일 업로드 시작 (수량 : 10)</li>
-                        <li>[2023-10-13 18:26:45] 파일 업로드 종료 (수량 : 10)</li>
-                        <li>[2023-10-13 18:26:30] 파일 업로드 시작 (수량 : 10)</li>
-                        <li>[2023-10-13 18:26:45] 파일 업로드 종료 (수량 : 10)</li>
-                        <li>[2023-10-13 18:26:30] 파일 업로드 시작 (수량 : 10)</li>
-                        <li>[2023-10-13 18:26:45] 파일 업로드 종료 (수량 : 10)</li>
-                        <li>[2023-10-13 18:26:30] 파일 업로드 시작 (수량 : 10)</li>
-                        <li>[2023-10-13 18:26:45] 파일 업로드 종료 (수량 : 10)</li>
-                        <li>[2023-10-13 18:26:30] 파일 업로드 시작 (수량 : 10)</li>
-                        <li>[2023-10-13 18:26:45] 파일 업로드 종료 (수량 : 10)</li>
+                        @if (transferLogData != null)
+                        {
+                            @foreach (SGTransferLogData log in transferLogData)
+                            {
+                                <li>@($"[ {log.LogDatetime} ] {log.Log}")</li>
+                            }
+                        }
                     </ul>
                 </div>
             </div>
@@ -225,9 +220,7 @@
 @code
 {
     [Parameter] public int groupIDbyParam { get; set; }
-
     [Parameter] public bool bAfterCheck { get; set; } = false;
-
     [Parameter] public string strDestNetWork { get; set; }
     // 3망 - 클립보드 전송 UI
     [Parameter] public Dictionary<string, SGNetOverData> dicDestSysPos { get; set; }
@@ -247,14 +240,12 @@
     [Parameter] public EventCallback OnOpenFileDialogOpenPopup { get; set; }
     [Parameter] public EventCallback OnCheckApprLine { get; set; }
 
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferTemplate01>();
+
     public string stSelectPath { get; set; }
     public string stCurrentSubPath { get; set; }
-
-    private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferTemplate01>();
     public string strAfterApprove = "";
 
-    public string strFromName = "-";
-    public string strToName = "-";
     public string strSelectFileDel = "";
     public string strSelectFileDelComment = "";
 
@@ -270,22 +261,17 @@
     string SortingKey = "";
     bool SortingAesc = true;
 
+    string strCurrentDate = "";
+
     /// <summary>
     /// 선택 삭제 버튼 사용 유무
     /// </summary>
     public bool bFileSelectDeleteBtn = false;
     FileTree refFileTree;
+    private List<SGTransferLogData> transferLogData = new List<SGTransferLogData>();
+
 
     private static Action<List<string>> ActionFileSelectOK;
-    //private static Action<string> actionLoadFileList;
-
-    //[JSInvokable("JSLoadListFiles")]    //좌측 하위 리스트에서, 폴더 더블클릭 시 호출
-    //public static void JSLoadListFiles(string path)
-    //{
-    //    actionLoadFileList.Invoke(path);
-    //}
-
-
     //Drag&Drop 관련 액션
     private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction1;
     private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction2;
@@ -341,9 +327,22 @@
         versionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
         OnSettingByGroupID(groupIDbyParam);
         InitText();
+
+        // 로그 데이터 리프레쉬 등록
+        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.TransferTemplate01, UpdateLogData);
         base.OnInitialized();
     }
-
+    void UpdateLogData()
+    {
+        transferLogData.Clear();
+        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupIDbyParam);
+        if (sgUserData != null)
+        {
+            string strUserSeq = sgUserData.GetUserSequence();
+            transferLogData = SGLogDBProc.Instance.SelectTransferLogDataList(groupIDbyParam, strUserSeq);
+        }
+        StateHasChanged();
+    }
     int nDrawPageGroupID = -1;          // 전달받은 groupID 별로 화면구성 - 다중접속화면구성
     protected override void OnAfterRender(bool firstRender)
     {
@@ -351,11 +350,20 @@
         {
             base.OnAfterRenderAsync(firstRender);
         }
+
+        //날짜 변경 시 이력 초기화
+        if(strCurrentDate != DateTime.Now.ToString("yyyy-MM-dd"))
+        {
+            SGLogDBProc.Instance.DeleteAllInfo(DateTime.Now, true);
+            strCurrentDate = DateTime.Now.ToString("yyyy-MM-dd");
+            UpdateLogData();
+        }
         // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
         if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
             refFileTree?.RefreshTree();
             nDrawPageGroupID = groupIDbyParam;
+            UpdateLogData();
         }
     }
 
@@ -508,43 +516,6 @@
         }
 
         StateHasChanged();
-    }
-
-    public int dragLabel = 1;
-    private string _makeSubFileList()
-    {
-        StringBuilder stRtn = new StringBuilder();
-        if (sgFile != null && sgFile.Count > 0)
-        {
-            if (dragLabel > 0) { dragLabel = 1; }
-            foreach (SGFileInfo item in sgFile)
-            {
-                if (item.Type == 3)
-                {
-                    stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
-                    stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
-                    stRtn.Append(item.getNameStr(false));
-                    stRtn.Append(@"</div>");
-                }
-                else
-                {
-                    if (item.Type == 1)
-                    {
-                        stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "'>");
-                        stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
-                    }
-                    else
-                    {
-                        stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
-                        stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
-                    }
-                    stRtn.Append(item.getNameStr(false) + " " + item.getSizeStr());
-                    stRtn.Append(@"</div>");
-                }
-                if (dragLabel > 0) { dragLabel++; }
-            }
-        }
-        return stRtn.ToString();
     }
 
 }

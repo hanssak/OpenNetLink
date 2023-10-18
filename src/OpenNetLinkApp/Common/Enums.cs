@@ -75,7 +75,9 @@ namespace OpenNetLinkApp.Common
             [Description("메일보안결재 승인대기조회")]
             MailSecurityApproveWaitUI = 9,
             [Description("메일보안결재")]
-            MailSecurityApproveUI = 10
+            MailSecurityApproveUI = 10,
+            [Description("파일전송 템플릿01")]
+            TransferTemplate01 = 11
         }
         /// <summary>
         /// 승인/반려
@@ -155,7 +157,6 @@ namespace OpenNetLinkApp.Common
             SoftCamp = 1,
             [Description("Fasso")]
             Fasso = 2,
-
         }
     }
 }
