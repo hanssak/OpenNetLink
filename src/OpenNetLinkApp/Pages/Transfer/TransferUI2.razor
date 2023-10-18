@@ -108,28 +108,28 @@
         <!-- /.row -->
         <!-- list -->
         <div id="divTransferTemplate" style="height:60vh">
-        @if (SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam) == 0)
-        {
-            <TransferTemplateDefault @ref="refTransferTemplateDefault" groupIDbyParam="@groupIDbyParam"
-                                 bAfterCheck="@bAfterCheck" bAfterApprChkHIde="@bAfterApprChkHIde" bAfterApprDisable="@bAfterApprDisable"
-                                 strDestNetWork="@strDestNetWork" dicDestSysPos="@dicDestSysPos"
-                                 strInitTitle="@strBindTitle" TitleValueChanged="@(value=> strCurrentTitle=value)"
-                                 strInitDesc="@strBindDesc" DescValueChanged="@(value=> strCurrentDesc=value)"
-                                 OnChangeAfterCheck="@GetAfterChk"
-                                 OnBasicSelectOpenPopup="@openBasicSelect"
-                                 OnOpenFileDialogOpenPopup="@OpenFileDialog"
-                                 OnCheckApprLine="@CheckApprLine" />
-        }
-        else
-        {
-            <TransferTemplate01 @ref="refTemplate01" groupIDbyParam="@groupIDbyParam"
-                    bAfterCheck="@bAfterCheck" bAfterApprChkHIde="@bAfterApprChkHIde" bAfterApprDisable="@bAfterApprDisable"
-                    strDestNetWork="@strDestNetWork" dicDestSysPos="@dicDestSysPos"
-                    OnChangeAfterCheck="@GetAfterChk"
-                    OnBasicSelectOpenPopup="@openBasicSelect"
-                    OnOpenFileDialogOpenPopup="@OpenFileDialog"
-                    OnCheckApprLine="@CheckApprLine" />
-        }
+            @if (SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam) == 0)
+            {
+                <TransferTemplateDefault @ref="refTransferTemplateDefault" groupIDbyParam="@groupIDbyParam"
+                                         bAfterCheck="@bAfterCheck" bAfterApprChkHIde="@bAfterApprChkHIde" bAfterApprDisable="@bAfterApprDisable"
+                                         strDestNetWork="@strDestNetWork" dicDestSysPos="@dicDestSysPos"
+                                         strInitTitle="@strBindTitle" TitleValueChanged="@(value=> strCurrentTitle=value)"
+                                         strInitDesc="@strBindDesc" DescValueChanged="@(value=> strCurrentDesc=value)"
+                                         OnChangeAfterCheck="@GetAfterChk"
+                                         OnBasicSelectOpenPopup="@openBasicSelect"
+                                         OnOpenFileDialogOpenPopup="@OpenFileDialog"
+                                         OnCheckApprLine="@CheckApprLine" />
+            }
+            else
+            {
+                <TransferTemplate01 @ref="refTemplate01" groupIDbyParam="@groupIDbyParam"
+                                    bAfterCheck="@bAfterCheck" bAfterApprChkHIde="@bAfterApprChkHIde" bAfterApprDisable="@bAfterApprDisable"
+                                    strDestNetWork="@strDestNetWork" dicDestSysPos="@dicDestSysPos"
+                                    OnChangeAfterCheck="@GetAfterChk"
+                                    OnBasicSelectOpenPopup="@openBasicSelect"
+                                    OnOpenFileDialogOpenPopup="@OpenFileDialog"
+                                    OnCheckApprLine="@CheckApprLine" />
+            }
         </div>
         <div id="divRightBottomSide" class="card-footer clearfix" style="padding:.5rem 1.25rem !important; font-size:.8rem !important;">
             <div class="float-left">
@@ -642,7 +642,7 @@
                         cntSendQuery++;
                         }*@
 
-    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
+                    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
                     SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "", sgLoginData.GetApproveProxyRight());
                     cntSendQuery++;
                 }
@@ -885,7 +885,7 @@
         await refTransProgress.openPopUp();
         await Task.Delay(1000);
 
-        //Hash 체크
+        #region HashCheck
         foreach (HsStream hsStream in FileList)
         {
             if (!hsStream.IsDir)
@@ -915,10 +915,88 @@
                     string strMsg = "";
                     strMsg = XmlConf.GetErrMsg("E_0263");
                     ShowMessage("error", strMsg);
+                    CLog.Here().Error($"HashCheck Error : {ex.Message}");
                     refTransProgress.CancelClosePopUp();
                 }
             }
         }
+        #endregion
+
+        #region ZipFileUnCompress
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseUnZipForTransfer(groupID))
+        {
+            try
+            {
+                DirectoryInfo directory = new DirectoryInfo("Temp");
+                if (directory.Exists)
+                {
+                    foreach (var file in directory.GetFiles())
+                    {
+                        file.Delete();
+                    }
+
+                    foreach (DirectoryInfo dir in directory.GetDirectories())
+                    {
+                        dir.Delete(true);
+                    }
+                }
+                else
+                {
+                    directory.Create();
+                }
+
+                Dictionary<string, List<HsStream>> listAppend = new Dictionary<string, List<HsStream>>();
+                int i = 0;
+                foreach (HsStream hsStream in FileList)
+                {
+                    if (!hsStream.IsDir)
+                    {
+                        string extType = Path.GetExtension(hsStream.FileName).Substring(1).ToUpper();
+                        if (fileAddManage.ListCheckableCompressExtension.Contains(extType))
+                        {
+                            i++;
+                            string tempPath = $"Temp\\Temp{i}";
+                            string zipTemp = Path.Combine(tempPath, $"UnZip_{hsStream.FileName}");
+
+                            //File.Copy(hsStream.FilePullPath, zipTemp);
+
+                            string destPath = zipTemp.Substring(0, zipTemp.Length - extType.Length - 1);
+                            DirectoryInfo destDir = new DirectoryInfo(destPath);
+                            if (destDir.Exists == false) destDir.Create();
+
+                            bool result = fileAddManage.UnZipFileForTransfer(hsStream.FilePullPath, destPath, false);
+                            if (result)
+                            {
+                                string path = Path.GetDirectoryName(hsStream.RelativePath);
+                                string startPath = hsStream.StartPath;
+                                listAppend.Add(hsStream.FilePullPath, fileAddManage.GetHsListInnerFolder(destPath, path));
+                            }
+                        }
+                    }
+                }
+
+                foreach (string filePullPath in listAppend.Keys)
+                {
+                    HsStream temp = FileList.Find(x => x.FilePullPath == filePullPath);
+                    FileList.Remove(temp);
+                    foreach (HsStream hsStream in listAppend[filePullPath])
+                    {
+                        FileList.Add(hsStream);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                string strMsg = "";
+                strMsg = XmlConf.GetErrMsg("E_0268");
+                ShowMessage("error", strMsg);
+                CLog.Here().Error($"UnZip for transfer : {ex.Message}");
+                refTransProgress.CancelClosePopUp();
+
+            }
+        }
+
+        #endregion
 
         //수신자 목록체크(철자틀림)
         string stReceiver = "";
@@ -934,9 +1012,9 @@
             }
         }
 
-        dropFile.SetLogDB(groupID, strUserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_FILETRANSFER"), FileList.Count)); //$"파일 전송 ({FileList.Count} 건)");        
+        dropFile.SetLogDB(groupID, strUserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_FILETRANSFER"), FileList.Count)); //$"파일 전송 ({FileList.Count} 건)");
         int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
-        
+
         if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID))
         {
             pageService.SetApproveExtFileTransWithApprove(groupID, false);
@@ -1322,6 +1400,8 @@
             if (sgUserInfo != null)
                 dropFile.SetLogDB(groupID, sgUserInfo.UserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_FILETRANSFER_FAIL"), e.result));
 
+            DeleteTempFolder();
+
             await refTransProgress.closePopUp();
             return;
         }
@@ -1335,6 +1415,8 @@
             if (sgUserInfo != null)
                 dropFile.SetLogDB(groupID, sgUserInfo.UserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_FILETRANSFER_FAIL"), e.count));
 
+            DeleteTempFolder();
+
             await refTransProgress.closePopUp();
             return;
         }
@@ -1346,6 +1428,9 @@
             ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
             if (sgUserInfo != null)
                 dropFile.SetLogDB(groupID, sgUserInfo.UserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_FILETRANSFER_FAIL"), e.count));
+
+            DeleteTempFolder();
+
             await refTransProgress.closePopUp();
             return;
         }
@@ -1357,6 +1442,9 @@
             ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
             if (sgUserInfo != null)
                 dropFile.SetLogDB(groupID, sgUserInfo.UserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_FILETRANSFER_FAIL"), e.count));
+
+            DeleteTempFolder();
+
             await refTransProgress.closePopUp();
             return;
         }
@@ -1386,13 +1474,15 @@
                 // error
                 CLog.Here().Error($"dropFile.DataClear - error:{err.Source} - Msg : {err.Message}");
             }
-             ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+            ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
             if (sgUserInfo != null)
                 dropFile.SetLogDB(groupID, sgUserInfo.UserSeq, XmlConf.GetTitle("T_LOG_DB_FILETRANSFER_SUCCESS"));
-            
+
             strBindTitle = strCurrentTitle = "";
             strBindDesc = strCurrentDesc = "";
             SendDayFileInfo();
+
+            DeleteTempFolder();
 
             await refTransProgress.closePopUp();
 
@@ -1411,9 +1501,28 @@
         }
         else
         {
+            DeleteTempFolder();
+
             strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
             return;
+        }
+    }
+
+    private void DeleteTempFolder()
+    {
+        DirectoryInfo directory = new DirectoryInfo("Temp");
+        if (directory.Exists)
+        {
+            foreach (var file in directory.GetFiles())
+            {
+                file.Delete();
+            }
+
+            foreach (DirectoryInfo dir in directory.GetDirectories())
+            {
+                dir.Delete(true);
+            }
         }
     }
 
@@ -1441,7 +1550,7 @@
         bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
         bFileSelectDeleteBtn = !OpConfigSvc.GetUseFileSelectDelete(groupID);
         bHideApprLine = OpConfigSvc.GetUseHideApprLine(groupIDbyParam);
-        
+
 
         if (bAfterApprChkHIde)
             strAfterApprove = "";
@@ -1825,7 +1934,7 @@
             nDrawPageGroupID = groupIDbyParam;
             groupID = groupIDbyParam;
 
-            nTransferTemplate =  SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupID);
+            nTransferTemplate = SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupID);
             //지정된 템플릿의 DropFileList
             if (nTransferTemplate == 0)
             {

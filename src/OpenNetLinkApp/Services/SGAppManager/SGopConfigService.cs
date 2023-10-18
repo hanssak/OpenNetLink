@@ -229,6 +229,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseHideToastPopup(int groupId);
 
+        public bool GetUseUnZipForTransfer(int groupId);
+
 
     }
 
@@ -1065,6 +1067,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseHideToastPopup(int groupId)
         {
             return AppConfigInfo[groupId].bHideMoveTrayMsgPopup;
+        }
+
+        public bool GetUseUnZipForTransfer(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseUnZipForTransfer;
         }
 
 

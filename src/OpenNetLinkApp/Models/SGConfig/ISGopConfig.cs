@@ -196,6 +196,8 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bHideMoveTrayMsgPopup { get; set; }       // Tray로 보낼때,
 
+        public bool bUseUnZipForTransfer { get; set; }    // 파일 전송 시 압축 파일 해제하여 전송
+
 
     }
 }

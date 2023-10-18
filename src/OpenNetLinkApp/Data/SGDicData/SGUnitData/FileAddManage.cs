@@ -4448,11 +4448,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtract, bDenyPasswordZIP);
 
                 // KKW
-                /*if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
+                if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
                 {
                     enRet = eFileAddErr.eUnZipInnerLeftZip;
                     AddDataForInnerZip(nTotalErrCount, strOrgZipFile, strOrgZipFileRelativePath, strOverMaxDepthInnerZipFile, enRet);
-                }*/
+                }
 
                 //if (enRet == eFileAddErr.eFAZipPW) AddData(strOrgZipFile, enRet, strOrgZipFileRelativePath);
 
@@ -4830,14 +4830,316 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 throw;
             }
         }
-
-        void scanDecompressedFile()
+        /// <summary>
+        /// ZIP 파일압축해제
+        /// </summary>
+        /// <param name="fileFullName"></param>
+        /// <param name="destFullPath"></param>
+        /// <returns></returns>
+        public bool unzipFile(string fileFullName, string destFullPath)
         {
+            try
+            {
+                //2022.10.06 BY kYH sharpPress 버전업하며, WriteToDirectory 호출 시 존재하지 않는 폴더는 오류가 발생하여 추가
+                DirectoryInfo destPath = new DirectoryInfo(destFullPath);
+                if (destPath.Exists == false) destPath.Create();
 
+                string fileName = Path.GetFileName(fileFullName);
+                string extType = Path.GetExtension(fileFullName).Substring(1).ToUpper();
+
+                switch (extType)
+                {
+                    case "ZIP":
+                    case "7Z":
+                        #region [ZIP/7Z 형식 검사]        
+                        var opts = new SharpCompress.Readers.ReaderOptions();
+                        var encoding = Encoding.Default;
+
+                        byte[] buff = null;
+                        using (FileStream fsSource = new FileStream(fileFullName, FileMode.Open, FileAccess.Read))
+                        {
+                            BinaryReader br = new BinaryReader(fsSource);
+                            long numBytes = 8;
+                            buff = br.ReadBytes((int)numBytes);
+
+                            //Zip File Foramt : Local File Header 구조 바이트 차트
+                            //Signature 4byte / Version 2Byte / Flags 2Byte / => Flags Bit가 서로 다름 Mac의 경우 8 그 이외는 0
+                            encoding = (buff[6] == 0x08) ? Encoding.Default : Encoding.GetEncoding(949);
+                        }
+
+                        opts.ArchiveEncoding = new SharpCompress.Common.ArchiveEncoding();
+                        opts.ArchiveEncoding.CustomDecoder = (data, x, y) =>
+                        {
+                            return encoding.GetString(data);
+                        };
+
+                        try
+                        {
+                            using (var archi = ArchiveFactory.Open(fileFullName, opts))
+                            {
+                                foreach (var entry in archi.Entries)
+                                {
+                                    // Check Password
+                                    // 암호가 걸려있으면 압축해제 불가	
+                                    if (entry.IsEncrypted == true)
+                                    {
+                                        destPath.Delete();
+                                        return false;
+                                    }
+
+                                    //그냥 만들고 시작하는게 나을 거 같다.
+                                    // Extract File in Zip 
+                                    entry.WriteToDirectory(destFullPath, new ExtractionOptions()
+                                    {
+                                        ExtractFullPath = true,
+                                        Overwrite = true,
+                                    });
+                                }
+                            }
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            destPath.Delete();
+                            return false;
+                        }
+                        #endregion [ZIP/7Z 형식 검사]
+                        break;
+                    case "TAR":
+                    case "GZ":
+                    case "TGZ":
+                    case "BZ2":
+                        #region [TAR 형식 검사]        
+                        try
+                        {
+                            CsFunction.TarFileDecompress(fileFullName, destFullPath);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            return false;
+                        }
+                        #endregion [TAR 형식 검사]
+                        break;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
+        /// <summary>
+        /// 전송을 위해 Zip 파일 Temp폴더에 압축을 풀고 전송
+        /// </summary>
+        /// <param name="zipFileName"></param>
+        /// <param name="destFullPath"></param>
+        /// <param name="isDelete"></param>
+        /// <returns></returns>
+        public bool UnZipFileForTransfer(string zipFileName, string destFullPath, bool isDelete)
+        {
+            bool result = unzipFile(zipFileName, destFullPath);
+            if (result)
+            {
+                if (isDelete)
+                    File.Delete(zipFileName);
+                string[] files = Directory.GetFiles(destFullPath, "*", SearchOption.AllDirectories);
+                foreach (string file in files)
+                {
+                    string extType = Path.GetExtension(file).Substring(1).ToUpper();
+
+                    if (ListCheckableCompressExtension.Contains(extType))
+                    {
+                        string destPath = file.Substring(0, file.Length - extType.Length - 1);
+                        DirectoryInfo destDir = new DirectoryInfo(destPath);
+                        if (destDir.Exists == false) destDir.Create();
+                        UnZipFileForTransfer(file, destPath, true);
+                    }
+                }
+            }
+
+            return result;
+        }
+        /// <summary>
+        /// 파일 전송을 위해 압축을 푼 Zip파일 HsStream으로 내보내기
+        /// </summary>
+        /// <param name="dirPath"></param>
+        /// <param name="relativePath"></param>
+        /// <returns></returns>
+        public List<HsStream> GetHsListInnerFolder(string dirPath, string relativePath)
+        {
+            List<HsStream> list = new List<HsStream>();
+            System.IO.FileInfo fInfo = new System.IO.FileInfo(dirPath);
+
+            HsStream hsStream = new HsStream();
+            hsStream.FileName = fInfo.Name;
+            hsStream.Size = 0;
+            hsStream.Type = "DIR";
+            hsStream.ModifyTime = fInfo.LastWriteTime;
+            DateTime date = (DateTime)hsStream.ModifyTime;
+            string strDate = date.ToShortDateString();
+            strDate = strDate.Replace("-", "");
+            string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
+            hsStream.MTime = strDate + strTime;
+            hsStream.RelativePath = fInfo.FullName;
+            hsStream.IsDir = true;
+            hsStream.StartPath = hsStream.RelativePath;
+            string strStartPath = hsStream.StartPath;
+            hsStream.stream = null;
+            hsStream.MemoryType = HsStreamType.FileStream;
+            if (!hsStream.StartPath.Equals(""))
+            {
+                int index = -1;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    index = hsStream.StartPath.LastIndexOf("\\");
+                else
+                    index = hsStream.StartPath.LastIndexOf("/");
+                //index = hsStream.StartPath.LastIndexOf("\\");
+                if (index >= 0)
+                {
+                    hsStream.StartPath = hsStream.StartPath.Substring(0, index);
+                    string startPath = "";
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        startPath = hsStream.StartPath + "\\";
+                    else
+                        startPath = hsStream.StartPath + "/";
+                    //string startPath = hsStream.StartPath + "\\";
+                    if (!hsStream.RelativePath.Equals(startPath))
+                        hsStream.RelativePath = hsStream.RelativePath.Replace(startPath, "");
+                }
+            }
+            else
+                hsStream.RelativePath = hsStream.RelativePath;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+            else
+                hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+
+            list.Add(hsStream);
+
+            List<System.IO.FileInfo> FileData = DirSearch(fInfo.FullName);
+
+            foreach (var item in FileData)
+            {
+                hsStream = new HsStream();
+                hsStream.FileName = item.Name;
+                hsStream.Type = item.Attributes.ToString();
+                hsStream.StartPath = strStartPath;
+                hsStream.RelativePath = item.FullName;
+
+                if (!hsStream.StartPath.Equals(""))
+                {
+                    int index = -1;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        index = hsStream.StartPath.LastIndexOf("\\");
+                    else
+                        index = hsStream.StartPath.LastIndexOf("/");
+
+                    if (index >= 0)
+                    {
+                        hsStream.StartPath = hsStream.StartPath.Substring(0, index);
+                        string startPath = "";
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            startPath = hsStream.StartPath + "\\";
+                        else
+                            startPath = hsStream.StartPath + "/";
+                        //string startPath = hsStream.StartPath + "\\";
+                        if (!hsStream.RelativePath.Equals(startPath))
+                            hsStream.RelativePath = hsStream.RelativePath.Replace(startPath, "");
+                    }
+                }
+                else
+                    hsStream.RelativePath = hsStream.RelativePath;
+
+                hsStream.isNeedApprove = false;
+                if ((item.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
+                {
+                    hsStream.Size = 0;
+                    hsStream.Type = "DIR";
+                    hsStream.stream = null;
+                    hsStream.MemoryType = HsStreamType.FileStream;
+                    hsStream.IsDir = true;
+                }
+                else
+                {
+                    hsStream.Size = item.Length;
+
+                    if (item.Name.LastIndexOf(".") > -1)
+                        hsStream.Type = item.Name.Substring(item.Name.LastIndexOf(".") + 1);
+                    else
+                        hsStream.Type = "";
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    }
+
+                    hsStream.IsDir = false;
+                }
+
+                hsStream.ModifyTime = item.LastWriteTime;
+                DateTime SubDate = (DateTime)hsStream.ModifyTime;
+                string strSubDate = SubDate.ToShortDateString();
+                strSubDate = strSubDate.Replace("-", "");
+                string strSubTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
+                hsStream.MTime = strSubDate + strSubTime;
+                hsStream.MemoryType = HsStreamType.FileStream;
+
+                if (!hsStream.IsDir)
+                {
+                    FileStream stream = File.OpenRead(item.FullName);
+                    if (hsStream.stream != null)
+                    {
+                        hsStream.stream.Dispose();
+                    }
+                    hsStream.stream = stream;
+                }
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                else
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+
+                list.Add(hsStream);
+            }
+
+            foreach (HsStream stream in list)
+            {
+                stream.RelativePath = Path.Combine(relativePath, stream.RelativePath);
+            }
 
 
+            return list;
+        }
+        /// <summary>
+        /// Dir 내부 전체 리스트 가져오기
+        /// </summary>
+        /// <param name="sDir"></param>
+        /// <param name="temp"></param>
+        /// <returns></returns>
+        public List<System.IO.FileInfo> DirSearch(string sDir, List<System.IO.FileInfo> temp = null)
+        {
+            if (temp == null)
+                temp = new List<System.IO.FileInfo>();
+            DirectoryInfo di = new DirectoryInfo(sDir);
 
+            foreach (var item in Directory.GetDirectories(sDir))
+            {
+                System.IO.FileInfo fInfo = new System.IO.FileInfo(item);
+                temp.Add(fInfo);
+                DirSearch(item, temp);
+            }
+
+            foreach (var item in di.GetFiles())
+            {
+                temp.Add(item);
+            }
+            return temp;
+        }
 
         /// <summary>
         /// 문서검사

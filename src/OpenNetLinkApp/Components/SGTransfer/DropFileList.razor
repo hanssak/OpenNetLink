@@ -948,7 +948,7 @@
                                 {
                                     existErr = true;
                                     @*fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);*@
-    childFile.eErrType = eFileAddErr.eFA_FILE_READ_ERROR;
+                                    childFile.eErrType = eFileAddErr.eFA_FILE_READ_ERROR;
                                     CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
                                     if (hsStream.stream != null)
                                     {
@@ -1864,14 +1864,14 @@
             if (per < 1000 || string.Compare(strFileName, "complete!", true) != 0)
                 return;
 
-            
+
             await Task.Delay(500);
             await refProgress.closePopUp();
             int nErrCount = fileAddManage.GetAddErrCount();
 
             ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(_groupId);
-            if (sgUserData != null)                    
-                SetLogDB(_groupId, sgUserData.UserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_ADDFILE_COMPLETE") ,pageService.GetPageStatus(_groupId).GetFileDragListData().Count)); // "파일 리스트 추가된 파일 : {0} 개");
+            if (sgUserData != null)
+                SetLogDB(_groupId, sgUserData.UserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_ADDFILE_COMPLETE"), pageService.GetPageStatus(_groupId).GetFileDragListData().Count)); // "파일 리스트 추가된 파일 : {0} 개");
 
             List<(string reason, string count)> listReason;
             List<FileAddErr> listErr;
@@ -1898,8 +1898,8 @@
             }
             else
                 fileAddManage.m_nCurRegisteringSize = 0;
-            
-           
+
+
             return;
         }
         refProgress.SetProgressText(false);
@@ -2510,10 +2510,10 @@
     /// <param name="log"></param>
     public void SetLogDB(int groupID, string userSeq, string log)
     {
-        if(SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupID) != 1)
+        if (SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupID) != 1)
             return;
         Data.SGLogData.SGLogDBProc.Instance.InsertTransferLogInfo(groupID, userSeq, DateTime.Now, log);
-        
+
         PageDataRefreshEvent pgRefreshEvent = HSCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.TransferTemplate01);
         if (pgRefreshEvent != null)
             pgRefreshEvent();
