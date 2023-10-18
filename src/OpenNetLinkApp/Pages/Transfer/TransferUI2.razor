@@ -951,6 +951,27 @@
             }
         }
 
+        #region ZipFileUnCompress
+
+        DirectoryInfo directory = new DirectoryInfo("Temp");
+        if (directory.Exists)
+        {
+            foreach (var file in directory.GetFiles())
+            {
+                file.Delete();
+            }
+
+            foreach (DirectoryInfo dir in directory.GetDirectories())
+            {
+                dir.Delete(true);
+            }
+        }
+        else
+        {
+            directory.Create();
+        }
+
+        Dictionary<string, List<HsStream>> listAppend = new Dictionary<string, List<HsStream>>();
         foreach (HsStream hsStream in FileList)
         {
             if (!hsStream.IsDir)
@@ -961,16 +982,35 @@
                     string tempPath = "Temp";
                     string zipTemp = Path.Combine(tempPath, hsStream.FileName);
 
-                    File.Copy(hsStream.FilePullPath, zipTemp);
+                    //File.Copy(hsStream.FilePullPath, zipTemp);
 
                     string destPath = zipTemp.Substring(0, zipTemp.Length - extType.Length - 1);
                     DirectoryInfo destDir = new DirectoryInfo(destPath);
                     if (destDir.Exists == false) destDir.Create();
 
-                    fileAddManage.UnZipFileForTransfer(zipTemp, destPath);
+                    bool result = fileAddManage.UnZipFileForTransfer(hsStream.FilePullPath, destPath, false);
+                    if(result)
+                    {
+                        string path = Path.GetDirectoryName(hsStream.RelativePath);
+                        string startPath = hsStream.StartPath;
+                        listAppend.Add(hsStream.FilePullPath, fileAddManage.GetHsListInnerFolder(destPath, path));
+                    }
                 }
             }
         }
+
+        foreach(string filePullPath in listAppend.Keys)
+        {
+            HsStream temp = FileList.Find(x => x.FilePullPath == filePullPath);
+            FileList.Remove(temp);
+            foreach(HsStream hsStream in listAppend[filePullPath])
+            {
+                FileList.Add(hsStream);
+            }
+        }
+
+
+        #endregion
 
         //수신자 목록체크(철자틀림)
         string stReceiver = "";

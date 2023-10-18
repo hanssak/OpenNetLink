@@ -924,7 +924,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 case eFileAddErr.eUnZipInnerDRM:                                // zip파일에 내부의 DRM 파일
                     /* TODO */
                     str = xmlConf.GetTitle("T_eUNZIP_INNER_DRMFILE");                 // T_eUNZIP_INNER_DRMFILE 
-                                                                                //str = "ZIP파일 내부 DRM 파일";
+                                                                                      //str = "ZIP파일 내부 DRM 파일";
                     break;
 
                 case eFileAddErr.eFA_LONG_PATH:                                //전송 길이초과
@@ -4634,7 +4634,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     //CheckDocumentFile()
                     //압축해제한 파일의 Stream 필요
                     //Check Document File (압축파일 내 문서검사할 파일이 존재하는 경우)
-                    
+
                     if (ListCheckableDocumentExtension.Exists(ext => (string.Compare(ext, strNoDotExt, true) == 0)))
                     {
                         //압축 내부 문서의 압축해제 개체를 보관할 폴더 (Temp/ZipExtract/ZipName/Document_Extract)
@@ -4646,7 +4646,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                         using (Stream oleFileStream = File.OpenRead(extractFile.FullName))
                         {
-                            m_bIsDrm = Task.Run<bool>(async () => {return await IsDRMbyStream(oleFileStream); }).Result;
+                            m_bIsDrm = Task.Run<bool>(async () => { return await IsDRMbyStream(oleFileStream); }).Result;
                             if (m_bIsDrm)
                             {
                                 m_bIsDrm = false;
@@ -4926,24 +4926,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 throw;
             }
         }
-        public bool UnZipFileForTransfer(string zipFileName, string destFullPath)
+        public bool UnZipFileForTransfer(string zipFileName, string destFullPath, bool isDelete)
         {
-            List<string> zipExt = new List<string>() {"ZIP","7Z","TAR","GZ","TGZ","BZ2" };
             bool result = unzipFile(zipFileName, destFullPath);
             if (result)
             {
-                File.Delete(zipFileName);
+                if(isDelete)
+                    File.Delete(zipFileName);
                 string[] files = Directory.GetFiles(destFullPath, "*", SearchOption.AllDirectories);
                 foreach (string file in files)
                 {
                     string extType = Path.GetExtension(file).Substring(1).ToUpper();
 
-                    if (zipExt.Contains(extType))
+                    if (ListCheckableCompressExtension.Contains(extType))
                     {
                         string destPath = file.Substring(0, file.Length - extType.Length - 1);
                         DirectoryInfo destDir = new DirectoryInfo(destPath);
                         if (destDir.Exists == false) destDir.Create();
-                        UnZipFileForTransfer(file, destPath);
+                        UnZipFileForTransfer(file, destPath, true);
                     }
                 }
             }
@@ -4951,6 +4951,175 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return result;
         }
 
+        public List<HsStream> GetHsListInnerFolder(string dirPath, string relativePath)
+        {
+            List<HsStream> list = new List<HsStream>();
+            System.IO.FileInfo fInfo = new System.IO.FileInfo(dirPath);
+
+            HsStream hsStream = new HsStream();
+            hsStream.FileName = fInfo.Name;
+            hsStream.Size = 0;
+            hsStream.Type = "DIR";
+            hsStream.ModifyTime = fInfo.LastWriteTime;
+            DateTime date = (DateTime)hsStream.ModifyTime;
+            string strDate = date.ToShortDateString();
+            strDate = strDate.Replace("-", "");
+            string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
+            hsStream.MTime = strDate + strTime;
+            hsStream.RelativePath = fInfo.FullName;
+            hsStream.IsDir = true;
+            hsStream.StartPath = hsStream.RelativePath;
+            string strStartPath = hsStream.StartPath;
+            hsStream.stream = null;
+            hsStream.MemoryType = HsStreamType.FileStream;
+            if (!hsStream.StartPath.Equals(""))
+            {
+                int index = -1;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    index = hsStream.StartPath.LastIndexOf("\\");
+                else
+                    index = hsStream.StartPath.LastIndexOf("/");
+                //index = hsStream.StartPath.LastIndexOf("\\");
+                if (index >= 0)
+                {
+                    hsStream.StartPath = hsStream.StartPath.Substring(0, index);
+                    string startPath = "";
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        startPath = hsStream.StartPath + "\\";
+                    else
+                        startPath = hsStream.StartPath + "/";
+                    //string startPath = hsStream.StartPath + "\\";
+                    if (!hsStream.RelativePath.Equals(startPath))
+                        hsStream.RelativePath = hsStream.RelativePath.Replace(startPath, "");
+                }
+            }
+            else
+                hsStream.RelativePath = hsStream.RelativePath;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+            else
+                hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+
+            list.Add(hsStream);
+
+            List<System.IO.FileInfo> FileData = DirSearch(fInfo.FullName);
+
+            foreach (var item in FileData)
+            {
+                hsStream = new HsStream();
+                hsStream.FileName = item.Name;
+                hsStream.Type = item.Attributes.ToString();
+                hsStream.StartPath = strStartPath;
+                hsStream.RelativePath = item.FullName;
+
+                if (!hsStream.StartPath.Equals(""))
+                {
+                    int index = -1;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        index = hsStream.StartPath.LastIndexOf("\\");
+                    else
+                        index = hsStream.StartPath.LastIndexOf("/");
+
+                    if (index >= 0)
+                    {
+                        hsStream.StartPath = hsStream.StartPath.Substring(0, index);
+                        string startPath = "";
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            startPath = hsStream.StartPath + "\\";
+                        else
+                            startPath = hsStream.StartPath + "/";
+                        //string startPath = hsStream.StartPath + "\\";
+                        if (!hsStream.RelativePath.Equals(startPath))
+                            hsStream.RelativePath = hsStream.RelativePath.Replace(startPath, "");
+                    }
+                }
+                else
+                    hsStream.RelativePath = hsStream.RelativePath;
+
+                hsStream.isNeedApprove = false;
+                if ((item.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
+                {
+                    hsStream.Size = 0;
+                    hsStream.Type = "DIR";
+                    hsStream.stream = null;
+                    hsStream.MemoryType = HsStreamType.FileStream;
+                    hsStream.IsDir = true;
+                }
+                else
+                {
+                    hsStream.Size = item.Length;
+
+                    if (item.Name.LastIndexOf(".") > -1)
+                        hsStream.Type = item.Name.Substring(item.Name.LastIndexOf(".") + 1);
+                    else
+                        hsStream.Type = "";
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    }
+
+                    hsStream.IsDir = false;
+                }
+
+                hsStream.ModifyTime = item.LastWriteTime;
+                DateTime SubDate = (DateTime)hsStream.ModifyTime;
+                string strSubDate = SubDate.ToShortDateString();
+                strSubDate = strSubDate.Replace("-", "");
+                string strSubTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
+                hsStream.MTime = strSubDate + strSubTime;
+                hsStream.MemoryType = HsStreamType.FileStream;
+
+                if (!hsStream.IsDir)
+                {
+                    FileStream stream = File.OpenRead(item.FullName);
+                    if (hsStream.stream != null)
+                    {
+                        hsStream.stream.Dispose();
+                    }
+                    hsStream.stream = stream;
+                }
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                else
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+
+                list.Add(hsStream);
+            }
+
+            foreach(HsStream stream in list)
+            {
+                stream.RelativePath = Path.Combine(relativePath, stream.RelativePath);
+            }
+
+
+            return list;
+        }
+
+        public List<System.IO.FileInfo> DirSearch(string sDir, List<System.IO.FileInfo> temp = null)
+        {
+            if (temp == null)
+                temp = new List<System.IO.FileInfo>();
+            DirectoryInfo di = new DirectoryInfo(sDir);
+
+            foreach (var item in Directory.GetDirectories(sDir))
+            {
+                System.IO.FileInfo fInfo = new System.IO.FileInfo(item);
+                temp.Add(fInfo);
+                DirSearch(item, temp);
+            }
+
+            foreach (var item in di.GetFiles())
+            {
+                temp.Add(item);
+            }
+            return temp;
+        }
 
         /// <summary>
         /// 문서검사
