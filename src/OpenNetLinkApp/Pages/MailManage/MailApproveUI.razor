@@ -316,11 +316,12 @@
 
     public bool bUseDlpDataView = true;
 
-    @*public string strFromDay = "";
-        public string strToDay = "";*@
+    // public string strFromDay = "";
+    // public string strToDay = "";
+
     //검색조건 바인딩 변수
-    @*private string curFromDay;
-        private string curToDay;*@
+    // private string curFromDay;
+    // private string curToDay;
 
     private string strSearchReceiver;       //검색수신자(user_id)
     private string strSearchTitle;          //제목(title)
@@ -350,6 +351,7 @@
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<MailApproveUI>();
+    int nDrawPageGroupID = -1;
 
     public void CheckStateUpdate(emailApproveData item)
     {
@@ -808,18 +810,18 @@
             curFromDay = curFromDay.Substring(0, 8);
             curToDay = curToDay.Substring(0, 8);
 
-        // Test용도
-        //curFromDay = "20220101";
-        //curToDay = "20221231";
+            // Test용도
+            //curFromDay = "20220101";
+            //curToDay = "20221231";
 
-        // 실제사용 - UI상에 설정된 값 안나옴
-        mailParam.SetSearchStartDate(curFromDay);
+            // 실제사용 - UI상에 설정된 값 안나옴
+            mailParam.SetSearchStartDate(curFromDay);
             mailParam.SetSearchEndDate(curToDay);
 
             string systemid = (sgLoginData.GetSystemPosition() ? "I" : "E");
             mailParam.PageListCount = nPageListCount;
             mailParam.APPROVE_TYPE_SFM = sgLoginData.GetApproveTypeSFM().ToString();    //대결재 방식 지정
-        mailParam.UserID = curUserID;
+            mailParam.UserID = curUserID;
             mailParam.SystemId = systemid;
 
             mailParam.Sender = strSearchSender;
@@ -831,8 +833,8 @@
 
             mailParam.SetTransStatusCode(strTransFlag);
 
-        // SetTransStatusCode 이후에 SetApprStatusCode 사용해야함(꼭)
-        mailParam.SetApprStatusCode(strSearchApproveStatus);
+            // SetTransStatusCode 이후에 SetApprStatusCode 사용해야함(꼭)
+            mailParam.SetApprStatusCode(strSearchApproveStatus);
 
             mailParam.SetDlpValue(strDlpValue);
 
@@ -977,10 +979,10 @@
 
 
         using (Mutex mutex = new Mutex(true, "MailApproveUI", out bool isNewInstance))
-        { 
+        {
             if (isNewInstance)
             {
-            
+
                 ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
                 int groupID = 0;
                 if (sgSideBar != null)
@@ -1057,7 +1059,7 @@
 
             }
             else
-            { 
+            {
                 CLog.Here().Information($"MailApproveUI - doSearch, Doing ~");
             }
 
@@ -1120,31 +1122,34 @@
 
         InitText();
 
-        //Email 배치 승인,반려 요청에 응답 이벤트
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
-
-        HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupIDbyParam, ApproveBatchResult);
-        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveUI, UpdateData);
-        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveWaitUI, ApproveWaitSearch);
-
-
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData != null)
-            approveTypesfm = sgLoginData.GetApproveTypeSFM();
-
         base.OnInitialized();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+
+        await jsRuntime.InvokeAsync<object>("exitLogIn");
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize");
+
+        int groupID = groupIDbyParam;
+        CLog.Here().Information($"MailApproveUI - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
+
+        // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
+            nDrawPageGroupID = groupIDbyParam;
+
+            bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
+
+            HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupIDbyParam, ApproveBatchResult);
+            HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveUI, UpdateData);
+            HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveWaitUI, ApproveWaitSearch);
+
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData != null)
+                approveTypesfm = sgLoginData.GetApproveTypeSFM();
+
             jsRuntime.InvokeAsync<object>("initPageLeft");
 
             if (menuMode == 1)
@@ -1153,6 +1158,11 @@
                 strSearchApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT"); //"승인대기"
             }
             await doSearch();
+            StateHasChanged();
+        }
+
+        if (firstRender)
+        {
         }
         
         base.OnAfterRender(firstRender);

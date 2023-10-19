@@ -194,6 +194,7 @@
 
     public List<SGFileExceptionData> mData = new List<SGFileExceptionData>();
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<FileExceptionView>();
+    int nDrawPageGroupID = -1;
 
     // 전체 checkbox 운영용도
     public bool bAllCheck = false;
@@ -886,6 +887,32 @@
 
         base.OnInitialized();
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await jsRuntime.InvokeAsync<object>("exitLogIn");
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize");
+
+        int groupID = groupIDbyParam;
+        CLog.Here().Information($"fileException - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
+
+        // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
+        {
+            nDrawPageGroupID = groupIDbyParam;
+
+
+
+            StateHasChanged();
+        }
+
+        if (firstRender)
+        {
+        }
+
+        base.OnAfterRender(firstRender);
+    }
+
 
     private void HomeMove()
     {
