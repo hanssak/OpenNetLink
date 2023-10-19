@@ -515,8 +515,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public long m_nTansCurSize = 0;
         public long m_nCurRegisteringSize = 0;
-
         public int m_nTransCurCount = 0;
+        public Dictionary<string, (int, long)> m_ZipFileInnerInfo = new Dictionary<string, (int, long)>();
 
         /// <summary>
         /// 0KB 파일 전송 가능 유무
@@ -601,6 +601,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_nCurRegisteringSize = 0;
 
             m_nTransCurCount = 0;
+        }
+
+        public void SetZipFileInnerInfo(string pathFile, (int, long)info)
+        {
+            if (m_ZipFileInnerInfo == null)
+                m_ZipFileInnerInfo = new Dictionary<string, (int, long)>();
+
+            if (m_ZipFileInnerInfo.Keys.Contains(pathFile))
+                m_ZipFileInnerInfo[pathFile] = info;
+            else
+                m_ZipFileInnerInfo.Add(pathFile, info);
         }
 
         public void Copy(FileAddManage fileaddManage)
@@ -1523,9 +1534,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return count;
         }
 
-        public static bool GetRegCountEnable(int nStandardCount, int nRegCount)
+        public bool GetRegCountEnable(int nStandardCount, int nRegCount)
         {
-            if (nStandardCount < nRegCount)
+            if (nStandardCount < nRegCount + m_nTransCurCount)
                 return false;
             return true;
         }
@@ -1588,7 +1599,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (FileTransMaxSize <= 0)
                 return true;
 
-            if (RemainFileTransSize < nRegSize)
+            if (RemainFileTransSize < nRegSize + m_nTansCurSize)
                 return false;
             return true;
         }
@@ -4444,8 +4455,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 await stStream.CopyToAsync(fileStream);
                 fileStream.Close();
 
+                int innerFileCount = 0;
+                long innerFileSize = 0;
+
                 enRet = ScanZipFile(currentFile, strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, nOption, 1, blWhite, strExtInfo, 0, hsStream.Type.ToUpper(),
-                    out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtract, bDenyPasswordZIP);
+                    out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtract,ref innerFileCount, ref innerFileSize, bDenyPasswordZIP);
+
+                SetZipFileInnerInfo((stStream as FileStream).Name , (innerFileCount, innerFileSize));
 
                 // KKW
                 //if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
@@ -4503,7 +4519,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="bZipPasswdCheck"></param>
         /// <returns></returns>
         public eFileAddErr ScanZipFile(FileAddErr currentFile, string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nBlockOption, int nCurDepth,
-            bool blWhite, string strExtInfo, int nErrCount, string strExtType, out int nTotalErrCount, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, DocumentExtractType documentExtractType, bool bZipPasswdCheck = true)
+            bool blWhite, string strExtInfo, int nErrCount, string strExtType, out int nTotalErrCount, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, DocumentExtractType documentExtractType,ref int innerFileCount, ref long innerFileSize, bool bZipPasswdCheck = true)
         {
             bIsApproveExt = false;
             eFileAddErr enErr = eFileAddErr.eFANone;
@@ -4566,12 +4582,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         nCurErrCount++;
                         continue;
                     }
-
+                    
+                    //내부 파일 Count 합산, 폴더 포함
+                    innerFileCount++;
                     if (extractFile.Attributes.HasFlag(FileAttributes.Directory))
                     {
                         //디렉토리는 내부 항목 검사
                         eFileAddErr enRetDir = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, extractFile.FullName, Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.Name)), nMaxDepth, nBlockOption, nCurDepth,
-                                                            blWhite, strExtInfo, nCurErrCount, "", out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtractType);
+                                                            blWhite, strExtInfo, nCurErrCount, "", out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtractType, ref innerFileCount, ref innerFileSize);
 
                         if (enRetDir != eFileAddErr.eFANone) enErr = enRetDir;
                         if (childFile.HasChildrenErr) currentFile.HasChildrenErr = true;
@@ -4592,6 +4610,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         continue;
                     }
 
+                    //내부 File Size 합산
+                    innerFileSize += fileInfo.Length;
                     // Check Block File Extension
                     strExt = Path.GetExtension(extractFile.Name);
                     string strNoDotExt = strExt.Replace(".", "");
@@ -4696,7 +4716,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                                             //                    string strExtractPath = strExtractFilePath;//Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.));
 
                     eFileAddErr enRet = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, strCurZip, Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.Name)), nMaxDepth, nBlockOption, nCurDepth + 1,
-                        blWhite, strExtInfo, nCurErrCount, Path.GetExtension(extractFile.Name).Substring(1), out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtractType);
+                        blWhite, strExtInfo, nCurErrCount, Path.GetExtension(extractFile.Name).Substring(1), out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtractType, ref innerFileCount, ref innerFileSize);
 
                     if (enRet != eFileAddErr.eFANone) enErr = enRet;
                     if (childFile.HasChildrenErr) currentFile.HasChildrenErr = true;

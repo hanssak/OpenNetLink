@@ -231,6 +231,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseUnZipForTransfer(int groupId);
 
+        public bool GetUseCheckZipFileAfterUnZip(int groupId);
 
         public bool GetUseAskFileSendAlert(int groupId);
     }
@@ -1073,6 +1074,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseUnZipForTransfer(int groupId)
         {
             return AppConfigInfo[groupId].bUseUnZipForTransfer;
+        }
+
+        public bool GetUseCheckZipFileAfterUnZip(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseCheckZipFileAfterUnZip;
         }
 
 

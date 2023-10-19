@@ -199,6 +199,6 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseUnZipForTransfer { get; set; }    // 파일 전송 시 압축 파일 해제하여 전송
 
-
+        public bool bUseCheckZipFileAfterUnZip { get; set; } // 전송 파일 용량 체크 및 Count 체크 시 Zip 파일 풀어서 나오는 Size와 Count 로 체크
     }
 }
