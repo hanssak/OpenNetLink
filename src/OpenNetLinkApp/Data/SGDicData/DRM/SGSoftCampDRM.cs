@@ -18,7 +18,7 @@ namespace OpenNetLinkApp.Data.SGDicData.DRM
 
         public int DrmEncrypt(string source)
         {
-            string grade = "0000001";
+            string grade = "0000004";
             int ret = DSCSGradeEncryptFileV2(source, grade);
 
             //ret == 0 암호화 실패

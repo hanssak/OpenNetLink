@@ -231,9 +231,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseUnZipForTransfer(int groupId);
 
+        public bool GetUseAskFileSendAlert(int groupId);
+
+
+        public bool GetUseCommonEnvNetNameRevert(int groupId);
+
+
         public bool GetUseCheckZipFileAfterUnZip(int groupId);
 
-        public bool GetUseAskFileSendAlert(int groupId);
+        public bool GetMakeRecvDownPathShortCut(int groupId);
     }
 
 
@@ -1076,6 +1082,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo[groupId].bUseUnZipForTransfer;
         }
 
+        public bool GetUseAskFileSendAlert(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseAskFileSendAlert;
+        }
+
+        public bool GetUseCommonEnvNetNameRevert(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseCommonEnvNetNameRevert;
+        }
         public bool GetUseCheckZipFileAfterUnZip(int groupId)
         {
             return AppConfigInfo[groupId].bUseCheckZipFileAfterUnZip;
@@ -1083,9 +1098,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
 
 
-        public bool GetUseAskFileSendAlert(int groupId)
+        public bool GetMakeRecvDownPathShortCut(int groupId)
         {
-            return AppConfigInfo[groupId].bUseAskFileSendAlert;
+            return AppConfigInfo[groupId].bMakeRecvDownPathShortCut;
         }
     }
 

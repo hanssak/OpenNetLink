@@ -417,7 +417,16 @@
         @foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))
         {
             <div class="mb-2  w-100">
-                <span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span><br>
+
+                @if (bUseCommonEnvNetNameRevert)
+                {
+                    <span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.ToName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.FromName)</span><br>
+                }
+                else
+                {
+                    <span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span><br>
+                }
+
                 <input type="text" value="@(GetRecvDownPath(Idx))" class="mr-1 col-md-10" readonly="readonly" />
                 <a class="file_dw" @onclick="@(e => openSaveDirPopup(Idx, GetRecvDownPath(Idx)))" hidden="@(GetRecvDownPathChangeHide(Idx))"><i class="fas fa-folder-open pl-1"></i></a>
             </div>
@@ -734,7 +743,9 @@
 
     bool bUseEmailTransManageUI = true;
 
-    
+    bool bUseCommonEnvNetNameRevert = false;
+
+
     private void SaveDownloadDir(string dir)
     {
         string[] arrDir = dir.Split("|");
@@ -840,6 +851,8 @@
             bUseFileClipManageUI &= SGAppMgrSvc.OpConfigInfoService.GetUseFileClipManageUI(netlist.GroupID);
             bUseEmailTransManageUI &= SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(netlist.GroupID);
         }        
+
+        bUseCommonEnvNetNameRevert = SGAppMgrSvc.OpConfigInfoService.GetUseCommonEnvNetNameRevert(0);
 
     }
 
@@ -1718,12 +1731,25 @@
     {
 
         string strNosystemVarPath = AppConfigSvc.ConvertRecvDownPath(stPath);
+        
+        if(SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId))
+        {
+            SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
+            if(sgLoginData != null)
+                strNosystemVarPath = Path.Combine(strNosystemVarPath, sgLoginData.GetUserID());
+        }
 
         // NetLib 쪽에는 실재절대경로로 전달해줘야함, 아님 수신때 이상한곳에 저장함
         HsCmdCenter.SetDownLoadPath(groupId, strNosystemVarPath);
         HsCmdCenter.SetBaseDownLoadPath(groupId, strNosystemVarPath);
         CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
 
+        //바탕화면 바로가기 설정
+        if(SGAppMgrSvc.OpConfigInfoService.GetMakeRecvDownPathShortCut(groupId))
+        {            
+            string linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.ToName);
+            CtrlSideUISvc.ChangeRecvDownPathLink(linkName, strNosystemVarPath);
+        }
         CLog.Here().Information($"Set DownLoadPath, BaseDownLoadPath, RecvDownPath Set: [{stPath}] useUserPath : {SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId)}");   // siteConfig
     }
 
