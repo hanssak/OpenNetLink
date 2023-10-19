@@ -1187,7 +1187,7 @@
     /// </summary>
     /// <param name="groupID">그룹ID</param>
     /// <param name="strPath">다운경로</param>
-    public void SetUserIDRecvDownLoad(int groupID)
+    public string SetUserIDRecvDownLoad(int groupID)
     {
         ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         string strPath = AppConfigSvc.GetRecvDownPath(groupID);
@@ -1210,6 +1210,7 @@
                 //CtrlSideUISvc.SetRecvDownPath(groupID, strPath);
             }
         }
+        return strPath;
     }
 
     /// <summary>
@@ -1271,7 +1272,13 @@
                     sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
                     HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));
-                    SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
+                    string recvPath = SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
+                                        
+                    if(SGAppMgrSvc.OpConfigInfoService.GetMakeRecvDownPathShortCut(groupId))//바탕화면 바로가기 설정
+                    {
+                        string linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.ToName);
+                        CtrlSideUISvc.ChangeRecvDownPathLink(linkName, recvPath);
+                    }
 
                     // 3중망 정보 적용
                     dicSysIdName = new Dictionary<string, SGNetOverData>();

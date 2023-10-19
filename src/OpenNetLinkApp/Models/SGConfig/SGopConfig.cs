@@ -213,6 +213,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseCommonEnvNetNameRevert { get; set; } = false;   // 공통환경설정에 수신폴더이름 위에 망방향 from To 를 반대로 표현
 
 
+        public bool bMakeRecvDownPathShortCut { get; set; } = false;  //다운로드 수신폴더에 대한 바탕화면 바로가기 생성 여부 (Default : false)
     }
 
 }

@@ -19,6 +19,7 @@ using System.Runtime.InteropServices;
 using OpenNetLinkApp.Common;
 using OpenNetLinkApp.Models.SGNetwork;
 using HsNetWorkSG;
+using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -77,6 +78,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetUserSelectFirstNet(int nSelectNet);
 
         void SetAskFileSend(int nGroupID, bool askFileSend);
+
+        void ChangeRecvDownPathLink(string linkFileName, string linkRecvDownPath);
     }
     public class SGCtrlSideUIService : ISGCtrlSideUIService
     {
@@ -502,7 +505,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="startProgramReg"></param>
         public void SetStartProgramReg(bool startProgramReg)
         {
-
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 string strAgentPath = CsSystemFunc.GetCurrentProcessName();
@@ -608,6 +610,33 @@ namespace OpenNetLinkApp.Services.SGAppManager
             groupAskFileSend[nGroupID] = askFileSend;
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
+        }
+
+        /// <summary>
+        /// 수신파일 경로 바로가기 링크 생성
+        /// </summary>
+        /// <param name="linkFileName"></param>
+        /// <param name="linkRecvDownPath"></param>
+        public void ChangeRecvDownPathLink(string linkFileName, string linkRecvDownPath)
+        {
+            try
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    CsSystemFunc.MakeDesktopLinkOSwindow(false, false, linkRecvDownPath, linkFileName);
+                    CsSystemFunc.MakeDesktopLinkOSwindow(true, false, linkRecvDownPath, linkFileName);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) { }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) { }
+                else
+                {
+                    CLog.Here().Information($"ChangeRecvDownPathLink - UnSupported OS Type - OSDescription : {RuntimeInformation.OSDescription}, OSArchitecture : {RuntimeInformation.OSArchitecture}");
+                }
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error("ChangeRecvDownPathLink, Exception[MSG]:" + ex.ToString());
+            }
         }
     }
 }
