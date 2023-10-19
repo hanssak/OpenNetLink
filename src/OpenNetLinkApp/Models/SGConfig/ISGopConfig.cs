@@ -200,5 +200,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseUnZipForTransfer { get; set; }    // 파일 전송 시 압축 파일 해제하여 전송
 
 
+        public bool bUseCommonEnvNetNameRevert { get; set; }    // 공통환경설정에 수신폴더이름 위에 망방향 from To 를 반대로 표현
+        
+
     }
 }
