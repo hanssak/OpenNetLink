@@ -621,6 +621,12 @@ window.initPageLeft = () => {
     $("#main-body").css("margin-left", "250px");
 }
 
+window.initPushMenu = (PushMenuStat) => {
+    if (PushMenuStat != null && PushMenuStat != '') {
+        $('[data-widget="pushmenu"]').PushMenu(PushMenuStat);   //사이드바 메뉴 상태 옵션 ([Default]expand, collapse)
+    }
+}
+
 window.exitLogIn = (trensferTemplate) => {
     $("#main-nav").css("display", "");
     $("#left-sidebar").css("display", "");
@@ -657,8 +663,6 @@ window.exitLogIn = (trensferTemplate) => {
             $("#divFileList").css("height", divRest + "px");
         }
     }
-    //로그인 후 햄버거 메뉴 축소화 나중에 사용 예정
-    //$('[data-widget="pushmenu"]').PushMenu('collapse');
 }
 
 window.closeProgressMessageOnScreenLock = (id) => {

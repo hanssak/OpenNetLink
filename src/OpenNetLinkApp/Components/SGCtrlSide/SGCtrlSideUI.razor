@@ -246,11 +246,11 @@
         </div>
     }
 
-    @if (m_bUseMainPage)
-    {
-        <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_MAINPAGE_SETTING")</div> <!--화면설정-->
-        <div class="ml-2 mb-4">
-            <div class="mb-1  w-100">
+    <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_MAINPAGE_SETTING")</div> <!--화면설정-->
+    <div class="ml-2 mb-4">        
+        @if (m_bUseMainPage)
+        {
+            <div class="mb-2  w-100">
                 <span class="pr-2">@XmlConf.GetTitle("T_APPCONFIG_MAINPAGE")</span>                                              <!--클립보드 알림형식 -->
                 @*<select value="@((int)GetMainPageType())"
                     @onchange="eventArgs => { SetMainPageType(eventArgs); }">
@@ -295,8 +295,12 @@
 
                 </div>
             </div>
+        }
+        <div class="mb-1  w-100">
+            <input type="checkbox" class="mr-1" checked="@(GetHideSideBarAfterLogin())"
+                                            @onchange="eventArgs => { SetHideSideBarAfterLogin(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_HIDE_SIDEBAR_AFTER_LOGIN")</span>                            <!--로그인 후, 사이드바 숨김-->
         </div>
-    }
+    </div>    
 
     @if (m_bUseURLRedirection)
     {
@@ -1105,6 +1109,10 @@
     {
         return SGAppMgrSvc.AppConfigInfoService.GetAfterBasicChk();
     }
+    private bool GetHideSideBarAfterLogin()
+    {
+        return SGAppMgrSvc.AppConfigInfoService.GetHideSideBarAfterLogin();
+    }
 
     private string GetRecvDownPath(int groupId)
     {
@@ -1542,8 +1550,12 @@
         if (PageStatusData.SAfterApprControlCheckEvent != null)
             PageStatusData.SAfterApprControlCheckEvent();
     }
-
-
+    private void SetHideSideBarAfterLogin(ChangeEventArgs changeEventArg)
+    {
+        bool hiddenSideBarChk = Convert.ToBoolean(changeEventArg.Value);
+        CLog.Here().Information($"Check Hidden SideBar Set: [{hiddenSideBarChk}]");
+        CtrlSideUISvc.SetHideSideBarAfterLogin(hiddenSideBarChk);
+    }
     private async void SetRecvDownPath(int groupId, string stPath)
     {
         CLog.Here().Information($"RecvDownPath Set: [{stPath}]");

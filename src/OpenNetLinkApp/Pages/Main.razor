@@ -40,13 +40,13 @@
 
 <div id="divLoginMain" class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
 
-        <div class="login-box  p-0 m-0" style="height:413px; width:@(bHiddenLogoMode?440:880)px !important;">
+    <div class="login-box  p-0 m-0" style="height:413px; width:@(bHiddenLogoMode?440:880)px !important;">
 
         <div class="card p-0" style="border-radius:.7rem !important; background-color:rgba(0,0,0,0.7);">
             <div class="card-body login-card-body  p-0">
                 <div class="row1">
 
-                    @if (bHiddenLogoMode==false)
+                    @if (bHiddenLogoMode == false)
                     {
                         <div class="col-md-6 login-card-body  pt-0 pb-0" style="border-radius:.7rem 0rem 0rem .7rem !important;">
                             <ul class="full_login_left">
@@ -64,16 +64,16 @@
                     }
 
                     <div id="loginCard" class="col-md-6 login-card-body" style="height:413px; border-radius:0rem .7rem .7rem 0rem !important;">
-                        
+
                         <div style=" width:310px;">
-                            @if(bUseLoginCI)
+                            @if (bUseLoginCI)
                             {
-                                <img src="/images/ci/sitelogo.png" style="width:60px; height:60px; margin-right:auto; margin-left:auto; display:block">    
+                                <img src="/images/ci/sitelogo.png" style="width:60px; height:60px; margin-right:auto; margin-left:auto; display:block">
                             }
-                            
+
                             <p class="login-box-msg1" style="padding-top:@(bUseLoginCI ? 20 : 50)px;color:#fff; font-size:1.4rem;">
-                            @*<img src="/images/ci/sitelogo.png" style="width:50px; height:50px; margin-right:auto; margin-left:auto; display:block">*@
-                            @strSystemName <span class="full_txt">@strConNetwork </span>
+                                @*<img src="/images/ci/sitelogo.png" style="width:50px; height:50px; margin-right:auto; margin-left:auto; display:block">*@
+                                @strSystemName <span class="full_txt">@strConNetwork </span>
                             </p>
 
                             <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@id" @oninput="@(e => id = e.Value.ToString())" tabindex="1" autocomplete="off">
@@ -318,7 +318,7 @@
             ShowLoginFail(XmlConf.GetWarnMsg("W_0039"));
             await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
             bStartedLogin = false;
-            bLoginBtnDisable = false;            
+            bLoginBtnDisable = false;
             StateHasChanged();
             return;
         }
@@ -948,6 +948,9 @@
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
         InitText();
+        if(srcLoc == "Logout")  //로그인 화면 재진입 시 SideBar는 기존 Layout으로 초기화
+            JSRuntime.InvokeAsync<object>("initPushMenu", new object[] { "expand" });
+            
 
         bHiddenLogoMode = SGAppMgrSvc.OpConfigInfoService.GetHiddenLoginLogo(0);
         bUseLoginCI = SGAppMgrSvc.OpConfigInfoService.GetUseLoginCI(0);
@@ -979,7 +982,7 @@
         if (srcLoc == "Logout")
         {
 
-            pageService.SetStatusSideMenuReBuildTime(groupid, true);            
+            pageService.SetStatusSideMenuReBuildTime(groupid, true);
 
             if (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer(0) && NetWorkSvc.NetWorkInfo.Count > 1)
                 MyNavigationManager.NavigateTo("/SelectNet");
@@ -1273,8 +1276,8 @@
 
                     HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));
                     string recvPath = SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
-                                        
-                    if(SGAppMgrSvc.OpConfigInfoService.GetMakeRecvDownPathShortCut(groupId))//바탕화면 바로가기 설정
+
+                    if (SGAppMgrSvc.OpConfigInfoService.GetMakeRecvDownPathShortCut(groupId))//바탕화면 바로가기 설정
                     {
                         string linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.ToName);
                         CtrlSideUISvc.ChangeRecvDownPathLink(linkName, recvPath);
@@ -1472,7 +1475,7 @@
 
                     pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
-                    // 
+                    //
                     LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
                     loginAfterSGHeaderUI = HSCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
                     if (loginAfterSGHeaderUI != null)
@@ -1699,7 +1702,7 @@
                     refPWChange.Init();
 
                     // 초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거 시작 2021/07/05 YKH
-                    //패스워드 변경 유무에 따라 패스워드 체크 가능 여부 확인                    
+                    //패스워드 변경 유무에 따라 패스워드 체크 가능 여부 확인
 
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId) && pageService.GetStatusSideMenuReBuildTime(groupId))
                     {
@@ -1931,8 +1934,7 @@
             {
                 string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
                 HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
-            }
-
+            }         
             InitSideMenu(groupId);
 
             // MyNavigationManager.NavigateTo("/Welcome");
@@ -2075,7 +2077,7 @@
 
             pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
-            // 
+            //
             LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
             loginAfterSGHeaderUI = HSCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
             if (loginAfterSGHeaderUI != null)
@@ -2399,6 +2401,8 @@
             SideBarUISvc.EmitNotifyStateChangedActMenu();
             return;
         }
+        string pushmenuStat = (SGAppMgrSvc.AppConfigInfoService.GetHideSideBarAfterLogin()) ? "collapse" : "expand";        
+        JSRuntime.InvokeAsync<object>("initPushMenu", new object[] { pushmenuStat });
 
         string strDataTrans = XmlConf.GetTitle("T_COMMON_FILETRANS_BASIC");                     // 자료전송
         string strFileTrans = XmlConf.GetTitle("T_COMMON_FILETRANS");                           // 파일전송
@@ -2829,13 +2833,13 @@
         //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-                                    {
-                                        return true;
-                                            }
-                                                else
-                                                    return false;
+                                        {
+                                            return true;
+                                                }
+                                                    else
+                                                        return false;
 
-                                                        }
+                                                            }
     */
 
 }

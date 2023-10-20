@@ -1133,6 +1133,8 @@
             SideBarUISvc.EmitNotifyStateChangedActMenu();
             return;
         }
+        string pushmenuStat = (SGAppMgrSvc.AppConfigInfoService.GetHideSideBarAfterLogin()) ? "collapse" : "expand";
+        JSRuntime.InvokeAsync<object>("initPushMenu", new object[] { pushmenuStat });
 
         string strDataTrans = XmlConf.GetTitle("T_COMMON_FILETRANS_BASIC");                     // 자료전송
         string strFileTrans = XmlConf.GetTitle("T_COMMON_FILETRANS");                           // 파일전송

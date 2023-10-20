@@ -81,6 +81,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         int GetUserSelectFirstNet();
         bool GetAskFileSend(int nGroupID);
+        bool GetHideSideBarAfterLogin();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -662,6 +663,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return (AppConfigInfo as SGAppConfig).bAskFileSend[nGroupID];
 
             return false;
+        }
+
+        public bool GetHideSideBarAfterLogin()
+        {
+            return AppConfigInfo.bHideSideBarAfterLogin;
         }
     }
 }

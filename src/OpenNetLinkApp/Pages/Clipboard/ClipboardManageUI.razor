@@ -526,10 +526,10 @@
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-
-        await jsRuntime.InvokeAsync<object>("exitLogIn");
-        await jsRuntime.InvokeAsync<object>("adJustWindowsize");
+    {        
+        int transferTemplate = (groupIDbyParam >= 0) ? SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam) : 0;
+        await jsRuntime.InvokeAsync<object>("exitLogIn",new object[] {transferTemplate});
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize",new object[] {transferTemplate});
 
 
         int groupID = groupIDbyParam;

@@ -78,8 +78,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetUserSelectFirstNet(int nSelectNet);
 
         void SetAskFileSend(int nGroupID, bool askFileSend);
+        
+        void SetHideSideBarAfterLogin(bool hidden);
 
-        void ChangeRecvDownPathLink(string linkFileName, string linkRecvDownPath);
+        void ChangeRecvDownPathLink(string linkFileName, string linkRecvDownPath);        
     }
     public class SGCtrlSideUIService : ISGCtrlSideUIService
     {
@@ -608,6 +610,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 }
             }
             groupAskFileSend[nGroupID] = askFileSend;
+            SaveAppConfigSerialize();
+            NotifyStateChangedCtrlSide();
+        }
+
+        public void SetHideSideBarAfterLogin(bool hidden)
+        {
+            (AppConfigInfo as SGAppConfig).bHideSideBarAfterLogin = hidden;
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }

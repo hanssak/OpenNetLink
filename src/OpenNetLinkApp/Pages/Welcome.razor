@@ -968,25 +968,9 @@
     /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        //await JSRuntime.InvokeAsync<object>("initWelcome");
         int transferTemplate = SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam);
         await JSRuntime.InvokeAsync<object>("exitLogIn",new object[] {transferTemplate});
         await JSRuntime.InvokeAsync<object>("adJustWindowsize",new object[] {transferTemplate});
-
-        /*
-        object[] param = { nDayMaxFileSize, nDayUseFileSize };
-        await JSRuntime.InvokeAsync<object>("initTransferChart", param);
-
-        object[] param2 = { nDayMaxFileCount, nDayUseFileCount };
-        await JSRuntime.InvokeAsync<object>("initTransferCountChart", param2);
-
-        object[] param3 = { nDayMaxClipSize, nDayUseClipSize };
-        await JSRuntime.InvokeAsync<object>("initClipBoardChart", param3);
-
-        object[] param5 = { nDayMaxClipCount, nDayUseClipCount };
-        await JSRuntime.InvokeAsync<object>("initClipBoardCountChart", param5);
-        */
-
 
         if (nDiskFreeSize <= 0)
             nDiskFreeSize = 1;
