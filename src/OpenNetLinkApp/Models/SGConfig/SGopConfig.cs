@@ -211,7 +211,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseUnZipForTransfer { get; set; } = false;    // 파일 전송 시 압축 파일 해제하여 전송
 
         public bool bUseCommonEnvNetNameRevert { get; set; } = false;   // 공통환경설정에 수신폴더이름 위에 망방향 from To 를 반대로 표현
-        public bool bUseCheckZipFileAfterUnZip { get; set; } = false; // 전송 파일 용량 체크 및 Count 체크 시 Zip 파일 풀어서 나오는 File Count 로 체크
+        public bool bUseCheckZipFileInnerFileCount { get; set; } = false; // 1회 전송 가능 파일 검사 시 Zip 파일일 경우 내부 파일 전체를 Count에 포함
 
 
 

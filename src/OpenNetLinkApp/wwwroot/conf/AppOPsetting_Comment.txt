@@ -249,6 +249,10 @@ bUseAskFileSendAlert : 파일리스트 추가 후 전송을 묻는 팝업표시 
 
 bUseCommonEnvNetNameRevert : 공통환경설정에 수신경로 망별이름을 from > to 에서 to > from 으로 표현현 유무(Default : false)
 
+bUseUnZipForTransfer :    파일 전송 시 압축 파일 해제하여 전송(Default : false)
+
+bUseCheckZipFileInnerFileCount : 1회 전송 가능 파일 검사 시 Zip 파일일 경우 내부 파일 전체를 Count에 포함(Default : false)
+
 
 
 

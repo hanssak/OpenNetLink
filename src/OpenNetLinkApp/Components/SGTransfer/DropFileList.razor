@@ -243,16 +243,24 @@
                 {
                     if (HsStreamList[i - 1].isCheck)
                     {
-                        if (SGAppMgrSvc.OpConfigInfoService.GetUseCheckZipFileAfterUnZip(groupID) || SGAppMgrSvc.OpConfigInfoService.GetUseUnZipForTransfer(groupID))
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseCheckZipFileInnerFileCount(groupID) || SGAppMgrSvc.OpConfigInfoService.GetUseUnZipForTransfer(groupID))
                         {
                             if (fileAddManage.ListCheckableCompressExtension.Contains(HsStreamList[i - 1].Type))
                             {
                                 if (fileAddManage.m_ZipFileInnerInfo.ContainsKey(HsStreamList[i - 1].FilePullPath))
                                 {
+                                    if (SGAppMgrSvc.OpConfigInfoService.GetUseUnZipForTransfer(groupID))
+                                        fileAddManage.m_nTansCurSize = fileAddManage.m_nTansCurSize - fileAddManage.m_ZipFileInnerInfo[HsStreamList[i - 1].FilePullPath].Item2;
+                                    else
+                                        fileAddManage.m_nTansCurSize = fileAddManage.m_nTansCurSize - HsStreamList[i - 1].Size;
 
-                                    fileAddManage.m_nTansCurSize = fileAddManage.m_nTansCurSize - fileAddManage.m_ZipFileInnerInfo[HsStreamList[i - 1].FilePullPath].Item2;
                                     fileAddManage.m_nTransCurCount = fileAddManage.m_nTransCurCount - fileAddManage.m_ZipFileInnerInfo[HsStreamList[i - 1].FilePullPath].Item1;
                                     fileAddManage.m_ZipFileInnerInfo.Remove(HsStreamList[i - 1].FilePullPath);
+                                }
+                                else
+                                {
+                                    fileAddManage.m_nTansCurSize = fileAddManage.m_nTansCurSize - HsStreamList[i - 1].Size;
+                                    fileAddManage.m_nTransCurCount = fileAddManage.m_nTransCurCount - 1;
                                 }
                             }
                             else
@@ -1197,6 +1205,8 @@
         catch (Exception ex)
         {
             CLog.Here().Error($"OnDropFileAdd, Exception(MSG) : {ex.Message}");
+            string strErr = XmlConf.GetErrMsg("E_0269");        //파일 전송을 위해 파일 체크하는 도중 오류가 발생했습니다.
+            ShowMessage("error", strErr);
         }
         finally
         {
@@ -1224,13 +1234,17 @@
     {
         int regCount = 0;
         long fileSize = 0;
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseCheckZipFileAfterUnZip(groupID) || SGAppMgrSvc.OpConfigInfoService.GetUseUnZipForTransfer(groupID))
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseCheckZipFileInnerFileCount(groupID) || SGAppMgrSvc.OpConfigInfoService.GetUseUnZipForTransfer(groupID))
         {
             if (!hsStream.IsDir)
             {
                 if (fileAddManage.m_ZipFileInnerInfo.ContainsKey(hsStream.FilePullPath))
                 {
-                    fileSize = fileAddManage.m_ZipFileInnerInfo[hsStream.FilePullPath].Item2;
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseUnZipForTransfer(groupID))
+                        fileSize = fileAddManage.m_ZipFileInnerInfo[hsStream.FilePullPath].Item2;
+                    else
+                        fileSize = hsStream.Size;
+
                     regCount = fileAddManage.m_ZipFileInnerInfo[hsStream.FilePullPath].Item1;
                 }
                 else

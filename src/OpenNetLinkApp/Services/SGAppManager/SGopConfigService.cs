@@ -237,7 +237,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseCommonEnvNetNameRevert(int groupId);
 
 
-        public bool GetUseCheckZipFileAfterUnZip(int groupId);
+        public bool GetUseCheckZipFileInnerFileCount(int groupId);
 
         public bool GetMakeRecvDownPathShortCut(int groupId);
     }
@@ -1091,12 +1091,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseCommonEnvNetNameRevert;
         }
-        public bool GetUseCheckZipFileAfterUnZip(int groupId)
+        public bool GetUseCheckZipFileInnerFileCount(int groupId)
         {
-            return AppConfigInfo[groupId].bUseCheckZipFileAfterUnZip;
+            return AppConfigInfo[groupId].bUseCheckZipFileInnerFileCount;
         }
-
-
 
         public bool GetMakeRecvDownPathShortCut(int groupId)
         {
