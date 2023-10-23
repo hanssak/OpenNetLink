@@ -21,7 +21,8 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public string CustomLoginHttpUrl { get; set; }                       //로그인 연동을 위한 사이트 URL
         public bool bUseGpkiLogin { get; set; }                            // GPKI 로그인 사용 여부
-        public bool bUserIDSave { get; set; }                                      // 로그인한 ID 저장 여부
+        public bool bUserIDSave { get; set; }                                      // 로그인한 ID 저장 여부 => ID저장 기능 사용유무로 의미 변경
+        public bool bUserIDSaveCheck { get; set; }                                 // 로그인한 ID저장 체크박스 체크여부
         public bool bAutoLogin { get; set; }                                       // 자동로그인 사용 여부.
         public bool bAutoLoginCheck { get; set; }                                  // 자동로그인 체크박스 체크여부.
         public bool bUseUserSelectFirstServer { get; set; }   // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무

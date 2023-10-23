@@ -71,16 +71,30 @@
                                 </div>
                             }
                             <div class="row">
-                                @if (nGroupID > -1 && bAutoLogin && eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
+                                @if (nGroupID > -1 && eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
                                 {
-                                    <div class="col-12 pt-1 pr-4 text-right ">
-                                        <div class="icheck-primary">
-                                            <input type="checkbox" id="remember" @onclick="CheckStateChange" checked=@bAutoLoginCheck disabled=@bUIBtnDisable>
-                                            <label for="remember">
-                                                @XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX")
-                                            </label>
+                                    @if(bAutoLogin)
+                                    {
+                                        <div class="col-12 pt-1 pr-4 text-right ">
+                                            <div class="icheck-primary">
+                                                <input type="checkbox" id="remember" @onclick="CheckStateChange" checked=@bAutoLoginCheck disabled=@bUIBtnDisable>
+                                                <label for="remember">
+                                                    @XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX")
+                                                </label>
+                                            </div>
                                         </div>
-                                    </div>
+                                    }
+                                    else if(bIDSave)
+                                    {
+                                        <div class="col-12 pt-1 pr-4 text-right ">
+                                            <div class="icheck-primary">
+                                                <input type="checkbox" id="rememberIDSave" @onclick="SaveIDCheckStateChange" checked=@bIDSaveCheck />
+                                                <label for="rememberIDSave">
+                                                    @XmlConf.GetTitle("T_ETC_IDSAVE_CHECKBOX")
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
                                 }
                                 <div class="col-12  pt-2">
                                     <button class="btn btn-login btn-block btn_blue" @onclick="doLogInByBtn" disabled=@bUIBtnDisable>LOGIN</button>
@@ -120,6 +134,9 @@
     public bool bLoginTryOver1auth = false;
     public bool bAutoLogin = true;                          // 자동로그인 CheckBox 표현 및 사용유무
     public bool bAutoLoginCheck = false;                    // 자동로그인 check 상태 설정
+    public bool bIDSave = false;                            // 로그인한 ID 저장 기능 사용 유무
+    public bool bIDSaveCheck = false;                       // 로그인한 ID 저장 체크 여부
+
     public bool bUIBtnDisable = false;
     public int nGroupID = -1;                       // 현재 사용할 GroupID
     public int nDrawPageGroupID = -1;              // Draw하는 GroupID
@@ -629,15 +646,9 @@
     /// </summary>
     public void CheckStateChange()
     {
-
         bAutoLoginCheck = (!bAutoLoginCheck);
-        //        if (!bAutoLoginCheck)
-        //        {
-        //            bUIBtnDisable = false;
-        //            StateHasChanged();
-        //        }
-
     }
+    public void SaveIDCheckStateChange() => bIDSaveCheck = (!bIDSaveCheck);
 
     protected override void OnInitialized()
     {
@@ -672,6 +683,7 @@
             nDrawPageGroupID = nGroupID;
 
             bAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID);
+            bIDSave = SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID);
             // bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(nGroupID);
 
             if (pageService.m_bMultiLoginDo)
@@ -721,14 +733,24 @@
                 //if (siteConfig.GetUseLoginIDSave(nGroupID) == true)   // json으로 설정이동
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID))
                 {
-                    string strEncID = "";
-                    strEncID = sgSettingProc.GetSettingUID(nGroupID);
-                    if (strEncID == null || strEncID.Equals(""))
-                        return;
-                    string strID = "";
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                    id = strID;
+                    bool bIDSaveContinue = sgSettingProc.GetSettingIDSave(nGroupID);
+                    bIDSaveCheck = bIDSaveContinue;
+                    
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSaveCheck(nGroupID))
+                        bIDSaveCheck = true;
+
+                    if(bIDSaveContinue)
+                    {
+                        string strEncID = "";
+                        strEncID = sgSettingProc.GetSettingUID(nGroupID);
+                        if (strEncID == null || strEncID.Equals(""))
+                            return;
+                        string strID = "";
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                        id = strID;
+                    }
+                    
                     StateHasChanged();
                 }
 
@@ -736,7 +758,6 @@
                 // if (siteConfig.GetUseAutoLogin(nGroupID) == true)    // json으로 이동
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
                 {
-
                     // siteConfig. json으로 이동
                     bAutoLoginCheck = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLoginCheck(nGroupID);
 
@@ -1086,11 +1107,21 @@
                 //if (siteConfig.GetUseLoginIDSave(groupId) == true)    // json으로 설정이동
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID))
                 {
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    string strEncID = "";
-                    sgRSACrypto.ValueEncrypt(id, out strEncID);
-                    if (sgSettingData != null)
-                        sgSettingProc.SetSettingUID(groupId, strEncID);
+                    if(bIDSaveCheck)
+                    {
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        string strEncID = "";
+                        sgRSACrypto.ValueEncrypt(id, out strEncID);
+                        if (sgSettingData != null)
+                        {
+                            sgSettingProc.SetSettingUID(groupId, strEncID);
+                            sgSettingProc.SetSettingIDSave(groupId, true);
+                        }                            
+                    }
+                    else
+                    {
+                        sgSettingProc.SetSettingIDSave(groupId, false);
+                    }
                 }
             }
 

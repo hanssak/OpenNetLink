@@ -61,88 +61,125 @@ else
     //결재단계 멤버변수 추가 0:AND 1:OR 2:AND+OR
     int m_step = 0;
 
+    public int groupIDbyParam = 0;
+    int nDrawPageGroupID = -1;
+
     protected override void OnInitialized()
     {
         sgUserSvr = SGAppMgrSvc.UserInfoService;
         sgSettingProc = SGSettingsDBProc.Instance;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-        if (pageService.GetInitApprLine(groupID) == false)
+
+        base.OnInitialized();
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        int groupID = groupIDbyParam;
+
+        // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
-            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sgLoginData == null)
-            {
-                ApproveLineChange();
-                base.OnInitialized();
-                return;
-            }
 
-            if (!sgLoginData.GetApprove())
-            {
-                InitApproveLine();
-                pageService.SetInitApprLine(groupID, true);
-                base.OnInitialized();
-            }
-            int nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY");
+            nDrawPageGroupID = groupIDbyParam;
+            CLog.Here().Information($"ApproveLine - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
 
-            bool bLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID);  // siteConfig   json으로 설정이동
-            if (bLocalSave && nApproveProxy > 1)
+            groupID = nDrawPageGroupID;
+            if (pageService.GetInitApprLine(groupID) == false)
             {
-                bool bApprLineExist = false;
-                SGSettingData sgSettingData = null;
-                sgSettingData = sgSettingProc.SelectSettingData(groupID);
-                if (sgSettingData != null)
+                SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                if (sgLoginData == null)
                 {
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    string strEncApprLine = sgSettingProc.GetSettingApprLine(groupID);
-                    string strApprLine = "";
-                    sgRSACrypto.ValueDecrypt(strEncApprLine, out strApprLine);
-
-                    SGUserData sgUserData = null;
-                    sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-                    if (sgUserData == null)
-                    {
-                        ApproveLineChange();
-                        base.OnInitialized();
-                        return;
-                    }
-
-                    string strUserSeq = sgUserData.GetUserSequence();
-
-                    int approveStep = (sgLoginData != null) ? sgLoginData.GetApproveStep() : 0;
-
-                    SGApprLineData sgApprLineData = null;
-                    sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
-
-                    if (sgApprLineData != null)
-                    {
-                        bApprLineExist = sgApprLineData.LocalLoadANDApprLineData(strApprLine, strUserSeq, approveStep);
-                        if (!bApprLineExist)
-                            InitApproveLine();
-                    }
-                }
-                if (bApprLineExist)
                     ApproveLineChange();
+                    StateHasChanged();
+                    return;
+                }
+
+                if (!sgLoginData.GetApprove())
+                {
+                    InitApproveLine();
+                    pageService.SetInitApprLine(groupID, true);
+                    //base.OnInitialized();
+                }
+                int nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY");
+
+                bool bLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID);  // siteConfig   json으로 설정이동
+                if (bLocalSave && nApproveProxy > 1)
+                {
+                    bool bApprLineExist = false;
+                    SGSettingData sgSettingData = null;
+                    sgSettingData = sgSettingProc.SelectSettingData(groupID);
+                    if (sgSettingData != null)
+                    {
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        string strEncApprLine = sgSettingProc.GetSettingApprLine(groupID);
+                        string strApprLine = "";
+                        sgRSACrypto.ValueDecrypt(strEncApprLine, out strApprLine);
+
+                        SGUserData sgUserData = null;
+                        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+                        if (sgUserData == null)
+                        {
+                            ApproveLineChange();
+                            StateHasChanged();
+                            return;
+                        }
+
+                        string strUserSeq = sgUserData.GetUserSequence();
+
+                        int approveStep = (sgLoginData != null) ? sgLoginData.GetApproveStep() : 0;
+
+                        SGApprLineData sgApprLineData = null;
+                        sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+
+                        if (sgApprLineData != null)
+                        {
+                            bApprLineExist = sgApprLineData.LocalLoadANDApprLineData(strApprLine, strUserSeq, approveStep);
+                            if (!bApprLineExist)
+                                InitApproveLine();
+                        }
+
+                    }
+                    if (bApprLineExist)
+                        ApproveLineChange();
+                }
+                else
+                    InitApproveLine();
+                pageService.SetInitApprLine(groupID, true);
+                //bInitApprLine = true;
             }
             else
-                InitApproveLine();
-            pageService.SetInitApprLine(groupID, true);
-            //bInitApprLine = true;
+                ApproveLineChange();
+
+            StateHasChanged();
         }
-        else
-            ApproveLineChange();
-        base.OnInitialized();
+
+        if (firstRender)
+        {
+            //await TransSearchCount();
+        }
+
+        base.OnAfterRender(firstRender);
+    }
+
+    
+    public void Refresh()
+    { 
+        StateHasChanged();
     }
 
     public void InitApproveLine()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*@
+        
+        int groupID = nDrawPageGroupID;
+        if (groupID < 0)
+            return;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -158,6 +195,8 @@ else
             return;
 
         ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+
+        approverList.Clear();
 
         SGApprLineData sgApprLineData = null;
         sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
@@ -276,10 +315,14 @@ else
         //InitApproveLine();
         //아래로 InitApproveLine 과 크게 다르지 않아서 InitApproveLine 수행으로 변경함 2021/03/08 YKH
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*@
+
+        int groupID = nDrawPageGroupID;
+        if (groupID < 0)
+            return;
 
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);

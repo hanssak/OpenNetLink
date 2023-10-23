@@ -985,7 +985,7 @@
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 string strMsg = "";
                 strMsg = XmlConf.GetErrMsg("E_0268");
@@ -1520,7 +1520,10 @@
                 {
                     file.Delete();
                 }
-                catch{}
+                catch(Exception ex)
+                {
+                    CLog.Here().Error($"DeleteTempFolder, File Delete Failed : {ex.Message}");
+                }
             }
 
             foreach (DirectoryInfo dir in directory.GetDirectories())
@@ -1529,7 +1532,10 @@
                 {
                     dir.Delete(true);
                 }
-                catch{}
+                catch (Exception ex)
+                {
+                    CLog.Here().Error($"DeleteTempFolder, DirectoryInfo Delete Failed : {ex.Message}");
+                }
             }
         }
     }
@@ -1557,7 +1563,7 @@
         bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
         bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
         bFileSelectDeleteBtn = !OpConfigSvc.GetUseFileSelectDelete(groupID);
-        bHideApprLine = OpConfigSvc.GetUseHideApprLine(groupIDbyParam);
+        bHideApprLine = OpConfigSvc.GetUseHideApprLine(groupID); // groupIDbyParam
 
 
         if (bAfterApprChkHIde)
@@ -1603,7 +1609,9 @@
                 bHideApprChooseAddBtn = true;
             else
             {
-                if (!bApprEdit)
+                if (bApprEdit)
+                    bHideApprChooseAddBtn = false;
+                else
                     bHideApprChooseAddBtn = true;
 
                 if (sgUserInfo != null)
@@ -1638,19 +1646,53 @@
         OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
         versionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
         InitText();
-        OnSettingByGroupID(groupIDbyParam);
-        UseUrlRedirectionByServer = GetUseUrlRedirectionByServer();
 
         base.OnInitialized();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JSRuntime.InvokeAsync<object>("exitLogIn");
+        await JSRuntime.InvokeAsync<object>("adJustWindowsize");
+
+        int groupID = groupIDbyParam;
+        CLog.Here().Information($"Transfer - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
+
+        // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
+        {
+            nDrawPageGroupID = groupIDbyParam;
+
+            OnSettingByGroupID(groupID);
+            UseUrlRedirectionByServer = GetUseUrlRedirectionByServer();
+
+            ApprLine.groupIDbyParam = groupIDbyParam;
+            ApprLine.Refresh();
+            //dropFile._groupId = groupIDbyParam;
+            dropFile.Refresh();
+            StateHasChanged();
+        }
+
+        if (firstRender)
+        {
+            //await TransSearchCount();
+        }
+
+        base.OnAfterRender(firstRender);
     }
 
 
     public bool GetUseUrlRedirectionByServer()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+        @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;*@
+
+        if (nDrawPageGroupID < 0)
+            return false;
+
+        int groupID = nDrawPageGroupID;
 
         CLog.Here().Information($"GetUseUrlRedirectionByServer - groupID : {groupID}");
 
@@ -1895,42 +1937,16 @@
 
     protected override void OnAfterRender(bool firstRender)
     {
+
+        JSRuntime.InvokeAsync<string>("exitLogIn");
+        JSRuntime.InvokeAsync<string>("adJustWindowsize");
+
+        CLog.Here().Information($"Transfer - OnAfterRender - Called (groupID : {groupIDbyParam})! ");
+
         int groupID = groupIDbyParam;
+
         if (firstRender)
         {
-            //LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-            //INPUT Target Index 초기화
-            JSRuntime.InvokeAsync<string>("initTransferUIPosition");
-            JSRuntime.InvokeAsync<string>("initTargetInputNumber");
-            JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex");
-            JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex_InputFile");
-
-            for (int i = 0; i < maxDropReference; i++)
-            {
-                //IFileReaderRef dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-                //string target = $"fileInput{i + 1}";
-                //dropReference.initFileReaderService(target);
-                //dropReference.SetDragTargetElementAsync(target);
-                //dropReferenceList.Add(dropReference);
-            }
-
-            //_dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-            //_dropReference.initFileReaderService("fileInputTrans");
-            //_dropReference.SetDragTargetElementAsync("fileInputTrans");
-
-            LoadJavaScriptSync();
-            base.OnAfterRenderAsync(firstRender);
-
-            if (pageService.GetLoginComplete(groupID) != true)
-            {
-                SendDayFileInfo();
-            }
-            else
-                UseDayInfoDisplay();
-
-            //로그인 팝업 샘플 2020/07/01 YKH
-            //await OpenLogIn();
-            StateHasChanged();
         }
 
         strBindTitle = strCurrentTitle;
@@ -1941,6 +1957,37 @@
         {
             nDrawPageGroupID = groupIDbyParam;
             groupID = groupIDbyParam;
+
+            OnSettingByGroupID(groupID);
+            UseUrlRedirectionByServer = GetUseUrlRedirectionByServer();
+
+            JSRuntime.InvokeAsync<string>("initTransferUIPosition");
+            JSRuntime.InvokeAsync<string>("initTargetInputNumber");
+            JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex");
+            JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex_InputFile");
+
+            //for (int i = 0; i < maxDropReference; i++)
+            //{
+            //IFileReaderRef dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+            //string target = $"fileInput{i + 1}";
+            //dropReference.initFileReaderService(target);
+            //dropReference.SetDragTargetElementAsync(target);
+            //dropReferenceList.Add(dropReference);
+            //}
+
+            //_dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+            //_dropReference.initFileReaderService("fileInputTrans");
+            //_dropReference.SetDragTargetElementAsync("fileInputTrans");
+
+            LoadJavaScriptSync();
+
+            if (pageService.GetLoginComplete(groupID) != true)
+            {
+                SendDayFileInfo();
+            }
+            else
+                UseDayInfoDisplay();
+
 
             nTransferTemplate = SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupID);
             //지정된 템플릿의 DropFileList
@@ -1991,6 +2038,10 @@
 
             pageService.SetLogOutFileListClearEvent(groupID, LogoutClearFileList);
 
+            ApprLine.groupIDbyParam = groupIDbyParam;
+            ApprLine.Refresh();
+            //dropFile._groupId = groupIDbyParam;
+            dropFile.Refresh();
             StateHasChanged();
         }
 
@@ -2015,9 +2066,10 @@
         if (firstRender)
         {
             CheckContinueFileUpload();
+            base.OnAfterRender(firstRender);
         }
-
     }
+
 
     @*public void DeptInfoResult(int groupId)
         {
@@ -2918,6 +2970,7 @@
     /// <param name="groupid"></param>
     public void RefreshUI(int groupid)
     {
+
         StateHasChanged();
     }
 

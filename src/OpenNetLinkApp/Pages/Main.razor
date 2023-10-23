@@ -100,6 +100,17 @@
                                         </div>
                                     </div>
                                 }
+                                else if(bIDSave)
+                                {
+                                    <div class="col-md-12 mt-1 ">
+                                        <div class="form-group float-right col-md-4">
+                                            <div class="form-check" style="width:150px;">
+                                                <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;" tabindex="4" @onclick="SaveIDCheckStateChange" checked="@bIDSaveCheck">
+                                                <label class="form-check-label" style="color:#fff;width:80px;">@strIDSave</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
                                 <div class="col-md-12 text-center">
                                     @*@if (pageService.m_nLoginType != (int)eLoginType.eLOGINTYPE_AD)*@
                                     @*{*@
@@ -172,6 +183,7 @@
     public string strSystemName = "";
     public string strConNetwork = "";
     public string strAutoLogin = "";
+    public string strIDSave = "";
     public bool bViewBackButton = false;  //로그인 취소버튼 표시여부
 
     ISGAppConfigService AppConfigSvc;
@@ -186,6 +198,10 @@
     SGSettingsDBProc sgSettingProc;
     public bool bAutoLogin = false;
     public bool bAutoLoginCheck = false;
+
+    public bool bIDSave = false;
+    public bool bIDSaveCheck = false;
+
     public bool bLoginBtnDisable;
     Dictionary<string, SGNetOverData> dicSysIdName = null;
 
@@ -940,16 +956,27 @@
     {
         // ID저장
         // if (siteConfig.GetUseLoginIDSave(groupID) == true)   // json으로 설정이동
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(groupID))
+        bIDSave = SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(groupID);
+        if (bIDSave)
         {
-            string strEncID = "";
-            strEncID = sgSettingProc.GetSettingUID(groupID);
-            if (strEncID == null || strEncID.Equals(""))
-                return;
-            string strID = "";
-            SGRSACrypto sgRSACrypto = new SGRSACrypto();
-            sgRSACrypto.ValueDecrypt(strEncID, out strID);
-            id = strID;
+            bool bIDSaveContinue = sgSettingProc.GetSettingIDSave(groupID);
+            bIDSaveCheck = bIDSaveContinue;
+
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSaveCheck(groupID))
+                bIDSaveCheck = true;
+
+            if(bIDSaveContinue)
+            {
+                string strEncID = "";
+                strEncID = sgSettingProc.GetSettingUID(groupID);
+                if (strEncID == null || strEncID.Equals(""))
+                    return;
+                string strID = "";
+                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                id = strID;
+            }
+           
             StateHasChanged();
         }
 
@@ -1160,7 +1187,7 @@
         *@
 
 
-        // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
+    // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
         {
@@ -1172,6 +1199,7 @@
         }
 
         strAutoLogin = XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX");        // 자동로그인
+        strIDSave = XmlConf.GetTitle("T_ETC_IDSAVE_CHECKBOX");        // ID 저장
     }
 
 
@@ -1642,10 +1670,22 @@
 
                         if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(groupId) == true)
                         {
-                            SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                            string strEncID = "";
-                            sgRSACrypto.ValueEncrypt(id, out strEncID);
-                            sgSettingProc.SetSettingUID(groupId, strEncID);
+                            if(bIDSaveCheck)
+                            {
+                                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                                string strEncID = "";
+                                if ((!id.Equals("")) & (id != null))
+                                {
+                                    sgRSACrypto.ValueEncrypt(id, out strEncID);
+                                    sgSettingProc.SetSettingUID(groupId, strEncID);
+                                    sgSettingProc.SetSettingIDSave(groupId, true);
+                                }
+                            }
+                            else
+                            {
+                                sgSettingProc.SetSettingIDSave(groupId, false);
+                            }
+                            
                         }
                     }
 
@@ -2247,10 +2287,21 @@
                 // if (siteConfig.GetUseLoginIDSave(groupId) == true)
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(groupId))
                 {
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    string strEncID = "";
-                    sgRSACrypto.ValueEncrypt(id, out strEncID);
-                    sgSettingProc.SetSettingUID(groupId, strEncID);
+                    if(bIDSaveCheck)
+                    {
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        string strEncID = "";
+                        if ((!id.Equals("")) & (id != null))
+                        {
+                            sgRSACrypto.ValueEncrypt(id, out strEncID);
+                            sgSettingProc.SetSettingUID(groupId, strEncID);
+                            sgSettingProc.SetSettingIDSave(groupId, true);
+                        }
+                    }
+                    else
+                    {
+                        sgSettingProc.SetSettingIDSave(groupId, false);
+                    }                            
                 }
 
 
@@ -2926,6 +2977,7 @@
             StateHasChanged();
         }
     }
+    public void SaveIDCheckStateChange() => bIDSaveCheck = (!bIDSaveCheck);
 
     /// <summary>
     /// 사후결재 사용유무에 대한 초기 checkBox의 check 상태 유무를 저장
