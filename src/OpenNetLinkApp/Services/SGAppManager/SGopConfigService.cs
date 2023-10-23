@@ -36,6 +36,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseLoginIDSave(int groupId);
 
+        public bool GetUseLoginIDSaveCheck(int groupId);
+
         public bool GetUseAutoLogin(int groupId);
 
         public bool GetUseAutoLoginCheck(int groupId);
@@ -401,6 +403,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseLoginIDSave(int groupId)
         {
             return AppConfigInfo[groupId].bUserIDSave;
+        }
+        public bool GetUseLoginIDSaveCheck(int groupId)
+        {
+            return AppConfigInfo[groupId].bUserIDSaveCheck;
         }
         public bool GetUseAutoLogin(int groupId)
         {
