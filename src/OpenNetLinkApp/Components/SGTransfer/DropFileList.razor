@@ -148,7 +148,7 @@
     public bool bAllCheck = false;
     public bool tempTest = false;
 
-    public int _groupId = 0;
+    public int _groupId = -1;
 
     /// <summary>최근에 추가된 파일 수량</summary>
     public int CurrentDragFileAddCount = 0;
@@ -1279,14 +1279,13 @@
         bViewDropFileAddError = false; // SGAppMgrSvc.OpConfigInfoService.GetUseDropErrorUI();
         InitText();
 
-
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
         if (groupID > -1)
-            bHideTitleDesc = SGAppMgrSvc.OpConfigInfoService.GetUseHideTitleDesc(groupID);
+            bHideTitleDesc = SGAppMgrSvc.OpConfigInfoService.GetUseHideTitleDesc(groupID);*@
     }
 
     private void onDrop()
@@ -1852,26 +1851,36 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        _groupId = groupID;
-        //2022.10.28 이동 - 다중망 접속 시 초기화면이 [파일전송] 화면인 경우, 해당 망의 이벤트와 리스트로 재배치
-        HSCmdCenter.sgPageEvent.SetRMouseFileAddEventAdd(groupID, RMouseFileAction);
-        InitText();
-        //action1 = HandleFileInputChange;
-        //action2 = HandleFileInputChange;
-        //SGFileExamEvent = FileExamResult;
-        HSCmdCenter.sgPageEvent.SetFileExamNotiEventAdd(groupID, FileExamResult);
-        PageStatusData pageSData = pageService.GetPageStatus(groupID);
-        HsStreamList = pageSData.GetFileDragListData();
-        fileAddManage = pageSData.GetFileAddManage();
+        if (_groupId < 0 || _groupId != groupID)
+        {
+            _groupId = groupID;
 
-        base.OnAfterRender(firstRender);
-        RMouseFileAddEvent RMouseFileAdd = null;
-        RMouseFileAdd = HSCmdCenter.sgPageEvent.GetRMouseFileAddEvent(groupID);
-        string strRMFilePath = PageStatusData.GetRMFIlePath();
-        if ((RMFileExist(strRMFilePath) == true) && (RMouseFileAdd != null))
-            RMouseFileAdd(groupID);
+            //2022.10.28 이동 - 다중망 접속 시 초기화면이 [파일전송] 화면인 경우, 해당 망의 이벤트와 리스트로 재배치
+            HSCmdCenter.sgPageEvent.SetRMouseFileAddEventAdd(groupID, RMouseFileAction);
+            InitText();
+            //action1 = HandleFileInputChange;
+            //action2 = HandleFileInputChange;
+            //SGFileExamEvent = FileExamResult;
+            HSCmdCenter.sgPageEvent.SetFileExamNotiEventAdd(groupID, FileExamResult);
+            PageStatusData pageSData = pageService.GetPageStatus(groupID);
+            HsStreamList = pageSData.GetFileDragListData();
+            fileAddManage = pageSData.GetFileAddManage();
+
+            bHideTitleDesc = SGAppMgrSvc.OpConfigInfoService.GetUseHideTitleDesc(groupID);
+
+            base.OnAfterRender(firstRender);
+            RMouseFileAddEvent RMouseFileAdd = null;
+            RMouseFileAdd = HSCmdCenter.sgPageEvent.GetRMouseFileAddEvent(groupID);
+            string strRMFilePath = PageStatusData.GetRMFIlePath();
+            if ((RMFileExist(strRMFilePath) == true) && (RMouseFileAdd != null))
+                RMouseFileAdd(groupID);
+
+            StateHasChanged();
+        }
+
         return stopClick();
     }
+
     private async Task stopClick()
     {
         await jsRuntime.InvokeAsync<object>("stopClick");
@@ -2677,4 +2686,11 @@
         if (pgRefreshEvent != null)
             pgRefreshEvent();
     }
+
+
+    public void Refresh()
+    {
+        StateHasChanged();
+    }
+
 }
