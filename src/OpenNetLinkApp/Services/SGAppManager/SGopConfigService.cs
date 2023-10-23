@@ -31,6 +31,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseAppLoginType(int groupId);
 
         public int GetAppLoginType(int groupId);
+        public int GetCustomLoginType(int groupId);
+
+        public string GetCustomLoginHttpUrl(int groupId);
 
         public bool GetUseGPKILogin(int groupId);
 
@@ -393,6 +396,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public int GetAppLoginType(int groupId)
         {
             return AppConfigInfo[groupId].LoginType;
+        }
+        public int GetCustomLoginType(int groupId)
+        {
+            return AppConfigInfo[groupId].CustomLoginType;
+        }
+        public string GetCustomLoginHttpUrl(int groupId)
+        {
+            return AppConfigInfo[groupId].CustomLoginHttpUrl;
         }
         public bool GetUseGPKILogin(int groupId)
         {

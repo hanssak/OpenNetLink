@@ -12,6 +12,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using System.Threading
 @using OpenNetLinkApp.Common
+@using OpenNetLinkApp.LoginMethod
 @using System.Text.Json;
 
 @inherits LayoutComponentBase
@@ -170,7 +171,7 @@
         hsNetWork = HSCmdCenter.GetConnectNetWork(refGoogleOTP.nGroupID);
         if (hsNetWork != null)
         {
-            // 구글Otp 값 어느 Tag에 보낼것인지 협의후 동작            
+            // 구글Otp 값 어느 Tag에 보낼것인지 협의후 동작
             hsNetWork.SetGoogleOtp(refGoogleOTP.strUserOTP);
 
             hsNetWork.SendSeedKeyBindFor2FactorAuth();
@@ -193,8 +194,6 @@
     /// <param name="e"></param>
     private async void Show2FactorAuth(int groupID, PageEventArgs e)
     {
-
-
         if (e.strDummy == "google_otp")
         {
 
@@ -469,22 +468,22 @@
             stRtn = "1";
 #else
 
-        stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
-        if (stRtn == null || (1 > stRtn.Length))
-        {
-            CLog.Here().Information($"Result - json, Data is null OR 0 Size");
-            ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
-            return false;
-        }
+    stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
+    if (stRtn == null || (1 > stRtn.Length))
+    {
+        CLog.Here().Information($"Result - json, Data is null OR 0 Size");
+        ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
+        return false;
+    }
 
-        // json으로 온 Data에서 실제 data 뽑아내는 동작
-        using (JsonDocument document = JsonDocument.Parse(stRtn))
-        {
-            JsonElement jroot = document.RootElement;
-            nCode = jroot.GetProperty("code").GetInt32();
-            strMsg = jroot.GetProperty("msg").GetString();
-            strData = jroot.GetProperty("data").GetString();
-        }
+    // json으로 온 Data에서 실제 data 뽑아내는 동작
+    using (JsonDocument document = JsonDocument.Parse(stRtn))
+    {
+        JsonElement jroot = document.RootElement;
+        nCode = jroot.GetProperty("code").GetInt32();
+        strMsg = jroot.GetProperty("msg").GetString();
+        strData = jroot.GetProperty("data").GetString();
+    }
 #endif
 
             CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
@@ -573,6 +572,34 @@
 
             if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
                 HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginUITypeData);
+            else if (eLoginUITypeData == eLoginType.eLOGINTYPE_CUSTOM)
+            {
+                if(SGAppMgrSvc.OpConfigInfoService.GetCustomLoginType(nGroupID) == (int)Enums.EnumCustomLoginType.LoginTemplate01)
+                {
+                    //외부 그룹웨어 연동
+                    try
+                    {
+                        LoginTemplate01 loginTemplate01 = new LoginTemplate01();
+                        string url = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginHttpUrl(nGroupID);
+                        (bool, string) resultMsg = loginTemplate01.Login(id, pw, url);
+                        CLog.Here().Information($"result bool  : {resultMsg.Item1} , result Msg : {resultMsg.Item2}");
+                        if (!resultMsg.Item1)
+                        {
+                            ShowMessage("error", resultMsg.Item2);
+                            bStartedLogin = false;
+                            return;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        CLog.Here().Error($"doCustomLogin01 - Exception(Msg) : {ex.Message}");
+                        ShowMessage("error", XmlConf.GetErrMsg("W_0187"));
+                        return;
+                    }
+
+                    HSCmdCenter.LoginNotCheckPw(nGroupID, id, pw, strCurCliVersion, otp, 0);
+                }
+            }
             else
                 HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginUITypeData);
 
@@ -835,7 +862,7 @@
             {
                 eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
                 pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
-                // goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);                
+                // goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
                 goToPage.InvokeAsync(strInvokeSendParam);
                 closePopUp();
                 return false;
@@ -1198,13 +1225,13 @@
                 HSCmdCenter.SetDownLoadPath(groupID, strPath);
                 HSCmdCenter.SetBaseDownLoadPath(groupID, strPath);
                 //CtrlSideUISvc.SetRecvDownPath(groupID, strPath);
-            }            
+            }
         }
         return strPath;
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     public void SetReconnectStart(int groupId)
@@ -1269,9 +1296,9 @@
 
 
                 HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));
-                string recvPath =SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
-                
-                if(SGAppMgrSvc.OpConfigInfoService.GetMakeRecvDownPathShortCut(groupId))//바탕화면 바로가기 설정
+                string recvPath = SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
+
+                if (SGAppMgrSvc.OpConfigInfoService.GetMakeRecvDownPathShortCut(groupId))//바탕화면 바로가기 설정
                 {
                     string linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.ToName);
                     CtrlSideUISvc.ChangeRecvDownPathLink(linkName, recvPath);
@@ -1380,7 +1407,7 @@
 
                 pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
-                // 
+                //
                 LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
                 loginAfterSGHeaderUI = HSCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
                 if (loginAfterSGHeaderUI != null)

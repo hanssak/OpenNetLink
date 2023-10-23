@@ -2,6 +2,7 @@ using WebWindows.Blazor;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Reflection;
 
 //테스트
 namespace OpenNetLinkApp
@@ -52,7 +53,7 @@ namespace OpenNetLinkApp
                 arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
                 arg[1] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartTrayMove;
 
-                string windowTitle = Services.SGAppManager.SGopConfigService.AppConfigInfo[0].strWindowTitle;
+                string windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
                 if (String.IsNullOrEmpty(windowTitle))
                     windowTitle = "OpenNetLink";
 
@@ -61,7 +62,11 @@ namespace OpenNetLinkApp
             else
             {
                 int nhWnd = 0;
-                nhWnd = FindWindow("WebWindow", "OpenNetLink");
+                string windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
+                if (String.IsNullOrEmpty(windowTitle))
+                    windowTitle = "OpenNetLink";
+
+                nhWnd = FindWindow("WebWindow", windowTitle);
                 if (nhWnd != 0 && IsWindow(nhWnd))
                 {
                     PostMessage(nhWnd, 0x0400+0x0003, 0, 0);

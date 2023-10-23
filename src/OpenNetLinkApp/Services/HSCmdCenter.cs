@@ -2104,12 +2104,12 @@ namespace OpenNetLinkApp.Services
                 hsNetWork.bIgnoreSessionDuplicate = bIgnoreSessionDuplicate;
         }
 
-        public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType = 0)
+        public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType = 0, int passWordType = 0)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             int ret = 0;
             if (hsNetWork != null)
-                ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, 0, loginType);
+                ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, passWordType, loginType);
             return 0;
         }
 

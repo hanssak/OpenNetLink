@@ -635,7 +635,11 @@
         if (nDrawPageGroupID < 0)
             return false;
 
-        return (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nDrawPageGroupID));
+        if ((pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN || pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_CUSTOM) && SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nDrawPageGroupID))
+            return true;
+
+        return false;
+        
     }
 
 

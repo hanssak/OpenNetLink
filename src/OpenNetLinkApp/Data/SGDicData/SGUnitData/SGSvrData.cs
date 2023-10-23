@@ -20,7 +20,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eLOGINTYPE_NAC=7,
         eLOGINTYPE_SSO2=8,
         eLOGINTYPE_GPKI=9,
-        eLOGINTYPE_GOOGLE_OTP=10
+        eLOGINTYPE_GOOGLE_OTP=10,
+        eLOGINTYPE_CUSTOM = 11,
     }
     public class SGSvrData : SGData
     {
@@ -73,6 +74,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     case eLoginType.eLOGINTYPE_SSO2:       return "SSO2";
                     case eLoginType.eLOGINTYPE_GPKI:       return "GPKI";
                     case eLoginType.eLOGINTYPE_GOOGLE_OTP: return "GOOGLE_OTP";
+                    case eLoginType.eLOGINTYPE_CUSTOM:     return "CUSTOM";
                     default:                               return "ORIGIN";
                 }
             }

@@ -16,6 +16,10 @@ namespace OpenNetLinkApp.Models.SGConfig
         //로그인 관련 기능
         public bool bUseAppLoginType { get; set; }                       //사용자 지정 로그인타입 사용 여부
         public int LoginType { get; set; }                                   //사용자 지정 로그인타입 지정
+
+        public int CustomLoginType { get; set; }                              //사이트별 로그인 방식 커스터마이징
+
+        public string CustomLoginHttpUrl { get; set; }                       //로그인 연동을 위한 사이트 URL
         public bool bUseGpkiLogin { get; set; }                            // GPKI 로그인 사용 여부
         public bool bUserIDSave { get; set; }                                      // 로그인한 ID 저장 여부
         public bool bAutoLogin { get; set; }                                       // 자동로그인 사용 여부.
@@ -192,8 +196,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseEmailApprUIwait { get; set; }             // Email 결재UI가 열리면 승인대기중인 화면으로 조회되게할지 유무
 
         public string strVirusAptDetailCustomMsg { get; set; }
-
-        public string strWindowTitle { get; set; }            // 윈도우 창 이름
 
         public bool bHideMoveTrayMsgPopup { get; set; }       // Tray로 보낼때,
 
