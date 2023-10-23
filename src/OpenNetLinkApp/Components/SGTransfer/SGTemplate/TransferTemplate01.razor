@@ -33,189 +33,202 @@
 @inject PageStatusService pageService
 @inject IFileReaderService fileReaderService
 
-<div class="row" id="divUpperContent">
+<div class="row">
     <div class="col-md-12">
-        <div id="divRightUpperSide">
-            <div id="divDropFile" class="card-body p-0" style="height:20vh">
-                <DropFileList @ref="refDropFileList" OnCompleteDragFileExam="AskFileSendAlert"></DropFileList>
+        <div class="card card-navy card-outline card-boder1">
+            <div class="form-check p-2">
+                <table style="width:100%">
+                    <tr>
+                        @if (!bAfterApprChkHIde)
+                        {
+                            <td>
+                                <input type="checkbox" class="form-check-input ml-0" id="exampleCheck2" checked="@bAfterCheck" @onclick="(OnChangeAfterCheck.InvokeAsync)" hidden="@bAfterApprChkHIde" disabled="@bAfterApprDisable">
+                            </td>
+                            <td>
+                                <label class="form-check-label" for="exampleCheck2" hidden="@bAfterApprChkHIde"><b>@strAfterApprove</b></label>
+                            </td>
+                        }
+
+                        @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileSelectDelete(groupIDbyParam))
+                        {
+                            <td>
+                                <label><font color="red">@strSelectFileDelComment</font></label>
+                            </td>
+                        }
+                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                        {
+                            <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                            <td class="pr-2">
+                                <button type="button" @onclick="@(OnBasicSelectOpenPopup.InvokeAsync)" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
+                            </td>
+                        }
+                        <td style="display:flex; flex-direction:row;">
+                            <button type="button" class="btn btn-md btn-green ml-0" style="flex:1" @onclick="@(OnCheckApprLine.InvokeAsync)"><i class="fas fa-share"></i>@strFileSend</button>
+                            <button type="button" class="btn btn-md btn-blue ml-1" style="flex:1" @onclick="@(OnOpenFileDialogOpenPopup.InvokeAsync)"><i class="fas fa-file-upload"></i>@strFileReg</button>
+                            <button type="button" class="btn btn-md btn-black ml-1" style="flex:1" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
+                            <button type="button" class="btn btn-md btn-red ml-1" style="flex:1" @onclick="@(e => RemoveSelectFile())" hidden="@bFileSelectDeleteBtn"><i class="fas fa-times"></i>@strSelectFileDel</button>
+
+                        </td>
+                    </tr>
+                </table>
             </div>
-            @*제목과 설명은 삭제*@
-            <div class="form-group  clearfix mt-1 mb-1">
-                <div class="pt-1">
-                    <div class="form-check p-0">
-                        <table style="width:100%">
-                            <tr>
-                                @if (!bAfterApprChkHIde)
-                                {
-                                    <td>
-                                        <input type="checkbox" class="form-check-input ml-0" id="exampleCheck2" checked="@bAfterCheck" @onclick="(OnChangeAfterCheck.InvokeAsync)" hidden="@bAfterApprChkHIde" disabled="@bAfterApprDisable">
-                                    </td>
-                                    <td>
-                                        <label class="form-check-label" for="exampleCheck2" hidden="@bAfterApprChkHIde"><b>@strAfterApprove</b></label>
-                                    </td>
-                                }
+            <div id="divUpperContent" class="col-md-12">
+                <div id="divDropFile" class="card-body p-0" style="height:18vh">
+                    <DropFileList @ref="refDropFileList" OnCompleteDragFileExam="AskFileSendAlert"></DropFileList>
+                </div>
+            </div>
+            <hr class="m-2"/>
+            <div id="divMiddleContent">
+                <div class="row pr-2 pl-2">
+                    <div class="col-md-3 pr-0">
+                        <div id="divFileTree" class="card card-boder1" style="background-color:white; border-color:#d7d8db;">
+                            <FileTree @ref="refFileTree" Height="100%" OnSelectPathFromFileTree="changeSelectPath"></FileTree>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <!-- 파일리스트 -->
+                        <div id="divFileList" class="card card-boder1" style="background-color:white; border-color:#d7d8db; overflow:auto;">
+                            <table id="tableFileList" class="table table-hover table-head-fixed" style="font-size: 13px; line-height: 20px; min-width:740px;">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width:400px;background-color:white; color:black;">
+                                            @*파일명 헤더*@
+                                            <div @onclick="@(()=> OnClickHeader("Name"))">
+                                                <label class="pr-2">
+                                                    @strFileName
+                                                </label>
+                                                @if (SortingKey == "Name")
+                                                {
+                                                    <i class=@((SortingAesc ? "fas fa-arrow-up" : "fas fa-arrow-down") + " pr-2") />
+                                                }
+                                                @*</label> *@
+                                            </div>
+                                        </th>
+                                        <th style="background-color:white; color:black;">
+                                            @*크기 헤더*@
+                                            <div @onclick="@(()=> OnClickHeader("Size"))" style="width:70px;text-align:right;">
+                                                <label class="pr-2">
+                                                    @strFileSize
+                                                </label>
+                                                @if (SortingKey == "Size")
+                                                {
+                                                    <i class=@((SortingAesc ? "fas fa-arrow-up" : "fas fa-arrow-down") + " pr-2") />
+                                                }
+                                                @*</label>  *@
+                                            </div>
+                                        </th>
+                                        <th style="background-color:white; color:black;">
+                                            @*유형 헤더*@
+                                            <div @onclick="@(()=> OnClickHeader("Ext"))" style="width:70px;text-align:left;">
+                                                <label class="pr-2">
+                                                    @strFileType
+                                                </label>
+                                                @if (SortingKey == "Ext")
+                                                {
+                                                    <i class=@((SortingAesc ? "fas fa-arrow-up" : "fas fa-arrow-down") + " pr-2") />
+                                                }
+                                            </div>
+                                        </th>
+                                        <th style="background-color:white; color:black;">
+                                            @*수정한 날짜 헤더*@
+                                            <div @onclick="@(()=> OnClickHeader("LastModeified"))" style="width:200px;text-align:left">
+                                                <label class="pr-2">
+                                                    @strLastModDay
+                                                </label>
+                                                @if (SortingKey == "LastModeified")
+                                                {
+                                                    <i class=@((SortingAesc ? "fas fa-arrow-up" : "fas fa-arrow-down") + " pr-2") />
+                                                }
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (sgFile != null && sgFile.Count > 0)
+                                    {
+                                        @foreach (SGFileInfo item in sgFile)
+                                        {
+                                            @if (item.Type == 3) //최상위 이동 버튼
+                                            {
+                                                <tr data-draggable="item" draggable="true" aria-grabbed="false" style="line-height:18px; display:table-row; border-width:0;" title=@item.Name value=@item.Path label=@(item.dispIndex+1) onclick="refreshList('@(item.Path.Replace(@"\", @"\\"))')">
+                                                    <td draggable="true" colspan="4" class="pr-2">
+                                                        <i class="@item.GetIcon() text-center" style="font-size:1.2em; width:18px; color:@(item.GetIconColor());"></i>
+                                                        @item.Name
+                                                    </td>
+                                                </tr>
+                                            }
+                                            else if (item.Type == 2) //디렉토리
+                                            {
+                                                <tr data-draggable="item" draggable="true" aria-grabbed="false" style="line-height:18px; display:table-row; border-width:0;" title=@item.Name value=@item.Path label=@(item.dispIndex+1) ondblclick="refreshList('@(item.Path.Replace(@"\", @"\\"))')">
+                                                    <td draggable="true" colspan="4" class="pr-2">
+                                                        <i class="@item.GetIcon() text-center" style="font-size:1.2em; width:18px; color:@(item.GetIconColor());"></i>
+                                                        @item.Name
+                                                    </td>
+                                                </tr>
+                                            }
+                                            else if (item.Type == 1) //파일목록
+                                            {
+                                                <tr data-draggable="item" draggable="true" aria-grabbed="false" style="line-height:18px; display:table-row; border-width:0;" title=@item.Name value=@item.Path label=@(item.dispIndex+1)>
+                                                    <td draggable="true" class="text-truncate pr-2">
+                                                        <i class="@item.GetIcon() text-center" style="font-size:1.2em; width:18px; color:@(item.GetIconColor());"></i>
+                                                        @item.Name
+                                                    </td>
 
-                                @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileSelectDelete(groupIDbyParam))
-                                {
-                                    <td>
-                                        <label><font color="red">@strSelectFileDelComment</font></label>
-                                    </td>
-                                }
-                                @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                                {
-                                    <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
-                                    <td class="pr-2">
-                                        <button type="button" @onclick="@(OnBasicSelectOpenPopup.InvokeAsync)" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
-                                    </td>
-                                }
-                                <td style="display:flex; flex-direction:row;">
-                                    <button type="button" class="btn btn-md btn-green ml-0" style="flex:1" @onclick="@(OnCheckApprLine.InvokeAsync)"><i class="fas fa-share"></i>@strFileSend</button>
-                                    <button type="button" class="btn btn-md btn-blue ml-1" style="flex:1" @onclick="@(OnOpenFileDialogOpenPopup.InvokeAsync)"><i class="fas fa-file-upload"></i>@strFileReg</button>
-                                    <button type="button" class="btn btn-md btn-black ml-1" style="flex:1" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
-                                    <button type="button" class="btn btn-md btn-red ml-1" style="flex:1" @onclick="@(e => RemoveSelectFile())" hidden="@bFileSelectDeleteBtn"><i class="fas fa-times"></i>@strSelectFileDel</button>
-
-                                </td>
-                            </tr>
-                        </table>
+                                                    <td draggable="true" class="text-truncate text-right pr-2" style="width:70px;">
+                                                        @(CsFunction.GetSizeStr(item.Size))
+                                                    </td>
+                                                    <td draggable="true" class="text-truncate text-left pl-2" style="width:70px;">
+                                                        @(item.Ext.Replace(".", ""))
+                                                    </td>
+                                                    <td draggable="true" class="text-truncate text-left pl-1" style="width:200px;">
+                                                        @(item.LastModeified)
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-<div class="row" id="divMiddleContent">
-    <div class="col-md-3 pr-0">
-        <div id="divFileTree" class="card" style="border-radius:0">
-            <FileTree @ref="refFileTree" Height="100%" OnSelectPathFromFileTree="changeSelectPath"></FileTree>
-        </div>
-    </div>
-    <div class="col-md-9">
-        <!-- 파일리스트 -->
-        <div id="divFileList" class="card" style="overflow:auto; border-radius:0">
-            <table id="tableFileList" class="table table-hover table-head-fixed" style="font-size: 13px; line-height: 20px; min-width:740px;">
-                <thead>
-                    <tr>
-                        <th style="min-width:400px;">
-                            @*파일명 헤더*@
-                            <div @onclick="@(()=> OnClickHeader("Name"))">
-                                <label class="pr-2">
-                                    @strFileName
-                                </label>
-                                @if (SortingKey == "Name")
+            <hr class="m-2"/>
+            <div id="divBottomContent" class="col-md-12 mb-2">
+                <div class="card card-boder1" style="background-color:white; border-color:#d7d8db;">
+                    <div class="card-body" style="height:10vh; overflow:auto;">
+                        <div id="divLeftUpperSide">
+                            <ul class="list-unstyled" style="font-size:11px;">
+                                @if (transferLogData != null)
                                 {
-                                    <i class=@((SortingAesc ? "fas fa-arrow-up" : "fas fa-arrow-down") + " pr-2") />
+                                    @foreach (SGTransferLogData log in transferLogData)
+                                    {
+                                        <li>@($"[ {log.LogDatetime} ] {log.Log}")</li>
+                                    }
                                 }
-                                @*</label> *@
-                            </div>
-                        </th>
-                        <th>
-                            @*크기 헤더*@
-                            <div @onclick="@(()=> OnClickHeader("Size"))" style="width:70px;text-align:right;">
-                                <label class="pr-2">
-                                    @strFileSize
-                                </label>
-                                @if (SortingKey == "Size")
-                                {
-                                    <i class=@((SortingAesc ? "fas fa-arrow-up" : "fas fa-arrow-down") + " pr-2") />
-                                }
-                                @*</label>  *@
-                            </div>
-                        </th>
-                        <th>
-                            @*유형 헤더*@
-                            <div @onclick="@(()=> OnClickHeader("Ext"))" style="width:70px;text-align:left;">
-                                <label class="pr-2">
-                                    @strFileType
-                                </label>
-                                @if (SortingKey == "Ext")
-                                {
-                                    <i class=@((SortingAesc ? "fas fa-arrow-up" : "fas fa-arrow-down") + " pr-2") />
-                                }
-                            </div>
-                        </th>
-                        <th>
-                            @*수정한 날짜 헤더*@
-                            <div @onclick="@(()=> OnClickHeader("LastModeified"))" style="width:200px;text-align:left">
-                                <label class="pr-2">
-                                    @strLastModDay
-                                </label>
-                                @if (SortingKey == "LastModeified")
-                                {
-                                    <i class=@((SortingAesc ? "fas fa-arrow-up" : "fas fa-arrow-down") + " pr-2") />
-                                }
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (sgFile != null && sgFile.Count > 0)
-                    {
-                        @foreach (SGFileInfo item in sgFile)
-                        {
-                            @if (item.Type == 3) //최상위 이동 버튼
-                            {
-                                <tr data-draggable="item" draggable="true" aria-grabbed="false" style="line-height:18px; display:table-row;" title=@item.Name value=@item.Path label=@(item.dispIndex+1) onclick="refreshList('@(item.Path.Replace(@"\", @"\\"))')">
-                                    <td draggable="true" colspan="4" class="pr-2">
-                                        <i class="@item.GetIcon() text-center" style="font-size:1.2em; width:18px; color:@(item.GetIconColor());"></i>
-                                        @item.Name
-                                    </td>
-                                </tr>
-                            }
-                            else if (item.Type == 2) //디렉토리
-                            {
-                                <tr data-draggable="item" draggable="true" aria-grabbed="false" style="line-height:18px; display:table-row;" title=@item.Name value=@item.Path label=@(item.dispIndex+1) ondblclick="refreshList('@(item.Path.Replace(@"\", @"\\"))')">
-                                    <td draggable="true" colspan="4" class="pr-2">
-                                        <i class="@item.GetIcon() text-center" style="font-size:1.2em; width:18px; color:@(item.GetIconColor());"></i>
-                                        @item.Name
-                                    </td>
-                                </tr>
-                            }
-                            else if (item.Type == 1) //파일목록
-                            {
-                                <tr data-draggable="item" draggable="true" aria-grabbed="false" style="line-height:18px; display:table-row;" title=@item.Name value=@item.Path label=@(item.dispIndex+1)>
-                                    <td draggable="true" class="text-truncate pr-2">
-                                        <i class="@item.GetIcon() text-center" style="font-size:1.2em; width:18px; color:@(item.GetIconColor());"></i>
-                                        @item.Name
-                                    </td>
-
-                                    <td draggable="true" class="text-truncate text-right pr-2" style="width:70px;">
-                                        @(CsFunction.GetSizeStr(item.Size))
-                                    </td>
-                                    <td draggable="true" class="text-truncate text-left pl-2" style="width:70px;">
-                                        @(item.Ext.Replace(".", ""))
-                                    </td>
-                                    <td draggable="true" class="text-truncate text-left pl-1" style="width:200px;">
-                                        @(item.LastModeified)
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-<div class="row" id="divBottomContent">
-    <div class="col-md-12">
-        <div class="card card-border mt-2" style="box-shadow:none;">
-            <div class="card-body clearfix" style="height:12vh; overflow:auto;">
-                <div id="divLeftUpperSide">
-                    <ul class="list-unstyled" style="font-size:11px;">
-                        @if (transferLogData != null)
-                        {
-                            @foreach (SGTransferLogData log in transferLogData)
-                            {
-                                <li>@($"[ {log.LogDatetime} ] {log.Log}")</li>
-                            }
-                        }
-                    </ul>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
+        @*        <div class="card card-border1 mt-2">
+                    <div class="card-body clearfix" style="height:12vh; overflow:auto;">
+                        <div id="divLeftUpperSide">
+                            <ul class="list-unstyled" style="font-size:11px;">
+                                @if (transferLogData != null)
+                                {
+                                    @foreach (SGTransferLogData log in transferLogData)
+                                    {
+                                        <li>@($"[ {log.LogDatetime} ] {log.Log}")</li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>*@
             </div>
         </div>
     </div>
 </div>
-
 <SGAlert @ref="refSGAlertAskFileSend" OnConfirm="@(arg=> AskFileSendAlertResult(arg, true))" OnCancel="@(arg=> AskFileSendAlertResult(arg, false))" Guid="AskFileSendAlert"></SGAlert>
 
 @code
@@ -528,9 +541,9 @@
     {
         try
         {
-            if(!OpConfigSvc.GetUseAskFileSendAlert(DragValue.groupId))
+            if (!OpConfigSvc.GetUseAskFileSendAlert(DragValue.groupId))
                 return;
-            
+
             if (HSCmdCenter.GetFileRecving(DragValue.groupId) || HSCmdCenter.GetFileSending(DragValue.groupId))
             {
                 CLog.Here().Information("AskFileSendAlert, 송/수신 중으로 Ask Popup Skip");
@@ -541,8 +554,8 @@
             bool chkAskState = AppConfigSvc.GetAskFileSend(DragValue.groupId);
             bool chkDontShowState = !chkAskState;
             string chkMessage = XmlConf.GetTitle("T_COMMON_ALLDAYCLOSE");
-            
-            if(chkDontShowState)
+
+            if (chkDontShowState)
             {
                 CLog.Here().Information("AskFileSendAlert, CtrlSideUI Checkbox Off로 Ask Popup Skip");
                 return;
@@ -561,8 +574,8 @@
         {
             bool chkAskState = !refSGAlertAskFileSend.CheckboxState;
             CtrlSideUISvc.SetAskFileSend(groupId, chkAskState);
-            
-            if(isConfirm)
+
+            if (isConfirm)
                 OnCheckApprLine.InvokeAsync(groupId);
         }
     }

@@ -636,7 +636,7 @@ window.exitLogIn = (trensferTemplate) => {
     //$("#main-body").css("height", "630px");
     var dirRightHeight = $("#divRightContent").css("height");
     var divRightUpper = $("#divRightUpperSide").css("height");
-
+    var divTemplateHeight = $("#divTransferTemplate").css("height");
 
     if (trensferTemplate == 0) {
         //var divRightBottom = $("#divRightBottomSide").css("height");
@@ -650,15 +650,14 @@ window.exitLogIn = (trensferTemplate) => {
     }
     else
     {        
-        if (divRightUpper != null) {
+        if (divTemplateHeight != null) {
             //$("#divLeftUpperSide").css("height", divRightUpper);
 
-            //중간 div의 컨트롤이 모두 overflow가 가능하므로, 템플릿 영역에서 상단/하단 Div 높이를 제한 값으로 설정
-            var divTemplateHeight = $("#divTransferTemplate").css("height");
+            //중간 div의 컨트롤이 모두 overflow가 가능하므로, 템플릿 영역에서 상단/하단 Div 높이를 제한 값으로 설정            
             var divUpperHeight = $("#divUpperContent").css("height");
             var divBottomHeight = $("#divBottomContent").css("height");
 
-            var divRest = parseInt(divTemplateHeight.replace("px", "") - divUpperHeight.replace("px", "") - divBottomHeight.replace("px", ""));
+            var divRest = parseInt(divTemplateHeight.replace("px", "") - divUpperHeight.replace("px", "") - divBottomHeight.replace("px", "") - 95);
             $("#divFileTree").css("height", divRest + "px");
             $("#divFileList").css("height", divRest + "px");
         }
@@ -926,6 +925,7 @@ window.adJustWindowsize = (trensferTemplate) => {
     $(window).resize(function () {
         var dirRightHeight = $("#divRightContent").css("height");
         var divRightUpper = $("#divRightUpperSide").css("height");
+        var divTemplateHeight = $("#divTransferTemplate").css("height");
         if (trensferTemplate == 0) {
             //var divRightBottom = $("#divRightBottomSide").css("height");
             var dirRightWidth = $("#divDropFile").css("width");
@@ -938,15 +938,14 @@ window.adJustWindowsize = (trensferTemplate) => {
         }
         else {
             
-            if (divRightUpper != null) {
+            if (divTemplateHeight != null) {
                 //$("#divLeftUpperSide").css("height", divRightUpper);
 
                 //중간 div의 컨트롤이 모두 overflow가 가능하므로, 템플릿 영역에서 상단/하단 Div 높이를 제한 값으로 설정
-                var divTemplateHeight = $("#divTransferTemplate").css("height");
                 var divUpperHeight = $("#divUpperContent").css("height");
                 var divBottomHeight = $("#divBottomContent").css("height");
 
-                var divRest = parseInt(divTemplateHeight.replace("px", "") - divUpperHeight.replace("px", "") - divBottomHeight.replace("px", ""));
+                var divRest = parseInt(divTemplateHeight.replace("px", "") - divUpperHeight.replace("px", "") - divBottomHeight.replace("px", "") - 95);
                 $("#divFileTree").css("height", divRest + "px");
                 $("#divFileList").css("height", divRest + "px");
             }            
