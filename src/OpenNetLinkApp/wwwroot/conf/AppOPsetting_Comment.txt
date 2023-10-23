@@ -5,6 +5,8 @@
 // agent 지정한 방식으로 login(siteConfig)
 bUseAppLoginType : 사용자 지정 로그인타입 사용 여부 ( true, false )
 LoginType : 사용자 지정 로그인타입 지정 (0 = IDPW, 1 = AD, 2 = Ldap, ....)
+CustomLoginType : 사이트별 로그인 방식 커스터마이징 
+CustomLoginHttpUrl : 로그인 연동을 위한 사이트 URL
 
 // 공통환경설정(일부)
 
