@@ -132,7 +132,7 @@
                                     // 다중접속일때에는 단일망에만 전달가능
                                     // 단일접속일때에는 3중망에 전달가능
                                     @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx != 0 &&
-                             (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                           (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                     {
 
                                         @if (bAddedClipBoardItem)
@@ -1822,7 +1822,7 @@
             {
                 if (dicCurrentAfterChkHide[nGroupID] != pageService.GetAfterApprChkHide(groupid))
                     dicCurrentAfterChkHide[nGroupID] = pageService.GetAfterApprChkHide(groupid);
-            }                
+            }
             else
                 dicCurrentAfterChkHide.Add(groupid, pageService.GetAfterApprChkHide(groupid));
 
@@ -2269,12 +2269,13 @@
                         case (int)Enums.EnumDrmType.SoftCamp:
                             {
                                 SGSoftCampDRM lib = new SGSoftCampDRM();
+                                string grade = SGAppMgrSvc.OpConfigInfoService.GetSoftCampGrade(Convert.ToInt32(e.NetWorkID));
                                 foreach (string key in e.MsgRecode.Keys)
                                 {
                                     if (!FileAddManage.IsDRMFilePath(key))
                                     {
                                         //DRM 걸기
-                                        int ret = lib.DrmEncrypt(key);
+                                        int ret = lib.DrmEncrypt(key, grade);
                                         CLog.Here().Information($"{key} DRM Result  : {ret}");
                                     }
                                     else

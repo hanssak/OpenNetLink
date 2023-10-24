@@ -1,3 +1,5 @@
+using Serilog;
+using AgLogManager;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -51,11 +53,13 @@ namespace OpenNetLinkApp.LoginMethod
 
             string method = "GET";
             string contentType = "application/json; utf-8";
-
+            
             //전송
             RequestParameter requestParameter = new RequestParameter(id, strEncPw);
+            Log.Logger.Here().Information($"requestParameter : {requestParameter.GetJsonString()}");
             string strResult = WebRequestCommon(method, contentType, url, 10, requestParameter.GetJsonString());
             string msg = "";
+            Log.Logger.Here().Information($"responseParameter : {strResult}");
             if (!String.IsNullOrEmpty(strResult))
             {
                 ResponseParameter response = JsonSerializer.Deserialize<ResponseParameter>(strResult);
@@ -99,7 +103,7 @@ namespace OpenNetLinkApp.LoginMethod
             WebRequest wreq = WebRequest.Create(url);
             wreq.Method = method;
             wreq.Timeout = ReqTimeOut;
-            wreq.ContentType = "application/json; utf-8";
+            wreq.ContentType = contentType;
 
             using (var streamWriter = new StreamWriter(wreq.GetRequestStream())) //전송
             {

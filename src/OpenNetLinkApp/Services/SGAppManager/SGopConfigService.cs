@@ -217,7 +217,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseDrmAfterFileReceive(int groupId);
 
         public int GetDrmType(int groupId);
-
+        public string GetSoftCampGrade(int groupId);
 
         public bool GetUseHideApprLine(int groupId);
 
@@ -1056,6 +1056,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public int GetDrmType(int groupId)
         {
             return AppConfigInfo[groupId].nDrmType;
+        }
+        public string GetSoftCampGrade(int groupId)
+        {
+            return AppConfigInfo[groupId].strSoftCampGrade;
         }
 
 

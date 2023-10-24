@@ -16,9 +16,9 @@ namespace OpenNetLinkApp.Data.SGDicData.DRM
         [DllImport(strSoftCampDrmLibName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         public static extern int DSCSGradeEncryptFileV2(string stSource, string grade);
 
-        public int DrmEncrypt(string source)
+        public int DrmEncrypt(string source, string grade)
         {
-            string grade = "0000004";
+            //string grade = "0000004";
             int ret = DSCSGradeEncryptFileV2(source, grade);
 
             //ret == 0 암호화 실패
