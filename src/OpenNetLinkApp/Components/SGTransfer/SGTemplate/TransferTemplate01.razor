@@ -91,7 +91,7 @@
                             <table id="tableFileList" class="table table-hover table-head-fixed" style="font-size: 13px; line-height: 20px; min-width:740px;">
                                 <thead>
                                     <tr>
-                                        <th style="min-width:400px;background-color:white; color:black;">
+                                        <th style="min-width:400px;background-color:white; color:black; box-shadow:inset 0 2px 0 #c1d4e9, inset 0 -2px 0 #c1d4e9;">
                                             @*파일명 헤더*@
                                             <div @onclick="@(()=> OnClickHeader("Name"))">
                                                 <label class="pr-2">
@@ -104,7 +104,7 @@
                                                 @*</label> *@
                                             </div>
                                         </th>
-                                        <th style="background-color:white; color:black;">
+                                        <th style="background-color:white; color:black; box-shadow:inset 0 2px 0 #c1d4e9, inset 0 -2px 0 #c1d4e9;">
                                             @*크기 헤더*@
                                             <div @onclick="@(()=> OnClickHeader("Size"))" style="width:70px;text-align:right;">
                                                 <label class="pr-2">
@@ -117,7 +117,7 @@
                                                 @*</label>  *@
                                             </div>
                                         </th>
-                                        <th style="background-color:white; color:black;">
+                                        <th style="background-color:white; color:black; box-shadow:inset 0 2px 0 #c1d4e9, inset 0 -2px 0 #c1d4e9;">
                                             @*유형 헤더*@
                                             <div @onclick="@(()=> OnClickHeader("Ext"))" style="width:70px;text-align:left;">
                                                 <label class="pr-2">
@@ -129,7 +129,7 @@
                                                 }
                                             </div>
                                         </th>
-                                        <th style="background-color:white; color:black;">
+                                        <th style="background-color:white; color:black; box-shadow:inset 0 2px 0 #c1d4e9, inset 0 -2px 0 #c1d4e9;">
                                             @*수정한 날짜 헤더*@
                                             <div @onclick="@(()=> OnClickHeader("LastModeified"))" style="width:200px;text-align:left">
                                                 <label class="pr-2">
@@ -554,6 +554,7 @@
             bool chkAskState = AppConfigSvc.GetAskFileSend(DragValue.groupId);
             bool chkDontShowState = !chkAskState;
             string chkMessage = XmlConf.GetTitle("T_COMMON_ALLDAYCLOSE");
+            chkMessage+= XmlConf.GetInfoMsg("I_0247");
 
             if (chkDontShowState)
             {

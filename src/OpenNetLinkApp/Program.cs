@@ -28,7 +28,7 @@ namespace OpenNetLinkApp
 
             bool flagMutex;
             System.Threading.Mutex m_hMutex = new System.Threading.Mutex(true, "OpenNetLink", out flagMutex);
-
+            
 #if DEBUG
             if (true)
 #else
@@ -45,7 +45,9 @@ namespace OpenNetLinkApp
                 }
                 else 
                 {
-                    cwdPath = Environment.CurrentDirectory;
+                    //cwdPath = Environment.CurrentDirectory;
+                    //관리자가 사용자를 지정하여 OpenNetLink 실행 시에도 정상적인 경로로 표시하기 위해 변경
+                    cwdPath = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
                 }
 
                 Directory.SetCurrentDirectory(cwdPath);
