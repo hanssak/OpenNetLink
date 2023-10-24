@@ -237,6 +237,7 @@ bUseClipTypeImage : IMAGE로 클립보드 전송 사용 유무
 bHiddenLoginLogo : Main Login 창 좌측 로고 숨김 처리
 bUseDrmAfterFileReceive :           //파일 수신 완료 후 DRM 사용 여부
 nDrmType :                          //DRM 종류 - 1. SoftCamp, 2.Fasso
+strSoftCampGrade:                   // SoftCamp 연동 시 보안등급
 bHideApprLine : 파일전송에 결재라인 UI상에 숨길지 유무 (true:숨김, 기본값: false)
 bHideTitleDesc : 파일전송에 제목/설명 UI상에 숨길지 유무 (true:숨김, 기본값: false)
 

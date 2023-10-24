@@ -43,7 +43,7 @@ namespace OpenNetLinkApp.LoginMethod
         public (bool, string) Login(string id, string pw, string url)
         {
             bool result = false;
-
+            Log.Logger.Here().Information($"Url : {url}");
             //암호화
             string key = "SnuhGwEnDSecValK";
             string iv = "SnuhGwVecValKeyU";
