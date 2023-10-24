@@ -17,9 +17,9 @@
             <div class="modal-footer1">
                 @if(UseCheckbox)
                 {
-                    <div class="icheck-primary" style="margin-right:260px;">
+                    <div class="icheck-primary" style="width:100%;">
                         <input type="checkbox" id="SGAlert-Checkbox" checked=@CheckboxState @onchange="(e => { CheckStateChange(e); })" />
-                        <label class="form-check-label" for="SGAlert-Checkbox"><b>@CheckboxMessage</b></label>
+                        <label for="SGAlert-Checkbox"><b>@((MarkupString)CheckboxMessage)</b></label>
                     </div>
                 }
                 @if (mode != 0)
