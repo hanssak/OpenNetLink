@@ -28,7 +28,11 @@ namespace OpenNetLinkApp
 
             bool flagMutex;
             System.Threading.Mutex m_hMutex = new System.Threading.Mutex(true, "OpenNetLink", out flagMutex);
-            
+
+            string windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
+            if (String.IsNullOrEmpty(windowTitle))
+                windowTitle = "OpenNetLink";
+
 #if DEBUG
             if (true)
 #else
@@ -55,19 +59,11 @@ namespace OpenNetLinkApp
                 arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
                 arg[1] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartTrayMove;
 
-                string windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
-                if (String.IsNullOrEmpty(windowTitle))
-                    windowTitle = "OpenNetLink";
-
                 ComponentsDesktop.Run<Startup>(windowTitle, "wwwroot/index.html", arg);
             }
             else
             {
                 int nhWnd = 0;
-                string windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
-                if (String.IsNullOrEmpty(windowTitle))
-                    windowTitle = "OpenNetLink";
-
                 nhWnd = FindWindow("WebWindow", windowTitle);
                 if (nhWnd != 0 && IsWindow(nhWnd))
                 {
