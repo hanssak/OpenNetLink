@@ -32,6 +32,11 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bVisibleLogOutButton { get; set; }                //상단의 [로그아웃] 버튼 표시 여부
         public bool bUseLoginCI { get; set; }                      //로그인 화면 상단에 CI 이미지 표시 여부
 
+        public int nLoginConnectLimitCount { get; set; }               //최초 프로그램 실행 시 서버 접속 Connect Limit 횟수
+
+        public int nLoginConnectDelaySecond { get; set; }           //최초 프로그램 실행 시 서버 접속 총 대기 시간
+                                                                    //예) 총 대기시간 3분이면 180 입력 - LimitConnect 횟수가 6이면 30초마다 Connect 시도
+
         //패스워드
         public bool bUserPWChange { get; set; }                   // 사용자 패스워드 변경 사용 여부.
 
@@ -205,7 +210,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
 
         public bool bUseCommonEnvNetNameRevert { get; set; }    // 공통환경설정에 수신폴더이름 위에 망방향 from To 를 반대로 표현
-        
+
 
         public bool bMakeRecvDownPathShortCut { get; set; }     //다운로드 수신폴더에 대한 바탕화면 바로가기 생성 여부 (Default : false)
         public bool bUseCheckZipFileInnerFileCount { get; set; }  // 1회 전송 가능 파일 검사 시 Zip 파일일 경우 내부 파일 전체를 Count에 포함

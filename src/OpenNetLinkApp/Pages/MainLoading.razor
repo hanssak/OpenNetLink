@@ -32,7 +32,7 @@
         </div>
         <!-- <div class="loading_title" @onclick="goLogIn"> -->
         <div class="loading_title">
-            @XmlConf.GetInfoMsg(bConnectServerTimeOut ? "I_0232" : "I_0212")
+            @_stateMessage
         </div>
     </section>
 </div>
@@ -50,6 +50,8 @@
 
     Timer conTimer = new Timer();
     private bool bConnectServerTimeOut = false;
+    private int currentConnectCount = 0;
+    private string _stateMessage = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -73,6 +75,8 @@
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+
+        _stateMessage = XmlConf.GetInfoMsg("I_0212");
 
         if (!string.IsNullOrEmpty(NetWorkSvc.NetWorkInfo[0].IPAddress))
             loadingProcess();
@@ -112,6 +116,7 @@
         }
 
         //HSCmdCenter.sgPageEvent.SetSvrEventAdd(0, SvrResult);
+        //서버 접속 시도
         HSCmdCenter.Init();
 
         for (int i = 0; i < listNetWork.Count; i++)
@@ -134,9 +139,12 @@
         pageService.m_approveMenuArray = new ISGSideBarUI[listNetWork.Count];
         pageService.m_approveMenuArray.Initialize();
 
-        // 30초간 서버에서 응답없으면 메세지 변경
-        conTimer.AutoReset = false;
-        conTimer.Interval = 30 * 1000;
+        // 서버에서 응답없으면 Connect 재시도
+        int interval = SGAppMgrSvc.OpConfigInfoService.GetLoginConnectDelaySecond(0) / SGAppMgrSvc.OpConfigInfoService.GetLoginConnectLimitCount(0);
+        currentConnectCount++;
+
+        conTimer.AutoReset = true;
+        conTimer.Interval = interval * 1000;
         conTimer.Elapsed += new ElapsedEventHandler(dayTimer_Elapsed);
         conTimer.Start();
     }
@@ -144,7 +152,21 @@
     private void dayTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
         CLog.Here().Information($@"{conTimer.Interval / 1000} sec after, Server Result Failed !!!");
-        bConnectServerTimeOut = true;
+        currentConnectCount++;
+        if (currentConnectCount > SGAppMgrSvc.OpConfigInfoService.GetLoginConnectLimitCount(0))
+        {
+            _stateMessage = XmlConf.GetInfoMsg("I_0232");
+            bConnectServerTimeOut = true;
+            conTimer.Stop();
+        }
+        else
+        {
+            _stateMessage = XmlConf.GetInfoMsg("I_0248");
+            _stateMessage = String.Format(_stateMessage, currentConnectCount);
+            //서버접속 재시도
+            HSCmdCenter.Init();
+        }
+
         StateHasChanged();
     }
 

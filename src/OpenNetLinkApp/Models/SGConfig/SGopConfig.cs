@@ -34,6 +34,11 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bVisibleLogOutButton { get; set; } = true;              //상단의 [로그아웃] 버튼 표시 여부
         public bool bUseLoginCI { get; set; } = false;                      //로그인 화면 상단에 CI 이미지 표시 여부
 
+        public int nLoginConnectLimitCount { get; set; } = 1;                 //최초 프로그램 실행 시 서버 접속 Connect Limit 횟수
+
+        public int nLoginConnectDelaySecond { get; set; } = 30;           //최초 프로그램 실행 시 서버 접속 총 대기 시간
+                                                                          //예) 총 대기시간 3분이면 180 입력 - LimitConnect 횟수가 6이면 30초마다 Connect 시도
+
         /// <summary>
         /// -1 : 바로 차단, 0 : 접속유무를 사용자에게 문의, 1 : 강제 접속 진행
         /// </summary>

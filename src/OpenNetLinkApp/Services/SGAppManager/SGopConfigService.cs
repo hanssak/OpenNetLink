@@ -214,6 +214,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetHiddenLoginLogo(int groupId);
         public bool GetUseLoginCI(int groupId);
 
+        public int GetLoginConnectLimitCount(int groupId);
+        public int GetLoginConnectDelaySecond(int groupId);
+
         public bool GetUseDrmAfterFileReceive(int groupId);
 
         public int GetDrmType(int groupId);
@@ -1047,6 +1050,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseLoginCI(int groupId)
         {
             return AppConfigInfo[groupId].bUseLoginCI;
+        }
+        public int GetLoginConnectLimitCount(int groupId)
+        {
+            return AppConfigInfo[groupId].nLoginConnectLimitCount;
+        }
+        public int GetLoginConnectDelaySecond(int groupId)
+        {
+            return AppConfigInfo[groupId].nLoginConnectDelaySecond;
         }
 
         public bool GetUseDrmAfterFileReceive(int groupId)
