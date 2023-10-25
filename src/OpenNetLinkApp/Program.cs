@@ -31,23 +31,6 @@ namespace OpenNetLinkApp
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
 #if DEBUG
-                        cwdPath = Environment.CurrentDirectory;
-#else
-                cwdPath = "/Applications/OpenNetLinkApp.app/Contents/MacOS";
-#endif
-            }
-            else
-            {
-                //cwdPath = Environment.CurrentDirectory;
-                //관리자가 사용자를 지정하여 OpenNetLink 실행 시에도 정상적인 경로로 표시하기 위해 변경
-                cwdPath = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            }
-
-            Directory.SetCurrentDirectory(cwdPath);
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-#if DEBUG
                 cwdPath = Environment.CurrentDirectory;
 #else
                 cwdPath = "/Applications/OpenNetLinkApp.app/Contents/MacOS";
@@ -66,8 +49,6 @@ namespace OpenNetLinkApp
             if (String.IsNullOrEmpty(windowTitle))
                 windowTitle = "OpenNetLink";
 
-
-            //#if DEBUG
 #if false
             if (true)
 #else
@@ -89,6 +70,7 @@ namespace OpenNetLinkApp
                     PostMessage(nhWnd, 0x0400+0x0003, 0, 0);
                 }
             }
+
         }
     }
 }
