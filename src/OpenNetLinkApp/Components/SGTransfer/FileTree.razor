@@ -149,7 +149,13 @@
                 MyPcEntries.Add(Path.Combine(userProfile, "Desktop"));
                 MyPcEntries.Add(Path.Combine(userProfile, "Favorites"));
                 
-                MyPcEntries.AddRange(Directory.GetLogicalDrives());
+                foreach (DriveInfo d in DriveInfo.GetDrives())
+                {
+                    if (!d.IsReady)
+                    continue;
+
+                MyPcEntries.Add(d.Name);
+                }
                 entries = MyPcEntries;
             }
             else if (initWindowDir == "ROOT")
