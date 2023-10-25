@@ -561,7 +561,7 @@
                 CLog.Here().Information("AskFileSendAlert, CtrlSideUI Checkbox Off로 Ask Popup Skip");
                 return;
             }
-            await refSGAlertAskFileSend.openPopUp(XmlConf.GetTitle("T_ASK_FILE_SEND"), string.Format(XmlConf.GetInfoMsg("I_0246"), DragValue.count), 2, DragValue.groupId, useChk, chkDontShowState, chkMessage, DragValue.groupId.ToString(), XmlConf.GetTitle("T_COMMON_FILETRANS"));
+            await refSGAlertAskFileSend.openPopUp(XmlConf.GetTitle("T_ASK_FILE_SEND"), string.Format(XmlConf.GetInfoMsg("I_0246"), DragValue.count), 2, DragValue.groupId, useChk, chkDontShowState, chkMessage, DragValue.groupId.ToString(), XmlConf.GetTitle("T_ETC_FILESEND"));
         }
         catch (Exception ex)
         {
