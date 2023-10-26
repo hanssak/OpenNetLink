@@ -256,7 +256,10 @@ bUseUnZipForTransfer :    파일 전송 시 압축 파일 해제하여 전송(De
 
 bUseCheckZipFileInnerFileCount : 1회 전송 가능 파일 검사 시 Zip 파일일 경우 내부 파일 전체를 Count에 포함(Default : false)
 
+nLoginConnectLimitCount : 최초 프로그램 실행 시 서버 접속 Connect Limit 횟수
 
+nLoginConnectDelaySecond : 최초 프로그램 실행 시 서버 접속 총 대기 시간
+                           예) 총 대기시간 3분이면 180 입력 - LimitConnect 횟수가 6이면 30초마다 Connect 시도
 
 
 
