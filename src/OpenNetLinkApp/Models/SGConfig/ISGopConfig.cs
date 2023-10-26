@@ -202,8 +202,6 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseEmailApprUIwait { get; set; }             // Email 결재UI가 열리면 승인대기중인 화면으로 조회되게할지 유무
 
-        public string strVirusAptDetailCustomMsg { get; set; }
-
         public bool bHideMoveTrayMsgPopup { get; set; }       // Tray로 보낼때,
 
         public bool bUseUnZipForTransfer { get; set; }    // 파일 전송 시 압축 파일 해제하여 전송

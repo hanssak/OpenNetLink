@@ -49,7 +49,7 @@ namespace OpenNetLinkApp
             if (String.IsNullOrEmpty(windowTitle))
                 windowTitle = "OpenNetLink";
 
-#if false
+#if DEBUG
             if (true)
 #else
             if (flagMutex)

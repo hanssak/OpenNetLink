@@ -120,14 +120,6 @@
             strInfo = XmlConf.GetTitle("T_DETAIL_DETECT_DRM");                  // 전송 파일에 허용되지 않는 DRM 적용이 되어 있습니다.
             strVirusContentInfo = XmlConf.GetTitle("T_DETAIL_DESC");              // 설명
         }
-        else if(m_eBlockType == Common.Enums.PreworkType.APT_SCAN ||
-            m_eBlockType == Common.Enums.PreworkType.VIRUS_SCAN)
-        {
-            // 상세메세지 custom Msg
-            strUserInfo = SGAppMgrSvc.OpConfigInfoService.GetVirusAptDetailCustomMsg(m_GroupID);
-            if (strUserInfo.Length < 1)
-                strUserInfo = XmlConf.GetTitle("T_COMMON_DETAILLIST_VIEW");             // [전송관리] - [상세보기] 에서 확인하세요.
-        }
 
         StateHasChanged();
     }

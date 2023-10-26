@@ -233,8 +233,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseEmailApprUIwait(int groupId);
 
-        public string GetVirusAptDetailCustomMsg(int groupId);
-
         public bool GetUseHideToastPopup(int groupId);
 
         public bool GetUseUnZipForTransfer(int groupId);
@@ -1094,10 +1092,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo[groupId].bUseEmailApprUIwait;
         }
 
-        public string GetVirusAptDetailCustomMsg(int groupId)
-        {
-            return AppConfigInfo[groupId].strVirusAptDetailCustomMsg;
-        }
 
         public int GetTransferTemplate(int groupId)
         {
