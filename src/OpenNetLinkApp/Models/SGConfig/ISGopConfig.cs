@@ -20,6 +20,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public int CustomLoginType { get; set; }                              //사이트별 로그인 방식 커스터마이징
 
         public string CustomLoginHttpUrl { get; set; }                       //로그인 연동을 위한 사이트 URL
+        public string CustomLoginSecurityKey { get; set; }                   //로그인 연동 시 암호화에 사용할 Key 값
+        public string CustomLoginSecurityIV { get; set; }                   //로그인 연동 시 암호화에 사용할 Key 값
         public bool bUseGpkiLogin { get; set; }                            // GPKI 로그인 사용 여부
         public bool bUserIDSave { get; set; }                                      // 로그인한 ID 저장 여부 => ID저장 기능 사용유무로 의미 변경
         public bool bUserIDSaveCheck { get; set; }                                 // 로그인한 ID저장 체크박스 체크여부

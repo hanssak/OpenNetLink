@@ -598,7 +598,9 @@
                     {
                         LoginTemplate01 loginTemplate01 = new LoginTemplate01();
                         string url = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginHttpUrl(nGroupID);
-                        (bool, string) resultMsg = loginTemplate01.Login(id, pw, url);
+                        string siteKey = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginSecurityKey(nGroupID);
+                        string siteIV = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginSecurityIV(nGroupID);
+                        (bool, string) resultMsg = loginTemplate01.Login(id, pw, url, siteKey, siteIV);
                         CLog.Here().Information($"result bool  : {resultMsg.Item1} , result Msg : {resultMsg.Item2}");
                         if (!resultMsg.Item1)
                         {
@@ -735,7 +737,7 @@
                 {
                     bool bIDSaveContinue = sgSettingProc.GetSettingIDSave(nGroupID);
                     bIDSaveCheck = bIDSaveContinue;
-                    
+
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSaveCheck(nGroupID))
                         bIDSaveCheck = true;
 
@@ -750,7 +752,7 @@
                         sgRSACrypto.ValueDecrypt(strEncID, out strID);
                         id = strID;
                     }
-                    
+
                     StateHasChanged();
                 }
 
@@ -1116,7 +1118,7 @@
                         {
                             sgSettingProc.SetSettingUID(groupId, strEncID);
                             sgSettingProc.SetSettingIDSave(groupId, true);
-                        }                            
+                        }
                     }
                     else
                     {

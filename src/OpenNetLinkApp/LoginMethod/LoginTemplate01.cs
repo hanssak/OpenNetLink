@@ -40,13 +40,13 @@ namespace OpenNetLinkApp.LoginMethod
             public string errMsg { get; set; }
         }
 
-        public (bool, string) Login(string id, string pw, string url)
+        public (bool, string) Login(string id, string pw, string url, string siteKey, string siteIV)
         {
             bool result = false;
             Log.Logger.Here().Information($"Url : {url}");
             //암호화
-            string key = "SnuhGwEnDSecValK";
-            string iv = "SnuhGwVecValKeyU";
+            string key = siteKey;
+            string iv = siteIV;
 
             byte[] bEncPw = HsNetWorkSG.SGCrypto.AESEncrypt(pw, key, iv);
             string strEncPw = Convert.ToBase64String(bEncPw);

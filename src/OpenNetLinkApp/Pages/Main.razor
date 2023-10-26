@@ -100,7 +100,7 @@
                                         </div>
                                     </div>
                                 }
-                                else if(bIDSave)
+                                else if (bIDSave)
                                 {
                                     <div class="col-md-12 mt-1 ">
                                         <div class="form-group float-right col-md-4">
@@ -825,7 +825,9 @@
             {
                 LoginTemplate01 loginTemplate01 = new LoginTemplate01();
                 string url = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginHttpUrl(groupid);
-                (bool, string) resultMsg = loginTemplate01.Login(id, pw, url);
+                string siteKey = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginSecurityKey(groupid);
+                string siteIV = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginSecurityIV(groupid);
+                (bool, string) resultMsg = loginTemplate01.Login(id, pw, url, siteKey, siteIV);
                 CLog.Here().Information($"result bool  : {resultMsg.Item1} , result Msg : {resultMsg.Item2}");
                 if (!resultMsg.Item1)
                 {
@@ -965,7 +967,7 @@
             if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSaveCheck(groupID))
                 bIDSaveCheck = true;
 
-            if(bIDSaveContinue)
+            if (bIDSaveContinue)
             {
                 string strEncID = "";
                 strEncID = sgSettingProc.GetSettingUID(groupID);
@@ -976,7 +978,7 @@
                 sgRSACrypto.ValueDecrypt(strEncID, out strID);
                 id = strID;
             }
-           
+
             StateHasChanged();
         }
 
@@ -1187,7 +1189,7 @@
         *@
 
 
-    // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
+        // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
         {
@@ -1670,7 +1672,7 @@
 
                         if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(groupId) == true)
                         {
-                            if(bIDSaveCheck)
+                            if (bIDSaveCheck)
                             {
                                 SGRSACrypto sgRSACrypto = new SGRSACrypto();
                                 string strEncID = "";
@@ -1685,7 +1687,7 @@
                             {
                                 sgSettingProc.SetSettingIDSave(groupId, false);
                             }
-                            
+
                         }
                     }
 
@@ -2287,7 +2289,7 @@
                 // if (siteConfig.GetUseLoginIDSave(groupId) == true)
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(groupId))
                 {
-                    if(bIDSaveCheck)
+                    if (bIDSaveCheck)
                     {
                         SGRSACrypto sgRSACrypto = new SGRSACrypto();
                         string strEncID = "";
@@ -2301,7 +2303,7 @@
                     else
                     {
                         sgSettingProc.SetSettingIDSave(groupId, false);
-                    }                            
+                    }
                 }
 
 
