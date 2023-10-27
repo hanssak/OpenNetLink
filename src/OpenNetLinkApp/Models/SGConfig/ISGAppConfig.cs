@@ -47,6 +47,15 @@ namespace OpenNetLinkApp.Models.SGConfig
         NETOVER_IDX = 5
     }
 
+    /// <summary>
+    /// OpenNetLink 로그인을 요청하는 NAC 종류
+    /// </summary>
+    public enum NAC_LOGIN_TYPE : int
+    {
+        NONE=0,
+        Genian =1,
+    }
+
     public interface ISGAppConfig
     {
 	

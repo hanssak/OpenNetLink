@@ -7,6 +7,10 @@ bUseAppLoginType : 사용자 지정 로그인타입 사용 여부 ( true, false 
 LoginType : 사용자 지정 로그인타입 지정 (0 = IDPW, 1 = AD, 2 = Ldap, ....)
 CustomLoginType : 사이트별 로그인 방식 커스터마이징 
 CustomLoginHttpUrl : 로그인 연동을 위한 사이트 URL
+NACLoginType : NAC연계 로그인 종류 지정 - 실행 시 전달받은 arg를 이용하여 로그인처리
+				0 : NONE (default)
+				1 : Genian NAC
+NacLoginEncryptKey : NAC연계 로그인 시 인증상태 정보 암호화 키          
 
 // 공통환경설정(일부)
 

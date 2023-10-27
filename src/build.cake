@@ -27,6 +27,8 @@ var patchAppEnv = Argument<bool>("patchAppEnv", false);					//true로 하면, pa
 var inkFileName = Argument("inkFileName", "OpenNetLink");      // 바탕화면 Ink 파일 이름 설정 
 
 var isPatchInstaller = false;
+var nacLoginType ="0" ;		//0:none / 1:Genian NAC
+var nacLoginEncryptKey ="";	//NAC 사용 시 전달되는 인증정보 암호화에 사용하는 Key 
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
 var customName = "NONE";
 var storageName ="NONE";
@@ -870,7 +872,7 @@ Task("PubCrossflatform")
 		String strNetLinkUninstallDir = "./OpenNetLinkApp/Library/NetLink.Uninstall";		
 		if(DirectoryExists(strNetLinkUninstallDir)) {
 			DeleteDirectory(strNetLinkUninstallDir, new DeleteDirectorySettings { Force = true, Recursive = true });
-		}	
+		}
 	}
 
     DotNetCorePublish("./OpenNetLinkApp", settings);
@@ -948,14 +950,13 @@ Task("PkgCrossflatform")
 			//현재 스토리지 기준 Publish
 			RunTarget("PubCrossflatform");			
 		}
-		
 		CopyFile($"{storageUnit}/ReleaseNote.md", $"{ReleaseNoteDirPath}/{AppProps.PropVersion.ToString()}.md");				
 		CopyFiles("./OpenNetLinkApp/VersionHash.txt", $"{AppProps.InstallerRootDirPath}/{unitName}");
 		
 		//storage의 OP 파일 published 경로에 적용 (+ OP 설정파일 암호화)
 		DeleteFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppOPsetting_*.json");		
 		CopyFiles($"{storageUnit}/AppOPsetting*.json", $"./artifacts/{AppProps.Platform}/published/wwwroot/conf");		
-		
+
 		if(isEnc.ToString().ToUpper() == "TRUE")
 			RunTarget("EncryptConfig");
 
@@ -1042,7 +1043,32 @@ Task("PkgCrossflatform")
 
 				CopyFiles($"{agentUnit}/AppEnvSetting.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
 				CopyFiles($"{agentUnit}/NetWork.json", $"./artifacts/{AppProps.AppUpdatePlatform}/published/wwwroot/conf");
-				
+
+				//Check Op & Set SGNac.exe
+				if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/Library/SGNacAgent"))		
+					DeleteDirectory($"./artifacts/{AppProps.Platform}/published/Library/SGNacAgent", new DeleteDirectorySettings {Force = true, Recursive = true });
+				nacLoginType ="0";
+				nacLoginEncryptKey ="";
+				if(AppProps.Platform == "windows")
+				{	
+					var opFiles = GetFiles($"{storageUnit}/AppOPsetting_*_{AgentName}.json");
+					foreach(var opFile in opFiles)
+					{
+						String strOPFile = (String)opFile.FullPath;
+						JObject OPJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(strOPFile));	
+						if(OPJObj["NACLoginType"] != null && && OPJObj["NACLoginType"].ToString() != "" && OPJObj["NACLoginType"].ToString() != "0")
+						{
+							if(OPJObj["NACLoginEncryptKey"] == null || OPJObj["NACLoginEncryptKey"].ToString() == "")
+								throw new Exception(String.Format("[Err] NACLoginType 사용 시, 인증상태 정보 암호화를 위한 키 'NACLoginEncryptKey'를 설정해주세요."));
+							
+							//Add SGNac.exe
+							CopyFiles("./OpenNetLinkApp/Library/SGNacAgent/SGNac.exe", $"./artifacts/{AppProps.Platform}/published");
+							nacLoginType = OPJObj["NACLoginType"].ToString();
+							nacLoginEncryptKey = OPJObj["NACLoginEncryptKey"].ToString();
+							break;
+						}							
+					}
+				}
 				isPatchInstaller=false;
 				RunTarget("MakeInstaller");		
 			}
@@ -1068,7 +1094,7 @@ Task("PkgCrossflatform")
 				if(FileExists("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json"))
 					DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
 			}
-			
+			nacLoginType ="0";
 			isPatchInstaller=true;
 			RunTarget("MakeInstaller");		
 		}
@@ -1100,6 +1126,8 @@ Task("MakeInstaller")
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
+					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
+					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
 				}
 			});			
 
@@ -1119,9 +1147,10 @@ Task("MakeInstaller")
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
+					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
+					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
 				}
 			});
-
 		}
 		else
 		{
