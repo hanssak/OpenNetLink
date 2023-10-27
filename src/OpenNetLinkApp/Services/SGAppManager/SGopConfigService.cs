@@ -423,10 +423,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo[groupId].NACLoginType;
         }
 
-        public string GetNacLoginEncryptKey(int groupId)
+        public string GetNACLoginEncryptKey(int groupId)
         {
-            return AppConfigInfo[groupId].NacLoginEncryptKey;
+            return AppConfigInfo[groupId].NACLoginEncryptKey;
         }
+
         public bool GetUseLoginIDSave(int groupId)
         {
             return AppConfigInfo[groupId].bUserIDSave;

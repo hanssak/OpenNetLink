@@ -24,7 +24,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public string CustomLoginHttpUrl { get; set; } = "";                       //로그인 연동을 위한 사이트 URL
         public bool bUseGpkiLogin { get; set; } = false;                            // GPKI 로그인 사용 여부
         public int NACLoginType { get; set; } = 0;                              //NAC연계 로그인 종류 지정 - 0 : NONE(default) / 1 : Genian NAC
-        public string NacLoginEncryptKey { get; set; } = "";                      //NAC연계 로그인 시 인증상태 정보 암호화 키          
+        public string NACLoginEncryptKey { get; set; } = "";                      //NAC연계 로그인 시 인증상태 정보 암호화 키          
 
 
 
