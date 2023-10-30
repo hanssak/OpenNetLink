@@ -5248,33 +5248,40 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return 0;
 
             //Docuement로 OLE 개체 검사 모듈 실행
-            using (MemoryStream fileMemoryStream = new MemoryStream())
-            {
-                if (hsStream.MemoryType == HsStreamType.MemoryStream)
-                {
-                    int bufferSize = 1024 * 1024;
-                    int readCount = 0;
-                    byte[] buf = new byte[bufferSize];
-                    while (true)
-                    {
-                        Array.Clear(buf, 0, buf.Length);
-                        readCount = await hsStream.stream.ReadAsync(buf);
+            //using (MemoryStream fileMemoryStream = new MemoryStream())
+            //{
+            //    if (hsStream.MemoryType == HsStreamType.MemoryStream)
+            //    {
+            //        int bufferSize = 1024 * 1024;
+            //        int readCount = 0;
+            //        byte[] buf = new byte[bufferSize];
+            //        while (true)
+            //        {
+            //            Array.Clear(buf, 0, buf.Length);
+            //            readCount = await hsStream.stream.ReadAsync(buf);
 
-                        if (readCount > 0)
-                            fileMemoryStream.Write(buf, 0, readCount);
-                        else
-                            break;
-                    }
-                }
-                else if (hsStream.MemoryType == HsStreamType.FileStream)
-                {
-                    fileStream.CopyTo(fileMemoryStream);
-                }
+            //            if (readCount > 0)
+            //                fileMemoryStream.Write(buf, 0, readCount);
+            //            else
+            //                break;
+            //        }
+            //    }
+            //    else if (hsStream.MemoryType == HsStreamType.FileStream)
+            //    {
+            //        fileStream.CopyTo(fileMemoryStream);
+            //    }
 
-                //0단계 : 모듈검사 (문서 검사의 필수)
-                extractorResult = OfficeExtractor.Controller.ExcuteExtractor(fileMemoryStream, hsStream.FileName, strExtractFilePath);
-                Log.Logger.Here().Information($"[scanDocumentFile]  ExcuteExtractor DocumentFile[{Path.GetFileName(hsStream.FileName)}] extractorResult[{extractorResult}]");
-            }
+            //    //0단계 : 모듈검사 (문서 검사의 필수)
+            //    extractorResult = OfficeExtractor.Controller.ExcuteExtractor(fileMemoryStream, hsStream.FileName, strExtractFilePath);
+            //    Log.Logger.Here().Information($"[scanDocumentFile]  ExcuteExtractor DocumentFile[{Path.GetFileName(hsStream.FileName)}] extractorResult[{extractorResult}]");
+            //}
+            //0단계 : 모듈검사 (문서 검사의 필수)
+            string source = (hsStream.stream as FileStream).Name;
+            hsStream.stream.Close();
+            extractorResult = OfficeExtractor.Controller.ExcuteExtractor(source, strExtractFilePath);
+            hsStream.stream = File.OpenRead(source);
+
+            Log.Logger.Here().Information($"[scanDocumentFile]  ExcuteExtractor DocumentFile[{Path.GetFileName(hsStream.FileName)}] extractorResult[{extractorResult}]");
 
             GC.Collect();
             GC.WaitForPendingFinalizers();

@@ -48,6 +48,7 @@ namespace OfficeExtractor
     /// </summary>
     public class Extractor
     {
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<Extractor>();
         #region Fields
         /// <summary>
         ///     <see cref="Checker"/>
@@ -312,7 +313,7 @@ namespace OfficeExtractor
             outputFolder = FileManager.CheckForDirectorySeparator(outputFolder);
 
             List<string> result;
-
+            CLog.Information($"ExcuteExtractor.Extract Checking Data - extension[{extension}] inputFile[{inputFile}]");
             try
             {
                 switch (extension)
@@ -437,10 +438,12 @@ namespace OfficeExtractor
             }
             catch (CFCorruptedFileException)
             {
+                CLog.Error($"Extract Exception - The file '{Path.GetFileName(inputFile)}' is corrupt");
                 throw new OEFileIsCorrupt($"The file '{Path.GetFileName(inputFile)}' is corrupt");
             }
             catch (Exception exception)
             {
+                CLog.Error($"Extract Exception - {exception.ToString()}");
                 Logger.WriteToLog($"Cant check for embedded object because an error occured, error: {exception.Message}");
                 throw;
             }
@@ -464,7 +467,8 @@ namespace OfficeExtractor
             outputFolder = FileManager.CheckForDirectorySeparator(outputFolder);
 
             List<string> result;
-
+            
+            CLog.Information($"ExcuteExtractor.Extract Checking Data - extension[{extension}] inputFile.Length[{inputFile?.Length}]");
 
             try
             {
@@ -600,6 +604,7 @@ namespace OfficeExtractor
             }
             catch (Exception exception)
             {
+                CLog.Error($"Extract Exception - {exception.ToString()}");
                 Logger.WriteToLog($"Cant check for embedded object because an error occured, error: {exception.Message}");
                 throw;
             }
