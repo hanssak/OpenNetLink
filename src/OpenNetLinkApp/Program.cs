@@ -21,7 +21,7 @@ namespace OpenNetLinkApp
 
 
         static void Main(string[] args)
-         {
+        {
             string cwdPath = "";
             string CWD = Directory.GetCurrentDirectory();
             Console.WriteLine("==> {0}", CWD);
@@ -45,6 +45,8 @@ namespace OpenNetLinkApp
 
             Directory.SetCurrentDirectory(cwdPath);
 
+            Services.SGAppManager.SGSystemService.SystemInfo.StartArg = args;
+
             string windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
             if (String.IsNullOrEmpty(windowTitle))
                 windowTitle = "OpenNetLink";
@@ -67,7 +69,7 @@ namespace OpenNetLinkApp
                 nhWnd = FindWindow("WebWindow", windowTitle);
                 if (nhWnd != 0 && IsWindow(nhWnd))
                 {
-                    PostMessage(nhWnd, 0x0400+0x0003, 0, 0);
+                    PostMessage(nhWnd, 0x0400 + 0x0003, 0, 0);
                 }
             }
 

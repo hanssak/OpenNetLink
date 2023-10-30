@@ -164,5 +164,15 @@ namespace OpenNetLinkApp.Common
             [Description("LoginTemplate01")] //서울대학병원 그룹웨어 연동
             LoginTemplate01 = 1,
         }
+
+        /// <summary>
+        /// OpenNetLink 로그인을 요청하는 NAC 종류
+        /// </summary>
+        public enum enumNacLoginType : Int32
+        {
+            NONE = 0,
+            Genian = 1,
+        }
+
     }
 }
