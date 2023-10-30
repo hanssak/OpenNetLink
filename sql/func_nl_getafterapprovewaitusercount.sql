@@ -35,26 +35,9 @@ begin
 	ELSE
 		RETURN;
 	END IF;
-	
-	
+
 	
 	V_SQL:='
-	WITH TBL_TMP_APPROVE_AFTER AS
-	(
-		SELECT * from TBL_APPROVE_AFTER TAA WHERE TAA.trans_seq in 
-		(
-			SELECT trans_seq FROM tbl_transfer_req_his WHERE
-			( ##DATATYPE## (tbl_transfer_req_his.trans_seq in 
-				(
-					SELECT AA.trans_seq
-					FROM 
-					TBL_APPROVE_AFTER AA
-					WHERE
-					APPROVE_USER_SEQ='||_userseq_||'
-				)													 )
-			)
-		)
-	)
 	SELECT A.APPROVE_USER_SEQ, U.USER_ID, U.USER_NAME, U.USER_RANK,
 		CAST (COUNT(*) AS VARCHAR) AFTER_APPROVE_WAIT_COUNT
 		, CASE WHEN '''||V_OVER_DAY||''' = ''0'' THEN ''0''
@@ -65,12 +48,15 @@ begin
 		END AS WARRING_DAY_COUNT				
 		, CAST ('||V_OVER_DAY||' AS VARCHAR) SET_OVER_DAY
 		, CAST ('||V_WARRING_DAY||' AS VARCHAR) SET_WARRING_DAY
-				FROM TBL_TMP_APPROVE_AFTER A
+				FROM TBL_APPROVE_AFTER A
 					, TBL_USER_INFO U
+					, view_transfer_all K
 				WHERE A.APPROVE_USER_SEQ=U.USER_SEQ	
 					AND COALESCE(U.ACCOUNT_EXPIRES, ''99991231'') > TO_CHAR(NOW(), ''YYYYMMDD'')
 					AND U.USE_STATUS = ''1''
 					AND U.USER_SEQ IN('||_userseq_||')
+					##DATATYPE##
+					AND K.trans_seq = A.trans_seq
 				group by APPROVE_USER_SEQ, USER_ID, USER_NAME, USER_RANK;					
 	';
 
@@ -78,10 +64,10 @@ begin
 	IF _DATA_TYPE_ < 0 THEN	-- ALL 검색
 		V_SQL:=Replace(V_SQL, '##DATATYPE##', '');
 	ELSEIF _DATA_TYPE_ = 3 THEN -- ClipBoard 검색때 사용
-	    V_CONDITION:='(tbl_transfer_req_his.DATA_TYPE=1 OR tbl_transfer_req_his.DATA_TYPE=2) AND';
+	    V_CONDITION:='AND (K.data_type=''1'' OR K.data_type=''2'')';
 		V_SQL:=Replace(V_SQL, '##DATATYPE##', V_CONDITION);
 	ELSE	-- 파일 / 기타 나머지 항목 1개식 검색때 사용
-	    V_CONDITION:='tbl_transfer_req_his.DATA_TYPE='||_DATA_TYPE_||' AND';
+	    V_CONDITION:='AND K.data_type='''||_DATA_TYPE_||'''';
 		V_SQL:=Replace(V_SQL, '##DATATYPE##', V_CONDITION);
 	END IF;
 	
