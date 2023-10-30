@@ -1056,7 +1056,7 @@ Task("PkgCrossflatform")
 					{
 						String strOPFile = (String)opFile.FullPath;
 						JObject OPJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(strOPFile));	
-						if(OPJObj["NACLoginType"] != null && && OPJObj["NACLoginType"].ToString() != "" && OPJObj["NACLoginType"].ToString() != "0")
+						if(OPJObj["NACLoginType"] != null && OPJObj["NACLoginType"].ToString() != "" && OPJObj["NACLoginType"].ToString() != "0")
 						{
 							if(OPJObj["NACLoginEncryptKey"] == null || OPJObj["NACLoginEncryptKey"].ToString() == "")
 								throw new Exception(String.Format("[Err] NACLoginType 사용 시, 인증상태 정보 암호화를 위한 키 'NACLoginEncryptKey'를 설정해주세요."));
@@ -1169,6 +1169,8 @@ Task("MakeInstaller")
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
+					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
+					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
 				}
 			});			
 		}
