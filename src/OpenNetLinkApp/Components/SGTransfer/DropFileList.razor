@@ -607,6 +607,8 @@
                         try
                         {
                             hsStream.stream = File.OpenRead(fInfo.FullName);
+                            hsStream.FilePullPath = (hsStream.stream as FileStream).Name;
+                            hsStream.FileLength = (hsStream.stream as FileStream).Length;
                         }
                         catch
                         {
