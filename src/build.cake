@@ -1049,8 +1049,9 @@ Task("PkgCrossflatform")
 					DeleteDirectory($"./artifacts/{AppProps.Platform}/published/Library/SGNacAgent", new DeleteDirectorySettings {Force = true, Recursive = true });
 				nacLoginType ="0";
 				nacLoginEncryptKey ="";
-				if(AppProps.Platform == "windows")
+				if(AppProps.Platform == "windows")	//SGNAC.exe는 Window만 필요 시 배포
 				{	
+					//OP파일은 Plain Text인 SiteProfile에서 참고
 					var opFiles = GetFiles($"{storageUnit}/AppOPsetting_*_{AgentName}.json");
 					foreach(var opFile in opFiles)
 					{
