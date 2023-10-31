@@ -73,7 +73,7 @@
                             <div class="row">
                                 @if (nGroupID > -1 && eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
                                 {
-                                    @if(bAutoLogin)
+                                    @if (bAutoLogin)
                                     {
                                         <div class="col-12 pt-1 pr-4 text-right ">
                                             <div class="icheck-primary">
@@ -84,7 +84,7 @@
                                             </div>
                                         </div>
                                     }
-                                    else if(bIDSave)
+                                    else if (bIDSave)
                                     {
                                         <div class="col-12 pt-1 pr-4 text-right ">
                                             <div class="icheck-primary">
@@ -386,7 +386,7 @@
                 strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-            strPW = "HsckAD.com";
+        strPW = "HsckAD.com";
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -479,28 +479,28 @@
             int nData = 0;
 
 #if DEBUG  // SITE배포용도
-            //#if false  // SITE배포용도
-            CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
-            strData = "1";
-            stRtn = "1";
+        //#if false  // SITE배포용도
+        CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
+        strData = "1";
+        stRtn = "1";
 #else
 
-    stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
-    if (stRtn == null || (1 > stRtn.Length))
-    {
-        CLog.Here().Information($"Result - json, Data is null OR 0 Size");
-        ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
-        return false;
-    }
+            stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
+            if (stRtn == null || (1 > stRtn.Length))
+            {
+                CLog.Here().Information($"Result - json, Data is null OR 0 Size");
+                ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
+                return false;
+            }
 
-    // json으로 온 Data에서 실제 data 뽑아내는 동작
-    using (JsonDocument document = JsonDocument.Parse(stRtn))
-    {
-        JsonElement jroot = document.RootElement;
-        nCode = jroot.GetProperty("code").GetInt32();
-        strMsg = jroot.GetProperty("msg").GetString();
-        strData = jroot.GetProperty("data").GetString();
-    }
+            // json으로 온 Data에서 실제 data 뽑아내는 동작
+            using (JsonDocument document = JsonDocument.Parse(stRtn))
+            {
+                JsonElement jroot = document.RootElement;
+                nCode = jroot.GetProperty("code").GetInt32();
+                strMsg = jroot.GetProperty("msg").GetString();
+                strData = jroot.GetProperty("data").GetString();
+            }
 #endif
 
             CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
@@ -591,7 +591,7 @@
                 HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginUITypeData);
             else if (eLoginUITypeData == eLoginType.eLOGINTYPE_CUSTOM)
             {
-                if(SGAppMgrSvc.OpConfigInfoService.GetCustomLoginType(nGroupID) == (int)Enums.EnumCustomLoginType.LoginTemplate01)
+                if (SGAppMgrSvc.OpConfigInfoService.GetCustomLoginType(nGroupID) == (int)Enums.EnumCustomLoginType.LoginTemplate01)
                 {
                     //외부 그룹웨어 연동
                     try
@@ -631,6 +631,70 @@
         //MyNavigationManager.NavigateTo(url);
     }
 
+    /// <summary>
+    /// NAC로그인 방식으로 로그인동작 진행
+    /// </summary>
+    private void doNACLogin(string nacUserId)
+    {
+        try
+        {
+            if (bStartedLogin)
+                return;
+
+            CLog.Here().Information($"PopupLogin.doNACLogin - ###### -  Start");
+
+            JSRuntime.InvokeAsync<object>("loginCursorChange");
+
+
+            id = nacUserId;
+            pw = string.Empty;
+
+            if ((id?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0030"));
+                return;
+            }
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
+            string strCurCliVersion = "";
+            string strPlatform = "";
+            if (VersionConfigSvc != null)
+            {
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
+                strCurCliVersion = "OpenNetLink " + strCurCliVersion;
+
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
+                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
+            }
+
+            if (strCurCliVersion.Equals(""))
+                return;
+
+            HSCmdCenter.sgPageEvent.SetLoginEventAdd(nGroupID, LoginpopUpResult);
+            HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(nGroupID, ShowSessionCountPopup);
+            HSCmdCenter.sgPageEvent.Set2FactorAuthEventAdd(nGroupID, Show2FactorAuth);
+
+            bStartedLogin = true;
+
+            CLog.Here().Information("doNACLogin, try LogIn Type:" + pageService.m_nLoginType.ToString());
+            HSCmdCenter.SetCliVersion(strCurCliVersion);
+
+            string unUsePw = id;
+
+            //NAC Login 시 IdSave 여부 확인하여 인자로 받은 ID 저장
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID))
+                bIDSaveCheck = true;
+            CLog.Here().Information($"doNACLogin - ###### -  Do");
+            HSCmdCenter.LoginNotCheckPw(nGroupID, id, unUsePw, strCurCliVersion, otp, pageService.m_nLoginType);
+            pageService.SetGroupIDLoginType(nGroupID, (eLoginType)pageService.m_nLoginType);
+
+            CLog.Here().Information($"doNACLogin - ###### -  End");
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"doNACLogin - Exception - Msg : {ex.Message}");
+        }
+
+    }
     /// <summary>
     /// KeyBoard 입력에 따른 동작 정의하는 함수
     /// </summary>
@@ -726,8 +790,16 @@
                     eLoginUITypeData = eLoginType.eLOGINTYPE_AD;
             }
 
+            if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(nGroupID) == (int)Enums.enumNacLoginType.Genian && SGAppMgrSvc.SystemService.IsStartedByNAC())
+            {
+                string NacKey = SGAppMgrSvc.OpConfigInfoService.GetNACLoginEncryptKey(0);
+                string nacId = SGAppMgrSvc.SystemService.GetGenianNACUserID(NacKey);
+
+                StateHasChanged();
+                doNACLogin(nacId);
+            }
             // IDPW 로그인
-            if (eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
+            else if (eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
             {
                 // ID저장 사용
                 //if (siteConfig.GetUseLoginIDSave(nGroupID) == true)   // json으로 설정이동
@@ -735,11 +807,11 @@
                 {
                     bool bIDSaveContinue = sgSettingProc.GetSettingIDSave(nGroupID);
                     bIDSaveCheck = bIDSaveContinue;
-                    
+
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSaveCheck(nGroupID))
                         bIDSaveCheck = true;
 
-                    if(bIDSaveContinue)
+                    if (bIDSaveContinue)
                     {
                         string strEncID = "";
                         strEncID = sgSettingProc.GetSettingUID(nGroupID);
@@ -750,7 +822,7 @@
                         sgRSACrypto.ValueDecrypt(strEncID, out strID);
                         id = strID;
                     }
-                    
+
                     StateHasChanged();
                 }
 
@@ -809,7 +881,7 @@
                     pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-                pw = "HsckAD.com";
+            pw = "HsckAD.com";
 #endif
                 pw = pw.ToLower();
 
@@ -1107,7 +1179,7 @@
                 //if (siteConfig.GetUseLoginIDSave(groupId) == true)    // json으로 설정이동
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID))
                 {
-                    if(bIDSaveCheck)
+                    if (bIDSaveCheck)
                     {
                         SGRSACrypto sgRSACrypto = new SGRSACrypto();
                         string strEncID = "";
@@ -1116,7 +1188,7 @@
                         {
                             sgSettingProc.SetSettingUID(groupId, strEncID);
                             sgSettingProc.SetSettingIDSave(groupId, true);
-                        }                            
+                        }
                     }
                     else
                     {

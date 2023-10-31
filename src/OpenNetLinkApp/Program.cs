@@ -70,8 +70,9 @@ namespace OpenNetLinkApp
 
                 ComponentsDesktop.Run<Startup>(windowTitle, "wwwroot/index.html", arg);
             }
-            else if (Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginType == (int)Common.Enums.enumNacLoginType.Genian)
+            else if (Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginType == (int)Common.Enums.enumNacLoginType.Genian && args?.Length > 0 && args[0].ToString().ToUpper() == "NAC")
             {
+                //NAC으로 로그인 시
                 //기존 OpenNetLink로 종료요청("REQUEST_OPENNETLINK_EXIT" 키워드 전달)
                 HsNetWorkSG.HsContextSender.RequestExitSender();
 

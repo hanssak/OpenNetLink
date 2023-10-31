@@ -79,11 +79,17 @@
 
                             <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@id" @oninput="@(e => id = e.Value.ToString())" tabindex="1" autocomplete="off">
 
-                            @if (pageService.m_nLoginType != 5 && srcLoc != "OKTA") //OTP PW 필요없음
+                            @if (pageService.m_nLoginType != 5 && srcLoc != "OKTA" && SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(0) != (int)Enums.enumNacLoginType.Genian) //OTP PW 필요없음
                             {
                                 //AD 로그인은 PW 사용자 입력 불가 (Readonly)
                                 <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@pw" @oninput="@(e => pw = e.Value.ToString())" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
                             }
+                            else if(SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(0) == (int)Enums.enumNacLoginType.Genian && (srcLoc == "Logout" || !SGAppMgrSvc.SystemService.IsStartedByNAC()))
+                            {
+                                //Genian NAC은 NAC 인자에 의해 실행되지 않을때는 PW 표시
+                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" value="@pw" @oninput="@(e => pw = e.Value.ToString())" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
+                            }
+
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
                             {
                                 <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" value="@otp" @oninput="@(e=>otp = e.Value.ToString())" @onkeyup="keyCheck" tabindex="3" autocomplete="off">
@@ -899,8 +905,7 @@
             CLog.Here().Information($"doNACLogin - ###### -  Start");
 
             JSRuntime.InvokeAsync<object>("loginCursorChange");
-            bStartedLogin = true;
-
+            
             id = nacUserId;
             pw = string.Empty;
 
@@ -924,6 +929,8 @@
 
             if (strCurCliVersion.Equals(""))
                 return;
+
+            bStartedLogin = true;
 
             CLog.Here().Information("[Main] LogIn Type:" + pageService.m_nLoginType.ToString());
             HSCmdCenter.SetCliVersion(strCurCliVersion);
@@ -1212,6 +1219,9 @@
             {
                 string NacKey = SGAppMgrSvc.OpConfigInfoService.GetNACLoginEncryptKey(0);
                 string nacId = SGAppMgrSvc.SystemService.GetGenianNACUserID(NacKey);
+                bLoginBtnDisable = true;
+                StateHasChanged();
+
                 doNACLogin(nacId);
             }
         }
