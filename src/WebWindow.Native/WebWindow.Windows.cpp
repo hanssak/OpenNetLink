@@ -2069,11 +2069,11 @@ bool WebWindow::SaveImage(char* PathName, void* lpBits, int size)
 void WebWindow::ProgramExit()
 {
 	NTLog(this, Info, "Called : OpenNetLink Exit");
-	hwndToWebWindow.erase(hwnd);
+	hwndToWebWindow.erase(_hWnd);
+	tray_exit();	//트레이 정리
 
 	WinToast::instance()->clear();
-
-	if (hwnd == messageLoopRootWindowHandle)
+	if (_hWnd == messageLoopRootWindowHandle)
 	{
 		PostQuitMessage(0);
 		printf("PostQuitMessage - %s(%d)\n", __FILE__, __LINE__);

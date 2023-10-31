@@ -9,7 +9,5 @@ namespace OpenNetLinkApp.Models.SGSystem
     public class SGSystemData
     {
         public string[] StartArg { get; set; }
-
-        public string NACUserId { get; set; }
     }
 }

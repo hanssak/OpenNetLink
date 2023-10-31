@@ -832,6 +832,14 @@ namespace OpenNetLinkApp.Services
                     case eCmdList.eOLEMIMELISTQUERY:
                         OLEMimeListAfterSend(groupId, sgData);
                         break;
+                    case eCmdList.eREQUESTEXIT:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            NotiRequestExitEvent notiRequestExit= sgPageEvent.GetNotiRequestExitEvent();
+                            if (notiRequestExit != null) notiRequestExit(groupId);
+                        }
+                        break;
                     default:
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
