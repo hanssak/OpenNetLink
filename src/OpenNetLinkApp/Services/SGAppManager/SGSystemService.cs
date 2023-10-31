@@ -63,7 +63,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SystemInfo.StartArg = arg;
         }
 
-        public string[] GetArg() => SystemInfo.StartArg;
+        public string[] GetStartArg() => SystemInfo.StartArg;
 
         public bool IsStartedByNAC()
         {
