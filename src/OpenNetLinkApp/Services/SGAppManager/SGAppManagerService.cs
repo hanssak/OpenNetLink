@@ -24,7 +24,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <summary>
         /// Declared: Corporate Identity(CI) Service for CI Info/Image.
         /// </summary>
-        ISGCorpIdUIService CorpIdUIService { get; }
+        ISGSystemService SystemService { get; }
 
         /* To Manage User Info State */
         /// <summary>
@@ -70,7 +70,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             HeaderUIService = new SGHeaderUIService();
             FooterUIService = new SGFooterUIService();
-            CorpIdUIService = new SGCorpIdUIService();
+            SystemService = new SGSystemService();
             UserInfoService = new SGUserInfoService(); 
             SideBarUIService = new SGSideBarUIService();
             NetworkInfoService = new SGNetworkService();
@@ -87,7 +87,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public ISGFooterUIService FooterUIService { get; private set; } = null;
 
         /* To Manage Corporate Identity State */
-        public ISGCorpIdUIService CorpIdUIService { get; private set; } = null;
+        public ISGSystemService SystemService { get; private set; } = null;
 
         /* To Manage User Info State */
         public ISGUserInfoService UserInfoService { get; private set; } = null;

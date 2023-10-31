@@ -1748,6 +1748,7 @@
         HsCmdCenter.sgPageEvent.SetFileMimeRecvEvent(FileMimeRecvEvent);
         HsCmdCenter.sgPageEvent.SetOLEMimeRecvEvent(OLEMimeRecvEvent);
         HsCmdCenter.sgPageEvent.SetChangeLanguageEvent(ChangeLanguageEvent);
+        HsCmdCenter.sgPageEvent.SetNotiRequestExitEvent(RequestExitEvent);
 
         pageService.SetAlramAndMessageDeleteEvent(DelAllAlramAndMessage);
 
@@ -2313,6 +2314,12 @@
     {
         NetWorkSvc.SaveIPAndReload(argNewIP);
 
+        //프로그램 종료
+        Window.ProgramExit();
+    }
+
+    public void RequestExitEvent(int groupId)
+    {
         //프로그램 종료
         Window.ProgramExit();
     }
