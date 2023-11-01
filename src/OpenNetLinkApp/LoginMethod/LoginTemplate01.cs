@@ -52,12 +52,12 @@ namespace OpenNetLinkApp.LoginMethod
             string strEncPw = Convert.ToBase64String(bEncPw);
 
             string method = "GET";
-            string contentType = "application/json; utf-8";
+            string contentType = "application/json";
             
             //전송
             RequestParameter requestParameter = new RequestParameter(id, strEncPw);
             Log.Logger.Here().Information($"requestParameter : {requestParameter.GetJsonString()}");
-            string strResult = WebRequestCommon(method, contentType, url, 10, requestParameter.GetJsonString());
+            string strResult = WebRequestCommon(method, contentType, url, 10, id, strEncPw);
             string msg = "";
             Log.Logger.Here().Information($"responseParameter : {strResult}");
             if (!String.IsNullOrEmpty(strResult))
@@ -97,18 +97,21 @@ namespace OpenNetLinkApp.LoginMethod
 
 
 
-        public static string WebRequestCommon(string method , string contentType, string url, int ReqTimeOut, string json)
+        public static string WebRequestCommon(string method , string contentType, string url, int ReqTimeOut, string id, string password)
         {
 
             WebRequest wreq = WebRequest.Create(url);
             wreq.Method = method;
-            wreq.Timeout = ReqTimeOut;
-            wreq.ContentType = contentType;
+            wreq.Timeout = ReqTimeOut * 1000;
+            wreq.Headers.Add("Content-Type", contentType);
+            wreq.Headers.Add("empNo", id);
+            wreq.Headers.Add("encPwd", password);
+            //wreq.ContentType = contentType;
 
-            using (var streamWriter = new StreamWriter(wreq.GetRequestStream())) //전송
-            {
-                streamWriter.Write(json);
-            }
+            //using (var streamWriter = new StreamWriter(wreq.GetRequestStream())) //전송
+            //{
+            //    streamWriter.Write(json);
+            //}
             var response = wreq.GetResponse();
             using (var streamReader = new StreamReader(response.GetResponseStream()))
             {

@@ -878,7 +878,7 @@
             }
             else
             {
-                HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, 0);
+                HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, 0);
                 pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
             }
 
