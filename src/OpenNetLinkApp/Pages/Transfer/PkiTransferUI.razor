@@ -328,8 +328,8 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
 
-        await jsRuntime.InvokeAsync<object>("exitLogIn");
-        await jsRuntime.InvokeAsync<object>("adJustWindowsize");
+        await jsRuntime.InvokeAsync<object>("exitLogIn", new object[] {""});
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize", new object[] {""});
 
         int groupID = groupIDbyParam;
         CLog.Here().Information($"TransManage - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");

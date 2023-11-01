@@ -427,8 +427,7 @@ Function .onInstSuccess
 			ExecWait '"C:\HANSSAK\SecureGate\uninstall.exe'
 			
 		${endif}	
-	${endif}
-  
+	${endif}  
   
   ${If} ${IS_PATCH} == 'TRUE'
 	 ; 하위 exist 작업을 위해, 패치본의 json/db는 삭제
@@ -550,8 +549,6 @@ Section "MainSection" SEC01
 		  ${EndIf}
           
 	  ${EndIf}
-
-
   ${Else}
 
 	  ${If} ${NETWORK_FLAG} == 'CN'
@@ -571,7 +568,17 @@ Section "MainSection" SEC01
 		  	ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
 		  ${EndIf}
 	  ${EndIf}
-
+	  
+	  ;NAC 등록
+	  ${if} ${NAC_LOGIN_TYPE} == '1'
+		IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" GnFind GnNotFind
+		GnFind:			
+			ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe -e:AES-${NAC_LOGIN_ENCRYPTKEY}"'
+			goto GnEND
+		GnNotFind:
+		GnEND:
+	${EndIf}
+	
   ${EndIf} ; ${IS_PATCH} == 'TRUE'
 
   
@@ -656,12 +663,21 @@ Section Uninstall
   ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMex0X64.dll"'
   ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMex1X64.dll"'
   ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMex2X64.dll"'
-
+  
   Delete "$SMPROGRAMS\OpenNetLink\Uninstall.lnk"
   Delete "$SMPROGRAMS\OpenNetLink\Website.lnk"
   Delete "C:\Users\Public\Desktop\${INK_NAME}.lnk"
   Delete "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk"
 
+  ${if} ${NAC_LOGIN_TYPE} == '1'
+  	;NAC 등록 해제
+  	IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" UnGnFind UnGnNotFind
+  	UnGnFind:
+  		ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -u -auth_in:$INSTDIR\SGNac.exe"'
+  		goto UnGnEND
+  	UnGnNotFind:
+  	UnGnEND:	  
+  ${EndIf}
   RMDir "$SMPROGRAMS\OpenNetLink"
   RMDir /r "$INSTDIR"
 

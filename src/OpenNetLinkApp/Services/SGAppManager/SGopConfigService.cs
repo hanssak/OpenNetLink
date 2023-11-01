@@ -40,6 +40,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseGPKILogin(int groupId);
 
+        public int GetNACLoginType(int groupId);
+
+        public string GetNACLoginEncryptKey(int groupId);
+
         public bool GetUseLoginIDSave(int groupId);
 
         public bool GetUseLoginIDSaveCheck(int groupId);
@@ -423,10 +427,20 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseGpkiLogin;
         }
+        public int GetNACLoginType(int groupId)
+        {
+            return AppConfigInfo[groupId].NACLoginType;
+        }
+
+        public string GetNACLoginEncryptKey(int groupId)
+        {
+            return AppConfigInfo[groupId].NACLoginEncryptKey;
+        }
+
         public bool GetUseLoginIDSave(int groupId)
         {
             return AppConfigInfo[groupId].bUserIDSave;
-        }
+        }        
         public bool GetUseLoginIDSaveCheck(int groupId)
         {
             return AppConfigInfo[groupId].bUserIDSaveCheck;

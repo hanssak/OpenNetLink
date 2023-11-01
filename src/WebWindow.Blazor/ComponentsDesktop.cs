@@ -151,33 +151,31 @@ namespace WebWindows.Blazor
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true);
 
-            /* Configuration Log */
-            AgLog.LogLevelSwitch.MinimumLevel = LogEventLevel.Information;
-            string strLogTemplate  = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}][APP:{ProcessName}][PID:{ProcessId}][THR:{ThreadId}]{operationId} {Message} ";
-                   strLogTemplate += "{MemberName} {FilePath}{LineNumber}{NewLine}{Exception}";
+            ///* Configuration Log */
+            //AgLog.LogLevelSwitch.MinimumLevel = LogEventLevel.Information;
+            //string strLogTemplate  = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}][APP:{ProcessName}][PID:{ProcessId}][THR:{ThreadId}]{operationId} {Message} ";
+            //       strLogTemplate += "{MemberName} {FilePath}{LineNumber}{NewLine}{Exception}";
 
-            string Path = System.IO.Path.Combine(System.Environment.CurrentDirectory, "wwwroot");
-            Path = System.IO.Path.Combine(Path, "Log");
-            System.IO.Directory.CreateDirectory(Path);
-            Path = System.IO.Path.Combine(Path, "SecureGate-{Date}.Log");
-
-            Serilog.Log.Logger = new LoggerConfiguration()
-                            .Enrich.FromLogContext()
-                            .Enrich.WithProcessName()
-                            .Enrich.WithProcessId()
-                            .Enrich.WithThreadId()
-                            .Enrich.With<OperationIdEnricher>()
-                            .WriteTo.RollingFile( Path, 
-                                                //rollingInterval: RollingInterval.Day, 
-                                                //rollOnFileSizeLimit: true,
-                                                fileSizeLimitBytes: 1024*1024*100,
-                                                retainedFileCountLimit: 31,
-                                                buffered: false,
-                                                outputTemplate: strLogTemplate)
-                           // .WriteTo.Console(outputTemplate: strLogTemplate, theme: AnsiConsoleTheme.Literate)
-                            .MinimumLevel.ControlledBy(AgLog.LogLevelSwitch)
-                            .CreateLogger();
-
+            //string Path = System.IO.Path.Combine(System.Environment.CurrentDirectory, "wwwroot");
+            //Path = System.IO.Path.Combine(Path, "Log");
+            //System.IO.Directory.CreateDirectory(Path);
+            //Path = System.IO.Path.Combine(Path, "SecureGate-{Date}.Log");
+            //Serilog.Log.Logger = new LoggerConfiguration()
+            //                .Enrich.FromLogContext()
+            //                .Enrich.WithProcessName()
+            //                .Enrich.WithProcessId()
+            //                .Enrich.WithThreadId()
+            //                .Enrich.With<OperationIdEnricher>()
+            //                .WriteTo.RollingFile( Path, 
+            //                                    //rollingInterval: RollingInterval.Day, 
+            //                                    //rollOnFileSizeLimit: true,
+            //                                    fileSizeLimitBytes: 1024*1024*100,
+            //                                    retainedFileCountLimit: 31,
+            //                                    buffered: false,
+            //                                    outputTemplate: strLogTemplate)
+            //               // .WriteTo.Console(outputTemplate: strLogTemplate, theme: AnsiConsoleTheme.Literate)
+            //                .MinimumLevel.ControlledBy(AgLog.LogLevelSwitch)
+            //                .CreateLogger();
             DesktopJSRuntime = new DesktopJSRuntime(ipc);
             await PerformHandshakeAsync(ipc);
             AttachJsInterop(ipc, appLifetime);

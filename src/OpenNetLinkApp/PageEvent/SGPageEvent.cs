@@ -276,7 +276,13 @@ namespace OpenNetLinkApp.PageEvent
     public delegate bool SendPkiFileEvent(int groupid, string strPcfFilePath, bool bSendPkiByFileTrans);
 
     public delegate void OSNotificationEvent(int groupId, WebWindows.OS_NOTI category, string title, string message, string navURI = "");
-	
+
+    /// <summary>
+    /// OpenNetLink 종료 요청 Notify
+    /// </summary>
+    /// <param name="groupId"></param>
+    public delegate void NotiRequestExitEvent(int groupId);
+
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -453,6 +459,9 @@ namespace OpenNetLinkApp.PageEvent
         public SendPkiFileEvent PkiFileSendEventFunc = null;   // pki파일전송용
 
         public OSNotificationEvent oSNotificationEvent = null;
+
+        public NotiRequestExitEvent notiRequestExitEvent = null;
+        
         public SGPageEvent()
         {
 
@@ -497,6 +506,11 @@ namespace OpenNetLinkApp.PageEvent
         {
             notiUpdatePolicyEvent = e;
         }
+
+        public NotiRequestExitEvent GetNotiRequestExitEvent() => notiRequestExitEvent;
+        public void SetNotiRequestExitEvent(NotiRequestExitEvent e) => notiRequestExitEvent = e;
+
+
 
         public PageDataRefreshEvent GetPageDataRefreshEvent(Enums.EnumPageView ePageView)
         {

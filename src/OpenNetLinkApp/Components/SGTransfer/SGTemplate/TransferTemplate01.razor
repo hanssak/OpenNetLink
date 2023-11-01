@@ -201,9 +201,9 @@
                             <ul class="list-unstyled" style="font-size:11px;">
                                 @if (transferLogData != null)
                                 {
-                                    @foreach (SGTransferLogData log in transferLogData)
+                                    @for(int idx = (transferLogData.Count-1); idx>= 0 ; idx--)
                                     {
-                                        <li>@($"[ {log.LogDatetime} ] {log.Log}")</li>
+                                        <li>@($"[ {transferLogData[idx].LogDatetime} ] {transferLogData[idx].Log}")</li>
                                     }
                                 }
                             </ul>
