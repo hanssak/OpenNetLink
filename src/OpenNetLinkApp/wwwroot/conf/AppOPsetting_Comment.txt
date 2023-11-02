@@ -265,6 +265,9 @@ nLoginConnectLimitCount : 최초 프로그램 실행 시 서버 접속 Connect L
 nLoginConnectDelaySecond : 최초 프로그램 실행 시 서버 접속 총 대기 시간
                            예) 총 대기시간 3분이면 180 입력 - LimitConnect 횟수가 6이면 30초마다 Connect 시도
 
+bDisableCertAutoUpdate : 윈도우 버전 설치 시, 로컬 보안 정책 > '인증서 자동 업데이트 사용안함' 설정 (default : false)
+								  최초 설치 과정에서만 사용
+
 
 
 
