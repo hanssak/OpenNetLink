@@ -570,7 +570,7 @@ Section "MainSection" SEC01
 	  ${EndIf}
 	  
 	  ;NAC 등록
-	  ${if} ${NAC_LOGIN_TYPE} == '1'
+	  ${If} ${NAC_LOGIN_TYPE} == '1'
 		IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" GnFind GnNotFind
 		GnFind:			
 			ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe -e:AES-${NAC_LOGIN_ENCRYPTKEY}"'
@@ -579,6 +579,10 @@ Section "MainSection" SEC01
 		GnEND:
 	${EndIf}
 	
+	;인증서 자동 업데이트 설정 Off
+	${If} ${DISABLE_CERT_AUTOUPDATE} == 'TRUE'
+		WriteRegDWORD HKLM "SOFTWARE\Policies\Microsoft\SystemCertificates\AuthRoot" "DisableRootAutoUpdate" 1	
+	${EndIf}	
   ${EndIf} ; ${IS_PATCH} == 'TRUE'
 
   

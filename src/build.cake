@@ -32,7 +32,7 @@ var nacLoginEncryptKey ="";	//NAC 사용 시 전달되는 인증정보 암호화
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
 var customName = "NONE";
 var storageName ="NONE";
-
+var disableCertAutoUpdate =false;	//윈도우 버전 최초 설치 시, 로컬 보안 정책 > '인증서 자동 업데이트 사용안함' 설정 (default : false)
 var AppProps = new AppProperty(Context,
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								 "../", 													// Path of the Git Local Repository
@@ -1049,6 +1049,7 @@ Task("PkgCrossflatform")
 					DeleteDirectory($"./artifacts/{AppProps.Platform}/published/Library/SGNacAgent", new DeleteDirectorySettings {Force = true, Recursive = true });
 				nacLoginType ="0";
 				nacLoginEncryptKey ="";
+				disableCertAutoUpdate =false;
 				if(AppProps.Platform == "windows")	//SGNAC.exe는 Window만 필요 시 배포
 				{	
 					//OP파일은 Plain Text인 SiteProfile에서 참고
@@ -1057,17 +1058,25 @@ Task("PkgCrossflatform")
 					{
 						String strOPFile = (String)opFile.FullPath;
 						JObject OPJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(strOPFile));	
-						if(OPJObj["NACLoginType"] != null && OPJObj["NACLoginType"].ToString() != "" && OPJObj["NACLoginType"].ToString() != "0")
+						if(nacLoginType == "0")
 						{
-							if(OPJObj["NACLoginEncryptKey"] == null || OPJObj["NACLoginEncryptKey"].ToString() == "")
-								throw new Exception(String.Format("[Err] NACLoginType 사용 시, 인증상태 정보 암호화를 위한 키 'NACLoginEncryptKey'를 설정해주세요."));
-							
-							//Add SGNac.exe
-							CopyFiles("./OpenNetLinkApp/Library/SGNacAgent/SGNac.exe", $"./artifacts/{AppProps.Platform}/published");
-							nacLoginType = OPJObj["NACLoginType"].ToString();
-							nacLoginEncryptKey = OPJObj["NACLoginEncryptKey"].ToString();
-							break;
-						}							
+							if(OPJObj["NACLoginType"] != null && OPJObj["NACLoginType"].ToString() != "" && OPJObj["NACLoginType"].ToString() != "0")
+							{
+								if(OPJObj["NACLoginEncryptKey"] == null || OPJObj["NACLoginEncryptKey"].ToString() == "")
+									throw new Exception(String.Format("[Err] NACLoginType 사용 시, 인증상태 정보 암호화를 위한 키 'NACLoginEncryptKey'를 설정해주세요."));
+								
+								//Add SGNac.exe
+								CopyFiles("./OpenNetLinkApp/Library/SGNacAgent/SGNac.exe", $"./artifacts/{AppProps.Platform}/published");
+								nacLoginType = OPJObj["NACLoginType"].ToString();
+								nacLoginEncryptKey = OPJObj["NACLoginEncryptKey"].ToString();
+							}
+						}
+
+						if(disableCertAutoUpdate == false)
+						{
+							if(OPJObj["bDisableCertAutoUpdate"] != null && OPJObj["bDisableCertAutoUpdate"].ToString() != "" && OPJObj["bDisableCertAutoUpdate"].ToString().ToUpper() != "FALSE")
+								disableCertAutoUpdate = true;
+						}
 					}
 				}
 				isPatchInstaller=false;
@@ -1096,6 +1105,7 @@ Task("PkgCrossflatform")
 					DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
 			}
 			nacLoginType ="0";
+			disableCertAutoUpdate = false;
 			isPatchInstaller=true;
 			RunTarget("MakeInstaller");		
 		}
@@ -1129,6 +1139,7 @@ Task("MakeInstaller")
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
+					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
 				}
 			});			
 
@@ -1150,6 +1161,7 @@ Task("MakeInstaller")
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
+					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
 				}
 			});
 		}
@@ -1172,6 +1184,7 @@ Task("MakeInstaller")
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
+					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
 				}
 			});			
 		}
