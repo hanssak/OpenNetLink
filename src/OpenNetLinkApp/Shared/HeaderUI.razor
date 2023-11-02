@@ -3520,7 +3520,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             }*@
 
 
-        OS_NOTI os_noti = OS_NOTI.OFFLINE;
+    OS_NOTI os_noti = OS_NOTI.OFFLINE;
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = XmlConf.GetInfoMsg("I_0198");               // 오프라인 되었습니다.
         if (HsCmdCenter.GetFileRecvPossible(groupID) == true)
@@ -3597,6 +3597,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
         {
+            Window.MoveTrayToWebWindow();
             ShowMessage("error", XmlConf.GetErrMsg("E_0235"));
             CLog.Here().Information("RMHeaderNoti-sgLoginData null : Not Login!");
             return;
@@ -3604,6 +3605,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         if (pageService.GetLogoutStatus(groupID))
         {
+            Window.MoveTrayToWebWindow();
             ShowMessage("error", XmlConf.GetErrMsg("E_0235"));
             CLog.Here().Information($"RMHeaderNoti- GetLogoutStatus - GroupID : {groupID}");
             return;

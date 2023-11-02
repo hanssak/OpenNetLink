@@ -48,7 +48,7 @@
     <!-- user info -->
     <li class="nav-link white_font"><font size="2">@(GetUserInfo()?.HeaderUserName)</font></li>
     <li class="nav-item dropdown">
-        <a class="nav-link white_font" data-toggle="dropdown">
+        <a class="nav-link white_font" data-toggle="dropdown" title=@xmlConf.GetTitle("T_ETC_USER_INFO")>
             <i class="fas fa-user-alt "></i>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
@@ -226,7 +226,7 @@
     <!-- /. ClipBoard Dropdown Menu -->
     <!-- Messages Dropdown Menu -->
     <li class="nav-item dropdown">
-        <a class="nav-link white_font" data-toggle="dropdown">
+        <a class="nav-link white_font" data-toggle="dropdown" title=@xmlConf.GetTitle("T_TOOL_MESSAGE")>
             <!--<i class="fas fa-comments "></i>-->
             <i class="@GetNotiIcon() "></i>
             @if ((nNotiCount = GetNotiAllNetSum(strUserSeq)) > 0)
@@ -326,7 +326,7 @@
 
 
     <li class="nav-item dropdown">
-        <a class="nav-link white_font" data-toggle="dropdown">
+        <a class="nav-link white_font" data-toggle="dropdown" title=@xmlConf.GetTitle("T_INFO_ALARM")>
             <!--<i class="fas fa-bell"></i>-->
             <i class="@GetAlarmIcon() "></i>
             @if ((nAlarmCount = GetAlarmAllNetSum(strUserSeq)) > 0)
@@ -367,7 +367,7 @@
                                     <h3 class="dropdown-item-title font-weight-bold mb-2">
                                         <span class="float-left"><i class="fas fa-bell"></i></span>&nbsp;
                                         @AlarmViewHead
-                                        <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))" style="cursor:pointer"><i class="fas fa-times fa-lg"></i></a></span>
+                                        <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))" style="cursor:pointer" ><i class="fas fa-times fa-lg"></i></a></span>
                                     </h3>
                                     <p class="text-xs">@AlarmViewBody</p>
                                     <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</p>
@@ -440,7 +440,7 @@
         </li>
     }
     <li class="nav-item">
-        <a id="toggleRightSideBar" class="nav-link white_font" data-widget="control-sidebar" data-slide="true" role="button"><i class="fas fa-cog"></i></a>
+        <a id="toggleRightSideBar" class="nav-link white_font" data-widget="control-sidebar" data-slide="true" role="button" title=@xmlConf.GetTitle("T_APPCONFIG_COMMON")><i class="fas fa-cog"></i></a>
     </li>
 </ul>
 
