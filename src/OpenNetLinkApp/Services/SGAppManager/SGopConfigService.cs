@@ -253,6 +253,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseCheckZipFileInnerFileCount(int groupId);
 
         public bool GetMakeRecvDownPathShortCut(int groupId);
+
+
+        public bool GetEmptyExtFileTrans(int groupid);
+
     }
 
 
@@ -1151,6 +1155,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bMakeRecvDownPathShortCut;
         }
+
+        public bool GetEmptyExtFileTrans(int groupid)
+        {
+            return AppConfigInfo[groupid].bIsBlockEmptyExt;
+        }
+
+
     }
 
 }

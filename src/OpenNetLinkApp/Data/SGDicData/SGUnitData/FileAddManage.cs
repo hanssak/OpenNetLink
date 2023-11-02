@@ -536,6 +536,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool m_bIsDrm = false;
 
         /// <summary>
+        /// 빈확장자 파일은 차단할지 유무
+        /// </summary>
+        public bool m_bIsBlockEmptyExt = false;
+
+        /// <summary>
         /// OLE개체 및 압축형식 검사가 필요한 문서 확장자 대상 목록 (보통)
         /// <para>"ODT", "DOC", "DOCM", "DOCX", "DOT", "DOTM", "DOTX", "RTF"</para>
         /// <para>"XLS", "XLSB", "XLSM", "XLSX", "XLT", "XLTM", "XLTX", "XLW"</para>
@@ -1653,11 +1658,49 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return !bWhite;
             }
 
+            string strExtData = strExt;
+            strExtData = strExtData.Replace(" ", "");
+
+            // empty 확장자
+            if (strExtData.Equals(""))
+            {
+                if (m_bIsBlockEmptyExt)
+                {
+                    Log.Logger.Here().Information($"### - GetRegExtEnable, input File Ext is empty!!!, file Add Failed, white(true)/black(false): {bWhite} ");
+                    return false;
+                }
+                else
+                {
+
+                    bool bTxtinFilter = false;
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (string.Compare(strExtList[i], "txt", true) == 0)
+                        {
+                            bTxtinFilter = true;
+                            break;
+                        }
+                    }
+
+                    if ((bTxtinFilter && bWhite) || (bTxtinFilter == false && bWhite == false))
+                    {
+                        Log.Logger.Here().Information($"### - GetRegExtEnable, input File Ext is empty!!!, file Add Do - in Policy");
+                        return true;
+                    }
+                    else
+                    {
+                        Log.Logger.Here().Information($"### - GetRegExtEnable, input File Ext is empty!!!, file Add Failed, filefilter have no txt.");
+                        return false;
+                    }
+
+                }
+            }
+
             bool bFind = false;
             for (int i = 0; i < count; i++)
             {
                 // if (strExtList[i].Equals(strExt))
-                if (String.Compare(strExtList[i], strExt, true) == 0)
+                if (String.Compare(strExtList[i], strExtData, true) == 0)
                 {
                     bFind = true;
                     break;
@@ -3317,11 +3360,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             if (String.Compare(strFileMime, "text/plain") == 0) return (eFileAddErr.eFANone, strFileMime);
 
-            if (String.IsNullOrEmpty(strExt) == true)
-            {
-                if (String.Compare(strFileMime, "application/x-executable") == 0) return (eFileAddErr.eFANone, strFileMime);
-                return (eFileAddErr.eFAUNKNOWN, strFileMime);
-            }
+            // empty Ext policy changed // application/x-executable
 
             if (IsValidMimeAndExtension(strFileMime, strExt) == true) return (eFileAddErr.eFANone, strFileMime);
 
@@ -3357,16 +3396,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             string strFileMime = MimeGuesser.GuessMimeType(btFileData);
             Log.Logger.Here().Information("[IsValidFileExtInnerZip] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM);
+
+
             if (String.Compare(strFileMime, "text/plain") == 0) return eFileAddErr.eFANone;
 
             // 0kb			
             if (bEmptyFIleNoCheck && String.Compare(strFileMime, "application/x-empty") == 0) return eFileAddErr.eFANone;
 
-            if (String.IsNullOrEmpty(strExt) == true)
-            {
-                if (String.Compare(strFileMime, "application/x-executable") == 0) return eFileAddErr.eFANone;
-                return eFileAddErr.eUnZipInnerExtUnknown;
-            }
+            // empty Ext policy changed // application/x-executable
 
             if (IsValidMimeAndExtension(strFileMime, strExt) == true) return eFileAddErr.eFANone;
 
