@@ -1758,8 +1758,12 @@
 
         //바탕화면 바로가기 설정
         if(SGAppMgrSvc.OpConfigInfoService.GetMakeRecvDownPathShortCut(groupId))
-        {            
-            string linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.ToName);
+        {
+            string linkName= string.Empty;
+            if(SGAppMgrSvc.OpConfigInfoService.GetUseFromNameRecvDownPathShortCut(groupId))
+                linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.FromName);
+            else
+                linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.ToName);
             CtrlSideUISvc.ChangeRecvDownPathLink(linkName, strNosystemVarPath);
         }
         CLog.Here().Information($"Set DownLoadPath, BaseDownLoadPath, RecvDownPath Set: [{stPath}] useUserPath : {SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId)}");   // siteConfig

@@ -35,6 +35,7 @@ bManualRecvDownChange : 수동다운로드 폴더선택 체크박스 설정값(t
 
 // 자동다운로드 설정
 bMakeRecvDownPathShortCut : 다운로드 수신폴더에 대한 바탕화면 바로가기 생성 여부 (Default : false)
+bUseFromNameRecvDownPathShortCut : 다운로드 수신폴더에 대한 바탕화면 바로가기 생성 시, 이름 정보에 ToName이 아닌, FromName으로 표시 (default:false)
 
 // 우클릭 파일추가 및 자동전송
 bRFileAutoSend: 마우스 우클릭 파일 추가 후 자동전송 체크박스 나오도록 (파일전송 사용할때에만 기능함)(true, false)

@@ -229,6 +229,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseCheckZipFileInnerFileCount { get; set; } = false; // 1회 전송 가능 파일 검사 시 Zip 파일일 경우 내부 파일 전체를 Count에 포함
 
         public bool bMakeRecvDownPathShortCut { get; set; } = false;  //다운로드 수신폴더에 대한 바탕화면 바로가기 생성 여부 (Default : false)
+        public bool bUseFromNameRecvDownPathShortCut { get; set; } = false; //다운로드 수신폴더에 대한 바탕화면 바로가기 생성 시, 이름 정보에 ToName이 아닌, FromName으로 표시 (Default :false)
 
         public bool bIsBlockEmptyExt { get; set; } = false;           // 확장자가 비어있는 파일전송 차단할지 유무(Default:false), 전송가능함
 

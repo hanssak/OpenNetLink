@@ -1405,7 +1405,11 @@
 
                 if (SGAppMgrSvc.OpConfigInfoService.GetMakeRecvDownPathShortCut(groupId))//바탕화면 바로가기 설정
                 {
-                    string linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.ToName);
+                    string linkName= string.Empty;
+                        if(SGAppMgrSvc.OpConfigInfoService.GetUseFromNameRecvDownPathShortCut(groupId))
+                            linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.FromName);
+                        else
+                            linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.ToName);
                     CtrlSideUISvc.ChangeRecvDownPathLink(linkName, recvPath);
                 }
                 Dictionary<string, SGNetOverData> dicSysIdName = null;

@@ -35,7 +35,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public string GetCustomLoginHttpUrl(int groupId);
         public string GetCustomLoginSecurityKey(int groupId);
-        
+
         public string GetCustomLoginSecurityIV(int groupId);
 
         public bool GetUseGPKILogin(int groupId);
@@ -254,6 +254,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetMakeRecvDownPathShortCut(int groupId);
 
+        public bool GetUseFromNameRecvDownPathShortCut(int groupId);
 
         public bool GetEmptyExtFileTrans(int groupid);
 
@@ -444,7 +445,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseLoginIDSave(int groupId)
         {
             return AppConfigInfo[groupId].bUserIDSave;
-        }        
+        }
         public bool GetUseLoginIDSaveCheck(int groupId)
         {
             return AppConfigInfo[groupId].bUserIDSaveCheck;
@@ -1073,7 +1074,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bHiddenLoginLogo;
         }
-        
+
         public bool GetUseLoginCI(int groupId)
         {
             return AppConfigInfo[groupId].bUseLoginCI;
@@ -1154,6 +1155,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetMakeRecvDownPathShortCut(int groupId)
         {
             return AppConfigInfo[groupId].bMakeRecvDownPathShortCut;
+        }
+
+        public bool GetUseFromNameRecvDownPathShortCut(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseFromNameRecvDownPathShortCut;
         }
 
         public bool GetEmptyExtFileTrans(int groupid)
