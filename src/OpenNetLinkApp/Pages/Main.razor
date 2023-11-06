@@ -72,9 +72,9 @@
                                 <img src="/images/ci/sitelogo.png" style="width:60px; height:60px; margin-right:auto; margin-left:auto; display:block">
                             }
 
-                            <p class="login-box-msg1" style="padding-top:@(bUseLoginCI ? 20 : 50)px;color:#fff; font-size:1.4rem;">
+                            <p class="login-box-msg1" style="padding-top:@(bUseLoginCI ? 20 : 50)px;color:#fff; font-size:@(strLoginTextFontSize);">
                                 @*<img src="/images/ci/sitelogo.png" style="width:50px; height:50px; margin-right:auto; margin-left:auto; display:block">*@
-                                @strSystemName <span class="full_txt">@strConNetwork </span>
+                                @strSystemName <span class="full_txt">@strConNetwork</span>
                             </p>
 
                             <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@id" @oninput="@(e => id = e.Value.ToString())" tabindex="1" autocomplete="off">
@@ -84,7 +84,7 @@
                                 //AD 로그인은 PW 사용자 입력 불가 (Readonly)
                                 <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@pw" @oninput="@(e => pw = e.Value.ToString())" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
                             }
-                            else if(SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(0) == (int)Enums.enumNacLoginType.Genian && (srcLoc == "Logout" || !SGAppMgrSvc.SystemService.IsStartedByNAC()))
+                            else if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(0) == (int)Enums.enumNacLoginType.Genian && (srcLoc == "Logout" || !SGAppMgrSvc.SystemService.IsStartedByNAC()))
                             {
                                 //Genian NAC은 NAC 인자에 의해 실행되지 않을때는 PW 표시
                                 <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" value="@pw" @oninput="@(e => pw = e.Value.ToString())" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
@@ -225,6 +225,7 @@
 
     bool bHiddenLogoMode = false;
     bool bUseLoginCI = false;
+    string strLoginTextFontSize = "1.4rem";
 
     private void GoogleOtpCancel()
     {
@@ -598,7 +599,7 @@
                 strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-   strPW = "HsckAD.com";
+            strPW = "HsckAD.com";
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -653,7 +654,7 @@
             pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-    pw = "HsckAD.com";
+        pw = "HsckAD.com";
 #endif
 
         pw = pw.ToLower();
@@ -690,7 +691,7 @@
 
 
 #if DEBUG
-  pw = "HsckAD.com";
+            pw = "HsckAD.com";
 #endif
             pw = pw.ToLower();
 
@@ -907,7 +908,7 @@
             CLog.Here().Information($"doNACLogin - ###### -  Start");
 
             JSRuntime.InvokeAsync<object>("loginCursorChange");
-            
+
             id = nacUserId;
             pw = string.Empty;
 
@@ -1160,7 +1161,7 @@
 
         bHiddenLogoMode = SGAppMgrSvc.OpConfigInfoService.GetHiddenLoginLogo(0);
         bUseLoginCI = SGAppMgrSvc.OpConfigInfoService.GetUseLoginCI(0);
-
+        strLoginTextFontSize = SGAppMgrSvc.OpConfigInfoService.GetLoginTextFontSize(0);
         if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
         {
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -1498,8 +1499,8 @@
 
                     if (SGAppMgrSvc.OpConfigInfoService.GetMakeRecvDownPathShortCut(groupId))//바탕화면 바로가기 설정
                     {
-                        string linkName= string.Empty;
-                        if(SGAppMgrSvc.OpConfigInfoService.GetUseFromNameRecvDownPathShortCut(groupId))
+                        string linkName = string.Empty;
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseFromNameRecvDownPathShortCut(groupId))
                             linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.FromName);
                         else
                             linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.ToName);

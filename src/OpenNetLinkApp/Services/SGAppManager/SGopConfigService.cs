@@ -220,6 +220,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetHiddenLoginLogo(int groupId);
         public bool GetUseLoginCI(int groupId);
+        public string GetLoginTextFontSize(int groupId);
 
         public int GetLoginConnectLimitCount(int groupId);
         public int GetLoginConnectDelaySecond(int groupId);
@@ -1078,6 +1079,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseLoginCI(int groupId)
         {
             return AppConfigInfo[groupId].bUseLoginCI;
+        }
+
+        public string GetLoginTextFontSize(int groupId)
+        {
+            return AppConfigInfo[groupId].strLoginTextFontSize;
         }
         public int GetLoginConnectLimitCount(int groupId)
         {

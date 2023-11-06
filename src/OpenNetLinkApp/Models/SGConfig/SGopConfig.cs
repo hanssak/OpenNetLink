@@ -42,6 +42,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bVisibleLogOutButton { get; set; } = true;              //상단의 [로그아웃] 버튼 표시 여부
         public bool bUseLoginCI { get; set; } = false;                      //로그인 화면 상단에 CI 이미지 표시 여부
 
+        public string strLoginTextFontSize { get; set; } = "1.4rem";             //로그인 화면 망연계솔루션 TEXT FontSize
         public int nLoginConnectLimitCount { get; set; } = 1;                 //최초 프로그램 실행 시 서버 접속 Connect Limit 횟수
 
         public int nLoginConnectDelaySecond { get; set; } = 30;           //최초 프로그램 실행 시 서버 접속 총 대기 시간
