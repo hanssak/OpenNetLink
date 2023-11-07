@@ -291,88 +291,91 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         private static void LoadFile()
         {
-            //로그 삭제
-            HsLogDel hsLog = new HsLogDel();
-            hsLog.Delete(7);    // 7일이전 Log들 삭제
-
-            List<ISGNetwork> listNetworks = SGNetworkService.NetWorkInfo;
-
-            if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
-                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
-
-            _AppConfigInfo = new Dictionary<int, ISGopConfig>();
-            var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
-            foreach (SGNetwork sgNetwork in listNetworks)
+            string AppConfig = "";
+            try
             {
-                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sgNetwork.GroupID}_{sgNetwork.NetPos}.json";
+                //로그 삭제
+                HsLogDel hsLog = new HsLogDel();
+                hsLog.Delete(7);    // 7일이전 Log들 삭제
 
-                CLog.Here().Information($"- AppOPsetting Path: [{AppConfig}]");
+                List<ISGNetwork> listNetworks = SGNetworkService.NetWorkInfo;
 
-                if (File.Exists(AppConfig))
+                if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
+                    Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
+
+                _AppConfigInfo = new Dictionary<int, ISGopConfig>();
+                var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
+                foreach (SGNetwork sgNetwork in listNetworks)
                 {
-                    try
+                    AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sgNetwork.GroupID}_{sgNetwork.NetPos}.json";
+
+                    CLog.Here().Information($"- AppOPsetting Path: [{AppConfig}]");
+
+                    if (File.Exists(AppConfig))
                     {
-                        CLog.Here().Information($"- AppOPsetting Loading... : [{AppConfig}]");
-
-                        byte[] hsckByte = File.ReadAllBytes(AppConfig);
-                        byte[] masterKey = SGCrypto.GetMasterKey();
-
-                        bool isDeCrypt = true;
-                        string strData = String.Empty;
                         try
                         {
-                            byte[] dData = SGCrypto.AESDecrypt256(hsckByte, masterKey, PaddingMode.PKCS7);
-                            strData = Encoding.UTF8.GetString(dData);
+                            CLog.Here().Information($"- AppOPsetting Loading... : [{AppConfig}]");
+
+                            byte[] hsckByte = File.ReadAllBytes(AppConfig);
+                            byte[] masterKey = SGCrypto.GetMasterKey();
+
+                            bool isDeCrypt = true;
+                            string strData = String.Empty;
+                            try
+                            {
+                                byte[] dData = SGCrypto.AESDecrypt256(hsckByte, masterKey, PaddingMode.PKCS7);
+                                strData = Encoding.UTF8.GetString(dData);
+                            }
+                            catch (Exception ex)
+                            {
+                                CLog.Here().Information($"- AppOPsetting Loading... : Decrypt Fail {AppConfig}]");
+                                //디크립션 실패
+                                isDeCrypt = false;
+                            }
+
+                            if (isDeCrypt)
+                            {
+                                SGopConfig appConfig = JsonSerializer.Deserialize<SGopConfig>(strData);
+                                _AppConfigInfo.Add(sgNetwork.GroupID, appConfig);
+
+                            }
+                            else
+                            {
+                                //Open the stream and read it back.
+                                using (FileStream fs = File.OpenRead(AppConfig))
+                                {
+                                    SGopConfig appConfig = (SGopConfig)serializer.ReadObject(fs);
+                                    _AppConfigInfo.Add(sgNetwork.GroupID, appConfig);
+                                }
+                            }
+
+                            CLog.Here().Information($"- AppOPsetting Load Completed : [{AppConfig}]");
                         }
                         catch (Exception ex)
                         {
-                            CLog.Here().Information($"- AppOPsetting Loading... : Decrypt Fail {AppConfig}]");
-                            //디크립션 실패
-                            isDeCrypt = false;
+                            CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+                            _AppConfigInfo.Add(sgNetwork.GroupID, new SGopConfig());
                         }
-
-                        if (isDeCrypt)
-                        {
-                            SGopConfig appConfig = JsonSerializer.Deserialize<SGopConfig>(strData);
-                            _AppConfigInfo.Add(sgNetwork.GroupID, appConfig);
-
-                        }
-                        else
-                        {
-                            //Open the stream and read it back.
-                            using (FileStream fs = File.OpenRead(AppConfig))
-                            {
-                                SGopConfig appConfig = (SGopConfig)serializer.ReadObject(fs);
-                                _AppConfigInfo.Add(sgNetwork.GroupID, appConfig);
-                            }
-                        }
-
-                        CLog.Here().Information($"- AppOPsetting Load Completed : [{AppConfig}]");
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
-                        _AppConfigInfo.Add(sgNetwork.GroupID, new SGopConfig());
-                    }
-                }
-                else
-                {
-                    SGopConfig sgOpConfig = new SGopConfig();
-                    _AppConfigInfo.Add(sgNetwork.GroupID, sgOpConfig);
-                    //파일이 없으면 생성
-                    try
-                    {
-                        using (var fs = new FileStream(AppConfig, FileMode.Create))
+                        SGopConfig sgOpConfig = new SGopConfig();
+                        _AppConfigInfo.Add(sgNetwork.GroupID, sgOpConfig);
+                        //파일이 없으면 생성
+                        try
                         {
-                            var encoding = Encoding.UTF8;
-                            var ownsStream = false;
-                            var indent = true;
-
-                            using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
+                            using (var fs = new FileStream(AppConfig, FileMode.Create))
                             {
-                                serializer.WriteObject(writer, sgOpConfig);
+                                var encoding = Encoding.UTF8;
+                                var ownsStream = false;
+                                var indent = true;
+
+                                using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
+                                {
+                                    serializer.WriteObject(writer, sgOpConfig);
+                                }
                             }
-                        }
 
 #if !DEBUG
                         byte[] info = null;
@@ -392,12 +395,17 @@ namespace OpenNetLinkApp.Services.SGAppManager
                             fs.Write(info, 0, info.Length);
                         }
 #endif
-                    }
-                    catch (Exception ex)
-                    {
-                        CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+                        }
+                        catch (Exception ex)
+                        {
+                            CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"SGopConfigService LoadFile(Path:{AppConfig}) Exception :{ex.ToString()}");
             }
         }
 

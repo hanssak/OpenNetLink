@@ -3,6 +3,7 @@ using OpenNetLinkApp.Models.SGSystem;
 using System;
 using System.IO;
 using System.Text;
+using AgLogManager;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -75,19 +76,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public string GetGenianNACUserID(string nacEncryptKey)
         {
+            string NacFile = Path.Combine(Environment.CurrentDirectory, "NAC");
             try
             {
-                CLog.Debug($"GetGenianNACUserID NAC Encrypt: {nacEncryptKey}");
-
                 if (IsStartedByNAC() == false)
                     return string.Empty;
-
-                string NacFile = Path.Combine(Environment.CurrentDirectory, "NAC");
 
                 if (File.Exists(NacFile))
                 {
                     string strNacEncData = File.ReadAllText(NacFile);
-
+                    CLog.Here().Information($"GetGenianNACUserID NAC Encrypt: {strNacEncData}");
                     //test
                     //strNacEncData = "kf+MFAB+M5Poc54osw5R6izVKLaGMqneqKMvg7N/Qla1M7DY0A3llIle1HwpV3YoTLPGxh3QHjY2mm4WoYHNxg=="; //yhkim41
                     //strNacEncData = "kf+MFAB+M5Poc54osw5R6oL7R7mw5MRfIICRC9ZJWfWH4qaYi9RHGReEiRvIMiUic65TVy4huouqqtt4jstt9Ym31lG2V5b3ZW0XTaQ0RW8="; //errId
@@ -114,11 +112,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
                         }
                     }
                 }
+                else
+                {
+                    CLog.Here().Warning($"GetGenianNACUserID File not Found (Path:{NacFile})");
+                }
                 return string.Empty;
             }
             catch (Exception ex)
             {
-                CLog.Error($"GetGenianNACUserID Exception : " + ex.ToString());
+                CLog.Here().Error($"GetGenianNACUserID Exception : " + ex.ToString());
                 return string.Empty;
             }
         }

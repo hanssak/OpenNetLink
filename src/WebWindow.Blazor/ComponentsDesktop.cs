@@ -33,83 +33,92 @@ namespace WebWindows.Blazor
 
         public static void Run<TStartup>(string windowTitle, string hostHtmlPath, object[] arg)
         {
-            DesktopSynchronizationContext.UnhandledException += (sender, exception) =>
-            {
-                UnhandledException(exception);
-            };
-
-            WebWindow = new WebWindow(windowTitle, options =>
-            {
-                var contentRootAbsolute = Path.GetDirectoryName(Path.GetFullPath(hostHtmlPath));
-
-                options.SchemeHandlers.Add(BlazorAppScheme, (string url, out string contentType) =>
-                {
-                    // TODO: Only intercept for the hostname 'app' and passthrough for others
-                    // TODO: Prevent directory traversal?
-                    var appFile = Path.Combine(contentRootAbsolute, new Uri(url).AbsolutePath.Substring(1));
-                    if (appFile == contentRootAbsolute)
-                    {
-                        appFile = hostHtmlPath;
-                    }
-
-                    contentType = GetContentType(appFile);
-                    return File.Exists(appFile) ? File.OpenRead(appFile) : null;
-                });
-
-                // framework:// is resolved as embedded resources
-                options.SchemeHandlers.Add("framework", (string url, out string contentType) =>
-                {
-                    contentType = GetContentType(url);
-                    return SupplyFrameworkFile(url);
-                });
-            });
-
-            CancellationTokenSource appLifetimeCts = new CancellationTokenSource();
-            Task.Factory.StartNew(async () =>
-            {
-                try
-                {
-                    var ipc = new IPC(WebWindow);
-                    await RunAsync<TStartup>(ipc, appLifetimeCts.Token);
-                }
-                catch (Exception ex)
-                {
-                    UnhandledException(ex);
-                    throw;
-                }
-            });
-
+            Console.WriteLine($"Run ComponentsDescktop");
             try
             {
+                DesktopSynchronizationContext.UnhandledException += (sender, exception) =>
+                {
+                    UnhandledException(exception);
+                };
 
-                ////json에서 초기 시작을 tray 인지 아닌지 판단하여 셋팅
-                ////현재는 AppOpSetting.json에서 가져오는데 추후 AppEnvSetting으로 변경시 여기 json 파일 위치도 변경 필요.
-                //var contentRootAbsolute = Path.GetDirectoryName(Path.GetFullPath(hostHtmlPath));
-                ////json에서 초기 시작을 startProgramReg 인지 아닌지 판단하여 셋팅
-                ////현재는 AppEnvSetting.json에서 가져오는데 추후 AppOpSetting으로 변경시 여기 json 파일 위치도 변경 필요.
-                //var envJsonPath = Path.Combine(contentRootAbsolute, "conf", "AppEnvSetting.json");
-                //string contentsEnv = System.IO.File.ReadAllText(envJsonPath);
-                //using (JsonDocument document = JsonDocument.Parse(contentsEnv))
-                //{
-                //    JsonElement jroot = document.RootElement;
-                //    bool value = jroot.GetProperty("bStartProgramReg").GetBoolean();
-                //    if(value)
-                //        WebWindow.RegStartProgram();
+                WebWindow = new WebWindow(windowTitle, options =>
+                {
+                    var contentRootAbsolute = Path.GetDirectoryName(Path.GetFullPath(hostHtmlPath));
 
-                //    value = jroot.GetProperty("bStartTrayMove").GetBoolean();
-                //    WebWindow.SetTrayStartUse(value);
-                //}
+                    options.SchemeHandlers.Add(BlazorAppScheme, (string url, out string contentType) =>
+                    {
+                        // TODO: Only intercept for the hostname 'app' and passthrough for others
+                        // TODO: Prevent directory traversal?
+                        var appFile = Path.Combine(contentRootAbsolute, new Uri(url).AbsolutePath.Substring(1));
+                        if (appFile == contentRootAbsolute)
+                        {
+                            appFile = hostHtmlPath;
+                        }
 
-                if ((bool)arg[0] == true)
-                    WebWindow.RegStartProgram();
-                WebWindow.SetUseHttpUrl(false);
-                WebWindow.SetTrayStartUse((bool)arg[1]);
-                WebWindow.NavigateToUrl(BlazorAppScheme + "://app/");
-                WebWindow.WaitForExit();
+                        contentType = GetContentType(appFile);
+                        return File.Exists(appFile) ? File.OpenRead(appFile) : null;
+                    });
+
+                    // framework:// is resolved as embedded resources
+                    options.SchemeHandlers.Add("framework", (string url, out string contentType) =>
+                        {
+                            contentType = GetContentType(url);
+                            return SupplyFrameworkFile(url);
+                        });
+                });
+
+                CancellationTokenSource appLifetimeCts = new CancellationTokenSource();
+                Task.Factory.StartNew(async () =>
+                {
+                    try
+                    {
+                        var ipc = new IPC(WebWindow);
+                        await RunAsync<TStartup>(ipc, appLifetimeCts.Token);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Run StartNew Exception {ex.ToString()}");
+                        UnhandledException(ex);
+                        throw;
+                    }
+                });
+
+                try
+                {
+
+                    ////json에서 초기 시작을 tray 인지 아닌지 판단하여 셋팅
+                    ////현재는 AppOpSetting.json에서 가져오는데 추후 AppEnvSetting으로 변경시 여기 json 파일 위치도 변경 필요.
+                    //var contentRootAbsolute = Path.GetDirectoryName(Path.GetFullPath(hostHtmlPath));
+                    ////json에서 초기 시작을 startProgramReg 인지 아닌지 판단하여 셋팅
+                    ////현재는 AppEnvSetting.json에서 가져오는데 추후 AppOpSetting으로 변경시 여기 json 파일 위치도 변경 필요.
+                    //var envJsonPath = Path.Combine(contentRootAbsolute, "conf", "AppEnvSetting.json");
+                    //string contentsEnv = System.IO.File.ReadAllText(envJsonPath);
+                    //using (JsonDocument document = JsonDocument.Parse(contentsEnv))
+                    //{
+                    //    JsonElement jroot = document.RootElement;
+                    //    bool value = jroot.GetProperty("bStartProgramReg").GetBoolean();
+                    //    if(value)
+                    //        WebWindow.RegStartProgram();
+
+                    //    value = jroot.GetProperty("bStartTrayMove").GetBoolean();
+                    //    WebWindow.SetTrayStartUse(value);
+                    //}
+
+                    if ((bool)arg[0] == true)
+                        WebWindow.RegStartProgram();
+                    WebWindow.SetUseHttpUrl(false);
+                    WebWindow.SetTrayStartUse((bool)arg[1]);
+                    WebWindow.NavigateToUrl(BlazorAppScheme + "://app/");
+                    WebWindow.WaitForExit();
+                }
+                finally
+                {
+                    appLifetimeCts.Cancel();
+                }
             }
-            finally
+            catch (Exception ex)
             {
-                appLifetimeCts.Cancel();
+                Console.WriteLine($"Run Exception {ex.ToString()}");
             }
         }
 

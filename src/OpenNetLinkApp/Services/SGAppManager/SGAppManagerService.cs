@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OpenNetLinkApp.Models.SGUserInfo;
 using OpenNetLinkApp.Models.SGNetwork;
 using OpenNetLinkApp.Models.SGConfig;
+using AgLogManager;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -66,18 +67,26 @@ namespace OpenNetLinkApp.Services.SGAppManager
     }
     internal class SGAppManagerService : ISGAppManagerService
     {
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGAppManagerService>();
         public SGAppManagerService()
         {
-            HeaderUIService = new SGHeaderUIService();
-            FooterUIService = new SGFooterUIService();
-            SystemService = new SGSystemService();
-            UserInfoService = new SGUserInfoService(); 
-            SideBarUIService = new SGSideBarUIService();
-            NetworkInfoService = new SGNetworkService();
-            AppConfigInfoService = new SGAppConfigService();
-            OpConfigInfoService = new SGopConfigService();
-            VersionConfigInfoService = new SGVersionConfigService();
-            CtrlSideUIService = new SGCtrlSideUIService(ref VersionConfigInfoService.VersionConfigInfo, NetworkInfoService.NetWorkInfo);
+            try
+            {
+                HeaderUIService = new SGHeaderUIService();
+                FooterUIService = new SGFooterUIService();
+                SystemService = new SGSystemService();
+                UserInfoService = new SGUserInfoService();
+                SideBarUIService = new SGSideBarUIService();
+                NetworkInfoService = new SGNetworkService();
+                AppConfigInfoService = new SGAppConfigService();
+                OpConfigInfoService = new SGopConfigService();
+                VersionConfigInfoService = new SGVersionConfigService();
+                CtrlSideUIService = new SGCtrlSideUIService(ref VersionConfigInfoService.VersionConfigInfo, NetworkInfoService.NetWorkInfo);
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"SGAppManagerService Exception :{ex.ToString()}");
+            }
         }
 
         /* To Manage Header State */
