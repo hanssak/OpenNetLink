@@ -917,6 +917,7 @@
                     ShowMessage("error", strMsg);
                     CLog.Here().Error($"HashCheck Error : {ex.Message}");
                     refTransProgress.CancelClosePopUp();
+                    return;
                 }
             }
         }
@@ -992,7 +993,7 @@
                 ShowMessage("error", strMsg);
                 CLog.Here().Error($"UnZip for transfer : {ex.Message}");
                 refTransProgress.CancelClosePopUp();
-
+                return;
             }
         }
 
