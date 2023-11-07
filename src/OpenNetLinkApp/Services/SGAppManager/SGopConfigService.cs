@@ -134,6 +134,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApprDeptSearch(int groupId);
         public bool GetViewDlpApproverMyDept(int groupId);
         public bool GetUseOneAClockChangeAgentTimer(int groupId);
+        public bool GetUserLineShowNameAndID(int groupId);
         public bool GetFileRecvAlarmRetain(int groupId);
         //public bool GetFileRecvTrayFix(int groupId);
         public bool GetApprCountAlarmRetain(int groupId);
@@ -731,6 +732,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseAgentTime1aClock;
         }
+        public bool GetUserLineShowNameAndID(int groupId)
+        {
+            return AppConfigInfo[groupId].bUserLineShowNameAndID;
+        }
+
         public bool GetFileRecvAlarmRetain(int groupId)
         {
             return AppConfigInfo[groupId].bFileRecvAlarmRetain;

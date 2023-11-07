@@ -45,6 +45,11 @@
                     <th>@strDept </th>            <!--부서-->
                     <th>@strRank </th>            <!--직급-->
                     <th>@strName </th>            <!--이름-->
+                    @if(ShowUserID)
+                    {
+                        <th>@strID </th>            <!--ID-->
+                    }
+                    
                 </tr>
             </thead>
             <tbody>
@@ -58,6 +63,10 @@
                         <td>@item.DeptName</td>
                         <td>@item.Grade</td>
                         <td>@item.Name</td>
+                        @if(ShowUserID)
+                        {
+                            <td>@item.APPR_USERID</td>            <!--ID-->
+                        }
                     </tr>
                 }
 
@@ -70,7 +79,9 @@
     [Parameter] public int TreeHeight { get; set; } = 170;
 
     [Parameter] public bool UseInputSearch { get; set; } = true;
-
+    /// <summary>조회 결과 리스트에 ID 정보 표시</summary>
+    [Parameter]
+    public bool ShowUserID { get; set; } = false;
     [Parameter] public string Seleted_BackColor { get; set; } = "#8FA9D9";
     [Parameter] public string Seleted_ForeColor { get; set; } = "#FFFFFF";
     [Parameter] public string Default_BackColor { get; set; } = "#FFFFFF";
@@ -150,6 +161,7 @@
     private string strSearch = "";
     private string strOrder = "";
     private string strRank = "";
+    private string strID = "";
     private string strDeptPlaceHolder = "";
     private string strNamePlaceHolder = "";
     private string strSelectedDeptCode = "";
@@ -227,6 +239,7 @@
         strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                            // 조회
         strOrder = XmlConf.GetTitle("T_COMMON_ORDER");                              // 순번
         strRank = XmlConf.GetTitle("T_COMMON_RANK");                                // 직급
+        strID = XmlConf.GetTitle("T_COMMON_ID");                                     //ID
         @*strOrder = XmlConf.GetTitle("T_COMMON_ORDER");                              // 순번
             strRank = XmlConf.GetTitle("T_COMMON_RANK");                                // 직급
             strMostTop = XmlConf.GetTitle("T_ETC_TOP");                                 // 맨위

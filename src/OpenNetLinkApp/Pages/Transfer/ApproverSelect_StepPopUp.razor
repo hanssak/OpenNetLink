@@ -35,14 +35,14 @@
                         @if (approverSearchType == "SEARCH")
                         {
 
-                            <SGDeptSearchList UseInputSearch="@useInputInTree" Height="420" UserDataSource="@ApproverSearch"
+                            <SGDeptSearchList UseInputSearch="@useInputInTree" ShowUserID="@showUserId" Height="420" UserDataSource="@ApproverSearch"
                                               OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
 
                         }
                         else //TREE
                         {
                             @*<SGDeptTreeList Height="368" UserSearchList="@ApproverSearch" @bind-SelectedUserSeq="@stSelectApprover" />*@
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="420" TreeHeight="160" UserSearchList="@ApproverSearch"
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" ShowUserID="@showUserId" Height="420" TreeHeight="160" UserSearchList="@ApproverSearch"
                                             OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => SGDeptTreeList_OnItemDoubleClick(item)" />
                         }
                     </div>
@@ -99,6 +99,10 @@
                                                         <th style="text-align:center">@strDept </th>     <!--부서-->
                                                         <th style="text-align:center">@strRank </th>     <!--직급-->
                                                         <th style="text-align:center">@strName </th>     <!--이름-->
+                                                        @if(showUserId)
+                                                        {
+                                                            <th style="text-align:center">@strID </th>     <!--ID-->
+                                                        }
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -108,6 +112,10 @@
                                                             <td>@subitem.DeptName</td>
                                                             <td>@subitem.Grade</td>
                                                             <td>@subitem.Name</td>
+                                                            @if(showUserId)
+                                                            {
+                                                                <td>@subitem.APPR_USERID</td>
+                                                            }
                                                         </tr>
                                                     }
                                                 </tbody>
@@ -157,6 +165,7 @@
     public string strApproverSearch = "";
     public string strDept = "";
     public string strName = "";
+    public string strID = "";
     public string strSearch = "";
     public string strOrder = "";
     public string strRank = "";
@@ -180,7 +189,7 @@
 
     private string approverSearchType = "";
     private bool useInputInTree;
-
+    private bool showUserId = false;
     ///// <summary>
     ///// true 결재자만 검색 (결재자 라인 추가는 APPROVERPROXYRIGHT와 상관없이 일반사용자는 미노출)
     ///// </summary>
@@ -702,6 +711,7 @@
         actionTargetSelect = SelectTarget;
         approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproverSearchType(groupID);
         useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproverTree(groupID);
+        showUserId  = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
         InitText();
     }
 
@@ -725,6 +735,7 @@
             HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResultStep);
             DeptApprLine(true);
         }
+        showUserId  = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
         InitApprLine();
     }
 
@@ -864,6 +875,7 @@
         strApproverSearch = XmlConf.GetTitle("T_COMMON_APPROVESEARCH");             // 결재자 조회
         strDept = XmlConf.GetTitle("T_COMMON_DEPT");                                // 부서
         strName = XmlConf.GetTitle("T_COMMON_NAME");                                // 이름
+        strID = XmlConf.GetTitle("T_COMMON_ID");                                // ID
         strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                            // 조회
         strOrder = XmlConf.GetTitle("T_COMMON_ORDER");                              // 순번
         strRank = XmlConf.GetTitle("T_COMMON_RANK");                                // 직급

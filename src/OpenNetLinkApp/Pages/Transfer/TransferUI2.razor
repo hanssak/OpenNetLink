@@ -642,7 +642,7 @@
                         cntSendQuery++;
                         }*@
 
-                    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
+    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
                     SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "", sgLoginData.GetApproveProxyRight());
                     cntSendQuery++;
                 }
@@ -1670,13 +1670,23 @@
 
             ApprLine.groupIDbyParam = groupIDbyParam;
             ApprLine.Refresh();
+
+            if(refForwardLine != null)
+            {
+                refForwardLine.groupIDbyParam= groupIDbyParam;
+                refForwardLine.Refresh();
+            }
+                
             //dropFile._groupId = groupIDbyParam;
             dropFile.Refresh();
             StateHasChanged();
         }
 
         if (firstRender)
-        {
+        {   
+            ApprLine.Refresh();
+            //dropFile._groupId = groupIDbyParam;
+            dropFile.Refresh();
             //await TransSearchCount();
         }
 
@@ -2042,6 +2052,13 @@
 
             ApprLine.groupIDbyParam = groupIDbyParam;
             ApprLine.Refresh();
+            
+            if(refForwardLine != null)
+            {
+                refForwardLine.groupIDbyParam= groupIDbyParam;
+                refForwardLine.Refresh();
+            }
+                
             //dropFile._groupId = groupIDbyParam;
             dropFile.Refresh();
             StateHasChanged();

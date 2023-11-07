@@ -146,6 +146,7 @@ bAllowDRM : DRM 파일 전송 허용 여부 (true : 전송, false : 차단) - De
 bApprDeptSearch : 결재자 검색 창의 타부서 수정 가능 여부. ( true, false )(siteConfig)
 bApprLineChkBlock : 고정 결재라인 사용할때, 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부(결재자를 추가하라는 메세지 발생유무) ( true : 전송 차단, false : 전송 허용 )(siteConfig)
 bApprLineLocalSave : 결재라인 로컬 저장 여부  ( true, false )
+bUserLineShowNameAndID : 결재라인 및 수신자라인 등에 [이름&직급] 포맷이 아닌, [이름&아이디] 포맷을 사용 (Default:false)
 
 // 클립보드 - 기타
 bUseClipAlarmType : 공통환경설정에서 클립보드 송수신 알림형식 수정가능 유무 (true,false)

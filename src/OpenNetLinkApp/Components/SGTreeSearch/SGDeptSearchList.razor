@@ -32,6 +32,10 @@
                     <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>     <!--부서-->
                     <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>    <!--직급-->
                     <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>    <!--이름-->
+                    @if(ShowUserID)
+                    {   
+                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_ID") </th>    <!--아이디-->                        
+                    }
 
                 </tr>
             </thead>
@@ -44,6 +48,10 @@
                         <td style="text-align:left;">@item.DeptName</td>
                         <td style="text-align:left;">@item.Grade</td>
                         <td style="text-align:left;">@item.Name</td>
+                        @if(ShowUserID)
+                        {   
+                            <td style="text-align:left;">@item.APPR_USERID</td>
+                        }
                     </tr>
                 }
             </tbody>
@@ -60,6 +68,9 @@
     /// </summary>
     [Parameter]
     public bool UseInputSearch { get; set; } = true;
+    /// <summary>조회 결과 리스트에 ID 정보 표시</summary>
+    [Parameter]
+    public bool ShowUserID { get; set; } = false;
     [Parameter] public EventCallback<string[]> OnSearchClick { get; set; }
     [Parameter] public EventCallback<ApproverInfo> OnItemClick { get; set; }
     [Parameter] public EventCallback<ApproverInfo> OnItemDoubleClick { get; set; }

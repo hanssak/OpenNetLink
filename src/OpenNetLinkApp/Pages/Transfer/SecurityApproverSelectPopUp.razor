@@ -48,7 +48,11 @@
                                         <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_DEPT") </th>        <!--부서-->
                                     <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_NAME") </th>        <!--이름-->
                                     <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_RANK") </th>        <!--직급-->
-                                    <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_SELECT2")</th>        <!--선택-->
+                                    @if(showUserId)
+                                    {   
+                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_ID") </th>    <!--아이디-->                        
+                                    }
+                                    <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_SELECT2")</th>        <!--선택-->                                    
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -59,6 +63,10 @@
                                             <td style="text-align: center; vertical-align: middle;">@item[3]</td>
                                             <td style="text-align: center; vertical-align: middle;">@item[1]</td>
                                             <td style="text-align: center; vertical-align: middle;">@item[4]</td>
+                                            @if (showUserId)
+                                            {
+                                                <td style="text-align: center; vertical-align: middle;">@item[0]</td>
+                                            }
                                             <td style="text-align: center; vertical-align: middle;">
                                                 <button @onclick="e => doOk(item[8])" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-user-plus"></i>@XmlConf.GetTitle("T_COMMON_SELECT")</button>
                                             </td>
@@ -96,6 +104,7 @@
     private SGDeptTree refSGDeptTree;
     private string securityApproverSearchType = "";
     private bool useInputInTree;
+    private bool showUserId = false;
 
     public string strCurDept = "";
     public string strCurName = "";
@@ -126,6 +135,7 @@
 
         securityApproverSearchType = SGAppMgrSvc.OpConfigInfoService.GetSecurityApproverSearchType(groupID);
         useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInSecurityApproverTree(groupID);
+        showUserId  = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
 
         //대결자 검색
         SGUserData sgUserData = null;

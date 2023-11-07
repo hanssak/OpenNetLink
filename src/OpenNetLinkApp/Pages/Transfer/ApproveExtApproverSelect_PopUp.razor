@@ -105,13 +105,13 @@
                             <div class="box1" style=" width:46%;  float:left;">
                                 @if (approverSearchType == "SEARCH")
                                 {
-                                    <SGDeptSearchList UseInputSearch="@useInputInTree" Height="149" UserDataSource="@ApproverSearch"
+                                    <SGDeptSearchList UseInputSearch="@useInputInTree" ShowUserID="@showUserId" Height="149" UserDataSource="@ApproverSearch"
                                                   OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(approve) => AssignApprover(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
 
                                 }
                                 else    //TREE
                                 {
-                                    <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="@(useInputInTree?180:216)" TreeHeight="@(useInputInTree?70:87)" UserSearchList="@ApproverSearch"
+                                    <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" ShowUserID="@showUserId" Height="@(useInputInTree?180:216)" TreeHeight="@(useInputInTree?70:87)" UserSearchList="@ApproverSearch"
                                                 OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                                 }
                             </div>
@@ -140,7 +140,7 @@
                                     }
                                 </div>
 
-                                <SGDeptSearchList UseInputSearch="false" Height=@(approverSearchType == "SEARCH" ? 120 : 159) UserDataSource="@ApproverSelect"
+                                <SGDeptSearchList UseInputSearch="false" ShowUserID="@showUserId" Height=@(approverSearchType == "SEARCH" ? 120 : 159) UserDataSource="@ApproverSelect"
                                                   OnItemClick="(item)=>SelectTarget(item.UserSeq)" OnItemDoubleClick="(item)=>target_OnItemDoubleClick(item)" />
 
 
@@ -180,6 +180,8 @@
     private int m_step = 0;
     private string approverSearchType = "";
     private bool useInputInTree;
+    private bool showUserId = false;
+
     private SGDeptTreeList refSGDeptTreeList;
 
     public string strApproverSearch = "";
@@ -661,6 +663,8 @@
 
         approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproveExtSelectType(groupID);
         useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchApproveExtTree(groupID);
+        showUserId  = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
+
         InitText();
 
         sgSettingProc = SGSettingsDBProc.Instance;

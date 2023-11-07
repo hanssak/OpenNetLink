@@ -25,12 +25,12 @@
                     <div class="box1" style=" width:46%;  float:left;">
                         @if (receiverSearchType == "SEARCH")
                         {   //Search
-                            <SGDeptSearchList UseInputSearch="@useInputInTree" Height="359" UserDataSource="@ReceiverSearch" ColumnIndexVisible="false"
+                            <SGDeptSearchList UseInputSearch="@useInputInTree" ShowUserID="@showUserId" Height="359" UserDataSource="@ReceiverSearch" ColumnIndexVisible="false"
                                           OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(approve) => AssignApprover(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                         else //Tree
                         {
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="359" TreeHeight="170" UserSearchList="@ReceiverSearch"
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" ShowUserID="@showUserId" Height="359" TreeHeight="170" UserSearchList="@ReceiverSearch"
                                         OnItemClick="(approve) => AssignApprover(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                     </div>
@@ -57,7 +57,7 @@
                     <!--e btn -->
                     <!--s table -->
                     <div class="box1" style="width:46%;float:left;">
-                        <SGDeptSearchList UseInputSearch="false" Height="358" UserDataSource="@ReceiverSelect" ColumnIndexVisible="false"
+                        <SGDeptSearchList UseInputSearch="false" ShowUserID="@showUserId" Height="358" UserDataSource="@ReceiverSelect" ColumnIndexVisible="false"
                                           OnItemClick="(approve) => SelectTarget(approve.UserSeq)" OnItemDoubleClick="(item) => target_OnItemDoubleClick(item)" />
                     </div>
                     <!--e table -->
@@ -84,6 +84,7 @@
     private static Action<string> actionTargetSelect;
     private string receiverSearchType = "";
     private bool useInputInTree;
+    private bool showUserId = false;
     private SGDeptTreeList refSGDeptTreeList;
 
     public string strApproverSearch = "";
@@ -252,10 +253,8 @@
         actionTargetSelect = SelectTarget;
         receiverSearchType = SGAppMgrSvc.OpConfigInfoService.GetReceiverSearchType(groupID);
         useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInReceiverTree(groupID);
-
-        InitText();
-
-     
+        showUserId  = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
+        InitText();     
     }
 
     public void SetInitDeptName(string strDeptName)
@@ -270,7 +269,6 @@
 
         DeptApprLine();
     }
-
 
     public void DeptApprLine(bool isInit = false)
     {
@@ -332,6 +330,7 @@
             target.Grade = item[5];
             target.Name = item[1];
             target.UserSeq = item[8];
+            target.APPR_USERID= item[0];
             ReceiverSearch.AddLast(target);
             cnt++;
         }
@@ -345,6 +344,16 @@
             refSGDeptTreeList.BindEvent(false);  //수신자 라인 추가는 무조건 일반사용자 노출
         else
             DeptApprLine(true);
+
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        receiverSearchType = SGAppMgrSvc.OpConfigInfoService.GetReceiverSearchType(groupID);
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInReceiverTree(groupID);
+        showUserId  = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
     }
     // [JSInvokable("ReceiverTargetSelect")]
     // public static void ReceiverTargetSelect(string value)

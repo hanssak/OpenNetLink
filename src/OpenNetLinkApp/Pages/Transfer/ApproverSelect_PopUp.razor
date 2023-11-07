@@ -34,7 +34,7 @@
                         @if (approverSearchType == "SEARCH")
                         {
                             //Search
-                            <SGDeptSearchList UseInputSearch="@useInputInTree" Height="359" UserDataSource="@ApproverSearch"
+                            <SGDeptSearchList UseInputSearch="@useInputInTree" ShowUserID="@showUserId" Height="359" UserDataSource="@ApproverSearch"
                                           OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
 
 
@@ -42,7 +42,7 @@
                         }
                         else    //TREE
                         {
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="359" TreeHeight="160" UserSearchList="@ApproverSearch"
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" ShowUserID="@showUserId" Height="359" TreeHeight="160" UserSearchList="@ApproverSearch"
                                             OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                     </div>
@@ -72,7 +72,7 @@
                         </div>
 
 
-                        <SGDeptSearchList UseInputSearch="false" Height="359" UserDataSource="@ApproverSelect"
+                        <SGDeptSearchList UseInputSearch="false" ShowUserID="@showUserId" Height="359" UserDataSource="@ApproverSelect"
                                           OnItemClick="(item)=>SelectTarget(item.UserSeq)" OnItemDoubleClick="(item)=>target_OnItemDoubleClick(item)" />
 
 
@@ -104,6 +104,7 @@
     private int m_step = 0;
     private string approverSearchType = "";
     private bool useInputInTree;
+    private bool showUserId = false;
     private SGDeptTreeList refSGDeptTreeList;
 
     public string strApproverSearch = "";
@@ -470,6 +471,7 @@
 
         approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproverSearchType(groupID);
         useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproverTree(groupID);
+
         InitText();
 
         sgSettingProc = SGSettingsDBProc.Instance;
@@ -560,7 +562,7 @@
         if (sgLoginData == null)
             return;
         m_step = sgLoginData.GetApproveStep();    //결재유형 취득
-
+        showUserId  = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
 
         // 실제 사용안함
         //HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult); //타부서 조회 결과

@@ -132,6 +132,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bApprDeptSearch { get; set; }                              // 결재자 검색 창의 타부서 선택 가능 여부.
         public bool bViewDlpApproverSelectMyDept { get; set; }                   // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
         public bool bUseAgentTime1aClock { get; set; }        // 사후결재 정책, 자정에  검색화면 검색날짜 UI / 일일 송순가능수 UI 변경되는거 Server 시간이 아니라 agent 시간기준으로 동작(XX:00:00에 동작)
+        public bool bUserLineShowNameAndID { get; set; }        // 결재라인 및 수신자라인 등에 [이름 & 직급] 포맷이 아닌, [이름&아이디] 포맷을 사용(Default:false)
 
         //알림 기능
         public bool bFileRecvAlarmRetain { get; set; }                          // 파일 수신 후 알림 유지 사용 유무(환경설정)

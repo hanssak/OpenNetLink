@@ -14,7 +14,15 @@
     @foreach (SGApprover app in approverList)
     {
         <button type="button" class="btn btn-line btn-sm col-xs-1 @app.attrClass">
-            <i class="fas fa-user "></i> @app.Name @app.Grade
+            <i class="fas fa-user "></i> 
+            @if(SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(nDrawPageGroupID))
+            {
+                @($"{app.Name} {app.ID}")
+            }
+            else
+            {
+                @($"{app.Name} {app.Grade}")
+            }
         </button>
         @if (!last.Equals(app))
         {
@@ -33,7 +41,15 @@ else
             nApv = approverList[i + 1];
         }
         <button type="button" class="btn btn-line btn-sm col-xs-1 @cApv.attrClass">
-            <i class="fas fa-user "></i> @cApv.Name @cApv.Grade
+            <i class="fas fa-user "></i> 
+            @if(SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(nDrawPageGroupID))
+            {
+                @($"{cApv.Name} {cApv.ID}")
+            }
+            else
+            {
+                @($"{cApv.Name} {cApv.Grade}")
+            }
         </button>
         @if (nApv != null)
         {
@@ -202,14 +218,15 @@ else
         sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
         if (sgApprLineData == null)
         {
-
             string strApprLineName = sgUserData.GetUserName();
             string strApprLineRank = sgUserData.GetRank();
             string strApprLineDeptName = sgUserData.GetTeamName();
             string strApprLineDeptSeq = sgUserData.GetTeamCode();
             string strApprLineSeq = sgUserData.GetUserSequence();
+            string strApprLineID = sgUserData.GetUserID();
+
             string strApprLineOrder = "0";
-            approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder));
+            approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder, strApprLineID));
             return;
         }
 
@@ -219,6 +236,7 @@ else
         List<string> listApprLineDeptSeq = null;                   // 결재자 부서Seq
         List<string> listApprLineSeq = null;                       // 결재자 Seq
         List<string> listApprLineOrder = null;                     // 결재자 Order
+        List<string> listApprLineID = null;                         //결재자 ID
 
 
         listApprLineName = sgApprLineData.GetBaseApprAndLineName();            // 결재자 이름
@@ -227,6 +245,7 @@ else
         listApprLineDeptSeq = sgApprLineData.GetBaseApprAndLineDeptSeq();      // 결재자 부서Seq
         listApprLineSeq = sgApprLineData.GetBaseApprAndLineSeq();              // 결재자 Seq
         listApprLineOrder = sgApprLineData.GetBaseApprAndLineOrder();          // 결재자 Order
+        listApprLineID = sgApprLineData.GetBaseApprAndLineID();                 //결재자 ID
 
         if (listApprLineName == null)
         {
@@ -286,13 +305,13 @@ else
                 }
 
                 if (m_step == 0 || m_step == 2)
-                    approverList.Add(new SGApprover(listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i]));  // 결재자명, 결재자 직위, 결재자 부서명, 결재자 Seq, 결재자 Order
+                    approverList.Add(new SGApprover(listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i], listApprLineID[i]));  // 결재자명, 결재자 직위, 결재자 부서명, 결재자 Seq, 결재자 Order, 결재자 ID
                 else //1번 STEP OR 결재는 단일단계 결재이므로 결재 순서를 본인을 제외하고는 1로 교정해준다
                 {
                     if (i == 0)
-                        approverList.Add(new SGApprover(listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i]));  // 결재자명, 결재자 직위, 결재자 부서명, 결재자 Seq, 결재자 Order
+                        approverList.Add(new SGApprover(listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i], listApprLineID[i]));  // 결재자명, 결재자 직위, 결재자 부서명, 결재자 Seq, 결재자 Order, 결재자 ID
                     else
-                        approverList.Add(new SGApprover(listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], "1"));  // 결재자명, 결재자 직위, 결재자 부서명, 결재자 Seq, 결재자 Order
+                        approverList.Add(new SGApprover(listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], "1", listApprLineID[i]));  // 결재자명, 결재자 직위, 결재자 부서명, 결재자 Seq, 결재자 Order, 결재자 ID
                 }
 
             }
@@ -347,7 +366,9 @@ else
         string strApprLineDeptSeq = sgUserData.GetTeamCode();
         string strApprLineSeq = sgUserData.GetUserSequence();
         string strApprLineOrder = "0";
-        approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder));
+        string strApprLineID = sgUserData.GetUserID();
+        approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder, strApprLineID));
+
 
         SGApprLineData sgApprLineData = null;
         sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
@@ -377,6 +398,7 @@ else
             strApprLineDeptName = item.DeptName;
             strApprLineDeptSeq = item.DeptSeq;
             strApprLineSeq = item.UserSeq;
+            strApprLineID = item.APPR_USERID;
             //AndOr 결재에서는 apvOrder서 설정되서 넘어오므로 apvOrder값을 사용 2021/03/11
             if (m_step == 2 && item.nApvOrder != 0)
                 strApprLineOrder = item.nApvOrder.ToString();
@@ -387,7 +409,7 @@ else
             if (approverList.Exists(apr => apr.Seq == strApprLineSeq))
                 continue;
 
-            approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder));
+            approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder, strApprLineID));
         }
         last = approverList.Last();
 
@@ -445,11 +467,12 @@ else
         public string Grade { get; set; }
         public string Seq { get; set; }
         public string Order { get; set; }
+        public string ID { get; set; }
         public string attrClass;
 
 
         public SGApprover() { }
-        public SGApprover(string name, string grade, string deptname, string seq, string order)
+        public SGApprover(string name, string grade, string deptname, string seq, string order, string id)
         {
             Name = name;
             Grade = grade;
@@ -457,13 +480,14 @@ else
             deptSeq = "-";
             Seq = seq;
             Order = order;
+            ID = id;
             if (Order.Equals("-99") || Order.Equals("0"))
                 attrClass = "ml-1";
             else
                 attrClass = "";
         }
 
-        public SGApprover(string name, string grade, string deptname, string deptseq, string seq, string order)
+        public SGApprover(string name, string grade, string deptname, string deptseq, string seq, string order, string id)
         {
             Name = name;
             Grade = grade;
@@ -471,6 +495,7 @@ else
             deptSeq = deptseq;
             Seq = seq;
             Order = order;
+            ID=id;
             if (Order.Equals("-99") || Order.Equals("0"))
                 attrClass = "ml-1";
             else
