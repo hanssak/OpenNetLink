@@ -647,14 +647,14 @@
     <T_COMMON_APPROVESEARCH>
       <KR>결재자 조회</KR>
       <JP>決裁者照会</JP>
-      <EN>Views gyeoljaeja</EN>
+      <EN>Views approver</EN>
       <CN>查找审批人</CN>
     </T_COMMON_APPROVESEARCH>
 
     <T_COMMON_SECURESEARCH>
       <KR>보안결재자 조회</KR>
       <JP>保安決裁者照会</JP>
-      <EN>Security gyeoljaeja Views</EN>
+      <EN>Security approver Views</EN>
       <CN>查找安全审批人</CN>
     </T_COMMON_SECURESEARCH>
 
@@ -1186,7 +1186,7 @@
     <T_COMMON_ALLDAYCLOSE>
       <KR>다시 보지 않기</KR>
       <JP></JP>
-      <EN>Hide until today</EN>
+      <EN>Don't show again</EN>
       <CN>不再显示</CN>
     </T_COMMON_ALLDAYCLOSE>
 
@@ -1367,6 +1367,7 @@
       <EN>The file used for the encryption key is broken.<![CDATA[<br>]]>The program will be closed.<![CDATA[<br>]]>Please reinstall the program.</EN>
       <CN></CN>
     </T_COMMON_CRYPTO_VIOLATION_MESSAGE>
+
 
     <!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
 
@@ -1752,7 +1753,7 @@
     </T_FILE_TITLE>
 
     <T_FILE_EMPTYTITLE>
-      <KR>제목을 입력하십시오. (최대 한글 80자, 영문 250자).</KR>
+      <KR>제목을 입력하십시오. (최대 한글 42자, 영문 128자).</KR>
       <JP>タイトルを入力して下さい。 最大ハングル60字まで入力することができます。</JP>
       <EN>Please enter a title. You can enter up to 60 characters.</EN>
       <CN>请输入标题。最多可输入60字。</CN>
@@ -1766,7 +1767,7 @@
     </T_FILE_DESC>
 
     <T_FILE_EMPTYDESC>
-      <KR>설명을 입력하십시오. (최대 한글 80자, 영문 250자)</KR>
+      <KR>설명을 입력하십시오. (최대 한글 83자, 영문 250자)</KR>
       <JP>説明を入力して下さい。 最大80字まで入力することができます。</JP>
       <EN>Please enter a description. You can enter up to 80 characters.</EN>
       <CN>请输入说明。最多可输入80字。</CN>
@@ -1831,7 +1832,7 @@
     <T_APPROVE_PRIVACY>
       <KR>보안결재자</KR>
       <JP>保安決裁者</JP>
-      <EN>Security gyeoljaeja.</EN>
+      <EN>Security approver.</EN>
       <CN>安全审批人</CN>
     </T_APPROVE_PRIVACY>
 
@@ -2596,14 +2597,14 @@
     <T_INFO_USER_APPROVE_RIGHT>
       <KR>결재 권한</KR>
       <JP></JP>
-      <EN>Approval authority</EN>
+      <EN>Appr.Auth</EN>
       <CN></CN>
     </T_INFO_USER_APPROVE_RIGHT>
 
     <T_INFO_USER_PRIVACY_APPROVE_RIGHT>
       <KR>보안 결재 권한</KR>
       <JP></JP>
-      <EN>Secure approval authority</EN>
+      <EN>Secure Appr.Auth.</EN>
       <CN></CN>
     </T_INFO_USER_PRIVACY_APPROVE_RIGHT>
 
@@ -2736,7 +2737,7 @@
     <T_INFO_LIMMIT_FILE>
       <KR>전송최대용량</KR>
       <JP>転送最大サイズ</JP>
-      <EN>The maximum transmission capacity</EN>
+      <EN>Max. transfer capacity</EN>
       <CN>最大传输容量</CN>
     </T_INFO_LIMMIT_FILE>
 
@@ -2841,7 +2842,7 @@
     <T_COMMON_SIZELIMMIT_CLIPBOARD>
       <KR>클립보드 최대용량</KR>
       <JP></JP>
-      <EN>Maximum size of Clipboard</EN>
+      <EN>Max. Size of Clipboard</EN>
       <CN>剪贴板最大容量</CN>
     </T_COMMON_SIZELIMMIT_CLIPBOARD>
 
@@ -2862,21 +2863,21 @@
     <T_INFO_ONEDAY_TRANCE_COUNTLIMIT>
       <KR>일일 전송횟수 제한</KR>
       <JP></JP>
-      <EN>Limit the number of transmissions</EN>
+      <EN>Limit the Num. of transfer</EN>
       <CN>传输次数限制</CN>
     </T_INFO_ONEDAY_TRANCE_COUNTLIMIT>
 
     <T_INFO_ONEDAY_TRANCE_SIZELIMIT>
       <KR>일일 전송용량 제한</KR>
       <JP></JP>
-      <EN>Transmission capacity limit</EN>
+      <EN>transfer capacity limit</EN>
       <CN>传输容量限制</CN>
     </T_INFO_ONEDAY_TRANCE_SIZELIMIT>
 
     <T_INFO_APPROVEEXCEPTION_SIZELIMIT>
       <KR>전송가능 용량</KR>
       <JP></JP>
-      <EN>Transmission capacity</EN>
+      <EN>transfer capacity</EN>
       <CN></CN>
     </T_INFO_APPROVEEXCEPTION_SIZELIMIT>
 
@@ -2918,7 +2919,7 @@
     <T_INFO_TRAY_MOVE>
       <KR>트레이 이동</KR>
       <JP></JP>
-      <EN>Alarm Tray</EN>
+      <EN>Move Tray</EN>
       <CN></CN>
     </T_INFO_TRAY_MOVE>
 
@@ -3172,6 +3173,8 @@
       <EN>Certificates transfer</EN>
       <CN></CN>
     </T_PKI_TITLE_DESC>
+
+
 
     <!-- ********************************************* [END] 인증서전송 화면 (T_PKI_0000) ********************************************* -->
 
@@ -3643,7 +3646,6 @@
       <EN>An error occurred while changing your password. Please try again later.</EN>
       <CN></CN>
     </T_ETC_PASSWORD_CHANGE_ERROR>
-
     <T_ETC_LOGIN_USERID>
       <KR>아이디</KR>
       <JP>ＩＤ</JP>
@@ -3724,14 +3726,14 @@
     <T_ETC_BOTTOM>
       <KR>맨아래</KR>
       <JP>最下</JP>
-      <EN>The most bottom</EN>
+      <EN>Lowest</EN>
       <CN>底端</CN>
     </T_ETC_BOTTOM>
 
     <T_ETC_TOP>
       <KR> 맨위</KR>
       <JP>トップへ</JP>
-      <EN>The most top</EN>
+      <EN>Highest</EN>
       <CN>顶端</CN>
     </T_ETC_TOP>
 
@@ -3995,7 +3997,7 @@
     </T_eFAZIP>
 
     <T_eFACHG>
-      <KR>서버에 등록되지 않은 파일</KR>
+      <KR>확장자 변경</KR>
       <JP>拡張子変更</JP>
       <EN>Change extension</EN>
       <CN>修改扩展名</CN>
@@ -4086,7 +4088,7 @@
     </T_eFAUNKNOWN_ATTACH>
 
     <T_eFACHG_ATTACH>
-      <KR>EML내 서버에 등록되지 않은 파일 포함</KR>
+      <KR>EML내 확장자 변경 파일 포함</KR>
       <JP>EMLファイルの内、拡張子変更ファイル含み</JP>
       <EN>Include file with EML change extension</EN>
       <CN>EML内含有修改扩展名文件</CN>
@@ -4522,7 +4524,7 @@
     <T_ETC_TOTALALARMLOOK>
       <KR>전체 알림 보기</KR>
       <JP></JP>
-      <EN>LOGOUT</EN>
+      <EN>View All</EN>
       <CN></CN>
     </T_ETC_TOTALALARMLOOK>
 
@@ -4562,7 +4564,7 @@
     </T_eUnZipInnerExt>
 
     <T_eUnZipInnerExtChange>
-      <KR>zip파일 내부의 서버에 등록되지 않은 파일</KR>
+      <KR>zip파일 내부의 위변조 파일</KR>
       <JP></JP>
       <EN>Including extension change in compressed file</EN>
       <CN></CN>
@@ -4713,7 +4715,7 @@
     </T_eUNZIP_INNER_EXT>
 
     <T_eUNZIP_INNER_EXT_CHANGE>
-      <KR>%s내에 서버에 등록되지 않은 파일 포함</KR>
+      <KR>%s내에 확장자 변경 포함</KR>
       <JP></JP>
       <EN>Changed File Extension in %s</EN>
       <CN></CN>
@@ -4781,7 +4783,7 @@
       <EN>DRM file in compressed file</EN>
       <CN></CN>
     </T_eUNZIP_INNER_DRMFILE>
-    
+
     <T_eUNZIP_INNER_FILENAME_CHAR_ERR>
       <KR>ZIP 파일 내부 파일이름, 미지원 문자 오류 ({0})</KR>
       <JP></JP>
@@ -4910,7 +4912,7 @@
     <T_APPCONFIG_URLAUTOTRANS_FORWARD>
       <KR>특정 URL 포워딩</KR>
       <JP></JP>
-      <EN>specific URL forwarding</EN>
+      <EN>Specific URL forwarding</EN>
       <CN></CN>
     </T_APPCONFIG_URLAUTOTRANS_FORWARD>
 
@@ -5081,7 +5083,6 @@
       <EN>Run transfer pop-up after adding file</EN>
       <CN></CN>
     </T_APPCONFIG_ASK_FILESEND>
-
     <!-- ********************************************* [END] App 설정 (T_APPCONFIG_0000) ******************************************** -->
 
     <!-- ********************************************* [START] Message 설정 (T_MESSAGE_0000) ********************************************* -->
@@ -5355,7 +5356,7 @@
       <CN></CN>
     </T_eFADOC_EXTRACT_COMPRESS_EXTENSION>
     <T_eFADOC_EXTRACT_CHANGE>
-      <KR>문서 내 파일의 서버에 등록되지 않은 파일 제한</KR>
+      <KR>문서 내 파일의 위변조 제한</KR>
       <JP></JP>
       <EN>Including tampered files in document</EN>
       <CN></CN>
@@ -5541,6 +5542,7 @@
       <CN></CN>
     </T_PAGE_TYPE_EMAIL_TRANSMANAGER>
 
+
     <T_DROP_PROGRESS_STATUS>
       <KR>파일처리 현황</KR>
       <JP></JP>
@@ -5617,6 +5619,7 @@
       <CN></CN>
     </T_DATAPICKER_DAY_MIN_GROUP>
 
+
     <T_FILETRANS_USE_TIME_TITLE>
       <KR>자료전송 가능시간</KR>
       <JP></JP>
@@ -5681,7 +5684,6 @@
       <EN>the data transmission system Download-</EN>
       <CN></CN>
     </T_RECV_DOWNLOAD_LINK_NAME>
-
   </TITLE>
 
   <INFO>
@@ -6647,7 +6649,7 @@
     </I_0137>
 
     <I_0138>
-      <KR>전송제한 및 서버에 등록되지 않은 파일이 발견됐습니다.  &#10;전송이 취소됐습니다.&#10;&#10;제목:%s&#10;파일명:%s&#10;제한 및 서버에 등록되지 않은 파일개수:%s</KR>
+      <KR>전송제한 및 위변조된 파일이 발견됐습니다.  &#10;전송이 취소됐습니다.&#10;&#10;제목:%s&#10;파일명:%s&#10;제한 및 위변조된 파일개수:%s</KR>
       <JP></JP>
       <EN>Transfer restrictions and tampered files were found.  &#10;The transfer was cancelled.&#10;&#10;Title:%s&#10;File name:%s&#10;Limited and number of forged files:%s</EN>
       <CN>发现传输受限和被篡改的文件。  &#10;已取消传输。&#10;&#10;标题:%s&#10;文件名:%s&#10;受限和被篡改的文件个数 :%s</CN>
@@ -7376,6 +7378,7 @@
       <EN>There are new security mail approval request data.</EN>
       <CN> </CN>
     </I_0243>
+
     <I_0244>
       <KR>인증서를 수신 했습니다.</KR>
       <JP> </JP>
@@ -7550,9 +7553,9 @@
     </W_0019>
 
     <W_0020>
-      <KR>제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다.</KR>
+      <KR>제목은 최대 한글 42자, 영문 128자 / 설명은 최대 한글 83자, 영문 250자까지 입력할 수 있습니다.</KR>
       <JP>タイトルおよび説明は最大ハングル80字、英語250字まで入力できます。</JP>
-      <EN>Hangul titles and descriptions up to 80 characters , you can enter up to 250 characters in English.</EN>
+      <EN>The title can be up to 42 Korean characters and 128 English characters, and the description can be up to 83 Korean characters and 250 English characters.</EN>
       <CN>标题和说明最多可输入80字，英文250个字母。</CN>
     </W_0020>
 
@@ -8079,7 +8082,7 @@
     <W_0095>
       <KR>전송대기 중인 파일에서 <![CDATA[<font color='red'>]]>개인정보<![CDATA[</font>]]>가 검출되었습니다.<![CDATA[<br>]]>추가로 보안결재자에게 승인받아야 파일전송이 가능합니다.<![CDATA[<br>]]>제목 :  {0}<![CDATA[<br>]]>파일 전송을 계속 진행하시겠습니까?</KR>
       <JP>転送待機中のファイルから個人情報が検出されました<![CDATA[<br>]]>追加に保安決裁者による承認を行った上で、ファイル転送が可能です.<![CDATA[<br>]]>タイトル： {0} <![CDATA[<br>]]>ファイルの転送を続行しますか？</JP>
-      <EN>Personal information has been detected in the file waiting to be sent.<![CDATA[<br>]]>Add security to be approved by gyeoljaeja Files can be transferred.<![CDATA[<br>]]>Title :  {0}<![CDATA[<br>]]>Do you want to continue the file transfer?</EN>
+      <EN>Personal information has been detected in the file waiting to be sent.<![CDATA[<br>]]>Add security to be approved by approver Files can be transferred.<![CDATA[<br>]]>Title :  {0}<![CDATA[<br>]]>Do you want to continue the file transfer?</EN>
       <CN>在待传输文件中检出个人信息。<![CDATA[<br>]]>须在获得安全审批人的批准后才能传输文件。<![CDATA[<br>]]>标题 :  {0}<![CDATA[<br>]]>确定要继续传输文件吗？</CN>
     </W_0095>
 
@@ -8280,7 +8283,7 @@
     </W_0122>
 
     <W_0123>
-      <KR>&#10;Eml 파일내 서버에 등록되지 않은 첨부파일이 포함 : %d 개</KR>
+      <KR>&#10;Eml 파일내 확장자가 변경된 첨부파일이 포함 : %d 개</KR>
       <JP>&#10;Emlファイル内拡張子が変更された添付ファイルを含み : %d 個</JP>
       <EN>&#10;Includes attachments with changed extensions in Eml files : %d</EN>
       <CN>&#10;Eml文件内含有扩展名被修改的附件：%d个</CN>
@@ -8609,7 +8612,7 @@
     </W_0169>
 
     <W_0170>
-      <KR>전송제한 및 서버에 등록되지 않은 파일이 발견됐습니다.  &#10;전송이 취소됐습니다.&#10;&#10;제목:%s&#10;파일명:%s&#10;제한 및 서버에 등록되지 않은 파일개수:%s</KR>
+      <KR>전송제한 및 위변조된 파일이 발견됐습니다.  &#10;전송이 취소됐습니다.&#10;&#10;제목:%s&#10;파일명:%s&#10;제한 및 위변조된 파일개수:%s</KR>
       <JP></JP>
       <EN>Transfer restrictions and tampered files were found.&#10;The transfer was canceled.&#10;&#10;Title:%s&#10;File name:%s&#10;Limited and number of forged files:%s</EN>
       <CN>发现传输受限及被篡改文件。&#10;已取消传输。&#10;&#10;标题：%s&#10;文件名：%s&#10;受限及被篡改文件数：%s</CN>
@@ -9391,6 +9394,7 @@
       <EN>Please enter a description.</EN>
       <CN>请输入说明。</CN>
     </W_0291>
+
     <W_0292>
       <KR>제목에 사용할 수 없는 문자가 입력되었습니다.<![CDATA[<br>]]>제목을 다시 입력해 주십시요.</KR>
       <JP></JP>
@@ -9460,14 +9464,13 @@
       <EN>It is blocked, Because not connected at file transfer system./r/nFor unlock Blocking of Access, Please contact your administrator.</EN>
       <CN></CN>
     </W_0301>
-    
+
     <W_0302>
       <KR>{0} 압축파일안에 지원하지 않는 이름을 가진 파일이 존재합니다.</KR>
       <JP></JP>
       <EN>There is a file with an unsupported name in the compressed file.{0} </EN>
       <CN></CN>
     </W_0302>
-
   </WARNING>
 
 
@@ -10160,7 +10163,7 @@
     <E_0100>
       <KR>사용정지 및 기간 만료된 결재자가 있습니다.</KR>
       <JP>使用停止および使用期限が切れた決裁者がいます。</JP>
-      <EN>Use the expired period and stopped gyeoljaeja.</EN>
+      <EN>Use the expired period and stopped approver.</EN>
       <CN>存在已停用或到期的审批人。</CN>
     </E_0100>
 
@@ -10181,7 +10184,7 @@
     <E_0103>
       <KR>계정이 삭제된 결재자가 있습니다.</KR>
       <JP>アカウントが削除された決裁者がいます。</JP>
-      <EN>There is an account is deleted gyeoljaeja.</EN>
+      <EN>There is an account is deleted approver.</EN>
       <CN>存在账号已被删除的审批人。</CN>
     </E_0103>
 
@@ -10830,7 +10833,7 @@
     </E_0195>
 
     <E_0196>
-      <KR>/r/n└ 압축파일내 서버에 등록되지 않은 파일 포함 : %d개</KR>
+      <KR>/r/n└ 압축파일내 확장자 변경 포함 : %d개</KR>
       <JP></JP>
       <EN>/r/n└ Including extension change in compressed file: %d</EN>
       <CN></CN>
@@ -11278,6 +11281,8 @@
       <EN>Failed to send certificate.</EN>
       <CN></CN>
     </E_0260>
+
+
     <E_0261>
       <KR>인증서 수신에 실패했습니다.</KR>
       <JP></JP>
@@ -11332,7 +11337,6 @@
       <EN>An error occurred while checking the file for transfer.</EN>
       <CN></CN>
     </E_0269>
-
   </ERROR>
   <!-- ********************************************* [END] MSG ERROR (E_0000) ********************************************* -->
 </TEXT>
