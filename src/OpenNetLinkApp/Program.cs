@@ -142,6 +142,7 @@ namespace OpenNetLinkApp
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"InitializeLogger Exception : {ex.ToString()}");
                 throw;
             }
         }

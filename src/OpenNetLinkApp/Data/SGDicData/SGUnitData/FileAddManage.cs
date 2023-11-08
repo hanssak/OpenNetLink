@@ -613,7 +613,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_nTransCurCount = 0;
         }
 
-        public void SetZipFileInnerInfo(string pathFile, (int, long)info)
+        public void SetZipFileInnerInfo(string pathFile, (int, long) info)
         {
             if (m_ZipFileInnerInfo == null)
                 m_ZipFileInnerInfo = new Dictionary<string, (int, long)>();
@@ -945,7 +945,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 case eFileAddErr.eUnZipInnerDRM:                                // zip파일에 내부의 DRM 파일
                     /* TODO */
                     str = xmlConf.GetTitle("T_eUNZIP_INNER_DRMFILE");                 // T_eUNZIP_INNER_DRMFILE 
-                                                                                //str = "ZIP파일 내부 DRM 파일";
+                                                                                      //str = "ZIP파일 내부 DRM 파일";
                     break;
                 case eFileAddErr.eUnZipInnerFileName:                                // zip파일에 내부의 DRM 파일
                     /* TODO */
@@ -3232,7 +3232,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
         public static bool IsDRMFilePath(string path)
         {
-            using(FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+            using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
                 byte[] btFileData = new byte[MaxBufferSize];
                 stream.Read(btFileData, 0, MaxBufferSize);
@@ -4511,9 +4511,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 long innerFileSize = 0;
 
                 enRet = ScanZipFile(currentFile, strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, nOption, 1, blWhite, strExtInfo, 0, hsStream.Type.ToUpper(),
-                    out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtract,ref innerFileCount, ref innerFileSize, bDenyPasswordZIP);
+                    out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtract, ref innerFileCount, ref innerFileSize, bDenyPasswordZIP);
 
-                SetZipFileInnerInfo((stStream as FileStream).Name , (innerFileCount, innerFileSize));
+                SetZipFileInnerInfo((stStream as FileStream).Name, (innerFileCount, innerFileSize));
 
                 // KKW
                 //if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
@@ -4571,7 +4571,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="bZipPasswdCheck"></param>
         /// <returns></returns>
         public eFileAddErr ScanZipFile(FileAddErr currentFile, string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nBlockOption, int nCurDepth,
-            bool blWhite, string strExtInfo, int nErrCount, string strExtType, out int nTotalErrCount, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, DocumentExtractType documentExtractType,ref int innerFileCount, ref long innerFileSize, bool bZipPasswdCheck = true)
+            bool blWhite, string strExtInfo, int nErrCount, string strExtType, out int nTotalErrCount, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, DocumentExtractType documentExtractType, ref int innerFileCount, ref long innerFileSize, bool bZipPasswdCheck = true)
         {
             bIsApproveExt = false;
             eFileAddErr enErr = eFileAddErr.eFANone;
@@ -4635,7 +4635,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         nCurErrCount++;
                         continue;
                     }
-                    
+
                     //내부 파일 Count 합산, 폴더 포함
                     innerFileCount++;
                     if (extractFile.Attributes.HasFlag(FileAttributes.Directory))
@@ -4715,7 +4715,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     //CheckDocumentFile()
                     //압축해제한 파일의 Stream 필요
                     //Check Document File (압축파일 내 문서검사할 파일이 존재하는 경우)
-                    
+
                     if (ListCheckableDocumentExtension.Exists(ext => (string.Compare(ext, strNoDotExt, true) == 0)))
                     {
                         //압축 내부 문서의 압축해제 개체를 보관할 폴더 (Temp/ZipExtract/ZipName/Document_Extract)
@@ -5563,72 +5563,83 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public void LoadMimeConf(int groupID)
         {
-            lock (objLock)
+            string strFileName = "";
+            try
             {
-
-                string strFileName = String.Format("FileMime.{0}.conf", groupID.ToString());
-                strFileName = Path.Combine("wwwroot/conf", strFileName);
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                lock (objLock)
                 {
-                    strFileName = strFileName.Replace("/", "\\");
-                }
-                else
-                {
-                    strFileName = strFileName.Replace("\\", "/");
-                }
 
-                try
-                {
-                    string strEncMimeInfo = System.IO.File.ReadAllText(strFileName);
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    string strMimeInfo = sgRSACrypto.MimeConfDecrypt(strEncMimeInfo);
-
-                    if (strMimeInfo.Equals(""))
-                        return;
-
-                    string strMimeSavedData = "";
-                    bool bShowMimeLog = false;
-                    if (dicMimeConfData.TryGetValue(groupID, out strMimeSavedData))
+                    strFileName = String.Format("FileMime.{0}.conf", groupID.ToString());
+                    strFileName = Path.Combine("wwwroot/conf", strFileName);
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
-                        if (strMimeSavedData != strEncMimeInfo)
-                        {
-                            if (dicMimeConfData.Remove(groupID))
-                                bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
-                        }
+                        strFileName = strFileName.Replace("/", "\\");
                     }
                     else
                     {
-                        bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
+                        strFileName = strFileName.Replace("\\", "/");
                     }
 
-                    //if (bShowMimeLog == false)
-                    //    Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Skip MimeType Display");
-
-
-                    if (strMimeInfo[strMimeInfo.Length - 1] == '\n')
-                        strMimeInfo = strMimeInfo.Substring(0, strMimeInfo.Length - 1);
-                    string[] strMimeList = strMimeInfo.Split('\n');
-                    if (strMimeList.Length <= 1)
-                        return;
-                    for (int i = 1; i < strMimeList.Length; i++)
+                    try
                     {
-                        string[] strSplit = strMimeList[i].Split(' ');
-                        if (strSplit.Length < 2)
-                            continue;
+                        string strEncMimeInfo = System.IO.File.ReadAllText(strFileName);
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        string strMimeInfo = sgRSACrypto.MimeConfDecrypt(strEncMimeInfo);
 
-                        if (bShowMimeLog)
-                            Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Add MimeType : {strSplit[0]}, Ext : {strSplit[1]}");
+                        if (strMimeInfo.Equals(""))
+                            return;
 
-                        MimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
+                        string strMimeSavedData = "";
+                        bool bShowMimeLog = false;
+                        if (dicMimeConfData.TryGetValue(groupID, out strMimeSavedData))
+                        {
+                            if (strMimeSavedData != strEncMimeInfo)
+                            {
+                                if (dicMimeConfData.Remove(groupID))
+                                    bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
+                            }
+                        }
+                        else
+                        {
+                            bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
+                        }
+
+                        //if (bShowMimeLog == false)
+                        //    Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Skip MimeType Display");
+
+
+                        if (strMimeInfo[strMimeInfo.Length - 1] == '\n')
+                            strMimeInfo = strMimeInfo.Substring(0, strMimeInfo.Length - 1);
+                        string[] strMimeList = strMimeInfo.Split('\n');
+                        if (strMimeList.Length <= 1)
+                            return;
+                        for (int i = 1; i < strMimeList.Length; i++)
+                        {
+                            string[] strSplit = strMimeList[i].Split(' ');
+                            if (strSplit.Length < 2)
+                                continue;
+
+                            if (bShowMimeLog)
+                                Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Add MimeType : {strSplit[0]}, Ext : {strSplit[1]}");
+
+                            MimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
+                        }
                     }
-                }
-                catch (FileNotFoundException ioEx)
-                {
-                    Log.Logger.Here().Error($"LoadMimeConf, GroupID:{groupID}, Exception Msg = [{ioEx.Message}]");
-                }
+                    catch (FileNotFoundException ioEx)
+                    {
+                        Log.Logger.Here().Error($"LoadMimeConf, GroupID:{groupID}, Exception Msg = [{ioEx.Message}]");
+                    }
+                    catch(Exception ex)
+                    {
+                        Log.Logger.Here().Error($"LoadMimeConf (Path:{strFileName}) GroupID:{groupID}, Exception Msg = [{ex.Message}]");
+                    }
 
-            } // lock (objLock)
-
+                } // lock (objLock)
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Here($"LoadMimeConf Exception (Path:{strFileName}) {ex.ToString()}");
+            }
         }
 
         public void SetOLEMimeList(int groupID, List<Dictionary<int, string>> oleMimeList)

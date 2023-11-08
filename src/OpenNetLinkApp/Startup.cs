@@ -11,22 +11,37 @@ namespace OpenNetLinkApp
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<XmlConfService>();
-            services.AddSGAppManagerService();
-            services.AddSGAppUpdaterService();
-            services.AddSingleton<DragAndDropService>();
-            services.AddSingleton<HSCmdCenter>();
-            services.AddSingleton<PageStatusService>();
-            services.AddSingleton<OSXcmdService>();
-            services.AddFileReaderService(options => {
-                options.InitializeOnFirstCall = true;
-                options.UseWasmSharedBuffer = false;
-            });
+            try
+            {
+                services.AddSingleton<XmlConfService>();
+                services.AddSGAppManagerService();
+                services.AddSGAppUpdaterService();
+                services.AddSingleton<DragAndDropService>();
+                services.AddSingleton<HSCmdCenter>();
+                services.AddSingleton<PageStatusService>();
+                services.AddSingleton<OSXcmdService>();
+                services.AddFileReaderService(options => {
+                    options.InitializeOnFirstCall = true;
+                    options.UseWasmSharedBuffer = false;
+                });
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine($"Startup ConfigureServices Exception : {ex.ToString()}");
+            }
         }
 
         public void Configure(DesktopApplicationBuilder app)
         {
-            app.AddComponent<App>("app");
+            try
+            {
+                app.AddComponent<App>("app");
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine($"Startup Configure Exception : {ex.ToString()}");
+            }
+            
         }
     }
 }
