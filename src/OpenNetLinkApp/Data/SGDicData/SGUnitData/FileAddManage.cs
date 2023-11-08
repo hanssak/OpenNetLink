@@ -24,6 +24,7 @@ using BlazorInputFile;
 using System.Collections;
 using static OpenNetLinkApp.Common.Enums;
 using OpenNetLinkApp.Common;
+using SharpCompress.Readers;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -462,6 +463,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strMsg = xmlConf.GetWarnMsg("W_0271");                      // 압축파일안에 DRM이 적용된 {0}파일이 있습니다.
                     strMsg = String.Format(strMsg, strFileName);
                     break;
+                case eFileAddErr.eUnZipInnerFileName:
+                    strMsg = xmlConf.GetWarnMsg("W_0302");                      // {0} 압축파일안에 지원하지 않는 이름을 가진 파일이 존재합니다.
+                    strMsg = String.Format(strMsg, strFileName);
+                    break;
 
 
                 // 70 ~ 72
@@ -771,7 +776,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 _ => eFileAddErr.eFADOC_EXTRACT_COMMONE  //정의되지 않은 에러
             };
 
-        public string SetExceptionReason(eFileAddErr err)
+        public string SetExceptionReason(eFileAddErr err, string msg)
         {
             string str = "";
             switch (err)
@@ -941,6 +946,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     /* TODO */
                     str = xmlConf.GetTitle("T_eUNZIP_INNER_DRMFILE");                 // T_eUNZIP_INNER_DRMFILE 
                                                                                 //str = "ZIP파일 내부 DRM 파일";
+                    break;
+                case eFileAddErr.eUnZipInnerFileName:                                // zip파일에 내부의 DRM 파일
+                    /* TODO */
+                    str = xmlConf.GetTitle("T_eUNZIP_INNER_FILENAME_CHAR_ERR");       // T_eUNZIP_INNER_FILENAME_CHAR_ERR 
+                    if(String.IsNullOrEmpty(msg))
+                    {
+                        str = str.Substring(0, str.Length - 6);
+                    }
+                    else
+                        str = String.Format(str, msg);                                    //str = "ZIP 파일 내부 파일이름, 미지원 문자 오류";
                     break;
 
                 case eFileAddErr.eFA_LONG_PATH:                                //전송 길이초과
@@ -2193,7 +2208,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strReason, strCount = "";
             foreach (eFileAddErr err in fileAddErrReason.Keys)
             {
-                strReason = SetExceptionReason(err);
+                strReason = SetExceptionReason(err, "");
                 strCount = GetExceptionCountString(fileAddErrReason[err]);
                 m_FileAddErrReason.Add((strReason, strCount));
             }
@@ -2220,7 +2235,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     includeErr = true;
 
                     //Tree에 표시할 사유 세팅
-                    err.ExceptionReason = SetExceptionReason(err.eErrType);
+                    err.ExceptionReason = SetExceptionReason(err.eErrType, err.ExceptionReason);
                     int errCnt = getFileAddErrReason.FirstOrDefault(i => i.Key == err.eErrType).Value;
                     getFileAddErrReason[err.eErrType] = ++errCnt;
                 }
@@ -4578,13 +4593,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     if (dirUnzipFilesDir.Exists != true) dirUnzipFilesDir.Create();
 
                     #region [검사를 위해 임시 폴더에 압축 해제]
-                    eFileAddErr unzipResult = unzipFile(strZipFile, strTempUnzipDirPath, nCurDepth, SGFileExamEvent, ExamCount, TotalCount, bZipPasswdCheck);
-                    if (unzipResult != eFileAddErr.eFANone)
+                    (eFileAddErr, string) unzipResult = unzipFile(strZipFile, strTempUnzipDirPath, nCurDepth, SGFileExamEvent, ExamCount, TotalCount, bZipPasswdCheck);
+                    if (unzipResult.Item1 != eFileAddErr.eFANone)
                     {
                         //비밀번호 등의 문제로 압축해제 실패 시 검사 실패 return
-                        currentFile.eErrType = unzipResult;
+                        currentFile.eErrType = unzipResult.Item1;
+                        currentFile.ExceptionReason = unzipResult.Item2;
                         nTotalErrCount = nCurErrCount++;
-                        return unzipResult;
+                        return unzipResult.Item1;
                     }
                     #endregion
                 }
@@ -4755,7 +4771,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     eFileAddErr enRet = ScanZipFile(childFile, strOrgZipFile, strOrgZipFileRelativePath, strCurZip, Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(extractFile.Name)), nMaxDepth, nBlockOption, nCurDepth + 1,
                         blWhite, strExtInfo, nCurErrCount, Path.GetExtension(extractFile.Name).Substring(1), out nInnerErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtractType, ref innerFileCount, ref innerFileSize);
 
-                    if (enRet != eFileAddErr.eFANone) enErr = enRet;
+                    if (enRet != eFileAddErr.eFANone)
+                    {
+                        enErr = enRet;
+                    }
+                    if(childFile.eErrType != eFileAddErr.eFANone)
+                        currentFile.HasChildrenErr = true;
+
                     if (childFile.HasChildrenErr) currentFile.HasChildrenErr = true;
                     nCurErrCount += nInnerErrCount;
                 }
@@ -4771,7 +4793,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 return enErr;
             }
-            catch (Exception ex) { throw ex; }
+            catch (Exception ex) {
+                Log.Logger.Here().Error($"[ScanZipFile] {strZipFile} Err : {ex.Message}");
+                throw ex; 
+            }
         }
 
         /// <summary>
@@ -4779,7 +4804,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="fileFullName"></param>
         /// <param name="destFullPath"></param>
-        public eFileAddErr unzipFile(string fileFullName, string destFullPath, int nCurDepth, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = true)
+        public (eFileAddErr, string) unzipFile(string fileFullName, string destFullPath, int nCurDepth, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = true)
         {
             try
             {
@@ -4829,11 +4854,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                 if (SGFileExamEvent != null)
                                     SGFileExamEvent(per, fileName);
 
+                                string strTempPath = "";
+                                //Zip 내부파일 FileName Check
+                                if (bUseCrossPlatformOSforFileName)
+                                {
+                                    foreach (var entry in archi.Entries.Where(entry => !entry.IsDirectory))
+                                    {
+                                        // Check Password	
+                                        if (entry.IsEncrypted == true && bZipPasswdCheck == true)
+                                            return (nCurDepth == 1) ? (eFileAddErr.eFAZipPW, fileFullName) : (eFileAddErr.eUnZipInnerZipPassword, fileFullName);
+
+                                        strTempPath = entry.Key.Replace("\\", "/");
+                                        if (GetFileNameEnable(strTempPath) == false)
+                                        {
+                                            return (eFileAddErr.eUnZipInnerFileName, entry.Key);
+                                        }
+
+                                    }
+                                }
+
                                 foreach (var entry in archi.Entries.Where(entry => !entry.IsDirectory))
                                 {
                                     // Check Password	
                                     if (entry.IsEncrypted == true && bZipPasswdCheck == true)
-                                        return (nCurDepth == 1) ? eFileAddErr.eFAZipPW : eFileAddErr.eUnZipInnerZipPassword;
+                                        return (nCurDepth == 1) ? (eFileAddErr.eFAZipPW, fileFullName) : (eFileAddErr.eUnZipInnerZipPassword, fileFullName);
 
                                     //그냥 만들고 시작하는게 나을 거 같다.
                                     // Extract File in Zip 
@@ -4849,7 +4893,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         {
                             Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
                             if (bZipPasswdCheck == true)
-                                return (nCurDepth == 1) ? eFileAddErr.eFAZipPW : eFileAddErr.eUnZipInnerZipPassword;
+                                return (nCurDepth == 1) ? (eFileAddErr.eFAZipPW, fileFullName) : (eFileAddErr.eUnZipInnerZipPassword, fileFullName);
                         }
                         #endregion [ZIP/7Z 형식 검사]
                         break;
@@ -4869,23 +4913,53 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                             if (SGFileExamEvent != null)
                                 SGFileExamEvent(per, fileName);
+                            if (bUseCrossPlatformOSforFileName)
+                            {
+                                (bool, string) result = TarFileCheckFileName(fileFullName);
+                                if (result.Item1)
+                                    return (eFileAddErr.eUnZipInnerFileName, result.Item2);
+                            }
+
                             CsFunction.TarFileDecompress(fileFullName, destFullPath);
                         }
                         catch (System.Exception ex)
                         {
                             Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
                             if (bZipPasswdCheck == true)
-                                return (nCurDepth == 1) ? eFileAddErr.eFAZipPW : eFileAddErr.eUnZipInnerZipPassword;
+                                return (nCurDepth == 1) ? (eFileAddErr.eFAZipPW, fileFullName) : (eFileAddErr.eUnZipInnerZipPassword, fileFullName);
                         }
                         #endregion [TAR 형식 검사]
                         break;
                 }
-                return eFileAddErr.eFANone;
+                return (eFileAddErr.eFANone, "");
             }
             catch (Exception ex)
             {
                 throw;
             }
+        }
+
+        public (bool, string) TarFileCheckFileName(string filePath)
+        {
+            string strTempPath = "";
+            using (Stream stream = System.IO.File.OpenRead(filePath))
+            {
+                using (var reader = ReaderFactory.Open(stream))
+                {
+                    while (reader.MoveToNextEntry())
+                    {
+                        if (!reader.Entry.IsDirectory)
+                        {
+                            strTempPath = reader.Entry.Key.Replace("\\", "/");
+                            if (GetFileNameEnable(strTempPath) == false)
+                            {
+                                return (true, reader.Entry.Key);
+                            }
+                        }
+                    }
+                }
+            }
+            return (false, "");
         }
         /// <summary>
         /// ZIP 파일압축해제
@@ -4893,6 +4967,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="fileFullName"></param>
         /// <param name="destFullPath"></param>
         /// <returns></returns>
+
         public bool unzipFile(string fileFullName, string destFullPath)
         {
             try
