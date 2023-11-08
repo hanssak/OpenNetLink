@@ -343,11 +343,11 @@ namespace OfficeExtractor
                         if (_passwordProtectedChecker.IsFileProtected(inputFile).Protected)
                             ThrowPasswordProtected(inputFile);
 
-                        if (extension == ".DOCX")
-                        {
-                            if (DocumentCorruptCheck(inputFile, outputFolder))
-                                throw new DocumentCorrupt("ERROR FILE CHANGE");
-                        }
+                        //if (extension == ".DOCX")
+                        //{
+                        if (DocumentCorruptCheck(inputFile, outputFolder))
+                            throw new DocumentCorrupt("ERROR FILE CHANGE");
+                        //}
 
                         // Word 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/word/embeddings/", outputFolder, "Word");
@@ -372,14 +372,15 @@ namespace OfficeExtractor
                     case ".XLSX":
                     case ".XLTM":
                     case ".XLTX":
+                    case ".XLAM":
                         if (_passwordProtectedChecker.IsFileProtected(inputFile).Protected)
                             ThrowPasswordProtected(inputFile);
 
-                        if (extension == ".XLSX")
-                        {
-                            if (DocumentCorruptCheck(inputFile, outputFolder))
-                                throw new DocumentCorrupt("ERROR FILE CHANGE");
-                        }
+                        //if (extension == ".XLSX")
+                        //{
+                        if (DocumentCorruptCheck(inputFile, outputFolder))
+                            throw new DocumentCorrupt("ERROR FILE CHANGE");
+                        //}
 
                         // Excel 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/xl/embeddings/", outputFolder, "Excel");
@@ -412,16 +413,20 @@ namespace OfficeExtractor
                     case ".POTX":
                     case ".PPSM":
                     case ".PPSX":
+                    case ".PPAM":
                     case ".PPTM":
                     case ".PPTX":
+                    case ".SLDM":
+                    case ".SLDX":
+                    case ".THMX":
                         if (_passwordProtectedChecker.IsFileProtected(inputFile).Protected)
                             ThrowPasswordProtected(inputFile);
 
-                        if (extension == ".PPTX")
-                        {
-                            if (DocumentCorruptCheck(inputFile, outputFolder))
-                                throw new DocumentCorrupt("ERROR FILE CHANGE");
-                        }
+                        //if (extension == ".PPTX" || extension == ".THMX" || extension == ".SLDX" || )
+                        //{
+                        if (DocumentCorruptCheck(inputFile, outputFolder))
+                            throw new DocumentCorrupt("ERROR FILE CHANGE");
+                        //}
 
                         // PowerPoint 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/ppt/embeddings/", outputFolder, "PowerPoint");
@@ -430,7 +435,7 @@ namespace OfficeExtractor
                     default:
                         var message = "The file '" + Path.GetFileName(inputFile) +
                                       "' is not supported, only .ODT, .DOC, .DOCM, .DOCX, .DOT, .DOTM, .DOTX, .RTF, .XLS, .XLSB, .XLSM, .XLSX, .XLT, " +
-                                      ".XLTM, .XLTX, .XLW, .POT, .PPT, .POTM, .POTX, .PPS, .PPSM, .PPSX, .PPTM, .PPTX, .HML, .HWP and .HWPX are supported";
+                                      ".XLTM, .XLTX, .XLW, .POT, .PPT, .POTM, .POTX, .PPS, .PPSM, .PPSX, .PPTM, .PPTX, .SLDX, .SLDM, .THMX, .XLAM, .HML, .HWP and .HWPX are supported";
 
                         Logger.WriteToLog(message);
                         throw new OEFileTypeNotSupported(message);
@@ -441,11 +446,23 @@ namespace OfficeExtractor
                 CLog.Error($"Extract Exception - The file '{Path.GetFileName(inputFile)}' is corrupt");
                 throw new OEFileIsCorrupt($"The file '{Path.GetFileName(inputFile)}' is corrupt");
             }
+            catch (OEFileIsPasswordProtected ex)
+            {
+                throw ex;
+            }
             catch (Exception exception)
             {
                 CLog.Error($"Extract Exception - {exception.ToString()}");
-                Logger.WriteToLog($"Cant check for embedded object because an error occured, error: {exception.Message}");
-                throw;
+
+                if (extension == ".HWP" || extension == ".HWT")
+                    result = ExtractFromHwpxFormat(inputFile, outputFolder, "Hwpx");
+                else if (extension == ".HWPX" || extension == ".HWTX")
+                    result = ExtractFromHwpFormat(inputFile, outputFolder, "Hwp");
+                else
+                {
+                    Logger.WriteToLog($"Cant check for embedded object because an error occured, error: {exception.Message}");
+                    throw;
+                }
             }
 
             var count = result.Count;
@@ -467,7 +484,6 @@ namespace OfficeExtractor
             outputFolder = FileManager.CheckForDirectorySeparator(outputFolder);
 
             List<string> result;
-            
             CLog.Information($"ExcuteExtractor.Extract Checking Data - extension[{extension}] inputFile.Length[{inputFile?.Length}]");
 
             try
@@ -501,8 +517,8 @@ namespace OfficeExtractor
 
                         //if (extension == ".DOCX")
                         //{
-                            if (DocumentCorruptCheck(inputFile, outputFolder))
-                                throw new DocumentCorrupt("ERROR FILE CHANGE");
+                        if (DocumentCorruptCheck(inputFile, outputFolder))
+                            throw new DocumentCorrupt("ERROR FILE CHANGE");
                         //}
 
                         // Word 2007 - 2013
@@ -523,21 +539,21 @@ namespace OfficeExtractor
                         result = Excel.Extract(inputFile, outputFolder);
                         break;
 
-                    case ".XLSX":
-                    case ".XLSM":
-                    case ".XLTX":
-                    case ".XLTM":
                     case ".XLSB":
+                    case ".XLSM":
+                    case ".XLSX":
+                    case ".XLTM":
+                    case ".XLTX":
                     case ".XLAM":
                         if (_passwordProtectedChecker.IsStreamProtected(inputFile).Protected)
                             ThrowPasswordProtected(inputFileName);
 
-                        //if (extension == ".XLSX")
-                        //{
-                            if (DocumentCorruptCheck(inputFile, outputFolder))
-                                throw new DocumentCorrupt("ERROR FILE CHANGE");
+                        //                        if (extension == ".XLSX")
+                        //                        {
+                        if (DocumentCorruptCheck(inputFile, outputFolder))
+                            throw new DocumentCorrupt("ERROR FILE CHANGE");
 
-                        //}
+                        //                        }
                         // Excel 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/xl/embeddings/", outputFolder, "Excel");
                         break;
@@ -566,25 +582,25 @@ namespace OfficeExtractor
                         result = PowerPoint.Extract(inputFile, outputFolder);
                         break;
 
-                    case ".PPTX":
-                    case ".PPTM":
-                    case ".POTX":
                     case ".POTM":
-                    case ".PPAM":
-                    case ".PPSX":
+                    case ".POTX":
                     case ".PPSM":
-                    case ".SLDX":
+                    case ".PPSX":
+                    case ".PPAM":
+                    case ".PPTM":
+                    case ".PPTX":
                     case ".SLDM":
+                    case ".SLDX":
                     case ".THMX":
                         if (_passwordProtectedChecker.IsStreamProtected(inputFile).Protected)
                             ThrowPasswordProtected(inputFileName);
 
-                        //if (extension == ".PPTX")
-                        //{
-                            if (DocumentCorruptCheck(inputFile, outputFolder))
-                                throw new DocumentCorrupt("ERROR FILE CHANGE");
+                        //                        if (extension == ".PPTX")
+                        //                        {
+                        if (DocumentCorruptCheck(inputFile, outputFolder))
+                            throw new DocumentCorrupt("ERROR FILE CHANGE");
 
-                        //}
+                        //                        }
                         // PowerPoint 2007 - 2013
                         result = ExtractFromOfficeOpenXmlFormat(inputFile, "/ppt/embeddings/", outputFolder, "PowerPoint");
                         break;
@@ -592,7 +608,7 @@ namespace OfficeExtractor
                     default:
                         var message = "The file '" + Path.GetFileName(inputFileName) +
                                       "' is not supported, only .ODT, .ODS, .ODP, .DOC, .DOCM, .DOCX, .DOT, .DOTM, .DOTX, .RTF, .XLS, .XLSB, .XLSM, .XLSX, .XLT, " +
-                                      ".XLTM, .XLTX, .XLW, .POT, .PPT, .POTM, .POTX, .PPS, .PPSM, .PPSX, .PPTM, .PPTX, .HML, .HWP and .HWPX are supported";
+                                      ".XLTM, .XLTX, .XLW, .POT, .PPT, .POTM, .POTX, .PPS, .PPSM, .PPSX, .PPTM, .PPTX, .SLDX, .SLDM, .THMX, .XLAM, .HML, .HWP and .HWPX are supported";
 
                         Logger.WriteToLog(message);
                         throw new OEFileTypeNotSupported(message);
@@ -602,11 +618,23 @@ namespace OfficeExtractor
             {
                 throw new OEFileIsCorrupt($"The file '{Path.GetFileName(inputFileName)}' is corrupt");
             }
+            catch (OEFileIsPasswordProtected ex)
+            {
+                throw ex;
+            }
             catch (Exception exception)
             {
                 CLog.Error($"Extract Exception - {exception.ToString()}");
-                Logger.WriteToLog($"Cant check for embedded object because an error occured, error: {exception.Message}");
-                throw;
+
+                if (extension == ".HWP" || extension == ".HWT")
+                    result = ExtractFromHwpxFormat(inputFile, inputFileName, outputFolder, "Hwpx");
+                else if (extension == ".HWPX" || extension == ".HWTX")
+                    result = ExtractFromHwpFormat(inputFile, inputFileName, outputFolder, "Hwp");
+                else
+                {
+                    Logger.WriteToLog($"Cant check for embedded object because an error occured, error: {exception.Message}");
+                    throw;
+                }
             }
 
 
@@ -856,14 +884,14 @@ namespace OfficeExtractor
             }
 
             var contentEntry = FindEntryByName(zipFile, "Contents/content.hpf");
-            if(contentEntry == null)
+            if (contentEntry == null)
             {
                 throw new DocumentCorrupt("ERROR FILE CHANGE");
             }
             else
             {
-                List<string> defaultContents = new List<string>() { 
-                    "mimetype", "settings.xml", "version.xml", 
+                List<string> defaultContents = new List<string>() {
+                    "mimetype", "settings.xml", "version.xml",
                     "Preview/PrvImage.png", "Preview/PrvText.txt",
                     "META-INF/container.rdf", "META-INF/container.xml","META-INF/manifest.xml",
                     "Contents/content.hpf"
@@ -871,7 +899,7 @@ namespace OfficeExtractor
 
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.Load(contentEntry.OpenEntryStream());
-                
+
                 XmlNode root = xmlDoc.FirstChild.NextSibling;
                 string ns = root.GetNamespaceOfPrefix(root.Prefix);
                 var nsManager = new XmlNamespaceManager(new NameTable());
@@ -914,7 +942,7 @@ namespace OfficeExtractor
                     }
                 }
 
-                if(checkResult)
+                if (checkResult)
                 {
                     throw new DocumentCorrupt("ERROR FILE CHANGE");
                 }
@@ -1057,7 +1085,7 @@ namespace OfficeExtractor
                 xmlDoc.LoadXml(File.ReadAllText(inputFile));
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return false;
             }
@@ -1078,7 +1106,7 @@ namespace OfficeExtractor
         private List<string> ExtractFromXmlFormat(string inputFile, string outputFolder, string programm)
         {
             Logger.WriteToLog($"The {programm} file is of the type '{programm} format'");
-            
+
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(File.ReadAllText(inputFile));
 
@@ -1187,6 +1215,7 @@ namespace OfficeExtractor
             }
             return result;
         }
+
         private List<string> ExtractFromHwpFormat(Stream inputFile, string inputFileName, string outputFolder, string programm)
         {
             Logger.WriteToLog($"The {programm} file is of the type '{programm} format'");
@@ -1232,6 +1261,9 @@ namespace OfficeExtractor
                     {
                         if (zipEntry.IsDirectory) continue;
 
+                        if (zipEntry.Key.Equals("[trash]/0000.dat"))
+                            continue;
+
                         if (zipEntry.Key.ToLower().EndsWith(".xml"))
                         {
                             if (zipEntry.LastModifiedTime.Value.Ticks != contentTypeTicks)
@@ -1244,6 +1276,7 @@ namespace OfficeExtractor
                                 return true;
                             }
                         }
+
                         zipCount++;
                     }
 
