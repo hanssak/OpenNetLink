@@ -973,6 +973,15 @@ window.addKeyDown = () => {
             //console.log("F5 not allowed.");
             event.returnValue = false;
         }
+
+        if (e.ctrlKey && !(e.keyCode == 65 || e.keyCode == 67 || e.keyCode == 86 || e.keyCode == 88 || e.keyCode == 90)) // Ctrl + a , c, v, x , z 를 제외하고 나머지 막음
+        { 
+            e.preventDefault();
+        }
+        
+        //if (e.keyCode == 123) { // F12 막을지 유무는 결정 
+        //    e.preventDefault();
+        //}
     }, false);
 }
 
