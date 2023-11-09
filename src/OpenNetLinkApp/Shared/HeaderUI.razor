@@ -3630,17 +3630,15 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 MyNavigationManager.NavigateTo(activeMenu.Path);
                 Thread.Sleep(1000);
             }
-            else
-            {
-                AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
-                if (addFileRM_Event != null)
-                {
-                    addFileRM_Event(groupID, e);
 
-                    CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, Add Processed!");
-                }
+            AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
+            if (addFileRM_Event != null)
+            {
+                addFileRM_Event(groupID, e);
+                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, Add Processed!");
             }
         }
+
     }
 
     public void SetPlatFormInfo()
