@@ -1734,12 +1734,30 @@ namespace OpenNetLinkApp.Services
                 SCClear_Event(groupId, e);
             }
         }
+
+
+
+
+
         public void ZipDepthInfoSetting(int nRet, int groupId, SGData sgData)
         {
             SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+            if (sgLoginData == null)
+            {
+
+                return;
+            }
+
             if (nRet == 0)
             {
                 sgLoginData.AddZipDepthInfo(sgData);
+
+                UrlTypeForwardDataEvent eventUrlTypeForwardData = null;
+                eventUrlTypeForwardData = sgPageEvent.GetUrlTypeForwardData(groupId);
+                if (eventUrlTypeForwardData != null)
+                {
+                    eventUrlTypeForwardData(groupId);
+                }
             }
             else
             {

@@ -371,14 +371,25 @@
                     <!--<option value="N">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN")</option>-->                                                                               <!--유지-->
                     <!--<option value="F">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</option>-->                                                                    <!--특정 URL포워딩-->
                     <!--</select>-->
-                    <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        @GetURLAutoAfterBrowser(0)
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenu4" style="min-width:105px">
-                        <button class="dropdown-item text-xs p-1" type="button" @onclick="@(()=>SetURLRedirectType(0, "C"))">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FOLD")</button>
-                        <button class="dropdown-item text-xs p-1" type="button" @onclick="@(()=>SetURLRedirectType(0, "N"))">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN")</button>
-                        <button class="dropdown-item text-xs p-1" type="button" @onclick="@(()=>SetURLRedirectType(0, "F"))">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</button>
-                    </div>
+
+                    @if(false)
+                    {
+                        <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @GetURLAutoAfterBrowser(0)
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenu4" style="min-width:105px">
+                            <button class="dropdown-item text-xs p-1" type="button" @onclick="@(()=>SetURLRedirectType(0, "C"))">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FOLD")</button>
+                            <button class="dropdown-item text-xs p-1" type="button" @onclick="@(()=>SetURLRedirectType(0, "N"))">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN")</button>
+                            <button class="dropdown-item text-xs p-1" type="button" @onclick="@(()=>SetURLRedirectType(0, "F"))">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <button class="btn btn-default btn-xs btn-flat" type="button" id="dropdownMenu4" aria-expanded="false">
+                            @GetURLTransTextCurLibSet(0)
+                        </button>
+                    }
+
                 </div>
             }
 
@@ -829,9 +840,11 @@
             }
             }*@
 
-    HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
+        HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
         HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
         SGAppMgrSvc.SideBarUIService.OnChangeActMenu += CtrlSideUILoginAfterOnChange;
+        HsCmdCenter.sgPageEvent.SetCtrlSideRefreshEvent(CtrlSideRefresh);
+    
         //versionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
 
         // Windows일때, 자동실행 설정상태면 Lnk 만듬
@@ -1090,6 +1103,34 @@
                 break;
             case "F":
                 str = XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD");
+                break;
+        }
+        return str;
+    }
+
+    /// <summary>
+    /// NetLib 쪽에 설정되어 있는 현재 Redirection Type 설정 값
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    /// <returns></returns>
+    private string GetURLTransTextCurLibSet(int nGroupID)
+    {
+        string str = "";
+
+        str = HsNetWorkSG.HsHttpWatcher.GetUrlRedirectionType(nGroupID);
+        switch (str)
+        {
+            case "C":
+                str = XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FOLD");
+                break;
+            case "N":
+                str = XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN");
+                break;
+            case "F":
+                str = XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD");
+                break;
+            default:
+                str = XmlConf.GetCommon("T_IDENTIFING");
                 break;
         }
         return str;
@@ -1599,7 +1640,7 @@
             return;
             }*@
 
-    //HsCmdCenter.SetDownLoadPath(groupId, stPath);
+        //HsCmdCenter.SetDownLoadPath(groupId, stPath);
         //HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
         //CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
         SetAllDownloadPath(groupId, stPath);
@@ -1743,7 +1784,7 @@
     {
 
         string strNosystemVarPath = AppConfigSvc.ConvertRecvDownPath(stPath);
-        
+
         if(SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId))
         {
             SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
@@ -1816,12 +1857,12 @@
         ISGSideBarUI sgSideBar = SGAppMgrSvc.SideBarUIService.ActiveMenu;
         if (sgSideBar != null)
         {
-            
+
             CtrlSideUISvc.SetAskFileSend(sgSideBar.GroupId, askFilesSend);
             CLog.Here().Information($"AskFileSend Set: [GID:{sgSideBar.GroupId}][{askFilesSend}]");
         }
         else
-            CLog.Here().Information($"AskFileSend Set: [GID:ActiveManu is null][{askFilesSend}]");        
+            CLog.Here().Information($"AskFileSend Set: [GID:ActiveManu is null][{askFilesSend}]");
     }
 
     private int GetCountSGNetwork()
@@ -1908,8 +1949,16 @@
     }
 
     public void CtrlSideUILoginAfterOnChange()
-    { 
+    {
         CtrlSideUILoginAfter(-1);
+    }
+
+    /// <summary>
+    /// 다른 Menu에서 원할때, 화면 갱신 시키고 싶을때
+    /// </summary>
+    public void CtrlSideRefresh()
+    {
+        StateHasChanged();
     }
 
     /// <summary>
@@ -1921,10 +1970,10 @@
         int loginDataCount = HsCmdCenter.GetNetWorkCount();
         m_bUseClipBoard = false;
         m_bUseURLRedirection = false;
-        m_bUseFileSend = false;        
+        m_bUseFileSend = false;
         bool bManualDown = false;
         bool bAfterCheckHide = false;
-        
+
         SGLoginData sgLoginData = null;
         ISGSideBarUIService SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1971,7 +2020,7 @@
 
             if (i == sgSideBar.GroupId) //GroupID 별 표시 여부가 상이할 수 있으므로 해당 Groupid에 대한 설정값만 적용
                 bAfterCheckHide = sgLoginData.GetAfterChkHide();
-            }                
+        }
 
         ////AD로그인이 존재하면 화면잠금 미사용
         //foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))

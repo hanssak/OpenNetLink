@@ -183,6 +183,10 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void FileExamEvent(int per, string strFileName);
     // 로그인 후 오른쪽 사이드바 환경설정 노티
     public delegate void CtrlSideEvent(int ngroupid);
+
+    // 로그인 후 오른쪽 사이드바 환경설정 화면갱신 노티
+    public delegate void CtrlSideRefreshEvent();
+
     // 업데이트 노티
     public delegate void ClientUpgradeEvent(int groupid, PageEventArgs e);
     // 업데이트 실행
@@ -282,6 +286,12 @@ namespace OpenNetLinkApp.PageEvent
     /// </summary>
     /// <param name="groupId"></param>
     public delegate void NotiRequestExitEvent(int groupId);
+
+    /// <summary>
+    /// OpenNetLink 종료 요청 Notify
+    /// </summary>
+    /// <param name="groupId"></param>
+    public delegate bool UrlTypeForwardDataEvent(int groupId);    
 
 }
 
@@ -397,6 +407,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, FileExamEvent> DicFileExamEvent = new Dictionary<int, FileExamEvent>();                                                  // 파일 검사 노티.
 
         public CtrlSideEvent ctrlSideEvent;
+        public CtrlSideRefreshEvent ctrlSideRefreshEvent;
 
         public ClientUpgradeEvent ClientUpdate;                                                                                                         // 업데이트 노티
         public ClientUpgradeExeEvent ClientUpgreadeExe;                                                                                                 // 업데이트 실행
@@ -461,7 +472,10 @@ namespace OpenNetLinkApp.PageEvent
         public OSNotificationEvent oSNotificationEvent = null;
 
         public NotiRequestExitEvent notiRequestExitEvent = null;
-        
+
+        public Dictionary<int, UrlTypeForwardDataEvent> DicUrlTypeForwardDataEvent = new Dictionary<int, UrlTypeForwardDataEvent>();
+
+
         public SGPageEvent()
         {
 
@@ -1364,6 +1378,18 @@ namespace OpenNetLinkApp.PageEvent
             ctrlSideEvent = ctrlSideNoti;
         }
 
+
+        public CtrlSideRefreshEvent GetCtrlSideRefreshEvent()
+        {
+            return ctrlSideRefreshEvent;
+        }
+
+        public void SetCtrlSideRefreshEvent(CtrlSideRefreshEvent ctrlSideNoti)
+        {
+            ctrlSideRefreshEvent = ctrlSideNoti;
+        }
+
+
         /// <summary>
         /// 노티로 Update 버전 확인 발생
         /// </summary>
@@ -1414,6 +1440,23 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicDashBoardCountEvent[groupid];
             return e;
         }
+
+        public void SetUrlTypeForwardData(int groupid, UrlTypeForwardDataEvent e)
+        {
+            UrlTypeForwardDataEvent temp = null;
+            if (DicUrlTypeForwardDataEvent.TryGetValue(groupid, out temp))
+                DicUrlTypeForwardDataEvent.Remove(groupid);
+            DicUrlTypeForwardDataEvent[groupid] = e;
+        }
+
+        public UrlTypeForwardDataEvent GetUrlTypeForwardData(int groupid)
+        {
+            UrlTypeForwardDataEvent e = null;
+            if (DicUrlTypeForwardDataEvent.TryGetValue(groupid, out e) == true)
+                e = DicUrlTypeForwardDataEvent[groupid];
+            return e;
+        }
+
 
         public void SetDashBoardTransReqCountEventAdd(int groupid, DashBoardTransReqCountEvent e)
         {
