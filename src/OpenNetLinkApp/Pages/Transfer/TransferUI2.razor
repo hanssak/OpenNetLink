@@ -113,8 +113,6 @@
                 <TransferTemplateDefault @ref="refTransferTemplateDefault" groupIDbyParam="@groupIDbyParam"
                                          bAfterCheck="@bAfterCheck" bAfterApprChkHIde="@bAfterApprChkHIde" bAfterApprDisable="@bAfterApprDisable"
                                          strDestNetWork="@strDestNetWork" dicDestSysPos="@dicDestSysPos"
-                                         strInitTitle="@strBindTitle" TitleValueChanged="@(value=> strCurrentTitle=value)"
-                                         strInitDesc="@strBindDesc" DescValueChanged="@(value=> strCurrentDesc=value)"
                                          OnChangeAfterCheck="@GetAfterChk"
                                          OnBasicSelectOpenPopup="@openBasicSelect"
                                          OnOpenFileDialogOpenPopup="@OpenFileDialog"
@@ -391,8 +389,8 @@
                 {
                     string strMsg = XmlConf.GetWarnMsg("W_0020");           //제목은 최대 한글 42자, 영문 128자 / 설명은 최대 한글 83자, 영문 250자까지 입력할 수 있습니다.
                     ShowMessage("warn", strMsg);
-                    strBindTitle = strCurrentTitle = "";
-                    strBindDesc = strCurrentDesc = "";
+                    //strBindTitle = strCurrentTitle = "";
+                    //strBindDesc = strCurrentDesc = "";
                     StateHasChanged();
                     return;
                 }
@@ -404,8 +402,8 @@
                 {
                     string strMsg = XmlConf.GetWarnMsg("W_0020");           //제목은 최대 한글 42자, 영문 128자 / 설명은 최대 한글 83자, 영문 250자까지 입력할 수 있습니다.
                     ShowMessage("warn", strMsg);
-                    strBindTitle = strCurrentTitle = "";
-                    strBindDesc = strCurrentDesc = "";
+                    //strBindTitle = strCurrentTitle = "";
+                    //strBindDesc = strCurrentDesc = "";
                     StateHasChanged();
                     return;
                 }
@@ -553,8 +551,19 @@
 
     private async Task CheckApprLine()
     {
-        strBindTitle = strCurrentTitle;
-        strBindDesc = strCurrentDesc;
+        if (SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam) == 0)
+        {
+            strBindTitle = refTransferTemplateDefault.strInitTitle;
+            strBindDesc = refTransferTemplateDefault.strInitDesc;
+        }
+        else
+        {
+            strBindTitle = "";
+            strBindDesc = "";
+        }
+
+        //strBindTitle = strCurrentTitle;
+        //strBindDesc = strCurrentDesc;
 
         cntSendQuery = 0;
         cntRecvQuery = 0;
@@ -642,7 +651,7 @@
                         cntSendQuery++;
                         }*@
 
-    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
+                    // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
                     SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "", sgLoginData.GetApproveProxyRight());
                     cntSendQuery++;
                 }
@@ -1479,8 +1488,14 @@
             if (sgUserInfo != null)
                 dropFile.SetLogDB(groupID, sgUserInfo.UserSeq, XmlConf.GetTitle("T_LOG_DB_FILETRANSFER_SUCCESS"));
 
-            strBindTitle = strCurrentTitle = "";
-            strBindDesc = strCurrentDesc = "";
+            //strBindTitle = strCurrentTitle = "";
+            //strBindDesc = strCurrentDesc = "";
+            if (SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam) == 0)
+            {
+                refTransferTemplateDefault.strInitTitle = "";
+                refTransferTemplateDefault.strInitDesc = "";
+            }
+
             SendDayFileInfo();
 
             DeleteTempFolder();
@@ -1521,7 +1536,7 @@
                 {
                     file.Delete();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     CLog.Here().Error($"DeleteTempFolder, File Delete Failed : {ex.Message}");
                 }
@@ -1655,10 +1670,10 @@
     {
         int groupID = groupIDbyParam;
         nTransferTemplate = SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupID);
-        await JSRuntime.InvokeAsync<object>("exitLogIn", new object[] {nTransferTemplate });
-        await JSRuntime.InvokeAsync<object>("adJustWindowsize", new object[] {nTransferTemplate });
+        await JSRuntime.InvokeAsync<object>("exitLogIn", new object[] { nTransferTemplate });
+        await JSRuntime.InvokeAsync<object>("adJustWindowsize", new object[] { nTransferTemplate });
 
-        
+
         CLog.Here().Information($"Transfer - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
 
         // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
@@ -1672,19 +1687,19 @@
             ApprLine.groupIDbyParam = groupIDbyParam;
             ApprLine.Refresh();
 
-            if(refForwardLine != null)
+            if (refForwardLine != null)
             {
-                refForwardLine.groupIDbyParam= groupIDbyParam;
+                refForwardLine.groupIDbyParam = groupIDbyParam;
                 refForwardLine.Refresh();
             }
-                
+
             //dropFile._groupId = groupIDbyParam;
             dropFile.Refresh();
             StateHasChanged();
         }
 
         if (firstRender)
-        {   
+        {
             ApprLine.Refresh();
             //dropFile._groupId = groupIDbyParam;
             dropFile.Refresh();
@@ -1954,16 +1969,16 @@
 
         int groupID = groupIDbyParam;
         nTransferTemplate = SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupID);
-        JSRuntime.InvokeAsync<string>("exitLogIn", new object[] {nTransferTemplate });
-        JSRuntime.InvokeAsync<string>("adJustWindowsize", new object[] {nTransferTemplate });
+        JSRuntime.InvokeAsync<string>("exitLogIn", new object[] { nTransferTemplate });
+        JSRuntime.InvokeAsync<string>("adJustWindowsize", new object[] { nTransferTemplate });
 
 
         if (firstRender)
         {
         }
 
-        strBindTitle = strCurrentTitle;
-        strBindDesc = strCurrentDesc;
+        //strBindTitle = strCurrentTitle;
+        //strBindDesc = strCurrentDesc;
 
         // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
         if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
@@ -2053,13 +2068,13 @@
 
             ApprLine.groupIDbyParam = groupIDbyParam;
             ApprLine.Refresh();
-            
-            if(refForwardLine != null)
+
+            if (refForwardLine != null)
             {
-                refForwardLine.groupIDbyParam= groupIDbyParam;
+                refForwardLine.groupIDbyParam = groupIDbyParam;
                 refForwardLine.Refresh();
             }
-                
+
             //dropFile._groupId = groupIDbyParam;
             dropFile.Refresh();
             StateHasChanged();
@@ -2109,16 +2124,16 @@
         object[] param = { "Message" };
         //DropZone 클릭방지코드
         //await JSRuntime.InvokeAsync<object>("stopClick");
-        await JSRuntime.InvokeAsync<object>("exitLogIn",new object[] {nTransferTemplate});
-        await JSRuntime.InvokeAsync<object>("adJustWindowsize",new object[] {nTransferTemplate});
+        await JSRuntime.InvokeAsync<object>("exitLogIn", new object[] { nTransferTemplate });
+        await JSRuntime.InvokeAsync<object>("adJustWindowsize", new object[] { nTransferTemplate });
     }
     private void stopClickSync()
     {
         object[] param = { "Message" };
         //DropZone 클릭방지코드
         //await JSRuntime.InvokeAsync<object>("stopClick");
-        JSRuntime.InvokeAsync<object>("exitLogIn",new object[] {nTransferTemplate});
-        JSRuntime.InvokeAsync<object>("adJustWindowsize",new object[] {nTransferTemplate});
+        JSRuntime.InvokeAsync<object>("exitLogIn", new object[] { nTransferTemplate });
+        JSRuntime.InvokeAsync<object>("adJustWindowsize", new object[] { nTransferTemplate });
     }
 
     private void AddDataList(string str, string type)
@@ -2990,7 +3005,6 @@
     /// <param name="groupid"></param>
     public void RefreshUI(int groupid)
     {
-
         StateHasChanged();
     }
 

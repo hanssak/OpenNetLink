@@ -57,7 +57,7 @@
                         <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
                             <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_TRANS_TITLE")</label>
                             <div class="col-sm-11 pr-0 pl-0">
-                                <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@strCurTitle" value="@strInitTitle" @onchange="@(e=>TitleValueChanged.InvokeAsync(e.Value.ToString()))" autocomplete="off">
+                                <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@strCurTitle" @bind="@strInitTitle" autocomplete="off">
                                 <input type="text" hidden="hidden" />
                             </div>
                         </div>
@@ -65,7 +65,7 @@
                         <div class="form-group row mb-3" style="border:1px solid #c7d6e9;">
                             <label for="2" class="col-sm-1 col-form-label text-center " style="background-color:#eff8ff;">@XmlConf.GetTitle("T_DETAIL_DESC")</label>
                             <div class="col-sm-11 pr-0 pl-0">
-                                <textarea class="form-control p-2 border-0 " rows="2" placeholder="@strCurDesc" value="@strInitDesc" @onchange="@(e=>DescValueChanged.InvokeAsync(e.Value.ToString()))"></textarea>
+                                <textarea class="form-control p-2 border-0 " rows="2" placeholder="@strCurDesc" @bind="@strInitDesc"></textarea>
                             </div>
                         </div>
                     </div>
@@ -133,9 +133,6 @@
 {
     [Parameter] public int groupIDbyParam { get; set; }
 
-    [Parameter] public string strInitTitle { get; set; }
-    [Parameter] public string strInitDesc { get; set; }
-
     [Parameter] public EventCallback<string> TitleValueChanged { get; set; }
     [Parameter] public EventCallback<string> DescValueChanged { get; set; }
 
@@ -154,18 +151,18 @@
     /// 사후결재 checkBox Disable 설정유무(By:서버정책, true : 사용못함, false : 사용함)
     /// </summary>
     [Parameter] public bool bAfterApprDisable { get; set; }
-    
+
     [Parameter] public EventCallback OnChangeAfterCheck { get; set; }
     [Parameter] public EventCallback OnBasicSelectOpenPopup { get; set; }
     [Parameter] public EventCallback OnOpenFileDialogOpenPopup { get; set; }
     [Parameter] public EventCallback OnCheckApprLine { get; set; }
-    
+
+    public string strInitTitle { get; set; }
+    public string strInitDesc { get; set; }
+
     public string stSelectPath { get; set; }
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferTemplateDefault>();
-
-    private string strCurrentTitleValue;
-    private string strCurrentDescValue;
 
     public string strAfterApprove = "";
     public string strCurTitle = "";
@@ -215,8 +212,6 @@
 
     public DropFileList GetDropFileList() => refDropFileList;
 
-
-
     private void changeSelectPath(string args)
     {
         stSelectPath = args;
@@ -259,7 +254,7 @@
     int nDrawPageGroupID = -1;          // 전달받은 groupID 별로 화면구성 - 다중접속화면구성
     protected override void OnAfterRender(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             base.OnAfterRenderAsync(firstRender);
         }
