@@ -1547,6 +1547,12 @@
                             strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
                         }
 
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseMaxLengthTitleDesc(groupId))
+                        {
+                            strGetinfoTagName += ", 'CLIENT_TITLE_MAX_LENGTH'";
+                            strGetinfoTagName += ", 'CLIENT_DESC_MAX_LENGTH'";
+                        }
+
                         string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
                         HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
                     }

@@ -1642,6 +1642,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             => (GetSystemPosition()) ? GetTagData("I_FORWARD_AUTODOWN") : GetTagData("E_FORWARD_AUTODOWN");
 
         /// <summary>
+        /// 제목 최대 길이 값
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetTitleMaxLength()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_TITLE_MAX_LENGTH") : GetTagData("E_CLIENT_TITLE_MAX_LENGTH");
+
+        /// <summary>
         /// 제목 최소 길이 값
         /// </summary>
         /// <param name="bSystem"></param>
@@ -1650,14 +1658,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             => (GetSystemPosition()) ? GetTagData("I_CLIENT_TITLE_MIN_LENGTH") : GetTagData("E_CLIENT_TITLE_MIN_LENGTH");
 
         /// <summary>
+        /// 설명 최대 길이 값
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetDescMaxLength()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_DESC_MAX_LENGTH") : GetTagData("E_CLIENT_DESC_MAX_LENGTH");
+
+        /// <summary>
         /// 설명 최소 길이 값
         /// </summary>
         /// <param name="bSystem"></param>
         /// <returns></returns>
         public string GetDescMinLength()
             => (GetSystemPosition()) ? GetTagData("I_CLIENT_DESC_MIN_LENGTH") : GetTagData("E_CLIENT_DESC_MIN_LENGTH");
-
-
 
         /// <summary>
         /// value 값을 암호화해서 sgData에 저장

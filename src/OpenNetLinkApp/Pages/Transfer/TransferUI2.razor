@@ -444,6 +444,41 @@
                 }
             }
 
+            // 최대길이 체크 동작
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseMaxLengthTitleDesc(groupID))
+            {
+                SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                if (sgLoginData == null)
+                    return;
+
+                string strLength = sgLoginData.GetTitleMaxLength();
+                int nLength = 0;
+                if ((strLength?.Length ?? 0) > 0)
+                    nLength = Convert.ToInt32(strLength);
+
+                if ((strBindTitle?.Length ?? 0) > nLength)
+                {
+                    CLog.Here().Error($"UploadFiles, Stoped(#), Title-Req-Length : {nLength}, Title-Cur-Length : {strBindTitle.Length},");
+                    ShowMessage("warning", string.Format(XmlConf.GetWarnMsg("W_0303"), nLength));
+                    StateHasChanged();
+                    return;
+                }
+
+                strLength = sgLoginData.GetDescMaxLength();
+                nLength = 0;
+                if ((strLength?.Length ?? 0) > 0)
+                    nLength = Convert.ToInt32(strLength);
+
+                if ((strBindDesc?.Length ?? 0) > nLength)
+                {
+                    CLog.Here().Error($"UploadFiles, Stoped(#), Desc-Req-Length : {nLength}, Desc-Cur-Length : {strBindDesc.Length},");
+                    ShowMessage("warning", string.Format(XmlConf.GetWarnMsg("W_0304"), nLength));
+                    StateHasChanged();
+                    return;
+                }
+            }
+
             if (pageService.GetDayFileTransCountEnable(groupID) != true)
             {
                 string strMsg = XmlConf.GetErrMsg("E_0106");    // 일일 전송 최대 횟수는 {0}번 입니다./r/n일일 전송 횟수를 초과하였습니다.

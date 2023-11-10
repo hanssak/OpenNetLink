@@ -103,6 +103,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseFileSelectDelete(int groupId);
         public bool GetUseCrossPlatformOSforFileName(int groupId);
         public bool GetUseMinLengthTitleDesc(int groupId);
+        public bool GetUseMaxLengthTitleDesc(int groupId);
         public bool GetUseAgentBlockValueChange(int groupId);
         public bool GetUseOSMaxFilePath(int groupId);
         public bool GetUseFileForwardDownNotRecv(int groupId);
@@ -613,6 +614,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseMinLengthTitleDesc(int groupId)
         {
             return AppConfigInfo[groupId].bUseTitleDescMinLength;
+        }
+        public bool GetUseMaxLengthTitleDesc(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseTitleDescMaxLength;
         }
         public bool GetUseAgentBlockValueChange(int groupId)
         {

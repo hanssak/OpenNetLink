@@ -80,6 +80,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileSelectDelete { get; set; }                    // 파일 선택 삭제 사용 유무
         public bool bUseCrossPlatformOSforFileName { get; set; }         // 윈도우에서 파일이름에 사용못하는 문자 막는지 유무
         public bool bUseTitleDescMinLength { get; set; }             //제목,설명 최소길이 제한 사용유무
+        public bool bUseTitleDescMaxLength { get; set; }             //제목,설명 최대길이 제한 사용유무
         public bool bUseAgentBlockValueChange { get; set; }                   // tbl_agent_block 에 들어가는 Type 값을 WebManager에서 data를 보여줄 수 있는 형태로 변경(WebManager/NetLink와 맞춤)
         public bool bUseOSMaxFilePath { get; set; }                             // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
         public bool bUseFileForwardDownNotRecv { get; set; }                     // 파일 수신되기전에 파일포워드로 다운로드 가능유무
