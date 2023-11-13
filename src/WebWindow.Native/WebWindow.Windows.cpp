@@ -11,6 +11,7 @@
 #include <iostream>
 #include <filesystem>
 #include <fileapi.h>
+#include <WebView2EnvironmentOptions.h>
 
 using namespace std;
 
@@ -755,10 +756,16 @@ void WebWindow::AttachWebView()
 
 	//HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(tempEdgePath.c_str(), nullptr, nullptr,
 	//HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(nullptr, nullptr, nullptr,
+	/*std::wstring args;
+	args.append(L"--disable-features=RendererCodeIntegrity");
+	auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
+	options->put_AdditionalBrowserArguments(args.c_str());*/
+
 	HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(lpEdgeptr, nullptr, nullptr,
 		Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
 			[&, this](HRESULT result, ICoreWebView2Environment* env) -> HRESULT {
 				HRESULT envResult = env->QueryInterface(&_webviewEnvironment);
+				
 				if (envResult != S_OK)
 				{
 					return envResult;
@@ -918,6 +925,7 @@ void WebWindow::AttachWebView()
 	{
 		// Block until it's ready. This simplifies things for the caller, so they
 		// don't need to regard this process as async.
+
 		MSG msg = { };
 		while (flag.test_and_set() && GetMessage(&msg, NULL, 0, 0))
 		{
@@ -971,16 +979,10 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	wchar_t ModelID[MAX_PATH] = { 0, };
 	wsprintf(ModelID, L"Noti%d", m_nAppNotiID++);
 
-
-#ifdef DEBUG
-	appName = (LPWSTR)L"KKW";
-	//appUserModelID = (LPWSTR)ModelID;
-	const auto aumi = WinToast::configureAUMI(L"KKW", L"Test", L"Kwkim", ModelID);
-#else
 	appName = (LPWSTR)L"OpenNetLink";
 	//appUserModelID = (LPWSTR)ModelID;
 	const auto aumi = WinToast::configureAUMI(L"HANSSAK", L"SecureGate", L"OpenNetLink", ModelID);
-#endif
+
 
 	onlyCreateShortcut = false;
 
