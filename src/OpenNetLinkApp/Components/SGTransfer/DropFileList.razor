@@ -54,9 +54,9 @@
                             }
                             <th style="vertical-align: middle; width: 60%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left: 5px;">@strFileName</th>
                             <!--파일명-->
-                            <th style="text-align:right;vertical-align:middle;width:10%;">@strFileSize</th>
+                        <th style="text-align:right;vertical-align:middle;width:10%;">@strFileSize</th>
                             <!--크기-->
-                            <th style="text-align:center;vertical-align:middle;width:10%;">@strFileType</th>
+                        <th style="text-align:center;vertical-align:middle;width:10%;">@strFileType</th>
                             <!--유형-->
                             @if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(_groupId) && isUserNeedApproveExtUI())
                             {
@@ -65,7 +65,7 @@
                             }
 
                             <!--<th width="30%">@strLastModDay</th>--> <!--수정한 날짜-->
-                        </tr>
+                    </tr>
                     </thead>
                     <tbody>
                         @foreach (var file in HsStreamList)
@@ -85,7 +85,7 @@
                                     <td style="text-align:center;vertical-align:middle;width:20%;">@(file.isNeedApprove? XmlConf.GetTitle("T_COMMON_APPROVE_EXT_ITEM") : "")</td>
                                 }
                                 <!--<td width="30%">@file.ModifyTime.ToString("yyyy/MM/dd HH:mm:ss")</td>-->
-                            </tr>
+                    </tr>
                         }
                     </tbody>
                 </table>
@@ -101,7 +101,7 @@
                     <br /><br />
                 }
                 @((MarkupString)strFileDragInfo)         <!--파일을 이곳으로 드래그 하세요.-->
-            </p>
+        </p>
 
         }
         @*<input type="file" id="fileInputTrans" onclick="stopClickOpen(event);" multiple="multiple" />*@
@@ -1028,7 +1028,7 @@
                                 {
                                     existErr = true;
                                     @*fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);*@
-                                    childFile.eErrType = eFileAddErr.eFA_FILE_READ_ERROR;
+    childFile.eErrType = eFileAddErr.eFA_FILE_READ_ERROR;
                                     CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
                                     if (hsStream.stream != null)
                                     {
@@ -1273,21 +1273,16 @@
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        //파일리더 초기화 통합
-        _dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-        string targets = new string("fileInput");
-        _dropReference.SetDragTargetElementAsync(targets);
-        _dropReference.RegisterDropEventsAsync();
 
         bViewDropFileAddError = false; // SGAppMgrSvc.OpConfigInfoService.GetUseDropErrorUI();
         InitText();
 
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
+            int groupID = 0;
+            if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        if (groupID > -1)
+            if (groupID > -1)
             bHideTitleDesc = SGAppMgrSvc.OpConfigInfoService.GetUseHideTitleDesc(groupID);*@
     }
 
@@ -1848,11 +1843,19 @@
     //DropZone 클릭방지코드
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
+        if (!firstRender)
+        {
+            string targets = new string("fileInput");
+            //파일리더 초기화 통합        
+            _dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+            _dropReference.SetDragTargetElementAsync(targets);
+            _dropReference.RegisterDropEventsAsync();
+        }
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;       
 
         if (_groupId < 0 || _groupId != groupID)
         {
