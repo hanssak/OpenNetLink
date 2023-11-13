@@ -286,70 +286,77 @@ namespace WebWindows
 
         public WebWindow(string title, Action<WebWindowOptions> configure)
         {
-            _ownerThreadId = Thread.CurrentThread.ManagedThreadId;
-
-            if (configure is null)
+            try
             {
-                throw new ArgumentNullException(nameof(configure));
+                _ownerThreadId = Thread.CurrentThread.ManagedThreadId;
+
+                if (configure is null)
+                {
+                    throw new ArgumentNullException(nameof(configure));
+                }
+
+                var options = new WebWindowOptions();
+                configure.Invoke(options);
+
+                WriteTitleField(title);
+
+                var onWebMessageReceivedDelegate = (OnWebMessageReceivedCallback)ReceiveWebMessage;
+                _gcHandlesToFree.Add(GCHandle.Alloc(onWebMessageReceivedDelegate));
+
+                var parentPtr = options.Parent?._nativeWebWindow ?? default;
+                _nativeWebWindow = WebWindow_ctor(_title, parentPtr, onWebMessageReceivedDelegate);
+
+                foreach (var (schemeName, handler) in options.SchemeHandlers)
+                {
+                    AddCustomScheme(schemeName, handler);
+                }
+
+                var onResizedDelegate = (ResizedCallback)OnResized;
+                _gcHandlesToFree.Add(GCHandle.Alloc(onResizedDelegate));
+                WebWindow_SetResizedCallback(_nativeWebWindow, onResizedDelegate);
+
+                var onMovedDelegate = (MovedCallback)OnMoved;
+                _gcHandlesToFree.Add(GCHandle.Alloc(onMovedDelegate));
+                WebWindow_SetMovedCallback(_nativeWebWindow, onMovedDelegate);
+
+                var onNTLogDelegate = (NTLogCallback)OnNTLog;
+                _gcHandlesToFree.Add(GCHandle.Alloc(onNTLogDelegate));
+                WebWindow_SetNTLogCallback(_nativeWebWindow, onNTLogDelegate);
+
+                var onClipBoardDelegate = (ClipBoardCallback)OnClipBoard;
+                _gcHandlesToFree.Add(GCHandle.Alloc(onClipBoardDelegate));
+                WebWindow_SetClipBoardCallback(_nativeWebWindow, onClipBoardDelegate);
+
+                var onRecvClipBoardDelegate = (RecvClipBoardCallback)OnRecvClipBoard;
+                _gcHandlesToFree.Add(GCHandle.Alloc(onRecvClipBoardDelegate));
+                WebWindow_SetRecvClipBoardCallback(_nativeWebWindow, onRecvClipBoardDelegate);
+
+                var onRequestedNavigateURLDelegate = (RequestedNavigateURLCallback)OnRequestedNavigateURL;
+                _gcHandlesToFree.Add(GCHandle.Alloc(onRequestedNavigateURLDelegate));
+                WebWindow_SetRequestedNavigateURLCallback(_nativeWebWindow, onRequestedNavigateURLDelegate);
+
+                var onURLChangedDelegate = (URLChangedCallback)OnURLChanged;
+                _gcHandlesToFree.Add(GCHandle.Alloc(onURLChangedDelegate));
+                WebWindow_SetURLChangedCallback(_nativeWebWindow, onURLChangedDelegate);
+
+                var onDragNDropDelegate = (DragNDropCallback)OnDragNDrop;
+                _gcHandlesToFree.Add(GCHandle.Alloc(onDragNDropDelegate));
+                WebWindow_SetDragNDropCallback(_nativeWebWindow, onDragNDropDelegate);
+
+                // Auto-show to simplify the API, but more importantly because you can't
+                // do things like navigate until it has been shown
+                Show();
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    winClip = new WinClipboardLibray();
+                    winClip.SetRecvHotKeyEvent(WinOnHotKey);
+                    //winClip.RegHotKey(0, false, true, true, false, 'V');
+                }
             }
-
-            var options = new WebWindowOptions();
-            configure.Invoke(options);
-
-            WriteTitleField(title);
-
-            var onWebMessageReceivedDelegate = (OnWebMessageReceivedCallback)ReceiveWebMessage;
-            _gcHandlesToFree.Add(GCHandle.Alloc(onWebMessageReceivedDelegate));
-
-            var parentPtr = options.Parent?._nativeWebWindow ?? default;
-            _nativeWebWindow = WebWindow_ctor(_title, parentPtr, onWebMessageReceivedDelegate);
-
-            foreach (var (schemeName, handler) in options.SchemeHandlers)
+            catch (Exception ex)
             {
-                AddCustomScheme(schemeName, handler);
-            }
-
-            var onResizedDelegate = (ResizedCallback)OnResized;
-            _gcHandlesToFree.Add(GCHandle.Alloc(onResizedDelegate));
-            WebWindow_SetResizedCallback(_nativeWebWindow, onResizedDelegate);
-
-            var onMovedDelegate = (MovedCallback)OnMoved;
-            _gcHandlesToFree.Add(GCHandle.Alloc(onMovedDelegate));
-            WebWindow_SetMovedCallback(_nativeWebWindow, onMovedDelegate);
-
-            var onNTLogDelegate = (NTLogCallback)OnNTLog;
-            _gcHandlesToFree.Add(GCHandle.Alloc(onNTLogDelegate));
-            WebWindow_SetNTLogCallback(_nativeWebWindow, onNTLogDelegate);
-
-            var onClipBoardDelegate = (ClipBoardCallback)OnClipBoard;
-            _gcHandlesToFree.Add(GCHandle.Alloc(onClipBoardDelegate));
-            WebWindow_SetClipBoardCallback(_nativeWebWindow, onClipBoardDelegate);
-
-            var onRecvClipBoardDelegate = (RecvClipBoardCallback)OnRecvClipBoard;
-            _gcHandlesToFree.Add(GCHandle.Alloc(onRecvClipBoardDelegate));
-            WebWindow_SetRecvClipBoardCallback(_nativeWebWindow, onRecvClipBoardDelegate);
-
-            var onRequestedNavigateURLDelegate = (RequestedNavigateURLCallback)OnRequestedNavigateURL;
-            _gcHandlesToFree.Add(GCHandle.Alloc(onRequestedNavigateURLDelegate));
-            WebWindow_SetRequestedNavigateURLCallback(_nativeWebWindow, onRequestedNavigateURLDelegate);
-
-            var onURLChangedDelegate = (URLChangedCallback)OnURLChanged;
-            _gcHandlesToFree.Add(GCHandle.Alloc(onURLChangedDelegate));
-            WebWindow_SetURLChangedCallback(_nativeWebWindow, onURLChangedDelegate);
-
-            var onDragNDropDelegate = (DragNDropCallback)OnDragNDrop;
-            _gcHandlesToFree.Add(GCHandle.Alloc(onDragNDropDelegate));
-            WebWindow_SetDragNDropCallback(_nativeWebWindow, onDragNDropDelegate);
-
-            // Auto-show to simplify the API, but more importantly because you can't
-            // do things like navigate until it has been shown
-            Show();
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                winClip = new WinClipboardLibray();
-                winClip.SetRecvHotKeyEvent(WinOnHotKey);
-                //winClip.RegHotKey(0, false, true, true, false, 'V');
+                Console.WriteLine($"WebWindow 생성자 Exception : " + ex.ToString());
             }
         }
 
