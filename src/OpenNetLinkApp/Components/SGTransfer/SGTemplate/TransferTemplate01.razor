@@ -65,7 +65,7 @@
                         <td style="display:flex; flex-direction:row;">
                             <button type="button" class="btn btn-md btn-green ml-0" style="flex:1" @onclick="@(OnCheckApprLine.InvokeAsync)"><i class="fas fa-share"></i>@strFileSend</button>
                             <button type="button" class="btn btn-md btn-blue ml-1" style="flex:1" @onclick="@(OnOpenFileDialogOpenPopup.InvokeAsync)"><i class="fas fa-file-upload"></i>@strFileReg</button>
-                            <button type="button" class="btn btn-md btn-black ml-1" style="flex:1" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
+                            <button type="button" class="btn btn-md btn-black ml-1" style="flex:1" @onclick="@(e => RemoveAllFile())" hidden="@bHideFileAllDeleteBtn"><i class="fas fa-times"></i>@strFileDel</button>
                             <button type="button" class="btn btn-md btn-red ml-1" style="flex:1" @onclick="@(e => RemoveSelectFile())" hidden="@bFileSelectDeleteBtn"><i class="fas fa-times"></i>@strSelectFileDel</button>
 
                         </td>
@@ -283,6 +283,12 @@
     /// 선택 삭제 버튼 사용 유무
     /// </summary>
     public bool bFileSelectDeleteBtn = false;
+
+    /// <summary>
+    /// 일괄 삭제 버튼 사용 유무
+    /// </summary>
+    public bool bHideFileAllDeleteBtn =false;
+
     FileTree refFileTree;
     private List<SGTransferLogData> transferLogData = new List<SGTransferLogData>();
 
@@ -407,6 +413,7 @@
         bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
         bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
         bFileSelectDeleteBtn = !OpConfigSvc.GetUseFileSelectDelete(groupID);
+        bHideFileAllDeleteBtn = !OpConfigSvc.GetUseFileAllDelete(groupID);
     }
 
     public void LoadListFiles(string stPath)

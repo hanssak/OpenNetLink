@@ -978,7 +978,11 @@ window.addKeyDown = () => {
         { 
             e.preventDefault();
         }
-        
+
+        if (e.altKey || e.keyCode == 91)    //Alt 키와 Win키도 막음
+        {
+            e.preventDefault();
+        }
         //if (e.keyCode == 123) { // F12 막을지 유무는 결정 
         //    e.preventDefault();
         //}

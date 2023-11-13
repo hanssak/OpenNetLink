@@ -287,11 +287,6 @@
     /// </summary>
     public bool bAfterApprDisable = false;
 
-    /// <summary>
-    /// 선택 삭제 버튼 사용 유무
-    /// </summary>
-    public bool bFileSelectDeleteBtn = false;
-
     public bool bURLRedirection = true;
 
     public int nTransferTemplate = 0;
@@ -1613,7 +1608,6 @@
 
         bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
         bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
-        bFileSelectDeleteBtn = !OpConfigSvc.GetUseFileSelectDelete(groupID);
         bHideApprLine = OpConfigSvc.GetUseHideApprLine(groupID); // groupIDbyParam
 
 

@@ -101,6 +101,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseFileApproveReason(int groupId);
         public bool GetUseClipBoardApproveReason(int groupId);
         public bool GetUseFileSelectDelete(int groupId);
+        public bool GetUseFileAllDelete(int groupId);
         public bool GetUseCrossPlatformOSforFileName(int groupId);
         public bool GetUseMinLengthTitleDesc(int groupId);
         public bool GetUseMaxLengthTitleDesc(int groupId);
@@ -157,6 +158,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //public bool GetExitTrayMove(int groupId);
         public bool GetUseStartTrayMove(int groupId);
         public bool GetUseLoginAfterTray(int groupId);
+        public bool GetUseLoginAfterShow(int groupId);
         //public bool GetStartTrayMove(int groupId);
         public bool GetUseStartProgramReg(int groupId);
         //public bool GetStartProgramReg(int groupId);
@@ -607,6 +609,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseFileSelectDelete;
         }
+        public bool GetUseFileAllDelete(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseFileAllDelete;
+        }
         public bool GetUseCrossPlatformOSforFileName(int groupId)
         {
             return AppConfigInfo[groupId].bUseCrossPlatformOSforFileName;
@@ -872,6 +878,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseLoginAfterTray(int groupId)
         {
             return AppConfigInfo[groupId].bUseLoginAfterTray;
+        }
+
+        public bool GetUseLoginAfterShow(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseLoginAfterShow;
         }
         //public bool GetStartTrayMove(int groupId)
         //{

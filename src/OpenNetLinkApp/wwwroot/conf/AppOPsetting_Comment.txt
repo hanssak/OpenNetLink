@@ -215,11 +215,15 @@ bUseOver1Auth : AD로그인 실패시, IDPW 로그인시도할수 있게 Login U
 
 bUseLoginAfterTray : 로그인 후 Tray로 이동, bStartTrayMove 이 옵션과 혼동해서 사용 금지, 로그인 후 Tray 로 이동과 프로그램 시작시 Tray로 이동
 
+bUseLoginAfterShow : 로그인 후 WebWindow 표시 (default :false)
+
 bUseFileApproveReason: 파일 전송 승인시 승인사유 입력 여부
 
 bUseClipBoardApproveReason : 클립보드 전송 승인시 승인 사유 입력 여부
 
 bUseFileSelectDelete : 파일 선택 삭제 사용 유무
+
+bUseFileAllDelete : 파일 일괄 삭제 사용 유무 (Defulat :true)
 
 bUseCrossPlatformOSforFileName : 파일이름에 OS간에 사용할수 없는 문자 들어간거 차단기능 사용유무(default:true - 윈도우가 Mac이보낸거수신가능)(Mac/Linux 간에만 사용한다든지 할때는 false 해도 무관)
 

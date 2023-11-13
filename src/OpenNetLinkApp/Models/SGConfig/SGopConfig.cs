@@ -86,6 +86,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileApproveReason { get; set; } = false;                        //파일 승인사유 입력 여부
         public bool bUseClipBoardApproveReason { get; set; } = false;                //클립보드 승인사유 입력여부
         public bool bUseFileSelectDelete { get; set; } = false;                         // 파일 선택 삭제 사용 유무
+        public bool bUseFileAllDelete { get; set; } = true;                            // 파일 일괄 삭제 사용 유무
         public bool bUseCrossPlatformOSforFileName { get; set; } = true;          // 윈도우에서 파일이름에 사용못하는 문자 막는지 유무
         public bool bUseTitleDescMinLength { get; set; } = false;             //제목,설명 최소길이 제한 사용유무
         public bool bUseTitleDescMaxLength { get; set; } = false;             //제목,설명 최대길이 제한 사용유무
@@ -169,6 +170,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         //public bool bExitTrayMove { get; set; } = false;                                    // 종료 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
         public bool bUseStartTrayMove { get; set; } = false;                                // 프로그램 시작 시 트레이 이동 사용 유무.(환경설정)
         public bool bUseLoginAfterTray { get; set; } = false;                               //로그인 후 Tray 아이콘으로 이동
+        public bool bUseLoginAfterShow { get; set; } = false;                               //로그인 후 WebWindow 표시
         //public bool bStartTrayMove { get; set; } = false;                                   // 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
         public bool bUseStartProgramReg { get; set; } = false;                              // 시작 프로그램 등록 사용 유무.(환경설정)
         //public bool bStartProgramReg { get; set; } = false;                                 // 시작 프로그램 등록 ( true : 시작프로그램 등록, false : 시작프로그램 등록 해제 )

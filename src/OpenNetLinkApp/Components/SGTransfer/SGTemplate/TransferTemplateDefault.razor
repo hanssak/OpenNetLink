@@ -106,7 +106,7 @@
                                         <td>
                                             <button type="button" class="btn btn-md btn-green" @onclick="@(OnCheckApprLine.InvokeAsync)"><i class="fas fa-share"></i>@strFileSend</button>
                                             <button type="button" class="btn btn-md btn-blue" @onclick="@(OnOpenFileDialogOpenPopup.InvokeAsync)"><i class="fas fa-file-upload"></i>@strFileReg</button>
-                                            <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
+                                            <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())" hidden="@bHideFileAllDeleteBtn"><i class="fas fa-times"></i>@strFileDel</button>
                                             <button type="button" class="btn btn-md btn-red" @onclick="@(e => RemoveSelectFile())" hidden="@bFileSelectDeleteBtn"><i class="fas fa-times"></i>@strSelectFileDel</button>
 
                                         </td>
@@ -181,6 +181,12 @@
     /// 선택 삭제 버튼 사용 유무
     /// </summary>
     public bool bFileSelectDeleteBtn = false;
+    
+    /// <summary>
+    /// 일괄 삭제 버튼 사용 유무
+    /// </summary>
+    public bool bHideFileAllDeleteBtn =false;
+
     FileTree refFileTree;
 
     /// <summary>
@@ -284,6 +290,8 @@
         bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
         bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
         bFileSelectDeleteBtn = !OpConfigSvc.GetUseFileSelectDelete(groupID);
+        bHideFileAllDeleteBtn = !OpConfigSvc.GetUseFileAllDelete(groupID);
+
         bHideTitleDesc = OpConfigSvc.GetUseHideTitleDesc(groupID);
         bHideApprLine = OpConfigSvc.GetUseHideApprLine(groupID);
     }
