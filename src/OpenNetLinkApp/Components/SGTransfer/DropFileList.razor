@@ -1277,7 +1277,7 @@
         _dropReference = fileReaderService.CreateReference(inputTypeFileElement);
         string targets = new string("fileInput");
         _dropReference.SetDragTargetElementAsync(targets);
-        _dropReference.RegisterDropEventsAsync();
+        //_dropReference.RegisterDropEventsAsync();
 
         bViewDropFileAddError = false; // SGAppMgrSvc.OpConfigInfoService.GetUseDropErrorUI();
         InitText();
@@ -1880,6 +1880,8 @@
 
             StateHasChanged();
         }
+        if(firstRender)
+            _dropReference.RegisterDropEventsAsync();
 
         return stopClick();
     }
