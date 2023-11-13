@@ -25,6 +25,8 @@ var isSilentShowAll = Argument<bool>("isSilentShowAll", false);	//true로 하면
 var regCrxForce = Argument<bool>("regCrxForce", false);					//true로 하면, NetPos가 "IN"인 Case
 var patchAppEnv = Argument<bool>("patchAppEnv", false);					//true로 하면, patch때에 AppEnvSetting.json 파일을 덮어씌우는 동작함(win)
 var inkFileName = Argument("inkFileName", "OpenNetLink");      // 바탕화면 Ink 파일 이름 설정 
+var isPatchSilent = Argument<bool>("isPatchSilent", true);		// false로 하면 패치파일의 설치과정을 UI View로 변경함(사용자가 직접 여러번 클릭해줘야함.)
+
 
 var isPatchInstaller = false;
 var nacLoginType ="0" ;		//0:none / 1:Genian NAC
@@ -1107,6 +1109,7 @@ Task("PkgCrossflatform")
 			nacLoginType ="0";
 			disableCertAutoUpdate = false;
 			isPatchInstaller=true;
+			isSilent=isPatchSilent;			
 			RunTarget("MakeInstaller");		
 		}
 	}
