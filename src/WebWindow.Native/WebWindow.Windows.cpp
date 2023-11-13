@@ -923,7 +923,6 @@ void WebWindow::AttachWebView()
 	}
 	else
 	{
-		wprintf(L"AttachWebView - S_OK\n");
 		// Block until it's ready. This simplifies things for the caller, so they
 		// don't need to regard this process as async.
 
@@ -933,7 +932,6 @@ void WebWindow::AttachWebView()
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		wprintf(L"AttachWebView - S_OK End\n");
 	}
 }
 
