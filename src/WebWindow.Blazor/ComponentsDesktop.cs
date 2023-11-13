@@ -43,28 +43,35 @@ namespace WebWindows.Blazor
 
                 WebWindow = new WebWindow(windowTitle, options =>
                 {
-                    var contentRootAbsolute = Path.GetDirectoryName(Path.GetFullPath(hostHtmlPath));
-
-                    options.SchemeHandlers.Add(BlazorAppScheme, (string url, out string contentType) =>
+                    try
                     {
+                        var contentRootAbsolute = Path.GetDirectoryName(Path.GetFullPath(hostHtmlPath));
+
+                        options.SchemeHandlers.Add(BlazorAppScheme, (string url, out string contentType) =>
+                        {
                         // TODO: Only intercept for the hostname 'app' and passthrough for others
                         // TODO: Prevent directory traversal?
                         var appFile = Path.Combine(contentRootAbsolute, new Uri(url).AbsolutePath.Substring(1));
-                        if (appFile == contentRootAbsolute)
-                        {
-                            appFile = hostHtmlPath;
-                        }
+                            if (appFile == contentRootAbsolute)
+                            {
+                                appFile = hostHtmlPath;
+                            }
 
-                        contentType = GetContentType(appFile);
-                        return File.Exists(appFile) ? File.OpenRead(appFile) : null;
-                    });
-
-                    // framework:// is resolved as embedded resources
-                    options.SchemeHandlers.Add("framework", (string url, out string contentType) =>
-                        {
-                            contentType = GetContentType(url);
-                            return SupplyFrameworkFile(url);
+                            contentType = GetContentType(appFile);
+                            return File.Exists(appFile) ? File.OpenRead(appFile) : null;
                         });
+
+                        // framework:// is resolved as embedded resources
+                        options.SchemeHandlers.Add("framework", (string url, out string contentType) =>
+                            {
+                                contentType = GetContentType(url);
+                                return SupplyFrameworkFile(url);
+                            });
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"WebWindow Action Exception :" + ex.ToString());
+                    }
                 });
 
                 CancellationTokenSource appLifetimeCts = new CancellationTokenSource();
