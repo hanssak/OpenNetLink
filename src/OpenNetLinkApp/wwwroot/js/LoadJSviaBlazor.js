@@ -1605,11 +1605,7 @@ window.loadFileReaderService = () => {
           };
 
           this.SetDragTargetElement = function (targetId) {
-              console.log("SetDragTargetElement start/" + targetId);
-              if (this.dragTargetElements.size < 1)
-                  this.dragTargetElements.add(targetId);
-
-              console.log("SetDragTargetElement end  / dragTargetElements.size :" + this.dragTargetElements.size);
+              this.dragTargetElements.add(targetId);
               return true;
           };
           this.DelDragTargetElement = function (targetId) {
@@ -1629,11 +1625,7 @@ window.loadFileReaderService = () => {
           };
           this.RegisterDropEvents = function (element, additive) {
               var elementReal = this.GetDragTargetElement();
-              if (elementReal == null) {
-                  console.log("RegisterDropEvents : false");
-                  return false;
-              }
-                  
+              if(elementReal == null) return false;
 
               _this.LogIfNull(elementReal);
               var handler = function (ev) {
