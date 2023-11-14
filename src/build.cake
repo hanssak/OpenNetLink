@@ -26,6 +26,7 @@ var regCrxForce = Argument<bool>("regCrxForce", false);					//true로 하면, Ne
 var patchAppEnv = Argument<bool>("patchAppEnv", false);					//true로 하면, patch때에 AppEnvSetting.json 파일을 덮어씌우는 동작함(win)
 var inkFileName = Argument("inkFileName", "OpenNetLink");      // 바탕화면 Ink 파일 이름 설정 
 var isPatchSilent = Argument<bool>("isPatchSilent", true);		// false로 하면 패치파일의 설치과정을 UI View로 변경함(사용자가 직접 여러번 클릭해줘야함.)
+var regStartProgram = Argument<bool>("regStartProgram", true);		// 시작프로그램에 등록 여부(Window)
 
 
 var isPatchInstaller = false;
@@ -1143,6 +1144,7 @@ Task("MakeInstaller")
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
 					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
+					{"REG_STARTPROGRAM", regStartProgram.ToString().ToUpper()},
 				}
 			});			
 
@@ -1165,6 +1167,7 @@ Task("MakeInstaller")
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
 					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
+					{"REG_STARTPROGRAM", regStartProgram.ToString().ToUpper()},
 				}
 			});
 		}
@@ -1188,6 +1191,7 @@ Task("MakeInstaller")
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
 					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
+					{"REG_STARTPROGRAM", regStartProgram.ToString().ToUpper()},
 				}
 			});			
 		}
