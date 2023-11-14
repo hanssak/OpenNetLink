@@ -63,140 +63,206 @@ namespace OpenNetLinkApp.Services
                 contents.hsClear(3);
             }
 
-            m_StrLanguage = SGAppManager.SGAppConfigService.AppConfigInfo.strLanguage;
-            if (string.IsNullOrEmpty(m_StrLanguage))
-                m_StrLanguage = "KR";
+                m_StrLanguage = SGAppManager.SGAppConfigService.AppConfigInfo.strLanguage;
+                if (string.IsNullOrEmpty(m_StrLanguage))
+                    m_StrLanguage = "KR";
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"XmlConfService LoadFile(Path:{strFileName}) Exception :{ex.ToString()}");
+                throw;
+            }
         }
 
         public string GetCommon(string strID)
         {
-            if (m_Xml == null)
-                LoadXmlFile(xmlFileName);
-
-            string str = "";
-            XmlNodeList xnList = m_Xml.GetElementsByTagName("COMMON");
-            if (m_StrLanguage == null)
-                m_StrLanguage = "KR";
-            foreach (XmlNode xn in xnList)
+            try
             {
-                str = xn[strID][m_StrLanguage].InnerText;
+                if (m_Xml == null)
+                    LoadXmlFile(xmlFileName);
+
+                string str = "";
+                XmlNodeList xnList = m_Xml.GetElementsByTagName("COMMON");
+                if (m_StrLanguage == null)
+                    m_StrLanguage = "KR";
+                foreach (XmlNode xn in xnList)
+                {
+                    str = xn[strID][m_StrLanguage].InnerText;
+                }
+                return str;
             }
-            return str;
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"XmlConfService GetCommon(Text:{strID}) Exception :{ex.ToString()}");
+                throw;
+            }
         }
 
         public string GetTitle(string strID)
         {
-            if (m_Xml == null)
-                LoadXmlFile(xmlFileName);
+            try
+            {
+                if (m_Xml == null)
+                    LoadXmlFile(xmlFileName);
 
-            string str = "";
-            XmlNodeList xnList = m_Xml.GetElementsByTagName("TITLE");
-            if (m_StrLanguage == null)
-                m_StrLanguage = "KR";
-            foreach (XmlNode xn in xnList)
-            {
-                str = xn[strID][m_StrLanguage].InnerText;
-            }
-            return str;
-        }
-        public string GetInfoMsg(string strID)
-        {
-            if (m_Xml == null)
-                LoadXmlFile(xmlFileName);
-            string str = "";
-            XmlNodeList xnList = m_Xml.GetElementsByTagName("INFO");
-            if (m_StrLanguage == null)
-                m_StrLanguage = "KR";
-            foreach (XmlNode xn in xnList)
-            {
-                if (xn[strID][m_StrLanguage].InnerText != null)
+                string str = "";
+                XmlNodeList xnList = m_Xml.GetElementsByTagName("TITLE");
+                if (m_StrLanguage == null)
+                    m_StrLanguage = "KR";
+                foreach (XmlNode xn in xnList)
                 {
                     str = xn[strID][m_StrLanguage].InnerText;
                 }
+                return str;
             }
-            return str;
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"XmlConfService GetTitle(Text:{strID}) Exception :{ex.ToString()}");
+                throw;
+            }
+        }
+        public string GetInfoMsg(string strID)
+        {
+            try
+            {
+                if (m_Xml == null)
+                    LoadXmlFile(xmlFileName);
+
+                string str = "";
+                XmlNodeList xnList = m_Xml.GetElementsByTagName("INFO");
+                if (m_StrLanguage == null)
+                    m_StrLanguage = "KR";
+                foreach (XmlNode xn in xnList)
+                {
+                    if (xn[strID][m_StrLanguage].InnerText != null)
+                    {
+                        str = xn[strID][m_StrLanguage].InnerText;
+                    }
+                }
+                return str;
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"XmlConfService GetInfoMsg(Text:{strID}) Exception :{ex.ToString()}");
+                throw;
+            }
         }
         public string GetErrMsg(string strID)
         {
-            if (m_Xml == null)
-                LoadXmlFile(xmlFileName);
-
-            string str = "";
-            XmlNodeList xnList = m_Xml.GetElementsByTagName("ERROR");
-            if (m_StrLanguage == null)
-                m_StrLanguage = "KR";
-            foreach (XmlNode xn in xnList)
+            try
             {
-                str = xn[strID][m_StrLanguage].InnerText;
+                if (m_Xml == null)
+                    LoadXmlFile(xmlFileName);
+
+                string str = "";
+                XmlNodeList xnList = m_Xml.GetElementsByTagName("ERROR");
+                if (m_StrLanguage == null)
+                    m_StrLanguage = "KR";
+                foreach (XmlNode xn in xnList)
+                {
+                    str = xn[strID][m_StrLanguage].InnerText;
+                }
+                return str;
             }
-            return str;
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"XmlConfService GetErrMsg(Text:{strID}) Exception :{ex.ToString()}");
+                throw;
+            }
+
         }
         public string GetWarnMsg(string strID)
         {
-            if (m_Xml == null)
-                LoadXmlFile(xmlFileName);
-
-            string str = "";
-            XmlNodeList xnList = m_Xml.GetElementsByTagName("WARNING");
-            if (m_StrLanguage == null)
-                m_StrLanguage = "KR";
-            foreach (XmlNode xn in xnList)
+            try
             {
-                str = xn[strID][m_StrLanguage].InnerText;
-            }
-            return str;
-        }
-        public void SetLangType(string strLanguage) => m_StrLanguage = strLanguage;
+                if (m_Xml == null)
+                    LoadXmlFile(xmlFileName);
 
+                string str = "";
+                XmlNodeList xnList = m_Xml.GetElementsByTagName("WARNING");
+                if (m_StrLanguage == null)
+                    m_StrLanguage = "KR";
+                foreach (XmlNode xn in xnList)
+                {
+                    str = xn[strID][m_StrLanguage].InnerText;
+                }
+                return str;
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"XmlConfService GetWarnMsg(Text:{strID}) Exception :{ex.ToString()}");
+                throw;
+            }
+        }
+        public void SetLangType(string strLanguage)
+        {
+            m_StrLanguage = strLanguage;
+        }
 
         public void GetNetworkTitle(int groupID, out string strFromName, out string strToName)
         {
-            string str1 = "-";
-            string str2 = "-";
-            int count = listNetworks.Count;
-            if (count <= 0)
+            try
             {
+                string str1 = "-";
+                string str2 = "-";
+                int count = listNetworks.Count;
+                if (count <= 0)
+                {
+                    strFromName = str1;
+                    strToName = str2;
+                    return;
+                }
+                for (int i = 0; i < count; i++)
+                {
+                    int gID = listNetworks[i].GroupID;
+                    if (gID == groupID)
+                    {
+                        str1 = listNetworks[i].FromName;
+                        str2 = listNetworks[i].ToName;
+                        break;
+                    }
+                }
+
                 strFromName = str1;
                 strToName = str2;
                 return;
             }
-            for (int i = 0; i < count; i++)
+            catch (Exception ex)
             {
-                int gID = listNetworks[i].GroupID;
-                if (gID == groupID)
-                {
-                    str1 = listNetworks[i].FromName;
-                    str2 = listNetworks[i].ToName;
-                    break;
-                }
+                strFromName = strToName = "";
+                CLog.Here().Error($"XmlConfService GetNetworkTitle Exception :{ex.ToString()}");
             }
-
-            strFromName = str1;
-            strToName = str2;
-            return;
         }
         public string GetNetworkTitle(int groupID)
         {
-            string str1 = "-";
-            string str2 = "-";
-            int count = listNetworks.Count;
-            if (count <= 0)
+            try
             {
-                return "-";
-            }
-            for (int i = 0; i < count; i++)
-            {
-                int gID = listNetworks[i].GroupID;
-                if (gID == groupID)
+                string str1 = "-";
+                string str2 = "-";
+                int count = listNetworks.Count;
+                if (count <= 0)
                 {
-                    str1 = listNetworks[i].FromName;
-                    str2 = listNetworks[i].ToName;
-                    break;
+                    return "-";
                 }
-            }
+                for (int i = 0; i < count; i++)
+                {
+                    int gID = listNetworks[i].GroupID;
+                    if (gID == groupID)
+                    {
+                        str1 = listNetworks[i].FromName;
+                        str2 = listNetworks[i].ToName;
+                        break;
+                    }
+                }
 
-            str1 = str1 + " → " + str2;
-            return str1;
+                str1 = str1 + " → " + str2;
+                return str1;
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"XmlConfService GetNetworkTitle Exception :{ex.ToString()}");
+                throw;
+            }
         }
 
         public string[] GetMonthNamesGroup()

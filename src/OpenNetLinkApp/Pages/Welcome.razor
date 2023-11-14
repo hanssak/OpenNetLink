@@ -635,7 +635,11 @@
         if (nDrawPageGroupID < 0)
             return false;
 
-        return (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nDrawPageGroupID));
+        if ((pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN || pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_CUSTOM) && SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nDrawPageGroupID))
+            return true;
+
+        return false;
+        
     }
 
 
@@ -809,19 +813,8 @@
     {
 
         int groupID = groupIDbyParam;
-
         path += $"/{groupID}";
 
-        string strNavigateUrl = path.ToLower();
-
-        if (strNavigateUrl.IndexOf("transfer") > 0 && strNavigateUrl.IndexOf("transferapprove") < 0)
-        {
-            strNavigateUrl = pageService.GetFileTransPage(groupID);
-            if (strNavigateUrl == null || strNavigateUrl.Length < 1)
-                strNavigateUrl = "/Transfer/";
-            strNavigateUrl += groupID.ToString();
-            path = strNavigateUrl;
-        }
 
         KeyboardEventArgs eventArgs = new KeyboardEventArgs();
         eventArgs.Key = "Enter";
@@ -897,16 +890,6 @@
         InitDeviceInfo();
         InitDBInfo();
         InitAdministrator();
-
-        LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
-        loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
-        if (loginAfterSGHeaderUI != null)
-            loginAfterSGHeaderUI(groupID);
-
-        LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
-        loginAfterSGSideBar = HsCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
-        if (loginAfterSGSideBar != null)
-            loginAfterSGSideBar(groupID);
 
         SendDayFileInfo();*/
 
@@ -989,24 +972,9 @@
     /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        //await JSRuntime.InvokeAsync<object>("initWelcome");
-        await JSRuntime.InvokeAsync<object>("exitLogIn");
-        await JSRuntime.InvokeAsync<object>("adJustWindowsize");
-
-        /*
-        object[] param = { nDayMaxFileSize, nDayUseFileSize };
-        await JSRuntime.InvokeAsync<object>("initTransferChart", param);
-
-        object[] param2 = { nDayMaxFileCount, nDayUseFileCount };
-        await JSRuntime.InvokeAsync<object>("initTransferCountChart", param2);
-
-        object[] param3 = { nDayMaxClipSize, nDayUseClipSize };
-        await JSRuntime.InvokeAsync<object>("initClipBoardChart", param3);
-
-        object[] param5 = { nDayMaxClipCount, nDayUseClipCount };
-        await JSRuntime.InvokeAsync<object>("initClipBoardCountChart", param5);
-        */
-
+        int transferTemplate = SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam);
+        await JSRuntime.InvokeAsync<object>("exitLogIn",new object[] {transferTemplate});
+        await JSRuntime.InvokeAsync<object>("adJustWindowsize",new object[] {transferTemplate});
 
         if (nDiskFreeSize <= 0)
             nDiskFreeSize = 1;
@@ -1080,15 +1048,6 @@
             InitAdministrator();
             InitTransApprList();
 
-            LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
-            loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
-            if (loginAfterSGHeaderUI != null)
-                loginAfterSGHeaderUI(groupID);
-
-            LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
-            loginAfterSGSideBar = HsCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
-            if (loginAfterSGSideBar != null)
-                loginAfterSGSideBar(groupID);
 
             GetUsePasswordUseDay();
 
@@ -1100,7 +1059,6 @@
 
             CheckContinueFileUpload();
 
-            CheckClientPatch(sgLoginData, groupID);
         }
 
         pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);          //매일 자정 데이터 새로고침
@@ -2122,60 +2080,6 @@
         }
         InitDBInfo();
         StateHasChanged();
-    }
-
-    /// <summary>
-    /// Server와 Local의 Client version 버전 비교 후 자동 업데이트 (PATCHMODE= 1 일때 기능함)
-    /// </summary>
-    /// <param name="sgLoginData"></param>
-    /// <returns></returns>
-    public void CheckClientPatch(SGLoginData sgLoginData, int groupID)
-    {
-        //return false;
-        if (sgLoginData == null)
-            return;
-        if (!sgLoginData.GetClientUpgrade())
-            return;
-
-        //PATCHMODE가 1 일때, 서버에 업데이트 대기중인 버전 정보가 반환됨
-        string strSvrCliVersion = sgLoginData.GetServClientVersion().ToUpper();
-
-        if (strSvrCliVersion.Equals(""))
-            return;
-
-        CLog.Here().Information("groupID : {0} - DashBoard Server Client Version {1}", groupID, strSvrCliVersion);
-
-        string strCliVersion = HsCmdCenter.GetCliVersion().ToUpper();
-
-        if (strCliVersion.Equals(""))
-            return;
-
-        if (!versionConfigSvc.isUpperVersion(strSvrCliVersion, strCliVersion))
-            return;
-
-        CLog.Here().Information("groupID : {0} - WelCome Server Client Version {1}", groupID, strSvrCliVersion);
-        CLog.Here().Information("groupID : {0} - WelCome Local Client Version {1}", groupID, strCliVersion);
-
-        //업데이트  진행중이면 SKIP 하도록 처리 (KYH)
-        (Enums.UpdateStatusType status, int groupId) nowUpdateInfo = AppUpdaterSvc.GetNowUpdateInfo();
-        if (nowUpdateInfo.status != Enums.UpdateStatusType.NONE && nowUpdateInfo.groupId > -1)
-        {
-            CLog.Here().Information($"nowUpdateInfo.groupId : {groupID} - Update Already Started By GroupID[{nowUpdateInfo.groupId}] / Status[{nowUpdateInfo.status.ToString()}]");
-            return;
-        }
-
-        //다른망에 Update Cancel 중이면 SKIP
-        if (AppUpdaterSvc.IsCancelRequested)
-        {
-            CLog.Here().Information($"groupId : {groupID} SKIP - Update Canceling...");
-            return;
-        }
-
-        //ForceUpdate와 상관없이, PatchMode가 1이면 무조건 강제 업데이트 처리
-        ClientUpgradeExeEvent clientUpdateExe = null;
-        clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
-        if (clientUpdateExe != null)
-            clientUpdateExe(groupID, true);
     }
 
 

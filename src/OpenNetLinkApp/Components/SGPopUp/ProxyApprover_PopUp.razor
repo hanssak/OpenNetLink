@@ -36,7 +36,7 @@
                         }
                         else        //TREE
                         {
-                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="392" TreeHeight="160" UserSearchList="@ProxySearch"
+                            <SGDeptTreeList @ref="refSGDeptTreeList" ShowUserID="@showUserId" UseInputSearch="@useInputInTree" Height="392" TreeHeight="160" UserSearchList="@ProxySearch"
                                             OnItemClick="(approve) => AssignProxy(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                     </div>
@@ -57,7 +57,7 @@
                             <span class="float-left p-1">-</span>
                             <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly="readonly" value="@strToDay">
                         </div>
-                        <SGDeptSearchList UseInputSearch="false" Height="392" ColumnIndexVisible="false" UserDataSource="@ProxySelect" OnItemClick="(target)=> SelectTarget(target.UserSeq)" OnItemDoubleClick="target_OnItemDoubleClick" />
+                        <SGDeptSearchList UseInputSearch="false"  ShowUserID="@showUserId" Height="392" ColumnIndexVisible="false" UserDataSource="@ProxySelect" OnItemClick="(target)=> SelectTarget(target.UserSeq)" OnItemDoubleClick="target_OnItemDoubleClick" />
                     </div>
                     <!--e table -->
                 </div>
@@ -99,6 +99,7 @@
 
     private string proxySearchType = "";
     private bool useInputInTree;
+    private bool showUserId = false;
 
     private int nActionType = -1;  //1:삭제, 2:등록
 
@@ -140,7 +141,7 @@
         //if (sgLoginData != null)
         //    bApproverOnly = !sgLoginData.GetApproveProxyRight();
 
-
+       
         base.OnAfterRender(firstRender);
     }
 
@@ -203,6 +204,7 @@
             newApprover.APPR_USERNAME = apv.Name;
             newApprover.RANK = apv.Grade;
             newApprover.UserSeq = apv.UserSeq;
+            newApprover.APPR_USERID = apv.APPR_USERID;
 
             int count = ProxySelect.Count;
             newApprover.ORDER = ++count;
@@ -296,7 +298,6 @@
     {
         RequestProxyInfo();
         RequestPossibleCount();
-
         object[] param = { "ProxyApprover" };
         await jsRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -418,11 +419,10 @@
     {
         int groupID = 0;
         groupID = SGAppMgrSvc.SideBarUIService.ActiveMenu.GroupId;
-
-       
-
+        
         proxySearchType = SGAppMgrSvc.OpConfigInfoService.GetProxySearchType(groupID);
         useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInProxyTree(groupID);
+        showUserId  = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
 
         //*****************************************************************
         //EventBinding : EventBinding DeptApprLine -> DeptApprLineResult

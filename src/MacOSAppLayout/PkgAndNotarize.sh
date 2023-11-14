@@ -37,11 +37,19 @@ dev_team="L7W5N48H4G"
 # dev_keychain_label="eumg-vmam-nluz-ygto"
 dev_keychain_label="sxog-tiki-hjrx-pxfs"
 
+# submission_id
+profile_name="hanssakSG"
+
 # put your project's information into these variables
 if [ $# -ne 10 ]; then
 	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {startauto} $6 {isupdatecheck} $7 {storagename} $8 {regcrxforce} $9"
 	exit -1
 fi;
+
+echo "$@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+echo "Notarize (CMD-identify) : $0 $1 $2 $3 $4 $5 $6 $7"
+echo "$@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+
 version=$1
 identifier="com.hanssak.OpenNetLinkApp"
 productname="OpenNetLinkApp"
@@ -150,6 +158,46 @@ notarizefile() { # $1: path to file to notarize, $2: identifier
     fi
     
 }
+
+notarizefilenotarytool() { # $1: path to file to notarize, $2: identifier
+    filepath=${1:?"need a filepath"}
+    identifier=${2:?"need an identifier"}
+    
+    # upload file
+    echo "## uploading $filepath for notarization"
+                               #--password "@keychain:$dev_keychain_label" \
+    # requestUUID=$(xcrun altool --notarize-app \
+    #                           --primary-bundle-id "$identifier" \
+    #                           --username "$dev_account" \
+    #                           --password "$dev_keychain_label" \
+    #                           --asc-provider "$dev_team" \
+    #                           --file "$filepath" 2>&1 \
+    #              | awk '/RequestUUID/ { print $NF; }')
+
+    #--keychain-profile "$dev_account" \
+    # Use notarytool : Use.1
+    requestUUID1=$(xcrun notarytool submit "$filepath" --wait \
+                              --apple-id "$dev_account" \
+                              --password "$dev_keychain_label" \
+                              --team-id "$dev_team")
+
+    # Use notarytool : Use.2 - req bug fix
+    # requestUUID1=$(xcrun notarytool submit "$filepath" --wait \
+    #                         --keychain-profile "$dev_account")
+
+
+    echo "------------------ vervoses (debug) ----------------"
+    echo $requestUUID1
+
+    # a72946c2-a9c1-4214-8c32-50a048dcfc8e
+
+    requestUUID1=$(xcrun notarytool log "$dev_account" notary-log.json)
+
+    echo "------------------ vervoses (debug) ----------------"
+    echo $requestUUID1
+    
+}
+
 
 
 # build clean install
@@ -265,8 +313,10 @@ if [[ $ispatch != "TRUE" ]]; then
     isupdatecheck="FALSE"
 fi
 if [[ $regcrxforce == "FALSE" ]]; then 
+    # echo "Check regcrxforce : FALSE"
     sed -i '' -e 's/REG_CRX=true/REG_CRX=false/g' $filepostinstall
 else
+    # echo "Check regcrxforce : TRUE"
     sed -i '' -e 's/REG_CRX=false/REG_CRX=true/g' $filepostinstall
 fi
 
@@ -284,6 +334,7 @@ else
     sed -i '' -e 's/UPDATE_CHECK=false/UPDATE_CHECK=true/g' $filepreinstall
 fi
 
+#read -n 1 -s -r -p "계속하려면 아무 키나 누르세요.(KKW)"   # package 생성 error
 
 if [[ $ispatch == "TRUE" ]]; then 
     #for patch
@@ -304,7 +355,9 @@ pkgbuild --root "$pkgroot" \
 
 echo "##############################################################################################"
 # upload for notarization
-notarizefile "$pkgpath" "$identifier"
+#notarizefile "$pkgpath" "$identifier"
+notarizefilenotarytool "$pkgpath" "$identifier"
+
 # notarizefile "$ZIP_PATH" "$identifier"
 
 echo "##############################################################################################"

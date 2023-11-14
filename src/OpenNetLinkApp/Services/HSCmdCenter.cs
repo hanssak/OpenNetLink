@@ -22,7 +22,7 @@ using OpenNetLinkApp.Data.SGQuery;
 using OpenNetLinkApp.Models.SGConfig;
 using System.Runtime.Serialization.Json;
 using Microsoft.EntityFrameworkCore.Storage;
-
+using Serilog;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
@@ -390,416 +390,418 @@ namespace OpenNetLinkApp.Services
         }
         private void SGDataRecv(int groupId, eCmdList cmd, SGData sgData)
         {
-            //lock (objDataRecv)
 
             HsNetWork hs = null;
             int nRet = 0;
 
-            nRet = sgData.GetResult();
-            switch (cmd)
+            try
             {
-                case eCmdList.eLINKCHK:
-                    SetHoliday(groupId, sgData);
-                    break;
-                case eCmdList.eSEEDKEY:                                                  // SEEDKEY_ACK : seed key 요청 응답
-                    break;
+                nRet = sgData.GetResult();
 
-                case eCmdList.eBIND:                                                  // BIND_ACK : user bind(connect) 인증 응답
-                    BindAfterSend(nRet, groupId, sgData);
-                    break;
+                switch (cmd)
+                {
+                    case eCmdList.eLINKCHK:
+                        SetHoliday(groupId, sgData);
+                        break;
+                    case eCmdList.eSEEDKEY:                                                  // SEEDKEY_ACK : seed key 요청 응답
+                        break;
 
-                case eCmdList.eCHANGEPASSWD:                                                  // 비밀번호 변경 요청 응답.
-                    ChgPassWDAfterSend(nRet, groupId);
-                    break;
-
-                case eCmdList.eDEPTINFO:                                                  // 부서정보 조회 요청 응답.
-                    DeptInfoAfterSend(nRet, groupId, sgData);
-                    {
-                        int result = sgData.GetResult();
-                        sgData.GetRecordData("DeptCount");
-                    }
-                    break;
-
-                case eCmdList.eURLLIST:                                                  // URL 자동전환 리스트 요청 응답.
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        sgDicRecvData.SetUrlListData(hs, groupId, sgData);
-                        URLListAfterSend(nRet, groupId, sgData);
-                    }
-                    break;
-
-                case eCmdList.eUSERINFOEX:                                                  // USERINFOEX : 사용자 정보 응답.
-                    UserInfoAfterSend(nRet, groupId, sgData);
-                    break;
-
-                case eCmdList.eAPPRINSTCUR:                                                  // 현재 등록된 대결재자 정보 요청 응답.
-                    ApprInstAfterSend(nRet, groupId, sgData);
-                    break;
-                case eCmdList.eAPPRINSTCLEAR:                                       //대결자삭제
-                case eCmdList.eAPPRINSTREG:                                         //대결자등록
-                    CommonResultAfterSend(nRet, groupId, sgData);
-                    break;
-                case eCmdList.eFILETRANSLIST:                                                  // 전송관리 조회 리스트 데이터 요청 응답.
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        sgDicRecvData.SetTransManageData(hs, groupId, sgData);
-                        TransSearchAfterSend(nRet, groupId);
-                    }
-                    break;
-
-                case eCmdList.eFILEAPPROVE:                                                  // 결재관리 조회 리스트 데이터 요청 응답.
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        sgDicRecvData.SetApprManageData(hs, groupId, sgData);
-                        ApprSearchAfterSend(nRet, groupId);
-                    }
-                    break;
-
-                case eCmdList.eSYSTEMRUNENV:                                                       // 시스템 환경정보 요청에 대한 응답.
-                    SystemRunAfterSend(nRet, groupId, sgData);
-
-                    break;
-
-                case eCmdList.eSESSIONCOUNT:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
-                    System.Diagnostics.Debug.WriteLine("SESSIONCOUNT ON HSCmdCenter:" + groupId);
-                    if (nRet != 0)
+                    case eCmdList.eBIND:                                                  // BIND_ACK : user bind(connect) 인증 응답
                         BindAfterSend(nRet, groupId, sgData);
-                    break;
+                        break;
 
-                case eCmdList.eAPPROVEDEFAULT:                                                  // 사용자기본결재정보조회 요청 응답.
-                    ApprLineAfterSend(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eCHANGEPASSWD:                                                  // 비밀번호 변경 요청 응답.
+                        ChgPassWDAfterSend(nRet, groupId);
+                        break;
 
-                case eCmdList.eFILETRANSLISTQUERYCOUNT:                                                  // 전송관리 조회 리스트 데이터 Count 요청 응답.
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        string strCount = sgData.GetSvrRecordTagData("RECORD");
-                        int count = 0;
-                        if (!strCount.Equals(""))
+                    case eCmdList.eDEPTINFO:                                                  // 부서정보 조회 요청 응답.
+                        DeptInfoAfterSend(nRet, groupId, sgData);
                         {
-                            strCount = strCount.Replace("\u0001", "");
-                            count = Convert.ToInt32(strCount);
+                            int result = sgData.GetResult();
+                            sgData.GetRecordData("DeptCount");
                         }
-                        TransSearchCountAfterSend(nRet, groupId, count);
-                    }
-                    break;
+                        break;
 
-                case eCmdList.eFILETRANSLISTQUERY:                                                  // 전송관리 조회 리스트 데이터 요청 응답.
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        sgDicRecvData.SetTransManageData(hs, groupId, sgData);
-                        TransSearchAfterSend(nRet, groupId);
-                    }
-                    //RMouseFileAddNotiAfterSend(nRet, groupId);
-                    break;
-
-                case eCmdList.eFILEAPPRLISTQUERYCOUNT:                                           // 결재관리 조회 리스트 데이터 Count 요청 응답. (쿼리 방식) 
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        string sCount = sgData.GetSvrRecordTagData("RECORD");
-                        int cnt = 0;
-                        if (!sCount.Equals(""))
+                    case eCmdList.eURLLIST:                                                  // URL 자동전환 리스트 요청 응답.
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
                         {
-                            sCount = sCount.Replace("\u0001", "");
-                            cnt = Convert.ToInt32(sCount);
+                            sgDicRecvData.SetUrlListData(hs, groupId, sgData);
+                            URLListAfterSend(nRet, groupId, sgData);
                         }
-                        ApprSearchCountAfterSend(nRet, groupId, cnt);
-                    }
-                    break;
+                        break;
 
-                case eCmdList.eFILEAPPRLISTQUERY:                                           // 결재관리 조회 리스트 요청 응답. (쿼리 방식) 
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        sgDicRecvData.SetApprManageData(hs, groupId, sgData);
-                        ApprSearchAfterSend(nRet, groupId);
-                    }
-                    break;
+                    case eCmdList.eUSERINFOEX:                                                  // USERINFOEX : 사용자 정보 응답.
+                        UserInfoAfterSend(nRet, groupId, sgData);
+                        break;
 
-                case eCmdList.eFILETRANSDETAILQUERY:                                         // 전송 상세보기 조회 리스트 요청 응답. (쿼리 방식) 
-                    break;
+                    case eCmdList.eAPPRINSTCUR:                                                  // 현재 등록된 대결재자 정보 요청 응답.
+                        ApprInstAfterSend(nRet, groupId, sgData);
+                        break;
+                    case eCmdList.eAPPRINSTCLEAR:                                       //대결자삭제
+                    case eCmdList.eAPPRINSTREG:                                         //대결자등록
+                        CommonResultAfterSend(nRet, groupId, sgData);
+                        break;
+                    case eCmdList.eFILETRANSLIST:                                                  // 전송관리 조회 리스트 데이터 요청 응답.
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetTransManageData(hs, groupId, sgData);
+                            TransSearchAfterSend(nRet, groupId);
+                        }
+                        break;
 
-                case eCmdList.eFILEAPPRDETAILQUERY:                                         // 결재 상세보기 조회 리스트 요청 응답. (쿼리 방식) 
-                    break;
+                    case eCmdList.eFILEAPPROVE:                                                  // 결재관리 조회 리스트 데이터 요청 응답.
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetApprManageData(hs, groupId, sgData);
+                            ApprSearchAfterSend(nRet, groupId);
+                        }
+                        break;
 
-                case eCmdList.eSENDCANCEL:                                                  // 전송취소 요청 응답 
-                    TransCancelAfterSend(nRet, groupId);
-                    break;
+                    case eCmdList.eSYSTEMRUNENV:                                                       // 시스템 환경정보 요청에 대한 응답.
+                        SystemRunAfterSend(nRet, groupId, sgData);
 
-                case eCmdList.eAPPROVEBATCH:                                                // 일괄결재 응답.
-                    ApproveBatchAfterSend(nRet, groupId, sgData);
-                    break;
+                        break;
 
-                case eCmdList.eTRANSDETAIL:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        sgDicRecvData.SetDetailData(hs, groupId, sgData);
-                        string strTransSeq = sgData.GetBasicTagData("TRANSSEQ");
-                        DetailSearchAfterSend(nRet, groupId, strTransSeq);
-                    }
-                    break;
+                    case eCmdList.eSESSIONCOUNT:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
+                        System.Diagnostics.Debug.WriteLine("SESSIONCOUNT ON HSCmdCenter:" + groupId);
+                        if (nRet != 0)
+                            BindAfterSend(nRet, groupId, sgData);
+                        break;
 
-                case eCmdList.eDEPTAPPRLINESEARCHQUERY:                                     // 같은 부서 결재자 정보 리스트    
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        sgDicRecvData.SetDeptApprLineSearchData(hs, groupId, sgData);
-                        DeptApprLineSearchAfterSend(nRet, groupId);
-                    }
-                    break;
-                case eCmdList.eDEPTAPPRLINEREFLASHQUERY:                                    // 타 부서 결재자 정보 리스트
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        sgDicRecvData.SetDeptApprLineSearchData(hs, groupId, sgData);
-                        DeptApprLineReflashAfterSend(nRet, groupId);
-                    }
-                    break;
+                    case eCmdList.eAPPROVEDEFAULT:                                                  // 사용자기본결재정보조회 요청 응답.
+                        ApprLineAfterSend(nRet, groupId, sgData);
+                        break;
 
-                case eCmdList.eFILESENDPROGRESSNOTI:
-                    FileSendProgressNotiAfterSend(nRet, groupId, sgData);
-                    break;
-                case eCmdList.eFILERECVPROGRESSNOTI:
-                    FileRecvProgressNotiAfterSend(nRet, groupId, sgData);
-                    break;
-                case eCmdList.eFILEPREVPROGRESSNOTI:                                        // 파일 미리보기 수신 진행률 노티.
-                    FilePrevProgressNotiAfterSend(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eFILETRANSLISTQUERYCOUNT:                                                  // 전송관리 조회 리스트 데이터 Count 요청 응답.
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            string strCount = sgData.GetSvrRecordTagData("RECORD");
+                            int count = 0;
+                            if (!strCount.Equals(""))
+                            {
+                                strCount = strCount.Replace("\u0001", "");
+                                count = Convert.ToInt32(strCount);
+                            }
+                            TransSearchCountAfterSend(nRet, groupId, count);
+                        }
+                        break;
 
-                case eCmdList.eCLIPBOARDTXT:                                                    // 클립보드 데이터 Recv
-                    ClipRecvNotiAfterSend(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eFILETRANSLISTQUERY:                                                  // 전송관리 조회 리스트 데이터 요청 응답.
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetTransManageData(hs, groupId, sgData);
+                            TransSearchAfterSend(nRet, groupId);
+                        }
+                        //RMouseFileAddNotiAfterSend(nRet, groupId);
+                        break;
 
-                case eCmdList.eSUBDATAEXCHANGE:                                                    // 클립보드 데이터 Recv(서버에서)
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        UrlServerRecvNotiAfterSend(nRet, groupId, sgData);
-                    }
-                    break;
+                    case eCmdList.eFILEAPPRLISTQUERYCOUNT:                                           // 결재관리 조회 리스트 데이터 Count 요청 응답. (쿼리 방식) 
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            string sCount = sgData.GetSvrRecordTagData("RECORD");
+                            int cnt = 0;
+                            if (!sCount.Equals(""))
+                            {
+                                sCount = sCount.Replace("\u0001", "");
+                                cnt = Convert.ToInt32(sCount);
+                            }
+                            ApprSearchCountAfterSend(nRet, groupId, cnt);
+                        }
+                        break;
 
-                case eCmdList.eSUBDATANOTIFY:                                                    // 클립보드 데이터 Recv(서버에서)
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        UrlBrowserRecvNotiAfterSend(nRet, groupId, sgData);
-                    }
-                    break;
+                    case eCmdList.eFILEAPPRLISTQUERY:                                           // 결재관리 조회 리스트 요청 응답. (쿼리 방식) 
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetApprManageData(hs, groupId, sgData);
+                            ApprSearchAfterSend(nRet, groupId);
+                        }
+                        break;
 
-                case eCmdList.eRMOUSEFILEADD:                                                   // 마우스 우클릭 이벤트 노티
-                    RMouseFileAddNotiAfterSend(nRet, groupId);
-                    break;
+                    case eCmdList.eFILETRANSDETAILQUERY:                                         // 전송 상세보기 조회 리스트 요청 응답. (쿼리 방식) 
+                        break;
 
-                case eCmdList.eAPPROVECOUNT:                                                // 승인대기 노티.
-                    ApproveCountNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId, sgData);
-                    break;
-                case eCmdList.ePRIVACYAPPROVENOTIFY:
-                    PrivacyApproveCountNotiAfterSend(nRet, eCmdList.ePRIVACYAPPROVENOTIFY, groupId, sgData);
-                    break;
-                case eCmdList.eVIRUSSCAN:                                                   // 바이러스 검출 노티.
-                    VirusScanNotiAfterSend(nRet, eCmdList.eVIRUSSCAN, groupId, sgData);
-                    break;
-                case eCmdList.eAPTSCAN:                                                     // APT 노티.
-                    VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
-                    break;
-                case eCmdList.eDrmBlockNoti:                                                     // DRM Noti
-                    VirusScanNotiAfterSend(nRet, eCmdList.eDrmBlockNoti, groupId, sgData);
-                    break;
+                    case eCmdList.eFILEAPPRDETAILQUERY:                                         // 결재 상세보기 조회 리스트 요청 응답. (쿼리 방식) 
+                        break;
 
-                case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
-                    EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
-                    break;
-                case eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
-                    BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
-                    break;
-                case eCmdList.eAPPROVEACTIONNOTIFY:                                         // 사용자 결재 완료(승인/반려)노티.
-                    ApproveActionNotiAfterSend(nRet, eCmdList.eAPPROVEACTIONNOTIFY, groupId, sgData);
-                    break;
+                    case eCmdList.eSENDCANCEL:                                                  // 전송취소 요청 응답 
+                        TransCancelAfterSend(nRet, groupId);
+                        break;
 
-                case eCmdList.eLOGOUT:                                                      // 로그아웃 노티.
-                    LogOutNotiAfterSend(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eAPPROVEBATCH:                                                // 일괄결재 응답.
+                        ApproveBatchAfterSend(nRet, groupId, sgData);
+                        break;
 
-                case eCmdList.eUSEDAYFILETRANS:                                             // 사용된 일일 파일 전송 사용량 및 횟수 데이터.
-                    UseDayFileInfoNotiAfterSend(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eTRANSDETAIL:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetDetailData(hs, groupId, sgData);
+                            string strTransSeq = sgData.GetBasicTagData("TRANSSEQ");
+                            DetailSearchAfterSend(nRet, groupId, strTransSeq);
+                        }
+                        break;
 
-                case eCmdList.eUSEDAYCLIPTRANS:                                             // 사용된 일일 클립보드 전송 사용량 및 횟수 데이터.
-                    UseDayClipInfoNotiAfterSend(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eDEPTAPPRLINESEARCHQUERY:                                     // 같은 부서 결재자 정보 리스트    
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetDeptApprLineSearchData(hs, groupId, sgData);
+                            DeptApprLineSearchAfterSend(nRet, groupId);
+                        }
+                        break;
+                    case eCmdList.eDEPTAPPRLINEREFLASHQUERY:                                    // 타 부서 결재자 정보 리스트
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetDeptApprLineSearchData(hs, groupId, sgData);
+                            DeptApprLineReflashAfterSend(nRet, groupId);
+                        }
+                        break;
 
-                case eCmdList.eCLIENTUNLOCK:                                                      // 화면잠금 해제
-                    ScreenLockClearAfterSend(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eFILESENDPROGRESSNOTI:
+                        FileSendProgressNotiAfterSend(nRet, groupId, sgData);
+                        break;
+                    case eCmdList.eFILERECVPROGRESSNOTI:
+                        FileRecvProgressNotiAfterSend(nRet, groupId, sgData);
+                        break;
+                    case eCmdList.eFILEPREVPROGRESSNOTI:                                        // 파일 미리보기 수신 진행률 노티.
+                        FilePrevProgressNotiAfterSend(nRet, groupId, sgData);
+                        break;
 
-                case eCmdList.eZIPDEPTHINFO:                                                    // zip 파일 내부검사 설정 정보 조회.
-                    ZipDepthInfoSetting(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eCLIPBOARDTXT:                                                    // 클립보드 데이터 Recv
+                        ClipRecvNotiAfterSend(nRet, groupId, sgData);
+                        break;
 
-                case eCmdList.eCLIENTVERSION:                                                       // 업데이트 노티.
-                    UpgradeNotiAfterSend(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eSUBDATAEXCHANGE:                                                    // 클립보드 데이터 Recv(서버에서)
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            UrlServerRecvNotiAfterSend(nRet, groupId, sgData);
+                        }
+                        break;
 
-                case eCmdList.eDASHBOARDCOUNT:                                  // 대쉬보드 조회 쿼리 데이터.
-                    DashBoardCountAfterSend(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eSUBDATANOTIFY:                                                    // 클립보드 데이터 Recv(서버에서)
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            UrlBrowserRecvNotiAfterSend(nRet, groupId, sgData);
+                        }
+                        break;
 
-                case eCmdList.eDASHBOARDTRANSREQCOUNT:                              // 대쉬보드 전송요청 Count 쿼리
-                    DashBoardTransReqCountAfterSend(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eRMOUSEFILEADD:                                                   // 마우스 우클릭 이벤트 노티
+                        RMouseFileAddNotiAfterSend(nRet, groupId);
+                        break;
 
-                case eCmdList.eDASHBOARDAPPRWAITCOUNT:                              // 대쉬보드 승인대기 Count 쿼리
-                    DashBoardApprWaitCountAfterSend(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eAPPROVECOUNT:                                                // 승인대기 노티.
+                        ApproveCountNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId, sgData);
+                        break;
+                    case eCmdList.ePRIVACYAPPROVENOTIFY:
+                        PrivacyApproveCountNotiAfterSend(nRet, eCmdList.ePRIVACYAPPROVENOTIFY, groupId, sgData);
+                        break;
+                    case eCmdList.eVIRUSSCAN:                                                   // 바이러스 검출 노티.
+                        VirusScanNotiAfterSend(nRet, eCmdList.eVIRUSSCAN, groupId, sgData);
+                        break;
+                    case eCmdList.eAPTSCAN:                                                     // APT 노티.
+                        VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
+                        break;
+                    case eCmdList.eDrmBlockNoti:                                                     // DRM Noti
+                        VirusScanNotiAfterSend(nRet, eCmdList.eDrmBlockNoti, groupId, sgData);
+                        break;
 
-                case eCmdList.eDASHBOARDAPPRCONFIRMCOUNT:                              // 대쉬보드 승인 Count 쿼리
-                    DashBoardApprConfirmCountAfterSend(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
+                        EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
+                        break;
+                    case eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
+                        BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
+                        break;
+                    case eCmdList.eAPPROVEACTIONNOTIFY:                                         // 사용자 결재 완료(승인/반려)노티.
+                        ApproveActionNotiAfterSend(nRet, eCmdList.eAPPROVEACTIONNOTIFY, groupId, sgData);
+                        break;
 
-                case eCmdList.eDASHBOARDAPPRREJECTCOUNT:                              // 대쉬보드 반려 Count 쿼리
-                    DashBoardApprRejectCountAfterSend(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eLOGOUT:                                                      // 로그아웃 노티.
+                        LogOutNotiAfterSend(nRet, groupId, sgData);
+                        break;
 
-                case eCmdList.ePASSWDCHGDAY:                                        // 패스워드 변경날짜 조회.
-                    PasswdChgDayAfterSend(nRet, groupId, sgData);
-                    break;
+                    case eCmdList.eUSEDAYFILETRANS:                                             // 사용된 일일 파일 전송 사용량 및 횟수 데이터.
+                        UseDayFileInfoNotiAfterSend(nRet, groupId, sgData);
+                        break;
 
-                case eCmdList.eBOARDNOTIFYSEARCH:                                   // 공지사항 조회 결과 
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        sgDicRecvData.SetBoardNoti(hs, groupId, sgData);
-                        BoardNotiSearchAfterSend(nRet, groupId);
-                    }
-                    break;
+                    case eCmdList.eUSEDAYCLIPTRANS:                                             // 사용된 일일 클립보드 전송 사용량 및 횟수 데이터.
+                        UseDayClipInfoNotiAfterSend(nRet, groupId, sgData);
+                        break;
 
-                case eCmdList.eGPKIRANDOM:                                   // Gpki_Random 결과 
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        sgDicRecvData.SetGpkiData(hs, groupId, sgData);
-                        RecvSvrGPKIRandomAfterSend(groupId);
-                    }
-                    break;
+                    case eCmdList.eCLIENTUNLOCK:                                                      // 화면잠금 해제
+                        ScreenLockClearAfterSend(nRet, groupId, sgData);
+                        break;
 
-                case eCmdList.eGPKICERT:                                   // Gpki_Cert 결과 
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        sgDicRecvData.SetGpkiData(hs, groupId, sgData);
-                        RecvSvrGPKICertAfterSend(groupId);
-                    }
-                    break;
+                    case eCmdList.eZIPDEPTHINFO:                                                    // zip 파일 내부검사 설정 정보 조회.
+                        ZipDepthInfoSetting(nRet, groupId, sgData);
+                        break;
 
-                case eCmdList.eCHANGEGPKICN:                                   // CHANGEGPKI_CN 결과 
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        sgDicRecvData.SetGpkiData(hs, groupId, sgData);
-                        RecvSvrGPKIRegAfterSend(groupId);
-                    }
-                    break;
-                case eCmdList.ePRIVACYNOTIFY:                                     //개인정보 Noti
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        PrivacyNotiEvent privacyNotiEvent = sgPageEvent.GetPrivacyNotiEvent(groupId);
-                        if (privacyNotiEvent != null) privacyNotiEvent(groupId, sgData);
-                    }
-                    break;
-                case eCmdList.eEMAILAPPROVEBATCH:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        ResponseEvent resEvent = sgPageEvent.GetEmailApprBatchEvent(groupId);
-                        if (resEvent != null) resEvent(groupId, sgData);
-                    }
-                    break;
-                case eCmdList.eSECURITYAPPROVERQUERY:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        SecurityApproverSearchEvent securityApproverSearchEvent = sgPageEvent.GetSecurityApproverSearchEvent(groupId);
-                        if (securityApproverSearchEvent != null) securityApproverSearchEvent(groupId, sgData);
-                    }
-                    break;
-                case eCmdList.eCOUNTQUERY:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        QueryCountEvent queryCountEvent = sgPageEvent.GetQueryCountEvent(groupId);
-                        if (queryCountEvent != null) queryCountEvent(groupId, sgData);
-                    }
-                    break;
-                case eCmdList.eLISTQUERY:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        QueryListEvent queryListEvent = sgPageEvent.GetQueryListEvent(groupId);
-                        if (queryListEvent != null) queryListEvent(groupId, sgData);
-                    }
-                    break;
-                case eCmdList.eDETAILQUERY:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        QueryDetailEvent queryDetailEvent = sgPageEvent.GetQueryDetailEvent(groupId);
-                        if (queryDetailEvent != null) queryDetailEvent(groupId, sgData);
-                    }
-                    break;
-                case eCmdList.eRECORDEXISTCHECKQUERY:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        QueryRecordExistCheckEvent queryRecordExistCheckEvent = sgPageEvent.GetQueryRecordExistCheckEvent(groupId);
-                        if (queryRecordExistCheckEvent != null) queryRecordExistCheckEvent(groupId, sgData);
-                    }
-                    break;
-                case eCmdList.eEMAILSENDCANCEL:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        EmailSendCancelEvent emailSendCancelEvent = sgPageEvent.GetEmailSendCancelEvent(groupId);
-                        if (emailSendCancelEvent != null) emailSendCancelEvent(groupId, sgData);
-                    }
-                    break;
-                case eCmdList.eDOWNLOADCOUNT:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        DownloadCountEvent downloadCountEvent = sgPageEvent.GetDownloadCountEvent(groupId);
-                        if (downloadCountEvent != null) downloadCountEvent(groupId, sgData);
-                    }
-                    break;
+                    case eCmdList.eCLIENTVERSION:                                                       // 업데이트 노티.
+                        UpgradeNotiAfterSend(nRet, groupId, sgData);
+                        break;
 
-                case eCmdList.eFILEMAXLENGTH:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        //Serilog.Log.Logger.Error("HsCmdCenter - eCmdList.eFILEMAXLENGTH - ########## - ");
-                        FileRecvErrInfoEvent filerecvErrEvent = sgPageEvent.GetAddFIleRecvErrEvent(groupId);
-                        if (filerecvErrEvent != null) filerecvErrEvent(groupId, sgData);
-                    }
-                    break;
-                case eCmdList.eFORWARDFILEINFO:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        FileForwardEvent fileforwardEvent = sgPageEvent.GetFileForwardNotifyEventAdd(groupId);
-                        if (fileforwardEvent != null) fileforwardEvent(groupId, sgData);
-                    }
-                    break;
-                case eCmdList.eHSCKQUERY:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
+                    case eCmdList.eDASHBOARDCOUNT:                                  // 대쉬보드 조회 쿼리 데이터.
+                        DashBoardCountAfterSend(nRet, groupId, sgData);
+                        break;
+
+                    case eCmdList.eDASHBOARDTRANSREQCOUNT:                              // 대쉬보드 전송요청 Count 쿼리
+                        DashBoardTransReqCountAfterSend(nRet, groupId, sgData);
+                        break;
+
+                    case eCmdList.eDASHBOARDAPPRWAITCOUNT:                              // 대쉬보드 승인대기 Count 쿼리
+                        DashBoardApprWaitCountAfterSend(nRet, groupId, sgData);
+                        break;
+
+                    case eCmdList.eDASHBOARDAPPRCONFIRMCOUNT:                              // 대쉬보드 승인 Count 쿼리
+                        DashBoardApprConfirmCountAfterSend(nRet, groupId, sgData);
+                        break;
+
+                    case eCmdList.eDASHBOARDAPPRREJECTCOUNT:                              // 대쉬보드 반려 Count 쿼리
+                        DashBoardApprRejectCountAfterSend(nRet, groupId, sgData);
+                        break;
+
+                    case eCmdList.ePASSWDCHGDAY:                                        // 패스워드 변경날짜 조회.
+                        PasswdChgDayAfterSend(nRet, groupId, sgData);
+                        break;
+
+                    case eCmdList.eBOARDNOTIFYSEARCH:                                   // 공지사항 조회 결과 
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetBoardNoti(hs, groupId, sgData);
+                            BoardNotiSearchAfterSend(nRet, groupId);
+                        }
+                        break;
+
+                    case eCmdList.eGPKIRANDOM:                                   // Gpki_Random 결과 
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
+                            RecvSvrGPKIRandomAfterSend(groupId);
+                        }
+                        break;
+
+                    case eCmdList.eGPKICERT:                                   // Gpki_Cert 결과 
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
+                            RecvSvrGPKICertAfterSend(groupId);
+                        }
+                        break;
+
+                    case eCmdList.eCHANGEGPKICN:                                   // CHANGEGPKI_CN 결과 
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
+                            RecvSvrGPKIRegAfterSend(groupId);
+                        }
+                        break;
+                    case eCmdList.ePRIVACYNOTIFY:                                     //개인정보 Noti
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            PrivacyNotiEvent privacyNotiEvent = sgPageEvent.GetPrivacyNotiEvent(groupId);
+                            if (privacyNotiEvent != null) privacyNotiEvent(groupId, sgData);
+                        }
+                        break;
+                    case eCmdList.eEMAILAPPROVEBATCH:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            ResponseEvent resEvent = sgPageEvent.GetEmailApprBatchEvent(groupId);
+                            if (resEvent != null) resEvent(groupId, sgData);
+                        }
+                        break;
+                    case eCmdList.eSECURITYAPPROVERQUERY:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            SecurityApproverSearchEvent securityApproverSearchEvent = sgPageEvent.GetSecurityApproverSearchEvent(groupId);
+                            if (securityApproverSearchEvent != null) securityApproverSearchEvent(groupId, sgData);
+                        }
+                        break;
+                    case eCmdList.eCOUNTQUERY:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            QueryCountEvent queryCountEvent = sgPageEvent.GetQueryCountEvent(groupId);
+                            if (queryCountEvent != null) queryCountEvent(groupId, sgData);
+                        }
+                        break;
+                    case eCmdList.eLISTQUERY:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            QueryListEvent queryListEvent = sgPageEvent.GetQueryListEvent(groupId);
+                            if (queryListEvent != null) queryListEvent(groupId, sgData);
+                        }
+                        break;
+                    case eCmdList.eDETAILQUERY:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            QueryDetailEvent queryDetailEvent = sgPageEvent.GetQueryDetailEvent(groupId);
+                            if (queryDetailEvent != null) queryDetailEvent(groupId, sgData);
+                        }
+                        break;
+                    case eCmdList.eRECORDEXISTCHECKQUERY:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            QueryRecordExistCheckEvent queryRecordExistCheckEvent = sgPageEvent.GetQueryRecordExistCheckEvent(groupId);
+                            if (queryRecordExistCheckEvent != null) queryRecordExistCheckEvent(groupId, sgData);
+                        }
+                        break;
+                    case eCmdList.eEMAILSENDCANCEL:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            EmailSendCancelEvent emailSendCancelEvent = sgPageEvent.GetEmailSendCancelEvent(groupId);
+                            if (emailSendCancelEvent != null) emailSendCancelEvent(groupId, sgData);
+                        }
+                        break;
+                    case eCmdList.eDOWNLOADCOUNT:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            DownloadCountEvent downloadCountEvent = sgPageEvent.GetDownloadCountEvent(groupId);
+                            if (downloadCountEvent != null) downloadCountEvent(groupId, sgData);
+                        }
+                        break;
+
+                    case eCmdList.eFILEMAXLENGTH:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            //Serilog.Log.Logger.Error("HsCmdCenter - eCmdList.eFILEMAXLENGTH - ########## - ");
+                            FileRecvErrInfoEvent filerecvErrEvent = sgPageEvent.GetAddFIleRecvErrEvent(groupId);
+                            if (filerecvErrEvent != null) filerecvErrEvent(groupId, sgData);
+                        }
+                        break;
+                    case eCmdList.eFORWARDFILEINFO:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            FileForwardEvent fileforwardEvent = sgPageEvent.GetFileForwardNotifyEventAdd(groupId);
+                            if (fileforwardEvent != null) fileforwardEvent(groupId, sgData);
+                        }
+                        break;
+                    case eCmdList.eHSCKQUERY:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
 
                     }
                     break;
@@ -838,6 +840,14 @@ namespace OpenNetLinkApp.Services
                         if (auditOriRecvEvent != null) auditOriRecvEvent(groupId, sgData);
                     }
                     break;
+                case eCmdList.eREQUESTEXIT:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        NotiRequestExitEvent notiRequestExit = sgPageEvent.GetNotiRequestExitEvent();
+                        if (notiRequestExit != null) notiRequestExit(groupId);
+                    }
+                    break;
                 default:
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
@@ -849,13 +859,17 @@ namespace OpenNetLinkApp.Services
                             queryListEvent(groupId, obj);
                         }
 
-                    }
-                    break;
+                     }
+                        break;
 
+                }
+            }
+            catch(Exception ex)
+            {
+                Log.Logger.Here().Error($"SGDataRecv, CMD : {cmd}, Exception(MSG) : {ex.Message}");
             }
 
         }
-
 
         private void SGSvrRecv(int groupId, int cmd, SGData sgData)
         {
@@ -1200,26 +1214,40 @@ namespace OpenNetLinkApp.Services
 
         public void ApprLineAfterSend(int nRet, int groupId, SGData sgData)
         {
-            if (nRet == 0)
+            string strUserID = "";
+
+            try
             {
-                HsNetWork hs = null;
-                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                if (nRet == 0)
                 {
-                    hs = m_DicNetWork[groupId];
-                    sgDicRecvData.SetApprLineData(hs, groupId, sgData);
+                    HsNetWork hs = null;
+                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    {
+                        hs = m_DicNetWork[groupId];
+                        sgDicRecvData.SetApprLineData(hs, groupId, sgData);
+                    }
                 }
+                /*
+                SGApprLineData sgApprLineData = (SGApprLineData)sgDicRecvData.GetApprLineData(groupId);
+                List<string> strListName = sgApprLineData.GetApprAndLineName();
+                List<string> strListSeq = sgApprLineData.GetApprAndLineSeq();
+                */
+
+                // SGUserData sgUserData = (SGUserData)sgDicRecvData.GetUserData(groupId);
+                // string strTeamCode = sgUserData.GetTeamCode();
+
+                SGLoginData sgLoginDataApproveDefault = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                strUserID = sgLoginDataApproveDefault.GetUserID();
+
             }
-            /*
-            SGApprLineData sgApprLineData = (SGApprLineData)sgDicRecvData.GetApprLineData(groupId);
-            List<string> strListName = sgApprLineData.GetApprAndLineName();
-            List<string> strListSeq = sgApprLineData.GetApprAndLineSeq();
-            */
-            SGUserData sgUserData = (SGUserData)sgDicRecvData.GetUserData(groupId);
-            SGLoginData sgLoginDataApproveDefault = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-            string strTeamCode = sgUserData.GetTeamCode();
-            string strUserID = sgLoginDataApproveDefault.GetUserID();
+            catch(Exception ex)
+            {
+                HsLog.err($"ApprLineAfterSend - Exception(MSG) : {ex.Message}");
+            }
+
             //SendInstApprove(groupId, strUserID, strTeamCode);
-            SendSystemRunEnv(groupId, strUserID);
+            if (groupId > -1 && strUserID.Length > 0)
+                SendSystemRunEnv(groupId, strUserID);
         }
 
         public void TransSearchAfterSend(int nRet, int groupId)
@@ -1717,12 +1745,30 @@ namespace OpenNetLinkApp.Services
                 SCClear_Event(groupId, e);
             }
         }
+
+
+
+
+
         public void ZipDepthInfoSetting(int nRet, int groupId, SGData sgData)
         {
             SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+            if (sgLoginData == null)
+            {
+
+                return;
+            }
+
             if (nRet == 0)
             {
                 sgLoginData.AddZipDepthInfo(sgData);
+
+                UrlTypeForwardDataEvent eventUrlTypeForwardData = null;
+                eventUrlTypeForwardData = sgPageEvent.GetUrlTypeForwardData(groupId);
+                if (eventUrlTypeForwardData != null)
+                {
+                    eventUrlTypeForwardData(groupId);
+                }
             }
             else
             {
@@ -2095,12 +2141,12 @@ namespace OpenNetLinkApp.Services
                 hsNetWork.bIgnoreSessionDuplicate = bIgnoreSessionDuplicate;
         }
 
-        public int Login(int groupid, string strID, string strProtectedPW, string strCurCliVersion, string otp, int loginType = 0)
+        public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType = 0, int passWordType = 0)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             int ret = 0;
             if (hsNetWork != null)
-                ret = hsNetWork.Login(strID, strProtectedPW, otp, strCurCliVersion, 0, loginType);
+                ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, passWordType, loginType);
             return 0;
         }
 

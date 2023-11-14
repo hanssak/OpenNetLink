@@ -673,8 +673,6 @@ namespace OpenNetLinkApp.Common
             return strAgentPath;
         }
 
-
-
         public static string GetCurrentProcessName(bool bGetExePath = true)
         {
             string strAgentPath = "";
@@ -746,7 +744,45 @@ namespace OpenNetLinkApp.Common
             return false;
         }
 
+        /// <summary>
+        /// 프로그램 실행 시, 바탕화면에 파일수신 경로 Lnk를 등록/제거하는 기능
+        /// </summary>
+        /// <param name="bIsReg">시작프로그램으로 등록시킬지 유무(true:생성,false:삭제)</param>
+        /// <param name="bUsePublicPath">false만 사용, 공통계정용폴더에 Lnk 생성하려면 관리자권한 필요(Exception발생함)</param>
+        /// <param name="strOrgPath">EXE의 FullPath 경로</param>
+        /// <param name="strLnkFIleName">생성할 Lnk 파일의 FullPath 경로<</param>
+        /// <returns></returns>
+        public static bool MakeDesktopLinkOSwindow(bool bIsReg, bool bUsePublicPath, string strOrgPath, string strLnkFIleName)
+        {
+            bUsePublicPath = false;
 
+            string strDesktoptDir = Environment.GetFolderPath(bUsePublicPath ? Environment.SpecialFolder.CommonDesktopDirectory : Environment.SpecialFolder.DesktopDirectory);
+            string LinkFullPath = strDesktoptDir.ToString() + @$"\{strLnkFIleName}"; // OpenNetLink 수신폴더(파일).lnk
+            FileInfo LinkFile = new FileInfo(LinkFullPath);
+            if (LinkFile.Exists)
+            {
+                if (bIsReg== false)
+                    LinkFile.Delete();
+
+                Log.Logger.Here().Debug($"MakeDesktopLinkOSwindow - Lnk File exist : {LinkFullPath},  {(bIsReg ? "Lnk Create Skip!" : "Lnk Delete Done!")}");
+                return true;
+            }
+            else
+            {
+                if (bIsReg == false)
+                {
+                    Log.Logger.Here().Debug($"MakeDesktopLinkOSwindow - Lnk File isn't exist(Lnk Delete Skip!) : {LinkFullPath}");
+                    return true;
+                }
+            }
+            Log.Logger.Here().Information($"MakeDesktopLinkOSwindow - WorkingPath(#####) : {Environment.CurrentDirectory}");
+
+            return CsLnkFunc.makeLnkShortCut(strOrgPath, LinkFullPath, "", Environment.CurrentDirectory);
+        }
+        /// <summary>MAC 미사용</summary>
+        public static bool MakeDesktopLinkOSX(bool bStartReg, string strOrgPath, string strLnkPath) => false;
+        /// <summary>Linux 미사용</summary>
+        public static bool MakeDesktopLinkLinux(bool bStartReg, string strOrgPath, string strLnkPath) => false;
     }
 
     public class CsLnkFunc

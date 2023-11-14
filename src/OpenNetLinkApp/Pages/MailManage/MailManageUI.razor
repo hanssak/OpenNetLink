@@ -341,6 +341,7 @@
 
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<MailManageUI>();
+    int nDrawPageGroupID = -1;
 
     /// <summary>
     /// checkBox 등 사용자의 설정 정보가 반영된 LIST data
@@ -860,14 +861,6 @@
         InitText();
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
-        HSCmdCenter.sgPageEvent.SetEmailSendCancelEvent(groupIDbyParam, TransCancelResult);             // 전송 취소 결과.
-
         base.OnInitialized();
     }
 
@@ -1139,7 +1132,7 @@
         if (isPossibleDownload)
         {
 
-        //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
+            //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
             @*
             if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForwardDownBeforeRecv())
             {
@@ -1239,9 +1232,29 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        int transferTemplate = (groupIDbyParam >= 0) ? SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam) : 0;
+        await jsRuntime.InvokeAsync<object>("exitLogIn",new object[] {transferTemplate});
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize",new object[] {transferTemplate});
+
+        int groupID = groupIDbyParam;
+        CLog.Here().Information($"MailManage - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
+
+        // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
+        { 
+            nDrawPageGroupID = groupIDbyParam;
+
+            bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
+            HSCmdCenter.sgPageEvent.SetEmailSendCancelEvent(groupIDbyParam, TransCancelResult);             // 전송 취소 결과.
+
+            await TransSearchCount();
+
+            StateHasChanged();
+        }
+
+
         if (firstRender)
         {
-            await TransSearchCount();
         }
         base.OnAfterRender(firstRender);
     }
@@ -1263,9 +1276,8 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        string strNavigateWithGroupID = "/Welcome/";
+        string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
         strNavigateWithGroupID += groupID.ToString();
-
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
         foreach (var MenuItem in SideBarUISvc.MenuList)

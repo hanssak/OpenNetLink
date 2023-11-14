@@ -262,7 +262,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 case 13: // 등록되지 않은 MAC
                     strLoginFailMsg = xmlConf.GetWarnMsg("W_0204");                                         // 등록되지 않은 MAC 정보입니다.
                     break;
-
+                case 14: //  장기 미접속 차단
+                    strLoginFailMsg = xmlConf.GetWarnMsg("W_0301");                                         // 장기간 접속하지 않아 차단되었습니다./r/n접속 차단을 해제하시려면 관리자에게 요청하시기 바랍니다.
+                    break;
                 default: //사용자 인증에 실패
                     strLoginFailMsg = xmlConf.GetWarnMsg("W_0037");                                         // 사용자 인증에 실패 하였습니다.
                     break;
@@ -1651,12 +1653,28 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             => (GetSystemPosition()) ? GetTagData("I_FORWARD_AUTODOWN") : GetTagData("E_FORWARD_AUTODOWN");
 
         /// <summary>
+        /// 제목 최대 길이 값
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetTitleMaxLength()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_TITLE_MAX_LENGTH") : GetTagData("E_CLIENT_TITLE_MAX_LENGTH");
+
+        /// <summary>
         /// 제목 최소 길이 값
         /// </summary>
         /// <param name="bSystem"></param>
         /// <returns></returns>
         public string GetTitleMinLength()
             => (GetSystemPosition()) ? GetTagData("I_CLIENT_TITLE_MIN_LENGTH") : GetTagData("E_CLIENT_TITLE_MIN_LENGTH");
+
+        /// <summary>
+        /// 설명 최대 길이 값
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetDescMaxLength()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_DESC_MAX_LENGTH") : GetTagData("E_CLIENT_DESC_MAX_LENGTH");
 
         /// <summary>
         /// 설명 최소 길이 값
@@ -1666,17 +1684,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetDescMinLength()
             => (GetSystemPosition()) ? GetTagData("I_CLIENT_DESC_MIN_LENGTH") : GetTagData("E_CLIENT_DESC_MIN_LENGTH");
 
-
-
-        ///// <summary>
-        ///// value 값을 암호화해서 sgData에 저장
-        ///// </summary>
-        ///// <param name="strKey"></param>
-        ///// <param name="strValue"></param>
-        //public void AddData(string strKey, string strValue)
-        //{
-        //    EncAdd(strKey, strValue);
-        //}
+        /// <summary>
+        /// value 값을 암호화해서 sgData에 저장
+        /// </summary>
+        /// <param name="strKey"></param>
+        /// <param name="strValue"></param>
+        public void AddData(string strKey, string strValue)
+        {
+            EncAdd(strKey, strValue);
+        }
 
         /// <summary>
         /// 패스워드 변경 유무 또는 변경 타입을 반환한다.

@@ -16,6 +16,7 @@
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
 @using OpenNetLinkApp.Common
+@using OpenNetLinkApp.LoginMethod
 @using System.Threading
 @using System.Runtime.InteropServices
 @using NetSparkleUpdater
@@ -42,13 +43,13 @@
 
 <div id="divLoginMain" class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
 
-        <div class="login-box  p-0 m-0" style="height:413px; width:@(bHiddenLogoMode?440:880)px !important;">
+    <div class="login-box  p-0 m-0" style="height:413px; width:@(bHiddenLogoMode?440:880)px !important;">
 
         <div class="card p-0" style="border-radius:.7rem !important; background-color:rgba(0,0,0,0.7);">
             <div class="card-body login-card-body  p-0">
                 <div class="row1">
 
-                    @if (bHiddenLogoMode==false)
+                    @if (bHiddenLogoMode == false)
                     {
                         <div class="col-md-6 login-card-body  pt-0 pb-0" style="border-radius:.7rem 0rem 0rem .7rem !important;">
                             <ul class="full_login_left">
@@ -67,16 +68,30 @@
 
                     <div id="loginCard" class="col-md-6 login-card-body" style="height:413px; border-radius:0rem .7rem .7rem 0rem !important;">
 
-                        <div style=" width:310px;">
-                            <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.4rem;">@strSystemName <span class="full_txt">@strConNetwork </span></p>
+                        <div style=" width:310px; margin-left:@(bHiddenLogoMode?15:0)px ">
+                            @if (bUseLoginCI)
+                            {
+                                <img src="/images/ci/sitelogo.png" style="width:60px; height:60px; margin-right:auto; margin-left:auto; display:block">
+                            }
+
+                            <p class="login-box-msg1" style="padding-top:@(bUseLoginCI ? 20 : 50)px;color:#fff; font-size:@(strLoginTextFontSize);">
+                                @*<img src="/images/ci/sitelogo.png" style="width:50px; height:50px; margin-right:auto; margin-left:auto; display:block">*@
+                                @strSystemName <span class="full_txt">@strConNetwork</span>
+                            </p>
 
                             <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@id" @oninput="@(e => id = e.Value.ToString())" tabindex="1" autocomplete="off">
 
-                            @if (pageService.m_nLoginType != 5 && srcLoc != "OKTA") //OTP PW 필요없음
+                            @if (pageService.m_nLoginType != 5 && srcLoc != "OKTA" && SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(0) != (int)Enums.enumNacLoginType.Genian) //OTP PW 필요없음
                             {
                                 //AD 로그인은 PW 사용자 입력 불가 (Readonly)
                                 <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" onkeydown="KeyEventPW('btnLogin');" tabindex="2" autocomplete="off">
                             }
+                            else if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(0) == (int)Enums.enumNacLoginType.Genian && (srcLoc == "Logout" || !SGAppMgrSvc.SystemService.IsStartedByNAC()))
+                            {
+                                //Genian NAC은 NAC 인자에 의해 실행되지 않을때는 PW 표시
+                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" value="@pw" @oninput="@(e => pw = e.Value.ToString())" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
+                            }
+
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
                             {
                                 <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" value="@otp" @oninput="@(e=>otp = e.Value.ToString())" tabindex="3" autocomplete="off">
@@ -89,6 +104,17 @@
                                             <div class="form-check" style="width:150px;">
                                                 <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;" tabindex="4" @onclick="CheckStateChange" checked="@bAutoLoginCheck">
                                                 <label class="form-check-label" style="color:#fff;width:80px;">@strAutoLogin</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else if (bIDSave)
+                                {
+                                    <div class="col-md-12 mt-1 ">
+                                        <div class="form-group float-right col-md-4">
+                                            <div class="form-check" style="width:150px;">
+                                                <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;" tabindex="4" @onclick="SaveIDCheckStateChange" checked="@bIDSaveCheck">
+                                                <label class="form-check-label" style="color:#fff;width:80px;">@strIDSave</label>
                                             </div>
                                         </div>
                                     </div>
@@ -207,6 +233,7 @@
     public string strSystemName = "";
     public string strConNetwork = "";
     public string strAutoLogin = "";
+    public string strIDSave = "";
     public bool bViewBackButton = false;  //로그인 취소버튼 표시여부
 
     ISGAppConfigService AppConfigSvc;
@@ -221,6 +248,10 @@
     SGSettingsDBProc sgSettingProc;
     public bool bAutoLogin = false;
     public bool bAutoLoginCheck = false;
+
+    public bool bIDSave = false;
+    public bool bIDSaveCheck = false;
+
     public bool bLoginBtnDisable;
     Dictionary<string, SGNetOverData> dicSysIdName = null;
 
@@ -237,6 +268,8 @@
     string strOtpUrlCode = "";
 
     bool bHiddenLogoMode = false;
+    bool bUseLoginCI = false;
+    string strLoginTextFontSize = "1.4rem";
 
     private void GoogleOtpCancel()
     {
@@ -350,6 +383,18 @@
             ShowLoginFail(XmlConf.GetWarnMsg("W_0039"));
             await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
             bStartedLogin = false;
+            bLoginBtnDisable = false;
+            StateHasChanged();
+            return;
+        }
+
+
+        if (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupID) == -1)
+        {
+            await JSRuntime.InvokeVoidAsync("setElementValue", new object[] { "loginPw", "" });
+            ShowLoginFail(XmlConf.GetWarnMsg("W_0039"));
+            await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+            bStartedLogin = false;
             bLoginBtnDisable = false;            
             StateHasChanged();
             return;
@@ -364,10 +409,6 @@
 
         await refSGAlert.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
     }
-
-
-
-
 
     /// <summary>
     /// 2Factor 인증이 필요한 시기에 호출됨
@@ -408,7 +449,6 @@
         }
 
     }
-
 
     /// <summary>
     ///
@@ -472,6 +512,13 @@
             }
             else
                 doADLogin();
+        }
+        else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_CUSTOM)
+        {
+            if (SGAppMgrSvc.OpConfigInfoService.GetCustomLoginType(groupid) == (int)Enums.EnumCustomLoginType.LoginTemplate01)
+            {
+                doCustomLogin01();
+            }
         }
         else
         {
@@ -602,6 +649,7 @@
         {
             CLog.Here().Error($"doLogIn - Exception(Msg) : {ex.Message}");
             Debug.WriteLine(ex.Message);
+            ShowMessage("error", XmlConf.GetErrMsg("W_0187"));
         }
     }
     /// <summary>
@@ -788,7 +836,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
     }
 
     /// <summary>
-    /// AD로그인 방식으로 로그인동작 진행
+    /// OKTA로그인 방식으로 로그인동작 진행
     /// </summary>
     private void doOKTALogin(string oktaUserId)
     {
@@ -846,10 +894,179 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         {
             CLog.Here().Error($"ADLogin - Exception - Msg : {ex.Message}");
         }
+    }
 
+    private void doCustomLogin01()
+    {
+        try
+        {
+            if (bStartedLogin)
+                return;
+
+            if ((id?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0030"));
+                return;
+            }
+
+            if ((pw?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
+                return;
+            }
+
+            CLog.Here().Information($"doCustomLogin01 - ###### -  Start");
+            JSRuntime.InvokeAsync<object>("loginCursorChange");
+            bStartedLogin = true;
+
+            int groupid = pageService.m_nCurViewPageGroupID;
+
+            //외부 그룹웨어 연동
+            try
+            {
+                LoginTemplate01 loginTemplate01 = new LoginTemplate01();
+                string url = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginHttpUrl(groupid);
+                string siteKey = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginSecurityKey(groupid);
+                string siteIV = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginSecurityIV(groupid);
+                (bool, string) resultMsg = loginTemplate01.Login(id, pw, url, siteKey, siteIV);
+                CLog.Here().Information($"result bool  : {resultMsg.Item1} , result Msg : {resultMsg.Item2}");
+                if (!resultMsg.Item1)
+                {
+                    ShowMessage("error", resultMsg.Item2);
+                    bStartedLogin = false;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"doCustomLogin01 - Exception(Msg) : {ex.Message}");
+                ShowMessage("error", XmlConf.GetErrMsg("W_0187"));
+                return;
+            }
+
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
+            string strCurCliVersion = "";
+            string strPlatform = "";
+            if (VersionConfigSvc != null)
+            {
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
+                strCurCliVersion = "OpenNetLink " + strCurCliVersion;
+
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
+                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
+            }
+
+            if (strCurCliVersion.Equals(""))
+                return;
+
+            CLog.Here().Information($"[Main] LogIn Type (######) : {pageService.m_nLoginType.ToString()}, GroupIDLoginType : {pageService.GetGroupIDLoginType(groupid)}");
+            HSCmdCenter.SetCliVersion(strCurCliVersion);
+
+
+            List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+            int count = listNetWork.Count;
+
+            //pageService.m_nCurViewPageGroupID=0;
+
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
+            {
+                foreach (ISGNetwork netlist in listNetWork)
+                {
+                    CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
+                    HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, pw, strCurCliVersion, otp, 0);
+                    pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
+                }
+            }
+            else
+            {
+                HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, 0);
+                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"doLogIn - Exception(Msg) : {ex.Message}");
+            Debug.WriteLine(ex.Message);
+            ShowMessage("error", XmlConf.GetErrMsg("W_0187"));
+        }
     }
 
 
+    /// <summary>
+    /// NAC로그인 방식으로 로그인동작 진행
+    /// </summary>
+    private void doNACLogin(string nacUserId)
+    {
+        try
+        {
+            CLog.Here().Information($"doNACLogin - ###### -  Start");
+
+            JSRuntime.InvokeAsync<object>("loginCursorChange");
+
+            id = nacUserId;
+            pw = string.Empty;
+
+            if ((id?.Length ?? 0) < 1)
+            {
+                Window.MoveTrayToWebWindow();
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0030"));
+                return;
+            }
+
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
+            string strCurCliVersion = "";
+            string strPlatform = "";
+            if (VersionConfigSvc != null)
+            {
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
+                strCurCliVersion = "OpenNetLink " + strCurCliVersion;
+
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
+                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
+            }
+
+            if (strCurCliVersion.Equals(""))
+                return;
+
+            bStartedLogin = true;
+
+            CLog.Here().Information("[Main] LogIn Type:" + pageService.m_nLoginType.ToString());
+            HSCmdCenter.SetCliVersion(strCurCliVersion);
+
+            string unUsePw = id;
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
+            {
+                List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+                foreach (ISGNetwork netlist in listNetWork)
+                {
+                    //NAC Login 시 IdSave 여부 확인하여 저장
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(netlist.GroupID))
+                        bIDSaveCheck = true;
+
+                    CLog.Here().Information($"doNACLogin - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
+                    HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, unUsePw, strCurCliVersion, otp, pageService.m_nLoginType);
+                    pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
+                }
+            }
+            else
+            {
+                //NAC Login 시 IdSave 여부 확인하여 인자로 받은 ID 저장
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(pageService.m_nCurViewPageGroupID))
+                    bIDSaveCheck = true;
+                CLog.Here().Information($"doNACLogin - ###### -  Do");
+                HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, unUsePw, strCurCliVersion, otp, pageService.m_nLoginType);
+                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
+            }
+
+            CLog.Here().Information($"doNACLogin - ###### -  End");
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"doNACLogin - Exception - Msg : {ex.Message}");
+        }
+
+    }
     /// <summary>
     ///
     /// </summary>
@@ -868,19 +1085,6 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             }*@
     }
 
-
-    ///// <summary>
-    /////
-    ///// </summary>
-    ///// <param name="firstRender"></param>
-    //protected override void OnAfterRender(bool firstRender)
-    //{
-    //    Thread waitTh = new Thread(WaitForFocus);
-    //    waitTh.Start();
-    //    base.OnAfterRender(firstRender);
-    //}
-
-
     /// <summary>
     ///
     /// </summary>
@@ -893,15 +1097,16 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         await JSRuntime.InvokeAsync<object>("initLogIn", param);
 
         await JSRuntime.InvokeAsync<object>("InitDragAndDrop");
-        await JSRuntime.InvokeAsync<object>("addMouseDown");
-        await JSRuntime.InvokeAsync<object>("addMouseUp");
-        await JSRuntime.InvokeAsync<object>("addDragStart");
-        await JSRuntime.InvokeAsync<object>("addKeyDown");
 
         int groupID = pageService.m_nCurViewPageGroupID;
 
         if (firstRender)
         {
+            await JSRuntime.InvokeAsync<object>("addMouseUp");
+            await JSRuntime.InvokeAsync<object>("addMouseDown");
+            await JSRuntime.InvokeAsync<object>("addDragStart");
+            await JSRuntime.InvokeAsync<object>("addKeyDown");
+
             if (srcLoc != "Logout" && CheckPatchHistoryFile(out bool patchResult, out string patchTime, out string patchReason))
             {
                 if (!patchResult)
@@ -912,6 +1117,12 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             {
                 if (srcLoc != "GPKI")
                     MyNavigationManager.NavigateTo("/GPKI_LogIn/1");    // login Mode로 실행
+            }
+            else if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(groupID) == (int)Enums.enumNacLoginType.Genian)
+            {
+                //NAC에 의해 로그인하지 않았거나, 로그아웃한 경우, ID 저장/자동로그인 옵션 적용
+                if (!SGAppMgrSvc.SystemService.IsStartedByNAC() || srcLoc == "Logout")
+                    SetIdPwLogin(groupID);
             }
             else
             {
@@ -932,16 +1143,27 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
     {
         // ID저장
         // if (siteConfig.GetUseLoginIDSave(groupID) == true)   // json으로 설정이동
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(groupID))
+        bIDSave = SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(groupID);
+        if (bIDSave)
         {
-            string strEncID = "";
-            strEncID = sgSettingProc.GetSettingUID(groupID);
-            if (strEncID == null || strEncID.Equals(""))
-                return;
-            string strID = "";
-            SGRSACrypto sgRSACrypto = new SGRSACrypto();
-            sgRSACrypto.ValueDecrypt(strEncID, out strID);
-            id = strID;
+            bool bIDSaveContinue = sgSettingProc.GetSettingIDSave(groupID);
+            bIDSaveCheck = bIDSaveContinue;
+
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSaveCheck(groupID))
+                bIDSaveCheck = true;
+
+            if (bIDSaveContinue)
+            {
+                string strEncID = "";
+                strEncID = sgSettingProc.GetSettingUID(groupID);
+                if (strEncID == null || strEncID.Equals(""))
+                    return;
+                string strID = "";
+                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                id = strID;
+            }
+
             StateHasChanged();
         }
 
@@ -979,6 +1201,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 strEncPW = sgSettingProc.GetSettingUPW(groupID);
                 if ((strEncID == null || strEncID.Equals("")) || (strEncPW == null || strEncPW.Equals("")))
                 {
+                    Window.MoveTrayToWebWindow();
                     bLoginBtnDisable = false;
                     StateHasChanged();
                     return;
@@ -999,9 +1222,29 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 await Task.Delay(500);
 
                 if (srcLoc != "Logout")
-                    doLogIn();
+                {
+                    if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_CUSTOM)
+                    {
+                        if (SGAppMgrSvc.OpConfigInfoService.GetCustomLoginType(groupID) == (int)Enums.EnumCustomLoginType.LoginTemplate01)
+                        {
+                            doCustomLogin01();
+                        }
+                    }
+                    else
+                    {
+                        doLogIn();
+                    }
+                }
                 StateHasChanged();
             }
+            else
+            {
+                Window.MoveTrayToWebWindow();
+            }
+        }
+        else
+        {
+            Window.MoveTrayToWebWindow();
         }
     }
 
@@ -1021,9 +1264,12 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
         InitText();
+        if (srcLoc == "Logout")  //로그인 화면 재진입 시 SideBar는 기존 Layout으로 초기화
+            JSRuntime.InvokeAsync<object>("initPushMenu", new object[] { "expand" });
 
         bHiddenLogoMode = SGAppMgrSvc.OpConfigInfoService.GetHiddenLoginLogo(0);
-
+        bUseLoginCI = SGAppMgrSvc.OpConfigInfoService.GetUseLoginCI(0);
+        strLoginTextFontSize = SGAppMgrSvc.OpConfigInfoService.GetLoginTextFontSize(0);
         if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
         {
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -1077,6 +1323,18 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             StateHasChanged();
 
             doOKTALogin(srcArgs);
+        }
+        else if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(groupid) == (int)Enums.enumNacLoginType.Genian) //Genian Nac Login
+        {
+            if (SGAppMgrSvc.SystemService.IsStartedByNAC())
+            {
+                string NacKey = SGAppMgrSvc.OpConfigInfoService.GetNACLoginEncryptKey(0);
+                string nacId = SGAppMgrSvc.SystemService.GetGenianNACUserID(NacKey);
+                bLoginBtnDisable = true;
+                StateHasChanged();
+
+                doNACLogin(nacId);
+            }
         }
         else
         {
@@ -1135,7 +1393,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         *@
 
 
-        // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
+    // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
         {
@@ -1147,6 +1405,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         }
 
         strAutoLogin = XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX");        // 자동로그인
+        strIDSave = XmlConf.GetTitle("T_ETC_IDSAVE_CHECKBOX");        // ID 저장
     }
 
 
@@ -1259,7 +1518,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
     /// </summary>
     /// <param name="groupID">그룹ID</param>
     /// <param name="strPath">다운경로</param>
-    public void SetUserIDRecvDownLoad(int groupID)
+    public string SetUserIDRecvDownLoad(int groupID)
     {
         ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         string strPath = AppConfigSvc.GetRecvDownPath(groupID);
@@ -1282,6 +1541,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 //CtrlSideUISvc.SetRecvDownPath(groupID, strPath);
             }
         }
+        return strPath;
     }
 
     /// <summary>
@@ -1356,7 +1616,17 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
                     HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));
-                    SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
+                    string recvPath = SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
+
+                    if (SGAppMgrSvc.OpConfigInfoService.GetMakeRecvDownPathShortCut(groupId))//바탕화면 바로가기 설정
+                    {
+                        string linkName = string.Empty;
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseFromNameRecvDownPathShortCut(groupId))
+                            linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.FromName);
+                        else
+                            linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.ToName);
+                        CtrlSideUISvc.ChangeRecvDownPathLink(linkName, recvPath);
+                    }
 
                     // 3중망 정보 적용
                     dicSysIdName = new Dictionary<string, SGNetOverData>();
@@ -1391,11 +1661,19 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         // strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";     // Table 이름 따로 정해졌음
                         strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
                         strGetinfoTagName += ", 'FORWARD_AUTODOWN'";
+                        strGetinfoTagName += ", 'CLIENT_URL_FW_PAGE'";
+
 
                         if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupId))
                         {
                             strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
                             strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
+                        }
+
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseMaxLengthTitleDesc(groupId))
+                        {
+                            strGetinfoTagName += ", 'CLIENT_TITLE_MAX_LENGTH'";
+                            strGetinfoTagName += ", 'CLIENT_DESC_MAX_LENGTH'";
                         }
 
                         string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
@@ -1550,6 +1828,17 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
                     pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
+                    //
+                    LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+                    loginAfterSGHeaderUI = HSCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+                    if (loginAfterSGHeaderUI != null)
+                        loginAfterSGHeaderUI(groupId);
+
+                    LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
+                    loginAfterSGSideBar = HSCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
+                    if (loginAfterSGSideBar != null)
+                        loginAfterSGSideBar(groupId);
+
                     Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
                     int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
                     Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
@@ -1612,10 +1901,22 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
                         if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(groupId) == true)
                         {
-                            SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                            string strEncID = "";
-                            sgRSACrypto.ValueEncrypt(id, out strEncID);
-                            sgSettingProc.SetSettingUID(groupId, strEncID);
+                            if (bIDSaveCheck)
+                            {
+                                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                                string strEncID = "";
+                                if ((!id.Equals("")) & (id != null))
+                                {
+                                    sgRSACrypto.ValueEncrypt(id, out strEncID);
+                                    sgSettingProc.SetSettingUID(groupId, strEncID);
+                                    sgSettingProc.SetSettingIDSave(groupId, true);
+                                }
+                            }
+                            else
+                            {
+                                sgSettingProc.SetSettingIDSave(groupId, false);
+                            }
+
                         }
                     }
 
@@ -1625,20 +1926,8 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
                         // enMainPageType 값이 2 : 파일전송화면, 다른거 : Dash보드 (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
                         //strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+
                         strNavigatePathWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
-
-
-                        // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
-                        string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
-                        if (strNavigateUrl.IndexOf("transfer") > 0)
-                        {
-                            strNavigateUrl = pageService.GetFileTransPage(groupId);
-                            if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                                strNavigatePathWithGroupID = strNavigateUrl;
-                            else
-                                strNavigatePathWithGroupID = "/Transfer/";
-                        }
-
                         strNavigatePathWithGroupID += groupId.ToString();
                     }
 
@@ -1648,7 +1937,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     CtrlSideEvent ctrlSideEvent = null;
                     ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
                     if (ctrlSideEvent != null)
-                        ctrlSideEvent();
+                        ctrlSideEvent(groupId);
 
 
                     SetReconnectStart(groupId);
@@ -1869,26 +2158,8 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
                     // enMainPageType 값이 2 : 파일전송화면, 다른거 : Dash보드 (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
                     //strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+
                     strNavigatePathnGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
-
-                    // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
-                    string strNavigateUrl = strNavigatePathnGroupID.ToLower();
-                    if (strNavigateUrl.IndexOf("transfer") > 0)
-                    {
-                        strNavigateUrl = pageService.GetFileTransPage(nGroupIDfirst);
-                        if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                            strNavigatePathnGroupID = strNavigateUrl;
-                        else
-                            strNavigatePathnGroupID = "/Transfer/";
-                    }
-
-                    if (sgLoginData != null)
-                    {
-                        bool bFileTransUse = sgLoginData.GetFileTrans();
-
-                        if (!bFileTransUse)
-                            strNavigatePathnGroupID = "/Welcome/";  // 설정에 상관없도록
-                    }
                     strNavigatePathnGroupID += nGroupIDfirst.ToString();
                 }
 
@@ -1896,6 +2167,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 SaveAfterApproveCheckBoxStatus(nGroupIDfirst);
 
                 await JSRuntime.InvokeAsync<object>("closeAllPopup");
+
                 //if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
                 MyNavigationManager.NavigateTo(strNavigatePathnGroupID);
 
@@ -1910,10 +2182,23 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     {
                         if (pageService.GetConnectCount(nGroupIDfirst) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                         {
-                            string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                            string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
-                            HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                            if (SGAppMgrSvc.OpConfigInfoService.GetUseHideToastPopup(0) == false)
+                            {
+                                string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                                string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
+                                HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                            }
+
                             Window.MoveWebWindowToTray();
+                        }
+                        else
+                            HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                    }
+                    else if(SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterShow(0))
+                    {
+                        if (pageService.GetConnectCount(nGroupIDfirst) <= 0)                                                                     // 재접속이 아닐 경우에만 화면 호출
+                        {
+                            Window.MoveTrayToWebWindow();
                         }
                         else
                             HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
@@ -1980,6 +2265,8 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             SideBarUISvc.EmitNotifyStateChangedActMenu();
             return;
         }
+        string pushmenuStat = (SGAppMgrSvc.AppConfigInfoService.GetHideSideBarAfterLogin()) ? "collapse" : "expand";
+        JSRuntime.InvokeAsync<object>("initPushMenu", new object[] { pushmenuStat });
 
         string strDataTrans = XmlConf.GetTitle("T_COMMON_FILETRANS_BASIC");                     // 자료전송
         string strFileTrans = XmlConf.GetTitle("T_COMMON_FILETRANS");                           // 파일전송
@@ -2107,21 +2394,8 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     bFileTransMenuUse = true;
             }
 
-            @*string strRootPath = "/Welcome";
-                if (!siteConfig.GetUseDashBoard())
-                strRootPath = "/Transfer";*@
-
             // 파일전송화면 이면 저장했던 위치를 찾아서 사용한다. (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
             string strRootPath = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
-            string strNavigateUrl = strRootPath.ToLower();
-            if (strNavigateUrl.IndexOf("transfer") > 0)
-            {
-                strNavigateUrl = pageService.GetFileTransPage(groupid);
-                if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                    strRootPath = strNavigateUrl;
-                else
-                    strRootPath = "/Transfer/";
-            }
 
             bFileTransUse = SGAppMgrSvc.OpConfigInfoService.GetUseFileTrans(groupid);
             // siteConfig. json으로 이동
@@ -2408,6 +2682,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             StateHasChanged();
         }
     }
+    public void SaveIDCheckStateChange() => bIDSaveCheck = (!bIDSaveCheck);
 
     /// <summary>
     /// 사후결재 사용유무에 대한 초기 checkBox의 check 상태 유무를 저장
@@ -2474,13 +2749,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-                                            {
-                                                return true;
-                                                    }
-                                                        else
-                                                            return false;
+                                                                        {
+                                                                            return true;
+                                                                                }
+                                                                                    else
+                                                                                        return false;
 
-                                                                }
+                                                                                            }
     */
 
 }

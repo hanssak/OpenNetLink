@@ -35,7 +35,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         CLIPALM_TYPE GetClipAlarmType();
         PAGE_TYPE GetMainPageType();
-        string GetMainPage(PAGE_TYPE enSiteMainPage, bool useDashBoard);
+
         string GetMainPage();
         bool GetClipCopyAutoSend();
         bool GetURLAutoTrans(int nGroupID);
@@ -80,6 +80,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         string ConvertRecvDownPath(string DownPath);
 
         int GetUserSelectFirstNet();
+        bool GetAskFileSend(int nGroupID);
+        bool GetHideSideBarAfterLogin();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -101,11 +103,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         private static void LoadFile()
         {
-            var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));
             string AppConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppEnvSetting.json";
+            try
+            {
+                var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));               
 
-            HsLogDel hsLog = new HsLogDel();
-            hsLog.Delete(7);    // 7일이전 Log들 삭제
+                HsLogDel hsLog = new HsLogDel();
+                hsLog.Delete(7);    // 7일이전 Log들 삭제
 
             CLog.Here().Information($"- AppEnvSetting Path: [{AppConfig}]");
             if (File.Exists(AppConfig))
@@ -384,31 +388,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.enMainPageType;
         }
-        public string GetMainPage(PAGE_TYPE enInitMainPage, bool useDashBoard)
-        {
-            string strPage = "/Welcome";
-            PAGE_TYPE page;
 
-            //사용자 선택이 NONE(초기값)이라면 프로그램에서 지정된 페이지로 설정
-            page = (AppConfigInfo.enMainPageType == PAGE_TYPE.NONE) ? enInitMainPage : AppConfigInfo.enMainPageType;
-
-            switch (page)
-            {
-                case PAGE_TYPE.NONE:
-                case PAGE_TYPE.DASHBOARD:
-                    strPage = useDashBoard ? "/Welcome" : "/Transfer";
-                    break;
-
-                case PAGE_TYPE.TRANSFER:
-                    strPage = "/Transfer";
-                    break;
-
-                default:
-                    strPage = "/Welcome";
-                    break;
-            }
-            return strPage;
-        }
         public string GetMainPage()
         {
             string strPage = "/Welcome";
@@ -424,12 +404,25 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     strPage = "/Transfer";
                     break;
 
+                case PAGE_TYPE.TRANSMANAGER_FILE:
+                    strPage = "/transManage";
+                    break;
+
+                case PAGE_TYPE.TRANSMANAGER_CLIP:
+                    strPage = "/clipBoardManage";
+                    break;
+
+                case PAGE_TYPE.TRANSMANAGER_EMAIL:
+                    strPage = "/mailManage";
+                    break;
+
                 default:
                     strPage = "/Welcome";
                     break;
             }
             return strPage;
         }
+
         public bool GetClipCopyAutoSend()
         {
             return AppConfigInfo.bClipCopyAutoSend;
@@ -673,7 +666,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.nUserSelectFirstNet;
         }
 
+        public bool GetAskFileSend(int nGroupID)
+        {
+            (AppConfigInfo as SGAppConfig).bAskFileSend ??= new List<bool>();
 
+            if ((AppConfigInfo as SGAppConfig).bAskFileSend.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGAppConfig).bAskFileSend[nGroupID];
 
+            return false;
+        }
+
+        public bool GetHideSideBarAfterLogin()
+        {
+            return AppConfigInfo.bHideSideBarAfterLogin;
+        }
     }
 }

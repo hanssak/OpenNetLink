@@ -75,7 +75,9 @@ namespace OpenNetLinkApp.Common
             [Description("메일보안결재 승인대기조회")]
             MailSecurityApproveWaitUI = 9,
             [Description("메일보안결재")]
-            MailSecurityApproveUI = 10
+            MailSecurityApproveUI = 10,
+            [Description("파일전송 템플릿01")]
+            TransferTemplate01 = 11
         }
         /// <summary>
         /// 승인/반려
@@ -148,5 +150,29 @@ namespace OpenNetLinkApp.Common
             /// </summary>
             INSTALLING =4,
         }
+
+        public enum EnumDrmType : Int32
+        {
+            [Description("SoftCamp")]
+            SoftCamp = 1,
+            [Description("Fasso")]
+            Fasso = 2,
+        }
+
+        public enum EnumCustomLoginType : Int32
+        {
+            [Description("LoginTemplate01")] //서울대학병원 그룹웨어 연동
+            LoginTemplate01 = 1,
+        }
+
+        /// <summary>
+        /// OpenNetLink 로그인을 요청하는 NAC 종류
+        /// </summary>
+        public enum enumNacLoginType : Int32
+        {
+            NONE = 0,
+            Genian = 1,
+        }
+
     }
 }

@@ -16,8 +16,18 @@ namespace OpenNetLinkApp.Models.SGConfig
         //로그인 관련 기능
         public bool bUseAppLoginType { get; set; }                       //사용자 지정 로그인타입 사용 여부
         public int LoginType { get; set; }                                   //사용자 지정 로그인타입 지정
+
+        public int CustomLoginType { get; set; }                              //사이트별 로그인 방식 커스터마이징
+
+        public string CustomLoginHttpUrl { get; set; }                       //로그인 연동을 위한 사이트 URL
+        public string CustomLoginSecurityKey { get; set; }                   //로그인 연동 시 암호화에 사용할 Key 값
+        public string CustomLoginSecurityIV { get; set; }                   //로그인 연동 시 암호화에 사용할 Key 값
         public bool bUseGpkiLogin { get; set; }                            // GPKI 로그인 사용 여부
-        public bool bUserIDSave { get; set; }                                      // 로그인한 ID 저장 여부
+        public int NACLoginType { get; set; }                              //NAC연계 로그인 종류 지정
+        public string NACLoginEncryptKey { get; set; }                      //NAC연계 로그인 시 인증상태 정보 암호화 키
+
+        public bool bUserIDSave { get; set; }                                      // 로그인한 ID 저장 여부 => ID저장 기능 사용유무로 의미 변경
+        public bool bUserIDSaveCheck { get; set; }                                 // 로그인한 ID저장 체크박스 체크여부
         public bool bAutoLogin { get; set; }                                       // 자동로그인 사용 여부.
         public bool bAutoLoginCheck { get; set; }                                  // 자동로그인 체크박스 체크여부.
         public bool bUseUserSelectFirstServer { get; set; }   // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
@@ -25,6 +35,14 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseOneByOneLogOut { get; set; }         // 1번에 다중망 로그인 기능 사용때에도 로그아웃은 선택한 망에서 개별 로그아웃적영
         public bool bUseOver1Auth { get; set; }                        // 1단계 이상 인증 사용
         public bool bVisibleLogOutButton { get; set; }                //상단의 [로그아웃] 버튼 표시 여부
+        public bool bUseLoginCI { get; set; }                      //로그인 화면 상단에 CI 이미지 표시 여부
+
+        public string strLoginTextFontSize { get; set; }              //로그인 화면 망연계솔루션 Text Font Size
+
+        public int nLoginConnectLimitCount { get; set; }               //최초 프로그램 실행 시 서버 접속 Connect Limit 횟수
+
+        public int nLoginConnectDelaySecond { get; set; }           //최초 프로그램 실행 시 서버 접속 총 대기 시간
+                                                                    //예) 총 대기시간 3분이면 180 입력 - LimitConnect 횟수가 6이면 30초마다 Connect 시도
 
         //패스워드
         public bool bUserPWChange { get; set; }                   // 사용자 패스워드 변경 사용 여부.
@@ -66,8 +84,10 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileApproveReason { get; set; }                     //파일 승인사유 입력 여부
         public bool bUseClipBoardApproveReason { get; set; }             //클립보드 승인사유 입력여부
         public bool bUseFileSelectDelete { get; set; }                    // 파일 선택 삭제 사용 유무
+        public bool bUseFileAllDelete { get; set; }                    // 파일 일괄 삭제 사용 유무
         public bool bUseCrossPlatformOSforFileName { get; set; }         // 윈도우에서 파일이름에 사용못하는 문자 막는지 유무
         public bool bUseTitleDescMinLength { get; set; }             //제목,설명 최소길이 제한 사용유무
+        public bool bUseTitleDescMaxLength { get; set; }             //제목,설명 최대길이 제한 사용유무
         public bool bUseAgentBlockValueChange { get; set; }                   // tbl_agent_block 에 들어가는 Type 값을 WebManager에서 data를 보여줄 수 있는 형태로 변경(WebManager/NetLink와 맞춤)
         public bool bUseOSMaxFilePath { get; set; }                             // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
         public bool bUseFileForwardDownNotRecv { get; set; }                     // 파일 수신되기전에 파일포워드로 다운로드 가능유무
@@ -79,6 +99,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bAllowDRM { get; set; }                           //DRM 파일 전송 허용 여부 (true : 전송, false : 차단) - Default : true
 
         public bool bHiddenLoginLogo { get; set; }           // Main Login 창 좌측 로고 숨김 처리
+
+        public int nTransferTemplate { get; set; }            //파일전송 UI 템플릿 지정
+        public bool bUseAskFileSendAlert { get; set; }       //파일리스트 추가 후 전송을 묻는 팝업표시 기능 활성화 (Default : false)
 
 
         //클립보드
@@ -117,6 +140,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bApprDeptSearch { get; set; }                              // 결재자 검색 창의 타부서 선택 가능 여부.
         public bool bViewDlpApproverSelectMyDept { get; set; }                   // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
         public bool bUseAgentTime1aClock { get; set; }        // 사후결재 정책, 자정에  검색화면 검색날짜 UI / 일일 송순가능수 UI 변경되는거 Server 시간이 아니라 agent 시간기준으로 동작(XX:00:00에 동작)
+        public bool bUserLineShowNameAndID { get; set; }        // 결재라인 및 수신자라인 등에 [이름 & 직급] 포맷이 아닌, [이름&아이디] 포맷을 사용(Default:false)
 
         //알림 기능
         public bool bFileRecvAlarmRetain { get; set; }                          // 파일 수신 후 알림 유지 사용 유무(환경설정)
@@ -140,6 +164,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         //public bool bExitTrayMove { get; set; }                                 // 종료 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
         public bool bUseStartTrayMove { get; set; }                              // 프로그램 시작 시 트레이 이동 사용 유무.
         public bool bUseLoginAfterTray { get; set; }                                        //로그인 후 Tray 아이콘으로 이동
+        public bool bUseLoginAfterShow { get; set; }                               //로그인 후 WebWindow 표시
         //public bool bStartTrayMove { get; set; }                               // 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
         public bool bUseStartProgramReg { get; set; }                             // 시작 프로그램 등록 사용 유무.(환경설정)
         //public bool bStartProgramReg { get; set; }                                // 시작 프로그램 등록 ( true : 시작프로그램 등록, false : 시작프로그램 등록 해제 )
@@ -181,6 +206,33 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public string strOKTAUrl { get; set; }                             //OKTA 연동 URL
         public bool bPkiSendByFileTrans { get; set; }                 // 인증서 전송기능 파일전송 방법으로 전송할지, 클립보드 방식으로 전송할지 유무
+        public int nSessionDuplicate { get; set; }              // 로그인때, 세션중복시 동작값
+        public bool bUseDrmAfterFileReceive { get; set; }             //파일 수신 완료 후 DRM 사용 여부
+        public int nDrmType { get; set; }                          //DRM 종류 - 1. SoftCamp
+        public string strSoftCampGrade { get; set; }         //DRM 종류 - SoftCamp Grade 옵션화 처리
+
+        public bool bHideApprLine { get; set; }             // 결재라인 표현유무
+
+        public bool bHideTitleDesc { get; set; }             // 제목 및 설명 표현유무
+
+        public bool bUseDashBoard { get; set; }             // DashBoard를 사용하게 할지 유무
+
+        public bool bUseEmailApprUIwait { get; set; }             // Email 결재UI가 열리면 승인대기중인 화면으로 조회되게할지 유무
+
+        public bool bHideMoveTrayMsgPopup { get; set; }       // Tray로 보낼때,
+
+        public bool bUseUnZipForTransfer { get; set; }    // 파일 전송 시 압축 파일 해제하여 전송
+
+
+        public bool bUseCommonEnvNetNameRevert { get; set; }    // 공통환경설정에 수신폴더이름 위에 망방향 from To 를 반대로 표현
+
+
+        public bool bMakeRecvDownPathShortCut { get; set; }     //다운로드 수신폴더에 대한 바탕화면 바로가기 생성 여부 (Default : false)
+        public bool bUseFromNameRecvDownPathShortCut { get; set; } //다운로드 수신폴더에 대한 바탕화면 바로가기 생성 시, 이름 정보에 ToName이 아닌, FromName으로 표시 (default :false)
+
+        public bool bUseCheckZipFileInnerFileCount { get; set; }  // 1회 전송 가능 파일 검사 시 Zip 파일일 경우 내부 파일 전체를 Count에 포함
+
+        public bool bIsBlockEmptyExt { get; set; }  // 빈 확장자 파일 전송가능유무
 
         public int nSessionDuplicate { get; set; }              // 로그인때, 세션중복시 동작값
     }

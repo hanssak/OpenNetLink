@@ -4,6 +4,8 @@ using System.Text;
 using HsNetWorkSGData;
 using HsNetWorkSG;
 using OpenNetLinkApp.Pages.Transfer;
+using Serilog;
+using AgLogManager;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -29,7 +31,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string RANK { get; set; }
 
         public int ORDER { get; set; } //대결재 순서....
-        public ApproverInfo(int index, string name, string rank, string deptname, string deptseq, string seq, string apvorder)
+        public ApproverInfo(int index, string name, string rank, string deptname, string deptseq, string seq, string apvorder, string id)
         {
             Index = index.ToString();
 
@@ -58,13 +60,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             else
                 UserSeq = seq;
 
+            if (String.IsNullOrEmpty(id))
+                APPR_USERID = "-";
+            else
+                APPR_USERID = id;
+
             nApvOrder = Int32.Parse(apvorder);
         }
         public ApproverInfo()
         {
-            Index = DeptName = DeptSeq = Grade = Name = UserSeq = "";
+            Index = DeptName = DeptSeq = Grade = Name = UserSeq = APPR_USERID = "";
         }
-        public ApproverInfo(string index, string deptname, string deptseq, string grade, string name, string userSeq, string apprPos, string dlpApprove)
+        public ApproverInfo(string index, string deptname, string deptseq, string grade, string name, string userSeq, string apprPos, string dlpApprove, string id)
         {
             Index = index;
             DeptName = deptname;
@@ -76,6 +83,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 nApprPos = Convert.ToInt32(apprPos);
             if (!dlpApprove.Equals(""))
                 nDlpApprove = Convert.ToInt32(dlpApprove);
+            APPR_USERID = id;
         }
         public ApproverInfo(int index, ApproverInfo info)
         {
@@ -86,6 +94,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             this.DeptSeq = info.DeptSeq;
             this.UserSeq = info.UserSeq;
             this.nApvOrder = info.nApvOrder;
+            this.APPR_USERID = info.APPR_USERID;
         }
         public bool GetApprover()
         {
@@ -129,6 +138,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     }
     public class SGApprLineData : SGData
     {
+
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGApprLineData>();
+
         public LinkedList<ApproverInfo> ApproverSelect = null;
         List<string> apprList = null;
         public SGApprLineData()
@@ -159,11 +171,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             listDicdata = GetRecordData("APPROVERECORD");
             return listDicdata;
         }
-
+        
         public List<string> GetBaseApprAndLineName()
         {
             List<string> listApprLine = new List<string>();
             List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
+            if (listDicdata == null)
+            {
+                Log.Logger.Here().Error($"GetBaseApprAndLineName, listDicdata == null !");
+                return listApprLine;
+            }
+
             int nTotalCount = listDicdata.Count;
             for (int i = 0; i < nTotalCount; i++)                              // UI 에서 사용하기 위해 자기 자신을 포함하기 위해 i = 0 부터 시작.                  
             {
@@ -179,10 +197,41 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return listApprLine;
         }
 
+        public List<string> GetBaseApprAndLineID()
+        {
+            List<string> listApprLine = new List<string>();
+            List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
+            if (listDicdata == null)
+            {
+                Log.Logger.Here().Error($"GetBaseApprAndLineID, listDicdata == null !");
+                return listApprLine;
+            }
+
+            int nTotalCount = listDicdata.Count;
+            for (int i = 0; i < nTotalCount; i++)                              // UI 에서 사용하기 위해 자기 자신을 포함하기 위해 i = 0 부터 시작.                  
+            {
+                Dictionary<int, string> dic = listDicdata[i];
+                string tmpStr = "";
+                if (dic.TryGetValue(1, out tmpStr) == true)
+                {
+                    tmpStr = dic[1];
+                    if (!tmpStr.Equals(""))
+                        listApprLine.Add(tmpStr);
+                }
+            }
+            return listApprLine;
+        }
+
         public List<string> GetBaseApprAndLineSeq()
         {
             List<string> listApprLine = new List<string>();
             List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
+            if (listDicdata == null)
+            {
+                Log.Logger.Here().Error($"GetBaseApprAndLineSeq, listDicdata == null !");
+                return listApprLine;
+            }
+
             int nTotalCount = listDicdata.Count;
             for (int i = 0; i < nTotalCount; i++)                       // 파일 전송 시 사용하기 위해 자기 자신을 제외하기 위해서 i = 1 부터 시작.
             {
@@ -202,6 +251,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             List<string> listApprLine = new List<string>();
             List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
+            if (listDicdata == null)
+            {
+                Log.Logger.Here().Error($"GetBaseApprAndLineDeptName, listDicdata == null !");
+                return listApprLine;
+            }
+
             int nTotalCount = listDicdata.Count;
             for (int i = 0; i < nTotalCount; i++)                       // 파일 전송 시 사용하기 위해 자기 자신을 제외하기 위해서 i = 1 부터 시작.
             {
@@ -238,6 +293,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             List<string> listApprLine = new List<string>();
             List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
+            if (listDicdata == null)
+            {
+                Log.Logger.Here().Error($"GetBaseApprAndLineRank, listDicdata == null");
+                return listApprLine;
+            }
+
             int nTotalCount = listDicdata.Count;
             for (int i = 0; i < nTotalCount; i++)                       // 파일 전송 시 사용하기 위해 자기 자신을 제외하기 위해서 i = 1 부터 시작.
             {
@@ -257,6 +318,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             List<string> listApprLine = new List<string>();
             List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
+            if (listDicdata == null)
+            {
+                Log.Logger.Here().Error($"GetBaseApprAndLineOrder, listDicdata == null ");
+                return listApprLine;
+            }
+
             int nTotalCount = listDicdata.Count;
             for (int i = 0; i < nTotalCount; i++)                       // 파일 전송 시 사용하기 위해 자기 자신을 제외하기 위해서 i = 1 부터 시작.
             {
@@ -266,7 +333,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 {
                     tmpStr = dic[6];
                     if (!tmpStr.Equals(""))
+                    {
+                        if (tmpStr.IndexOf('-') > -1)
+                        {
+                            Log.Logger.Here().Error($"GetBaseApprAndLineOrder, ApproveLine -  index: {i}, order : {tmpStr}, MSG: order Value is less than 0.");
+                            // tmpStr = tmpStr.Replace("-", "");
+                            tmpStr = i.ToString();
+                        }
+
                         listApprLine.Add(tmpStr);
+                    }
                 }
             }
             return listApprLine;
@@ -274,52 +350,72 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public LinkedList<ApproverInfo> GetConvertBaseApprAndLineData()
         {
-            List<string> listApprLineName = GetBaseApprAndLineName();                // 결재자 이름 List
-            List<string> listApprLineSeq = GetBaseApprAndLineSeq();                  // 결재자 Seq List
-            List<string> listApprLineDeptName = GetBaseApprAndLineDeptName();            // 결재자 부서이름 List
-            List<string> listApprLineDeptSeq = GetBaseApprAndLineDeptSeq();              // 결재자 부서Seq List
-            List<string> listApprLineRank = GetBaseApprAndLineRank();                // 결재자 이름 직위 List
-            List<string> listApprLineOrder = GetBaseApprAndLineOrder();
-
             LinkedList<ApproverInfo> ApproverSelect = new LinkedList<ApproverInfo>();
 
-            if ((listApprLineName == null) && (listApprLineName.Count <= 0))
-                return null;
-            if (listApprLineName.Count != listApprLineDeptSeq.Count)
+            try
             {
-                int NameCount = listApprLineName.Count;
-                int DeptSeqCount = listApprLineDeptSeq.Count;
-                for (int i = 0; i < NameCount - DeptSeqCount; i++)
+                List<string> listApprLineName = GetBaseApprAndLineName();                // 결재자 이름 List
+                List<string> listApprLineSeq = GetBaseApprAndLineSeq();                  // 결재자 Seq List
+                List<string> listApprLineDeptName = GetBaseApprAndLineDeptName();            // 결재자 부서이름 List
+                List<string> listApprLineDeptSeq = GetBaseApprAndLineDeptSeq();              // 결재자 부서Seq List
+                List<string> listApprLineRank = GetBaseApprAndLineRank();                // 결재자 이름 직위 List
+                List<string> listApprLineOrder = GetBaseApprAndLineOrder();
+                List<string> listApprLineID = GetBaseApprAndLineID();                   // 결재자 ID List
+
+                if (listApprLineName == null || listApprLineName.Count <= 0)
                 {
-                    listApprLineDeptSeq.Add("-");
+                    Log.Logger.Here().Error($"GetConvertBaseApprAndLineData, listApprLineName == null !!!");
+                    return null;
                 }
-            }
 
-
-            Dictionary<int, List<string>> checkUserSeqByOrder = new Dictionary<int, List<string>>();
-
-            for (int i = 0; i < listApprLineName.Count; i++)
-            {
-                int order = Convert.ToInt32(listApprLineOrder[i]);
-                if (checkUserSeqByOrder.ContainsKey(order))
+                if (listApprLineName.Count != listApprLineDeptSeq.Count)
                 {
-                    if (checkUserSeqByOrder[order].Contains(listApprLineSeq[i]))
-                        continue;
-                    else
+                    int NameCount = listApprLineName.Count;
+                    int DeptSeqCount = listApprLineDeptSeq.Count;
+                    for (int i = 0; i < NameCount - DeptSeqCount; i++)
                     {
-                        checkUserSeqByOrder[order].Add(listApprLineSeq[i]);
+                        listApprLineDeptSeq.Add("-");
                     }
                 }
-                else
+
+                Dictionary<int, List<string>> checkUserSeqByOrder = new Dictionary<int, List<string>>();
+
+                for (int i = 0; i < listApprLineName.Count; i++)
                 {
-                    List<string> list = new List<string>();
-                    list.Add(listApprLineSeq[i]);
-                    checkUserSeqByOrder.Add(order, list);
+                    int order = Convert.ToInt32(listApprLineOrder[i]);
+
+                    //Log.Logger.Here().Information($"GetConvertBaseApprAndLineData, index: {i}, order : {order}");
+                    if (order < 0)
+                    {
+                        Log.Logger.Here().Error($"GetConvertBaseApprAndLineData, ApproveLine -  index: {i}, order : {order}, MSG: order Value is less than 0.");
+                        order = i;                        
+                    }
+
+                    if (checkUserSeqByOrder.ContainsKey(order))
+                    {
+                        if (checkUserSeqByOrder[order].Contains(listApprLineSeq[i]))
+                            continue;
+                        else
+                        {
+                            checkUserSeqByOrder[order].Add(listApprLineSeq[i]);
+                        }
+                    }
+                    else
+                    {
+                        List<string> list = new List<string>();
+                        list.Add(listApprLineSeq[i]);
+                        checkUserSeqByOrder.Add(order, list);
+                    }
+                    ApproverInfo apprInfo = new ApproverInfo(i, listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i], listApprLineID[i]);
+                    apprInfo.nApprPos = 1;
+                    apprInfo.nDlpApprove = 0;
+                    ApproverSelect.AddLast(apprInfo);
                 }
-                ApproverInfo apprInfo = new ApproverInfo(i, listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i]);
-                apprInfo.nApprPos = 1;
-                apprInfo.nDlpApprove = 0;
-                ApproverSelect.AddLast(apprInfo);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"GetConvertBaseApprAndLineData-Exception(MSG) : {ex.Message}");
             }
 
             return ApproverSelect;
@@ -549,7 +645,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strApprLineOrder = item.nApvOrder.ToString();
                 int ApprPos = item.nApprPos;
                 int DlpApprove = item.nDlpApprove;
-                strApprLineData = strApprLineData + String.Format("{0}\u0001{1}\u0001{2}\u0001{3}\u0001{4}\u0001{5}\u0001{6}\u0001{7}\u0003", strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder, ApprPos, DlpApprove);
+                string strApprLineID = item.APPR_USERID;
+                strApprLineData = strApprLineData + String.Format("{0}\u0001{1}\u0001{2}\u0001{3}\u0001{4}\u0001{5}\u0001{6}\u0001{7}\u0001{8}\u0003", strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder, ApprPos, DlpApprove, strApprLineID);
             }
 
             strApprLineData = strApprLineData.Substring(0, strApprLineData.Length - 1);
@@ -678,6 +775,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     apprdata.nApprPos = Convert.ToInt32(strApprData[6]);
                 if (!strApprData[7].Equals(""))
                     apprdata.nDlpApprove = Convert.ToInt32(strApprData[7]);
+                if (strApprData.Length >= 9 && !strApprData[8].Equals(""))
+                    apprdata.APPR_USERID = strApprData[8];
 
                 //DeptSeq가 비어있으면 유효성 검증 넘어가기 위해 "-"로 저장
                 if (apprdata.DeptSeq.Equals(""))

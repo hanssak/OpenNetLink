@@ -327,7 +327,8 @@
     public bool bAllCheck = false;
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
-    private static Serilog.ILogger CLog => Serilog.Log.ForContext<MailApproveUI>();
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<MailSecurityApproveUI>();
+    int nDrawPageGroupID = -1;
 
     public void CheckStateUpdate(emailApproveData item)
     {
@@ -1097,25 +1098,32 @@
 
         @*GetInitDateTime();*@
 
-        //Email 배치 승인,반려 요청에 응답 이벤트
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
-
-        HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupIDbyParam, ApproveBatchResult);
-        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailSecurityApproveUI, UpdateData);
-        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailSecurityApproveWaitUI, ApproveWaitSearch);
-
         base.OnInitialized();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+
+        await jsRuntime.InvokeAsync<object>("exitLogIn", new object[] {""});
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize", new object[] {""});
+
+        int groupID = groupIDbyParam;
+        CLog.Here().Information($"TransManage - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
+
+        // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
+
+            nDrawPageGroupID = groupIDbyParam;
+
+            //Email 배치 승인,반려 요청에 응답 이벤트
+
+            bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
+
+            HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupIDbyParam, ApproveBatchResult);
+            HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailSecurityApproveUI, UpdateData);
+            HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailSecurityApproveWaitUI, ApproveWaitSearch);
+
             jsRuntime.InvokeAsync<object>("initPageLeft");
 
             if (menuMode == 1)
@@ -1123,7 +1131,16 @@
                 refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
                 strSearchApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT"); //"승인대기"
             }
+
             await doSearch();
+
+            StateHasChanged();
+        }
+
+
+
+        if (firstRender)
+        {
         }
 
         base.OnAfterRender(firstRender);
@@ -1213,9 +1230,8 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        string strNavigateWithGroupID = "/Welcome/";
+        string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
         strNavigateWithGroupID += groupID.ToString();
-
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
         foreach (var MenuItem in SideBarUISvc.MenuList)

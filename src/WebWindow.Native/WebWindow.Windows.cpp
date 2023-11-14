@@ -11,6 +11,7 @@
 #include <iostream>
 #include <filesystem>
 #include <fileapi.h>
+#include <WebView2EnvironmentOptions.h>
 
 using namespace std;
 
@@ -755,10 +756,16 @@ void WebWindow::AttachWebView()
 
 	//HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(tempEdgePath.c_str(), nullptr, nullptr,
 	//HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(nullptr, nullptr, nullptr,
+	/*std::wstring args;
+	args.append(L"--disable-features=RendererCodeIntegrity");
+	auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
+	options->put_AdditionalBrowserArguments(args.c_str());*/
+
 	HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(lpEdgeptr, nullptr, nullptr,
 		Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
 			[&, this](HRESULT result, ICoreWebView2Environment* env) -> HRESULT {
 				HRESULT envResult = env->QueryInterface(&_webviewEnvironment);
+				
 				if (envResult != S_OK)
 				{
 					return envResult;
@@ -921,6 +928,7 @@ void WebWindow::AttachWebView()
 	{
 		// Block until it's ready. This simplifies things for the caller, so they
 		// don't need to regard this process as async.
+
 		MSG msg = { };
 		while (flag.test_and_set() && GetMessage(&msg, NULL, 0, 0))
 		{
@@ -970,13 +978,14 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	imagePath = (LPWSTR)image;
 	//actions.push_back(L"OK");
 	expiration = 0;
-	appName = (LPWSTR)L"OpenNetLink";
 
 	wchar_t ModelID[MAX_PATH] = { 0, };
 	wsprintf(ModelID, L"Noti%d", m_nAppNotiID++);
-	//appUserModelID = (LPWSTR)ModelID;
 
+	appName = (LPWSTR)L"OpenNetLink";
+	//appUserModelID = (LPWSTR)ModelID;
 	const auto aumi = WinToast::configureAUMI(L"HANSSAK", L"SecureGate", L"OpenNetLink", ModelID);
+
 
 	onlyCreateShortcut = false;
 
@@ -2065,11 +2074,11 @@ bool WebWindow::SaveImage(char* PathName, void* lpBits, int size)
 void WebWindow::ProgramExit()
 {
 	NTLog(this, Info, "Called : OpenNetLink Exit");
-	hwndToWebWindow.erase(hwnd);
+	hwndToWebWindow.erase(_hWnd);
+	tray_exit();	//트레이 정리
 
 	WinToast::instance()->clear();
-
-	if (hwnd == messageLoopRootWindowHandle)
+	if (_hWnd == messageLoopRootWindowHandle)
 	{
 		PostQuitMessage(0);
 		printf("PostQuitMessage - %s(%d)\n", __FILE__, __LINE__);

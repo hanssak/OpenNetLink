@@ -10,6 +10,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGDomain
 @using System.Text
+@using AgLogManager
 
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
@@ -141,7 +142,8 @@
                             <table class="table table-head-fixed table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th style="text-align:center; vertical-align:middle;width:5%;">                                            @*체크박스*@
+                                        <th style="text-align:center; vertical-align:middle;width:5%;">
+                                            @*체크박스*@
                                             @*<input class="input" type="checkbox">*@
                                         </th>
                                         <th style="text-align:center; vertical-align:middle;width:7%;">@strApproveKind</th>                        <!--결재종류-->
@@ -152,8 +154,9 @@
                                         <th style="text-align:center; vertical-align:middle;width:15%;">@strTitle</th>                             <!--제목-->
                                         <th style="text-align:center; vertical-align:middle;width:14%;">@strFileSendDay</th>                       <!--전송요청일-->
                                         @if (bUseDlpDataView)
-                                        { 
-                                            <th style="text-align:center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>  <!--개인정보-->
+                                        {
+                                            <th style="text-align:center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
+ <!--개인정보-->
                                         }
                                         <th style="text-align:center; vertical-align:middle;width:7%;">@strDetail</th>                             <!--상세보기-->
                                     </tr>
@@ -173,7 +176,7 @@
                                             <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                             <td style="text-align:center; vertical-align:middle">@item.RequestTime</td>
                                             @if (bUseDlpDataView)
-                                            { 
+                                            {
                                                 <td style="text-align:center; vertical-align:middle">@item.stDLP</td>
                                             }
                                             <td style="text-align:center; vertical-align:middle"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
@@ -258,9 +261,12 @@
 
     bool bUseDlpDataView = true;
 
-    @*public string strFromDay = "";
-        public string strToDay = "";*@
+    //  public string strFromDay = "";
+    //  public string strToDay = "";
     //private int m_currentDownloadCount = 0;
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<ClipboardManageUI>();
+    int nDrawPageGroupID = -1;
 
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
@@ -514,44 +520,58 @@
         //param.XmlConf = XmlConf;
         //param.jsRuntime = jsRuntime;
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        // 조회방식변경
-        @*HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchResult);           // 조회 데이터 결과.
-            HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCount);           // 조회 데이터 수 결과.*@
-
-        // 전송관리 처럼
-        HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
-        HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
-        HSCmdCenter.sgPageEvent.SetTransCancelEventAdd(groupID, TransCancelResult);             // 전송 취소 결과.
-
-        strDestNetWork = strTotal;
-
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData.GetUseOverNetwork2())
-        {
-            dicDestSysPos = pageService.GetTargetSystemList(groupID);
-        }
-
-        bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
-
         @*GetInitDateTime();*@
-        base.OnInitialized();
+        base.OnInitializedAsync();
 
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
+    {        
+        await jsRuntime.InvokeAsync<object>("exitLogIn",new object[] {""});
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize",new object[] {""});
+
+
+        int groupID = groupIDbyParam;
+        CLog.Here().Information($"ClipboardManageUI - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
+
+        // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
+            nDrawPageGroupID = groupIDbyParam;
+
+
+            // 조회방식변경
+            // HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchResult);           // 조회 데이터 결과.
+            // HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCount);           // 조회 데이터 수 결과.
+
+            // 전송관리 처럼
+            HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
+            HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
+            HSCmdCenter.sgPageEvent.SetTransCancelEventAdd(groupID, TransCancelResult);             // 전송 취소 결과.
+
+            strDestNetWork = strTotal;
+
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData.GetUseOverNetwork2())
+            {
+                dicDestSysPos = pageService.GetTargetSystemList(groupID);
+            }
+
+            bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
+
             jsRuntime.InvokeAsync<object>("initPageLeft");
             await TransSearchCount();
+
+            StateHasChanged();
+
+        }
+
+        if (firstRender)
+        {
         }
         base.OnAfterRender(firstRender);
     }
+
 
     public void InitText()
     {
@@ -1186,23 +1206,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        //string strNavigateWithGroupID = "";
-        //if (siteConfig.GetUseDashBoard())
-        //    strNavigateWithGroupID = "/Welcome/";
-        //else
-        //    strNavigateWithGroupID = "/Transfer/";
-
-        //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
-        string strNavigateUrl = strNavigateWithGroupID.ToLower();
-        if (strNavigateUrl.IndexOf("transfer") > 0)
-        {
-            strNavigateUrl = pageService.GetFileTransPage(groupID);
-            if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                strNavigateWithGroupID = strNavigateUrl;
-            else
-                strNavigateWithGroupID = "/Transfer/";
-        }
         strNavigateWithGroupID += groupID.ToString();
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 

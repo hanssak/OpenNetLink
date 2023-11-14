@@ -39,6 +39,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+
                                     @foreach (FileAddErr item in listDenied)
                                     {
                                         @*<tr class="@(item.bSub == false ? "filezip" : "")">*@
@@ -185,10 +186,10 @@
         builder.CloseComponent();
 
     @*builder.AddContent(3, context.Text);*@
-        string htmlString = "<div class=\"p-0 m-0\" style=\"width:100%;\">" +
+        string htmlString = "<div class=\"p-0 m-0\" style=\"width:100%;display:inline-flex;align-items:center;\">" +
                                                 "<div class=\"p-0 m-0\" style=\"width:60%;float:left;\">" + context.Text + "</div>"
                                                 +
-                                                "<div class=\"p-0 m-0\" style=\"width:40%;float:right;font-style:italic;color:#D44867\">" + errInfo.ExceptionReason + "</div>"
+                                                "<div class=\"p-0 m-0\" style=\"width:40%;float:right;font-style:italic;color:#D44867;\">" + errInfo.ExceptionReason + "</div>"
                                             + "</div>";
         builder.AddContent(3, (MarkupString)htmlString);
 
@@ -252,19 +253,21 @@
         }
     }
 
-    private void GetInnerFileErr(List<FileAddErr> list, ref List<FileAddErr> errList)
+    private void GetInnerFileErr(List<FileAddErr> list, ref List<FileAddErr> errList, bool isInclude)
     {
         for (int i = 0; i < list.Count; i++)
         {
-
-            if (list[i].eErrType != eFileAddErr.eFANone)
+            if (isInclude)
             {
-                errList.Add(list[i]);
+                if (list[i].eErrType != eFileAddErr.eFANone)
+                {
+                    errList.Add(list[i]);
+                }
             }
 
             if (list[i].HasChildrenErr && (list[i].ChildrenFiles?.Count ?? 0) > 0)
             {
-                GetInnerFileErr(list[i].ChildrenFiles, ref errList);
+                GetInnerFileErr(list[i].ChildrenFiles, ref errList, true);
             }
         }
     }
@@ -315,7 +318,7 @@
     public void SetInnerFileErr(int groupId)
     {
         listInnerErr.Clear();
-        GetInnerFileErr(listDenied, ref listInnerErr);
+        GetInnerFileErr(listDenied, ref listInnerErr, false);
 
         bShowInnerFileErr = SGAppMgrSvc.OpConfigInfoService.GetShowInnerFileErrDetail(groupId);
         StateHasChanged();

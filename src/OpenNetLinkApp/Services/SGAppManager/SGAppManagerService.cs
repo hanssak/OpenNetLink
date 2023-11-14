@@ -5,6 +5,7 @@ using OpenNetLinkApp.Models.SGNetwork;
 using OpenNetLinkApp.Models.SGConfig;
 using System.IO;
 using HsNetWorkSG;
+using AgLogManager;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -26,7 +27,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <summary>
         /// Declared: Corporate Identity(CI) Service for CI Info/Image.
         /// </summary>
-        ISGCorpIdUIService CorpIdUIService { get; }
+        ISGSystemService SystemService { get; }
 
         /* To Manage User Info State */
         /// <summary>
@@ -68,18 +69,27 @@ namespace OpenNetLinkApp.Services.SGAppManager
     }
     internal class SGAppManagerService : ISGAppManagerService
     {
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGAppManagerService>();
         public SGAppManagerService()
         {
-            HeaderUIService = new SGHeaderUIService();
-            FooterUIService = new SGFooterUIService();
-            CorpIdUIService = new SGCorpIdUIService();
-            UserInfoService = new SGUserInfoService();
-            SideBarUIService = new SGSideBarUIService();
-            NetworkInfoService = new SGNetworkService();
-            AppConfigInfoService = new SGAppConfigService();
-            OpConfigInfoService = new SGopConfigService();
-            VersionConfigInfoService = new SGVersionConfigService();
-            CtrlSideUIService = new SGCtrlSideUIService(ref VersionConfigInfoService.VersionConfigInfo, NetworkInfoService.NetWorkInfo);
+            try
+            {
+                HeaderUIService = new SGHeaderUIService();
+                FooterUIService = new SGFooterUIService();
+                SystemService = new SGSystemService();
+                CorpIdUIService = new SGCorpIdUIService();
+                UserInfoService = new SGUserInfoService();
+                SideBarUIService = new SGSideBarUIService();
+                NetworkInfoService = new SGNetworkService();
+                AppConfigInfoService = new SGAppConfigService();
+                OpConfigInfoService = new SGopConfigService();
+                VersionConfigInfoService = new SGVersionConfigService();
+                CtrlSideUIService = new SGCtrlSideUIService(ref VersionConfigInfoService.VersionConfigInfo, NetworkInfoService.NetWorkInfo);
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"SGAppManagerService Exception :{ex.ToString()}");
+            }
         }
 
         /* To Manage Header State */
@@ -89,7 +99,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public ISGFooterUIService FooterUIService { get; private set; } = null;
 
         /* To Manage Corporate Identity State */
-        public ISGCorpIdUIService CorpIdUIService { get; private set; } = null;
+        public ISGSystemService SystemService { get; private set; } = null;
 
         /* To Manage User Info State */
         public ISGUserInfoService UserInfoService { get; private set; } = null;

@@ -66,7 +66,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public List<ISGSideBarUI> MenuList { get; private set; }
         public SGSideBarUIService()
         {
-            MenuList = new List<ISGSideBarUI>();
+            try
+            {
+                MenuList = new List<ISGSideBarUI>();
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"SGSideBarUIService Exception :{ex.ToString()}");
+            }
         }
 
         public ISGSideBarUIService AddRoot(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path,

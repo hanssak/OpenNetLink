@@ -30,10 +30,22 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseAppLoginType(int groupId);
 
         public int GetAppLoginType(int groupId);
+        public int GetCustomLoginType(int groupId);
+
+        public string GetCustomLoginHttpUrl(int groupId);
+        public string GetCustomLoginSecurityKey(int groupId);
+
+        public string GetCustomLoginSecurityIV(int groupId);
 
         public bool GetUseGPKILogin(int groupId);
 
+        public int GetNACLoginType(int groupId);
+
+        public string GetNACLoginEncryptKey(int groupId);
+
         public bool GetUseLoginIDSave(int groupId);
+
+        public bool GetUseLoginIDSaveCheck(int groupId);
 
         public bool GetUseAutoLogin(int groupId);
 
@@ -116,8 +128,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseFileApproveReason(int groupId);
         public bool GetUseClipBoardApproveReason(int groupId);
         public bool GetUseFileSelectDelete(int groupId);
+        public bool GetUseFileAllDelete(int groupId);
         public bool GetUseCrossPlatformOSforFileName(int groupId);
         public bool GetUseMinLengthTitleDesc(int groupId);
+        public bool GetUseMaxLengthTitleDesc(int groupId);
         public bool GetUseAgentBlockValueChange(int groupId);
         public bool GetUseOSMaxFilePath(int groupId);
         public bool GetUseFileForwardDownNotRecv(int groupId);
@@ -149,6 +163,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApprDeptSearch(int groupId);
         public bool GetViewDlpApproverMyDept(int groupId);
         public bool GetUseOneAClockChangeAgentTimer(int groupId);
+        public bool GetUserLineShowNameAndID(int groupId);
         public bool GetFileRecvAlarmRetain(int groupId);
         //public bool GetFileRecvTrayFix(int groupId);
         public bool GetApprCountAlarmRetain(int groupId);
@@ -170,6 +185,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //public bool GetExitTrayMove(int groupId);
         public bool GetUseStartTrayMove(int groupId);
         public bool GetUseLoginAfterTray(int groupId);
+        public bool GetUseLoginAfterShow(int groupId);
         //public bool GetStartTrayMove(int groupId);
         public bool GetUseStartProgramReg(int groupId);
         //public bool GetStartProgramReg(int groupId);
@@ -234,6 +250,46 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetAllowDRM(int groupId);
 
         public bool GetHiddenLoginLogo(int groupId);
+        public bool GetUseLoginCI(int groupId);
+        public string GetLoginTextFontSize(int groupId);
+
+        public int GetLoginConnectLimitCount(int groupId);
+        public int GetLoginConnectDelaySecond(int groupId);
+
+        public bool GetUseDrmAfterFileReceive(int groupId);
+
+        public int GetDrmType(int groupId);
+        public string GetSoftCampGrade(int groupId);
+
+        public bool GetUseHideApprLine(int groupId);
+
+
+        public bool GetUseHideTitleDesc(int groupId);
+
+        public int GetTransferTemplate(int groupId);
+
+        public bool GetUseDashBoard(int groupId);
+
+        public bool GetUseEmailApprUIwait(int groupId);
+
+        public bool GetUseHideToastPopup(int groupId);
+
+        public bool GetUseUnZipForTransfer(int groupId);
+
+        public bool GetUseAskFileSendAlert(int groupId);
+
+
+        public bool GetUseCommonEnvNetNameRevert(int groupId);
+
+
+        public bool GetUseCheckZipFileInnerFileCount(int groupId);
+
+        public bool GetMakeRecvDownPathShortCut(int groupId);
+
+        public bool GetUseFromNameRecvDownPathShortCut(int groupId);
+
+        public bool GetEmptyExtFileTrans(int groupid);
+
     }
 
 
@@ -265,28 +321,31 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         private static void LoadFile()
         {
-            //로그 삭제
-            HsLogDel hsLog = new HsLogDel();
-            hsLog.Delete(7);    // 7일이전 Log들 삭제
-
-            List<ISGNetwork> listNetworks = SGNetworkService.NetWorkInfo;
-
-            if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
-                Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
-
-            _AppConfigInfo = new Dictionary<int, ISGopConfig>();
-            var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
-            foreach (SGNetwork sgNetwork in listNetworks)
+            string AppConfig = "";
+            try
             {
-                string AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sgNetwork.GroupID}_{sgNetwork.NetPos}.json";
+                //로그 삭제
+                HsLogDel hsLog = new HsLogDel();
+                hsLog.Delete(7);    // 7일이전 Log들 삭제
 
-                CLog.Here().Information($"- AppOPsetting Path: [{AppConfig}]");
+                List<ISGNetwork> listNetworks = SGNetworkService.NetWorkInfo;
 
-                if (File.Exists(AppConfig))
+                if (!Directory.Exists(Environment.CurrentDirectory + $"/wwwroot/conf"))
+                    Directory.CreateDirectory(Environment.CurrentDirectory + $"/wwwroot/conf");
+
+                _AppConfigInfo = new Dictionary<int, ISGopConfig>();
+                var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
+                foreach (SGNetwork sgNetwork in listNetworks)
                 {
-                    try
+                    AppConfig = Environment.CurrentDirectory + $"/wwwroot/conf/AppOPsetting_{sgNetwork.GroupID}_{sgNetwork.NetPos}.json";
+
+                    CLog.Here().Information($"- AppOPsetting Path: [{AppConfig}]");
+
+                    if (File.Exists(AppConfig))
                     {
-                        CLog.Here().Information($"- AppOPsetting Loading... : [{AppConfig}]");
+                        try
+                        {
+                            CLog.Here().Information($"- AppOPsetting Loading... : [{AppConfig}]");
 
                         byte[] hsckByte = File.ReadAllBytes(AppConfig);
                         string strContents = Encoding.UTF8.GetString(hsckByte);
@@ -364,11 +423,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
                             var ownsStream = false;
                             var indent = true;
 
-                            using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
-                            {
-                                serializer.WriteObject(writer, sgOpConfig);
+                                using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
+                                {
+                                    serializer.WriteObject(writer, sgOpConfig);
+                                }
                             }
-                        }
 
 #if !DEBUG
                         byte[] info = null;
@@ -388,12 +447,17 @@ namespace OpenNetLinkApp.Services.SGAppManager
                             fs.Write(info, 0, info.Length);
                         }
 #endif
-                    }
-                    catch (Exception ex)
-                    {
-                        CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+                        }
+                        catch (Exception ex)
+                        {
+                            CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"SGopConfigService LoadFile(Path:{AppConfig}) Exception :{ex.ToString()}");
             }
         }
 
@@ -410,13 +474,43 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].LoginType;
         }
+        public int GetCustomLoginType(int groupId)
+        {
+            return AppConfigInfo[groupId].CustomLoginType;
+        }
+        public string GetCustomLoginHttpUrl(int groupId)
+        {
+            return AppConfigInfo[groupId].CustomLoginHttpUrl;
+        }
+        public string GetCustomLoginSecurityKey(int groupId)
+        {
+            return AppConfigInfo[groupId].CustomLoginSecurityKey;
+        }
+        public string GetCustomLoginSecurityIV(int groupId)
+        {
+            return AppConfigInfo[groupId].CustomLoginSecurityIV;
+        }
         public bool GetUseGPKILogin(int groupId)
         {
             return AppConfigInfo[groupId].bUseGpkiLogin;
         }
+        public int GetNACLoginType(int groupId)
+        {
+            return AppConfigInfo[groupId].NACLoginType;
+        }
+
+        public string GetNACLoginEncryptKey(int groupId)
+        {
+            return AppConfigInfo[groupId].NACLoginEncryptKey;
+        }
+
         public bool GetUseLoginIDSave(int groupId)
         {
             return AppConfigInfo[groupId].bUserIDSave;
+        }
+        public bool GetUseLoginIDSaveCheck(int groupId)
+        {
+            return AppConfigInfo[groupId].bUserIDSaveCheck;
         }
         public bool GetUseAutoLogin(int groupId)
         {
@@ -580,6 +674,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseFileSelectDelete;
         }
+        public bool GetUseFileAllDelete(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseFileAllDelete;
+        }
         public bool GetUseCrossPlatformOSforFileName(int groupId)
         {
             return AppConfigInfo[groupId].bUseCrossPlatformOSforFileName;
@@ -587,6 +685,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseMinLengthTitleDesc(int groupId)
         {
             return AppConfigInfo[groupId].bUseTitleDescMinLength;
+        }
+        public bool GetUseMaxLengthTitleDesc(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseTitleDescMaxLength;
         }
         public bool GetUseAgentBlockValueChange(int groupId)
         {
@@ -714,6 +816,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseAgentTime1aClock;
         }
+        public bool GetUserLineShowNameAndID(int groupId)
+        {
+            return AppConfigInfo[groupId].bUserLineShowNameAndID;
+        }
+
         public bool GetFileRecvAlarmRetain(int groupId)
         {
             return AppConfigInfo[groupId].bFileRecvAlarmRetain;
@@ -836,6 +943,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseLoginAfterTray(int groupId)
         {
             return AppConfigInfo[groupId].bUseLoginAfterTray;
+        }
+
+        public bool GetUseLoginAfterShow(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseLoginAfterShow;
         }
         //public bool GetStartTrayMove(int groupId)
         //{
@@ -1057,7 +1169,106 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetHiddenLoginLogo(int groupId)
         {
             return AppConfigInfo[groupId].bHiddenLoginLogo;
-        }        
+        }
+
+        public bool GetUseLoginCI(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseLoginCI;
+        }
+
+        public string GetLoginTextFontSize(int groupId)
+        {
+            return AppConfigInfo[groupId].strLoginTextFontSize;
+        }
+        public int GetLoginConnectLimitCount(int groupId)
+        {
+            return AppConfigInfo[groupId].nLoginConnectLimitCount;
+        }
+        public int GetLoginConnectDelaySecond(int groupId)
+        {
+            return AppConfigInfo[groupId].nLoginConnectDelaySecond;
+        }
+
+        public bool GetUseDrmAfterFileReceive(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseDrmAfterFileReceive;
+        }
+        public int GetDrmType(int groupId)
+        {
+            return AppConfigInfo[groupId].nDrmType;
+        }
+        public string GetSoftCampGrade(int groupId)
+        {
+            return AppConfigInfo[groupId].strSoftCampGrade;
+        }
+
+
+        public bool GetUseHideApprLine(int groupId)
+        {
+            return AppConfigInfo[groupId].bHideApprLine;
+        }
+
+        public bool GetUseHideTitleDesc(int groupId)
+        {
+            return AppConfigInfo[groupId].bHideTitleDesc;
+        }
+
+        public bool GetUseDashBoard(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseDashBoard;
+        }
+
+        public bool GetUseEmailApprUIwait(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseEmailApprUIwait;
+        }
+
+
+        public int GetTransferTemplate(int groupId)
+        {
+            return AppConfigInfo[groupId].nTransferTemplate;
+        }
+
+        public bool GetUseHideToastPopup(int groupId)
+        {
+            return AppConfigInfo[groupId].bHideMoveTrayMsgPopup;
+        }
+
+        public bool GetUseUnZipForTransfer(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseUnZipForTransfer;
+        }
+
+        public bool GetUseAskFileSendAlert(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseAskFileSendAlert;
+        }
+
+        public bool GetUseCommonEnvNetNameRevert(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseCommonEnvNetNameRevert;
+        }
+        public bool GetUseCheckZipFileInnerFileCount(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseCheckZipFileInnerFileCount;
+        }
+
+        public bool GetMakeRecvDownPathShortCut(int groupId)
+        {
+            return AppConfigInfo[groupId].bMakeRecvDownPathShortCut;
+        }
+
+        public bool GetUseFromNameRecvDownPathShortCut(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseFromNameRecvDownPathShortCut;
+        }
+
+        public bool GetEmptyExtFileTrans(int groupid)
+        {
+            return AppConfigInfo[groupid].bIsBlockEmptyExt;
+        }
+
 
     }
+
 }

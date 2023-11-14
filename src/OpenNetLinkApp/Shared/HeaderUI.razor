@@ -168,6 +168,7 @@
                 //HsCmdCenter.sgPageEvent.SetFileForwardNotifyEventAdd(listNetWork[nIdx].GroupID, FileForwardNotify); //파일전달 알람 이벤트
                 HsCmdCenter.SetUseOSMaxPath(listNetWork[nIdx].GroupID, OpConfigSvc.GetUseOSMaxFilePath(listNetWork[nIdx].GroupID));
 
+                HsCmdCenter.sgPageEvent.SetUrlTypeForwardData(listNetWork[nIdx].GroupID, SetUrlTypeForwardInfo);
             }
         }
     }
@@ -807,6 +808,62 @@
 
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    bool SetUrlTypeForwardInfo(int groupid)
+    {
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        if (sgLoginData == null)
+        {
+            CLog.Here().Information($"SetUrlTypeForwardInfo, groupID : {groupid},  ### UrlRedirection - loginData empty !");
+            return false;
+        }
+
+        string strForwardUrl = "";
+        char chType = 'C';
+
+        CLog.Here().Information($"SetUrlTypeForwardInfo, groupID : {groupid} -  ### UrlRedirection - GetLogin Data !");
+
+        string strData = "";
+        strData = sgLoginData.GetTagDataBySystemEnvName("CLIENT_URL_FW_PAGE");
+        if (strData.Length < 1)
+        {
+            // C - Type 적용
+            CLog.Here().Information($"SetUrlTypeForwardInfo, groupID : {groupid} -  ### UrlRedirection - Server CLIENT_URL_FW_PAGE tag Empty, Type : C !");
+        }
+        else
+        {
+            CLog.Here().Information($"SetUrlTypeForwardInfo, groupID : {groupid} -  ### UrlRedirection - CLIENT_URL_FW_PAGE : {strData}");
+
+            if (string.Compare(strData, "uselocal", true) == 0)
+            {
+                // 'N' Type 필요 및 기타 local 설정사용필요시
+                chType = SGAppMgrSvc.AppConfigInfoService.GetURLAutoAfterBrowser(0).ElementAt(0);
+                strForwardUrl = SGAppMgrSvc.AppConfigInfoService.GetForwardUrl(0);
+            }
+            else
+            {
+                // F - Type, Url 적용
+                chType = 'F';
+                strForwardUrl = strData;
+            }
+        }
+        HsNetWorkSG.HsHttpWatcher.SetUrlRedirectSomeData(groupid, chType, strForwardUrl);
+
+        CtrlSideRefreshEvent ctrlSideEvent = null;
+        ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideRefreshEvent();
+        if (ctrlSideEvent != null)
+            ctrlSideEvent();
+
+        return true;
+    }
+
+
+    /// <summary>
     /// UrlList 동시 접근 문제 발생하지 않도록 Read / Write 1곳에서 처리
     /// (GetUrlListfromNetLib - true: Urlredirection 서버 정책 변경에 의한 watcher Thread에 정책반영유무, false : 사용자가 설정변경으로 인한 watcher Thread에 정책반영유무)
     /// </summary>
@@ -943,7 +1000,6 @@
                                 dicBWpolicy.TryGetValue(groupid, out bWBState))
                             {
 
-
                                 // 망별주소와 Type 사용 : OpConfigSvc.GetURLAutoAfterBrowser(groupid).ElementAt(0), OpConfigSvc.GetForwardUrl(groupid)
 
                                 bool bUseUrlRedirection = GetUseUrlSendServer(groupid);
@@ -955,11 +1011,58 @@
                                     CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection  Use User policy : {bUseUrlRedirection}");
                                 }
 
+
+                                string strForwardUrl = "";
+                                char chType = 'C';
+                                SGLoginData sgLoginData = null;
+                                sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+                                if (sgLoginData != null)
+                                {
+                                    CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection - GetLogin Data !");
+
+                                    string strData = "";
+                                    strData = sgLoginData.GetTagDataBySystemEnvName("CLIENT_URL_FW_PAGE");
+                                    if (strData.Length < 1)
+                                    {
+                                        // C - Type 적용
+                                        CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection - Server CLIENT_URL_FW_PAGE tag Empty, Type : C !");
+                                    }
+                                    else
+                                    {
+
+                                        CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection - CLIENT_URL_FW_PAGE : {strData}");
+
+                                        if (string.Compare(strData, "uselocal", true) == 0)
+                                        {
+                                            // 'N' Type 필요 및 기타 local 설정사용필요시
+                                            chType = SGAppMgrSvc.AppConfigInfoService.GetURLAutoAfterBrowser(0).ElementAt(0);
+                                            strForwardUrl = SGAppMgrSvc.AppConfigInfoService.GetForwardUrl(0);
+                                        }
+                                        else
+                                        {
+                                            // F - Type, Url 적용
+                                            chType = 'F';
+                                            strForwardUrl = strData;
+                                        }
+                                    }
+                                }
+
+                                //strForwardUrl = SGAppMgrSvc.AppConfigInfoService.GetForwardUrl(0);
+                                //chType = SGAppMgrSvc.AppConfigInfoService.GetURLAutoAfterBrowser(0).ElementAt(0);
+
+
                                 // 0x00 : White, 0x01 : Black
                                 // hsNetWork
                                 HsNetWorkSG.HsHttpWatcher.SetUrlList(groupid, bUseUrlRedirection,
-                                    SGAppMgrSvc.AppConfigInfoService.GetURLAutoAfterBrowser(0).ElementAt(0), SGAppMgrSvc.AppConfigInfoService.GetForwardUrl(0),
-                                    (dicBWpolicy[groupid] ? 0x00 : 0x01), listUrl, listUrlException);
+                                    chType, strForwardUrl,
+                                // Local의 정보를 사용하는 예전방식
+                                // SGAppMgrSvc.AppConfigInfoService.GetURLAutoAfterBrowser(0).ElementAt(0), SGAppMgrSvc.AppConfigInfoService.GetForwardUrl(0), 
+                                (dicBWpolicy[groupid] ? 0x00 : 0x01), listUrl, listUrlException);
+
+                                CtrlSideRefreshEvent ctrlSideEvent = null;
+                                ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideRefreshEvent();
+                                if (ctrlSideEvent != null)
+                                    ctrlSideEvent();
 
                                 CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection policy - SetUrlListis Call !!!");
 
@@ -3378,7 +3481,19 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         // 로그아웃에 따른 공통환경설정 UI조정
         CtrlSideEvent ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
         if (ctrlSideEvent != null)
-            ctrlSideEvent();
+            ctrlSideEvent(groupID);
+
+        // Reconnect, 메뉴 재생성동작하게 
+        pageService.SetStatusSideMenuReBuildTime(groupID, true);
+
+        // sessionCheck 동작하게 적용
+        HsNetWork hsNetWork = null;
+        hsNetWork = HsCmdCenter.GetConnectNetWork(groupID);
+        if (hsNetWork != null)
+        {
+            hsNetWork.SetLoginSessionCheckDo();
+            hsNetWork.SetReconnectStop();
+        }
 
         // Reconnect, 메뉴 재생성동작하게 
         pageService.SetStatusSideMenuReBuildTime(groupID, true);
@@ -3526,7 +3641,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             }*@
 
 
-        OS_NOTI os_noti = OS_NOTI.OFFLINE;
+    OS_NOTI os_noti = OS_NOTI.OFFLINE;
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = XmlConf.GetInfoMsg("I_0198");               // 오프라인 되었습니다.
         if (HsCmdCenter.GetFileRecvPossible(groupID) == true)
@@ -3603,6 +3718,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
         {
+            Window.MoveTrayToWebWindow();
             ShowMessage("error", XmlConf.GetErrMsg("E_0235"));
             CLog.Here().Information("RMHeaderNoti-sgLoginData null : Not Login!");
             return;
@@ -3610,6 +3726,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         if (pageService.GetLogoutStatus(groupID))
         {
+            Window.MoveTrayToWebWindow();
             ShowMessage("error", XmlConf.GetErrMsg("E_0235"));
             CLog.Here().Information($"RMHeaderNoti- GetLogoutStatus - GroupID : {groupID}");
             return;
@@ -3634,17 +3751,15 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 MyNavigationManager.NavigateTo(activeMenu.Path);
                 Thread.Sleep(1000);
             }
-            else
-            {
-                AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
-                if (addFileRM_Event != null)
-                {
-                    addFileRM_Event(groupID, e);
 
-                    CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, Add Processed!");
-                }
+            AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
+            if (addFileRM_Event != null)
+            {
+                addFileRM_Event(groupID, e);
+                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, Add Processed!");
             }
         }
+
     }
 
     public void SetPlatFormInfo()

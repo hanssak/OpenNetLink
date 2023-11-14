@@ -11,12 +11,22 @@
 @foreach (ApproverInfo item in ReceiverSelect)
 {
     <button type="button" class="btn btn-blue btn-sm col-xs-1" style="margin-right:5px;">
-        <i class="fas fa-user-plus"></i> @item.Name @item.Grade
+        <i class="fas fa-user-plus"></i> 
+        @if (SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupIDbyParam))
+        {
+            @($"{item.Name} {item.APPR_USERID}")
+        }
+        else
+        {
+            @($"{item.Name} {item.Grade}")
+        }
     </button>
 }
 
 @code {
     private LinkedList<ApproverInfo> ReceiverSelect = new LinkedList<ApproverInfo>();
+
+    public int groupIDbyParam = 0;
 
     public void AssignReceiver(LinkedList<ApproverInfo> arg)
     {
@@ -27,4 +37,6 @@
     {
         return ReceiverSelect;
     }
+
+    public void Refresh() => StateHasChanged();
 }

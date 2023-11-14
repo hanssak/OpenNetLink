@@ -21,7 +21,7 @@
 @using OpenNetLinkApp.Common
 @using static OpenNetLinkApp.Common.Enums;
 
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
@@ -189,6 +189,9 @@
     /// </summary>
     bool bSendPkiFilebyClipSendType = false;
 
+
+    int nDrawPageGroupID = -1;
+
     /// <summary>
     /// 홈 이동 버튼
     /// </summary>
@@ -200,9 +203,8 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        string strNavigateWithGroupID = "/Welcome/";
+        string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
         strNavigateWithGroupID += groupID.ToString();
-
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
         foreach (var MenuItem in SideBarUISvc.MenuList)
@@ -321,6 +323,27 @@
 
         base.OnInitialized();
     }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        await jsRuntime.InvokeAsync<object>("exitLogIn", new object[] {""});
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize", new object[] {""});
+
+        int groupID = groupIDbyParam;
+        CLog.Here().Information($"TransManage - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
+
+        // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
+        {
+            nDrawPageGroupID = groupIDbyParam;
+
+
+        }
+
+    }
+
 
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
@@ -495,7 +518,7 @@
     private void ShowMessage(string strType, string strMsg)
     {
         object[] param = { strType, XmlConf.GetTitle("T_SYSTEMNAME2"), strMsg };
-        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
     /// <summary>

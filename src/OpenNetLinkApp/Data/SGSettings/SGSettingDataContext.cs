@@ -250,6 +250,30 @@ namespace OpenNetLinkApp.Data.SGSettings
         }
 
         /// <summary>
+        /// ID저장 시, AUTOLOGINING:2로 설정
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="idSave"></param>
+        /// <returns></returns>
+        public bool SetSettingIDSave(int groupId, bool idSave)
+        {
+            // Create
+            Log.Logger.Here().Information($"Set a SettingData, GROUPID({groupId})=>AUTOLOGINING.IDSAVE({idSave})");
+            SGSettingData SData;
+
+            lock (_locker)
+            {
+                SData = DBSDataCtx.setting
+                .Where(x => x.GROUPID == groupId)
+                .FirstOrDefault();
+                SData.AUTOLOGINING = idSave ? 2 : 0;
+                DBSDataCtx.SaveChanges();
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Select * from SGSettingDataUpdate
         /// </summary>
         /// <param name="groupId"></param>
@@ -393,8 +417,31 @@ namespace OpenNetLinkApp.Data.SGSettings
             }
 
             bool bAutoLogin = nAutoLogin==1?true:false;
-            //Log.Logger.Here().Information($"Get for a SGSettingData, GroupId({groupId})=>DELAYDISPLAYPW({bAutoLogin})");
+            Log.Logger.Here().Information($"Get for a SGSettingData, GroupId({groupId})=>AUTOLOGINING({nAutoLogin})");
             return bAutoLogin;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        public bool GetSettingIDSave(int groupId)
+        {
+            int nAutoLogin;
+
+            lock (_locker)
+            {
+                // Read
+                nAutoLogin = DBSDataCtx.setting
+                .Where(x => x.GROUPID == groupId)
+                .Select(x => x.AUTOLOGINING)
+                .FirstOrDefault();
+            }
+
+            bool bIDSave= nAutoLogin == 2 ? true : false;
+            Log.Logger.Here().Information($"Get for a SGSettingData, GroupId({groupId})=>AUTOLOGINING.IDSAVE({bIDSave})");
+            return bIDSave;
         }
 
         /// <summary>

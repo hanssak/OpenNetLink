@@ -28,7 +28,13 @@ namespace OpenNetLinkApp.Models.SGConfig
         [Description("T_PAGE_TYPE_DASHBOARD")]
         DASHBOARD = 1,
         [Description("T_PAGE_TYPE_TRNASFER")]
-        TRANSFER = 2
+        TRANSFER = 2,
+        [Description("T_PAGE_TYPE_FILE_TRANSMANAGER")]
+        TRANSMANAGER_FILE = 3,
+        [Description("T_PAGE_TYPE_CLIP_TRANSMANAGER")]
+        TRANSMANAGER_CLIP = 4,
+        [Description("T_PAGE_TYPE_EMAIL_TRANSMANAGER")]
+        TRANSMANAGER_EMAIL = 5
     }
     public enum HOTKEY_MOD: int
     {
@@ -72,5 +78,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public LogEventLevel LogLevel { get; }                      // 로그레벨
         bool bUseApprWaitNoti { get; }                              // 승인대기 알림 사용 여부.(체크)
         int nUserSelectFirstNet { get; }
+        List<bool> bAskFileSend { get; }                            //파일리스트 추가 후 전송을 묻는 팝업표시 여부 (템플릿에 한하여  Default : true)
+        bool bHideSideBarAfterLogin { get; }                           // 로그인 후 좌측 사이드바 숨김 여부 설정(Default :false)
     }
 }

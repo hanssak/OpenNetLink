@@ -11,6 +11,7 @@
 @using HsNetWorkSG
 @using HsNetWorkSGData
 @using OpenNetLinkApp.Common
+@using OpenNetLinkApp.Data.SGDicData.DRM
 
 
 @inject NavigationManager MyNavigationManager
@@ -28,17 +29,17 @@
     </li>
     <li class="nav-item d-none d-sm-inline-block">
         <!-- <a href="#" class="nav-link pl-1 white_font">자료전송</a> -->
-        
+
         <a class="nav-link pl-1 white_font">@(GetDescription())</a>
         @*
-        @if (String.IsNullOrEmpty(SideBarUISvc.ActiveMenu?.Path ?? ""))
-        {
+            @if (String.IsNullOrEmpty(SideBarUISvc.ActiveMenu?.Path ?? ""))
+            {
             <a class="nav-link pl-1 white_font">@(GetDescription())</a>
-        }
-        else
-        {
+            }
+            else
+            {
             <a @onclick="@(()=> MyNavigationManager.NavigateTo(SideBarUISvc.ActiveMenu.Path))" class="nav-link pl-1 white_font">@(GetDescription())</a>
-        }*@
+            }*@
     </li>
 </ul>
 
@@ -47,7 +48,7 @@
     <!-- user info -->
     <li class="nav-link white_font"><font size="2">@(GetUserInfo()?.HeaderUserName)</font></li>
     <li class="nav-item dropdown">
-        <a class="nav-link white_font" data-toggle="dropdown">
+        <a class="nav-link white_font" data-toggle="dropdown" title=@xmlConf.GetTitle("T_ETC_USER_INFO")>
             <i class="fas fa-user-alt "></i>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
@@ -225,7 +226,7 @@
     <!-- /. ClipBoard Dropdown Menu -->
     <!-- Messages Dropdown Menu -->
     <li class="nav-item dropdown">
-        <a class="nav-link white_font" data-toggle="dropdown">
+        <a class="nav-link white_font" data-toggle="dropdown" title=@xmlConf.GetTitle("T_TOOL_MESSAGE")>
             <!--<i class="fas fa-comments "></i>-->
             <i class="@GetNotiIcon() "></i>
             @if ((nNotiCount = GetNotiAllNetSum(strUserSeq)) > 0)
@@ -325,7 +326,7 @@
 
 
     <li class="nav-item dropdown">
-        <a class="nav-link white_font" data-toggle="dropdown">
+        <a class="nav-link white_font" data-toggle="dropdown" title=@xmlConf.GetTitle("T_INFO_ALARM")>
             <!--<i class="fas fa-bell"></i>-->
             <i class="@GetAlarmIcon() "></i>
             @if ((nAlarmCount = GetAlarmAllNetSum(strUserSeq)) > 0)
@@ -401,12 +402,12 @@
 
             @if (String.IsNullOrEmpty(GetAlarmPath()))
             {
-            //<a class="dropdown-item dropdown-footer">전체 알림 보기</a>
-                <a @onclick="@(()=> MyNavigationManager.NavigateTo("/alarmList"))"  class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
+                //<a class="dropdown-item dropdown-footer">전체 알림 보기</a>
+                <a @onclick="@(()=> MyNavigationManager.NavigateTo("/alarmList"))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
             }
             else
             {
-            //<a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>
+                //<a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>
                 <a @onclick="@(()=> MyNavigationManager.NavigateTo("/alarmList"))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
             }
 
@@ -439,7 +440,7 @@
         </li>
     }
     <li class="nav-item">
-        <a id="toggleRightSideBar" class="nav-link white_font" data-widget="control-sidebar" data-slide="true" role="button"><i class="fas fa-cog"></i></a>
+        <a id="toggleRightSideBar" class="nav-link white_font" data-widget="control-sidebar" data-slide="true" role="button" title=@xmlConf.GetTitle("T_APPCONFIG_COMMON")><i class="fas fa-cog"></i></a>
     </li>
 </ul>
 
@@ -503,7 +504,7 @@
     /// <summary>
     /// GroupId 별 서버의 잠금시간 항목 중 최종 시간 값
     /// </summary>
-    public int m_nSvrTime = 0;
+    public Dictionary<int, int> m_nSvrTime = new Dictionary<int, int>();
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -1037,7 +1038,12 @@
         if (pageService.GetGroupIDLoginType(groupId) == eLoginType.eLOGINTYPE_AD)
             return;
 
+        //잠금시간이 0이면 화면 잠금 사용하지 않음
+        if (screentime <= 0)
+            return;
+
         object[] param = { screentime };
+
         //object[] param = { 1 };
         tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
 
@@ -1079,7 +1085,6 @@
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         int count = listNetWork.Count;
-
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         if (sgSideBar != null)
@@ -1341,24 +1346,28 @@
         {
             HsNetWork hsNetWork = HsCmdCenter.GetConnectNetWork(sgNetWork.GroupID);
             hsNetWork?.SGFileInfoSave_EventReg(FileInfoSaveEvent);
+            hsNetWork?.SGDownComplete_EventReg(DownCompleteEvent);
         }
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-
         if (sgSideBar != null)
         {
             bViewAlarmNotiAllDelMenu = SGAppMgrSvc.OpConfigInfoService.GetViewSGHeaderUIAlarmNoriAllDel(sgSideBar.GroupId);
 
             if (dicCurrentAfterChkHide.ContainsKey(sgSideBar.GroupId))
-                dicCurrentAfterChkHide[nGroupID] = pageService.GetAfterApprChkHide(sgSideBar.GroupId);
+            {
+                if (dicCurrentAfterChkHide[nGroupID] != pageService.GetAfterApprChkHide(sgSideBar.GroupId))
+                    dicCurrentAfterChkHide[nGroupID] = pageService.GetAfterApprChkHide(sgSideBar.GroupId);
+            }
             else
                 dicCurrentAfterChkHide.Add(sgSideBar.GroupId, pageService.GetAfterApprChkHide(sgSideBar.GroupId));
         }
+
     }
 
-    /**
-    *@brief clipboard전송 버튼 view유무(bUseClipBoardui), List 형태로 표현유무(bClipboardMultiItem)를 확정짓기 위한 함수
-*/
+    /// <summary>
+    /// clipboard전송 버튼 view유무(bUseClipBoardui), List 형태로 표현유무(bClipboardMultiItem)를 확정짓기 위한 함수
+    /// </summary>
     private void SetClipBoardUI()
     {
 
@@ -1774,6 +1783,7 @@
         HsCmdCenter.sgPageEvent.SetOLEMimeRecvEvent(OLEMimeRecvEvent);
         HsCmdCenter.sgPageEvent.SetAuditOriEvent(AuditOriRecvEvent);
         HsCmdCenter.sgPageEvent.SetChangeLanguageEvent(ChangeLanguageEvent);
+        HsCmdCenter.sgPageEvent.SetNotiRequestExitEvent(RequestExitEvent);
 
 
         pageService.SetAlramAndMessageDeleteEvent(DelAllAlramAndMessage);
@@ -1803,18 +1813,32 @@
 */
     public void ScreenLockTimeInitNoti(int groupID, ConfigArgs e)
     {
-        int time = e.ScreenTime;
+        //int time = e.ScreenTime;
+        m_nSvrTime[groupID] = e.ScreenTime;
 
         // logout 까지 고려
-        if (m_nSvrTime == 0)        //다중망 중, 화면잠금을 사용하는 망이 하나라도 있으면 잠금 시간 적용
-            m_nSvrTime = time;
-        else if (time < m_nSvrTime)  //다중망 중, 화면잠금 시간은 최소값으로 적용
-            m_nSvrTime = time;
+        foreach (int groupId in m_nSvrTime.Keys)
+        {
+            //로그아웃된 groupId에 대한 잠금설정은 삭제
+            if (pageService.GetLogoutStatus(groupId))
+                m_nSvrTime.Remove(groupId);
+        }
+        int newScreenTime = 0;
 
-        if (time <= 0)
+        var activeTimes = m_nSvrTime.Where(svr => svr.Value > 0);
+
+        if (activeTimes.Count() <= 0)   //모든 망에 대한 잠금시간이 0이면 0으로 설정
+            newScreenTime = 0;
+        else                            //잠금을 사용하는 망이 하나라도 있으면 0 제외하고 최소값으로 적용
+            newScreenTime = activeTimes.Min(svr => svr.Value);
+
+        if (newScreenTime == screentime)  //기존 값과 동일할 경우 Skip
             return;
 
-        screentime = e.ScreenTime;
+        //screentime = e.ScreenTime;
+        screentime = newScreenTime;
+
+        //변경한 screentime 적용
         if (mouseTimer == null)
         {
             mouseTimer = new Timer();
@@ -1839,6 +1863,16 @@
         if (sgUserData != null)
         {
             strUserSeq = sgUserData.GetUserSequence();
+
+            // login 이후에 사후결재 관련 설정값
+            bViewAlarmNotiAllDelMenu = SGAppMgrSvc.OpConfigInfoService.GetViewSGHeaderUIAlarmNoriAllDel(groupid);
+            if (dicCurrentAfterChkHide.ContainsKey(groupid))
+            {
+                if (dicCurrentAfterChkHide[nGroupID] != pageService.GetAfterApprChkHide(groupid))
+                    dicCurrentAfterChkHide[nGroupID] = pageService.GetAfterApprChkHide(groupid);
+            }
+            else
+                dicCurrentAfterChkHide.Add(groupid, pageService.GetAfterApprChkHide(groupid));
 
             StateHasChanged();
         }
@@ -2220,7 +2254,7 @@
         //공통환경설정의 '사후결재 관리' 부분 화면 표시 여부 갱신
         CtrlSideEvent ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
         if (ctrlSideEvent != null)
-            ctrlSideEvent();
+            ctrlSideEvent(groupID);
 
         //파일 송수신 중 사후결재 여부가 변경되었다면 메세지 표시
         if (pageService.GetFileSending() || pageService.GetFileRecving())
@@ -2283,6 +2317,53 @@
         }
     }
 
+    public void DownCompleteEvent(object obj, SGEventArgs e)
+    {
+        try
+        {
+            //파일 수신 후 DRM 체크해서 DRM 걸기
+            //파일일 경우에만
+
+            if (e.strDataType == ((int)FrameType.File).ToString() ||
+                (e.strDataType == null || e.strDataType == "" || e.strDataType == ((int)FrameType.Dir).ToString()))
+            {
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseDrmAfterFileReceive(Convert.ToInt32(e.NetWorkID)))
+                {
+                    switch (SGAppMgrSvc.OpConfigInfoService.GetDrmType(Convert.ToInt32(e.NetWorkID)))
+                    {
+                        case (int)Enums.EnumDrmType.SoftCamp:
+                            {
+                                SGSoftCampDRM lib = new SGSoftCampDRM();
+                                string grade = SGAppMgrSvc.OpConfigInfoService.GetSoftCampGrade(Convert.ToInt32(e.NetWorkID));
+                                foreach (string key in e.MsgRecode.Keys)
+                                {
+                                    if (!FileAddManage.IsDRMFilePath(key))
+                                    {
+                                        //DRM 걸기
+                                        int ret = lib.DrmEncrypt(key, grade);
+                                        CLog.Here().Information($"{key} DRM Result  : {ret}");
+                                    }
+                                    else
+                                    {
+                                        CLog.Here().Information($"{key} is DRM already!!!");
+                                    }
+                                }
+                            }
+                            break;
+                        default:
+                            break;
+
+                    }
+
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error("DownCompeleteEvent Err  : {0}", ex.Message);
+        }
+    }
+
     private async Task ChangeIPOpenPopup()
     {
         await refChangeIPPopUp.openPopUp();
@@ -2297,6 +2378,12 @@
     {
         NetWorkSvc.SaveIPAndReload(argNewIP);
 
+        //프로그램 종료
+        Window.ProgramExit();
+    }
+
+    public void RequestExitEvent(int groupId)
+    {
         //프로그램 종료
         Window.ProgramExit();
     }

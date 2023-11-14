@@ -12,7 +12,7 @@
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 
-<div style="width:100%;height:50%;border-bottom:1px solid #ddd; padding:0px;overflow:auto">
+<div style="width:100%;height:@(Height);border-bottom:1px solid #ddd; padding:0px;overflow:auto">
     @if (m_btoTheTop == false)
     {
         <div @onclick="toUpperTree">
@@ -42,6 +42,9 @@
 
     [Parameter]
     public EventCallback<string> OnSelectPathFromFileTree { get; set; }
+
+    [Parameter]
+    public string Height { get; set; } = "50%";
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<FileTree>();
 
     private void toUpperTree()
@@ -132,7 +135,30 @@
             //기본 디렉토리 설정
             string initWindowDir = SGAppMgrSvc.OpConfigInfoService.GetInitTransferFileExplorerPathInWindow(groupID);
 
-            if (initWindowDir == "ROOT")
+            if(initWindowDir.ToUpper() == "WINDOW")
+            {
+                m_btoTheTop = true;
+                //Window 기본 탐색기 스타일
+                string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+                List<string> MyPcEntries = new List<string>();
+                
+                MyPcEntries.Add(Path.Combine(userProfile, "Downloads"));
+                MyPcEntries.Add(Path.Combine(userProfile, "Videos"));
+                MyPcEntries.Add(Path.Combine(userProfile, "Documents"));
+                MyPcEntries.Add(Path.Combine(userProfile, "Desktop"));
+                MyPcEntries.Add(Path.Combine(userProfile, "Favorites"));
+                
+                foreach (DriveInfo d in DriveInfo.GetDrives())
+                {
+                    if (!d.IsReady)
+                    continue;
+
+                MyPcEntries.Add(d.Name);
+                }
+                entries = MyPcEntries;
+            }
+            else if (initWindowDir == "ROOT")
             {
                 m_btoTheTop = true;
                 entries = Directory.GetLogicalDrives();

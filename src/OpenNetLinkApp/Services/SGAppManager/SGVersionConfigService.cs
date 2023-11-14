@@ -9,10 +9,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
 {
     public interface ISGVersionConfigService
     {
-        ref ISGVersionConfig VersionConfigInfo { get; }        
+        ref ISGVersionConfig VersionConfigInfo { get; }
         string GetLastUpdated();
         string GetSWVersion();
-        string GetSWCommitId();       
+        string GetSWCommitId();
         string GetUpdatePlatform();
         void SetUpdatePlatform(string strPlatform);
         bool isUpperVersion(string localVer, string serverVer);
@@ -26,38 +26,45 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public SGVersionConfigService()
         {
-            var serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));
-            string VersionConfig = Environment.CurrentDirectory+"/wwwroot/conf/AppVersion.json";
-
-            HsLogDel hsLog = new HsLogDel();
-            hsLog.Delete(7);    // 7일이전 Log들 삭제
-
-            CLog.Here().Information($"- VersionConfig Path: [{VersionConfig}]");
-            if(File.Exists(VersionConfig))
+            string VersionConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppVersion.json";
+            try
             {
-                try
+                var serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));
+                HsLogDel hsLog = new HsLogDel();
+                hsLog.Delete(7);    // 7일이전 Log들 삭제
+
+                CLog.Here().Information($"- VersionConfig Path: [{VersionConfig}]");
+                if (File.Exists(VersionConfig))
                 {
-                    CLog.Here().Information($"- VersionConfig Loading... : [{VersionConfig}]");
-                    //Open the stream and read it back.
-                    using (FileStream fs = File.OpenRead(VersionConfig))
+                    try
                     {
-                        SGVersionConfig versionConfig = (SGVersionConfig)serializer.ReadObject(fs);
-                        _VersionConfigInfo = versionConfig;
+                        CLog.Here().Information($"- VersionConfig Loading... : [{VersionConfig}]");
+                        //Open the stream and read it back.
+                        using (FileStream fs = File.OpenRead(VersionConfig))
+                        {
+                            SGVersionConfig versionConfig = (SGVersionConfig)serializer.ReadObject(fs);
+                            _VersionConfigInfo = versionConfig;
+                        }
+                        CLog.Here().Information($"- VersionConfig Load Completed : [{VersionConfig}]");
                     }
-                    CLog.Here().Information($"- VersionConfig Load Completed : [{VersionConfig}]");
+                    catch (Exception ex)
+                    {
+                        CLog.Here().Warning($"Exception - Message  : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+                        _VersionConfigInfo = new SGVersionConfig();
+                    }
                 }
-                catch(Exception ex)
+                else
                 {
-                    CLog.Here().Warning($"Exception - Message  : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+                    CLog.Here().Warning($"SGVersionConfigService File not Found (Path:{VersionConfig})");
                     _VersionConfigInfo = new SGVersionConfig();
                 }
             }
-            else
+            catch (Exception ex)
             {
-                _VersionConfigInfo = new SGVersionConfig();
+                CLog.Here().Error($"SGVersionConfigService (Path:{VersionConfig}) Exception :{ex.ToString()}");
             }
-        }    
-        
+        }
+
         public string GetLastUpdated()
         {
             return VersionConfigInfo.LastUpdated;
@@ -69,11 +76,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetSWCommitId()
         {
             return VersionConfigInfo.SWCommitId;
-        }       
+        }
         public string GetUpdatePlatform()
         {
             return VersionConfigInfo.UpdatePlatform;
-        }     
+        }
         public void SetUpdatePlatform(string strPlatform)
         {
             VersionConfigInfo.UpdatePlatform = strPlatform;
@@ -93,7 +100,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             string[] svrVer = GetVersion(serverVer);
             bool res = false;
 
-            for(int i = 0; i < locVer.Length; i++)
+            for (int i = 0; i < locVer.Length; i++)
             {
                 int loc = Convert.ToInt32(locVer[i]);
                 int svr = Convert.ToInt32(svrVer[i]);

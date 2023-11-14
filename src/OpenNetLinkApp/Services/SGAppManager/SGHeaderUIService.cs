@@ -1,6 +1,7 @@
 using System;
 using OpenNetLinkApp.Models.SGHeader;
 using OpenNetLinkApp.Data.SGNotify;
+using AgLogManager;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -19,9 +20,17 @@ namespace OpenNetLinkApp.Services.SGAppManager
     }
     internal class SGHeaderUIService : ISGHeaderUIService
     {
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGHeaderUIService>();
         public SGHeaderUIService()
         {
-            Header = new SGHeaderUI();
+            try
+            {
+                Header = new SGHeaderUI();
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"SGHeaderUIService Exception :{ex.ToString()}");
+            }
         }
 
         /* To Manage Header State */

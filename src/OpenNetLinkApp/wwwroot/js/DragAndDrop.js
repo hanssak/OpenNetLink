@@ -636,22 +636,46 @@ window.initPageLeft = () => {
     $("#main-body").css("margin-left", "250px");
 }
 
-window.exitLogIn = () => {
+window.initPushMenu = (PushMenuStat) => {
+    if (PushMenuStat != null && PushMenuStat != '') {
+        $('[data-widget="pushmenu"]').PushMenu(PushMenuStat);   //사이드바 메뉴 상태 옵션 ([Default]expand, collapse)
+    }
+}
+
+window.exitLogIn = (trensferTemplate) => {
     $("#main-nav").css("display", "");
     $("#left-sidebar").css("display", "");
     $("#main-body").css("margin-left", "250px");
     $("#main-body").css("margin-top", "calc(3rem)");
     $("#main-footer").css("display", "");
     //$("#main-body").css("height", "630px");
-
     var dirRightHeight = $("#divRightContent").css("height");
     var divRightUpper = $("#divRightUpperSide").css("height");
-    var divRightBottom = $("#divRightBottomSide").css("height");
-    if (divRightUpper != null && divRightBottom != null) {
-        var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
-        $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
-        //Window 사이즈 조절 시 divDropFile Height 도 함께 조절
-        setDropzonSize();
+    var divTemplateHeight = $("#divTransferTemplate").css("height");
+
+    if (trensferTemplate == 0) {
+        //var divRightBottom = $("#divRightBottomSide").css("height");
+        if (divRightUpper != null) {
+            /*var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));*/
+            var divRest = parseInt(divRightUpper.replace("px", ""));
+            $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 3)) + "px");
+            //Window 사이즈 조절 시 divDropFile Height 도 함께 조절
+            setDropzonSize();
+        }
+    }
+    else
+    {        
+        if (divTemplateHeight != null) {
+            //$("#divLeftUpperSide").css("height", divRightUpper);
+
+            //중간 div의 컨트롤이 모두 overflow가 가능하므로, 템플릿 영역에서 상단/하단 Div 높이를 제한 값으로 설정            
+            var divUpperHeight = $("#divUpperContent").css("height");
+            var divBottomHeight = $("#divBottomContent").css("height");
+
+            var divRest = parseInt(divTemplateHeight.replace("px", "") - divUpperHeight.replace("px", "") - divBottomHeight.replace("px", "") - 95);
+            $("#divFileTree").css("height", divRest + "px");
+            $("#divFileList").css("height", divRest + "px");
+        }
     }
 }
 
@@ -831,7 +855,7 @@ window.closeAllPopup = () => {
     $("#modal-alert-header-ipchange").modal("hide"); 
     $("#modal-alert-header-language").modal("hide");
     
-    
+    $("#AskFileSendAlert").modal("hide");
 }
 
 window.initTransferUIPosition = () => {
@@ -913,18 +937,37 @@ window.mouseDownIntervalCheck = (minuteTime) => {
         return "true";
 }
 
-window.adJustWindowsize = () => {
+window.adJustWindowsize = (trensferTemplate) => {
 
     $(window).resize(function () {
         var dirRightHeight = $("#divRightContent").css("height");
         var divRightUpper = $("#divRightUpperSide").css("height");
-        var divRightBottom = $("#divRightBottomSide").css("height");
-        var dirRightWidth = $("#divDropFile").css("width");
-        if (divRightUpper != null && divRightBottom != null) {
-            var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
-            $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
-            setDropzonSize();
+        var divTemplateHeight = $("#divTransferTemplate").css("height");
+        if (trensferTemplate == 0) {
+            //var divRightBottom = $("#divRightBottomSide").css("height");
+            var dirRightWidth = $("#divDropFile").css("width");
+            if (divRightUpper != null) {
+                /*var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));*/
+                var divRest = parseInt(divRightUpper.replace("px", ""));
+                $("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 3)) + "px");
+                setDropzonSize();
+            }
         }
+        else {
+            
+            if (divTemplateHeight != null) {
+                //$("#divLeftUpperSide").css("height", divRightUpper);
+
+                //중간 div의 컨트롤이 모두 overflow가 가능하므로, 템플릿 영역에서 상단/하단 Div 높이를 제한 값으로 설정
+                var divUpperHeight = $("#divUpperContent").css("height");
+                var divBottomHeight = $("#divBottomContent").css("height");
+
+                var divRest = parseInt(divTemplateHeight.replace("px", "") - divUpperHeight.replace("px", "") - divBottomHeight.replace("px", "") - 95);
+                $("#divFileTree").css("height", divRest + "px");
+                $("#divFileList").css("height", divRest + "px");
+            }            
+        }
+
     });
 }
 
@@ -948,6 +991,19 @@ window.addKeyDown = () => {
             //console.log("F5 not allowed.");
             event.returnValue = false;
         }
+
+        if (e.ctrlKey && !(e.keyCode == 65 || e.keyCode == 67 || e.keyCode == 86 || e.keyCode == 88 || e.keyCode == 90)) // Ctrl + a , c, v, x , z 를 제외하고 나머지 막음
+        { 
+            e.preventDefault();
+        }
+
+        if (e.altKey || e.keyCode == 91)    //Alt 키와 Win키도 막음
+        {
+            e.preventDefault();
+        }
+        //if (e.keyCode == 123) { // F12 막을지 유무는 결정 
+        //    e.preventDefault();
+        //}
     }, false);
 }
 function KeyEventPW(clickbtnId) {
@@ -971,8 +1027,11 @@ window.addMouseDown = (message) => {
     document.addEventListener('mousedown', function (e) {
 
 
-        if (MouseTime == Math.floor(+ new Date() / 1000))
+        if (MouseTime == Math.floor(+ new Date() / 1000)) {
+            console.log("MOUSE DOWN EVENT -Return /" + MouseTime + "/" + new Date() + "/" + Math.floor(+ new Date() / 1000));
             return;
+        }
+            
         MouseTime = Math.floor(+ new Date() / 1000);
         console.log("MOUSE DOWN EVENT " + e.target.getAttribute('name') + " MouseTime:" + MouseTime);
 
@@ -1117,20 +1176,30 @@ window.addMouseDown = (message) => {
         }
         //기본파일선택
         if (e.target.getAttribute('draggable')) {
+
+            var eventTarget = e.target;
+
+            //드래그할 요소의 하위 요소(draggable속성을 가짐)를 클릭하였을 때, 부모요소를 찾아서 target으로 지정
+            if (e.target.getAttribute('aria-grabbed') == null) {
+                var parentTarget = searchParentDragTarget(e.target);
+                if (parentTarget != null)
+                    eventTarget = parentTarget;
+            }            
+
             //if the multiple selection modifier is not pressed 
             //and the item's grabbed state is currently false
-            if (!hasModifier(e) && e.target.getAttribute('aria-grabbed') == 'false') {
+            if (!hasModifier(e) && eventTarget.getAttribute('aria-grabbed') == 'false') {
                 //clear all existing selections
                 clearSelections();
                 //then add this new selection
-                addSelection(e.target);
-                firstShift = e.target.getAttribute('label');
+                addSelection(eventTarget);
+                firstShift = eventTarget.getAttribute('label');
                 console.log("First SHIFT KEY:" + firstShift);
                 return;
             }
 
-            if (hasShitfKey(e) == true && e.target.getAttribute('aria-grabbed') == 'false') {
-                secondShift = e.target.getAttribute('label');
+            if (hasShitfKey(e) == true && eventTarget.getAttribute('aria-grabbed') == 'false') {
+                secondShift = eventTarget.getAttribute('label');
                 console.log("Second SHIFT KEY:" + secondShift);
                 if ((firstShift != secondShift) && firstShift > 0 && secondShift > 0) {
                     clearSelections();
@@ -1158,6 +1227,15 @@ window.addMouseDown = (message) => {
     }, false);
 }
 
+function searchParentDragTarget(child) {
+    if (child.getAttribute('aria-grabbed') != null)
+        return child;
+    else if (child.parentElement != null)
+        return searchParentDragTarget(child.parentElement);
+    else
+        null;
+}
+
 function ShiftPopSelection(firstShift, secondShift) {
     console.log("ShiftPopSelection start");
     var tempFirst = firstShift;
@@ -1183,7 +1261,6 @@ function ShiftPopSelection(firstShift, secondShift) {
 }
 
 function ShiftSelection(firstShift, secondShift) {
-
     var tempFirst = firstShift;
     var tempSecond = secondShift;
 
@@ -1215,12 +1292,22 @@ window.addMouseUp = (message) => {
         //console.log("MOUSE UP EVENT");
 
         if (e.target.getAttribute('draggable') && hasModifier(e)) {
+
+            var eventTarget = e.target;
+
+            //드래그할 요소의 하위 요소(draggable속성을 가짐)를 클릭하였을 때, 부모요소를 찾아서 target으로 지정
+            if (e.target.getAttribute('aria-grabbed') == null) {
+                var parentTarget = searchParentDragTarget(e.target);
+                if (parentTarget != null)
+                    eventTarget = parentTarget;
+            }
+
             //if the item's grabbed state is currently true
             //console.log("MOUSE UP EVENT");
-            if (e.target.getAttribute('aria-grabbed') == 'true') {
+            if (eventTarget.getAttribute('aria-grabbed') == 'true') {
                 //unselect this item
                 if (hasShitfKey(e) != true && hasCtrlKey(e) != true) {
-                    removeSelection(e.target);
+                    removeSelection(eventTarget);
                     //if that was the only selected item 
                     //then reset the owner container reference			
                     if (!selections.items.length) {
@@ -1232,7 +1319,7 @@ window.addMouseUp = (message) => {
             else {
                 //add this additional selection
                 //console.log("MOUSE UP EVENT");
-                addSelection(e.target);
+                addSelection(eventTarget);
             }
         }
     }, false);

@@ -40,7 +40,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         //public int tScreenTime { get; set; } = 5;                                          // 화면잠금 시간 설정( 단위 : 분 )       
         public LogEventLevel LogLevel { get; set; } = LogEventLevel.Information;          // 로그레벨
         public bool bUseApprWaitNoti { get; set; } = true;                                  // 승인대기 알림 사용 여부.(체크)
-        public int nUserSelectFirstNet { get; set; } = 0;                         //사용자가 선택한 제일먼저 접속할 망(서버) 선택값
-
+        public int nUserSelectFirstNet { get; set; } = 0;                                   //사용자가 선택한 제일먼저 접속할 망(서버) 선택값
+        public List<bool> bAskFileSend { get; set; } = null;                                //파일전송 템플릿01 에서 파일리스트 추가 후 전송을 묻는 팝업표시 여부 (템플릿에 한하여  Default : true)
+        public bool bHideSideBarAfterLogin { get; set; } = false;                         // 로그인 후 좌측 사이드바 숨김 여부 설정(Default :false)
     }
 }

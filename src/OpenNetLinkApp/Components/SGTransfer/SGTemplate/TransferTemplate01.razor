@@ -1,0 +1,590 @@
+@using Microsoft.JSInterop
+@using OpenNetLinkApp.Data.SGLogData
+@using OpenNetLinkApp.Models.SGLogData
+@using Radzen
+@using Radzen.Blazor
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Components.SGTransfer
+@using OpenNetLinkApp.Pages.Transfer
+@using HsNetWorkSG
+@using HsNetWorkSGData
+@using System.Diagnostics
+@using System.Runtime.InteropServices
+@using System.Text
+@using AgLogManager
+@using OpenNetLinkApp.Pages.PCURL
+@using BlazorInputFile
+@using OpenNetLinkApp.Common
+@using OfficeExtractor
+@using Data.SGDicData.SGAlz;
+@using OpenNetLinkApp.Components.SGTransfer.SGTemplate;
+
+@inject XmlConfService XmlConf
+@inject DragAndDropService DragAndDropService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager MyNavigationManager
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
+@inject WebWindow Window
+@inject NavigationManager MyNavigationManager
+@inject PageStatusService pageService
+@inject IFileReaderService fileReaderService
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-navy card-outline card-boder1">
+            <div class="form-check p-2">
+                <table style="width:100%">
+                    <tr>
+                        @if (!bAfterApprChkHIde)
+                        {
+                            <td>
+                                <input type="checkbox" class="form-check-input ml-0" id="exampleCheck2" checked="@bAfterCheck" @onclick="(OnChangeAfterCheck.InvokeAsync)" hidden="@bAfterApprChkHIde" disabled="@bAfterApprDisable">
+                            </td>
+                            <td>
+                                <label class="form-check-label" for="exampleCheck2" hidden="@bAfterApprChkHIde"><b>@strAfterApprove</b></label>
+                            </td>
+                        }
+
+                        @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileSelectDelete(groupIDbyParam))
+                        {
+                            <td>
+                                <label><font color="red">@strSelectFileDelComment</font></label>
+                            </td>
+                        }
+                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                        {
+                            <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                            <td class="pr-2">
+                                <button type="button" @onclick="@(OnBasicSelectOpenPopup.InvokeAsync)" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
+                            </td>
+                        }
+                        <td style="display:flex; flex-direction:row;">
+                            <button type="button" class="btn btn-md btn-green ml-0" style="flex:1" @onclick="@(OnCheckApprLine.InvokeAsync)"><i class="fas fa-share"></i>@strFileSend</button>
+                            <button type="button" class="btn btn-md btn-blue ml-1" style="flex:1" @onclick="@(OnOpenFileDialogOpenPopup.InvokeAsync)"><i class="fas fa-file-upload"></i>@strFileReg</button>
+                            <button type="button" class="btn btn-md btn-black ml-1" style="flex:1" @onclick="@(e => RemoveAllFile())" hidden="@bHideFileAllDeleteBtn"><i class="fas fa-times"></i>@strFileDel</button>
+                            <button type="button" class="btn btn-md btn-red ml-1" style="flex:1" @onclick="@(e => RemoveSelectFile())" hidden="@bFileSelectDeleteBtn"><i class="fas fa-times"></i>@strSelectFileDel</button>
+
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="divUpperContent" class="col-md-12">
+                <div id="divDropFile" class="card-body p-0" style="height:18vh">
+                    <DropFileList @ref="refDropFileList" OnCompleteDragFileExam="AskFileSendAlert"></DropFileList>
+                </div>
+            </div>
+            <hr class="m-2"/>
+            <div id="divMiddleContent">
+                <div class="row pr-2 pl-2">
+                    <div class="col-md-3 pr-0">
+                        <div id="divFileTree" class="card card-boder1" style="background-color:white; border-color:#d7d8db;">
+                            <FileTree @ref="refFileTree" Height="100%" OnSelectPathFromFileTree="changeSelectPath"></FileTree>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <!-- 파일리스트 -->
+                        <div id="divFileList" class="card card-boder1" style="background-color:white; border-color:#d7d8db; overflow:auto;">
+                            <table id="tableFileList" class="table table-hover table-head-fixed" style="font-size: 13px; line-height: 20px; min-width:740px;">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width:400px;background-color:white; color:black; box-shadow:inset 0 2px 0 #c1d4e9, inset 0 -2px 0 #c1d4e9;">
+                                            @*파일명 헤더*@
+                                            <div @onclick="@(()=> OnClickHeader("Name"))">
+                                                <label class="pr-2">
+                                                    @strFileName
+                                                </label>
+                                                @if (SortingKey == "Name")
+                                                {
+                                                    <i class=@((SortingAesc ? "fas fa-arrow-up" : "fas fa-arrow-down") + " pr-2") />
+                                                }
+                                                @*</label> *@
+                                            </div>
+                                        </th>
+                                        <th style="background-color:white; color:black; box-shadow:inset 0 2px 0 #c1d4e9, inset 0 -2px 0 #c1d4e9;">
+                                            @*크기 헤더*@
+                                            <div @onclick="@(()=> OnClickHeader("Size"))" style="width:70px;text-align:right;">
+                                                <label class="pr-2">
+                                                    @strFileSize
+                                                </label>
+                                                @if (SortingKey == "Size")
+                                                {
+                                                    <i class=@((SortingAesc ? "fas fa-arrow-up" : "fas fa-arrow-down") + " pr-2") />
+                                                }
+                                                @*</label>  *@
+                                            </div>
+                                        </th>
+                                        <th style="background-color:white; color:black; box-shadow:inset 0 2px 0 #c1d4e9, inset 0 -2px 0 #c1d4e9;">
+                                            @*유형 헤더*@
+                                            <div @onclick="@(()=> OnClickHeader("Ext"))" style="width:70px;text-align:left;">
+                                                <label class="pr-2">
+                                                    @strFileType
+                                                </label>
+                                                @if (SortingKey == "Ext")
+                                                {
+                                                    <i class=@((SortingAesc ? "fas fa-arrow-up" : "fas fa-arrow-down") + " pr-2") />
+                                                }
+                                            </div>
+                                        </th>
+                                        <th style="background-color:white; color:black; box-shadow:inset 0 2px 0 #c1d4e9, inset 0 -2px 0 #c1d4e9;">
+                                            @*수정한 날짜 헤더*@
+                                            <div @onclick="@(()=> OnClickHeader("LastModeified"))" style="width:200px;text-align:left">
+                                                <label class="pr-2">
+                                                    @strLastModDay
+                                                </label>
+                                                @if (SortingKey == "LastModeified")
+                                                {
+                                                    <i class=@((SortingAesc ? "fas fa-arrow-up" : "fas fa-arrow-down") + " pr-2") />
+                                                }
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (sgFile != null && sgFile.Count > 0)
+                                    {
+                                        @foreach (SGFileInfo item in sgFile)
+                                        {
+                                            @if (item.Type == 3) //최상위 이동 버튼
+                                            {
+                                                <tr data-draggable="item" draggable="true" aria-grabbed="false" style="line-height:18px; display:table-row; border-width:0;" title=@item.Name value=@item.Path label=@(item.dispIndex+1) onclick="refreshList('@(item.Path.Replace(@"\", @"\\"))')">
+                                                    <td draggable="true" colspan="4" class="pr-2">
+                                                        <i class="@item.GetIcon() text-center" style="font-size:1.2em; width:18px; color:@(item.GetIconColor());"></i>
+                                                        @item.Name
+                                                    </td>
+                                                </tr>
+                                            }
+                                            else if (item.Type == 2) //디렉토리
+                                            {
+                                                <tr data-draggable="item" draggable="true" aria-grabbed="false" style="line-height:18px; display:table-row; border-width:0;" title=@item.Name value=@item.Path label=@(item.dispIndex+1) ondblclick="refreshList('@(item.Path.Replace(@"\", @"\\"))')">
+                                                    <td draggable="true" colspan="4" class="pr-2">
+                                                        <i class="@item.GetIcon() text-center" style="font-size:1.2em; width:18px; color:@(item.GetIconColor());"></i>
+                                                        @item.Name
+                                                    </td>
+                                                </tr>
+                                            }
+                                            else if (item.Type == 1) //파일목록
+                                            {
+                                                <tr data-draggable="item" draggable="true" aria-grabbed="false" style="line-height:18px; display:table-row; border-width:0;" title=@item.Name value=@item.Path label=@(item.dispIndex+1)>
+                                                    <td draggable="true" class="text-truncate pr-2">
+                                                        <i class="@item.GetIcon() text-center" style="font-size:1.2em; width:18px; color:@(item.GetIconColor());"></i>
+                                                        @item.Name
+                                                    </td>
+
+                                                    <td draggable="true" class="text-truncate text-right pr-2" style="width:70px;">
+                                                        @(CsFunction.GetSizeStr(item.Size))
+                                                    </td>
+                                                    <td draggable="true" class="text-truncate text-left pl-2" style="width:70px;">
+                                                        @(item.Ext.Replace(".", ""))
+                                                    </td>
+                                                    <td draggable="true" class="text-truncate text-left pl-1" style="width:200px;">
+                                                        @(item.LastModeified)
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="m-2"/>
+            <div id="divBottomContent" class="col-md-12 mb-2">
+                <div class="card card-boder1" style="background-color:white; border-color:#d7d8db;">
+                    <div class="card-body" style="height:10vh; overflow:auto;">
+                        <div id="divLeftUpperSide">
+                            <ul class="list-unstyled" style="font-size:11px;">
+                                @if (transferLogData != null)
+                                {
+                                    @for(int idx = (transferLogData.Count-1); idx>= 0 ; idx--)
+                                    {
+                                        <li>@($"[ {transferLogData[idx].LogDatetime} ] {transferLogData[idx].Log}")</li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+        @*        <div class="card card-border1 mt-2">
+                    <div class="card-body clearfix" style="height:12vh; overflow:auto;">
+                        <div id="divLeftUpperSide">
+                            <ul class="list-unstyled" style="font-size:11px;">
+                                @if (transferLogData != null)
+                                {
+                                    @foreach (SGTransferLogData log in transferLogData)
+                                    {
+                                        <li>@($"[ {log.LogDatetime} ] {log.Log}")</li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>*@
+            </div>
+        </div>
+    </div>
+</div>
+<SGAlert @ref="refSGAlertAskFileSend" OnConfirm="@(arg=> AskFileSendAlertResult(arg, true))" OnCancel="@(arg=> AskFileSendAlertResult(arg, false))" Guid="AskFileSendAlert"></SGAlert>
+
+@code
+{
+    [Parameter] public int groupIDbyParam { get; set; }
+    [Parameter] public bool bAfterCheck { get; set; } = false;
+    [Parameter] public string strDestNetWork { get; set; }
+    // 3망 - 클립보드 전송 UI
+    [Parameter] public Dictionary<string, SGNetOverData> dicDestSysPos { get; set; }
+
+    /// <summary>
+    /// 사후결재 CheckBox Hide 유무(By:서버정책, true : 숨김, false : 보여줌)
+    /// </summary>
+    [Parameter] public bool bAfterApprChkHIde { get; set; } = true;
+
+    /// <summary>
+    /// 사후결재 checkBox Disable 설정유무(By:서버정책, true : 사용못함, false : 사용함)
+    /// </summary>
+    [Parameter] public bool bAfterApprDisable { get; set; }
+
+    [Parameter] public EventCallback OnChangeAfterCheck { get; set; }
+    [Parameter] public EventCallback OnBasicSelectOpenPopup { get; set; }
+    [Parameter] public EventCallback OnOpenFileDialogOpenPopup { get; set; }
+    [Parameter] public EventCallback OnCheckApprLine { get; set; }
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferTemplate01>();
+
+    SGAlert refSGAlertAskFileSend;
+
+    public string stSelectPath { get; set; }
+    public string stCurrentSubPath { get; set; }
+    public string strAfterApprove = "";
+
+    public string strSelectFileDel = "";
+    public string strSelectFileDelComment = "";
+
+    public string strFileSend = "";
+    public string strFileDel = "";
+    public string strFileReg = "";
+
+    string strFileName = "";
+    string strFileSize = "";
+    string strFileType = "";
+    string strLastModDay = "";
+
+    string SortingKey = "";
+    bool SortingAesc = true;
+
+    string strCurrentDate = "";
+
+    /// <summary>
+    /// 선택 삭제 버튼 사용 유무
+    /// </summary>
+    public bool bFileSelectDeleteBtn = false;
+
+    /// <summary>
+    /// 일괄 삭제 버튼 사용 유무
+    /// </summary>
+    public bool bHideFileAllDeleteBtn =false;
+
+    FileTree refFileTree;
+    private List<SGTransferLogData> transferLogData = new List<SGTransferLogData>();
+
+
+    private static Action<List<string>> ActionFileSelectOK;
+    //Drag&Drop 관련 액션
+    private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction1;
+    private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction2;
+
+    ISGVersionConfigService versionConfigSvc;
+    ISGSideBarUIService SideBarUISvc;
+    ISGAppConfigService AppConfigSvc;
+    ISGopConfigService OpConfigSvc;
+    ISGCtrlSideUIService CtrlSideUISvc;
+
+    List<SGFileInfo> sgFile = new List<SGFileInfo>();
+    DropFileList refDropFileList;
+
+    public DropFileList GetDropFileList() => refDropFileList;
+
+    private void OnClickHeader(string headerKey)
+    {
+        LoadListFiles(stCurrentSubPath, headerKey);
+        StateHasChanged();
+    }
+
+    private void changeSelectPath(string args)
+    {
+        stSelectPath = args;
+        LoadListFiles(stSelectPath);
+        //StateHasChanged();
+    }
+
+    public void GetAfterChk()
+    {
+        bAfterCheck = (!bAfterCheck);
+
+        int groupID = groupIDbyParam;
+        if (groupID > -1)
+            pageService.SetAfterApproveCheck(groupID, bAfterCheck);
+
+        StateHasChanged();
+    }
+
+
+    private async Task RemoveAllFile()
+    {
+        await refDropFileList.RemoveAllFile();
+    }
+    private async Task RemoveSelectFile()
+    {
+        await refDropFileList.RemoveSelectFile();
+    }
+
+    protected override void OnInitialized()
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
+        versionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
+        CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
+
+        OnSettingByGroupID(groupIDbyParam);
+        InitText();
+
+        // 로그 데이터 리프레쉬 등록
+        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.TransferTemplate01, UpdateLogData);
+        base.OnInitialized();
+    }
+    void UpdateLogData()
+    {
+        transferLogData.Clear();
+        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupIDbyParam);
+        if (sgUserData != null)
+        {
+            string strUserSeq = sgUserData.GetUserSequence();
+            transferLogData = SGLogDBProc.Instance.SelectTransferLogDataList(groupIDbyParam, strUserSeq);
+        }
+        StateHasChanged();
+    }
+    int nDrawPageGroupID = -1;          // 전달받은 groupID 별로 화면구성 - 다중접속화면구성
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            base.OnAfterRenderAsync(firstRender);
+        }
+
+        //날짜 변경 시 이력 초기화
+        if (strCurrentDate != DateTime.Now.ToString("yyyy-MM-dd"))
+        {
+            SGLogDBProc.Instance.DeleteAllInfo(DateTime.Now, true);
+            strCurrentDate = DateTime.Now.ToString("yyyy-MM-dd");
+            UpdateLogData();
+        }
+        // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
+        {
+            refFileTree?.RefreshTree();
+            nDrawPageGroupID = groupIDbyParam;
+            UpdateLogData();
+        }
+    }
+
+    public void InitText()
+    {
+        strAfterApprove = XmlConf.GetTitle("T_FILE_APPROVEAFTERPROC");                  // 사후결재
+        strFileSend = XmlConf.GetTitle("T_FILE_SENDFILE");                              // 파일 보내기
+        strFileDel = XmlConf.GetTitle("T_FILE_FILEDEL");                                // 파일 삭제
+        strSelectFileDel = XmlConf.GetTitle("T_FILE_SELECT_DELETE");                    // 선택 삭제
+        strSelectFileDelComment = XmlConf.GetTitle("T_FILE_SELECT_DELETE_COMMENT");     // ※체크박스 선택 후 선택삭제를 클릭해 주세요.
+        strFileReg = XmlConf.GetTitle("T_FILE_FILEREG");                                // 파일등록
+
+        strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                   // 파일명
+        strFileSize = XmlConf.GetTitle("T_COMMON_SIZE");                       // 크기
+        strFileType = XmlConf.GetTitle("T_COMMON_KIND");                       // 유형
+        strLastModDay = XmlConf.GetTitle("T_COMMON_MODIFYDATE");               // 수정한 날짜.
+    }
+
+    protected void OnSettingByGroupID(int groupID)
+    {
+        bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
+        bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
+        bFileSelectDeleteBtn = !OpConfigSvc.GetUseFileSelectDelete(groupID);
+        bHideFileAllDeleteBtn = !OpConfigSvc.GetUseFileAllDelete(groupID);
+    }
+
+    public void LoadListFiles(string stPath)
+    {
+        stCurrentSubPath = stPath;
+        LoadListFiles(stPath, "");
+    }
+
+    private void LoadListFiles(string stPath, string changeSortingKey)
+    {
+        sgFile.Clear();
+        //우측 리스트 갱신 전 선택되어 있던 selectionsItem클리어
+        JSRuntime.InvokeAsync<object>("clearSelections");
+
+        List<SGFileInfo> fileList = new List<SGFileInfo>();
+
+        IEnumerable<string> fList = null;
+        try
+        {
+            fList = Directory.EnumerateFileSystemEntries(stPath)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            CLog.Here().Error("LoadListFiles, UnauthorizedAccessException:" + e.Message);
+            Console.WriteLine(e.Message);
+        }
+        catch (Exception e2)
+        {
+            CLog.Here().Error("LoadListFiles, Exception:" + e2.Message);
+            Console.WriteLine(e2.Message);
+        }
+
+        try
+        {
+            if (fList != null)
+            {
+                foreach (string fname in fList)
+                {
+                    System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
+                    FileAttributes attr = fInfo.Attributes;
+                    if ((attr & FileAttributes.Directory) == FileAttributes.Directory)  //디렉토리 구성
+                    {
+                        SGFileInfo fileEntry = new SGFileInfo();
+                        fileEntry.Name = fInfo.Name;
+                        fileEntry.Size = 0;
+                        fileEntry.Path = fInfo.FullName;
+                        fileEntry.Ext = "";
+                        fileEntry.Type = 2;
+                        fileEntry.LastModeified = fInfo.LastWriteTime;
+                        fileList.Add(fileEntry);
+                    }
+                }
+
+                foreach (string fname in fList)
+                {
+                    System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
+                    FileAttributes attr = fInfo.Attributes;
+                    if ((attr & FileAttributes.Directory) != FileAttributes.Directory)  //파일 구성
+                    {
+                        SGFileInfo fileEntry = new SGFileInfo();
+                        fileEntry.Name = fInfo.Name;
+                        fileEntry.Size = fInfo.Length;
+                        fileEntry.Path = fInfo.FullName;
+                        fileEntry.Ext = fInfo.Extension;
+                        fileEntry.Type = 1;
+                        fileEntry.LastModeified = fInfo.LastWriteTime;
+                        fileList.Add(fileEntry);
+                    }
+                }
+            }
+        }
+        catch (Exception ex3)
+        {
+            CLog.Here().Error("LoadListFiles, Exception:" + ex3.Message);
+        }
+
+        //정렬 필요 시 정렬 작업
+        if (string.IsNullOrEmpty(changeSortingKey))
+        {
+            SortingKey = string.Empty;
+            SortingAesc = true;
+
+            sgFile.AddRange(fileList);
+        }
+        else
+        {
+            var infoType = typeof(SGFileInfo);
+            var sortProperty = infoType?.GetProperty(changeSortingKey);
+
+            if (SortingKey == changeSortingKey)
+                SortingAesc = !SortingAesc;
+            else
+            {
+                SortingKey = changeSortingKey;
+                SortingAesc = true;
+            }
+            sgFile.AddRange((sortProperty == null) ? fileList : (SortingAesc ? fileList.OrderBy(p => sortProperty.GetValue(p, null)).ToList()
+                                                                                : fileList.OrderByDescending(p => sortProperty.GetValue(p, null)).ToList()));
+        }
+
+        try
+        {
+            if (Directory.GetParent(stPath) != null)
+            {
+                string strUpperPath = Directory.GetParent(stPath).FullName;
+                if (strUpperPath != null && strUpperPath.Length > 0)
+                {
+                    SGFileInfo fileEntry = new SGFileInfo();
+                    fileEntry.Name = "..";
+                    fileEntry.Size = 0;
+                    fileEntry.Path = strUpperPath;
+                    fileEntry.Ext = "";
+                    fileEntry.Type = 3;         //상위디렉토리 버튼
+                    sgFile.Insert(0, fileEntry);
+                }
+            }
+        }
+        catch (Exception ex0)
+        {
+            CLog.Here().Error("LoadListFiles, GetParentError:" + ex0.Message);
+        }
+
+        for (int idx = 0; idx < sgFile.Count; idx++)
+        {
+            sgFile[idx].dispIndex = idx;
+        }
+        StateHasChanged();
+    }
+
+    async void AskFileSendAlert((int groupId, int count) DragValue)
+    {
+        try
+        {
+            if (!OpConfigSvc.GetUseAskFileSendAlert(DragValue.groupId))
+                return;
+
+            if (HSCmdCenter.GetFileRecving(DragValue.groupId) || HSCmdCenter.GetFileSending(DragValue.groupId))
+            {
+                CLog.Here().Information("AskFileSendAlert, 송/수신 중으로 Ask Popup Skip");
+                return;
+            }
+
+            bool useChk = true;
+            bool chkAskState = AppConfigSvc.GetAskFileSend(DragValue.groupId);
+            bool chkDontShowState = !chkAskState;
+            string chkMessage = XmlConf.GetTitle("T_COMMON_ALLDAYCLOSE");
+            chkMessage+= XmlConf.GetInfoMsg("I_0247");
+
+            if (chkDontShowState)
+            {
+                CLog.Here().Information("AskFileSendAlert, CtrlSideUI Checkbox Off로 Ask Popup Skip");
+                return;
+            }
+            await refSGAlertAskFileSend.openPopUp(XmlConf.GetTitle("T_ASK_FILE_SEND"), string.Format(XmlConf.GetInfoMsg("I_0246"), DragValue.count), 2, DragValue.groupId, useChk, chkDontShowState, chkMessage, DragValue.groupId.ToString(), XmlConf.GetTitle("T_ETC_FILESEND"));
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error("AskFileSendAlert Exception - " + ex.ToString());
+        }
+    }
+
+    void AskFileSendAlertResult(string arg, bool isConfirm)
+    {
+        if (int.TryParse(arg, out int groupId))
+        {
+            bool chkAskState = !refSGAlertAskFileSend.CheckboxState;
+            CtrlSideUISvc.SetAskFileSend(groupId, chkAskState);
+
+            if (isConfirm)
+                OnCheckApprLine.InvokeAsync(groupId);
+        }
+    }
+}

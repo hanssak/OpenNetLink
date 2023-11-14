@@ -12,6 +12,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using System.Threading
 @using OpenNetLinkApp.Common
+@using OpenNetLinkApp.LoginMethod
 @using System.Text.Json;
 @using System.Text
 
@@ -71,16 +72,30 @@
                                 </div>
                             }
                             <div class="row">
-                                @if (nGroupID > -1 && bAutoLogin && eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
+                                @if (nGroupID > -1 && eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
                                 {
-                                    <div class="col-12 pt-1 pr-4 text-right ">
-                                        <div class="icheck-primary">
-                                            <input type="checkbox" id="remember" @onclick="CheckStateChange" checked=@bAutoLoginCheck disabled=@bUIBtnDisable>
-                                            <label for="remember">
-                                                @XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX")
-                                            </label>
+                                    @if (bAutoLogin)
+                                    {
+                                        <div class="col-12 pt-1 pr-4 text-right ">
+                                            <div class="icheck-primary">
+                                                <input type="checkbox" id="remember" @onclick="CheckStateChange" checked=@bAutoLoginCheck disabled=@bUIBtnDisable>
+                                                <label for="remember">
+                                                    @XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX")
+                                                </label>
+                                            </div>
                                         </div>
-                                    </div>
+                                    }
+                                    else if (bIDSave)
+                                    {
+                                        <div class="col-12 pt-1 pr-4 text-right ">
+                                            <div class="icheck-primary">
+                                                <input type="checkbox" id="rememberIDSave" @onclick="SaveIDCheckStateChange" checked=@bIDSaveCheck />
+                                                <label for="rememberIDSave">
+                                                    @XmlConf.GetTitle("T_ETC_IDSAVE_CHECKBOX")
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
                                 }
                                 <div class="col-12  pt-2">
                                     <button id="btnPopUpLogin" class="btn btn-login btn-block btn_blue" @onclick="doLogInByBtn" disabled=@bUIBtnDisable>LOGIN</button>
@@ -120,6 +135,9 @@
     public bool bLoginTryOver1auth = false;
     public bool bAutoLogin = true;                          // 자동로그인 CheckBox 표현 및 사용유무
     public bool bAutoLoginCheck = false;                    // 자동로그인 check 상태 설정
+    public bool bIDSave = false;                            // 로그인한 ID 저장 기능 사용 유무
+    public bool bIDSaveCheck = false;                       // 로그인한 ID 저장 체크 여부
+
     public bool bUIBtnDisable = false;
     public int nGroupID = -1;                       // 현재 사용할 GroupID
     public int nDrawPageGroupID = -1;              // Draw하는 GroupID
@@ -131,6 +149,7 @@
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
+    ISGCtrlSideUIService CtrlSideUISvc;
 
     //    PWChange2 refPWChange;
     //    PWChangeDefaultPW2 refPWChangeDefaultPW;
@@ -213,7 +232,7 @@
         hsNetWork = HSCmdCenter.GetConnectNetWork(refGoogleOTP.nGroupID);
         if (hsNetWork != null)
         {
-            // 구글Otp 값 어느 Tag에 보낼것인지 협의후 동작            
+            // 구글Otp 값 어느 Tag에 보낼것인지 협의후 동작
             hsNetWork.SetGoogleOtp(refGoogleOTP.strUserOTP);
 
             hsNetWork.SendSeedKeyBindFor2FactorAuth();
@@ -236,8 +255,6 @@
     /// <param name="e"></param>
     private async void Show2FactorAuth(int groupID, PageEventArgs e)
     {
-
-
         if (e.strDummy == "google_otp")
         {
 
@@ -513,22 +530,22 @@
         stRtn = "1";
         #else
 
-        stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
-        if (stRtn == null || (1 > stRtn.Length))
-        {
-            CLog.Here().Information($"Result - json, Data is null OR 0 Size");
-            ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
-            return false;
-        }
+            stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
+            if (stRtn == null || (1 > stRtn.Length))
+            {
+                CLog.Here().Information($"Result - json, Data is null OR 0 Size");
+                ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
+                return false;
+            }
 
-        // json으로 온 Data에서 실제 data 뽑아내는 동작
-        using (JsonDocument document = JsonDocument.Parse(stRtn))
-        {
-            JsonElement jroot = document.RootElement;
-            nCode = jroot.GetProperty("code").GetInt32();
-            strMsg = jroot.GetProperty("msg").GetString();
-            strData = jroot.GetProperty("data").GetString();
-        }
+            // json으로 온 Data에서 실제 data 뽑아내는 동작
+            using (JsonDocument document = JsonDocument.Parse(stRtn))
+            {
+                JsonElement jroot = document.RootElement;
+                nCode = jroot.GetProperty("code").GetInt32();
+                strMsg = jroot.GetProperty("msg").GetString();
+                strData = jroot.GetProperty("data").GetString();
+            }
 #endif
 
         CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
@@ -628,7 +645,37 @@
             CLog.Here().Information($"doLogin, try Login Type : {(HsNetWork.UseHiddenLog ? eLoginUITypeData : "xxx")}");
 
             if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
-                HSCmdCenter.LoginAD(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginUITypeData);
+                HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginUITypeData);
+            else if (eLoginUITypeData == eLoginType.eLOGINTYPE_CUSTOM)
+            {
+                if (SGAppMgrSvc.OpConfigInfoService.GetCustomLoginType(nGroupID) == (int)Enums.EnumCustomLoginType.LoginTemplate01)
+                {
+                    //외부 그룹웨어 연동
+                    try
+                    {
+                        LoginTemplate01 loginTemplate01 = new LoginTemplate01();
+                        string url = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginHttpUrl(nGroupID);
+                        string siteKey = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginSecurityKey(nGroupID);
+                        string siteIV = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginSecurityIV(nGroupID);
+                        (bool, string) resultMsg = loginTemplate01.Login(id, pw, url, siteKey, siteIV);
+                        CLog.Here().Information($"result bool  : {resultMsg.Item1} , result Msg : {resultMsg.Item2}");
+                        if (!resultMsg.Item1)
+                        {
+                            ShowMessage("error", resultMsg.Item2);
+                            bStartedLogin = false;
+                            return;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        CLog.Here().Error($"doCustomLogin01 - Exception(Msg) : {ex.Message}");
+                        ShowMessage("error", XmlConf.GetErrMsg("W_0187"));
+                        return;
+                    }
+
+                    HSCmdCenter.LoginNotCheckPw(nGroupID, id, pw, strCurCliVersion, otp, 0);
+                }
+            }
             else
                 HSCmdCenter.Login(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginUITypeData);
 
@@ -641,6 +688,70 @@
         //MyNavigationManager.NavigateTo(url);
     }
 
+    /// <summary>
+    /// NAC로그인 방식으로 로그인동작 진행
+    /// </summary>
+    private void doNACLogin(string nacUserId)
+    {
+        try
+        {
+            if (bStartedLogin)
+                return;
+
+            CLog.Here().Information($"PopupLogin.doNACLogin - ###### -  Start");
+
+            JSRuntime.InvokeAsync<object>("loginCursorChange");
+
+
+            id = nacUserId;
+            pw = string.Empty;
+
+            if ((id?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0030"));
+                return;
+            }
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
+            string strCurCliVersion = "";
+            string strPlatform = "";
+            if (VersionConfigSvc != null)
+            {
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
+                strCurCliVersion = "OpenNetLink " + strCurCliVersion;
+
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
+                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
+            }
+
+            if (strCurCliVersion.Equals(""))
+                return;
+
+            HSCmdCenter.sgPageEvent.SetLoginEventAdd(nGroupID, LoginpopUpResult);
+            HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(nGroupID, ShowSessionCountPopup);
+            HSCmdCenter.sgPageEvent.Set2FactorAuthEventAdd(nGroupID, Show2FactorAuth);
+
+            bStartedLogin = true;
+
+            CLog.Here().Information("doNACLogin, try LogIn Type:" + pageService.m_nLoginType.ToString());
+            HSCmdCenter.SetCliVersion(strCurCliVersion);
+
+            string unUsePw = id;
+
+            //NAC Login 시 IdSave 여부 확인하여 인자로 받은 ID 저장
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID))
+                bIDSaveCheck = true;
+            CLog.Here().Information($"doNACLogin - ###### -  Do");
+            HSCmdCenter.LoginNotCheckPw(nGroupID, id, unUsePw, strCurCliVersion, otp, pageService.m_nLoginType);
+            pageService.SetGroupIDLoginType(nGroupID, (eLoginType)pageService.m_nLoginType);
+
+            CLog.Here().Information($"doNACLogin - ###### -  End");
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"doNACLogin - Exception - Msg : {ex.Message}");
+        }
+
+    }
     /// <summary>
     /// KeyBoard 입력에 따른 동작 정의하는 함수
     /// </summary>
@@ -656,15 +767,9 @@
     /// </summary>
     public void CheckStateChange()
     {
-
         bAutoLoginCheck = (!bAutoLoginCheck);
-        //        if (!bAutoLoginCheck)
-        //        {
-        //            bUIBtnDisable = false;
-        //            StateHasChanged();
-        //        }
-
     }
+    public void SaveIDCheckStateChange() => bIDSaveCheck = (!bIDSaveCheck);
 
     protected override void OnInitialized()
     {
@@ -674,6 +779,7 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
 
         sgSettingProc = SGSettingsDBProc.Instance;
 
@@ -698,6 +804,7 @@
             nDrawPageGroupID = nGroupID;
 
             bAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID);
+            bIDSave = SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID);
             // bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(nGroupID);
 
             if (pageService.m_bMultiLoginDo)
@@ -740,21 +847,39 @@
                     eLoginUITypeData = eLoginType.eLOGINTYPE_AD;
             }
 
+            if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(nGroupID) == (int)Enums.enumNacLoginType.Genian && SGAppMgrSvc.SystemService.IsStartedByNAC())
+            {
+                string NacKey = SGAppMgrSvc.OpConfigInfoService.GetNACLoginEncryptKey(0);
+                string nacId = SGAppMgrSvc.SystemService.GetGenianNACUserID(NacKey);
+
+                StateHasChanged();
+                doNACLogin(nacId);
+            }
             // IDPW 로그인
-            if (eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
+            else if (eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
             {
                 // ID저장 사용
                 //if (siteConfig.GetUseLoginIDSave(nGroupID) == true)   // json으로 설정이동
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID))
                 {
-                    string strEncID = "";
-                    strEncID = sgSettingProc.GetSettingUID(nGroupID);
-                    if (strEncID == null || strEncID.Equals(""))
-                        return;
-                    string strID = "";
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                    id = strID;
+                    bool bIDSaveContinue = sgSettingProc.GetSettingIDSave(nGroupID);
+                    bIDSaveCheck = bIDSaveContinue;
+
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSaveCheck(nGroupID))
+                        bIDSaveCheck = true;
+
+                    if (bIDSaveContinue)
+                    {
+                        string strEncID = "";
+                        strEncID = sgSettingProc.GetSettingUID(nGroupID);
+                        if (strEncID == null || strEncID.Equals(""))
+                            return;
+                        string strID = "";
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                        id = strID;
+                    }
+
                     StateHasChanged();
                 }
 
@@ -762,7 +887,6 @@
                 // if (siteConfig.GetUseAutoLogin(nGroupID) == true)    // json으로 이동
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
                 {
-
                     // siteConfig. json으로 이동
                     bAutoLoginCheck = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLoginCheck(nGroupID);
 
@@ -1143,11 +1267,21 @@
                 //if (siteConfig.GetUseLoginIDSave(groupId) == true)    // json으로 설정이동
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID))
                 {
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    string strEncID = "";
-                    sgRSACrypto.ValueEncrypt(id, out strEncID);
-                    if (sgSettingData != null)
-                        sgSettingProc.SetSettingUID(groupId, strEncID);
+                    if (bIDSaveCheck)
+                    {
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        string strEncID = "";
+                        sgRSACrypto.ValueEncrypt(id, out strEncID);
+                        if (sgSettingData != null)
+                        {
+                            sgSettingProc.SetSettingUID(groupId, strEncID);
+                            sgSettingProc.SetSettingIDSave(groupId, true);
+                        }
+                    }
+                    else
+                    {
+                        sgSettingProc.SetSettingIDSave(groupId, false);
+                    }
                 }
             }
 
@@ -1261,7 +1395,7 @@
     /// </summary>
     /// <param name="groupID">그룹ID</param>
     /// <param name="strPath">다운경로</param>
-    public void SetUserIDRecvDownLoad(int groupID)
+    public string SetUserIDRecvDownLoad(int groupID)
     {
         ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         string strPath = AppConfigSvc.GetRecvDownPath(groupID);
@@ -1275,7 +1409,6 @@
             if (sgLoginData != null)
             {
                 //공영홈쇼핑에서 MAC/Window 모두 ID 적용요청하여 사용
-
                 string strAddFolder = "";
                 strAddFolder = sgLoginData.GetUserID();
 
@@ -1285,10 +1418,11 @@
                 //CtrlSideUISvc.SetRecvDownPath(groupID, strPath);
             }
         }
+        return strPath;
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     public void SetReconnectStart(int groupId)
@@ -1353,8 +1487,17 @@
 
 
                 HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));
-                SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
+                string recvPath = SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
 
+                if (SGAppMgrSvc.OpConfigInfoService.GetMakeRecvDownPathShortCut(groupId))//바탕화면 바로가기 설정
+                {
+                    string linkName= string.Empty;
+                    if(SGAppMgrSvc.OpConfigInfoService.GetUseFromNameRecvDownPathShortCut(groupId))
+                        linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.FromName);
+                    else
+                        linkName = string.Format("{0}{1}.lnk", XmlConf.GetTitle("T_RECV_DOWNLOAD_LINK_NAME"), NetWorkSvc.NetWorkInfo?[groupId]?.ToName);
+                    CtrlSideUISvc.ChangeRecvDownPathLink(linkName, recvPath);
+                }
                 Dictionary<string, SGNetOverData> dicSysIdName = null;
                 dicSysIdName = new Dictionary<string, SGNetOverData>();
 
@@ -1386,11 +1529,18 @@
                     //strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";       // Table 이름 따로 정해졌음
                     strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
                     strGetinfoTagName += ", 'FORWARD_AUTODOWN'";
+                    strGetinfoTagName += ", 'CLIENT_URL_FW_PAGE'";
 
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupId))
                     {
                         strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
                         strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
+                    }
+
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseMaxLengthTitleDesc(groupId))
+                    {
+                        strGetinfoTagName += ", 'CLIENT_TITLE_MAX_LENGTH'";
+                        strGetinfoTagName += ", 'CLIENT_DESC_MAX_LENGTH'";
                     }
 
                     string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
@@ -1459,6 +1609,17 @@
 
                 pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
+                //
+                LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+                loginAfterSGHeaderUI = HSCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+                if (loginAfterSGHeaderUI != null)
+                    loginAfterSGHeaderUI(groupId);
+
+                LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
+                loginAfterSGSideBar = HSCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
+                if (loginAfterSGSideBar != null)
+                    loginAfterSGSideBar(groupId);
+
                 Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
                 int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
                 Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
@@ -1492,7 +1653,7 @@
                 CtrlSideEvent ctrlSideEvent = null;
                 ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
                 if (ctrlSideEvent != null)
-                    ctrlSideEvent();
+                    ctrlSideEvent(groupId);
 
                 // 로그인 완료 -
 

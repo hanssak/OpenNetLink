@@ -5,7 +5,6 @@
 !define PRODUCT_MAIN_FILE_NAME "OpenNetLinkApp.exe"
 !define PRODUCT_KILL_FILE_NAME "SGClean.exe"
 
-
 ; !define PRODUCT_VERSION "1.0.0"
 !define PRODUCT_PUBLISHER "Hanssak, Inc."
 !define PRODUCT_WEB_SITE "http://www.hanssak.co.kr"
@@ -482,7 +481,9 @@ Function .onInit
 			FindClose $2			
 		${Else}        
 			CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
-			CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
+			${If} ${PATCH_APPENV} == 'FALSE'
+				CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
+			${EndIf}
 			CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGNotifyDB.db" "$TEMP" 
 			CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\db\SGSettingsDB.db" "$TEMP"	
 			CopyFiles /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\hsck" "$TEMP"	
@@ -545,7 +546,9 @@ Function .onInstSuccess
 		${Else}
 			; 하위 exist 작업을 위해, 패치본의 json/db는 삭제	                                                       		
 			CopyFiles /SILENT /FILESONLY "$TEMP\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
-			CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf"
+			${If} ${PATCH_APPENV} == 'FALSE'
+				Delete "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json"
+			${EndIf}
 			CopyFiles /FILESONLY "$TEMP\SGNotifyDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"
 			CopyFiles /FILESONLY "$TEMP\SGSettingsDB.db" "C:\HANSSAK\OpenNetLink\wwwroot\db"  
 			CopyFiles /FILESONLY "$TEMP\hsck" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
@@ -626,11 +629,18 @@ Section "MainSection" SEC01
 	; 한꺼번에 지정하는 방식 사용
 	File /r "artifacts\windows\published\"
 
-	SetOutPath "$INSTDIR"
-	File "bin_addon\SecureGateChromiumExtension_v1.1.crx"
+  SetOutPath "$INSTDIR"
+  File "bin_addon\SecureGateChromiumExtension_v1.1.crx"
 
-	${If} ${IS_PATCH} == 'TRUE'
-		${If} $g_iNetPos == 2 ;CN
+  ; 단축아이콘 생성
+  CreateDirectory "$SMPROGRAMS\OpenNetLink"
+  CreateShortCut "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
+  CreateShortCut "C:\Users\Public\Desktop\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
+  
+  ${If} ${IS_PATCH} == 'TRUE'
+
+	  ${If} $g_iNetPos == 2
+	  	  ;CreateDirectory "${INSTALLPATH}\22222" ; 확인용
 		  ;File "artifacts\windows\published\AddFileRMex0X64.dll"
 		  ;File "artifacts\windows\published\AddFileRMex1X64.dll"
 		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
@@ -709,8 +719,22 @@ Section "MainSection" SEC01
 			ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
 		  ${EndIf}
 	  ${EndIf}
-
-	${EndIf} ; ${IS_PATCH} == 'TRUE'
+	  
+	  ;NAC 등록
+	  ${If} ${NAC_LOGIN_TYPE} == '1'
+		IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" GnFind GnNotFind
+		GnFind:			
+			ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe -e:AES-${NAC_LOGIN_ENCRYPTKEY}"'
+			goto GnEND
+		GnNotFind:
+		GnEND:
+	${EndIf}
+	
+	;인증서 자동 업데이트 설정 Off
+	${If} ${DISABLE_CERT_AUTOUPDATE} == 'TRUE'
+		WriteRegDWORD HKLM "SOFTWARE\Policies\Microsoft\SystemCertificates\AuthRoot" "DisableRootAutoUpdate" 1	
+	${EndIf}	
+  ${EndIf} ; ${IS_PATCH} == 'TRUE'
 
   
   ; 단축아이콘 생성
@@ -745,14 +769,14 @@ Section -Post
 	  ${If} ${NETWORK_FLAG} == "IN"
 	  
 		  ; edge
-		  WriteRegStr HKLM "SOFTWARE\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		  WriteRegStr HKLM "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
 		  ;WriteRegStr HKLM "SOFTWARE\WOW6432Node\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
-		  ;WriteRegStr HKCU "Software\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		  WriteRegStr HKCU "Software\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
 		  
 		  ; chrome
 		  WriteRegStr HKLM "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"
 		  ;WriteRegStr HKLM "SOFTWARE\WOW6432Node\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"
-		  ;WriteRegStr HKCU "Software\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"	  
+		  WriteRegStr HKCU "Software\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"	  
 		  
 	  ${EndIf}  
 
@@ -799,12 +823,21 @@ Section Uninstall
   ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMex0X64.dll"'
   ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMex1X64.dll"'
   ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMex2X64.dll"'
-
+  
   Delete "$SMPROGRAMS\OpenNetLink\Uninstall.lnk"
   Delete "$SMPROGRAMS\OpenNetLink\Website.lnk"
-  Delete "C:\Users\Public\Desktop\OpenNetLink.lnk"
-  Delete "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk"
+  Delete "C:\Users\Public\Desktop\${INK_NAME}.lnk"
+  Delete "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk"
 
+  ${if} ${NAC_LOGIN_TYPE} == '1'
+  	;NAC 등록 해제
+  	IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" UnGnFind UnGnNotFind
+  	UnGnFind:
+  		ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -u -auth_in:$INSTDIR\SGNac.exe"'
+  		goto UnGnEND
+  	UnGnNotFind:
+  	UnGnEND:	  
+  ${EndIf}
   RMDir "$SMPROGRAMS\OpenNetLink"
   RMDir /r "$INSTDIR"
 
@@ -816,13 +849,13 @@ Section Uninstall
 	${If} ${REG_CRX} == 'TRUE'
 
 	  ; CRX강제등록 제거
-	  DeleteRegKey HKLM "SOFTWARE\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
-	  ;DeleteRegKey HKLM "SOFTWARE\WOW6432Node\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
-	  ;DeleteRegKey HKCU "SOFTWARE\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"  
+	  DeleteRegKey HKLM "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei"
+	  ;DeleteRegKey HKLM "SOFTWARE\WOW6432Node\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei"
+	  DeleteRegKey HKCU "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei"  
 
 	  DeleteRegKey HKLM "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
 	  ;DeleteRegKey HKLM "SOFTWARE\WOW6432Node\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
-	  ;DeleteRegKey HKCU "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
+	  DeleteRegKey HKCU "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
 
 	${EndIf}  
   

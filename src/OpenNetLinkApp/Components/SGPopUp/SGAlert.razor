@@ -15,6 +15,13 @@
                 </div>
             </div>
             <div class="modal-footer1">
+                @if(UseCheckbox)
+                {
+                    <div class="icheck-primary" style="width:100%;">
+                        <input type="checkbox" id="SGAlert-Checkbox" checked=@CheckboxState @onchange="(e => { CheckStateChange(e); })" />
+                        <label for="SGAlert-Checkbox"><b>@((MarkupString)CheckboxMessage)</b></label>
+                    </div>
+                }
                 @if (mode != 0)
                 {
                     <button type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right" @onclick="Confirm">@strOk</button>
@@ -37,6 +44,11 @@
     public int groupId = 0;
     public string arg = "";
     public string strOk = "";
+
+    public bool UseCheckbox { get; set; } = false;
+    public bool CheckboxState { get; set; }
+    public string CheckboxMessage {get;set;}
+    
 
     public void Confirm()
     {
@@ -86,9 +98,32 @@
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
+     /// <summary>
+    /// Alert 팝업
+    /// </summary>
+    /// <param name="tle"></param>
+    /// <param name="msg"></param>
+    /// <param name="md">0: none / 1:confirm / 2: confirm && cancel </param>
+    /// <param name="gid"></param>
+    /// <param name="argument">전달인자</param>
+    /// <param name="okMsg">확인 버튼 문구</param>
+    /// <returns></returns>
+    public async Task openPopUp(string tle, string msg, int md, int gid, bool useCheckBox, bool checkboxState, string checkBoxMessage, string argument = "", string okMsg = "")
+    {
+        UseCheckbox = useCheckBox;
+        CheckboxState = checkboxState;
+        CheckboxMessage = checkBoxMessage;
+        await openPopUp(tle, msg, md, gid, argument, okMsg);
+    }
+
     public void closePopUp()
     {
         object[] param = { Guid };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+      void CheckStateChange(ChangeEventArgs changeEventArgs)
+    {
+        CheckboxState =(bool)changeEventArgs.Value;
     }
 }

@@ -407,6 +407,8 @@
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
+    int nDrawPageGroupID = -1;
+
     /// <summary>
     ///
     /// </summary>
@@ -605,42 +607,54 @@
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
-        HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
-        HSCmdCenter.sgPageEvent.SetTransCancelEventAdd(groupID, TransCancelResult);             // 전송 취소 결과.
-
-        strDestNetWork = strTotal;
-
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
-        {
-            CLog.Here().Information($"OnInitialized, groupid : {groupID}, SideBar Build Skip!");
-            return;
-        }
-
-        if (sgLoginData.GetUseOverNetwork2())
-        {
-            dicDestSysPos = pageService.GetTargetSystemList(groupID);
-        }
-
         //GetInitDateTime();
 
         base.OnInitialized();
-
-
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
+    {     
+        int transferTemplate = (groupIDbyParam >= 0) ? SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam) : 0;
+        await jsRuntime.InvokeAsync<object>("exitLogIn",new object[] {transferTemplate});
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize",new object[] {transferTemplate});
+
+
+        int groupID = groupIDbyParam;
+        CLog.Here().Information($"TransManage - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
+
+        // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
+        {
+            nDrawPageGroupID = groupIDbyParam;
+
+            HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
+            HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
+            HSCmdCenter.sgPageEvent.SetTransCancelEventAdd(groupID, TransCancelResult);             // 전송 취소 결과.
+
+            strDestNetWork = strTotal;
+
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+            {
+                CLog.Here().Information($"OnInitialized, groupid : {groupID}, SideBar Build Skip!");
+                return;
+            }
+
+            if (sgLoginData.GetUseOverNetwork2())
+            {
+                dicDestSysPos = pageService.GetTargetSystemList(groupID);
+            }
+
+            await TransSearchCount();
+
+            StateHasChanged();
+        }
+
         if (firstRender)
         {
-            await TransSearchCount();
+            //await TransSearchCount();
         }
+
         base.OnAfterRender(firstRender);
     }
 
@@ -1452,9 +1466,8 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        string strNavigateWithGroupID = "/Welcome/";
+        string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
         strNavigateWithGroupID += groupID.ToString();
-
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
         foreach (var MenuItem in SideBarUISvc.MenuList)

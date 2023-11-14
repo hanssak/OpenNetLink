@@ -525,27 +525,13 @@
             //else
             //    strNavigateWithGroupID = "/Transfer/";
 
-            //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-
-            string strNavigateWithGroupID = String.Empty;
-            if (basicPageType == (int)Enums.EnumBasicPageType.Main)
-            {
-                strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
-                string strNavigateUrl = strNavigateWithGroupID.ToLower();
-                if (strNavigateUrl.IndexOf("transfer") > 0)
-                {
-                    strNavigateUrl = pageService.GetFileTransPage(groupID);
-                    if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                        strNavigateWithGroupID = strNavigateUrl;
-                    else
-                        strNavigateWithGroupID = "/Transfer/";
-                }
-                if (!bFileTransUse)
-                    strNavigateWithGroupID = "/Welcome/";  // 설정에 상관없도록
-
-                strNavigateWithGroupID += groupID.ToString();
-                MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-            }
+        string strNavigateWithGroupID = String.Empty;
+        if (basicPageType == (int)Enums.EnumBasicPageType.Main)
+        {
+            strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
+            strNavigateWithGroupID += groupID.ToString();
+            MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+        }
 
             MoveSiderBarFocusTogroupid();
 
@@ -621,7 +607,7 @@
             CtrlSideEvent ctrlSideEvent = null;
             ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
             if (ctrlSideEvent != null)
-                ctrlSideEvent();
+                ctrlSideEvent(groupID);
         }
         catch (Exception ex)
         {

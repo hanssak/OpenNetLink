@@ -11,6 +11,7 @@ namespace OfficeExtractor
 {
     public class Controller
     {
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<Controller>();
         //[DllExport]
         public static int ExcuteExtractor([MarshalAs(UnmanagedType.LPWStr)] string strSource, [MarshalAs(UnmanagedType.LPWStr)] string strDest)
         {
@@ -24,47 +25,58 @@ namespace OfficeExtractor
             catch (XmlParsingException ex)
             {
                 result = -11;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
             }
             catch (DocumentCorrupt ex)
             {
                 result = -10;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
             }
             catch (PathTooLongException ex)
             {
                 result = -9;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
             }
             catch (OEObjectTypeNotSupported ex)
             {
                 result = -8;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
             }
             catch (OEFileIsCorrupt ex)
             {
                 result = -7;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
             }
             catch(ArgumentNullException ex)
             {
                 result = -6;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
             }
             catch(FileNotFoundException ex)
             {
                 result = -5;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
             }
             catch(DirectoryNotFoundException ex)
             {
                 result = -4;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
             }
             catch(OEFileTypeNotSupported ex)
             {
                 result = -3;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
             }
             catch (OEFileIsPasswordProtected ex)
             {
 
                 result = -2;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
             }
             catch (Exception ex)
             {
                 result = -1;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
             }
             finally
             {

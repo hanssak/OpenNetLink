@@ -63,8 +63,9 @@ namespace ViewTest
                 try
                 {
                     //tempFolder = GetTemporaryFolder();
-                    tempFolder = "C:\\Users\\smkoo\\Desktop\\DRMTEST";
-                    _tempFolders.Add(tempFolder);
+                    //tempFolder = "C:\\Users\\smkoo\\Desktop\\DRMTEST";
+                    //_tempFolders.Add(tempFolder);
+                    tempFolder = textBox1.Text;
 
                     var extractor = new OfficeExtractor.Extractor();
                     var files = extractor.Extract(openFileDialog1.FileName, tempFolder);
