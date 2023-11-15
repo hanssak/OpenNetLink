@@ -118,6 +118,13 @@ namespace OpenNetLinkApp
                 arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
                 arg[1] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartTrayMove;
 
+                string hiddenFlagFile = Path.Combine("wwwroot/Log", "UseHiddenLog");
+                if (File.Exists(hiddenFlagFile))
+                {
+                    HsNetWork.UseHiddenLog = true;
+                    File.Delete(hiddenFlagFile);
+                }
+
                 ComponentsDesktop.Run<Startup>(windowTitle, "wwwroot/index.html", arg);
             }
             else
