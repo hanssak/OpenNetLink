@@ -2150,12 +2150,12 @@ namespace OpenNetLinkApp.Services
             return 0;
         }
 
-        public int LoginNotCheckPw(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType = 0)
+        public int LoginNotCheckPw(int groupid, string strID, string strProtectedPW, string strCurCliVersion, string otp, int loginType = 0)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             int ret = 0;
             if (hsNetWork != null)
-                ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, 9, loginType);
+                ret = hsNetWork.Login(strID, strProtectedPW, otp, strCurCliVersion, 9, loginType);
             return 0;
         }
 

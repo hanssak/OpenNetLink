@@ -998,6 +998,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
     /// </summary>
     private void doNACLogin(string nacUserId)
     {
+        byte[] originalPW = new byte[1];
         try
         {
             CLog.Here().Information($"doNACLogin - ###### -  Start");
@@ -1005,8 +1006,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             JSRuntime.InvokeAsync<object>("loginCursorChange");
 
             id = nacUserId;
-            protectedPw = string.Empty;
-
+            
+            originalPW = Encoding.UTF8.GetBytes(nacUserId);
+            SetProtectedPW(SGCrypto.AESEncrypt256WithDEK(originalPW));
+            
             if ((id?.Length ?? 0) < 1)
             {
                 Window.MoveTrayToWebWindow();
@@ -1034,7 +1037,6 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             CLog.Here().Information("[Main] LogIn Type:" + pageService.m_nLoginType.ToString());
             HSCmdCenter.SetCliVersion(strCurCliVersion);
 
-            string unUsePw = id;
             if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
             {
                 List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -1045,7 +1047,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         bIDSaveCheck = true;
 
                     CLog.Here().Information($"doNACLogin - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
-                    HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, unUsePw, strCurCliVersion, otp, pageService.m_nLoginType);
+                    HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
                     pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
                 }
             }
@@ -1055,7 +1057,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(pageService.m_nCurViewPageGroupID))
                     bIDSaveCheck = true;
                 CLog.Here().Information($"doNACLogin - ###### -  Do");
-                HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, unUsePw, strCurCliVersion, otp, pageService.m_nLoginType);
+                HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
                 pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
             }
 
@@ -1064,6 +1066,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         catch (Exception ex)
         {
             CLog.Here().Error($"doNACLogin - Exception - Msg : {ex.Message}");
+        }
+        finally
+        {
+            originalPW.hsClear(3);
         }
 
     }
