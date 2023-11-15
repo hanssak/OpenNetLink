@@ -357,403 +357,6 @@ Task("Release")
         DotNetCoreBuild("./OpenNetLinkApp/OpenNetLinkApp.csproj", settings);
 });
 
-/*
-Task("SetFileName")
-	//patch가 아닐 경우만 실행
-	.WithCriteria(!isPatch)
-	.Does(()=>{
-		customName = Prompt("Custom Name : ");	
-		networkFlag = Prompt("Network Flag (IN/CN/EX) : ");		
-		AppProps.NetworkPos = networkFlag.ToUpper();
-	});
-
-Task("SetNetwork")
-	.WithCriteria(setNetwork)
-	.WithCriteria(!isPatch)
-	.Does(() => {		
-		Information($"Current Network infomation : {AppProps.NetworkIPAddress} ({AppProps.NetworkFromName} -> {AppProps.NetworkToName}) / Update IP : {AppProps.AppEnvUpdateSvnIP}");
-			
-		AppProps.NetworkIPAddress = Prompt("IPAddress : ");
-		AppProps.AppEnvUpdateSvnIP = $"{AppProps.NetworkIPAddress}:{AppProps.AppEnvUpdatePort}";
-		AppProps.NetworkFromName = Prompt($"{AppProps.NetworkIPAddress} - From Name : ");
-		AppProps.NetworkToName = Prompt($"{AppProps.NetworkIPAddress} - To Name : ");	
-
-		Information($"Change Complete : {networkFlag} - {AppProps.NetworkIPAddress} ({AppProps.NetworkFromName} -> {AppProps.NetworkToName})");						
-	});
-
-
-Task("PubDebian")
-    .IsDependentOn("Version")
-    .Does(() => {
-
-	AppProps.AppUpdatePlatform = "debian";
-	PackageDirPath 	= String.Format("artifacts/installer/{0}/packages", AppProps.AppUpdatePlatform);
-	var settings = new DotNetCorePublishSettings {
-		Framework = "net5.0",
-		Configuration = "Release",
-		Runtime = "linux-x64",
-		OutputDirectory = $"./artifacts/{AppProps.AppUpdatePlatform}/published"
-	};
-	
-	if(DirectoryExists(settings.OutputDirectory)) {
-		DeleteDirectory(settings.OutputDirectory, new DeleteDirectorySettings { 
-		Force = true, Recursive = true });
-	}
-
-    DotNetCorePublish("./OpenNetLinkApp", settings);
-    DotNetCorePublish("./PreviewUtil", settings);
-    DotNetCorePublish("./ContextTransferClient", settings);
-
-	// 필요할때에 추가로 개발예정
-    	using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility"))
-        {
-			process.WaitForExit();
-			//Information("Package linux: Exit code: {0}", process.GetExitCode());
-		}
-});
-
-Task("PkgDebian")
-	.IsDependentOn("SetFileName")
-	.IsDependentOn("SetNetwork")
-    .IsDependentOn("PubDebian")
-    .Does(() => {
-
-	using(var process = StartAndReturnProcess("./PkgDebian.sh", new ProcessSettings{ 
-		Arguments = new ProcessArgumentBuilder()
-			.Append(AppProps.PropVersion.ToString())
-			.Append(isPatch.ToString().ToUpper())
-			.Append(networkFlag.ToUpper()) 
-			.Append(customName.ToUpper())
-		}))
-	{
-		process.WaitForExit();
-		Information("Package Debin: Exit code: {0}", process.GetExitCode());
-	}
-});
-
-
-Task("PubRedhat")
-    .IsDependentOn("Version")
-    .Does(() => {
-
-	AppProps.AppUpdatePlatform = "redhat";
-	PackageDirPath 	= String.Format("artifacts/installer/{0}/packages", AppProps.AppUpdatePlatform);
-	var settings = new DotNetCorePublishSettings {
-		Framework = "net5.0",
-		Configuration = "Release",
-		Runtime = "linux-x64",
-		OutputDirectory = $"./artifacts/{AppProps.AppUpdatePlatform}/published"
-	};
-	
-	if(DirectoryExists(settings.OutputDirectory)) {
-		DeleteDirectory(settings.OutputDirectory, new DeleteDirectorySettings { 
-		Force = true, Recursive = true });
-	}
-
-    DotNetCorePublish("./OpenNetLinkApp", settings);
-    DotNetCorePublish("./PreviewUtil", settings);
-    DotNetCorePublish("./ContextTransferClient", settings);
-
-	// 필요할때에 추가로 개발예정
-    //	using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility"))
-    //        {
-	//	process.WaitForExit();
-	//	Information("Package linux: Exit code: {0}", process.GetExitCode());
-	//}
-});
-
-Task("PkgRedhat")
-	.IsDependentOn("SetFileName")
-	.IsDependentOn("SetNetwork")
-    .IsDependentOn("PubRedhat")
-    .Does(() => {
-
-	using(var process = StartAndReturnProcess("./PkgRedhat.sh", new ProcessSettings{ 
-		Arguments = new ProcessArgumentBuilder()
-			.Append(AppProps.PropVersion.ToString())
-			.Append(isPatch.ToString().ToUpper())
-			.Append(networkFlag.ToUpper()) 
-			.Append(customName.ToUpper())
-		}))
-	{
-		process.WaitForExit();
-		Information("Package Redhat: Exit code: {0}", process.GetExitCode());
-	}
-});
-
-Task("PubWin10")
-    .IsDependentOn("Version")
-    .Does(() => {
-
-	AppProps.AppUpdatePlatform = "windows";
-	PackageDirPath 	= String.Format("artifacts/installer/{0}/packages", AppProps.AppUpdatePlatform);
-	var settings = new DotNetCorePublishSettings
-	{
-		Framework = "net5.0",
-		Configuration = "Release",
-		Runtime = "win-x64",
-		OutputDirectory = $"./artifacts/{AppProps.AppUpdatePlatform}/published"
-	};
-
-	String strWebViewLibPath 			= "./OpenNetLinkApp/Library/WebView2Loader.dll";
-	if(FileExists(strWebViewLibPath)) { DeleteFile(strWebViewLibPath); }
-
-	String strWebWindowNativeLibPath 	= "./OpenNetLinkApp/Library/WebWindow.Native.dll";
-	if(FileExists(strWebWindowNativeLibPath)) { DeleteFile(strWebWindowNativeLibPath); }
-
-	if(DirectoryExists(settings.OutputDirectory)) {
-		DeleteDirectory(settings.OutputDirectory, new DeleteDirectorySettings { Force = true, Recursive = true });
-	}		
-
-    DotNetCorePublish("./OpenNetLinkApp", settings);
-    DotNetCorePublish("./PreviewUtil", settings);
-    DotNetCorePublish("./ContextTransferClient", settings);
-    
-     using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = "1 windows" }))
-     {
-		process.WaitForExit();
-		Information("Package windows: Exit code: {0}", process.GetExitCode());
-     }
-
-     using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = "2 windows" }))
-     {
-		process.WaitForExit();
-		Information("Package windows: Exit code: {0}", process.GetExitCode());
-     }
-});
-
-Task("PkgWin10")
-	.IsDependentOn("SetFileName")
-	.IsDependentOn("SetNetwork")
-    .IsDependentOn("PubWin10")
-    .Does(() => {
-	if(DirectoryExists(PackageDirPath)) {
-		DeleteDirectory(PackageDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
-	}	
-
-	System.IO.Directory.CreateDirectory(PackageDirPath);
-
-	// window 쪽에 필요없는 파일들 배포전에 제거
-	DeleteFiles("./artifacts/windows/published/*.so");
-	DeleteFiles("./artifacts/windows/published/*.pdb");
-
-	//Light Patch 버전일 땐, edge 폴더 배포전에 제거
-	if(isPatch.ToString().ToUpper().Equals("TRUE"))
-	{
-		if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
-		{
-			if(DirectoryExists("./artifacts/windows/published/wwwroot/edge")) 
-			{
-				DeleteDirectory("./artifacts/windows/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
-			}
-		}
-	}
-	
-	var files = GetFiles("./artifacts/windows/published/*.so.*");
-	foreach(var file in files)
-	{
-		String strSearchFile = (String)file.FullPath;
-		//Information("File: {0}", strSearchFile);
-
-        int nIdex = strSearchFile.LastIndexOf('.');
-        if (nIdex > 0)
-        {
-            String strItem = strSearchFile.Substring(nIdex+1);
-
-            int n=0;
-            bool isNumeric = int.TryParse(strItem, out n);
-            if (isNumeric)
-			{
-				Information("File-Deleted: {0}", strSearchFile);
-				DeleteFile(strSearchFile);
-			}
-        }		
-	}
-            
-	MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
-		Defines = new Dictionary<string, string>{
-			{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
-			{"IS_PATCH", isPatch.ToString().ToUpper()},
-			{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
-			{"NETWORK_FLAG", networkFlag.ToUpper()},
-			{"CUSTOM_NAME", customName.ToUpper()},
-			{"INK_NAME", $"\"{inkFileName}\""}	
-		}
-	});
-});
-
-Task("PubOSX")
-	.IsDependentOn("Version")
-    .Does(() => {
-	AppProps.AppUpdatePlatform = "mac";
-	PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppUpdatePlatform);
-	var settings = new DotNetCorePublishSettings {
-		Framework = "net5.0",
-		Configuration = "Release",
-		Runtime = "osx-x64",
-		OutputDirectory = $"./artifacts/{AppProps.AppUpdatePlatform}/published"
-	};
-    DotNetCorePublish("./OpenNetLinkApp", settings);
-    DotNetCorePublish("./PreviewUtil", settings);
-
-	using(var process = StartAndReturnProcess("./HashToolOSX/MD5HashUtility"))
-             {
-		process.WaitForExit();
-		Information("Package mac: Exit code: {0}", process.GetExitCode());
-	 }
-});
-
-Task("PkgOSX")	
-	.IsDependentOn("SetFileName")
-	.IsDependentOn("SetNetwork")
-    .IsDependentOn("PubOSX")
-    .Does(() => {
-
-	if(DirectoryExists(PackageDirPath)) {
-		DeleteDirectory(PackageDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
-	}
-
-	System.IO.Directory.CreateDirectory(PackageDirPath);
-
-	using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings{ 
-		Arguments = new ProcessArgumentBuilder()
-			.Append(AppProps.PropVersion.ToString())
-			.Append(isPatch.ToString().ToUpper())
-			.Append(networkFlag.ToUpper()) 
-			.Append(customName.ToUpper())
-		}))
-	{
-		process.WaitForExit();
-		Information("Package osx: Exit code: {0}", process.GetExitCode());
-	}
-});
-
-Task("CreateReleaseNote")
-	.Does(() =>
-{
-	Information("CreateReleaseNote v{0}", AppProps.PropVersion.ToString());
-
-	string Title 			= String.Format("OpenNetLink v{0}", AppProps.PropVersion.ToString());
-	string ReleaseNotePath 	= String.Format("{0}/{1}.md", ReleaseNoteDirPath, AppProps.PropVersion.ToString());
-	if(DirectoryExists(ReleaseNoteDirPath)) { DeleteDirectory(ReleaseNoteDirPath, new DeleteDirectorySettings { Force = true, Recursive = true }); }
-	System.IO.Directory.CreateDirectory(ReleaseNoteDirPath);
-
-	// Write File
-	using(StreamWriter writer = new StreamWriter(ReleaseNotePath)){
-		
-
-		if(FileExists(AppProps.ReleaseNoteFile))
-		{
-			foreach(var line in FileReadLines(AppProps.ReleaseNoteFile))
-			{
-				writer.WriteLine(line);
-			}
-			
-		}
-		else
-		{
-			writer.WriteLine("# "+Title);
-			writer.WriteLine("");
-			foreach (var tag in AppProps.GitLastTag)
-			{
-				writer.WriteLine(tag.Message);
-			}
-		}
-	};
-});
-
-Task("Appcast")
-	.IsDependentOn("Install-NetSparkleUpdater.Tools.AppCastGenerator")
-    .IsDependentOn("CreateReleaseNote")
-	.Does(() =>
-{
-	string InstallerOsPath	= String.Format("artifacts/installer/{0}", AppProps.AppUpdatePlatform);
-	string PackagesURL 		= String.Format("https://{0}/updatePlatform/{1}/packages/", AppProps.AppEnvUpdateSvnIP, AppProps.AppUpdatePlatform);
-	string ReleaseNoteURL 	= String.Format("https://{0}/updatePlatform/{1}/release_note/", AppProps.AppEnvUpdateSvnIP, AppProps.AppUpdatePlatform);
-
-	if(!DirectoryExists(PackageDirPath)) {
-		throw new Exception(String.Format("[Error] Not Found Directory : {0}", PackageDirPath));
-	}
-
-	// default OS
-	string strEXT 	= "exe";
-	string strOS 	= "windows";
-	if(AppProps.AppUpdatePlatform.Equals("mac")) { 
-		strOS 	= "mac";
-		strEXT 	= "pkg";
-	}
-	if(AppProps.AppUpdatePlatform.Equals("debian")) { 
-		strOS 	= "linux";
-		strEXT 	= "deb";
-	}
-
-	using(var process = StartAndReturnProcess("netsparkle-generate-appcast"
-						, new ProcessSettings { 
-							Arguments = new ProcessArgumentBuilder()
-											.Append("--product-name").AppendQuoted("opennetlink")
-											.Append("--file-extract-version").AppendQuoted(AppProps.PropVersion.ToString())
-											.Append("--appcast-output-directory").AppendQuoted(InstallerOsPath)
-											.Append("--os").AppendQuoted(strOS)
-											.Append("--ext").AppendQuoted(strEXT)
-											.Append("--key-path").AppendQuoted("Appcasts/Generator/keys")
-											.Append("--binaries").AppendQuoted(PackageDirPath)
-											.Append("--base-url").AppendQuoted(PackagesURL)
-											
-											// * README: when creating --change-log-path 
-											// 1. There must be a directory version before the package.
-											// 2. The version directory and md file should be the same name. 
-											.Append("--change-log-path").AppendQuoted(ReleaseNoteDirPath)
-											.Append("--change-log-url").AppendQuoted(ReleaseNoteURL)
-							}))
-	{
-		process.WaitForExit();
-		// Information("Exit code: {0}", process.GetExitCode());
-	}
-});
-
-
-Task("Deploy")
-	.IsDependentOn("CreateReleaseNote")
-	.IsDependentOn("Install-DotnetCompressor")
-    .Does(() => {
-
-	string PackagePath;
-	if(AppProps.AppUpdatePlatform.Equals("mac")) { 
-		PackagePath = String.Format("{0}/OpenNetLink-Mac-{1}.pkg", PackageDirPath, AppProps.PropVersion.ToString());
-	}
-	else if(AppProps.AppUpdatePlatform.Equals("debian")) { 
-		PackagePath = String.Format("{0}/OpenNetLink-Debian-{1}.deb", PackageDirPath, AppProps.PropVersion.ToString());
-	}
-	else if(AppProps.AppUpdatePlatform.Equals("windows")) { 
-		PackagePath = String.Format("{0}/OpenNetLink-Windows-{1}.exe", PackageDirPath, AppProps.PropVersion.ToString());
-	}
-	else {
-		throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.AppUpdatePlatform));
-	}
-
-	if(!FileExists(PackagePath)) {
-		throw new Exception(String.Format("[Err] Not Found Package : {0}", PackagePath));
-	}
-
-	string Password = "%hsckconfigseed$";
-	// 압축 command: dcomp zip c -p %hsckconfigseed$ -b artifacts/packages/ -o test.zip
-	using(var process = StartAndReturnProcess("dcomp"
-						, new ProcessSettings { 
-							Arguments = new ProcessArgumentBuilder()
-											.Append("zip")
-											.Append("c")
-											.Append("-p").AppendQuoted(Password)
-											.Append("-b").AppendQuoted("artifacts/installer")
-											.Append("-o").AppendQuoted(PackageZipFile)
-							}))
-	{
-		process.WaitForExit();
-		//Information("Result: {0} - Deploy Package Zip : {1}", process.GetExitCode(), PackagePath);
-	}
-
-});
-*/
-
 Task("MakeHashSqlScript")
 	.Does(()=> {
 		//해시 생성 sql 문 생성 (Arg : 1 + [OS])
@@ -1219,14 +822,13 @@ Task("MakeInstaller")
 					{"IS_SILENT", "TRUE"},
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
-					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
+					{"REG_CRX", regCrxForce.ToString().ToUpper()}
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
-					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
-					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
-					{"REG_CRX", regCrxForce.ToString().ToUpper()}
+					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},					
 				}
 			});			
 
@@ -1243,14 +845,13 @@ Task("MakeInstaller")
 					{"IS_SILENT", "FALSE"},
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
-					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
+					{"REG_CRX", regCrxForce.ToString().ToUpper()}
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
-					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
-					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
-					{"REG_CRX", regCrxForce.ToString().ToUpper()}
+					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},					
 				}
 			});
 		}
@@ -1268,15 +869,13 @@ Task("MakeInstaller")
 					{"IS_SILENT", isSilent.ToString().ToUpper()},
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
-					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
+					{"REG_CRX", regCrxForce.ToString().ToUpper()}
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
 					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
-					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
-					{"REG_CRX", regCrxForce.ToString().ToUpper()}
-					
 				}
 			});			
 		}
@@ -1290,9 +889,9 @@ Task("MakeInstaller")
 												.Append(networkFlag.ToUpper()) 
 												.Append(customName.ToUpper())
 												.Append(PackageDirPath)//$5	
-												.Append(startAuto.ToString().ToUpper())//$6
-												.Append(storageName.ToUpper())//$7
-												.Append(isUpdateCheck.ToString().ToUpper())	//$8 Output
+												.Append(isUpdateCheck.ToString().ToUpper())	//$6
+												.Append(startAuto.ToString().ToUpper())//$7
+												.Append(storageName.ToUpper())//$8									
 												.Append(regCrxForce.ToString().ToUpper())//$9
 																								})
 												
@@ -1311,9 +910,10 @@ Task("MakeInstaller")
 													.Append(networkFlag.ToUpper()) 
 													.Append(customName.ToUpper())
 													.Append(PackageDirPath) //$5
-													.Append(startAuto.ToString().ToUpper())
-													.Append(storageName.ToUpper())//$6	
-													.Append(isUpdateCheck.ToString().ToUpper())	//$7 Output
+													.Append(isUpdateCheck.ToString().ToUpper())	//$6
+													.Append(startAuto.ToString().ToUpper()) //$7
+													.Append(storageName.ToUpper())//$8
+													
 													})
 		)
 		{
@@ -1321,22 +921,19 @@ Task("MakeInstaller")
 			Information("Package Redhat: Exit code: {0}", process.GetExitCode());
 		}
 	}
-	// else if( AppProps.Platform == "mac" && (networkFlag == "IN"))
 	else if( AppProps.Platform == "mac" )
 	{
-
-
 		using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings
 													{ Arguments = new ProcessArgumentBuilder()
 													.Append(AppProps.PropVersion.ToString())
 													.Append(isPatchInstaller.ToString().ToUpper())
 													.Append(networkFlag.ToUpper()) 
-													.Append(customName.ToUpper())
-													.Append(PackageDirPath)	//$5 Output
-													.Append(storageName.ToUpper())//$6
-													.Append(regCrxForce.ToString().ToUpper())//$7														
-													.Append(startAuto.ToString().ToUpper())//$8
-													.Append(isUpdateCheck.ToString().ToUpper())	//$9 Output
+													.Append(customName.ToUpper())	//$4
+													.Append(PackageDirPath)	//$5
+													.Append(isUpdateCheck.ToString().ToUpper())	//$6
+													.Append(startAuto.ToString().ToUpper())//$7
+													.Append(storageName.ToUpper())//$8
+													.Append(regCrxForce.ToString().ToUpper())//$9
 													})
 		)
 		{

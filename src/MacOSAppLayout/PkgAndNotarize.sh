@@ -42,7 +42,7 @@ profile_name="hanssakSG"
 
 # put your project's information into these variables
 if [ $# -ne 10 ]; then
-	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {startauto} $6 {isupdatecheck} $7 {storagename} $8 {regcrxforce} $9"
+	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {isupdatecheck} $6 {startauto} $7 {storagename} $8 {regcrxforce} $9"
 	exit -1
 fi;
 
@@ -57,8 +57,8 @@ ispatch=$2
 networkflag=$3
 customname=$4
 outputpath=$5
-startauto=$6
-isupdatecheck=$7
+isupdatecheck=$6
+startauto=$7
 storagename=$8
 regcrxforce=$9
 
