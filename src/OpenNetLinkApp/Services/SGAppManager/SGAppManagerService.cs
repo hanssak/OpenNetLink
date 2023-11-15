@@ -77,7 +77,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 HeaderUIService = new SGHeaderUIService();
                 FooterUIService = new SGFooterUIService();
                 SystemService = new SGSystemService();
-                CorpIdUIService = new SGCorpIdUIService();
                 UserInfoService = new SGUserInfoService();
                 SideBarUIService = new SGSideBarUIService();
                 NetworkInfoService = new SGNetworkService();

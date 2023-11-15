@@ -98,7 +98,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     byte[] arrNACEnc = Encoding.UTF8.GetBytes(nacEncryptKey);
                     Array.Copy(arrNACEnc, 0, decKey, 0, arrNACEnc.Length);
 
-                    byte[] arrNACDec = SGCrypto.AESDecrypt256(arrNacEncData, decKey, System.Security.Cryptography.PaddingMode.None);
+                    byte[] arrNACDec = null;
+                    SGCrypto.AESDecrypt128(arrNacEncData, ref decKey, System.Security.Cryptography.PaddingMode.None, ref arrNACDec);
                     string strNacDec = Encoding.UTF8.GetString(arrNACDec);
 
                     //format. -nac "-authid:test" -IP:192.168.1.168 -MAC:00:24:1D:88:1D:B4

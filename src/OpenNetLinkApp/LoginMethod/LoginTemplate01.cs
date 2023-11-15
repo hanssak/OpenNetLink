@@ -48,7 +48,11 @@ namespace OpenNetLinkApp.LoginMethod
             string key = siteKey;
             string iv = siteIV;
 
-            byte[] bEncPw = HsNetWorkSG.SGCrypto.AESEncrypt(pw, key, iv);
+            byte[] bPw = Encoding.UTF8.GetBytes(pw);
+            byte[] bKey = Encoding.UTF8.GetBytes(key);
+            byte[] bIv = Encoding.UTF8.GetBytes(iv);
+
+            byte[] bEncPw = HsNetWorkSG.SGCrypto.AESEncrypt128(bPw, bKey, bIv, System.Security.Cryptography.PaddingMode.PKCS7);
             string strEncPw = Convert.ToBase64String(bEncPw);
 
             string method = "GET";

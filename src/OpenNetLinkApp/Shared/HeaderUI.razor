@@ -3498,15 +3498,6 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         // Reconnect, 메뉴 재생성동작하게 
         pageService.SetStatusSideMenuReBuildTime(groupID, true);
 
-        // sessionCheck 동작하게 적용
-        HsNetWork hsNetWork = null;
-        hsNetWork = HsCmdCenter.GetConnectNetWork(groupID);
-        if (hsNetWork != null)
-        {
-            hsNetWork.SetLoginSessionCheckDo();
-            hsNetWork.SetReconnectStop();
-        }
-
         // Page 이동
         int i = 0;
         ISGSideBarUI activeMenu = null;
