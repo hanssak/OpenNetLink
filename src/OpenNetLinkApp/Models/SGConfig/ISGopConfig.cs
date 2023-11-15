@@ -233,7 +233,5 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseCheckZipFileInnerFileCount { get; set; }  // 1회 전송 가능 파일 검사 시 Zip 파일일 경우 내부 파일 전체를 Count에 포함
 
         public bool bIsBlockEmptyExt { get; set; }  // 빈 확장자 파일 전송가능유무
-
-        public int nSessionDuplicate { get; set; }              // 로그인때, 세션중복시 동작값
     }
 }

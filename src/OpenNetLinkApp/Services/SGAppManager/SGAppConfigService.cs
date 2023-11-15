@@ -106,42 +106,48 @@ namespace OpenNetLinkApp.Services.SGAppManager
             string AppConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppEnvSetting.json";
             try
             {
-                var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));               
+                var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));
 
                 HsLogDel hsLog = new HsLogDel();
                 hsLog.Delete(7);    // 7일이전 Log들 삭제
 
-            CLog.Here().Information($"- AppEnvSetting Path: [{AppConfig}]");
-            if (File.Exists(AppConfig))
-            {
-                byte[] contents = File.ReadAllBytes(AppConfig);
-                try
+                CLog.Here().Information($"- AppEnvSetting Path: [{AppConfig}]");
+                if (File.Exists(AppConfig))
                 {
-                    CLog.Here().Information($"- AppEnvSetting Loading... : [{AppConfig}]");
-
-                    //string strContents = Encoding.UTF8.GetString(contents);
-                    using (MemoryStream str = new MemoryStream(contents))
+                    byte[] contents = File.ReadAllBytes(AppConfig);
+                    try
                     {
-                        SGAppConfig appConfig = (SGAppConfig)serializer.ReadObject(str);
-                        _AppConfigInfo = appConfig;
-                    }
+                        CLog.Here().Information($"- AppEnvSetting Loading... : [{AppConfig}]");
 
-                    ////Open the stream and read it back.
-                    //using (FileStream fs = File.OpenRead(AppConfig))
-                    //{
-                    //    SGAppConfig appConfig = (SGAppConfig)serializer.ReadObject(fs);
-                    //    _AppConfigInfo = appConfig;
-                    //}
-                    CLog.Here().Information($"- AppEnvSetting Load Completed : [{AppConfig}]");
+                        //string strContents = Encoding.UTF8.GetString(contents);
+                        using (MemoryStream str = new MemoryStream(contents))
+                        {
+                            SGAppConfig appConfig = (SGAppConfig)serializer.ReadObject(str);
+                            _AppConfigInfo = appConfig;
+                        }
+
+                        ////Open the stream and read it back.
+                        //using (FileStream fs = File.OpenRead(AppConfig))
+                        //{
+                        //    SGAppConfig appConfig = (SGAppConfig)serializer.ReadObject(fs);
+                        //    _AppConfigInfo = appConfig;
+                        //}
+                        CLog.Here().Information($"- AppEnvSetting Load Completed : [{AppConfig}]");
+                    }
+                    catch (Exception ex)
+                    {
+                        CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
+                        _AppConfigInfo = new SGAppConfig();
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
                     _AppConfigInfo = new SGAppConfig();
                 }
             }
-            else
+            catch(Exception ex)
             {
+                CLog.Here().Warning($"Exception - Message : {ex.Message}, HelpLink : {ex.HelpLink}, StackTrace : {ex.StackTrace}");
                 _AppConfigInfo = new SGAppConfig();
             }
         }

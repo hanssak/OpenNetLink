@@ -63,15 +63,10 @@ namespace OpenNetLinkApp.Services
                 contents.hsClear(3);
             }
 
-                m_StrLanguage = SGAppManager.SGAppConfigService.AppConfigInfo.strLanguage;
-                if (string.IsNullOrEmpty(m_StrLanguage))
-                    m_StrLanguage = "KR";
-            }
-            catch (Exception ex)
-            {
-                CLog.Here().Error($"XmlConfService LoadFile(Path:{strFileName}) Exception :{ex.ToString()}");
-                throw;
-            }
+            m_StrLanguage = SGAppManager.SGAppConfigService.AppConfigInfo.strLanguage;
+            if (string.IsNullOrEmpty(m_StrLanguage))
+                m_StrLanguage = "KR";
+
         }
 
         public string GetCommon(string strID)
