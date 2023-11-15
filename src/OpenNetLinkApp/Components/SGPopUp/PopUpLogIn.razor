@@ -645,7 +645,7 @@
             CLog.Here().Information($"doLogin, try Login Type : {(HsNetWork.UseHiddenLog ? eLoginUITypeData : "xxx")}");
 
             if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
-                HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginUITypeData);
+                HSCmdCenter.LoginAD(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginUITypeData);
             else if (eLoginUITypeData == eLoginType.eLOGINTYPE_CUSTOM)
             {
                 if (SGAppMgrSvc.OpConfigInfoService.GetCustomLoginType(nGroupID) == (int)Enums.EnumCustomLoginType.LoginTemplate01)
@@ -657,7 +657,7 @@
                         string url = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginHttpUrl(nGroupID);
                         string siteKey = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginSecurityKey(nGroupID);
                         string siteIV = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginSecurityIV(nGroupID);
-                        (bool, string) resultMsg = loginTemplate01.Login(id, pw, url, siteKey, siteIV);
+                        (bool, string) resultMsg = loginTemplate01.Login(id, protectedPw, url, siteKey, siteIV);
                         CLog.Here().Information($"result bool  : {resultMsg.Item1} , result Msg : {resultMsg.Item2}");
                         if (!resultMsg.Item1)
                         {
@@ -673,7 +673,7 @@
                         return;
                     }
 
-                    HSCmdCenter.LoginNotCheckPw(nGroupID, id, pw, strCurCliVersion, otp, 0);
+                    HSCmdCenter.LoginNotCheckPw(nGroupID, id, protectedPw, strCurCliVersion, otp, 0);
                 }
             }
             else
@@ -704,7 +704,7 @@
 
 
             id = nacUserId;
-            pw = string.Empty;
+            protectedPw = string.Empty;
 
             if ((id?.Length ?? 0) < 1)
             {

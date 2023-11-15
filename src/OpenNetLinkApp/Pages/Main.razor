@@ -89,7 +89,7 @@
                             else if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(0) == (int)Enums.enumNacLoginType.Genian && (srcLoc == "Logout" || !SGAppMgrSvc.SystemService.IsStartedByNAC()))
                             {
                                 //Genian NAC은 NAC 인자에 의해 실행되지 않을때는 PW 표시
-                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" value="@pw" @oninput="@(e => pw = e.Value.ToString())" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
+                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" onkeydown="KeyEventPW('btnLogin');" tabindex="2" autocomplete="off">
                             }
 
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
@@ -909,7 +909,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 return;
             }
 
-            if ((pw?.Length ?? 0) < 1)
+            if ((protectedPw?.Length ?? 0) < 1)
             {
                 ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
                 return;
@@ -928,7 +928,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 string url = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginHttpUrl(groupid);
                 string siteKey = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginSecurityKey(groupid);
                 string siteIV = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginSecurityIV(groupid);
-                (bool, string) resultMsg = loginTemplate01.Login(id, pw, url, siteKey, siteIV);
+                (bool, string) resultMsg = loginTemplate01.Login(id, protectedPw, url, siteKey, siteIV);
                 CLog.Here().Information($"result bool  : {resultMsg.Item1} , result Msg : {resultMsg.Item2}");
                 if (!resultMsg.Item1)
                 {
@@ -973,13 +973,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 foreach (ISGNetwork netlist in listNetWork)
                 {
                     CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
-                    HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, pw, strCurCliVersion, otp, 0);
+                    HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id,  protectedPw, strCurCliVersion, otp, 0);
                     pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
                 }
             }
             else
             {
-                HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, 0);
+                HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, 0);
                 pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
             }
 
@@ -1005,7 +1005,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             JSRuntime.InvokeAsync<object>("loginCursorChange");
 
             id = nacUserId;
-            pw = string.Empty;
+            protectedPw = string.Empty;
 
             if ((id?.Length ?? 0) < 1)
             {
