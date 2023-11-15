@@ -378,7 +378,7 @@
             string strContents = strBindDesc;
 
             // 최대길이 Check 동작
-            if (!strBindTitle.Equals(""))
+            if ((strBindTitle?.Length ?? 0) > 0)
             {
                 if (Encoding.UTF8.GetByteCount(strBindTitle) > 128)
                 {
@@ -391,7 +391,7 @@
                 }
             }
 
-            if (!strBindDesc.Equals(""))
+            if ((strBindDesc?.Length ?? 0) > 0)
             {
                 if (Encoding.UTF8.GetByteCount(strBindDesc) > 250)
                 {
