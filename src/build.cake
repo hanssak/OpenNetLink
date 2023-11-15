@@ -823,7 +823,7 @@ Task("MakeInstaller")
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
-					{"REG_CRX", regCrxForce.ToString().ToUpper()}
+					{"REG_CRX", regCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
@@ -846,7 +846,7 @@ Task("MakeInstaller")
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
-					{"REG_CRX", regCrxForce.ToString().ToUpper()}
+					{"REG_CRX", regCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
@@ -870,7 +870,7 @@ Task("MakeInstaller")
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
-					{"REG_CRX", regCrxForce.ToString().ToUpper()}
+					{"REG_CRX", regCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
