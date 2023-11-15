@@ -159,6 +159,13 @@ namespace OpenNetLinkApp.Common
             Fasso = 2,
         }
 
+        public enum EnumDlpType : Int32
+        {
+            [Description("Somansa")]
+            Somansa = 1,
+
+        }
+
         public enum EnumCustomLoginType : Int32
         {
             [Description("LoginTemplate01")] //서울대학병원 그룹웨어 연동

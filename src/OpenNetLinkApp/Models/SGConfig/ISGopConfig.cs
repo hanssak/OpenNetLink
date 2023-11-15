@@ -204,6 +204,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseDrmAfterFileReceive { get; set; }             //파일 수신 완료 후 DRM 사용 여부
         public int nDrmType { get; set; }                          //DRM 종류 - 1. SoftCamp
         public string strSoftCampGrade { get; set; }         //DRM 종류 - SoftCamp Grade 옵션화 처리
+        public bool bUseDlpCheck { get; set; }          //파일 전송 시 DLP 검사 사용 유무
+        public int nDlpType { get; set; }                          //DLP 종류 - 1. 소만사
 
         public bool bHideApprLine { get; set; }             // 결재라인 표현유무
 
@@ -227,6 +229,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseCheckZipFileInnerFileCount { get; set; }  // 1회 전송 가능 파일 검사 시 Zip 파일일 경우 내부 파일 전체를 Count에 포함
 
         public bool bIsBlockEmptyExt { get; set; }  // 빈 확장자 파일 전송가능유무
+
+        public bool bDeleteUploadFile { get; set; }           // 파일 전송 후 파일 삭제
 
     }
 }

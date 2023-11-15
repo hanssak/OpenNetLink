@@ -218,6 +218,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public int nDrmType { get; set; } = 1;                          //DRM 종류 - 1. SoftCamp
         public string strSoftCampGrade { get; set; } = "0000001";         //DRM 종류 - SoftCamp Grade 옵션화 처리
 
+        public bool bUseDlpCheck { get; set; } = false;          //파일 전송 시 DLP 검사 사용 유무
+        public int nDlpType { get; set; } = 1;                          //DLP 종류 - 1. 소만사
+
         public bool bHideApprLine { get; set; } = false;           // 결재라인 표현유무
 
         public bool bHideTitleDesc { get; set; } = false;           // 제목 및 설명 표현유무
@@ -237,6 +240,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFromNameRecvDownPathShortCut { get; set; } = false; //다운로드 수신폴더에 대한 바탕화면 바로가기 생성 시, 이름 정보에 ToName이 아닌, FromName으로 표시 (Default :false)
 
         public bool bIsBlockEmptyExt { get; set; } = false;           // 확장자가 비어있는 파일전송 차단할지 유무(Default:false), 전송가능함
+
+        public bool bDeleteUploadFile { get; set; } = false;           // 파일 전송 후 파일 삭제
 
     }
 

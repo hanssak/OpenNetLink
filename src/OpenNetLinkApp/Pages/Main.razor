@@ -826,6 +826,7 @@
 
             int groupid = pageService.m_nCurViewPageGroupID;
 
+
             //외부 그룹웨어 연동
             try
             {
@@ -837,8 +838,10 @@
                 CLog.Here().Information($"result bool  : {resultMsg.Item1} , result Msg : {resultMsg.Item2}");
                 if (!resultMsg.Item1)
                 {
-                    ShowMessage("error", resultMsg.Item2);
+                    JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
                     bStartedLogin = false;
+                    ShowMessage("error", resultMsg.Item2);
+
                     return;
                 }
             }
@@ -1295,7 +1298,7 @@
         *@
 
 
-    // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
+        // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
         {
@@ -2077,7 +2080,7 @@
                         else
                             HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
                     }
-                    else if(SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterShow(0))
+                    else if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterShow(0))
                     {
                         if (pageService.GetConnectCount(nGroupIDfirst) <= 0)                                                                     // 재접속이 아닐 경우에만 화면 호출
                         {
