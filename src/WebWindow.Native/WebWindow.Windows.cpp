@@ -377,9 +377,33 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	break;
 	case WM_GETMINMAXINFO:
+	{
 		mmi = (LPMINMAXINFO)lParam;
-		mmi->ptMinTrackSize.x = WINDOW_MIN_WIDTH;
-		mmi->ptMinTrackSize.y = WINDOW_MIN_HEIGHT;
+
+		//WebWindow* webWindow = hwndToWebWindow[hwnd];
+		//webWindow->GetScreenDpi();
+		int dpi = GetDpiForWindow(hwnd);
+		printf("dpi %d\n", dpi);
+		if (dpi <= 100)
+		{
+			mmi->ptMinTrackSize.x = WINDOW_MIN_WIDTH;
+			mmi->ptMinTrackSize.y = WINDOW_MIN_HEIGHT;
+		}
+		else if (dpi <= 130)
+		{
+			mmi->ptMinTrackSize.x = 1270;
+			mmi->ptMinTrackSize.y = 900;// WINDOW_MIN_HEIGHT;
+		}
+		else if (dpi <= 150)
+		{
+			mmi->ptMinTrackSize.x = 1510;
+			mmi->ptMinTrackSize.y = 900;// WINDOW_MIN_HEIGHT;
+		}
+		else //다른 해상도는 조정필요
+		{
+			mmi->ptMinTrackSize.x = 1510;
+			mmi->ptMinTrackSize.y = 900;// WINDOW_MIN_HEIGHT;
+		}
 		return 0;
 		//case WM_QUIT:
 		//{
@@ -392,6 +416,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		//		KillProcess(pid);
 		//	break;
 		//}
+	}
 	case WM_CLOSE:
 		NTLog(SelfThis, Info, "Called : OpenNetLink - WM_CLOSE - TrayUse : %s", g_bDoExit2TrayUse ? "YES" : "NO");
 		if (g_bDoExit2TrayUse)
