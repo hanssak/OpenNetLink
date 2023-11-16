@@ -51,11 +51,7 @@ namespace OpenNetLinkApp
             Directory.SetCurrentDirectory(cwdPath);
 
             Services.SGAppManager.SGSystemService.SystemInfo.StartArg = args;
-
-            string windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
-            if (String.IsNullOrEmpty(windowTitle))
-                windowTitle = "OpenNetLink";
-
+            string windowTitle = "OpenNetLink";
 #if DEBUG
             if (true)
 #else
@@ -65,6 +61,14 @@ namespace OpenNetLinkApp
                 InitializeLogger();
 
                 if (args?.Length > 0) CLog.Information($"args : {string.Join(',', args)}");
+
+                //json파일 재암호화
+                //파일에 저장된 항목 dek 재 암호화
+                SGCrypto.ValidationResult &= SGFileCrypto.Instance.EncryptSettingFiles();
+
+                windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
+                if (String.IsNullOrEmpty(windowTitle))
+                    windowTitle = "OpenNetLink";
 
                 //HsNetWorkSG.SGCrypto.UseKeyGen = false;
                 //OP 파일 재 암호화 => 암복호화 실패 시 재설치
@@ -76,11 +80,6 @@ namespace OpenNetLinkApp
                     SGCrypto.ValidationResult &= SGCrypto.SaveKeyGenerate("wwwroot/conf/hsck");
                 else
                     SGCrypto.ValidationResult &= SGCrypto.LoadKeyGenerate("wwwroot/conf/hsck");
-
-                //json파일 재암호화
-                //파일에 저장된 항목 dek 재 암호화
-                SGCrypto.ValidationResult &= SGFileCrypto.Instance.EncryptSettingFiles();
-
 
                 //SP1 테스트를 위해 처리
                 //SGFileCrypto.Instance.EncryptSettingFiles("wwwroot/conf/SP1_DEBUG");
@@ -112,6 +111,14 @@ namespace OpenNetLinkApp
 
                 InitializeLogger();
 
+                //json파일 재암호화
+                //파일에 저장된 항목 dek 재 암호화
+                SGCrypto.ValidationResult &= SGFileCrypto.Instance.EncryptSettingFiles();
+                
+                windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
+                if (String.IsNullOrEmpty(windowTitle))
+                    windowTitle = "OpenNetLink";
+
                 if (args?.Length > 0) CLog.Information($"args : {string.Join(',', args)}");
 
                 object[] arg = new object[2];
@@ -129,6 +136,10 @@ namespace OpenNetLinkApp
             }
             else
             {
+                windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
+                if (String.IsNullOrEmpty(windowTitle))
+                    windowTitle = "OpenNetLink";
+
                 int nhWnd = 0;
                 nhWnd = FindWindow("WebWindow", windowTitle);
                 if (nhWnd != 0 && IsWindow(nhWnd))
@@ -136,7 +147,6 @@ namespace OpenNetLinkApp
                     PostMessage(nhWnd, 0x0400 + 0x0003, 0, 0);
                 }
             }
-
         }
 
         /// <summary>
