@@ -1622,14 +1622,12 @@ void AutoPasteClipBoard(int groupID)
 		keybd_event('V', 0x98, 0, 0);
 		keybd_event('V', 0x98, KEYEVENTF_KEYUP, 0);
 		keybd_event(VK_CONTROL, 0x9d, KEYEVENTF_KEYUP, 0);
-		Sleep(300);
+		//Sleep(300);
 	}
 }
 
 int WebWindow::SendClipBoard(int groupID)
 {
-	wprintf(L"SendClipBoard => groupID : %d, g_bDoingSendClipBoard : %d", groupID, g_bDoingSendClipBoard ? _T("True") : _T("False"));
-
 	if (g_bDoingSendClipBoard)
 	{
 		NTLog(SelfThis, Info, "WebWindow::SendClipBoard - SendClipBoard(GroupID : %d) - Send is Doing, so Return-", groupID);
