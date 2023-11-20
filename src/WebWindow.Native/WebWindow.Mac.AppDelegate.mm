@@ -10,6 +10,7 @@
 - (id)init {
     if (self = [super init]) {
         // allocate and initialize window and stuff here ..
+        gPasteGroupID = 100;
     }
     return self;
 }
