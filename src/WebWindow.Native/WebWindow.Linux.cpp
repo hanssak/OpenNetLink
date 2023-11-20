@@ -1440,6 +1440,37 @@ void AutoCopyClipBoard(int groupID)
 
 }
 
+void AutoPasteClipBoard(int groupID)
+{
+
+	NTLog(SelfThis, Info, "AutoPasteClipBoard - Start - nGroupID : %d", groupID);
+
+	Display* dpy = NULL;
+	dpy = XOpenDisplay(NULL);
+
+	if (dpy == NULL)
+		return;
+
+	usleep(1);
+
+	KeyCode xk_v = XKeysymToKeycode(dpy, XK_V);
+	KeyCode xk_control = XKeysymToKeycode(dpy, XK_Control_L);
+
+	XTestFakeKeyEvent(dpy, xk_control, True, 0);
+	XTestFakeKeyEvent(dpy, xk_v, True, 0);
+	XTestFakeKeyEvent(dpy, xk_control, False, 0);
+	XTestFakeKeyEvent(dpy, xk_v, False, 0);
+
+	usleep(1 * 100);
+
+	XFlush(dpy);
+	XSync(dpy, 0);
+	XCloseDisplay(dpy);
+
+	NTLog(SelfThis, Info, "AutoPasteClipBoard - End - nGroupID : %d", groupID);
+
+}
+
 
 void ClipBoardKeybinderHandler(const char* keystring, void* user_data)
 {
@@ -1447,7 +1478,14 @@ void ClipBoardKeybinderHandler(const char* keystring, void* user_data)
 	int nGroupId = pstParm->nGroupId;
 
 	NTLog(pstParm->self, Info, "Called ClipBoardKeybinderHandler, \" %s \" with GroupId(%d)", keystring, nGroupId);
-	if (g_bClipCopyNsend)
+	
+	if (g_nClipBoardPasteGroupId == nGroupId)
+	{
+		if (g_bClipBoardPasteHotKey)
+			AutoPasteClipBoard(nGroupId);
+		return;
+	}
+	else if (g_bClipCopyNsend)
 	{
 		AutoCopyClipBoard(nGroupId);
 	}
