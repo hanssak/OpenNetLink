@@ -152,6 +152,7 @@ bUserLineShowNameAndID : 결재라인 및 수신자라인 등에 [이름&직급]
 bUseClipAlarmType : 공통환경설정에서 클립보드 송수신 알림형식 수정가능 유무 (true,false)
 bUseClipCopyAndSend : 공통환경설정에서 클립보드 복사 후 전송 체크박스가 나오도록 ( true, false ) [기능X, 체크박스만동작]
 bClipCopyAutoSend : 클립보드 복사 후 전송 체크박스 설정값(true, false)
+bUseClipBoardPasteHotKey : 붙여넣기에 대한 추가 단축키 기능 활성화 유무 (Defulat : false) [기능X, 환경설정 표시 여부만 동작]
 
 // APP 트레이 이동 설정
 bUseCloseTrayMove : 공통환경설정에서 종료 시, 트레이로 이동 체크박스가 나오도록 ( true, false )

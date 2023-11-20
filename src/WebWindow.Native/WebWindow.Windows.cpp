@@ -59,6 +59,8 @@ bool g_bDoingSendClipBoard = false;
 bool g_bDoExit2TrayUse = false;
 bool g_bStartTray = true;
 bool g_bClipCopyNsend = false;
+int g_nClipBoardPasteGroupId = 100;
+bool g_bClipBoardPasteHotKey = false;
 bool g_bUseHttpUrl = false;
 
 std::map<int, wstring> mapHotKey;
@@ -2239,6 +2241,14 @@ void WebWindow::SetUseClipCopyNsend(bool bUseCopyNsend)
 	g_bClipCopyNsend = bUseCopyNsend;
 	//NTLog(this, Info, "Called : SetUseClipCopyNsend(################) : %s", (AutoString)(bUseCopyNsend ? "Yes" : "No"));
 }
+
+void WebWindow::SetUseClipBoardPasteHotKey(int pasteGroupID, bool bUse)
+{
+	g_nClipBoardPasteGroupId = pasteGroupID;
+	g_bClipBoardPasteHotKey = bUse;
+	printf("SetUseClipBoardPasteHotKey :GroupID: %d => %s\n", g_nClipBoardPasteGroupId , g_bClipBoardPasteHotKey ? "true" : "false");
+}
+
 void WebWindow::SetUseHttpUrl(bool bUse)
 {
 	g_bUseHttpUrl = bUse;
@@ -2263,7 +2273,15 @@ void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, 
 		(wchar_t)chVKCode, nIdx,
 		(AutoString)strTempHotKey.data());
 
+	wprintf(L"current MapHotKey Start: groupID : %d / Value : %s\n", groupID, strTempHotKey.c_str());
 	mapHotKey[groupID] = strTempHotKey;
+	wprintf(L"current MapHotKey end: groupID : %d / Value : %s\n", groupID, strTempHotKey.c_str());
+
+	for (map<int, wstring>::const_iterator it = mapHotKey.begin();
+		it != mapHotKey.end(); ++it)
+	{
+		wprintf(L"current MapHotKey : key : %d / Value : %s\n", it->first, it->second.c_str());
+	}
 }
 
 

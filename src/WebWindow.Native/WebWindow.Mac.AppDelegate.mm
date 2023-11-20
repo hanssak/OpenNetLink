@@ -334,6 +334,16 @@
     //NSLog(@"gCopyAndSend Value Change : %d", gCopyAndSend);
 }
 
+- (void) SetPasteHotKey:(bool)value
+{
+    NSLog(@"SetPasteHotKey");
+    if(value)
+        gPasteHotKey = 1;
+    else
+        gPasteHotKey = 0;
+
+}
+
 - (void) hotkeyGenerate:(char)chVKCode alt:(bool)bAlt control:(bool)bControl shift:(bool)bShift win:(bool)bWin
 {
     NSLog(@"generate hotkey, alt:%d control:%d shift:%d win:%d keycode:%c", bAlt, bControl, bShift, bWin, chVKCode);

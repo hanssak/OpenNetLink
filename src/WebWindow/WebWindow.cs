@@ -236,6 +236,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetTrayStartUse(IntPtr instance, bool useTrayStart);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetUseClipCopyNsend(IntPtr instance, bool bUse);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetUseClipBoardPasteHotKey(IntPtr instance, int groupID, bool bUse);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetUseHttpUrl(IntPtr instance, bool bUse);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetNativeClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
@@ -928,6 +929,8 @@ namespace WebWindows
         public void SetTrayStartUse(bool useTrayStart) => WebWindow_SetTrayStartUse(_nativeWebWindow, useTrayStart);
 
         public void SetUseClipCopyNsend(bool bUse) => WebWindow_SetUseClipCopyNsend(_nativeWebWindow, bUse);
+
+        public void SetUseClipBoardPasteHotKey(int groupID, bool bUse) => WebWindow_SetUseClipBoardPasteHotKey(_nativeWebWindow, groupID, bUse);
 
         public void SetUseHttpUrl(bool bUse) => WebWindow_SetUseHttpUrl(_nativeWebWindow, bUse);
 

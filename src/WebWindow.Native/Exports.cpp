@@ -219,6 +219,11 @@ extern "C"
 	{
 		instance->SetUseClipCopyNsend(bUse);
 	}
+	EXPORTED void WebWindow_SetUseClipBoardPasteHotKey(WebWindow* instance, int groupID, bool bUse)
+	{
+		instance->SetUseClipBoardPasteHotKey(groupID, bUse);
+	}
+
 	EXPORTED void WebWindow_SetUseHttpUrl(WebWindow* instance, bool bUse)
 	{
 		instance->SetUseHttpUrl(bUse);
