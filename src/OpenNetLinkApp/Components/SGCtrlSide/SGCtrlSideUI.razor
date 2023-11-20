@@ -246,7 +246,7 @@
                 <hr style="border-color:gray">
                  <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetClipBoardPasteHotKey())"
-                           @onchange="eventArgs => { SetClipBoardPasteHotKey(eventArgs); }" /><span>붙여넣기 추가 단축키 사용</span>                <!--붙여넣기 추가 단축키 사용-->
+                           @onchange="eventArgs => { SetClipBoardPasteHotKey(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPPASTE_SHORTCUTS")</span>                <!--붙여넣기 추가 단축키 사용-->
                     <br>
                     @if(GetClipBoardPasteHotKey())////붙여넣기에 대한 id는 100으로 단일화
                     {
