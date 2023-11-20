@@ -881,11 +881,31 @@
             Window.SetUseClipCopyNsend(true);
 
         // 붙여넣기 단축키 추가 기능 활성화 설정
-        if (GetClipBoardPasteHotKey())
+        if (SGAppMgrSvc.OpConfigInfoService.getUseClipBoardPasteHotKey(0) && GetClipBoardPasteHotKey())
         {
             Window.SetUseClipBoardPasteHotKey(PasteGroupId ,true);
             List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(PasteGroupId, true);
             char chVKey = AppConfigSvc.GetClipBoardVKey(PasteGroupId, true);
+
+            //OS 별 HotKey 등록
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                bool bAlt = listModKey[(int)HOTKEY_MOD.ALT];
+                bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
+                bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
+                bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
+                Window.WinRegClipboardHotKey(PasteGroupId, bAlt, bCtrl, bShift, bWin, chVKey);
+            }
+            else
+            {
+                Window.RegClipboardHotKey(PasteGroupId,
+                                listModKey[(int)HOTKEY_MOD.ALT],
+                                listModKey[(int)HOTKEY_MOD.CTRL],
+                                listModKey[(int)HOTKEY_MOD.SHIFT],
+                                listModKey[(int)HOTKEY_MOD.WINDOW],
+                                chVKey);
+            }
+            //Native의 MAP에 등록
             Window.SetNativeClipboardHotKey(PasteGroupId,
                                             listModKey[(int)HOTKEY_MOD.ALT],
                                             listModKey[(int)HOTKEY_MOD.CTRL],
@@ -893,7 +913,6 @@
                                             listModKey[(int)HOTKEY_MOD.WINDOW],
                                             chVKey, 0);
         }
-            
 
         // 첫Page 설정가능유무 Check, 다중망일때에는 모든 망에서 접속 할 수 있는 화면만 첫Page로 선택가능
 
@@ -1545,10 +1564,29 @@
 
         if (clipBoardPasteHotKey)
         {
-            //활성화 되면 단축키들 Native의 map에 저장
-           List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(PasteGroupId, true);
-           char chVKey = AppConfigSvc.GetClipBoardVKey(PasteGroupId, true);
-           Window.SetNativeClipboardHotKey(PasteGroupId, listModKey[(int)HOTKEY_MOD.ALT],
+            List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(PasteGroupId, true);
+            char chVKey = AppConfigSvc.GetClipBoardVKey(PasteGroupId, true);
+            //활성화 되면, OS 별 HotKey 등록
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                bool bAlt = listModKey[(int)HOTKEY_MOD.ALT];
+                bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
+                bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
+                bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
+                Window.WinRegClipboardHotKey(PasteGroupId, bAlt, bCtrl, bShift, bWin, chVKey);
+            }
+            else
+            {
+                Window.RegClipboardHotKey(PasteGroupId,
+                                listModKey[(int)HOTKEY_MOD.ALT],
+                                listModKey[(int)HOTKEY_MOD.CTRL],
+                                listModKey[(int)HOTKEY_MOD.SHIFT],
+                                listModKey[(int)HOTKEY_MOD.WINDOW],
+                                chVKey);
+            }
+
+            //활성화 되면 단축키들 Native의 map에 저장           
+            Window.SetNativeClipboardHotKey(PasteGroupId, listModKey[(int)HOTKEY_MOD.ALT],
                                 listModKey[(int)HOTKEY_MOD.CTRL],
                                 listModKey[(int)HOTKEY_MOD.SHIFT],
                                 listModKey[(int)HOTKEY_MOD.WINDOW],

@@ -223,7 +223,7 @@ namespace WebWindows
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_FolderOpen(IntPtr instance, string strFileDownPath);
 
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);  //Window만 사용
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetDragNDropFilePath(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardData(IntPtr instance, int nGroupID, int nType, int nClipSize, byte[] data);
@@ -785,6 +785,7 @@ namespace WebWindows
         {
             WinUnRegClipboardHotKey(groupID);
             Invoke(() => winClip.RegHotKey(groupID, bAlt, bControl, bShift, bWin, chVKCode));
+            CLog.Here().Information($"WinRegClipboardHotKey GroupID : {groupID}, Alt[{bAlt}], Ctrl[{bControl}], Shift[{bShift}], Win[{bWin}], Char[{chVKCode}]");
         }
         public void WinUnRegClipboardHotKey(int groupID)
         {
