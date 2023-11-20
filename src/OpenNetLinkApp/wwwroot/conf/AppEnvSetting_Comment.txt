@@ -123,6 +123,9 @@ bHideSideBarAfterLogin : 로그인 후 좌측 사이드바 숨김 여부 설정 
 bUseClipAlarmType : 공통환경설정에서 클립보드 송수신 알림형식 수정가능 유무 (true,false)
 bUseClipCopyAndSend : 공통환경설정에서 클립보드 복사 후 전송 체크박스가 나오도록 ( true, false ) [기능X, 체크박스만동작]
 bClipCopyAutoSend : 클립보드 복사 후 전송 체크박스 설정값(true, false)
+bClipBoardPasteHotKey : 붙여넣기에 대한 추가 단축키 설정값 (Defulat : false) 
+strClipBoardPasteHotKeyValue : 붙여넣기에 대한 추가 단축키 정보 (Default : "N,Y,N,Y,V")
+
 
 // APP 트레이 이동 설정
 bUseCloseTrayMove : 공통환경설정에서 종료 시, 트레이로 이동 체크박스가 나오도록 ( true, false )

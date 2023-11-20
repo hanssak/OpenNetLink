@@ -41,13 +41,11 @@
                             // 3중 - 다중망
                             @foreach (var itemData in m_dicDestSysPos)
                             {
-
                                 // 다중접속일때에는 단일망에만 전달가능
                                 // 단일접속일때에는 3중망에 전달가능
                                 @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0 &&
                             (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                 {
-
                                     //@if (itemData.Value.nIdx == 1 && ListModKey.Count > 0)
                                     @if (itemData.Value.nIdx == 1 && DicModKey.Count > 0)
                                     {
@@ -242,7 +240,36 @@
                     <input type="checkbox" class="mr-1" checked="@(GetClipCopyAutoSend())"
                            @onchange="eventArgs => { SetClipCopyAutoSend(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPCOPYANDSEND")</span>                <!--클립보드 복사 후 전송 -->
                     </div>
-                }
+            }
+            @if (m_bUseClipBoardPasteHotKey)
+            {
+                <hr style="border-color:gray">
+                 <div class="mb-1  w-100">
+                    <input type="checkbox" class="mr-1" checked="@(GetClipBoardPasteHotKey())"
+                           @onchange="eventArgs => { SetClipBoardPasteHotKey(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPPASTE_SHORTCUTS")</span>                <!--붙여넣기 추가 단축키 사용-->
+                    <br>
+                    @if(GetClipBoardPasteHotKey())////붙여넣기에 대한 id는 100으로 단일화
+                    {
+                        <div class="mt-1 ml-3">
+                            @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
+                            {
+                                <input type="checkbox" class="mr-1" checked="@(GetDicModKey(PasteGroupId, Index))" disabled="@(!isValidDicModKey(PasteGroupId, Index))" @onclick:preventDefault="@GetPreventDefault(PasteGroupId, Index)"
+                                        @onchange="eventArgs => { CheckBoxModifierClicked(PasteGroupId, (HOTKEY_MOD)Index, eventArgs); }" />
+                                <span class="mr-2">@Modifier</span>
+                            }
+                            <button class="btn btn-default btn-xs btn-flat dropdown-toggle" type="button" id="dropdownMenu7" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                @GetDicModVKeyValue(PasteGroupId)
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenu7" style="height:135px; overflow-y:scroll; min-width:0px;">
+                                @foreach (var VKey in VKeyList())
+                                {
+                                <button class="dropdown-item text-xs p-1" style="text-align:center;" type="button" @onclick="@(()=>SelectBoxVKeySelected(PasteGroupId, VKey))">@VKey</button>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
         </div>
     }
 
@@ -715,6 +742,7 @@
 
     public bool m_bUseClipAlarmType = true;                                             // 클립보드 알림 형식 사용 유무
     public bool m_bUseClipCopyAndSend = false;                                           // 클립보드 복사 후 전송 사용 유무
+    public bool m_bUseClipBoardPasteHotKey = false;                                     // 클립보드 수신 후, 붙여넣기에 대한 별도 단축키 사용 유무
     public bool m_bUseURLRedirectionAlarm = true;                                       // URL 자동전환 알림 사용 유무
     public bool m_bUseURLRedirectionAlarmType = true;                                   // URL 자동전환 알림 타입 선택 사용 유무
     public bool m_bRFileAutoSend = true;                                                // 마우스 우클릭 후 자동전송 사용 유무
@@ -741,13 +769,10 @@
 
     Dictionary<string, SGNetOverData> m_dicDestSysPos = null;                       // 3망상황일때 정보
 
+    /// <summary>붙여넣기에 대한 [단축키 목록관리], [HotKey 콜백]에 사용되는 GroupId는 100으로 통일</summary>
+    const int PasteGroupId = 100;
+
     // 첫 Page 설정 List 나오게할지 유무 값
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// 
-
     bool bUseDashBoardUI = true;
 
     bool bUseFileTransUI = true;
@@ -840,7 +865,7 @@
             }
             }*@
 
-        HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
+    HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
         HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
         SGAppMgrSvc.SideBarUIService.OnChangeActMenu += CtrlSideUILoginAfterOnChange;
         HsCmdCenter.sgPageEvent.SetCtrlSideRefreshEvent(CtrlSideRefresh);
@@ -854,6 +879,40 @@
         // 클립보드 자동전송 상태 설정
         if (GetClipCopyAutoSend())
             Window.SetUseClipCopyNsend(true);
+
+        // 붙여넣기 단축키 추가 기능 활성화 설정
+        if (SGAppMgrSvc.OpConfigInfoService.getUseClipBoardPasteHotKey(0) && GetClipBoardPasteHotKey())
+        {
+            Window.SetUseClipBoardPasteHotKey(PasteGroupId ,true);
+            List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(PasteGroupId, true);
+            char chVKey = AppConfigSvc.GetClipBoardVKey(PasteGroupId, true);
+
+            //OS 별 HotKey 등록
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                bool bAlt = listModKey[(int)HOTKEY_MOD.ALT];
+                bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
+                bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
+                bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
+                Window.WinRegClipboardHotKey(PasteGroupId, bAlt, bCtrl, bShift, bWin, chVKey);
+            }
+            else
+            {
+                Window.RegClipboardHotKey(PasteGroupId,
+                                listModKey[(int)HOTKEY_MOD.ALT],
+                                listModKey[(int)HOTKEY_MOD.CTRL],
+                                listModKey[(int)HOTKEY_MOD.SHIFT],
+                                listModKey[(int)HOTKEY_MOD.WINDOW],
+                                chVKey);
+            }
+            //Native의 MAP에 등록
+            Window.SetNativeClipboardHotKey(PasteGroupId,
+                                            listModKey[(int)HOTKEY_MOD.ALT],
+                                            listModKey[(int)HOTKEY_MOD.CTRL],
+                                            listModKey[(int)HOTKEY_MOD.SHIFT],
+                                            listModKey[(int)HOTKEY_MOD.WINDOW],
+                                            chVKey, 0);
+        }
 
         // 첫Page 설정가능유무 Check, 다중망일때에는 모든 망에서 접속 할 수 있는 화면만 첫Page로 선택가능
 
@@ -1077,6 +1136,11 @@
     private bool GetClipCopyAutoSend()
     {
         return SGAppMgrSvc.AppConfigInfoService.GetClipCopyAutoSend();
+    }
+
+    private bool GetClipBoardPasteHotKey()
+    {
+        return SGAppMgrSvc.AppConfigInfoService.GetClipBoardPasteHotKey();
     }
 
     private bool GetURLAutoTrans(int nGroupID)
@@ -1313,6 +1377,8 @@
     /// <param name="chVKCode"></param>
     private void SetClipBoardHotKey(int groupId, ref List<bool> listModKey, char chVKCode)
     {
+        bool isPaste = (groupId == PasteGroupId);
+
         string strHotKey = String.Empty;
         foreach (var IsKeyUse in listModKey)
         {
@@ -1333,8 +1399,8 @@
         }
         else
         {
-            List<bool> oldModKey = AppConfigSvc.GetClipBoardModifier(groupId);
-            char oldVKey = AppConfigSvc.GetClipBoardVKey(groupId);
+            List<bool> oldModKey = AppConfigSvc.GetClipBoardModifier(groupId, isPaste);
+            char oldVKey = AppConfigSvc.GetClipBoardVKey(groupId, isPaste);
             Window.UnRegClipboardHotKey(groupId,
                                 oldModKey[(int)HOTKEY_MOD.ALT],
                                 oldModKey[(int)HOTKEY_MOD.CTRL],
@@ -1349,16 +1415,26 @@
                                     listModKey[(int)HOTKEY_MOD.WINDOW],
                                     chVKCode);
         }
+
         //SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode)
-        CtrlSideUISvc.SetClipBoardHotKey(groupId,
-                                        listModKey[(int)HOTKEY_MOD.WINDOW],
-                                        listModKey[(int)HOTKEY_MOD.CTRL],
-                                        listModKey[(int)HOTKEY_MOD.ALT],
-                                        listModKey[(int)HOTKEY_MOD.SHIFT],
-                                        chVKCode);
+        if(isPaste == false)        
+            CtrlSideUISvc.SetClipBoardHotKey(groupId,
+                                            listModKey[(int)HOTKEY_MOD.WINDOW],
+                                            listModKey[(int)HOTKEY_MOD.CTRL],
+                                            listModKey[(int)HOTKEY_MOD.ALT],
+                                            listModKey[(int)HOTKEY_MOD.SHIFT],
+                                            chVKCode);
+        else     
+            CtrlSideUISvc.SetClipBoardPasteHotKeyValue(
+                                            listModKey[(int)HOTKEY_MOD.WINDOW],
+                                            listModKey[(int)HOTKEY_MOD.CTRL],
+                                            listModKey[(int)HOTKEY_MOD.ALT],
+                                            listModKey[(int)HOTKEY_MOD.SHIFT],
+                                            chVKCode);
 
         // Native 쪽에 저장해줌
-        if (SGAppMgrSvc.AppConfigInfoService.GetClipCopyAutoSend())
+        if (SGAppMgrSvc.AppConfigInfoService.GetClipCopyAutoSend() 
+        || SGAppMgrSvc.AppConfigInfoService.GetClipBoardPasteHotKey())
         {
             Window.SetNativeClipboardHotKey(groupId,
                 listModKey[(int)HOTKEY_MOD.ALT],
@@ -1477,6 +1553,44 @@
                                 listModKey[(int)HOTKEY_MOD.WINDOW],
                                 chVKey, 0);
             }
+        }
+    }
+    private void SetClipBoardPasteHotKey(ChangeEventArgs changeEventArg)
+    {
+        bool clipBoardPasteHotKey = Convert.ToBoolean(changeEventArg.Value);
+        CLog.Here().Information($"SetClipBoardPasteHotKey Set: [{clipBoardPasteHotKey}]");
+        CtrlSideUISvc.SetClipBoardPasteHotKey(clipBoardPasteHotKey);
+        Window.SetUseClipBoardPasteHotKey(PasteGroupId, clipBoardPasteHotKey);
+
+        if (clipBoardPasteHotKey)
+        {
+            List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(PasteGroupId, true);
+            char chVKey = AppConfigSvc.GetClipBoardVKey(PasteGroupId, true);
+            //활성화 되면, OS 별 HotKey 등록
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                bool bAlt = listModKey[(int)HOTKEY_MOD.ALT];
+                bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
+                bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
+                bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
+                Window.WinRegClipboardHotKey(PasteGroupId, bAlt, bCtrl, bShift, bWin, chVKey);
+            }
+            else
+            {
+                Window.RegClipboardHotKey(PasteGroupId,
+                                listModKey[(int)HOTKEY_MOD.ALT],
+                                listModKey[(int)HOTKEY_MOD.CTRL],
+                                listModKey[(int)HOTKEY_MOD.SHIFT],
+                                listModKey[(int)HOTKEY_MOD.WINDOW],
+                                chVKey);
+            }
+
+            //활성화 되면 단축키들 Native의 map에 저장           
+            Window.SetNativeClipboardHotKey(PasteGroupId, listModKey[(int)HOTKEY_MOD.ALT],
+                                listModKey[(int)HOTKEY_MOD.CTRL],
+                                listModKey[(int)HOTKEY_MOD.SHIFT],
+                                listModKey[(int)HOTKEY_MOD.WINDOW],
+                                chVKey, 0);
         }
     }
 
@@ -1640,7 +1754,7 @@
             return;
             }*@
 
-        //HsCmdCenter.SetDownLoadPath(groupId, stPath);
+    //HsCmdCenter.SetDownLoadPath(groupId, stPath);
         //HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
         //CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
         SetAllDownloadPath(groupId, stPath);
@@ -2045,6 +2159,7 @@
             // siteConfig. json으로 이동
             m_bUseClipAlarmType = SGAppMgrSvc.OpConfigInfoService.GetUseClipAlarmTypeChange(0);
             m_bUseClipCopyAndSend = SGAppMgrSvc.OpConfigInfoService.GetUseClipCopyAndSend(0);
+            m_bUseClipBoardPasteHotKey = SGAppMgrSvc.OpConfigInfoService.getUseClipBoardPasteHotKey(0);
             //m_bUseClipBoard = (m_bUseClipAlarmType | m_bUseClipCopyAndSend);
         }
 
@@ -2096,7 +2211,6 @@
             sgLoginData = null;
             foreach (var NetworkInfo in GetSGNetworkList())
             {
-
                 sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(NetworkInfo.GroupID);
 
                 if (sgLoginData != null && sgLoginData.GetClipboard())  // UI에서 처리
@@ -2190,8 +2304,11 @@
 
                     }
 
-
-
+                    //클립보드 설정
+                    List<bool> bPasteList = AppConfigSvc.GetClipBoardModifier(PasteGroupId, true);
+                    char chPasteData = AppConfigSvc.GetClipBoardVKey(PasteGroupId, true);
+                    SetDicModKeyList(PasteGroupId, ref bPasteList);
+                    SetDicModVKey(PasteGroupId, chPasteData);
                 }
 
             }
@@ -2384,7 +2501,6 @@
     /// <returns></returns>
     public bool SetDicModKeyList(int nGroupId, ref List<bool> listKey)
     {
-
         bool bRet = true;
         try
         {
@@ -2404,10 +2520,8 @@
             bRet = false;
             CLog.Here().Information($"CliBoard - SetDicModKeyList - Exception : {ex.Message}");
         }
-
         return bRet;
     }
-
 
     public void SetPreventDefault(int groupId, List<bool> listKey)
     {

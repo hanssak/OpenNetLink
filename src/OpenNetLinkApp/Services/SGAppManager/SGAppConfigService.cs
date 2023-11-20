@@ -25,11 +25,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         ISGAppConfig GetSGAppConfigService();
 
         string GetClipBoardHotKey(int groupId);
-        List<bool> GetClipBoardModifier(int groupId);
+        List<bool> GetClipBoardModifier(int groupId, bool isPaste=false);
 
         List<bool> GetClipBoardModifierWhenNetOver(int groupId, int nIdx);
 
-        char GetClipBoardVKey(int groupId);
+        char GetClipBoardVKey(int groupId, bool isPaste = false);
 
         char GetClipBoardVKeyWhenNetOver(int groupId, int nIdx, int nMaxGroupID, int nMaxIdx);
 
@@ -38,6 +38,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         string GetMainPage();
         bool GetClipCopyAutoSend();
+        bool GetClipBoardPasteHotKey();
+        string GetClipBoardPasteHotKeyValue();
         bool GetURLAutoTrans(int nGroupID);
         bool GetURLAutoAfterMsg(int nGroupID);
         string GetURLAutoAfterBrowser(int nGroupID);
@@ -171,12 +173,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
 
 
-        public List<bool> GetClipBoardModifier(int groupId)
+        public List<bool> GetClipBoardModifier(int groupId, bool isPaste =false)
         {
             string strHotKey;
             String[] HotKeylist;
 
-            strHotKey = GetClipBoardHotKey(groupId);
+
+            strHotKey = (isPaste) ? GetClipBoardPasteHotKeyValue() :GetClipBoardHotKey(groupId);
             HotKeylist = strHotKey.Split(",", StringSplitOptions.RemoveEmptyEntries);
 
             // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
@@ -257,13 +260,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
 
 
-        public char GetClipBoardVKey(int groupId)
+        public char GetClipBoardVKey(int groupId, bool isPaste = false)
         {
             char cVKey;
             string strHotKey;
             String[] HotKeylist;
 
-            strHotKey = GetClipBoardHotKey(groupId);
+            strHotKey = (isPaste) ? GetClipBoardPasteHotKeyValue() :GetClipBoardHotKey(groupId);
             HotKeylist = strHotKey.Split(",", StringSplitOptions.RemoveEmptyEntries);
 
             // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
@@ -424,6 +427,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bClipCopyAutoSend;
         }
+        public bool GetClipBoardPasteHotKey() => AppConfigInfo.bClipBoardPasteHotKey;
+        public string GetClipBoardPasteHotKeyValue() => AppConfigInfo.strClipBoardPasteHotKeyValue;
+
         public bool GetURLAutoTrans(int nGroupID)
         {
             //return AppConfigInfo.bURLAutoTrans;
