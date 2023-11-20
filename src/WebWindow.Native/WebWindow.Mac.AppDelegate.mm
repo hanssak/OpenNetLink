@@ -159,7 +159,19 @@
     NSNumber *nsNumbGuId = (NSNumber *)anObject;
     
     //NSLog(@"gCopyAndSend Value : %d", gCopyAndSend);
-    if(gCopyAndSend == 1)
+    
+    if(gPasteGroupID == [nsNumbGuId intValue])
+    {
+        if(gPasteHotKey == 1)
+        {
+            NSLog(@"Command + V Press!");
+            [self hotkeyGenerate:'v' alt:false control:false shift:false win:true];        
+            //usleep(1000000);
+        } 
+        return;
+    }
+    
+    else if(gCopyAndSend == 1)
     {
         NSLog(@"Command + C Press!");
        [self hotkeyGenerate:'c' alt:false control:false shift:false win:true];
@@ -334,9 +346,13 @@
     //NSLog(@"gCopyAndSend Value Change : %d", gCopyAndSend);
 }
 
-- (void) SetPasteHotKey:(bool)value
+- (void) SetPasteHotKey:(bool)value object:(id)anObject
 {
     NSLog(@"SetPasteHotKey");
+    
+    NSNumber *nsNumbGuId = (NSNumber *)anObject;
+    gPasteGroupID = [nsNumbGuId intValue];
+
     if(value)
         gPasteHotKey = 1;
     else

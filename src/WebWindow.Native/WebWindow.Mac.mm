@@ -947,8 +947,10 @@ void WebWindow::SetUseClipCopyNsend(bool bUse)
 void WebWindow::SetUseClipBoardPasteHotKey(int pasteGroupID, bool bUse)
 {
     g_nClipBoardPasteGroupId = pasteGroupID;
+    NSNumber *numGuId = [NSNumber numberWithInt:g_nClipBoardPasteGroupId];
+
     g_bClipBoardPasteHotKey = bUse;
-    [_appDelegate SetPasteHotKey:g_bClipBoardPasteHotKey];
+    [_appDelegate SetPasteHotKey:g_bClipBoardPasteHotKey object:numGuId];
 }
 
 void WebWindow::SetUseHttpUrl(bool bUse)
