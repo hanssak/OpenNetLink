@@ -114,6 +114,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseClipTypeText { get; set; }             //TEXT로 클립보드 전송 사용 유무
 
         public bool bUseClipTypeImage { get; set; }            //IMAGE로 클립보드 전송 사용 유무
+        public bool bUseClipBoardPasteHotKey { get; set; }      // 붙여넣기에 대한 추가 단축키 기능 활성화 유무(Defulat : false) [기능X, 환경설정 표시 여부만 동작]
         //메일
         public bool bUseEmail { get; set; }               // 메일 관리/결재 사용 유무.
 

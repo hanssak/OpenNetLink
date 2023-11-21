@@ -1066,7 +1066,8 @@
                     {
                         // 트레이 이동.
                         // 트레이 아이콘으로 이동합니다
-                        HsCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, XmlConf.GetTitle("T_ETC_TRAYMOVE"), XmlConf.GetInfoMsg("I_0051"));
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseHideToastPopup(groupId) == false)
+                            HsCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, XmlConf.GetTitle("T_ETC_TRAYMOVE"), XmlConf.GetInfoMsg("I_0051"));
 
                         Window.MoveWebWindowToTray();
                     }

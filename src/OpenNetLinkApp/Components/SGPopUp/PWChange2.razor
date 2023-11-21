@@ -322,7 +322,8 @@
             {
                 string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
                 string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
-                Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseHideToastPopup(groupID) == false)
+                    Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
                 Window.MoveWebWindowToTray();
             }
             else
@@ -406,7 +407,8 @@
             {
                 string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
                 string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
-                Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseHideToastPopup(groupID) == false)
+                    Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
                 Window.MoveWebWindowToTray();
             }
             else
