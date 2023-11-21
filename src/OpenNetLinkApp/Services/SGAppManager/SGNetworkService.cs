@@ -39,10 +39,29 @@ namespace OpenNetLinkApp.Services.SGAppManager
             LoadNetWorkFile();
         }
 
-        public static void LoadNetWorkFile()
+        public void SaveIPAndReload(string IP)
+        {
+            string strNetworkFileName = "wwwroot/conf/NetWork.json";
+            NetWorkInfo[0].IPAddress = IP;
+
+            SGNetworkForSave saveFormat = new SGNetworkForSave();
+            saveFormat.NETWORKS = NetWorkInfo;
+
+            var opt = new JsonSerializerOptions() { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            var json = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes<SGNetworkForSave>(saveFormat, opt);
+
+            string jsonString = Encoding.UTF8.GetString(json);
+
+            File.WriteAllText(strNetworkFileName, jsonString);
+
+            LoadNetWorkFile(true);
+        }
+
+        public static void LoadNetWorkFile(bool isReload = false)
         {
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
             byte[] contents = File.ReadAllBytes(strNetworkFileName);
+            List<ISGNetwork> listNetworks = new List<ISGNetwork>();
             try
             {
                 string strContents = Encoding.UTF8.GetString(contents);
@@ -57,7 +76,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 try
                 {
-                    _netWorkInfo = networkParsing(strContents);
+                    listNetworks = networkParsing(strContents);
                 }
                 catch (Exception ex)
                 {
@@ -84,7 +103,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
                         SGCrypto.AESEncrypt256WithDEK(Encoding.UTF8.GetBytes(strContents), ref saveContetns);
                         File.WriteAllBytes(strNetworkFileName, saveContetns);
                     }
-                    _netWorkInfo = networkParsing(strContents);
+                    listNetworks = networkParsing(strContents);
+                }
+
+                if(isReload)
+                {
+                    //Reload 시에는 이미 해당 변수를 참조하는 곳이 있으므로,
+                    //객체를 재생성하지 않고 유지
+                    _netWorkInfo?.Clear();
+                    _netWorkInfo?.AddRange(listNetworks);
+                }
+                else
+                {
+                    _netWorkInfo = listNetworks;
                 }
             }
             catch (Exception ex)
@@ -95,23 +126,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
         }
 
-        public void SaveIPAndReload(string IP)
-        {
-            string strNetworkFileName = "wwwroot/conf/NetWork.json";
-            NetWorkInfo[0].IPAddress = IP;
-
-            SGNetworkForSave saveFormat = new SGNetworkForSave();
-            saveFormat.NETWORKS = NetWorkInfo;
-
-            var opt = new JsonSerializerOptions() { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
-            var json = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes<SGNetworkForSave>(saveFormat, opt);
-
-            string jsonString = Encoding.UTF8.GetString(json);
-
-            File.WriteAllText(strNetworkFileName, jsonString);
-
-            LoadNetWorkFile();
-        }
         static List<ISGNetwork> networkParsing(string jsonString)
         {
             List<ISGNetwork> listNetworks = new List<ISGNetwork>();
