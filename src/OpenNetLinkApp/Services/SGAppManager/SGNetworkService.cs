@@ -54,10 +54,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             File.WriteAllText(strNetworkFileName, jsonString);
 
-            loadNetworkFile();
+            loadNetworkFile(true);
         }
 
-        private static void loadNetworkFile()
+        private static void loadNetworkFile(bool isReload = false)
         {
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
             try
@@ -111,7 +111,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
                         }
                     }
                 }
-                _netWorkInfo = listNetworks;
+                
+                if(isReload)
+                {
+                    //Reload 시에는 이미 해당 변수를 참조하는 곳이 있으므로,
+                    //객체를 재생성하지 않고 유지
+                    _netWorkInfo?.Clear();
+                    _netWorkInfo?.AddRange(listNetworks);
+                }
+                else
+                {
+                    _netWorkInfo = listNetworks;
+                }
+                
             }
             catch (Exception ex)
             {
