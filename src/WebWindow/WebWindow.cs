@@ -223,7 +223,7 @@ namespace WebWindows
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_FolderOpen(IntPtr instance, string strFileDownPath);
 
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);  //Window만 사용
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetDragNDropFilePath(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardData(IntPtr instance, int nGroupID, int nType, int nClipSize, byte[] data);
@@ -236,6 +236,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetTrayStartUse(IntPtr instance, bool useTrayStart);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetUseClipCopyNsend(IntPtr instance, bool bUse);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetUseClipBoardPasteHotKey(IntPtr instance, int groupID, bool bUse);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetUseHttpUrl(IntPtr instance, bool bUse);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetNativeClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
@@ -784,6 +785,7 @@ namespace WebWindows
         {
             WinUnRegClipboardHotKey(groupID);
             Invoke(() => winClip.RegHotKey(groupID, bAlt, bControl, bShift, bWin, chVKCode));
+            CLog.Here().Information($"WinRegClipboardHotKey GroupID : {groupID}, Alt[{bAlt}], Ctrl[{bControl}], Shift[{bShift}], Win[{bWin}], Char[{chVKCode}]");
         }
         public void WinUnRegClipboardHotKey(int groupID)
         {
@@ -928,6 +930,8 @@ namespace WebWindows
         public void SetTrayStartUse(bool useTrayStart) => WebWindow_SetTrayStartUse(_nativeWebWindow, useTrayStart);
 
         public void SetUseClipCopyNsend(bool bUse) => WebWindow_SetUseClipCopyNsend(_nativeWebWindow, bUse);
+
+        public void SetUseClipBoardPasteHotKey(int groupID, bool bUse) => WebWindow_SetUseClipBoardPasteHotKey(_nativeWebWindow, groupID, bUse);
 
         public void SetUseHttpUrl(bool bUse) => WebWindow_SetUseHttpUrl(_nativeWebWindow, bUse);
 

@@ -84,7 +84,6 @@ namespace OfficeExtractor
             }
             return result;
         }
-
         public static int ExcuteExtractor(Stream inputFile, string inputFileName, string strDest)
         {
             int result = 0;
@@ -145,5 +144,26 @@ namespace OfficeExtractor
             }
             return result;
         }
+
+        public static int ExcuteBinaryCheck([MarshalAs(UnmanagedType.LPWStr)] string strSource)
+        {
+            int result = 0;
+            try
+            {
+                OfficeExtractor.AppendCheck appendChecker = new OfficeExtractor.AppendCheck();
+                result = appendChecker.FileAppendCheck(strSource);
+            }
+            catch (Exception ex)
+            {
+                result = -2;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
+            }
+            finally
+            {
+                GC.Collect();
+            }
+            return result;
+        }
+
     }
 }

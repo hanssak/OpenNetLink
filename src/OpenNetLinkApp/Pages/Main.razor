@@ -921,6 +921,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
             int groupid = pageService.m_nCurViewPageGroupID;
 
+
             //외부 그룹웨어 연동
             try
             {
@@ -932,8 +933,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 CLog.Here().Information($"result bool  : {resultMsg.Item1} , result Msg : {resultMsg.Item2}");
                 if (!resultMsg.Item1)
                 {
-                    ShowMessage("error", resultMsg.Item2);
+                    JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
                     bStartedLogin = false;
+                    ShowMessage("error", resultMsg.Item2);
+
                     return;
                 }
             }
@@ -1399,7 +1402,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         *@
 
 
-    // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
+        // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
         {
@@ -1668,6 +1671,8 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
                         strGetinfoTagName += ", 'FORWARD_AUTODOWN'";
                         strGetinfoTagName += ", 'CLIENT_URL_FW_PAGE'";
+                        strGetinfoTagName += ", 'CLIENT_BINARY_CHECK'";
+                        strGetinfoTagName += ", 'CLIENT_BINARY_CHECK_EXT'";
 
 
                         if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupId))
@@ -2188,7 +2193,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     {
                         if (pageService.GetConnectCount(nGroupIDfirst) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                         {
-                            if (SGAppMgrSvc.OpConfigInfoService.GetUseHideToastPopup(0) == false)
+                            if (SGAppMgrSvc.OpConfigInfoService.GetUseHideToastPopup(nGroupIDfirst) == false)
                             {
                                 string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
                                 string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
@@ -2200,7 +2205,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         else
                             HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
                     }
-                    else if(SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterShow(0))
+                    else if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterShow(0))
                     {
                         if (pageService.GetConnectCount(nGroupIDfirst) <= 0)                                                                     // 재접속이 아닐 경우에만 화면 호출
                         {

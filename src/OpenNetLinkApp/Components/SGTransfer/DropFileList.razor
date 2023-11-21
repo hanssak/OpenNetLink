@@ -11,6 +11,7 @@
 @using System.Threading
 @using OpenNetLinkApp.Common
 @using System.Web
+@using OpenNetLinkApp.Data.SGDicData.DLP
 
 @inject IJSRuntime jsRuntime
 @inject IFileReaderService fileReaderService
@@ -58,7 +59,7 @@
                             <!--크기-->
                             <th style="text-align:center;vertical-align:middle;width:10%;">@strFileType</th>
                             <!--유형-->
-                            @if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(_groupId) && isUserNeedApproveExtUI())
+                            @if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(_groupId) && isUserNeedApproveExtUI() || SGAppMgrSvc.OpConfigInfoService.GetUseNotApproveExceptEtc(_groupId))
                             {
                                 <th style="text-align:center;vertical-align:middle;width:20%;">@XmlConf.GetTitle("T_COMMON_REMARK")</th>
                                 <!--비고-->
@@ -80,7 +81,7 @@
                                 <td style="width:60%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-left:5px;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
                                 <td style="text-align:right;vertical-align:middle;width:10%;">@(file.IsDir? "" : CsFunction.GetSizeStr(file.FileLength))</td>
                                 <td style="text-align:center;vertical-align:middle;width:10%;">@file.Type</td>
-                                @if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(_groupId) && isUserNeedApproveExtUI())
+                                @if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(_groupId) && isUserNeedApproveExtUI() || SGAppMgrSvc.OpConfigInfoService.GetUseNotApproveExceptEtc(_groupId))
                                 {
                                     <td style="text-align:center;vertical-align:middle;width:20%;">@(file.isNeedApprove? XmlConf.GetTitle("T_COMMON_APPROVE_EXT_ITEM") : "")</td>
                                 }
@@ -463,6 +464,7 @@
 
             fileAddManage.DataClear();
             fileAddManage.SetOleExtractExtData(sgLoginData.GetDocumentExtractExt());
+            fileAddManage.SetBinaryCheckExtData(sgLoginData.GetBinaryCheckExt());
             fileAddManage.m_bIsBlockEmptyExt = SGAppMgrSvc.OpConfigInfoService.GetEmptyExtFileTrans(groupID);
 
             foreach (var item in HsStreamList)
@@ -570,7 +572,7 @@
                         hsStream.IsDir = false;
                         hsStream.MemoryType = HsStreamType.FileStream;
                         hsStream.isNeedApprove = false;
-                        if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI())
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI() || SGAppMgrSvc.OpConfigInfoService.GetUseNotApproveExceptEtc(_groupId))
                         {
                             if (CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
                                 hsStream.isNeedApprove = true;
@@ -709,8 +711,46 @@
                         //01. 문서파일 내 OLE 개체 검사
                         //02. 문서파일 압축해제 후 파일 검사
 
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpCheck(groupID))
+                        {
+                            if (SGAppMgrSvc.OpConfigInfoService.GetDlpType(groupID) == (int)Enums.EnumDlpType.Somansa)
+                            {
+                                (int, string) dlpResult = SGSomansaDLP.DlpCheck(hsStream.FilePullPath);
+                                hsStream.DlpCheck = dlpResult.Item1;
+                                hsStream.DlpContent = dlpResult.Item2;
+
+                                CLog.Here().Information($"FilePath : {hsStream.FilePullPath} DlpCheck : [{hsStream.DlpCheck}] , DlpContent : {hsStream.DlpContent}");
+                                //DLP가 결렸을 경우 반드시 결재가 필요
+                                if (dlpResult.Item1 == 1)
+                                    hsStream.isNeedApprove = true;
+                            }
+                        }
+
                         //01. 문서파일 내 OLE 개체 검사
                         if (await GetExamCheckDocument(fileAddManage, topFile, hsStream) != 0)
+                        {
+                            if (pageService.GetFileExaming() == false)
+                            {
+                                if (isRMouseAdd)
+                                    NotifyChange_InDropFileList(null);
+                                else
+                                    StateHasChanged();
+                                return;
+                            }
+                            existErr = true;
+                            if (hsStream.stream != null)
+                            {
+                                hsStream.stream.Close();
+                                hsStream.stream = null;
+                            }
+                            nExamCount++;
+                            per = (nExamCount * 100) / nTotalCount;
+                            SGFileExamEvent(per, hsStream.FileName);
+                            continue;
+                        }
+
+                        //Binary Append 체크
+                        if (await GetExamCheckBinaryAppend(fileAddManage, topFile, hsStream) != 0)
                         {
                             if (pageService.GetFileExaming() == false)
                             {
@@ -762,11 +802,6 @@
 
                         //HsStreamList.Add(hsStream);
                         //SetFileAdd(hsStream);    // 2022.10.05 BY KYH - 등록 시도 파일이 모두 정상인 경우 등록 가능하도록 이동
-
-
-
-
-
 
                         listTryHsStream.Add(hsStream);
                         nExamCount++;
@@ -933,7 +968,7 @@
                             {
                                 hsStream.Size = item.Length;
 
-                                if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI())
+                                if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI() || SGAppMgrSvc.OpConfigInfoService.GetUseNotApproveExceptEtc(_groupId))
                                 {
                                     if (CsFunction.isFileExtinListStr(false, hsStream.FileName, sgLoginData.GetExceptionExt()))
                                         hsStream.isNeedApprove = true;
@@ -1117,9 +1152,44 @@
                                 //2022.10.07 BY KYH - OLE 상세파일 UI 표현 기능 추가
                                 //01. 문서파일 내 OLE 개체 검사
                                 //02. 문서파일 압축해제 후 파일 검사
+                                if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpCheck(groupID))
+                                {
+                                    if (SGAppMgrSvc.OpConfigInfoService.GetDlpType(groupID) == (int)Enums.EnumDlpType.Somansa)
+                                    {
+                                        (int, string) dlpResult = SGSomansaDLP.DlpCheck(hsStream.FilePullPath);
+                                        hsStream.DlpCheck = dlpResult.Item1;
+                                        hsStream.DlpContent = dlpResult.Item2;
 
+                                        //DLP가 걸렸을 경우 반드시 결재가 필요
+                                        if (dlpResult.Item1 == 1)
+                                            hsStream.isNeedApprove = true;
+                                    }
+                                }
                                 //01. 문서파일 내 OLE 개체 검사
                                 if (await GetExamCheckDocument(fileAddManage, childFile, hsStream) != 0)
+                                {
+                                    if (pageService.GetFileExaming() == false)
+                                    {
+                                        if (isRMouseAdd)
+                                            NotifyChange_InDropFileList(null);
+                                        else
+                                            StateHasChanged();
+                                        return;
+                                    }
+
+                                    existErr = true;
+                                    if (hsStream.stream != null)
+                                    {
+                                        hsStream.stream.Close();
+                                        hsStream.stream = null;
+                                    }
+                                    nExamCount++;
+                                    per = (nExamCount * 100) / nTotalCount;
+                                    SGFileExamEvent(per, hsStream.FileName);
+                                    continue;
+                                }
+
+                                if (await GetExamCheckBinaryAppend(fileAddManage, childFile, hsStream) != 0)
                                 {
                                     if (pageService.GetFileExaming() == false)
                                     {
@@ -1285,12 +1355,12 @@
         InitText();
 
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
 
-        if (groupID > -1)
-            bHideTitleDesc = SGAppMgrSvc.OpConfigInfoService.GetUseHideTitleDesc(groupID);*@
+            if (groupID > -1)
+                bHideTitleDesc = SGAppMgrSvc.OpConfigInfoService.GetUseHideTitleDesc(groupID);*@
     }
 
     /// <summary>
@@ -1856,7 +1926,7 @@
 
             StateHasChanged();
         }
-        if(firstRender)
+        if (firstRender)
             _dropReference.RegisterDropEventsAsync();
 
         return stopClick();
@@ -2443,6 +2513,57 @@
 
         //bool bDenyPasswordZIP = SGAppMgrSvc.AppConfigInfoService.GetDenyPasswordZIP();
         if (await fileAddManager.CheckDocumentFile(hsStream, currentFile, strDocumentExtractType, bWhite, strFileExtInfo, bAllowDRM) != 0)
+            return -1;
+
+        return 0;
+    }
+
+    /// <summary>
+    /// [문서파일에 한하여] OLE 개체 추출 및 MIME 검사
+    /// </summary>
+    /// <param name="fileAddManager"></param>
+    /// <param name="currentFile"></param>
+    /// <param name="hsStream"></param>
+    /// <param name="SGFileExamEvent"></param>
+    /// <param name="ExamCount"></param>
+    /// <param name="TotalCount"></param>
+    /// <returns></returns>
+    public async Task<int> GetExamCheckBinaryAppend(FileAddManage fileAddManager, FileAddErr currentFile, HsStream hsStream)
+    {
+        if (hsStream == null)
+            return 0;
+
+        if (hsStream.Size <= 0)     //0kb 문서파일은 정상적인 OLE개체추출 및 압축해제가 불가하므로 미검사
+            return 0;
+
+        string strExtType = hsStream.Type;
+        strExtType = strExtType.ToUpper();
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return -1;
+
+        //if (sgLoginData.IsVipUser())
+        if (false)
+        {
+            CLog.Here().Information($"No check OLD for Vip User");
+            return 0;
+        }
+
+        string strBinaryAppendCheckType = sgLoginData.GetBinaryCheckType(sgLoginData.GetSystemPosition());        //문서파일 내부 검사유형 (0 : 문서 검사 않함. / 1 : 모듈검사 & OLE객체 마임리스트검사 / 2 : 모듈검사 & 위변조 체크 / 3 : 모듈검사 & OLE마임리스트검사 & 위변조체크 )
+        if (string.IsNullOrEmpty(strBinaryAppendCheckType))   //ENV테이블에 해당 항목 없으면 검사X
+            return 0;
+
+        if (strBinaryAppendCheckType == "0")
+            return 0;
+
+        if (await fileAddManager.CheckBinaryAppendFile(hsStream, currentFile) != 0)
             return -1;
 
         return 0;

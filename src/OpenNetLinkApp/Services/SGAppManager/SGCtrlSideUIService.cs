@@ -49,6 +49,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetClipAlarmType(CLIPALM_TYPE alamType);
         void SetMainPage(PAGE_TYPE pageType);
         void SetClipAfterSend(bool clipAfterSend);
+        void SetClipBoardPasteHotKey(bool clipBoardPastHotKey);
+        void SetClipBoardPasteHotKeyValue(bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode);
         void SetURLAutoTrans(int nGroupID, bool urlAutoTrans);
         void SetURLAutoAfterMsg(int nGroupID, bool urlAutoAfterMsg);
         void SetURLAutoAfterBrowser(int nGroupID, string urlAutoAfterBrowser);
@@ -220,6 +222,28 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SaveAppConfigSerialize();
             //SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
+        }
+
+        public void SetClipBoardPasteHotKey(bool clipBoardPastHotKey)
+        {
+            (AppConfigInfo as SGAppConfig).bClipBoardPasteHotKey = clipBoardPastHotKey ;
+
+            SaveAppConfigSerialize();
+            NotifyStateChangedCtrlSide();
+        }
+
+        public void SetClipBoardPasteHotKeyValue(bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode)
+        {
+            char cWin, cCtrl, cAlt, cShift;
+            
+            cWin = bWin ? 'Y' : 'N';
+            cCtrl = bCtrl ? 'Y' : 'N';
+            cAlt = bAlt ? 'Y' : 'N';
+            cShift = bShift ? 'Y' : 'N';
+            (AppConfigInfo as SGAppConfig).strClipBoardPasteHotKeyValue = String.Format($"{cWin},{cCtrl},{cAlt},{cShift},{chVKCode}");
+            
+            SaveAppConfigSerialize();
+            NotifyStateChangedCtrlSide();            
         }
 
         public void SetURLAutoTrans(int nGroupID, bool urlAutoTrans)

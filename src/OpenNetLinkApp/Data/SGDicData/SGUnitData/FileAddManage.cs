@@ -25,6 +25,7 @@ using System.Collections;
 using static OpenNetLinkApp.Common.Enums;
 using OpenNetLinkApp.Common;
 using SharpCompress.Readers;
+using OpenNetLinkApp.Data.SGDicData.DLP;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -165,6 +166,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         ///// </summary>
         //eFADOC_EXTRACT_FILES,
 
+        #endregion
+
+        #region Binary Check
+        /// <summary>
+        /// BINARY  COMMON ERROR
+        /// <para>101</para>
+        /// </summary>
+        eFABINARY_APPEND_COMMONE = 201,
+        /// <summary>
+        /// 파일 Append
+        /// </summary>
+        eFABINARY_APPEND_FILE_ADD_ONPURPOSE = 202,
         #endregion
     }
 
@@ -483,6 +496,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strMsg = String.Format(strMsg, strFileName);
                     break;
 
+                case eFileAddErr.eFABINARY_APPEND_COMMONE:
+                    strMsg = xmlConf.GetWarnMsg("W_0305");                      // {0} 파일은 다른 파일 첨부 체크 검사에 실패했습니다.
+                    strMsg = String.Format(strMsg, strFileName);
+                    break;
+                case eFileAddErr.eFABINARY_APPEND_FILE_ADD_ONPURPOSE:
+                    strMsg = xmlConf.GetWarnMsg("W_0306");                      // {0} 파일은 다른 파일이 첨부된 파일 입니다.
+                    strMsg = String.Format(strMsg, strFileName);
+                    break;
+
                 // 101~107
                 case eFileAddErr.eFADOC_EXTRACT_COMMONE:
                 case eFileAddErr.eFADOC_EXTRACT_PASSWORD:
@@ -556,14 +578,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                             , "XLS", "XLSB", "XLSM", "XLSX", "XLT", "XLTM", "XLTX", "XLW"
                                             , "POT", "PPT", "POTM", "POTX", "PPS", "PPSM", "PPSX", "PPTM", "PPTX"
                                             , "HML", "HWP", "HWPX"};
-        //public List<string> ListCheckableDocumentExtension = new List<string>();
+        /// <summary>
+        /// Binary Append 체크할 수 있는 파일 확장자 목록
+        /// </summary>
+        public List<string> ListCheckableBinaryAppendExtension = new List<string>() { "PNG", "BMP", "JFIF", "JPE", "JPEG", "JPG", "GIF" };
 
 
         /// <summary>
         /// 압축형식 내부검사가 필요한 파일 확장자 대상 목록
-        /// <para>ZIP, 7Z, TAR, GZ, TGZ</para>
+        /// <para>"ZIP", "7Z", "TAR", "GZ", "TGZ", "BZ2", "ALZ"</para>
         /// </summary>
-        public readonly List<string> ListCheckableCompressExtension = new List<string>() { "ZIP", "7Z", "TAR", "GZ", "TGZ", "BZ2" };
+        public readonly List<string> ListCheckableCompressExtension = new List<string>() { "ZIP", "7Z", "TAR", "GZ", "TGZ", "BZ2", "ALZ" };
 
         /// <summary>
         /// 전체경로길이 체크용
@@ -744,6 +769,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             ListCheckableDocumentExtension.Clear();
             ListCheckableDocumentExtension.InsertRange(0, listItem);
         }
+        public void SetBinaryCheckExtData(string strData)
+        {
+            if ((strData?.Length ?? 0) < 1)
+            {
+                Log.Logger.Here().Error($"SetBinaryCheckExtData, input Error - 0 size input!");
+                return;
+            }
+
+            if (strData == ";")
+            {
+                Log.Logger.Here().Error($"SetBinaryCheckExtData, input Error - Empty$ input!");
+                return;
+            }
+
+            string[] listItem = strData.Split(';');
+            if ((listItem?.Length ?? 0) < 1)
+            {
+                Log.Logger.Here().Error($"SetBinaryCheckExtData, input Error - file Ext : {strData}");
+                return;
+            }
+
+            ListCheckableBinaryAppendExtension.Clear();
+            ListCheckableBinaryAppendExtension.InsertRange(0, listItem);
+        }
 
         public void DataClear()
         {
@@ -774,6 +823,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 -9 => eFileAddErr.eFADOC_EXTRACT_COMMONE,//파일 Path가 너무 길때
                 -10 => eFileAddErr.eFADOC_EXTRACT_FILE_ADD_ONPURPOSE, //압축형식의 고의 추가 파일 발생
                 _ => eFileAddErr.eFADOC_EXTRACT_COMMONE  //정의되지 않은 에러
+            };
+
+        /// <summary>
+        /// OLE 개체 검출 함수 호출 후 반환된 Result Code의 Err 정보
+        /// </summary>
+        /// <param name="BaseResult"></param>
+        /// <returns></returns>
+        public eFileAddErr GetBinaryAppendError(int BaseResult) =>
+            BaseResult switch
+            {
+                -1 => eFileAddErr.eFABINARY_APPEND_COMMONE, //공통
+                -2 => eFileAddErr.eFABINARY_APPEND_COMMONE, //공통
+                -3 => eFileAddErr.eFABINARY_APPEND_FILE_ADD_ONPURPOSE, //파일 Append 감지
+                -4 => eFileAddErr.eFABINARY_APPEND_COMMONE, //파일 형식 잘못된 경우
+                -5 => eFileAddErr.eFABINARY_APPEND_COMMONE, //검사할 수 없는 확장자
             };
 
         public string SetExceptionReason(eFileAddErr err, string msg)
@@ -1001,6 +1065,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     break;
                 case eFileAddErr.eFADOC_EXTRACT_FILEFILTER:
                     str = xmlConf.GetTitle("T_eFADOC_EXTRACT_FILEFILTER");
+                    break;
+                #endregion
+
+                #region
+                case eFileAddErr.eFABINARY_APPEND_COMMONE:
+                    str = xmlConf.GetTitle("T_eFABINARY_APPEND_COMMONE");                                                  //다른 파일 추가 확인 검사 실패
+                    break;
+                case eFileAddErr.eFABINARY_APPEND_FILE_ADD_ONPURPOSE:
+                    str = xmlConf.GetTitle("T_eFABINARY_APPEND_FILE_ADD_ONPURPOSE");                                       //다른 파일이 추가 된 파일
                     break;
                 #endregion
 
@@ -4741,6 +4814,26 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
                     }
 
+                    if (ListCheckableBinaryAppendExtension.Exists(ext => (string.Compare(ext, strNoDotExt, true) == 0)))
+                    {
+                        HsStream binaryHsStream = null;
+
+                        using (Stream binaryFileStream = File.OpenRead(extractFile.FullName))
+                        {
+                            binaryHsStream = new HsStream() { stream = binaryFileStream, FileName = extractFile.FullName, MemoryType = HsStreamType.FileStream };
+                            scanBinaryAppendCheck(binaryHsStream, childFile).Wait();
+                        }
+
+                        if (childFile.eErrType != eFileAddErr.eFANone)
+                        {
+                            //childFile.eErrType = enErr;
+                            currentFile.HasChildrenErr = true;
+                            nCurErrCount++;
+                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
+                            continue;
+                        }
+                    }
+
                     // Check Zip File  (압축파일 내 압축파일이 또 존재하는 경우.
                     if (!ListCheckableCompressExtension.Exists(ext => ext == strExt.Replace(".", "").ToUpper())) continue;
                     //if ((String.Compare(strExt, ".zip", true) != 0) && (String.Compare(strExt, ".7z", true) != 0)) continue;
@@ -4897,8 +4990,67 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
                         #endregion [ZIP/7Z 형식 검사]
                         break;
-                    case "TAR":
                     case "GZ":
+                        #region [GZ 형식 검사]  
+                        try
+                        {
+                            Log.Logger.Here().Information("[unzipFile] Try Decompress File[{0}]", fileName);
+
+                            int per = (ExamCount * 100) / TotalCount;
+                            if (per < 20)
+                                per = 20;
+
+                            if (SGFileExamEvent != null)
+                                SGFileExamEvent(per, fileName);
+                            if (bUseCrossPlatformOSforFileName)
+                            {
+                                (bool, string) result = GzFileCheckFileName(fileFullName);
+                                if (result.Item1)
+                                    return (eFileAddErr.eUnZipInnerFileName, result.Item2);
+                            }
+
+                            CsFunction.GzFileDecompress(fileFullName, destFullPath);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            if (bZipPasswdCheck == true)
+                                return (nCurDepth == 1) ? (eFileAddErr.eFAZipPW, fileFullName) : (eFileAddErr.eUnZipInnerZipPassword, fileFullName);
+                        }
+                        #endregion [GZ 형식 검사]
+                        break;
+                    case "ALZ":
+                        #region [ALZ 형식 검사]  
+                        try
+                        {
+                            Log.Logger.Here().Information("[unzipFile] Try Decompress File[{0}]", fileName);
+
+                            int per = (ExamCount * 100) / TotalCount;
+                            if (per < 20)
+                                per = 20;
+
+                            if (SGFileExamEvent != null)
+                                SGFileExamEvent(per, fileName);
+
+                            //ALZ 파일은 압축 풀기 전 이름 체크 불가
+                            //if (bUseCrossPlatformOSforFileName)
+                            //{
+                            //    (bool, string) result = GzFileCheckFileName(fileFullName);
+                            //    if (result.Item1)
+                            //        return (eFileAddErr.eUnZipInnerFileName, result.Item2);
+                            //}
+
+                            CsFunction.AlzFileDecompress(fileFullName, destFullPath);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            if (bZipPasswdCheck == true)
+                                return (nCurDepth == 1) ? (eFileAddErr.eFAZipPW, fileFullName) : (eFileAddErr.eUnZipInnerZipPassword, fileFullName);
+                        }
+                        #endregion [ALZ 형식 검사]
+                        break;
+                    case "TAR":                    
                     case "TGZ":
                     case "BZ2":
                         #region [TAR 형식 검사]        
@@ -4960,6 +5112,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 }
             }
             return (false, "");
+        }
+
+        public (bool, string) GzFileCheckFileName(string filePath)
+        {
+            string currentFileName = filePath;
+            string newFileName = Path.GetFileName(currentFileName.Remove(currentFileName.Length - Path.GetExtension(filePath).Length));
+            if (GetFileNameEnable(newFileName) == false)
+                return (true, newFileName);
+            else
+                return (false, "");
         }
         /// <summary>
         /// ZIP 파일압축해제
@@ -5037,8 +5199,33 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
                         #endregion [ZIP/7Z 형식 검사]
                         break;
-                    case "TAR":
                     case "GZ":
+                        #region [GZ 형식 검사]        
+                        try
+                        {
+                            CsFunction.GzFileDecompress(fileFullName, destFullPath);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            return false;
+                        }
+                        #endregion [GZ 형식 검사]                        
+                        break;
+                    case "ALZ":
+                        #region [ALZ 형식 검사]
+                        try
+                        {
+                            CsFunction.AlzFileDecompress(fileFullName, destFullPath);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            return false;
+                        }                        
+                        #endregion [ALZ 형식 검사]
+                        break;
+                    case "TAR":
                     case "TGZ":
                     case "BZ2":
                         #region [TAR 형식 검사]        
@@ -5332,6 +5519,44 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
+        /// 문서검사
+        /// </summary>
+        /// <param name="hsStream">검사할 문서 파일</param>
+        /// <param name="currentFile">에러리스트 관리 전역변수</param>
+        /// <param name="documentExtractType">문서 검사 타입</param>
+        /// <param name="isOLEMimeTypeWhite">OLE마임리스트의 필터타입</param>
+        /// <param name="isWhite">기본 파일확장자 제한 타입</param>
+        /// <param name="fileFilterExtInfo">기본 파일확장자 제한</param>
+        /// <returns></returns>
+        public async Task<int> CheckBinaryAppendFile(HsStream hsStream, FileAddErr currentFile)
+        {
+            try
+            {
+                Log.Logger.Here().Information($"[CheckBinaryAppendFile] File[{Path.GetFileName(hsStream.FileName)}]");
+
+                // 검사가 필요한 확장자(문서) 체크
+                //if (!ListCheckableDocumentExtension.Exists(ext => ext == hsStream.Type.ToUpper()))
+                if (!ListCheckableBinaryAppendExtension.Exists(ext => (string.Compare(ext, hsStream.Type, true) == 0)))
+                {
+                    Log.Logger.Here().Information($"[CheckBinaryAppendFile] No Check, Ext : {hsStream.Type.ToUpper()}, check CLIENT_BINARY_APPEND_EXT !!!");
+                    return 0;
+                }
+
+
+                await scanBinaryAppendCheck(hsStream, currentFile);
+                if (currentFile.eErrType == eFileAddErr.eFANone)
+                    return 0;
+
+                return -1;
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"[CheckBinaryAppendFile] Exception = [{ex.ToString()}]");
+                return -1;
+            }
+        }
+
+        /// <summary>
         /// 문서 추출 방식으로 문서 검사
         /// </summary>
         /// <param name="hsStream">검사 대상 문서</param>
@@ -5519,6 +5744,49 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 }
             }
             return (currentFile.HasChildrenErr) ? -1 : 0;
+        }
+
+        async Task<int> scanBinaryAppendCheck(HsStream hsStream, FileAddErr currentFile)
+        {
+            string source = (hsStream.stream as FileStream).Name;
+            hsStream.stream.Close();
+            int binaryCheckResult = OfficeExtractor.Controller.ExcuteBinaryCheck(source);
+            hsStream.stream = File.OpenRead(source);
+
+            Log.Logger.Here().Information($"[scanBinaryAppendCheck] ExcuteBinaryCheck DocumentFile[{Path.GetFileName(source)}] binaryCheckResult[{binaryCheckResult}]");
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            if (binaryCheckResult < 0)      //OLE 개체 검출 중 오류 발생
+            {
+                //오류 표시
+                currentFile.eErrType = GetBinaryAppendError(binaryCheckResult);
+                currentFile.ChildrenFiles = null;
+                return binaryCheckResult;
+            }
+
+            return binaryCheckResult;
+        }
+
+        async Task<(int, string)> scanDlpCheck(HsStream hsStream, FileAddErr currentFile, Enums.EnumDlpType dlpType)
+        {
+            string source = (hsStream.stream as FileStream).Name;
+            hsStream.stream.Close();
+            (int, string) dlpResult = (0, "");
+            if (dlpType == EnumDlpType.Somansa)
+            {
+                dlpResult = SGSomansaDLP.DlpCheck(hsStream.FilePullPath);
+                hsStream.DlpCheck = dlpResult.Item1;
+                hsStream.DlpContent = dlpResult.Item2;
+            }
+
+            Log.Logger.Here().Information($"[scanDlpCheck] ExcuteDlpCheck DocumentFile[{Path.GetFileName(source)}] DlpCheckResult[{dlpResult.Item1}]");
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            return dlpResult;
         }
 
         /// <summary>

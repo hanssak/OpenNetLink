@@ -378,7 +378,7 @@
             string strContents = strBindDesc;
 
             // 최대길이 Check 동작
-            if (!strBindTitle.Equals(""))
+            if ((strBindTitle?.Length ?? 0) > 0)
             {
                 if (Encoding.UTF8.GetByteCount(strBindTitle) > 128)
                 {
@@ -391,7 +391,7 @@
                 }
             }
 
-            if (!strBindDesc.Equals(""))
+            if ((strBindDesc?.Length ?? 0) > 0)
             {
                 if (Encoding.UTF8.GetByteCount(strBindDesc) > 250)
                 {
@@ -538,6 +538,7 @@
                 if (sgLoginData == null)
                     return;
 
+                //결재가 없지만 반드시 결재를 해야할 파일이 존재할 경우 결재자 등록 팝업 생성
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isFilesNeedApprove())
                 {
 
@@ -832,6 +833,27 @@
             {
                 CLog.Here().Information($"FileTrans - NoApprove Policy - FileTrans !!!");
                 stApprLineSeq = "";
+            }
+        }
+        else
+        {
+            //결재를 사용하지만 필수결재가 아니면 결재를 사용하지 않을 경우
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseNotApproveExceptEtc(groupID))
+            {
+                List<HsStream> tempList = dropFile.GetHsStreamList();
+                bool tempResult = false;
+
+                foreach (HsStream hs in tempList)
+                {
+                    if (hs.isNeedApprove)
+                    {
+                        tempResult = true;
+                        break;
+                    }
+                }
+                //필수로 결재할게 없으면 결재를 하지 않음.
+                if (!tempResult)
+                    stApprLineSeq = "";
             }
         }
 
@@ -1511,6 +1533,61 @@
 
         if (e.count >= 100)
         {
+            try
+            {
+                if (FileList != null)
+                {
+                    foreach (HsStream stream in FileList)
+                    {
+                        if (!stream.IsDir)
+                        {
+                            if (File.Exists(stream.FilePullPath))
+                            {
+                                if (stream.stream != null)
+                                {
+                                    stream.stream.Close();
+                                    stream.stream.Dispose();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //파일 전송 완료 후 삭제
+                if (SGAppMgrSvc.OpConfigInfoService.GetDeleteUploadFile(groupID))
+                {
+                    if (FileList != null)
+                    {
+                        foreach (HsStream stream in FileList)
+                        {
+                            if (stream.IsDir)
+                            {
+                                if (Directory.Exists(Path.Combine(stream.StartPath, stream.RelativePath)))
+                                {
+                                    Directory.Delete(Path.Combine(stream.StartPath, stream.RelativePath), true);
+                                }
+                            }
+                            else
+                            {
+                                if (File.Exists(stream.FilePullPath))
+                                {
+                                    File.Delete(stream.FilePullPath);
+                                }
+                            }
+                        }
+                    }
+                }
+                await dropFile.DataClear();
+                FileList?.Clear();  // approveExt 결재없는 전송때, List중 결재없는 목록만 별도 생성한것도 정리
+
+                CLog.Here().Information($"dropFile.DataClear - !");
+            }
+            catch (Exception err)
+            {
+                // error
+                CLog.Here().Error($"dropFile.DataClear - error:{err.Source} - Msg : {err.Message}");
+            }
+
             strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
 
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -1523,17 +1600,6 @@
                 InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileTrans, "", strMsg);
             }
 
-            try
-            {
-                await dropFile.DataClear();
-                FileList?.Clear();  // approveExt 결재없는 전송때, List중 결재없는 목록만 별도 생성한것도 정리
-                CLog.Here().Information($"dropFile.DataClear - !");
-            }
-            catch (Exception err)
-            {
-                // error
-                CLog.Here().Error($"dropFile.DataClear - error:{err.Source} - Msg : {err.Message}");
-            }
             ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
             if (sgUserInfo != null)
                 dropFile.SetLogDB(groupID, sgUserInfo.UserSeq, XmlConf.GetTitle("T_LOG_DB_FILETRANSFER_SUCCESS"));

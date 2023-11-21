@@ -633,8 +633,10 @@ Section "MainSection" SEC01
   File "bin_addon\SecureGateChromiumExtension_v1.1.crx"
 
   ; 단축아이콘 생성
-  CreateDirectory "$SMPROGRAMS\OpenNetLink"
-  CreateShortCut "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
+  ${If} ${REG_STARTPROGRAM} == 'TRUE'
+	CreateDirectory "$SMPROGRAMS\OpenNetLink"
+	CreateShortCut "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
+  ${EndIf}  
   CreateShortCut "C:\Users\Public\Desktop\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
   
   ${If} ${IS_PATCH} == 'TRUE'
@@ -745,8 +747,11 @@ SectionEnd
 
 Section -AdditionalIcons
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
-  CreateShortCut "$SMPROGRAMS\OpenNetLink\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
-  CreateShortCut "$SMPROGRAMS\OpenNetLink\Uninstall.lnk" "$INSTDIR\uninst.exe"
+  
+  ${If} ${REG_STARTPROGRAM} == 'TRUE'
+	CreateShortCut "$SMPROGRAMS\OpenNetLink\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
+	CreateShortCut "$SMPROGRAMS\OpenNetLink\Uninstall.lnk" "$INSTDIR\uninst.exe"
+  ${EndIf}    
 SectionEnd
 
 

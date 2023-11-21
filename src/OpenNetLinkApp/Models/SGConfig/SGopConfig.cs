@@ -127,6 +127,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseClipTypeText { get; set; } = true;          //TEXT로 클립보드 전송 사용 유무
 
         public bool bUseClipTypeImage { get; set; } = true;            //IMAGE로 클립보드 전송 사용 유무
+        public bool bUseClipBoardPasteHotKey { get; set; } = false;     // 붙여넣기에 대한 추가 단축키 기능 활성화 유무(Defulat : false) [기능X, 환경설정 표시 여부만 동작]
 
         //메일
         public bool bUseEmail { get; set; } = false;               // 메일 관리/결재 사용 유무.
@@ -210,6 +211,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public string strApproveExtApproverSearchType { get; set; } = "SEARCH";     // 결재필수 확장자 검색됐을때, 결재자 검색방식
         public bool bUseInputSearchApproveExtTree { get; set; } = false;         // 결재필수 확장자, 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
         public bool bUseApproveExt { get; set; } = false;                            // 결재필수 확장자 결재하는 기능 사용유무
+        public bool bUseNotApproveExceptEtc { get; set; } = false;                            // 결재를 사용하지만 Dlp, 필수결재확장자 등 반드시 결재해야할 경우를 제외하고 결재를 사용하지 않을 경우
         public bool bUseFileExceptionDescCheck { get; set; } = false;                           // 파일 예외신청 설명정보 필수 기입여부
         public bool bUsePKIsendRecv { get; set; } = false;             // 인증서 전송 사용 유무 (망별로) ( true : 사용, false : 미사용 )
         public bool bUseToastInsteadOfOSNotification { get; set; } = false;                        //레지스트리 차단으로 OS 노티 사용 불가한 Site에서 OS노티 대신 Toast 사용 (Default/false) 
@@ -222,6 +224,9 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public int nDrmType { get; set; } = 1;                          //DRM 종류 - 1. SoftCamp
         public string strSoftCampGrade { get; set; } = "0000001";         //DRM 종류 - SoftCamp Grade 옵션화 처리
+
+        public bool bUseDlpCheck { get; set; } = false;          //파일 전송 시 DLP 검사 사용 유무
+        public int nDlpType { get; set; } = 1;                          //DLP 종류 - 1. 소만사
 
         public bool bHideApprLine { get; set; } = false;           // 결재라인 표현유무
 
@@ -242,6 +247,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFromNameRecvDownPathShortCut { get; set; } = false; //다운로드 수신폴더에 대한 바탕화면 바로가기 생성 시, 이름 정보에 ToName이 아닌, FromName으로 표시 (Default :false)
 
         public bool bIsBlockEmptyExt { get; set; } = false;           // 확장자가 비어있는 파일전송 차단할지 유무(Default:false), 전송가능함
+
+        public bool bDeleteUploadFile { get; set; } = false;           // 파일 전송 후 파일 삭제
 
     }
 

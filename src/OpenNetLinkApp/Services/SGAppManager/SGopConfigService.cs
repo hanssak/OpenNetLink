@@ -148,6 +148,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseClipTypeTextFirstSend(int groupId);
         public bool GetUseClipTypeText(int groupId);
         public bool GetUseClipTypeImage(int groupId);
+        public bool getUseClipBoardPasteHotKey(int groupId);
         public bool GetUseEmailManageApprove(int groupId);
 
         public bool GetUseUIdlpData(int groupId);
@@ -221,6 +222,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetApproveExtSelectType(int groupId);
         public bool GetUseInputSearchApproveExtTree(int groupId);
         public bool GetUseApproveExt(int groupId);
+        public bool GetUseNotApproveExceptEtc(int groupId);
         public bool GetUseFileExceptionDescCheck(int groupId);
         public bool GetUsePKIsendRecv(int groupId);
         public bool GetPKIsendType(int groupId);
@@ -260,6 +262,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public int GetDrmType(int groupId);
         public string GetSoftCampGrade(int groupId);
+        public int GetDlpType(int groupId);
+
+        public bool GetUseDlpCheck(int groupId);
 
         public bool GetUseHideApprLine(int groupId);
 
@@ -289,6 +294,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseFromNameRecvDownPathShortCut(int groupId);
 
         public bool GetEmptyExtFileTrans(int groupid);
+
+        public bool GetDeleteUploadFile(int groupId);
 
     }
 
@@ -754,6 +761,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseClipTypeImage;
         }
+        public bool getUseClipBoardPasteHotKey(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseClipBoardPasteHotKey;
+        }
         public bool GetUseEmailManageApprove(int groupId)
         {
             return AppConfigInfo[groupId].bUseEmail;
@@ -1085,6 +1096,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseApproveExt;
         }
+        public bool GetUseNotApproveExceptEtc(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseNotApproveExceptEtc;
+        }
         public bool GetUseFileExceptionDescCheck(int groupId)
         {
             return AppConfigInfo[groupId].bUseFileExceptionDescCheck;
@@ -1201,7 +1216,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].strSoftCampGrade;
         }
-
+        public int GetDlpType(int groupId)
+        {
+            return AppConfigInfo[groupId].nDlpType;
+        }
+        public bool GetUseDlpCheck(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseDlpCheck;
+        }
 
         public bool GetUseHideApprLine(int groupId)
         {
@@ -1263,9 +1285,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo[groupId].bUseFromNameRecvDownPathShortCut;
         }
 
-        public bool GetEmptyExtFileTrans(int groupid)
+        public bool GetEmptyExtFileTrans(int groupId)
         {
-            return AppConfigInfo[groupid].bIsBlockEmptyExt;
+            return AppConfigInfo[groupId].bIsBlockEmptyExt;
+        }
+
+        public bool GetDeleteUploadFile(int groupId)
+        {
+            return AppConfigInfo[groupId].bDeleteUploadFile;
         }
 
 

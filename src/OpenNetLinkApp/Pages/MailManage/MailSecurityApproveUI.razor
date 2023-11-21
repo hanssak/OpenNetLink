@@ -540,6 +540,17 @@
 
     private async Task ApproveReject()
     {
+
+        // For Test
+        /*
+        PageDataRefreshEvent pgRefreshEvent = null;
+        pgRefreshEvent = HSCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.MailSecurityApproveWaitUI);
+        if (pgRefreshEvent != null)
+        {
+            pgRefreshEvent();
+            return;
+        }*/
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -1148,13 +1159,25 @@
 
     private void ApproveWaitSearch()
     {
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseEmailApprUIwait(0))
+        {
+            refPeriodDatePicker.SetDateTime(DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
+            ApproveWaitSearchForSetting(false, true);   // 승인대기 - 지정한 날짜기간만 검사
+        }
+        else
+            ApproveWaitSearchForSetting(true, true);    // 승인대기 - 전부검사
+    }
 
-        refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
-        strDlpValue = XmlConf.GetTitle("T_COMMON_DLP_INCLUSION");
+    private void ApproveWaitSearchForSetting(bool bSearchEndlessDay, bool bSearchApprWait)
+    {
+        if (bSearchEndlessDay)
+            refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
+
+        strDlpValue = XmlConf.GetTitle("T_COMMON_ALL");
         strApproveKind = XmlConf.GetTitle("T_COMMON_ALL");
         strTransTypeText = XmlConf.GetTitle("T_COMMON_ALL");
         strTransFlag = XmlConf.GetTitle("T_COMMON_ALL");
-        strSearchApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT"); //"승인대기"
+        strSearchApproveStatus = XmlConf.GetTitle(bSearchApprWait ? "T_COMMON_APPROVE_WAIT" :"T_COMMON_ALL"); //"승인대기"
 
         Task.Run(async () => { await doSearch(); });
     }
@@ -1217,6 +1240,18 @@
         if (firstRender)
         {
             jsRuntime.InvokeAsync<object>("initPageLeft");
+
+            if (groupIDbyParam >=0 && SGAppMgrSvc.OpConfigInfoService.GetUseEmailApprUIwait(groupIDbyParam))
+            {
+                CLog.Here().Information($"OnAfterRender, 1 ############################ !!!!!!!!!!!!!!!!!!!!!!!");
+                ApproveWaitSearchForSetting(false, true);
+            }
+            else
+            {
+                CLog.Here().Information($"OnAfterRender, 4 ############################ !!!!!!!!!!!!!!!!!!!!!!!");
+                Task.Run(async () => { await doSearch(); });
+            }
+
             Task.Run(async () => { await doSearch(); });
         }
         @*pageService.SetDayInfoRefreshEvent(groupIDbyParam, DayInfoRefreshResult);*@

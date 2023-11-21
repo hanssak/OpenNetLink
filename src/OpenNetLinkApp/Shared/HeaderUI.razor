@@ -2691,7 +2691,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         CLog.Here().Information($"HeaerUI - RecvClipBoardHandler - groupID : {groupID}, To User Message View");
 
         string strText = XmlConf.GetInfoMsg("I_0193");                         // 클립보드를 수신받았습니다.
-        ShowClipboardMessage("info", strText, groupID, OS_NOTI.CLIPBOARD);
+        string recvTitle = XmlConf.GetTitle("T_MESSAGE_CLIPRECV");              //클립보드 수신
+        ShowClipboardMessage("info", strText, groupID, OS_NOTI.CLIPBOARD, recvTitle);
         InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipRecv, "", strText);
         //Window.Notification(OS_NOTI.CLIPBOARD, XmlConf.GetInfoMsg("I_0164"), XmlConf.GetInfoMsg("I_0193"));
 
@@ -2951,7 +2952,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
                 }*@
 
-        }
+    }
         catch (Exception e)
         {
             CLog.Here().Information($"Toast-Click-Navigate-Exception, navURI : {navURI}, Exception(MSG) : {e.Message}");
@@ -2999,7 +3000,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
     /// <param name="strMsg"></param>
     /// <param name="nGroupId">3망전송의 Title 표시방식에 사용</param>
     /// <param name="eOSNoti">OS 노티 시 표현할 아이콘(이미지)</param>
-    private void ShowClipboardMessage(string strType, string strMsg, int nGroupId, OS_NOTI eOSNoti = OS_NOTI.CLIPBOARD)
+    /// <param name="strTitle">표시할 Title (없을 시, 기본 FromName->ToName 형식으로 표시)</param>
+    private void ShowClipboardMessage(string strType, string strMsg, int nGroupId, OS_NOTI eOSNoti = OS_NOTI.CLIPBOARD, string strTitle="")
     {
         //클립보드 알람타입 (OS/UI/OSUI)
         CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
@@ -3010,14 +3012,16 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         Dictionary<string, SGNetOverData> dicDestSysPos = null;
         dicDestSysPos = pageService.GetTargetSystemList(nGroupId);
-        string strTitle = "";
-
-        if (dicDestSysPos == null || dicDestSysPos.Count < 2)
-            strTitle = XmlConf.GetNetworkTitle(nGroupId);  // 원래 표시하던 방식
-        else
+        
+        if(string.IsNullOrEmpty(strTitle))
         {
-            if (GetClipboardToastTitle(nGroupId, ref strTitle) == false)   // 3망전송 표시 방식
-                strTitle = XmlConf.GetNetworkTitle(nGroupId);
+            if (dicDestSysPos == null || dicDestSysPos.Count < 2)
+                strTitle = XmlConf.GetNetworkTitle(nGroupId);  // 원래 표시하던 방식
+            else
+            {
+                if (GetClipboardToastTitle(nGroupId, ref strTitle) == false)   // 3망전송 표시 방식
+                    strTitle = XmlConf.GetNetworkTitle(nGroupId);
+            }
         }
 
         if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))

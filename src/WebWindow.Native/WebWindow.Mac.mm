@@ -36,6 +36,9 @@ using namespace std;
 bool g_bStartTray = true;
 bool g_bDoExit2TrayUse = false;
 bool g_bClipCopyNsend = false;
+
+int g_nClipBoardPasteGroupId = 100;
+bool g_bClipBoardPasteHotKey = false;
 bool g_bUseHttpUrl = false;
 static id _appDelegate;
 static id _uiDelegate;
@@ -939,6 +942,15 @@ void WebWindow::SetUseClipCopyNsend(bool bUse)
 	g_bClipCopyNsend = bUse;
     [_appDelegate SetCopyAndSend:g_bClipCopyNsend];
 	//NTLog(this, Info, "Called : SetUseClipCopyNsend(@@@@@@@@@@) : %s", (AutoString)(bUse ? "Yes" : "No"));
+}
+
+void WebWindow::SetUseClipBoardPasteHotKey(int pasteGroupID, bool bUse)
+{
+    g_nClipBoardPasteGroupId = pasteGroupID;
+    NSNumber *numGuId = [NSNumber numberWithInt:g_nClipBoardPasteGroupId];
+
+    g_bClipBoardPasteHotKey = bUse;
+    [_appDelegate SetPasteHotKey:g_bClipBoardPasteHotKey object:numGuId];
 }
 
 void WebWindow::SetUseHttpUrl(bool bUse)

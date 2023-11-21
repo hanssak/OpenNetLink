@@ -59,6 +59,8 @@ bool g_bDoingSendClipBoard = false;
 bool g_bDoExit2TrayUse = false;
 bool g_bStartTray = true;
 bool g_bClipCopyNsend = false;
+int g_nClipBoardPasteGroupId = 100;
+bool g_bClipBoardPasteHotKey = false;
 bool g_bUseHttpUrl = false;
 
 std::map<int, wstring> mapHotKey;
@@ -377,9 +379,32 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	break;
 	case WM_GETMINMAXINFO:
+	{
 		mmi = (LPMINMAXINFO)lParam;
-		mmi->ptMinTrackSize.x = WINDOW_MIN_WIDTH;
-		mmi->ptMinTrackSize.y = WINDOW_MIN_HEIGHT;
+
+		//WebWindow* webWindow = hwndToWebWindow[hwnd];
+		//webWindow->GetScreenDpi();
+		int dpi = GetDpiForWindow(hwnd);
+		if (dpi <= 100)
+		{
+			mmi->ptMinTrackSize.x = WINDOW_MIN_WIDTH;
+			mmi->ptMinTrackSize.y = WINDOW_MIN_HEIGHT;
+		}
+		else if (dpi <= 130)
+		{
+			mmi->ptMinTrackSize.x = 1270;
+			mmi->ptMinTrackSize.y = 900;// WINDOW_MIN_HEIGHT;
+		}
+		else if (dpi <= 150)
+		{
+			mmi->ptMinTrackSize.x = 1510;
+			mmi->ptMinTrackSize.y = 900;// WINDOW_MIN_HEIGHT;
+		}
+		else //다른 해상도는 조정필요
+		{
+			mmi->ptMinTrackSize.x = 1510;
+			mmi->ptMinTrackSize.y = 900;// WINDOW_MIN_HEIGHT;
+		}
 		return 0;
 		//case WM_QUIT:
 		//{
@@ -392,6 +417,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		//		KillProcess(pid);
 		//	break;
 		//}
+	}
 	case WM_CLOSE:
 		NTLog(SelfThis, Info, "Called : OpenNetLink - WM_CLOSE - TrayUse : %s", g_bDoExit2TrayUse ? "YES" : "NO");
 		if (g_bDoExit2TrayUse)
@@ -1582,9 +1608,29 @@ void AutoCopyClipBoard(int groupID)
 	}
 }
 
+void AutoPasteClipBoard(int groupID)
+{
+	HWND h_active_wnd = ::GetForegroundWindow();
+	if (h_active_wnd != NULL)
+	{
+		::ShowWindow(h_active_wnd, SW_SHOW);
+		::SetForegroundWindow(h_active_wnd);
+		::SetFocus(h_active_wnd);
+
+		// 필요한지 확인
+		// => 해당 함수없으면, 키를 모두 떼기 전까지 HotKey 이벤트가 반복적으로 호출된다.
+		FreeClipHotKey(groupID);
+
+		keybd_event(VK_CONTROL, 0x9d, 0, 0);
+		keybd_event('V', 0x98, 0, 0);
+		keybd_event('V', 0x98, KEYEVENTF_KEYUP, 0);
+		keybd_event(VK_CONTROL, 0x9d, KEYEVENTF_KEYUP, 0);
+		//Sleep(300);
+	}
+}
+
 int WebWindow::SendClipBoard(int groupID)
 {
-
 	if (g_bDoingSendClipBoard)
 	{
 		NTLog(SelfThis, Info, "WebWindow::SendClipBoard - SendClipBoard(GroupID : %d) - Send is Doing, so Return-", groupID);
@@ -1602,7 +1648,18 @@ int WebWindow::SendClipBoard(int groupID)
 	NTLog(SelfThis, Info, "WebWindow::SendClipBoard - groupID : %d, ClipSelectSend - Use : %s", groupID, bUseClipSelectSend ? _T("True") : _T("False"));
 	//WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard - groupID : %d, ClipSelectSend - Use : %s"), groupID, bUseClipSelectSend?_T("True"): _T("False"));
 
-	if (g_bClipCopyNsend)
+	if (groupID == g_nClipBoardPasteGroupId)
+	{
+		if (g_bClipBoardPasteHotKey)
+		{
+			//붙여넣기 단축키 인경우, Ctrl+V만 키 입력한 후, Return 처리
+			wprintf(L"Paste HotKey groupID : %d\n", groupID);
+			AutoPasteClipBoard(groupID);
+		}
+		g_bDoingSendClipBoard = false;
+		return 0;
+	}
+	else if (g_bClipCopyNsend)
 	{
 		AutoCopyClipBoard(groupID);
 	}
@@ -2217,6 +2274,14 @@ void WebWindow::SetUseClipCopyNsend(bool bUseCopyNsend)
 	g_bClipCopyNsend = bUseCopyNsend;
 	//NTLog(this, Info, "Called : SetUseClipCopyNsend(################) : %s", (AutoString)(bUseCopyNsend ? "Yes" : "No"));
 }
+
+void WebWindow::SetUseClipBoardPasteHotKey(int pasteGroupID, bool bUse)
+{
+	g_nClipBoardPasteGroupId = pasteGroupID;
+	g_bClipBoardPasteHotKey = bUse;
+	printf("SetUseClipBoardPasteHotKey :GroupID: %d => %s\n", g_nClipBoardPasteGroupId , g_bClipBoardPasteHotKey ? "true" : "false");
+}
+
 void WebWindow::SetUseHttpUrl(bool bUse)
 {
 	g_bUseHttpUrl = bUse;
@@ -2242,6 +2307,12 @@ void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, 
 		(AutoString)strTempHotKey.data());
 
 	mapHotKey[groupID] = strTempHotKey;
+
+	//for (map<int, wstring>::const_iterator it = mapHotKey.begin();
+	//	it != mapHotKey.end(); ++it)
+	//{
+	//	wprintf(L"current MapHotKey : key : %d / Value : %s\n", it->first, it->second.c_str());
+	//}
 }
 
 

@@ -19,6 +19,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public CLIPALM_TYPE enClipAlarmType { get; set; } = CLIPALM_TYPE.OSUI;              // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
         public PAGE_TYPE enMainPageType { get; set; } = PAGE_TYPE.NONE;                     // 메인페이지 리스트 (0 : DASHBOARD, 1 : TRANSFER)
         public bool bClipCopyAutoSend { get; set; } = false;                                // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
+        public bool bClipBoardPasteHotKey { get; set; } = false;                            // 붙여넣기에 대한 추가 단축키 체크 유무(Defulat : false)
+        public string strClipBoardPasteHotKeyValue { get; set; } = "N,Y,N,Y,V";                  // 붙여넣기에 대한 추가 단축키 정보
         public List<bool> bURLAutoTrans { get; set; } = null;                               // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
         public List<bool> bURLAutoAfterMsg { get; set; } = null;                            // URL 자동전환 후 사용자 알림 메시지 사용 여부(망별로) ( true : 사용, false : 미사용 )
         public List<string> strURLAutoAfterBrowser { get; set; } = null;                    // URL 자동전환 후 브라우저 창 처리방식(망별로) ( C : 닫기, N : 유지, F : 특정 URL 포워딩 )

@@ -553,7 +553,8 @@
                 {
                     if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                     {
-                        HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, XmlConf.GetTitle("T_ETC_TRAYMOVE"), XmlConf.GetInfoMsg("I_0051"));
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseHideToastPopup(groupID) == false)
+                            HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, XmlConf.GetTitle("T_ETC_TRAYMOVE"), XmlConf.GetInfoMsg("I_0051"));
                         Window.MoveWebWindowToTray();
                     }
                     else
@@ -626,8 +627,9 @@
                 if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                 {
                     string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                    string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
-                    HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                    string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseHideToastPopup(groupID) == false)
+                        HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, strTitle, strInfoMsg);
                     Window.MoveWebWindowToTray();
                 }
                 else
@@ -750,30 +752,31 @@
                 sgSettingProc.SetSettingUPW(groupID, strEncPW);
             }
 
-            //Main에서 Tray일 경우 페이지 이동
-            if (basicPageType == (int)Enums.EnumBasicPageType.Main)
+        //Main에서 Tray일 경우 페이지 이동
+        if (basicPageType == (int)Enums.EnumBasicPageType.Main)
+        {
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray(groupID))
             {
-                if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray(groupID))
+                if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
                 {
-                    if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
-                    {
-                        string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                        string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
+                    string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                    string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseHideToastPopup(groupID) == false)
                         HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, strTitle, strInfoMsg);
-                        Window.MoveWebWindowToTray();
-                    }
-                    else
-                        HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                    Window.MoveWebWindowToTray();
                 }
                 else
-                {
                     HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-                }
             }
             else
             {
                 HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
             }
+        }
+        else
+        {
+            HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+        }
 
             pageService.ConnectCountAdd(groupID);
             pageService.SetConnectStatus(groupID, true);
