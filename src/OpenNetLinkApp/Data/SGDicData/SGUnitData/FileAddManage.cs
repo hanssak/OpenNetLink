@@ -561,9 +561,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         /// <summary>
         /// 압축형식 내부검사가 필요한 파일 확장자 대상 목록
-        /// <para>ZIP, 7Z, TAR, GZ, TGZ</para>
+        /// <para>"ZIP", "7Z", "TAR", "GZ", "TGZ", "BZ2", "ALZ"</para>
         /// </summary>
-        public readonly List<string> ListCheckableCompressExtension = new List<string>() { "ZIP", "7Z", "TAR", "GZ", "TGZ", "BZ2" };
+        public readonly List<string> ListCheckableCompressExtension = new List<string>() { "ZIP", "7Z", "TAR", "GZ", "TGZ", "BZ2", "ALZ" };
 
         /// <summary>
         /// 전체경로길이 체크용
@@ -4897,8 +4897,67 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
                         #endregion [ZIP/7Z 형식 검사]
                         break;
-                    case "TAR":
                     case "GZ":
+                        #region [GZ 형식 검사]  
+                        try
+                        {
+                            Log.Logger.Here().Information("[unzipFile] Try Decompress File[{0}]", fileName);
+
+                            int per = (ExamCount * 100) / TotalCount;
+                            if (per < 20)
+                                per = 20;
+
+                            if (SGFileExamEvent != null)
+                                SGFileExamEvent(per, fileName);
+                            if (bUseCrossPlatformOSforFileName)
+                            {
+                                (bool, string) result = GzFileCheckFileName(fileFullName);
+                                if (result.Item1)
+                                    return (eFileAddErr.eUnZipInnerFileName, result.Item2);
+                            }
+
+                            CsFunction.GzFileDecompress(fileFullName, destFullPath);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            if (bZipPasswdCheck == true)
+                                return (nCurDepth == 1) ? (eFileAddErr.eFAZipPW, fileFullName) : (eFileAddErr.eUnZipInnerZipPassword, fileFullName);
+                        }
+                        #endregion [GZ 형식 검사]
+                        break;
+                    case "ALZ":
+                        #region [ALZ 형식 검사]  
+                        try
+                        {
+                            Log.Logger.Here().Information("[unzipFile] Try Decompress File[{0}]", fileName);
+
+                            int per = (ExamCount * 100) / TotalCount;
+                            if (per < 20)
+                                per = 20;
+
+                            if (SGFileExamEvent != null)
+                                SGFileExamEvent(per, fileName);
+
+                            //ALZ 파일은 압축 풀기 전 이름 체크 불가
+                            //if (bUseCrossPlatformOSforFileName)
+                            //{
+                            //    (bool, string) result = GzFileCheckFileName(fileFullName);
+                            //    if (result.Item1)
+                            //        return (eFileAddErr.eUnZipInnerFileName, result.Item2);
+                            //}
+
+                            CsFunction.AlzFileDecompress(fileFullName, destFullPath);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            if (bZipPasswdCheck == true)
+                                return (nCurDepth == 1) ? (eFileAddErr.eFAZipPW, fileFullName) : (eFileAddErr.eUnZipInnerZipPassword, fileFullName);
+                        }
+                        #endregion [ALZ 형식 검사]
+                        break;
+                    case "TAR":                    
                     case "TGZ":
                     case "BZ2":
                         #region [TAR 형식 검사]        
@@ -4960,6 +5019,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 }
             }
             return (false, "");
+        }
+
+        public (bool, string) GzFileCheckFileName(string filePath)
+        {
+            string currentFileName = filePath;
+            string newFileName = Path.GetFileName(currentFileName.Remove(currentFileName.Length - Path.GetExtension(filePath).Length));
+            if (GetFileNameEnable(newFileName) == false)
+                return (true, newFileName);
+            else
+                return (false, "");
         }
         /// <summary>
         /// ZIP 파일압축해제
@@ -5037,8 +5106,33 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
                         #endregion [ZIP/7Z 형식 검사]
                         break;
-                    case "TAR":
                     case "GZ":
+                        #region [GZ 형식 검사]        
+                        try
+                        {
+                            CsFunction.GzFileDecompress(fileFullName, destFullPath);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            return false;
+                        }
+                        #endregion [GZ 형식 검사]                        
+                        break;
+                    case "ALZ":
+                        #region [ALZ 형식 검사]
+                        try
+                        {
+                            CsFunction.AlzFileDecompress(fileFullName, destFullPath);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Logger.Here().Error("[unzipFile] " + ex.ToString());
+                            return false;
+                        }                        
+                        #endregion [ALZ 형식 검사]
+                        break;
+                    case "TAR":
                     case "TGZ":
                     case "BZ2":
                         #region [TAR 형식 검사]        
