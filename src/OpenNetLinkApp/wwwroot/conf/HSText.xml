@@ -5368,6 +5368,20 @@
       <EN>Including limited extensions in document</EN>
       <CN></CN>
     </T_eFADOC_EXTRACT_FILEFILTER>
+
+    <T_eFABINARY_APPEND_COMMONE>
+      <KR>다른 파일 추가 검사 실패</KR>
+      <JP></JP>
+      <EN>Add another file check failed</EN>
+      <CN></CN>
+    </T_eFABINARY_APPEND_COMMONE>
+      <T_eFABINARY_APPEND_FILE_ADD_ONPURPOSE>
+      <KR>다른 파일이 추가 된 파일</KR>
+      <JP></JP>
+      <EN>File is added other files</EN>
+      <CN></CN>
+    </T_eFABINARY_APPEND_FILE_ADD_ONPURPOSE>
+    
     <T_APPROVEEXT_USE_APPROVE>
       <KR>결재 사용</KR>
       <JP></JP>
@@ -9485,6 +9499,20 @@
       <EN>Please enter a description.</EN>
       <CN>请输入说明。</CN>
     </W_0304>
+    
+    <W_0305>
+      <KR>{0} 파일은 다른 파일 첨부 체크 검사에 실패했습니다.</KR>
+      <JP></JP>
+      <EN>The file failed the other file attachment check. {0}</EN>
+      <CN></CN>
+    </W_0305>
+    
+    <W_0306>
+      <KR>{0} 파일에 다른 파일이 첨부되었습니다.</KR>
+      <JP></JP>
+      <EN>Another file is attached to the file. {0}</EN>
+      <CN></CN>
+    </W_0306>
     
   </WARNING>
 

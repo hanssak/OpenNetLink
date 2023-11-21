@@ -1640,7 +1640,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             => (GetSystemPosition()) ? GetTagData("I_CLIENT_OLE_EXTRACT_EXT") : GetTagData("E_CLIENT_OLE_EXTRACT_EXT");
         public string GetForwardAutoDown()
             => (GetSystemPosition()) ? GetTagData("I_FORWARD_AUTODOWN") : GetTagData("E_FORWARD_AUTODOWN");
-
+        public string GetBinaryCheckType(bool bSystem)
+            => (bSystem) ? GetTagData("I_CLIENT_BINARY_CHECK") : GetTagData("E_CLIENT_BINARY_CHECK");
+        public string GetBinaryCheckExt()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_BINARY_CHECK_EXT") : GetTagData("E_CLIENT_BINARY_CHECK_EXT");
         /// <summary>
         /// 제목 최대 길이 값
         /// </summary>

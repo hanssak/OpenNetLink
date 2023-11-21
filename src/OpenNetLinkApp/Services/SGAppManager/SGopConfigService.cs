@@ -194,6 +194,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetApproveExtSelectType(int groupId);
         public bool GetUseInputSearchApproveExtTree(int groupId);
         public bool GetUseApproveExt(int groupId);
+        public bool GetUseNotApproveExceptEtc(int groupId);
         public bool GetUseFileExceptionDescCheck(int groupId);
         public bool GetUsePKIsendRecv(int groupId);
         public bool GetPKIsendType(int groupId);
@@ -1024,6 +1025,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApproveExt(int groupId)
         {
             return AppConfigInfo[groupId].bUseApproveExt;
+        }
+        public bool GetUseNotApproveExceptEtc(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseNotApproveExceptEtc;
         }
         public bool GetUseFileExceptionDescCheck(int groupId)
         {

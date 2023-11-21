@@ -11,6 +11,7 @@ namespace OfficeExtractor
 {
     class AppendCheck
     {
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<AppendCheck>();
         public int FileAppendCheck(string inputFile)
         {
             int result = 0;
@@ -91,7 +92,7 @@ namespace OfficeExtractor
                                         }
                                         else
                                         {
-                                            result = -1;
+                                            result = -3;
                                         }
                                         break;
                                     }
@@ -102,7 +103,7 @@ namespace OfficeExtractor
 
                                         if (stream.Position + length + 4 > stream.Length)
                                         {
-                                            result = -2;
+                                            result = -4;
                                             break;
                                         }
 
@@ -132,7 +133,7 @@ namespace OfficeExtractor
                                     result = 0;
                                 }
                                 else
-                                    result = -1;
+                                    result = -3;
                             }
                         }
                         break;
@@ -180,13 +181,13 @@ namespace OfficeExtractor
                                         }
                                         else
                                         {
-                                            result = -1;
+                                            result = -3;
                                         }
                                         break;
                                     }
                                     if (!(extensionIntroucer == 0x21 || extensionIntroucer == 0x3B || extensionIntroucer == 0x2C))
                                     {
-                                        result = -2;
+                                        result = -4;
                                         return result;
                                     }
                                     byte graphicControlLabel = (byte)stream.ReadByte();
@@ -255,7 +256,7 @@ namespace OfficeExtractor
                                     }
                                     else
                                     {
-                                        result = -2;
+                                        result = -4;
                                         break;
                                     }
                                 }
@@ -265,15 +266,15 @@ namespace OfficeExtractor
                     case ".TIF":
                     case ".TIFF":
                     default:
-                        result = -3;
+                        result = -5;
                         break;
                 }
                 #endregion
             }
             catch (Exception ex)
             {
-                result = -4;
-                throw ex.InnerException;
+                result = -1;
+                CLog.Error($"BinaryAppend Check Exception (code:{result})- {ex.ToString()}");
             }
 
             return result;
@@ -281,7 +282,7 @@ namespace OfficeExtractor
 
         private static int GetCheckJPG(FileStream stream)
         {
-            int result = -1;
+            int result = -3;
             byte[] bLength = new byte[2];
             byte first = 0x00;
             byte second = 0x00;
@@ -308,7 +309,7 @@ namespace OfficeExtractor
                 }
                 else
                 {
-                    result = -2;
+                    result = -4;
                     return result;
                 }
             }
@@ -354,7 +355,7 @@ namespace OfficeExtractor
                                     }
                                     else
                                     {
-                                        result = -1;
+                                        result = -3;
                                         break;
                                     }
                                 }
@@ -384,7 +385,7 @@ namespace OfficeExtractor
                                                     }
                                                     else
                                                     {
-                                                        result = -1;
+                                                        result = -3;
                                                     }
                                                     break;
 
@@ -395,7 +396,7 @@ namespace OfficeExtractor
                                     count++;
                                     if (count > 1000 || stream.Position == stream.Length)
                                     {
-                                        result = -1;
+                                        result = -3;
                                         break;
                                     }
                                 }
