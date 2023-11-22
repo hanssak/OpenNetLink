@@ -62,14 +62,6 @@ namespace OpenNetLinkApp
 
                 if (args?.Length > 0) CLog.Information($"args : {string.Join(',', args)}");
 
-                //json파일 재암호화
-                //파일에 저장된 항목 dek 재 암호화
-                SGCrypto.ValidationResult &= SGFileCrypto.Instance.EncryptSettingFiles();
-
-                windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
-                if (String.IsNullOrEmpty(windowTitle))
-                    windowTitle = "OpenNetLink";
-
                 //HsNetWorkSG.SGCrypto.UseKeyGen = false;
                 //OP 파일 재 암호화 => 암복호화 실패 시 재설치
                 //Network 파일 재 암호화 => 암복호화 실패 시 재설치
@@ -81,6 +73,16 @@ namespace OpenNetLinkApp
                 else
                     SGCrypto.ValidationResult &= SGCrypto.LoadKeyGenerate("wwwroot/conf/hsck");
 
+
+                //json파일 재암호화
+                //파일에 저장된 항목 dek 재 암호화
+                SGCrypto.ValidationResult &= SGFileCrypto.Instance.EncryptSettingFiles();
+
+                windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
+                if (String.IsNullOrEmpty(windowTitle))
+                    windowTitle = "OpenNetLink";
+
+                
                 //SP1 테스트를 위해 처리
                 //SGFileCrypto.Instance.EncryptSettingFiles("wwwroot/conf/SP1_DEBUG");
 
