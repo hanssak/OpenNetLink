@@ -865,6 +865,26 @@
 
         FileList = dropFile.GetHsStreamList();
 
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpCheck(groupID))
+        {
+            nDlp = 2;
+            foreach (HsStream hsStream in FileList)
+            {
+                if (!hsStream.IsDir)
+                {
+                    if (hsStream.DlpCheck == 1)
+                    {
+                        nDlp = 1;
+                        break;
+                    }
+                    else if (hsStream.DlpCheck == 3)
+                    {
+                        nDlp = 3;
+                    }
+                }
+            }
+        }
+
         int nTransType = 0;
         if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) &&
         isFilesNeedApprove())
