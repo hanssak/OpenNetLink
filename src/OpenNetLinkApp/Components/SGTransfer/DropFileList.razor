@@ -2425,7 +2425,7 @@
 
         int nRet = 0;
         nRet = await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, strDocumentExtractType, bAllowDRM, MaxDepth, Option,
-            ((SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI()) ? sgLoginData.GetExceptionExt() : ""));
+            ((SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI()) || (SGAppMgrSvc.OpConfigInfoService.GetUseNotApproveExceptEtc(_groupId)) ? sgLoginData.GetExceptionExt() : ""));
         // if (await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option) != 0)
 
         if (nRet == 1)

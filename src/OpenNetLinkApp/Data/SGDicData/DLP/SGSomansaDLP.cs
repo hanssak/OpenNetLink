@@ -21,6 +21,8 @@ namespace OpenNetLinkApp.Data.SGDicData.DLP
         }
         public static (int, string) DlpCheck(string filePath)
         {
+            return (1, $"DLP - 검출 파일 Name {Path.GetFileName(filePath)}");
+
             if (!Directory.Exists("TempDLP"))
             {
                 Directory.CreateDirectory("TempDLP");
