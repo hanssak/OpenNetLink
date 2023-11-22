@@ -1945,12 +1945,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			if (strData.Equals(""))
 			{
-				SetTagData("EXCEPTIONEXT", ";".Base64EncodingStr());
 				return ";";
 			}
-
-			if (GetApprove())
-				return ";";
 
 			if (string.Compare(strData, "none", true) == 0)
 				return ";";

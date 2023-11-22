@@ -842,8 +842,29 @@
             bAfterApprove = false;
 
         // 3중망 상황 상관없이 결재Line 정보는 무조건 보내어, 서버에서 결정하도록 한다.
-
+        
         FileList = dropFile.GetHsStreamList();
+
+        if(SGAppMgrSvc.OpConfigInfoService.GetUseDlpCheck(groupID))
+        {
+            nDlp = 2;
+            foreach(HsStream hsStream in FileList)
+            {
+                if(!hsStream.IsDir)
+                {
+                    if(hsStream.DlpCheck == 1)
+                    {
+                        nDlp = 1;
+                        break;
+                    }
+                    else if(hsStream.DlpCheck == 3)
+                    {
+                        nDlp = 3;
+                    }
+                }
+            }
+        }
+
 
         int nTransType = 0;
         if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) &&
