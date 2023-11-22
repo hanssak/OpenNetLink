@@ -80,9 +80,9 @@ extern "C"
 		instance->SendMessage(message);
 	}
 
-	EXPORTED void WebWindow_ShowUserNotification(WebWindow* instance, AutoString image, AutoString title, AutoString message, AutoString navURI)
+	EXPORTED void WebWindow_ShowUserNotification(WebWindow* instance, AutoString image, AutoString title, AutoString message, AutoString navURI, AutoString appName)
 	{
-		instance->ShowUserNotification(image, title, message, navURI);
+		instance->ShowUserNotification(image, title, message, navURI, appName);
 	}
 
 	EXPORTED void WebWindow_AddCustomScheme(WebWindow* instance, AutoString scheme, WebResourceRequestedCallback requestHandler)

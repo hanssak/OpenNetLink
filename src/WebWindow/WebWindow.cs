@@ -196,7 +196,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_NavigateToUrl(IntPtr instance, string url);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_ShowMessage(IntPtr instance, string title, string body, uint type);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SendMessage(IntPtr instance, string message);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_ShowUserNotification(IntPtr instance, string image, string title, string message, string navURI = null);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_ShowUserNotification(IntPtr instance, string image, string title, string message, string navURI = null, string appName=null);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_AddCustomScheme(IntPtr instance, string scheme, OnWebResourceRequestedCallback requestHandler);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetResizable(IntPtr instance, int resizable);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_GetSize(IntPtr instance, out int width, out int height);
@@ -259,6 +259,7 @@ namespace WebWindows
         private readonly IntPtr _nativeWebWindow;
         private readonly int _ownerThreadId;
         private string _title;
+        private string toastAppName = "OpenNetLink";
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<WebWindow>();
 
         public WinClipboardLibray winClip = null;
@@ -410,6 +411,8 @@ namespace WebWindows
             }
         }
 
+        public string SetToastAppName(string appName) => toastAppName = appName;
+
         public void ShowMessage(string title, string body)
         {
             //WebWindow_ShowMessage(_nativeWebWindow, title, body, /* MB_OK */ 0);
@@ -465,10 +468,10 @@ namespace WebWindows
             WebWindow_SendMessage(_nativeWebWindow, message);
         }
 
-        public void ShowUserNotification(string image, string title, string message, string navURI = null)
+        public void ShowUserNotification(string image, string title, string message, string navURI = null, string appName = null)
         {
             //WebWindow_ShowUserNotification(_nativeWebWindow, image, title, message, navURI);
-            Invoke(() => WebWindow_ShowUserNotification(_nativeWebWindow, image, title, message, navURI));   // KKW
+            Invoke(() => WebWindow_ShowUserNotification(_nativeWebWindow, image, title, message, navURI, appName));   // KKW
         }
 
         public void Notification(OS_NOTI category, string title, string message, string navURI = "")
@@ -505,7 +508,10 @@ namespace WebWindows
                 image = image.Replace("/", "\\");
             }
 
-            ShowUserNotification(image, title, message, navURI);
+            if (string.IsNullOrEmpty(toastAppName.Trim()))
+                toastAppName = "OpenNetLink";
+
+            ShowUserNotification(image, title, message, navURI, toastAppName);
         }
 
         public event EventHandler<string> OnWebMessageReceived;
