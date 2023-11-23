@@ -20,7 +20,7 @@
 
 <div class="p-3 control-sidebar-content">
 
-    <div class="r_set_title"> <i class="fas fa-cogs pr-2"></i>@XmlConf.GetTitle("T_APPCONFIG_COMMON")</div>                     <!--공통환경설정-->
+    <div class="r_set_title"> <i class="fas fa-cogs pr-2"></i>@((MarkupString)XmlConf.GetTitle("T_APPCONFIG_COMMON"))</div>                     <!--공통환경설정-->
     <hr class="mb-2">
 
     @if (m_bUseClipBoard)
