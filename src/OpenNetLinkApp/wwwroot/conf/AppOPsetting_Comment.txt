@@ -229,6 +229,7 @@ bUseFileAllDelete : 파일 일괄 삭제 사용 유무 (Defulat :true)
 bUseCrossPlatformOSforFileName : 파일이름에 OS간에 사용할수 없는 문자 들어간거 차단기능 사용유무(default:true - 윈도우가 Mac이보낸거수신가능)(Mac/Linux 간에만 사용한다든지 할때는 false 해도 무관)
 
 bUseTitleDescMinLength : 제목 / 설명 글자 최소 글자수 서버 DB에서 받아서 동작하게 설정
+bUseTitleDescMaxLength : 제목 / 설명 글자 최대 글자수 서버 DB에서 받아서 동작하게 설정
 
 InitTransferFileExplorerDirectoryInWindow : 윈도우에 한하여 전송화면에서 좌측에 초기 표시할 기본 경로 (Default : "")
 											=> "ROOT" : 상위 드라이버를 초기 표시											
@@ -249,6 +250,10 @@ bHiddenLoginLogo : Main Login 창 좌측 로고 숨김 처리
 bUseDrmAfterFileReceive :           //파일 수신 완료 후 DRM 사용 여부
 nDrmType :                          //DRM 종류 - 1. SoftCamp, 2.Fasso
 strSoftCampGrade:                   // SoftCamp 연동 시 보안등급
+
+bUseDlpCheck :           //파일 DLP 검사 사용 유무
+nDlpType :                          //DLP 종류 - 1. 소만사
+
 bHideApprLine : 파일전송에 결재라인 UI상에 숨길지 유무 (true:숨김, 기본값: false)
 bHideTitleDesc : 파일전송에 제목/설명 UI상에 숨길지 유무 (true:숨김, 기본값: false)
 
@@ -279,6 +284,14 @@ bIsBlockEmptyExt : 확장자가 빈 파일 차단유무 (Default : false),
                    예) false - txt가 filefilter에 있을 때에만 text/plain 파일들만 허용, true - 확장자가 빈 파일들 위변조 혹은 확장자 차단으로 모두 차단됨
 
 strLoginTextFontSize : 로그인 화면 망 명칭, 솔루션 명칭 FontSize 
+
+bUseNotApproveExceptEtc : 결재를 사용하지만 필수결재확장자 등등을 제외하고 결재를 사용하지 않을 때 사용
+
+bDeleteUploadFile : 파일 전송 후 전송한 파일 삭제
+
+
+
+
 
 
 
