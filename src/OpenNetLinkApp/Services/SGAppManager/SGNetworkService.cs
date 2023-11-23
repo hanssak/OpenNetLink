@@ -42,7 +42,37 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public void SaveIPAndReload(string IP)
         {
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
+
+            string jsonString = File.ReadAllText(strNetworkFileName);
+
+            int i = 0;
+            using (JsonDocument document = JsonDocument.Parse(jsonString))
+            {
+                JsonElement root = document.RootElement;
+                JsonElement NetWorkElement = root.GetProperty("NETWORKS");
+                //JsonElement Element;
+                foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
+                {
+                    SGNetwork sgNet = new SGNetwork();
+                    string strJsonElement = netElement.ToString();
+                    var options = new JsonSerializerOptions
+                    {
+                        ReadCommentHandling = JsonCommentHandling.Skip,
+                        AllowTrailingCommas = true,
+                        PropertyNameCaseInsensitive = true,
+                    };
+                    sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
+                    if(  NetWorkInfo.Count > i)
+                    {
+                        NetWorkInfo[i].FromName = sgNet.FromName;
+                        NetWorkInfo[i].ToName = sgNet.ToName;
+                    }
+                    i++;
+                }
+            }
+
             NetWorkInfo[0].IPAddress = IP;
+            
 
             SGNetworkForSave saveFormat = new SGNetworkForSave();
             saveFormat.NETWORKS = NetWorkInfo;
@@ -50,7 +80,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             var opt = new JsonSerializerOptions() { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
             var json = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes<SGNetworkForSave>(saveFormat, opt);
 
-            string jsonString = Encoding.UTF8.GetString(json);
+            jsonString = Encoding.UTF8.GetString(json);
 
             File.WriteAllText(strNetworkFileName, jsonString);
 
