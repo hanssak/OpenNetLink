@@ -1010,6 +1010,10 @@
 
         if (firstRender)
         {
+            string notiAppName = XmlConf.GetTitle("T_OS_NOTIFICATION_NAME");
+            Window.SetToastAppName(notiAppName);
+
+
             await JSRuntime.InvokeAsync<object>("addMouseUp");
             await JSRuntime.InvokeAsync<object>("addMouseDown");
             await JSRuntime.InvokeAsync<object>("addDragStart");
@@ -1161,6 +1165,7 @@
         int groupid = pageService.m_nCurViewPageGroupID;
 
         base.OnInitialized();
+
         sgUserSvr = SGAppMgrSvc.UserInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;

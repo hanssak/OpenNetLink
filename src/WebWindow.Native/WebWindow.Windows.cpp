@@ -977,7 +977,7 @@ void WebWindow::SendMessage(AutoString message)
 }
 
 // TODO: Call UserNotification on Windows API
-void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI)
+void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI, AutoString toastAppName)
 {
 	//return;
 	if (!WinToast::isCompatible()) {
@@ -1004,8 +1004,8 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 
 	wchar_t ModelID[MAX_PATH] = { 0, };
 	wsprintf(ModelID, L"Noti%d", m_nAppNotiID++);
-
-	appName = (LPWSTR)L"OpenNetLink";
+	
+	appName = toastAppName != NULL ? (LPWSTR)toastAppName : (LPWSTR)L"OpenNetLink";
 	//appUserModelID = (LPWSTR)ModelID;
 	const auto aumi = WinToast::configureAUMI(L"HANSSAK", L"SecureGate", L"OpenNetLink", ModelID);
 
