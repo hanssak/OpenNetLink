@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.IO;
+using System.Xml;
 
 namespace OpenNetLinkApp.Data.SGDicData.DLP
 {
@@ -60,7 +61,7 @@ namespace OpenNetLinkApp.Data.SGDicData.DLP
                                         {
                                             //검출
                                             result.Item1 = 1;
-                                            result.Item2 = value.ToString();
+                                            result.Item2 = GetResultParsing(value.ToString());
                                         }
                                         break;
                                     case "2":
@@ -73,7 +74,7 @@ namespace OpenNetLinkApp.Data.SGDicData.DLP
                                     case "3":
                                         {
                                             //분석 불가
-                                            result.Item1 = 3;
+                                            result.Item1 = 2;
                                             result.Item2 = "";
                                         }
                                         break;
@@ -120,6 +121,44 @@ namespace OpenNetLinkApp.Data.SGDicData.DLP
             }
 
             return result;
+        }
+
+        public static string GetResultParsing(string result)
+        {
+            XmlDocument xdoc = new XmlDocument();
+
+            xdoc.Load(new StringReader(result));
+
+            Dictionary<string, int> dlpResult = new Dictionary<string, int>();
+            XmlNodeList nodes = xdoc.SelectNodes("PatternList");
+            foreach (XmlNode node in nodes)
+            {
+                foreach (XmlNode childNode in node.ChildNodes)
+                {
+                    if (!dlpResult.Keys.Contains(childNode.Attributes["PatternName"].Value))
+                    {
+                        dlpResult.Add(childNode.Attributes["PatternName"].Value, Convert.ToInt32(childNode.Attributes["Repetition"].Value));
+                    }
+                    else
+                    {
+                        dlpResult[childNode.Attributes["PatternName"].Value] += Convert.ToInt32(childNode.Attributes["Repetition"].Value);
+                    }
+                }
+            }
+
+            string finalResult = "";
+
+            if (dlpResult.Count > 0)
+            {
+                foreach (string key in dlpResult.Keys)
+                {
+                    finalResult += $"{key} : {dlpResult[key]}, ";
+                }
+
+                finalResult = finalResult.Substring(0, finalResult.Length - 2);
+            }
+
+            return finalResult;
         }
     }
 }
