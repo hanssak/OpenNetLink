@@ -840,6 +840,14 @@ namespace OpenNetLinkApp.Services
                             if (notiRequestExit != null) notiRequestExit(groupId);
                         }
                         break;
+                    case eCmdList.eEMAILPREVIEWINFO:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            EmailPreviewInfoEvent emailPreviewInfoEvent = sgPageEvent.GetEmailPreviewInfoEvent(groupId);
+                            if (emailPreviewInfoEvent != null) emailPreviewInfoEvent(groupId, sgData);
+                        }
+                        break;
                     default:
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
@@ -2356,6 +2364,14 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestManualDownload(hsNetWork, groupid, strUserID, strTransSeq);
+            return -1;
+        }
+
+        public int RequestEmailPreviewInfo(int groupid, string strUserID, string strEmailSeq)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestEmailPreviewInfo(hsNetWork, groupid, strUserID, strEmailSeq);
             return -1;
         }
 

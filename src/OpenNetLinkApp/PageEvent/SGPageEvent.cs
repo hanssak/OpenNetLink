@@ -221,6 +221,8 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void LoginAfterSGHeaderUIEvent(int groupid);
     // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
     public delegate void GPKICNListRecvEvent(int groupid, PageEventArgs e);
+    //메일 본문 미리보기 정보 응답 이벤트 정의
+    public delegate void EmailPreviewInfoEvent(int groupid, SGData e);
     /// <summary>
     /// 대결재 갱신에 따른 로그아웃 Event
     /// </summary>
@@ -475,6 +477,7 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, UrlTypeForwardDataEvent> DicUrlTypeForwardDataEvent = new Dictionary<int, UrlTypeForwardDataEvent>();
 
+        public Dictionary<int, EmailPreviewInfoEvent> DicEmailPreviewInfoEvent = new Dictionary<int, EmailPreviewInfoEvent>(); //메일 본문 미리보기 정보 결과 노티
 
         public SGPageEvent()
         {
@@ -1696,5 +1699,19 @@ namespace OpenNetLinkApp.PageEvent
                 oSNotificationEvent(groupId, category, title, message, navURI);
         }
 
+        public void SetEmailPreviewInfoEvent(int groupid, EmailPreviewInfoEvent e)
+        {
+            EmailPreviewInfoEvent temp = null;
+            if (DicEmailPreviewInfoEvent.TryGetValue(groupid, out temp))
+                DicEmailPreviewInfoEvent.Remove(groupid);
+            DicEmailPreviewInfoEvent[groupid] = e;
+        }
+        public EmailPreviewInfoEvent GetEmailPreviewInfoEvent(int groupid)
+        {
+            EmailPreviewInfoEvent e = null;
+            if (DicEmailPreviewInfoEvent.TryGetValue(groupid, out e) == true)
+                e = DicEmailPreviewInfoEvent[groupid];
+            return e;
+        }
     }
 }

@@ -1111,11 +1111,39 @@
 
     public async Task OpenDetail(string transSeq, string apvseq, string apvenable, bool bIsAfterApprove, bool bIsCanFilePreview)
     {
+        //메일결재 미리보기 신규 방식으로 표시 가능한지 확인
+          ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        string strUserID = "";
+        if (sgLoginData != null)
+            strUserID = sgLoginData.GetUserID();
+
+        HSCmdCenter.sgPageEvent.SetEmailPreviewInfoEvent(groupID, EmailPreviewInfoResult);
+        HSCmdCenter.RequestEmailPreviewInfo(groupID, strUserID, transSeq);
+        return;
         refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
         refMailApprovePopUp.bIsPrivacyApproveDetail = false;
         //apvenable = "true";
         await refMailApprovePopUp.openPopUp(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
     }
+
+    void EmailPreviewInfoResult(int groupid, SGData e)
+    {
+        Console.WriteLine("\n\nEmailPreviewInfoResult====================");
+        Console.WriteLine($"AppId : {e.GetBasicTagData("APPID")}");
+        Console.WriteLine($"ClientId : {e.GetBasicTagData("CLIENTID")}");
+        Console.WriteLine($"Result : {e.GetBasicTagData("RESULT")}");
+        Console.WriteLine($"Reason : {e.GetBasicTagData("REASON")}");
+        Console.WriteLine($"BODYNAME : {e.GetBasicTagData("BODYNAME")}");
+        Console.WriteLine($"BODYFILE_IP : {e.GetBasicTagData("BODYFILE_IP")}");
+        Console.WriteLine($"PREVIEW_POSSIBLE : {e.GetBasicTagData("PREVIEW_POSSIBLE")}");
+        Console.WriteLine("EmailPreviewInfoResult====================\n\n");
+    }
+
 
     @*protected override void OnInitialized()
     {
