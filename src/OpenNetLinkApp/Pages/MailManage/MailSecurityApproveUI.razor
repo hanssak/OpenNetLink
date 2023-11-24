@@ -1090,7 +1090,7 @@
 
     public async Task OpenDetail(string transSeq, string apvseq, string apvenable, bool bIsAfterApprove, bool bIsCanFilePreview)
     {
-         //메일결재 미리보기 신규 방식으로 표시 가능한지 확인
+         
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -1100,19 +1100,31 @@
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
-        
-        HSCmdCenter.sgPageEvent.SetEmailPreviewInfoEvent(groupID, EmailPreviewInfoResult);
-        HSCmdCenter.RequestEmailPreviewInfo(groupID, strUserID, transSeq);
 
-        refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
-        refMailApprovePopUp.bIsPrivacyApproveDetail = true;
-        refMailApprovePopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
+        if(!SGAppMgrSvc.OpConfigInfoService.GetUseEmailApprovePreviewPopup(groupID))
+        {
+            refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
+            refMailApprovePopUp.bIsPrivacyApproveDetail = true;
+            //apvenable = "true";
+            refMailApprovePopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
+            await refMailApprovePopUp.openPopUp();
+            return;
+        }
+        else
+        {
+            //메일결재 미리보기 신규 방식으로 표시 가능한지 CMD 통해 확인
+            HSCmdCenter.sgPageEvent.SetEmailPreviewInfoEvent(groupID, EmailPreviewInfoResult);
+            HSCmdCenter.RequestEmailPreviewInfo(groupID, strUserID, transSeq);
 
-        refMailApprovePreviewPopUp.bUseDlpDataView = bUseDlpDataView;
-        refMailApprovePreviewPopUp.bIsPrivacyApproveDetail = true;
-        refMailApprovePreviewPopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
-        return;
+            refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
+            refMailApprovePopUp.bIsPrivacyApproveDetail = true;
+            refMailApprovePopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
 
+            refMailApprovePreviewPopUp.bUseDlpDataView = bUseDlpDataView;
+            refMailApprovePreviewPopUp.bIsPrivacyApproveDetail = true;
+            refMailApprovePreviewPopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
+            return;
+        }
         //await refMailApprovePopUp.openPopUp();
     }
 

@@ -119,7 +119,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseEmail { get; set; }               // 메일 관리/결재 사용 유무.
 
         public bool bUseEmailOnly { get; set; }               // 메일 관리/결재만 사용 (여기에 맞도록 UI 메뉴 재구성)
-
+        public bool bUseEmailApprovePreviewPopup { get; set; }       //메일 결재 미리보기 팝업 사용 (Default :false)
         //URL Redirection (URL 반대망 전송)
         //public bool bURLAutoTrans { get; set; }                            // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
         public bool bUseURLRedirectionAlarm { get; set; }                                 // URL 자동전환 알림 사용 유무(환경설정)

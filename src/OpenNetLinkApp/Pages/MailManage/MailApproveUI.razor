@@ -1123,18 +1123,30 @@
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
-
-        HSCmdCenter.sgPageEvent.SetEmailPreviewInfoEvent(groupID, EmailPreviewInfoResult);
-        HSCmdCenter.RequestEmailPreviewInfo(groupID, strUserID, transSeq);
-
-        refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
-        refMailApprovePopUp.bIsPrivacyApproveDetail = false;
-        refMailApprovePopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
         
-        refMailApprovePreviewPopUp.bUseDlpDataView = bUseDlpDataView;
-        refMailApprovePreviewPopUp.bIsPrivacyApproveDetail = false;
-        refMailApprovePreviewPopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
-        return;
+        if(!SGAppMgrSvc.OpConfigInfoService.GetUseEmailApprovePreviewPopup(groupID))
+        {
+            refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
+            refMailApprovePopUp.bIsPrivacyApproveDetail = false;
+            refMailApprovePopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
+            await refMailApprovePopUp.openPopUp();
+            return;       
+        }
+        else
+        {
+            //메일결재 미리보기 신규 방식으로 표시 가능한지 CMD 통해 확인
+            HSCmdCenter.sgPageEvent.SetEmailPreviewInfoEvent(groupID, EmailPreviewInfoResult);
+            HSCmdCenter.RequestEmailPreviewInfo(groupID, strUserID, transSeq);
+
+            refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
+            refMailApprovePopUp.bIsPrivacyApproveDetail = false;
+            refMailApprovePopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
+        
+            refMailApprovePreviewPopUp.bUseDlpDataView = bUseDlpDataView;
+            refMailApprovePreviewPopUp.bIsPrivacyApproveDetail = false;
+            refMailApprovePreviewPopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
+            return;
+        }
     }
 
     void EmailPreviewInfoResult(int groupid, SGData e)
