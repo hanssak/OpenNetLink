@@ -1091,7 +1091,8 @@
         refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
         refMailApprovePopUp.bIsPrivacyApproveDetail = true;
         //apvenable = "true";
-        await refMailApprovePopUp.openPopUp(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
+        refMailApprovePopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
+        await refMailApprovePopUp.openPopUp();
     }
 
     @*protected override void OnInitialized()

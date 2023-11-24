@@ -299,6 +299,7 @@
 <!-- /S. file content -->
 
 <MailApprovePopUp @ref="refMailApprovePopUp"></MailApprovePopUp>
+<MailApprovePreviewPopUp @ref="refMailApprovePreviewPopUp"></MailApprovePreviewPopUp>
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
 <SGReject @ref="refSGReject" Guid="modalEmailReject"></SGReject>
 
@@ -468,6 +469,7 @@
     }
 
     MailApprovePopUp refMailApprovePopUp;
+    MailApprovePreviewPopUp refMailApprovePreviewPopUp;
     public int TotalCount { get; set; }
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
     private int nViewPageNo = 1;
@@ -1124,30 +1126,39 @@
 
         HSCmdCenter.sgPageEvent.SetEmailPreviewInfoEvent(groupID, EmailPreviewInfoResult);
         HSCmdCenter.RequestEmailPreviewInfo(groupID, strUserID, transSeq);
-        return;
+
         refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
         refMailApprovePopUp.bIsPrivacyApproveDetail = false;
-        //apvenable = "true";
-        await refMailApprovePopUp.openPopUp(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
+        refMailApprovePopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
+        
+        refMailApprovePreviewPopUp.bUseDlpDataView = bUseDlpDataView;
+        refMailApprovePreviewPopUp.bIsPrivacyApproveDetail = false;
+        refMailApprovePreviewPopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
+        return;
     }
 
     void EmailPreviewInfoResult(int groupid, SGData e)
     {
-        Console.WriteLine("\n\nEmailPreviewInfoResult====================");
-        Console.WriteLine($"AppId : {e.GetBasicTagData("APPID")}");
-        Console.WriteLine($"ClientId : {e.GetBasicTagData("CLIENTID")}");
-        Console.WriteLine($"Result : {e.GetBasicTagData("RESULT")}");
-        Console.WriteLine($"Reason : {e.GetBasicTagData("REASON")}");
-        Console.WriteLine($"BODYNAME : {e.GetBasicTagData("BODYNAME")}");
-        Console.WriteLine($"BODYFILE_IP : {e.GetBasicTagData("BODYFILE_IP")}");
-        Console.WriteLine($"PREVIEW_POSSIBLE : {e.GetBasicTagData("PREVIEW_POSSIBLE")}");
-        Console.WriteLine("EmailPreviewInfoResult====================\n\n");
+        //신규 미리보기 가능 여부 확인
+        string result =e.GetBasicTagData("RESULT"); 
+        string reason =e.GetBasicTagData("REASON");
+        string bodyName= e.GetBasicTagData("BODYNAME");
+        string bodyFileIP = e.GetBasicTagData("BODYFILE_IP");
+        string newPreviewPossible = e.GetBasicTagData("PREVIEW_POSSIBLE");
+
+        CLog.Here().Information($"EmailPreviewInfoResult : result:{result} / preview possible:{newPreviewPossible}");
+
+        if(result == "0" && newPreviewPossible == "1")  
+        {
+            //신규버전 메일결재 미리보기 표현
+            refMailApprovePreviewPopUp.openPopUp(bodyName, bodyFileIP);
+        }
+        else
+        {
+           //기존 메일결재 미리보기 표현
+           refMailApprovePopUp.openPopUp();
+        }
     }
-
-
-    @*protected override void OnInitialized()
-    {
-    }*@
 
     protected override async Task OnInitializedAsync()
     {
