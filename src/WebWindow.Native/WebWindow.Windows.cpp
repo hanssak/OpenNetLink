@@ -933,6 +933,8 @@ void WebWindow::AttachWebView()
 								return S_OK;
 							}
 						).Get(), &webNavigationStarting);
+						
+						_webviewWindow->CallDevToolsProtocolMethod(L"Security.setIgnoreCertificateErrors", L"{\"ignore\": true}", nullptr);
 						RefitContent();
 
 						flag.clear();
