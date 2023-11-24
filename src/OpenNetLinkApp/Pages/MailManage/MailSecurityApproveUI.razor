@@ -278,6 +278,7 @@
 <!-- /S. file content -->
 
 <MailApprovePopUp @ref="refMailApprovePopUp"></MailApprovePopUp>
+<MailApprovePreviewPopUp @ref="refMailApprovePreviewPopUp"></MailApprovePreviewPopUp>
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
 <SGReject @ref="refSGReject" Guid="modalEmailReject"></SGReject>
 
@@ -445,6 +446,7 @@
     }
 
     MailApprovePopUp refMailApprovePopUp;
+    MailApprovePreviewPopUp refMailApprovePreviewPopUp;
     public int TotalCount { get; set; }
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
     private int nViewPageNo = 1;
@@ -1088,16 +1090,54 @@
 
     public async Task OpenDetail(string transSeq, string apvseq, string apvenable, bool bIsAfterApprove, bool bIsCanFilePreview)
     {
+         //메일결재 미리보기 신규 방식으로 표시 가능한지 확인
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        string strUserID = "";
+        if (sgLoginData != null)
+            strUserID = sgLoginData.GetUserID();
+        
+        HSCmdCenter.sgPageEvent.SetEmailPreviewInfoEvent(groupID, EmailPreviewInfoResult);
+        HSCmdCenter.RequestEmailPreviewInfo(groupID, strUserID, transSeq);
+
         refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
         refMailApprovePopUp.bIsPrivacyApproveDetail = true;
-        //apvenable = "true";
         refMailApprovePopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
-        await refMailApprovePopUp.openPopUp();
+
+        refMailApprovePreviewPopUp.bUseDlpDataView = bUseDlpDataView;
+        refMailApprovePreviewPopUp.bIsPrivacyApproveDetail = true;
+        refMailApprovePreviewPopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
+        return;
+
+        //await refMailApprovePopUp.openPopUp();
     }
 
-    @*protected override void OnInitialized()
+    void EmailPreviewInfoResult(int groupid, SGData e)
+    {
+        //신규 미리보기 가능 여부 확인
+        string result =e.GetBasicTagData("RESULT"); 
+        string reason =e.GetBasicTagData("REASON");
+        string bodyName= e.GetBasicTagData("BODYNAME");
+        string bodyFileIP = e.GetBasicTagData("BODYFILE_IP");
+        string newPreviewPossible = e.GetBasicTagData("PREVIEW_POSSIBLE");
+
+        CLog.Here().Information($"EmailPreviewInfoResult : result:{result} / preview possible:{newPreviewPossible}");
+
+        if(result == "0" && newPreviewPossible == "1")  
         {
-        }*@
+            //신규버전 메일결재 미리보기 표현
+            refMailApprovePreviewPopUp.openPopUp(bodyName, bodyFileIP);
+        }
+        else
+        {
+           //기존 메일결재 미리보기 표현
+           refMailApprovePopUp.openPopUp();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
