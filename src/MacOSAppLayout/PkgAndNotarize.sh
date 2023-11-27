@@ -41,7 +41,7 @@ dev_keychain_label="sxog-tiki-hjrx-pxfs"
 profile_name="hanssakSG"
 
 # put your project's information into these variables
-if [ $# -ne 10 ]; then
+if [ $# -ne 9 ]; then
 	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {isupdatecheck} $6 {startauto} $7 {storagename} $8 {regcrxforce} $9"
 	exit -1
 fi;
