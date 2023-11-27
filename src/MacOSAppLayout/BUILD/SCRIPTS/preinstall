@@ -5,10 +5,10 @@
 
 
 
-UPDATE_CHECK=false
+UPDATE_CHECK=0
 INSTALL_PATH="/Applications/OpenNetLinkApp.app"
 
-if [ $UPDATE_CHECK ]; then
+if [ $UPDATE_CHECK -eq 1 ]; then
     if [ -d "$INSTALL_PATH" ]; then
         cp -r $INSTALL_PATH /tmp
         rm -rf $INSTALL_PATH

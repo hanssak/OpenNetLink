@@ -314,24 +314,24 @@ if [[ $ispatch != "TRUE" ]]; then
 fi
 if [[ $regcrxforce == "FALSE" ]]; then 
     # echo "Check regcrxforce : FALSE"
-    sed -i '' -e 's/REG_CRX=true/REG_CRX=false/g' $filepostinstall
+    sed -i '' -e 's/REG_CRX=1/REG_CRX=0/g' $filepostinstall
 else
     # echo "Check regcrxforce : TRUE"
-    sed -i '' -e 's/REG_CRX=false/REG_CRX=true/g' $filepostinstall
+    sed -i '' -e 's/REG_CRX=0/REG_CRX=1/g' $filepostinstall
 fi
 
 if [[ $startauto == "FALSE" ]]; then 
-    sed -i '' -e 's/START_AUTO=true/START_AUTO=false/g' $filepostinstall
+    sed -i '' -e 's/START_AUTO=1/START_AUTO=0/g' $filepostinstall
 else
-    sed -i '' -e 's/START_AUTO=false/START_AUTO=true/g' $filepostinstall
+    sed -i '' -e 's/START_AUTO=0/START_AUTO=1/g' $filepostinstall
 fi
 
 if [[ $isupdatecheck == "FALSE" ]]; then 
-    sed -i '' -e 's/UPDATE_CHECK=true/UPDATE_CHECK=false/g' $filepostinstall
-    sed -i '' -e 's/UPDATE_CHECK=true/UPDATE_CHECK=false/g' $filepreinstall
+    sed -i '' -e 's/UPDATE_CHECK=1/UPDATE_CHECK=0/g' $filepostinstall
+    sed -i '' -e 's/UPDATE_CHECK=1/UPDATE_CHECK=0/g' $filepreinstall
 else
-    sed -i '' -e 's/UPDATE_CHECK=false/UPDATE_CHECK=true/g' $filepostinstall
-    sed -i '' -e 's/UPDATE_CHECK=false/UPDATE_CHECK=true/g' $filepreinstall
+    sed -i '' -e 's/UPDATE_CHECK=0/UPDATE_CHECK=1/g' $filepostinstall
+    sed -i '' -e 's/UPDATE_CHECK=0/UPDATE_CHECK=1/g' $filepreinstall
 fi
 
 #read -n 1 -s -r -p "계속하려면 아무 키나 누르세요.(KKW)"   # package 생성 error
