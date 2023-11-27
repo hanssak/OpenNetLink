@@ -12,7 +12,7 @@ file="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/temp/Upda
 
 
 
-REG_CRX=true
+REG_CRX=false
 NAME_CRX="gbbehmiepgfmmnifjbnknjaebgmnpbam.json"
 
 WHOAREYOU=`last | head -1 | awk -F' ' '{ print $1 }'`

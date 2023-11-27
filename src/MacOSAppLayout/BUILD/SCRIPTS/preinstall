@@ -5,7 +5,7 @@
 
 
 
-UPDATE_CHECK=true
+UPDATE_CHECK=false
 INSTALL_PATH="/Applications/OpenNetLinkApp.app"
 
 if [ $UPDATE_CHECK ]; then
