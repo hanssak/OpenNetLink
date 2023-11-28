@@ -618,13 +618,9 @@
     </if>
   </statement>
 
-  <statement id = "SFMModifyDelete">
-    Hsck_Transaction:DELETE FROM TBL_USER_SFM WHERE USER_SEQ = #userSeq#\n
-  </statement>
+  <statement id = "SFMModifyDelete">Hsck_Transaction:DELETE FROM TBL_USER_SFM WHERE USER_SEQ = #userSeq#\n</statement>
 
-  <statement id = "SFMModifyInsert">
-    INSERT INTO TBL_USER_SFM VALUES (#userSeq# , #ApprUserSeq#, '#stStartTime#', '#stEndTime#',  CAST (to_char(now(), 'YYYYMMDDHH24MISS') AS VARCHAR), #userSeq# )\n
-  </statement>
+  <statement id = "SFMModifyInsert">INSERT INTO TBL_USER_SFM VALUES (#userSeq# , #ApprUserSeq#, '#stStartTime#', '#stEndTime#',  CAST (to_char(now(), 'YYYYMMDDHH24MISS') AS VARCHAR), #userSeq# )\n</statement>
 
   <statement id = "SFMApprover">
     SELECT * FROM FUNC_SFM_APPROVE_SEARCH(#userSeq#)
