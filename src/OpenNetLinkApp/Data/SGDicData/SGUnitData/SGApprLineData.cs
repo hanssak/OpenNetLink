@@ -267,6 +267,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     tmpStr = dic[5];
                     if (!tmpStr.Equals(""))
                         listApprLine.Add(tmpStr);
+                    else
+                        listApprLine.Add("-");
                 }
             }
             return listApprLine;
@@ -285,6 +287,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     tmpStr = dic[4];
                     if (!tmpStr.Equals(""))
                         listApprLine.Add(tmpStr);
+                    else
+                        listApprLine.Add("-");
                 }
             }
             return listApprLine;
@@ -309,6 +313,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     tmpStr = dic[3];
                     if (!tmpStr.Equals(""))
                         listApprLine.Add(tmpStr);
+                    else
+                        listApprLine.Add("-");
                 }
             }
             return listApprLine;
@@ -342,6 +348,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
 
                         listApprLine.Add(tmpStr);
+                    }
+                    else
+                    {
+                        listApprLine.Add("0");
                     }
                 }
             }
@@ -378,8 +388,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     }
                 }
 
+                
                 Dictionary<int, List<string>> checkUserSeqByOrder = new Dictionary<int, List<string>>();
-
+                
                 for (int i = 0; i < listApprLineName.Count; i++)
                 {
                     int order = Convert.ToInt32(listApprLineOrder[i]);
@@ -406,6 +417,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         list.Add(listApprLineSeq[i]);
                         checkUserSeqByOrder.Add(order, list);
                     }
+
                     ApproverInfo apprInfo = new ApproverInfo(i, listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i], listApprLineID[i]);
                     apprInfo.nApprPos = 1;
                     apprInfo.nDlpApprove = 0;
