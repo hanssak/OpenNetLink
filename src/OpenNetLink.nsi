@@ -512,7 +512,14 @@ Section "MainSection" SEC01
 	    ExecWait '"$INSTDIR\VC_redist.x86.exe" /q /norestart'
 	 	  ;ExecWait 'vcredist_x86.exe'
 	  ${EndIf}
-
+	
+	; 바탕화면과, 단축아이콘 생성은 설치본일때만 적용되도록 수정
+	; 단축아이콘 생성
+	${If} ${REG_STARTPROGRAM} == 'TRUE'
+		CreateDirectory "$SMPROGRAMS\OpenNetLink"
+		CreateShortCut "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
+	${EndIf}  
+	CreateShortCut "C:\Users\Public\Desktop\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
   ${EndIf}
 
   ; 한꺼번에 지정하는 방식 사용
@@ -521,12 +528,7 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   File "bin_addon\SecureGateChromiumExtension_v1.1.crx"
 
-  ; 단축아이콘 생성
-  ${If} ${REG_STARTPROGRAM} == 'TRUE'
-	CreateDirectory "$SMPROGRAMS\OpenNetLink"
-	CreateShortCut "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
-  ${EndIf}  
-  CreateShortCut "C:\Users\Public\Desktop\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
+  
   
   ${If} ${IS_PATCH} == 'TRUE'
 
