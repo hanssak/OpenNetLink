@@ -42,13 +42,12 @@ var AppProps = new AppProperty(Context,
 								"./OpenNetLinkApp/wwwroot/conf/AppVersion.json",		// Version file Path 
 								 "./openNetLinkApp/ReleaseNote.md");						// Release Note of Patch File
 
-var MakeProps = new MakeProperty(Context, useMakeConfig);
+var MakeProps = new MakeProperty(Context, useMakeConfig, "./OpenNetLinkApp/wwwroot/SiteProfile/MakeConfig.json");
 
 string PackageDirPath 		= "NONE";
 string ReleaseNoteDirPath 	= "NONE";
 // string PackageZipFile 		= String.Format("OpenNetLink-{0}-{1}.hz", AppProps.AppUpdatePlatform, AppProps.PropVersion.ToString());
 string siteProfilePath = "./OpenNetLinkApp/wwwroot/SiteProfile";
-string makeConfigFile = "./OpenNetLinkApp/wwwroot/SiteProfile/MakeConfig.json";
 
 ///////////////////////////////////////////////////////////////////////////////
 // CLASSES
@@ -1116,8 +1115,9 @@ Task("PkgCrossflatform")
 			disableCertAutoUpdate = false;
 			isPatchInstaller=true;
 			isSilent= isPatchSilent;			
-			if(useMakeConfig == true)
-				inkFileName = MakeProps.GetLinkFileName(unitName, AgentName);
+			// 패치는 시작프로그램 등 설정하지 않으므로 제외
+			// if(useMakeConfig == true)
+			// 	inkFileName = MakeProps.GetLinkFileName(unitName, AgentName);
 			RunTarget("MakeInstaller");		
 		}
 	}
