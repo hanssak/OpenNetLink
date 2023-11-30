@@ -27,7 +27,7 @@ var patchAppEnv = Argument<bool>("patchAppEnv", false);					//true로 하면, pa
 var inkFileName = Argument("inkFileName", "OpenNetLink");      // 바탕화면 Ink 파일 이름 설정 
 var isPatchSilent = Argument<bool>("isPatchSilent", true);		// false로 하면 패치파일의 설치과정을 UI View로 변경함(사용자가 직접 여러번 클릭해줘야함.)
 var regStartProgram = Argument<bool>("regStartProgram", true);		// 시작프로그램에 등록 여부(Window)
-
+var useMakeConfig = Argument<bool>("useMakeConfig", false);		//Json 형식으로된 MakeConfig.json을 로드하여 지정된 속성을 처리
 
 var isPatchInstaller = false;
 var nacLoginType ="0" ;		//0:none / 1:Genian NAC
@@ -40,17 +40,64 @@ var AppProps = new AppProperty(Context,
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								 "../", 													// Path of the Git Local Repository
 								"./OpenNetLinkApp/wwwroot/conf/AppVersion.json",		// Version file Path 
-								// "./OpenNetLinkApp/wwwroot/conf/AppEnvSetting.json",		// Env file Path of the Application env settings
-								// "./OpenNetLinkApp/wwwroot/conf/NetWork.json",			// Network file Path of the Network settings
 								 "./openNetLinkApp/ReleaseNote.md");						// Release Note of Patch File
+
+var MakeProps = new MakeProperty(Context, useMakeConfig, "./OpenNetLinkApp/wwwroot/SiteProfile/MakeConfig.json");
 
 string PackageDirPath 		= "NONE";
 string ReleaseNoteDirPath 	= "NONE";
 // string PackageZipFile 		= String.Format("OpenNetLink-{0}-{1}.hz", AppProps.AppUpdatePlatform, AppProps.PropVersion.ToString());
 string siteProfilePath = "./OpenNetLinkApp/wwwroot/SiteProfile";
+
 ///////////////////////////////////////////////////////////////////////////////
 // CLASSES
 ///////////////////////////////////////////////////////////////////////////////
+public class MakeProperty
+{
+	ICakeContext Context{get;}
+	public JObject FileObj;
+
+
+	public MakeProperty(ICakeContext context, bool useMakeConfig, string makeConfigFile)
+	{
+		if(useMakeConfig == false)	return;		
+		Context = context;		
+		FileObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(makeConfigFile));
+	}
+
+	public JObject GetStorageValue(string storageName)
+	{
+		if(FileObj == null) return null;
+
+		foreach(JObject storage in FileObj["STORAGE"])
+		{
+			if(storage["STORAGE_NAME"].ToString() == storageName)
+				return storage;
+		}
+		return null;
+	}
+	public JObject GetAgentValue(string storageName, string agentName)
+	{
+		JObject storage = GetStorageValue(storageName);		
+		if(storage == null) return null;
+
+		foreach(JObject agent in storage["AGENT"])
+		{
+			if(agent["AGENT_NAME"].ToString() == agentName)
+				return agent;
+		}
+		return null;
+	}
+
+	public string GetLinkFileName(string storageName, string agentName)
+	{
+		JObject agent= GetAgentValue(storageName, agentName);
+		if(agent == null || agent["LNK_FILE_NAME"] == null || agent["LNK_FILE_NAME"].ToString() == "")	
+			return "OpenNetLink";
+		else
+			return agent["LNK_FILE_NAME"].ToString();
+	}
+}
 
 public class AppProperty
 {
@@ -217,52 +264,6 @@ public class AppProperty
 			return "3439";
 		}
 	}
-	// public string NetworkFromName {
-	// 	get {
-	// 		return NetworkJobj["NETWORKS"][0]["FROMNAME"].ToString();
-	// 	}
-	// 	set {
-	// 		NetworkJobj["NETWORKS"][0]["FROMNAME"] = value;
-	// 		JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
-	// 	}
-	// }
-
-	// public string NetworkToName {
-	// 	get {
-	// 		return NetworkJobj["NETWORKS"][0]["TONAME"].ToString();
-	// 	}
-	// 	set {
-	// 		NetworkJobj["NETWORKS"][0]["TONAME"] = value;
-	// 		JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
-	// 	}
-	// }
-
-	// public string NetworkIPAddress {
-	// 	get {
-	// 		return NetworkJobj["NETWORKS"][0]["IPADDRESS"].ToString();
-	// 	}
-	// 	set {
-	// 		NetworkJobj["NETWORKS"][0]["IPADDRESS"] = value;
-	// 		JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
-	// 	}
-	// }
-
-	// public string NetworkPort {
-	// 	get {
-	// 		return NetworkJobj["NETWORKS"][0]["PORT"].ToString();
-	// 	}		
-	// }
-
-	// public string NetworkPos {
-	// 	get {
-	// 		return NetworkJobj["NETWORKS"][0]["NETPOS"].ToString();
-	// 	}	
-	// 	set {
-	// 		NetworkJobj["NETWORKS"][0]["NETPOS"] = value;
-	// 		JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
-	// 	}	
-	// }
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1053,6 +1054,7 @@ Task("PkgCrossflatform")
 				nacLoginType ="0";
 				nacLoginEncryptKey ="";
 				disableCertAutoUpdate =false;
+				
 				if(AppProps.Platform == "windows")	//SGNAC.exe는 Window만 필요 시 배포
 				{	
 					//OP파일은 Plain Text인 SiteProfile에서 참고
@@ -1083,6 +1085,8 @@ Task("PkgCrossflatform")
 					}
 				}
 				isPatchInstaller=false;
+				if(useMakeConfig == true)
+					inkFileName = MakeProps.GetLinkFileName(unitName, AgentName);
 				RunTarget("MakeInstaller");		
 			}
 		}
@@ -1110,7 +1114,10 @@ Task("PkgCrossflatform")
 			nacLoginType ="0";
 			disableCertAutoUpdate = false;
 			isPatchInstaller=true;
-			isSilent=isPatchSilent;			
+			isSilent= isPatchSilent;			
+			// 패치는 시작프로그램 등 설정하지 않으므로 제외
+			// if(useMakeConfig == true)
+			// 	inkFileName = MakeProps.GetLinkFileName(unitName, AgentName);
 			RunTarget("MakeInstaller");		
 		}
 	}

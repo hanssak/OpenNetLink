@@ -1975,6 +1975,7 @@
                             pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
                             refPWChangeDefaultPW.nGroupID = groupId;
                             await refPWChangeDefaultPW.openPopUp();
+                            Window.MoveTrayToWebWindow();
                             return;
                         }
                         else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
@@ -1985,6 +1986,7 @@
                             // password 강제변경 창
                             pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
                             await refPWChange.openPopUp();
+                            Window.MoveTrayToWebWindow();
                             return;
                         }
                         else    //AfterWord
@@ -1998,6 +2000,7 @@
                             {
                                 pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
                                 await refPWChange.openPopUp();
+                                Window.MoveTrayToWebWindow();
                                 return;
                             }
 
@@ -2007,6 +2010,7 @@
                                 // 처음설치해서 사용하는 사용자들 항상 실행하게 되는 경로
                                 pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
                                 await refPWChange.openPopUp();
+                                Window.MoveTrayToWebWindow();
                                 return;
                             }
 
@@ -2018,6 +2022,7 @@
                             {
                                 pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
                                 await refPWChange.openPopUp();
+                                Window.MoveTrayToWebWindow();
                                 return;
                             }
 
@@ -2028,6 +2033,7 @@
                             {
                                 pageService.SetPassWDChgType(nGroupIDfirst, ePassWDType.eDAYPASSWDCHG);
                                 await refPWChange.openPopUp();
+                                Window.MoveTrayToWebWindow();
                                 return;
                             }
 
