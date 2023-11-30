@@ -29,15 +29,6 @@
             <div class="modal-body">
 
                 <div class="card-body pt-0">
-                    @(new MarkupString($@"<script src=""https://218.145.246.25:1300/viewer/CM001_Docs_Viewer.do?params=rDAhBcpqXiXSBkR6mUmDzu987UJHjqD88tmbHOupG0%2fB82LoYW7%2f4f0isXs7FzBIgNmJxC0uFfciTAbp3%2b0o5lLeWrbP6EQWR4R2Tn9ohIED2IhEHwJhgjPYJLknZvGN9GACmMcHE0caLG4RlCw7Pw%3d%3d"" style=""width:100%;height:100%;border:0px;top:0px;left:0px;""/>"))
-                    
-                    @*<embed src="https://218.145.246.25:1300/viewer/CM001_Docs_Viewer.do?params=rDAhBcpqXiXSBkR6mUmDzu987UJHjqD88tmbHOupG0%2fB82LoYW7%2f4f0isXs7FzBIgNmJxC0uFfciTAbp3%2b0o5lLeWrbP6EQWR4R2Tn9ohIED2IhEHwJhgjPYJLknZvGN9GACmMcHE0caLG4RlCw7Pw%3d%3d" style="width:100%;height:100%;border:0px;top:0px;left:0px;" />*@
-                   
-                 @*   <iframe src="https://218.145.246.25:1300/viewer/CM001_Docs_Viewer.do?params=rDAhBcpqXiXSBkR6mUmDzu987UJHjqD88tmbHOupG0%2fB82LoYW7%2f4f0isXs7FzBIgNmJxC0uFfciTAbp3%2b0o5lLeWrbP6EQWR4R2Tn9ohIED2IhEHwJhgjPYJLknZvGN9GACmMcHE0caLG4RlCw7Pw%3d%3d" style="width:100%;height:100%;border:0px;top:0px;left:0px;" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture">
-                        <p>iframe not Support</p>
-                    </iframe>*@
-
-                    @*<object id="qqq" data="https://218.145.246.25:1300/viewer/CM001_Docs_Viewer.do?params=rDAhBcpqXiXSBkR6mUmDzu987UJHjqD88tmbHOupG0%2fB82LoYW7%2f4f0isXs7FzBIgNmJxC0uFfciTAbp3%2b0o5lLeWrbP6EQWR4R2Tn9ohIED2IhEHwJhgjPYJLknZvGN9GACmMcHE0caLG4RlCw7Pw%3d%3d" width="100%" height="100%" style="width:auto; height:auto; display:block"/>*@
                     <div class="modal-sub-title mb-2"> @XmlConf.GetTitle("T_COMMON_DETAILVIEW") </div>      <!-- 상세내역 -->
                     <table class="table table-bordered blue">
                         <tbody>
@@ -104,7 +95,7 @@
                     </table>
                 </div>
                 <div class="card-body pt-0">
-                    <iframe src="@strBodyPreviewUrl" style="width:100%;height:100%;border:0px;top:0px;left:0px;" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"/>
+                    <iframe src="@strBodyPreviewUrl" style="background-color:white; width:100%;height:100%;border:0px;top:0px;left:0px;" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"/>
                 </div>
                 <div class="card-body pt-0 pb-0">
                     <div class="modal-sub-title mb-2"> @XmlConf.GetTitle("T_DETAIL_EMAILFILEINFO") </div>  <!--첨부 파일정보 -->
@@ -284,7 +275,7 @@
         {
             //string previewParam = makeParamOfMailViewer(fileseq, filename);
             string previewParam = makeParamOfMailViewer(stEmailSeq, filename);
-            string strAttachPreviewUrl = $"https://{strBodyFileIP}:1300/viewer/CM001_Docs_Viewer.do?params={previewParam}";
+            string strAttachPreviewUrl = $"https://{strBodyFileIP}:1300/webView/webView?params={previewParam}";
 
             //CLog.Here().Information("PreviewUtil - attach");
             //CLog.Here().Information($"FileSeq {fileseq} / FileName {filename}");
@@ -924,7 +915,7 @@
 
         //본문 미리보기 URL 구성        
         string previewParam = makeParamOfMailViewer(stEmailSeq, getBodyFileName);
-        strBodyPreviewUrl = $"https://{getBodyFileIP}:1300/viewer/CM001_Docs_Viewer.do?params={previewParam}";
+        strBodyPreviewUrl = $"https://{getBodyFileIP}:1300/webView/mailViewer?params={previewParam}";
         //strBodyPreviewUrl = $"https://{getBodyFileIP}:1300/weblink/AP001_Docs_Viewer.do?{previewParam}";
 
         //CLog.Here().Information("PreviewUtil");
@@ -933,11 +924,6 @@
 
         object[] param = { "MailApprovePreviewPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
-
-        //object[] param2 = { "MyIframe", "https://192.168.2.106:1300/" };
-        //await JSRuntime.InvokeAsync<object>("iframeMove", param2);
-
-     //   MyNavigationManager.NavigateTo("https://218.145.246.25:1300/viewer/CM001_Docs_Viewer.do?params=rDAhBcpqXiXSBkR6mUmDzu987UJHjqD88tmbHOupG0%2fB82LoYW7%2f4f0isXs7FzBIgNmJxC0uFfciTAbp3%2b0o5lLeWrbP6EQWR4R2Tn9ohIED2IhEHwJhgjPYJLknZvGN9GACmMcHE0caLG4RlCw7Pw%3d%3d");
     }
 
     public void closePopUp()
