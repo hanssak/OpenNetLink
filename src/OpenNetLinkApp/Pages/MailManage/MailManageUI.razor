@@ -55,8 +55,8 @@
                                 <th class="p-1" style="text-align: right; vertical-align: middle;">@strPeriod</th>
                                 <td style="width:30%;">
                                     @*<input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker9" readonly="readonly" value="@strFromDay">
-            <span class="float-left col-md-1">-</span>
-            <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker10" readonly="readonly" value="@strToDay">*@
+                                        <span class="float-left col-md-1">-</span>
+                                        <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker10" readonly="readonly" value="@strToDay">*@
                                     <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
 
@@ -95,7 +95,8 @@
 
                                 @if (bUseDlpDataView)
                                 {
-                                    <th class="p-1"style="text-align: right; vertical-align: middle;"> @strDlpInfo </th> <!-- 개인정보 -->
+                                    <th class="p-1" style="text-align: right; vertical-align: middle;"> @strDlpInfo </th>
+                                    <!-- 개인정보 -->
                                     <td>
                                         <div class="dropdown">
                                             <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -193,7 +194,8 @@
 
                                         @if (bUseDlpDataView)
                                         {
-                                            <th style="text-align:center; vertical-align:middle;width:6%;">@strDlpInfo</th>     <!-- 개인정보 -->
+                                            <th style="text-align:center; vertical-align:middle;width:6%;">@strDlpInfo</th>
+                                            <!-- 개인정보 -->
                                         }
                                         <th style="text-align:center; vertical-align:middle;width:6%;">@strFileAttach</th>      <!-- 파일첨부 -->
                                         <th style="text-align:center; vertical-align:middle;width:8%;">@strTransferStatus</th>  <!-- 발송상태 -->
@@ -539,12 +541,12 @@
             curFromDay = curFromDay.Substring(0, 8);
             curToDay = curToDay.Substring(0, 8);
 
-            // Test용도
-            //curFromDay = "20220101";
-            //curToDay = "20221227";
+        // Test용도
+        //curFromDay = "20220101";
+        //curToDay = "20221227";
 
-            // 실제사용 - UI상에 설정된 값 안나옴
-            mailParam.SetSearchStartDate(curFromDay);
+        // 실제사용 - UI상에 설정된 값 안나옴
+        mailParam.SetSearchStartDate(curFromDay);
             mailParam.SetSearchEndDate(curToDay);
 
             mailParam.SetApprKindCode(strApproveTypeText);
@@ -820,7 +822,7 @@
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
 
-        CLog.Here().Information($"TransCancel(email) - EmailTransSeq : {strTransSeq}, GetLoginData : {(sgLoginData != null?"YES":"No")}");
+        CLog.Here().Information($"TransCancel(email) - EmailTransSeq : {strTransSeq}, GetLoginData : {(sgLoginData != null ? "YES" : "No")}");
 
         if (strTransSeq == null || strTransSeq.Equals(""))
         {
@@ -1121,21 +1123,21 @@
 
             //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
             @*
-            if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForwardDownBeforeRecv())
-            {
-            if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
-            isPossibleDownload = true;
-            else
-            isPossibleDownload = false;
-            }
-            else
-            {
-            //수동다운로드 이므로 PC수신완료 건만 다운가능
-            if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
-            isPossibleDownload = true;
-            else
-            isPossibleDownload = false;
-            }
+                if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForwardDownBeforeRecv())
+                {
+                if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
+                isPossibleDownload = true;
+                else
+                isPossibleDownload = false;
+                }
+                else
+                {
+                //수동다운로드 이므로 PC수신완료 건만 다운가능
+                if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
+                isPossibleDownload = true;
+                else
+                isPossibleDownload = false;
+                }
             *@
 
             //수동다운로드 이므로 PC수신완료 건만 다운가능
@@ -1220,15 +1222,15 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         int transferTemplate = (groupIDbyParam >= 0) ? SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam) : 0;
-        await jsRuntime.InvokeAsync<object>("exitLogIn",new object[] {transferTemplate});
-        await jsRuntime.InvokeAsync<object>("adJustWindowsize",new object[] {transferTemplate});
+        await jsRuntime.InvokeAsync<object>("exitLogIn", new object[] { transferTemplate });
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize", new object[] { transferTemplate });
 
         int groupID = groupIDbyParam;
         CLog.Here().Information($"MailManage - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
 
         // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
         if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
-        { 
+        {
             nDrawPageGroupID = groupIDbyParam;
 
             bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
@@ -1265,16 +1267,19 @@
 
         string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
         strNavigateWithGroupID += groupID.ToString();
+        ChangeActiveMenuEvent changeActiveMenuEvent = HSCmdCenter.sgPageEvent.GetChangeActiveMenu();
+        if (changeActiveMenuEvent != null)
+            changeActiveMenuEvent(groupID, strNavigateWithGroupID);
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
-        foreach (var MenuItem in SideBarUISvc.MenuList)
-        {
-            if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
-            {
-                SideBarUISvc.ActiveMenu = MenuItem;
-                break;
-            }
-        }
+        //foreach (var MenuItem in SideBarUISvc.MenuList)
+        //{
+        //    if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
+        //    {
+        //        SideBarUISvc.ActiveMenu = MenuItem;
+        //        break;
+        //    }
+        //}
     }
 
 

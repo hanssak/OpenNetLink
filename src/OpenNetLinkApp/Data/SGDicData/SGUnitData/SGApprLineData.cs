@@ -267,6 +267,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     tmpStr = dic[5];
                     if (!tmpStr.Equals(""))
                         listApprLine.Add(tmpStr);
+                    else
+                        listApprLine.Add("-");
                 }
             }
             return listApprLine;
@@ -285,6 +287,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     tmpStr = dic[4];
                     if (!tmpStr.Equals(""))
                         listApprLine.Add(tmpStr);
+                    else
+                        listApprLine.Add("-");
                 }
             }
             return listApprLine;
@@ -309,6 +313,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     tmpStr = dic[3];
                     if (!tmpStr.Equals(""))
                         listApprLine.Add(tmpStr);
+                    else
+                        listApprLine.Add("-");
                 }
             }
             return listApprLine;
@@ -342,6 +348,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
 
                         listApprLine.Add(tmpStr);
+                    }
+                    else
+                    {
+                        listApprLine.Add("0");
                     }
                 }
             }

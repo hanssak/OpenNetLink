@@ -873,6 +873,9 @@
             // 인증서 등록모드 완료
             string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
             strNavigateWithGroupID += groupID.ToString();
+            ChangeActiveMenuEvent changeActiveMenuEvent = HsCmdCenter.sgPageEvent.GetChangeActiveMenu();
+            if (changeActiveMenuEvent != null)
+                changeActiveMenuEvent(groupID, strNavigateWithGroupID);
             MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
         }
@@ -1058,6 +1061,9 @@
 
                 string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
                 strNavigateWithGroupID += groupId.ToString();
+                ChangeActiveMenuEvent changeActiveMenuEvent = HsCmdCenter.sgPageEvent.GetChangeActiveMenu();
+                if (changeActiveMenuEvent != null)
+                    changeActiveMenuEvent(groupId, strNavigateWithGroupID);
                 MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
                 if (SGAppMgrSvc.AppConfigInfoService.GetStartTrayMove())

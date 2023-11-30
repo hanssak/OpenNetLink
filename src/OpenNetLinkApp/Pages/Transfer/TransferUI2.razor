@@ -842,22 +842,22 @@
             bAfterApprove = false;
 
         // 3중망 상황 상관없이 결재Line 정보는 무조건 보내어, 서버에서 결정하도록 한다.
-        
+
         FileList = dropFile.GetHsStreamList();
 
-        if(SGAppMgrSvc.OpConfigInfoService.GetUseDlpCheck(groupID))
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpCheck(groupID))
         {
             nDlp = 2;
-            foreach(HsStream hsStream in FileList)
+            foreach (HsStream hsStream in FileList)
             {
-                if(!hsStream.IsDir)
+                if (!hsStream.IsDir)
                 {
-                    if(hsStream.DlpCheck == 1)
+                    if (hsStream.DlpCheck == 1)
                     {
                         nDlp = 1;
                         break;
                     }
-                    else if(hsStream.DlpCheck == 3)
+                    else if (hsStream.DlpCheck == 3)
                     {
                         nDlp = 3;
                     }
@@ -3055,18 +3055,22 @@
 
         string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
         strNavigateWithGroupID += groupID.ToString();
+
+        ChangeActiveMenuEvent changeActiveMenuEvent = HSCmdCenter.sgPageEvent.GetChangeActiveMenu();
+        if (changeActiveMenuEvent != null)
+            changeActiveMenuEvent(groupID, strNavigateWithGroupID);
+
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
-        foreach (var MenuItem in SideBarUISvc.MenuList)
-        {
-            if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
-            {
-                SideBarUISvc.ActiveMenu = MenuItem;
-                break;
-            }
-        }
+        //foreach (var MenuItem in SideBarUISvc.MenuList)
+        //{
+        //    if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
+        //    {
+        //        SideBarUISvc.ActiveMenu = MenuItem;
+        //        break;
+        //    }
+        //}
     }
-
     /// <summary>
     /// 3망일때, 전체전송기능 사용해도 되는 상황인지 판단
     /// </summary>

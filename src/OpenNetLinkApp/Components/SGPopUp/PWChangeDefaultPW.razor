@@ -298,12 +298,16 @@
             return;
         }
 
-
         string strNavigateWithGroupID = String.Empty;
         if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
             strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
             strNavigateWithGroupID += groupID.ToString();
+
+            ChangeActiveMenuEvent changeActiveMenuEvent = HSCmdCenter.sgPageEvent.GetChangeActiveMenu();
+            if (changeActiveMenuEvent != null)
+                changeActiveMenuEvent(groupID, strNavigateWithGroupID);
+
             MyNavigationManager.NavigateTo(strNavigateWithGroupID);
         }
 

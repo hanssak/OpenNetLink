@@ -1114,7 +1114,7 @@
     public async Task OpenDetail(string transSeq, string apvseq, string apvenable, bool bIsAfterApprove, bool bIsCanFilePreview)
     {
         //메일결재 미리보기 신규 방식으로 표시 가능한지 확인
-          ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
@@ -1123,14 +1123,14 @@
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
-        
+
         if(!SGAppMgrSvc.OpConfigInfoService.GetUseEmailApprovePreviewPopup(groupID))
         {
             refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
             refMailApprovePopUp.bIsPrivacyApproveDetail = false;
             refMailApprovePopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
             await refMailApprovePopUp.openPopUp();
-            return;       
+            return;
         }
         else
         {
@@ -1141,7 +1141,7 @@
             refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
             refMailApprovePopUp.bIsPrivacyApproveDetail = false;
             refMailApprovePopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
-        
+
             refMailApprovePreviewPopUp.bUseDlpDataView = bUseDlpDataView;
             refMailApprovePreviewPopUp.bIsPrivacyApproveDetail = false;
             refMailApprovePreviewPopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
@@ -1152,7 +1152,7 @@
     void EmailPreviewInfoResult(int groupid, SGData e)
     {
         //신규 미리보기 가능 여부 확인
-        string result =e.GetBasicTagData("RESULT"); 
+        string result =e.GetBasicTagData("RESULT");
         string reason =e.GetBasicTagData("REASON");
         string bodyName= e.GetBasicTagData("BODYNAME");
         string bodyFileIP = e.GetBasicTagData("BODYFILE_IP");
@@ -1160,15 +1160,15 @@
 
         CLog.Here().Information($"EmailPreviewInfoResult : result:{result} / preview possible:{newPreviewPossible}");
 
-        if(result == "0" && newPreviewPossible == "1")  
+        if(result == "0" && newPreviewPossible == "1")
         {
             //신규버전 메일결재 미리보기 표현
             refMailApprovePreviewPopUp.openPopUp(bodyName, bodyFileIP);
         }
         else
         {
-           //기존 메일결재 미리보기 표현
-           refMailApprovePopUp.openPopUp();
+            //기존 메일결재 미리보기 표현
+            refMailApprovePopUp.openPopUp();
         }
     }
 
@@ -1341,16 +1341,19 @@
 
         string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
         strNavigateWithGroupID += groupID.ToString();
+        ChangeActiveMenuEvent changeActiveMenuEvent = HSCmdCenter.sgPageEvent.GetChangeActiveMenu();
+        if (changeActiveMenuEvent != null)
+            changeActiveMenuEvent(groupID, strNavigateWithGroupID);
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
-        foreach (var MenuItem in SideBarUISvc.MenuList)
-        {
-            if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
-            {
-                SideBarUISvc.ActiveMenu = MenuItem;
-                break;
-            }
-        }
+        //foreach (var MenuItem in SideBarUISvc.MenuList)
+        //{
+        //    if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
+        //    {
+        //        SideBarUISvc.ActiveMenu = MenuItem;
+        //        break;
+        //    }
+        //}
 
     }
 }

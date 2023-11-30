@@ -2061,7 +2061,10 @@
 
                 await JSRuntime.InvokeAsync<object>("closeAllPopup");
 
-                //if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
+                ChangeActiveMenuEvent changeActiveMenuEvent = HSCmdCenter.sgPageEvent.GetChangeActiveMenu();
+                if (changeActiveMenuEvent != null)
+                    changeActiveMenuEvent(nGroupIDfirst, strNavigatePathnGroupID);
+
                 MyNavigationManager.NavigateTo(strNavigatePathnGroupID);
 
                 // SideBarUI 에서 nGroupIDfirst로 지정된 UI로 선택
@@ -2128,6 +2131,23 @@
 
             pageService.SetIsPolicyUpdate(groupId, false);
         }
+    }
+    /// <summary>
+    /// SGSideBarUI 와 동일
+    /// </summary>
+    /// <param name="eventArgs"></param>
+    /// <param name="activeMenu"></param>
+    public void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
+    {
+
+        // ChangeActiveMenuWrap
+        if (pageService.m_nCurViewPageGroupID != activeMenu.GroupId)
+            pageService.m_nLastViewPageGroupID = pageService.m_nCurViewPageGroupID;
+
+        // 이동하는UI 그룹ID 지정
+        pageService.m_nCurViewPageGroupID = activeMenu.GroupId;
+
+        SideBarUISvc.ChgActiveMenu(eventArgs, activeMenu);
     }
 
     private void ShowMessage(string strType, string strMsg)

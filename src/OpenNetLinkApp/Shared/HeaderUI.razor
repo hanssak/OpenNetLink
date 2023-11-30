@@ -121,6 +121,8 @@
         //HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);
         HsCmdCenter.sgPageEvent.SetFileRecvProgressMasterEventAdd(FileRecvProgress);
 
+        HsCmdCenter.sgPageEvent.SetChangeActiveMenu(ChangeActiveMenu);
+
         HsCmdCenter.sgPageEvent.SetSkipFileNotiEventAdd(RecvSkipFileServerNoti);
         HsCmdCenter.sgPageEvent.SetPkiFileSendEventAdd(SendPkiFilesByFileTrans);
 
@@ -2726,6 +2728,9 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         // 이동하는UI 그룹ID 지정
         pageService.m_nCurViewPageGroupID = activeMenu.GroupId;
 
+        if (activeMenu.Actived)
+            return;
+
         SideBarUISvc.ChgActiveMenu(eventArgs, activeMenu);
     }
 
@@ -2946,7 +2951,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
                 }*@
 
-    }
+        }
         catch (Exception e)
         {
             CLog.Here().Information($"Toast-Click-Navigate-Exception, navURI : {navURI}, Exception(MSG) : {e.Message}");
@@ -3006,7 +3011,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         Dictionary<string, SGNetOverData> dicDestSysPos = null;
         dicDestSysPos = pageService.GetTargetSystemList(nGroupId);
-        
+
         if(string.IsNullOrEmpty(strTitle))
         {
             if (dicDestSysPos == null || dicDestSysPos.Count < 2)
@@ -3204,6 +3209,18 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         }
     }
 
+    public void ChangeActiveMenu(int groupId, string path)
+    {
+        KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+        eventArgs.Key = "Enter";
+
+        ISGSideBarUI activeMenu = null;
+        activeMenu = SideBarUISvc.FindSubMenu(groupId, path);
+        if (activeMenu != null)
+        {
+            ChangeActiveMenuWrap(eventArgs, activeMenu);
+        }
+    }
     /// <summary>
     /// 파일검사 예외신청한거 승인, 반려 Noti 도착 했을때, 처리
     /// </summary>

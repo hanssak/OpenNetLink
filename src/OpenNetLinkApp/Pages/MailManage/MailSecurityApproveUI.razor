@@ -1090,7 +1090,7 @@
 
     public async Task OpenDetail(string transSeq, string apvseq, string apvenable, bool bIsAfterApprove, bool bIsCanFilePreview)
     {
-         
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -1101,7 +1101,7 @@
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
-        if(!SGAppMgrSvc.OpConfigInfoService.GetUseEmailApprovePreviewPopup(groupID))
+        if (!SGAppMgrSvc.OpConfigInfoService.GetUseEmailApprovePreviewPopup(groupID))
         {
             refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
             refMailApprovePopUp.bIsPrivacyApproveDetail = true;
@@ -1131,23 +1131,23 @@
     void EmailPreviewInfoResult(int groupid, SGData e)
     {
         //신규 미리보기 가능 여부 확인
-        string result =e.GetBasicTagData("RESULT"); 
-        string reason =e.GetBasicTagData("REASON");
-        string bodyName= e.GetBasicTagData("BODYNAME");
+        string result = e.GetBasicTagData("RESULT");
+        string reason = e.GetBasicTagData("REASON");
+        string bodyName = e.GetBasicTagData("BODYNAME");
         string bodyFileIP = e.GetBasicTagData("BODYFILE_IP");
         string newPreviewPossible = e.GetBasicTagData("PREVIEW_POSSIBLE");
 
         CLog.Here().Information($"EmailPreviewInfoResult : result:{result} / preview possible:{newPreviewPossible}");
 
-        if(result == "0" && newPreviewPossible == "1")  
+        if (result == "0" && newPreviewPossible == "1")
         {
             //신규버전 메일결재 미리보기 표현
             refMailApprovePreviewPopUp.openPopUp(bodyName, bodyFileIP);
         }
         else
         {
-           //기존 메일결재 미리보기 표현
-           refMailApprovePopUp.openPopUp();
+            //기존 메일결재 미리보기 표현
+            refMailApprovePopUp.openPopUp();
         }
     }
 
@@ -1168,8 +1168,8 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
 
-        await jsRuntime.InvokeAsync<object>("exitLogIn", new object[] {""});
-        await jsRuntime.InvokeAsync<object>("adJustWindowsize", new object[] {""});
+        await jsRuntime.InvokeAsync<object>("exitLogIn", new object[] { "" });
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize", new object[] { "" });
 
         int groupID = groupIDbyParam;
         CLog.Here().Information($"TransManage - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
@@ -1230,7 +1230,7 @@
         strApproveKind = XmlConf.GetTitle("T_COMMON_ALL");
         strTransTypeText = XmlConf.GetTitle("T_COMMON_ALL");
         strTransFlag = XmlConf.GetTitle("T_COMMON_ALL");
-        strSearchApproveStatus = XmlConf.GetTitle(bSearchApprWait ? "T_COMMON_APPROVE_WAIT" :"T_COMMON_ALL"); //"승인대기"
+        strSearchApproveStatus = XmlConf.GetTitle(bSearchApprWait ? "T_COMMON_APPROVE_WAIT" : "T_COMMON_ALL"); //"승인대기"
 
         Task.Run(async () => { await doSearch(); });
     }
@@ -1294,7 +1294,7 @@
         {
             jsRuntime.InvokeAsync<object>("initPageLeft");
 
-            if (groupIDbyParam >=0 && SGAppMgrSvc.OpConfigInfoService.GetUseEmailApprUIwait(groupIDbyParam))
+            if (groupIDbyParam >= 0 && SGAppMgrSvc.OpConfigInfoService.GetUseEmailApprUIwait(groupIDbyParam))
             {
                 CLog.Here().Information($"OnAfterRender, 1 ############################ !!!!!!!!!!!!!!!!!!!!!!!");
                 ApproveWaitSearchForSetting(false, true);
@@ -1320,16 +1320,19 @@
 
         string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
         strNavigateWithGroupID += groupID.ToString();
+        ChangeActiveMenuEvent changeActiveMenuEvent = HSCmdCenter.sgPageEvent.GetChangeActiveMenu();
+        if (changeActiveMenuEvent != null)
+            changeActiveMenuEvent(groupID, strNavigateWithGroupID);
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
-        foreach (var MenuItem in SideBarUISvc.MenuList)
-        {
-            if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
-            {
-                SideBarUISvc.ActiveMenu = MenuItem;
-                break;
-            }
-        }
+        //foreach (var MenuItem in SideBarUISvc.MenuList)
+        //{
+        //    if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
+        //    {
+        //        SideBarUISvc.ActiveMenu = MenuItem;
+        //        break;
+        //    }
+        //}
 
     }
 }

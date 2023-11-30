@@ -293,7 +293,14 @@ namespace OpenNetLinkApp.PageEvent
     /// OpenNetLink 종료 요청 Notify
     /// </summary>
     /// <param name="groupId"></param>
-    public delegate bool UrlTypeForwardDataEvent(int groupId);    
+    public delegate bool UrlTypeForwardDataEvent(int groupId);
+
+    /// <summary>
+    /// 사이드바 엑티브 메뉴 변경
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="path"></param>
+    public delegate void ChangeActiveMenuEvent(int groupId, string path);
 
 }
 
@@ -472,6 +479,8 @@ namespace OpenNetLinkApp.PageEvent
         public SendPkiFileEvent PkiFileSendEventFunc = null;   // pki파일전송용
 
         public OSNotificationEvent oSNotificationEvent = null;
+
+        public ChangeActiveMenuEvent changeActiveMenuEvent = null;
 
         public NotiRequestExitEvent notiRequestExitEvent = null;
 
@@ -1697,6 +1706,16 @@ namespace OpenNetLinkApp.PageEvent
         {
             if (oSNotificationEvent != null)
                 oSNotificationEvent(groupId, category, title, message, navURI);
+        }
+
+        public void SetChangeActiveMenu(ChangeActiveMenuEvent e)
+        {
+            changeActiveMenuEvent = e;
+        }
+
+        public ChangeActiveMenuEvent GetChangeActiveMenu()
+        {
+            return changeActiveMenuEvent;
         }
 
         public void SetEmailPreviewInfoEvent(int groupid, EmailPreviewInfoEvent e)

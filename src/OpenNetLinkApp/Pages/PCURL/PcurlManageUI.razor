@@ -2,10 +2,12 @@
 @page "/pcurlManage/{groupIDbyParam:int}"
 
 @using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent 
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject NavigationManager MyNavigationManager
 @inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
@@ -121,7 +123,7 @@
                                             <!--<td style="text-align:center">
                                                 <input class="input" type="checkbox">
                                             </td>-->
-                                        <td style="text-align:center">@item.ApvStatus</td>
+                                            <td style="text-align:center">@item.ApvStatus</td>
                                             <td style="text-align:center">@item.ReqReason</td>
                                             <td style="text-align:center">@item.URL</td>
                                             <td style="text-align:center">@item.RequestTime</td>
@@ -280,6 +282,9 @@
 
         string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
         strNavigateWithGroupID += groupID.ToString();
+        ChangeActiveMenuEvent changeActiveMenuEvent = HSCmdCenter.sgPageEvent.GetChangeActiveMenu();
+        if (changeActiveMenuEvent != null)
+            changeActiveMenuEvent(groupID, strNavigateWithGroupID);
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
         foreach (var MenuItem in SideBarUISvc.MenuList)
