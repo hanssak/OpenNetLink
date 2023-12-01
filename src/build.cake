@@ -952,7 +952,13 @@ Task("PkgCrossflatform")
 			Information($"AppPorps.PropVersion : {AppProps.PropVersion}");		
 			
 			//현재 스토리지 기준 Publish
-			RunTarget("PubCrossflatform");			
+			RunTarget("PubCrossflatform");		
+
+			//publish 이후에, Edge 따로 백업 처리	
+			if(DirectoryExists($"./artifacts/edge"))		
+				DeleteDirectory($"./artifacts/edge", new DeleteDirectorySettings {Force = true, Recursive = true });
+			if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/edge"))	
+				CopyDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/edge", $"./artifacts/edge");					
 		}
 		CopyFile($"{storageUnit}/ReleaseNote.md", $"{ReleaseNoteDirPath}/{AppProps.PropVersion.ToString()}.md");				
 		CopyFiles("./OpenNetLinkApp/VersionHash.txt", $"{AppProps.InstallerRootDirPath}/{unitName}");
@@ -1083,6 +1089,15 @@ Task("PkgCrossflatform")
 								disableCertAutoUpdate = true;
 						}
 					}
+
+					//LightPatch 다음에 설치 생성 시, edge 없으면 복원하여 처리
+					if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/edge") == false)	
+					{
+						if(DirectoryExists($"./artifacts/edge") == false)
+							throw new Exception(String.Format($"[Err] 설치본을 위해 복원할 edge 폴더가 없습니다. Copy to [artifacts/edge] -> [artifacts/{AppProps.Platform}/published/wwwroot/edge]"));
+						
+						CopyDirectory($"./artifacts/edge", $"./artifacts/{AppProps.Platform}/published/wwwroot/edge");		
+					}						
 				}
 				isPatchInstaller=false;
 				if(useMakeConfig == true)
@@ -1103,13 +1118,13 @@ Task("PkgCrossflatform")
 				}
 			}
 			
-			if(FileExists("./artifacts/windows/published/wwwroot/conf/NetWork.json"))
-				DeleteFile("./artifacts/windows/published/wwwroot/conf/NetWork.json");		
+			if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/NetWork.json"))
+				DeleteFile($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/NetWork.json");		
 
 			if (patchAppEnv.ToString().ToUpper() == "FALSE")
 			{
-				if(FileExists("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json"))
-					DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
+				if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppEnvSetting.json"))
+					DeleteFile($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppEnvSetting.json");
 			}
 			nacLoginType ="0";
 			disableCertAutoUpdate = false;
