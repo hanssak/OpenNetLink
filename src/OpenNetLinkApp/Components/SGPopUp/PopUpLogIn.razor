@@ -949,6 +949,8 @@
 
                     CLog.Here().Information($"PopupLogin(nGroupID :{nGroupID}) - ADLogin - ###### - PWCheck : {(HsNetWork.UseHiddenLog ? Encoding.UTF8.GetString(originalPW) : "xxx")}");
 
+                    SetProtectedPW(SGCrypto.AESEncrypt256WithDEK(originalPW));
+
                     StateHasChanged();
                     await Task.Delay(100);
                     doLogIn();
