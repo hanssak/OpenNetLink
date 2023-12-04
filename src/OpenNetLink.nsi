@@ -740,12 +740,7 @@ Section "MainSection" SEC01
 		WriteRegDWORD HKLM "SOFTWARE\Policies\Microsoft\SystemCertificates\AuthRoot" "DisableRootAutoUpdate" 1	
 	${EndIf}	
   ${EndIf} ; ${IS_PATCH} == 'TRUE'
-
-  
-  ; 단축아이콘 생성
-  CreateDirectory "$SMPROGRAMS\OpenNetLink"
-  CreateShortCut "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
-  CreateShortCut "C:\Users\Public\Desktop\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"  
+ 
 SectionEnd
 
 Section -AdditionalIcons
