@@ -850,7 +850,7 @@
         else
         {
             //결재를 사용하지만 필수결재가 아니면 결재를 사용하지 않을 경우
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseNotApproveExceptEtc(groupID))
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExtRegardlessApprove(groupID))
             {
                 List<HsStream> tempList = dropFile.GetHsStreamList();
                 bool tempResult = false;
@@ -863,9 +863,18 @@
                         break;
                     }
                 }
-                //필수로 결재할게 없으면 결재를 하지 않음.
-                if (!tempResult)
-                    stApprLineSeq = "";
+                if (SGAppMgrSvc.OpConfigInfoService.GetMethodApproveExtRegardlessApprove(groupID) == (int)Enums.EnumMethodApproveExtRegardlessApprove.Method01)
+                {
+                    if (!tempResult)
+                    {
+                        stApprLineSeq = "";
+                    }
+                }
+                else if (SGAppMgrSvc.OpConfigInfoService.GetMethodApproveExtRegardlessApprove(groupID) == (int)Enums.EnumMethodApproveExtRegardlessApprove.Method02)
+                {
+                    if (tempResult)
+                        bPrivachApprove = true;
+                }
             }
         }
 

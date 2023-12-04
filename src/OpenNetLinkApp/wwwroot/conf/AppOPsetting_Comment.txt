@@ -286,7 +286,9 @@ bIsBlockEmptyExt : 확장자가 빈 파일 차단유무 (Default : false),
 
 strLoginTextFontSize : 로그인 화면 망 명칭, 솔루션 명칭 FontSize 
 
-bUseNotApproveExceptEtc : 결재를 사용하지만 필수결재확장자 등등을 제외하고 결재를 사용하지 않을 때 사용
+bUseApproveExtRegardlessApprove : 결재 상관없이 결재 필수 확장자 검색
+
+nMethodApproveExtRegardlessApprove : 결재상관없이 결재 필수 확장자 검색되었을때 처리 방법
 
 bDeleteUploadFile : 파일 전송 후 전송한 파일 삭제
 
