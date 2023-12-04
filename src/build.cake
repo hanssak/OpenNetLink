@@ -28,7 +28,7 @@ var inkFileName = Argument("inkFileName", "OpenNetLink");      // 바탕화면 I
 var isPatchSilent = Argument<bool>("isPatchSilent", true);		// false로 하면 패치파일의 설치과정을 UI View로 변경함(사용자가 직접 여러번 클릭해줘야함.)
 var regStartProgram = Argument<bool>("regStartProgram", true);		// 시작프로그램에 등록 여부(Window)
 var isUpdateCheck = Argument<bool>("isUpdateCheck", false);				//false 하면 업데이트 체크 안함
-
+var useMakeConfig = Argument<bool>("useMakeConfig", false);		//Json 형식으로된 MakeConfig.json을 로드하여 지정된 속성을 처리
 
 var isPatchInstaller = false;
 var nacLoginType ="0" ;		//0:none / 1:Genian NAC
@@ -41,9 +41,9 @@ var AppProps = new AppProperty(Context,
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								 "../", 													// Path of the Git Local Repository
 								"./OpenNetLinkApp/wwwroot/conf/AppVersion.json",		// Version file Path 
-								// "./OpenNetLinkApp/wwwroot/conf/AppEnvSetting.json",		// Env file Path of the Application env settings
-								// "./OpenNetLinkApp/wwwroot/conf/NetWork.json",			// Network file Path of the Network settings
 								 "./openNetLinkApp/ReleaseNote.md");						// Release Note of Patch File
+
+var MakeProps = new MakeProperty(Context, useMakeConfig, "./OpenNetLinkApp/wwwroot/SiteProfile/MakeConfig.json");
 
 string PackageDirPath 		= "NONE";
 string ReleaseNoteDirPath 	= "NONE";
@@ -53,6 +53,52 @@ string publishInitJsonDirPath ="NONE";	//암호화가 필요한 json 초기 파�
 ///////////////////////////////////////////////////////////////////////////////
 // CLASSES
 ///////////////////////////////////////////////////////////////////////////////
+public class MakeProperty
+{
+	ICakeContext Context{get;}
+	public JObject FileObj;
+
+
+	public MakeProperty(ICakeContext context, bool useMakeConfig, string makeConfigFile)
+	{
+		if(useMakeConfig == false)	return;		
+		Context = context;		
+		FileObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(makeConfigFile));
+	}
+
+	public JObject GetStorageValue(string storageName)
+	{
+		if(FileObj == null) return null;
+
+		foreach(JObject storage in FileObj["STORAGE"])
+		{
+			if(storage["STORAGE_NAME"].ToString() == storageName)
+				return storage;
+		}
+		return null;
+	}
+	public JObject GetAgentValue(string storageName, string agentName)
+	{
+		JObject storage = GetStorageValue(storageName);		
+		if(storage == null) return null;
+
+		foreach(JObject agent in storage["AGENT"])
+		{
+			if(agent["AGENT_NAME"].ToString() == agentName)
+				return agent;
+		}
+		return null;
+	}
+
+	public string GetLinkFileName(string storageName, string agentName)
+	{
+		JObject agent= GetAgentValue(storageName, agentName);
+		if(agent == null || agent["LNK_FILE_NAME"] == null || agent["LNK_FILE_NAME"].ToString() == "")	
+			return "OpenNetLink";
+		else
+			return agent["LNK_FILE_NAME"].ToString();
+	}
+}
 
 public class AppProperty
 {
@@ -219,52 +265,6 @@ public class AppProperty
 			return "3439";
 		}
 	}
-	// public string NetworkFromName {
-	// 	get {
-	// 		return NetworkJobj["NETWORKS"][0]["FROMNAME"].ToString();
-	// 	}
-	// 	set {
-	// 		NetworkJobj["NETWORKS"][0]["FROMNAME"] = value;
-	// 		JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
-	// 	}
-	// }
-
-	// public string NetworkToName {
-	// 	get {
-	// 		return NetworkJobj["NETWORKS"][0]["TONAME"].ToString();
-	// 	}
-	// 	set {
-	// 		NetworkJobj["NETWORKS"][0]["TONAME"] = value;
-	// 		JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
-	// 	}
-	// }
-
-	// public string NetworkIPAddress {
-	// 	get {
-	// 		return NetworkJobj["NETWORKS"][0]["IPADDRESS"].ToString();
-	// 	}
-	// 	set {
-	// 		NetworkJobj["NETWORKS"][0]["IPADDRESS"] = value;
-	// 		JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
-	// 	}
-	// }
-
-	// public string NetworkPort {
-	// 	get {
-	// 		return NetworkJobj["NETWORKS"][0]["PORT"].ToString();
-	// 	}		
-	// }
-
-	// public string NetworkPos {
-	// 	get {
-	// 		return NetworkJobj["NETWORKS"][0]["NETPOS"].ToString();
-	// 	}	
-	// 	set {
-	// 		NetworkJobj["NETWORKS"][0]["NETPOS"] = value;
-	// 		JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
-	// 	}	
-	// }
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -601,11 +601,16 @@ Task("PkgCrossflatform")
 			Information($"AppPorps.PropVersion : {AppProps.PropVersion}");		
 			
 			//현재 스토리지 기준 Publish
-			RunTarget("PubCrossflatform");	
+			RunTarget("PubCrossflatform");		
 
-			//UpdateListList.txt는 잠시 백업
+			//publish 이후에, Edge 따로 백업 처리	
+			if(DirectoryExists($"./artifacts/edge"))		
+				DeleteDirectory($"./artifacts/edge", new DeleteDirectorySettings {Force = true, Recursive = true });
+			if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/edge"))	
+				CopyDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/edge", $"./artifacts/edge");					
+		    //UpdateListList.txt는 잠시 백업
 			if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp/UpdateFileList.txt"))
-				CopyFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp/UpdateFileList.txt", $"{storageUnit}");						
+				CopyFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp/UpdateFileList.txt", $"{storageUnit}");
 		}
 		CopyFile($"{storageUnit}/ReleaseNote.md", $"{ReleaseNoteDirPath}/{AppProps.PropVersion.ToString()}.md");				
 		CopyFiles("./OpenNetLinkApp/VersionHash.txt", $"{AppProps.InstallerRootDirPath}/{unitName}");
@@ -713,6 +718,7 @@ Task("PkgCrossflatform")
 				nacLoginType ="0";
 				nacLoginEncryptKey ="";
 				disableCertAutoUpdate =false;
+				
 				if(AppProps.Platform == "windows")	//SGNAC.exe는 Window만 필요 시 배포
 				{	
 					//OP파일은 Plain Text인 SiteProfile에서 참고
@@ -741,8 +747,19 @@ Task("PkgCrossflatform")
 								disableCertAutoUpdate = true;
 						}
 					}
+
+					//LightPatch 다음에 설치 생성 시, edge 없으면 복원하여 처리
+					if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/edge") == false)	
+					{
+						if(DirectoryExists($"./artifacts/edge") == false)
+							throw new Exception(String.Format($"[Err] 설치본을 위해 복원할 edge 폴더가 없습니다. Copy to [artifacts/edge] -> [artifacts/{AppProps.Platform}/published/wwwroot/edge]"));
+						
+						CopyDirectory($"./artifacts/edge", $"./artifacts/{AppProps.Platform}/published/wwwroot/edge");		
+					}						
 				}
 				isPatchInstaller=false;
+				if(useMakeConfig == true)
+					inkFileName = MakeProps.GetLinkFileName(unitName, AgentName);
 				RunTarget("MakeInstaller");		
 			}
 		}
@@ -781,21 +798,22 @@ Task("PkgCrossflatform")
 				if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/edge")) 
 					DeleteDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
 			}
+			
+			if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/NetWork.json"))
+				DeleteFile($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/NetWork.json");		
 
-			if(FileExists("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json"))
-				DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
-			if(FileExists("./artifacts/windows/published/wwwroot/conf/Network.json"))
-				DeleteFile("./artifacts/windows/published/wwwroot/conf/Network.json");
-            
 			if (patchAppEnv.ToString().ToUpper() == "FALSE")
 			{
-				if(FileExists("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json"))
-					DeleteFile("./artifacts/windows/published/wwwroot/conf/AppEnvSetting.json");
+				if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppEnvSetting.json"))
+					DeleteFile($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppEnvSetting.json");
 			}
 			nacLoginType ="0";
 			disableCertAutoUpdate = false;
 			isPatchInstaller=true;
-			isSilent=isPatchSilent;			
+			isSilent= isPatchSilent;			
+			// 패치는 시작프로그램 등 설정하지 않으므로 제외
+			// if(useMakeConfig == true)
+			// 	inkFileName = MakeProps.GetLinkFileName(unitName, AgentName);
 			RunTarget("MakeInstaller");		
 		}
 	}

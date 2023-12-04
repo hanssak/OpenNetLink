@@ -825,6 +825,7 @@ window.closeAllPopup = () => {
     $("#ClipboardApprovePopUp").modal("hide");
     $("#ClipboardManagePopUp").modal("hide");
     $("#MailApprovePopUp").modal("hide");
+    $("#MailApprovePreviewPopUp").modal("hide");
     $("#MailManagePopUp").modal("hide");
     $("#PcurlApprovePopUp").modal("hide");
     $("#PcurlManagePopUp").modal("hide");

@@ -188,6 +188,7 @@
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 <SGAlert @ref="refSGAlertApproveAfter" OnConfirm="ApproveAfterTransFile" Guid="ApporveAfterAlert"></SGAlert>
 <SGAlert @ref="refSGAlertContinueFileTrans" OnConfirm="ContinueFileUpload" OnCancel="ContinueFileUploadCancel" Guid="ContinueFileTrans"></SGAlert>
+<SGAlert @ref="refSGAlertFileTransDelete" OnConfirm="FileTransDeleteUploadFile" Guid="FileTransFileDeleteAlert"></SGAlert>
 <input type="hidden" @ref=inputTypeFileElement />
 
 @code
@@ -219,6 +220,7 @@
 
     SGAlert refSGAlertApproveAfter;
     SGAlert refSGAlertContinueFileTrans;
+    SGAlert refSGAlertFileTransDelete;
     TransProgress refTransProgress;
 
     ISGVersionConfigService versionConfigSvc;
@@ -519,6 +521,9 @@
                 return;
             }
 
+            //전송 파일 삭제 시 경고 팝업창 생성
+
+
             // 3중망일때 목적지 점검
             if (dicDestSysPos != null && dicDestSysPos.Count > 0 && strDestNetWork.Length < 1)
             {
@@ -526,9 +531,14 @@
                 return;
             }
 
+            //전송 파일 삭제 시 경고 팝업창 생성
+            if (SGAppMgrSvc.OpConfigInfoService.GetDeleteUploadFile(groupID))
+            {
+                if (refSGAlertFileTransDelete != null)
+                    refSGAlertFileTransDelete.openPopUp(XmlConf.GetTitle("T_DATA_DELETE_TRANS_FILE"), XmlConf.GetTitle("T_DATA_DELETE_TRANS_FILE_COMMENT"), 2, groupID, "");
+            }
             //사후결재 제한 체크 여부
-
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveAfterLimit(groupID))
+            else if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveAfterLimit(groupID))
                 await CheckApproveAfterLimit();
             else
             {
@@ -599,6 +609,8 @@
         }
 
     }
+
+
 
     private async Task CheckApprLine()
     {
@@ -1314,6 +1326,8 @@
             }
         }
     }
+
+
 
     public async void ResultApproveAfter(int groupId, object[] e)
     {
@@ -2065,6 +2079,73 @@
         stopClick();
     }
 
+    public async Task FileTransDeleteUploadFile(string arg)
+    {
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveAfterLimit(groupIDbyParam))
+            await CheckApproveAfterLimit();
+        else
+        {
+
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupIDbyParam);
+            if (sgLoginData == null)
+                return;
+
+            //결재가 없지만 반드시 결재를 해야할 파일이 존재할 경우 결재자 등록 팝업 생성
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupIDbyParam) && isFilesNeedApprove())
+            {
+
+                refApproveExtApproverSelect_PopUp.FileList = dropFile.GetHsStreamList();
+
+                // 파일목록이 있는 화면을 갱신해줘야 UI상에 나타남
+                refApproveExtApproverSelect_PopUp.Refresh();
+
+                // 파일송신 버튼, 실행
+                refApproveExtApproverSelect_PopUp.SetFileTransWithApproveEvent(FileTransWithApprover);
+
+                //(0:미사용 1:제목 2:설명 3:제목,설명모두 / 최소입력자리수)
+                string strApproveExtPolicy = sgLoginData.GetTagDataBySystemEnvName("CS_EXCEPTION_EXT_REASON_TYPE");
+                bool useReason = false;
+                string initReason = "";
+                string[] policy = strApproveExtPolicy.Split("/");
+                if (policy.Length > 1)
+                {
+                    if (string.IsNullOrEmpty(policy[0]) || policy[0] == "0")
+                    {
+                        //Default
+                        initReason = strBindDesc;
+                        useReason = true;
+                    }
+                    else if (policy[0] == "1")
+                    {
+                        initReason = strBindTitle;
+                        useReason = true;
+                    }
+                    else
+                    {
+                        initReason = strBindDesc;
+                        useReason = true;
+                    }
+                }
+                else
+                {
+                    initReason = strBindDesc;
+                    useReason = true;
+                }
+
+                refApproveExtApproverSelect_PopUp.SetInitReason(useReason, initReason);
+                await refApproveExtApproverSelect_PopUp.openPopUp();
+            }
+            else
+            {
+                FileTrans();
+                //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+                await stopClick();
+            }
+
+        }
+    }
+
     private void ReceiverSelectOK(LinkedList<ApproverInfo> list)
     {
         refForwardLine.AssignReceiver(list);
@@ -2740,7 +2821,6 @@
         HSCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
     }
 
-
     public void DayInfoChange()
     {
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -2853,6 +2933,7 @@
         if (bFilePreView != true)
             DayInfoChange();
     }
+
     public void DayInfoClipChangeEvent(int groupID)
     {
         bool bFilePreView = pageService.GetDayInfoPrev(groupID);
@@ -3074,18 +3155,22 @@
 
         string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
         strNavigateWithGroupID += groupID.ToString();
+
+        ChangeActiveMenuEvent changeActiveMenuEvent = HSCmdCenter.sgPageEvent.GetChangeActiveMenu();
+        if (changeActiveMenuEvent != null)
+            changeActiveMenuEvent(groupID, strNavigateWithGroupID);
+
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
-        foreach (var MenuItem in SideBarUISvc.MenuList)
-        {
-            if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
-            {
-                SideBarUISvc.ActiveMenu = MenuItem;
-                break;
-            }
-        }
+        //foreach (var MenuItem in SideBarUISvc.MenuList)
+        //{
+        //    if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
+        //    {
+        //        SideBarUISvc.ActiveMenu = MenuItem;
+        //        break;
+        //    }
+        //}
     }
-
     /// <summary>
     /// 3망일때, 전체전송기능 사용해도 되는 상황인지 판단
     /// </summary>

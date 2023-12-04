@@ -33,6 +33,12 @@
       <EN>OpenNetLink</EN>
       <CN></CN>
     </T_WINDOW_TITLE>
+    <T_OS_NOTIFICATION_NAME>
+      <KR>OpenNetLink</KR>
+      <JP>OpenNetLink</JP>
+      <EN>OpenNetLink</EN>
+      <CN>OpenNetLink</CN>
+    </T_OS_NOTIFICATION_NAME>
     <T_LOGIN_DUPLICATE>
       <KR>로그인 중복</KR>
       <JP>LogIn Duplicate</JP>
@@ -2126,6 +2132,19 @@
       <EN>Resume transmission</EN>
       <CN></CN>
     </T_DATA_CONTINUE_TRANS>
+    <T_DATA_DELETE_TRANS_FILE_COMMENT>
+      <KR>전송 시 원본파일은 정보유출 사고 예방을 위하여 삭제됩니다.<![CDATA[<br>]]>파일을 전송하시겠습니까?</KR>
+      <JP></JP>
+      <EN>When transferring, the original file will be deleted to prevent information leakage.<![CDATA[<br>]]>Would you like to transfer the file?</EN>
+      <CN></CN>
+    </T_DATA_DELETE_TRANS_FILE_COMMENT>
+
+    <T_DATA_DELETE_TRANS_FILE>
+      <KR>전송파일 삭제</KR>
+      <JP></JP>
+      <EN>Delete transmitted files</EN>
+      <CN></CN>
+    </T_DATA_DELETE_TRANS_FILE>
 
     <!-- ********************************************* [END] 전송 관리 화면 (T_TRANS_0000) ********************************************* -->
 
@@ -5375,7 +5394,6 @@
       <EN>Including limited extensions in document</EN>
       <CN></CN>
     </T_eFADOC_EXTRACT_FILEFILTER>
-
     <T_eFABINARY_APPEND_COMMONE>
       <KR>다른 파일 추가 검사 실패</KR>
       <JP></JP>
@@ -5388,7 +5406,6 @@
       <EN>File is added other files</EN>
       <CN></CN>
     </T_eFABINARY_APPEND_FILE_ADD_ONPURPOSE>
-
     <T_APPROVEEXT_USE_APPROVE>
       <KR>결재 사용</KR>
       <JP></JP>
@@ -9520,7 +9537,6 @@
       <EN>Another file is attached to the file. {0}</EN>
       <CN></CN>
     </W_0306>
-
   </WARNING>
 
 

@@ -1236,9 +1236,13 @@
         strInvokeSendParam += ":";
         strInvokeSendParam += ((int)eLoginUITypeData).ToString();
 
-        // IDPW UI 형태일때에만 사용
-        if (eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
+        try
         {
+            if (!pageService.GetIsPolicyUpdate(groupId))
+            {
+                // IDPW UI 형태일때에만 사용
+                if (eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
+                {
 
             //if (siteConfig.GetUseAutoLogin(groupId) == true)  // json으로 설정이동
             if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
@@ -1253,113 +1257,113 @@
                         sgRSACrypto?.ValueEncrypt(id, out strEncID);
                         sgRSACrypto?.ValueEncrypt(protectedPw, out strEncPW);
 
-                        sgSettingProc.SetSettingUID(groupId, strEncID);
-                        sgSettingProc.SetSettingUPW(groupId, strEncPW);
-                        sgSettingProc.SetSettingAutoLogin(groupId, true);
-                    }
-                }
-                else
-                {
-                    sgSettingProc.SetSettingAutoLogin(groupId, false);
-                }
-
-            }
-            else
-            {
-                //if (siteConfig.GetUseLoginIDSave(groupId) == true)    // json으로 설정이동
-                if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID))
-                {
-                    if (bIDSaveCheck)
-                    {
-                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                        string strEncID = "";
-                        sgRSACrypto.ValueEncrypt(id, out strEncID);
-                        if (sgSettingData != null)
-                        {
-                            sgSettingProc.SetSettingUID(groupId, strEncID);
-                            sgSettingProc.SetSettingIDSave(groupId, true);
+                                sgSettingProc.SetSettingUID(groupId, strEncID);
+                                sgSettingProc.SetSettingUPW(groupId, strEncPW);
+                                sgSettingProc.SetSettingAutoLogin(groupId, true);
+                            }
                         }
+                        else
+                        {
+                            sgSettingProc.SetSettingAutoLogin(groupId, false);
+                        }
+
                     }
                     else
                     {
-                        sgSettingProc.SetSettingIDSave(groupId, false);
+                        //if (siteConfig.GetUseLoginIDSave(groupId) == true)    // json으로 설정이동
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID))
+                        {
+                            if (bIDSaveCheck)
+                            {
+                                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                                string strEncID = "";
+                                sgRSACrypto.ValueEncrypt(id, out strEncID);
+                                if (sgSettingData != null)
+                                {
+                                    sgSettingProc.SetSettingUID(groupId, strEncID);
+                                    sgSettingProc.SetSettingIDSave(groupId, true);
+                                }
+                            }
+                            else
+                            {
+                                sgSettingProc.SetSettingIDSave(groupId, false);
+                            }
+                        }
                     }
-                }
-            }
 
-            //암호 체크는 ID/PW일 경우에만 해당
-            if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
-            {
-                if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId))
-                {
-
-                    if (GetInitPWLogin(groupId) == true)
+                    //암호 체크는 ID/PW일 경우에만 해당
+                    if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
                     {
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
-                        eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
-                        // goToPage.InvokeAsync(groupId, (int)eLoginUITypeData);
-                        goToPage.InvokeAsync(strInvokeSendParam);
-                        closePopUp();
-                        return false;
-                    }
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId))
+                        {
+
+                            if (GetInitPWLogin(groupId) == true)
+                            {
+                                pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
+                                eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
+                                // goToPage.InvokeAsync(groupId, (int)eLoginUITypeData);
+                                goToPage.InvokeAsync(strInvokeSendParam);
+                                closePopUp();
+                                return false;
+                            }
 
                     //pw = "";
                     bAutoLoginCheck = false;
 
-                    if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
-                    {
-                        eResultIdPwAfterJob = eIDPWresultJob.eNone;
-                        //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
-                        HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-                        goToPage.InvokeAsync(strInvokeSendParam);
-                        return true;
-                    }
-                    else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
-                    {
-                        eResultIdPwAfterJob = eIDPWresultJob.eEnforced;
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        goToPage.InvokeAsync(strInvokeSendParam);
-                        closePopUp();
-                        return false;
-                    }
+                            if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
+                            {
+                                eResultIdPwAfterJob = eIDPWresultJob.eNone;
+                                //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+                                HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                                goToPage.InvokeAsync(strInvokeSendParam);
+                                return true;
+                            }
+                            else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
+                            {
+                                eResultIdPwAfterJob = eIDPWresultJob.eEnforced;
+                                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                                goToPage.InvokeAsync(strInvokeSendParam);
+                                closePopUp();
+                                return false;
+                            }
 
-                    string strTime = "";
-                    //SGSettingData sgSettingData = null;
-                    sgSettingData = sgSettingProc.SelectSettingData(groupId);
-                    if (sgSettingData == null)
-                    {
-                        eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        goToPage.InvokeAsync(strInvokeSendParam);
-                        closePopUp();
-                        return false;
-                    }
+                            string strTime = "";
+                            //SGSettingData sgSettingData = null;
+                            sgSettingData = sgSettingProc.SelectSettingData(groupId);
+                            if (sgSettingData == null)
+                            {
+                                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                                goToPage.InvokeAsync(strInvokeSendParam);
+                                closePopUp();
+                                return false;
+                            }
 
-                    strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
-                    if (strTime.Equals(""))
-                    {
-                        // pw 변경날짜 정보가 없는 첫Login시
-                        eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        goToPage.InvokeAsync(strInvokeSendParam);
-                        closePopUp();
-                        return false;
-                    }
+                            strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
+                            if (strTime.Equals(""))
+                            {
+                                // pw 변경날짜 정보가 없는 첫Login시
+                                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                                goToPage.InvokeAsync(strInvokeSendParam);
+                                closePopUp();
+                                return false;
+                            }
 
-                    SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
-                    string strUserSeq = sgUserData.GetUserSequence();
-                    strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
-                    if (strTime.Equals(""))
-                    {
-                        eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        goToPage.InvokeAsync(strInvokeSendParam);
-                        closePopUp();
-                        return false;
-                    }
+                            SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
+                            string strUserSeq = sgUserData.GetUserSequence();
+                            strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
+                            if (strTime.Equals(""))
+                            {
+                                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                                goToPage.InvokeAsync(strInvokeSendParam);
+                                closePopUp();
+                                return false;
+                            }
 
-                    DateTime dtLocalTime = DateTime.Parse(strTime);
-                    DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
+                            DateTime dtLocalTime = DateTime.Parse(strTime);
+                            DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
 
                     if (DateTime.Compare(dtLocalTime, svrDt) < 0)
                     {
@@ -1377,16 +1381,28 @@
                 bAutoLoginCheck = false;
             }
 
+                }
+                else
+                {
+
+                }
+
+                eResultIdPwAfterJob = eIDPWresultJob.eNone;
+                //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+                HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                goToPage.InvokeAsync(strInvokeSendParam);
+            }
+            else
+            {
+                goToPage.InvokeAsync(strInvokeSendParam);
+            }
         }
-        else
+        catch(Exception ex)
         {
-
+            pageService.SetIsPolicyUpdate(groupId, false);
+            return false;
         }
 
-        eResultIdPwAfterJob = eIDPWresultJob.eNone;
-        //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
-        HSCmdCenter.sgPageEvent.OSNotification(groupId, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-        goToPage.InvokeAsync(strInvokeSendParam);
 
         return true;
 

@@ -803,61 +803,69 @@ namespace OpenNetLinkApp.Services
                         if (hs != null)
                         {
 
-                    }
-                    break;
-                case eCmdList.eGENERICNOTI:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        GenericNotiType2Event eventData = sgPageEvent.GetGenericNotiType2EventAdd(groupId);
-                        if (eventData != null) eventData(groupId, sgData);
-                    }
-                    break;
-                case eCmdList.eSKIPFILENOTI:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        SkipFileNotiEvent eventData = sgPageEvent.GetSkipFileNotiEventAdd();
-                        if (eventData != null) eventData(groupId, sgData);
-                    }
-                    break;
-                case eCmdList.eUPDATEPOLICY:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        NotiUpdatePolicyEvent updatePolicyEvent = sgPageEvent.GetUpdatePolicyEvent();
-                        if (updatePolicyEvent != null) updatePolicyEvent(groupId);
-                    }
-                    break;
-                case eCmdList.eOLEMIMELISTQUERY:
-                    OLEMimeListAfterSend(groupId, sgData);
-                    break;
-                case eCmdList.eAUDITORI:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        AuditOriRecvEvent auditOriRecvEvent = sgPageEvent.GetAuditOriEvent();
-                        if (auditOriRecvEvent != null) auditOriRecvEvent(groupId, sgData);
-                    }
-                    break;
-                case eCmdList.eREQUESTEXIT:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        NotiRequestExitEvent notiRequestExit = sgPageEvent.GetNotiRequestExitEvent();
-                        if (notiRequestExit != null) notiRequestExit(groupId);
-                    }
-                    break;
-                default:
-                    hs = GetConnectNetWork(groupId);
-                    if (hs != null)
-                    {
-                        CommonQueryReciveEvent queryListEvent = sgPageEvent.GetQueryReciveEvent(groupId, cmd);
-                        object[] obj = new object[] { sgData };
-                        if (queryListEvent != null)
-                        {
-                            queryListEvent(groupId, obj);
                         }
+                        break;
+                    case eCmdList.eGENERICNOTI:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            GenericNotiType2Event eventData = sgPageEvent.GetGenericNotiType2EventAdd(groupId);
+                            if (eventData != null) eventData(groupId, sgData);
+                        }
+                        break;
+                    case eCmdList.eSKIPFILENOTI:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            SkipFileNotiEvent eventData = sgPageEvent.GetSkipFileNotiEventAdd();
+                            if (eventData != null) eventData(groupId, sgData);
+                        }
+                        break;
+                    case eCmdList.eUPDATEPOLICY:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            NotiUpdatePolicyEvent updatePolicyEvent = sgPageEvent.GetUpdatePolicyEvent();
+                            if (updatePolicyEvent != null) updatePolicyEvent(groupId);
+                        }
+                        break;
+                    case eCmdList.eOLEMIMELISTQUERY:
+                        OLEMimeListAfterSend(groupId, sgData);
+                        break;
+                    case eCmdList.eAUDITORI:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            AuditOriRecvEvent auditOriRecvEvent = sgPageEvent.GetAuditOriEvent();
+                            if (auditOriRecvEvent != null) auditOriRecvEvent(groupId, sgData);
+                        }
+                        break;
+                    case eCmdList.eREQUESTEXIT:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            NotiRequestExitEvent notiRequestExit= sgPageEvent.GetNotiRequestExitEvent();
+                            if (notiRequestExit != null) notiRequestExit(groupId);
+                        }
+                        break;
+                    case eCmdList.eEMAILPREVIEWINFO:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            EmailPreviewInfoEvent emailPreviewInfoEvent = sgPageEvent.GetEmailPreviewInfoEvent(groupId);
+                            if (emailPreviewInfoEvent != null) emailPreviewInfoEvent(groupId, sgData);
+                        }
+                        break;
+                    default:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            CommonQueryReciveEvent queryListEvent = sgPageEvent.GetQueryReciveEvent(groupId, cmd);
+                            object[] obj = new object[] { sgData };
+                            if (queryListEvent != null)
+                            {
+                                queryListEvent(groupId, obj);
+                            }
 
                      }
                         break;
@@ -2367,6 +2375,14 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestManualDownload(hsNetWork, groupid, strUserID, strTransSeq);
+            return -1;
+        }
+
+        public int RequestEmailPreviewInfo(int groupid, string strUserID, string strEmailSeq)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestEmailPreviewInfo(hsNetWork, groupid, strUserID, strEmailSeq);
             return -1;
         }
 

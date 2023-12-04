@@ -631,7 +631,7 @@ void WebWindow::SendMessage(AutoString message)
 	}
 }
 
-void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI)
+void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI, AutoString toastAppName)
 {
 	GNotification* notification;
 	GFile* file;

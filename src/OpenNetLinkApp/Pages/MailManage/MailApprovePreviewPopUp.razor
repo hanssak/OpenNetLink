@@ -6,14 +6,18 @@
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Common
 @using AgLogManager
+@using System.Security.Cryptography
+@using System.Text
+@using System.Web
 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
 @inject PageStatusService pageService
+@inject NavigationManager MyNavigationManager
 
-<div class="modal fade" id="MailApprovePopUp" data-backdrop="static" data-keyboard="false" style="z-index:5000;">
+<div class="modal fade" id="MailApprovePreviewPopUp" data-backdrop="static" data-keyboard="false" style="z-index:5000;">
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
         <div class="modal-content">
             <div class="modal-header modal-outline">
@@ -84,40 +88,15 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                     }
-
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <th>@XmlConf.GetTitle("T_RECV_USER")</th>        <!--수신자-->
-                                <td colspan="7">@stDispReceiver</td>
-                            </tr>
-
-                            <tr>
-                                <th>@XmlConf.GetTitle("T_EMAIL_REFERENCE")</th>    <!-- 참조 -->
-                                <td colspan="7">
-                                    @stDispCC
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>@XmlConf.GetTitle("T_EMAIL_HIDEREFERENCE")</th>     <!-- 숨은참조-->
-                                <td colspan="7">@stHideCC</td>
-                            </tr>
-
-                            <tr>
-                                <th>@XmlConf.GetTitle("T_TRANS_TITLE")</th>       <!--   제목 -->
-                                <td colspan="7">
-                                    @stTitle
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-
-
-
+                <div class="card-body pt-0">
+                    <iframe src="@strBodyPreviewUrl" style="background-color:white; width:100%;height:100%;border:0px;top:0px;left:0px;" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"/>
+                </div>
                 <div class="card-body pt-0 pb-0">
                     <div class="modal-sub-title mb-2"> @XmlConf.GetTitle("T_DETAIL_EMAILFILEINFO") </div>  <!--첨부 파일정보 -->
 
@@ -127,14 +106,6 @@
                             <i class="fas fa-lightbulb fa-1x"></i>&nbsp;&nbsp;
                             @strPrevInfo1 &nbsp;&nbsp; @strPrevInfo2
                         </div>
-                        
-                        @*<div class="float-right mb-2">
-                                @if (bApproveEnable)
-                                {
-                                    <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@XmlConf.GetTitle("T_EMAIL_BODYPREVIEW")</button>
-                                    <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@XmlConf.GetTitle("T_EMAIL_ATTATCHPREVIEW")</button>
-                                }
-                            </div>*@
                     </div>
 
                     <table class="table table-head-fixed table-bordered table-hover white">
@@ -177,7 +148,7 @@
                                     {
                                         if (file.bFilePreviewPossiable)
                                         { 
-                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e => attachDownload(file.fileSeq, file.fileKey, file.fileName))"><i class="fas fa-search"></i></button></td>
+                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e => attachPreviewOrDownload(file.fileSeq, file.fileKey, file.fileName))"><i class="fas fa-search"></i></button></td>
                                         }
                                         else
                                         { 
@@ -216,7 +187,7 @@
     <!-- /.modal-dialog -->
 </div>
 
-<SGReject @ref="refSGDetailReject" Guid="modalEmailDetailReject"></SGReject>
+<SGReject @ref="refSGDetailReject" Guid="modalEmailPreviewDetailReject"></SGReject>
 
 @code 
 {
@@ -227,7 +198,7 @@
     bool bApproveEnable = false;
 
     SGReject refSGDetailReject;
-    private static Serilog.ILogger CLog => Serilog.Log.ForContext<MailApprovePopUp>();
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<MailApprovePreviewPopUp>();
     List<Dictionary<int, string>> detailData = null;          //DB 데이타 직접 사용하는걸로 수정
     string stTransKindValue = String.Empty;
     string stTransStatusValue = String.Empty;
@@ -265,18 +236,22 @@
     public string strPrevInfo2 = "";
     public bool m_bReject = true;                              // 반려 가능 상태 여부
     public bool m_bCanFilePreView = false;                     // 파일 미리보기 가능유무
+    public string strBodyPreviewUrl = "";                       //본문 미리보기 URL
+    public string strBodyFileName= "";                          //본문 파일명
+    public string strBodyFileIP = "";
 
     SGeMailTransManageData strDisplayData = new SGeMailTransManageData();
     FileAddManage fileAddManage = new FileAddManage();
 
     /// <summary>
-    /// 첨부파일 다운로드 요청
+    /// 첨부파일 미리보기 또는 다운로드 요청
     /// </summary>
     /// <param name="fileseq"></param>
     /// <param name="filekey"></param>
     /// <param name="filename"></param>
-    private void attachDownload(string fileseq, string filekey, string filename)
+    private void attachPreviewOrDownload(string fileseq, string filekey, string filename)
     {
+        
         //AppId, ClientId, EmailSeq, FileName, FileKey, FileSeq
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -285,20 +260,57 @@
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         string strUserID = "";
+        string strViewerExt ="";
         if (sgLoginData != null)
+        {
             strUserID = sgLoginData.GetUserID();
+            strViewerExt = sgLoginData.GetPreViewerExt();
+        }
 
-        //pageService.SetFilePrevRecving(true);
-        //string sFileName = fileAddManage.GetFileRename(true, filename);
-        ShowProgress(groupID, 1, 0, filename);
-        HSCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FileDownloadProgressNoti);
-        //Task.Delay(1000);
+        //확장자 종류로 미리보기 가능한 타입군 확인
+        string strExtName = Path.GetExtension(filename);
+        strExtName = (strExtName.Equals("")) ? "" : strExtName.Substring(1);         //확장자가 없는 파일(text/plain)을 다운로드로 처리
+        
+        if (CsFunction.isFileExtinListStr(true, strExtName, strViewerExt))
+        {
+            //string previewParam = makeParamOfMailViewer(fileseq, filename);
+            string previewParam = makeParamOfMailViewer(stEmailSeq, filename);
+            string strAttachPreviewUrl = $"https://{strBodyFileIP}:1300/webView/webView?params={previewParam}";
+
+            //CLog.Here().Information("PreviewUtil - attach");
+            //CLog.Here().Information($"FileSeq {fileseq} / FileName {filename}");
+            //CLog.Here().Information($"URL {strAttachPreviewUrl}");
+
+            ProcessStartInfo startInfo = null;
+            //미리보기로 처리
+#if _WINDOWS    
+            startInfo = new ProcessStartInfo("PreviewUtil.exe");
+#else
+            startInfo = new ProcessStartInfo("PreviewUtil");
+#endif
+            startInfo.Arguments = strAttachPreviewUrl;
+            startInfo.WindowStyle = ProcessWindowStyle.Normal;
+            using (Process proc = Process.Start(startInfo))
+            {
+                //proc.WaitForExit();
+            }
+        }
+        else
+        {
+            //다운로드로 처리
+
+            //pageService.SetFilePrevRecving(true);
+            //string sFileName = fileAddManage.GetFileRename(true, filename);
+            ShowProgress(groupID, 1, 0, filename);
+            HSCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FileDownloadProgressNoti);
+            //Task.Delay(1000);
 
 
-        // Server 쪽에서 파일이름에서 특수문자 치완해서 찾는거 안함. 동작할때 적용
-        // filename = fileAddManage.GetFileRename(true, filename);
+            // Server 쪽에서 파일이름에서 특수문자 치완해서 찾는거 안함. 동작할때 적용
+            // filename = fileAddManage.GetFileRename(true, filename);
 
-        HSCmdCenter.SendEmailDownload(groupID, strUserID, stEmailSeq, filename, filekey, fileseq);
+            HSCmdCenter.SendEmailDownload(groupID, strUserID, stEmailSeq, filename, filekey, fileseq);
+        }
     }
 
     /// <summary>
@@ -772,7 +784,89 @@
         }
         StateHasChanged();
     }
-    
+
+    private string makeParamOfMailViewer(string stSelectedSeq, string stSelectedFileName)
+    {
+        try
+        {
+            string stYear = DateTime.Now.ToString("yyyy");
+            string stMonth = DateTime.Now.ToString("MM");
+            string stDay = DateTime.Now.ToString("dd");
+
+            string sha1Year = SGBase64Hash(stYear);
+            sha1Year = sha1Year.ToLower().Replace("-", "");
+            string sha1Mon = SGBase64Hash(stMonth);
+            sha1Mon = sha1Mon.ToLower().Replace("-", "");
+            string sha1Day = SGBase64Hash(stDay);
+            sha1Day = sha1Day.ToLower().Replace("-", "");
+            string sha1_Total = SGBase64Hash(sha1Year + sha1Mon + sha1Day);
+            sha1_Total = sha1_Total.ToLower().Replace("-", "");
+            
+            int shasum = 0;
+            char[] arrSha = sha1_Total.ToCharArray();
+            for (int i = 0; i < arrSha.Length; i++)
+            {
+                shasum += arrSha[i];
+            }
+
+            var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
+            string pathToContentRoot = Path.GetDirectoryName(pathToExe);
+            string filepath = pathToContentRoot + "/wwwroot/conf/postgresql.crt";
+            string stCrt = File.ReadAllText(filepath);
+
+            int nOffSet = shasum / 128;
+            string stCert = stCrt.Replace("\r", "").Replace("\n", "");
+            string cert_enc_key = stCert.Substring(nOffSet, 128);
+            //CLog.Information("인증서 추출키:" + cert_enc_key);
+            string stBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(cert_enc_key)).Substring(0, 16);
+            //CLog.Information("인증서 추출키 BASE64:" + stBase64);
+
+            string stLawparam = stSelectedSeq + "|" + stSelectedFileName;
+            string finalData = AESEncrypt256(stLawparam, stBase64);
+            string stParam = HttpUtility.UrlEncode(finalData);
+
+            return stParam;
+        }
+        catch(Exception ex)
+        {
+            CLog.Here().Error($"makeParamOfMailViewer Exception : {ex.ToString()}");
+            throw;
+        }
+    }
+
+    public static string SGBase64Hash(string stringToHash)
+    {
+        using (var sha1 = new SHA1Managed())
+        {
+            return BitConverter.ToString(sha1.ComputeHash(Encoding.UTF8.GetBytes(stringToHash)));
+        }
+    }
+    private String AESEncrypt256(String Input, String key)
+    {
+        RijndaelManaged aes = new RijndaelManaged();
+        aes.KeySize = 256;
+        aes.BlockSize = 128;
+        aes.Mode = CipherMode.CBC;
+        aes.Padding = PaddingMode.PKCS7;
+        aes.Key = Encoding.UTF8.GetBytes(key);
+        //aes.IV = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        aes.IV = Encoding.UTF8.GetBytes("weblinkhanssak16");
+
+        var encrypt = aes.CreateEncryptor(aes.Key, aes.IV);
+        byte[] xBuff = null;
+        using (var ms = new MemoryStream())
+        {
+            using (var cs = new CryptoStream(ms, encrypt, CryptoStreamMode.Write))
+            {
+                byte[] xXml = Encoding.UTF8.GetBytes(Input);
+                cs.Write(xXml, 0, xXml.Length);
+            }
+            xBuff = ms.ToArray();
+        }
+        String Output = Convert.ToBase64String(xBuff);
+        return Output;
+    }
+
     //Param : Email Seq, Request Seq, 승인가능여부
     public void SetParam(string seq, string apvseq, string apvenable, bool bIsAfterApprove, bool bIsFilePreView)
     {
@@ -790,9 +884,10 @@
         m_bCanFilePreView = bIsFilePreView;
     }
 
-    
-    public async Task openPopUp()
+    public async Task openPopUp(string getBodyFileName, string getBodyFileIP)
     {
+        strBodyFileName = getBodyFileName;
+        strBodyFileIP = getBodyFileIP;
         apvList.Clear();
         fileList.Clear();
 
@@ -814,17 +909,26 @@
         MailManageDao dao = new MailManageDao();
         string strQuery = dao.MailDetail(stEmailSeq, bIsEmailApproveSfm2Mode);
 
-        CLog.Here().Information($@"MailApprove - QueryDetail-@@@@@@@@@@ : {strQuery}");
+        //CLog.Here().Information($@"MailApprove - QueryDetail-@@@@@@@@@@ : {strQuery}");
 
         HSCmdCenter.SendDetailQuery(groupID, curUserID, strQuery);
 
-        object[] param = { "MailApprovePopUp" };
+        //본문 미리보기 URL 구성        
+        string previewParam = makeParamOfMailViewer(stEmailSeq, getBodyFileName);
+        strBodyPreviewUrl = $"https://{getBodyFileIP}:1300/webView/mailViewer?params={previewParam}";
+        //strBodyPreviewUrl = $"https://{getBodyFileIP}:1300/weblink/AP001_Docs_Viewer.do?{previewParam}";
+
+        //CLog.Here().Information("PreviewUtil");
+        //CLog.Here().Information($"EmailSeq {stEmailSeq} / FileName {getBodyFileName}");
+        //CLog.Here().Information($"URL {strBodyPreviewUrl}");
+
+        object[] param = { "MailApprovePreviewPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
     public void closePopUp()
     {
-        object[] param = { "MailApprovePopUp" };
+        object[] param = { "MailApprovePreviewPopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
@@ -895,6 +999,7 @@
         InitText();
         base.OnInitialized();
     }
+    
 
     private void ShowMessage(string strType, string strMsg)
     {

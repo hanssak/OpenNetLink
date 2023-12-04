@@ -310,6 +310,18 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_MANUALDOWNLOAD", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
+
+        public int RequestEmailPreviewInfo(HsNetWork hsNet, int groupid, string strUserID, string strEmailSeq)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["EMAILSEQ"] = strEmailSeq;
+            CmdSendParser sendParser = new CmdSendParser();
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_EMAILPREVIEWINFO", dic, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.SendMessage(args);
+        }
+
         public int RequestSendTransListCountQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();

@@ -530,6 +530,11 @@
         {
             strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
             strNavigateWithGroupID += groupID.ToString();
+
+            ChangeActiveMenuEvent changeActiveMenuEvent = HSCmdCenter.sgPageEvent.GetChangeActiveMenu();
+            if (changeActiveMenuEvent != null)
+                changeActiveMenuEvent(groupID, strNavigateWithGroupID);
+
             MyNavigationManager.NavigateTo(strNavigateWithGroupID);
         }
 

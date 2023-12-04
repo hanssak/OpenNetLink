@@ -88,6 +88,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     CLog.Here().Information($"GetGenianNACUserID NAC Encrypt: {strNacEncData}");
                     //test
                     //strNacEncData = "kf+MFAB+M5Poc54osw5R6izVKLaGMqneqKMvg7N/Qla1M7DY0A3llIle1HwpV3YoTLPGxh3QHjY2mm4WoYHNxg=="; //yhkim41
+                    //strNacEncData = "kf+MFAB+M5Poc54osw5R6qbFcbsKBN4KPIUR+fFZNE+rIR8KzHLKCXL9wlOPtBHM/yTDc84P53BKFNWYzXEY2Q=="; //yhkim40
                     //strNacEncData = "kf+MFAB+M5Poc54osw5R6oL7R7mw5MRfIICRC9ZJWfWH4qaYi9RHGReEiRvIMiUic65TVy4huouqqtt4jstt9Ym31lG2V5b3ZW0XTaQ0RW8="; //errId
 
                     //Base64 디코딩

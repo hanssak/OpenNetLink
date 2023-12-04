@@ -206,7 +206,7 @@ public:
 	void NavigateToUrl(AutoString url);
 	void NavigateToString(AutoString content);
 	void SendMessage(AutoString message);
-	void ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI = nullptr);
+	void ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI = nullptr, AutoString appName = nullptr);
 	void AddCustomScheme(AutoString scheme, WebResourceRequestedCallback requestHandler);
 	void SetResizable(bool resizable);
 	void GetSize(int* width, int* height);

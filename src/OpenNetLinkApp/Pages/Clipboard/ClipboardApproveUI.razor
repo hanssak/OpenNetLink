@@ -572,8 +572,8 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
 
-        await jsRuntime.InvokeAsync<object>("exitLogIn", new object[] {""});
-        await jsRuntime.InvokeAsync<object>("adJustWindowsize", new object[] {""});
+        await jsRuntime.InvokeAsync<object>("exitLogIn", new object[] { "" });
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize", new object[] { "" });
 
         int groupID = groupIDbyParam;
         CLog.Here().Information($"clipBoardApproveUI - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
@@ -1443,17 +1443,19 @@
 
         string strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
         strNavigateWithGroupID += groupID.ToString();
+        ChangeActiveMenuEvent changeActiveMenuEvent = HSCmdCenter.sgPageEvent.GetChangeActiveMenu();
+        if (changeActiveMenuEvent != null)
+            changeActiveMenuEvent(groupID, strNavigateWithGroupID);
+
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-
-        foreach (var MenuItem in SideBarUISvc.MenuList)
-        {
-            if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
-            {
-                SideBarUISvc.ActiveMenu = MenuItem;
-                break;
-            }
-        }
-
+        //foreach (var MenuItem in SideBarUISvc.MenuList)
+        //{
+        //    if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
+        //    {
+        //        SideBarUISvc.ActiveMenu = MenuItem;
+        //        break;
+        //    }
+        //}
     }
 
 }

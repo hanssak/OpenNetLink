@@ -390,7 +390,7 @@ void WebWindow::SendMessage(AutoString message)
     [webView evaluateJavaScript:javaScriptToEval completionHandler:nil];
 }
 
-void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI)
+void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI, AutoString toastAppName)
 {
     NSString* nsimage = [NSString stringWithUTF8String:image];
     NSString* nstitle = [NSString stringWithUTF8String:title];
@@ -402,6 +402,7 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
     [notification setTitle:nstitle];
     [notification setInformativeText:nsmessage];
     [notification setSoundName:NSUserNotificationDefaultSoundName];
+    
 
     if(navURI && strlen(navURI) > 0)
     {
