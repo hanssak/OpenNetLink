@@ -2132,6 +2132,19 @@
 			<EN>Resume transmission</EN>
 			<CN></CN>
 		</T_DATA_CONTINUE_TRANS>
+    <T_DATA_DELETE_TRANS_FILE_COMMENT>
+      <KR>전송 시 원본파일은 정보유출 사고 예방을 위하여 삭제됩니다.<![CDATA[<br>]]>파일을 전송하시겠습니까?</KR>
+      <JP></JP>
+      <EN>When transferring, the original file will be deleted to prevent information leakage.<![CDATA[<br>]]>Would you like to transfer the file?</EN>
+      <CN></CN>
+    </T_DATA_DELETE_TRANS_FILE_COMMENT>
+
+    <T_DATA_DELETE_TRANS_FILE>
+      <KR>전송파일 삭제</KR>
+      <JP></JP>
+      <EN>Delete transmitted files</EN>
+      <CN></CN>
+    </T_DATA_DELETE_TRANS_FILE>
 
 		<!-- ********************************************* [END] 전송 관리 화면 (T_TRANS_0000) ********************************************* -->
 
