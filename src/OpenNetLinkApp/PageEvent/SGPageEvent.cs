@@ -302,6 +302,8 @@ namespace OpenNetLinkApp.PageEvent
     /// <param name="path"></param>
     public delegate void ChangeActiveMenuEvent(int groupId, string path);
 
+    public delegate void SideBarLoginAfterMenuAddEvent(int groupId);
+
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -481,6 +483,8 @@ namespace OpenNetLinkApp.PageEvent
         public OSNotificationEvent oSNotificationEvent = null;
 
         public ChangeActiveMenuEvent changeActiveMenuEvent = null;
+
+        public SideBarLoginAfterMenuAddEvent sideBarLoginAfterMenuAddEvent = null;
 
         public NotiRequestExitEvent notiRequestExitEvent = null;
 
@@ -1708,14 +1712,24 @@ namespace OpenNetLinkApp.PageEvent
                 oSNotificationEvent(groupId, category, title, message, navURI);
         }
 
-        public void SetChangeActiveMenu(ChangeActiveMenuEvent e)
+        public void SetSideBarLoginAfterMenuAddEvent(SideBarLoginAfterMenuAddEvent e)
         {
-            changeActiveMenuEvent = e;
+            sideBarLoginAfterMenuAddEvent = e;
+        }
+
+        public SideBarLoginAfterMenuAddEvent GetSideBarLoginAfterMenuAddEvent()
+        {
+            return sideBarLoginAfterMenuAddEvent;
         }
 
         public ChangeActiveMenuEvent GetChangeActiveMenu()
         {
             return changeActiveMenuEvent;
+        }
+
+        public void SetChangeActiveMenu(ChangeActiveMenuEvent e)
+        {
+            changeActiveMenuEvent = e;
         }
 
         public void SetEmailPreviewInfoEvent(int groupid, EmailPreviewInfoEvent e)

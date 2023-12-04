@@ -1579,7 +1579,17 @@
                         HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
                     }
 
-                    InitSideMenu(groupId);
+                    if (pageService.GetIsPolicyUpdate(groupId))
+                    {
+                        SideBarLoginAfterMenuAddEvent sideBarLoginAfterMenuAddEvent = HSCmdCenter.sgPageEvent.GetSideBarLoginAfterMenuAddEvent();
+                        if (sideBarLoginAfterMenuAddEvent != null)
+                        {
+                            SGAppMgrSvc.SideBarUIService.DeleteMenuAllButRoot(groupId);
+                            sideBarLoginAfterMenuAddEvent(groupId);
+                        }
+                    }
+                    else
+                        InitSideMenu(groupId);
 
                     bool bUseClipBoard = sgLoginData.GetClipboard();
                     if (bUseClipBoard)

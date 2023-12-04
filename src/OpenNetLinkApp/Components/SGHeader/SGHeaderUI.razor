@@ -132,7 +132,7 @@
                                     // 다중접속일때에는 단일망에만 전달가능
                                     // 단일접속일때에는 3중망에 전달가능
                                     @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx != 0 &&
-                           (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                       (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                     {
 
                                         @if (bAddedClipBoardItem)
@@ -367,7 +367,7 @@
                                     <h3 class="dropdown-item-title font-weight-bold mb-2">
                                         <span class="float-left"><i class="fas fa-bell"></i></span>&nbsp;
                                         @AlarmViewHead
-                                        <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))" style="cursor:pointer" ><i class="fas fa-times fa-lg"></i></a></span>
+                                        <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))" style="cursor:pointer"><i class="fas fa-times fa-lg"></i></a></span>
                                     </h3>
                                     <p class="text-xs">@AlarmViewBody</p>
                                     <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</p>
@@ -1973,12 +1973,14 @@
         //UserInfo 재요청 - 결재라인 정보, SFM 정보, 시스템 환경설정정보 갱신
         //SFM 정보 삭제
         HsCmdCenter.sgDicRecvData.SetSFMListData(groupId, null);
-        HsCmdCenter.SendUserSFMInfo(groupId, sgUserData.UserId);
-        HsCmdCenter.SendApproveLine(groupId, sgUserData.UserId);
-
+        //HsCmdCenter.SendUserSFMInfo(groupId, sgUserData.UserId);
+        //HsCmdCenter.SendApproveLine(groupId, sgUserData.UserId);
+        HsCmdCenter.SendUserInfoEx(groupId, sgUserData.UserId);
         //UserInfoCheck를 요청하여 사용자의 정보 갱신
         HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eUSERINFOCHECK, ResultUserInfoCheck);
         HsCmdCenter.SendUserInfoCheck(groupId, sgUserData.UserId);
+
+
     }
 
     /// <summary>
