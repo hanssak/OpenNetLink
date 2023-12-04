@@ -181,5 +181,12 @@ namespace OpenNetLinkApp.Common
             Genian = 1,
         }
 
+        public enum EnumMethodApproveExtRegardlessApprove : Int32
+        {
+            [Description("Method01")] //결재자 모두 삭제 
+            Method01 = 1,
+            [Description("Method01")] //2차(보안결재자) 결재자 추가
+            Method02 = 2,
+        }
     }
 }

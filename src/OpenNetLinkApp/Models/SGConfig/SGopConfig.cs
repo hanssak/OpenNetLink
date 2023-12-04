@@ -208,7 +208,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public string strApproveExtApproverSearchType { get; set; } = "SEARCH";     // 결재필수 확장자 검색됐을때, 결재자 검색방식
         public bool bUseInputSearchApproveExtTree { get; set; } = false;         // 결재필수 확장자, 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
         public bool bUseApproveExt { get; set; } = false;                            // 결재필수 확장자 결재하는 기능 사용유무
-        public bool bUseNotApproveExceptEtc { get; set; } = false;                            // 결재를 사용하지만 Dlp, 필수결재확장자 등 반드시 결재해야할 경우를 제외하고 결재를 사용하지 않을 경우
+        public bool bUseApproveExtRegardlessApprove { get; set; } = false;                            // 결재유무 상관없이 결재필수 확장자 검색
+        public int nMethodApproveExtRegardlessApprove { get; set; } = 0;                       // 결재상관없이 결재 필수 확장자 검색되었을때 처리 방법
         public bool bUseFileExceptionDescCheck { get; set; } = false;                           // 파일 예외신청 설명정보 필수 기입여부
         public bool bUsePKIsendRecv { get; set; } = false;             // 인증서 전송 사용 유무 (망별로) ( true : 사용, false : 미사용 )
         public bool bUseToastInsteadOfOSNotification { get; set; } = false;                        //레지스트리 차단으로 OS 노티 사용 불가한 Site에서 OS노티 대신 Toast 사용 (Default/false) 
