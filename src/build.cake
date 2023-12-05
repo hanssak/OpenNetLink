@@ -960,6 +960,11 @@ Task("PkgCrossflatform")
 			if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/edge"))	
 				CopyDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/edge", $"./artifacts/edge");					
 		}
+		else
+		{
+			AppProps.AppUpdatePlatform = AppProps.Platform;
+			AppProps.AppLastUpdated = LastUpdatedTime;			
+		}
 		CopyFile($"{storageUnit}/ReleaseNote.md", $"{ReleaseNoteDirPath}/{AppProps.PropVersion.ToString()}.md");				
 		CopyFiles("./OpenNetLinkApp/VersionHash.txt", $"{AppProps.InstallerRootDirPath}/{unitName}");
 		
