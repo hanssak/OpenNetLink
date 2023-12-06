@@ -1291,7 +1291,13 @@
             if (e.strUrlData != null && e.strUrlData.Length > 0)
             {
                 string url = $"\"{e.strUrlData}\"";
-                System.Diagnostics.Process.Start("explorer", url);
+                System.Diagnostics.Process.Start(
+                    new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = url,
+                        UseShellExecute = true
+                    });
+                //System.Diagnostics.Process.Start("explorer", url); // 260자 제한됨
             }
         }
         catch (Exception ex)
