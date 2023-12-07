@@ -248,6 +248,8 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bDeleteUploadFile { get; set; } = false;           // 파일 전송 후 파일 삭제
 
+        public bool bUseDlpAfterApproveToNormal { get; set; } = false; // DLP검출된 파일 사후 결재요청한 것도 사전으로 보내도록 할지 유무
+
     }
 
 }
