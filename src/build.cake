@@ -979,7 +979,7 @@ Task("PkgCrossflatform")
 		if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile"))		
 			DeleteDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile", new DeleteDirectorySettings {Force = true, Recursive = true });
 			
-		// window에 한하여 필요없는 파일들 배포전에 제거
+		// window에 한하여 필요없는 파일들 배포전에 제거 / 추가
 		if(AppProps.Platform == "windows")
 		{
 			DeleteFiles("./artifacts/windows/published/*.so");
@@ -1005,14 +1005,20 @@ Task("PkgCrossflatform")
 					}
 				}		
 			}
+			
+			// Nsis script에서 2개파일 조절하지 않음
+			CopyFiles("./Appcasts/preinstall/windows/VC_redist.x64.exe", $"./artifacts/{AppProps.Platform}/published");
+			CopyFiles("./OpenNetLinkApp/wwwroot/bin_addon/SecureGateChromiumExtension_v1.1.crx", $"./artifacts/{AppProps.Platform}/published");
 		}
 		
 		//[빌드 후] 에이전트 별 파일 적용 (ex.Network.json, AppEnvSetting 등)
 		Information($"Copy [Agent Unit] Files");
 
-		//설치파일 생성
+		//설치파일 생성 - 잠시중단KKW
 		if(isFull.ToString().ToUpper() == "TRUE")
+		// if(false)
 		{
+		
 			foreach(var agentUnit in System.IO.Directory.GetDirectories(storageUnit))
 			{
 				var agentUnitInfo = new DirectoryInfo(agentUnit);
@@ -1113,7 +1119,9 @@ Task("PkgCrossflatform")
 
 		//패치파일 생성
 		if(isPatch.ToString().ToUpper() == "TRUE")
-		{
+		{		
+			isLightPatch=true;
+		
 			//Light Patch 버전일 땐, edge 폴더 배포전에 제거
 			if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
 			{
@@ -1121,6 +1129,88 @@ Task("PkgCrossflatform")
 				{
 					DeleteDirectory("./artifacts/windows/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
 				}
+
+				if(DirectoryExists("./artifacts/windows/patch_published")) 
+				{
+					Information("================================================");				
+					Information("Delete Pre Patch File !!!");
+					Information("================================================");
+					DeleteDirectory("./artifacts/windows/patch_published", new DeleteDirectorySettings { Force = true, Recursive = true });
+				}
+				
+				// window에 한하여 필요없는 파일들 배포전에 제거 - patch Size 경량화
+				if(AppProps.Platform == "windows")
+				{
+					CreateDirectory("./artifacts/windows/patch_published");
+					CreateDirectory("./artifacts/windows/patch_published/wwwroot");
+					
+					// 지정한 파일들 이동
+					var fileNames = System.IO.File.ReadAllLines("./PatchFileList.txt");
+					
+					Information("Patch Target File List");
+					Information("========================");
+					
+					// 각 파일을 대상 디렉토리로 복사합니다.
+					foreach (var fileName in fileNames)
+					{
+					
+						var sourcePath = $"./artifacts/windows/published/{fileName}"; // 소스 디렉토리 경로 설정
+						var targetDirectory = $"./artifacts/windows/patch_published/{fileName}"; // 소스 디렉토리 경로 설정
+
+						//Information("src : {0}, To : {1}", sourcePath, );
+						//Information("dest : {0}", targetDirectory);
+
+						// 파일 복사
+						// CopyFileToDirectory(
+						if (FileExists(sourcePath))
+						{
+							Information("Patch File: {0}", fileName);
+							MoveFile(sourcePath, targetDirectory);
+						}
+						
+						if (DirectoryExists(sourcePath))
+						{
+							Information("Patch Folder: {0}", fileName);
+							MoveDirectory(sourcePath, targetDirectory);
+						}
+					}					
+					
+					Information("========================");
+					Information("Delete published!");
+					DeleteDirectory("./artifacts/windows/published", new DeleteDirectorySettings { Force = true, Recursive = true });
+					Information("========================");
+					Information("Rename patch_published => published");
+					MoveDirectory("./artifacts/windows/patch_published", "./artifacts/windows/published");
+					Information("========================");
+					
+					// 
+					/*
+					DeleteFiles("./artifacts/windows/published/*.so"); 
+					DeleteFiles("./artifacts/windows/published/*.pdb");
+
+					var files = GetFiles("./artifacts/windows/published/*.so.*");
+					foreach(var file in files)
+					{
+						String strSearchFile = (String)file.FullPath;
+						//Information("File: {0}", strSearchFile);
+
+						int nIdex = strSearchFile.LastIndexOf('.');
+						if (nIdex > 0)
+						{
+							String strItem = strSearchFile.Substring(nIdex+1);
+
+							int n=0;
+							bool isNumeric = int.TryParse(strItem, out n);
+							if (isNumeric)
+							{
+								Information("File-Deleted: {0}", strSearchFile);
+								DeleteFile(strSearchFile);
+							}
+						}		
+					}
+					*/
+				}
+				
 			}
 			
 			if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/NetWork.json"))
@@ -1131,6 +1221,7 @@ Task("PkgCrossflatform")
 				if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppEnvSetting.json"))
 					DeleteFile($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/AppEnvSetting.json");
 			}
+			
 			nacLoginType ="0";
 			disableCertAutoUpdate = false;
 			isPatchInstaller=true;
