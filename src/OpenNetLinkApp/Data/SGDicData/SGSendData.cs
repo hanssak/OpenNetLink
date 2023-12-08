@@ -546,14 +546,18 @@ namespace OpenNetLinkApp.Data.SGDicData
 
             dic["FILECOUNT"] = "-";
             dic["FILERECORD"] = "-";
-            dic["FORWARDUSERID"] = receiver;
+
+            if ((receiver?.Length ?? 0) > 0)
+                dic["FORWARDUSERID"] = receiver;
+
             dic["DATATYPE"] = strDataType;
-            dic["GROUPID"] = groupid.ToString();
             if ((strinterlockflagConfirmId?.Length ?? 0) > 0)
             {
                 strinterlockflagConfirmId = strinterlockflagConfirmId.Replace('|', '\u0002');
                 dic["INTERLOCKFLAGCONFIRMID"] = strinterlockflagConfirmId;
             }
+            dic["GROUPID"] = groupid.ToString();
+
 
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
@@ -719,7 +723,10 @@ namespace OpenNetLinkApp.Data.SGDicData
 
             dic["FILECOUNT"] = "-";
             dic["FILERECORD"] = "-";
-            dic["FORWARDUSERID"] = receiver;
+
+            if ((receiver?.Length ?? 0) > 0)
+                dic["FORWARDUSERID"] = receiver;
+
             dic["DATATYPE"] = strDataType;
 
             if ((strinterlockflagConfirmId?.Length ?? 0) > 0)
