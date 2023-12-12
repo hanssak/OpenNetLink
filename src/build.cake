@@ -1028,8 +1028,13 @@ Task("PkgCrossflatform")
 			
 		
 		// 공통항목들중 필요없는거 제거
-		DeleteFiles("./artifacts/{AppProps.Platform}/published/*.pdb");
-		DeleteFiles("./artifacts/{AppProps.Platform}/published/wwwroot/Log/*.Log");		
+				// 공통항목들중 필요없는거 제거
+		Information("================================================");
+		Information("Delete Unused Files !!!");
+		Information("================================================");
+		DeleteFiles($"./artifacts/{AppProps.Platform}/published/*.pdb");
+		Information($"./artifacts/{AppProps.Platform}/published/*.pdb");		
+		DeleteFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/Log/*.Log");	
 		if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/SGNacAgent"))
 			DeleteDirectory($"./artifacts/{AppProps.Platform}/published/SGNacAgent", new DeleteDirectorySettings {Force = true, Recursive = true });
 		
@@ -1061,11 +1066,11 @@ Task("PkgCrossflatform")
 			
 			// Nsis script에서 2개파일 조절하지 않음
 			CopyFiles("./Appcasts/preinstall/windows/VC_redist.x64.exe", $"./artifacts/{AppProps.Platform}/published");
-			CopyFiles("./OpenNetLinkApp/wwwroot/bin_addon/SecureGateChromiumExtension_v1.1.crx", $"./artifacts/{AppProps.Platform}/published");
+			//CopyFiles("./OpenNetLinkApp/wwwroot/bin_addon/SecureGateChromiumExtension_v1.1.crx", $"./artifacts/{AppProps.Platform}/published");
 		}
 		else
 		{
-			DeleteFiles("./artifacts/{AppProps.Platform}/published/AddFileRM*X64.dll");
+			DeleteFiles($"./artifacts/{AppProps.Platform}/published/AddFileRM*X64.dll");
 		}
 		
 		//[빌드 후] 에이전트 별 파일 적용 (ex.Network.json, AppEnvSetting 등)
