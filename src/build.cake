@@ -404,6 +404,15 @@ Task("PubDebian")
     DotNetCorePublish("./PreviewUtil", settings);
     DotNetCorePublish("./ContextTransferClient", settings);
 
+	// KKW - OS마다 다른 HashFileList 운영가능
+	String strHashFileList 	= "./OpenNetLinkApp/HashFileList.txt";
+	if (FileExists(strHashFileList))
+	{
+		Information($"HashFileList.txt Changed to OS Type!");
+		DeleteFile(strHashFileList);		
+		CopyFile($"./OpenNetLinkApp/HashFileList-LINUX.txt", strHashFileList);
+	}
+
 	// 필요할때에 추가로 개발예정
     	using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility"))
         {
@@ -453,6 +462,15 @@ Task("PubRedhat")
     DotNetCorePublish("./OpenNetLinkApp", settings);
     DotNetCorePublish("./PreviewUtil", settings);
     DotNetCorePublish("./ContextTransferClient", settings);
+
+	// KKW - OS마다 다른 HashFileList 운영가능
+	String strHashFileList 	= "./OpenNetLinkApp/HashFileList.txt";
+	if (FileExists(strHashFileList))
+	{
+		Information($"HashFileList.txt Changed to OS Type!");
+		DeleteFile(strHashFileList);		
+		CopyFile($"./OpenNetLinkApp/HashFileList-{AppProps.AppUpdatePlatform.ToUpper()}.txt", strHashFileList);
+	}
 
 	// 필요할때에 추가로 개발예정
     //	using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility"))
@@ -509,6 +527,15 @@ Task("PubWin10")
     DotNetCorePublish("./PreviewUtil", settings);
     DotNetCorePublish("./ContextTransferClient", settings);
     
+	// KKW - OS마다 다른 HashFileList 운영가능
+	strWebWindowNativeLibPath 	= "./OpenNetLinkApp/HashFileList.txt";
+	if (FileExists(strWebWindowNativeLibPath))
+	{
+		Information($"HashFileList.txt Changed to OS Type!");
+		DeleteFile(strWebWindowNativeLibPath);		
+		CopyFile($"./OpenNetLinkApp/HashFileList-{AppProps.AppUpdatePlatform..ToUpper()}.txt", strWebWindowNativeLibPath);
+	}
+	
      using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = "1 windows" }))
      {
 		process.WaitForExit();
@@ -595,6 +622,15 @@ Task("PubOSX")
 	};
     DotNetCorePublish("./OpenNetLinkApp", settings);
     DotNetCorePublish("./PreviewUtil", settings);
+
+	// KKW - OS마다 다른 HashFileList 운영가능
+	String strHashFileList 	= "./OpenNetLinkApp/HashFileList.txt";
+	if (FileExists(strHashFileList))
+	{
+		Information($"HashFileList.txt Changed to OS Type!");
+		DeleteFile(strHashFileList);		
+		CopyFile($"./OpenNetLinkApp/HashFileList-{AppProps.AppUpdatePlatform.ToUpper()}.txt", strHashFileList);
+	}
 
 	using(var process = StartAndReturnProcess("./HashToolOSX/MD5HashUtility"))
              {
@@ -758,7 +794,18 @@ Task("MakeHashSqlScript")
 	.Does(()=> {
 		//해시 생성 sql 문 생성 (Arg : 1 + [OS])
 		var arg = $"1 {AppProps.Platform}";
-		
+
+		// KKW - OS마다 다른 HashFileList 운영가능
+		String strHashFileList 	= "./OpenNetLinkApp/HashFileList.txt";
+		if (FileExists(strHashFileList))
+		{
+			Information($"HashFileList.txt Changed to OS Type!");
+			DeleteFile(strHashFileList);		
+			if(AppProps.Platform == "debian" || AppProps.Platform == "redhat")
+				CopyFile($"./OpenNetLinkApp/HashFileList-LINUX.txt", strHashFileList);
+			else
+				CopyFile($"./OpenNetLinkApp/HashFileList-{AppProps.AppUpdatePlatform.ToUpper()}.txt", strHashFileList);
+		}
 
 		if(AppProps.Platform == "windows")
 		{
@@ -979,11 +1026,17 @@ Task("PkgCrossflatform")
 		if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile"))		
 			DeleteDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/SiteProfile", new DeleteDirectorySettings {Force = true, Recursive = true });
 			
-		// window에 한하여 필요없는 파일들 배포전에 제거 / 추가
+		
+		// 공통항목들중 필요없는거 제거
+		DeleteFiles("./artifacts/{AppProps.Platform}/published/*.pdb");
+		DeleteFiles("./artifacts/{AppProps.Platform}/published/wwwroot/Log/*.Log");		
+		if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/SGNacAgent"))
+			DeleteDirectory($"./artifacts/{AppProps.Platform}/published/SGNacAgent", new DeleteDirectorySettings {Force = true, Recursive = true });
+		
+		// OS별로 필요없는 파일들 배포전에 제거 / 추가
 		if(AppProps.Platform == "windows")
 		{
 			DeleteFiles("./artifacts/windows/published/*.so");
-			DeleteFiles("./artifacts/windows/published/*.pdb");
 
 			var files = GetFiles("./artifacts/windows/published/*.so.*");
 			foreach(var file in files)
@@ -1010,11 +1063,15 @@ Task("PkgCrossflatform")
 			CopyFiles("./Appcasts/preinstall/windows/VC_redist.x64.exe", $"./artifacts/{AppProps.Platform}/published");
 			CopyFiles("./OpenNetLinkApp/wwwroot/bin_addon/SecureGateChromiumExtension_v1.1.crx", $"./artifacts/{AppProps.Platform}/published");
 		}
+		else
+		{
+			DeleteFiles("./artifacts/{AppProps.Platform}/published/AddFileRM*X64.dll");
+		}
 		
 		//[빌드 후] 에이전트 별 파일 적용 (ex.Network.json, AppEnvSetting 등)
 		Information($"Copy [Agent Unit] Files");
 
-		//설치파일 생성 - 잠시중단KKW
+		//설치파일 생성
 		if(isFull.ToString().ToUpper() == "TRUE")
 		// if(false)
 		{
