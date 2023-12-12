@@ -602,21 +602,32 @@ Section -Post
   ${If} ${REG_CRX} == "TRUE"
   
 	  ; CRX 파일 - 강제등록
-	  ${If} ${NETWORK_FLAG} == "IN"
 	  
 		  ; edge
-		  WriteRegStr HKLM "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		WriteRegStr HKLM "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
 		  ;WriteRegStr HKLM "SOFTWARE\WOW6432Node\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
-		  WriteRegStr HKCU "Software\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		WriteRegStr HKCU "Software\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
 		  
 		  ; chrome
-		  WriteRegStr HKLM "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"
+		WriteRegStr HKLM "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"
 		  ;WriteRegStr HKLM "SOFTWARE\WOW6432Node\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"
-		  WriteRegStr HKCU "Software\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"	  
-		  
-	  ${EndIf}  
+		WriteRegStr HKCU "Software\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"	  
+		
+  ${EndIf}
 
-  ${EndIf}  
+  ${If} ${FORCE_REG_CRX} == "TRUE"
+  
+		  ; CRX 파일 - 강제등록
+		  ; edge
+		  ;WriteRegStr HKLM "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		  ;WriteRegStr HKLM "SOFTWARE\WOW6432Node\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		  ;WriteRegStr HKCU "Software\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		  
+		  ; chrome
+		WriteRegStr HKLM "SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist" "10" "gbbehmiepgfmmnifjbnknjaebgmnpbam;https://clients2.google.com/service/update2/crx"
+		WriteRegStr HKCU "SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist" "10" "gbbehmiepgfmmnifjbnknjaebgmnpbam;https://clients2.google.com/service/update2/crx"
+		
+  ${EndIf}    
 
 SectionEnd
 
@@ -692,6 +703,20 @@ Section Uninstall
 	  DeleteRegKey HKLM "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
 	  ;DeleteRegKey HKLM "SOFTWARE\WOW6432Node\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
 	  DeleteRegKey HKCU "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
+
+	${EndIf}  
+	
+	${If} ${FORCE_REG_CRX} == 'TRUE'
+
+	  ; CRX강제등록 제거
+	  ;DeleteRegKey HKLM "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei"
+	  ;DeleteRegKey HKLM "SOFTWARE\WOW6432Node\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei"
+	  ;DeleteRegKey HKCU "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei"  
+
+	  DeleteRegValue HKLM "SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist" "10"
+	  DeleteRegValue HKCU "SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist" "10"
+	  ;DeleteRegKey HKLM "SOFTWARE\WOW6432Node\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
+	  ;DeleteRegKey HKCU "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
 
 	${EndIf}  
   

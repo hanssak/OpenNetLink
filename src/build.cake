@@ -23,6 +23,7 @@ var isSilent = Argument<bool>("isSilent", false);				//true로 하면, Silent �
 var startAuto = Argument<bool>("startAuto", true);				//false 하면, 설치 완료 후 자동 실행 안됨
 var isSilentShowAll = Argument<bool>("isSilentShowAll", false);	//true로 하면, Silent / Show 모드 설치파일 모두 만듬
 var regCrxForce = Argument<bool>("regCrxForce", false);					//true로 하면, NetPos가 "IN"인 Case
+var regPolicyCrxForce = Argument<bool>("regPolicyCrxForce", false);					//true로 하면, NetPos가 "IN"인 Case
 var patchAppEnv = Argument<bool>("patchAppEnv", false);					//true로 하면, patch때에 AppEnvSetting.json 파일을 덮어씌우는 동작함(win)
 var inkFileName = Argument("inkFileName", "OpenNetLink");      // 바탕화면 Ink 파일 이름 설정 
 var isPatchSilent = Argument<bool>("isPatchSilent", true);		// false로 하면 패치파일의 설치과정을 UI View로 변경함(사용자가 직접 여러번 클릭해줘야함.)
@@ -96,6 +97,24 @@ public class MakeProperty
 			return "OpenNetLink";
 		else
 			return agent["LNK_FILE_NAME"].ToString();
+	}
+
+	public bool GetCrxForce(string storageName, string agentName)
+	{
+		JObject agent= GetAgentValue(storageName, agentName);
+		if(agent == null || agent["CRX_FORCE"] == null || agent["CRX_FORCE"].ToString() == "")	
+			return false;
+		else
+			return (bool)agent["CRX_FORCE"];
+	}
+	
+	public bool GetPolicyCrxForce(string storageName, string agentName)
+	{
+		JObject agent= GetAgentValue(storageName, agentName);
+		if(agent == null || agent["POLICY_CRX_FORCE"] == null || agent["POLICY_CRX_FORCE"].ToString() == "")	
+			return false;
+		else
+			return (bool)agent["POLICY_CRX_FORCE"];
 	}
 }
 
@@ -1169,7 +1188,11 @@ Task("PkgCrossflatform")
 				}
 				isPatchInstaller=false;
 				if(useMakeConfig == true)
+				{
 					inkFileName = MakeProps.GetLinkFileName(unitName, AgentName);
+					regCrxForce = MakeProps.GetCrxForce(unitName, AgentName);
+					regPolicyCrxForce = MakeProps.GetPolicyCrxForce(unitName, AgentName);
+				}
 				RunTarget("MakeInstaller");		
 			}
 		}
@@ -1314,6 +1337,7 @@ Task("MakeInstaller")
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"FORCE_REG_CRX", regPolicyCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
@@ -1337,6 +1361,7 @@ Task("MakeInstaller")
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"FORCE_REG_CRX", regPolicyCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
@@ -1361,6 +1386,7 @@ Task("MakeInstaller")
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"FORCE_REG_CRX", regPolicyCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
