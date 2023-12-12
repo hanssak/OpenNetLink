@@ -299,7 +299,6 @@
         }
         else
         {
-
             if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
             {
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(refSGAlert.groupId))
@@ -316,6 +315,19 @@
                 }
                 else
                     doADLogin(true);
+            }
+            else if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(refSGAlert.groupId) == (int)Enums.enumNacLoginType.Genian) //Genian Nac Login
+            {
+                if (SGAppMgrSvc.SystemService.IsStartedByNAC() && srcLoc != "Logout")
+                {
+                    string NacKey = SGAppMgrSvc.OpConfigInfoService.GetNACLoginEncryptKey(0);
+                    string nacId = SGAppMgrSvc.SystemService.GetGenianNACUserID(NacKey);
+                    doNACLogin(nacId);
+                }
+                else    
+                {
+                    doLogIn();
+                }
             }
             else
             {
