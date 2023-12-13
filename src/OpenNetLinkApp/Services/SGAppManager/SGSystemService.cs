@@ -91,16 +91,25 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     //strNacEncData = "kf+MFAB+M5Poc54osw5R6qbFcbsKBN4KPIUR+fFZNE+rIR8KzHLKCXL9wlOPtBHM/yTDc84P53BKFNWYzXEY2Q=="; //yhkim40
                     //strNacEncData = "kf+MFAB+M5Poc54osw5R6oL7R7mw5MRfIICRC9ZJWfWH4qaYi9RHGReEiRvIMiUic65TVy4huouqqtt4jstt9Ym31lG2V5b3ZW0XTaQ0RW8="; //errId
 
-                    //Base64 디코딩
-                    byte[] arrNacEncData = Convert.FromBase64String(strNacEncData);
+                    string strNacDec = string.Empty;
+                    if(string.IsNullOrEmpty(nacEncryptKey.Trim()))
+                    {
+                        //NAC 계정 암호화 사용하지 않으면 그대로 계정 사용
+                        strNacDec = strNacEncData;
+                    }
+                    else
+                    {
+                        //Base64 디코딩
+                        byte[] arrNacEncData = Convert.FromBase64String(strNacEncData);
 
-                    //AES128로 복호화 필요함 (OP에 NAC 키 있음)
-                    byte[] decKey = new byte[16];
-                    byte[] arrNACEnc = Encoding.UTF8.GetBytes(nacEncryptKey);
-                    Array.Copy(arrNACEnc, 0, decKey, 0, arrNACEnc.Length);
+                        //AES128로 복호화 필요함 (OP에 NAC 키 있음)
+                        byte[] decKey = new byte[16];
+                        byte[] arrNACEnc = Encoding.UTF8.GetBytes(nacEncryptKey);
+                        Array.Copy(arrNACEnc, 0, decKey, 0, arrNACEnc.Length);
 
-                    byte[] arrNACDec = SGCrypto.AESDecrypt256(arrNacEncData, decKey, System.Security.Cryptography.PaddingMode.None);
-                    string strNacDec = Encoding.UTF8.GetString(arrNACDec);
+                        byte[] arrNACDec = SGCrypto.AESDecrypt256(arrNacEncData, decKey, System.Security.Cryptography.PaddingMode.None);
+                        strNacDec = Encoding.UTF8.GetString(arrNACDec);
+                    }
 
                     //format. -nac "-authid:test" -IP:192.168.1.168 -MAC:00:24:1D:88:1D:B4
                     strNacDec = strNacDec.Replace("\"", "");

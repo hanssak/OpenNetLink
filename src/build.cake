@@ -770,13 +770,17 @@ Task("PkgCrossflatform")
 						{
 							if(OPJObj["NACLoginType"] != null && OPJObj["NACLoginType"].ToString() != "" && OPJObj["NACLoginType"].ToString() != "0")
 							{
-								if(OPJObj["NACLoginEncryptKey"] == null || OPJObj["NACLoginEncryptKey"].ToString() == "")
-									throw new Exception(String.Format("[Err] NACLoginType 사용 시, 인증상태 정보 암호화를 위한 키 'NACLoginEncryptKey'를 설정해주세요."));
+								//암호화 값 없으면 NAC 인자로 암호화 사용하지 않는 것으로 간주
+								// if(OPJObj["NACLoginEncryptKey"] == null || OPJObj["NACLoginEncryptKey"].ToString() == "")
+								// 	throw new Exception(String.Format("[Err] NACLoginType 사용 시, 인증상태 정보 암호화를 위한 키 'NACLoginEncryptKey'를 설정해주세요."));
 								
 								//Add SGNac.exe
 								CopyFiles("./OpenNetLinkApp/Library/SGNacAgent/SGNac.exe", $"./artifacts/{AppProps.Platform}/published");
 								nacLoginType = OPJObj["NACLoginType"].ToString();
-								nacLoginEncryptKey = OPJObj["NACLoginEncryptKey"].ToString();
+								if(OPJObj["NACLoginEncryptKey"] == null || OPJObj["NACLoginEncryptKey"].ToString() == "")
+									nacLoginEncryptKey = "";	
+								else
+									nacLoginEncryptKey = OPJObj["NACLoginEncryptKey"].ToString();
 							}
 						}
 

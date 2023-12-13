@@ -561,11 +561,18 @@ Section "MainSection" SEC01
 	  ;NAC 등록
 	  ${If} ${NAC_LOGIN_TYPE} == '1'
 		IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" GnFind GnNotFind
-		GnFind:			
-			ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe -e:AES-${NAC_LOGIN_ENCRYPTKEY}"'
+		GnFind:					
+			StrCmp ${NAC_LOGIN_ENCRYPTKEY} "" GnKeyNoEnctrypt GnKeyEncrypt 
+			GnKeyNoEnctrypt:
+				ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe"'
+				goto GnKeyEND
+			GnKeyEncrypt:
+				ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe -e:AES-${NAC_LOGIN_ENCRYPTKEY}"'				
+				goto GnKeyEND			
+			GnKeyEND:
 			goto GnEND
 		GnNotFind:
-		GnEND:
+		GnEND:			
 	${EndIf}
 	
 	;인증서 자동 업데이트 설정 Off
