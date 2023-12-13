@@ -718,7 +718,7 @@ Task("PkgCrossflatform")
 				networkFlag = AgentName.ToUpper();			
 				storageName = unitName.ToUpper();
 				
-				if(AppProps.Platform == "windows")
+				if(AppProps.Platform == "windows") 
 				{
 					JObject AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"));
 					for(int i = 0; i < AppEnvJObj["strForwardUrl"].Count(); i++)
@@ -842,7 +842,7 @@ Task("PkgCrossflatform")
 					var fileNames = System.IO.File.ReadAllLines("./PatchFileList.txt");
 					
 					Information("Patch Target File List");
-					Information("========================");
+					Information("================================================");
 					
 					// 각 파일을 대상 디렉토리로 복사합니다.
 					foreach (var fileName in fileNames)
@@ -859,50 +859,25 @@ Task("PkgCrossflatform")
 						if (FileExists(sourcePath))
 						{
 							Information("Patch File: {0}", fileName);
-							MoveFile(sourcePath, targetDirectory);
+							CopyFile(sourcePath, targetDirectory);
 						}
 						
 						if (DirectoryExists(sourcePath))
 						{
 							Information("Patch Folder: {0}", fileName);
-							MoveDirectory(sourcePath, targetDirectory);
+							CopyDirectory(sourcePath, targetDirectory);
 						}
 					}					
 					
-					Information("========================");
-					Information("Delete published!");
-					DeleteDirectory("./artifacts/windows/published", new DeleteDirectorySettings { Force = true, Recursive = true });
-					Information("========================");
+					Information("================================================");
+					Information("Published Folder BackUp (-> published_backup)!");
+					MoveDirectory("./artifacts/windows/published", "./artifacts/windows/published_backup");
+
+					Information("================================================");
 					Information("Rename patch_published => published");
 					MoveDirectory("./artifacts/windows/patch_published", "./artifacts/windows/published");
-					Information("========================");
-					
-					// 
-					/*
-					DeleteFiles("./artifacts/windows/published/*.so"); 
-					DeleteFiles("./artifacts/windows/published/*.pdb");
+					Information("================================================");
 
-					var files = GetFiles("./artifacts/windows/published/*.so.*");
-					foreach(var file in files)
-					{
-						String strSearchFile = (String)file.FullPath;
-						//Information("File: {0}", strSearchFile);
-
-						int nIdex = strSearchFile.LastIndexOf('.');
-						if (nIdex > 0)
-						{
-							String strItem = strSearchFile.Substring(nIdex+1);
-
-							int n=0;
-							bool isNumeric = int.TryParse(strItem, out n);
-							if (isNumeric)
-							{
-								Information("File-Deleted: {0}", strSearchFile);
-								DeleteFile(strSearchFile);
-							}
-						}		
-					}
-					*/
 				}
 				
 			}
@@ -923,7 +898,24 @@ Task("PkgCrossflatform")
 			// 패치는 시작프로그램 등 설정하지 않으므로 제외
 			// if(useMakeConfig == true)
 			// 	inkFileName = MakeProps.GetLinkFileName(unitName, AgentName);
-			RunTarget("MakeInstaller");		
+			RunTarget("MakeInstaller");
+
+			if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
+			{
+				if(AppProps.Platform == "windows")
+				{
+					Information("================================================");
+					Information("Delete published File(For Patch) !!!");
+					Information("================================================");
+					DeleteDirectory("./artifacts/windows/published", new DeleteDirectorySettings { Force = true, Recursive = true });
+
+					Information("================================================");
+					Information("published_backup Folder Restore Folder (-> published)!");
+					MoveDirectory("./artifacts/windows/published_backup", "./artifacts/windows/published");					
+					Information("================================================");
+				}
+			}
+
 		}
 	}
 });
