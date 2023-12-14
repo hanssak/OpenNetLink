@@ -1083,8 +1083,15 @@ namespace OpenNetLinkApp.Services
 
                 if (Directory.EnumerateFileSystemEntries(Dir.FullName).Any() == false)
                 {
-                    Directory.Delete(Dir.FullName);
-                    CLog.Here().Information($"DeleteTimeOverFiles - Delete Empty Folder : {Dir.FullName}");
+                    try
+                    {
+                        Directory.Delete(Dir.FullName);
+                        CLog.Here().Information($"DeleteTimeOverFiles - Delete Empty Folder : {Dir.FullName}");
+                    }
+                    catch(Exception ex)
+                    {
+                        CLog.Here().Error($"DeleteTimeOverFiles - ERR : {ex.Message}");
+                    }
                 }
             }
         }
