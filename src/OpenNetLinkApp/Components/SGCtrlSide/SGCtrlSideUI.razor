@@ -873,8 +873,8 @@
         //versionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
 
         // Windows일때, 자동실행 설정상태면 Lnk 만듬
-        if (GetStartProgramReg() && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            CtrlSideUISvc.SetStartProgramReg(true);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            CtrlSideUISvc.SetStartProgramReg(GetStartProgramReg());
 
         // 클립보드 자동전송 상태 설정
         if (GetClipCopyAutoSend())
