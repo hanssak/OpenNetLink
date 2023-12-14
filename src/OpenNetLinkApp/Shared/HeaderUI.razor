@@ -37,7 +37,7 @@
 
 <SelectReceiveFolder @ref="refSelectReceiveFolder"></SelectReceiveFolder>
 <ClipBoardTypeSelect @ref="refClipBoardTypeSelect" OnClipTypeSelect="ClipBoardTypeSelectResult"></ClipBoardTypeSelect>
-<SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
+<SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" OnClickDropItemToPath="@NavigateToPath"/>
 <SGAlert @ref="refSGAlertApproveAfter" OnConfirm="ApproveAfterTransFile" Guid="HeaderUIApporveAfterAlert"></SGAlert>
 <SGAlert @ref="refSGAlertApproveAfterMyCount" OnConfirm="ApproveAfterPageMove" OnCancel="ApproveAfterCancel" Guid="HeaderUIApporveAfterMyCountAlert"></SGAlert>
 <SGAlert @ref="refSGAlertUpdateStart" Guid="HeaderUIUpdateStartAlert"></SGAlert>
@@ -807,7 +807,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
@@ -1055,7 +1055,7 @@
                                 HsNetWorkSG.HsHttpWatcher.SetUrlList(groupid, bUseUrlRedirection,
                                     chType, strForwardUrl,
                                 // Local의 정보를 사용하는 예전방식
-                                // SGAppMgrSvc.AppConfigInfoService.GetURLAutoAfterBrowser(0).ElementAt(0), SGAppMgrSvc.AppConfigInfoService.GetForwardUrl(0), 
+                                // SGAppMgrSvc.AppConfigInfoService.GetURLAutoAfterBrowser(0).ElementAt(0), SGAppMgrSvc.AppConfigInfoService.GetForwardUrl(0),
                                 (dicBWpolicy[groupid] ? 0x00 : 0x01), listUrl, listUrlException);
 
                                 CtrlSideRefreshEvent ctrlSideEvent = null;
@@ -1286,24 +1286,24 @@
 
 #if _WINDOWS
 
-        try
+    try
+    {
+        if (e.strUrlData != null && e.strUrlData.Length > 0)
         {
-            if (e.strUrlData != null && e.strUrlData.Length > 0)
-            {
-                string url = $"\"{e.strUrlData}\"";
-                System.Diagnostics.Process.Start(
-                    new System.Diagnostics.ProcessStartInfo
-                    {
-                        FileName = url,
-                        UseShellExecute = true
-                    });
-                //System.Diagnostics.Process.Start("explorer", url); // 260자 제한됨
-            }
+            string url = $"\"{e.strUrlData}\"";
+            System.Diagnostics.Process.Start(
+                new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true
+                });
+            //System.Diagnostics.Process.Start("explorer", url); // 260자 제한됨
         }
-        catch (Exception ex)
-        {
-            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-        }
+    }
+    catch (Exception ex)
+    {
+        CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+    }
 
 #elif _LINUX
 
@@ -2743,45 +2743,56 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
     public void NavigateURLHandler(object sender, List<object> list)
     {
         string navURI = "";
-        if (list != null)
-        {
-            IntPtr bUri = (IntPtr)list[0];
-            int length = (int)list[1];
-            byte[] data = new byte[length];
+        try
+        {            
+            if (list != null)
+            {
+                IntPtr bUri = (IntPtr)list[0];
+                int length = (int)list[1];
+                byte[] data = new byte[length];
 
-            Marshal.Copy(bUri, data, 0, length);
+                Marshal.Copy(bUri, data, 0, length);
 
-            navURI = Encoding.UTF8.GetString(data);
+                navURI = Encoding.UTF8.GetString(data);
+            }
+
+            CLog.Here().Information("Toast-Click-navURI : {0}", navURI);
+
+            NavigateToPath(navURI);
         }
-
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"NavigateURLHandler-Exception, pathURL : {navURI}, Exception(MSG) : {ex.Message}");
+        }
+    }
+    public void NavigateToPath(string pathURL)
+    {
         int nGroupID = 0;
-        //string strGroupID = "";
-        //string strMenuName = "";
-
-        CLog.Here().Information("Toast-Click-navURI : {0}", navURI);
 
         //int nPos = -1;
         bool bChangedMenu = false;
-
+        CLog.Here().Information("NavigateToPath : {0}", pathURL);
         try
         {
-
-            string[] strArray = navURI.Split("/");
-
-            if (strArray != null && strArray.Length > 1)
+            string[] strArray = pathURL.Split("/");
+            if (strArray != null && strArray.Length <= 2)
+            {
+                //Alarm 등 groupID 없는 경우
+                bChangedMenu = true;
+            }
+            else if (strArray != null && strArray.Length > 2)
             {
                 nGroupID = Convert.ToInt32(strArray[2]);
 
                 KeyboardEventArgs eventArgs = new KeyboardEventArgs();
                 eventArgs.Key = "Enter";
 
-                ISGSideBarUI activeMenu = null;
+                ISGSideBarUI activeMenu = null;         
                 string path = $"/{strArray[1]}/{strArray[2]}";
                 activeMenu = SideBarUISvc.FindSubMenu(nGroupID, path);
 
                 if (activeMenu != null)
                 {
-
                     PageDataRefreshEvent pgRefreshEvent = null;
 
                     if (!activeMenu.Actived)
@@ -2836,135 +2847,16 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
                     if (pgRefreshEvent != null)
                         pgRefreshEvent();
-
                 }
             }
-
-
-            // 왼쪽 SideBar Navigate 되는 곳으로 선택되게 적용
-            @*nPos = navURI.LastIndexOf('/');
-                if (nPos > 0 && navURI.Length > 3 && nPos < navURI.Length - 1)
-                {
-                strGroupID = navURI.Substring(nPos + 1);
-                nGroupID = Convert.ToInt32(strGroupID);
-
-                // 결재권한이 있을때에만 결재관리로 넘어가게 적용가능
-                /*SGLoginData sgLoginData = null;
-                SGUserData sgUserData = null;
-                sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
-                sgUserData = (SGUserData)HsCmdCenter.GetUserData(nGroupID);
-                bool bApprMenuUse = false;
-
-                if (sgLoginData != null && sgUserData != null)
-                {
-                // if (sgLoginData.GetApprove() == true)   // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
-
-                // 3망 정책고려한 결재사용유무 설정
-                if (pageService.GetUseApproveNetOver(nGroupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
-                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
-                bApprMenuUse = true;
-                }*/
-
-                KeyboardEventArgs eventArgs = new KeyboardEventArgs();
-                eventArgs.Key = "Enter";
-
-                ISGSideBarUI activeMenu = null;
-                string path = navURI.Substring(0, nPos);
-                activeMenu = SideBarUISvc.FindSubMenu(nGroupID, navURI);
-
-                if (activeMenu != null)
-                {
-                if (!activeMenu.Actived)
-                {
-                ChangeActiveMenuWrap(eventArgs, activeMenu);
-                bChangedMenu = true;
-                }
-                else
-                {
-                PageDataRefreshEvent pgRefreshEvent = null;
-                if (activeMenu.Path.Contains("transferApprove"))
-                {
-                pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
-                }
-                else if (activeMenu.Path.Contains("securityApprove"))
-                {
-                pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.SecurityApproveUI);
-                }
-                else if (activeMenu.Path.Contains("clipBoardApprove"))
-                {
-                pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
-                }
-                else if (activeMenu.Path.Contains("fileException"))
-                {
-                pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.FileException);
-                }
-
-                if (pgRefreshEvent != null)
-                pgRefreshEvent();
-                }
-                }
-
-                // 결재관리 확인 - 선택변경
-                //strMenuName = "transferApprove";
-                //nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
-                //ISGSideBarUI activeMenu = null;
-                //if (nPos > 0)
-                ////if (nPos > 0 && bApprMenuUse)
-                //{
-                //    activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 2);
-
-                //    if (activeMenu != null)
-                //    {
-                //        ChangeActiveMenuWrap(eventArgs, activeMenu);
-                //        bChangedMenu = true;
-                //    }
-                //}
-
-                //if (bChangedMenu == false)
-                //{
-                //    // 전송관리 확인 - 선택변경
-                //    strMenuName = "transManage";
-                //    nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
-                //    if (nPos > 0)
-                //    {
-                //        activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 1);
-                //        if (activeMenu != null)
-                //        {
-                //            ChangeActiveMenuWrap(eventArgs, activeMenu);
-                //            bChangedMenu = true;
-                //        }
-                //    }
-                //}
-
-                // 기능 동작하나 위에 방식 사용
-                /*if (nPos > 0 && pageService.m_approveMenuArray[nGroupID] != null)
-                {
-                SideBarUISvc.ChgActiveMenu(eventArgs, pageService.m_approveMenuArray[nGroupID]);
-                bChangedMenu = true;
-                }
-
-                if (bChangedMenu == false)
-                {
-                // 전송관리 확인 - 선택변경
-                strMenuName = "transManage";
-                nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
-                if (nPos > 0 && pageService.m_TransMenuArray[nGroupID] != null)
-                {
-                SideBarUISvc.ChgActiveMenu(eventArgs, pageService.m_TransMenuArray[nGroupID]);
-                bChangedMenu = true;
-                }
-                }*/
-
-                }*@
-
         }
         catch (Exception e)
         {
-            CLog.Here().Information($"Toast-Click-Navigate-Exception, navURI : {navURI}, Exception(MSG) : {e.Message}");
+            CLog.Here().Information($"NavigateToPath-Exception, pathURL : {pathURL}, Exception(MSG) : {e.Message}");
         }
 
         if (bChangedMenu)
-            MyNavigationManager.NavigateTo(navURI);
+            MyNavigationManager.NavigateTo(pathURL);
     }
 
     public void DragNDropHandler(object sender, List<object> list)
@@ -3006,7 +2898,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
     /// <param name="nGroupId">3망전송의 Title 표시방식에 사용</param>
     /// <param name="eOSNoti">OS 노티 시 표현할 아이콘(이미지)</param>
     /// <param name="strTitle">표시할 Title (없을 시, 기본 FromName->ToName 형식으로 표시)</param>
-    private void ShowClipboardMessage(string strType, string strMsg, int nGroupId, OS_NOTI eOSNoti = OS_NOTI.CLIPBOARD, string strTitle="")
+    private void ShowClipboardMessage(string strType, string strMsg, int nGroupId, OS_NOTI eOSNoti = OS_NOTI.CLIPBOARD, string strTitle = "")
     {
         //클립보드 알람타입 (OS/UI/OSUI)
         CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
@@ -3018,7 +2910,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         Dictionary<string, SGNetOverData> dicDestSysPos = null;
         dicDestSysPos = pageService.GetTargetSystemList(nGroupId);
 
-        if(string.IsNullOrEmpty(strTitle))
+        if (string.IsNullOrEmpty(strTitle))
         {
             if (dicDestSysPos == null || dicDestSysPos.Count < 2)
                 strTitle = XmlConf.GetNetworkTitle(nGroupId);  // 원래 표시하던 방식
@@ -3189,7 +3081,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         eAlarmType eAType = sgMsgData.GetConvertOSNotiAlarmTitle(os_noti);
         LSIDEBAR sidebar = sgMsgData.GetConvertOSNotiMenuCategory(os_noti);
 
-        InsertAlarm(groupID, sidebar, eAType, "", strMsg);
+        InsertAlarm(groupID, sidebar, eAType, naviURI, strMsg);
         //InsertAlarm(groupID, sidebar, eAType, naviURI, strMsg);
     }
 
@@ -3504,7 +3396,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         if (ctrlSideEvent != null)
             ctrlSideEvent(groupID);
 
-        // Reconnect, 메뉴 재생성동작하게 
+        // Reconnect, 메뉴 재생성동작하게
         pageService.SetStatusSideMenuReBuildTime(groupID, true);
 
         // sessionCheck 동작하게 적용
@@ -3650,7 +3542,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             }*@
 
 
-    OS_NOTI os_noti = OS_NOTI.OFFLINE;
+        OS_NOTI os_noti = OS_NOTI.OFFLINE;
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = XmlConf.GetInfoMsg("I_0198");               // 오프라인 되었습니다.
         if (HsCmdCenter.GetFileRecvPossible(groupID) == true)

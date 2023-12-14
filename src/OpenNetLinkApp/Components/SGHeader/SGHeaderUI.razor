@@ -132,7 +132,7 @@
                                     // 다중접속일때에는 단일망에만 전달가능
                                     // 단일접속일때에는 3중망에 전달가능
                                     @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx != 0 &&
-                       (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                                   (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                     {
 
                                         @if (bAddedClipBoardItem)
@@ -147,7 +147,7 @@
                                         <a style="cursor:pointer;" class="dropdown-item" @onclick="(e => ClipboardSend(Netitem.GroupID, itemData))">
                                             @*href="#" *@
                                             <!-- Message Start -->
-                                            <div class="media p-2">
+                <div class="media p-2">
                                                 <div class="media-body">
                                                     <h3 class="dropdown-item-title font-weight-bold mb-2">
                                                         <i class="fas fa-copy mr-2"></i>
@@ -159,21 +159,21 @@
                                                 </div>
                                             </div>
                                             <!-- Message End -->
-                                        </a>
+            </a>
 
                                         bAddedClipBoardItem = true;
                                     }
 
                                 }
 
-                                // 클립보드 전체망으로 전송하는 기능
+            // 클립보드 전체망으로 전송하는 기능
                                 @if (IsCanTransferClipBoardAllNet())
                                 {
                                     <div class="dropdown-divider"></div>
                                     <a style="cursor:pointer;" class="dropdown-item" @onclick="(e => ClipboardSendAllNet(Netitem.GroupID))">
                                         @*href="#" *@
                                         <!-- Message Start -->
-                                        <div class="media p-2">
+                <div class="media p-2">
                                             <div class="media-body">
                                                 <h3 class="dropdown-item-title font-weight-bold mb-2">
                                                     <i class="fas fa-copy mr-2"></i>
@@ -185,7 +185,7 @@
                                             </div>
                                         </div>
                                         <!-- Message End -->
-                                    </a>
+            </a>
                                 }
 
                             }
@@ -194,7 +194,7 @@
                                 // 목적망이 1곳일때
                                 <a style="cursor:pointer;" class="dropdown-item" @onclick="(e => ClipboardSend(Netitem.GroupID))">
                                     <!-- Message Start -->
-                                    <div class="media p-2">
+                <div class="media p-2">
                                         <div class="media-body">
                                             <h3 class="dropdown-item-title font-weight-bold mb-2">
                                                 <i class="fas fa-copy mr-2"></i>
@@ -206,7 +206,7 @@
                                         </div>
                                     </div>
                                     <!-- Message End -->
-                                </a>
+            </a>
 
                                 bAddedClipBoardItem = true;
                             }
@@ -229,14 +229,14 @@
         <a class="nav-link white_font" data-toggle="dropdown" title=@xmlConf.GetTitle("T_TOOL_MESSAGE")>
             <!--<i class="fas fa-comments "></i>-->
             <i class="@GetNotiIcon() "></i>
-            @if ((nNotiCount = GetNotiAllNetSum(strUserSeq)) > 0)
+            @if ((nNotiCount = GetNotiAllNetSum(GetUserInfo()?.UserSeq)) > 0)
             {
                 //<span class="badge badge-danger navbar-badge">5</span>-->
                 <span class="@GetNotiBadge() navbar-badge">@(nNotiCount)</span>
             }
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="z-index:2000;">
-            @if (nNotiCount > 0)@foreach (var NotiItem in GetNotiInfoList(strUserSeq, 5))
+            @if (nNotiCount > 0)@foreach (var NotiItem in GetNotiInfoList(GetUserInfo()?.UserSeq, 5))
                 {
                     @if (NotiItem.Head.Length > 16)
                     {
@@ -258,10 +258,10 @@
                     {
                         <a class="dropdown-item">
                             <!-- Message Start -->
-                            <div class="media p-2">
+                <div class="media p-2">
                                 <!-- 아바타 이미지 사용안함 -->
                                 <!-- <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle"> -->
-                                <div class="media-body">
+                    <div class="media-body">
                                     <h3 class="dropdown-item-title font-weight-bold mb-2">
                                         <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))" style="cursor:pointer"><i class="fas fa-times fa-lg"></i></a></span>
                                         @NotiViewHead
@@ -272,16 +272,16 @@
                                 </div>
                             </div>
                             <!-- Message End -->
-                        </a>
+            </a>
                     }
                     else
                     {
-                        <a @onclick="@(()=> MyNavigationManager.NavigateTo(NotiItem.Path))" class="nav-link dropdown-item">
+                        <a @onclick="@(()=> ItemClickToNavigate(NotiItem.Path))" class="dropdown-item" style="cursor:pointer;">
                             <!-- Message Start -->
-                            <div class="media p-2">
+                <div class="media p-2">
                                 <!-- 아바타 이미지 사용안함 -->
                                 <!-- <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle"> -->
-                                <div class="media-body">
+                    <div class="media-body">
                                     <h3 class="dropdown-item-title font-weight-bold mb-2">
                                         <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))" style="cursor:pointer"><i class="fas fa-times fa-lg"></i></a></span>
                                         @NotiViewHead
@@ -292,7 +292,7 @@
                                 </div>
                             </div>
                             <!-- Message End -->
-                        </a>
+            </a>
                     }
                     <div class="dropdown-divider"></div>
                 }
@@ -300,12 +300,12 @@
             @if (String.IsNullOrEmpty(GetNotiPath()))
             {
                 @*<a class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>*@
-                <a @onclick="@(()=> MyNavigationManager.NavigateTo("/messageList"))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGLOOK")</a> <!--전체 메세지 보기-->
+                <a @onclick="@(()=> ItemClickToNavigate("/messageList"))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGLOOK")</a> <!--전체 메세지 보기-->
             }
             else
             {
                 @*<a href="@GetNotiPath()" class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>*@
-                <a @onclick="@(()=> MyNavigationManager.NavigateTo("/messageList"))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGLOOK")</a> <!--전체 메세지 보기-->
+                <a @onclick="@(()=> ItemClickToNavigate("/messageList"))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGLOOK")</a> <!--전체 메세지 보기-->
             }
 
             @if (bViewAlarmNotiAllDelMenu)
@@ -313,11 +313,11 @@
                 <div class="dropdown-divider"></div>
                 @if (String.IsNullOrEmpty(GetNotiPath()))
                 {
-                    <a @onclick="@(async () => DelAllMsgInfo(strUserSeq))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGDEL")</a> <!--전체 메세지 삭제-->
+                    <a @onclick="@(async () => DelAllMsgInfo(GetUserInfo()?.UserSeq))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGDEL")</a> <!--전체 메세지 삭제-->
                 }
                 else
                 {
-                    <a @onclick="@(async () => DelAllMsgInfo(strUserSeq))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGDEL")</a>
+                    <a @onclick="@(async () => DelAllMsgInfo(GetUserInfo()?.UserSeq))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGDEL")</a>
                 }
             }
         </div>
@@ -329,7 +329,7 @@
         <a class="nav-link white_font" data-toggle="dropdown" title=@xmlConf.GetTitle("T_INFO_ALARM")>
             <!--<i class="fas fa-bell"></i>-->
             <i class="@GetAlarmIcon() "></i>
-            @if ((nAlarmCount = GetAlarmAllNetSum(strUserSeq)) > 0)
+            @if ((nAlarmCount = GetAlarmAllNetSum(GetUserInfo()?.UserSeq)) > 0)
             {
                 //<span class="badge badge-warning navbar-badge">15</span>
                 <span class="@GetAlarmBadge() navbar-badge">@(nAlarmCount)</span>
@@ -338,7 +338,7 @@
 
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
             @*<span class="dropdown-item dropdown-header">@nAlarmCount Notifications</span>*@
-            @if (nAlarmCount > 0)@foreach (var AlarmItem in GetAlarmInfoList(strUserSeq, 5))
+            @if (nAlarmCount > 0)@foreach (var AlarmItem in GetAlarmInfoList(GetUserInfo()?.UserSeq, 5))
                 {
                     <div class="dropdown-divider"></div>
                     @if (AlarmItem.Head.Length > 20)
@@ -362,7 +362,7 @@
 
                         <a class="dropdown-item">
                             <!-- Notification Start -->
-                            <div class="media p-2">
+                <div class="media p-2">
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title font-weight-bold mb-2">
                                         <span class="float-left"><i class="fas fa-bell"></i></span>&nbsp;
@@ -374,14 +374,14 @@
                                 </div>
                             </div>
                             <!-- Notification End -->
-                        </a>
+            </a>
 
                     }
                     else
                     {
-                        <a @onclick="@(()=> MyNavigationManager.NavigateTo(AlarmItem.Path))" class="nav-link dropdown-item p-2">
+                        <a @onclick="@(()=> ItemClickToNavigate(AlarmItem.Path))" class="dropdown-item p-2" style="cursor:pointer">
                             <!-- Notification Start -->
-                            <div class="media-body">
+                <div class="media-body">
                                 <h3 class="dropdown-item-title font-weight-bold mb-2">
                                     <span class="float-left"><i class="fas fa-bell"></i></span>&nbsp;
                                     @AlarmViewHead
@@ -403,12 +403,12 @@
             @if (String.IsNullOrEmpty(GetAlarmPath()))
             {
                 //<a class="dropdown-item dropdown-footer">전체 알림 보기</a>
-                <a @onclick="@(()=> MyNavigationManager.NavigateTo("/alarmList"))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
+                <a @onclick="@(()=> ItemClickToNavigate("/alarmList"))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
             }
             else
             {
                 //<a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>
-                <a @onclick="@(()=> MyNavigationManager.NavigateTo("/alarmList"))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
+                <a @onclick="@(()=> ItemClickToNavigate("/alarmList"))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
             }
 
             @if (bViewAlarmNotiAllDelMenu)
@@ -416,11 +416,11 @@
                 <div class="dropdown-divider"></div>
                 @if (String.IsNullOrEmpty(GetAlarmPath()))
                 {
-                    <a @onclick="@(async () => DelAllNotiInfo(strUserSeq))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMDELETE")</a> <!--전체 알림 삭제-->
+                    <a @onclick="@(async () => DelAllNotiInfo(GetUserInfo()?.UserSeq))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMDELETE")</a> <!--전체 알림 삭제-->
                 }
                 else
                 {
-                    <a @onclick="@(async () => DelAllNotiInfo(strUserSeq))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMDELETE")</a> <!--전체 알림 삭제-->
+                    <a @onclick="@(async () => DelAllNotiInfo(GetUserInfo()?.UserSeq))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMDELETE")</a> <!--전체 알림 삭제-->
                 }
             }
         </div>
@@ -467,6 +467,7 @@
     [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
     [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
+    [Parameter] public EventCallback<string> OnClickDropItemToPath { get; set; }
     private string stProfilePhotoPath = String.Empty;
     private SGNtfyDBProc SQLiteDB { get; } = SGNtfyDBProc.Instance;
     Timer mouseTimer = null;
@@ -475,7 +476,7 @@
     public int screentime = 0;
     SGSettingsDBProc sgSettingProc;
 
-    public string strUserSeq;
+    @*public string strUserSeq;*@
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGHeaderUI>();
 
@@ -510,6 +511,13 @@
         strMsg = strMsg.Replace("/r/n", "<br>");
         object[] param = { strType, xmlConf.GetTitle("T_SYSTEMNAME2"), strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    private void ItemClickToNavigate(string path)
+    {
+        if(path == null || path.Length < 1 || !OnClickDropItemToPath.HasDelegate)
+            return;
+        OnClickDropItemToPath.InvokeAsync(path);  
     }
 
     /// <summary>
@@ -1526,6 +1534,8 @@
 
     private List<SGNotiData> GetNotiInfoList(string userSeq, int nLimit)
     {
+        if (userSeq == null || userSeq.Length < 1)
+            return new List<SGNotiData>();
         return SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.USER, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq, nLimit);
     }
 
@@ -1686,6 +1696,9 @@
 
     private List<SGAlarmData> GetAlarmInfoList(string userSeq, int nLimit)
     {
+        if (userSeq == null || userSeq.Length < 1)
+            return new List<SGAlarmData>();
+
         return SQLiteDB.SelectAlarmInfoLimit(SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq, nLimit);
     }
 
@@ -1815,7 +1828,7 @@
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
         if (sgUserData != null)
         {
-            strUserSeq = sgUserData.GetUserSequence();
+            //strUserSeq = sgUserData.GetUserSequence();
 
             // login 이후에 사후결재 관련 설정값
             bViewAlarmNotiAllDelMenu = SGAppMgrSvc.OpConfigInfoService.GetViewSGHeaderUIAlarmNoriAllDel(groupid);
