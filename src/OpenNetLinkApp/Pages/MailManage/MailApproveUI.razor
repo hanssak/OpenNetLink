@@ -1214,19 +1214,37 @@
 
             if (menuMode == 1)
             {
-                CLog.Here().Information($"OnAfterRender, menuMode == 1, 2 ############################ !!!!!!!!!!!!!!!!!!!!!!!");
+                CLog.Here().Information($"OnAfterRenderAsync, menuMode == 1, 2 ############################ !!!!!!!!!!!!!!!!!!!!!!!");
                 refPeriodDatePicker.SetDateTime(DateTime.MinValue.ToString("yyyy-MM-dd"), DateTime.Now.ToString("yyyy-MM-dd"));
                 strSearchApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT"); //"승인대기"
             }
-            await doSearch();
-            StateHasChanged();
+            // await doSearch();
+
+            if (groupIDbyParam >= 0)
+            {
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseEmailApprUIwait(groupIDbyParam))
+                {
+                    CLog.Here().Information($"OnAfterRenderAsync, 1 ############################ !!!!!!!!!!!!!!!!!!!!!!!");
+                    ApproveWaitSearchForSetting(false, true);
+                }
+                else
+                {
+                    CLog.Here().Information($"OnAfterRenderAsync, 4 ############################ !!!!!!!!!!!!!!!!!!!!!!!");
+                    Task.Run(async () => { await doSearch(); });
+                }
+
+                StateHasChanged();
+            }
+
         }
 
         if (firstRender)
         {
         }
 
-        base.OnAfterRender(firstRender);
+        base.OnAfterRenderAsync(firstRender);
+
+        //base.OnAfterRender(firstRender);
     }
 
     // bSearchUnLimitedDay
@@ -1316,6 +1334,7 @@
         {
             jsRuntime.InvokeAsync<object>("initPageLeft");
 
+            @*
             if (groupIDbyParam >=0 && SGAppMgrSvc.OpConfigInfoService.GetUseEmailApprUIwait(groupIDbyParam))
             {
                 CLog.Here().Information($"OnAfterRender, 1 ############################ !!!!!!!!!!!!!!!!!!!!!!!");
@@ -1325,7 +1344,7 @@
             {
                 CLog.Here().Information($"OnAfterRender, 4 ############################ !!!!!!!!!!!!!!!!!!!!!!!");
                 Task.Run(async () => { await doSearch(); });
-            }
+            }*@
         }
 
         // pageService.SetDayInfoRefreshEvent(groupIDbyParam, DayInfoRefreshResult);
