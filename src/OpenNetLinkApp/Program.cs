@@ -68,7 +68,7 @@ namespace OpenNetLinkApp
                 bool kekGenInit = (!File.Exists("wwwroot/conf/hsck"));
                 SGCrypto.ValidationResult = true;
 
-                if (kekGenInit)
+                 if (kekGenInit)
                     SGCrypto.ValidationResult &= SGCrypto.SaveKeyGenerate("wwwroot/conf/hsck");
                 else
                     SGCrypto.ValidationResult &= SGCrypto.LoadKeyGenerate("wwwroot/conf/hsck");
@@ -99,68 +99,62 @@ namespace OpenNetLinkApp
 
                 ComponentsDesktop.Run<Startup>(windowTitle, "wwwroot/index.html", arg);
             }
-            else if (Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginType == (int)Common.Enums.enumNacLoginType.Genian && args?.Length > 0 && args[0].ToString().ToUpper() == "NAC")
-            {
-                //NAC으로 로그인 시
-                //기존 OpenNetLink로 종료요청("REQUEST_OPENNETLINK_EXIT" 키워드 전달)
-                HsNetWorkSG.HsContextSender.RequestExitSender();
-
-                //정상종료 불가 시 강제종료
-                Thread.Sleep(1000);
-                Process[] OpenNetLinkes = Process.GetProcessesByName("OpenNetLinkApp");
-                if (OpenNetLinkes.Length > 1)
-                    OpenNetLinkes[0].Kill();
-
-                InitializeLogger();
-
-                if (args?.Length > 0) CLog.Information($"args : {string.Join(',', args)}");
-                //OP 파일 재 암호화 => 암복호화 실패 시 재설치
-                //Network 파일 재 암호화 => 암복호화 실패 시 재설치
-                bool kekGenInit = (!File.Exists("wwwroot/conf/hsck"));
-                SGCrypto.ValidationResult = true;
-
-                if (kekGenInit)
-                    SGCrypto.ValidationResult &= SGCrypto.SaveKeyGenerate("wwwroot/conf/hsck");
-                else
-                    SGCrypto.ValidationResult &= SGCrypto.LoadKeyGenerate("wwwroot/conf/hsck");
-
-                //json파일 재암호화
-                //파일에 저장된 항목 dek 재 암호화
-                SGCrypto.ValidationResult &= SGFileCrypto.Instance.EncryptSettingFiles();
-                
-                windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
-                if (String.IsNullOrEmpty(windowTitle))
-                    windowTitle = "OpenNetLink";
-
-                if (args?.Length > 0) CLog.Information($"args : {string.Join(',', args)}");
-
-                object[] arg = new object[2];
-                arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
-                arg[1] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartTrayMove;
-
-                string hiddenFlagFile = Path.Combine("wwwroot/Log", "UseHiddenLog");
-                if (File.Exists(hiddenFlagFile))
-                {
-                    HsNetWork.UseHiddenLog = true;
-                    File.Delete(hiddenFlagFile);
-                }
-
-                ComponentsDesktop.Run<Startup>(windowTitle, "wwwroot/index.html", arg);
-            }
             else
             {
-                //중복 실행은, KetLoad만 사용
                 SGCrypto.ValidationResult = SGCrypto.LoadKeyGenerate("wwwroot/conf/hsck");
-
-                windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
-                if (String.IsNullOrEmpty(windowTitle))
-                    windowTitle = "OpenNetLink";
-
-                int nhWnd = 0;
-                nhWnd = FindWindow("WebWindow", windowTitle);
-                if (nhWnd != 0 && IsWindow(nhWnd))
+                if (Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginType == (int)Common.Enums.enumNacLoginType.Genian && args?.Length > 0 && args[0].ToString().ToUpper() == "NAC")
                 {
-                    PostMessage(nhWnd, 0x0400 + 0x0003, 0, 0);
+                    //NAC으로 로그인 시
+                    //기존 OpenNetLink로 종료요청("REQUEST_OPENNETLINK_EXIT" 키워드 전달)
+                    HsNetWorkSG.HsContextSender.RequestExitSender();
+
+                    //정상종료 불가 시 강제종료
+                    Thread.Sleep(1000);
+                    Process[] OpenNetLinkes = Process.GetProcessesByName("OpenNetLinkApp");
+                    if (OpenNetLinkes.Length > 1)
+                        OpenNetLinkes[0].Kill();
+
+                    InitializeLogger();
+
+                    if (args?.Length > 0) CLog.Information($"args : {string.Join(',', args)}");
+                    
+                    //json파일 재암호화
+                    //파일에 저장된 항목 dek 재 암호화
+                    SGCrypto.ValidationResult &= SGFileCrypto.Instance.EncryptSettingFiles();
+
+                    windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
+                    if (String.IsNullOrEmpty(windowTitle))
+                        windowTitle = "OpenNetLink";
+
+                    if (args?.Length > 0) CLog.Information($"args : {string.Join(',', args)}");
+
+                    object[] arg = new object[2];
+                    arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
+                    arg[1] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartTrayMove;
+
+                    string hiddenFlagFile = Path.Combine("wwwroot/Log", "UseHiddenLog");
+                    if (File.Exists(hiddenFlagFile))
+                    {
+                        HsNetWork.UseHiddenLog = true;
+                        File.Delete(hiddenFlagFile);
+                    }
+
+                    ComponentsDesktop.Run<Startup>(windowTitle, "wwwroot/index.html", arg);
+                }
+                else
+                {
+                    SGCrypto.ValidationResult = SGCrypto.LoadKeyGenerate("wwwroot/conf/hsck");
+
+                    windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
+                    if (String.IsNullOrEmpty(windowTitle))
+                        windowTitle = "OpenNetLink";
+
+                    int nhWnd = 0;
+                    nhWnd = FindWindow("WebWindow", windowTitle);
+                    if (nhWnd != 0 && IsWindow(nhWnd))
+                    {
+                        PostMessage(nhWnd, 0x0400 + 0x0003, 0, 0);
+                    }
                 }
             }
         }
