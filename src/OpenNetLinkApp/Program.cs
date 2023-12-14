@@ -113,6 +113,17 @@ namespace OpenNetLinkApp
 
                 InitializeLogger();
 
+                if (args?.Length > 0) CLog.Information($"args : {string.Join(',', args)}");
+                //OP 파일 재 암호화 => 암복호화 실패 시 재설치
+                //Network 파일 재 암호화 => 암복호화 실패 시 재설치
+                bool kekGenInit = (!File.Exists("wwwroot/conf/hsck"));
+                SGCrypto.ValidationResult = true;
+
+                if (kekGenInit)
+                    SGCrypto.ValidationResult &= SGCrypto.SaveKeyGenerate("wwwroot/conf/hsck");
+                else
+                    SGCrypto.ValidationResult &= SGCrypto.LoadKeyGenerate("wwwroot/conf/hsck");
+
                 //json파일 재암호화
                 //파일에 저장된 항목 dek 재 암호화
                 SGCrypto.ValidationResult &= SGFileCrypto.Instance.EncryptSettingFiles();
@@ -138,6 +149,9 @@ namespace OpenNetLinkApp
             }
             else
             {
+                //중복 실행은, KetLoad만 사용
+                SGCrypto.ValidationResult = SGCrypto.LoadKeyGenerate("wwwroot/conf/hsck");
+
                 windowTitle = Common.CsFunction.XmlConf.GetTitle("T_WINDOW_TITLE");
                 if (String.IsNullOrEmpty(windowTitle))
                     windowTitle = "OpenNetLink";
