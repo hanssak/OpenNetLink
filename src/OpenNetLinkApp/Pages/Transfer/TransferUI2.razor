@@ -1135,8 +1135,15 @@
             }
         }
 
+        string strInterLockFlagConfirmId = "";
+        if (bAfterApprove && ((stApprLineSeq?.Length ?? 0) > 0) && SGAppMgrSvc.OpConfigInfoService.GetUseDlpAfterApproveToNormal(groupID))
+        {
+            // interlockflag | 0(사전전환) or 1(사후전환) | 결재자정보
+            strInterLockFlagConfirmId = "8|0|" + stApprLineSeq;
+        }
+
         dropFile.SetLogDB(groupID, strUserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_FILETRANSFER"), FileList.Count)); //$"파일 전송 ({FileList.Count} 건)");
-        int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
+        int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver, strInterLockFlagConfirmId);
 
         if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID))
         {

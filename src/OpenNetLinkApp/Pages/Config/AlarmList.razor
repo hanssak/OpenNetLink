@@ -49,7 +49,7 @@
                             <table class="table_notice table_notice_hover table-head-fixed" style="font-size: 12px;table-layout: fixed;">
                                 <tr>
                                     <th style="width:5%;"><input type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())"></th>
-                                    <th style="width:7%;">@XmlConf.GetTitle("T_INFO_NETWORK_KIND")</th>
+                                    <th style="width:10%;">@XmlConf.GetTitle("T_INFO_NETWORK_KIND")</th>
                                     <th style="width:10%;">@XmlConf.GetTitle("T_INFO_MESSAGE_TITLE")</th>
                                     <th style="width:20%;">@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</th>
                                     <th style="width:10%;">@XmlConf.GetTitle("T_INFO_TIME")</th>
@@ -248,7 +248,7 @@
         string strFromName = "";
         string strToName = "";
         XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
-        return strFromName;
+        return $"[{strFromName}-{strToName}]";
     }
     public void AlarmPageReflash()
     {

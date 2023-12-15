@@ -437,7 +437,7 @@ namespace OpenNetLinkApp.Data.SGDicData
         public int RequestSendFileTrans(HsNetWork hsNet, int groupid, string strUserID, string strMid, string strPolicyFlag,
             string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos,
             string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep,
-            string ApprLineSeq, List<HsStream> FileList, string strNetOver3info, string receiver)
+            string ApprLineSeq, List<HsStream> FileList, string strNetOver3info, string receiver, string strinterlockflagConfirmId = "")
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
@@ -484,8 +484,16 @@ namespace OpenNetLinkApp.Data.SGDicData
 
             dic["FILECOUNT"] = "-";
             dic["FILERECORD"] = "-";
-            dic["FORWARDUSERID"] = receiver;
+
+            if ((receiver?.Length ?? 0) > 0)
+                dic["FORWARDUSERID"] = receiver;
+
             dic["DATATYPE"] = strDataType;
+            if ((strinterlockflagConfirmId?.Length ?? 0) > 0)
+            {
+                strinterlockflagConfirmId = strinterlockflagConfirmId.Replace('|', '\u0002');
+                dic["INTERLOCKFLAGCONFIRMID"] = strinterlockflagConfirmId;
+            }
             dic["GROUPID"] = groupid.ToString();
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", dic, hsNet.stCliMem.GetProtectedSeedKey());
 
@@ -562,7 +570,7 @@ namespace OpenNetLinkApp.Data.SGDicData
         public int RequestSendFileTrans(HsNetWork hsNet, int groupid, string strUserID, string strMid, string strPolicyFlag,
             string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos,
             string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep,
-            List<string> ApprLineSeq, List<HsStream> FileList, string strNetOver3info, string receiver)
+            List<string> ApprLineSeq, List<HsStream> FileList, string strNetOver3info, string receiver, string strinterlockflagConfirmId = "")
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
@@ -647,9 +655,17 @@ namespace OpenNetLinkApp.Data.SGDicData
 
             dic["FILECOUNT"] = "-";
             dic["FILERECORD"] = "-";
-            dic["FORWARDUSERID"] = receiver;
+
+            if ((receiver?.Length ?? 0) > 0)
+                dic["FORWARDUSERID"] = receiver;
+
             dic["DATATYPE"] = strDataType;
 
+            if ((strinterlockflagConfirmId?.Length ?? 0) > 0)
+            {
+                strinterlockflagConfirmId = strinterlockflagConfirmId.Replace('|', '\u0002');
+                dic["INTERLOCKFLAGCONFIRMID"] = strinterlockflagConfirmId;
+            }
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", dic, hsNet.stCliMem.GetProtectedSeedKey());
 
             // 통신에서 transreq를 보낼때, '/' 문자로 나누어서 망개수 만큼 보냄 

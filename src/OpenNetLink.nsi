@@ -607,38 +607,26 @@ Section "MainSection" SEC01
 	Call SetConfig
 	Call ReMoveAddFileRM
 
-	${If} ${IS_PATCH} == 'TRUE'
-		Call GetNetPositionByFile  
-		${If} $g_iPatchEdge == 1
-			RMDir /r "$INSTDIR\wwwroot\edge\" 
-		${EndIf}    
-	${Else}
-		; 재배포 Package는 설치때만
-		File "Appcasts\preinstall\windows\VC_redist.x64.exe"
-		File "Appcasts\preinstall\windows\VC_redist.x86.exe"
+  ${If} ${IS_PATCH} == 'TRUE'
 
-	  ${If} ${RunningX64}
-	    ExecWait '"$INSTDIR\VC_redist.x64.exe" /q /norestart'
-	    ;ExecWait 'vcredist_x64.exe'
-	  ${Else}
-	    ExecWait '"$INSTDIR\VC_redist.x86.exe" /q /norestart'
-	 	  ;ExecWait 'vcredist_x86.exe'
-	  ${EndIf}
+    Call GetNetPositionByFile
+  
+
+  ${EndIf}  
+
+    File /r "artifacts\windows\published\"
+
+  ${If} ${IS_PATCH} != 'TRUE'
 	
-	; 바탕화면과, 단축아이콘 생성은 설치본일때만 적용되도록 수정
-	; 단축아이콘 생성
-	${If} ${REG_STARTPROGRAM} == 'TRUE'
-		CreateDirectory "$SMPROGRAMS\OpenNetLink"
-		CreateShortCut "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
-	${EndIf}  
-	CreateShortCut "C:\Users\Public\Desktop\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
-  ${EndIf}
 
-	; 한꺼번에 지정하는 방식 사용
-	File /r "artifacts\windows\published\"
+          ExecWait '"$INSTDIR\VC_redist.x64.exe" /q /norestart'
 
-  SetOutPath "$INSTDIR"
-  File "bin_addon\SecureGateChromiumExtension_v1.1.crx"
+	  ; 단축아이콘 생성
+	  CreateDirectory "$SMPROGRAMS\OpenNetLink"
+	  CreateShortCut "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
+	  CreateShortCut "C:\Users\Public\Desktop\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
+
+  ${EndIf}  
 
   
   
@@ -656,8 +644,6 @@ Section "MainSection" SEC01
 		${Else}
 
 		  ${If} $g_iNetPos == 1	; IN
-			ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
-		  ${Else}
 			ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
 		  ${EndIf}		  
 		${EndIf}
@@ -728,11 +714,18 @@ Section "MainSection" SEC01
 	  ;NAC 등록
 	  ${If} ${NAC_LOGIN_TYPE} == '1'
 		IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" GnFind GnNotFind
-		GnFind:			
-			ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe -e:AES-${NAC_LOGIN_ENCRYPTKEY}"'
+		GnFind:					
+			StrCmp ${NAC_LOGIN_ENCRYPTKEY} "" GnKeyNoEnctrypt GnKeyEncrypt 
+			GnKeyNoEnctrypt:
+				ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe"'
+				goto GnKeyEND
+			GnKeyEncrypt:
+				ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe -e:AES-${NAC_LOGIN_ENCRYPTKEY}"'				
+				goto GnKeyEND			
+			GnKeyEND:
 			goto GnEND
 		GnNotFind:
-		GnEND:
+		GnEND:			
 	${EndIf}
 	
 	;인증서 자동 업데이트 설정 Off
@@ -769,21 +762,32 @@ Section -Post
   ${If} ${REG_CRX} == "TRUE"
   
 	  ; CRX 파일 - 강제등록
-	  ${If} ${NETWORK_FLAG} == "IN"
 	  
 		  ; edge
-		  WriteRegStr HKLM "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		WriteRegStr HKLM "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
 		  ;WriteRegStr HKLM "SOFTWARE\WOW6432Node\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
-		  WriteRegStr HKCU "Software\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		WriteRegStr HKCU "Software\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
 		  
 		  ; chrome
-		  WriteRegStr HKLM "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"
+		WriteRegStr HKLM "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"
 		  ;WriteRegStr HKLM "SOFTWARE\WOW6432Node\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"
-		  WriteRegStr HKCU "Software\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"	  
-		  
-	  ${EndIf}  
+		WriteRegStr HKCU "Software\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://clients2.google.com/service/update2/crx"	  
+		
+  ${EndIf}
 
-  ${EndIf}  
+  ${If} ${FORCE_REG_CRX} == "TRUE"
+  
+		  ; CRX 파일 - 강제등록
+		  ; edge
+		  ;WriteRegStr HKLM "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		  ;WriteRegStr HKLM "SOFTWARE\WOW6432Node\Microsoft\Edge\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		  ;WriteRegStr HKCU "Software\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei" "update_url" "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+		  
+		  ; chrome
+		WriteRegStr HKLM "SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist" "10" "gbbehmiepgfmmnifjbnknjaebgmnpbam;https://clients2.google.com/service/update2/crx"
+		WriteRegStr HKCU "SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist" "10" "gbbehmiepgfmmnifjbnknjaebgmnpbam;https://clients2.google.com/service/update2/crx"
+		
+  ${EndIf}    
 
 SectionEnd
 
@@ -859,6 +863,20 @@ Section Uninstall
 	  DeleteRegKey HKLM "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
 	  ;DeleteRegKey HKLM "SOFTWARE\WOW6432Node\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
 	  DeleteRegKey HKCU "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
+
+	${EndIf}  
+	
+	${If} ${FORCE_REG_CRX} == 'TRUE'
+
+	  ; CRX강제등록 제거
+	  ;DeleteRegKey HKLM "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei"
+	  ;DeleteRegKey HKLM "SOFTWARE\WOW6432Node\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei"
+	  ;DeleteRegKey HKCU "SOFTWARE\Microsoft\Edge\Extensions\nkkcalfgcngjibikamkniojdpennonei"  
+
+	  DeleteRegValue HKLM "SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist" "10"
+	  DeleteRegValue HKCU "SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist" "10"
+	  ;DeleteRegKey HKLM "SOFTWARE\WOW6432Node\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
+	  ;DeleteRegKey HKCU "SOFTWARE\Google\Chrome\Extensions\gbbehmiepgfmmnifjbnknjaebgmnpbam"
 
 	${EndIf}  
   

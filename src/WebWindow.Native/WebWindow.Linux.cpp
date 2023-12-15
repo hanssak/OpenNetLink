@@ -34,6 +34,7 @@ bool g_bClipCopyNsend = false;
 
 int g_nClipBoardPasteGroupId = 100;
 bool g_bClipBoardPasteHotKey = false;
+bool g_bUseHttpUrl = false;
 
 gchar* g_ClipTextResult = NULL;
 gsize g_ClipTextLength = 0;
@@ -1882,5 +1883,11 @@ void WebWindow::SetTrayStatus(bool bSetTextShowNchecked)
 {
 
 }
+
+void WebWindow::SetUseHttpUrl(bool bUse)
+{
+	g_bUseHttpUrl = bUse;
+}
+
 #endif
 

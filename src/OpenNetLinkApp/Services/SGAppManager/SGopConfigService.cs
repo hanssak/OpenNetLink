@@ -299,6 +299,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetDeleteUploadFile(int groupId);
 
+        public bool GetUseDlpAfterApproveToNormal(int groupId);
     }
 
 
@@ -1306,6 +1307,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo[groupId].bDeleteUploadFile;
         }
 
+        public bool GetUseDlpAfterApproveToNormal(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseDlpAfterApproveToNormal;
+        }
 
     }
 
