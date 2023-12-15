@@ -502,11 +502,15 @@ Section "MainSection" SEC01
   ${If} ${IS_PATCH} != 'TRUE'
 	
 
-          ExecWait '"$INSTDIR\VC_redist.x64.exe" /q /norestart'
+		ExecWait '"$INSTDIR\VC_redist.x64.exe" /q /norestart'
 
-	  ; 단축아이콘 생성
-	  CreateDirectory "$SMPROGRAMS\OpenNetLink"
-	  CreateShortCut "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
+
+		  ; 단축아이콘 생성
+		${If} ${REG_STARTPROGRAM} == 'TRUE'
+		  CreateDirectory "$SMPROGRAMS\OpenNetLink"
+		  CreateShortCut "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
+		${EndIf}  
+	  
 	  CreateShortCut "C:\Users\Public\Desktop\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
 
   ${EndIf}  

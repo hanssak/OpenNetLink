@@ -648,6 +648,107 @@ namespace OpenNetLinkApp.Common
 
     }
 
+
+    public class CsVersionFunc
+    {
+
+        public enum eVerInfo
+        {
+            eSameVer = 0,
+            eOverVer = 1,
+            eLessVer = 2,
+            eUnSafeVer = 3
+        }
+
+        /// <summary>
+        /// 입력된 Version Array 중에 strClientSWver 보다 높진 않으며 가장 높은 Version 의 String을 return <br></br>
+        /// 현재버전에 가장 가까운 Version 정보를 찾기 위한 용도 함수
+        /// </summary>
+        /// <param name="arrayVer"></param>
+        /// <returns></returns>
+        public static string GetTopVerString(string strClientSWver, string[] arrayVer)
+        {
+            if ((arrayVer?.Length ?? 0) < 1)
+            {
+                Log.Logger.Here().Error($"GetTopVerString, input Length Error, null Or 0 !");
+                return "";
+            }
+
+            if ((strClientSWver?.Length ?? 0) < 1)
+            {
+                Log.Logger.Here().Error($"GetTopVerString, Cur Client SWver Length Error, null Or 0 !");
+                return "";
+            }
+
+            string strRet = "";
+            eVerInfo eRet = eVerInfo.eUnSafeVer;
+
+            try
+            {
+                if (arrayVer.Length == 1)
+                    return arrayVer[0];
+
+                strRet = "0.0.0.0";
+                foreach (string strVer in arrayVer)
+                {
+                    eRet = isVerOverThanCurVer(strRet, strVer);
+                    if (eRet == eVerInfo.eOverVer)
+                    {
+                        eRet = isVerOverThanCurVer(strClientSWver, strVer);
+                        if (eRet == eVerInfo.eLessVer || eRet == eVerInfo.eSameVer)
+                            strRet = strVer;
+                    }
+                }
+
+                Log.Logger.Here().Information($"GetTopVerString, Ver : {strRet}");
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"GetTopVerString, Exception(MSG) : {ex.Message}");
+                strRet = "";
+            }
+
+            return strRet;
+        }
+
+        /// <summary>
+        /// 입력된 2개의 Version string 2개중에 strCurVer 보다 strTarGetVer 가 높은지 유무 정보를 return
+        /// </summary>
+        /// <param name="strCurVer"></param>
+        /// <param name="strTarGetVer"></param>
+        /// <returns></returns>
+        public static eVerInfo isVerOverThanCurVer(string strCurVer, string strTarGetVer)
+        {
+            eVerInfo eRet = eVerInfo.eUnSafeVer;
+
+            if ((strCurVer?.Length??0) < 1 || (strTarGetVer?.Length ?? 0) < 1)
+            {
+                Log.Logger.Here().Error($"isVerOverThanCurVer, Length Error, CurVer : {strCurVer}, TarGetVer : {strTarGetVer}");
+                return eRet;
+            }
+
+            try
+            {
+                Version objVerTarget = new Version(strTarGetVer);
+                Version objVerCur = new Version(strCurVer);
+                int nResult = objVerCur.CompareTo((object)objVerTarget);
+                if (nResult == 0)
+                    eRet = eVerInfo.eSameVer;
+                else if (nResult > 0)
+                    eRet = eVerInfo.eLessVer;
+                else // if (nResult < 0)
+                    eRet = eVerInfo.eOverVer;
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"isVerOverThanCurVer, Exception(MSG) : {ex.Message}");
+            }
+
+            return eRet;
+        }
+
+    }
+
     public class CsSystemFunc
     {
 
