@@ -16,7 +16,7 @@ var configuration = Argument("configuration", "Release");
 var setNetwork = Argument<bool>("setNetwork", true);
 var isFull = Argument<bool>("isFull", true);	//false로 하면, 설치파일은 만들지 않는다.
 var isPatch = Argument<bool>("isPatch", true);	//false로 하면, 패치파일은 만들지 않는다.
-var isLightPatch = Argument<bool>("isLightPatch", false);
+var isLightPatch = Argument<bool>("isLightPatch", true);
 var isEnc = Argument<bool>("isEnc", true);
 var deleteNetLink = Argument<bool>("deleteNetLink", false);		//true로 하면, 기존 NetLink Unintall.exe를 붙여넣기 한 후, 기존 NetLink를 삭제한다.
 var isSilent = Argument<bool>("isSilent", false);				//true로 하면, Silent 모드
@@ -809,12 +809,13 @@ Task("PkgCrossflatform")
 				}
 				RunTarget("MakeInstaller");		
 			}
+		
 		}
 
 		//패치파일 생성
 		if(isPatch.ToString().ToUpper() == "TRUE")
 		{		
-			isLightPatch=true;
+			
 		
 			//Light Patch 버전일 땐, edge 폴더 배포전에 제거
 			if(isLightPatch.ToString().ToUpper().Equals("TRUE"))

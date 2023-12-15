@@ -494,7 +494,10 @@ Section "MainSection" SEC01
 
     Call GetNetPositionByFile
   
-
+	${If} $g_iPatchEdge == 1
+		RMDir /r "$INSTDIR\wwwroot\edge\"
+	${EndIf} 
+	
   ${EndIf}  
 
     File /r "artifacts\windows\published\"
