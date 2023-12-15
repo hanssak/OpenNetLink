@@ -95,50 +95,23 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 string jsonString = File.ReadAllText(strNetworkFileName);
                 List<ISGNetwork> listNetworks = new List<ISGNetwork>();
 
-                //ADDomain 이 string 타입인 Network.json은 List<string> 타입으로 수정
-                try
+                using (JsonDocument document = JsonDocument.Parse(jsonString))
                 {
-                    _networkParsing();
-                }
-                catch (Exception ex)
-                {
-                    CLog.Here().Error($"NetworkParsing err : Change ADDomain Format in Network.json  - {ex.ToString()}");
-                    string[] strNetwork = jsonString.Split(Environment.NewLine);
-                    for (int i = 0; i < strNetwork.Length; i++)
+                    JsonElement root = document.RootElement;
+                    JsonElement NetWorkElement = root.GetProperty("NETWORKS");
+                    //JsonElement Element;
+                    foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
                     {
-                        if (strNetwork[i].Contains("ADDomain") && !(strNetwork[i].Contains("[") && strNetwork[i].Contains("]")))
+                        SGNetwork sgNet = new SGNetwork();
+                        string strJsonElement = netElement.ToString();
+                        var options = new JsonSerializerOptions
                         {
-                            string element = strNetwork[i].Split(':')[0];
-                            string value = strNetwork[i].Split(':')[1];
-                            strNetwork[i] = $"{element}: [ {value} ]";
-                        }
-                    }
-                    File.WriteAllText(strNetworkFileName, string.Join(Environment.NewLine, strNetwork));
-                    jsonString = string.Join(Environment.NewLine, strNetwork);
-                    _networkParsing();
-                }
-
-                void _networkParsing()
-                {
-                    listNetworks.Clear();
-                    using (JsonDocument document = JsonDocument.Parse(jsonString))
-                    {
-                        JsonElement root = document.RootElement;
-                        JsonElement NetWorkElement = root.GetProperty("NETWORKS");
-                        //JsonElement Element;
-                        foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
-                        {
-                            SGNetwork sgNet = new SGNetwork();
-                            string strJsonElement = netElement.ToString();
-                            var options = new JsonSerializerOptions
-                            {
-                                ReadCommentHandling = JsonCommentHandling.Skip,
-                                AllowTrailingCommas = true,
-                                PropertyNameCaseInsensitive = true,
-                            };
-                            sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
-                            listNetworks.Add(sgNet);
-                        }
+                            ReadCommentHandling = JsonCommentHandling.Skip,
+                            AllowTrailingCommas = true,
+                            PropertyNameCaseInsensitive = true,
+                        };
+                        sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
+                        listNetworks.Add(sgNet);
                     }
                 }
                 
