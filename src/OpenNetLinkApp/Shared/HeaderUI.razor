@@ -41,6 +41,7 @@
 <SGAlert @ref="refSGAlertApproveAfter" OnConfirm="ApproveAfterTransFile" Guid="HeaderUIApporveAfterAlert"></SGAlert>
 <SGAlert @ref="refSGAlertApproveAfterMyCount" OnConfirm="ApproveAfterPageMove" OnCancel="ApproveAfterCancel" Guid="HeaderUIApporveAfterMyCountAlert"></SGAlert>
 <SGAlert @ref="refSGAlertUpdateStart" Guid="HeaderUIUpdateStartAlert"></SGAlert>
+<SGAlert @ref="refSGAlertFileDownDrm" Guid="HeaderUIFileDownDrmAlert"></SGAlert>
 
 @code
 {
@@ -56,6 +57,7 @@
     SGAlert refSGAlertApproveAfter;
     SGAlert refSGAlertApproveAfterMyCount;
     SGAlert refSGAlertUpdateStart;
+    SGAlert refSGAlertFileDownDrm;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
 
@@ -1259,6 +1261,10 @@
 
                     Task.Run(async () => { await refSelectReceiveFolder.openPopUp(groupid, AppConfigSvc.GetRecvDownPath(groupid)); });
                 }
+                else if(strReason == "DRM 실행 요청")
+                {
+                    Task.Run(async () => { await refSGAlertFileDownDrm.openPopUp("DRM 실행 요청", "QDRM Agent를 실행시켜주시기 바랍니다.", 1, groupid); });
+                }
 
                 // HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);
                 HsCmdCenter.sgPageEvent.SetFileRecvProgressMasterEventAdd(FileRecvProgress);
@@ -1286,24 +1292,24 @@
 
 #if _WINDOWS
 
-    try
-    {
-        if (e.strUrlData != null && e.strUrlData.Length > 0)
+        try
         {
-            string url = $"\"{e.strUrlData}\"";
-            System.Diagnostics.Process.Start(
-                new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = url,
-                    UseShellExecute = true
-                });
-            //System.Diagnostics.Process.Start("explorer", url); // 260자 제한됨
+            if (e.strUrlData != null && e.strUrlData.Length > 0)
+            {
+                string url = $"\"{e.strUrlData}\"";
+                System.Diagnostics.Process.Start(
+                    new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = url,
+                        UseShellExecute = true
+                    });
+                //System.Diagnostics.Process.Start("explorer", url); // 260자 제한됨
+            }
         }
-    }
-    catch (Exception ex)
-    {
-        CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-    }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+        }
 
 #elif _LINUX
 
