@@ -107,6 +107,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         //클립보드
 
         public bool bDlpFoundSendContinue { get; set; } = false;  //  개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무
+        public bool bDlpFoundSendBlock { get; set; } = false;         // 개인정보 검출 됐을때, 전송 차단
 
         public bool bUseClipBoard { get; set; } = true;                  // 클립보드 사용 여부
         public bool bUseClipCopyAndSend { get; set; } = false;    // 클립보드 복사 후 전송 사용 유무 ( 환경설정 체크박스 보이고 안보이고)

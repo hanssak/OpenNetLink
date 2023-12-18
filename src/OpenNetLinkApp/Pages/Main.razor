@@ -2095,6 +2095,9 @@
 
                 MyNavigationManager.NavigateTo(strNavigatePathnGroupID);
 
+                if (!pageService.GetIsPolicyUpdate(groupId))
+                    HSCmdCenter.SendNetLinkStatus(nGroupIDfirst, sgUserData.GetUserID());
+
                 // SideBarUI 에서 nGroupIDfirst로 지정된 UI로 선택
                 MoveSiderBarFocusTogroupid(nGroupIDfirst);
 

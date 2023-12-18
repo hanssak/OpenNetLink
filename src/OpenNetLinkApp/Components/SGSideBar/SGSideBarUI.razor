@@ -260,12 +260,12 @@
 
 @code
 {
-    PopUpLogIn refPopUpLogIn;
-    LogIn_GPKI refPopUpGpkiLogIn;
-    PWChange refPWChange;
-    PWChangeDefaultPW refPWChangeDefaultPW;
-    HanssakOTP refHanssakOTP;
-    ProxyApprover_PopUp refProxyApprover_PopUp;
+        PopUpLogIn refPopUpLogIn;
+        LogIn_GPKI refPopUpGpkiLogIn;
+        PWChange refPWChange;
+        PWChangeDefaultPW refPWChangeDefaultPW;
+        HanssakOTP refHanssakOTP;
+        ProxyApprover_PopUp refProxyApprover_PopUp;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUI>();
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
@@ -317,7 +317,15 @@
         if (changeActiveMenuEvent != null)
             changeActiveMenuEvent(nGroupID, strNavigatePathWithGroupID);
 
+
         MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
+
+        SGUserData sgUserData = null;
+        if (sgUserData != null)
+        {
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(nGroupID);
+            HSCmdCenter.SendNetLinkStatus(nGroupID, sgUserData.GetUserID());
+        }
 
     }
 
