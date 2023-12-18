@@ -213,6 +213,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bHideApprLine { get; set; }             // 결재라인 표현유무
 
         public bool bHideTitleDesc { get; set; }             // 제목 및 설명 표현유무
+        public bool bHideTitle { get; set; }             // 제목 표현 유무
+        public bool bHideDesc { get; set; }             // 설명 표현유무
 
         public bool bUseDashBoard { get; set; }             // DashBoard를 사용하게 할지 유무
 

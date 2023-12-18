@@ -245,6 +245,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
 
         public bool GetUseHideTitleDesc(int groupId);
+        public bool GetUseHideTitle(int groupId);
+        public bool GetUseHideDesc(int groupId);
 
         public int GetTransferTemplate(int groupId);
 
@@ -1180,6 +1182,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseHideTitleDesc(int groupId)
         {
             return AppConfigInfo[groupId].bHideTitleDesc;
+        }
+        public bool GetUseHideTitle(int groupId)
+        {
+            return AppConfigInfo[groupId].bHideTitle;
+        }
+        public bool GetUseHideDesc(int groupId)
+        {
+            return AppConfigInfo[groupId].bHideDesc;
         }
 
         public bool GetUseDashBoard(int groupId)

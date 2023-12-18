@@ -257,6 +257,8 @@ nDlpType :                          //DLP 종류 - 1. 소만사
 
 bHideApprLine : 파일전송에 결재라인 UI상에 숨길지 유무 (true:숨김, 기본값: false)
 bHideTitleDesc : 파일전송에 제목/설명 UI상에 숨길지 유무 (true:숨김, 기본값: false)
+bHideTitle : 파일전송에 제목 UI상에 숨길지 유무 (true:숨김, 기본값: false)
+bHideDesc : 파일전송에 설명 UI상에 숨길지 유무 (true:숨김, 기본값: false)
 
 nTransferTemplate : 파일전송 UI 템플릿 지정 (Default : 0)
 								=> 0 : 기존 전송 템플릿
