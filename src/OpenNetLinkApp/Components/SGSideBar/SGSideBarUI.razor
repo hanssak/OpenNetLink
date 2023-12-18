@@ -320,10 +320,9 @@
 
         MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
-        SGUserData sgUserData = null;
+        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(nGroupID);
         if (sgUserData != null)
         {
-            sgUserData = (SGUserData)HSCmdCenter.GetUserData(nGroupID);
             HSCmdCenter.SendNetLinkStatus(nGroupID, sgUserData.GetUserID());
         }
 
