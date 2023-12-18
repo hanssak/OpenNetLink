@@ -17,6 +17,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 using OpenNetLinkApp.Models.SGNetwork;
 using System.Text.Json;
 using System.Security.Cryptography;
+using System.Reflection;
+using OpenNetLinkApp.Common;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -276,6 +278,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetDeleteUploadFile(int groupId);
 
         public bool GetUseDlpAfterApproveToNormal(int groupId);
+
+        public bool SetPropertyVal(int groupId, string strProperty, object strVal);
+
+        public bool SavePropertyToFile(int groupId, string strFilePath);
+
     }
 
 
@@ -1261,6 +1268,141 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseDlpAfterApproveToNormal;
         }
+
+
+        /// <summary>
+        /// groupId에 해당하는 Property의 값 변경
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="strProperty"></param>
+        /// <param name="strVal"></param>
+        /// <returns></returns>
+        public bool SetPropertyVal(int groupId, string strProperty, string strVal)
+        {
+
+            if (groupId < 0 || (strProperty?.Length ?? 0) < 1 || (strVal?.Length ?? 0) < 1)
+                return false;
+
+            PropertyInfo[] infos = AppConfigInfo[groupId].GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (PropertyInfo info in infos)
+            {
+
+                if ( ((info.Name?.Length??0) > 0) && string.Compare(info.Name, strProperty, true) == 0 )
+                {
+
+                    Log.Logger.Here().Error($"SetPropertyVal, groupId : {groupId}, strProperty : {info.Name}, Value(asis) : {info.PropertyType}, Value(tobe) : {strVal}");
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool SetPropertyVal(int groupId, string strProperty, object strVal)
+        {
+
+            if (groupId < 0 || (strProperty?.Length ?? 0) < 1 || (strVal == null))
+                return false;
+
+            bool bRet = false;
+            bool bNameFind = false;
+            try
+            {
+                PropertyInfo[] infos = AppConfigInfo[groupId].GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                foreach (PropertyInfo info in infos)
+                {
+
+                    //Log.Logger.Here().Error($"SetPropertyVal, groupId : {groupId}, Property : {info.Name}, Type : {info.PropertyType.Name}");
+
+                    if (((info.Name?.Length ?? 0) > 0) && string.Compare(info.Name, strProperty, true) == 0)
+                    {
+                        if (info.GetValue(AppConfigInfo[groupId], null).GetType().Name == "Boolean")
+                        {
+                            info.SetValue(AppConfigInfo[groupId], Convert.ToBoolean(strVal));
+                            bRet = true;
+                        }
+                        else if (info.GetValue(AppConfigInfo[groupId], null).GetType().Name == "Int32")
+                        {
+                            info.SetValue(AppConfigInfo[groupId], Convert.ToInt32(strVal));
+                            bRet = true;
+                        }
+                        else if (info.GetValue(AppConfigInfo[groupId], null).GetType().Name == "String")
+                        {
+                            info.SetValue(AppConfigInfo[groupId], Convert.ToString(strVal));
+                            bRet = true;
+                        }
+                        else
+                        {
+                            Log.Logger.Here().Error($"SetPropertyVal, ##### Unsurpported DataType Server Value #####  groupId : {groupId}, strProperty : {info.Name}, Value : {strVal.ToString()}");
+                        }
+
+                        bNameFind = true;
+                        //Log.Logger.Here().Error($"SetPropertyVal, groupId : {groupId}, strProperty : {info.Name}, Value : {info.GetValue(AppConfigInfo[groupId], null).ToString()}");
+                        break;
+                    }
+                }
+
+                if (bNameFind == false)
+                    Log.Logger.Here().Error($"SetPropertyVal, ##### Unsurpported Data Name ##### Server Value #####  groupId : {groupId}, strProperty : {strProperty}, Value : {strVal.ToString()}");
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"SetPropertyVal, Exception(MSG) : {ex.Message}");
+                bRet = false;
+            }
+
+            return bRet;
+        }
+
+
+
+        /// <summary>
+        /// 'AppOPsetting_(groupid)_(Netpos).json' 파일에 해당 내용 저장하는 함수
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="strFilePath"></param>
+        /// <returns></returns>
+        public bool SavePropertyToFile(int groupId, string strNetPos)
+        {
+
+            if (groupId < 0 || (strNetPos?.Length ?? 0) < 1)
+                return false;
+
+            var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
+
+            bool bRet = true;
+            string strFilePath = "";
+            strFilePath = CsSystemFunc.GetCurrentModulePath();
+
+            string AppConfig = strFilePath + $"/wwwroot/conf/AppOPsetting_{groupId}_{strNetPos}.json";
+            try
+            {
+                using (var fs = new FileStream(AppConfig, FileMode.Create))
+                {
+                    var encoding = Encoding.UTF8;
+                    var ownsStream = false;
+                    var indent = true;
+
+                    using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
+                    {
+                        serializer.WriteObject(writer, AppConfigInfo[groupId] as SGopConfig);
+                    }
+
+                    CLog.Here().Information($"SavePropertyToFile, toFile : {AppConfig}");
+
+                }
+            }
+            catch (Exception ex)
+            {
+                bRet = false;
+                CLog.Here().Error($"SavePropertyToFile, Exception - Message : {ex.Message}, StackTrace : {ex.StackTrace}");
+            }
+
+            return bRet;
+        }
+
 
     }
 

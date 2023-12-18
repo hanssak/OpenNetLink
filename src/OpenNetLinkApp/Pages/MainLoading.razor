@@ -2,6 +2,9 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Common
+@using System.Text.Json;
 @using AgLogManager
 @using System.Timers
 @inject IJSRuntime JSRuntime
@@ -49,6 +52,8 @@
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<MainLoading>(); //PopUpLogIn
 
     Timer conTimer = new Timer();
+    object svr1005obj = new object();
+
     private bool bConnectServerTimeOut = false;
     private int currentConnectCount = 0;
     private string _stateMessage = "";
@@ -111,6 +116,9 @@
             sgSettingData = sgSettingProc.SelectSettingData(listNetWork[i].GroupID);
             if (sgSettingData == null)
                 sgSettingProc.InsertSettingData(listNetWork[i].GroupID, "", "", "", "", 0);
+
+            // Get : fileSvr 2105
+            //HSCmdCenter.sgPageEvent.SetSvr2105EventAdd(listNetWork[i].GroupID, Svr1105Result);
 
             CLog.Here().Information($"Connect Network Check, From :{listNetWork[i].FromName}, To : {listNetWork[i].ToName}");
         }
@@ -176,7 +184,7 @@
         pageService.m_nLoginType = Int32.Parse(loginType);
         pageService.m_nCurViewPageGroupID = 0;
 
-        @*MyNavigationManager.NavigateTo("/fileException");*@
+        // MyNavigationManager.NavigateTo("/fileException");
         if (String.IsNullOrEmpty(SGAppMgrSvc.OpConfigInfoService.GetOKTAUrl(0)))
             MyNavigationManager.NavigateTo((SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer(0) && NetWorkSvc.NetWorkInfo.Count > 1) ? "/SelectNet" : "/LogIn");
         else
@@ -188,6 +196,141 @@
 
 
     /// <summary>
+    ///
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="loginType"></param>
+    /// <param name="systemID"></param>
+    public void Svr1105Result(int groupId, PageEventArgs e)
+    {
+
+        CLog.Here().Information($"Svr1105Result, groupId : {groupId}");
+
+        try
+        {
+            int ret = e.result;
+
+            if (ret == 0 && (e.strMsg?.Length ?? 0) > 0)
+            {
+
+                lock (svr1005obj)
+                {
+
+                    // NetPos Get
+                    string strNetPos = "";
+                    List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+                    for (int i = 0; i < listNetWork.Count; i++)
+                    {
+                        if (listNetWork[i].GroupID == groupId)
+                        {
+                            strNetPos = listNetWork[i].NetPos;
+                            break;
+                        }
+                    }
+
+                    if ((strNetPos?.Length ?? 0) < 1)
+                    {
+                        CLog.Here().Information($"Svr1105Result, groupId : {groupId}, NetPos : Empty!!! , No Change OpConfig.json");
+                        return;
+                    }
+
+
+                    List<string> listVerinfo = new List<string>();
+                    using (JsonDocument document = JsonDocument.Parse(e.strMsg))
+                    {
+                        JsonElement root = document.RootElement;
+                        JsonElement configsElement = root.GetProperty("configs");
+
+                        string strClientSWver = "";
+                        strClientSWver = SGAppMgrSvc.VersionConfigInfoService.GetSWVersion();
+                        //strClientSWver = "1.0.0.2";
+                        listVerinfo.Clear();
+
+                        // 적용할 Ver 찾음
+                        foreach (JsonElement config in configsElement.EnumerateArray())
+                        {
+
+                            if (config.TryGetProperty("version", out JsonElement versionElement))
+                            {
+                                string strJsonVer = "";
+                                strJsonVer = versionElement.GetString();
+                                CLog.Here().Information($"Svr1105Result, groupId : {groupId}, Get Svr Json Config Ver :{strJsonVer}");
+                                listVerinfo.Add(strJsonVer);
+                            }
+                            else
+                            {
+                                CLog.Here().Information($"Svr1105Result, groupId : {groupId}, Version Property Empty!");
+                            }
+
+                        }
+
+                        if (listVerinfo.Count < 1)
+                        {
+                            CLog.Here().Information($"Svr1105Result, groupId : {groupId}, Svr Json Config Empty!");
+                            return;
+                        }
+
+                        string strApplyVer = "";
+                        strApplyVer = CsVersionFunc.GetTopVerString(strClientSWver, listVerinfo.ToArray());
+                        listVerinfo.Clear();
+                        CLog.Here().Information($"Svr1105Result, groupId : {groupId}, CurClientVer :{strClientSWver},  apply SvrJsonVer :{strApplyVer}");
+
+                        foreach (JsonElement config in configsElement.EnumerateArray())
+                        {
+
+                            if (config.TryGetProperty("version", out JsonElement versionElement))
+                            {
+                                string strJsonVer = "";
+                                strJsonVer = versionElement.GetString();
+                                if (string.Compare(strApplyVer, strJsonVer) == 0)
+                                {
+
+                                    // 찾은 Ver에 적용
+                                    CLog.Here().Information($"==========================================================================");
+                                    foreach (JsonProperty property in config.EnumerateObject())
+                                    {
+                                        if ( string.Compare(property.Name, "version") != 0)
+                                        {
+                                            // Memory 변경
+                                            bool bResult = SGAppMgrSvc.OpConfigInfoService.SetPropertyVal(groupId, property.Name, (object)property.Value.GetRawText()); // (object)property.Value
+                                            CLog.Here().Information($"Svr1105Result, groupId : {groupId}, Apply Op Json property : {property.Name}, Value : {property.Value}, {(bResult?"Success!":"Failed!")}");
+                                        }
+                                    }
+
+                                    CLog.Here().Information($"==========================================================================");
+                                    CLog.Here().Information($"Svr1105Result, groupId : {groupId}, CurClientVer :{strClientSWver},  apply SvrJsonVer :{strApplyVer}, DONE!!!");
+
+                                    // Memory 변경된 값들 저장 json
+                                    CLog.Here().Information($"==========================================================================");
+                                    CLog.Here().Information($"Svr1105Result, groupId : {groupId}, Apply SvrJsonVer :{strApplyVer}, To File Save !!!");
+
+                                    SGAppMgrSvc.OpConfigInfoService.SavePropertyToFile(groupId, strNetPos);
+
+                                    break;
+                                }
+                            }
+                        }
+
+
+                    } // using (JsonDocument document = JsonDocument.Parse(e.strMsg))
+
+                } // lock (svr1005obj)
+
+            }
+            else
+            {
+                CLog.Here().Information($"Svr1105Result, groupId : {groupId}, result : {ret}, json data : {e.strMsg}");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"Svr1105Result, groupId : {groupId}, Exception-MSG : {ex.Message}");
+        }
+
+    }
+
+    /// <summary>
     /// loginType : 5 OTP, 3:LDAP
     /// </br>1:내부 , 2:외부
     /// </summary>
@@ -195,6 +338,43 @@
     /// <param name="loginType"></param>
     public void SvrResult(int groupId, string loginType, string systemID)
     {
+
+        // KKW-Test - Start
+        PageEventArgs e = new PageEventArgs();
+        e.result = 0;
+        e.strMsg = @"
+        {
+            ""configs"" : [
+            {
+                ""version"" : ""1.0.0.1"",
+                ""bAutoLogin"": true,
+                ""bAutoLoginCheck"": true,
+                ""strInitPasswd"": ""1K27SdexltsW0ubSCJgsZw=="",
+                ""LoginType"": 1,
+                ""bUseApprCountAlaram"": true
+            },
+            {
+                ""version"" : ""1.0.0.2"",
+                ""bAutoLogin"": true,
+                ""bAutoLoginCheck"": true,
+                ""strInitPasswd"": ""1K27SdexltsW0ubSCJgsZw=="",
+                ""LoginType"": 1,
+                ""bUseApprCountAlaram"": true
+            },
+            {
+                ""version"" : ""1.0.0.3"",
+                ""bAutoLogin"": true,
+                ""bAutoLoginCheck"": true,
+                ""strInitPasswd"": ""1K27SdexltsW0ubSCJgsZw=="",
+                ""LoginType"": 1,
+                ""bUseApprCountAlaram"": true
+            }
+        ]
+        }";
+
+        //Svr1105Result(groupId, e);
+
+        
         CLog.Here().Information($"SvrResult Init groupID : {groupId} LoginType : {loginType}");
         pageService.SetGroupIDLoginType(groupId, (eLoginType)Int32.Parse(loginType));
         CLog.Here().Information($"SvrResult ReSet groupID : {groupId}, LoginType : {loginType}");
@@ -228,7 +408,6 @@
         }
 
         conTimer.Stop();
-
 
         //groupId 별로 AppUpdaterServie 관리
         string strRipNport = "";
