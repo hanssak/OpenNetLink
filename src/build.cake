@@ -37,6 +37,8 @@ var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어
 var customName = "NONE";
 var storageName ="NONE";
 var disableCertAutoUpdate =false;	//윈도우 버전 최초 설치 시, 로컬 보안 정책 > '인증서 자동 업데이트 사용안함' 설정 (default : false)
+var regAgentInNAC =false;			//NAC 사용 시, 설치과정에서 NAC시스템에 Agent 등록 여부
+
 var AppProps = new AppProperty(Context,
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								 "../", 													// Path of the Git Local Repository
@@ -129,6 +131,16 @@ public class MakeProperty
 			return true;
 		else 
 			return false;
+	}
+
+	//설치과정에서 NAC시스템에 Agent 등록 여부
+	public bool GetRegAgentInNAC(string storageName, string agentName)
+	{
+		JObject agent= GetAgentValue(storageName, agentName);
+		if(agent == null || agent["REG_AGENT_IN_NAC"] == null || agent["REG_AGENT_IN_NAC"].ToString() == "")	
+			return false;
+		else
+			return (bool)agent["REG_AGENT_IN_NAC"];
 	}
 }
 
@@ -806,6 +818,7 @@ Task("PkgCrossflatform")
 					inkFileName = MakeProps.GetLinkFileName(unitName, AgentName);
 					regCrxForce = MakeProps.GetCrxForce(unitName, AgentName);
 					regPolicyCrxForce = MakeProps.GetPolicyCrxForce(unitName, AgentName);
+					regAgentInNAC = MakeProps.GetRegAgentInNAC(unitName, AgentName);
 				}
 				RunTarget("MakeInstaller");		
 			}
@@ -951,6 +964,7 @@ Task("MakeInstaller")
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
 					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
 					{"REG_STARTPROGRAM", regStartProgram.ToString().ToUpper()},
+					{"REG_AGENT_IN_NAC", regAgentInNAC.ToString().ToUpper()},
 				}
 			});			
 
@@ -975,6 +989,7 @@ Task("MakeInstaller")
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
 					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
 					{"REG_STARTPROGRAM", regStartProgram.ToString().ToUpper()},
+					{"REG_AGENT_IN_NAC", regAgentInNAC.ToString().ToUpper()},
 				}
 			});
 		}
@@ -1000,6 +1015,7 @@ Task("MakeInstaller")
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
 					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
 					{"REG_STARTPROGRAM", regStartProgram.ToString().ToUpper()},
+					{"REG_AGENT_IN_NAC", regAgentInNAC.ToString().ToUpper()},
 				}
 			});			
 		}

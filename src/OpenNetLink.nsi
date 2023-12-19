@@ -566,22 +566,23 @@ Section "MainSection" SEC01
 	  ${EndIf}
 	  
 	  ;NAC 등록
-	  ${If} ${NAC_LOGIN_TYPE} == '1'
-		IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" GnFind GnNotFind
-		GnFind:					
-			StrCmp ${NAC_LOGIN_ENCRYPTKEY} "" GnKeyNoEnctrypt GnKeyEncrypt 
-			GnKeyNoEnctrypt:
-				ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe"'
-				goto GnKeyEND
-			GnKeyEncrypt:
-				ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe -e:AES-${NAC_LOGIN_ENCRYPTKEY}"'				
-				goto GnKeyEND			
-			GnKeyEND:
-			goto GnEND
-		GnNotFind:
-		GnEND:			
+	  ${If} ${REG_AGENT_IN_NAC} == 'TRUE'
+		  ${If} ${NAC_LOGIN_TYPE} == '1'
+			IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" GnFind GnNotFind
+			GnFind:					
+				StrCmp ${NAC_LOGIN_ENCRYPTKEY} "" GnKeyNoEnctrypt GnKeyEncrypt 
+				GnKeyNoEnctrypt:
+					ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe"'
+					goto GnKeyEND
+				GnKeyEncrypt:
+					ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe -e:AES-${NAC_LOGIN_ENCRYPTKEY}"'				
+					goto GnKeyEND			
+				GnKeyEND:
+				goto GnEND
+			GnNotFind:
+			GnEND:			
+		${EndIf}
 	${EndIf}
-	
 	;인증서 자동 업데이트 설정 Off
 	${If} ${DISABLE_CERT_AUTOUPDATE} == 'TRUE'
 		WriteRegDWORD HKLM "SOFTWARE\Policies\Microsoft\SystemCertificates\AuthRoot" "DisableRootAutoUpdate" 1	
@@ -690,14 +691,16 @@ Section Uninstall
   Delete "C:\Users\Public\Desktop\${INK_NAME}.lnk"
   Delete "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk"
 
-  ${if} ${NAC_LOGIN_TYPE} == '1'
-  	;NAC 등록 해제
-  	IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" UnGnFind UnGnNotFind
-  	UnGnFind:
-  		ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -u -auth_in:$INSTDIR\SGNac.exe"'
-  		goto UnGnEND
-  	UnGnNotFind:
-  	UnGnEND:	  
+  ${If} ${REG_AGENT_IN_NAC} == 'TRUE'
+	${If} ${NAC_LOGIN_TYPE} == '1'
+		;NAC 등록 해제
+		IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" UnGnFind UnGnNotFind
+		UnGnFind:
+			ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -u -auth_in:$INSTDIR\SGNac.exe"'
+			goto UnGnEND
+		UnGnNotFind:
+		UnGnEND:	  
+	${EndIf}
   ${EndIf}
   RMDir "$SMPROGRAMS\OpenNetLink"
   RMDir /r "$INSTDIR"
