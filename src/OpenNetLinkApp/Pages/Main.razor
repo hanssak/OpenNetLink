@@ -364,6 +364,7 @@
             strOtpUrlCode = e.strMsg;
         }
 
+        Window.MoveTrayToWebWindow();
         await refSGAlert.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
     }
 
