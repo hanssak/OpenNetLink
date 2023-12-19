@@ -610,6 +610,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bUseChkHardSpace;
         }
+        public bool GetUseCheckExeExcute(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseChkExeExcute;
+        }
         public bool GetUseFileApproveReason(int groupId)
         {
             return AppConfigInfo[groupId].bUseFileApproveReason;

@@ -159,6 +159,7 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SetGroupID(groupID);
                 hsNetwork.SetFileRecvPossible(false);
                 hsNetwork.SetIsCheckHardSpace(dicOpConfig[groupID].bUseChkHardSpace);
+                hsNetwork.SetIsCheckExeExcute(dicOpConfig[groupID].bUseChkExeExcute);
 
                 //PageStatusData.RefreshInfoEvent()
 
