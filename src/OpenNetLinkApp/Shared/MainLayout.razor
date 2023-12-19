@@ -279,9 +279,9 @@
         }
 
         @*bool bVirus = false;
-        if (cmd == eCmdList.eVIRUSSCAN)
-            bVirus = true;
-        refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, bVirus);*@
+            if (cmd == eCmdList.eVIRUSSCAN)
+                bVirus = true;
+            refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, bVirus);*@
 
         Common.Enums.PreworkType BlockType = Common.Enums.PreworkType.BLOCK_NONE;
         if (cmd == eCmdList.eVIRUSSCAN)
@@ -437,14 +437,25 @@
         }
         else
         {
+            //개인정보 검출 시 전송 차단
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpFoundSendBlock(groupId))
+            {
+                string msg = String.Format(XmlConf.GetWarnMsg("W_0307"));
+                refSecurityPopUp.setDesc(String.Format(msg, stTitle));
+                refSecurityPopUp.listInfo = lstInfo;
+                await Task.Delay(1000);
+                await refSecurityPopUp.openPopUp();
+            }
+            else
+            {
+                string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
 
-            string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
-
-            refSecurityConfirm.listInfo = lstInfo;
-            refSecurityConfirm.fileInfoDatas = mFileData;
-            refSecurityConfirm.Refresh();
-            await Task.Delay(1000);
-            await refSecurityConfirm.openPopUp();
+                refSecurityConfirm.listInfo = lstInfo;
+                refSecurityConfirm.fileInfoDatas = mFileData;
+                refSecurityConfirm.Refresh();
+                await Task.Delay(1000);
+                await refSecurityConfirm.openPopUp();
+            }
 
         }
     }

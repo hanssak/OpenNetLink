@@ -95,6 +95,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUiDlpShow { get; set; }                     //  상세보기 화면에서 DLP 상세사항 보여주는 유무
         public bool bUiFileExpiredDateShow { get; set; }                     //  상세보기 화면에서 DLP 상세사항 보여주는 유무
         public bool bDlpFoundSendContinue { get; set; }         // 개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무
+        public bool bDlpFoundSendBlock { get; set; }         // 개인정보 검출 됐을때, 전송 차단
         public bool bShowInnerFileErrDetail { get; set; }            //파일 추가에 제외된 파일 리스트에 내부에 걸린 파일 리스트 전부 보여주기
         public bool bAllowDRM { get; set; }                           //DRM 파일 전송 허용 여부 (true : 전송, false : 차단) - Default : true
 
@@ -219,6 +220,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bHideApprLine { get; set; }             // 결재라인 표현유무
 
         public bool bHideTitleDesc { get; set; }             // 제목 및 설명 표현유무
+        public bool bHideTitle { get; set; }             // 제목 표현 유무
+        public bool bHideDesc { get; set; }             // 설명 표현유무
 
         public bool bUseDashBoard { get; set; }             // DashBoard를 사용하게 할지 유무
 

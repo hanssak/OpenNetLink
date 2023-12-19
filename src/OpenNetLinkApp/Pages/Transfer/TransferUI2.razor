@@ -534,8 +534,37 @@
             //전송 파일 삭제 시 경고 팝업창 생성
             if (SGAppMgrSvc.OpConfigInfoService.GetDeleteUploadFile(groupID))
             {
-                if (refSGAlertFileTransDelete != null)
-                    refSGAlertFileTransDelete.openPopUp(XmlConf.GetTitle("T_DATA_DELETE_TRANS_FILE"), XmlConf.GetTitle("T_DATA_DELETE_TRANS_FILE_COMMENT"), 2, groupID, "");
+                //결재를 사용하지만 필수결재가 아니면 결재를 사용하지 않을 경우
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExtRegardlessApprove(groupID))
+                {
+                    List<HsStream> tempList = dropFile.GetHsStreamList();
+                    bool tempResult = false;
+
+                    foreach (HsStream hs in tempList)
+                    {
+                        if (hs.isNeedApprove)
+                        {
+                            tempResult = true;
+                            break;
+                        }
+                    }
+
+                    if (tempResult)
+                    {
+                        if (refSGAlertFileTransDelete != null)
+                            refSGAlertFileTransDelete.openPopUp(XmlConf.GetTitle("T_DATA_DELETE_APPROVE_TRANS_FILE"), XmlConf.GetTitle("T_DATA_DELETE_APPROVE_TRANS_FILE_COMMENT"), 2, groupID, "");
+                    }
+                    else
+                    {
+                        if (refSGAlertFileTransDelete != null)
+                            refSGAlertFileTransDelete.openPopUp(XmlConf.GetTitle("T_DATA_DELETE_TRANS_FILE"), XmlConf.GetTitle("T_DATA_DELETE_TRANS_FILE_COMMENT"), 2, groupID, "");
+                    }
+                }
+                else
+                {
+                    if (refSGAlertFileTransDelete != null)
+                        refSGAlertFileTransDelete.openPopUp(XmlConf.GetTitle("T_DATA_DELETE_TRANS_FILE"), XmlConf.GetTitle("T_DATA_DELETE_TRANS_FILE_COMMENT"), 2, groupID, "");
+                }
             }
             //사후결재 제한 체크 여부
             else if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveAfterLimit(groupID))

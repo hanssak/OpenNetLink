@@ -54,7 +54,7 @@
                 <div id="divRightUpperSide" class="card-body">
 
                     <div class="col-md-12" hidden="@bHideTitleDesc">
-                        <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
+                        <div class="form-group row mb-1" style="border:1px solid #c7d6e9;" hidden="@bHideTitle">
                             <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_TRANS_TITLE")</label>
                             <div class="col-sm-11 pr-0 pl-0">
                                 <input type="text" class="form-control p-2 border-0" style="border-radius:0px;height:100%" id="1" placeholder="@strCurTitle" @bind="@strInitTitle" autocomplete="off">
@@ -62,7 +62,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group row mb-3" style="border:1px solid #c7d6e9;">
+                        <div class="form-group row mb-3" style="border:1px solid #c7d6e9;" hidden="@bHideDesc">
                             <label for="2" class="col-sm-1 col-form-label text-center " style="background-color:#eff8ff;">@XmlConf.GetTitle("T_DETAIL_DESC")</label>
                             <div class="col-sm-11 pr-0 pl-0">
                                 <textarea class="form-control p-2 border-0 " rows="2" placeholder="@strCurDesc" @bind="@strInitDesc"></textarea>
@@ -181,7 +181,7 @@
     /// 선택 삭제 버튼 사용 유무
     /// </summary>
     public bool bFileSelectDeleteBtn = false;
-    
+
     /// <summary>
     /// 일괄 삭제 버튼 사용 유무
     /// </summary>
@@ -193,6 +193,8 @@
     /// 제목 / 설명 표현 유무
     /// </summary>
     public bool bHideTitleDesc = false;
+    public bool bHideTitle = false;
+    public bool bHideDesc = false;
     bool bHideApprLine = false;
 
     private static Action<List<string>> ActionFileSelectOK;
@@ -293,6 +295,8 @@
         bHideFileAllDeleteBtn = !OpConfigSvc.GetUseFileAllDelete(groupID);
 
         bHideTitleDesc = OpConfigSvc.GetUseHideTitleDesc(groupID);
+        bHideTitle = OpConfigSvc.GetUseHideTitle(groupID);
+        bHideDesc = OpConfigSvc.GetUseHideDesc(groupID);
         bHideApprLine = OpConfigSvc.GetUseHideApprLine(groupID);
     }
 

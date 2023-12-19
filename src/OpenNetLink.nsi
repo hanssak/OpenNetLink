@@ -611,7 +611,10 @@ Section "MainSection" SEC01
 
     Call GetNetPositionByFile
   
-
+	${If} $g_iPatchEdge == 1
+		RMDir /r "$INSTDIR\wwwroot\edge\"
+	${EndIf} 
+	
   ${EndIf}  
 
     File /r "artifacts\windows\published\"
@@ -619,11 +622,15 @@ Section "MainSection" SEC01
   ${If} ${IS_PATCH} != 'TRUE'
 	
 
-          ExecWait '"$INSTDIR\VC_redist.x64.exe" /q /norestart'
+		ExecWait '"$INSTDIR\VC_redist.x64.exe" /q /norestart'
 
-	  ; 단축아이콘 생성
-	  CreateDirectory "$SMPROGRAMS\OpenNetLink"
-	  CreateShortCut "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
+
+		  ; 단축아이콘 생성
+		${If} ${REG_STARTPROGRAM} == 'TRUE'
+		  CreateDirectory "$SMPROGRAMS\OpenNetLink"
+		  CreateShortCut "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
+		${EndIf}  
+	  
 	  CreateShortCut "C:\Users\Public\Desktop\${INK_NAME}.lnk" "$INSTDIR\OpenNetLinkApp.exe" "" "$INSTDIR\wwwroot\SecureGate.ico" 0
 
   ${EndIf}  
@@ -712,22 +719,23 @@ Section "MainSection" SEC01
 	  ${EndIf}
 	  
 	  ;NAC 등록
-	  ${If} ${NAC_LOGIN_TYPE} == '1'
-		IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" GnFind GnNotFind
-		GnFind:					
-			StrCmp ${NAC_LOGIN_ENCRYPTKEY} "" GnKeyNoEnctrypt GnKeyEncrypt 
-			GnKeyNoEnctrypt:
-				ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe"'
-				goto GnKeyEND
-			GnKeyEncrypt:
-				ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe -e:AES-${NAC_LOGIN_ENCRYPTKEY}"'				
-				goto GnKeyEND			
-			GnKeyEND:
-			goto GnEND
-		GnNotFind:
-		GnEND:			
+	  ${If} ${REG_AGENT_IN_NAC} == 'TRUE'
+		  ${If} ${NAC_LOGIN_TYPE} == '1'
+			IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" GnFind GnNotFind
+			GnFind:					
+				StrCmp ${NAC_LOGIN_ENCRYPTKEY} "" GnKeyNoEnctrypt GnKeyEncrypt 
+				GnKeyNoEnctrypt:
+					ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe"'
+					goto GnKeyEND
+				GnKeyEncrypt:
+					ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -auth_in:$INSTDIR\SGNac.exe -e:AES-${NAC_LOGIN_ENCRYPTKEY}"'				
+					goto GnKeyEND			
+				GnKeyEND:
+				goto GnEND
+			GnNotFind:
+			GnEND:			
+		${EndIf}
 	${EndIf}
-	
 	;인증서 자동 업데이트 설정 Off
 	${If} ${DISABLE_CERT_AUTOUPDATE} == 'TRUE'
 		WriteRegDWORD HKLM "SOFTWARE\Policies\Microsoft\SystemCertificates\AuthRoot" "DisableRootAutoUpdate" 1	
@@ -836,14 +844,16 @@ Section Uninstall
   Delete "C:\Users\Public\Desktop\${INK_NAME}.lnk"
   Delete "$SMPROGRAMS\OpenNetLink\${INK_NAME}.lnk"
 
-  ${if} ${NAC_LOGIN_TYPE} == '1'
-  	;NAC 등록 해제
-  	IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" UnGnFind UnGnNotFind
-  	UnGnFind:
-  		ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -u -auth_in:$INSTDIR\SGNac.exe"'
-  		goto UnGnEND
-  	UnGnNotFind:
-  	UnGnEND:	  
+  ${If} ${REG_AGENT_IN_NAC} == 'TRUE'
+	${If} ${NAC_LOGIN_TYPE} == '1'
+		;NAC 등록 해제
+		IfFileExists "$PROGRAMFILES\Geni\Genian\GnExLib.exe" UnGnFind UnGnNotFind
+		UnGnFind:
+			ExecWait '"$PROGRAMFILES\Geni\Genian\GnExLib.exe" "-i -u -auth_in:$INSTDIR\SGNac.exe"'
+			goto UnGnEND
+		UnGnNotFind:
+		UnGnEND:	  
+	${EndIf}
   ${EndIf}
   RMDir "$SMPROGRAMS\OpenNetLink"
   RMDir /r "$INSTDIR"

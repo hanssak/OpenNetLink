@@ -112,6 +112,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         //클립보드
 
         public bool bDlpFoundSendContinue { get; set; } = false;  //  개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무
+        public bool bDlpFoundSendBlock { get; set; } = false;         // 개인정보 검출 됐을때, 전송 차단
 
         public bool bUseClipBoard { get; set; } = true;                  // 클립보드 사용 여부
         public bool bUseClipCopyAndSend { get; set; } = false;    // 클립보드 복사 후 전송 사용 유무 ( 환경설정 체크박스 보이고 안보이고)
@@ -234,6 +235,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bHideApprLine { get; set; } = false;           // 결재라인 표현유무
 
         public bool bHideTitleDesc { get; set; } = false;           // 제목 및 설명 표현유무
+        public bool bHideTitle { get; set; } = false;           // 제목 표현유무
+        public bool bHideDesc { get; set; } = false;           // 설명 표현유무
 
         public bool bUseDashBoard { get; set; } = true;           // DashBoard를 사용하게 할지 유무
 

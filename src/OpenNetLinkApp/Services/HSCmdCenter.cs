@@ -614,7 +614,8 @@ namespace OpenNetLinkApp.Services
                     case eCmdList.eDrmBlockNoti:                                                     // DRM Noti
                         VirusScanNotiAfterSend(nRet, eCmdList.eDrmBlockNoti, groupId, sgData);
                         break;
-
+                    case eCmdList.eNetLinkStatus:
+                        break;
                     case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
                         EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
                         break;
@@ -2277,6 +2278,15 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestDeptInfo(hsNetWork, groupid, strUserID);
+            return -1;
+        }
+
+        public int SendNetLinkStatus(int groupid, string strUserID)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestNetLinkStatus(hsNetWork, groupid, strUserID);
             return -1;
         }
 

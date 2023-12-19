@@ -171,6 +171,17 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_DEPTINFO", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
+        public int RequestNetLinkStatus(HsNetWork hsNet, int groupid, string strUserID)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["STATUS"] = "0";
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_NETLINK_STATUS", dic);
+            return hsNet.SendMessage(args);
+        }
 
         public int RequestFileTransList(HsNetWork hsNet, int groupid, string strUserID, string strFromDate, string strToDate, string strTransKind, string strTransStatus, string strApprStatus, string strDlp, string strTitle, string strDataType)
         {

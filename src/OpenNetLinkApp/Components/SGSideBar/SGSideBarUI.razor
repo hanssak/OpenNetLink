@@ -98,14 +98,14 @@
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (bViewSGSideBarUIBadge && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                  && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                 && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                         </span>
                                                     }
                                                     @if (bViewSGSideBarUIBadge && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                  && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                 && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -124,7 +124,7 @@
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (bViewSGSideBarUIBadge && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                  && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                 && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
@@ -133,7 +133,7 @@
                                                     }
 
                                                     @if (bViewSGSideBarUIBadge && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                  && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                 && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -196,7 +196,7 @@
                                             <p>
                                                 @(GetDescription(SubMenuList.CategoryId))
                                                 @if (bViewSGSideBarUIBadge && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                              && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                             && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <!-- Badge -->
                                                     <span class="@(SubMenuList.BadgeType) ">
@@ -205,7 +205,7 @@
                                                 }
 
                                                 @if (bViewSGSideBarUIBadge && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                              && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                             && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <!-- Badge -->
                                                     <span class="badge badge-danger ">
@@ -299,7 +299,7 @@
             pageService.SetStatusSideMenuReBuildTime(nGroupID, false);
             SideBarUISvc.ChgActiveMenu(eventArgsPopup, activeMenuPopup);
         }
-        else if(pageService.GetIsPolicyUpdate(nGroupID))
+        else if (pageService.GetIsPolicyUpdate(nGroupID))
         {
             SideBarLoginAfterMenuAddEvent sideBarLoginAfterMenuAddEvent = HSCmdCenter.sgPageEvent.GetSideBarLoginAfterMenuAddEvent();
             if (sideBarLoginAfterMenuAddEvent != null)
@@ -317,7 +317,14 @@
         if (changeActiveMenuEvent != null)
             changeActiveMenuEvent(nGroupID, strNavigatePathWithGroupID);
 
+
         MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
+
+        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(nGroupID); ;
+        if (sgUserData != null)
+        {
+            HSCmdCenter.SendNetLinkStatus(nGroupID, sgUserData.GetUserID());
+        }
 
     }
 

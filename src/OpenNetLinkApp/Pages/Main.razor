@@ -419,6 +419,7 @@
             strOtpUrlCode = e.strMsg;
         }
 
+        Window.MoveTrayToWebWindow();
         await refSGAlert.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
     }
 
@@ -2217,6 +2218,9 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     changeActiveMenuEvent(nGroupIDfirst, strNavigatePathnGroupID);
 
                 MyNavigationManager.NavigateTo(strNavigatePathnGroupID);
+
+                if (!pageService.GetIsPolicyUpdate(groupId))
+                    HSCmdCenter.SendNetLinkStatus(nGroupIDfirst, sgUserData.GetUserID());
 
                 // SideBarUI 에서 nGroupIDfirst로 지정된 UI로 선택
                 MoveSiderBarFocusTogroupid(nGroupIDfirst);
