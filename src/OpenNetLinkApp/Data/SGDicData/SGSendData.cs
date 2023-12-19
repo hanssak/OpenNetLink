@@ -178,8 +178,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CLIENTID"] = strUserID;
             dic["STATUS"] = "0";
             CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_NETLINK_STATUS", dic);
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_NETLINK_STATUS", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 

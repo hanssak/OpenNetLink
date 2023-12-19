@@ -92,7 +92,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     //strNacEncData = "kf+MFAB+M5Poc54osw5R6oL7R7mw5MRfIICRC9ZJWfWH4qaYi9RHGReEiRvIMiUic65TVy4huouqqtt4jstt9Ym31lG2V5b3ZW0XTaQ0RW8="; //errId
 
                     string strNacDec = string.Empty;
-                    if(string.IsNullOrEmpty(nacEncryptKey.Trim()))
+                    if (string.IsNullOrEmpty(nacEncryptKey.Trim()))
                     {
                         //NAC 계정 암호화 사용하지 않으면 그대로 계정 사용
                         strNacDec = strNacEncData;
@@ -107,18 +107,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
                         byte[] arrNACEnc = Encoding.UTF8.GetBytes(nacEncryptKey);
                         Array.Copy(arrNACEnc, 0, decKey, 0, arrNACEnc.Length);
 
-                    byte[] arrNACDec = null;
-                    SGCrypto.AESDecrypt128(arrNacEncData, ref decKey, System.Security.Cryptography.PaddingMode.None, ref arrNACDec);
-                    string strNacDec = Encoding.UTF8.GetString(arrNACDec);
+                        byte[] arrNACDec = null;
+                        SGCrypto.AESDecrypt128(arrNacEncData, ref decKey, System.Security.Cryptography.PaddingMode.None, ref arrNACDec);
+                        strNacDec = Encoding.UTF8.GetString(arrNACDec);
 
-                    //format. -nac "-authid:test" -IP:192.168.1.168 -MAC:00:24:1D:88:1D:B4
-                    strNacDec = strNacDec.Replace("\"", "");
-                    string findKey = "-authid:";
-                    foreach (string arg in strNacDec.Split(" "))
-                    {
-                        if (arg.Contains(findKey))
+                        //format. -nac "-authid:test" -IP:192.168.1.168 -MAC:00:24:1D:88:1D:B4
+                        strNacDec = strNacDec.Replace("\"", "");
+                        string findKey = "-authid:";
+                        foreach (string arg in strNacDec.Split(" "))
                         {
-                            return arg.Replace(findKey, "");
+                            if (arg.Contains(findKey))
+                            {
+                                return arg.Replace(findKey, "");
+                            }
                         }
                     }
                 }

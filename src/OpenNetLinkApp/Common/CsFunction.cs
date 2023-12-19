@@ -1476,6 +1476,9 @@ namespace OpenNetLinkApp.Common
 
         public bool GetProhibitLimit(ref byte[] bytePW, string strProhibit)
         {
+            if (String.IsNullOrEmpty(strProhibit))
+                return false;
+
             byte[] byteProhibit = Encoding.UTF8.GetBytes(strProhibit);
             int index = IndexOf(ref bytePW, byteProhibit, 0);
 
