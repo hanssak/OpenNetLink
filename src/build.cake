@@ -16,13 +16,14 @@ var configuration = Argument("configuration", "Release");
 var setNetwork = Argument<bool>("setNetwork", true);
 var isFull = Argument<bool>("isFull", true);	//false로 하면, 설치파일은 만들지 않는다.
 var isPatch = Argument<bool>("isPatch", true);	//false로 하면, 패치파일은 만들지 않는다.
-var isLightPatch = Argument<bool>("isLightPatch", false);
+var isLightPatch = Argument<bool>("isLightPatch", true);
 var isEnc = Argument<bool>("isEnc", true);
 var deleteNetLink = Argument<bool>("deleteNetLink", false);		//true로 하면, 기존 NetLink Unintall.exe를 붙여넣기 한 후, 기존 NetLink를 삭제한다.
 var isSilent = Argument<bool>("isSilent", false);				//true로 하면, Silent 모드
 var startAuto = Argument<bool>("startAuto", true);				//false 하면, 설치 완료 후 자동 실행 안됨
 var isSilentShowAll = Argument<bool>("isSilentShowAll", false);	//true로 하면, Silent / Show 모드 설치파일 모두 만듬
 var regCrxForce = Argument<bool>("regCrxForce", false);					//true로 하면, NetPos가 "IN"인 Case
+var regPolicyCrxForce = Argument<bool>("regPolicyCrxForce", false);					//true로 하면, NetPos가 "IN"인 Case
 var patchAppEnv = Argument<bool>("patchAppEnv", false);					//true로 하면, patch때에 AppEnvSetting.json 파일을 덮어씌우는 동작함(win)
 var inkFileName = Argument("inkFileName", "OpenNetLink");      // 바탕화면 Ink 파일 이름 설정 
 var isPatchSilent = Argument<bool>("isPatchSilent", true);		// false로 하면 패치파일의 설치과정을 UI View로 변경함(사용자가 직접 여러번 클릭해줘야함.)
@@ -37,6 +38,8 @@ var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어
 // var customName = "NONE";
 var storageName ="NONE";
 var disableCertAutoUpdate =false;	//윈도우 버전 최초 설치 시, 로컬 보안 정책 > '인증서 자동 업데이트 사용안함' 설정 (default : false)
+var regAgentInNAC =false;			//NAC 사용 시, 설치과정에서 NAC시스템에 Agent 등록 여부
+
 var AppProps = new AppProperty(Context,
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								 "../", 													// Path of the Git Local Repository
@@ -90,6 +93,7 @@ public class MakeProperty
 		return null;
 	}
 
+	//Agent 별 바로가기 명칭 설정 ("LNK_FILE_NAME")
 	public string GetLinkFileName(string storageName, string agentName)
 	{
 		JObject agent= GetAgentValue(storageName, agentName);
@@ -97,6 +101,46 @@ public class MakeProperty
 			return "OpenNetLink";
 		else
 			return agent["LNK_FILE_NAME"].ToString();
+	}
+	public bool GetCrxForce(string storageName, string agentName)
+	{
+		JObject agent= GetAgentValue(storageName, agentName);
+		if(agent == null || agent["CRX_FORCE"] == null || agent["CRX_FORCE"].ToString() == "")	
+			return false;
+		else
+			return (bool)agent["CRX_FORCE"];
+	}
+	
+	public bool GetPolicyCrxForce(string storageName, string agentName)
+	{
+		JObject agent= GetAgentValue(storageName, agentName);
+		if(agent == null || agent["POLICY_CRX_FORCE"] == null || agent["POLICY_CRX_FORCE"].ToString() == "")	
+			return false;
+		else
+			return (bool)agent["POLICY_CRX_FORCE"];
+	}
+
+	//빌드 전 siteProfile-> src 하위로 Copy 할 항목 존재 여부("COPY_STRUCTURE")
+	public bool GetCopyStructure()
+	{
+		//ex. Copy_Structure\OpenNetLinkApp\wwwroot\images\ci\sitelogi.png
+		//  	      => src\OpenNetLinkApp\wwwroot\images\ci\sitelogi.png
+		if(FileObj == null || FileObj["COPY_STRUCTURE"] == null) return false;
+
+		if(FileObj["COPY_STRUCTURE"].ToString().ToUpper() == "TRUE") 
+			return true;
+		else 
+			return false;
+	}
+	
+	//설치과정에서 NAC시스템에 Agent 등록 여부
+	public bool GetRegAgentInNAC(string storageName, string agentName)
+	{
+		JObject agent= GetAgentValue(storageName, agentName);
+		if(agent == null || agent["REG_AGENT_IN_NAC"] == null || agent["REG_AGENT_IN_NAC"].ToString() == "")	
+			return false;
+		else
+			return (bool)agent["REG_AGENT_IN_NAC"];
 	}
 }
 
@@ -363,6 +407,17 @@ Task("MakeHashSqlScript")
 		//해시 생성 sql 문 생성 (Arg : 1 + [OS])
 		var arg = $"1 {AppProps.Platform}";
 		
+		// KKW - OS마다 다른 HashFileList 운영가능
+		String strHashFileList 	= "./OpenNetLinkApp/HashFileList.txt";
+		if (FileExists(strHashFileList))
+		{
+			Information($"HashFileList.txt Changed to OS Type!");
+			DeleteFile(strHashFileList);		
+			if(AppProps.Platform == "debian" || AppProps.Platform == "redhat")
+				CopyFile($"./OpenNetLinkApp/HashFileList-LINUX.txt", strHashFileList);
+			else
+				CopyFile($"./OpenNetLinkApp/HashFileList-{AppProps.AppUpdatePlatform.ToUpper()}.txt", strHashFileList);
+		}
 
 		if(AppProps.Platform == "windows")
 		{
@@ -418,38 +473,6 @@ Task("EncryptConfig")
 		{
 			process.WaitForExit();
 		}
-
-			
-		// if(AppProps.Platform == "windows")
-		// {
-		// 	using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = arg }))    {
-		// 		process.WaitForExit();
-		// 	}
-		// }
-		// else if(AppProps.Platform == "debian" || AppProps.Platform == "redhat")
-		// {
-		// 	using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility", new ProcessSettings
-		// 										{ Arguments = new ProcessArgumentBuilder()
-		// 										.Append(arg)
-		// 										}))
-		// 	{
-		// 		process.WaitForExit();
-		// 	}
-		// }
-		// else if(AppProps.Platform == "mac")
-		// {
-		// 	using(var process = StartAndReturnProcess("./HashToolOSX/MD5HashUtility", new ProcessSettings
-		// 										{ Arguments = new ProcessArgumentBuilder()
-		// 										.Append(arg)
-		// 										}))
-		// 	{
-		// 		process.WaitForExit();
-		// 	}
-		// }
-		// else
-		// {
-		// 	throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.Platform));
-		// }
 
 	});
 
@@ -548,13 +571,32 @@ Task("PkgCrossflatform")
 	//SetFileName
 	
 	if(isFull.ToString().ToUpper() == "TRUE")
-	{
-		if(customName == "")
-			customName = Prompt("Custom Name : ");			
-	}
+		customName = Prompt("Custom Name : ");		
 		
 
 	var LastUpdatedTime = DateTime.Now.ToString(@"yyyy\/MM\/dd H\:mm");
+
+	//[빌드 전] src 하위로 복사해야 하는 항목 적용
+	if(MakeProps.GetCopyStructure())
+	{
+		string structFull = System.IO.Path.GetFullPath($"{siteProfilePath}/Copy_Structure");
+		if(DirectoryExists(structFull))
+		{
+			Information($"\n== Copy [structure]->[src] Contents ==");
+			foreach(var file in GetFiles($"{structFull}/**/*.*"))
+			{
+				string relativePath = System.IO.Path.GetRelativePath(structFull, file.FullPath);
+				
+				CopyFile(file.FullPath, $"./{relativePath}");
+				Information($"{relativePath} -> src");
+			}
+			Information($"=======================================");
+		}
+		else
+		{
+			throw new Exception($"[Err] src 하위 복사 사용 시, Copy_Structure 폴더가 존재해야 합니다. (Path : {structFull})");
+		}
+	}
 
 	if(DirectoryExists(AppProps.InstallerRootDirPath)) {
 		DeleteDirectory(AppProps.InstallerRootDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
@@ -578,6 +620,9 @@ Task("PkgCrossflatform")
 		string unitName = storageUnitInfo.Name;
 
 		if(unitName.Substring(0, 1) == ".") 
+			continue;
+
+		if(unitName == "Copy_Structure")
 			continue;
 
 		PackageDirPath =$"{AppProps.InstallerRootDirPath}/{unitName}/packages";
@@ -612,6 +657,11 @@ Task("PkgCrossflatform")
 			if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp/UpdateFileList.txt"))
 				CopyFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/temp/UpdateFileList.txt", $"{storageUnit}");
 		}
+		else
+		{
+			AppProps.AppUpdatePlatform = AppProps.Platform;
+			AppProps.AppLastUpdated = LastUpdatedTime;			
+		}
 		CopyFile($"{storageUnit}/ReleaseNote.md", $"{ReleaseNoteDirPath}/{AppProps.PropVersion.ToString()}.md");				
 		CopyFiles("./OpenNetLinkApp/VersionHash.txt", $"{AppProps.InstallerRootDirPath}/{unitName}");
 		
@@ -634,11 +684,22 @@ Task("PkgCrossflatform")
 		if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/Log"))		
 			DeleteDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/Log", new DeleteDirectorySettings {Force = true, Recursive = true });
 			
-		// window에 한하여 필요없는 파일들 배포전에 제거
+			
+		// 공통항목들중 필요없는거 제거
+				// 공통항목들중 필요없는거 제거
+		Information("================================================");
+		Information("Delete Unused Files !!!");
+		Information("================================================");
+		DeleteFiles($"./artifacts/{AppProps.Platform}/published/*.pdb");
+		Information($"./artifacts/{AppProps.Platform}/published/*.pdb");		
+		DeleteFiles($"./artifacts/{AppProps.Platform}/published/wwwroot/Log/*.Log");	
+		if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/SGNacAgent"))
+			DeleteDirectory($"./artifacts/{AppProps.Platform}/published/SGNacAgent", new DeleteDirectorySettings {Force = true, Recursive = true });
+		
+		// OS별로 필요없는 파일들 배포전에 제거 / 추가
 		if(AppProps.Platform == "windows")
 		{
 			DeleteFiles("./artifacts/windows/published/*.so");
-			DeleteFiles("./artifacts/windows/published/*.pdb");
 
 			var files = GetFiles("./artifacts/windows/published/*.so.*");
 			foreach(var file in files)
@@ -660,10 +721,18 @@ Task("PkgCrossflatform")
 					}
 				}		
 			}
+			
+			// Nsis script에서 2개파일 조절하지 않음
+			CopyFiles("./Appcasts/preinstall/windows/VC_redist.x64.exe", $"./artifacts/{AppProps.Platform}/published");
+			//CopyFiles("./OpenNetLinkApp/wwwroot/bin_addon/SecureGateChromiumExtension_v1.1.crx", $"./artifacts/{AppProps.Platform}/published");
+		}
+		else
+		{
+			DeleteFiles($"./artifacts/{AppProps.Platform}/published/AddFileRM*X64.dll");
 		}
 		
 		//[빌드 후] 에이전트 별 파일 적용 (ex.Network.json, AppEnvSetting 등)
-		Information($"Copy [Agent Unit] Files - " + storageUnit);
+		Information($"Copy [Agent Unit] Files");
 		
 		publishInitJsonDirPath = $"./artifacts/{AppProps.Platform}/published/wwwroot/conf/Init";	
 		//설치파일 생성
@@ -681,8 +750,43 @@ Task("PkgCrossflatform")
 				if(AgentName.Substring(0, 1) == ".")
 					continue;
 				
+				Information($"Make Agent Installer {AgentName}");
+
+				networkFlag = AgentName.ToUpper();			
+				storageName = unitName.ToUpper();
+				
 				if(DirectoryExists(publishInitJsonDirPath))		
 					DeleteDirectory(publishInitJsonDirPath, new DeleteDirectorySettings {Force = true, Recursive = true });
+				
+				if(AppProps.Platform == "windows") 
+				{
+					JObject AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"));
+					for(int i = 0; i < AppEnvJObj["strForwardUrl"].Count(); i++)
+					{
+						//AppEnvJObj["strForwardUrl"][i] = "file:\\\\\\C:\\HANSSAK\\OpenNetLink\\wwwroot\\Web\\WebLinkInfo.html";
+						AppEnvJObj["strForwardUrl"][i] = "";
+					}
+					JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"), AppEnvJObj);
+
+				}
+				else if(AppProps.Platform == "mac")
+				{
+					JObject AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"));
+					for(int i = 0; i < AppEnvJObj["strForwardUrl"].Count(); i++)
+					{
+						AppEnvJObj["strForwardUrl"][i] = "file:/Applications/OpenNetLinkApp.app/Contents/MacOS/wwwroot/Web/WebLinkInfo.html";
+					}
+					JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"), AppEnvJObj);
+				}
+				else
+				{
+					JObject AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"));
+					for(int i = 0; i < AppEnvJObj["strForwardUrl"].Count(); i++)
+					{
+						AppEnvJObj["strForwardUrl"][i] = "file:/opt/hanssak/opennetlink/wwwroot/Web/WebLinkInfo.html";
+					}
+					JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath($"{agentUnit}/AppEnvSetting.json"), AppEnvJObj);
+				}
 				
 				if(isEnc.ToString().ToUpper() == "TRUE")
 				{
@@ -731,13 +835,17 @@ Task("PkgCrossflatform")
 						{
 							if(OPJObj["NACLoginType"] != null && OPJObj["NACLoginType"].ToString() != "" && OPJObj["NACLoginType"].ToString() != "0")
 							{
-								if(OPJObj["NACLoginEncryptKey"] == null || OPJObj["NACLoginEncryptKey"].ToString() == "")
-									throw new Exception(String.Format("[Err] NACLoginType 사용 시, 인증상태 정보 암호화를 위한 키 'NACLoginEncryptKey'를 설정해주세요."));
+								//암호화 값 없으면 NAC 인자로 암호화 사용하지 않는 것으로 간주
+								// if(OPJObj["NACLoginEncryptKey"] == null || OPJObj["NACLoginEncryptKey"].ToString() == "")
+								// 	throw new Exception(String.Format("[Err] NACLoginType 사용 시, 인증상태 정보 암호화를 위한 키 'NACLoginEncryptKey'를 설정해주세요."));
 								
 								//Add SGNac.exe
 								CopyFiles("./OpenNetLinkApp/Library/SGNacAgent/SGNac.exe", $"./artifacts/{AppProps.Platform}/published");
 								nacLoginType = OPJObj["NACLoginType"].ToString();
-								nacLoginEncryptKey = OPJObj["NACLoginEncryptKey"].ToString();
+								if(OPJObj["NACLoginEncryptKey"] == null || OPJObj["NACLoginEncryptKey"].ToString() == "")
+									nacLoginEncryptKey = "";	
+								else
+									nacLoginEncryptKey = OPJObj["NACLoginEncryptKey"].ToString();
 							}
 						}
 
@@ -759,7 +867,12 @@ Task("PkgCrossflatform")
 				}
 				isPatchInstaller=false;
 				if(useMakeConfig == true)
+				{
 					inkFileName = MakeProps.GetLinkFileName(unitName, AgentName);
+					regCrxForce = MakeProps.GetCrxForce(unitName, AgentName);
+					regPolicyCrxForce = MakeProps.GetPolicyCrxForce(unitName, AgentName);
+					regAgentInNAC = MakeProps.GetRegAgentInNAC(unitName, AgentName);
+				}
 				RunTarget("MakeInstaller");		
 			}
 		}
@@ -795,8 +908,66 @@ Task("PkgCrossflatform")
 			//Light Patch 버전일 땐, edge 폴더 배포전에 제거
 			if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
 			{
-				if(DirectoryExists($"./artifacts/{AppProps.Platform}/published/wwwroot/edge")) 
-					DeleteDirectory($"./artifacts/{AppProps.Platform}/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
+				if(DirectoryExists("./artifacts/windows/published/wwwroot/edge")) 
+				{
+					DeleteDirectory("./artifacts/windows/published/wwwroot/edge", new DeleteDirectorySettings { Force = true, Recursive = true });
+				}
+
+				if(DirectoryExists("./artifacts/windows/patch_published")) 
+				{
+					Information("================================================");				
+					Information("Delete Pre Patch File !!!");
+					Information("================================================");
+					DeleteDirectory("./artifacts/windows/patch_published", new DeleteDirectorySettings { Force = true, Recursive = true });
+				}
+				
+				// window에 한하여 필요없는 파일들 배포전에 제거 - patch Size 경량화
+				if(AppProps.Platform == "windows")
+				{
+					CreateDirectory("./artifacts/windows/patch_published");
+					CreateDirectory("./artifacts/windows/patch_published/wwwroot");
+					
+					// 지정한 파일들 이동
+					var fileNames = System.IO.File.ReadAllLines("./PatchFileList.txt");
+					
+					Information("Patch Target File List");
+					Information("================================================");
+					
+					// 각 파일을 대상 디렉토리로 복사합니다.
+					foreach (var fileName in fileNames)
+					{
+					
+						var sourcePath = $"./artifacts/windows/published/{fileName}"; // 소스 디렉토리 경로 설정
+						var targetDirectory = $"./artifacts/windows/patch_published/{fileName}"; // 소스 디렉토리 경로 설정
+
+						//Information("src : {0}, To : {1}", sourcePath, );
+						//Information("dest : {0}", targetDirectory);
+
+						// 파일 복사
+						// CopyFileToDirectory(
+						if (FileExists(sourcePath))
+						{
+							Information("Patch File: {0}", fileName);
+							CopyFile(sourcePath, targetDirectory);
+						}
+						
+						if (DirectoryExists(sourcePath))
+						{
+							Information("Patch Folder: {0}", fileName);
+							CopyDirectory(sourcePath, targetDirectory);
+						}
+					}					
+					
+					Information("================================================");
+					Information("Published Folder BackUp (-> published_backup)!");
+					MoveDirectory("./artifacts/windows/published", "./artifacts/windows/published_backup");
+
+					Information("================================================");
+					Information("Rename patch_published => published");
+					MoveDirectory("./artifacts/windows/patch_published", "./artifacts/windows/published");
+					Information("================================================");
+
+				}
 			}
 			
 			if(FileExists($"./artifacts/{AppProps.Platform}/published/wwwroot/conf/NetWork.json"))
@@ -814,7 +985,24 @@ Task("PkgCrossflatform")
 			// 패치는 시작프로그램 등 설정하지 않으므로 제외
 			// if(useMakeConfig == true)
 			// 	inkFileName = MakeProps.GetLinkFileName(unitName, AgentName);
-			RunTarget("MakeInstaller");		
+			RunTarget("MakeInstaller");
+
+			if(isLightPatch.ToString().ToUpper().Equals("TRUE"))
+			{
+				if(AppProps.Platform == "windows")
+				{
+					Information("================================================");
+					Information("Delete published File(For Patch) !!!");
+					Information("================================================");
+					DeleteDirectory("./artifacts/windows/published", new DeleteDirectorySettings { Force = true, Recursive = true });
+
+					Information("================================================");
+					Information("published_backup Folder Restore Folder (-> published)!");
+					MoveDirectory("./artifacts/windows/published_backup", "./artifacts/windows/published");					
+					Information("================================================");
+				}
+			}
+			
 		}
 	}
 });
@@ -843,12 +1031,14 @@ Task("MakeInstaller")
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"FORCE_REG_CRX", regPolicyCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
 					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
 					{"REG_STARTPROGRAM", regStartProgram.ToString().ToUpper()},
+					{"REG_AGENT_IN_NAC", regAgentInNAC.ToString().ToUpper()},
 				}
 			});			
 
@@ -867,12 +1057,14 @@ Task("MakeInstaller")
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"FORCE_REG_CRX", regPolicyCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
 					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
 					{"REG_STARTPROGRAM", regStartProgram.ToString().ToUpper()},
+					{"REG_AGENT_IN_NAC", regAgentInNAC.ToString().ToUpper()},
 				}
 			});
 		}
@@ -892,12 +1084,14 @@ Task("MakeInstaller")
 					{"STORAGE_NAME", storageName.ToUpper()},
 					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"FORCE_REG_CRX", regPolicyCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
 					{"INK_NAME", $"\"{inkFileName}\""},
 					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
 					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
 					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
 					{"REG_STARTPROGRAM", regStartProgram.ToString().ToUpper()},
+					{"REG_AGENT_IN_NAC", regAgentInNAC.ToString().ToUpper()},
 				}
 			});			
 		}
