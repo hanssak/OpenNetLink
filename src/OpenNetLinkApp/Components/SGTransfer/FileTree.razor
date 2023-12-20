@@ -143,10 +143,10 @@
 
                 List<string> MyPcEntries = new List<string>();
                 
+                MyPcEntries.Add(Path.Combine(userProfile, "Desktop"));
                 MyPcEntries.Add(Path.Combine(userProfile, "Downloads"));
                 MyPcEntries.Add(Path.Combine(userProfile, "Videos"));
-                MyPcEntries.Add(Path.Combine(userProfile, "Documents"));
-                MyPcEntries.Add(Path.Combine(userProfile, "Desktop"));
+                MyPcEntries.Add(Path.Combine(userProfile, "Documents"));                
                 MyPcEntries.Add(Path.Combine(userProfile, "Favorites"));
                 
                 foreach (DriveInfo d in DriveInfo.GetDrives())
