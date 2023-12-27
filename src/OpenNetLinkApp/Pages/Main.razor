@@ -367,7 +367,7 @@
                     string nacId = SGAppMgrSvc.SystemService.GetGenianNACUserID(NacKey);
                     doNACLogin(nacId);
                 }
-                else    
+                else
                 {
                     doLogIn();
                 }
@@ -1691,7 +1691,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         strGetinfoTagName += ", 'CLIENT_URL_FW_PAGE'";
                         strGetinfoTagName += ", 'CLIENT_BINARY_CHECK'";
                         strGetinfoTagName += ", 'CLIENT_BINARY_CHECK_EXT'";
-
+                        strGetinfoTagName += ", 'CLIENT_PRIVACY_COMMENT'";
 
                         if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupId))
                         {
@@ -2553,10 +2553,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     //파일검사 예외 신청(4)
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseFileCheckException(gID))
                     {
-                        strNavigatePathWithGroupID = "/fileException/";
-                        strNavigatePathWithGroupID += gID.ToString();
-                        if (SideBarUISvc.FindSubMenu(gID, nParentID, 4) == null)
-                            SideBarUISvc.AddSubMenu(groupId: gID, Id: 4, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_FILE_EXCEPTION"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strUserSeq);              // 파일검사 예외 신청
+                        if (sgLoginData.GetServerVirusExam())
+                        {
+                            strNavigatePathWithGroupID = "/fileException/";
+                            strNavigatePathWithGroupID += gID.ToString();
+                            if (SideBarUISvc.FindSubMenu(gID, nParentID, 4) == null)
+                                SideBarUISvc.AddSubMenu(groupId: gID, Id: 4, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_FILE_EXCEPTION"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strUserSeq);              // 파일검사 예외 신청
+                        }
                     }
 
                     //대결재관리(5)

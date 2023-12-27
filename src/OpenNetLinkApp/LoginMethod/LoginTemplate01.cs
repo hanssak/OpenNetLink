@@ -78,7 +78,7 @@ namespace OpenNetLinkApp.LoginMethod
                         msg = "사용자가 존재하지 않습니다.";
                         break;
                     case "AccountLocked":
-                        msg = "계정이 잠겨 있습니다.";
+                        msg = "비밀번호 횟수 5회 초과로 그룹웨어 비밀번호 재설정 후 이용하시기 바랍니다.";
                         break;
                     case "RetiredUser":
                         msg = "사용자 퇴직 상태 입니다.";

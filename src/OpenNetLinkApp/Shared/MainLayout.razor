@@ -441,6 +441,8 @@
             if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpFoundSendBlock(groupId))
             {
                 string msg = String.Format(XmlConf.GetWarnMsg("W_0307"));
+                if (!String.IsNullOrEmpty(sgLoginData.GetPrivacyComment()))
+                    msg += $"<br>{sgLoginData.GetPrivacyComment()}";
                 refSecurityPopUp.setDesc(String.Format(msg, stTitle));
                 refSecurityPopUp.listInfo = lstInfo;
                 await Task.Delay(1000);

@@ -151,13 +151,15 @@
                                 <th>@strTitle</th>                                                     <!--제목-->
                                 <td colspan="7">@strDataTitle</td>
                             </tr>
-
-                            <tr>
-                                <th>@strDesc</th>                                                     <!--설명-->
-                                <td colspan="7">
-                                    @strDataDesc
-                                </td>
-                            </tr>
+                            @if (!bHideDesc)
+                            {
+                                <tr>
+                                    <th>@strDesc</th>                                                     <!--설명-->
+                                    <td colspan="7">
+                                        @strDataDesc
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -317,6 +319,7 @@
     }
 
     public bool bUseDlpDataView = true;
+    public bool bHideDesc = false;
 
     public string strTransDetailTitle = "";
     public string strArrpHistory = "";
@@ -683,6 +686,7 @@
             groupID = sgSideBar.GroupId;
         InitText(groupID);
         bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
+        bHideDesc = SGAppMgrSvc.OpConfigInfoService.GetUseHideDesc(groupID);
     }
 
     public void SetBindingData()

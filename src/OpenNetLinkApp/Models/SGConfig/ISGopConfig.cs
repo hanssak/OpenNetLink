@@ -246,5 +246,6 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseDlpAfterApproveToNormal { get; set; }    // DLP검출된 파일 사후 결재요청한 것도 사전으로 보내도록 할지 유무
 
+        public bool bHideTransManageDownLoadColumn { get; set; }         //전송관리화면에서 만료일, 다운로드, 다운로드 가능 횟수
     }
 }

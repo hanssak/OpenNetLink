@@ -306,6 +306,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseDlpAfterApproveToNormal(int groupId);
 
+        public bool GetHideTransManageDownLoadColumn(int groupId);
+
         public bool SetPropertyVal(int groupId, string strProperty, object strVal);
 
         public bool SavePropertyToFile(int groupId, string strFilePath);
@@ -1334,6 +1336,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo[groupId].bUseDlpAfterApproveToNormal;
         }
 
+        public bool GetHideTransManageDownLoadColumn(int groupId)
+        {
+            return AppConfigInfo[groupId].bHideTransManageDownLoadColumn;
+        }
 
         /// <summary>
         /// groupId에 해당하는 Property의 값 변경

@@ -1688,6 +1688,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             => (GetSystemPosition()) ? GetTagData("I_CLIENT_DESC_MIN_LENGTH") : GetTagData("E_CLIENT_DESC_MIN_LENGTH");
 
         /// <summary>
+        /// 개인정보 검출 시 차단 문구에 추가할 문구
+        /// </summary>
+        /// <param name="bSystem"></param>
+        /// <returns></returns>
+        public string GetPrivacyComment()
+            => (GetSystemPosition()) ? GetTagData("I_CLIENT_PRIVACY_COMMENT") : GetTagData("E_CLIENT_PRIVACY_COMMENT");
+
+        /// <summary>
         /// value 값을 암호화해서 sgData에 저장
         /// </summary>
         /// <param name="strKey"></param>
