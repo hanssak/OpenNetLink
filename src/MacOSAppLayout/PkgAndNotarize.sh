@@ -35,7 +35,7 @@ dev_team="L7W5N48H4G"
 # the label of the keychain item which contains an app-specific password
 # dev_keychain_label="Developer-altool"
 # dev_keychain_label="eumg-vmam-nluz-ygto"
-dev_keychain_label="sxog-tiki-hjrx-pxfs"
+dev_keychain_label="pfth-pvpn-mhut-arrc"
 
 # submission_id
 profile_name="hanssakSG"
