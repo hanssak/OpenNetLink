@@ -41,9 +41,9 @@ dev_keychain_label="sxog-tiki-hjrx-pxfs"
 profile_name="hanssakSG"
 
 # put your project's information into these variables
-if [ $# -ne 7 ]; then
-	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {storagename} $6 {regcrxforce} $7"
-	exit -1
+if [ $# -ne 9 ]; then
+    echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {isupdatecheck} $6 {startauto} $7 {storagename} $8 {regcrxforce} $9"
+    exit -1
 fi;
 
 echo "$@@@@@@@@@@@@@@@@@@@@@@@@@@@"
@@ -57,8 +57,10 @@ ispatch=$2
 networkflag=$3
 customname=$4
 outputpath=$5
-storagename=$6
-regcrxforce=$7
+isupdatecheck=$6
+startauto=$7
+storagename=$8
+regcrxforce=$9
 
 # code starts here
 projectdir=$(dirname $0)
@@ -306,13 +308,29 @@ echo "##########################################################################
 filepostinstall="$SCRIPT_PATH/postinstall"
 filepreinstall="$SCRIPT_PATH/preinstall"
 
+if [[ $ispatch != "TRUE" ]]; then
+    isupdatecheck="FALSE"
+fi
+if [[ $startauto == "FALSE" ]]; then 
+    sed -i '' -e 's/START_AUTO=1/START_AUTO=0/g' $filepostinstall
+else
+    sed -i '' -e 's/START_AUTO=0/START_AUTO=1/g' $filepostinstall
+fi
 
 if [[ $regcrxforce == "FALSE" ]]; then 
     # echo "Check regcrxforce : FALSE"
-    sed -i '' -e 's/REG_CRX=true/REG_CRX=false/g' $filepostinstall
+    sed -i '' -e 's/REG_CRX=1/REG_CRX=0/g' $filepostinstall
 else
     # echo "Check regcrxforce : TRUE"
-    sed -i '' -e 's/REG_CRX=false/REG_CRX=true/g' $filepostinstall
+    sed -i '' -e 's/REG_CRX=0/REG_CRX=1/g' $filepostinstall
+fi
+
+if [[ $isupdatecheck == "FALSE" ]]; then 
+    sed -i '' -e 's/UPDATE_CHECK=1/UPDATE_CHECK=0/g' $filepostinstall
+    sed -i '' -e 's/UPDATE_CHECK=1/REG_CRUPDATE_CHECKX=0/g' $filepreinstall
+else
+    sed -i '' -e 's/UPDATE_CHECK=0/UPDATE_CHECK=1/g' $filepostinstall
+    sed -i '' -e 's/UPDATE_CHECK=0/UPDATE_CHECK=1/g' $filepreinstall
 fi
 
 #read -n 1 -s -r -p "계속하려면 아무 키나 누르세요.(KKW)"   # package 생성 error
@@ -362,3 +380,4 @@ echo "##########################################################################
 open -R "$pkgpath"
 
 exit 0
+
