@@ -11,7 +11,7 @@
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
 var target = Argument("target", "Default");
-var sitename = Argument("sitename", "hanssak");
+var customName = Argument("customName", "");
 var configuration = Argument("configuration", "Release");
 var setNetwork = Argument<bool>("setNetwork", true);
 var isFull = Argument<bool>("isFull", true);	//false로 하면, 설치파일은 만들지 않는다.
@@ -28,13 +28,14 @@ var patchAppEnv = Argument<bool>("patchAppEnv", false);					//true로 하면, pa
 var inkFileName = Argument("inkFileName", "OpenNetLink");      // 바탕화면 Ink 파일 이름 설정 
 var isPatchSilent = Argument<bool>("isPatchSilent", true);		// false로 하면 패치파일의 설치과정을 UI View로 변경함(사용자가 직접 여러번 클릭해줘야함.)
 var regStartProgram = Argument<bool>("regStartProgram", true);		// 시작프로그램에 등록 여부(Window)
+var isUpdateCheck = Argument<bool>("isUpdateCheck", false);				//false 하면 업데이트 체크 안함
 var useMakeConfig = Argument<bool>("useMakeConfig", false);		//Json 형식으로된 MakeConfig.json을 로드하여 지정된 속성을 처리
 
 var isPatchInstaller = false;
 var nacLoginType ="0" ;		//0:none / 1:Genian NAC
 var nacLoginEncryptKey ="";	//NAC 사용 시 전달되는 인증정보 암호화에 사용하는 Key 
 var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
-var customName = "NONE";
+// var customName = "NONE";
 var storageName ="NONE";
 var disableCertAutoUpdate =false;	//윈도우 버전 최초 설치 시, 로컬 보안 정책 > '인증서 자동 업데이트 사용안함' 설정 (default : false)
 var regAgentInNAC =false;			//NAC 사용 시, 설치과정에서 NAC시스템에 Agent 등록 여부
@@ -456,36 +457,22 @@ Task("EncryptConfig")
 	.Does(()=> {
 		//OP 파일 암호화 처리 (Arg : 2 + [publish 생성 OS폴더명]
 		var arg = $"2 {AppProps.Platform}";
-
-		if(AppProps.Platform == "windows")
-		{
-			using(var process = StartAndReturnProcess("./HashTool/MD5HashUtility.exe", new ProcessSettings{ Arguments = arg }))    {
-				process.WaitForExit();
-			}
-		}
+		var UtilityFilePath ="";
+		if(AppProps.Platform == "windows")	
+			UtilityFilePath = "./HashTool/MD5HashUtility.exe";
 		else if(AppProps.Platform == "debian" || AppProps.Platform == "redhat")
-		{
-			using(var process = StartAndReturnProcess("./HashToolLinux/MD5HashUtility", new ProcessSettings
-												{ Arguments = new ProcessArgumentBuilder()
-												.Append(arg)
-												}))
-			{
-				process.WaitForExit();
-			}
-		}
+			UtilityFilePath = "./HashToolLinux/MD5HashUtility";
 		else if(AppProps.Platform == "mac")
-		{
-			using(var process = StartAndReturnProcess("./HashToolOSX/MD5HashUtility", new ProcessSettings
+			UtilityFilePath = "./HashToolOSX/MD5HashUtility";
+		else
+			throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.Platform));
+		
+		using(var process = StartAndReturnProcess(UtilityFilePath, new ProcessSettings
 												{ Arguments = new ProcessArgumentBuilder()
 												.Append(arg)
 												}))
-			{
-				process.WaitForExit();
-			}
-		}
-		else
 		{
-			throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.Platform));
+			process.WaitForExit();
 		}
 
 	});
@@ -956,6 +943,7 @@ Task("MakeInstaller")
 					{"IS_SILENT", "TRUE"},
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
+					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
 					{"FORCE_REG_CRX", regPolicyCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
@@ -981,6 +969,7 @@ Task("MakeInstaller")
 					{"IS_SILENT", "FALSE"},
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
+					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
 					{"FORCE_REG_CRX", regPolicyCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
@@ -1007,6 +996,7 @@ Task("MakeInstaller")
 					{"IS_SILENT", isSilent.ToString().ToUpper()},
 					{"STARTAUTO", startAuto.ToString().ToUpper()},
 					{"STORAGE_NAME", storageName.ToUpper()},
+					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
 					{"REG_CRX", regCrxForce.ToString().ToUpper()},
 					{"FORCE_REG_CRX", regPolicyCrxForce.ToString().ToUpper()},
 					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
@@ -1029,8 +1019,10 @@ Task("MakeInstaller")
 												.Append(networkFlag.ToUpper()) 
 												.Append(customName.ToUpper())
 												.Append(PackageDirPath)//$5	
-												.Append(storageName.ToUpper())//$6	
-												.Append(regCrxForce.ToString().ToUpper())//$7
+												.Append(isUpdateCheck.ToString().ToUpper())	//$6
+												.Append(startAuto.ToString().ToUpper())//$7
+												.Append(storageName.ToUpper())//$8									
+												.Append(regCrxForce.ToString().ToUpper())//$9
 												})
 												
 		)
@@ -1048,15 +1040,17 @@ Task("MakeInstaller")
 													.Append(networkFlag.ToUpper()) 
 													.Append(customName.ToUpper())
 													.Append(PackageDirPath) //$5
-													.Append(storageName.ToUpper())//$6	
-													})
+													.Append(isUpdateCheck.ToString().ToUpper())	//$6
+													.Append(startAuto.ToString().ToUpper())//$7
+													.Append(storageName.ToUpper())//$8									
+													.Append(regCrxForce.ToString().ToUpper())//$9
+																								})
 		)
 		{
 			process.WaitForExit();
 			Information("Package Redhat: Exit code: {0}", process.GetExitCode());
 		}
 	}
-	// else if( AppProps.Platform == "mac" && (networkFlag == "IN"))
 	else if( AppProps.Platform == "mac" )
 	{
 		using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings
@@ -1064,10 +1058,12 @@ Task("MakeInstaller")
 													.Append(AppProps.PropVersion.ToString())
 													.Append(isPatchInstaller.ToString().ToUpper())
 													.Append(networkFlag.ToUpper()) 
-													.Append(customName.ToUpper())
-													.Append(PackageDirPath)	//$5 Output
-													.Append(storageName.ToUpper())//$6
-													.Append(regCrxForce.ToString().ToUpper())//$7														
+													.Append(customName.ToUpper())	//$4
+													.Append(PackageDirPath)	//$5
+													.Append(isUpdateCheck.ToString().ToUpper())	//$6
+													.Append(startAuto.ToString().ToUpper())//$7
+													.Append(storageName.ToUpper())//$8
+													.Append(regCrxForce.ToString().ToUpper())//$9													
 													})
 		)
 		{
