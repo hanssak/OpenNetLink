@@ -4,7 +4,8 @@
 #echo $WHOAREYOU > /tmp/whoareyou-OpenNetLinkApp.log
 
 
-REG_CRX=true
+REG_CRX=0
+START_AUTO=1
 NAME_CRX="gbbehmiepgfmmnifjbnknjaebgmnpbam.json"
 
 WHOAREYOU=`last | head -1 | awk -F' ' '{ print $1 }'`
@@ -60,8 +61,7 @@ else
 fi
 
 # json 파일복사로 Crx 파일 자동설치
-testVal=-1 # 1 : 동작, -1 : 미동작
-if [ $testVal -gt 0 ] && [[ "${NETPOS}" == *"IN"* ]]; then
+if [ $REG_CRX -gt 1 ]; then
 
     #mkdir "$HOME/Library/Application Support/Google/Chrome/REG_CRX_TRUE_IN"
     #chown -R $WHOAREYOU "$HOME/Library/Application Support/Google/Chrome/REG_CRX_TRUE_IN"
@@ -106,10 +106,9 @@ if [ $testVal -gt 0 ] && [[ "${NETPOS}" == *"IN"* ]]; then
     fi
 fi
 
-
-
-
 #설치종료시 프로그램 바로 실행
-open -a /Applications/OpenNetLinkApp.app
+if [ $START_AUTO -gt 1]; then
+    open -a /Applications/OpenNetLinkApp.app
+fi
 
 exit 0
