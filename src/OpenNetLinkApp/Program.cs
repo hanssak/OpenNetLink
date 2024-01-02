@@ -63,29 +63,21 @@ namespace OpenNetLinkApp
             {
                 InitializeLogger();
 
-                if (args?.Length > 0) CLog.Information($"args : {string.Join(',', args)}");
+                if (args?.Length > 0)
+                {
+                    CLog.Information($"args : {string.Join(',', args)}");
+                    if (Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginType == (int)Common.Enums.enumNacLoginType.Genian && args[0].ToString().ToUpper() == "NAC")
+                    {
+                        string NacKey = Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginEncryptKey;
+                        string nacId = Services.SGAppManager.SGSystemService.GetGenianNACUserID(NacKey);
 
-                object[] arg = new object[2];
-                arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
-                arg[1] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartTrayMove;
-
-                ComponentsDesktop.Run<Startup>(windowTitle, "wwwroot/index.html", arg);
-            }
-            else if (Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginType == (int)Common.Enums.enumNacLoginType.Genian && args?.Length > 0 && args[0].ToString().ToUpper() == "NAC")
-            {
-                //NAC으로 로그인 시
-                //기존 OpenNetLink로 종료요청("REQUEST_OPENNETLINK_EXIT" 키워드 전달)
-                HsNetWorkSG.HsContextSender.RequestExitSender();
-
-                //정상종료 불가 시 강제종료
-                Thread.Sleep(1000);
-                Process[] OpenNetLinkes = Process.GetProcessesByName("OpenNetLinkApp");
-                if (OpenNetLinkes.Length > 1)
-                    OpenNetLinkes[0].Kill();
-
-                InitializeLogger();
-
-                if (args?.Length > 0) CLog.Information($"args : {string.Join(',', args)}");
+                        if (string.IsNullOrEmpty(nacId.Trim())) //UserId 가 공백이면 '로그아웃' 신호로 인지하여 Skip 처리
+                        {
+                            CLog.Information($"Program exit because 'NAC UserId' is empty");
+                            return;
+                        }
+                    }
+                }
 
                 object[] arg = new object[2];
                 arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
@@ -95,14 +87,44 @@ namespace OpenNetLinkApp
             }
             else
             {
-                int nhWnd = 0;
-                nhWnd = FindWindow("WebWindow", windowTitle);
-                if (nhWnd != 0 && IsWindow(nhWnd))
+                if (Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginType == (int)Common.Enums.enumNacLoginType.Genian && args?.Length > 0 && args[0].ToString().ToUpper() == "NAC")
                 {
-                    PostMessage(nhWnd, 0x0400 + 0x0003, 0, 0);
+                    string NacKey = Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginEncryptKey;
+                    string nacId = Services.SGAppManager.SGSystemService.GetGenianNACUserID(NacKey);
+
+                    if (string.IsNullOrEmpty(nacId.Trim())) //UserId 가 공백이면 '로그아웃' 신호로 인지하여 Skip 처리
+                        return;                   
+
+                    //NAC으로 로그인 시
+                    //기존 OpenNetLink로 종료요청("REQUEST_OPENNETLINK_EXIT" 키워드 전달)
+                    HsNetWorkSG.HsContextSender.RequestExitSender();
+
+                    //정상종료 불가 시 강제종료
+                    Thread.Sleep(1000);
+                    Process[] OpenNetLinkes = Process.GetProcessesByName("OpenNetLinkApp");
+                    if (OpenNetLinkes.Length > 1)
+                        OpenNetLinkes[0].Kill();
+
+                    InitializeLogger();
+
+                    if (args?.Length > 0) CLog.Information($"args : {string.Join(',', args)}");
+
+                    object[] arg = new object[2];
+                    arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
+                    arg[1] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartTrayMove;
+
+                    ComponentsDesktop.Run<Startup>(windowTitle, "wwwroot/index.html", arg);
+                }
+                else
+                {
+                    int nhWnd = 0;
+                    nhWnd = FindWindow("WebWindow", windowTitle);
+                    if (nhWnd != 0 && IsWindow(nhWnd))
+                    {
+                        PostMessage(nhWnd, 0x0400 + 0x0003, 0, 0);
+                    }
                 }
             }
-
         }
 
         /// <summary>

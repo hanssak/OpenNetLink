@@ -792,10 +792,10 @@
                     eLoginUITypeData = eLoginType.eLOGINTYPE_AD;
             }
 
-            if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(nGroupID) == (int)Enums.enumNacLoginType.Genian && SGAppMgrSvc.SystemService.IsStartedByNAC())
+            if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(nGroupID) == (int)Enums.enumNacLoginType.Genian && SGSystemService.IsStartedByNAC())
             {
                 string NacKey = SGAppMgrSvc.OpConfigInfoService.GetNACLoginEncryptKey(0);
-                string nacId = SGAppMgrSvc.SystemService.GetGenianNACUserID(NacKey);
+                string nacId = SGSystemService.GetGenianNACUserID(NacKey);
 
                 StateHasChanged();
                 doNACLogin(nacId);
