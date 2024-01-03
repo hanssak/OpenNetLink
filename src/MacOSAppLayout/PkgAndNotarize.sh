@@ -35,7 +35,7 @@ dev_team="L7W5N48H4G"
 # the label of the keychain item which contains an app-specific password
 # dev_keychain_label="Developer-altool"
 # dev_keychain_label="eumg-vmam-nluz-ygto"
-dev_keychain_label="sxog-tiki-hjrx-pxfs"
+dev_keychain_label="pfth-pvpn-mhut-arrc"
 
 # submission_id
 profile_name="hanssakSG"
@@ -312,6 +312,12 @@ filepreinstall="$SCRIPT_PATH/preinstall"
 if [[ $ispatch != "TRUE" ]]; then
     isupdatecheck="FALSE"
 fi
+if [[ $startauto == "FALSE" ]]; then 
+    sed -i '' -e 's/START_AUTO=1/START_AUTO=0/g' $filepostinstall
+else
+    sed -i '' -e 's/START_AUTO=0/START_AUTO=1/g' $filepostinstall
+fi
+
 if [[ $regcrxforce == "FALSE" ]]; then 
     # echo "Check regcrxforce : FALSE"
     sed -i '' -e 's/REG_CRX=1/REG_CRX=0/g' $filepostinstall
@@ -320,15 +326,9 @@ else
     sed -i '' -e 's/REG_CRX=0/REG_CRX=1/g' $filepostinstall
 fi
 
-if [[ $startauto == "FALSE" ]]; then 
-    sed -i '' -e 's/START_AUTO=1/START_AUTO=0/g' $filepostinstall
-else
-    sed -i '' -e 's/START_AUTO=0/START_AUTO=1/g' $filepostinstall
-fi
-
 if [[ $isupdatecheck == "FALSE" ]]; then 
     sed -i '' -e 's/UPDATE_CHECK=1/UPDATE_CHECK=0/g' $filepostinstall
-    sed -i '' -e 's/UPDATE_CHECK=1/UPDATE_CHECK=0/g' $filepreinstall
+    sed -i '' -e 's/UPDATE_CHECK=1/REG_CRUPDATE_CHECKX=0/g' $filepreinstall
 else
     sed -i '' -e 's/UPDATE_CHECK=0/UPDATE_CHECK=1/g' $filepostinstall
     sed -i '' -e 's/UPDATE_CHECK=0/UPDATE_CHECK=1/g' $filepreinstall
@@ -381,3 +381,4 @@ echo "##########################################################################
 open -R "$pkgpath"
 
 exit 0
+

@@ -497,6 +497,12 @@ Task("EncryptInitDirectory")
 		{
 			process.WaitForExit();
 		}
+
+		else
+		{
+			throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.Platform));
+		}
+
 	});
 
 Task("PubCrossflatform")
@@ -1100,16 +1106,16 @@ Task("MakeInstaller")
 	{
 		using(var process = StartAndReturnProcess("./PkgDebian.sh", new ProcessSettings
 												{ Arguments = new ProcessArgumentBuilder()
-												.Append(AppProps.PropVersion.ToString())
-												.Append(isPatchInstaller.ToString().ToUpper())
-												.Append(networkFlag.ToUpper()) 
-												.Append(customName.ToUpper())
-												.Append(PackageDirPath)//$5	
 												.Append(isUpdateCheck.ToString().ToUpper())	//$6
 												.Append(startAuto.ToString().ToUpper())//$7
 												.Append(storageName.ToUpper())//$8									
 												.Append(regCrxForce.ToString().ToUpper())//$9
-																								})
+												})
+												.Append(customName.ToUpper())
+												.Append(PackageDirPath)//$5	
+												.Append(storageName.ToUpper())//$6	
+												.Append(regCrxForce.ToString().ToUpper())//$7
+												})
 												
 		)
 		{
@@ -1121,15 +1127,15 @@ Task("MakeInstaller")
 	{
 		using(var process = StartAndReturnProcess("./PkgRedhat.sh", new ProcessSettings
 													{ Arguments = new ProcessArgumentBuilder()
-													.Append(AppProps.PropVersion.ToString())
-													.Append(isPatchInstaller.ToString().ToUpper())
+													.Append(isUpdateCheck.ToString().ToUpper())	//$6
+													.Append(startAuto.ToString().ToUpper())//$7
+													.Append(storageName.ToUpper())//$8									
+													.Append(regCrxForce.ToString().ToUpper())//$9
+																								})
 													.Append(networkFlag.ToUpper()) 
 													.Append(customName.ToUpper())
 													.Append(PackageDirPath) //$5
-													.Append(isUpdateCheck.ToString().ToUpper())	//$6
-													.Append(startAuto.ToString().ToUpper()) //$7
-													.Append(storageName.ToUpper())//$8
-													
+													.Append(storageName.ToUpper())//$6	
 													})
 		)
 		{
@@ -1139,17 +1145,17 @@ Task("MakeInstaller")
 	}
 	else if( AppProps.Platform == "mac" )
 	{
-		using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings
-													{ Arguments = new ProcessArgumentBuilder()
-													.Append(AppProps.PropVersion.ToString())
-													.Append(isPatchInstaller.ToString().ToUpper())
-													.Append(networkFlag.ToUpper()) 
 													.Append(customName.ToUpper())	//$4
 													.Append(PackageDirPath)	//$5
 													.Append(isUpdateCheck.ToString().ToUpper())	//$6
 													.Append(startAuto.ToString().ToUpper())//$7
 													.Append(storageName.ToUpper())//$8
-													.Append(regCrxForce.ToString().ToUpper())//$9
+													.Append(regCrxForce.ToString().ToUpper())//$9													
+													.Append(networkFlag.ToUpper()) 
+													.Append(customName.ToUpper())
+													.Append(PackageDirPath)	//$5 Output
+													.Append(storageName.ToUpper())//$6
+													.Append(regCrxForce.ToString().ToUpper())//$7														
 													})
 		)
 		{

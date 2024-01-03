@@ -27,9 +27,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </param>
         /// <returns>void</returns>
         void SetCIPath(string ciPath);
-
-        public bool IsStartedByNAC();
-        public string GetGenianNACUserID(string nacEncryptKey);
     }
     internal class SGSystemService : ISGSystemService
     {
@@ -66,7 +63,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public string[] GetStartArg() => SystemInfo.StartArg;
 
-        public bool IsStartedByNAC()
+        public static bool IsStartedByNAC()
         {
             if (SystemInfo.StartArg != null && SystemInfo.StartArg.Length > 0)
                 return SystemInfo.StartArg[0].ToString().ToUpper() == "NAC";
@@ -74,7 +71,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return false;
         }
 
-        public string GetGenianNACUserID(string nacEncryptKey)
+        public static string GetGenianNACUserID(string nacEncryptKey)
         {
             string NacFile = Path.Combine(Environment.CurrentDirectory, "NAC");
             try

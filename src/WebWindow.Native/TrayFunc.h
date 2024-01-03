@@ -60,6 +60,7 @@ static void toggle_show(struct tray_menu *item) {
 #elif TRAY_WINAPI
 		::ShowWindow(messageLoopRootWindowHandle, SW_RESTORE);
 		::ShowWindow(messageLoopRootWindowHandle, SW_SHOW);
+		::SetForegroundWindow(messageLoopRootWindowHandle);
 #endif
 	}
 	item->checked = !item->checked;

@@ -79,14 +79,14 @@
                                 @strSystemName <span class="full_txt">@strConNetwork</span>
                             </p>
 
-                            <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@id" @oninput="@(e => id = e.Value.ToString())" tabindex="1" autocomplete="off">
+                            <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" @bind="@id" tabindex="1" autocomplete="off">
 
                             @if (pageService.m_nLoginType != 5 && srcLoc != "OKTA" && SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(0) != (int)Enums.enumNacLoginType.Genian) //OTP PW 필요없음
                             {
                                 //AD 로그인은 PW 사용자 입력 불가 (Readonly)
                                 <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" onkeydown="KeyEventPW('btnLogin');" tabindex="2" autocomplete="off">
                             }
-                            else if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(0) == (int)Enums.enumNacLoginType.Genian && (srcLoc == "Logout" || !SGAppMgrSvc.SystemService.IsStartedByNAC()))
+                            else if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(0) == (int)Enums.enumNacLoginType.Genian && (srcLoc == "Logout" || !SGSystemService.IsStartedByNAC()))
                             {
                                 //Genian NAC은 NAC 인자에 의해 실행되지 않을때는 PW 표시
                                 <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" onkeydown="KeyEventPW('btnLogin');" tabindex="2" autocomplete="off">
@@ -361,10 +361,10 @@
             }
             else if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(refSGAlert.groupId) == (int)Enums.enumNacLoginType.Genian) //Genian Nac Login
             {
-                if (SGAppMgrSvc.SystemService.IsStartedByNAC() && srcLoc != "Logout")
+                if (SGSystemService.IsStartedByNAC() && srcLoc != "Logout")
                 {
                     string NacKey = SGAppMgrSvc.OpConfigInfoService.GetNACLoginEncryptKey(0);
-                    string nacId = SGAppMgrSvc.SystemService.GetGenianNACUserID(NacKey);
+                    string nacId = SGSystemService.GetGenianNACUserID(NacKey);
                     doNACLogin(nacId);
                 }
                 else
@@ -1147,7 +1147,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             else if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(groupID) == (int)Enums.enumNacLoginType.Genian)
             {
                 //NAC에 의해 로그인하지 않았거나, 로그아웃한 경우, ID 저장/자동로그인 옵션 적용
-                if (!SGAppMgrSvc.SystemService.IsStartedByNAC() || srcLoc == "Logout")
+                if (!SGSystemService.IsStartedByNAC() || srcLoc == "Logout")
                     SetIdPwLogin(groupID);
             }
             else
@@ -1353,10 +1353,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         }
         else if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(groupid) == (int)Enums.enumNacLoginType.Genian) //Genian Nac Login
         {
-            if (SGAppMgrSvc.SystemService.IsStartedByNAC())
+            if (SGSystemService.IsStartedByNAC())
             {
                 string NacKey = SGAppMgrSvc.OpConfigInfoService.GetNACLoginEncryptKey(0);
-                string nacId = SGAppMgrSvc.SystemService.GetGenianNACUserID(NacKey);
+                string nacId = SGSystemService.GetGenianNACUserID(NacKey);
                 bLoginBtnDisable = true;
                 StateHasChanged();
 

@@ -56,7 +56,7 @@
                         <div class="login_w">
 
                             <div class="input-group mb-2">
-                                <input type="text" class="form-control-login" placeholder="ID" value="@id" @oninput="@(e=>id = e.Value.ToString())" disabled=@bUIBtnDisable tabindex="1">
+                                <input type="text" class="form-control-login" placeholder="ID" @bind="@id" disabled=@bUIBtnDisable tabindex="1">
                             </div>
                             @if (eLoginUITypeData != eLoginType.eLOGINTYPE_OTP) //OTP PW 필요없음
                             {
@@ -847,10 +847,10 @@
                     eLoginUITypeData = eLoginType.eLOGINTYPE_AD;
             }
 
-            if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(nGroupID) == (int)Enums.enumNacLoginType.Genian && SGAppMgrSvc.SystemService.IsStartedByNAC())
+            if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(nGroupID) == (int)Enums.enumNacLoginType.Genian && SGSystemService.IsStartedByNAC())
             {
                 string NacKey = SGAppMgrSvc.OpConfigInfoService.GetNACLoginEncryptKey(0);
-                string nacId = SGAppMgrSvc.SystemService.GetGenianNACUserID(NacKey);
+                string nacId = SGSystemService.GetGenianNACUserID(NacKey);
 
                 StateHasChanged();
                 doNACLogin(nacId);

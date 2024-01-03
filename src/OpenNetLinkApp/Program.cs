@@ -60,7 +60,21 @@ namespace OpenNetLinkApp
             {
                 InitializeLogger();
 
-                if (args?.Length > 0) CLog.Information($"args : {string.Join(',', args)}");
+                if (args?.Length > 0)
+                {
+                    CLog.Information($"args : {string.Join(',', args)}");
+                    if (Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginType == (int)Common.Enums.enumNacLoginType.Genian && args[0].ToString().ToUpper() == "NAC")
+                    {
+                        string NacKey = Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginEncryptKey;
+                        string nacId = Services.SGAppManager.SGSystemService.GetGenianNACUserID(NacKey);
+
+                        if (string.IsNullOrEmpty(nacId.Trim())) //UserId 가 공백이면 '로그아웃' 신호로 인지하여 Skip 처리
+                        {
+                            CLog.Information($"Program exit because 'NAC UserId' is empty");
+                            return;
+                        }
+                    }
+                }
 
                 //HsNetWorkSG.SGCrypto.UseKeyGen = false;
                 //OP 파일 재 암호화 => 암복호화 실패 시 재설치
@@ -104,6 +118,12 @@ namespace OpenNetLinkApp
                 SGCrypto.ValidationResult = SGCrypto.LoadKeyGenerate("wwwroot/conf/hsck");
                 if (Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginType == (int)Common.Enums.enumNacLoginType.Genian && args?.Length > 0 && args[0].ToString().ToUpper() == "NAC")
                 {
+                    string NacKey = Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginEncryptKey;
+                    string nacId = Services.SGAppManager.SGSystemService.GetGenianNACUserID(NacKey);
+
+                    if (string.IsNullOrEmpty(nacId.Trim())) //UserId 가 공백이면 '로그아웃' 신호로 인지하여 Skip 처리
+                        return;                   
+
                     //NAC으로 로그인 시
                     //기존 OpenNetLink로 종료요청("REQUEST_OPENNETLINK_EXIT" 키워드 전달)
                     HsNetWorkSG.HsContextSender.RequestExitSender();
