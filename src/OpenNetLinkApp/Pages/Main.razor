@@ -77,7 +77,7 @@
                                 @strSystemName <span class="full_txt">@strConNetwork</span>
                             </p>
 
-                            <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" value="@id" @oninput="@(e => id = e.Value.ToString())" tabindex="1" autocomplete="off">
+                            <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" readonly="@(pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)" @bind="@id" tabindex="1" autocomplete="off">
 
                             @if (pageService.m_nLoginType != 5 && srcLoc != "OKTA" && SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(0) != (int)Enums.enumNacLoginType.Genian) //OTP PW 필요없음
                             {

@@ -55,7 +55,7 @@
                         <div class="login_w">
 
                             <div class="input-group mb-2">
-                                <input type="text" class="form-control-login" placeholder="ID" value="@id" @oninput="@(e=>id = e.Value.ToString())" disabled=@bUIBtnDisable tabindex="1">
+                                <input type="text" class="form-control-login" placeholder="ID" @bind="@id" disabled=@bUIBtnDisable tabindex="1">
                             </div>
                             @if (eLoginUITypeData != eLoginType.eLOGINTYPE_OTP) //OTP PW 필요없음
                             {
