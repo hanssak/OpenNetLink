@@ -129,7 +129,7 @@ else
 fi
 
 # json 파일복사로 Crx 파일 자동설치
-if [ $REG_CRX -gt 1 ]; then
+if [ $REG_CRX -eq 1 ]; then
 
     #mkdir "$HOME/Library/Application Support/Google/Chrome/REG_CRX_TRUE_IN"
     #chown -R $WHOAREYOU "$HOME/Library/Application Support/Google/Chrome/REG_CRX_TRUE_IN"
