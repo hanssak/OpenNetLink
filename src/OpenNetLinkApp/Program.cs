@@ -68,6 +68,7 @@ namespace OpenNetLinkApp
                     CLog.Information($"args : {string.Join(',', args)}");
                     if (Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginType == (int)Common.Enums.enumNacLoginType.Genian && args[0].ToString().ToUpper() == "NAC")
                     {
+                        Services.SGAppManager.SGSystemService.SetNacFileValue();
                         string NacKey = Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginEncryptKey;
                         string nacId = Services.SGAppManager.SGSystemService.GetGenianNACUserID(NacKey);
 
@@ -87,8 +88,9 @@ namespace OpenNetLinkApp
             }
             else
             {
-                if (Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginType == (int)Common.Enums.enumNacLoginType.Genian && args?.Length > 0 && args[0].ToString().ToUpper() == "NAC")
+                if (args?.Length > 0 && args[0].ToString().ToUpper() == "NAC" && Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginType == (int)Common.Enums.enumNacLoginType.Genian)
                 {
+                    Services.SGAppManager.SGSystemService.SetNacFileValue();
                     string NacKey = Services.SGAppManager.SGopConfigService.AppConfigInfo[0].NACLoginEncryptKey;
                     string nacId = Services.SGAppManager.SGSystemService.GetGenianNACUserID(NacKey);
 

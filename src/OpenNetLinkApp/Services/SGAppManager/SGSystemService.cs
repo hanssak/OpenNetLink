@@ -56,11 +56,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             NotifyStateChangedCI();
         }
 
-        public void SetStartArg(string[] arg)
-        {
-            SystemInfo.StartArg = arg;
-        }
-
         public string[] GetStartArg() => SystemInfo.StartArg;
 
         public static bool IsStartedByNAC()
@@ -71,33 +66,53 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return false;
         }
 
+        public static void SetNacFileValue(string getNacFilePath = "")
+        {
+            string NacFilePath = getNacFilePath;
+            try
+            {
+                //Default Path
+                if (string.IsNullOrEmpty(NacFilePath.Trim()))
+                    NacFilePath = Path.Combine(Environment.CurrentDirectory, "NAC");
+
+                if (File.Exists(NacFilePath))
+                {
+                    string strNacFileValue = File.ReadAllText(NacFilePath);
+                    SGSystemService.SystemInfo.NacFileValue = strNacFileValue;    //실행 시점에 NAC 파일 Value 저장
+                    CLog.Here().Information($"NacFileValue : {SystemInfo.NacFileValue}");
+                }
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"SetNacFileValue Exception - {ex.ToString()}");
+            }
+        }
+
         public static string GetGenianNACUserID(string nacEncryptKey)
         {
-            string NacFile = Path.Combine(Environment.CurrentDirectory, "NAC");
             try
             {
                 if (IsStartedByNAC() == false)
                     return string.Empty;
 
-                if (File.Exists(NacFile))
+                if (!string.IsNullOrEmpty(SystemInfo.NacFileValue.Trim()))
                 {
-                    string strNacEncData = File.ReadAllText(NacFile);
-                    CLog.Here().Information($"GetGenianNACUserID NAC Encrypt: {strNacEncData}");
+                    CLog.Here().Information($"GetGenianNACUserID NAC Value: {SystemInfo.NacFileValue}");
                     //test
                     //strNacEncData = "kf+MFAB+M5Poc54osw5R6izVKLaGMqneqKMvg7N/Qla1M7DY0A3llIle1HwpV3YoTLPGxh3QHjY2mm4WoYHNxg=="; //yhkim41
                     //strNacEncData = "kf+MFAB+M5Poc54osw5R6qbFcbsKBN4KPIUR+fFZNE+rIR8KzHLKCXL9wlOPtBHM/yTDc84P53BKFNWYzXEY2Q=="; //yhkim40
                     //strNacEncData = "kf+MFAB+M5Poc54osw5R6oL7R7mw5MRfIICRC9ZJWfWH4qaYi9RHGReEiRvIMiUic65TVy4huouqqtt4jstt9Ym31lG2V5b3ZW0XTaQ0RW8="; //errId
 
                     string strNacDec = string.Empty;
-                    if(string.IsNullOrEmpty(nacEncryptKey.Trim()))
+                    if (string.IsNullOrEmpty(nacEncryptKey.Trim()))
                     {
                         //NAC 계정 암호화 사용하지 않으면 그대로 계정 사용
-                        strNacDec = strNacEncData;
+                        strNacDec = SystemInfo.NacFileValue;
                     }
                     else
                     {
                         //Base64 디코딩
-                        byte[] arrNacEncData = Convert.FromBase64String(strNacEncData);
+                        byte[] arrNacEncData = Convert.FromBase64String(SystemInfo.NacFileValue);
 
                         //AES128로 복호화 필요함 (OP에 NAC 키 있음)
                         byte[] decKey = new byte[16];
@@ -121,7 +136,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 }
                 else
                 {
-                    CLog.Here().Warning($"GetGenianNACUserID File not Found (Path:{NacFile})");
+                    CLog.Here().Error($"GetGenianNACUserID NAC Value is Empty : {SystemInfo.NacFileValue}");
                 }
                 return string.Empty;
             }
