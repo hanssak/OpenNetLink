@@ -2188,10 +2188,10 @@
         ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
         if (sgUserData == null)
             return;
-        @*
+        /*
             DateTime dt = pageService.GetAfterApprTime(groupID);
             pageService.SetSvrTime(groupID, dt, sgLoginData);
-        *@
+        */
         bool bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
         if (!dicCurrentAfterChkHide.ContainsKey(groupID))
         {
@@ -2286,12 +2286,26 @@
                             {
                                 SGSoftCampDRM lib = new SGSoftCampDRM();
                                 string grade = SGAppMgrSvc.OpConfigInfoService.GetSoftCampGrade(Convert.ToInt32(e.NetWorkID));
+                                int nMode = SGAppMgrSvc.OpConfigInfoService.GetSoftCampEncMode(Convert.ToInt32(e.NetWorkID));
+                                int nGuide = SGAppMgrSvc.OpConfigInfoService.GetSoftCampEncGuide(Convert.ToInt32(e.NetWorkID));
+                                string strSoftCampDAC = SGAppMgrSvc.OpConfigInfoService.GetSoftCampEncDAC(Convert.ToInt32(e.NetWorkID));
+
                                 foreach (string key in e.MsgRecode.Keys)
                                 {
                                     if (!FileAddManage.IsDRMFilePath(key))
                                     {
                                         //DRM 걸기
-                                        int ret = lib.DrmEncrypt(key, grade);
+                                        int ret = 0;
+
+                                        if (nMode == 1)
+                                            ret = lib.DrmEncrypt(key, grade);
+                                        else if (nMode == 2)
+                                        {
+                                            if (string.IsNullOrEmpty(strSoftCampDAC) == false && nGuide > 0)
+                                                lib.DrmAddDac(nGuide, strSoftCampDAC);
+                                            ret = lib.DrmEncrypt(key, grade);
+                                        }
+
                                         CLog.Here().Information($"{key} DRM Result  : {ret}");
                                     }
                                     else
@@ -2355,4 +2369,5 @@
         //드롭다운 롤백처리
         StateHasChanged();
     }
+
 }

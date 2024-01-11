@@ -224,6 +224,14 @@ namespace OpenNetLinkApp.Models.SGConfig
         public int nDrmType { get; set; } = 1;                          //DRM 종류 - 1. SoftCamp
         public string strSoftCampGrade { get; set; } = "0000001";         //DRM 종류 - SoftCamp Grade 옵션화 처리
 
+        public int nSoftCampEncMode { get; set; } = 1;        //DRM SoftCamp  암호화하는 동작 mode설정(1:예전방식간편모드, 2:상세설정mode)
+
+        public int nSoftCampGuide { get; set; } = 0;        //DRM Guide - 0:사용안함, 1: 개인 권한 설정, 2: 그룹 권한 설정, 3: 최상위 그룹 권한 설정
+
+        public string strSoftCampDAC { get; set; } = "";        //DRM 종류 - SoftCamp Grade 옵션화 처리
+
+
+
         public bool bUseDlpCheck { get; set; } = false;          //파일 전송 시 DLP 검사 사용 유무
         public int nDlpType { get; set; } = 1;                          //DLP 종류 - 1. 소만사
 

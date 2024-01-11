@@ -240,6 +240,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public int GetDrmType(int groupId);
         public string GetSoftCampGrade(int groupId);
+
+        public int GetSoftCampEncMode(int groupId);
+
+        public int GetSoftCampEncGuide(int groupId);
+
+        public string GetSoftCampEncDAC(int groupId);
+
         public int GetDlpType(int groupId);
 
         public bool GetUseDlpCheck(int groupId);
@@ -1179,6 +1186,25 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].strSoftCampGrade;
         }
+
+        public int GetSoftCampEncMode(int groupId)
+        {
+            return AppConfigInfo[groupId].nSoftCampEncMode;
+        }
+
+        public int GetSoftCampEncGuide(int groupId)
+        {
+            return AppConfigInfo[groupId].nSoftCampGuide;
+        }
+
+        public string GetSoftCampEncDAC(int groupId)
+        {
+            return AppConfigInfo[groupId].strSoftCampDAC;
+        }
+
+
+
+
         public int GetDlpType(int groupId)
         {
             return AppConfigInfo[groupId].nDlpType;

@@ -16,6 +16,10 @@ namespace OpenNetLinkApp.Data.SGDicData.DRM
         [DllImport(strSoftCampDrmLibName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         public static extern int DSCSGradeEncryptFileV2(string stSource, string grade);
 
+        [DllImport(strSoftCampDrmLibName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void DSCSAddDac(int nGuide, string grade);
+
+
         public int DrmEncrypt(string source, string grade)
         {
             //string grade = "0000004";
@@ -28,5 +32,20 @@ namespace OpenNetLinkApp.Data.SGDicData.DRM
 
             return ret;
         }
+
+        public bool DrmAddDac(int nGuide, string grade)
+        {
+            try
+            {
+                DSCSAddDac(nGuide, grade);
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Log.Logger.Here().Error($"DrmAddDac, Exception(MSG) : {ex.Message}");
+                return false;
+            }
+        }
+
     }
 }
