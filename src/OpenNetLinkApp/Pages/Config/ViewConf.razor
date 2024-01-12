@@ -115,33 +115,47 @@
                                         </table>
                                         @if (SGAppMgrSvc.OpConfigInfoService.GetViewFileFilter(groupIDbyParam) == true)
                                         {
-                                            <div class="table-responsive">
-                                                <div class="title_set"><i class="fas fa-cog mr-1"></i>@strExtLimitInfo</div>                   <!--확장자 제한-->
-                                                <table class="table_set">
-                                                    <colgroup>
-                                                        <col width="100%">
-                                                    </colgroup>
-                                                    <tr>
-                                                        <th>
 
-                                                            <div class="row">
-                                                                <div class="custom-control custom-radio mr-3 ml-1">
-                                                                    <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="customRadio1" name="customRadio" checked="@bExt1" disabled="true">
-                                                                    <label for="customRadio1" class="custom-control-label pt-1">@strExtWhite</label>                      <!--허용 (White)-->
-                                                                </div>
-                                                                <div class="custom-control custom-radio">
-                                                                    <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="@bExt2" disabled="true">
-                                                                    <label for="customRadio2" class="custom-control-label pt-1">@strExtBlack</label>                          <!--차단 (Black)-->
-                                                                </div>
+                                            <div class="title_set"><i class="fas fa-cog mr-1"></i>@strExtLimitInfo</div> <!--확장자 제한-->
+                                            <table class="table_set">
+                                                <colgroup>
+                                                    <col width="100%">
+                                                </colgroup>
+                                                <tr>
+                                                    <th>
+
+                                                        <div class="row">
+                                                            <div class="custom-control custom-radio mr-3 ml-1">
+                                                                <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="customRadio1" name="customRadio" checked="@bExt1" disabled="true">
+                                                                <label for="customRadio1" class="custom-control-label pt-1">@strExtWhite</label>                      <!--허용 (White)-->
                                                             </div>
+                                                            <div class="custom-control custom-radio">
+                                                                <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="@bExt2" disabled="true">
+                                                                <label for="customRadio2" class="custom-control-label pt-1">@strExtBlack</label>                          <!--차단 (Black)-->
+                                                            </div>
+                                                        </div>
 
-                                                        </th>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2" style="height:60px;">@strExtInfo</td>                                                  <!--상세 설명이 없습니다.-->
-                                                    </tr>
-                                                </table>
-                                            </div>
+                                                    </th>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" style="height:60px;">@strExtInfo</td>                                                  <!--상세 설명이 없습니다.-->
+                                                </tr>
+                                            </table>
+
+                                        }
+                                        @if (SGAppMgrSvc.OpConfigInfoService.GetViewApproveExt(groupIDbyParam))
+                                        {
+                                            <div class="title_set"><i class="fas fa-cog mr-1"></i>@strApproveExt</div> <!--필수결재확장자-->
+                                            <table class="table_set">
+                                                <colgroup>
+                                                    <col width="22%">
+                                                    <col width="78%">
+                                                </colgroup>
+                                                <tr>
+                                                    <th>@strApproveExt</th>                                                             <!--필수결재확장자-->
+                                                    <td>@strApproveExtValue</td>
+                                                </tr>
+                                            </table>
                                         }
                                     </div>
                                 </div>
@@ -165,7 +179,7 @@
                                         <button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-info btn-flat" @onclick="doExcelDown"><i class="fas fa-file-excel"></i>@XmlConf.GetTitle("T_INFO_EXCEL")</button>
                                         -->
                                     </div>
-                                    <div class="table-responsive" style="height:160px; border:1px solid #83a0bd;" >
+                                    <div class="table-responsive" style="height:160px; border:1px solid #83a0bd;">
                                         <table class="table_url table-hover" style="overflow: auto;">
                                             <colgroup>
                                                 <col width="80%">
@@ -183,7 +197,7 @@
                                                         </tr>
                                                     }
                                                 }
-                                                    </tbody>
+                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -226,6 +240,8 @@
     public string strExtWhite = "";                                                 // 허용(White)
     public string strExtBlack = "";                                                 // 차단 (Black)
     public string strExtInfo = "";                                                     // 상세 설명이 없습니다.
+    public string strApproveExt = "";                                                //필수결재확장자
+    public string strApproveExtValue = "";                                          //필수결재확장자 값
 
 
     public string strDataVersion = "";                                                  // SecureGate ver 2.01
@@ -291,6 +307,7 @@
         strTransMaxSize = XmlConf.GetTitle("T_INFO_ONEDAY_TRANCE_SIZELIMIT");                            // 전송용량제한.
         strDayClipboardMaxSize = XmlConf.GetTitle("T_INFO_ONEDAY_CLIPSEND");                             // 일일클립보드 전송 제한
         strExtLimitInfo = XmlConf.GetTitle("T_eFAEXT");                                                  // 확장자 제한
+        strApproveExt = XmlConf.GetTitle("T_APPROVE_EXT");                                                  // 필수결재확장자
         strExtWhite = XmlConf.GetTitle("T_INFO_CHECK_EXTENSION_WHITE");                                  // 허용(White)
         strExtBlack = XmlConf.GetTitle("T_INFO_CHECK_EXTENSION_BLACK");                                  // 차단 (Black)
         strExtInfo = XmlConf.GetInfoMsg("I_0190");                                                          // 상세 설명이 없습니다.
@@ -327,7 +344,7 @@
         temp = XmlConf.GetTitle("T_INFO_LIMMIT_SIZE");                                                 // {0} MB 까지 전송
         nTemp64 = sgLoginData.GetFileLimitSize();
         strDataMaxTransSize = String.Format(temp, nTemp64);                                 // 15,000MB까지 전송
-        if(!sgLoginData.GetFileTrans())
+        if (!sgLoginData.GetFileTrans())
             strDataMaxTransSize = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                //사용안함
 
         // 한번에 전송 가능한 파일 개수
@@ -410,7 +427,7 @@
         // 일일 클립보드 전송 최대 회수
         temp = XmlConf.GetInfoMsg("I_0130");                                                           // {0} 회까지 전송
         nTemp = sgLoginData.GetDayClipboardLimitCount();
-        if(!sgLoginData.GetClipboard())
+        if (!sgLoginData.GetClipboard())
         {
             strDataDayClipboardMaxCount = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");
         }
@@ -448,6 +465,8 @@
         if (!temp.Equals(""))
             strExtInfo = temp;
 
+        strApproveExtValue = sgLoginData.GetExceptionExt();
+
         bURLRedirection = sgLoginData.GetURLRedirect();
 
         SGUrlListData sgUrlData = null;
@@ -455,9 +474,9 @@
         if (sgUrlData != null)
         {
             eUrlType eUType = sgUrlData.GetURLuseType();
-            if(eUType == eUrlType.eWhiteList)
+            if (eUType == eUrlType.eWhiteList)
                 strURLRedirectCheck = $"{XmlConf.GetTitle("T_INFO_URL_REDIRECTION_CHECK")} {XmlConf.GetTitle("T_INFO_CHECK_EXTENSION_WHITE")}";
-            else if(eUType == eUrlType.eBlackList)
+            else if (eUType == eUrlType.eBlackList)
                 strURLRedirectCheck = $"{XmlConf.GetTitle("T_INFO_URL_REDIRECTION_CHECK")} {XmlConf.GetTitle("T_INFO_CHECK_EXTENSION_BLACK")}";
             else
                 strURLRedirectCheck = $"{XmlConf.GetTitle("T_INFO_URL_REDIRECTION_CHECK")} {XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED")}";

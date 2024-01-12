@@ -182,6 +182,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetWebLinkPreviewerURL(int groupId);
         public bool GetUseLanguageSet(int groupId);
         public bool GetViewFileFilter(int groupId);
+        public bool GetViewApproveExt(int groupId);
         public bool GetViewSGSideBarUIBadge(int groupId);
         public bool GetViewSGHeaderUIAlarmNoriAllDel(int groupId);
         public bool GetUseForceUpdate(int groupId);
@@ -287,6 +288,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseDlpAfterApproveToNormal(int groupId);
 
         public bool GetHideTransManageDownLoadColumn(int groupId);
+        public bool GetUseAptTimeOutMsg(int groupId);
 
         public bool SetPropertyVal(int groupId, string strProperty, object strVal);
 
@@ -994,6 +996,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bViewFileFilter;
         }
+        public bool GetViewApproveExt(int groupId)
+        {
+            return AppConfigInfo[groupId].bViewApproveExt;
+        }
         public bool GetViewSGSideBarUIBadge(int groupId)
         {
             return AppConfigInfo[groupId].bViewSGSideBarUIBadge;
@@ -1300,6 +1306,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetHideTransManageDownLoadColumn(int groupId)
         {
             return AppConfigInfo[groupId].bHideTransManageDownLoadColumn;
+        }
+
+        public bool GetUseAptTimeOutMsg(int groupId)
+        {
+            return AppConfigInfo[groupId].bUseAptTimeOutMsg;
         }
 
         /// <summary>

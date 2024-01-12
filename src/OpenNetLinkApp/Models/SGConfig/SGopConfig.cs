@@ -193,6 +193,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public string strWebLinkPreviewerURL { get; set; } = "218.145.246.25";     //WebLink 미리보기 사용 시 WebLink 주소 ( + AP001_Docs_Viewer.do 사용)
         public bool bUseLanguageSet { get; set; } = false;    // 언어설정 사용 유무.
         public bool bViewFileFilter { get; set; } = true;   // (환경설정) 확장자 제한 화면 표시 유무.
+        public bool bViewApproveExt { get; set; } = false;  // (환경설정) 결재필수확장자 화면 표시 유무.
         public bool bViewSGSideBarUIBadge { get; set; } = false;   // 왼쪽 메뉴들에서 Badge 나오게할지 유무 설정값
         public bool bViewSGHeaderUIAlarmNoriAllDel { get; set; } = true;   // 상단 HeaderUI에서 Alarm, Noti 상에 Badge 전체 삭제 메뉴 나오게할지 유무
         public bool bUseForceUpdate { get; set; } = true;   // 넘기는 기능 없이 무조건 업데이트 사용 유무
@@ -264,6 +265,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bHideTransManageDownLoadColumn { get; set; } = false;         //전송관리화면에서 만료일, 다운로드, 다운로드 가능 횟수
 
         public bool bUseTempDownPath { get; set; } = false;                      //파일 수신 시 hsz 파일을 사용자 설정 다운로드에 받을 것인지, Agent 설치된 경로의 wapppove에 받을 것인지 - true 면 wapprove
+
+        public bool bUseAptTimeOutMsg { get; set; } = false;                     //APT 타임아웃 났을때 문구 VirusReport로 보내지 않고 알림으로 사용
     }
 
 }
