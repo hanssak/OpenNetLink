@@ -30,6 +30,7 @@ var isPatchSilent = Argument<bool>("isPatchSilent", true);		// false로 하면 �
 var regStartProgram = Argument<bool>("regStartProgram", true);		// 시작프로그램에 등록 여부(Window)
 var isUpdateCheck = Argument<bool>("isUpdateCheck", false);				//false 하면 업데이트 체크 안함
 var useMakeConfig = Argument<bool>("useMakeConfig", false);		//Json 형식으로된 MakeConfig.json을 로드하여 지정된 속성을 처리
+var productName = Argument("productName", "OpenNetLink");           //PRODUCT_NAME 입력
 
 var isPatchInstaller = false;
 var nacLoginType ="0" ;		//0:none / 1:Genian NAC
@@ -1041,6 +1042,7 @@ Task("MakeInstaller")
 					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
 					{"REG_STARTPROGRAM", regStartProgram.ToString().ToUpper()},
 					{"REG_AGENT_IN_NAC", regAgentInNAC.ToString().ToUpper()},
+					{"PRODUCT_NAME", productName.ToString()},
 				}
 			});			
 
@@ -1067,6 +1069,7 @@ Task("MakeInstaller")
 					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
 					{"REG_STARTPROGRAM", regStartProgram.ToString().ToUpper()},
 					{"REG_AGENT_IN_NAC", regAgentInNAC.ToString().ToUpper()},
+					{"PRODUCT_NAME", productName.ToString()},
 				}
 			});
 		}
@@ -1094,6 +1097,7 @@ Task("MakeInstaller")
 					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
 					{"REG_STARTPROGRAM", regStartProgram.ToString().ToUpper()},
 					{"REG_AGENT_IN_NAC", regAgentInNAC.ToString().ToUpper()},
+					{"PRODUCT_NAME", productName.ToString()},
 				}
 			});			
 		}
