@@ -34,6 +34,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HsNetWorkSG", "..\openNetLi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSslLibrary", "..\openNetLib\OpenSslLibrary\OpenSslLibrary.csproj", "{252B4692-8B64-4CDD-8294-A202BEFB2BEF}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenNetLinkService", "src\OpenNetLinkService\OpenNetLinkService\OpenNetLinkService.csproj", "{E50D8D66-EC3B-40FB-96A6-C72787DF6F09}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -186,6 +188,18 @@ Global
 		{252B4692-8B64-4CDD-8294-A202BEFB2BEF}.Release|x64.Build.0 = Release|Any CPU
 		{252B4692-8B64-4CDD-8294-A202BEFB2BEF}.Release|x86.ActiveCfg = Release|x86
 		{252B4692-8B64-4CDD-8294-A202BEFB2BEF}.Release|x86.Build.0 = Release|x86
+		{E50D8D66-EC3B-40FB-96A6-C72787DF6F09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E50D8D66-EC3B-40FB-96A6-C72787DF6F09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E50D8D66-EC3B-40FB-96A6-C72787DF6F09}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E50D8D66-EC3B-40FB-96A6-C72787DF6F09}.Debug|x64.Build.0 = Debug|Any CPU
+		{E50D8D66-EC3B-40FB-96A6-C72787DF6F09}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E50D8D66-EC3B-40FB-96A6-C72787DF6F09}.Debug|x86.Build.0 = Debug|Any CPU
+		{E50D8D66-EC3B-40FB-96A6-C72787DF6F09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E50D8D66-EC3B-40FB-96A6-C72787DF6F09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E50D8D66-EC3B-40FB-96A6-C72787DF6F09}.Release|x64.ActiveCfg = Release|Any CPU
+		{E50D8D66-EC3B-40FB-96A6-C72787DF6F09}.Release|x64.Build.0 = Release|Any CPU
+		{E50D8D66-EC3B-40FB-96A6-C72787DF6F09}.Release|x86.ActiveCfg = Release|Any CPU
+		{E50D8D66-EC3B-40FB-96A6-C72787DF6F09}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -203,6 +217,7 @@ Global
 		{43883276-4BB0-4491-9F0A-5CEEF0A648E3} = {6A79DAD3-9AEF-47C3-9BF4-BF27365F3BF0}
 		{74C78E87-F623-4947-A38B-968003C4CBA0} = {6A79DAD3-9AEF-47C3-9BF4-BF27365F3BF0}
 		{252B4692-8B64-4CDD-8294-A202BEFB2BEF} = {6A79DAD3-9AEF-47C3-9BF4-BF27365F3BF0}
+		{E50D8D66-EC3B-40FB-96A6-C72787DF6F09} = {6A79DAD3-9AEF-47C3-9BF4-BF27365F3BF0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {27582E6D-A662-4DF3-834C-74D0A94025A1}
