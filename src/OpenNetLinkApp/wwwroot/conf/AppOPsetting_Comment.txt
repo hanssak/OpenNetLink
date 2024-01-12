@@ -254,6 +254,9 @@ bHiddenLoginLogo : Main Login 창 좌측 로고 숨김 처리
 bUseDrmAfterFileReceive :           //파일 수신 완료 후 DRM 사용 여부
 nDrmType :                          //DRM 종류 - 1. SoftCamp, 2.Fasso
 strSoftCampGrade:                   // SoftCamp 연동 시 보안등급
+nSoftCampEncMode : 1 - strSoftCampGrade 값을 사용한 Encrpty, 2 - DAC 사용한 Encrpty, nSoftCampGuide + strSoftCampDAC 값사용
+nSoftCampGuide : 1~3 중에사용, 보통 3
+strSoftCampDAC : 1;1;0;0;1;1;1     => softcamp 문서참고
 
 bUseDlpCheck :           //파일 DLP 검사 사용 유무
 nDlpType :                          //DLP 종류 - 1. 소만사
