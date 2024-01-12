@@ -104,8 +104,8 @@
                                 <colgroup><col width=""><col width=""></colgroup>
                                 <tbody>
                                     <tr>
-                                        <th>자료전송 가능시간</th>
-                                        <td>일:0~3,9~18 월:0~3,9~18 화:0~3,9~18 수:0~3,9~18 일:0~3,9~18 월:0~3,9~18 화:0~3,9~18 수:0~3,9~18</td>
+                                        <th width="67.53">@((MarkupString)XmlConf.GetTitle("T_FILETRANS_USE_TIME_TITLE"))</th>
+                                        <td>@strFileTransForTimeDisPlay</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -537,6 +537,7 @@
 
 
     bool bUseFileTransForTime = false;
+    string strFileTransForTimeDisPlay = "";
 
     private async Task OpenDetailPopup(BoardItem item)
     {
@@ -627,6 +628,35 @@
 
 
     /// <summary>
+    /// 자료전송 가능 시간 Display할 UI 만들어내는 함수
+    /// </summary>
+    /// <param name="groupID"></param>
+    protected bool GetFileTransWeekTimeDisplayData(int groupID)
+    {
+
+        bool bRet = false;
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+        {
+
+            bRet = sgLoginData.GetFileTransWeekTimeDisplay(XmlConf.GetTitle("T_FILETRANS_USE_DAY_ALL"),
+                XmlConf.GetTitle("T_FILETRANS_USE_DAY_NONE"),
+                XmlConf.GetTitle("T_FILETRANS_USE_TIME_DASHBOARD"),
+                XmlConf.GetTitle("T_FILETRANS_TIME_CONVERT"),
+                out strFileTransForTimeDisPlay);
+
+            if (bRet)
+            {
+                bUseFileTransForTime = true;
+            }
+
+        } // if (sgLoginData != null)
+
+        return bRet;
+    }
+
+    /// <summary>
     /// 자동로그인 설정 화면 나오게 할지 유무
     /// </summary>
     /// <returns></returns>
@@ -639,7 +669,7 @@
             return true;
 
         return false;
-        
+
     }
 
 
@@ -1037,6 +1067,8 @@
             GetNetOverModeData(groupID);
 
             SetQuickMenuModify(groupID);
+
+            GetFileTransWeekTimeDisplayData(groupID);
 
             InitText();
 

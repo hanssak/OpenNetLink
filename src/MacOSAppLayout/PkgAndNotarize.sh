@@ -328,7 +328,7 @@ fi
 
 if [[ $isupdatecheck == "FALSE" ]]; then 
     sed -i '' -e 's/UPDATE_CHECK=1/UPDATE_CHECK=0/g' $filepostinstall
-    sed -i '' -e 's/UPDATE_CHECK=1/REG_CRUPDATE_CHECKX=0/g' $filepreinstall
+    sed -i '' -e 's/UPDATE_CHECK=1/UPDATE_CHECK=0/g' $filepreinstall
 else
     sed -i '' -e 's/UPDATE_CHECK=0/UPDATE_CHECK=1/g' $filepostinstall
     sed -i '' -e 's/UPDATE_CHECK=0/UPDATE_CHECK=1/g' $filepreinstall

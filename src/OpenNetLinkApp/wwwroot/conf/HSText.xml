@@ -5673,27 +5673,48 @@
 
 
 		<T_FILETRANS_USE_TIME_TITLE>
-			<KR>자료전송 가능시간</KR>
+			<KR>파일전송<![CDATA[<br>]]>가능시간</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN>Data transmission time</CN>
 		</T_FILETRANS_USE_TIME_TITLE>
 
 		<T_FILETRANS_USE_TIME_DASHBOARD>
-			<KR>일:{0} 월:{1} 화:{2} 수:{3} 목:{4} 금:{5} 토:{6} 공휴일:{7}</KR>
+			<KR>일:{0}, 월:{1}, 화:{2}, 수:{3}, 목:{4}, 금:{5}, 토:{6}, 공휴일:{7}</KR>
 			<JP></JP>
 			<EN></EN>
-			<CN>Sun:{0} Mon:{1} Tue:{2} Wed:{3} Thu:{4} Fri:{5} Sat:{6} Holi:{7}</CN>
+			<CN>Sun:{0}, Mon:{1}, Tue:{2}, Wed:{3}, Thu:{4}, Fri:{5}, Sat:{6}, Holi:{7}</CN>
 		</T_FILETRANS_USE_TIME_DASHBOARD>
 
 		<T_FILETRANS_USE_TIME_TRANSFER>
-			<KR>사용가능 시간(일:{0} 월:{1} 화:{2} 수:{3} 목:{4} 금:{5} 토:{6} 공휴일:{7})</KR>
+			<KR>사용가능 시간(일:{0}, 월:{1}, 화:{2}, 수:{3}, 목:{4}, 금:{5}, 토:{6}, 공휴일:{7})</KR>
 			<JP></JP>
 			<EN></EN>
-			<CN>Available time(Sun:{0} Mon:{1} Tue:{2} Wed:{3} Thu:{4} Fri:{5} Sat:{6} Holi:{7})</CN>
+			<CN>Available time(Sun:{0}, Mon:{1}, Tue:{2}, Wed:{3}, Thu:{4}, Fri:{5}, Sat:{6}, Holi:{7})</CN>
 		</T_FILETRANS_USE_TIME_TRANSFER>
 
-		<T_LOG_DB_ADDFILE>
+    <T_FILETRANS_USE_DAY_ALL>
+      <KR>종일</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </T_FILETRANS_USE_DAY_ALL>
+
+    <T_FILETRANS_USE_DAY_NONE>
+      <KR>금지</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </T_FILETRANS_USE_DAY_NONE>
+
+    <T_FILETRANS_TIME_CONVERT>
+      <KR>이외</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </T_FILETRANS_TIME_CONVERT>
+    
+    <T_LOG_DB_ADDFILE>
 			<KR>파일 리스트 추가</KR>
 			<JP></JP>
 			<EN>Add file list</EN>

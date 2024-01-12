@@ -549,6 +549,8 @@ Task("PubCrossflatform")
 
     DotNetCorePublish("./OpenNetLinkApp", settings);
 	DotNetCorePublish("./PreviewUtil", settings);
+	if(AppProps.Platform == "windows")
+		DotNetCorePublish("./OpenNetLinkService", settings);
 
 	if(AppProps.Platform != "mac")
 		DotNetCorePublish("./ContextTransferClient", settings);

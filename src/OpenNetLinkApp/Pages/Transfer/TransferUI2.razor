@@ -65,7 +65,7 @@
         {
             <div class="row">
                 <div class="col-sm-12 text-dark" style="margin-left: 1.5rem">
-                    <i class="far fa-clock mr-1"></i><span style="margin-left: 0.5rem">사용가능 시간(일:0~3,9~18 월:0~3,9~18 화:0~3,9~18 수:0~3,9~18 목:0~3,9~18 금:0~3,9~18 토:0~3,9~18 공휴일:0~3,9~18)</span>
+                    <i class="far fa-clock mr-1"></i><span style="margin-left: 0.5rem">@strFileTransForTimeDisPlay</span>
                 </div>
             </div>
         }
@@ -323,6 +323,7 @@
     List<HsStream> FileList = null;
 
     bool bUseFileTransForTime = false;
+    string strFileTransForTimeDisPlay = "";
 
     [JSInvokable("JSLoadListFiles")]    //좌측 하위 리스트에서, 폴더 더블클릭 시 호출
     public static void JSLoadListFiles(string path)
@@ -822,7 +823,8 @@
 
         // 시간에 의한 파일전송 기능 사용 확인
         //bool bUseFileTrans = true; //sgLoginData.GetFileTrans();
-        if (sgLoginData.GetUseFileTransForTimeMode())
+
+        //if (sgLoginData.GetUseFileTransForTimeMode())     // KKW-Test
         {
             if (sgLoginData.GetUseFileTransForTime() == false)
             {
@@ -1380,7 +1382,7 @@
 
         List<Dictionary<int, string>> result = sgData.GetSvrRecordData("RECORD");
 
-        if (result.Count > 0)
+        if ((result?.Count ?? 0) > 0)
         {
             bool checkWarring = false;
             bool checkLimit = false;
@@ -1751,6 +1753,35 @@
         }
     }
 
+    /// <summary>
+    /// 자료전송 가능 시간 Display할 UI 만들어내는 함수
+    /// </summary>
+    /// <param name="groupID"></param>
+    protected bool GetFileTransWeekTimeDisplayData(int groupID)
+    {
+
+        bool bRet = false;
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+        {
+
+            bRet = sgLoginData.GetFileTransWeekTimeDisplay(XmlConf.GetTitle("T_FILETRANS_USE_DAY_ALL"),
+                XmlConf.GetTitle("T_FILETRANS_USE_DAY_NONE"),
+                XmlConf.GetTitle("T_FILETRANS_USE_TIME_TRANSFER"),
+                XmlConf.GetTitle("T_FILETRANS_TIME_CONVERT"),
+                out strFileTransForTimeDisPlay);
+
+            if (bRet)
+            {
+                bUseFileTransForTime = true;
+            }
+
+        } // if (sgLoginData != null)
+
+        return bRet;
+    }
+
     protected void OnSettingByGroupID(int groupID)
     {
         ActionFileSelectOK = PopUpFileSelectOK;
@@ -1843,6 +1874,10 @@
                 pageService.SetAfterApproveCheck(groupID, bAfterCheck);
                 strAfterApprove = "";
             }
+
+            //if (sgLoginData.GetUseFileTransForTimeMode())
+            GetFileTransWeekTimeDisplayData(groupID);
+
         }
 
         UseDayInfoDisplay();

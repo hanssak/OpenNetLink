@@ -185,6 +185,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public string strWebLinkPreviewerURL { get; set; }     //WebLink 미리보기 사용 시 WebLink 주소 ( + AP001_Docs_Viewer.do 사용)
         public bool bUseLanguageSet { get; set; }    // 언어설정 사용 유무.
         public bool bViewFileFilter { get; set; }   // (환경설정) 확장자 제한 화면 표시 유무.
+        public bool bViewApproveExt { get; set; }   // (환경설정) 결재필수확장자 화면 표시 유무.
         public bool bViewSGSideBarUIBadge { get; set; }  // 왼쪽 메뉴들에서 Badge 나오게할지 유무 설정값
         public bool bViewSGHeaderUIAlarmNoriAllDel { get; set; }  // 상단 HeaderUI에서 Alarm, Noti 상에 Badge 전체 삭제 메뉴 나오게할지 유무
         public bool bUseForceUpdate { get; set; }   // 넘기는 기능 없이 무조건 업데이트 사용 유무
@@ -214,6 +215,14 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseDrmAfterFileReceive { get; set; }             //파일 수신 완료 후 DRM 사용 여부
         public int nDrmType { get; set; }                          //DRM 종류 - 1. SoftCamp
         public string strSoftCampGrade { get; set; }         //DRM 종류 - SoftCamp Grade 옵션화 처리
+
+        public int nSoftCampEncMode { get; set; }         //DRM SoftCamp  암호화하는 동작 mode설정(1:예전방식간편모드, 2:상세설정mode)
+
+        public int nSoftCampGuide { get; set; }         //DRM Guide - 0:사용안함, 1: 개인 권한 설정, 2: 그룹 권한 설정, 3: 최상위 그룹 권한 설정
+
+        public string strSoftCampDAC { get; set; }         //DRM 종류 - SoftCamp Grade 옵션화 처리
+
+
         public bool bUseDlpCheck { get; set; }          //파일 전송 시 DLP 검사 사용 유무
         public int nDlpType { get; set; }                          //DLP 종류 - 1. 소만사
 
@@ -247,5 +256,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseDlpAfterApproveToNormal { get; set; }    // DLP검출된 파일 사후 결재요청한 것도 사전으로 보내도록 할지 유무
 
         public bool bHideTransManageDownLoadColumn { get; set; }         //전송관리화면에서 만료일, 다운로드, 다운로드 가능 횟수
+
+        public bool bUseTempDownPath { get; set; }                      //파일 수신 시 hsz 파일을 사용자 설정 다운로드에 받을 것인지, Agent 설치된 경로의 wapppove에 받을 것인지 - true 면 wapprove
+
+        public bool bUseAptTimeOutMsg { get; set; }                    //APT 타임아웃 났을때 문구 VirusReport로 보내지 않고 알림으로 사용
     }
 }

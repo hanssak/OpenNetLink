@@ -73,6 +73,7 @@
 <SecurityApproverSelectPopUp @ref="refSecurityAproverSelectPopUp" OnSelectOK="doSelectApporveOk" OnSelectCancel="doDLPCancel"></SecurityApproverSelectPopUp>
 <SecurityPopUp @ref="refSecurityPopUp" OnSelectCancel="doDLPCancel"></SecurityPopUp>
 <SecurityConfirm @ref="refSecurityConfirm" OnOK="doDLPOk" OnCancel="doDLPCancel"></SecurityConfirm>
+<SGAlert @ref="refSGAlertAPTNotice" Guid="MainLayoutAPTNotice"></SGAlert>
 <DownloadProgress></DownloadProgress>
 
 @code
@@ -86,6 +87,7 @@
     SecurityApproverSelectPopUp refSecurityAproverSelectPopUp;
     SecurityPopUp refSecurityPopUp;
     SecurityConfirm refSecurityConfirm;
+    SGAlert refSGAlertAPTNotice;
     bool bDlpUse = false;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<MainLayout>();
 
@@ -291,10 +293,29 @@
         else if (cmd == eCmdList.eDrmBlockNoti)
             BlockType = Common.Enums.PreworkType.DRM_SCAN;
 
-        refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, BlockType);
 
-        await refVirusReport.openPopUp();
+        bool isPopupAptScanTimeOut = false;
 
+        if (BlockType == Common.Enums.PreworkType.APT_SCAN)
+        {
+
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseAptTimeOutMsg(groupID))
+            {
+                if (strVirusContent == "검사 시간 초과") //검사 시간 초과를 판단할 수 있는 방법이 Content 내용밖에 없어서 .....
+                {
+                    isPopupAptScanTimeOut = true;
+                    string msg = XmlConf.GetErrMsg("E_0273");
+                    await refSGAlertAPTNotice.openPopUp(XmlConf.GetTitle("T_APT_TIME_OUT"), msg, 1, groupID, "1");
+                }
+            }
+        }
+
+        if(!isPopupAptScanTimeOut)
+        {
+            refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, BlockType);
+
+            await refVirusReport.openPopUp();
+        }
     }
 
     /// <summary>

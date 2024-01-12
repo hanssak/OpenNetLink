@@ -706,7 +706,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// 요일별 시간에 따른 자료전송 제약하는 기능 사용
+        /// 요일별 시간에 따른 자료전송 제약하는 기능 사용 유무
         /// </summary>
         /// <returns></returns>
         public bool GetUseFileTransForTimeMode()
@@ -724,16 +724,282 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 
         /// <summary>
+        /// 파일전송 사용 Mode 값을 return (0,1,2)
+        /// </summary>
+        /// <returns></returns>
+        public int GetModeValueForFileTrans()
+        {
+            string strData = GetTagData("FILEUPLOADTIME");
+
+            int nRet = -1;
+            try
+            {
+                if ((strData?.Length ?? 0) > 0)
+                {
+                    strData = strData.Substring(0, 1);
+                    return Convert.ToInt32(strData);
+                }
+            }
+            catch(Exception ex)
+            {
+                nRet = -2;
+                Log.Logger.Here().Information($"GetModeValueForFileTrans, Exception(MSG) : {ex.Message}");
+            }
+
+            return nRet;
+        }
+
+
+        /// <summary>
+        /// Server에서 요일별로 받은 파일전송 동작하도록할지 유무 Low data들 Dictionary화 해서 반환함<br></br>
+        /// 0: 일요일,.. 6:토요일, 7:공휴일<br></br>
+        /// Mode 값에 상관없이 동일한 형식으로 변환해서 반환함
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<int, string[]> GetModeWeekDataForFileTrans()
+        {
+            Dictionary<int, string[]> dicWeekData = new Dictionary<int, string[]>();
+
+            string strData = GetTagData("FILEUPLOADTIME");
+            // Test)
+            //strData = "2/0|0|1|7~8.17~23|2|-1|3|7~8.17~23|4|0|5|0~24|6|1~23|7|1~18";
+            //strData = "1/0,6/!9~18";
+
+            try
+            {
+                if (string.IsNullOrEmpty(strData) == false)
+                {
+                    int nModeValue = Convert.ToInt32(strData.Substring(0, 1));
+                    int nPos = strData.IndexOf('/');
+                    if (nPos < 1)
+                    {
+                        Log.Logger.Here().Information($"GetModeWeekDataForFileTrans, Error : syntax !!!");
+                        return dicWeekData;
+                    }
+
+                    strData = strData.Substring(nPos + 1);
+
+                    if (nModeValue == 1)
+                    {
+
+                        // ex) strData = "1/0,1,2,6/!9~18";
+                        string[] arrAfter = strData.Split("/");
+
+                        if ((arrAfter?.Length ?? 0) == 2)
+                        {
+
+                            string[] strArrUseOneDay = new string[1] { "0" };
+                            string[] strArrUseNoOneDay = new string[1] { "-1" };
+
+                            if (string.Compare(arrAfter[0], "all", true) == 0 ||
+                                 string.Compare(arrAfter[1], "all", true) == 0)
+                            {
+                                for (int iDx = 0; iDx < 8; iDx++)
+                                {
+                                    dicWeekData.TryAdd(iDx, strArrUseOneDay);
+                                }
+                            }
+                            else if (string.Compare(arrAfter[0], "none", true) == 0 &&
+                                    string.Compare(arrAfter[1], "none", true) == 0)
+                            {
+                                for (int iDx = 0; iDx < 7; iDx++)
+                                {
+                                    dicWeekData.TryAdd(iDx, strArrUseNoOneDay);
+                                }
+
+                                dicWeekData.TryAdd(7, (GetHoliday() == "1") ? strArrUseOneDay : strArrUseNoOneDay);
+                            }
+                            else
+                            {
+                                // 요일별설정
+                                if (string.Compare(arrAfter[0], "none", true) != 0)
+                                {
+                                    arrAfter[0] = arrAfter[0].Replace('.', ',');
+                                    string[] strWeekUseDay = arrAfter[0].Split(',');
+                                    foreach (string strWeekNum in strWeekUseDay)
+                                    {
+                                        dicWeekData.TryAdd(Convert.ToInt32(strWeekNum), strArrUseOneDay);
+                                    }
+                                }
+
+                                string[] strArrDayData = null;
+                                for (int iDx = 0; iDx < 7; iDx++)
+                                {
+                                    if (dicWeekData.TryGetValue(iDx, out strArrDayData) == false)
+                                    {
+                                        dicWeekData.TryAdd(iDx, strArrUseNoOneDay);
+                                    }
+                                }
+
+                                // 휴일설정
+                                dicWeekData.TryAdd(7, (GetHoliday() == "1") ? strArrUseOneDay : strArrUseNoOneDay);
+
+                                // 시간별설정
+                                if (string.Compare(arrAfter[1], "none", true) != 0)
+                                {
+                                    string[] strArrUseTime = new string[1] { arrAfter[1] };
+                                    for (int iDx = 0; iDx < 8; iDx++)
+                                    {
+                                        if (dicWeekData.TryGetValue(iDx, out strArrDayData))
+                                        {
+                                            if (strArrDayData[0] == "-1")
+                                            {
+                                                dicWeekData.Remove(iDx);
+                                                dicWeekData.TryAdd(iDx, strArrUseTime);
+                                            }
+
+                                            
+                                        }
+                                        else
+                                        {
+                                            dicWeekData.TryAdd(iDx, strArrUseTime);
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("FILEUPLOADTIME syntax Error");
+                        }
+                    }
+                    else if (nModeValue == 2)                    
+                    {
+
+                        // ex) 2/0|0|1|-1|2|-1|3|7~8.17~23|4|0|5|0~24|6|1~23|7|1~18
+                        string[] strWeekData = strData.Split('|');
+                        int nDx = 0;
+                        for(int iDx = 0; iDx < 16; )
+                        {
+                            if (dicWeekData.ContainsKey(nDx))
+                                dicWeekData.Remove(nDx);
+
+                            string[] strArrDayUseinfo = strWeekData[iDx + 1].Split('.');
+
+                            dicWeekData.TryAdd(nDx, strArrDayUseinfo);
+                            iDx += 2;
+                            nDx++;
+                        }
+
+                    }
+
+                } // if (string.IsNullOrEmpty(strData) == false)
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Information($"GetModeWeekDataForFileTrans, Exception(MSG) : {ex.Message}");
+            }
+
+            return dicWeekData;
+        }
+
+        /// <summary>
+        /// 요일별 파일전송 기능 사용때에 display할 서버의 정책값을 문구로 만들어내는 함수
+        /// </summary>
+        /// <param name="strUseOneday"></param>
+        /// <param name="strUseNoday"></param>
+        /// <param name="strDisplay"></param>
+        /// <param name="strDisplayOutData"></param>
+        /// <returns></returns>
+        public bool GetFileTransWeekTimeDisplay(string strUseOneday, string strUseNoday, string strDisplay, string strTimeConvertMsg, out string strDisplayOutData)
+        {
+            bool bRet = false;
+            strDisplayOutData = "";
+
+            try
+            {
+                int nMode = GetModeValueForFileTrans();
+
+                if (nMode == 1 || nMode == 2)
+                {
+                    Dictionary<int, string[]> dicWeekData = GetModeWeekDataForFileTrans();
+                    string[][] strArrayWeek = new string[8][];
+
+                    for (int nDx = 0; nDx < 8; nDx++)
+                    {
+                        if (dicWeekData.TryGetValue(nDx, out strArrayWeek[nDx]) == false)
+                        {
+                            throw new Exception("FileTrans Week Time Data, Wrong!");
+                        }
+
+                        string strTmpData2 = "";
+                        if ((strArrayWeek[nDx]?.Length ?? 0) == 1)
+                        {
+                            if (strArrayWeek[nDx][0] == "0")
+                                strArrayWeek[nDx][0] = strUseOneday;
+                            else if (strArrayWeek[nDx][0] == "-1")
+                                strArrayWeek[nDx][0] = strUseNoday;
+                            else if ((strArrayWeek[nDx][0]?.Length ?? 0) > 1 && strArrayWeek[nDx][0][0] == '!')
+                            {
+                                strTmpData2 = strArrayWeek[nDx][0].Substring(1);
+                                strTmpData2 += strTimeConvertMsg;
+
+                                strArrayWeek[nDx][0] = strTmpData2;
+                            }
+                            // time Data 1개는 그대로 사용
+                        }
+                        else if ((strArrayWeek[nDx]?.Length ?? 0) > 1)
+                        {
+                            string strTmpData = "";
+                            foreach (string strTime in strArrayWeek[nDx])
+                            {
+                                if (string.IsNullOrEmpty(strTmpData) == false)
+                                    strTmpData += ",";
+
+                                if ( (strTime?.Length ?? 0) > 1 && strTime[0]=='!') //  && nMode == 1
+                                {
+                                    strTmpData2 = strTime.Substring(1);
+                                    strTmpData2 += strTimeConvertMsg;
+
+                                    strTmpData += strTmpData2;
+                                }
+                                else
+                                    strTmpData += strTime;
+                            }
+
+                            if (string.IsNullOrEmpty(strTmpData) == false)
+                                strArrayWeek[nDx][0] = strTmpData;
+                            else
+                                throw new Exception("FileTrans Week Time Data, Any Empty!");
+                        }
+
+                    } // for (int nDx = 0; ; nDx++)
+
+                    strDisplayOutData = string.Format(strDisplay,
+                        strArrayWeek[0][0], strArrayWeek[1][0], strArrayWeek[2][0], strArrayWeek[3][0],
+                        strArrayWeek[4][0], strArrayWeek[5][0], strArrayWeek[6][0], strArrayWeek[7][0]);
+
+                    bRet = true;
+
+                } // if (nMode == 1 || nMode == 2)
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"GetFileTransWeekTimeDisplayData, Exception-MSG:{ex.Message}");
+            }
+
+            return bRet;
+        }
+
+
+        /// <summary>
         /// 현재(서버시간 기준) 자료전송을 사용할 수 있는 시간대인지 유무를 확인하는 함수
         /// </summary>
         /// <returns></returns>
         public bool GetUseFileTransForTime()
         {
-            bool m_bFileTansUseTime = false;
+            bool bRet = false;
             string strPolicy = GetTagData("FILEUPLOADTIME");
             string strHoliday = GetTagData("HOLIDAY");
 
             Log.Logger.Here().Information($"FILEUPLOADTIME : {strPolicy}, HOLIDAY : {strHoliday}");
+
+            //Test)
+            //strPolicy = "2/0|0|1|7~8.17~23|2|-1|3|7~8.17~23|4|0|5|0~24|6|1~23|7|1~18";
+            //strPolicy = "1/0,6/!9~20";
 
             if ( (strPolicy?.Length ?? 0) == 0)
             {
@@ -741,6 +1007,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return false;
             }
 
+            strPolicy = strPolicy.ToLower();
             string strData = strPolicy.Substring(0, 1);
             if (strData != "0" && strData != "1" && strData != "2")
             {
@@ -753,19 +1020,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 
             DateTime dtNow = GetSvrTimeConvert();
-            dtNow = System.DateTime.Now;
+            // Test)
+            // dtNow = System.DateTime.Now;
 
             if (strData == "1")
             {
                 // ex) 1/all/all
                 if (strPolicy.Length < 4)
                 {
-                    Log.Logger.Here().Error($"error(data Type error : less than 4) - Tag : FILEUPLOADTIME, Value : {strData} ");
+                    Log.Logger.Here().Error($"error(data Type error : less than 4) - Tag : FILEUPLOADTIME, Value : {strPolicy} ");
                     return false;
                 }
 
                 // ex) 1/none/none
-                m_bFileTansUseTime = IsFileTransTimeBy1(dtNow, strPolicy, strHoliday);
+                bRet = IsFileTransTimeBy1(dtNow, strPolicy, strHoliday);
 
             }
             else if (strData == "2")
@@ -773,50 +1041,251 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 if (strPolicy.Length < 33)
                 {
-                    Log.Logger.Here().Error($"error(data Type error : less than 33) - Tag : FILEUPLOADTIME, Value : {strData} ");
+                    Log.Logger.Here().Error($"error(data Type error : less than 33) - Tag : FILEUPLOADTIME, Value : {strPolicy} ");
                     return false;
                 }
 
                 // ex) 2/0|0|1|-1|2|-1|3|7~8.17~23|4|0|5|0~24|6|1~23|7|1~18
-                m_bFileTansUseTime = IsFileTransTimeBy2(dtNow, strPolicy, strHoliday);
+                bRet = IsFileTransTimeBy2(dtNow, strPolicy, strHoliday);
             }
 
-            return true;
+            return bRet;
         }
 
+        /// <summary>
+        /// "1/none/none" 방식으로 파일전송 사용유무 확인하는 함수
+        /// </summary>
+        /// <param name="dtNow"></param>
+        /// <param name="strPolicy"></param>
+        /// <param name="strHoliday"></param>
+        /// <returns></returns>
         bool IsFileTransTimeBy1(DateTime dtNow, string strPolicy, string strHoliday)
         {
 
-
-            int nPos = -1;
-            if ( (nPos = strPolicy.IndexOf("/none/none")) > 0)
+            try
             {
-                Log.Logger.Here().Information($"FILEUPLOADTIME, Type 1 - Found /none/none"); // 초기값인지에 따라 계산
-                return true;
+                if ((strHoliday?.Length ?? 0) > 0 && strHoliday != "0")
+                {
+                    Log.Logger.Here().Information($"FILEUPLOADTIME, Type 1 - Found Holiday : {strHoliday}"); // Holiday 인지에 따라 계산
+                    return true;
+                }
+
+                int nPos = -1;
+                if ((nPos = strPolicy.IndexOf("/none/none")) > 0)
+                {
+                    Log.Logger.Here().Information($"FILEUPLOADTIME, Type 1 - Found /none/none"); // 초기값인지에 따라 계산
+                    return false;
+                }
+
+                if ((nPos = strPolicy.IndexOf("/all")) > 0)
+                {
+                    Log.Logger.Here().Information($"FILEUPLOADTIME, Type 1 - Found /all"); // 초기값인지에 따라 계산
+                    return true;
+                }
+
+                string stCurWeekDay = GetDay(dtNow);
+                string[] arrstrPolicy = strPolicy.Split("/");
+
+                if (string.IsNullOrEmpty(stCurWeekDay) == false && ((arrstrPolicy?.Length ?? 0) > 2 && arrstrPolicy[1].Length > 0))
+                {
+                    if (arrstrPolicy[1].Contains(stCurWeekDay))
+                    {
+                        Log.Logger.Here().Information($"IsFileTransTimeBy1, Day in Week Policy : {arrstrPolicy[1]}");
+                        return true;
+                    }                        
+                }
+
+                if ((arrstrPolicy?.Length ?? 0) > 2 && (arrstrPolicy[2]?.Length ?? 0) > 0)
+                {
+                    if (string.Compare(arrstrPolicy[2], "none", true) == 0)
+                        return false;
+
+                    string[] arrHours = arrstrPolicy[2].Split("~");
+                    bool bInclude = true;
+                    if (arrHours[0].IndexOf("!") > -1)
+                    {
+                        bInclude = false;
+                        arrHours[0] = arrHours[0].Replace("!", "");
+                    }
+                    if (arrHours[0] == "null" || arrHours[0].Length < 1 || arrHours[0].Length > 2)
+                        arrHours[0] = "0";
+                    if (arrHours[1] == "null" || arrHours[1].Length < 1 || arrHours[1].Length > 2)
+                        arrHours[1] = "23";
+
+                    int startTime = Int32.Parse(arrHours[0]);
+                    int endTime = Int32.Parse(arrHours[1]);
+                    int curTime = Int32.Parse(dtNow.ToString("HH"));
+
+                    Log.Logger.Here().Information($"IsFileTransTimeBy1, Hour in Day Policy : {arrstrPolicy[2]}, CurTime:{curTime}");
+
+                    if (bInclude)
+                    {
+                        if (curTime >= startTime && curTime < endTime)
+                            return true;
+                        else
+                            return false;
+                    }
+                    else
+                    {
+                        if (curTime >= startTime && curTime < endTime)
+                            return false;
+                        else
+                            return true;
+                    }
+
+                } // if ((arrstrPolicy?.Length ?? 0) > 2 && (arrstrPolicy[2]?.Length ?? 0) > 0)
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"IsFileTransTimeBy1, Exception(MSG) : {ex.Message}");
+                return false;
             }
 
-            if ((nPos = strPolicy.IndexOf("/all")) > 0)
-            {
-                Log.Logger.Here().Information($"FILEUPLOADTIME, Type 1 - Found /all"); // 초기값인지에 따라 계산
-                return true;
-            }
-
-            if ( (strHoliday?.Length ?? 0) > 0 && strHoliday != "0")
-            {
-                Log.Logger.Here().Information($"FILEUPLOADTIME, Type 1 - Found Holiday : {strHoliday}"); // Holiday 인지에 따라 계산
-                return true;
-            }
-
-            //
-
-            return true;
+            Log.Logger.Here().Error($"IsFileTransTimeBy1, UnDefined Policy syntax : {strPolicy}");
+            return false;
         }
 
+
+        bool IsFileTransTimeBy2inOneDay(DateTime dtNow, string[] arrStrWeekData)
+        {
+
+            if ((arrStrWeekData?.Length ?? 0) < 1)
+            {
+                Log.Logger.Here().Information($"IsFileTransTimeBy2inOneDay, Day in Week Policy Data Empty");
+                return false;
+            }
+
+            if (arrStrWeekData[0] == "-1")
+            {
+                Log.Logger.Here().Information($"IsFileTransTimeBy2inOneDay, Day in Week, Policy Data Not Use!");
+                return false;
+            }
+            else if (arrStrWeekData[0] == "0")
+            {
+                Log.Logger.Here().Information($"IsFileTransTimeBy2inOneDay, Day in Week, Policy Data Use!");
+                return true;
+            }
+
+            // 요일체크
+            bool bInclude = true;
+            int curTime = Int32.Parse(dtNow.ToString("HH"));
+            foreach (string strUseTime in arrStrWeekData)
+            {
+                if (string.IsNullOrEmpty(strUseTime))
+                {
+                    Log.Logger.Here().Information($"IsFileTransTimeBy2inOneDay, Day in Week, Policy Empty");
+                    return false;
+                }
+
+                bInclude = true;
+                string[] arrHours = strUseTime.Split("~");
+                if (arrHours[0].IndexOf("!") > -1)
+                {
+                    bInclude = false;
+                    arrHours[0] = arrHours[0].Replace("!", "");
+                }
+
+                if (arrHours[0] == "null" || arrHours[0].Length < 1 || arrHours[0].Length > 2)
+                    arrHours[0] = "0";
+                if (arrHours[1] == "null" || arrHours[1].Length < 1 || arrHours[1].Length > 2)
+                    arrHours[1] = "23";
+
+                int startTime = Int32.Parse(arrHours[0]);
+                int endTime = Int32.Parse(arrHours[1]);
+
+                if (bInclude)
+                {
+                    if (curTime >= startTime && curTime < endTime)
+                    {
+                        Log.Logger.Here().Information($"IsFileTransTimeBy2inOneDay, Day in Week, Policy Time Data : {strUseTime}");
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (curTime >= startTime && curTime < endTime)
+                    { }
+                    else
+                    {
+                        Log.Logger.Here().Information($"IsFileTransTimeBy2inOneDay, Day in Week, Policy Time Data : {strUseTime}");
+                        return true;
+                    }
+                }
+
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// ex) 2/0|0|1|-1|2|-1|3|7~8.17~23|4|0|5|0~24|6|1~23|7|1~18 <br></br>
+        /// 방식으로 파일전송 기능 사용유무 확인하는 함수
+        /// </summary>
+        /// <param name="dtNow"></param>
+        /// <param name="strPolicy"></param>
+        /// <param name="strHoliday"></param>
+        /// <returns></returns>
         bool IsFileTransTimeBy2(DateTime dtNow, string strPolicy, string strHoliday)
         {
 
+            bool bRet = false;
 
-            return true;
+            try
+            {
+                string stCurWeekDay = GetDay(dtNow);
+                string[] arrstrPolicy = strPolicy.Split("/");
+
+
+                if ((arrstrPolicy?.Length ?? 0) < 2 || (arrstrPolicy[1]?.Length ?? 0) < 1)
+                {
+                    Log.Logger.Here().Information($"IsFileTransTimeBy2, Day in Week Policy : {strPolicy}");
+                    return false;
+                }
+
+                if (string.IsNullOrEmpty(stCurWeekDay))
+                {
+                    Log.Logger.Here().Information($"IsFileTransTimeBy2, Day in Week Policy Empty!");
+                    return false;
+                }
+
+                Dictionary<int, string[]> dicWeekData = GetModeWeekDataForFileTrans();
+                if ((dicWeekData?.Count ?? 0) != 8)
+                {
+                    Log.Logger.Here().Information($"IsFileTransTimeBy2, Day in Week Policy Data Syntax Error : {strPolicy}");
+                    return false;
+                }
+
+                // 요일별 체크
+                string[] arrStrWeekData = null;
+                dicWeekData.TryGetValue(Convert.ToInt32(stCurWeekDay), out arrStrWeekData);
+                if (IsFileTransTimeBy2inOneDay(dtNow, arrStrWeekData))
+                {
+                    return true;
+                }
+
+                // 휴일체크
+                if (string.IsNullOrEmpty(strHoliday) == false && strHoliday != "0")
+                {
+                    string[] arrStrHoliDayData = null;
+                    dicWeekData.TryGetValue(7, out arrStrHoliDayData);
+
+                    if (IsFileTransTimeBy2inOneDay(dtNow, arrStrHoliDayData))
+                    {
+                        return true;
+                    }
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"IsFileTransTimeBy2, Exception(MSG) : {ex.Message}");
+                return false;
+            }
+
+            Log.Logger.Here().Error($"IsFileTransTimeBy2, fileTrans is Policy : {strPolicy}");
+            return false;
         }
 
 

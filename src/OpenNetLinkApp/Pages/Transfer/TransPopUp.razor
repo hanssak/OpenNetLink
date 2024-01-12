@@ -1016,8 +1016,15 @@
             }
             else                            // 검사중인 prework 확인 (일치하면 '검사 중'으로 표시, 일치하지 않으면 이전 항목들이므로 '완료'로 표시)
             {
-                listPreworkInfo.Add((scan.ToString() == scanningValue) ? new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_ING"), preworkScanningBackColor)
-                                                                        : new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_END"), preworkCompleteBackColor));
+                if(scan.ToString() == scanningValue)
+                {
+                    listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_ING"), preworkScanningBackColor));
+                    isSetScanning = true;
+                }
+                else
+                {
+                    listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_END"), preworkCompleteBackColor));
+                }
             }
         }
     }
