@@ -687,7 +687,7 @@
     </else>
   </statement>
 
-  <statement id = "AgentBlock">insert into tbl_agent_block values(#strUserSeq#,'#strSystemType#','#strBlockType#','#strBlockReason#',Now())</statement>
+  <statement id = "AgentBlock">insert into tbl_agent_block values(#strUserSeq#,'#strSystemType#','#strBlockType#','#strBlockReason#',Now())\n</statement>
 
   <statement id = "DayFileTransInfo">
     SELECT U.USER_ID, SUM(F.FILE_SIZE) AS FS, COUNT(*) AS CNT
