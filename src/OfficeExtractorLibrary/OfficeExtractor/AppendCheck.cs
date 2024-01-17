@@ -325,9 +325,12 @@ namespace OfficeExtractor
                                             break;
 
                                         byte[] checkBinary = new byte[4096];
-                                        stream.Seek(offset + currentIndex - 2, SeekOrigin.Begin);
+                                        if(offset == 0)
+                                            stream.Seek(offset + currentIndex - 2, SeekOrigin.Begin);
+                                        else
+                                            stream.Seek(offset + currentIndex - 2 - 32, SeekOrigin.Begin);
                                         stream.Read(checkBinary, 0, 4096);
-                                        stream.Seek(offset, SeekOrigin.Begin);
+                                        //stream.Seek(offset, SeekOrigin.Begin);
                                         //PE 군 검출
                                         if (GetCheckPe(checkBinary))
                                         {
@@ -376,7 +379,7 @@ namespace OfficeExtractor
             catch (Exception ex)
             {
 
-                CLog.Error($"BinaryInner CheckPe Exception - {ex.ToString()}");
+                CLog.Information($"BinaryInner CheckPe Exception - {ex.ToString()}");
                 return detected;
             }
         }
