@@ -1287,7 +1287,7 @@ namespace OpenNetLinkApp.Services
         {
             SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
             if (sgLoginData != null)
-                sgLoginData.SetTagData("HOLIDAY", sgData.GetEncTagData("HOLIDAY"));
+                sgLoginData.EncAdd("HOLIDAY", sgData.GetEncTagData("HOLIDAY").Base64DecodingStr());
         }
 
         public void TransSearchCountAfterSend(int nRet, int groupId, int count)
