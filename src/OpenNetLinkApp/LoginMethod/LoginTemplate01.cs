@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace OpenNetLinkApp.LoginMethod
 {
+    /// <summary>
+    /// 서울대학병원 로그인 커스텀
+    /// </summary>
     class LoginTemplate01
     {
         class RequestParameter
@@ -53,7 +56,7 @@ namespace OpenNetLinkApp.LoginMethod
 
             string method = "GET";
             string contentType = "application/json";
-            
+
             //전송
             RequestParameter requestParameter = new RequestParameter(id, strEncPw);
             Log.Logger.Here().Information($"requestParameter : {requestParameter.GetJsonString()}");
@@ -65,7 +68,7 @@ namespace OpenNetLinkApp.LoginMethod
                 ResponseParameter response = JsonSerializer.Deserialize<ResponseParameter>(strResult);
                 result = response.result;
 
-                switch(response.errMsg)
+                switch (response.errMsg)
                 {
                     case "decryptErr":
                         msg = "복호화 도중 에러가 발생했습니다.";
@@ -92,12 +95,11 @@ namespace OpenNetLinkApp.LoginMethod
             }
 
             return (result, msg);
-
         }
 
 
 
-        public static string WebRequestCommon(string method , string contentType, string url, int ReqTimeOut, string id, string password)
+        public static string WebRequestCommon(string method, string contentType, string url, int ReqTimeOut, string id, string password)
         {
 
             WebRequest wreq = WebRequest.Create(url);

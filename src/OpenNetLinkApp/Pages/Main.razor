@@ -838,7 +838,28 @@
             bStartedLogin = true;
 
             int groupid = pageService.m_nCurViewPageGroupID;
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
+            string strCurCliVersion = "";
+            string strPlatform = "";
 
+            if (VersionConfigSvc != null)
+            {
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
+                strCurCliVersion = "OpenNetLink " + strCurCliVersion;
+
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
+                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
+            }
+
+            if (strCurCliVersion.Equals(""))
+            {
+                JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+                bStartedLogin = false;
+                return;
+            }
+
+            CLog.Here().Information($"[Main] LogIn Type (######) : {pageService.m_nLoginType.ToString()}, GroupIDLoginType : {pageService.GetGroupIDLoginType(groupid)}");
+            HSCmdCenter.SetCliVersion(strCurCliVersion);
 
             //외부 그룹웨어 연동
             try
@@ -851,11 +872,22 @@
                 CLog.Here().Information($"result bool  : {resultMsg.Item1} , result Msg : {resultMsg.Item2}");
                 if (!resultMsg.Item1)
                 {
-                    JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
-                    bStartedLogin = false;
-                    ShowMessage("error", resultMsg.Item2);
+                    if (resultMsg.Item2 == "사용자가 존재하지 않습니다.")
+                    {
+                        HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, (int)eLoginType.eLOGINTYPE_ORIGIN);
+                        pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, eLoginType.eLOGINTYPE_ORIGIN);
 
-                    return;
+                        return;
+                    }
+                    else
+                    {
+
+                        JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+                        bStartedLogin = false;
+                        ShowMessage("error", resultMsg.Item2);
+
+                        return;
+                    }
                 }
             }
             catch (Exception ex)
@@ -864,25 +896,6 @@
                 ShowMessage("error", XmlConf.GetErrMsg("W_0187"));
                 return;
             }
-
-            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
-            string strCurCliVersion = "";
-            string strPlatform = "";
-            if (VersionConfigSvc != null)
-            {
-                strCurCliVersion = VersionConfigSvc.GetSWVersion();
-                strCurCliVersion = "OpenNetLink " + strCurCliVersion;
-
-                strPlatform = VersionConfigSvc.GetUpdatePlatform();
-                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
-            }
-
-            if (strCurCliVersion.Equals(""))
-                return;
-
-            CLog.Here().Information($"[Main] LogIn Type (######) : {pageService.m_nLoginType.ToString()}, GroupIDLoginType : {pageService.GetGroupIDLoginType(groupid)}");
-            HSCmdCenter.SetCliVersion(strCurCliVersion);
-
 
             List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
             int count = listNetWork.Count;

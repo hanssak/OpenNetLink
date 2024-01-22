@@ -386,7 +386,7 @@
                 strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-        strPW = "HsckAD.com";
+            strPW = "HsckAD.com";
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -479,28 +479,28 @@
             int nData = 0;
 
 #if DEBUG  // SITE배포용도
-        //#if false  // SITE배포용도
-        CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
-        strData = "1";
-        stRtn = "1";
+            //#if false  // SITE배포용도
+            CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
+            strData = "1";
+            stRtn = "1";
 #else
 
-            stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
-            if (stRtn == null || (1 > stRtn.Length))
-            {
-                CLog.Here().Information($"Result - json, Data is null OR 0 Size");
-                ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
-                return false;
-            }
+        stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
+        if (stRtn == null || (1 > stRtn.Length))
+        {
+            CLog.Here().Information($"Result - json, Data is null OR 0 Size");
+            ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
+            return false;
+        }
 
-            // json으로 온 Data에서 실제 data 뽑아내는 동작
-            using (JsonDocument document = JsonDocument.Parse(stRtn))
-            {
-                JsonElement jroot = document.RootElement;
-                nCode = jroot.GetProperty("code").GetInt32();
-                strMsg = jroot.GetProperty("msg").GetString();
-                strData = jroot.GetProperty("data").GetString();
-            }
+        // json으로 온 Data에서 실제 data 뽑아내는 동작
+        using (JsonDocument document = JsonDocument.Parse(stRtn))
+        {
+            JsonElement jroot = document.RootElement;
+            nCode = jroot.GetProperty("code").GetInt32();
+            strMsg = jroot.GetProperty("msg").GetString();
+            strData = jroot.GetProperty("data").GetString();
+        }
 #endif
 
             CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
@@ -604,9 +604,17 @@
                         CLog.Here().Information($"result bool  : {resultMsg.Item1} , result Msg : {resultMsg.Item2}");
                         if (!resultMsg.Item1)
                         {
-                            ShowMessage("error", resultMsg.Item2);
-                            bStartedLogin = false;
-                            return;
+                            if (resultMsg.Item2 == "사용자가 존재하지 않습니다.")
+                            {
+                                HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, otp, (int)eLoginType.eLOGINTYPE_ORIGIN);
+                                return;
+                            }
+                            else
+                            {
+                                ShowMessage("error", resultMsg.Item2);
+                                bStartedLogin = false;
+                                return;
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -883,7 +891,7 @@
                     pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-            pw = "HsckAD.com";
+                pw = "HsckAD.com";
 #endif
                 pw = pw.ToLower();
 
