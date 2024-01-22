@@ -1545,7 +1545,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>"1" : 휴일, 나머지 : 휴일아님</returns>
         public string GetHoliday()
         {
-            string strHoliday = GetBasicTagData("HOLIDAY");
+            string strHoliday = GetTagData("HOLIDAY");
             return strHoliday;
         }
 
