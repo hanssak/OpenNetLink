@@ -9,6 +9,8 @@
 @using AgLogManager
 @using OpenNetLinkApp.PageEvent
 @using System.Runtime.InteropServices
+@using OpenNetLinkApp.Common
+
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HsCmdCenter
@@ -144,7 +146,7 @@
                                     <td style="text-align: center;">@item.strVirusExamDay</td>
 
                                     @if (bUseDlpDataView)
-                                    { 
+                                    {
                                         <td style="text-align: center; width: 20%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.stDLPDesc</td>
                                     }
 
@@ -345,7 +347,7 @@ startInfo.WindowStyle = ProcessWindowStyle.Normal;
 // Run the external process & wait for it to finish
 using (Process proc = Process.Start(startInfo))
 {
-    //proc.WaitForExit();
+//proc.WaitForExit();
 }
 #endif
 
@@ -806,7 +808,7 @@ using (Process proc = Process.Start(startInfo))
         strFilePrev = XmlConf.GetTitle("T_DETAIL_FILEPREVIEW");                 // 파일미리보기
         strDesc = XmlConf.GetTitle("T_DETAIL_DESC");                            // 설명
                                                                                 //strPrevInfo = XmlConf.GetWarnMsg("W_0077");                             // &nbsp;&nbsp;업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
-        
+
         strColumnSelect = XmlConf.GetTitle("T_COMMON_SELECT2");                         //선택
         strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                    // 파일명
         strFileType = XmlConf.GetTitle("T_COMMON_KIND");                        // 유형
@@ -1023,22 +1025,41 @@ using (Process proc = Process.Start(startInfo))
         }
 
         // 확장자 종류로 Web으로 preview 할지 결정
-        string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp", "log" };
         string strExtName = Path.GetExtension(sFileName);
-        strExtName = strExtName.Substring(1);
-        if (strExtName.Equals(""))
-            return true;
+        strExtName = (strExtName.Equals("")) ? "" : strExtName.Substring(1);         //확장자가 없는 파일(text/plain)을 다운로드로 처리
 
-        strExtName = strExtName.ToLower();
         bool bFind = false;
-        for (int i = 0; i < strExt.Length; i++)
+
+#if true
+
+        string strViewerExt = sgLoginData.GetPreViewerExt();
+        //CLIENT_PREVIEW_VIEWER_EXT의 데이터가 값이 없는 경우엔, 하기 다운로드 프로세스를 탈 수 있도록 삭제 처리
+        //if ((strViewerExt?.Length ?? 0) == 0)
+        //{
+        //    CLog.Here().Information($"ViewerExt : Empty!");
+        //    return false;
+        //}
+
+        CLog.Here().Information($"ViewerExt : {strViewerExt}");
+
+        if (CsFunction.isFileExtinListStr(true, strExtName, strViewerExt))
         {
-            if (strExt[i].Equals(strExtName))
-            {
-                bFind = true;
-                break;
-            }
+            bFind = true;
         }
+
+#else
+//
+string[] strExt = new string[] { "pdf", "docx", "doc", "pptx", "ppt", "xlsx", "xls", "xlw", "xlsb", "xlsm", "csv", "dbf", "dif", "slk", "sylk", "prn", "ods", "fods", "gif", "jpg", "jpeg", "bmp", "tiff", "tif", "png", "svg", "txt", "hwp", "log" };
+strExtName = strExtName.ToLower();
+for (int i = 0; i < strExt.Length; i++)
+{
+if (strExt[i].Equals(strExtName))
+{
+bFind = true;
+break;
+}
+}
+#endif
 
         if (!bFind)
         {

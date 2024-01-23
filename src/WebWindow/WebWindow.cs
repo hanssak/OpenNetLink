@@ -239,6 +239,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetUseClipBoardPasteHotKey(IntPtr instance, int groupID, bool bUse);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetUseHttpUrl(IntPtr instance, bool bUse);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetForeground(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetNativeClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern bool WebWindow_GetTrayUse(IntPtr instance);
@@ -948,6 +949,8 @@ namespace WebWindows
         public void MoveTrayToWebWindow() => WebWindow_MoveTrayToWebWindow(_nativeWebWindow);
         public void RegStartProgram() => WebWindow_RegStartProgram(_nativeWebWindow);
         public void UnRegStartProgram() => WebWindow_UnRegStartProgram(_nativeWebWindow);
+
+        public void SetForeground() => WebWindow_SetForeground(_nativeWebWindow);
 
         private void OnRequestedNavigateURL(IntPtr uriMem, int uriLength) => NavigateURLOccured?.Invoke(this, new List<object>() { uriMem, uriLength });
 

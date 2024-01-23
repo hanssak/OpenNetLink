@@ -192,6 +192,7 @@ public:
 	static void Register(HINSTANCE hInstance);
 	HWND getHwnd();
 	void RefitContent();
+	void SetForeground();
 #elif OS_MAC
 	static void Register();
 #endif

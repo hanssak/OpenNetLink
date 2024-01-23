@@ -1,7 +1,8 @@
 @using OpenNetLinkApp.Services;
 @inject DragAndDropService DragAndDropService
+@inject WebWindow Window
 
-<div id= "fileInput" ondragover="event.preventDefault()" @ondrop="OnDrop" style="height:100%;">
+<div id="fileInput" ondragover="event.preventDefault()" @ondragenter="DragEnter" @ondrop="OnDrop" style="height:100%;">
     @ChildContent
 </div>
 @functions {
@@ -19,5 +20,10 @@
         List<string> stList = DragAndDropService.getDataList();
         Drop(stList);
         //DragAndDropService.clearDataList();
+    }
+
+    public void DragEnter()
+    {
+        Window.SetForeground();
     }
 }

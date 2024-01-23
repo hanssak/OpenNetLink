@@ -2286,6 +2286,15 @@ void WebWindow::SetUseHttpUrl(bool bUse)
 	g_bUseHttpUrl = bUse;
 }
 
+void WebWindow::SetForeground()
+{
+	HWND temp = ::GetForegroundWindow();
+	if (temp != _hWnd)
+	{
+		::SetForegroundWindow(_hWnd);
+	}
+}
+
 void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
 {
 	wstring strTempHotKey = _T("");
