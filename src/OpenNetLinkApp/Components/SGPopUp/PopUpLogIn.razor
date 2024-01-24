@@ -620,7 +620,7 @@
                     catch (Exception ex)
                     {
                         CLog.Here().Error($"doCustomLogin01 - Exception(Msg) : {ex.Message}");
-                        ShowMessage("error", XmlConf.GetErrMsg("W_0187"));
+                        ShowMessage("warning", XmlConf.GetWarnMsg("W_0187"));
                         return;
                     }
 

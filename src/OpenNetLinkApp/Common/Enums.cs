@@ -170,6 +170,7 @@ namespace OpenNetLinkApp.Common
         {
             [Description("LoginTemplate01")] //서울대학병원 그룹웨어 연동
             LoginTemplate01 = 1,
+            LoginTemplate02 = 2,    // Koreg
         }
 
         /// <summary>
