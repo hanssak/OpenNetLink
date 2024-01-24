@@ -192,7 +192,6 @@ public:
 	static void Register(HINSTANCE hInstance);
 	HWND getHwnd();
 	void RefitContent();
-	void SetForeground();
 #elif OS_MAC
 	static void Register();
 #endif
@@ -307,6 +306,7 @@ public:
 	void MinimizeWebWindow();
 	void RegisterStartProgram();
 	void UnRegisterStartProgram();
+	void SetForeground();
 	bool GetTrayUse();
 
 	///

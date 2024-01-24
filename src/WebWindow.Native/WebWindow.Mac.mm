@@ -902,6 +902,10 @@ void WebWindow::RegisterStartProgram()
     }
 }
 
+void WebWindow::SetForeground()
+{
+    
+}
 void WebWindow::UnRegisterStartProgram()
 {
 	int myuid;
