@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.IO;
 using System.Net;
@@ -19,7 +19,7 @@ namespace OpenNetLinkService.Site
                     if (parameters.HasKeys() && parameters.GetKey(0) == "UserID")
                     {
                         string currentDir = AppDomain.CurrentDomain.BaseDirectory;
-                        string currentExePath = Path.Combine(currentDir, "OpenNetLinkApp.exe");
+                        string currentExePath = Path.Combine(currentDir, "OpenNetLinkApp.exe SERVICE");
                         string currentMessagePath = Path.Combine(currentDir, "KoReg.txt");
                         string message = $@"UserID={parameters["UserID"]}
 Page={parameters["Page"]}";
