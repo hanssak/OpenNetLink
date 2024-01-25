@@ -2599,6 +2599,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return true;
         }
 
+        private static bool IsTXT(string inputPath)
+        {
+            using(FileStream stream = File.OpenRead(inputPath))
+            {
+
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// PDF 문서인지 검사한다.
         /// </summary>
