@@ -2113,6 +2113,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             => (bSystem) ? GetTagData("I_CLIENT_BINARY_CHECK") : GetTagData("E_CLIENT_BINARY_CHECK");
         public string GetBinaryCheckExt()
             => (GetSystemPosition()) ? GetTagData("I_CLIENT_BINARY_CHECK_EXT") : GetTagData("E_CLIENT_BINARY_CHECK_EXT");
+        public string GetBinaryInnerCheck(bool bSystem)
+            => (bSystem) ? GetTagData("I_CLIENT_CHECK_PE") : GetTagData("E_CLIENT_CHECK_PE");
         /// <summary>
         /// 제목 최대 길이 값
         /// </summary>

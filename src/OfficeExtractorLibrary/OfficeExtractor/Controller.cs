@@ -165,5 +165,60 @@ namespace OfficeExtractor
             return result;
         }
 
+        public static bool ExcuteCheckZip([MarshalAs(UnmanagedType.LPWStr)] string strSource)
+        {
+            bool result = false;
+            try
+            {
+                result = AppendCheck.GetCheckZip(strSource);
+            }
+            catch (Exception ex)
+            {
+                result = false;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
+            }
+            finally
+            {
+                GC.Collect();
+            }
+            return result;
+        }
+        public static bool ExcuteCheckPe([MarshalAs(UnmanagedType.LPWStr)] string strSource)
+        {
+            bool result = false;
+            try
+            {
+                result = AppendCheck.GetCheckPe(strSource);
+            }
+            catch (Exception ex)
+            {
+                result = false;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
+            }
+            finally
+            {
+                GC.Collect();
+            }
+            return result;
+        }
+        public static bool ExcuteCheckCert([MarshalAs(UnmanagedType.LPWStr)] string strSource, [MarshalAs(UnmanagedType.LPWStr)] string strDest)
+        {
+            bool result = false;
+            try
+            {
+                result = AppendCheck.GetCheckCert(strSource, strDest);
+            }
+            catch (Exception ex)
+            {
+                result = false;
+                CLog.Error($"ExcuteExtractor Exception (code:{result})- {ex.ToString()}");
+            }
+            finally
+            {
+                GC.Collect();
+            }
+            return result;
+        }
+
     }
 }

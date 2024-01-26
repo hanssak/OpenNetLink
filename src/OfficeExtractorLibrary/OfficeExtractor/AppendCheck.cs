@@ -247,23 +247,54 @@ namespace OfficeExtractor
 
             return result;
         }
-        //파일 내부 검사를 하여 PE, MSI, ZIP 파일이 있는지 검색
-        public bool FileInnerCheck(string inputFile)
-        {
-            bool detected = false;
-
-            detected = GetCheckZip(inputFile);
-            //ZIP 파일이 검색 되면 바로 return 
-            if (detected)
-                return detected;
-
-            detected = GetCheckPe(inputFile);
-
-            return detected;
-
-        }
         //PE 파일 군 찾기 MSI 파일 찾기
-        private static bool GetCheckPe(string inputFilePath)
+        public static bool GetCheckCert(string inputFilePath, string outputFilePath)
+        {
+            return ExecuteCommandSync($"certutil -decode {inputFilePath} {outputFilePath}");
+        }
+        /// <summary>
+        /// Executes a shell command synchronously.
+        /// </summary>
+        /// <param name="command">string command</param>
+        /// <returns>정상 실행 1, 에러 0</returns>
+        private static bool ExecuteCommandSync(object command)
+        {
+            bool result = false;
+            try
+            {
+                // create the ProcessStartInfo using "cmd" as the program to be run, and "/c " as the parameters.
+                // Incidentally, /c tells cmd that we want it to execute the command that follows, and then exit.
+                System.Diagnostics.ProcessStartInfo procStartInfo = new System.Diagnostics.ProcessStartInfo("cmd", "/c " + command);
+                // The following commands are needed to redirect the standard output. 
+                //This means that it will be redirected to the Process.StandardOutput StreamReader.
+                procStartInfo.RedirectStandardOutput = false;
+                procStartInfo.RedirectStandardError = false;
+                procStartInfo.UseShellExecute = false;
+                // Do not create the black window.
+                procStartInfo.CreateNoWindow = true;
+                // Now we create a process, assign its ProcessStartInfo and start it
+                System.Diagnostics.Process proc = new System.Diagnostics.Process();
+                proc.StartInfo = procStartInfo;
+                proc.Start();
+
+                // Get the output into a string
+                proc.WaitForExit();
+
+                if (proc.ExitCode == 0)
+                    return true;
+                else
+                    return false;
+                // Display the command output.
+            }
+            catch (Exception objException)
+            {
+                // Log the exception
+                CLog.Error($"ExecuteCommandSync failed  : {objException.Message}");
+            }
+
+            return result;
+        }
+        public static bool GetCheckPe(string inputFilePath)
         {
             bool detected = false;
             try
@@ -281,11 +312,19 @@ namespace OfficeExtractor
                                                 0x3E, 0x00, 0x04, 0x00, 0xFE, 0xFF, 0x0C, 0x00
                     };
                     #endregion
-                    //한번에 불러올때 읽어 오는 Byte 수
+
                     int length = 1024 * 1024;
                     int offset = 0;
                     int readLength = 0;
                     long maxLength = stream.Length;
+                    int count = 0;
+
+                    //파일 길이가 32이하이면 PE 파일 검사 안된것으로 Return
+                    if(maxLength <= 32)
+                    {
+                        return false;
+                    }
+
                     while (true)
                     {
                         byte[] file = new byte[length];
@@ -324,8 +363,9 @@ namespace OfficeExtractor
                                         if ((int)maxLength <= offset + currentIndex - 2 + 4096)
                                             break;
 
+                                        count++;
                                         byte[] checkBinary = new byte[4096];
-                                        if(offset == 0)
+                                        if (offset == 0)
                                             stream.Seek(offset + currentIndex - 2, SeekOrigin.Begin);
                                         else
                                             stream.Seek(offset + currentIndex - 2 - 32, SeekOrigin.Begin);
@@ -378,17 +418,35 @@ namespace OfficeExtractor
             }
             catch (Exception ex)
             {
-
-                CLog.Information($"BinaryInner CheckPe Exception - {ex.ToString()}");
+                CLog.Error($"GetCheckPe failed  : {ex.Message}");
                 return detected;
             }
         }
-        private static bool GetCheckZip(string inputFilePath)
+        public static bool GetCheckZip(string inputFilePath)
         {
             //내부 ZIP 파일, Zip Compress 로 한번 열어본다...
+            byte[] zipSignature = new byte[] { 0x50, 0x4b, 0x03, 0x04 };
+            byte[] documentSignature = new byte[] {0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1};
+
+
             bool detected = false;
             try
             {
+                using (FileStream stream = File.OpenRead(inputFilePath))
+                {
+                    byte[] bData = new byte[8];
+                    stream.Read(bData, 0, 8);
+                    if ((bData[0] == zipSignature[0] && bData[1] == zipSignature[1] && bData[2] == zipSignature[2] && bData[3] == zipSignature[3])
+                        || (bData[0] == documentSignature[0] && bData[1] == documentSignature[1] && bData[2] == documentSignature[2] && bData[3] == documentSignature[3] && bData[4] == documentSignature[4]
+                        && bData[5] == documentSignature[5] && bData[6] == documentSignature[6] && bData[7] == documentSignature[7]))
+                    {
+                        //zip파일 또는 office 문서일 경우에는 zip 형태이기 때문에 검사안함
+                        stream.Close();
+                        return false;
+                    }
+                    stream.Close();
+                }
+                
                 using (var zipFile = ZipFile.Open(inputFilePath, ZipArchiveMode.Read))
                 {
                     detected = true;
@@ -396,6 +454,7 @@ namespace OfficeExtractor
             }
             catch (Exception ex)
             {
+                CLog.Error($"GetCheckZip failed  : {ex.Message}");
                 detected = false;
             }
 
@@ -462,6 +521,7 @@ namespace OfficeExtractor
             }
             catch (Exception ex)
             {
+                CLog.Error($"GetCheckZip failed  : {ex.Message}");
                 return false;
             }
             return false;
