@@ -56,9 +56,12 @@
                     <div class="mb-1">
 
                         <div class="card card-boder mb-3" style="box-shadow:none;">
-                            <div class="card-body clearfix">
-                                <label class="line-label pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_PKI_TRANS_DETAIL_TXT")</label>
-                            </div>
+                            @if (!bSendPkiFilebyClipSendType)
+                            {
+                                <div class="card-body clearfix">
+                                    <label class="line-label pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_PKI_TRANS_DETAIL_TXT")</label>
+                                </div>
+                            }
                         </div>
 
                         <div class="col-md-12 text-center" style="height: 115px; width: 400px; margin: auto; display: block; ">
