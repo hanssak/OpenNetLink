@@ -66,6 +66,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return false;
         }
 
+        public static bool IsStartedBySERVICE()
+        {
+            if (SystemInfo.StartArg != null && SystemInfo.StartArg.Length > 0)
+                return SystemInfo.StartArg[0].ToString().ToUpper() == "SERVICE";
+            else
+                return false;
+        }
+
         public static void SetNacFileValue(string getNacFilePath = "")
         {
             string NacFilePath = getNacFilePath;

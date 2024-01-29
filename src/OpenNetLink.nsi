@@ -796,6 +796,11 @@ Section -Post
 		WriteRegStr HKCU "SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist" "10" "gbbehmiepgfmmnifjbnknjaebgmnpbam;https://clients2.google.com/service/update2/crx"
 		
   ${EndIf}    
+  
+  ;호환성 모드가 ON 되어 있다면, OFF 처리 => 임시 사용 (차후 삭제 예정)
+  ; DeleteRegValue HKCU "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" "C:\HANSSAK\OpenNetLink\OpenNetLinkApp.exe"
+  ; DeleteRegValue HKCU "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" "C:\HANSSAK\OpenNetLink\wwwroot\edge\msedge.exe"
+  ; DeleteRegValue HKCU "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" "C:\HANSSAK\OpenNetLink\wwwroot\edge\msedgewebview2.exe"
 
 SectionEnd
 

@@ -228,6 +228,10 @@ extern "C"
 	{
 		instance->SetUseHttpUrl(bUse);
 	}
+	EXPORTED void WebWindow_SetForeground(WebWindow* instance)
+	{
+		instance->SetForeground();
+	}
 	EXPORTED void WebWindow_SetNativeClipboardHotKey(WebWindow* instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
 	{
 		instance->SetNativeClipboardHotKey(groupID, bAlt, bControl, bShift, bWin, chVKCode, nIdx);

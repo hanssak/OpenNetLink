@@ -2068,7 +2068,7 @@
         List<string> listSetTagName = new List<string>(){
     "FILEFILTER", "FILELIMITSIZE", "FILEFILTERTYPE", "DAYFILETRANSFERLIMITSIZE", "DAYFILETRANSFERLIMITCOUNT", "DAYCLIPBOARDCOUNT",
     "DAYCLIPBOARDSIZE", "CLIPBOARDSIZE", "MAXFILETRANSFERCOUNT", "AFTERAPPROVE", "DELETECYCLE", "FILEPARTSIZE", "FILEBANDWIDTH",
-    "SCRLOCK","HOLIDAY"
+    "SCRLOCK","HOLIDAY", "EXCEPTIONEXT"
     };
 
         //ReLoginTagName 해당하는 데이터가 수정됬을 경우 ReLogin 필요
@@ -2366,8 +2366,14 @@
                                         else if (nMode == 2)
                                         {
                                             if (string.IsNullOrEmpty(strSoftCampDAC) == false && nGuide > 0)
+                                            { 
                                                 lib.DrmAddDac(nGuide, strSoftCampDAC);
-                                            ret = lib.DrmEncrypt(key, grade);
+                                                lib.DrmEncryptUsingDac(key);
+                                            }
+                                            else
+                                            {
+                                                CLog.Here().Information($"DownCompleteEvent, DRM Encrpty Mode 2, But DAC CONFIG is Wrong, Guide : {nGuide}, DAC : {strSoftCampDAC}");
+                                            }
                                         }
 
                                         CLog.Here().Information($"{key} DRM Result  : {ret}");

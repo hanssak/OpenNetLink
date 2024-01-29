@@ -431,7 +431,7 @@
                 strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-        strPW = "HsckAD.com";
+            strPW = "HsckAD.com";
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -530,22 +530,22 @@
         stRtn = "1";
         #else
 
-            stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
-            if (stRtn == null || (1 > stRtn.Length))
-            {
-                CLog.Here().Information($"Result - json, Data is null OR 0 Size");
-                ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
-                return false;
-            }
+        stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
+        if (stRtn == null || (1 > stRtn.Length))
+        {
+            CLog.Here().Information($"Result - json, Data is null OR 0 Size");
+            ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
+            return false;
+        }
 
-            // json으로 온 Data에서 실제 data 뽑아내는 동작
-            using (JsonDocument document = JsonDocument.Parse(stRtn))
-            {
-                JsonElement jroot = document.RootElement;
-                nCode = jroot.GetProperty("code").GetInt32();
-                strMsg = jroot.GetProperty("msg").GetString();
-                strData = jroot.GetProperty("data").GetString();
-            }
+        // json으로 온 Data에서 실제 data 뽑아내는 동작
+        using (JsonDocument document = JsonDocument.Parse(stRtn))
+        {
+            JsonElement jroot = document.RootElement;
+            nCode = jroot.GetProperty("code").GetInt32();
+            strMsg = jroot.GetProperty("msg").GetString();
+            strData = jroot.GetProperty("data").GetString();
+        }
 #endif
 
         CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
@@ -661,15 +661,23 @@
                         CLog.Here().Information($"result bool  : {resultMsg.Item1} , result Msg : {resultMsg.Item2}");
                         if (!resultMsg.Item1)
                         {
-                            ShowMessage("error", resultMsg.Item2);
-                            bStartedLogin = false;
-                            return;
+                            if (resultMsg.Item2 == "사용자가 존재하지 않습니다.")
+                            {
+                                HSCmdCenter.Login(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginType.eLOGINTYPE_ORIGIN);
+                                return;
+                            }
+                            else
+                            {
+                                ShowMessage("error", resultMsg.Item2);
+                                bStartedLogin = false;
+                                return;
+                            }
                         }
                     }
                     catch (Exception ex)
                     {
                         CLog.Here().Error($"doCustomLogin01 - Exception(Msg) : {ex.Message}");
-                        ShowMessage("error", XmlConf.GetErrMsg("W_0187"));
+                        ShowMessage("warning", XmlConf.GetWarnMsg("W_0187"));
                         return;
                     }
 
@@ -1552,6 +1560,7 @@
                     strGetinfoTagName += ", 'CLIENT_URL_FW_PAGE'";
                     strGetinfoTagName += ", 'CLIENT_BINARY_CHECK'";
                     strGetinfoTagName += ", 'CLIENT_BINARY_CHECK_EXT'";
+                    strGetinfoTagName += ", 'CLIENT_CHECK_PE'";
                     strGetinfoTagName += ", 'CLIENT_PRIVACY_COMMENT'";
 
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupId))

@@ -272,6 +272,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseTempDownPath { get; set; } = false;                      //파일 수신 시 hsz 파일을 사용자 설정 다운로드에 받을 것인지, Agent 설치된 경로의 wapppove에 받을 것인지 - true 면 wapprove
 
         public bool bUseAptTimeOutMsg { get; set; } = false;                     //APT 타임아웃 났을때 문구 VirusReport로 보내지 않고 알림으로 사용
+
+        public bool bHideApproveRejectButtonInApproveUI { get; set; } = false; //결재관리 화면에서 승인, 반려 버튼 숨김처리 여부 - 기본 false - 보여준다.
     }
 
 }

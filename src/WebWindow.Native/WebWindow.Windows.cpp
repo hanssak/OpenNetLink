@@ -266,7 +266,7 @@ void WebWindow::Register(HINSTANCE hInstance)
 	wc.lpszClassName = CLASS_NAME;
 	RegisterClass(&wc);
 
-	SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+	SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
 }
 
 WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCallback webMessageReceivedCallback)
@@ -2285,6 +2285,15 @@ void WebWindow::SetUseClipBoardPasteHotKey(int pasteGroupID, bool bUse)
 void WebWindow::SetUseHttpUrl(bool bUse)
 {
 	g_bUseHttpUrl = bUse;
+}
+
+void WebWindow::SetForeground()
+{
+	HWND temp = ::GetForegroundWindow();
+	if (temp != _hWnd)
+	{
+		::SetForegroundWindow(_hWnd);
+	}
 }
 
 void WebWindow::SetNativeClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)

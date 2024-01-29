@@ -466,6 +466,10 @@
             fileAddManage.SetOleExtractExtData(sgLoginData.GetDocumentExtractExt());
             fileAddManage.SetBinaryCheckExtData(sgLoginData.GetBinaryCheckExt());
             fileAddManage.m_bIsBlockEmptyExt = SGAppMgrSvc.OpConfigInfoService.GetEmptyExtFileTrans(groupID);
+            // okb
+            fileAddManage.bEmptyFIleNoCheck = SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans(groupID);
+            // fileName Check
+            fileAddManage.bUseCrossPlatformOSforFileName = SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName(groupID); // SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName();
 
             foreach (var item in HsStreamList)
             {
@@ -751,6 +755,28 @@
 
                         //Binary Append 체크
                         if (await GetExamCheckBinaryAppend(fileAddManage, topFile, hsStream) != 0)
+                        {
+                            if (pageService.GetFileExaming() == false)
+                            {
+                                if (isRMouseAdd)
+                                    NotifyChange_InDropFileList(null);
+                                else
+                                    StateHasChanged();
+                                return;
+                            }
+                            existErr = true;
+                            if (hsStream.stream != null)
+                            {
+                                hsStream.stream.Close();
+                                hsStream.stream = null;
+                            }
+                            nExamCount++;
+                            per = (nExamCount * 100) / nTotalCount;
+                            SGFileExamEvent(per, hsStream.FileName);
+                            continue;
+                        }
+                        //Binary Inner PE, ZIP, CERT Check
+                        if (await GetExamCheckBinaryInner(fileAddManage, topFile, hsStream) != 0)
                         {
                             if (pageService.GetFileExaming() == false)
                             {
@@ -1190,6 +1216,29 @@
                                 }
 
                                 if (await GetExamCheckBinaryAppend(fileAddManage, childFile, hsStream) != 0)
+                                {
+                                    if (pageService.GetFileExaming() == false)
+                                    {
+                                        if (isRMouseAdd)
+                                            NotifyChange_InDropFileList(null);
+                                        else
+                                            StateHasChanged();
+                                        return;
+                                    }
+
+                                    existErr = true;
+                                    if (hsStream.stream != null)
+                                    {
+                                        hsStream.stream.Close();
+                                        hsStream.stream = null;
+                                    }
+                                    nExamCount++;
+                                    per = (nExamCount * 100) / nTotalCount;
+                                    SGFileExamEvent(per, hsStream.FileName);
+                                    continue;
+                                }
+
+                                if (await GetExamCheckBinaryInner(fileAddManage, childFile, hsStream) != 0)
                                 {
                                     if (pageService.GetFileExaming() == false)
                                     {
@@ -2275,10 +2324,9 @@
         CLog.Here().Information($"Ext(or Type): {strExt}, ###-FileAddCheck-###, FileFilterType : {(bWhite ? "WHITE" : "BLACK")}");
 
         // okb
-        fileAddManager.bEmptyFIleNoCheck = SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans(groupID);
-
+        //fileAddManager.bEmptyFIleNoCheck = SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans(groupID);
         // fileName Check
-        fileAddManager.bUseCrossPlatformOSforFileName = SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName(groupID); // SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName();
+        //fileAddManager.bUseCrossPlatformOSforFileName = SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName(groupID); // SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName();
 
         if (fileAddManager.GetExamFileAddEnable(hsStream, currentFile, bWhite, strFileExtInfo, bHidden, nConvEnableSize, RegSize, FileTransMaxSize, RemainFileTransSize, fileCountStandard, dayCountStandard, dayCountRemain, regCount) != true)
             return false;
@@ -2428,11 +2476,17 @@
             isBinaryAppendCheck = false;
         else
             isBinaryAppendCheck = true;
+        string strBinaryInnerCheck = sgLoginData.GetBinaryInnerCheck(sgLoginData.GetSystemPosition());
+        bool isBinaryInnerCheck = false;
+        if (strBinaryInnerCheck == "1" || strBinaryInnerCheck == "Y")
+            isBinaryInnerCheck = true;
+        else
+            isBinaryInnerCheck = false;
 
 
         int nRet = 0;
         nRet = await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, strDocumentExtractType, bAllowDRM, MaxDepth, Option,
-            ((SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI()) || (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExtRegardlessApprove(_groupId)) ? sgLoginData.GetExceptionExt() : ""), isBinaryAppendCheck : isBinaryAppendCheck);
+            ((SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID) && isUserNeedApproveExtUI()) || (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExtRegardlessApprove(_groupId)) ? sgLoginData.GetExceptionExt() : ""), isBinaryAppendCheck: isBinaryAppendCheck, isBinaryInnerCheck: isBinaryInnerCheck);
         // if (await fileAddManager.CheckZipFile(hsStream, currentFile, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option) != 0)
 
         if (nRet == 1)
@@ -2474,8 +2528,7 @@
         if (sgLoginData == null)
             return -1;
 
-        //if (sgLoginData.IsVipUser())
-        if (false)
+        if (sgLoginData.IsVipUser())
         {
             CLog.Here().Information($"No check OLD for Vip User");
             return 0;
@@ -2556,8 +2609,7 @@
         if (sgLoginData == null)
             return -1;
 
-        //if (sgLoginData.IsVipUser())
-        if (false)
+        if (sgLoginData.IsVipUser())
         {
             CLog.Here().Information($"No check OLD for Vip User");
             return 0;
@@ -2571,6 +2623,56 @@
             return 0;
 
         if (await fileAddManager.CheckBinaryAppendFile(hsStream, currentFile) != 0)
+            return -1;
+
+        return 0;
+    }
+
+    /// <summary>
+    /// PE, Zip, Cert 파일 내부검사
+    /// </summary>
+    /// <param name="fileAddManager"></param>
+    /// <param name="currentFile"></param>
+    /// <param name="hsStream"></param>
+    /// <param name="SGFileExamEvent"></param>
+    /// <param name="ExamCount"></param>
+    /// <param name="TotalCount"></param>
+    /// <returns></returns>
+    public async Task<int> GetExamCheckBinaryInner(FileAddManage fileAddManager, FileAddErr currentFile, HsStream hsStream)
+    {
+        if (hsStream == null)
+            return 0;
+
+        if (hsStream.Size <= 0)
+            return 0;
+
+        string strExtType = hsStream.Type;
+        strExtType = strExtType.ToUpper();
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return -1;
+
+        if (sgLoginData.IsVipUser())
+        {
+            CLog.Here().Information($"No check OLD for Vip User");
+            return 0;
+        }
+
+        string strBinaryInnerCheck = sgLoginData.GetBinaryInnerCheck(sgLoginData.GetSystemPosition());        //문서파일 내부 검사유형 (0 : 문서 검사 않함. / 1 : 모듈검사 & OLE객체 마임리스트검사 / 2 : 모듈검사 & 위변조 체크 / 3 : 모듈검사 & OLE마임리스트검사 & 위변조체크 )
+        if (string.IsNullOrEmpty(strBinaryInnerCheck))   //ENV테이블에 해당 항목 없으면 검사X
+            return 0;
+
+        if (!(strBinaryInnerCheck == "Y" || strBinaryInnerCheck == "1"))
+            return 0;
+
+        if (await fileAddManager.CheckBinaryInnerFile(hsStream, currentFile) != 0)
             return -1;
 
         return 0;

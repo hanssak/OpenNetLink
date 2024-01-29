@@ -2599,6 +2599,54 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return true;
         }
 
+        private static bool IsTXT(string inputPath)
+        {
+            try
+            {
+                using (FileStream stream = File.OpenRead(inputPath))
+                {
+                    long totalLength = stream.Length;
+                    long nCheckPos = 0;
+                    if (totalLength > 10)
+                        nCheckPos = totalLength / 10;
+                    else
+                        return false;
+
+                    long nCheckLen = 0;
+                    if (nCheckPos > 4096)
+                        nCheckLen = 4096;
+                    else
+                        nCheckLen = nCheckPos;
+
+                    byte[] btFileData = new byte[nCheckLen];
+
+                    for(int k = 0; k < 10; k++)
+                    {
+                        stream.Seek(nCheckPos * k, SeekOrigin.Begin);
+                        stream.Read(btFileData, 0, (int)nCheckLen);
+                        for (int i = 0; i < nCheckLen; i++)
+                        {
+                            if (btFileData[i] <= 0x00 || btFileData[i] > 0x7F)
+                            {
+                                if (btFileData[i] > 0x7F)
+                                {   // 한글
+                                    if ((i + 1) < nCheckLen && btFileData[i + 1] > 0x7F) i += 1;
+                                }
+                                else return false;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Information($"IsTXT Check Error : FileName {inputPath}, Message:{ex.Message}");
+                return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// PDF 문서인지 검사한다.
         /// </summary>
@@ -3022,6 +3070,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public static bool IsDER(byte[] btFileData, string strExt)
         {
             byte[] btHLP_Header = new byte[] { 0x30, 0x82 };
+            if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+            return false;
+        }
+        public static bool IsDER(string filePath)
+        {
+            byte[] btHLP_Header = new byte[] { 0x30, 0x82 };
+            byte[] btFileData = new byte[3];
+            using (FileStream stream = File.OpenRead(filePath))
+            {
+                if (stream.Length < 4)
+                    return false;
+
+                stream.Seek(0, SeekOrigin.Begin);
+                stream.Read(btFileData, 0, 3);
+            }
+
             if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
 
             return false;
@@ -4534,7 +4599,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="nOption">CLIENT_ZIP_DEPTH의 2번값(0: 1번째 zip depth에 또 zip이 발견되면 차단, 1 : 허용)</param>
         /// <param name="blAllowDRM"> drm 파일 허용유무(true:허용)</param>
         /// <returns></returns>
-        public async Task<int> CheckZipFile(HsStream hsStream, FileAddErr currentFile, bool bDenyPasswordZIP, bool blWhite, string strExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, string documentExtractType, bool blAllowDRM, int nMaxDepth = 3, int nOption = 0, string strApproveExt = "", bool isBinaryAppendCheck = false)
+        public async Task<int> CheckZipFile(HsStream hsStream, FileAddErr currentFile, bool bDenyPasswordZIP, bool blWhite, string strExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, string documentExtractType, bool blAllowDRM, int nMaxDepth = 3, int nOption = 0, string strApproveExt = "", bool isBinaryAppendCheck = false, bool isBinaryInnerCheck = false)
         {
             int nTotalErrCount = 0;
             eFileAddErr enRet;
@@ -4584,7 +4649,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 long innerFileSize = 0;
 
                 enRet = ScanZipFile(currentFile, strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, nOption, 1, blWhite, strExtInfo, 0, hsStream.Type.ToUpper(),
-                    out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtract, ref innerFileCount, ref innerFileSize, bDenyPasswordZIP, isBinaryAppendCheck: isBinaryAppendCheck);
+                    out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtract, ref innerFileCount, ref innerFileSize, bDenyPasswordZIP, isBinaryAppendCheck: isBinaryAppendCheck, isBinaryInnerCheck:isBinaryInnerCheck);
 
                 SetZipFileInnerInfo((stStream as FileStream).Name, (innerFileCount, innerFileSize));
 
@@ -4644,7 +4709,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="bZipPasswdCheck"></param>
         /// <returns></returns>
         public eFileAddErr ScanZipFile(FileAddErr currentFile, string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nBlockOption, int nCurDepth,
-            bool blWhite, string strExtInfo, int nErrCount, string strExtType, out int nTotalErrCount, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, DocumentExtractType documentExtractType, ref int innerFileCount, ref long innerFileSize, bool bZipPasswdCheck = true, bool isBinaryAppendCheck = false)
+            bool blWhite, string strExtInfo, int nErrCount, string strExtType, out int nTotalErrCount, out bool bIsApproveExt, string strApproveExt, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, DocumentExtractType documentExtractType, ref int innerFileCount, ref long innerFileSize, bool bZipPasswdCheck = true, bool isBinaryAppendCheck = false, bool isBinaryInnerCheck = false)
         {
             bIsApproveExt = false;
             eFileAddErr enErr = eFileAddErr.eFANone;
@@ -4818,7 +4883,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
                     }
 
-
                     if (isBinaryAppendCheck)
                     {
                         if (ListCheckableBinaryAppendExtension.Exists(ext => (string.Compare(ext, strNoDotExt, true) == 0)))
@@ -4840,6 +4904,27 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                 continue;
                             }
                         }
+                    }
+
+                    if (isBinaryInnerCheck)
+                    {
+                        HsStream binaryHsStream = null;
+
+                        using (Stream binaryFileStream = File.OpenRead(extractFile.FullName))
+                        {
+                            binaryHsStream = new HsStream() { stream = binaryFileStream, FileName = extractFile.FullName, MemoryType = HsStreamType.FileStream };
+                            scanBinaryInnerCheck(binaryHsStream, childFile, false).Wait();
+                        }
+
+                        if (childFile.eErrType != eFileAddErr.eFANone)
+                        {
+                            //childFile.eErrType = enErr;
+                            currentFile.HasChildrenErr = true;
+                            nCurErrCount++;
+                            //AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr, Path.GetFileName(strZipFile));
+                            continue;
+                        }
+
                     }
 
                     // Check Zip File  (압축파일 내 압축파일이 또 존재하는 경우.
@@ -5565,6 +5650,26 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
         }
 
+        public async Task<int> CheckBinaryInnerFile(HsStream hsStream, FileAddErr currentFile)
+        {
+            try
+            {
+                Log.Logger.Here().Information($"[CheckBinaryInnerFile] File[{Path.GetFileName(hsStream.FileName)}]");
+
+
+                await scanBinaryInnerCheck(hsStream, currentFile, true);
+                if (currentFile.eErrType == eFileAddErr.eFANone)
+                    return 0;
+
+                return -1;
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"[CheckBinaryInnerFile] Exception = [{ex.ToString()}]");
+                return -1;
+            }
+        }
+
         /// <summary>
         /// 문서 추출 방식으로 문서 검사
         /// </summary>
@@ -5779,6 +5884,137 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             return binaryCheckResult;
         }
+
+        async Task<bool> scanBinaryInnerCheck(HsStream hsStream, FileAddErr currentFile, bool isReOpen)
+        {
+            string source = (hsStream.stream as FileStream).Name;
+            hsStream.stream.Close();
+
+            bool result = false;
+
+            if((currentFile.MimeType == "application/x-dosexec" || currentFile.MimeType == "application/x-msi"))
+            {
+                //파일이 EXE , MSI 일 경우 Return
+                return false;
+            }
+            else
+            {
+                //먼저 CertUtil 사용유무 확인
+#if _WINDOWS
+                if(currentFile.MimeType == "text/plain" || IsTXT(source))
+                {
+                    string tempDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Temp\\BinaryCheck");
+
+                    if (!Directory.Exists(tempDirectory))
+                        Directory.CreateDirectory(tempDirectory);
+                    else
+                    {
+                        Directory.Delete(tempDirectory, true);
+                        Directory.CreateDirectory(tempDirectory);
+                    }
+
+                    result = CheckBinaryCert(source, tempDirectory);
+
+                    if (Directory.Exists(tempDirectory))
+                        Directory.Delete(tempDirectory, true);
+                }
+#endif
+
+                if (!result)
+                {
+                    result = OfficeExtractor.Controller.ExcuteCheckZip(source);
+                    if (!result)
+                    {
+                        result = OfficeExtractor.Controller.ExcuteCheckPe(source);
+                        if(result)
+                            Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck ExcuteCheckPe[{Path.GetFileName(source)}] ExcuteCheckPe[{result}]");
+                    }
+                    else
+                    {
+                        Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck ExcuteCheckZip[{Path.GetFileName(source)}] ExcuteCheckZip[{result}]");
+                    }
+                }
+                else
+                {
+                    Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck CheckBinaryCert[{Path.GetFileName(source)}] CheckBinaryCert[{result}]");
+                }
+            }
+            
+            if (isReOpen)
+                hsStream.stream = File.OpenRead(source);
+
+            Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck DocumentFile[{Path.GetFileName(source)}] binaryCheckResult[{result}]");
+
+            if (result)      
+            {
+                //오류 표시
+                currentFile.eErrType = eFileAddErr.eFAEXT; // 오류 타입 일단 확장자 제한
+                currentFile.ChildrenFiles = null;
+            }
+
+            return result;
+        }
+
+        public bool CheckBinaryCert(string source, string destDirectory)
+        {
+            string strFileMime = string.Empty;
+            byte[] btFileData = new byte[MaxBufferSize];
+
+            using(FileStream stream = File.OpenRead(source))
+            {
+                stream.Read(btFileData, 0, MaxBufferSize);
+            }
+            strFileMime = MimeGuesser.GuessMimeType(btFileData);
+
+            if (strFileMime == "text/plain" || IsTXT(source))
+            {
+                string tempSource = Path.Combine(destDirectory,$"{Path.GetFileName(source)}.txt");
+                
+                bool result = OfficeExtractor.Controller.ExcuteCheckCert(source, tempSource);
+                if (!result)
+                    return false;
+                else
+                {
+                    using (FileStream stream = File.OpenRead(tempSource))
+                    {
+                        stream.Seek(0, SeekOrigin.Begin);
+                        btFileData = new byte[MaxBufferSize];
+                        stream.Read(btFileData, 0, MaxBufferSize);
+                    }
+                    strFileMime = MimeGuesser.GuessMimeType(btFileData);
+
+                    if (strFileMime == "text/plain")
+                    {
+                        return CheckBinaryCert(tempSource, destDirectory);
+                    }
+                    else if (strFileMime == "application/octet-stream" || strFileMime == "binary")
+                    {
+                        if (IsTXT(tempSource))
+                        {
+                            Log.Logger.Here().Information($"[CheckBinaryCert] CheckBinaryCert is OK (isTXT)");
+                            return false;
+                        }
+                        else if (IsDER(tempSource))
+                        {
+                            Log.Logger.Here().Information($"[CheckBinaryCert] CheckBinaryCert is OK (isDER)");
+                            return false;
+                        }
+                        else
+                        {
+                            Log.Logger.Here().Information($"[CheckBinaryCert] CheckBinaryCert is FAIL!!!!!");
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+                return false;
+        }
+
 
         async Task<(int, string)> scanDlpCheck(HsStream hsStream, FileAddErr currentFile, Enums.EnumDlpType dlpType)
         {

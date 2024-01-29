@@ -306,6 +306,7 @@ public:
 	void MinimizeWebWindow();
 	void RegisterStartProgram();
 	void UnRegisterStartProgram();
+	void SetForeground();
 	bool GetTrayUse();
 
 	///

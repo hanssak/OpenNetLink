@@ -254,6 +254,9 @@ bHiddenLoginLogo : Main Login 창 좌측 로고 숨김 처리
 bUseDrmAfterFileReceive :           //파일 수신 완료 후 DRM 사용 여부
 nDrmType :                          //DRM 종류 - 1. SoftCamp, 2.Fasso
 strSoftCampGrade:                   // SoftCamp 연동 시 보안등급
+nSoftCampEncMode : 1 - strSoftCampGrade 값을 사용한 Encrpty, 2 - DAC 사용한 Encrpty, nSoftCampGuide + strSoftCampDAC 값사용
+nSoftCampGuide : 1~3 중에사용, 보통 3
+strSoftCampDAC : 1;1;0;0;1;1;1     => softcamp 문서참고
 
 bUseDlpCheck :           //파일 DLP 검사 사용 유무
 nDlpType :                          //DLP 종류 - 1. 소만사
@@ -300,6 +303,8 @@ bDeleteUploadFile : 파일 전송 후 전송한 파일 삭제
 bUseDlpAfterApproveToNormal : DLP 검출된 파일 사후결재요청일때, 사전결재로 전환해서 전달하는 기능
 
 bHideTransManageDownLoadColumn : 전송관리화면 리스트에서 만료일/다운로드가능횟수/다운로드 - 다운로드 관련 컬럼 삭제
+
+bHideApproveRejectButtonInApproveUI : 결재 관리 , 결재 팝업 창에서 승인, 반려 버튼 숨김 여부
 
 
 

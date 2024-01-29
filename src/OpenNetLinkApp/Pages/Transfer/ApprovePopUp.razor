@@ -272,9 +272,11 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-md btn-blue" disabled="@m_bApprove" @onclick="DetailApprove"><i class="fas fa-check-circle"></i>@strApprove</button>
-                <button type="button" class="btn btn-md btn-red" disabled="@m_bReject" @onclick="DetailReject"><i class="fas fa-times-circle"></i>@strReject</button>
+
+                <button type="button" class="btn btn-md btn-blue" disabled="@m_bApprove" @onclick="DetailApprove" hidden="@bHideApproveRejectButton"><i class="fas fa-check-circle"></i>@strApprove</button>
+                <button type="button" class="btn btn-md btn-red" disabled="@m_bReject" @onclick="DetailReject" hidden="@bHideApproveRejectButton"><i class="fas fa-times-circle"></i>@strReject</button>
                 <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@strClose</button>
+
             </div>
         </div>
         <!-- /.modal-content -->
@@ -649,6 +651,8 @@
 
     public bool bUseDlpDataView = true;
 
+    public bool bHideApproveRejectButton = false;
+
     @*    public string strFromServerNetOver = "";        // 3망상황 시작지
         public string strDestServerNetOver = "";        // 3망상황 목적지*@
 
@@ -689,6 +693,7 @@
         HsCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FilePrevProgressNoti);
 
         bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
+        bHideApproveRejectButton = SGAppMgrSvc.OpConfigInfoService.GetHideApproveRejectButtonInApproveUI(groupID);
     }
 
 

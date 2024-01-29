@@ -316,6 +316,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetHideTransManageDownLoadColumn(int groupId);
         public bool GetUseAptTimeOutMsg(int groupId);
+        public bool GetHideApproveRejectButtonInApproveUI(int groupId);
 
         public bool SetPropertyVal(int groupId, string strProperty, object strVal);
 
@@ -1376,6 +1377,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseAptTimeOutMsg(int groupId)
         {
             return AppConfigInfo[groupId].bUseAptTimeOutMsg;
+        }
+
+        public bool GetHideApproveRejectButtonInApproveUI(int groupId)
+        {
+            return AppConfigInfo[groupId].bHideApproveRejectButtonInApproveUI;
         }
 
         /// <summary>

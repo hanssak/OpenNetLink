@@ -532,6 +532,10 @@
             {
                 doCustomLogin01();
             }
+            else if (SGAppMgrSvc.OpConfigInfoService.GetCustomLoginType(groupid) == (int)Enums.EnumCustomLoginType.LoginTemplate02)
+            { 
+                doCustomLogin02();
+            }
         }
         else
         {
@@ -662,7 +666,7 @@
         {
             CLog.Here().Error($"doLogIn - Exception(Msg) : {ex.Message}");
             Debug.WriteLine(ex.Message);
-            ShowMessage("error", XmlConf.GetErrMsg("W_0187"));
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0187"));
         }
     }
     /// <summary>
@@ -933,7 +937,28 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             bStartedLogin = true;
 
             int groupid = pageService.m_nCurViewPageGroupID;
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
+            string strCurCliVersion = "";
+            string strPlatform = "";
 
+            if (VersionConfigSvc != null)
+            {
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
+                strCurCliVersion = "OpenNetLink " + strCurCliVersion;
+
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
+                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
+            }
+
+            if (strCurCliVersion.Equals(""))
+            {
+                JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+                bStartedLogin = false;
+                return;
+            }
+
+            CLog.Here().Information($"[Main] LogIn Type (######) : {pageService.m_nLoginType.ToString()}, GroupIDLoginType : {pageService.GetGroupIDLoginType(groupid)}");
+            HSCmdCenter.SetCliVersion(strCurCliVersion);
 
             //외부 그룹웨어 연동
             try
@@ -946,23 +971,88 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 CLog.Here().Information($"result bool  : {resultMsg.Item1} , result Msg : {resultMsg.Item2}");
                 if (!resultMsg.Item1)
                 {
-                    JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
-                    bStartedLogin = false;
-                    ShowMessage("error", resultMsg.Item2);
+                    if (resultMsg.Item2 == "사용자가 존재하지 않습니다.")
+                    {
+                        HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginType.eLOGINTYPE_ORIGIN);
+                        pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, eLoginType.eLOGINTYPE_ORIGIN);
 
-                    return;
+                        return;
+                    }
+                    else
+                    {
+
+                        JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+                        bStartedLogin = false;
+                        ShowMessage("error", resultMsg.Item2);
+
+                        return;
+                    }
                 }
             }
             catch (Exception ex)
             {
                 CLog.Here().Error($"doCustomLogin01 - Exception(Msg) : {ex.Message}");
-                ShowMessage("error", XmlConf.GetErrMsg("W_0187"));
+                ShowMessage("warning", XmlConf.GetWarnMsg("W_0187"));
                 return;
             }
 
+            List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+            int count = listNetWork.Count;
+
+            //pageService.m_nCurViewPageGroupID=0;
+
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
+            {
+                foreach (ISGNetwork netlist in listNetWork)
+                {
+                    CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
+                    HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, protectedPw, strCurCliVersion, otp, 0);
+                    pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
+                }
+            }
+            else
+            {
+                HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, 0);
+                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"doLogIn - Exception(Msg) : {ex.Message}");
+            Debug.WriteLine(ex.Message);
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0187"));
+        }
+    }
+
+    private void doCustomLogin02()
+    {
+        try
+        {
+            if (bStartedLogin)
+                return;
+
+            if ((id?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0030"));
+                return;
+            }
+
+            if ((protectedPw?.Length ?? 0) < 1)
+            {
+                ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
+                return;
+            }
+
+            CLog.Here().Information($"doCustomLogin02 - ###### -  Start");
+            JSRuntime.InvokeAsync<object>("loginCursorChange");
+            bStartedLogin = true;
+
+            int groupid = pageService.m_nCurViewPageGroupID;
             ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";
             string strPlatform = "";
+
             if (VersionConfigSvc != null)
             {
                 strCurCliVersion = VersionConfigSvc.GetSWVersion();
@@ -973,11 +1063,50 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             }
 
             if (strCurCliVersion.Equals(""))
+            {
+                JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+                bStartedLogin = false;
                 return;
+            }
 
             CLog.Here().Information($"[Main] LogIn Type (######) : {pageService.m_nLoginType.ToString()}, GroupIDLoginType : {pageService.GetGroupIDLoginType(groupid)}");
             HSCmdCenter.SetCliVersion(strCurCliVersion);
 
+            //외부 그룹웨어 연동
+            try
+            {
+                LoginTemplate01 loginTemplate01 = new LoginTemplate01();
+                string url = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginHttpUrl(groupid);
+                string siteKey = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginSecurityKey(groupid);
+                string siteIV = SGAppMgrSvc.OpConfigInfoService.GetCustomLoginSecurityIV(groupid);
+                (bool, string) resultMsg = loginTemplate01.Login(id, protectedPw, url, siteKey, siteIV);
+                CLog.Here().Information($"result bool  : {resultMsg.Item1} , result Msg : {resultMsg.Item2}");
+                if (!resultMsg.Item1)
+                {
+                    if (resultMsg.Item2 == "사용자가 존재하지 않습니다.")
+                    {
+                        HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginType.eLOGINTYPE_ORIGIN);
+                        pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, eLoginType.eLOGINTYPE_ORIGIN);
+
+                        return;
+                    }
+                    else
+                    {
+
+                        JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+                        bStartedLogin = false;
+                        ShowMessage("error", resultMsg.Item2);
+
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"doCustomLogin01 - Exception(Msg) : {ex.Message}");
+                ShowMessage("warning", XmlConf.GetWarnMsg("W_0187"));
+                return;
+            }
 
             List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
             int count = listNetWork.Count;
@@ -1004,9 +1133,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         {
             CLog.Here().Error($"doLogIn - Exception(Msg) : {ex.Message}");
             Debug.WriteLine(ex.Message);
-            ShowMessage("error", XmlConf.GetErrMsg("W_0187"));
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0187"));
         }
     }
+
 
 
     /// <summary>
@@ -1254,6 +1384,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         if (SGAppMgrSvc.OpConfigInfoService.GetCustomLoginType(groupID) == (int)Enums.EnumCustomLoginType.LoginTemplate01)
                         {
                             doCustomLogin01();
+                        }
+                        else if (SGAppMgrSvc.OpConfigInfoService.GetCustomLoginType(groupID) == (int)Enums.EnumCustomLoginType.LoginTemplate02)
+                        {
+                            doCustomLogin02();
                         }
                     }
                     else
@@ -1694,6 +1828,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         strGetinfoTagName += ", 'CLIENT_URL_FW_PAGE'";
                         strGetinfoTagName += ", 'CLIENT_BINARY_CHECK'";
                         strGetinfoTagName += ", 'CLIENT_BINARY_CHECK_EXT'";
+                        strGetinfoTagName += ", 'CLIENT_CHECK_PE'";
                         strGetinfoTagName += ", 'CLIENT_PRIVACY_COMMENT'";
 
                         if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupId))
