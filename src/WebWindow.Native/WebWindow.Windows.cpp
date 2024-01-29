@@ -2174,12 +2174,10 @@ void WebWindow::MoveTrayToWebWindow()
 			toggle_show(item);
 			break;
 		}
-		else //If already 'Show', just display foreground
+		else if (strcmp(item->text, "Hide") == 0)  //If already 'Show', just display foreground
 		{
 			if (_hWnd != NULL)
 			{
-				::ShowWindow(_hWnd, SW_RESTORE);
-				::ShowWindow(_hWnd, SW_SHOW);
 				::SetForegroundWindow(_hWnd);
 			}
 		}
