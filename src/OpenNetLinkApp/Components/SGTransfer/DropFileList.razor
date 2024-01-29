@@ -466,6 +466,10 @@
             fileAddManage.SetOleExtractExtData(sgLoginData.GetDocumentExtractExt());
             fileAddManage.SetBinaryCheckExtData(sgLoginData.GetBinaryCheckExt());
             fileAddManage.m_bIsBlockEmptyExt = SGAppMgrSvc.OpConfigInfoService.GetEmptyExtFileTrans(groupID);
+            // okb
+            fileAddManage.bEmptyFIleNoCheck = SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans(groupID);
+            // fileName Check
+            fileAddManage.bUseCrossPlatformOSforFileName = SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName(groupID); // SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName();
 
             foreach (var item in HsStreamList)
             {
@@ -2344,10 +2348,9 @@
         CLog.Here().Information($"Ext(or Type): {strExt}, ###-FileAddCheck-###, FileFilterType : {(bWhite ? "WHITE" : "BLACK")}");
 
         // okb
-        fileAddManager.bEmptyFIleNoCheck = SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans(groupID);
-
+        //fileAddManager.bEmptyFIleNoCheck = SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans(groupID);
         // fileName Check
-        fileAddManager.bUseCrossPlatformOSforFileName = SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName(groupID); // SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName();
+        //fileAddManager.bUseCrossPlatformOSforFileName = SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName(groupID); // SGAppMgrSvc.OpConfigInfoService.GetUseCrossPlatformOSforFileName();
 
         if (fileAddManager.GetExamFileAddEnable(hsStream, currentFile, bWhite, strFileExtInfo, bHidden, nConvEnableSize, RegSize, FileTransMaxSize, RemainFileTransSize, fileCountStandard, dayCountStandard, dayCountRemain, regCount) != true)
             return false;
