@@ -5947,7 +5947,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (result)      
             {
                 //오류 표시
-                currentFile.eErrType = eFileAddErr.e; // 오류 타입 일단 확장자 제한
+                currentFile.eErrType = eFileAddErr.eFAEXT; // 오류 타입 일단 확장자 제한
                 currentFile.ChildrenFiles = null;
             }
 
