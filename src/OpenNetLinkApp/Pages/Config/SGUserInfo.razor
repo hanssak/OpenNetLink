@@ -52,7 +52,7 @@
                                         <th>@XmlConf.GetTitle("T_COMMON_USER_NAME")</th>
                                         <td>
                                             @(GetUserInfo()?.UserName) &nbsp;&nbsp;&nbsp;
-                                            @if (pageService.GetGroupIDLoginType(groupIDbyParam) != eLoginType.eLOGINTYPE_AD && SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupIDbyParam))
+                                            @if (pageService.GetGroupIDLoginType(groupIDbyParam) == eLoginType.eLOGINTYPE_ORIGIN && SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupIDbyParam))
                                             {
                                                 <button type="button" class="btn bg-gradient-secondary btn-xs col-md-3" style="width:500px;" @onclick="openPWChangePopUp">@XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</button>
                                             }

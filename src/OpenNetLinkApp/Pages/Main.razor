@@ -912,13 +912,13 @@
                 {
                     CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
                     HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, pw, strCurCliVersion, otp, 0);
-                    pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
+                    pageService.SetGroupIDLoginType(netlist.GroupID, eLoginType.eLOGINTYPE_CUSTOM);
                 }
             }
             else
             {
                 HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, 0);
-                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
+                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, eLoginType.eLOGINTYPE_CUSTOM);
             }
 
         }
