@@ -94,7 +94,7 @@
 
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
                             {
-                                <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" value="@otp" @oninput="@(e=>otp = e.Value.ToString())" tabindex="3" autocomplete="off">
+                                <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" value="@otp" onkeydown="KeyEventPW('btnLogin');" @oninput="@(e=>otp = e.Value.ToString())" tabindex="3" autocomplete="off">
                             }
                             <div class="row p-0">
                                 @if (bAutoLogin)
