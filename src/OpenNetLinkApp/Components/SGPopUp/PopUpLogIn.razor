@@ -596,6 +596,20 @@
                 return;
             }
 
+            if(eLoginUITypeData == eLoginType.eLOGINTYPE_PW_OTP || eLoginUITypeData == eLoginType.eLOGINTYPE_OTP)
+            {
+                 if (otp == null || otp.Length < 6)
+                {
+                    ShowLoginFail(XmlConf.GetTitle("T_OTP_GUIDE"));
+                    SetProtectedPW(string.Empty);
+                    otp = "";
+                    return;
+                }
+
+                if(eLoginUITypeData == eLoginType.eLOGINTYPE_OTP) 
+                    protectedPw = SGCrypto.AESEncrypt256WithDEK(Encoding.UTF8.GetBytes(otp));
+            }
+
             if ((protectedPw?.Length ?? 0) < 1)
             {
                 ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
@@ -685,7 +699,13 @@
                 }
             }
             else
-                HSCmdCenter.Login(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginUITypeData);
+            {
+                if(eLoginUITypeData == eLoginType.eLOGINTYPE_OTP)
+                    HSCmdCenter.LoginNotCheckPw(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginUITypeData);
+                else
+                    HSCmdCenter.Login(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginUITypeData);
+            }
+                
 
         }
         catch (Exception ex)
@@ -1746,6 +1766,7 @@
         {
             bStartedLogin = false;
             SetProtectedPW(string.Empty);
+            otp = ""
         }
     }
 

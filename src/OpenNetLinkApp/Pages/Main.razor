@@ -500,7 +500,7 @@
             Show2FactorAuth(0, e);
             return;*@
 
-        int groupid = pageService.m_nCurViewPageGroupID;
+    int groupid = pageService.m_nCurViewPageGroupID;
 
         CLog.Here().Information($"ClickdoLogin - login - groupid : {groupid} (bLoginBtnDisable:{bLoginBtnDisable})");
         if (bLoginBtnDisable)   //버튼이 비활성화 되어 있다면, 이후 처리 불가(js에서 호출되는 경우에 체크 필요)
@@ -588,6 +588,21 @@
                 return;
             }
 
+               //VAlidation Check  PW_OTP(4), OTP(5)
+            if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5)
+            {
+                if (otp == null || otp.Length < 6)
+                {
+                    ShowLoginFail(XmlConf.GetTitle("T_OTP_GUIDE"));
+                    SetProtectedPW(string.Empty);
+                    otp = "";
+                    return;
+                }
+
+                if(pageService.m_nLoginType == 5) 
+                    protectedPw = SGCrypto.AESEncrypt256WithDEK(Encoding.UTF8.GetBytes(otp));
+            }
+
             if ((protectedPw?.Length ?? 0) < 1)
             {
                 ShowLoginFail(XmlConf.GetWarnMsg("W_0029"));
@@ -605,19 +620,6 @@
             CLog.Here().Information($"doLogin - ###### -  Start");
 
             int groupid = pageService.m_nCurViewPageGroupID;
-
-            //VAlidation Check  PW_OTP(4), OTP(5)
-            if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5)
-            {
-                if (otp == null || otp.Length < 6)
-                {
-                    ShowLoginFail(XmlConf.GetTitle("T_OTP_GUIDE"));
-                    bLoginBtnDisable = false;
-
-                    SetProtectedPW(string.Empty);
-                    return;
-                }
-            }
 
             JSRuntime.InvokeAsync<object>("loginCursorChange");
             bStartedLogin = true;
@@ -651,13 +653,20 @@
                 foreach (ISGNetwork netlist in listNetWork)
                 {
                     CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
-                    HSCmdCenter.Login(netlist.GroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
+                    
+                    if(pageService.m_nLoginType == 5)
+                        HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
+                    else
+                        HSCmdCenter.Login(netlist.GroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
                     pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
                 }
             }
             else
             {
-                HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
+                if(pageService.m_nLoginType == 5)
+                    HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
+                else
+                    HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
                 pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
             }
 
@@ -2836,7 +2845,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     strNavigatePathWithGroupID = "/hanssakOTP/";    //안씀
                     strNavigatePathWithGroupID += gID.ToString();
                     if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
-                        SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_COMMON_OTP"), icon: "fas fa-cog", path: "POPUP('OTP')", badgeType: "right badge badge-warning", bUse: bBasicConf, strUserSeq: strUserSeq);
+                        SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_COMMON_OTP"), icon: "fas fa-cog", path: "POPUP('OTP')", badgeType: "right badge badge-warning", bUse: true, strUserSeq: strUserSeq);
                 }
             }
 
