@@ -168,11 +168,8 @@
     <if test = "ReqUserName != ''">
       AND USER_NAME LIKE '%' || '#ReqUserName#' || '%'
     </if>
-    <if test = "Src_system_id != ''">
-      AND (SUBSTRING(SRC_SYSTEM_ID,1,1) = '#Src_system_id#')
-    </if>
     <if test = "Dest_system_id != ''">
-      AND (SUBSTRING(DEST_SYSTEM_ID,1,2) = '#Dest_system_id#')
+      AND DEST_SYSTEM_ID = '#Dest_system_id#'
     </if>
     ORDER BY REQUEST_TIME DESC
     LIMIT #PageListCount# OFFSET (#ViewPageNo# -1) * #PageListCount#
@@ -346,12 +343,14 @@
     <if test = "ReqUserName != ''">
       AND USER_NAME LIKE '%' || '#ReqUserName#' || '%'
     </if>
-    <if test = "Src_system_id != ''">
-      AND (SUBSTRING(SRC_SYSTEM_ID,1,1) = '#Src_system_id#')
-    </if>
-    <if test = "Dest_system_id != ''">
-      AND (SUBSTRING(DEST_SYSTEM_ID,1,2) = '#Dest_system_id#')
-    </if>
+    <case>
+      <when test = "Src_system_id != '' AND Dest_system_id != ''">
+        AND (SRC_SYSTEM_ID = '#Src_system_id#' OR DEST_SYSTEM_ID = '#Dest_system_id#')
+      </when>
+      <when test = "Dest_system_id != ''">
+        AND DEST_SYSTEM_ID = '#Dest_system_id#'
+      </when>
+    </case>
   </statement>
 
   <statement id = "TransferDaoList">
@@ -368,7 +367,9 @@
       LEFT OUTER JOIN VIEW_BACKUP_PERIOD B ON (A.TRANS_SEQ = B.TRANS_SEQ)
     </if>
     <if test = "NetWorkType == '2'">
-      GET_FORWARD_FLAG(A.TRANS_SEQ) AS DATAFORWARDED, GET_USER_INFO(A.USER_SEQ) AS ORGUSERINFO, A.RECV_POS AS RECVPOS, '0' AS RECEIVETYPE
+      GET_FORWARD_FLAG(A.TRANS_SEQ) AS DATAFORWARDED,
+      (SELECT AA.USER_ID || '|' || AA.USER_RANK  || '|' || BB.DEPT_NAME FROM TBL_USER_INFO AA, TBL_DEPT_INFO BB WHERE AA.DEPT_SEQ = BB.DEPT_SEQ AND AA.USER_SEQ = A.USER_SEQ) AS ORGUSERINFO,
+      A.RECV_POS AS RECVPOS, '0' AS RECEIVETYPE, A.DATA_TYPE AS DATATYPE
       ,C.SRC_SYSTEM_ID, C.DEST_SYSTEM_ID
       FROM TBL_TRANSFER_REQ_INFO A
       LEFT OUTER JOIN VIEW_BACKUP_PERIOD B ON (A.TRANS_SEQ = B.TRANS_SEQ)
@@ -391,7 +392,9 @@
       LEFT OUTER JOIN VIEW_BACKUP_PERIOD B ON (A.TRANS_SEQ = B.TRANS_SEQ)
     </if>
     <if test = "NetWorkType == '2'">
-      GET_FORWARD_FLAG(A.TRANS_SEQ) AS DATAFORWARDED, GET_USER_INFO(A.USER_SEQ) AS ORGUSERINFO, A.RECV_POS AS RECVPOS, '0' AS RECEIVETYPE
+      GET_FORWARD_FLAG(A.TRANS_SEQ) AS DATAFORWARDED,
+      (SELECT AA.USER_ID || '|' || AA.USER_RANK  || '|' || BB.DEPT_NAME FROM TBL_USER_INFO AA, TBL_DEPT_INFO BB WHERE AA.DEPT_SEQ = BB.DEPT_SEQ AND AA.USER_SEQ = A.USER_SEQ) AS ORGUSERINFO,
+      A.RECV_POS AS RECVPOS, '0' AS RECEIVETYPE, A.DATA_TYPE AS DATATYPE
       ,C.SRC_SYSTEM_ID, C.DEST_SYSTEM_ID
       FROM TBL_TRANSFER_REQ_HIS A
       LEFT OUTER JOIN VIEW_BACKUP_PERIOD B ON (A.TRANS_SEQ = B.TRANS_SEQ)
@@ -414,7 +417,9 @@
       INNER JOIN TBL_FORWARD_INFO B ON (A.TRANS_SEQ = B.TRANS_SEQ)
     </if>
     <if test = "NetWorkType == '2'">
-      '2' AS DATAFORWARDED, GET_USER_INFO(A.USER_SEQ) AS ORGUSERINFO, A.RECV_POS AS RECVPOS, '1' AS RECEIVETYPE
+      '2' AS DATAFORWARDED,
+      (SELECT AA.USER_ID || '|' || AA.USER_RANK  || '|' || BB.DEPT_NAME FROM TBL_USER_INFO AA, TBL_DEPT_INFO BB WHERE AA.DEPT_SEQ = BB.DEPT_SEQ AND AA.USER_SEQ = A.USER_SEQ) AS ORGUSERINFO,
+      A.RECV_POS AS RECVPOS, '1' AS RECEIVETYPE, A.DATA_TYPE AS DATATYPE
       ,C.SRC_SYSTEM_ID, C.DEST_SYSTEM_ID
       FROM VIEW_TRANSFER_ALL A
       INNER JOIN TBL_FORWARD_INFO B ON (A.TRANS_SEQ = B.TRANS_SEQ)
@@ -437,7 +442,9 @@
       INNER JOIN TBL_FORWARD_INFO_HIS B ON (A.TRANS_SEQ = B.TRANS_SEQ)
     </if>
     <if test = "NetWorkType == '2'">
-      '2' AS DATAFORWARDED, GET_USER_INFO(A.USER_SEQ) AS ORGUSERINFO, A.RECV_POS AS RECVPOS, '1' AS RECEIVETYPE
+      '2' AS DATAFORWARDED,
+      (SELECT AA.USER_ID || '|' || AA.USER_RANK  || '|' || BB.DEPT_NAME FROM TBL_USER_INFO AA, TBL_DEPT_INFO BB WHERE AA.DEPT_SEQ = BB.DEPT_SEQ AND AA.USER_SEQ = A.USER_SEQ) AS ORGUSERINFO,
+      A.RECV_POS AS RECVPOS, '1' AS RECEIVETYPE, A.DATA_TYPE AS DATATYPE
       ,C.SRC_SYSTEM_ID, C.DEST_SYSTEM_ID
       FROM VIEW_TRANSFER_ALL A
       INNER JOIN TBL_FORWARD_INFO_HIS B ON (A.TRANS_SEQ = B.TRANS_SEQ)
@@ -479,9 +486,14 @@
       AND UPPER(TITLE) LIKE UPPER('%' || '#Title#' || '%')
     </if>
     <if test = "NetWorkType == '2'">
-      <if test = "Dest_system_id != ''">
-        AND SUBSTRING(DEST_SYSTEM_ID,1,2) = '#Dest_system_id#'
-      </if>
+      <case>
+        <when test = "Src_system_id != '' AND Dest_system_id != ''">
+          AND (SRC_SYSTEM_ID = '#Src_system_id#' OR DEST_SYSTEM_ID = '#Dest_system_id#')
+        </when>
+        <when test = "Dest_system_id != ''">
+          AND DEST_SYSTEM_ID = '#Dest_system_id#'
+        </when>
+      </case>
     </if>
     ORDER BY REQUESTTIME DESC
     LIMIT #PageListCount# OFFSET (#ViewPageNo# -1) * #PageListCount#
@@ -501,7 +513,7 @@
       LEFT OUTER JOIN VIEW_BACKUP_PERIOD B ON (A.TRANS_SEQ = B.TRANS_SEQ)
     </if>
     <if test = "NetWorkType == '2'">
-      GET_FORWARD_FLAG(A.TRANS_SEQ) AS DATAFORWARDED, GET_USER_INFO(A.USER_SEQ) AS ORGUSERINFO, A.RECV_POS AS RECVPOS, '0' AS RECEIVETYPE
+      GET_FORWARD_FLAG(A.TRANS_SEQ) AS DATAFORWARDED, GET_USER_INFO(A.USER_SEQ) AS ORGUSERINFO, A.RECV_POS AS RECVPOS, '0' AS RECEIVETYPE, A.DATA_TYPE AS DATATYPE
       ,C.SRC_SYSTEM_ID, C.DEST_SYSTEM_ID
       FROM TBL_TRANSFER_REQ_INFO A
       LEFT OUTER JOIN VIEW_BACKUP_PERIOD B ON (A.TRANS_SEQ = B.TRANS_SEQ)
@@ -524,7 +536,7 @@
       LEFT OUTER JOIN VIEW_BACKUP_PERIOD B ON (A.TRANS_SEQ = B.TRANS_SEQ)
     </if>
     <if test = "NetWorkType == '2'">
-      GET_FORWARD_FLAG(A.TRANS_SEQ) AS DATAFORWARDED, GET_USER_INFO(A.USER_SEQ) AS ORGUSERINFO, A.RECV_POS AS RECVPOS, '0' AS RECEIVETYPE
+      GET_FORWARD_FLAG(A.TRANS_SEQ) AS DATAFORWARDED, GET_USER_INFO(A.USER_SEQ) AS ORGUSERINFO, A.RECV_POS AS RECVPOS, '0' AS RECEIVETYPE, A.DATA_TYPE AS DATATYPE
       ,C.SRC_SYSTEM_ID, C.DEST_SYSTEM_ID
       FROM TBL_TRANSFER_REQ_HIS A
       LEFT OUTER JOIN VIEW_BACKUP_PERIOD B ON (A.TRANS_SEQ = B.TRANS_SEQ)
@@ -547,7 +559,7 @@
       INNER JOIN TBL_FORWARD_INFO B ON (A.TRANS_SEQ = B.TRANS_SEQ)
     </if>
     <if test = "NetWorkType == '2'">
-      '2' AS DATAFORWARDED, GET_USER_INFO(A.USER_SEQ) AS ORGUSERINFO, A.RECV_POS AS RECVPOS, '1' AS RECEIVETYPE
+      '2' AS DATAFORWARDED, GET_USER_INFO(A.USER_SEQ) AS ORGUSERINFO, A.RECV_POS AS RECVPOS, '1' AS RECEIVETYPE, A.DATA_TYPE AS DATATYPE
       ,C.SRC_SYSTEM_ID, C.DEST_SYSTEM_ID
       FROM VIEW_TRANSFER_ALL A
       INNER JOIN TBL_FORWARD_INFO B ON (A.TRANS_SEQ = B.TRANS_SEQ)
@@ -570,7 +582,7 @@
       INNER JOIN TBL_FORWARD_INFO_HIS B ON (A.TRANS_SEQ = B.TRANS_SEQ)
     </if>
     <if test = "NetWorkType == '2'">
-      '2' AS DATAFORWARDED, GET_USER_INFO(A.USER_SEQ) AS ORGUSERINFO, A.RECV_POS AS RECVPOS, '1' AS RECEIVETYPE
+      '2' AS DATAFORWARDED, GET_USER_INFO(A.USER_SEQ) AS ORGUSERINFO, A.RECV_POS AS RECVPOS, '1' AS RECEIVETYPE, A.DATA_TYPE AS DATATYPE
       ,C.SRC_SYSTEM_ID, C.DEST_SYSTEM_ID
       FROM VIEW_TRANSFER_ALL A
       INNER JOIN TBL_FORWARD_INFO_HIS B ON (A.TRANS_SEQ = B.TRANS_SEQ)
@@ -612,9 +624,14 @@
       AND UPPER(TITLE) LIKE UPPER('%' || '#Title#' || '%')
     </if>
     <if test = "NetWorkType == '2'">
-      <if test = "Dest_system_id != ''">
-        AND SUBSTRING(DEST_SYSTEM_ID,1,2) = '#Dest_system_id#'
-      </if>
+      <case>
+        <when test = "Src_system_id != '' AND Dest_system_id != ''">
+          AND (SRC_SYSTEM_ID = '#Src_system_id#' OR DEST_SYSTEM_ID = '#Dest_system_id#')
+        </when>
+        <when test = "Dest_system_id != ''">
+          AND DEST_SYSTEM_ID = '#Dest_system_id#'
+        </when>
+      </case>
     </if>
   </statement>
 
