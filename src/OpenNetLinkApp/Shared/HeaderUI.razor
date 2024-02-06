@@ -158,6 +158,7 @@
                 //HsCmdCenter.sgPageEvent.SetFileForwardNotifyEventAdd(listNetWork[nIdx].GroupID, FileForwardNotify); //파일전달 알람 이벤트
                 HsCmdCenter.SetUseOSMaxPath(listNetWork[nIdx].GroupID, siteConfig.GetUseOSMaxFilePath());
 
+                HsCmdCenter.sgPageEvent.SetUrlTypeForwardData(listNetWork[nIdx].GroupID, SetUrlTypeForwardInfo);
             }
         }
     }
@@ -793,6 +794,62 @@
 
         SetUrlPolicyDataToNetworkLib(groupid, true);
 
+    }
+
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    bool SetUrlTypeForwardInfo(int groupid)
+    {
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        if (sgLoginData == null)
+        {
+            CLog.Here().Information($"SetUrlTypeForwardInfo, groupID : {groupid},  ### UrlRedirection - loginData empty !");
+            return false;
+        }
+
+        string strForwardUrl = "";
+        char chType = 'C';
+
+        CLog.Here().Information($"SetUrlTypeForwardInfo, groupID : {groupid} -  ### UrlRedirection - GetLogin Data !");
+
+        string strData = "";
+        strData = sgLoginData.GetTagDataBySystemEnvName("CLIENT_URL_FW_PAGE");
+        if (strData.Length < 1)
+        {
+            // C - Type 적용
+            CLog.Here().Information($"SetUrlTypeForwardInfo, groupID : {groupid} -  ### UrlRedirection - Server CLIENT_URL_FW_PAGE tag Empty, Type : C !");
+        }
+        else
+        {
+            CLog.Here().Information($"SetUrlTypeForwardInfo, groupID : {groupid} -  ### UrlRedirection - CLIENT_URL_FW_PAGE : {strData}");
+
+            if (string.Compare(strData, "uselocal", true) == 0)
+            {
+                // 'N' Type 필요 및 기타 local 설정사용필요시
+                chType = SGAppMgrSvc.AppConfigInfoService.GetURLAutoAfterBrowser(0).ElementAt(0);
+                strForwardUrl = SGAppMgrSvc.AppConfigInfoService.GetForwardUrl(0);
+            }
+            else
+            {
+                // F - Type, Url 적용
+                chType = 'F';
+                strForwardUrl = strData;
+            }
+        }
+        HsNetWorkSG.HsHttpWatcher.SetUrlRedirectSomeData(groupid, chType, strForwardUrl);
+
+        CtrlSideRefreshEvent ctrlSideEvent = null;
+        ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideRefreshEvent();
+        if (ctrlSideEvent != null)
+            ctrlSideEvent();
+
+        return true;
     }
 
 

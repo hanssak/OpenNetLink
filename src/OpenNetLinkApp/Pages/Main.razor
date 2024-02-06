@@ -1277,6 +1277,9 @@
                         strGetinfoTagName += ", 'CLIENT_TRANSFER_TITLE'";
                         strGetinfoTagName += ", 'CLIENT_TRANSFER_DESCRIPTION'";
 
+                        // 가이드 Page 위치 받아오는 기능 추가 : GO여부 확인후 기능추가
+                        //strGetinfoTagName += ", 'CLIENT_URL_FW_PAGE'";
+
                         if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc())
                         {
                             strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
@@ -1285,8 +1288,9 @@
 
                         if (sgLoginData.GetURLRedirect())
                         {
-                            strGetinfoTagName += ", 'CLIENT_URLREDIRECTION_F_INFO'";
-                            HSCmdCenter.sgPageEvent.SetSystemEnvQueryResultEvent(GetUrlRedirectionInfoData);
+                            //strGetinfoTagName += ", 'CLIENT_URLREDIRECTION_F_INFO'";
+                            strGetinfoTagName += ", 'CLIENT_URL_FW_PAGE'";
+                            //HSCmdCenter.sgPageEvent.SetSystemEnvQueryResultEvent(GetUrlRedirectionInfoData);
                         }
 
                         string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용

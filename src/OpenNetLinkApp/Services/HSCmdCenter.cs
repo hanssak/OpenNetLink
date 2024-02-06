@@ -1641,13 +1641,27 @@ namespace OpenNetLinkApp.Services
         public void ZipDepthInfoSetting(int nRet, int groupId, SGData sgData)
         {
             SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+            if (sgLoginData == null)
+            {
+                return;
+            }
+
+
             if (nRet == 0)
             {
                 sgLoginData.AddZipDepthInfo(sgData);
 
-                SystemEnvQueryNotiEvent SCClear_Event = sgPageEvent.GetSystemEnvQueryResultEvent();
+                // html 파일 변경하는 기능 Off
+                /*SystemEnvQueryNotiEvent SCClear_Event = sgPageEvent.GetSystemEnvQueryResultEvent();
                 if (SCClear_Event != null)
-                    SCClear_Event(groupId);
+                    SCClear_Event(groupId);*/
+
+                UrlTypeForwardDataEvent eventUrlTypeForwardData = null;
+                eventUrlTypeForwardData = sgPageEvent.GetUrlTypeForwardData(groupId);
+                if (eventUrlTypeForwardData != null)
+                {
+                    eventUrlTypeForwardData(groupId);
+                }
             }
             else
             {

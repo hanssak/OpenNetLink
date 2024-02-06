@@ -731,12 +731,21 @@
         }
     }
 
+    /// <summary>
+    /// 다른 Menu에서 원할때, 화면 갱신 시키고 싶을때
+    /// </summary>
+    public void CtrlSideRefresh()
+    {
+        StateHasChanged();
+    }
+
     protected override void OnInitialized()
     {
 
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         m_bScreenLockUserChange = OpConfigSvc.GetScreenLockUserChange();
 
+        HsCmdCenter.sgPageEvent.SetCtrlSideRefreshEvent(CtrlSideRefresh);
 
         /*SGLoginData sgLoginData = null;
 

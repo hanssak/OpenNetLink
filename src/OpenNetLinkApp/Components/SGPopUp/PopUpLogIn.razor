@@ -1207,6 +1207,13 @@
                         strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
                     }
 
+                    if (sgLoginData.GetURLRedirect())
+                    {
+                        //strGetinfoTagName += ", 'CLIENT_URLREDIRECTION_F_INFO'";
+                        strGetinfoTagName += ", 'CLIENT_URL_FW_PAGE'";
+                        //HSCmdCenter.sgPageEvent.SetSystemEnvQueryResultEvent(GetUrlRedirectionInfoData);
+                    }
+
                     string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
                     HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
 

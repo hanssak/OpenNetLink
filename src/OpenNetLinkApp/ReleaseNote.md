@@ -6,7 +6,7 @@
 -->
 
 ### OpenNetLink v1.0.0.3
-- URLRedirection, Page Guide 문구 변경적용
+- URLRedirection, Page File 커스터마이징 가능하게 수정
 
 
 ### OpenNetLink v1.0.0.2

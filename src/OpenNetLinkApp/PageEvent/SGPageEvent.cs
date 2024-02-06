@@ -239,6 +239,9 @@ namespace OpenNetLinkApp.PageEvent
     // 보안결재자 조회
     public delegate void SecurityApproverSearchEvent(int groupid, SGData e);
 
+    // 로그인 후 오른쪽 사이드바 환경설정 화면갱신 노티
+    public delegate void CtrlSideRefreshEvent();
+
     // 쿼리 카운트 공용 이벤트 Delegate
     public delegate void QueryCountEvent(int groupid, SGData e);
     // 쿼리 리스트 공용 이벤트 Delegate
@@ -277,6 +280,12 @@ namespace OpenNetLinkApp.PageEvent
     /// <param name="groupid"></param>
     /// <param name="e"></param>
     public delegate void SystemEnvQueryNotiEvent(int groupid);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="groupId"></param>
+    public delegate bool UrlTypeForwardDataEvent(int groupId);
 
 }
 
@@ -387,6 +396,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, FileExamEvent> DicFileExamEvent = new Dictionary<int, FileExamEvent>();                                                  // 파일 검사 노티.
 
         public CtrlSideEvent ctrlSideEvent;
+        public CtrlSideRefreshEvent ctrlSideRefreshEvent;
 
         public ClientUpgradeEvent ClientUpdate;                                                                                                         // 업데이트 노티
         public ClientUpgradeExeEvent ClientUpgreadeExe;                                                                                                 // 업데이트 실행
@@ -445,6 +455,8 @@ namespace OpenNetLinkApp.PageEvent
         private Dictionary<int, DeptInfoNotiEvent> _dicDeptInfoEvnet = new Dictionary<int, DeptInfoNotiEvent>();
 
         public Dictionary<int, ReconnectCountOutEvent> DicReconnectCountEvent = new Dictionary<int, ReconnectCountOutEvent>(); // Reconnect Count Out 횟수이상 발생시
+
+        public Dictionary<int, UrlTypeForwardDataEvent> DicUrlTypeForwardDataEvent = new Dictionary<int, UrlTypeForwardDataEvent>();
 
         public SendPkiFileEvent PkiFileSendEventFunc = null;   // pki파일전송용
 
@@ -1328,6 +1340,33 @@ namespace OpenNetLinkApp.PageEvent
         {
             ctrlSideEvent = ctrlSideNoti;
         }
+
+        public CtrlSideRefreshEvent GetCtrlSideRefreshEvent()
+        {
+            return ctrlSideRefreshEvent;
+        }
+
+        public void SetCtrlSideRefreshEvent(CtrlSideRefreshEvent ctrlSideNoti)
+        {
+            ctrlSideRefreshEvent = ctrlSideNoti;
+        }
+
+        public void SetUrlTypeForwardData(int groupid, UrlTypeForwardDataEvent e)
+        {
+            UrlTypeForwardDataEvent temp = null;
+            if (DicUrlTypeForwardDataEvent.TryGetValue(groupid, out temp))
+                DicUrlTypeForwardDataEvent.Remove(groupid);
+            DicUrlTypeForwardDataEvent[groupid] = e;
+        }
+
+        public UrlTypeForwardDataEvent GetUrlTypeForwardData(int groupid)
+        {
+            UrlTypeForwardDataEvent e = null;
+            if (DicUrlTypeForwardDataEvent.TryGetValue(groupid, out e) == true)
+                e = DicUrlTypeForwardDataEvent[groupid];
+            return e;
+        }
+
 
         /// <summary>
         /// 노티로 Update 버전 확인 발생
