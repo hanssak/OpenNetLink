@@ -2174,13 +2174,13 @@ void WebWindow::MoveTrayToWebWindow()
 			toggle_show(item);
 			break;
 		}
-		else if (strcmp(item->text, "Hide") == 0)  //If already 'Show', just display foreground
-		{
-			if (_hWnd != NULL)
-			{
-				::SetForegroundWindow(_hWnd);
-			}
-		}
+		//else if (strcmp(item->text, "Hide") == 0)  //If already 'Show', just display foreground
+		//{
+		//	if (_hWnd != NULL)
+		//	{
+		//		::SetForegroundWindow(_hWnd);
+		//	}
+		//}
 	} while ((++item)->text != NULL);
 }
 void WebWindow::MinimizeWebWindow()
