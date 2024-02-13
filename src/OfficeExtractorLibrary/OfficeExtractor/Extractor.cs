@@ -419,7 +419,10 @@ namespace OfficeExtractor
                     case ".SLDM":
                     case ".SLDX":
                     case ".THMX":
-                        if (_passwordProtectedChecker.IsFileProtected(inputFile).Protected)
+                        //if (_passwordProtectedChecker.IsFileProtected(inputFile).Protected)
+                        //    ThrowPasswordProtected(inputFile);
+
+                        if(IsPowerPointPasswordProtected(inputFile))
                             ThrowPasswordProtected(inputFile);
 
                         //if (extension == ".PPTX" || extension == ".THMX" || extension == ".SLDX" || )
@@ -1353,6 +1356,24 @@ namespace OfficeExtractor
             }
 
             return result;
+        }
+
+        private bool IsPowerPointPasswordProtected(string filePath)
+        {
+            try
+            {
+                using (var compoundFile = new CompoundFile(filePath))
+                {
+                    if (compoundFile.RootStorage.TryGetStream("EncryptedPackage", out _)) return true;
+
+                    return false;
+                }
+            }
+            catch (CFFileFormatException)
+            {
+                // It seems the file is just a normal Microsoft Office 2007 and up Open XML file
+                return false;
+            }
         }
 
         //Use system IO. Decompress with compress
