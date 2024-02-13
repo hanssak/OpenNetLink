@@ -1288,24 +1288,24 @@
 
 #if _WINDOWS
 
-    try
-    {
-        if (e.strUrlData != null && e.strUrlData.Length > 0)
+        try
         {
-            string url = $"\"{e.strUrlData}\"";
-            System.Diagnostics.Process.Start(
-                new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = url,
-                    UseShellExecute = true
-                });
-            //System.Diagnostics.Process.Start("explorer", url); // 260자 제한됨
+            if (e.strUrlData != null && e.strUrlData.Length > 0)
+            {
+                string url = $"\"{e.strUrlData}\"";
+                System.Diagnostics.Process.Start(
+                    new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = url,
+                        UseShellExecute = true
+                    });
+                //System.Diagnostics.Process.Start("explorer", url); // 260자 제한됨
+            }
         }
-    }
-    catch (Exception ex)
-    {
-        CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-    }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+        }
 
 #elif _LINUX
 
@@ -1763,9 +1763,32 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 return;
             }
 
+            string strNetOverData = "";
+            if(pageService.m_str3NetDestSysID.Length > 0)
+            {
+                string[] listNetOverPolicy = pageService.m_str3NetDestSysID.Split("/");
+                for(int i = 0; i < listNetOverPolicy.Count(); i++)
+                {
+                    if (i == 0)
+                    {
+                        strNetOverData = $"{listNetOverPolicy[i]},1/";
+                    }
+                    else if(i == listNetOverPolicy.Count() - 1)
+                    {
+                        strNetOverData += $"{listNetOverPolicy[i]},0";
+                    }
+                    else
+                    {
+                        strNetOverData += $"{listNetOverPolicy[i]},0/";
+                    }
+                }
+            }
+
+
             if (OpConfigSvc.GetUseClipBoardApproveAfterLimit(clipData.nGroupId))
             {
-                CheckApproveAfterLimit(clipData.nGroupId);
+                CheckApproveAfterLimit(clipData.nGroupId, strNetOverData);
+                pageService.m_str3NetDestSysID = "";
                 return;
             }
             else
@@ -1773,9 +1796,9 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 if (clipFilePath.Length > 1)
                 {
                     //파일전송
-                    FileTrans(clipData.nGroupId, MakeStream(clipFilePath));
+                    FileTrans(clipData.nGroupId, MakeStream(clipFilePath), strNetOverData: strNetOverData);
+                    pageService.m_str3NetDestSysID = "";
                 }
-
 
                 // Native에 할당된 Memory 제거
                 Window.ClipDataFree(clipData.nGroupId);
@@ -1801,13 +1824,13 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             String[] listNetOverPolicy = pageService.m_str3NetDestSysID.Split("/");
 
-            if (listNetOverPolicy.Count() < 2)
+            if (listNetOverPolicy.Count() == 1)
             {
                 // Clipboard Data 실제 전송하는 부분
                 if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)    // 선택전송
-                    ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), (eClipType == CLIPTYPE.IMAGE ? clipData.pMemByte : clipData.pExMemByte));
+                    ret = HsCmdCenter.SendClipboard(clipData.nGroupId, listNetOverPolicy[0], strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), (eClipType == CLIPTYPE.IMAGE ? clipData.pMemByte : clipData.pExMemByte));
                 else
-                    ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, clipData.pMemByte);
+                    ret = HsCmdCenter.SendClipboard(clipData.nGroupId, listNetOverPolicy[0], strUserID, 1, 1, (int)clipData.nType, clipData.nLength, clipData.pMemByte);
 
 
                 //ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, nClipSize, byteArray);
@@ -1942,7 +1965,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         return bSendPkiResult;
     }
-       
+
 
     public void ResultApproveAfter(int groupId, object[] e)
     {
@@ -2422,7 +2445,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
     /// 클립보드 파일형태로 전송하는 함수
     /// </summary>
     /// <param name="stream"></param>
-    private bool FileTrans(int groupId, HsStream stream, bool bShowErrMsg = true)
+    private bool FileTrans(int groupId, HsStream stream, bool bShowErrMsg = true, string strNetOverData = "")
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = groupId;
@@ -2528,6 +2551,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         //수신자 목록체크(철자틀림)
         string stReceiver = "";
         string strDestNetOverData = "";
+        strDestNetOverData = strNetOverData;
+
         pageService.SetClipboardSending(true);
         int ret = HsCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strTitle, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
         if (ret == -2)
@@ -2544,7 +2569,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         return true;
     }
 
-    private void CheckApproveAfterLimit(int groupID)
+    private void CheckApproveAfterLimit(int groupID, string strNetOverData)
     {
 
         SGLoginData sgLoginData = null;
@@ -2603,7 +2628,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         {
             if (!String.IsNullOrEmpty(_curFileName))
             {
-                FileTrans(_curGroupId, MakeStream(_curFileName));
+                FileTrans(_curGroupId, MakeStream(_curFileName), strNetOverData: strNetOverData);
             }
 
             // Native에 할당된 Memory 제거

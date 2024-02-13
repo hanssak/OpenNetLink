@@ -571,8 +571,8 @@
 
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
-    public string strNetFromName = "업무망";
-    public string strNetToName = "인터넷망";
+    public string strNetFromName = "";
+    public string strNetToName = "";
 
     public int nDayMaxFileSize = 0;
     public int nDayMaxFileCount = 0;
@@ -678,14 +678,13 @@
     /// </summary>
     public void InitText()
     {
-        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*/
-
         int groupID = groupIDbyParam;
 
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+
+
         if (listNetWork != null)
         {
             int count = listNetWork.Count;
@@ -695,14 +694,11 @@
                 if (gID == groupID)
                 {
                     strNetFromName = listNetWork[i].FromName;
-                    if (strUIdestInNetOverMode.Length > 0)
-                        strNetToName = strUIdestInNetOverMode;
-                    else
-                        strNetToName = listNetWork[i].ToName;
-                    break;
+                    strNetToName = listNetWork[i].ToName;
                 }
             }
         }
+
     }
 
     /// <summary>
@@ -926,40 +922,6 @@
     }
 
     /// <summary>
-    /// 3망 모드 상황일때, 수신받는 바로 앞의 망이름으로 수신망을 표현
-    /// </summary>
-    /// <param name="groupID"></param>
-    /// <returns></returns>
-    public bool GetNetOverModeData(int groupID)
-    {
-        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        if (sgLoginData.GetUseOverNetwork2())
-        {
-            dicDestSysPos = pageService.GetTargetSystemList(groupID);
-            if (dicDestSysPos != null && dicDestSysPos.Count > 1)
-            {
-
-                nUseNetOverFileTrans = 0;
-
-                foreach (var item in dicDestSysPos)
-                {
-                    // 첫번째 반대망 이름 가져옴
-                    if (item.Value.nIdx == 1 && item.Key.Length > 0)
-                        strUIdestInNetOverMode = item.Key;
-
-                    if ((item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0) &&
-                       ((pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork == false && item.Value.nIdx != 0)))
-                        //if (item.Value.bUseFileTrans)
-                        nUseNetOverFileTrans = 1;
-                }
-            }
-
-        }
-
-        return false;
-    }
-
-    /// <summary>
     /// 3망 모드 상황일때, Quick Menu에 버튼들 나오게 할지 유무 처리
     /// </summary>
     /// <param name="groupID"></param>
@@ -975,12 +937,7 @@
 
         if (sgLoginData != null && sgUserData != null)
         {
-            if (nUseNetOverFileTrans < 0)
-                bFileTransMenuUse = sgLoginData.GetFileTrans();     // 3망 Mode가 아닐때는 기존 파일전송 권한으로 UI 구성
-            else if (nUseNetOverFileTrans > 0)
-                bFileTransMenuUse = true;                           // 3망 Mode 일때는 설정값보고 UI 구성
-            else
-                bFileTransMenuUse = false;                           // 3망 Mode 일때, 파일전송 사용않함
+            bFileTransMenuUse = pageService.GetUseFileTransNetOver(groupID, sgLoginData);
 
             // if (sgLoginData.GetApprove() == true)                        // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
 
@@ -1003,8 +960,8 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         int transferTemplate = SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam);
-        await JSRuntime.InvokeAsync<object>("exitLogIn",new object[] {transferTemplate});
-        await JSRuntime.InvokeAsync<object>("adJustWindowsize",new object[] {transferTemplate});
+        await JSRuntime.InvokeAsync<object>("exitLogIn", new object[] { transferTemplate });
+        await JSRuntime.InvokeAsync<object>("adJustWindowsize", new object[] { transferTemplate });
 
         if (nDiskFreeSize <= 0)
             nDiskFreeSize = 1;
@@ -1063,8 +1020,6 @@
             // 수신 경로 변경은 기본 Page가 바뀔수 있으므로 Main, PopupLogin 쪽으로 이전
             @*HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
                 SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정*@
-
-            GetNetOverModeData(groupID);
 
             SetQuickMenuModify(groupID);
 
@@ -1490,7 +1445,7 @@
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
-        { 
+        {
             CLog.Here().Information($"ApproveSearchData, sgLoginData is null");
             return;
         }

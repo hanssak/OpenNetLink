@@ -2339,14 +2339,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool GetUseOverNetwork2()
         {
             string strData = GetTagData("NETOVERMODE");
-            //CLog.Here().Information("NETOVERMODE(Get from Server-###) : {0}", strData);
-            //strData = "0";	// (3중망연계,사용하지 않는다고 판단)
-            // strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// ex) (인터넷망, 파일/클립보드 사용안함)
-            //strData = "단말망,I001/업무망,E001,31/인터넷망,E101,31";  // ex) (인터넷망, 전부 사용)
+            
             if (strData == null || strData.Length == 0 || strData == "0")
-                return false;
-
-            if (strData.Length < 6)
                 return false;
 
             String[] listNetOver2 = strData.Split("/");
@@ -2362,56 +2356,45 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="dicSysIdName">망이름, 망정책정보  형태의 Dic Data 받아옴</param>
         /// <param name="bIsMultiNetWork"></param>
         /// <returns></returns>
-        public bool GetOverNetwork2Data(ref Dictionary<string, SGNetOverData> dicSysIdName, bool bIsMultiNetWork)
+        public bool GetOverNetwork2Data(ref Dictionary<string, SGNetOverData> dicSysIdName)
         {
             string strData = GetTagData("NETOVERMODE");
 
             CLog.Here().Information("NETOVERMODE(Get from Server-###) : {0}", strData);
 
-            // strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// (인터넷망, 파일/클립보드 사용안함)
-            //strData = "단말망,I001/업무망,E001,31/인터넷망,E101,31";	// (인터넷망, 전부 사용)
+            
+            //strData = "단말망,I001/업무망,E001,31/인터넷망,E101,31";	형태로 내려옴
+            //strData = "0" 이면 다중망 사용 안함
+
             if (strData == null || strData.Length == 0 || strData == "0")
                 return false;
 
             String[] listNetOver2 = strData.Split("/");
-            if (listNetOver2.Count() < 3)
-                return false;
-
-            int nIdx = 0;
-
+            
             try
             {
 
-                for (; nIdx < listNetOver2.Count(); nIdx++)
+                for (int nIdx = 0; nIdx < listNetOver2.Count(); nIdx++)
                 {
-
-                    // 다중망 접속일때에는 3번째 망 정보는 현재 접속한쪽 반대망이 아니므로 넣지 않음.(dicSysIdName)
-                    // if (nIdx <= 1 || (bIsMultiNetWork == false && nIdx > 1))
+                    String[] listOneNet = listNetOver2[nIdx].Split(",");
+                    if (listOneNet.Count() > 1)
                     {
+                        SGNetOverData DataNet = new SGNetOverData();
 
-                        String[] listOneNet = listNetOver2[nIdx].Split(",");
-                        if (listOneNet.Count() > 1)     // 첫번째 - 자신 제외한 타망들 정보 넣음
+                        DataNet.nIdx = nIdx;
+                        for (int nJdx = 1; nJdx < listOneNet.Count(); nJdx++)
                         {
-                            SGNetOverData DataNet = new SGNetOverData();
-
-                            DataNet.nIdx = nIdx;
-                            int nJdx = 1;
-                            for (; nJdx < listOneNet.Count(); nJdx++)
+                            if (nJdx == 1)
+                                DataNet.strDestSysid = listOneNet[nJdx];
+                            else if (nJdx == 2)
                             {
-                                if (nJdx == 1)
-                                    DataNet.strDestSysid = listOneNet[nJdx];
-                                else if (nJdx == 2)
-                                {
-                                    DataNet.strPolicy = listOneNet[nJdx];
-                                    SetPolicyDataWithParsing(ref DataNet);
-                                }
+                                DataNet.strPolicy = listOneNet[nJdx];
+                                SetPolicyDataWithParsing(ref DataNet);
                             }
-
-                            dicSysIdName.Add(listOneNet[0], DataNet);
                         }
 
+                        dicSysIdName.Add(listOneNet[0], DataNet);
                     }
-
                 }
 
             }

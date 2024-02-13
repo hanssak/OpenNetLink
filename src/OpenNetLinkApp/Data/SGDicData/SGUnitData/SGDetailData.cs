@@ -1354,7 +1354,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string TransferStatus { get; set; }          //전송상태
         public string ApvStatus { get; set; }               //승인상태
         public string IsFile { get; set; }                  //파일전달
-        public string strDestNet { get; set; }                  //목적지 (목적망)
+        public string strDestNet { get; set; }              //목적지 (목적망)
         public string Title { get; set; }                   //제목
         public string RequestTime { get; set; }             //전송요청일
         public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )

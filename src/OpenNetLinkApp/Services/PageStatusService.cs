@@ -67,7 +67,7 @@ namespace OpenNetLinkApp.Services
 
         public string m_strDragNDropFilePath = "";
 
-        public bool m_bIsMultiNetWork = false;                    // 다중접속상황 유무
+        public bool m_bIsMultiNetWork = false;                    //그룹ID가 여러개일 경우
 
         public ISGSideBarUI[] m_approveMenuArray = null;            // nGroupID 순서대로 결재관리 메뉴들 저장
         public ISGSideBarUI[] m_TransMenuArray = null;              // nGroupID 순서대로 전송관리 메뉴들 저장
@@ -222,6 +222,31 @@ namespace OpenNetLinkApp.Services
             if (data == null)
                 return null;
             return data.GetTargetSystemListData();
+        }
+
+        public bool GetUseFileTransNetOver(int groupId, SGLoginData sgLoginData)
+        {
+            if(sgLoginData.GetUseOverNetwork2())
+            {
+                //3망 연계를 사용하는 경우.
+                PageStatusData data = null;
+                data = GetPageStatus(groupId);
+                if (data == null)
+                    return false;
+
+                Dictionary<string, SGNetOverData> dicSysIdName = data.GetTargetSystemListData();
+                foreach (var netOverData in dicSysIdName.Values)
+                {
+                    if (netOverData.bUseFileTrans)
+                        return true;
+                }
+            }
+            else
+            {
+                return sgLoginData.GetFileTrans();
+            }
+
+            return false;
         }
 
 

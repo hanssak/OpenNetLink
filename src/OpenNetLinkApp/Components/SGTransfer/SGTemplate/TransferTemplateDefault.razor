@@ -96,12 +96,26 @@
                             <div class="float-right">
                                 <table>
                                     <tr>
-                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0 && listDestSysPos != null && listDestSysPos.Count > 1)
                                         {
-                                            <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
-                                            <td class="pr-2">
-                                                <button type="button" @onclick="@(OnBasicSelectOpenPopup.InvokeAsync)" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
+                                        <th>@XmlConf.GetTitle("T_RECV_NETWORK")&nbsp;:&nbsp;</th>
+                                            <td style="padding-right:.5rem">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="padding:.3rem 1rem;">
+                                                        @strDestNetWork
+                                                    </button>
+                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenu">
+                                                        @foreach (string str in listDestSysPos)
+                                                        {
+                                                            <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=> strDestNetWork = str)">@str</button>
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <!--<button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>-->
                                             </td>
+                                            @*<td class="pr-2">
+                                                    <button type="button" @onclick="@(OnBasicSelectOpenPopup.InvokeAsync)" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
+                                                </td>*@
                                         }
                                         <td>
                                             <button type="button" class="btn btn-md btn-green" @onclick="@(OnCheckApprLine.InvokeAsync)"><i class="fas fa-share"></i>@strFileSend</button>
@@ -141,6 +155,7 @@
     [Parameter] public string strDestNetWork { get; set; }
     // 3망 - 클립보드 전송 UI
     [Parameter] public Dictionary<string, SGNetOverData> dicDestSysPos { get; set; }
+    [Parameter] public List<string> listDestSysPos { get; set; }
 
     /// <summary>
     /// 사후결재 CheckBox Hide 유무(By:서버정책, true : 숨김, false : 보여줌)
@@ -185,7 +200,7 @@
     /// <summary>
     /// 일괄 삭제 버튼 사용 유무
     /// </summary>
-    public bool bHideFileAllDeleteBtn =false;
+    public bool bHideFileAllDeleteBtn = false;
 
     FileTree refFileTree;
 

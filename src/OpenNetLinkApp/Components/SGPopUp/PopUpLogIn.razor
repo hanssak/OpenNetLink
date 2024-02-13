@@ -322,7 +322,7 @@
     /// </summary>
     private void SessionAlertCancelpopup()
     {
-        CLog.Here().Information($"[PopupLogin] SessionAlertCancelpopup - GroupID:{refSGloginDuplicate.groupId} - LogInType: {(HsNetWork.UseHiddenLog ? pageService.GetGroupIDLoginType(nGroupID).ToString() :"xxx")}");
+        CLog.Here().Information($"[PopupLogin] SessionAlertCancelpopup - GroupID:{refSGloginDuplicate.groupId} - LogInType: {(HsNetWork.UseHiddenLog ? pageService.GetGroupIDLoginType(nGroupID).ToString() : "xxx")}");
 
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
         bUIBtnDisable = false;
@@ -469,112 +469,112 @@
     }
 
     @*
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="groupid"></param>
-        /// <returns></returns>
-        bool isWasAuth(int groupid)
-        {
+                /// <summary>
+                ///
+                /// </summary>
+                /// <param name="groupid"></param>
+                /// <returns></returns>
+                bool isWasAuth(int groupid)
+                {
 
-        if (groupid < 0)
-        {
-        CLog.Here().Error($"isWasAuth - InValid - groupid : {groupid}");
-        return false;
-        }
+                if (groupid < 0)
+                {
+                CLog.Here().Error($"isWasAuth - InValid - groupid : {groupid}");
+                return false;
+                }
 
-        bool bRet = false;
-        string strIP = "";
+                bool bRet = false;
+                string strIP = "";
 
-        try
-        {
-        List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+                try
+                {
+                List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
 
-        foreach (ISGNetwork netlist in listNetWork)
-        {
-        if (netlist.GroupID == groupid)
-        {
-        strIP = netlist.IPAddress;
-        break;
-        }
-        }
+                foreach (ISGNetwork netlist in listNetWork)
+                {
+                if (netlist.GroupID == groupid)
+                {
+                strIP = netlist.IPAddress;
+                break;
+                }
+                }
 
-        if ((strIP?.Length ?? 0) < 1)
-        {
-        CLog.Here().Error($"isWasAuth - InValid - IP");
-        return false;
-        }
+                if ((strIP?.Length ?? 0) < 1)
+                {
+                CLog.Here().Error($"isWasAuth - InValid - IP");
+                return false;
+                }
 
-        // strIP = "172.16.3.250"; // KKW - 사내TEST
-        SessionWebClient web = new SessionWebClient();
-        string strUrl = @$"https://{strIP}:1310/v2/sso/db/login";
-        string strEncID = "";
-        string strEncPW = "";
+                // strIP = "172.16.3.250"; // KKW - 사내TEST
+                SessionWebClient web = new SessionWebClient();
+                string strUrl = @$"https://{strIP}:1310/v2/sso/db/login";
+                string strEncID = "";
+                string strEncPW = "";
 
-        SGCrypto crypt = new SGCrypto();
-        // 실제사용
-        crypt.Aes256EncryptIVkey(id, out strEncID);
-        crypt.Aes256EncryptIVkey(pw, out strEncPW);
+                SGCrypto crypt = new SGCrypto();
+                // 실제사용
+                crypt.Aes256EncryptIVkey(id, out strEncID);
+                crypt.Aes256EncryptIVkey(pw, out strEncPW);
 
-        string strJsonData = CsWASfunc.stringIDpwJsonString(strEncID, strEncPW);
-        string stRtn = "";
-        int nCode = 0;
-        string strMsg = "";
-        string strData = "";
-        int nData = 0;
+                string strJsonData = CsWASfunc.stringIDpwJsonString(strEncID, strEncPW);
+                string stRtn = "";
+                int nCode = 0;
+                string strMsg = "";
+                string strData = "";
+                int nData = 0;
 
-        #if DEBUG  // SITE배포용도
-        //#if false  // SITE배포용도
-        CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
-        strData = "1";
-        stRtn = "1";
-        #else
+                #if DEBUG  // SITE배포용도
+                //#if false  // SITE배포용도
+                CLog.Here().Information($"doLogIn - IDPW - (사무실 TEST용도) 무조건 로그인!");
+                strData = "1";
+                stRtn = "1";
+                #else
 
-        stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
-        if (stRtn == null || (1 > stRtn.Length))
-        {
-            CLog.Here().Information($"Result - json, Data is null OR 0 Size");
-            ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
-            return false;
-        }
+                stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
+                if (stRtn == null || (1 > stRtn.Length))
+                {
+                    CLog.Here().Information($"Result - json, Data is null OR 0 Size");
+                    ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
+                    return false;
+                }
 
-        // json으로 온 Data에서 실제 data 뽑아내는 동작
-        using (JsonDocument document = JsonDocument.Parse(stRtn))
-        {
-            JsonElement jroot = document.RootElement;
-            nCode = jroot.GetProperty("code").GetInt32();
-            strMsg = jroot.GetProperty("msg").GetString();
-            strData = jroot.GetProperty("data").GetString();
-        }
-#endif
+                // json으로 온 Data에서 실제 data 뽑아내는 동작
+                using (JsonDocument document = JsonDocument.Parse(stRtn))
+                {
+                    JsonElement jroot = document.RootElement;
+                    nCode = jroot.GetProperty("code").GetInt32();
+                    strMsg = jroot.GetProperty("msg").GetString();
+                    strData = jroot.GetProperty("data").GetString();
+                }
+        #endif
 
-        CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
+                CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
 
-        if (stRtn != null && stRtn.Length > 0 && strData == "1")
-        {
-        pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(pageService.m_nCurViewPageGroupID) ? eLoginType.eLOGINTYPE_AD : (eLoginType)pageService.m_nLoginType));
-        CLog.Here().Information($"doLogIn - IDPW - Web Certificate Done!");
-        bRet = true;
-        }
-        else
-        {
-        strMsg = CsWASfunc.GetErrorCodeToStr(strData);
-        CLog.Here().Information($"doLogIn - IDPW - Web Certificate(@@@@@@@@@) Failed : {strMsg}");
-        ShowLoginFail(strMsg);
-        bRet = false;
-        }
+                if (stRtn != null && stRtn.Length > 0 && strData == "1")
+                {
+                pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (SGAppMgrSvc.OpConfigInfoService.GetUseOver1auth(pageService.m_nCurViewPageGroupID) ? eLoginType.eLOGINTYPE_AD : (eLoginType)pageService.m_nLoginType));
+                CLog.Here().Information($"doLogIn - IDPW - Web Certificate Done!");
+                bRet = true;
+                }
+                else
+                {
+                strMsg = CsWASfunc.GetErrorCodeToStr(strData);
+                CLog.Here().Information($"doLogIn - IDPW - Web Certificate(@@@@@@@@@) Failed : {strMsg}");
+                ShowLoginFail(strMsg);
+                bRet = false;
+                }
 
 
-        }
-        catch (Exception ex)
-        {
-        CLog.Here().Error($"isWasAuth - Exception(MSG) : {ex.Message}");
-        bRet = false;
-        }
+                }
+                catch (Exception ex)
+                {
+                CLog.Here().Error($"isWasAuth - Exception(MSG) : {ex.Message}");
+                bRet = false;
+                }
 
-        return bRet;
+                return bRet;
 
-        }
+                }
     *@
 
     /// <summary>
@@ -603,7 +603,7 @@
                 return;
             }
 
-            if(!id.ValidationSqlInjection())
+            if (!id.ValidationSqlInjection())
             {
                 ShowLoginFail(XmlConf.GetErrMsg("E_0119"));
                 SetProtectedPW(string.Empty);
@@ -1053,7 +1053,7 @@
             {
                 eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
                 pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
-                // goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);                
+                // goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
                 goToPage.InvokeAsync(strInvokeSendParam);
                 closePopUp();
                 return false;
@@ -1146,42 +1146,7 @@
     /// <param name="dicSystemIdName"></param>
     public void ChangeNetOverTitle(int nGroupID, Dictionary<string, SGNetOverData> dicSystemIdName)
     {
-
-        if (dicSystemIdName == null || dicSystemIdName.Count < 2)
-            return;
-
-        // string strNetOverDestTitle = "";
-
-        // NetWork.json 파일이 아니라 Server에서 받은 망이름(NETOVERMODE)으로 전부 수정해서 표현
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-        /*for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
-        {
-            if (listNetWork[nIdx].GroupID == nGroupID)
-            {
-
-                listNetWork[nIdx].FromName = "";
-                listNetWork[nIdx].ToName = "";
-
-                foreach (var item in dicSystemIdName)
-                {
-                    if (item.Value.nIdx != 0 && item.Key.Length > 0)
-                    {
-                        if (strNetOverDestTitle.Length > 0)
-                            strNetOverDestTitle += ",";
-
-                        strNetOverDestTitle += item.Key;
-                    }
-
-                    if (item.Value.nIdx == 0 && item.Key.Length > 0)
-                    {
-                        listNetWork[nIdx].FromName = item.Key;
-                    }
-                }
-
-                if (strNetOverDestTitle.Length > 0)
-                    listNetWork[nIdx].ToName = strNetOverDestTitle;
-            }
-        }*/
 
         // 왼쪽 SideBar 에서 도착하는 곳만 "다중망"으로 표현, 시작하는 곳 이름은 Server에서 받은 망이름(NETOVERMODE) 사용
         // Welcome(대쉬보드)에서 표현은 시작망이름은 망이름(NETOVERMODE) 사용, 도착망이름은 망이름(NETOVERMODE)에서 1번째 도달하는 망이름 사용
@@ -1189,27 +1154,9 @@
         {
             if (listNetWork[nIdx].GroupID == nGroupID)
             {
-
-                foreach (var item in dicSystemIdName)
-                {
-                    if (item.Value.nIdx == 0 && item.Key.Length > 0)
-                    {
-                        listNetWork[nIdx].FromName = item.Key;
-                    }
-
-                    if (item.Value.nIdx == 1 && item.Key.Length > 0)
-                    {
-                        listNetWork[nIdx].ToName = item.Key;
-                    }
-                }
-
-                // 다중망 양 끝단이 아닐때는 도착지를 "다중망"으로 표기하지 않음
-                if (pageService.m_bIsMultiNetWork == false)
-                    listNetWork[nIdx].ToName = XmlConf.GetTitle("T_RECV_SIDE_TITLE");
-                return;
+                listNetWork[nIdx].ToName = XmlConf.GetTitle("T_RECV_SIDE_TITLE"); // 사이드 망 다중망으로 이름 변경
             }
         }
-
     }
 
 
@@ -1252,18 +1199,18 @@
                 if (eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
                 {
 
-            //if (siteConfig.GetUseAutoLogin(groupId) == true)  // json으로 설정이동
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
-            {
-                if (bAutoLoginCheck)
-                {
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    string strEncID = "";
-                    string strEncPW = "";
-                    if ((!id.Equals("")) & (id != null) & (!protectedPw.Equals("")) & (protectedPw != null))
+                    //if (siteConfig.GetUseAutoLogin(groupId) == true)  // json으로 설정이동
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
                     {
-                        sgRSACrypto?.ValueEncrypt(id, out strEncID);
-                        sgRSACrypto?.ValueEncrypt(protectedPw, out strEncPW);
+                        if (bAutoLoginCheck)
+                        {
+                            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                            string strEncID = "";
+                            string strEncPW = "";
+                            if ((!id.Equals("")) & (id != null) & (!protectedPw.Equals("")) & (protectedPw != null))
+                            {
+                                sgRSACrypto?.ValueEncrypt(id, out strEncID);
+                                sgRSACrypto?.ValueEncrypt(protectedPw, out strEncPW);
 
                                 sgSettingProc.SetSettingUID(groupId, strEncID);
                                 sgSettingProc.SetSettingUPW(groupId, strEncPW);
@@ -1315,8 +1262,8 @@
                                 return false;
                             }
 
-                    //pw = "";
-                    bAutoLoginCheck = false;
+                            //pw = "";
+                            bAutoLoginCheck = false;
 
                             if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
                             {
@@ -1373,21 +1320,21 @@
                             DateTime dtLocalTime = DateTime.Parse(strTime);
                             DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
 
-                    if (DateTime.Compare(dtLocalTime, svrDt) < 0)
-                    {
-                        eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        goToPage.InvokeAsync(strInvokeSendParam);
-                        closePopUp();
-                        return false;
+                            if (DateTime.Compare(dtLocalTime, svrDt) < 0)
+                            {
+                                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                                goToPage.InvokeAsync(strInvokeSendParam);
+                                closePopUp();
+                                return false;
+                            }
+                        }
                     }
-                }
-            }
-            else
-            {
-                SetProtectedPW("");
-                bAutoLoginCheck = false;
-            }
+                    else
+                    {
+                        SetProtectedPW("");
+                        bAutoLoginCheck = false;
+                    }
 
                 }
                 else
@@ -1528,20 +1475,20 @@
                 Dictionary<string, SGNetOverData> dicSysIdName = null;
                 dicSysIdName = new Dictionary<string, SGNetOverData>();
 
-                if (sgLoginData.GetUseOverNetwork2())
+                //if (sgLoginData.GetUseOverNetwork2())
+                //{
+
+                if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName))
                 {
+                    pageService.SetTargetSystemList(groupId, dicSysIdName);
 
-                    if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName, pageService.m_bIsMultiNetWork))
+                    // 3중망이상일때, 왼쪽Sidebar 포함 도착망이름 변경
+                    if (dicSysIdName != null && dicSysIdName.Count > 2)
                     {
-                        pageService.SetTargetSystemList(groupId, dicSysIdName);
-
-                        // 3중망이상일때, 왼쪽Sidebar 포함 도착망이름 변경
-                        if (dicSysIdName != null && dicSysIdName.Count > 1)
-                        {
-                            ChangeNetOverTitle(groupId, dicSysIdName);
-                        }
+                        ChangeNetOverTitle(groupId, dicSysIdName);
                     }
                 }
+                //}
 
                 // CLIENT_ZIP_DEPTH 정보 가져옴
                 SGQueryExtend sgQueryExtend = null;
@@ -1726,7 +1673,7 @@
                         blockTime = Convert.ToInt32(list[2]);
                     }
                     //3분 -> {n}분으로 메세지 변경
-                    e.strMsg = string.Format(XmlConf.GetWarnMsg("W_0299"), blockTime); //e.strMsg = String.Format(e.strMsg, blockTime);                  
+                    e.strMsg = string.Format(XmlConf.GetWarnMsg("W_0299"), blockTime); //e.strMsg = String.Format(e.strMsg, blockTime);
                 }
 
                 strPopupMsg += e.strMsg;

@@ -99,7 +99,7 @@
                                 <th class="p-2 pt-2"> @strTitle </th>              <!--제목-->
                                 <td class="pt-2" colspan="1"><input type="text" class="form-control col-md-11" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>    <!--제목을 입력하여 주십시요.-->
 
-                                @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                @if (dicDestSysPos != null && dicDestSysPos.Count > 2)
                                 {
                                     <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                     <td>
@@ -160,7 +160,7 @@
                                     <th style="text-align:center; vertical-align:middle;width:8%">@strReqApprover</th>                            <!--승인요청자-->
                                     <th style="text-align:center; vertical-align:middle;width:8%">@strApproveStatus</th>                             <!--승인상태-->
                                     <!-- <th style="text-align: center;width:8%">@strFileForward</th> -->                            <!--파일전달-->
-                                    @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                    @if (dicDestSysPos != null && dicDestSysPos.Count > 2)
                                     {
                                         <th style="text-align:center; vertical-align:middle;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                         <!--목적지-->
@@ -183,7 +183,7 @@
                                         <td style="text-align:center; vertical-align:middle">@item.RequesterName</td>
                                         <td style="text-align:center; vertical-align:middle">@item.ApvStatus</td>
                                         <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
-                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 2)
                                         {
                                             <th style="text-align:center; vertical-align:middle;width:11%;">@item.strDestNet</th>
                                         }
@@ -464,10 +464,10 @@
             strDestNetWork = strTotal;
 
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sgLoginData.GetUseOverNetwork2())
-            {
-                dicDestSysPos = pageService.GetTargetSystemList(groupID);
-            }
+            //if (sgLoginData.GetUseOverNetwork2())
+            //{
+            dicDestSysPos = pageService.GetTargetSystemList(groupID);
+            //}
 
             //jsRuntime.InvokeAsync<object>("initApproveUIPosition");
             jsRuntime.InvokeAsync<object>("initPageLeft");
@@ -829,7 +829,7 @@
             ShowMessage("error", strMsg);
             return;
         }
-        
+
         if(!strReqUserValue.ValidationSqlInjection())
         {
             ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
@@ -879,22 +879,28 @@
         if (dicDestSysPos != null && dicDestSysPos.Count > 0)
         {
 
-            foreach (var item in dicDestSysPos)
+            if (dicDestSysPos.Count == 2) //3망이 아닌 단일 구성 /자신망/보낼망
             {
-                // src
-                if (item.Value.nIdx == 0)
+                foreach (var item in dicDestSysPos)
                 {
-                    param.Src_system_id = item.Value.strDestSysid;
-                }
 
-                // Dest
-                if (item.Key == strDestNetWork)
+                    if (item.Value.nIdx == 0) //자신의 망
+                    {
+                        param.Src_system_id = item.Value.strDestSysid;
+                        param.Dest_system_id = item.Value.strDestSysid;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in dicDestSysPos)
                 {
-                    param.Dest_system_id = item.Value.strDestSysid;
-                    if (param.Src_system_id == param.Dest_system_id)    // 현재망으로 수신된 경우만 검색
-                        param.Src_system_id = "";
+                    // Dest
+                    if (item.Key == strDestNetWork)
+                    {
+                        param.Dest_system_id = item.Value.strDestSysid;
+                    }
                 }
-
             }
 
             ApproveDao dao = new ApproveDao(); // 실제사용
@@ -956,22 +962,28 @@
         if (dicDestSysPos != null && dicDestSysPos.Count > 0)
         {
 
-            foreach (var item in dicDestSysPos)
+            if (dicDestSysPos.Count == 2) //3망이 아닌 단일 구성 /자신망/보낼망
             {
-                // src - 소스가 분명히 분리되어 계산될 대에만 사용
-                if (item.Value.nIdx == 0)
+                foreach (var item in dicDestSysPos)
                 {
-                    param.Src_system_id = item.Value.strDestSysid;
-                }
 
-                // Dest
-                if (item.Key == strDestNetWork)
+                    if (item.Value.nIdx == 0) //자신의 망
+                    {
+                        param.Src_system_id = item.Value.strDestSysid;
+                        param.Dest_system_id = item.Value.strDestSysid;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in dicDestSysPos)
                 {
-                    param.Dest_system_id = item.Value.strDestSysid;
-                    if (param.Src_system_id == param.Dest_system_id)    // 현재망으로 수신된 경우만 검색
-                        param.Src_system_id = "";
+                    // Dest
+                    if (item.Key == strDestNetWork)
+                    {
+                        param.Dest_system_id = item.Value.strDestSysid;
+                    }
                 }
-
             }
 
             ApproveDao dao = new ApproveDao();

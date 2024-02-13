@@ -116,6 +116,24 @@
                                     </div>
                                     <!--<button type="button" @onclick="@(()=>openCustomSelect("DataType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDataTypeValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
+                                @if (dicDestSysPos != null && dicDestSysPos.Count > 2)
+                                {
+                                    <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                @strDestNetWork
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
+                                                @foreach (string str in Common.CsFunction.GetOptionValue("DestNetwork", dicDestSysPos))
+                                                {
+                                                    <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDestNetWork, str, TransSearchCount))">@str</button>
+                                                }
+                                            </div>
+                                        </div>
+                                        <!--<button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>-->
+                                    </td>
+                                }
                             </tr>
                         </table>
                     </div>
@@ -151,6 +169,10 @@
                                         <th style="text-align:center; vertical-align:middle;width:8%;">@strTransStatus</th>                        <!--전송상태-->
                                         <th style="text-align:center; vertical-align:middle;width:7%;">@strApprStatus</th>                         <!--승인상태-->
                                         <th style="text-align:center; vertical-align:middle; width: 7%;">@strDataTypeStatus</th>                   <!--데이터타입-->
+                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 2)
+                                        {
+                                            <th style="text-align: center; vertical-align: middle; width: 8%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                        }
                                         <th style="text-align:center; vertical-align:middle;width:15%;">@strTitle</th>                             <!--제목-->
                                         <th style="text-align:center; vertical-align:middle;width:14%;">@strFileSendDay</th>                       <!--전송요청일-->
                                         @if (bUseDlpDataView)
@@ -173,6 +195,10 @@
                                             <td style="text-align:center; vertical-align:middle">@item.TransferStatus</td>
                                             <td style="text-align:center; vertical-align:middle">@item.ApvStatus</td>
                                             <td style="text-align:center; vertical-align:middle">@item.DataType</td>
+                                            @if (dicDestSysPos != null && dicDestSysPos.Count > 2)
+                                            {
+                                                <td style="text-align:center; vertical-align: middle">@item.strDestNet</td>
+                                            }
                                             <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                             <td style="text-align:center; vertical-align:middle">@item.RequestTime</td>
                                             @if (bUseDlpDataView)
@@ -552,10 +578,10 @@
             strDestNetWork = strTotal;
 
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sgLoginData.GetUseOverNetwork2())
-            {
-                dicDestSysPos = pageService.GetTargetSystemList(groupID);
-            }
+            //if (sgLoginData.GetUseOverNetwork2())
+            //{
+            dicDestSysPos = pageService.GetTargetSystemList(groupID);
+            //}
 
             bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
 
@@ -660,33 +686,40 @@
         // 3망상황일때
         if (dicDestSysPos != null && dicDestSysPos.Count > 0)
         {
-            foreach (var item in dicDestSysPos)
+            if (dicDestSysPos.Count == 2) //3망이 아닌 단일 구성 /자신망/보낼망
             {
-                // src - 소스가 분명히 분리되어 계산될 대에만 사용
-                if (item.Value.nIdx == 0)
+                foreach (var item in dicDestSysPos)
                 {
-                    param.Src_system_id = item.Value.strDestSysid;
-                }
 
-                // Dest
-                if (item.Key == strDestNetWork)
+                    if (item.Value.nIdx == 0) //자신의 망
+                    {
+                        param.Src_system_id = item.Value.strDestSysid;
+                        param.Dest_system_id = item.Value.strDestSysid;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in dicDestSysPos)
                 {
-                    param.Dest_system_id = item.Value.strDestSysid;
-                    if (param.Src_system_id == param.Dest_system_id)    // 현재망으로 수신된 경우만 검색
-                        param.Src_system_id = "";
+                    // Dest
+                    if (item.Key == strDestNetWork)
+                    {
+                        param.Dest_system_id = item.Value.strDestSysid;
+                    }
                 }
             }
 
             TransferDao dao = new TransferDao();
             param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
-            strQueryCount = dao.TotalCount(param, false);   // 쿼리 데이터 카운트
+            strQueryCount = dao.TotalCount(param, false, strArrClipDataType);   // 쿼리 데이터 카운트
         }
         else
         {
             TransferDao dao = new TransferDao();
             param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
             strQueryCount = dao.TotalCount(param, false, strArrClipDataType);   // 쿼리 데이터 카운트
-            
+
         }
 
         // 조회방식 변경
@@ -724,27 +757,33 @@
         if (dicDestSysPos != null && dicDestSysPos.Count > 0)
         {
 
-            foreach (var item in dicDestSysPos)
+            if (dicDestSysPos.Count == 2) //3망이 아닌 단일 구성 /자신망/보낼망
             {
-                // src
-                if (item.Value.nIdx == 0)
+                foreach (var item in dicDestSysPos)
                 {
-                    param.Src_system_id = item.Value.strDestSysid;
-                }
 
-                // Dest
-                if (item.Key == strDestNetWork)
+                    if (item.Value.nIdx == 0) //자신의 망
+                    {
+                        param.Src_system_id = item.Value.strDestSysid;
+                        param.Dest_system_id = item.Value.strDestSysid;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in dicDestSysPos)
                 {
-                    param.Dest_system_id = item.Value.strDestSysid;
-                    if (param.Src_system_id == param.Dest_system_id)    // 현재망으로 수신된 경우만 검색
-                        param.Src_system_id = "";
+                    // Dest
+                    if (item.Key == strDestNetWork)
+                    {
+                        param.Dest_system_id = item.Value.strDestSysid;
+                    }
                 }
-
             }
 
             TransferDao dao = new TransferDao();
             param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
-            strQuery = dao.List(param, false);   // 쿼리 데이터 리스트
+            strQuery = dao.List(param, false, strArrClipDataType);   // 쿼리 데이터 리스트
         }
         else
         {

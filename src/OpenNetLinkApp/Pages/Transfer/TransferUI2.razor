@@ -112,9 +112,8 @@
             {
                 <TransferTemplateDefault @ref="refTransferTemplateDefault" groupIDbyParam="@groupIDbyParam"
                                          bAfterCheck="@bAfterCheck" bAfterApprChkHIde="@bAfterApprChkHIde" bAfterApprDisable="@bAfterApprDisable"
-                                         strDestNetWork="@strDestNetWork" dicDestSysPos="@dicDestSysPos"
+                                         strDestNetWork="@strDestNetWork" dicDestSysPos="@dicDestSysPos" listDestSysPos="listDestSysPos"
                                          OnChangeAfterCheck="@GetAfterChk"
-                                         OnBasicSelectOpenPopup="@openBasicSelect"
                                          OnOpenFileDialogOpenPopup="@OpenFileDialog"
                                          OnCheckApprLine="@CheckApprLine" />
             }
@@ -124,7 +123,6 @@
                                     bAfterCheck="@bAfterCheck" bAfterApprChkHIde="@bAfterApprChkHIde" bAfterApprDisable="@bAfterApprDisable"
                                     strDestNetWork="@strDestNetWork" dicDestSysPos="@dicDestSysPos"
                                     OnChangeAfterCheck="@GetAfterChk"
-                                    OnBasicSelectOpenPopup="@openBasicSelect"
                                     OnOpenFileDialogOpenPopup="@OpenFileDialog"
                                     OnCheckApprLine="@CheckApprLine" />
             }
@@ -295,8 +293,9 @@
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
-    // 3망 - 클립보드 전송 UI
+    // 3망 - 전송 UI
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
+    List<string> listDestSysPos = null;
     public string strDestNetWork = "";
     int nDrawPageGroupID = -1;          // 전달받은 groupID 별로 화면구성 - 다중접속화면구성
     int m_apvStep = 0;                  //결재유형(0:and, 1:or, 2:and+or)
@@ -351,10 +350,6 @@
         strDestNetWork = value;
         StateHasChanged();
     }
-    private async Task openBasicSelect()
-    {
-        await refSGBasicSelect.openPopUp(dicDestSysPos, strDestNetWork);
-    }
 
     private async Task OpenFileDialog()
     {
@@ -407,7 +402,7 @@
                 }
             }
 
-            if(!strBindTitle.ValidationSqlInjection())
+            if (!strBindTitle.ValidationSqlInjection())
             {
                 string strMsg = XmlConf.GetWarnMsg("W_0292");                //제목에 사용할 수 없는 문자가 입력되었습니다.\r\n제목을 다시 입력해 주십시요.
                 ShowMessage("warn", strMsg);
@@ -417,7 +412,7 @@
                 return;
             }
 
-            if(!strBindDesc.ValidationSqlInjection())
+            if (!strBindDesc.ValidationSqlInjection())
             {
                 string strMsg = XmlConf.GetWarnMsg("W_0293");            //설명에 사용할 수 없는 문자가 입력되었습니다.\r\n설명을 다시 입력해 주십시요.
                 ShowMessage("warn", strMsg);
@@ -427,7 +422,7 @@
                 return;
             }
 
-	        // 최소길이 체크 동작
+            // 최소길이 체크 동작
             if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupID))
             {
                 SGLoginData sgLoginData = null;
@@ -648,6 +643,7 @@
         {
             strBindTitle = refTransferTemplateDefault.strInitTitle;
             strBindDesc = refTransferTemplateDefault.strInitDesc;
+            strDestNetWork = refTransferTemplateDefault.strDestNetWork;
         }
         else
         {
@@ -2271,6 +2267,35 @@
 
         if (firstRender)
         {
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData != null)
+            {
+                //if (sgLoginData.GetUseOverNetwork2())
+                //{
+                dicDestSysPos = pageService.GetTargetSystemList(groupID);
+                listDestSysPos = GetListDestSysPos();
+                if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                {
+                    if (IsCanTransferAllNet())
+                    {
+                        strDestNetWork = XmlConf.GetTitle("T_TRANS_NETOVER_ALL");
+                    }
+                    else
+                    {
+                        // 기본 선택망 설정
+                        foreach (var item in dicDestSysPos)
+                        {
+                            if (item.Value.nIdx > 0 && item.Value.bUseFileTrans)
+                            {
+                                strDestNetWork = item.Key;  // 바로 다음망 선택
+                                break;
+                            }
+                        }
+                    }
+                }
+                //}
+            }
         }
 
         //strBindTitle = strCurrentTitle;
@@ -2289,19 +2314,6 @@
             JSRuntime.InvokeAsync<string>("initTargetInputNumber");
             JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex");
             JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex_InputFile");
-
-            //for (int i = 0; i < maxDropReference; i++)
-            //{
-            //IFileReaderRef dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-            //string target = $"fileInput{i + 1}";
-            //dropReference.initFileReaderService(target);
-            //dropReference.SetDragTargetElementAsync(target);
-            //dropReferenceList.Add(dropReference);
-            //}
-
-            //_dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-            //_dropReference.initFileReaderService("fileInputTrans");
-            //_dropReference.SetDragTargetElementAsync("fileInputTrans");
 
             LoadJavaScriptSync();
 
@@ -2324,40 +2336,6 @@
             {
                 dropFile = refTemplate01.GetDropFileList();
                 actionLoadFileList = refTemplate01.LoadListFiles;
-            }
-
-            SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sgLoginData != null)
-            {
-                if (sgLoginData.GetUseOverNetwork2())
-                {
-                    dicDestSysPos = pageService.GetTargetSystemList(groupID);
-                    if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                    {
-                        if (IsCanTransferAllNet())
-                        {
-                            strDestNetWork = XmlConf.GetTitle("T_TRANS_NETOVER_ALL");
-                        }
-                        else
-                        {
-                            // 기본 선택망 설정
-                            foreach (var item in dicDestSysPos)
-                            {
-                                if (item.Value.nIdx > 0 && item.Key.Length > 0 && item.Value.strPolicy.Length != 0 && item.Value.bUseFileTrans)    // 보낼 수 있는 제일 마지막
-                                {
-                                    if (pageService.m_bIsMultiNetWork) // 중간에 다중접속망 일때
-                                    {
-                                        if (item.Value.nIdx == 1)
-                                            strDestNetWork = item.Key;
-                                        break;
-                                    }
-                                    strDestNetWork = item.Key;  // 3중망 양끝단
-                                }
-                            }
-                        }
-                    }
-                }
             }
 
             pageService.SetLogOutFileListClearEvent(groupID, LogoutClearFileList);
@@ -3259,22 +3237,8 @@
     {
 
         // Agent 설정에 모든망 전송 기능이 있는지 확인
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend(groupIDbyParam) == false)
+        if (!SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend(groupIDbyParam))
             return false;
-
-        // 3망 설정상황이 아니면
-        if (dicDestSysPos == null || dicDestSysPos.Count < 3)
-            return false;
-
-
-        // 다접속 상황이면
-        if (pageService.m_bIsMultiNetWork)
-            return false;
-
-        @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupID = 0;
-            if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -3283,21 +3247,51 @@
         if (sgLoginData == null)
             return false;
 
-        // 파일전송 사용 권한이 없으면
-        if (sgLoginData.GetFileTrans() == false)
+        if (!sgLoginData.GetUseOverNetwork2())
             return false;
 
         // 하나라도 파일전송 권한이 없거나 정보가 이상하면
         foreach (var item in dicDestSysPos)
         {
-
-            if (item.Value.nIdx > 0 &&
-              (item.Value.strDestSysid.Length == 0 || item.Value.bUseFileTrans == false || item.Key.Length < 1))
+            if (item.Value.nIdx > 0 && item.Value.bUseFileTrans == false)
             {
                 return false;
             }
         }
         return true;
+    }
+
+    private List<string> GetListDestSysPos()
+    {
+        List<string> result = new List<string>();
+
+        if (dicDestSysPos != null && dicDestSysPos.Count > 1)
+        {
+            if (IsCanTransferAllNet())
+            {
+                if (!result.Contains(XmlConf.GetTitle("T_TRANS_NETOVER_ALL")))
+                    result.Add(XmlConf.GetTitle("T_TRANS_NETOVER_ALL"));
+            }
+
+            int i = 0;
+            foreach (var key in dicDestSysPos.Keys)
+            {
+                if (i == 0)
+                {
+                    i++;
+                }
+                else
+                {
+                    if (dicDestSysPos[key].bUseFileTrans)
+                    {
+                        if (!result.Contains(key))
+                            result.Add(key);
+                    }
+                }
+            }
+        }
+
+        return result;
     }
     /// <summary>
     /// 공통환경설정 변경에 따른 UI 변경사항 반영 적용

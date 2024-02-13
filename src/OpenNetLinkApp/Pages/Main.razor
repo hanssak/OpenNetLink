@@ -256,7 +256,7 @@
     Dictionary<string, SGNetOverData> dicSysIdName = null;
 
     public bool bStartedLogin = false;//중복으로 로그인버튼 클릭 방지에 사용하는 상태
-        
+
     object obj = new object();
     Dictionary<int, bool> dicLoginResult = new Dictionary<int, bool>(); // ConcurrentDictionary / Dictionary
     private static readonly AsyncLock s_lock = new AsyncLock();
@@ -275,7 +275,7 @@
     {
         QRcode.Dispose();
         CLog.Here().Information($"[Main] GoogleOtp, User Cancel - GroupID:{refGoogleOTP.nGroupID} - LogInType: {(HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx")}");
-        
+
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
         bStartedLogin = false;
         bLoginBtnDisable = false;
@@ -326,7 +326,7 @@
     private void SessionAlertConfirm()
     {
         HSCmdCenter.SetAllowSessionDuplicate(refSGAlert.groupId);
-    
+
         CLog.Here().Information($"[Main] SessionAlertConfirm - GroupID:{refSGAlert.groupId} -  LogInType: {(HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx")}");
         ShowMessage("info", XmlConf.GetInfoMsg("I_0237"));
 
@@ -407,7 +407,7 @@
             ShowLoginFail(XmlConf.GetWarnMsg("W_0039"));
             await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
             bStartedLogin = false;
-            bLoginBtnDisable = false;            
+            bLoginBtnDisable = false;
             StateHasChanged();
             return;
         }
@@ -533,7 +533,7 @@
                 doCustomLogin01();
             }
             else if (SGAppMgrSvc.OpConfigInfoService.GetCustomLoginType(groupid) == (int)Enums.EnumCustomLoginType.LoginTemplate02)
-            { 
+            {
                 doCustomLogin02();
             }
         }
@@ -636,8 +636,8 @@
 
             if (strCurCliVersion.Equals(""))
                 return;
-            
-            CLog.Here().Information($"[Main] LogIn Type (######) : {(HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx")}, GroupIDLoginType : {(HsNetWork.UseHiddenLog ? pageService.GetGroupIDLoginType(groupid) : "xxx")}");            
+
+            CLog.Here().Information($"[Main] LogIn Type (######) : {(HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx")}, GroupIDLoginType : {(HsNetWork.UseHiddenLog ? pageService.GetGroupIDLoginType(groupid) : "xxx")}");
             HSCmdCenter.SetCliVersion(strCurCliVersion);
 
 
@@ -692,7 +692,7 @@
                 originalPW = Encoding.UTF8.GetBytes(OSxCmdService.GetOSXADConfig("Active Directory Domain").ToLower());
 
 #if DEBUG
-originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
+            originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 #endif
             strProtectedPW = SGCrypto.AESEncrypt256WithDEK(originalPW);
 
@@ -755,7 +755,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 originalPW = Encoding.UTF8.GetBytes(OSxCmdService.GetOSXADConfig("Active Directory Domain").ToLower());
 
 #if DEBUG
-    originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
+            originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 #endif
 
             CLog.Here().Information($"SetADLoginData - #End");
@@ -800,7 +800,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
 
 #if DEBUG
-    originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
+            originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 #endif
             SetProtectedPW(SGCrypto.AESEncrypt256WithDEK(originalPW));
 
@@ -818,9 +818,9 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
             if (strCurCliVersion.Equals(""))
                 return;
-                
+
             CLog.Here().Information("[Main] LogIn Type:" + (HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx"));
-            
+
             HSCmdCenter.SetCliVersion(strCurCliVersion);
 
             if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
@@ -881,10 +881,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
             if (strCurCliVersion.Equals(""))
                 return;
-             
-             CLog.Here().Information("[Main] LogIn Type:" + (HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx"));
-            
-             HSCmdCenter.SetCliVersion(strCurCliVersion);
+
+            CLog.Here().Information("[Main] LogIn Type:" + (HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx"));
+
+            HSCmdCenter.SetCliVersion(strCurCliVersion);
 
 
             if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
@@ -1118,7 +1118,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 foreach (ISGNetwork netlist in listNetWork)
                 {
                     CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
-                    HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id,  protectedPw, strCurCliVersion, otp, 0);
+                    HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, protectedPw, strCurCliVersion, otp, 0);
                     pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
                 }
             }
@@ -1152,10 +1152,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             JSRuntime.InvokeAsync<object>("loginCursorChange");
 
             id = nacUserId;
-            
+
             originalPW = Encoding.UTF8.GetBytes(nacUserId);
             SetProtectedPW(SGCrypto.AESEncrypt256WithDEK(originalPW));
-            
+
             if ((id?.Length ?? 0) < 1)
             {
                 Window.MoveTrayToWebWindow();
@@ -1458,7 +1458,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         if (srcLoc == "Logout")
         {
 
-            pageService.SetStatusSideMenuReBuildTime(groupid, true);            
+            pageService.SetStatusSideMenuReBuildTime(groupid, true);
 
             if (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer(0) && NetWorkSvc.NetWorkInfo.Count > 1)
                 MyNavigationManager.NavigateTo("/SelectNet");
@@ -1577,42 +1577,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
     /// <param name="dicSystemIdName"></param>
     public void ChangeNetOverTitle(int nGroupID, Dictionary<string, SGNetOverData> dicSystemIdName)
     {
-
-        if (dicSystemIdName == null || dicSystemIdName.Count < 2)
-            return;
-
-        // string strNetOverDestTitle = "";
-
-        // NetWork.json 파일이 아니라 Server에서 받은 망이름(NETOVERMODE)으로 전부 수정해서 표현
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-        /*for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
-        {
-            if (listNetWork[nIdx].GroupID == nGroupID)
-            {
-
-                listNetWork[nIdx].FromName = "";
-                listNetWork[nIdx].ToName = "";
-
-                foreach (var item in dicSystemIdName)
-                {
-                    if (item.Value.nIdx != 0 && item.Key.Length > 0)
-                    {
-                        if (strNetOverDestTitle.Length > 0)
-                            strNetOverDestTitle += ",";
-
-                        strNetOverDestTitle += item.Key;
-                    }
-
-                    if (item.Value.nIdx == 0 && item.Key.Length > 0)
-                    {
-                        listNetWork[nIdx].FromName = item.Key;
-                    }
-                }
-
-                if (strNetOverDestTitle.Length > 0)
-                    listNetWork[nIdx].ToName = strNetOverDestTitle;
-            }
-        }*/
 
         // 왼쪽 SideBar 에서 도착하는 곳만 "다중망"으로 표현, 시작하는 곳 이름은 Server에서 받은 망이름(NETOVERMODE) 사용
         // Welcome(대쉬보드)에서 표현은 시작망이름은 망이름(NETOVERMODE) 사용, 도착망이름은 망이름(NETOVERMODE)에서 1번째 도달하는 망이름 사용
@@ -1620,28 +1585,9 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         {
             if (listNetWork[nIdx].GroupID == nGroupID)
             {
-
-                foreach (var item in dicSystemIdName)
-                {
-                    if (item.Value.nIdx == 0 && item.Key.Length > 0)
-                    {
-                        listNetWork[nIdx].FromName = item.Key;
-                    }
-
-                    if (item.Value.nIdx == 1 && item.Key.Length > 0)
-                    {
-                        listNetWork[nIdx].ToName = item.Key;
-                    }
-                }
-
-                // 다중망 양 끝단이 아닐때는 도착지를 "다중망"으로 표기하지 않음
-                if (pageService.m_bIsMultiNetWork == false)
-                    listNetWork[nIdx].ToName = XmlConf.GetTitle("T_RECV_SIDE_TITLE");
-                return;
+                listNetWork[nIdx].ToName = XmlConf.GetTitle("T_RECV_SIDE_TITLE"); // 사이드 망 다중망으로 이름 변경
             }
         }
-
-
     }
 
 
@@ -1795,20 +1741,20 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     // 3중망 정보 적용
                     dicSysIdName = new Dictionary<string, SGNetOverData>();
 
-                    if (sgLoginData.GetUseOverNetwork2())
+                    //if (sgLoginData.GetUseOverNetwork2())
+                    //{
+
+                    if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName))
                     {
+                        pageService.SetTargetSystemList(groupId, dicSysIdName);
 
-                        if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName, pageService.m_bIsMultiNetWork))
+                        // 3중망이상일때, 왼쪽Sidebar 포함 도착망이름 변경
+                        if (dicSysIdName != null && dicSysIdName.Count > 2)
                         {
-                            pageService.SetTargetSystemList(groupId, dicSysIdName);
-
-                            // 3중망이상일때, 왼쪽Sidebar 포함 도착망이름 변경
-                            if (dicSysIdName != null && dicSysIdName.Count > 1)
-                            {
-                                ChangeNetOverTitle(groupId, dicSysIdName);
-                            }
+                            ChangeNetOverTitle(groupId, dicSysIdName);
                         }
                     }
+                    //}
 
                     // CLIENT_ZIP_DEPTH, CS_EXCEPTION_EXT_REASON_TYPE
                     // 정보 가져옴
@@ -2164,7 +2110,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                             blockTime = Convert.ToInt32(list[2]);
                         }
                         //3분 -> {n}분으로 메세지 변경
-                        e.strMsg = string.Format(XmlConf.GetWarnMsg("W_0299"), blockTime); //e.strMsg = String.Format(e.strMsg, blockTime);                        
+                        e.strMsg = string.Format(XmlConf.GetWarnMsg("W_0299"), blockTime); //e.strMsg = String.Format(e.strMsg, blockTime);
                     }
                     strPopupMsg += e.strMsg;
                     strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
@@ -2250,7 +2196,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     refPWChange.Init();
 
                     // 초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거 시작 2021/07/05 YKH
-                    //패스워드 변경 유무에 따라 패스워드 체크 가능 여부 확인                    
+                    //패스워드 변경 유무에 따라 패스워드 체크 가능 여부 확인
 
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId) && pageService.GetStatusSideMenuReBuildTime(groupId))
                     {
@@ -2362,7 +2308,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
                 // SideBarUI 에서 nGroupIDfirst로 지정된 UI로 선택
                 MoveSiderBarFocusTogroupid(nGroupIDfirst);
-            
+
                 CLog.Here().Information($"LoginResultOnetoAll, LoginType : {(HsNetWork.UseHiddenLog ? pageService.GetGroupIDLoginType(groupId) : "xxx")}, GroupID : {groupId}, Saved-GroupID : {nGroupIDfirst}, END!");
 
                 if (!pageService.GetIsPolicyUpdate(groupId))
@@ -2513,7 +2459,6 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         bool bPublicBoard = false;
         bool bBasicConf = false;
         bool bDeputyApprove = false;
-        int nUseNetOverFileTrans = -1;  // -1 : 3망상황아님, 0 : 3망상황에서 파일전송 모든곳에 미사용, 1 : 3망상황에서 파일전송 1곳에서라도 사용
         bool bHanssakOTP = false;       //OTP 팝업메뉴 표시여부
         int nApproveProxy = 1; //대결재사용여부 0: 사용안함, 1: 대결재(대결재를 신청하면 대결재가 결재),
                                //2: 결재자 추가(대결재 사용 결재자 추가),
@@ -2526,24 +2471,6 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             bSFMManageUse = sgUserInfo.UserInfoAdded.IsMySelfSFM;
 
         //bool bSFMManageUse = sgUserInfo.UserInfoAdded.IsMySelfSFM;
-
-        if (dicSysIdName != null && dicSysIdName.Count > 1)
-        {
-            nUseNetOverFileTrans = 0;
-            foreach (var item in dicSysIdName)
-            {
-
-                if ((item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0) &&
-                   ((pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork == false && item.Value.nIdx != 0)))
-
-                //if (item.Value.bUseFileTrans)
-                {
-                    nUseNetOverFileTrans = 1;
-                    break;
-                }
-            }
-        }
-
         //메뉴루프 시작
         for (int i = 0; i < count; i++)
         {
@@ -2589,15 +2516,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 //bSecurityApprMenuUse = sgUserData.GetUserPrivacyApprPos();
                 bPCURLUse = sgLoginData.GetPCURLUse();
 
-            }
 
-            // 3망 상황 - 파일전송 UI view 설정 확인
-            if (nUseNetOverFileTrans > -1)
-            {
-                if (nUseNetOverFileTrans == 0)
-                    bFileTransMenuUse = false;
-                else
-                    bFileTransMenuUse = true;
+                //3망일 경우 망별 상황에 따라 UI 보이게 수정
+                //3망 사용일때
+                bFileTransMenuUse = pageService.GetUseFileTransNetOver(groupid, sgLoginData);
             }
 
             // 파일전송화면 이면 저장했던 위치를 찾아서 사용한다. (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)

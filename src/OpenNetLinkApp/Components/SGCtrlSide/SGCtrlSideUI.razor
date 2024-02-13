@@ -36,15 +36,14 @@
                     {
                         m_dicDestSysPos = pageService.GetTargetSystemList(NetworkInfo.GroupID);
 
-                        @if (m_dicDestSysPos != null && m_dicDestSysPos.Count > 1)
+                        @if (m_dicDestSysPos != null && m_dicDestSysPos.Count > 2)
                         {
                             // 3중 - 다중망
                             @foreach (var itemData in m_dicDestSysPos)
                             {
                                 // 다중접속일때에는 단일망에만 전달가능
                                 // 단일접속일때에는 3중망에 전달가능
-                                @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0 &&
-                            (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                                @if (itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0 )
                                 {
                                     //@if (itemData.Value.nIdx == 1 && ListModKey.Count > 0)
                                     @if (itemData.Value.nIdx == 1 && DicModKey.Count > 0)
@@ -59,18 +58,6 @@
                                                    @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
                                             <span class="mr-2">@Modifier</span>
                                         }
-
-                                        // GetDicModVKeyValue
-                                        // ListVKey[NetworkInfo.GroupID]
-                                        <!--<select class="mr-1" value="@GetDicModVKeyValue(NetworkInfo.GroupID)"
-                                        @onchange="eventArgs => { SelectBoxVKeySelected(NetworkInfo.GroupID, eventArgs); }">
-                                        @*<select class="mr-1" value="@ListVKey[NetworkInfo.GroupID]"
-                                            @onchange="eventArgs => { SelectBoxVKeySelected(NetworkInfo.GroupID, eventArgs); }">*@
-                                        @foreach (var VKey in VKeyList())
-                                        {
-                                                    <option value="@VKey">@VKey</option>
-                                        }
-                                            </select>-->
                                         <div class="dropdown">
                                             <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 @GetDicModVKeyValue(NetworkInfo.GroupID)
@@ -96,14 +83,6 @@
                                                    @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, itemData.Value.nIdx, (HOTKEY_MOD)Index, eventArgs); }" />
                                             <span class="mr-2">@Modifier</span>
                                         }
-                                        @*<select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
-                                            @onchange="eventArgs => { SelectBoxVKeySelectedNetOver(NetworkInfo.GroupID, itemData.Value.nIdx, eventArgs); }">
-                                            @foreach (var VKey in VKeyList())
-                                            {
-                                            <option value="@VKey">@VKey</option>
-                                            }
-                                            </select>*@
-
                                         <div class="dropdown">
                                             <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 @dicVKeyNetOver[strNetgroupIDidxKey]
@@ -2270,14 +2249,6 @@
                             {
                                 if (item.Value.nIdx == 1)
                                 {
-
-                                    @*if (ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
-                                        {
-                                        ListModKey.RemoveAt(NetworkInfo.GroupID);
-                                        ListVKey.RemoveAt(NetworkInfo.GroupID);
-                                        }
-                                        ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
-                                        ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));*@
 
                                     List<bool> bList = AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID);
                                     char chData = AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID);
