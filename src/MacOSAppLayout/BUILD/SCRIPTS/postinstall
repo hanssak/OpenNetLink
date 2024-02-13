@@ -107,7 +107,7 @@ if [ $REG_CRX -eq 1 ]; then
 fi
 
 #설치종료시 프로그램 바로 실행
-if [ $START_AUTO -eq 1]; then
+if [ $START_AUTO -eq 1 ]; then
     open -a /Applications/OpenNetLinkApp.app
 fi
 
