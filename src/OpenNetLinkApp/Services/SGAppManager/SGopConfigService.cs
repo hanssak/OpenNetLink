@@ -322,6 +322,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool SavePropertyToFile(int groupId, string strFilePath);
 
+        public int GetNotifyConnectionType(int groupId);
+
     }
 
 
@@ -1383,6 +1385,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo[groupId].bHideApproveRejectButtonInApproveUI;
         }
+
+
+        public int GetNotifyConnectionType(int groupId)
+        {
+            return AppConfigInfo[groupId].nNotifyConnectionType;
+    }
 
         /// <summary>
         /// groupId에 해당하는 Property의 값 변경

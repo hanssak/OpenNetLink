@@ -262,5 +262,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseAptTimeOutMsg { get; set; }                    //APT 타임아웃 났을때 문구 VirusReport로 보내지 않고 알림으로 사용
 
         public bool bHideApproveRejectButtonInApproveUI { get; set; }  //결재관리 화면에서 승인, 반려 버튼 숨김처리 여부 - 기본 false - 보여준다.
+
+        public int nNotifyConnectionType { get; set; }                  //서버 Noti를 받기위한 연결 종류 (Default : 1 / None[0], WebSocket[1], CallbackURL[2], WebSocket+Callbacl[3])
     }
 }

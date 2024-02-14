@@ -306,7 +306,7 @@ bHideTransManageDownLoadColumn : 전송관리화면 리스트에서 만료일/�
 
 bHideApproveRejectButtonInApproveUI : 결재 관리 , 결재 팝업 창에서 승인, 반려 버튼 숨김 여부
 
-
+GetNotifyConnectionType : 서버 Noti를 받기위한 연결 종류 (Default : 1 / None[0], WebSocket[1], CallbackURL[2], WebSocket+Callback[3])
 
 
 
