@@ -22,7 +22,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public override void Copy(HsNetWork hs, SGData data)
         {
             SetProtectedSessionKey(hs.GetProtectedSeedKey());
-            m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);
+            m_DicTagData = new Dictionary<string, object>(data.m_DicTagData);
             m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
         }
 

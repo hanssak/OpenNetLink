@@ -36,11 +36,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public string GetSvrTagData(string strTag)
         {
-            return m_DicTagData[strTag];
+            return m_DicTagData[strTag].ToString();
         }
         public void Copy(SGData data)
         {
-            m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);
+            m_DicTagData = new Dictionary<string, object>(data.m_DicTagData);
             m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
         }
 
