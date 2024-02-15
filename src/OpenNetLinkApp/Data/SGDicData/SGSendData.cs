@@ -275,9 +275,9 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["PROCID"] = strProcID;
             dic["REASON"] = strReason;
             dic["EMAILAPPROVESEQS"] = strApproveSeqs;
-            dic["APPROVER"] = (bUseSfm2Approve?"1":"0");
+            dic["APPROVER"] = (bUseSfm2Approve ? "1" : "0");
             dic["APPROVEUSERKIND"] = (bUsePrivacyApprove ? "1" : "0");
-            
+
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_EMAIL_APPROVE_BATCH", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
@@ -839,6 +839,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_APT_CONFIRM", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
+
         public int RequestSendVirusConfirm(HsNetWork hsNet, string strUserID, string strTransSeq)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
@@ -1119,14 +1120,18 @@ namespace OpenNetLinkApp.Data.SGDicData
         //
         public int RequestReady(HsNetWork hsNet, string strAgentName, string strVersion, string strOSType, List<string> listGpkiCnList = null)
         {
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            dic["gpki_cn_list"] = (listGpkiCnList == null ? "": listGpkiCnList.ToArray().ToString());
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+            dic["gpki_cn_list"] = (listGpkiCnList == null ? new List<string>() : listGpkiCnList);
             dic["agent_name"] = strAgentName;
             dic["version"] = strVersion;
             dic["os_type"] = strOSType;
 
-            SGEventArgs args = sendParser.RequestReady(dic);
-            return hsNet.RequestRest(args);
+            SGEventArgs args = sendParser.RequestCmd(eAdvancedCmdList.ePostReady, dic, hsNet.stCliMem.GetProtectedSeedKey());
+            //return hsNet.RequestRest(args);
+            return hsNet.SendMessage(args);
+
+            //SGEventArgs args = sendParser.RequestReady(dic);
+            //return hsNet.RequestRest(args);
         }
 
 
