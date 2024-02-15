@@ -448,7 +448,7 @@
     /// </summary>
     /// <param name="groupID"></param>
     /// <param name="strReason"></param>
-    public void ApproveSend(int groupID, string strReason)
+    /*public void ApproveSend(int groupID, string strReason)
     {
 
         string strMsg = "";
@@ -466,8 +466,9 @@
             strUserID = sgLoginData.GetUserID();
 
         HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);
+
         closePopUp();
-    }
+    }*/
 
     /// <summary>
     /// 승인 동작
@@ -500,21 +501,37 @@
                 return;
             }
 
-            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            /*SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
             string strUserID = "";
             if (sgLoginData != null)
                 strUserID = sgLoginData.GetUserID();
 
             string strProcID = "A";
             string strReason = "Approve";
-            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);
+            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);*/
+
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+            if (sgUserData == null)
+            {
+                CLog.Here().Error($"ApproveAction, HSCmdCenter.GetUserData = null");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0209"));
+                return;
+            }
+
+            string strUserSeq = sgUserData.GetUserSequence();
+            List<string> listApproveSeq = new List<string>();
+            listApproveSeq.Add(stEmailSeq);
+
+            HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, bIsPrivacyApproveDetail?"security":"common", "mail", "confirm", "Approve", listApproveSeq);
+
             closePopUp();
         }
         else
         {
             refSGDetailReject.ResetReason(Common.Enums.EnumApproveType.Approve);
             refSGDetailReject.SetGroupID(groupID);
-            refSGDetailReject.SetApprRejectEvent(ApproveSend);
+            refSGDetailReject.SetApprRejectEvent(DetailApproveRejectSend);
             await refSGDetailReject.openPopUp();
         }
 
@@ -559,14 +576,39 @@
     /// </summary>
     /// <param name="groupID"></param>
     /// <param name="strReason"></param>
-    public void DetailApproveRejectSend(int groupID, string strReason)
+    public void DetailApproveRejectSend(int groupID, string strReason, bool bisReject)
     {
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        /*SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "R", strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "R", strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);*/
+
+        string strMsg = "";
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+        {
+            CLog.Here().Error($"ApproveAction, HSCmdCenter.GetUserData = null");
+            ShowMessage("error", XmlConf.GetErrMsg(bisReject ? "E_0210" : "E_0209"));
+            return;
+        }
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        List<string> listApproveSeq = new List<string>();
+        listApproveSeq.Add(stEmailSeq);
+
+        HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, bIsPrivacyApproveDetail?"security":"common", "mail", (bisReject ? "reject" : "confirm"), strReason, listApproveSeq);
+
         closePopUp();
     }
 
@@ -772,7 +814,7 @@
         }
         StateHasChanged();
     }
-    
+
     //Param : Email Seq, Request Seq, 승인가능여부
     public void SetParam(string seq, string apvseq, string apvenable, bool bIsAfterApprove, bool bIsFilePreView)
     {
@@ -790,7 +832,7 @@
         m_bCanFilePreView = bIsFilePreView;
     }
 
-    
+
     public async Task openPopUp()
     {
         apvList.Clear();

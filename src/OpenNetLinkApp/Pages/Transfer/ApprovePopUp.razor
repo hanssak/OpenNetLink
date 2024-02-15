@@ -976,13 +976,13 @@
         {
             refSGDetailReject.ResetReason(Common.Enums.EnumApproveType.Approve);
             refSGDetailReject.SetGroupID(groupID);
-            refSGDetailReject.SetApprRejectEvent(ApproveSend);
+            refSGDetailReject.SetApprRejectEvent(DetailApproveRejectSend);
             m_bFilePrevOpening = false;
             await refSGDetailReject.openPopUp();
         }
         else
         {
-            string strProcID = "A";
+            /*string strProcID = "A";
             string strReason = "Approve";
             string strApproveSeq = sgDetailData.GetApprSeq();
             string strApprover = "1";
@@ -990,7 +990,22 @@
             if (bIsPrivacyApproveDetail)
                 strApproveUserKind = "1";
 
-            HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+            HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);*/
+
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+            if (sgUserData == null)
+            {
+                CLog.Here().Error($"ApproveAction, HSCmdCenter.GetUserData = null");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0209"));
+                return;
+            }
+
+            string strUserSeq = sgUserData.GetUserSequence();
+            List<string> listApproveSeq = new List<string>();
+            listApproveSeq.Add(sgDetailData.GetApprSeq());
+
+            HsCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "file", "confirm", "Approve", listApproveSeq);
 
             closePopUp();
         }
@@ -1026,9 +1041,9 @@
         await refSGDetailReject.openPopUp();
     }
 
-    public void DetailApproveRejectSend(int groupID, string strReason)
+    public void DetailApproveRejectSend(int groupID, string strReason, bool bisReject)
     {
-        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        /*SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
@@ -1046,13 +1061,39 @@
         if (bIsPrivacyApproveDetail)
             strApproveUserKind = "1";
 
+        HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);*/
 
-        HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+		{
+			CLog.Here().Error($"DetailApproveRejectSend, HSCmdCenter.GetDetailData = null");
+			ShowMessage("error", XmlConf.GetErrMsg(bisReject?"E_0210":"E_0209"));
+			return;
+		}
+
+		SGUserData sgUserData = null;
+		sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+		if (sgUserData == null)
+		{
+			CLog.Here().Error($"DetailApproveRejectSend, HSCmdCenter.GetUserData = null");
+			ShowMessage("error", XmlConf.GetErrMsg(bisReject?"E_0210":"E_0209"));
+			return;
+		}
+
+		string strUserSeq = sgUserData.GetUserSequence();
+		List<string> listApproveSeq = new List<string>();
+		listApproveSeq.Add(sgDetailData.GetApprSeq());
+
+		HsCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "file", (bisReject?"reject":"confirm"), "Approve", listApproveSeq);
+
         closePopUp();
     }
 
-    public void ApproveSend(int groupID, string strReason)
+    // 이전방식사용
+    /*public void ApproveSend(int groupID, string strReason, bool bisReject)
     {
+
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         string strUserID = "";
         if (sgLoginData != null)
@@ -1072,8 +1113,9 @@
             strApproveUserKind = "1";
 
         HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+
         closePopUp();
-    }
+    }*/
 
     public void FilePrevCancel(string arg)
     {

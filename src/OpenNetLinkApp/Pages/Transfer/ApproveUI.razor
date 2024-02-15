@@ -793,7 +793,7 @@
         {
             refSGReject.ResetReason(Common.Enums.EnumApproveType.Approve);
             refSGReject.SetGroupID(groupID);
-            refSGReject.SetApprRejectEvent(ApproveSend);
+            refSGReject.SetApprRejectEvent(ApproveRejectSend);
             await refSGReject.openPopUp();
         }
     }
@@ -833,15 +833,15 @@
         await refSGReject.openPopUp();
     }
 
-    public void ApproveRejectSend(int groupID, string strReason)
+    public void ApproveRejectSend(int groupID, string strReason, bool bIsReject)
     {
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+
+        /*SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
-
-        /*string strProcID = "R";
+        string strProcID = "R";
         string strApproveSeqs = "";
         for (int i = 0; i < ListData.Count; i++)
         {
@@ -874,13 +874,15 @@
             }
         }
 
-        HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "file", "confirm", strReason, listApproveSeq);
+        HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "file", (bIsReject ? "reject" : "confirm"), strReason, listApproveSeq);
     }
 
 
 
-    public void ApproveSend(int groupID, string strReason)
+    /*public void ApproveSend(int groupID, string strReason)
     {
+
+        // 이전 code
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         string strUserID = "";
         if (sgLoginData != null)
@@ -899,7 +901,29 @@
         string strApproveUserKind = "0";
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
-    }
+
+        // 반려처리 동작
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+        {
+            CLog.Here().Error($"ApproveSend, HSCmdCenter.GetUserData = null");
+            ShowMessage("error", XmlConf.GetErrMsg("E_0210"));
+            return;
+        }
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        List<string> listApproveSeq = new List<string>();
+        for (int i = 0; i < ListData.Count; i++)
+        {
+            if (ListData[i].bCheck)
+            {
+                listApproveSeq.Add(ListData[i].ApprSeq);
+            }
+        }
+
+        HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "file", "reject", strReason, listApproveSeq);
+    }*/
 
     public string GetCheckApprSeq()
     {

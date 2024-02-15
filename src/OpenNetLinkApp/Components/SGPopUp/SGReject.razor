@@ -41,7 +41,7 @@
     public string strTitleName;
     public int GroupID;
     public Enums.EnumApproveType approveType;
-    public delegate void ApprRejectEvent(int groupID, string strReason);
+    public delegate void ApprRejectEvent(int groupID, string strReason, bool bisReject);
 
     public event ApprRejectEvent SGPageRejectEvent;
     public async Task openPopUp()
@@ -93,7 +93,7 @@
         object[] param = { Guid };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
         if (SGPageRejectEvent != null)
-            SGPageRejectEvent(GroupID, rejectReason);
+            SGPageRejectEvent(GroupID, rejectReason, approveType==Enums.EnumApproveType.Reject);
     }
     public void closeCancel()
     {

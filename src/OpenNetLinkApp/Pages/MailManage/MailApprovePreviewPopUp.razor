@@ -251,7 +251,7 @@
     /// <param name="filename"></param>
     private void attachPreviewOrDownload(string fileseq, string filekey, string filename)
     {
-        
+
         //AppId, ClientId, EmailSeq, FileName, FileKey, FileSeq
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -270,7 +270,7 @@
         //확장자 종류로 미리보기 가능한 타입군 확인
         string strExtName = Path.GetExtension(filename);
         strExtName = (strExtName.Equals("")) ? "" : strExtName.Substring(1);         //확장자가 없는 파일(text/plain)을 다운로드로 처리
-        
+
         if (CsFunction.isFileExtinListStr(true, strExtName, strViewerExt))
         {
             //string previewParam = makeParamOfMailViewer(fileseq, filename);
@@ -460,7 +460,7 @@
     /// </summary>
     /// <param name="groupID"></param>
     /// <param name="strReason"></param>
-    public void ApproveSend(int groupID, string strReason)
+    /*public void ApproveSend(int groupID, string strReason)
     {
 
         string strMsg = "";
@@ -479,7 +479,7 @@
 
         HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);
         closePopUp();
-    }
+    }*/
 
     /// <summary>
     /// 승인 동작
@@ -512,21 +512,37 @@
                 return;
             }
 
-            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            /*SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
             string strUserID = "";
             if (sgLoginData != null)
                 strUserID = sgLoginData.GetUserID();
 
             string strProcID = "A";
             string strReason = "Approve";
-            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);
+            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);*/
+
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+            if (sgUserData == null)
+            {
+                CLog.Here().Error($"ApproveAction, HSCmdCenter.GetUserData = null");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0209"));
+                return;
+            }
+
+            string strUserSeq = sgUserData.GetUserSequence();
+            List<string> listApproveSeq = new List<string>();
+            listApproveSeq.Add(stEmailSeq);
+
+            HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, bIsPrivacyApproveDetail?"security":"common", "mail", "confirm", "Approve", listApproveSeq);
+
             closePopUp();
         }
         else
         {
             refSGDetailReject.ResetReason(Common.Enums.EnumApproveType.Approve);
             refSGDetailReject.SetGroupID(groupID);
-            refSGDetailReject.SetApprRejectEvent(ApproveSend);
+            refSGDetailReject.SetApprRejectEvent(DetailApproveRejectSend);
             await refSGDetailReject.openPopUp();
         }
 
@@ -571,14 +587,30 @@
     /// </summary>
     /// <param name="groupID"></param>
     /// <param name="strReason"></param>
-    public void DetailApproveRejectSend(int groupID, string strReason)
+    public void DetailApproveRejectSend(int groupID, string strReason, bool bisReject)
     {
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        /*SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "R", strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "R", strReason, stApproveSeq, bIsEmailApproveSfm2Mode, bIsPrivacyApproveDetail);*/
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+        {
+            CLog.Here().Error($"ApproveAction, HSCmdCenter.GetUserData = null");
+            ShowMessage("error", XmlConf.GetErrMsg(bisReject ? "E_0210" : "E_0209"));
+            return;
+        }
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        List<string> listApproveSeq = new List<string>();
+        listApproveSeq.Add(stEmailSeq);
+
+        HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, bIsPrivacyApproveDetail?"security":"common", "mail", (bisReject ? "reject" : "confirm"), strReason, listApproveSeq);
+
         closePopUp();
     }
 
@@ -801,7 +833,7 @@
             sha1Day = sha1Day.ToLower().Replace("-", "");
             string sha1_Total = SGBase64Hash(sha1Year + sha1Mon + sha1Day);
             sha1_Total = sha1_Total.ToLower().Replace("-", "");
-            
+
             int shasum = 0;
             char[] arrSha = sha1_Total.ToCharArray();
             for (int i = 0; i < arrSha.Length; i++)
@@ -999,7 +1031,7 @@
         InitText();
         base.OnInitialized();
     }
-    
+
 
     private void ShowMessage(string strType, string strMsg)
     {

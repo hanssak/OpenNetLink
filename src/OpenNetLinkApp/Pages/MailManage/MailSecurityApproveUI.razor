@@ -461,7 +461,7 @@
     /// </summary>
     /// <param name="groupID"></param>
     /// <param name="strReason"></param>
-    public void ApproveSend(int groupID, string strReason)
+    /*public void ApproveSend(int groupID, string strReason)
     {
 
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
@@ -482,7 +482,7 @@
 
         HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupID, ApproveBatchResult);
         HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, strApproveSeqs, false, true);
-    }
+    }*/
 
     public async Task ApproveAction()
     {
@@ -511,7 +511,7 @@
         HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupID, ApproveBatchResult);
         if (!SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID))
         {
-            SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+            /*SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
             string strUserID = "";
             if (sgLoginData != null)
                 strUserID = sgLoginData.GetUserID();
@@ -528,13 +528,35 @@
                 }
             }
 
-            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, strApproveSeqs, false, true);
+            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, strApproveSeqs, false, true);*/
+
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+            if (sgUserData == null)
+            {
+                CLog.Here().Error($"ApproveAction, HSCmdCenter.GetUserData = null");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0209"));
+                return;
+            }
+
+            string strUserSeq = sgUserData.GetUserSequence();
+            List<string> listApproveSeq = new List<string>();
+            for (int i = 0; i < ListData.Count; i++)
+            {
+                if (ListData[i].bCheck)
+                {
+                    listApproveSeq.Add(ListData[i].ApprSeq);
+                }
+            }
+
+            HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "security", "mail", "confirm", "Approve", listApproveSeq);
+
         }
         else
         {
             refSGReject.ResetReason(Common.Enums.EnumApproveType.Approve);
             refSGReject.SetGroupID(groupID);
-            refSGReject.SetApprRejectEvent(ApproveSend);
+            refSGReject.SetApprRejectEvent(ApproveRejectSend);
             await refSGReject.openPopUp();
         }
     }
@@ -590,9 +612,9 @@
     /// </summary>
     /// <param name="groupID"></param>
     /// <param name="strReason"></param>
-    public void ApproveRejectSend(int groupID, string strReason)
+    public void ApproveRejectSend(int groupID, string strReason, bool bisReject)
     {
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        /*SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
@@ -609,7 +631,29 @@
         }
 
         HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupID, RejectBatchResult);
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "R", strReason, strApproveSeqs, false, true);
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "R", strReason, strApproveSeqs, false, true);*/
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+        {
+            CLog.Here().Error($"ApproveRejectSend, HSCmdCenter.GetUserData = null");
+            ShowMessage("error", XmlConf.GetErrMsg(bisReject?"E_0210":"E_0209"));
+            return;
+        }
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        List<string> listApproveSeq = new List<string>();
+        for (int i = 0; i < ListData.Count; i++)
+        {
+            if (ListData[i].bCheck)
+            {
+                listApproveSeq.Add(ListData[i].ApprSeq);
+            }
+        }
+
+        HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "security", "mail", (bisReject ? "reject" : "confirm"), strReason, listApproveSeq);
+
     }
 
     public bool GetCheckRejectPossible()

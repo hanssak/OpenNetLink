@@ -668,7 +668,7 @@
         if (!SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID))
         {
 
-            SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+            /*SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
             string strUserID = "";
             if (sgLoginData != null)
                 strUserID = sgLoginData.GetUserID();
@@ -687,18 +687,40 @@
             string strApprover = "1";
             string strApproveUserKind = "1";
 
-            HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+            HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);*/
+
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+            if (sgUserData == null)
+            {
+                CLog.Here().Error($"ApproveAction, HSCmdCenter.GetUserData = null");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0209"));
+                return;
+            }
+
+            string strUserSeq = sgUserData.GetUserSequence();
+            List<string> listApproveSeq = new List<string>();
+            for (int i = 0; i < ListData.Count; i++)
+            {
+                if (ListData[i].bCheck)
+                {
+                    listApproveSeq.Add(ListData[i].ApprSeq);
+                }
+            }
+
+            HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "security", "file", "confirm", "Approve", listApproveSeq);
+
         }
         else
         {
             refSGSecureReject.ResetReason(Common.Enums.EnumApproveType.Approve);
             refSGSecureReject.SetGroupID(groupID);
-            refSGSecureReject.SetApprRejectEvent(ApproveSend);
+            refSGSecureReject.SetApprRejectEvent(ApproveRejectSend);
             await refSGSecureReject.openPopUp();
         }
     }
 
-    public void ApproveSend(int groupID, string strReason)
+    /*public void ApproveSend(int groupID, string strReason)
     {
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         string strUserID = "";
@@ -718,7 +740,7 @@
         string strApproveUserKind = "1";
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
-    }
+    }*/
 
     private async Task ApproveReject()
     {
@@ -756,9 +778,9 @@
         await refSGSecureReject.openPopUp();
     }
 
-    public void ApproveRejectSend(int groupID, string strReason)
+    public void ApproveRejectSend(int groupID, string strReason, bool bisReject)
     {
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        /*SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
@@ -775,7 +797,29 @@
         string strApprover = "1";
         string strApproveUserKind = "1";
 
-        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);*/
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+        {
+            CLog.Here().Error($"ApproveRejectSend, HSCmdCenter.GetUserData = null");
+            ShowMessage("error", XmlConf.GetErrMsg(bisReject ? "E_0210" : "E_0209"));
+            return;
+        }
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        List<string> listApproveSeq = new List<string>();
+        for (int i = 0; i < ListData.Count; i++)
+        {
+            if (ListData[i].bCheck)
+            {
+                listApproveSeq.Add(ListData[i].ApprSeq);
+            }
+        }
+
+        HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "security", "file", (bisReject ? "reject" : "confirm"), strReason, listApproveSeq);
+
     }
 
     public string GetCheckApprSeq()
@@ -829,7 +873,7 @@
             ShowMessage("error", strMsg);
             return;
         }
-        
+
         if(!strReqUserValue.ValidationSqlInjection())
         {
             ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
