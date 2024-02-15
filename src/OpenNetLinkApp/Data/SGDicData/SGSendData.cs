@@ -1115,6 +1115,8 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.SendMessage(args);
         }
 
+
+        //
         public int RequestReady(HsNetWork hsNet, string strAgentName, string strVersion, string strOSType, List<string> listGpkiCnList = null)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
@@ -1127,6 +1129,25 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.RequestRest(args);
         }
 
+
+        public int RestRequestApproveBatch(HsNetWork hsNet, string strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<string> listSeqData)
+        {
+
+            Dictionary<string, string> dicApproveProcinfo = new Dictionary<string, string>();
+            dicApproveProcinfo["approver_seq"] = strUserSeq;
+            dicApproveProcinfo["approval_type"] = strApproveType;
+            dicApproveProcinfo["data_type"] = strDataType;
+            dicApproveProcinfo["approval_action"] = strApproveAction;
+            dicApproveProcinfo["description"] = strstrDescription;
+
+
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+            dic["approval_proc_info"] = dicApproveProcinfo;
+            dic["trans_seq_list"] = listSeqData.ToArray();
+
+            SGEventArgs args = sendParser.RequestApproveReject(dic);
+            return hsNet.RequestRest(args);
+        }
 
 
     }

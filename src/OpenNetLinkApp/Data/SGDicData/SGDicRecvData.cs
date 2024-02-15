@@ -86,6 +86,40 @@ namespace OpenNetLinkApp.Data.SGDicData
             }
         }
 
+        public SGData GetReadyData(int groupid)
+        {
+            SGLoginData tmpData = null;
+            if (m_DicLoginData.TryGetValue(groupid, out tmpData) != true)
+                return null;
+            return m_DicLoginData[groupid];
+        }
+
+        public void SetReadyData(HsNetWork hs, int groupid, SGData data)
+        {
+            SGLoginData tmpData = null;
+            if (m_DicLoginData.TryGetValue(groupid, out tmpData) == true)
+            {
+                m_DicLoginData.TryRemove(groupid, out tmpData);
+                //m_DicLoginData.Remove(groupid);
+                tmpData = null;
+            }
+            tmpData = new SGLoginData();
+            tmpData.Copy(hs, data);
+            //m_DicLoginData[groupid]= tmpData;
+            m_DicLoginData.TryAdd(groupid, tmpData);
+        }
+
+        public void SetReadyDataEmpty(int groupid)
+        {
+            SGLoginData tmpData = null;
+            if (m_DicLoginData.TryGetValue(groupid, out tmpData) == true)
+            {
+                m_DicLoginData.TryRemove(groupid, out tmpData);
+                //m_DicLoginData.Remove(groupid);
+                tmpData = null;
+            }
+        }
+
         public SGData GetUserData(int groupid)
         {
             SGUserData tmpData = null;

@@ -934,7 +934,7 @@ namespace OpenNetLinkApp.Services
             if (tmpData == null)
                 tmpData = new SGData();
 
-            switch (cmd)
+            /*switch (cmd)
             {
                 case 2005:                                                              // usertype, logintype, systemid, tlsversion
                     tmpData.m_DicTagData["USERTYPE"] = sgData.m_DicTagData["USERTYPE"].Base64EncodingStr();
@@ -960,8 +960,7 @@ namespace OpenNetLinkApp.Services
                         fileMimeRecvEvent(groupId);
                     }
                     break;
-
-            }
+            }*/
 
             sgDicRecvData.SetSvrData(groupId, tmpData);
 
@@ -3155,6 +3154,53 @@ namespace OpenNetLinkApp.Services
             return 0;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupid"></param>
+        /// <param name="strUserSeq"></param>
+        /// <param name="strApproveType"></param>
+        /// <param name="strDataType"></param>
+        /// <param name="strApproveAction"></param>
+        /// <param name="strstrDescription"></param>
+        /// <param name="listSeqData"></param>
+        /// <returns></returns>
+        public int RestSendApproveBatch(int groupid, string strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<string> listSeqData)
+        {
+
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RestRequestApproveBatch(hsNetWork, groupid, strUserSeq, strApproveType, strDataType, strApproveAction, strstrDescription, listSeqData);
+
+                    // gsdata 받아서, sgReadyData 쪽에 Set 동작
+                    //sgDicRecvData.SetApprLineData();
+                    // 등록된 Call Back호출
+                    //ret = hsNetWork.Ready(groupid, strAgentName, strVersion, strOSType, listGpkiCnLKist);
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"SendApproveBatch-Task-Exception : {ex.Message}");
+                }
+
+            });
+
+            return 0;
+
+            /*HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RestRequestApproveBatch(hsNetWork, groupid, strUserSeq, strApproveType, strDataType, strApproveAction, strstrDescription, listSeqData);
+            return -1;*/
+        }
 
 
     }
