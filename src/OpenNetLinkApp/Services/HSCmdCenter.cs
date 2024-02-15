@@ -181,7 +181,12 @@ namespace OpenNetLinkApp.Services
                     strDownPath = strDownPath.Replace("\\", "/");
                 }
 
-                hsNetwork.InitLib(strIP, port, false, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
+
+                NotifyConnectionType notiType = NotifyConnectionType.None;
+                if (Enum.TryParse(dicOpConfig[groupID].nNotifyConnectionType.ToString(), out notiType))
+                    notiType = NotifyConnectionType.None;
+
+                hsNetwork.InitLib(strIP, port, false, strModulePath, strDownPath, groupID.ToString(), notiType);    // basedir 정해진 후 설정 필요
 
                 /*if (strTlsVer.Equals("1.2"))
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
