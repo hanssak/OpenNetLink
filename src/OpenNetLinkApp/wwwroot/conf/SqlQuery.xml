@@ -168,9 +168,14 @@
     <if test = "ReqUserName != ''">
       AND USER_NAME LIKE '%' || '#ReqUserName#' || '%'
     </if>
-    <if test = "Dest_system_id != ''">
-      AND DEST_SYSTEM_ID = '#Dest_system_id#'
-    </if>
+    <case>
+      <when test = "Src_system_id != '' AND Dest_system_id != ''">
+        AND (SRC_SYSTEM_ID = '#Src_system_id#' OR DEST_SYSTEM_ID = '#Dest_system_id#')
+      </when>
+      <when test = "Dest_system_id != ''">
+        AND DEST_SYSTEM_ID = '#Dest_system_id#'
+      </when>
+    </case>
     ORDER BY REQUEST_TIME DESC
     LIMIT #PageListCount# OFFSET (#ViewPageNo# -1) * #PageListCount#
   </statement>
