@@ -183,7 +183,7 @@ namespace OpenNetLinkApp.Services
 
 
                 NotifyConnectionType notiType = NotifyConnectionType.None;
-                if (Enum.TryParse(dicOpConfig[groupID].nNotifyConnectionType.ToString(), out notiType))
+                if (Enum.TryParse(dicOpConfig[groupID].nNotifyConnectionType.ToString(), out notiType) == false)
                     notiType = NotifyConnectionType.None;
 
                 hsNetwork.InitLib(strIP, port, false, strModulePath, strDownPath, groupID.ToString(), notiType);    // basedir 정해진 후 설정 필요
