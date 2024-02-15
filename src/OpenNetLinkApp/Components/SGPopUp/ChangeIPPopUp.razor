@@ -119,7 +119,9 @@
         ShowMessage("info", XmlConf.GetInfoMsg("I_0058"));
 
         //연결 체크
-        bool connResult = HSCmdCenter.TrySSLConnect(NewIP, 3435, System.Security.Authentication.SslProtocols.Tls12);
+
+        // bool connResult = HSCmdCenter.TrySSLConnect(NewIP, 3435, System.Security.Authentication.SslProtocols.Tls12);
+        bool connResult = HSCmdCenter.SystemConnectable(NewIP);
 
         if (!connResult)
         {

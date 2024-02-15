@@ -1114,5 +1114,20 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_OLEMIMELISTQUERY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
+
+        public int RequestReady(HsNetWork hsNet, string strAgentName, string strVersion, string strOSType, List<string> listGpkiCnList = null)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["gpki_cn_list"] = (listGpkiCnList == null ? "": listGpkiCnList.ToArray().ToString());
+            dic["agent_name"] = strAgentName;
+            dic["version"] = strVersion;
+            dic["os_type"] = strOSType;
+
+            SGEventArgs args = sendParser.RequestReady(dic);
+            return hsNet.RequestRest(args);
+        }
+
+
+
     }
 }

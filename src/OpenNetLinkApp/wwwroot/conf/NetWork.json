@@ -8,36 +8,10 @@
       "PORT": 3435,
       "CONNECTTYPE": 1,
       "TLSVERSION": "1.2",
-      "NETPOS": "CN",
+      "NETPOS": "IN",
       "ADDomain": [
         "IpIeACsMrMfzCyTt9WRFUQ==",
         "NqIY8C7M1BOp3iNZ1tqUhA=="
-      ]
-    },
-    {
-      "GROUPID": 1,
-      "FROMNAME": "VDI망",
-      "TONAME": "공공존",
-      "IPADDRESS": "192.168.2.154",
-      "PORT": 3435,
-      "CONNECTTYPE": 1,
-      "TLSVERSION": "1.2",
-      "NETPOS": "CN",
-      "ADDomain": [
-        "NqIY8C7M1BOp3iNZ1tqUhA=="
-      ]
-    },
-    {
-      "GROUPID": 2,
-      "FROMNAME": "VDI망",
-      "TONAME": "금융존",
-      "IPADDRESS": "192.168.2.151",
-      "PORT": 3435,
-      "CONNECTTYPE": 1,
-      "TLSVERSION": "1.2",
-      "NETPOS": "CN",
-      "ADDomain": [
-        "5RloLo83NR+2bIUKzb2Q7Q=="
       ]
     }
   ]

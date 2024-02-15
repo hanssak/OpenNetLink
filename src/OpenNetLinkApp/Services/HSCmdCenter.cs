@@ -1,4 +1,5 @@
 using System;
+using System;
 using System.Net;
 using System.Collections.Generic;
 using System.Security.Authentication;
@@ -27,6 +28,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using AgLogManager;
+using HsNetWorkSG.RestApi;
 
 namespace OpenNetLinkApp.Services
 {
@@ -59,8 +61,13 @@ namespace OpenNetLinkApp.Services
 
         }
 
-        public bool TrySSLConnect(string TryConnectIP, int TryConnectPort = 3435, SslProtocols TryConnectProtocal = SslProtocols.Tls12)
+        // 이전 mode
+        public bool SystemConnectable(string TryConnectIP, int TryConnectPort = 1300, SslProtocols TryConnectProtocal = SslProtocols.Tls12)
         {
+
+            /*TryConnectIP = "218.145.246.25";
+            TryConnectPort = 1300;*/
+
             SslClient connTestClient = null;
             try
             {
@@ -77,6 +84,35 @@ namespace OpenNetLinkApp.Services
             {
                 connTestClient?.Dispose();
             }
+
+            /*try
+            {
+                //string url = $"https://{TryConnectIP}:{TryConnectPort}";
+                //string url = "https://218.145.246.25:1300/";
+                string url = "https://daum.net";
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                request.Timeout = 5000; // 5초간의 타임아웃 설정
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.Method = "Get";
+
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                {
+                    return response.StatusCode == HttpStatusCode.OK;
+                }
+            }
+            catch (WebException wEx)
+            {
+                // 서비스에 접근할 수 없는 경우
+                CLog.Here().Error($"SystemConnectable, WebException : {wEx.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                CLog.Here().Error($"SystemConnectable, exception : {ex.Message}");
+                return false;
+            }
+
+            return true;*/
         }
 
         public void Init()
@@ -112,11 +148,11 @@ namespace OpenNetLinkApp.Services
                 }
                 int port = listNetworks[i].Port;
                 int groupID = listNetworks[i].GroupID;
-                int ConnectType = listNetworks[i].ConnectType;
 
+                /*int ConnectType = listNetworks[i].ConnectType;
                 HsConnectType hsContype = HsConnectType.Direct;
                 if (ConnectType == 1)
-                    hsContype = HsConnectType.FindServer;
+                    hsContype = HsConnectType.FindServer;*/
 
                 hsNetwork = new HsNetWork();
                 string strTlsVer = listNetworks[i].TlsVersion;
@@ -145,14 +181,16 @@ namespace OpenNetLinkApp.Services
                     strDownPath = strDownPath.Replace("\\", "/");
                 }
 
-                if (strTlsVer.Equals("1.2"))
+                hsNetwork.InitLib(strIP, port, false, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
+
+                /*if (strTlsVer.Equals("1.2"))
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 else if (strTlsVer.Equals("1.0"))
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 else
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요*/
 
-                hsNetwork.SGSvr_EventReg(SGSvrRecv);
+                //hsNetwork.SGSvr_EventReg(SGSvrRecv);
                 hsNetwork.SGData_EventReg(SGDataRecv);
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
                 hsNetwork.SGException_EventRegEx(SGExceptionExRecv);
@@ -208,6 +246,7 @@ namespace OpenNetLinkApp.Services
             data = sgDicRecvData.GetSvrData(groupid);
             return data;
         }
+
         public SGData GetLoginData(int groupid)
         {
             SGData data = null;
@@ -3081,6 +3120,37 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.SendPatchHistory(hsNetWork, strStatus, hsNetWork.GetLocalIP(), strReason);
             return -1;
         }
+
+        public int RequestReady(int groupid, string strAgentName, string strVersion, string strOSType, List<string> listGpkiCnList = null)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+            
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestReady(hsNetWork, strAgentName, strVersion, strOSType, listGpkiCnList);
+
+                    // gsdata 받아서, sgReadyData 쪽에 Set 동작
+                    //sgDicRecvData.SetApprLineData();
+                    // 등록된 Call Back호출
+                    //ret = hsNetWork.Ready(groupid, strAgentName, strVersion, strOSType, listGpkiCnLKist);
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"Ready-Task-Exception : {ex.Message}");
+                }
+
+            });
+
+            return 0;
+        }
+
+
 
     }
 }

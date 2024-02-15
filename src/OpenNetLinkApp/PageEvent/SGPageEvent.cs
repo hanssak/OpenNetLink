@@ -95,6 +95,13 @@ namespace OpenNetLinkApp.PageEvent
     /// <param name="e"></param>
     public delegate void Session2FactorAuthEvent(int groupid, PageEventArgs e);
 
+    /// <summary>
+    /// Ready Cmd Type
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="e"></param>
+    public delegate void ReadyEvent(int groupid, PageEventArgs e);
+
     // 파일 전송 진행 이벤트 
     public delegate void FileSendProgressEvent(int groupid, PageEventArgs e);
     // 파일 수신 진행 이벤트
@@ -338,6 +345,8 @@ namespace OpenNetLinkApp.PageEvent
         /// 2Factor Auth(google Otp 현재기본)
         /// </summary>
         public Dictionary<int, Session2FactorAuthEvent> Dic2FactorAuthEvent = new Dictionary<int, Session2FactorAuthEvent>(); //세션중복 이벤트
+
+        public Dictionary<int, ReadyEvent> DicReadyEvent = new Dictionary<int, ReadyEvent>(); //세션중복 이벤트
 
         public Dictionary<int, FileSendProgressEvent> DicFileSendProgressEvent = new Dictionary<int, FileSendProgressEvent>();          // 파일 전송 Progress 이벤트
         //public Dictionary<int, FileRecvProgressEvent> DicFileRecvProgressEvent = new Dictionary<int, FileRecvProgressEvent>();          // 파일 수신 Progress 이벤트
@@ -693,6 +702,17 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
+        public void SetReadyEventAdd(int groupid, ReadyEvent e)
+        {
+            DicReadyEvent[groupid] = e;
+        }
+        public ReadyEvent GetReadyEventAdd(int groupid)
+        {
+            ReadyEvent e = null;
+            if (DicReadyEvent.TryGetValue(groupid, out e))
+                e = DicReadyEvent[groupid];
+            return e;
+        }
 
 
         public void SetLoginEventAdd(int groupid, LoginEvent e)
