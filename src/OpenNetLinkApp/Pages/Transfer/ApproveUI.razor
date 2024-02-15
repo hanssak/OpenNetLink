@@ -749,7 +749,7 @@
             if (sgUserData == null)
             {
                 CLog.Here().Error($"ApproveAction, HSCmdCenter.GetUserData = null");
-                ShowMessage("error", XmlConf.GetErrMsg("E_0205"));
+                ShowMessage("error", XmlConf.GetErrMsg("E_0209"));
                 return;
             }
 
@@ -839,7 +839,9 @@
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
-        string strProcID = "R";
+
+
+        /*string strProcID = "R";
         string strApproveSeqs = "";
         for (int i = 0; i < ListData.Count; i++)
         {
@@ -851,9 +853,31 @@
         }
         string strApprover = "1";
         string strApproveUserKind = "0";
+        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);*/
 
-        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+        {
+            CLog.Here().Error($"ApproveAction, HSCmdCenter.GetUserData = null");
+            ShowMessage("error", XmlConf.GetErrMsg("E_0210"));
+            return;
+        }
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        List<string> listApproveSeq = new List<string>();
+        for (int i = 0; i < ListData.Count; i++)
+        {
+            if (ListData[i].bCheck)
+            {
+                listApproveSeq.Add(ListData[i].ApprSeq);
+            }
+        }
+
+        HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "file", "confirm", strReason, listApproveSeq);
     }
+
+
 
     public void ApproveSend(int groupID, string strReason)
     {

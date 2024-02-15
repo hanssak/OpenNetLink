@@ -1126,10 +1126,10 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["version"] = strVersion;
             dic["os_type"] = strOSType;
 
-            SGEventArgs args = sendParser.RequestCmd(eAdvancedCmdList.ePostReady, dic, hsNet.stCliMem.GetProtectedSeedKey());
-            //return hsNet.RequestRest(args);
-            return hsNet.SendMessage(args);
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostReady, null, dic, hsNet.stCliMem.GetProtectedSeedKey()); // api-key 사용
+            return hsNet.RequestRest(args);
 
+            //return hsNet.SendMessage(args);
             //SGEventArgs args = sendParser.RequestReady(dic);
             //return hsNet.RequestRest(args);
         }
@@ -1137,7 +1137,6 @@ namespace OpenNetLinkApp.Data.SGDicData
 
         public int RestRequestApproveBatch(HsNetWork hsNet, string strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<string> listSeqData)
         {
-
             Dictionary<string, string> dicApproveProcinfo = new Dictionary<string, string>();
             dicApproveProcinfo["approver_seq"] = strUserSeq;
             dicApproveProcinfo["approval_type"] = strApproveType;
@@ -1146,14 +1145,27 @@ namespace OpenNetLinkApp.Data.SGDicData
             dicApproveProcinfo["description"] = strstrDescription;
 
 
-            Dictionary<string, object> dic = new Dictionary<string, object>();
-            dic["approval_proc_info"] = dicApproveProcinfo;
-            dic["trans_seq_list"] = listSeqData.ToArray();
+            Dictionary<string, object> dicApproveItem = new Dictionary<string, object>();
+            dicApproveItem["approval_proc_info"] = dicApproveProcinfo;
+            dicApproveItem["trans_seq_list"] = listSeqData.ToArray();
 
-            SGEventArgs args = sendParser.RequestApproveReject(dic);
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostApprovalsConfirmation, null, dicApproveItem, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.RequestRest(args);
         }
 
+
+        public int RestRequestDashBoardData(HsNetWork hsNet, string strFromToDate, int nItemCount)
+        {
+            Dictionary<string, string> dicSearch = new Dictionary<string, string>();
+            dicSearch["pdate "] = strFromToDate;
+            dicSearch["limit"] = nItemCount.ToString();
+
+            //SGEventArgs args = sendParser.RequestApproveReject(dicSearch);
+            //return hsNet.RequestRest(args);
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eGetDashboard, dicSearch, null, hsNet.stCliMem.GetProtectedSeedKey()); // api-key 사용
+            return hsNet.RequestRest(args);
+        }
 
     }
 }

@@ -3178,7 +3178,7 @@ namespace OpenNetLinkApp.Services
                 int ret = 0;
                 try
                 {
-                    ret = sgSendData.RestRequestApproveBatch(hsNetWork, groupid, strUserSeq, strApproveType, strDataType, strApproveAction, strstrDescription, listSeqData);
+                    ret = sgSendData.RestRequestApproveBatch(hsNetWork, strUserSeq, strApproveType, strDataType, strApproveAction, strstrDescription, listSeqData);
 
                     // gsdata 받아서, sgReadyData 쪽에 Set 동작
                     //sgDicRecvData.SetApprLineData();
@@ -3201,6 +3201,38 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RestRequestApproveBatch(hsNetWork, groupid, strUserSeq, strApproveType, strDataType, strApproveAction, strstrDescription, listSeqData);
             return -1;*/
         }
+
+
+        public int RestRequestDashBoardData(int groupid, string strFromToDate, int nItemCount)
+        {
+
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RestRequestDashBoardData(hsNetWork, strFromToDate, nItemCount);
+
+                    // gsdata 받아서, sgReadyData 쪽에 Set 동작
+                    //sgDicRecvData.SetApprLineData();
+                    // 등록된 Call Back호출
+                    //ret = hsNetWork.Ready(groupid, strAgentName, strVersion, strOSType, listGpkiCnLKist);
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestRequestDashBoardData-Task-Exception : {ex.Message}");
+                }
+
+            });
+
+            return 0;
+        }
+
 
 
     }
