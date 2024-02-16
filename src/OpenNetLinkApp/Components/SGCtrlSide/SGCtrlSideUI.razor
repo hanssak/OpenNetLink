@@ -110,13 +110,13 @@
                             // Both 전송기능 - 단축키
                             if (ListUseClipNetOverALL != null && ListUseClipNetOverALL.Count > 0 && ListUseClipNetOverALL[NetworkInfo.GroupID])
                             {
-                                MakeNetOverKeyGroupIdx(NetworkInfo.GroupID, 0);
-                                <span class="@("net" + (Idx + 1).ToString() + "0")">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(XmlConf.GetTitle("T_TRANS_NETOVER_ALL"))</span>
+                                MakeNetOverKeyGroupIdx(NetworkInfo.GroupID, 1);
+                                <span class="@("net" + (Idx + 1).ToString() + "1")">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(XmlConf.GetTitle("T_TRANS_NETOVER_ALL"))</span>
                                 <br>
                                 @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
                                 {
                                     <input type="checkbox" class="mr-1" checked="@dicModKeyNetOver[strNetgroupIDidxKey][Index]"
-                                           @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, 0, (HOTKEY_MOD)Index, eventArgs); }" />
+                                           @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, 1, (HOTKEY_MOD)Index, eventArgs); }" />
                                     <span class="mr-2">@Modifier</span>
                                 }
                                 @*<select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
@@ -2283,9 +2283,9 @@
                             {
                                 if (ListUseClipNetOverALL[NetworkInfo.GroupID])
                                 {
-                                    strKeyNetGroupIDidx = String.Format($"{NetworkInfo.GroupID}-{0}");
-                                    dicModKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardModifierWhenNetOver(NetworkInfo.GroupID, 0);
-                                    dicVKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardVKeyWhenNetOver(NetworkInfo.GroupID, 0, GetSGNetworkList().Count, dicDestSysPos.Count);
+                                    strKeyNetGroupIDidx = String.Format($"{NetworkInfo.GroupID}-1");
+                                    dicModKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardModifierWhenNetOver(NetworkInfo.GroupID, 1);
+                                    dicVKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardVKeyWhenNetOver(NetworkInfo.GroupID, 1, GetSGNetworkList().Count, dicDestSysPos.Count);
                                 }
                             }
                             else

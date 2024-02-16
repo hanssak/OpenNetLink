@@ -1892,9 +1892,9 @@
                             if (SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend(groupId) && bUseClipNetOverALL && NetWorkSvc.NetWorkInfo.Count < 2)
                             {
                                 // 3중망, clipboard 단축키 추가작업필요
-                                listModKey = AppConfigSvc.GetClipBoardModifierWhenNetOver(groupId, 0);
+                                listModKey = AppConfigSvc.GetClipBoardModifierWhenNetOver(groupId, 1);
                                 chVKey = ' ';
-                                chVKey = AppConfigSvc.GetClipBoardVKeyWhenNetOver(groupId, 0, NetWorkSvc.NetWorkInfo.Count, dicSysIdName.Count);
+                                chVKey = AppConfigSvc.GetClipBoardVKeyWhenNetOver(groupId, 1, NetWorkSvc.NetWorkInfo.Count, dicSysIdName.Count);
 
                                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                                 {
@@ -1902,7 +1902,7 @@
                                     bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
                                     bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
                                     bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
-                                    Window.WinRegClipboardHotKeyNetOver(groupId, bAlt, bCtrl, bShift, bWin, chVKey, 0);
+                                    Window.WinRegClipboardHotKeyNetOver(groupId, bAlt, bCtrl, bShift, bWin, chVKey, 1);
                                 }
                                 else
                                 {
@@ -1911,11 +1911,11 @@
                                                     listModKey[(int)HOTKEY_MOD.CTRL],
                                                     listModKey[(int)HOTKEY_MOD.SHIFT],
                                                     listModKey[(int)HOTKEY_MOD.WINDOW],
-                                                    chVKey, 0);
+                                                    chVKey, 1);
                                 }
 
                                 // 3망 사용 중이지 않다가 갑자가 사용으로 설정변경시 단축키 저장
-                                CtrlSideUISvc.SetClipBoardHotKeyNetOver(groupId, 0,
+                                CtrlSideUISvc.SetClipBoardHotKeyNetOver(groupId, 1,
                                                                 listModKey[(int)HOTKEY_MOD.WINDOW],
                                                                 listModKey[(int)HOTKEY_MOD.CTRL],
                                                                 listModKey[(int)HOTKEY_MOD.ALT],
