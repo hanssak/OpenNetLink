@@ -196,7 +196,10 @@ namespace OpenNetLinkApp.Services
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요*/
 
                 //hsNetwork.SGSvr_EventReg(SGSvrRecv);
-                hsNetwork.SGData_EventReg(SGDataRecv);
+                //hsNetwork.SGData_EventReg(SGDataRecv);
+
+                hsNetwork.SGData_EventRegAdvanced(SGDataRecvAdvanced);
+                
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
                 hsNetwork.SGException_EventRegEx(SGExceptionExRecv);
                 hsNetwork.SetGroupID(groupID);
@@ -434,6 +437,7 @@ namespace OpenNetLinkApp.Services
                 offlineEvent(groupId);
             }
         }
+
         private void SGDataRecv(int groupId, eCmdList cmd, SGData sgData)
         {
             HsNetWork hs = null;
@@ -925,7 +929,7 @@ namespace OpenNetLinkApp.Services
 
         }
 
-        private void SGDataRecv(int groupId, eAdvancedCmdList cmd, SGData sgData)
+        private void SGDataRecvAdvanced(int groupId, eAdvancedCmdList cmd, SGData sgData)
         {
             HsNetWork hs = null;
             int nRet = 0;
@@ -1264,24 +1268,14 @@ namespace OpenNetLinkApp.Services
                     //    }
                     //    break;
                     default:
-                        //hs = GetConnectNetWork(groupId);
-                        //if (hs != null)
-                        //{
-                        //    CommonQueryReciveEvent queryListEvent = sgPageEvent.GetQueryReciveEvent(groupId, );
-                        //    object[] obj = new object[] { sgData };
-                        //    if (queryListEvent != null)
-                        //    {
-                        //        queryListEvent(groupId, obj);
-                        //    }
-
-                        //}
+                        throw new Exception("UnKnown CMD!");
                         break;
 
                 }
             }
             catch (Exception ex)
             {
-                Log.Logger.Here().Error($"SGDataRecv, CMD : {cmd}, Exception(MSG) : {ex.Message}");
+                Log.Logger.Here().Error($"SGDataRecvAdvanced, CMD : {cmd}, Exception(MSG) : {ex.Message}");
             }
 
         }
@@ -3497,6 +3491,7 @@ namespace OpenNetLinkApp.Services
                 try
                 {
                     ret = sgSendData.RequestReady(hsNetWork, strAgentName, strVersion, strOSType, listGpkiCnList);
+                    CLog.Here().Information($"RequestReady, Ret : {ret}");
 
                     // gsdata 받아서, sgReadyData 쪽에 Set 동작
                     //sgDicRecvData.SetApprLineData();
