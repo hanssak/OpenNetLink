@@ -68,6 +68,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\openNetLib\HsNetWorkSG\HsNetWorkSG.csproj" />
     <ProjectReference Include="..\OfficeExtractorLibrary\OfficeExtractor\OfficeExtractor.csproj" />
     <ProjectReference Include="..\WebWindow.Blazor\WebWindow.Blazor.csproj" />
     <ProjectReference Include="..\AgLogManager\AgLogManager.csproj" />
@@ -1888,9 +1889,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="HsNetWorkSG">
-      <HintPath>..\..\..\OpenNetLink\src\OpenNetLinkApp\Library\HsNetWorkSG.dll</HintPath>
-    </Reference>
     <Reference Include="Interop.IWshRuntimeLibrary">
       <HintPath>Library\Interop.IWshRuntimeLibrary.dll</HintPath>
     </Reference>
