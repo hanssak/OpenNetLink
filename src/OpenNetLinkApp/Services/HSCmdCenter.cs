@@ -118,7 +118,7 @@ namespace OpenNetLinkApp.Services
         public void Init()
         {
             HsNetWork hsNetwork = null;
-            
+
             List<ISGNetwork> listNetworks = SGNetworkService.NetWorkInfo;
             List<string> RecvDownList = SGAppConfigService.AppConfigInfo.RecvDownPath;
 
@@ -436,7 +436,6 @@ namespace OpenNetLinkApp.Services
         }
         private void SGDataRecv(int groupId, eCmdList cmd, SGData sgData)
         {
-
             HsNetWork hs = null;
             int nRet = 0;
 
@@ -891,7 +890,7 @@ namespace OpenNetLinkApp.Services
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
                         {
-                            NotiRequestExitEvent notiRequestExit= sgPageEvent.GetNotiRequestExitEvent();
+                            NotiRequestExitEvent notiRequestExit = sgPageEvent.GetNotiRequestExitEvent();
                             if (notiRequestExit != null) notiRequestExit(groupId);
                         }
                         break;
@@ -914,12 +913,373 @@ namespace OpenNetLinkApp.Services
                                 queryListEvent(groupId, obj);
                             }
 
-                     }
+                        }
                         break;
 
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"SGDataRecv, CMD : {cmd}, Exception(MSG) : {ex.Message}");
+            }
+
+        }
+
+        private void SGDataRecv(int groupId, eAdvancedCmdList cmd, SGData sgData)
+        {
+            HsNetWork hs = null;
+            int nRet = 0;
+
+            try
+            {
+                nRet = sgData.GetResult();
+
+                switch (cmd)
+                {
+                    case eAdvancedCmdList.ePostReady:                                        //접속 정보 요청
+                        //eCmdList.eSESSIONCOUNT:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
+                        System.Diagnostics.Debug.WriteLine("SESSIONCOUNT ON HSCmdCenter:" + groupId);
+                        if (nRet != 0)
+                            BindAfterSend(nRet, groupId, sgData);
+                        break;
+
+                    case eAdvancedCmdList.ePostLogin:
+                        //eCmdList.eBIND:                                                  // BIND_ACK : user bind(connect) 인증 응답
+                        BindAfterSend(nRet, groupId, sgData);
+
+                        //eCmdList.eZIPDEPTHINFO:                                                    // zip 파일 내부검사 설정 정보 조회.
+                        ZipDepthInfoSetting(nRet, groupId, sgData);
+
+                        //eCmdList.eCLIENTVERSION:                                                       // 업데이트 노티.
+                        UpgradeNotiAfterSend(nRet, groupId, sgData);
+
+
+                        break;
+                    case eAdvancedCmdList.eNotiPolicy:
+                        //eAdvancedCmdList.eNotiPolicy:
+                        //eCmdList.eUPDATEPOLICY:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            NotiUpdatePolicyEvent updatePolicyEvent = sgPageEvent.GetUpdatePolicyEvent();
+                            if (updatePolicyEvent != null) updatePolicyEvent(groupId);
+                        }
+
+                        //eCmdList.eLINKCHK:
+                        SetHoliday(groupId, sgData);
+
+                        //eCmdList.eURLLIST:                                                  // URL 자동전환 리스트 요청 응답.
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetUrlListData(hs, groupId, sgData);
+                            URLListAfterSend(nRet, groupId, sgData);
+                        }
+
+                        //eCmdList.eUSERINFOEX:                                                  // USERINFOEX : 사용자 정보 응답.
+                        UserInfoAfterSend(nRet, groupId, sgData);
+
+                        //eCmdList.eUSEDAYFILETRANS:                                             // 사용된 일일 파일 전송 사용량 및 횟수 데이터.
+                        UseDayFileInfoNotiAfterSend(nRet, groupId, sgData);
+
+
+                        //eCmdList.eUSEDAYCLIPTRANS:                                             // 사용된 일일 클립보드 전송 사용량 및 횟수 데이터.
+                        UseDayClipInfoNotiAfterSend(nRet, groupId, sgData);
+
+
+                        //eCmdList.eDOWNLOADCOUNT:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            DownloadCountEvent downloadCountEvent = sgPageEvent.GetDownloadCountEvent(groupId);
+                            if (downloadCountEvent != null) downloadCountEvent(groupId, sgData);
+                        }
+                        break;
+                    case eAdvancedCmdList.ePatchSessionPW://eCmdList.eCHANGEPASSWD:                                                  // 비밀번호 변경 요청 응답.
+                        ChgPassWDAfterSend(nRet, groupId);
+                        break;
+                    case eAdvancedCmdList.eGetDepts://eCmdList.eDEPTINFO:                                                  // 부서정보 조회 요청 응답.
+                        DeptInfoAfterSend(nRet, groupId, sgData);
+                        {
+                            int result = sgData.GetResult();
+                            sgData.GetRecordData("DeptCount");
+                        }
+                        break;
+                    case eAdvancedCmdList.eGetProxyApprovers://eCmdList.eAPPRINSTCUR:                                                  // 현재 등록된 대결재자 정보 요청 응답.
+                        ApprInstAfterSend(nRet, groupId, sgData);
+                        break;
+                    case eAdvancedCmdList.ePostProxyApproversChange:
+                        //eCmdList.eAPPRINSTCLEAR:                                       //대결자삭제
+                        //eCmdList.eAPPRINSTREG:                                         //대결자등록
+                        CommonResultAfterSend(nRet, groupId, sgData);
+                        break;
+                    case eAdvancedCmdList.ePostTransferRequestRetrieval:
+                        //eCmdList.eFILETRANSLIST:                                                  // 전송관리 조회 리스트 데이터 요청 응답.
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetTransManageData(hs, groupId, sgData);
+                            TransSearchAfterSend(nRet, groupId);
+                        }
+                        break;
+
+                    case eAdvancedCmdList.ePostApprovalsRetrieval:
+                        //eCmdList.eFILEAPPROVE:                                                  // 결재관리 조회 리스트 데이터 요청 응답.
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetApprManageData(hs, groupId, sgData);
+                            ApprSearchAfterSend(nRet, groupId);
+                        }
+                        break;
+
+                    case eAdvancedCmdList.eGetDefaultApprovers:
+                        //eCmdList.eAPPROVEDEFAULT:                                                  // 사용자기본결재정보조회 요청 응답.
+                        ApprLineAfterSend(nRet, groupId, sgData);
+                        break;
+
+                    case eAdvancedCmdList.eDeleteTransferRequest:
+                        //eCmdList.eSENDCANCEL:                                                  // 전송취소 요청 응답 
+                        TransCancelAfterSend(nRet, groupId);
+
+                        //eCmdList.eEMAILSENDCANCEL:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            EmailSendCancelEvent emailSendCancelEvent = sgPageEvent.GetEmailSendCancelEvent(groupId);
+                            if (emailSendCancelEvent != null) emailSendCancelEvent(groupId, sgData);
+                        }
+                        break;
+
+                    case eAdvancedCmdList.ePostApprovalsConfirmation:
+                        //eCmdList.eAPPROVEBATCH:                                                // 일괄결재 응답.
+                        ApproveBatchAfterSend(nRet, groupId, sgData);
+
+                        //eCmdList.eEMAILAPPROVEBATCH:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            ResponseEvent resEvent = sgPageEvent.GetEmailApprBatchEvent(groupId);
+                            if (resEvent != null) resEvent(groupId, sgData);
+                        }
+                        break;
+
+                    case eAdvancedCmdList.eGetTransferRequestsDetail:
+                        //eCmdList.eTRANSDETAIL:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetDetailData(hs, groupId, sgData);
+                            string strTransSeq = sgData.GetBasicTagData("TRANSSEQ");
+                            DetailSearchAfterSend(nRet, groupId, strTransSeq);
+                        }
+                        break;
+
+                    case eAdvancedCmdList.eFileSendProgressNoti:
+                        //eCmdList.eFILESENDPROGRESSNOTI:
+                        FileSendProgressNotiAfterSend(nRet, groupId, sgData);
+                        break;
+                    case eAdvancedCmdList.eFileRecvProgressNoti:
+                        //eCmdList.eFILERECVPROGRESSNOTI:
+                        FileRecvProgressNotiAfterSend(nRet, groupId, sgData);
+                        break;
+                    case eAdvancedCmdList.eFilePrevProgressNoti:
+                        //eCmdList.eFILEPREVPROGRESSNOTI:                                        // 파일 미리보기 수신 진행률 노티.
+                        FilePrevProgressNotiAfterSend(nRet, groupId, sgData);
+                        break;
+
+                    case eAdvancedCmdList.eNotiURLRedirection:
+                        //eCmdList.eSUBDATAEXCHANGE:                                                    // 클립보드 데이터 Recv(서버에서)
+
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            UrlServerRecvNotiAfterSend(nRet, groupId, sgData);
+                        }
+                        //eCmdList.eSUBDATANOTIFY:                                                    // 클립보드 데이터 Recv(서버에서)
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            UrlBrowserRecvNotiAfterSend(nRet, groupId, sgData);
+                        }
+                        break;
+
+                    case eAdvancedCmdList.eRMOUSEFILEADD:
+                        //eCmdList.eRMOUSEFILEADD:                                                   // 마우스 우클릭 이벤트 노티
+                        RMouseFileAddNotiAfterSend(nRet, groupId);
+                        break;
+
+                    case eAdvancedCmdList.eNotiApprovalWaiting:
+                        // eCmdList.eAPPROVECOUNT:                                                // 승인대기 노티.
+                        ApproveCountNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId, sgData);
+                        //eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
+                        EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
+                        break;
+                    case eAdvancedCmdList.eNoti3rdPartyResult:
+                        //eCmdList.ePRIVACYAPPROVENOTIFY:
+                        PrivacyApproveCountNotiAfterSend(nRet, eCmdList.ePRIVACYAPPROVENOTIFY, groupId, sgData);
+                        //eCmdList.eVIRUSSCAN:                                                   // 바이러스 검출 노티.
+                        VirusScanNotiAfterSend(nRet, eCmdList.eVIRUSSCAN, groupId, sgData);
+                        //eCmdList.eAPTSCAN:                                                     // APT 노티.
+                        VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
+                        //eCmdList.eDrmBlockNoti:                                                     // DRM Noti
+                        VirusScanNotiAfterSend(nRet, eCmdList.eDrmBlockNoti, groupId, sgData);
+
+                        //eCmdList.ePRIVACYNOTIFY:                                     //개인정보 Noti
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            PrivacyNotiEvent privacyNotiEvent = sgPageEvent.GetPrivacyNotiEvent(groupId);
+                            if (privacyNotiEvent != null) privacyNotiEvent(groupId, sgData);
+                        }
+
+                        //eCmdList.eSECURITYAPPROVERQUERY:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            SecurityApproverSearchEvent securityApproverSearchEvent = sgPageEvent.GetSecurityApproverSearchEvent(groupId);
+                            if (securityApproverSearchEvent != null) securityApproverSearchEvent(groupId, sgData);
+                        }
+                        break;
+
+                    case eAdvancedCmdList.eNotiAnnouncements:
+                        //eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
+                        BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
+                        break;
+                    case eAdvancedCmdList.eNotiApprovalTermination:
+                        //eCmdList.eAPPROVEACTIONNOTIFY:                                         // 사용자 결재 완료(승인/반려)노티.
+                        ApproveActionNotiAfterSend(nRet, eCmdList.eAPPROVEACTIONNOTIFY, groupId, sgData);
+                        
+                        //eCmdList.eSKIPFILENOTI:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            SkipFileNotiEvent eventData = sgPageEvent.GetSkipFileNotiEventAdd();
+                            if (eventData != null) eventData(groupId, sgData);
+                        }
+                        break;
+
+                    case eAdvancedCmdList.ePostLogout:
+                        //eCmdList.eLOGOUT:                                                      // 로그아웃 노티.
+                        LogOutNotiAfterSend(nRet, groupId, sgData);
+                        break;
+
+
+
+                    case eAdvancedCmdList.ePatchSessionUnlock:
+                        //eCmdList.eCLIENTUNLOCK:                                                      // 화면잠금 해제
+                        ScreenLockClearAfterSend(nRet, groupId, sgData);
+                        break;
+
+
+                    case eAdvancedCmdList.eGetAnnouncements:
+                        //eCmdList.eDASHBOARDCOUNT:                                  // 대쉬보드 조회 쿼리 데이터.
+                        DashBoardCountAfterSend(nRet, groupId, sgData);
+                        //eCmdList.eDASHBOARDTRANSREQCOUNT:                              // 대쉬보드 전송요청 Count 쿼리
+                        DashBoardTransReqCountAfterSend(nRet, groupId, sgData);
+                        //eCmdList.eDASHBOARDAPPRWAITCOUNT:                              // 대쉬보드 승인대기 Count 쿼리
+                        DashBoardApprWaitCountAfterSend(nRet, groupId, sgData);
+                        //eCmdList.eDASHBOARDAPPRCONFIRMCOUNT:                              // 대쉬보드 승인 Count 쿼리
+                        DashBoardApprConfirmCountAfterSend(nRet, groupId, sgData);
+                        //eCmdList.eDASHBOARDAPPRREJECTCOUNT:                              // 대쉬보드 반려 Count 쿼리
+                        DashBoardApprRejectCountAfterSend(nRet, groupId, sgData);
+                        //eCmdList.eBOARDNOTIFYSEARCH:                                   // 공지사항 조회 결과 
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetBoardNoti(hs, groupId, sgData);
+                            BoardNotiSearchAfterSend(nRet, groupId);
+                        }
+                        break;
+
+                    case eAdvancedCmdList.ePostGPKIRandom:
+                        //eCmdList.eGPKIRANDOM:                                   // Gpki_Random 결과 
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
+                            RecvSvrGPKIRandomAfterSend(groupId);
+                        }
+                        //eCmdList.eGPKICERT:                                   // Gpki_Cert 결과 
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
+                            RecvSvrGPKICertAfterSend(groupId);
+                        }
+                        break;
+
+                    case eAdvancedCmdList.ePatchGPKICN:
+                        //eCmdList.eCHANGEGPKICN:                                   // CHANGEGPKI_CN 결과 
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
+                            RecvSvrGPKIRegAfterSend(groupId);
+                        }
+                        break;
+
+
+                    case eAdvancedCmdList.eNotiRequestDownload:
+                        //eCmdList.eFILEMAXLENGTH:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            //Serilog.Log.Logger.Error("HsCmdCenter - eCmdList.eFILEMAXLENGTH - ########## - ");
+                            FileRecvErrInfoEvent filerecvErrEvent = sgPageEvent.GetAddFIleRecvErrEvent(groupId);
+                            if (filerecvErrEvent != null) filerecvErrEvent(groupId, sgData);
+                        }
+                        //eCmdList.eFORWARDFILEINFO:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            FileForwardEvent fileforwardEvent = sgPageEvent.GetFileForwardNotifyEventAdd(groupId);
+                            if (fileforwardEvent != null) fileforwardEvent(groupId, sgData);
+                        }
+                        break;
+
+                    //case eCmdList.eAUDITORI:
+                    //    hs = GetConnectNetWork(groupId);
+                    //    if (hs != null)
+                    //    {
+                    //        AuditOriRecvEvent auditOriRecvEvent = sgPageEvent.GetAuditOriEvent();
+                    //        if (auditOriRecvEvent != null) auditOriRecvEvent(groupId, sgData);
+                    //    }
+                    //    break;
+                    case eAdvancedCmdList.eREQUESTEXIT:
+                        //eCmdList.eREQUESTEXIT:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            NotiRequestExitEvent notiRequestExit = sgPageEvent.GetNotiRequestExitEvent();
+                            if (notiRequestExit != null) notiRequestExit(groupId);
+                        }
+                        break;
+                    //case eCmdList.eEMAILPREVIEWINFO:
+                    //    hs = GetConnectNetWork(groupId);
+                    //    if (hs != null)
+                    //    {
+                    //        EmailPreviewInfoEvent emailPreviewInfoEvent = sgPageEvent.GetEmailPreviewInfoEvent(groupId);
+                    //        if (emailPreviewInfoEvent != null) emailPreviewInfoEvent(groupId, sgData);
+                    //    }
+                    //    break;
+                    default:
+                        //hs = GetConnectNetWork(groupId);
+                        //if (hs != null)
+                        //{
+                        //    CommonQueryReciveEvent queryListEvent = sgPageEvent.GetQueryReciveEvent(groupId, );
+                        //    object[] obj = new object[] { sgData };
+                        //    if (queryListEvent != null)
+                        //    {
+                        //        queryListEvent(groupId, obj);
+                        //    }
+
+                        //}
+                        break;
+
+                }
+            }
+            catch (Exception ex)
             {
                 Log.Logger.Here().Error($"SGDataRecv, CMD : {cmd}, Exception(MSG) : {ex.Message}");
             }
@@ -1134,7 +1494,7 @@ namespace OpenNetLinkApp.Services
                         Directory.Delete(Dir.FullName);
                         CLog.Here().Information($"DeleteTimeOverFiles - Delete Empty Folder : {Dir.FullName}");
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         CLog.Here().Error($"DeleteTimeOverFiles - ERR : {ex.Message}");
                     }
@@ -1301,7 +1661,7 @@ namespace OpenNetLinkApp.Services
                 strUserID = sgLoginDataApproveDefault.GetUserID();
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 HsLog.err($"ApprLineAfterSend - Exception(MSG) : {ex.Message}");
             }
@@ -2574,7 +2934,7 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int SendFileTrans(int groupid, string strUserID, string strMid, string strPolicyFlag, string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep, List<string> ApprLineSeq, List<HsStream> FileList, string strNetOver3info, string receiver, string strinterlockflagConfirmId="")
+        public int SendFileTrans(int groupid, string strUserID, string strMid, string strPolicyFlag, string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep, List<string> ApprLineSeq, List<HsStream> FileList, string strNetOver3info, string receiver, string strinterlockflagConfirmId = "")
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
@@ -3130,7 +3490,7 @@ namespace OpenNetLinkApp.Services
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork == null)
                 return -1;
-            
+
             Task.Run(() =>
             {
                 int ret = 0;
