@@ -115,6 +115,9 @@ namespace OpenNetLinkApp.Services
             return true;*/
         }
 
+        /// <summary>
+        /// 설정된 GroupID 리스트별 HsNetwork 객체 생성 및 이벤트 함수 정의
+        /// </summary>
         public void Init()
         {
             HsNetWork hsNetwork = null;
@@ -147,15 +150,12 @@ namespace OpenNetLinkApp.Services
                     strIP = addresses[0].ToString();
                 }
                 int port = listNetworks[i].Port;
+                string apiVersion = listNetworks[i].APIVersion;
+
                 int groupID = listNetworks[i].GroupID;
 
-                /*int ConnectType = listNetworks[i].ConnectType;
-                HsConnectType hsContype = HsConnectType.Direct;
-                if (ConnectType == 1)
-                    hsContype = HsConnectType.FindServer;*/
-
                 hsNetwork = new HsNetWork();
-                string strTlsVer = listNetworks[i].TlsVersion;
+                //string strTlsVer = listNetworks[i].TlsVersion;
                 string strDownPath = "";
                 if (RecvDownList != null && RecvDownList.Count > i)
                     strDownPath = RecvDownList[i];
@@ -181,12 +181,13 @@ namespace OpenNetLinkApp.Services
                     strDownPath = strDownPath.Replace("\\", "/");
                 }
 
-
                 NotifyConnectionType notiType = NotifyConnectionType.None;
                 if (Enum.TryParse(dicOpConfig[groupID].nNotifyConnectionType.ToString(), out notiType) == false)
                     notiType = NotifyConnectionType.None;
 
-                hsNetwork.InitLib(strIP, port, false, strModulePath, strDownPath, groupID.ToString(), notiType);    // basedir 정해진 후 설정 필요
+                bool bDo2FatorAuth = dicOpConfig[groupID].bUseGoogleOtp2FactorAuth;
+
+                hsNetwork.InitLib(strIP, port, apiVersion, false, bDo2FatorAuth, strModulePath, strDownPath, groupID.ToString(), notiType);    // basedir 정해진 후 설정 필요
 
                 /*if (strTlsVer.Equals("1.2"))
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
@@ -199,7 +200,7 @@ namespace OpenNetLinkApp.Services
                 //hsNetwork.SGData_EventReg(SGDataRecv);
 
                 hsNetwork.SGData_EventRegAdvanced(SGDataRecvAdvanced);
-                
+
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
                 hsNetwork.SGException_EventRegEx(SGExceptionExRecv);
                 hsNetwork.SetGroupID(groupID);
@@ -942,9 +943,7 @@ namespace OpenNetLinkApp.Services
                 {
                     case eAdvancedCmdList.ePostReady:                                        //접속 정보 요청
                         //eCmdList.eSESSIONCOUNT:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
-                        System.Diagnostics.Debug.WriteLine("SESSIONCOUNT ON HSCmdCenter:" + groupId);
-                        if (nRet != 0)
-                            BindAfterSend(nRet, groupId, sgData);
+                        PostReadyAfterSend(groupId, sgData);
                         break;
 
                     case eAdvancedCmdList.ePostLogin:
@@ -1153,7 +1152,7 @@ namespace OpenNetLinkApp.Services
                     case eAdvancedCmdList.eNotiApprovalTermination:
                         //eCmdList.eAPPROVEACTIONNOTIFY:                                         // 사용자 결재 완료(승인/반려)노티.
                         ApproveActionNotiAfterSend(nRet, eCmdList.eAPPROVEACTIONNOTIFY, groupId, sgData);
-                        
+
                         //eCmdList.eSKIPFILENOTI:
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
@@ -1277,8 +1276,24 @@ namespace OpenNetLinkApp.Services
             {
                 Log.Logger.Here().Error($"SGDataRecvAdvanced, CMD : {cmd}, Exception(MSG) : {ex.Message}");
             }
-
         }
+
+        public void PostReadyAfterSend(int groupId, SGData sgData)
+        {
+            string ipAddr= sgData.GetTagData("server_info", "ip_addr");
+            string loginTypeValue = sgData.GetTagData("server_info", "login_type");
+            string sgNetType = sgData.GetTagData("server_info", "sg_net_type");
+
+            Enum.TryParse(loginTypeValue.ToUpper(), out HsLoginType hsLoginType);
+            int loginType = (int)hsLoginType;
+
+            ReadyEvent evnt = sgPageEvent.GetReadyEventAdd(groupId);
+            if(evnt != null)
+            {
+                evnt(groupId, loginType, sgNetType, ipAddr);
+            }
+        }
+
 
         private void SGSvrRecv(int groupId, int cmd, SGData sgData)
         {
@@ -1327,6 +1342,8 @@ namespace OpenNetLinkApp.Services
                 svEvent(groupId, loginType, systemID);
             }
         }
+
+
 
         public void BindAfterSend(int nRet, int groupId, SGData sgData)
         {
@@ -3490,7 +3507,7 @@ namespace OpenNetLinkApp.Services
                 int ret = 0;
                 try
                 {
-                    ret = sgSendData.RequestReady(hsNetWork, strAgentName, strVersion, strOSType, listGpkiCnList);
+                    ret = sgSendData.RestRequestReady(hsNetWork, strAgentName, strVersion, strOSType, listGpkiCnList);
                     CLog.Here().Information($"RequestReady, Ret : {ret}");
 
                     // gsdata 받아서, sgReadyData 쪽에 Set 동작

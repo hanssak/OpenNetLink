@@ -99,8 +99,9 @@ namespace OpenNetLinkApp.PageEvent
     /// Ready Cmd Type
     /// </summary>
     /// <param name="groupid"></param>
-    /// <param name="e"></param>
-    public delegate void ReadyEvent(int groupid, PageEventArgs e);
+    /// <param name="loginType">택 1: origin, ad, ldap, pw_otp, otp, sso</param>
+    /// <param name="sgNetType">택 1: IN:내부, EX:외부</param>
+    public delegate void ReadyEvent(int groupid, int loginType, string sgNetType, string ipAddr);
 
     // 파일 전송 진행 이벤트 
     public delegate void FileSendProgressEvent(int groupid, PageEventArgs e);

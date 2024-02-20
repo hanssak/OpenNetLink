@@ -105,11 +105,6 @@
 
     void loadingProcess()
     {
-
-        //Test();
-        //TestWebSocket1();
-
-
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         pageService.listNetWork = NetWorkSvc.NetWorkInfo;
         sgSettingProc = SGSettingsDBProc.Instance;
@@ -120,9 +115,7 @@
         SGSettingData sgSettingData = null;
         for (int i = 0; i < listNetWork.Count; i++)
         {
-
-
-            HSCmdCenter.sgPageEvent.SetSvrEventAdd(listNetWork[i].GroupID, SvrResult); // kkw-예전
+            //HSCmdCenter.sgPageEvent.SetSvrEventAdd(listNetWork[i].GroupID, SvrResult); // kkw-예전
 
             HSCmdCenter.sgPageEvent.SetReadyEventAdd(listNetWork[i].GroupID, ReadyResult);
             pageService.SetLogoutStatus(listNetWork[i].GroupID, true);
@@ -150,17 +143,6 @@
             strCurCliVersion = VersionConfigSvc.GetSWVersion();
             strPlatform = VersionConfigSvc.GetUpdatePlatform();
         }
-
-        for (int i = 0; i < listNetWork.Count; i++)
-        {
-            HsNetWork hsNetWork = HSCmdCenter.GetConnectNetWork(listNetWork[i].GroupID);
-            if (hsNetWork != null)
-            {
-                hsNetWork.bDo2FatorAuth = OpConfigSvc.GetUseGoogleOtp2FactorAuth(listNetWork[i].GroupID);
-                HSCmdCenter.RequestReady(listNetWork[i].GroupID, "OpenNetLink", strCurCliVersion, strPlatform);
-            }
-        }
-
         // Toast에 사용되는 Text
         pageService.m_strLoginToastTitle = XmlConf.GetTitle("T_TOAST_LOGIN");
         pageService.m_strLoginToastMsg = XmlConf.GetInfoMsg("I_0213");
@@ -173,6 +155,13 @@
         // Toast 에서 결재관리 메뉴로 넘어가기 위해 저장
         pageService.m_approveMenuArray = new ISGSideBarUI[listNetWork.Count];
         pageService.m_approveMenuArray.Initialize();
+
+        //Ready 처리는 첫번째 Groupid만 구성
+        HsNetWork hsNetWork = HSCmdCenter.GetConnectNetWork(listNetWork[0].GroupID);
+        if (hsNetWork != null)
+        {
+            HSCmdCenter.RequestReady(listNetWork[0].GroupID, "OpenNetLink", strCurCliVersion, strPlatform);
+        }
 
         // 서버에서 응답없으면 Connect 재시도
         int interval = SGAppMgrSvc.OpConfigInfoService.GetLoginConnectDelaySecond(0) / SGAppMgrSvc.OpConfigInfoService.GetLoginConnectLimitCount(0);
@@ -205,10 +194,10 @@
         StateHasChanged();
     }
 
-    private void goLogIn(String loginType)
+    private void goLogIn(int loginType)
     {
         //초기로그인 페이지 지정
-        pageService.m_nLoginType = Int32.Parse(loginType);
+        pageService.m_nLoginType = loginType;
         pageService.m_nCurViewPageGroupID = 0;
 
         // MyNavigationManager.NavigateTo("/fileException");
@@ -316,11 +305,11 @@
                                     CLog.Here().Information($"==========================================================================");
                                     foreach (JsonProperty property in config.EnumerateObject())
                                     {
-                                        if ( string.Compare(property.Name, "version") != 0)
+                                        if (string.Compare(property.Name, "version") != 0)
                                         {
                                             // Memory 변경
                                             bool bResult = SGAppMgrSvc.OpConfigInfoService.SetPropertyVal(groupId, property.Name, (object)property.Value.GetRawText()); // (object)property.Value
-                                            CLog.Here().Information($"Svr1105Result, groupId : {groupId}, Apply Op Json property : {property.Name}, Value : {property.Value}, {(bResult?"Success!":"Failed!")}");
+                                            CLog.Here().Information($"Svr1105Result, groupId : {groupId}, Apply Op Json property : {property.Name}, Value : {property.Value}, {(bResult ? "Success!" : "Failed!")}");
                                         }
                                     }
 
@@ -357,25 +346,19 @@
 
     }
 
-    /// <summary>
-    /// loginType : 5 OTP, 3:LDAP
-    /// </br>1:내부 , 2:외부
-    /// </summary>
-    /// <param name="groupId"></param>
-    /// <param name="loginType"></param>
-    public void SvrResult(int groupId, string loginType, string systemID)
+    //public void ReadyResult(int groupId, string loginType, string systemID)
+    public void ReadyResult(int groupId, int loginType, string sgNetType, string ipAddr)
     {
         //CLog.Here().Information($"SvrResult Init groupID : {groupId} LoginType : {loginType}");
-        pageService.SetGroupIDLoginType(groupId, (eLoginType)Int32.Parse(loginType));
-        CLog.Here().Information($"SvrResult ReSet groupID : {groupId}, LoginType : {(HsNetWork.UseHiddenLog ? loginType : "xxx")}");
-        //pageService.m_DicGroupIDloginType[groupId] = (eLoginType)Int32.Parse(loginType);
-
-        //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
+        @*pageService.SetGroupIDLoginType(groupId, (eLoginType)Int32.Parse(loginType));
+            CLog.Here().Information($"SvrResult ReSet groupID : {groupId}, LoginType : {(HsNetWork.UseHiddenLog ? loginType : "xxx")}");
+            //pageService.m_DicGroupIDloginType[groupId] = (eLoginType)Int32.Parse(loginType);
+        *@
+    //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
         //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
-        //if (AppConfigSvc.GetUseAppLoginType())
         if (OpConfigSvc.GetUseAppLoginType(groupId))
         {
-            loginType = OpConfigSvc.GetAppLoginType(groupId).ToString();
+            loginType = OpConfigSvc.GetAppLoginType(groupId);
         }
         if (OpConfigSvc.GetPocMode(0))
         {
@@ -383,12 +366,12 @@
             {
                 if (String.IsNullOrEmpty(NetWorkSvc.NetWorkInfo[groupId].FromName))
                 {
-                    if (systemID == "1")//내부
+                    if (sgNetType == "IN")//내부
                     {
                         NetWorkSvc.NetWorkInfo[groupId].FromName = XmlConf.GetTitle("T_COMMON_LOGININNER");
                         NetWorkSvc.NetWorkInfo[groupId].ToName = XmlConf.GetTitle("T_COMMON_LOGINOUTER");
                     }
-                    else if (systemID == "2")//외부
+                    else if (sgNetType == "EX")//외부
                     {
                         NetWorkSvc.NetWorkInfo[groupId].FromName = XmlConf.GetTitle("T_COMMON_LOGINOUTER");
                         NetWorkSvc.NetWorkInfo[groupId].ToName = XmlConf.GetTitle("T_COMMON_LOGININNER");
@@ -400,81 +383,14 @@
         conTimer.Stop();
 
         //groupId 별로 AppUpdaterServie 관리
-        string strRipNport = "";
-        HsNetWork hsNetWork = null;
-        hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
-        if (hsNetWork != null)
-        {
-            strRipNport = hsNetWork.GetRealHostInfo();
-        }
-
-        strRipNport += ":3439";
-        SGAppUpdaterSvc.Init(groupId, strRipNport, SGAppMgrSvc.VersionConfigInfoService.GetUpdatePlatform(), HSCmdCenter);
-
-
+        string RipNPort = ipAddr + ":3439";
+        SGAppUpdaterSvc.Init(groupId, RipNPort, SGAppMgrSvc.VersionConfigInfoService.GetUpdatePlatform(), HSCmdCenter);
 
         if (groupId == 0)
         {
             if (SGCrypto.ValidationResult)
                 goLogIn(loginType);
         }
-    }
-
-
-    //public void ReadyResult(int groupId, string loginType, string systemID)
-    public void ReadyResult(int groupId, PageEventArgs e)
-    {
-        @*//CLog.Here().Information($"SvrResult Init groupID : {groupId} LoginType : {loginType}");
-        pageService.SetGroupIDLoginType(groupId, (eLoginType)Int32.Parse(loginType));
-        CLog.Here().Information($"SvrResult ReSet groupID : {groupId}, LoginType : {(HsNetWork.UseHiddenLog ? loginType : "xxx")}");
-        //pageService.m_DicGroupIDloginType[groupId] = (eLoginType)Int32.Parse(loginType);
-
-        //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
-        //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
-        //if (AppConfigSvc.GetUseAppLoginType())
-        if (OpConfigSvc.GetUseAppLoginType(groupId))
-        {
-            loginType = OpConfigSvc.GetAppLoginType(groupId).ToString();
-        }
-        if (OpConfigSvc.GetPocMode(0))
-        {
-            if (NetWorkSvc.NetWorkInfo?.Count > groupId)
-            {
-                if (String.IsNullOrEmpty(NetWorkSvc.NetWorkInfo[groupId].FromName))
-                {
-                    if (systemID == "1")//내부
-                    {
-                        NetWorkSvc.NetWorkInfo[groupId].FromName = XmlConf.GetTitle("T_COMMON_LOGININNER");
-                        NetWorkSvc.NetWorkInfo[groupId].ToName = XmlConf.GetTitle("T_COMMON_LOGINOUTER");
-                    }
-                    else if (systemID == "2")//외부
-                    {
-                        NetWorkSvc.NetWorkInfo[groupId].FromName = XmlConf.GetTitle("T_COMMON_LOGINOUTER");
-                        NetWorkSvc.NetWorkInfo[groupId].ToName = XmlConf.GetTitle("T_COMMON_LOGININNER");
-                    }
-                }
-            }
-        }
-
-        conTimer.Stop();
-
-        //groupId 별로 AppUpdaterServie 관리
-        string strRipNport = "";
-        HsNetWork hsNetWork = null;
-        hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
-        if (hsNetWork != null)
-        {
-            strRipNport = hsNetWork.GetRealHostInfo();
-        }
-
-        strRipNport += ":3439";
-        SGAppUpdaterSvc.Init(groupId, strRipNport, SGAppMgrSvc.VersionConfigInfoService.GetUpdatePlatform(), HSCmdCenter);
-
-        if (groupId == 0)
-        {
-            if (SGCrypto.ValidationResult)
-                goLogIn(loginType);
-        }*@
     }
 
 

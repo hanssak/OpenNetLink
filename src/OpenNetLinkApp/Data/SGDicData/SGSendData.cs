@@ -1118,13 +1118,14 @@ namespace OpenNetLinkApp.Data.SGDicData
 
 
         //
-        public int RequestReady(HsNetWork hsNet, string strAgentName, string strVersion, string strOSType, List<string> listGpkiCnList = null)
+        public int RestRequestReady(HsNetWork hsNet, string strAgentName, string strVersion, string strOSType, List<string> listGpkiCnList = null)
         {
             Dictionary<string, object> dic = new Dictionary<string, object>();
-            dic["gpki_cn_list"] = (listGpkiCnList == null ? new List<string>() : listGpkiCnList);
+            dic["gpki_cn_list"] = (listGpkiCnList == null ? new List<string>() : listGpkiCnList); 
             dic["agent_name"] = strAgentName;
             dic["version"] = strVersion;
             dic["os_type"] = strOSType;
+            dic["rsa_public_key"] = SGCrypto.GetRSAPublicKey_Base64Enc(hsNet.GetGroupID().ToString()); 
 
             SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostReady, null, dic, hsNet.stCliMem.GetProtectedSeedKey()); // api-key 사용
             return hsNet.RequestRest(args);

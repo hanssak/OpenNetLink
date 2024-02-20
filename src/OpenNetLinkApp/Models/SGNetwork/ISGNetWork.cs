@@ -12,8 +12,9 @@ namespace OpenNetLinkApp.Models.SGNetwork
         public string IPAddress { get; set; }
         public int Port { get; set; }
         public int ConnectType { get; set; }
-        public string TlsVersion { get; set; }
+        //public string TlsVersion { get; set; }
         //public string ClientVersion { get; set; }
+        public string APIVersion { get; set; }                  //RestAPI 서비스 정보
         public string NetPos { get; set; }
         public List<string> ADDomain { get; set; }
     }

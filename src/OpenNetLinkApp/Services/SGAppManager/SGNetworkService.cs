@@ -191,7 +191,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgNet.FromName = "UnKnown";
                 sgNet.ConnectType = 0;
                 sgNet.NetPos = "IN";
-                sgNet.TlsVersion = "1.2";
+                //sgNet.TlsVersion = "1.2";
+                sgNet.APIVersion = "1.0";
                 listNetworks.Add(sgNet);
             }
 
