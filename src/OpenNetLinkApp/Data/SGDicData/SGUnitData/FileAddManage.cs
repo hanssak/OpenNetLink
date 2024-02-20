@@ -5965,7 +5965,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             strFileMime = MimeGuesser.GuessMimeType(btFileData);
 
-            if (strFileMime == "text/plain" || IsTXT(source))
+            if (strFileMime == "text/plain" || strFileMime == "application/x-dbt" || strFileMime == "application/x-dbf" || IsTXT(source))
             {
                 string tempSource = Path.Combine(destDirectory,$"{Path.GetFileName(source)}.txt");
                 
@@ -5982,7 +5982,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     }
                     strFileMime = MimeGuesser.GuessMimeType(btFileData);
 
-                    if (strFileMime == "text/plain")
+                    if (strFileMime == "text/plain" || strFileMime == "application/x-dbt" || strFileMime == "application/x-dbf")
                     {
                         return CheckBinaryCert(tempSource, destDirectory);
                     }
