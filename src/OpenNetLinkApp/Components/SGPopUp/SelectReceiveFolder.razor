@@ -365,14 +365,16 @@
         if (curPushType.Equals("1"))
         {
             CLog.Here().Information($"SelectReceiveFolder SendForwardCancel TransSeq : {curTransSeq} pushType : {curPushType}");
-            HsCmdCenter.SendForwardCancel(groupid, sgLoginData.GetUserID(), curTransSeq);
+            //HsCmdCenter.SendForwardCancel(groupid, sgLoginData.GetUserID(), curTransSeq);
+            HsCmdCenter.RestSendForwardCancel(groupid, curTransSeq);
         }
 
         //파일 전송 취소
         else
         {
             CLog.Here().Information($"SelectReceiveFolder SendTransCancel TransSeq : {curTransSeq} pushType : {curPushType}");
-            HsCmdCenter.SendTransCancel(groupid, sgLoginData.GetUserID(), curTransSeq, curAction, curReason);
+            //HsCmdCenter.SendTransCancel(groupid, sgLoginData.GetUserID(), curTransSeq, curAction, curReason);
+            HsCmdCenter.RestSendTransCancel(groupid, curTransSeq, "file");
         }
 
         closePopUp();

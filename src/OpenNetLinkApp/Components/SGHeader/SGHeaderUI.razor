@@ -1897,15 +1897,17 @@
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
         if (sgLoginData == null)
             return;
-        string strUserID = sgLoginData.GetUserID();
 
+        /*string strUserID = sgLoginData.GetUserID();
         SGQueryExtend sgQueryExtend = null;
         sgQueryExtend = new SGQueryExtend();
         if (sgQueryExtend == null)
             return;
 
         string strQuery = sgQueryExtend.GetSGNotifyStatus(strBoardSeq, strUserID, "1");
-        HsCmdCenter.SendBoardNotiConfirm(groupid, strUserID, strQuery);
+        HsCmdCenter.SendBoardNotiConfirm(groupid, strUserID, strQuery);*/
+
+        HsCmdCenter.RestSendBoardNotiConfirm(groupid, strBoardSeq);
     }
 
     public void NotiDeleteHasChange(int groupID)

@@ -3557,6 +3557,96 @@ namespace OpenNetLinkApp.Services
             return -1;*/
         }
 
+        public int RestSendTransCancel(int groupid, string strTransSeq, string strDataType)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RestRequestSendCancel(hsNetWork, groupid, strTransSeq, strDataType);
+                    // gsdata 받아서, sgReadyData 쪽에 Set 동작
+                    //sgDicRecvData.SetApprLineData();
+                    // 등록된 Call Back호출
+                    //ret = hsNetWork.Ready(groupid, strAgentName, strVersion, strOSType, listGpkiCnLKist);
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestSendTransCancel-Task-Exception : {ex.Message}");
+                }
+
+            });            
+
+            return 0;
+        }
+
+
+        public int RestSendForwardCancel(int groupid, string strTransSeq)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RestRequestSendForwardCancel(hsNetWork, groupid, strTransSeq);
+                    // gsdata 받아서, sgReadyData 쪽에 Set 동작
+                    //sgDicRecvData.SetApprLineData();
+                    // 등록된 Call Back호출
+                    //ret = hsNetWork.Ready(groupid, strAgentName, strVersion, strOSType, listGpkiCnLKist);
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestSendForwardCancel-Task-Exception : {ex.Message}");
+                }
+
+            });
+
+            return 0;
+        }
+
+        public int RestSendBoardNotiConfirm(int groupid, string strBoardSeq)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RestRequestSendBoardNotiConfirm(hsNetWork, strBoardSeq);
+                    // gsdata 받아서, sgReadyData 쪽에 Set 동작
+                    //sgDicRecvData.SetApprLineData();
+                    // 등록된 Call Back호출
+                    //ret = hsNetWork.Ready(groupid, strAgentName, strVersion, strOSType, listGpkiCnLKist);
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestRequestSendBoardNotiConfirm-Task-Exception : {ex.Message}");
+                }
+
+            });
+
+            return 0;
+
+        }
+
+
 
         public int RestRequestDashBoardData(int groupid, string strFromToDate, int nItemCount)
         {
@@ -3587,6 +3677,25 @@ namespace OpenNetLinkApp.Services
 
             return 0;
         }
+
+
+        /// <summary>
+        /// 대결재자 조회 함수
+        /// </summary>
+        /// <param name="groupid"></param>
+        /// <param name="strApproverName"></param>
+        /// <param name="strDeptSeq"></param>
+        /// <param name="strDeptName"></param>
+        /// <returns></returns>
+        public int RestSendDeptApprLineSearch(int groupid, string strApproverName, string strDeptSeq, string strDeptName, List<string> listApproveType=null)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RestRequestSendSearchApprover(hsNetWork, strApproverName, strDeptSeq, strDeptName, listApproveType);
+            return -1;
+        }
+
 
 
 

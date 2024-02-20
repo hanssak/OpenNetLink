@@ -1045,20 +1045,23 @@
             return;
         }
 
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        string curUserID = "";
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-
         SGDetailData sgDetailData = null;
         sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
         if (sgDetailData == null)
             return;
+
         string curTransSeq = sgDetailData.GetTransSeq();
+
+        /*SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
         string curAction = "2";
         string curReason = "사유";
+        HSCmdCenter.SendTransCancel(groupID, curUserID, curTransSeq, curAction, curReason);*/
 
-        HSCmdCenter.SendTransCancel(groupID, curUserID, curTransSeq, curAction, curReason);
+        HSCmdCenter.RestSendTransCancel(groupID, curTransSeq, "file");
 
         closePopUp();
     }

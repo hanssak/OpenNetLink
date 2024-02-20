@@ -199,12 +199,13 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        /*SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         string curUserID = "";
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
+        HSCmdCenter.SendEmailTransferCancel(groupID, curUserID, stEmailSeq);*/
 
-        HSCmdCenter.SendEmailTransferCancel(groupID, curUserID, stEmailSeq);
+        HSCmdCenter.RestSendTransCancel(groupID, stEmailSeq, "email");
 
         closePopUp();
     }

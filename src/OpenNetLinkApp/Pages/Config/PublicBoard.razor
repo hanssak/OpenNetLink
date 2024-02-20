@@ -353,9 +353,10 @@
             if (sgLoginData == null)
                 continue;
 
-            string strUserID = sgLoginData.GetUserID();
+            /*string strUserID = sgLoginData.GetUserID();
             string strQuery = sgQueryExtend.GetSGNotifyStatus(listTmpBoardData[i].strBoardSeq, strUserID, "1");
-            HsCmdCenter.SendBoardNotiConfirm(groupID, strUserID, strQuery);
+            HsCmdCenter.SendBoardNotiConfirm(groupID, strUserID, strQuery);*/
+            HsCmdCenter.RestSendBoardNotiConfirm(groupID, listTmpBoardData[i].strBoardSeq);
 
             for (int j = 0; j < listBoardData.Count; j++)
             {

@@ -542,12 +542,12 @@
             curFromDay = curFromDay.Substring(0, 8);
             curToDay = curToDay.Substring(0, 8);
 
-        // Test용도
-        //curFromDay = "20220101";
-        //curToDay = "20221227";
+            // Test용도
+            //curFromDay = "20220101";
+            //curToDay = "20221227";
 
-        // 실제사용 - UI상에 설정된 값 안나옴
-        mailParam.SetSearchStartDate(curFromDay);
+            // 실제사용 - UI상에 설정된 값 안나옴
+            mailParam.SetSearchStartDate(curFromDay);
             mailParam.SetSearchEndDate(curToDay);
 
             mailParam.SetApprKindCode(strApproveTypeText);
@@ -844,13 +844,15 @@
             return;
         }
 
-        string curUserID = "";
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-
         CLog.Here().Information($"TransCancel(email) - Request(EmailTransSeq) : {strTransSeq}");
 
-        HSCmdCenter.SendEmailTransferCancel(groupID, curUserID, strTransSeq);
+        /*string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+        HSCmdCenter.SendEmailTransferCancel(groupID, curUserID, strTransSeq);*/
+
+        HSCmdCenter.RestSendTransCancel(groupID, strTransSeq, "email");
+
     }
 
 

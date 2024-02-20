@@ -1137,8 +1137,8 @@ namespace OpenNetLinkApp.Data.SGDicData
 
         public int RestRequestApproveBatch(HsNetWork hsNet, string strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<string> listSeqData)
         {
-            Dictionary<string, string> dicApproveProcinfo = new Dictionary<string, string>();
-            dicApproveProcinfo["approver_seq"] = strUserSeq;
+            Dictionary<string, object> dicApproveProcinfo = new Dictionary<string, object>();
+            dicApproveProcinfo["approver_seq"] = ((strUserSeq?.Length ?? 0) > 0) ? Convert.ToInt64(strUserSeq) : 0;
             dicApproveProcinfo["approval_type"] = strApproveType;
             dicApproveProcinfo["data_type"] = strDataType;
             dicApproveProcinfo["approval_action"] = strApproveAction;
@@ -1164,6 +1164,61 @@ namespace OpenNetLinkApp.Data.SGDicData
             //return hsNet.RequestRest(args);
 
             SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eGetDashboard, dicSearch, null, hsNet.stCliMem.GetProtectedSeedKey()); // api-key 사용
+            return hsNet.RequestRest(args);
+        }
+
+        public int RestRequestSendCancel(HsNetWork hsNet, int groupid, string strTransSeq, string strDataType)
+        {
+            Dictionary<string, string> dicDoDelete = new Dictionary<string, string>();
+            dicDoDelete["tseqs"] = strTransSeq;
+            //dicDoDelete["data_type"] = strDataType;   // Server와 협의후 사용
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eDeleteTransferRequest, dicDoDelete, null, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.RequestRest(args);
+        }
+
+        public int RestRequestSendForwardCancel(HsNetWork hsNet, int groupid, string strTransSeq)
+        {
+            Dictionary<string, string> dicDoDelete = new Dictionary<string, string>();
+            dicDoDelete["tseq"] = strTransSeq;
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eDeleteTransferRequestForward, dicDoDelete, null, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.RequestRest(args);
+        }
+
+        public int RestRequestSendBoardNotiConfirm(HsNetWork hsNet, string strBoardSeq)
+        {
+            Dictionary<string, string> dicGetParamQuery = new Dictionary<string, string>();
+            dicGetParamQuery["bseq"] = strBoardSeq;
+
+            Dictionary<string, object> dicBody = new Dictionary<string, object>();
+            dicBody["dept_seq"] = "";
+            dicBody["read_again"] = false;
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostAnnouncementsReadDone, dicGetParamQuery, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.RequestRest(args);
+        }
+
+        public int RestRequestSendSearchApprover(HsNetWork hsNet, string strApproverName, string strDeptSeq, string strDeptName, List<string> listApproveType)
+        {
+            Dictionary<string, object> dicBody = new Dictionary<string, object>();
+            dicBody["cond_approver_type_list"] = listApproveType.ToArray(); //"common", "security"
+            dicBody["dept_seq"] = ((strDeptSeq?.Length ?? 0) > 0) ? Convert.ToInt64(strDeptSeq) : 0;
+            dicBody["dept_name"] = strDeptName;
+            dicBody["approver_name"] = strApproverName;
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostApproversRetrieval, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.RequestRest(args);
+        }
+
+        public int RestRequestInstApproveRegChange(HsNetWork hsNet, string strUserID, string strQuery)
+        {
+            Dictionary<string, object> dicBody = new Dictionary<string, object>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["QUERY"] = strQuery;
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostProxyApproversChange, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.RequestRest(args);
         }
 

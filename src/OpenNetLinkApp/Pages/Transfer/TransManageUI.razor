@@ -769,7 +769,7 @@
             return;
         }
 
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        /*SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         string curUserID = "";
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
@@ -778,9 +778,11 @@
             curTransSeq = strTransSeq;
         string curAction = "2";
         string curReason = "사유";
+        HSCmdCenter.SendTransCancel(groupID, curUserID, curTransSeq, curAction, curReason);*/
 
-        HSCmdCenter.SendTransCancel(groupID, curUserID, curTransSeq, curAction, curReason);
+        HSCmdCenter.RestSendTransCancel(groupID, strTransSeq, "file");
     }
+
 
     /// <summary>
     /// 전송관리에서 검색되는 개수를 얻는 Query 실행
