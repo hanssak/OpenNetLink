@@ -1215,9 +1215,9 @@ namespace OpenNetLinkApp.Data.SGDicData
         public int RestRequestInstApproveRegChange(HsNetWork hsNet, string strUserID, string strQuery)
         {
             Dictionary<string, object> dicBody = new Dictionary<string, object>();
-            dic["APPID"] = "0x00000000";
-            dic["CLIENTID"] = strUserID;
-            dic["QUERY"] = strQuery;
+            dicBody["APPID"] = "0x00000000";
+            dicBody["CLIENTID"] = strUserID;
+            dicBody["QUERY"] = strQuery;
 
             SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostProxyApproversChange, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.RequestRest(args);
