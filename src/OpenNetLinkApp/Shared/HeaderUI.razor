@@ -440,7 +440,11 @@
     /// <returns></returns>
     public bool SendUrlData(int groupid, string strUserID, string strUrlData)
     {
-        if (HsCmdCenter.SendUrlData(groupid, strUserID, strUrlData) < 0)
+
+        /*if (HsCmdCenter.SendUrlData(groupid, strUserID, strUrlData) < 0)
+            return false;*/
+        
+        if (HsCmdCenter.RestSendUrlRedirection(groupid, 1, 1, 1, strUrlData) < 0)
             return false;
 
         return true;

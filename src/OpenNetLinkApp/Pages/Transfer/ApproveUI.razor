@@ -778,12 +778,12 @@
             string strApproveUserKind = "0";
             HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);*/
 
-            List<string> listApproveSeq = new List<string>();
+            List<Int64> listApproveSeq = new List<Int64>();
             for (int i = 0; i < ListData.Count; i++)
             {
                 if (ListData[i].bCheck)
                 {
-                    listApproveSeq.Add(ListData[i].ApprSeq);
+                    listApproveSeq.Add(Convert.ToInt64(ListData[i].ApprSeq));
                 }
             }
 
@@ -865,12 +865,12 @@
         }
 
         string strUserSeq = sgUserData.GetUserSequence();
-        List<string> listApproveSeq = new List<string>();
+        List<Int64> listApproveSeq = new List<Int64>();
         for (int i = 0; i < ListData.Count; i++)
         {
             if (ListData[i].bCheck)
             {
-                listApproveSeq.Add(ListData[i].ApprSeq);
+                listApproveSeq.Add(Convert.ToInt64(ListData[i].ApprSeq));
             }
         }
 

@@ -1233,10 +1233,16 @@ namespace OpenNetLinkApp.Data.SGDicData
 
 
 
-        public int RequestRestSendApproveBatch(HsNetWork hsNet, string strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<string> listSeqData)
+        public int RequestRestSendApproveBatch(HsNetWork hsNet, string strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<Int64> listSeqData)
         {
+
+            if ((strUserSeq?.Length ?? 0) < 1)
+            {
+                return -1;
+            }
+
             Dictionary<string, object> dicApproveProcinfo = new Dictionary<string, object>();
-            dicApproveProcinfo["approver_seq"] = ((strUserSeq?.Length ?? 0) > 0) ? Convert.ToInt64(strUserSeq) : 0;
+            dicApproveProcinfo["approver_seq"] = Convert.ToInt64(strUserSeq);
             dicApproveProcinfo["approval_type"] = strApproveType;
             dicApproveProcinfo["data_type"] = strDataType;
             dicApproveProcinfo["approval_action"] = strApproveAction;
@@ -1320,7 +1326,7 @@ namespace OpenNetLinkApp.Data.SGDicData
         }
 
 
-        public int RequestRestSendUrlRedirection(HsNetWork hsNet, int nTotalCount, int nCurrentCount, int nSubDataType, string strUrlData)
+        public int RequestRestSendUrlRedirection(HsNetWork hsNet, int nTotalCount, int nCurrentCount, int nSubDataType, string strUrlData, bool bRetCallPos)
         {
             if (strUrlData.Length < 1)
                 return -1;
@@ -1331,7 +1337,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dicBody["SUBDATATYPE"] = nSubDataType;
             dicBody["SUBDATA"] = strUrlData;
 
-            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostURLRedirection, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostURLRedirection, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey(), eCmdReponseType.CallPosReponse);
             return hsNet.RequestRest(args);
         }
 

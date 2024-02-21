@@ -520,8 +520,8 @@
             }
 
             string strUserSeq = sgUserData.GetUserSequence();
-            List<string> listApproveSeq = new List<string>();
-            listApproveSeq.Add(stEmailSeq);
+            List<Int64> listApproveSeq = new List<Int64>();
+            listApproveSeq.Add(Convert.ToInt64(stEmailSeq));
 
             HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, bIsPrivacyApproveDetail?"security":"common", "mail", "confirm", "Approve", listApproveSeq);
 
@@ -604,8 +604,8 @@
         }
 
         string strUserSeq = sgUserData.GetUserSequence();
-        List<string> listApproveSeq = new List<string>();
-        listApproveSeq.Add(stEmailSeq);
+        List<Int64> listApproveSeq = new List<Int64>();
+        listApproveSeq.Add(Convert.ToInt64(stEmailSeq));
 
         HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, bIsPrivacyApproveDetail?"security":"common", "mail", (bisReject ? "reject" : "confirm"), strReason, listApproveSeq);
 

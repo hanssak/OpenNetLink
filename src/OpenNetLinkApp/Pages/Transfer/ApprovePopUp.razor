@@ -1002,8 +1002,8 @@
             }
 
             string strUserSeq = sgUserData.GetUserSequence();
-            List<string> listApproveSeq = new List<string>();
-            listApproveSeq.Add(sgDetailData.GetApprSeq());
+            List<Int64> listApproveSeq = new List<Int64>();
+            listApproveSeq.Add(Convert.ToInt64(sgDetailData.GetApprSeq()));
 
             HsCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "file", "confirm", "Approve", listApproveSeq);
 
@@ -1082,8 +1082,8 @@
 		}
 
 		string strUserSeq = sgUserData.GetUserSequence();
-		List<string> listApproveSeq = new List<string>();
-		listApproveSeq.Add(sgDetailData.GetApprSeq());
+		List<Int64> listApproveSeq = new List<Int64>();
+		listApproveSeq.Add(Convert.ToInt64(sgDetailData.GetApprSeq()));
 
 		HsCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "file", (bisReject?"reject":"confirm"), "Approve", listApproveSeq);
 
