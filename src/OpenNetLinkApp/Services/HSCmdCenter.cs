@@ -1092,19 +1092,17 @@ namespace OpenNetLinkApp.Services
                         break;
 
                     case eAdvancedCmdList.eNotiURLRedirection:
-                        //eCmdList.eSUBDATAEXCHANGE:                                                    // 클립보드 데이터 Recv(서버에서)
-
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
                         {
                             UrlServerRecvNotiAfterSend(nRet, groupId, sgData);
                         }
-                        //eCmdList.eSUBDATANOTIFY:                                                    // 클립보드 데이터 Recv(서버에서)
+                        /*eCmdList.eSUBDATANOTIFY:                                                    // 클립보드 데이터 Recv(서버에서)
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
                         {
                             UrlBrowserRecvNotiAfterSend(nRet, groupId, sgData);
-                        }
+                        }*/
                         break;
 
                     case eAdvancedCmdList.eRMOUSEFILEADD:
@@ -3550,7 +3548,7 @@ namespace OpenNetLinkApp.Services
                 int ret = 0;
                 try
                 {
-                    ret = sgSendData.RestRequestApproveBatch(hsNetWork, strUserSeq, strApproveType, strDataType, strApproveAction, strstrDescription, listSeqData);
+                    ret = sgSendData.RequestRestSendApproveBatch(hsNetWork, strUserSeq, strApproveType, strDataType, strApproveAction, strstrDescription, listSeqData);
 
                     // gsdata 받아서, sgReadyData 쪽에 Set 동작
                     //sgDicRecvData.SetApprLineData();
@@ -3560,7 +3558,7 @@ namespace OpenNetLinkApp.Services
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.Here().Error($"SendApproveBatch-Task-Exception : {ex.Message}");
+                    Log.Logger.Here().Error($"RequestRestSendApproveBatch-Task-Exception : {ex.Message}");
                 }
 
             });
@@ -3586,7 +3584,7 @@ namespace OpenNetLinkApp.Services
                 int ret = 0;
                 try
                 {
-                    ret = sgSendData.RestRequestSendCancel(hsNetWork, groupid, strTransSeq, strDataType);
+                    ret = sgSendData.RequestRestSendTransCancel(hsNetWork, groupid, strTransSeq, strDataType);
                     // gsdata 받아서, sgReadyData 쪽에 Set 동작
                     //sgDicRecvData.SetApprLineData();
                     // 등록된 Call Back호출
@@ -3595,7 +3593,7 @@ namespace OpenNetLinkApp.Services
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.Here().Error($"RestSendTransCancel-Task-Exception : {ex.Message}");
+                    Log.Logger.Here().Error($"RequestRestSendTransCancel-Task-Exception : {ex.Message}");
                 }
 
             });            
@@ -3616,7 +3614,7 @@ namespace OpenNetLinkApp.Services
                 int ret = 0;
                 try
                 {
-                    ret = sgSendData.RestRequestSendForwardCancel(hsNetWork, groupid, strTransSeq);
+                    ret = sgSendData.RequestRestSendForwardCancel(hsNetWork, groupid, strTransSeq);
                     // gsdata 받아서, sgReadyData 쪽에 Set 동작
                     //sgDicRecvData.SetApprLineData();
                     // 등록된 Call Back호출
@@ -3625,7 +3623,7 @@ namespace OpenNetLinkApp.Services
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.Here().Error($"RestSendForwardCancel-Task-Exception : {ex.Message}");
+                    Log.Logger.Here().Error($"RequestRestSendForwardCancel-Task-Exception : {ex.Message}");
                 }
 
             });
@@ -3645,7 +3643,7 @@ namespace OpenNetLinkApp.Services
                 int ret = 0;
                 try
                 {
-                    ret = sgSendData.RestRequestSendBoardNotiConfirm(hsNetWork, strBoardSeq);
+                    ret = sgSendData.RequestRestSendBoardNotiConfirm(hsNetWork, strBoardSeq);
                     // gsdata 받아서, sgReadyData 쪽에 Set 동작
                     //sgDicRecvData.SetApprLineData();
                     // 등록된 Call Back호출
@@ -3654,7 +3652,7 @@ namespace OpenNetLinkApp.Services
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.Here().Error($"RestRequestSendBoardNotiConfirm-Task-Exception : {ex.Message}");
+                    Log.Logger.Here().Error($"RequestRestSendBoardNotiConfirm-Task-Exception : {ex.Message}");
                 }
 
             });
@@ -3665,7 +3663,7 @@ namespace OpenNetLinkApp.Services
 
 
 
-        public int RestRequestDashBoardData(int groupid, string strFromToDate, int nItemCount)
+        public int RestDashBoardData(int groupid, string strFromToDate, int nItemCount)
         {
 
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
@@ -3677,7 +3675,7 @@ namespace OpenNetLinkApp.Services
                 int ret = 0;
                 try
                 {
-                    ret = sgSendData.RestRequestDashBoardData(hsNetWork, strFromToDate, nItemCount);
+                    ret = sgSendData.RequestRestDashBoardData(hsNetWork, strFromToDate, nItemCount);
 
                     // gsdata 받아서, sgReadyData 쪽에 Set 동작
                     //sgDicRecvData.SetApprLineData();
@@ -3687,7 +3685,7 @@ namespace OpenNetLinkApp.Services
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.Here().Error($"RestRequestDashBoardData-Task-Exception : {ex.Message}");
+                    Log.Logger.Here().Error($"RequestRestDashBoardData-Task-Exception : {ex.Message}");
                 }
 
             });
@@ -3704,16 +3702,81 @@ namespace OpenNetLinkApp.Services
         /// <param name="strDeptSeq"></param>
         /// <param name="strDeptName"></param>
         /// <returns></returns>
-        public int RestSendDeptApprLineSearch(int groupid, string strApproverName, string strDeptSeq, string strDeptName, List<string> listApproveType=null)
+        public int RestUserSearch(int groupid, string strApproverName, string strDeptSeq, string strDeptName, List<string> listApproveType=null)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-                return sgSendData.RestRequestSendSearchApprover(hsNetWork, strApproverName, strDeptSeq, strDeptName, listApproveType);
-            return -1;
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestUserSearch(hsNetWork, strApproverName, strDeptSeq, strDeptName, listApproveType);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestSendDeptApprLineSearch-Task-Exception : {ex.Message}");
+                }
+
+            });
+
+            return 0;
+
         }
 
 
+
+        public int RestSendUrlRedirection(int groupid, int nTotalCount, int nCurrentCount, int nSubDataType, string strUrlData)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestSendUrlRedirection(hsNetWork, 1, 1, 1, strUrlData);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RequestRestSendUrlRedirection-Task-Exception : {ex.Message}");
+                }
+
+            });
+
+            return 0;
+        }
+
+        public int RestAgentBlockReason(int groupid, List<AgentBlockData> listAgentBlockData)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestAgentBlockReason(hsNetWork, listAgentBlockData);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RequestRestAgentBlockReason-Task-Exception : {ex.Message}");
+                }
+
+            });
+
+            return 0;
+
+        }
 
 
     }

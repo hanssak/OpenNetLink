@@ -181,6 +181,77 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         #endregion
     }
 
+
+
+    public class AgentBlockData
+    {
+        public string strBlockType = "";
+        public string strBlockReason = "";
+
+        string FileAddErrtoStr(eFileAddErr eErrType)
+        {
+
+            if (eErrType == eFileAddErr.eFAREG)
+                return "added_file";
+            else if(eErrType == eFileAddErr.eFADRM)
+                return "drm_file";
+            else if (eErrType == eFileAddErr.eFADLP)
+                return "dlp_file";
+            else if (eErrType == eFileAddErr.eFAEXT)
+                return "ext_block";
+            else if (eErrType == eFileAddErr.eFAZIP)
+                return "zip_block";
+            else if (eErrType == eFileAddErr.eFACHG)
+                return "ext_changed";
+            else if (eErrType == eFileAddErr.eFAVIRUS)
+                return "anti-virus";
+            else if (eErrType == eFileAddErr.eFAFileSize)
+                return "size_file";
+            // 회의후 확정되고 나서 아래작업 추가로 진행
+            /*else if (eErrType == eFileAddErr)
+                return "";
+            else if (eErrType == eFileAddErr)
+                return "";
+            else if (eErrType == eFileAddErr)
+                return "";
+            else if (eErrType == eFileAddErr)
+                return "";
+            else if (eErrType == eFileAddErr)
+                return "";
+            else if (eErrType == eFileAddErr)
+                return "";
+            else if (eErrType == eFileAddErr)
+                return "";
+            else if (eErrType == eFileAddErr)
+                return "";
+            else if (eErrType == eFileAddErr)
+                return "";
+            else if (eErrType == eFileAddErr)
+                return "";
+            else if (eErrType == eFileAddErr)
+                return "";
+            else if (eErrType == eFileAddErr)
+                return "";
+            else if (eErrType == eFileAddErr)
+                return "";
+            else if (eErrType == eFileAddErr)
+                return "";
+            else if (eErrType == eFileAddErr)
+                return "";
+*/
+            else
+                return "unknown";
+
+        }
+
+        public void SetFileAddErrToAgentBlockData(FileAddErr addErrorData)
+        {
+            strBlockType = FileAddErrtoStr(addErrorData.eErrType);
+            strBlockReason = addErrorData.ExceptionReason;
+        }
+
+    }
+
     public class FileAddErr
     {
         XmlConfService xmlConf = new XmlConfService();

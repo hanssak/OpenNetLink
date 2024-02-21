@@ -1136,7 +1136,7 @@ namespace OpenNetLinkApp.Data.SGDicData
         }
 
 
-        public int RestRequestApproveBatch(HsNetWork hsNet, string strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<string> listSeqData)
+        public int RequestRestSendApproveBatch(HsNetWork hsNet, string strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<string> listSeqData)
         {
             Dictionary<string, object> dicApproveProcinfo = new Dictionary<string, object>();
             dicApproveProcinfo["approver_seq"] = ((strUserSeq?.Length ?? 0) > 0) ? Convert.ToInt64(strUserSeq) : 0;
@@ -1155,7 +1155,7 @@ namespace OpenNetLinkApp.Data.SGDicData
         }
 
 
-        public int RestRequestDashBoardData(HsNetWork hsNet, string strFromToDate, int nItemCount)
+        public int RequestRestDashBoardData(HsNetWork hsNet, string strFromToDate, int nItemCount)
         {
             Dictionary<string, string> dicSearch = new Dictionary<string, string>();
             dicSearch["pdate "] = strFromToDate;
@@ -1168,7 +1168,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.RequestRest(args);
         }
 
-        public int RestRequestSendCancel(HsNetWork hsNet, int groupid, string strTransSeq, string strDataType)
+        public int RequestRestSendTransCancel(HsNetWork hsNet, int groupid, string strTransSeq, string strDataType)
         {
             Dictionary<string, string> dicDoDelete = new Dictionary<string, string>();
             dicDoDelete["tseqs"] = strTransSeq;
@@ -1178,7 +1178,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.RequestRest(args);
         }
 
-        public int RestRequestSendForwardCancel(HsNetWork hsNet, int groupid, string strTransSeq)
+        public int RequestRestSendForwardCancel(HsNetWork hsNet, int groupid, string strTransSeq)
         {
             Dictionary<string, string> dicDoDelete = new Dictionary<string, string>();
             dicDoDelete["tseq"] = strTransSeq;
@@ -1187,7 +1187,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.RequestRest(args);
         }
 
-        public int RestRequestSendBoardNotiConfirm(HsNetWork hsNet, string strBoardSeq)
+        public int RequestRestSendBoardNotiConfirm(HsNetWork hsNet, string strBoardSeq)
         {
             Dictionary<string, string> dicGetParamQuery = new Dictionary<string, string>();
             dicGetParamQuery["bseq"] = strBoardSeq;
@@ -1200,7 +1200,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.RequestRest(args);
         }
 
-        public int RestRequestSendSearchApprover(HsNetWork hsNet, string strApproverName, string strDeptSeq, string strDeptName, List<string> listApproveType)
+        public int RequestRestUserSearch(HsNetWork hsNet, string strApproverName, string strDeptSeq, string strDeptName, List<string> listApproveType)
         {
             Dictionary<string, object> dicBody = new Dictionary<string, object>();
             dicBody["cond_approver_type_list"] = listApproveType.ToArray(); //"common", "security"
@@ -1215,11 +1215,38 @@ namespace OpenNetLinkApp.Data.SGDicData
         public int RestRequestInstApproveRegChange(HsNetWork hsNet, string strUserID, string strQuery)
         {
             Dictionary<string, object> dicBody = new Dictionary<string, object>();
-            dicBody["APPID"] = "0x00000000";
             dicBody["CLIENTID"] = strUserID;
             dicBody["QUERY"] = strQuery;
 
             SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostProxyApproversChange, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.RequestRest(args);
+        }
+
+
+        public int RequestRestSendUrlRedirection(HsNetWork hsNet, int nTotalCount, int nCurrentCount, int nSubDataType, string strUrlData)
+        {
+            if (strUrlData.Length < 1)
+                return -1;
+
+            Dictionary<string, object> dicBody = new Dictionary<string, object>();
+            dicBody["TOTALCOUNT"] = nTotalCount;
+            dicBody["CURRENTCOUNT"] = nCurrentCount;
+            dicBody["SUBDATATYPE"] = nSubDataType;
+            dicBody["SUBDATA"] = strUrlData;
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostURLRedirection, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.RequestRest(args);
+        }
+
+        public int RequestRestAgentBlockReason(HsNetWork hsNet, List<AgentBlockData> listAgentBlock)
+        {
+            if ((listAgentBlock?.Count ?? 0) < 1)
+                return -1;
+
+            Dictionary<string, object> dicBody = new Dictionary<string, object>();
+            dicBody["agent_block_list"] = listAgentBlock.ToArray();
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostAgentBlocks, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.RequestRest(args);
         }
 
