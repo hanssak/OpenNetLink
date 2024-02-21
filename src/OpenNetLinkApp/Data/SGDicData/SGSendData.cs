@@ -1118,14 +1118,14 @@ namespace OpenNetLinkApp.Data.SGDicData
 
 
         //
-        public int RestRequestReady(HsNetWork hsNet, string strAgentName, string strVersion, string strOSType, List<string> listGpkiCnList = null)
+        public int RequestRestReady(HsNetWork hsNet, string strAgentName, string strVersion, string strOSType, List<string> listGpkiCnList = null)
         {
             Dictionary<string, object> dic = new Dictionary<string, object>();
-            dic["gpki_cn_list"] = (listGpkiCnList == null ? new List<string>() : listGpkiCnList); 
+            dic["gpki_cn_list"] = (listGpkiCnList == null ? new List<string>() : listGpkiCnList);
             dic["agent_name"] = strAgentName;
             dic["version"] = strVersion;
             dic["os_type"] = strOSType;
-            dic["rsa_public_key"] = SGCrypto.GetRSAPublicKey_Base64Enc(hsNet.GetGroupID().ToString()); 
+            dic["rsa_public_key"] = SGCrypto.GetRSAPublicKey_Base64Enc(hsNet.GetGroupID().ToString());
 
             SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostReady, null, dic, hsNet.stCliMem.GetProtectedSeedKey()); // api-key 사용
             return hsNet.RequestRest(args);
@@ -1134,6 +1134,103 @@ namespace OpenNetLinkApp.Data.SGDicData
             //SGEventArgs args = sendParser.RequestReady(dic);
             //return hsNet.RequestRest(args);
         }
+
+        /// <summary>
+        /// Post-User/Login
+        /// </summary>
+        /// <param name="hsNet"></param>
+        /// <param name="loginType">택 1: origin, ad, ldap, pw_otp, otp, sso</param>
+        /// <param name="userId"></param>
+        /// <param name="protectedUserPassword">메모리 암호화된 비밀번호</param>
+        /// <param name="checkPassword"></param>
+        /// <param name="strVersion"></param>
+        /// <param name="notiType">Callback 방식. 택1: WebSocket, URL, None(Callback 미사용)</param>
+        /// <param name="notiRootURL">URL 사용 시, Callback Root URL</param>
+        /// <param name="hanssakOTP"></param>
+        /// <returns></returns>
+        public int RequestRestLogin(HsNetWork hsNet, int loginType, string userId, string protectedUserPassword, bool checkPassword, string strVersion, NotifyConnectionType notiType, string notiRootURL, string hanssakOTP = "")
+        {
+            byte[] pw = null;
+            byte[] pwTag = null;
+            try
+            {
+                //hsNet.stCliMem.ExtLogin = loginType;
+                //hsNet.stCliMem.UserId= userId;
+                //hsNet.stCliMem.SetProtectedPassword(protectedUserPassword);
+
+                SGCrypto.AESDecrypt256WithDEK(hsNet.stCliMem.GetProtectedPassword(), ref pw);
+
+                Dictionary<string, object> dic = new Dictionary<string, object>();
+                Dictionary<string, object> auth_info = new Dictionary<string, object>();
+                Dictionary<string, object> agent_info = new Dictionary<string, object>();
+                Dictionary<string, object> user_conn_info = new Dictionary<string, object>();
+                Dictionary<string, object> session_callback = new Dictionary<string, object>();
+
+                dic.Add("hs_otp", hanssakOTP);
+                dic.Add("auth_info", auth_info);
+                dic.Add("agent_info", agent_info);
+                dic.Add("user_conn_info", user_conn_info);
+                user_conn_info.Add("session_callback", session_callback);
+
+                //auth_info
+                HsLoginType login = (HsLoginType)loginType;
+                auth_info.Add("login_type", login.ToString().ToLower());
+                auth_info.Add("user_id", userId);
+                if (login == HsLoginType.LDAP) //LDAP,LDAPS
+                {
+                    pwTag = new byte[pw.Length + 1];
+                    pwTag[0] = Convert.ToByte(2);
+                    System.Buffer.BlockCopy(pw, 0, pwTag, 1, pw.Length);
+
+                    //string newpwd = Convert.ToChar(2) + clientInfo.GetOriginalPassword();
+                    auth_info.Add("user_password", SGCrypto.AESEncrypt256(pwTag, hsNet.stCliMem.GetProtectedSeedKey()).ByteToBase64String().Base64EncodingStr());
+                }
+                else
+                    auth_info.Add("user_password", SGCrypto.AESEncrypt256(pw, hsNet.stCliMem.GetProtectedSeedKey()).ByteToBase64String().Base64EncodingStr());
+                auth_info.Add("check_password", checkPassword);
+
+                //agent_info
+                agent_info.Add("version", strVersion);
+                string uuid = "";
+                SGCrypto.getUUID(ref uuid, false);
+
+                agent_info.Add("uuid", uuid);
+                agent_info.Add("hash", hsNet.GetAgentHash().Base64EncodingStr());
+
+                                //user_conn_info
+                SgExtFunc.GetLocalIpMacAddress(out string strIPdata, out string strMacdata);
+                //TODO 고도화 - LocalIP 사용해도 될지 검토 필요
+                user_conn_info.Add("ip_addr", strIPdata.Base64EncodingStr());
+                user_conn_info.Add("mac", SGCrypto.AESEncrypt256(strMacdata, hsNet.stCliMem.GetProtectedSeedKey()).ByteToBase64String().Base64EncodingStr());
+                user_conn_info.Add("session_callback", new Dictionary<string, object>() { });
+
+                if (notiType == NotifyConnectionType.WebSocket)
+                    session_callback.Add("type", "WebSocket");
+                else if(notiType == NotifyConnectionType.CallBackURL)
+                {
+                    session_callback.Add("type", "URL");
+                    session_callback.Add("root_url", notiRootURL);
+                }
+                else
+                {
+                    session_callback.Add("type", "None");
+                }
+
+                SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostLogin, null, dic, hsNet.stCliMem.GetProtectedSeedKey()); // api-key 사용
+                return hsNet.RequestRest(args);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            finally
+            {
+                pw?.hsClear(3);
+                pwTag?.hsClear(3);
+            }
+        }
+
 
 
         public int RequestRestSendApproveBatch(HsNetWork hsNet, string strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<string> listSeqData)

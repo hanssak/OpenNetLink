@@ -7,6 +7,9 @@ using OpenNetLinkApp.Services;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
+    /// <summary>
+    /// (구 UserInfoEx)
+    /// </summary>
     public class SGUserData : SGData
     {
         private readonly XmlConfService xconf = new XmlConfService();

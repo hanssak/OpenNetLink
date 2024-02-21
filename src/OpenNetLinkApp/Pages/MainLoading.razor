@@ -160,7 +160,7 @@
         HsNetWork hsNetWork = HSCmdCenter.GetConnectNetWork(listNetWork[0].GroupID);
         if (hsNetWork != null)
         {
-            HSCmdCenter.RequestReady(listNetWork[0].GroupID, "OpenNetLink", strCurCliVersion, strPlatform);
+            HSCmdCenter.RestReady(listNetWork[0].GroupID, "OpenNetLink", strCurCliVersion, strPlatform);
         }
 
         // 서버에서 응답없으면 Connect 재시도

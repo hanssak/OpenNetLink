@@ -186,6 +186,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
     }
 
+    /// <summary>
+    /// (구 Bind)
+    /// </summary>
     public class SGLoginData : SGData
     {
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGLoginData>();

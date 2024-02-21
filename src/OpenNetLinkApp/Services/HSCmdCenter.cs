@@ -937,16 +937,19 @@ namespace OpenNetLinkApp.Services
 
             try
             {
-                nRet = sgData.GetResult();
+                nRet = sgData.GetResponseResult();
 
                 switch (cmd)
                 {
                     case eAdvancedCmdList.ePostReady:                                        //접속 정보 요청
                         //eCmdList.eSESSIONCOUNT:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
-                        PostReadyAfterSend(groupId, sgData);
+                        ReadyAfterSend(groupId, sgData);
                         break;
 
                     case eAdvancedCmdList.ePostLogin:
+                        //LoginAfterSend
+
+
                         //eCmdList.eBIND:                                                  // BIND_ACK : user bind(connect) 인증 응답
                         BindAfterSend(nRet, groupId, sgData);
 
@@ -1276,7 +1279,7 @@ namespace OpenNetLinkApp.Services
             }
         }
 
-        public void PostReadyAfterSend(int groupId, SGData sgData)
+        public void ReadyAfterSend(int groupId, SGData sgData)
         {
             string ipAddr= sgData.GetTagData("server_info", "ip_addr");
             string loginTypeValue = sgData.GetTagData("server_info", "login_type");
@@ -1289,6 +1292,49 @@ namespace OpenNetLinkApp.Services
             if(evnt != null)
             {
                 evnt(groupId, loginType, sgNetType, ipAddr);
+            }
+        }
+
+        public void LoginAfterSend(int groupId, SGData sgData)
+        {
+            int nRet = sgData.GetResponseResult();
+            string strMsg = "";
+
+            HsNetWork hs = null;
+            if (m_DicNetWork.TryGetValue(groupId, out hs) == false && nRet == 0)
+            {
+                CLog.Here().Information($"LoginAfterSend - Login Success But - m_DicNetWork.TryGetValue return false");
+                return;
+            }
+
+            if (nRet == 0)
+            {
+
+                //hs = m_DicNetWork[groupId];
+                sgDicRecvData.SetLoginData(hs, groupId, sgData);
+                SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                Int64 nFilePartSize = sgLoginBind.GetFilePartSize();
+                Int64 nFileBandWidth = sgLoginBind.GetFileBandWidth();
+                int nLinkCheckTime = sgLoginBind.GetLinkCheckTime();
+                nLinkCheckTime = (nLinkCheckTime * 2) / 3;
+                bool bDummy = sgLoginBind.GetUseDummyPacket();
+                hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);
+                SendUserInfoEx(groupId, sgLoginBind.GetUserID());
+
+            }
+            else
+            {
+                LoginEvent LoginResult_Event = null;
+                LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
+                if (LoginResult_Event != null)
+                {
+                    strMsg = SGLoginData.LoginFailMessage(nRet);
+                    PageEventArgs e = new PageEventArgs();
+                    e.result = nRet;
+                    e.strMsg = strMsg;
+                    LoginResult_Event(groupId, e);
+                }
+
             }
         }
 
@@ -3494,7 +3540,7 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int RequestReady(int groupid, string strAgentName, string strVersion, string strOSType, List<string> listGpkiCnList = null)
+        public int RestReady(int groupid, string strAgentName, string strVersion, string strOSType, List<string> listGpkiCnList = null)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork == null)
@@ -3505,7 +3551,7 @@ namespace OpenNetLinkApp.Services
                 int ret = 0;
                 try
                 {
-                    ret = sgSendData.RestRequestReady(hsNetWork, strAgentName, strVersion, strOSType, listGpkiCnList);
+                    ret = sgSendData.RequestRestReady(hsNetWork, strAgentName, strVersion, strOSType, listGpkiCnList);
                     CLog.Here().Information($"RequestReady, Ret : {ret}");
 
                     // gsdata 받아서, sgReadyData 쪽에 Set 동작
@@ -3521,6 +3567,28 @@ namespace OpenNetLinkApp.Services
 
             });
 
+            return 0;
+        }
+
+        public int RestLogin(int groupid, string strID, string strPW, string strCurCliVersion, int loginType, bool passwordCheck, NotifyConnectionType notiType = NotifyConnectionType.WebSocket, string notiRootURL= "", string hanssakOTP = "")
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+            
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestLogin(hsNetWork, loginType, strID, strPW, passwordCheck, strCurCliVersion, notiType, notiRootURL, hanssakOTP);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"Ready-Task-Exception : {ex.Message}");
+                }
+
+            });
             return 0;
         }
 
