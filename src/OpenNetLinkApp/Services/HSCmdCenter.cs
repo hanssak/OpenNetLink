@@ -29,6 +29,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AgLogManager;
 using HsNetWorkSG.RestApi;
+using Newtonsoft.Json;
 using static HsNetWorkSG.SGEnums;
 
 namespace OpenNetLinkApp.Services
@@ -458,7 +459,7 @@ namespace OpenNetLinkApp.Services
                         break;
 
                     case eCmdList.eBIND:                                                  // BIND_ACK : user bind(connect) 인증 응답
-                        BindAfterSend(nRet, groupId, sgData);
+                        //BindAfterSend(nRet, groupId, sgData);
                         break;
 
                     case eCmdList.eCHANGEPASSWD:                                                  // 비밀번호 변경 요청 응답.
@@ -518,8 +519,8 @@ namespace OpenNetLinkApp.Services
 
                     case eCmdList.eSESSIONCOUNT:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
                         System.Diagnostics.Debug.WriteLine("SESSIONCOUNT ON HSCmdCenter:" + groupId);
-                        if (nRet != 0)
-                            BindAfterSend(nRet, groupId, sgData);
+                        //if (nRet != 0)
+                        //BindAfterSend(nRet, groupId, sgData);
                         break;
 
                     case eCmdList.eAPPROVEDEFAULT:                                                  // 사용자기본결재정보조회 요청 응답.
@@ -882,7 +883,7 @@ namespace OpenNetLinkApp.Services
                         }
                         break;
                     case eCmdList.eOLEMIMELISTQUERY:
-                        OLEMimeListAfterSend(groupId, sgData);
+                        //OLEMimeListAfterSend(groupId, sgData);
                         break;
                     case eCmdList.eAUDITORI:
                         hs = GetConnectNetWork(groupId);
@@ -949,16 +950,16 @@ namespace OpenNetLinkApp.Services
 
                     case eAdvancedCmdList.ePostLogin:
                         //LoginAfterSend
+                        LoginAfterSend(groupId, sgData);
 
+                        ////eCmdList.eBIND:                                                  // BIND_ACK : user bind(connect) 인증 응답
+                        //BindAfterSend(nRet, groupId, sgData);
 
-                        //eCmdList.eBIND:                                                  // BIND_ACK : user bind(connect) 인증 응답
-                        BindAfterSend(nRet, groupId, sgData);
+                        ////eCmdList.eZIPDEPTHINFO:                                                    // zip 파일 내부검사 설정 정보 조회.
+                        //ZipDepthInfoSetting(nRet, groupId, sgData);
 
-                        //eCmdList.eZIPDEPTHINFO:                                                    // zip 파일 내부검사 설정 정보 조회.
-                        ZipDepthInfoSetting(nRet, groupId, sgData);
-
-                        //eCmdList.eCLIENTVERSION:                                                       // 업데이트 노티.
-                        UpgradeNotiAfterSend(nRet, groupId, sgData);
+                        ////eCmdList.eCLIENTVERSION:                                                       // 업데이트 노티.
+                        //UpgradeNotiAfterSend(nRet, groupId, sgData);
 
 
                         break;
@@ -1310,7 +1311,7 @@ namespace OpenNetLinkApp.Services
 
         public void ReadyAfterSend(int groupId, SGData sgData)
         {
-            string ipAddr= sgData.GetTagData("server_info", "ip_addr");
+            string ipAddr = sgData.GetTagData("server_info", "ip_addr");
             string loginTypeValue = sgData.GetTagData("server_info", "login_type");
             string sgNetType = sgData.GetTagData("server_info", "sg_net_type");
 
@@ -1318,7 +1319,7 @@ namespace OpenNetLinkApp.Services
             int loginType = (int)hsLoginType;
 
             ReadyEvent evnt = sgPageEvent.GetReadyEventAdd(groupId);
-            if(evnt != null)
+            if (evnt != null)
             {
                 evnt(groupId, loginType, sgNetType, ipAddr);
             }
@@ -1326,44 +1327,62 @@ namespace OpenNetLinkApp.Services
 
         public void LoginAfterSend(int groupId, SGData sgData)
         {
-            int nRet = sgData.GetResponseCode();
+            sgData.GetRespose(out string result, out string reason);
             string strMsg = "";
 
             HsNetWork hs = null;
-            if (m_DicNetWork.TryGetValue(groupId, out hs) == false && nRet == 0)
+            if (m_DicNetWork.TryGetValue(groupId, out hs) == false && result == "OK")
             {
                 CLog.Here().Information($"LoginAfterSend - Login Success But - m_DicNetWork.TryGetValue return false");
                 return;
             }
 
-            if (nRet == 0)
+            if (result == "OK")
             {
-
                 //hs = m_DicNetWork[groupId];
                 sgDicRecvData.SetLoginData(hs, groupId, sgData);
+                string apprLineValue = sgData.GetTagData("approve_line");
+                SGData apprLineData = new SGData();
+                apprLineData.m_DicTagData = JsonConvert.DeserializeObject<Dictionary<string, object>>(apprLineValue);
+                sgDicRecvData.SetApprLineData(hs, groupId, apprLineData);
+                
                 SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
                 Int64 nFilePartSize = sgLoginBind.GetFilePartSize();
                 Int64 nFileBandWidth = sgLoginBind.GetFileBandWidth();
-                int nLinkCheckTime = sgLoginBind.GetLinkCheckTime();
-                nLinkCheckTime = (nLinkCheckTime * 2) / 3;
-                bool bDummy = sgLoginBind.GetUseDummyPacket();
-                hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);
-                SendUserInfoEx(groupId, sgLoginBind.GetUserID());
 
+                //TODO 고도화 - 환경설정 부분은 별도 암호화가 필요한지 확인 필요
+                SGLoginData sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                sgLoginDataSystemRun.AddRunSystemEnvData(sgData);
+
+
+                //int nLinkCheckTime = sgLoginBind.GetLinkCheckTime();
+                //nLinkCheckTime = (nLinkCheckTime * 2) / 3;
+                //bool bDummy = sgLoginBind.GetUseDummyPacket();
+
+                hs.SetNetworkInfo(nFilePartSize, nFileBandWidth);
+                hs.SetHszDefault(sgLoginBind.GetHszDefaultDec());
+                hs.SetManualDownLoad(sgLoginBind.GetManualDownload());
+
+                //TODO 고도화 - OLE 정보 FilterType 정보 필요 OLEMimeRecvEvent oleMimeRecvEvent = sgPageEvent.GetOLEMimeRecvEvent();
+                OLEMimeRecvEvent oleMimeRecv_Event = sgPageEvent.GetOLEMimeRecvEvent();
+                List<string> oleList = sgData.GetTagDataList("mime_ole_url_info", "ole_mime", "list");
+                string oleFilterType = sgData.GetTagData("mime_ole_url_info", "ole_mime", "filterType");
+                if (oleMimeRecv_Event != null)
+                    oleMimeRecv_Event(groupId, oleFilterType, oleList);
             }
             else
             {
-                LoginEvent LoginResult_Event = null;
-                LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
+                int errResult = -1;
+                int.TryParse(result, out errResult);
+                LoginEvent LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
                 if (LoginResult_Event != null)
                 {
-                    strMsg = SGLoginData.LoginFailMessage(nRet);
+                    strMsg = SGLoginData.LoginFailMessage(errResult);
                     PageEventArgs e = new PageEventArgs();
-                    e.result = nRet;
+                    e.result = errResult;
                     e.strMsg = strMsg;
                     LoginResult_Event(groupId, e);
                 }
-
             }
         }
 
@@ -1413,52 +1432,6 @@ namespace OpenNetLinkApp.Services
             if (svEvent != null)
             {
                 svEvent(groupId, loginType, systemID);
-            }
-        }
-
-
-
-        public void BindAfterSend(int nRet, int groupId, SGData sgData)
-        {
-            nRet = sgData.GetResult();
-            string strMsg = "";
-
-            HsNetWork hs = null;
-            if (m_DicNetWork.TryGetValue(groupId, out hs) == false && nRet == 0)
-            {
-                CLog.Here().Information($"BindAfterSend - BIND Success But - m_DicNetWork.TryGetValue return false");
-                return;
-            }
-
-
-            if (nRet == 0)
-            {
-
-                //hs = m_DicNetWork[groupId];
-                sgDicRecvData.SetLoginData(hs, groupId, sgData);
-                SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                Int64 nFilePartSize = sgLoginBind.GetFilePartSize();
-                Int64 nFileBandWidth = sgLoginBind.GetFileBandWidth();
-                int nLinkCheckTime = sgLoginBind.GetLinkCheckTime();
-                nLinkCheckTime = (nLinkCheckTime * 2) / 3;
-                bool bDummy = sgLoginBind.GetUseDummyPacket();
-                hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);
-                SendUserInfoEx(groupId, sgLoginBind.GetUserID());
-
-            }
-            else
-            {
-                LoginEvent LoginResult_Event = null;
-                LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
-                if (LoginResult_Event != null)
-                {
-                    strMsg = SGLoginData.LoginFailMessage(nRet);
-                    PageEventArgs e = new PageEventArgs();
-                    e.result = nRet;
-                    e.strMsg = strMsg;
-                    LoginResult_Event(groupId, e);
-                }
-
             }
         }
         public void ChgPassWDAfterSend(int nRet, int groupId)
@@ -3557,21 +3530,7 @@ namespace OpenNetLinkApp.Services
 
             return -1;
         }
-        /// <summary>
-        /// 문서 OLE용 마임리스트 정보 저장
-        /// </summary>
-        /// <param name="groupId"></param>
-        /// <param name="data"></param>
-        public void OLEMimeListAfterSend(int groupId, SGData data)
-        {
-            OLEMimeRecvEvent oleMimeRecvEvent = sgPageEvent.GetOLEMimeRecvEvent();
-            if (oleMimeRecvEvent != null)
-            {
-                oleMimeRecvEvent(groupId, data);
-            }
 
-            //sgDicRecvData.SetOLEMimeListData(groupId, data);
-        }
 
         //public SGData GetOLEMimeListData(int groupId)
         //{
@@ -3636,18 +3595,18 @@ namespace OpenNetLinkApp.Services
             return 0;
         }
 
-        public int RestLogin(int groupid, string strID, string strPW, string strCurCliVersion, int loginType, bool passwordCheck, NotifyConnectionType notiType = NotifyConnectionType.WebSocket, string notiRootURL= "", string hanssakOTP = "")
+        public int RestLogin(int groupid, string strID, string strPW, string strCurCliVersion, int loginType, bool passwordCheck, string notiRootURL = "", string hanssakOTP = "")
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork == null)
                 return -1;
-            
+
             Task.Run(() =>
             {
                 int ret = 0;
                 try
                 {
-                    ret = sgSendData.RequestRestLogin(hsNetWork, loginType, strID, strPW, passwordCheck, strCurCliVersion, notiType, notiRootURL, hanssakOTP);
+                    ret = sgSendData.RequestRestLogin(hsNetWork, loginType, strID, strPW, passwordCheck, strCurCliVersion, notiRootURL, hanssakOTP);
                 }
                 catch (Exception ex)
                 {
@@ -3729,7 +3688,7 @@ namespace OpenNetLinkApp.Services
                     Log.Logger.Here().Error($"RequestRestSendTransCancel-Task-Exception : {ex.Message}");
                 }
 
-            });            
+            });
 
             return 0;
         }
@@ -3833,7 +3792,7 @@ namespace OpenNetLinkApp.Services
         /// <param name="strDeptSeq"></param>
         /// <param name="strDeptName"></param>
         /// <returns></returns>
-        public int RestUserSearch(int groupid, string strApproverName, string strDeptSeq, string strDeptName, List<string> listApproveType=null)
+        public int RestUserSearch(int groupid, string strApproverName, string strDeptSeq, string strDeptName, List<string> listApproveType = null)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);

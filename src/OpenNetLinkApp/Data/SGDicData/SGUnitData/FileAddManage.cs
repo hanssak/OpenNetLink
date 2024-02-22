@@ -6233,18 +6233,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
         }
 
-        public void SetOLEMimeList(int groupID, List<Dictionary<int, string>> oleMimeList)
+        public void SetOLEMimeList(int groupID, string oleMimeType, List<string> oleMimeList)
         {
             gOLEMimeTypeMap.Value.Clear();
-            if (oleMimeList != null)
+            if (oleMimeList != null && oleMimeList.Count >0)
             {
-                if (oleMimeList.Count > 0)
-                    oleMimeBlockType = oleMimeList[0][1];
+                oleMimeBlockType = oleMimeType;
 
-                foreach (Dictionary<int, string> row in oleMimeList)
+                foreach (string mimetype in oleMimeList)
                 {
-                    string mimetype = row[0];
-
                     //OLE 개체의 MimeType 정보를 fileAddManage의 정적 변수로 등록
                     if (!gOLEMimeTypeMap.Value.Contains(mimetype))
                     {

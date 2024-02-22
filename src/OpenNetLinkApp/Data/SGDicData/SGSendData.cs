@@ -1149,7 +1149,7 @@ namespace OpenNetLinkApp.Data.SGDicData
         /// <param name="notiRootURL">URL 사용 시, Callback Root URL</param>
         /// <param name="hanssakOTP"></param>
         /// <returns></returns>
-        public int RequestRestLogin(HsNetWork hsNet, int loginType, string userId, string protectedUserPassword, bool checkPassword, string strVersion, NotifyConnectionType notiType, string notiRootURL, string hanssakOTP = "")
+        public int RequestRestLogin(HsNetWork hsNet, int loginType, string userId, string protectedUserPassword, bool checkPassword, string strVersion, string notiRootURL, string hanssakOTP = "")
         {
             byte[] pw = null;
             byte[] pwTag = null;
@@ -1203,11 +1203,10 @@ namespace OpenNetLinkApp.Data.SGDicData
                 //TODO 고도화 - LocalIP 사용해도 될지 검토 필요
                 user_conn_info.Add("ip_addr", strIPdata.Base64EncodingStr());
                 user_conn_info.Add("mac", SGCrypto.AESEncrypt256(strMacdata, hsNet.stCliMem.GetProtectedSeedKey()).ByteToBase64String().Base64EncodingStr());
-                user_conn_info.Add("session_callback", new Dictionary<string, object>() { });
 
-                if (notiType == NotifyConnectionType.WebSocket)
+                if (hsNet.NotiConnType == NotifyConnectionType.WebSocket)
                     session_callback.Add("type", "WebSocket");
-                else if(notiType == NotifyConnectionType.CallBackURL)
+                else if(hsNet.NotiConnType == NotifyConnectionType.CallBackURL)
                 {
                     session_callback.Add("type", "URL");
                     session_callback.Add("root_url", notiRootURL);

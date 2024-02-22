@@ -250,7 +250,7 @@ namespace OpenNetLinkApp.PageEvent
     /// OLE Mime 정보 갱신 Event
     /// </summary>
     /// <param name="groupId"></param>
-    public delegate void OLEMimeRecvEvent(int groupId, SGData e);
+    public delegate void OLEMimeRecvEvent(int groupId, string oleMimeType, List<string> oleMimeList);
 
     // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
     //public delegate void GPKICNListRecvEvent(int groupid, PageEventArgs e);

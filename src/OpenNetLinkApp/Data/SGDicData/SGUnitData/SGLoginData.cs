@@ -46,7 +46,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
     public class SGUrlListData : SGData
     {
-
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGUrlListData>();
 
         public SGUrlListData()
@@ -187,7 +186,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     }
 
     /// <summary>
-    /// (구 Bind)
+    /// (구 Bind / 신 PostLogin)
     /// </summary>
     public class SGLoginData : SGData
     {
@@ -405,14 +404,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>true : 수동다운로드 사용.</returns>
         public bool GetManualDownload()
         {
-            string strData = GetTagData("MANUALDOWNLOAD");
-            int nValue = 0;
-            if (!strData.Equals(""))
-                nValue = Convert.ToInt32(strData);
-            if (nValue != 0)
-                return true;
-            else
-                return false;
+            string strData = GetTagData("user_policy", "manual_download_use");
+            return (strData.ToUpper() == "TRUE");
         }
 
         /// <summary>
@@ -556,11 +549,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         /// <summary>
         /// 파일 Part Size 값을 반환한다.
+        /// (Rest-전송 패킷 최대 사이즈)
         /// </summary>
         /// <returns>KB 단위</returns>
         public Int64 GetFilePartSize()
         {
-            string strData = GetTagData("FILEPARTSIZE");
+            string strData = GetTagData("user_policy","transfer_policy", "allowed_packet_size").ToString();
             if (strData.Equals(""))
                 return 0;
             Int64 size = Convert.ToInt64(strData);
@@ -589,7 +583,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>BPS(bit per Second) 단위</returns>
         public Int64 GetFileBandWidth()
         {
-            string strData = GetTagData("FILEBANDWIDTH");
+            string strData = GetTagData("user_policy", "transfer_policy", "allowed_bandwith");
             if (!strData.Equals(""))
                 return 0;
             Int64 bandwidth = Convert.ToInt64(strData);
@@ -1390,15 +1384,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return count;
         }
 
-        /// <summary>
-        /// 환경변수 HSZDEFAULTOPTION 값을 반환
-        /// </summary>
-        /// <returns>환경변수 HSZDEFAULTOPTION 값</returns>
-        public string GetHszDefaultOption()
-        {
-            string strData = GetTagData("HSZDEFAULTOPTION");
-            return strData;
-        }
+        ///// <summary>
+        ///// 환경변수 HSZDEFAULTOPTION 값을 반환
+        ///// </summary>
+        ///// <returns>환경변수 HSZDEFAULTOPTION 값</returns>
+        //public string GetHszDefaultOption()
+        //{
+        //    string strData = GetTagData("HSZDEFAULTOPTION");
+        //    return strData;
+        //}
 
         /// <summary>
         /// 환경변수 HSZDEFAULTOPTION 값을 10진수로 반환한다.
@@ -1406,26 +1400,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>HSZDEFAULTOPTION 값을 10진수</returns>
         public int GetHszDefaultDec()
         {
-            string strData = GetHszDefaultOption();
-            int len = 0;
+            //긴파일명, utf8은 기본사용 + 64Bit도 기본사용
+            int iHszOpt = (10 + 1 + 2);
 
-            if (strData.Equals(""))
-                strData = "00";
-            else
-            {
-                int pos = -1;
-                pos = strData.IndexOf("x");
-                if (pos > 0)
-                    strData = strData.Substring(pos + 1 + 8, strData.Length - (pos + 1 + 8));
+            //압축유무, 암호화유무 설정값
+            string compress = GetTagData("user_policy", "hsz_default_option", "compress");
+            string encode = GetTagData("user_policy", "hsz_default_option", "encode");
 
-                len = strData.Length;
-                if ((len % 2) != 0)  // 홀수 일 경우
-                    strData.Insert(0, "0");
-            }
-            len = strData.Length;
-            int iHszOpt = Convert.ToInt32(strData, 16);
+            if (compress == "1")
+                iHszOpt += 4;
+            if (encode == "1")
+                iHszOpt += 8;
 
-            return iHszOpt;
+            return Convert.ToInt32(iHszOpt.ToString(), 16);
         }
 
         /// <summary>

@@ -13,7 +13,7 @@ namespace OpenNetLinkApp.Data.SGDicData
         // Dictionary / ConcurrentDictionary
         public ConcurrentDictionary<int, SGSvrData> m_DicSvrData;
         public ConcurrentDictionary<int, SGLoginData> m_DicLoginData;
-        public ConcurrentDictionary<int, SGUserData> m_DicUserData;
+        //public ConcurrentDictionary<int, SGUserData> m_DicUserData;
         public ConcurrentDictionary<int, SGTransManageData> m_DicTransManageData;
         public ConcurrentDictionary<int, SGApprManageData> m_DicApprManageData;
         public ConcurrentDictionary<int, SGDetailData> m_DicDetailData;
@@ -25,13 +25,13 @@ namespace OpenNetLinkApp.Data.SGDicData
         public ConcurrentDictionary<int, SGData> m_DicBoardNoti;
         public ConcurrentDictionary<int, SGData> m_DicGpkiData;
         public ConcurrentDictionary<int, SGUrlListData> m_UrlListData;   // SGData
-        public ConcurrentDictionary<int, SGData> m_DicSFMListData; // 자신이 지정된 대결재 정보 관리
+        //public ConcurrentDictionary<int, SGData> m_DicSFMListData; // 자신이 지정된 대결재 정보 관리
 
         public SGDicRecvData()
         {
             m_DicSvrData = new ConcurrentDictionary<int, SGSvrData>();
             m_DicLoginData = new ConcurrentDictionary<int, SGLoginData>();
-            m_DicUserData = new ConcurrentDictionary<int, SGUserData>();
+            //m_DicUserData = new ConcurrentDictionary<int, SGUserData>();
             m_DicTransManageData = new ConcurrentDictionary<int, SGTransManageData>();
             m_DicApprManageData = new ConcurrentDictionary<int, SGApprManageData>();
             m_DicDetailData = new ConcurrentDictionary<int, SGDetailData>();
@@ -41,7 +41,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             m_DicBoardNoti = new ConcurrentDictionary<int, SGData>();
             m_DicGpkiData = new ConcurrentDictionary<int, SGData>();
             m_UrlListData = new ConcurrentDictionary<int, SGUrlListData>();
-            m_DicSFMListData = new ConcurrentDictionary<int, SGData>();
+            //m_DicSFMListData = new ConcurrentDictionary<int, SGData>();
             m_DicDeptInfoData = new ConcurrentDictionary<int, SGDeptInfo>();
         }
         ~SGDicRecvData()
@@ -122,24 +122,29 @@ namespace OpenNetLinkApp.Data.SGDicData
 
         public SGData GetUserData(int groupid)
         {
-            SGUserData tmpData = null;
-            if (m_DicUserData.TryGetValue(groupid, out tmpData) != true)
+            //TODO 고도화 - SGLoginData 에서 GetApprLineData 처리 필요
+            if (m_DicLoginData.TryGetValue(groupid, out SGLoginData tmpData) != true)
                 return null;
-            return m_DicUserData[groupid];
+            return tmpData;
+            //SGUserData tmpData = null;
+            //if (m_DicUserData.TryGetValue(groupid, out tmpData) != true)
+            //    return null;
+            //return m_DicUserData[groupid];
         }
         public void SetUserData(HsNetWork hs, int groupid, SGData data)
         {
-            SGUserData tmpData = null;
-            if (m_DicUserData.TryGetValue(groupid, out tmpData) == true)
-            {
-                m_DicUserData.TryRemove(groupid, out tmpData);
-                //m_DicUserData.Remove(groupid);
-                tmpData = null;
-            }
-            tmpData = new SGUserData();
-            tmpData.Copy(hs, data);
-            //m_DicUserData[groupid]= tmpData;
-            m_DicUserData.TryAdd(groupid, tmpData);
+            //TODO 고도화 - SGLoginData 에서 GetApprLineData 처리 필요
+            //SGUserData tmpData = null;
+            //if (m_DicUserData.TryGetValue(groupid, out tmpData) == true)
+            //{
+            //    m_DicUserData.TryRemove(groupid, out tmpData);
+            //    //m_DicUserData.Remove(groupid);
+            //    tmpData = null;
+            //}
+            //tmpData = new SGUserData();
+            //tmpData.Copy(hs, data);
+            ////m_DicUserData[groupid]= tmpData;
+            //m_DicUserData.TryAdd(groupid, tmpData);
         }
 
         public SGData GetSvrData(int groupid)
@@ -411,26 +416,27 @@ namespace OpenNetLinkApp.Data.SGDicData
 
         public SGData GetSFMListData(int groupId)
         {
-            if (m_DicSFMListData.ContainsKey(groupId))
-                return m_DicSFMListData[groupId];
-            else
+            //TODO 고도화 - SGLoginData 에서 처리 필요
+            if (m_DicLoginData.TryGetValue(groupId, out SGLoginData tmpData) != true)
                 return null;
+            return tmpData;
         }
 
         public void SetSFMListData(int groupId, SGData data)
         {
-            if (m_DicSFMListData.ContainsKey(groupId))
-            {
-                SGData tmpData = null;
-                if (m_DicSFMListData.TryRemove(groupId, out tmpData))
-                    m_DicSFMListData.TryAdd(groupId, data);
-                //m_DicSFMListData[groupId] = data;
-            }
-            else
-            {
-                m_DicSFMListData.TryAdd(groupId, data);
-                //m_DicSFMListData.Add(groupId, data);
-            }
+            //TODO 고도화 - SGLoginData 에서 처리 필요
+            //if (m_DicSFMListData.ContainsKey(groupId))
+            //{
+            //    SGData tmpData = null;
+            //    if (m_DicSFMListData.TryRemove(groupId, out tmpData))
+            //        m_DicSFMListData.TryAdd(groupId, data);
+            //    //m_DicSFMListData[groupId] = data;
+            //}
+            //else
+            //{
+            //    m_DicSFMListData.TryAdd(groupId, data);
+            //    //m_DicSFMListData.Add(groupId, data);
+            //}
         }
 
         public SGData GetDeptInfoData(int groupid)

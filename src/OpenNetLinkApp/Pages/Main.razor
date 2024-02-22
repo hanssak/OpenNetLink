@@ -666,7 +666,7 @@
                 if(pageService.m_nLoginType == 5)
                     HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
                 else
-                    HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
+                    HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion,pageService.m_nLoginType, true);
                 pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
             }
 

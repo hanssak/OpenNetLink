@@ -585,7 +585,7 @@
             pro.Start();
         *@
 
-        try
+    try
         {
             System.Diagnostics.Process.Start("xdotool", strParameter);
         }
@@ -2094,7 +2094,8 @@
         int nLinkCheckTime = sgLoginData.GetLinkCheckTime();
         nLinkCheckTime = (nLinkCheckTime * 2) / 3;
         bool bDummy = sgLoginData.GetUseDummyPacket();
-        hsNetWork.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);
+        @*hsNetWork.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);*@
+    hsNetWork.SetNetworkInfo(nFilePartSize, nFileBandWidth);
 
         //pageService에 변경된 내용 갱신
         DateTime dt = sgLoginData.GetSvrTimeConvert();
@@ -2215,15 +2216,15 @@
     }
 
     //서버DB 로 OLE MIME 리스트 결과 이벤트
-    public void OLEMimeRecvEvent(int groupId, SGData e)
+    public void OLEMimeRecvEvent(int groupId, string oleMimeType, List<string> oleMimeList)
     {
         PageStatusData statusData = pageService.GetPageStatus(groupId);
         if (statusData == null)
             return;
         if (statusData.fileAddManage == null)
             return;
-        List<Dictionary<int, string>> oleMimeList = e.GetSvrRecordData("RECORD");
-        statusData.fileAddManage.SetOLEMimeList(groupId, oleMimeList);
+        
+        statusData.fileAddManage.SetOLEMimeList(groupId, oleMimeType, oleMimeList);
     }
 
     /// <summary>
