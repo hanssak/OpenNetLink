@@ -657,10 +657,14 @@
     /// <param name="e"></param>
     public void TransCancelResult(int groupid, SGData e)
     {
-        string result = e.GetSvrRecordTagData("RESULT");
-        string reason = e.GetSvrRecordTagData("REASON");
 
-        CLog.Here().Information(@$"TransCancelResult(Email) - result : {result}, reason : {reason}");
+        // Advanced
+        string result = e.GetResponseResult().ToString();
+        CLog.Here().Information($"TransCancelResult(Email) - groupid : {groupid},result : {result}");
+
+        /*string result = e.GetSvrRecordTagData("RESULT");
+        string reason = e.GetSvrRecordTagData("REASON");
+        CLog.Here().Information(@$"TransCancelResult(Email) - result : {result}, reason : {reason}");*/
 
         if (result != "0")
         {

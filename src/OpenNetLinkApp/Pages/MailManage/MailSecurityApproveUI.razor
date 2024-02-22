@@ -1295,10 +1295,15 @@
     /// <param name="e"></param>
     public void ApproveBatchResult(int groupid, SGData e)
     {
-        string result = e.GetTagData("RESULT");
-        string reason = e.GetTagData("REASON");
 
-        CLog.Here().Information($"ApproveBatchResult - RESULT : {result}, reason : {reason}");
+        // Advanced
+        string result = e.GetResponseResult().ToString();
+        CLog.Here().Information($"ApproveBatchResult - groupID : {groupid}, RESULT : {result}");
+
+        /*string result = e.GetTagData("RESULT");
+        string reason = e.GetTagData("REASON");
+        CLog.Here().Information($"ApproveBatchResult - RESULT : {result}, reason : {reason}");*/
+
         if (result != "0")
         {
             //ShowMessage("error", reason);

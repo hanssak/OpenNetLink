@@ -1045,29 +1045,50 @@ namespace OpenNetLinkApp.Services
                         break;
 
                     case eAdvancedCmdList.eDeleteTransferRequest:
-                        //eCmdList.eSENDCANCEL:                                                  // 전송취소 요청 응답 
-                        TransCancelAfterSend(nRet, groupId);
-
-                        //eCmdList.eEMAILSENDCANCEL:
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
                         {
-                            EmailSendCancelEvent emailSendCancelEvent = sgPageEvent.GetEmailSendCancelEvent(groupId);
-                            if (emailSendCancelEvent != null) emailSendCancelEvent(groupId, sgData);
+                            string strDataType = sgData.GetTagData("cancel_proc_result", "data_type");  // Server쪽에서 이거 추가해 줘야 가능함.
+                            if (string.IsNullOrEmpty(strDataType))
+                            {
+                                Log.Logger.Here().Error($"eDeleteTransferRequest, cancel_proc_result, data_type is Empty!");
+                            }
+                            else if (strDataType == "email")
+                            {
+                                //eCmdList.eEMAILSENDCANCEL:
+                                EmailSendCancelEvent emailSendCancelEvent = sgPageEvent.GetEmailSendCancelEvent(groupId);
+                                if (emailSendCancelEvent != null) emailSendCancelEvent(groupId, sgData);
+                            }
+                            else
+                            {
+                                // file / clip
+                                //eCmdList.eSENDCANCEL:                                                  // 전송취소 요청 응답 
+                                TransCancelAfterSend(nRet, groupId);
+                            }
                         }
                         break;
 
-                    case eAdvancedCmdList.ePostApprovalsConfirmation:
-                        //eCmdList.eAPPROVEBATCH:                                                // 일괄결재 응답.
-                        ApproveBatchAfterSend(nRet, groupId, sgData);
-
-                        //eCmdList.eEMAILAPPROVEBATCH:
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            ResponseEvent resEvent = sgPageEvent.GetEmailApprBatchEvent(groupId);
-                            if (resEvent != null) resEvent(groupId, sgData);
+                    case eAdvancedCmdList.ePostApprovalsConfirmation:  // 일괄결재(모든결재) 응답
+                        { 
+                            string strDataType = sgData.GetTagData("approval_proc_result", "data_type");
+                            if (string.IsNullOrEmpty(strDataType))
+                            {
+                                Log.Logger.Here().Error($"ePostApprovalsConfirmation, approval_proc_result, data_type is Empty!");
+                            }
+                            else if (strDataType == "email")
+                            {
+                                ResponseEvent resEvent = sgPageEvent.GetEmailApprBatchEvent(groupId);
+                                if (resEvent != null) resEvent(groupId, sgData);
+                            }
+                            else
+                            {
+                                // file / clip
+                                //eCmdList.eAPPROVEBATCH:                                               
+                                ApproveBatchAfterSendAdvanced(nRet, groupId, sgData);
+                            }
                         }
+                        break;
+
+                    case eAdvancedCmdList.ePostAnnouncementsReadDone:
+                        // KKW 공지사항 읽음처리 동작 확인
                         break;
 
                     case eAdvancedCmdList.eGetTransferRequestsDetail:
@@ -1820,12 +1841,45 @@ namespace OpenNetLinkApp.Services
         public void ApproveBatchAfterSend(int nRet, int groupId, SGData data)
         {
 
-            data.GetTagData();
-
-
             if (data == null)
                 return;
             string strProcID = data.GetBasicTagData("PROCID");
+            ApprBatchEvent ApprBatchResult_Event = sgPageEvent.GetApprBatchEvent(groupId);
+            if (ApprBatchResult_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                if (nRet != 0)
+                    strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchError);
+                else
+                {
+                    if (strProcID.Equals("A"))                                                       // 승인 
+                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
+                    else if (strProcID.Equals("R"))                                                       // 반려 
+                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchRejectSuccess);
+                    else
+                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
+                }
+
+                e.strDummy = strProcID;
+                e.strMsg = strMsg;
+                ApprBatchResult_Event(groupId, e);
+            }
+        }
+
+        public void ApproveBatchAfterSendAdvanced(int nRet, int groupId, SGData data)
+        {
+            if (data == null)
+            {
+                Log.Logger.Here().Information($"ApproveBatchAfterSendAdvanced, groupid : {groupId}, SGData is null !!!!!!!!!!!!!!!!!!!!!!!!");
+                return;
+            }
+
+            string strProcID = data.GetTagData("approval_proc_result", "approval_action");
+            Log.Logger.Here().Information($"ApproveBatchAfterSendAdvanced, groupid : {groupId}, approval_proc_result, data_type:Not Email ALL , approval_action : {strProcID}");
+            strProcID = (strProcID== "reject" ? "R" : "A");
+
             ApprBatchEvent ApprBatchResult_Event = sgPageEvent.GetApprBatchEvent(groupId);
             if (ApprBatchResult_Event != null)
             {
