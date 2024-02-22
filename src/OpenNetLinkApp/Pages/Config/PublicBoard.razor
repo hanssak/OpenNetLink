@@ -345,6 +345,16 @@
         if (sgQueryExtend == null)
             return;
 
+        // Advanced (groupID 별로 묶어서 1번에 요청)
+        Dictionary<int, List<Int64>> dicTotalBoardData = new Dictionary<int, List<Int64>>();
+
+        int count = HsCmdCenter.GetNetWorkCount();
+        for (int i = 0; i < count; i++)
+        {
+            List<Int64> listBoardSeq = new List<Int64>();
+            dicTotalBoardData.Add(i, listBoardSeq);
+        }
+
         for (int i = 0; i < listTmpBoardData.Count; i++)
         {
             int groupID = listTmpBoardData[i].groupID;
@@ -356,8 +366,21 @@
             /*string strUserID = sgLoginData.GetUserID();
             string strQuery = sgQueryExtend.GetSGNotifyStatus(listTmpBoardData[i].strBoardSeq, strUserID, "1");
             HsCmdCenter.SendBoardNotiConfirm(groupID, strUserID, strQuery);*/
-            HsCmdCenter.RestSendBoardNotiConfirm(groupID, listTmpBoardData[i].strBoardSeq);
 
+            // Advanced
+            if (dicTotalBoardData.ContainsKey(groupID))
+            {
+                dicTotalBoardData[groupID].Add(Convert.ToInt64(listTmpBoardData[i].strBoardSeq));
+            }
+        }
+
+        foreach( KeyValuePair<int, List<Int64>> Item in dicTotalBoardData)
+        {
+            HsCmdCenter.RestSendBoardNotiConfirm(Item.Key, Item.Value);
+        }
+
+        for (int i = 0; i < listTmpBoardData.Count; i++)
+        {
             for (int j = 0; j < listBoardData.Count; j++)
             {
                 if (listTmpBoardData[i].nID == listBoardData[j].Id)
@@ -369,6 +392,7 @@
                 }
             }
         }
+
         StateHasChanged();
     }
 

@@ -1088,7 +1088,7 @@ namespace OpenNetLinkApp.Services
                         break;
 
                     case eAdvancedCmdList.ePostAnnouncementsReadDone:
-                        // KKW 공지사항 읽음처리 동작 확인
+                        // Action 없음
                         break;
 
                     case eAdvancedCmdList.eGetTransferRequestsDetail:
@@ -3756,7 +3756,8 @@ namespace OpenNetLinkApp.Services
             return 0;
         }
 
-        public int RestSendBoardNotiConfirm(int groupid, string strBoardSeq)
+
+        public int RestSendBoardNotiConfirm(int groupid, List<Int64> listBoardSeq)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
@@ -3768,7 +3769,7 @@ namespace OpenNetLinkApp.Services
                 int ret = 0;
                 try
                 {
-                    ret = sgSendData.RequestRestSendBoardNotiConfirm(hsNetWork, strBoardSeq);
+                    ret = sgSendData.RequestRestSendBoardNotiConfirm(hsNetWork, listBoardSeq);
                     if (ret < 0)
                     {
                         Log.Logger.Here().Error($"RestSendBoardNotiConfirm-Task-Ret : {ret}");
