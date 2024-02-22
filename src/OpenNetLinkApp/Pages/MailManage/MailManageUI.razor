@@ -659,7 +659,7 @@
     {
 
         // Advanced
-        string result = e.GetResponseResult().ToString();
+        string result = e.GetResponseCode().ToString();
         CLog.Here().Information($"TransCancelResult(Email) - groupid : {groupid},result : {result}");
 
         /*string result = e.GetSvrRecordTagData("RESULT");

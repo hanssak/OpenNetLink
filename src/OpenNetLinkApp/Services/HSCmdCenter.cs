@@ -29,6 +29,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AgLogManager;
 using HsNetWorkSG.RestApi;
+using static HsNetWorkSG.SGEnums;
 
 namespace OpenNetLinkApp.Services
 {
@@ -937,7 +938,7 @@ namespace OpenNetLinkApp.Services
 
             try
             {
-                nRet = sgData.GetResponseResult();
+                nRet = sgData.GetResponseCode();
 
                 switch (cmd)
                 {
@@ -1088,8 +1089,15 @@ namespace OpenNetLinkApp.Services
                         break;
 
                     case eAdvancedCmdList.ePostAnnouncementsReadDone:
+                        Log.Logger.Here().Error($"ePostAnnouncementsReadDone, groupid : {groupId}, GetResponseResult : {nRet}, reason:{sgData.GetResponseReason()}");
                         // Action 없음
                         break;
+
+                    case eAdvancedCmdList.ePostAgentBlocks:
+                        Log.Logger.Here().Error($"ePostAgentBlocks, groupid : {groupId}, GetResponseResult : {nRet}, reason:{sgData.GetResponseReason()}");
+                        // Action 없음
+                        break;
+                        
 
                     case eAdvancedCmdList.eGetTransferRequestsDetail:
                         //eCmdList.eTRANSDETAIL:
@@ -1318,7 +1326,7 @@ namespace OpenNetLinkApp.Services
 
         public void LoginAfterSend(int groupId, SGData sgData)
         {
-            int nRet = sgData.GetResponseResult();
+            int nRet = sgData.GetResponseCode();
             string strMsg = "";
 
             HsNetWork hs = null;

@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using OpenNetLinkApp.Data.SGNotify;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using static HsNetWorkSG.SGEnums;
 
 namespace OpenNetLinkApp.Data.SGDicData
 {
@@ -1290,10 +1291,10 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.RequestRest(args);
         }
 
-        public int RequestRestSendBoardNotiConfirm(HsNetWork hsNet, string strBoardSeq)
+        public int RequestRestSendBoardNotiConfirm(HsNetWork hsNet, List<Int64> listBoardSeq)
         {
             Dictionary<string, string> dicGetParamQuery = new Dictionary<string, string>();
-            dicGetParamQuery["bseq"] = strBoardSeq;
+            dicGetParamQuery["bseq"] = listBoardSeq.ToString();
 
             Dictionary<string, object> dicBody = new Dictionary<string, object>();
             dicBody["dept_seq"] = "";

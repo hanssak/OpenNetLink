@@ -1906,8 +1906,9 @@
 
         string strQuery = sgQueryExtend.GetSGNotifyStatus(strBoardSeq, strUserID, "1");
         HsCmdCenter.SendBoardNotiConfirm(groupid, strUserID, strQuery);*/
-
-        HsCmdCenter.RestSendBoardNotiConfirm(groupid, strBoardSeq);
+        List<Int64> listBseq = new List<Int64>();
+        listBseq.Add(Convert.ToInt64(strBoardSeq));
+        HsCmdCenter.RestSendBoardNotiConfirm(groupid, listBseq);
     }
 
     public void NotiDeleteHasChange(int groupID)

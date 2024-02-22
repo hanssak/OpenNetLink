@@ -284,7 +284,9 @@
 
     public void closePopUp()
     {
-        SendFileAddList();
+
+        //SendFileAddList();
+        SendFileAddListRest();
         listDenied.Clear();
         object[] param = { "Transfer_Denied" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
@@ -322,6 +324,121 @@
 
         bShowInnerFileErr = SGAppMgrSvc.OpConfigInfoService.GetShowInnerFileErrDetail(groupId);
         StateHasChanged();
+
+    }
+
+    
+    /// <summary>
+    /// Rest api를 사용해서 파일추가 error 정보 전달
+    /// </summary>
+    public void SendFileAddListRest()
+    {
+        if (listDenied.Count <= 0)
+            return;
+
+        //err가 없거나, 하위 파일들에도 err가 없는 경우엔 Return 처리
+        if (!listDenied.Exists(file => file.eErrType != eFileAddErr.eFANone || file.HasChildrenErr))
+            return;
+
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        AgentBlockData iTemBlockData = new AgentBlockData();
+        List<AgentBlockData> listAgentBlockData = new List<AgentBlockData>();
+        for (int i = 0; i < listDenied.Count; i++)
+        {
+            iTemBlockData.SetFileAddErrToAgentBlockData(listDenied[i]);
+            listAgentBlockData.Add(iTemBlockData);
+        }
+
+        /*string strUserSeq = sgUserData.GetUserSequence();
+
+        List<string> listQuery = new List<string>();
+        SGQueryExtend sgQuery = new SGQueryExtend();
+
+        // WebManager에서 값이 표현이 되도록 적당히 변경해서 올림(NetLink에 맞춤)
+        bool useAgentBlockValueChange = SGAppMgrSvc.OpConfigInfoService.GetUseAgentBlockValueChange(groupID);
+        for (int i = 0; i < listDenied.Count; i++)
+        {
+            addBlockQuery(listDenied[i]);
+        }
+
+        //지역함수 - 파일 내 포함된 하위 파일도 함께 error 쿼리 생성하는 함수
+        void addBlockQuery(FileAddErr deniedValue)
+        {
+            if (deniedValue.eErrType != eFileAddErr.eFANone)
+            {
+                int nType = (int)deniedValue.eErrType;
+                eFileAddErr errType = deniedValue.eErrType;
+                string strFileName = deniedValue.FileName;
+                string strReason = deniedValue.GetFileAddErrContent(strFileName, errType, strMIMEType: deniedValue.MimeType, strParentFileName: deniedValue.ParentFileName);
+
+                // WebManager에서 값이 표현이 되도록 적당히 변경해서 올림(NetLink에 맞춤)
+                if (nType < 100 && useAgentBlockValueChange)
+                {
+                    if (errType == eFileAddErr.eFAZIP
+                    || (errType > eFileAddErr.eFADLPERR && errType != eFileAddErr.eFADAYCOUNTOVER && errType != eFileAddErr.eFADAYSIZEOVER))
+                        nType = 4;
+                }
+
+                string strUnitQuery = sgQuery.GetAgentBlock(strUserSeq, strSystemType, nType.ToString(), strReason);
+                listQuery.Add(strUnitQuery);
+            }
+
+            //OLE 개체가 있는 파일인 경우, OLE 개체에 대한 Block 데이터도 생성
+            if (deniedValue.HasChildrenErr)
+            {
+                foreach (FileAddErr child in deniedValue.ChildrenFiles)
+                {
+                    addBlockQuery(child);
+                }
+            }
+        }
+
+        int nTotalLen = 0;
+        string strTotalQuery = "Hsck_Transaction:";
+        nTotalLen = strTotalQuery.Length;
+        string strQuery = "";
+        for (int i = 0; i < listQuery.Count; i++)
+        {
+            strQuery = listQuery[i];
+            int nLen = strQuery.Length;
+            nTotalLen += nLen;
+            if (nTotalLen >= 3000)
+            {
+                string strEncQuery = SGCrypto.AESEncrypt256WithDEK(ref strTotalQuery);
+                HSCmdCenter.SendFileAddErr(groupID, strUserID, strEncQuery);
+                i--;
+                nTotalLen = 0;
+                strTotalQuery = "Hsck_Transaction:";
+            }
+            else
+                strTotalQuery += strQuery;
+
+        }
+
+        if (pageService.GetConnectStatus(groupID) == true)
+        {
+            string strEncQuery = SGCrypto.AESEncrypt256WithDEK(ref strTotalQuery);
+            HSCmdCenter.SendFileAddErr(groupID, strUserID, strEncQuery);
+        }*/
+
+
+        if (listAgentBlockData.Count > 0)
+            HSCmdCenter.RestAgentBlockReason(groupID, listAgentBlockData);
 
     }
 

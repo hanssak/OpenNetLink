@@ -1297,7 +1297,7 @@
     {
 
         // Advanced
-        string result = e.GetResponseResult().ToString();
+        string result = e.GetResponseCode().ToString();
         CLog.Here().Information($"ApproveBatchResult - groupID : {groupid}, RESULT : {result}");
 
         /*string result = e.GetTagData("RESULT");
