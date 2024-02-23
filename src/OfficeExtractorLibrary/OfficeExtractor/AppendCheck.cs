@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO.Compression;
+using System.Security.Cryptography;
 
 namespace OfficeExtractor
 {
@@ -247,10 +248,104 @@ namespace OfficeExtractor
 
             return result;
         }
-        //PE 파일 군 찾기 MSI 파일 찾기
+        #region PE 파일 군 찾기 MSI 파일 찾기
         public static bool GetCheckCert(string inputFilePath, string outputFilePath)
         {
-            return ExecuteCommandSync($"certutil -decode {inputFilePath} {outputFilePath}");
+            byte[] bReadFile = null;
+            byte[] beginCertificate = new byte[] { 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x42, 0x45, 0x47, 0x49, 0x4E, 0x20, 0x43, 0x45,
+                                                   0x52, 0x54, 0x49, 0x46, 0x49, 0x43, 0x41, 0x54, 0x45, 0x2D, 0x2D, 0x2D, 0x2D,
+                                                   0x2D };
+            using (FileStream filestream = File.OpenRead(inputFilePath))
+            {
+                if (filestream.Length > beginCertificate.Length + 3)
+                {
+                    bool findBeginCertificate = true;
+                    byte[] readByte = new byte[beginCertificate.Length + 3];
+                    filestream.Read(readByte, 0, beginCertificate.Length + 3);
+                    if (readByte[0] == 0xEF)
+                    {
+                        for (int i = 0; i < beginCertificate.Length; i++)
+                        {
+                            if (readByte[i + 3] != beginCertificate[i])
+                            {
+                                findBeginCertificate = false;
+                                break;
+                            }
+                        }
+
+                        if (findBeginCertificate)
+                        {
+                            bReadFile = new byte[filestream.Length - (beginCertificate.Length + 3)];
+                            filestream.Read(bReadFile, 0, bReadFile.Length);
+                        }
+                    }
+                    else if (readByte[0] == 0x2D)
+                    {
+                        for (int i = 0; i < beginCertificate.Length; i++)
+                        {
+                            if (readByte[i] != beginCertificate[i])
+                            {
+                                findBeginCertificate = false;
+                                break;
+                            }
+                        }
+                        if (findBeginCertificate)
+                        {
+                            bReadFile = new byte[filestream.Length - beginCertificate.Length];
+                            filestream.Seek(beginCertificate.Length, SeekOrigin.Begin);
+                            filestream.Read(bReadFile, 0, bReadFile.Length);
+                        }
+                    }
+                }
+            }
+
+            if (bReadFile == null)
+                bReadFile = File.ReadAllBytes(inputFilePath);
+            int result = DecodeFromFile(bReadFile, outputFilePath);
+            if (result > 0)
+                return true;
+            else
+                return false;
+            //return ExecuteCommandSync($"certutil -decode {inputFilePath} {outputFilePath}");
+        }
+        public static int DecodeFromFile(byte[] myInputBytes, string outFileName)
+        {
+            int i = 0;
+            using (FromBase64Transform myTransform = new FromBase64Transform(FromBase64TransformMode.IgnoreWhiteSpaces))
+            {
+
+                byte[] myOutputBytes = new byte[myTransform.OutputBlockSize];
+
+                // Open the input and output files.
+                using (FileStream myOutputFile = new FileStream(outFileName, FileMode.Create, FileAccess.Write))
+                {
+
+                    // Transform the data in chunks the size of InputBlockSize. 
+                    while (myInputBytes.Length - i > 4/*myTransform.InputBlockSize*/)
+                    {
+                        try
+                        {
+                            int bytesWritten = myTransform.TransformBlock(myInputBytes, i, 4/*myTransform.InputBlockSize*/, myOutputBytes, 0);
+                            i += 4/*myTransform.InputBlockSize*/;
+                            myOutputFile.Write(myOutputBytes, 0, bytesWritten);
+                        }
+                        catch (Exception ex)
+                        {
+                            myTransform.Clear();
+                            return i;
+                        }
+                    }
+
+                    // Transform the final block of data.
+                    myOutputBytes = myTransform.TransformFinalBlock(myInputBytes, i, myInputBytes.Length - i);
+                    myOutputFile.Write(myOutputBytes, 0, myOutputBytes.Length);
+
+                    // Free up any used resources.
+                    myTransform.Clear();
+                }
+
+            }
+            return i;
         }
         /// <summary>
         /// Executes a shell command synchronously.
@@ -320,7 +415,7 @@ namespace OfficeExtractor
                     int count = 0;
 
                     //파일 길이가 32이하이면 PE 파일 검사 안된것으로 Return
-                    if(maxLength <= 32)
+                    if (maxLength <= 32)
                     {
                         return false;
                     }
@@ -426,7 +521,7 @@ namespace OfficeExtractor
         {
             //내부 ZIP 파일, Zip Compress 로 한번 열어본다...
             byte[] zipSignature = new byte[] { 0x50, 0x4b, 0x03, 0x04 };
-            byte[] documentSignature = new byte[] {0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1};
+            byte[] documentSignature = new byte[] { 0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1 };
 
 
             bool detected = false;
@@ -446,7 +541,7 @@ namespace OfficeExtractor
                     }
                     stream.Close();
                 }
-                
+
                 using (var zipFile = ZipFile.Open(inputFilePath, ZipArchiveMode.Read))
                 {
                     detected = true;
@@ -526,6 +621,7 @@ namespace OfficeExtractor
             }
             return false;
         }
+        #endregion
         private static int GetCheckJPG(FileStream stream)
         {
             int result = -3;

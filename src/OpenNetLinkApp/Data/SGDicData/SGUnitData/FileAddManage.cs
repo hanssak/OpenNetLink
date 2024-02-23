@@ -5899,7 +5899,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             else
             {
                 //먼저 CertUtil 사용유무 확인
-#if _WINDOWS
+
                 if(currentFile.MimeType == "text/plain" || IsTXT(source))
                 {
                     string tempDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Temp\\BinaryCheck");
@@ -5917,25 +5917,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     if (Directory.Exists(tempDirectory))
                         Directory.Delete(tempDirectory, true);
                 }
-#endif
-
-                if (!result)
-                {
-                    result = OfficeExtractor.Controller.ExcuteCheckZip(source);
-                    if (!result)
-                    {
-                        result = OfficeExtractor.Controller.ExcuteCheckPe(source);
-                        if(result)
-                            Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck ExcuteCheckPe[{Path.GetFileName(source)}] ExcuteCheckPe[{result}]");
-                    }
-                    else
-                    {
-                        Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck ExcuteCheckZip[{Path.GetFileName(source)}] ExcuteCheckZip[{result}]");
-                    }
-                }
                 else
                 {
-                    Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck CheckBinaryCert[{Path.GetFileName(source)}] CheckBinaryCert[{result}]");
+                    result = CheckZipAndPe(source);
                 }
             }
             
@@ -5954,64 +5938,46 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return result;
         }
 
-        public bool CheckBinaryCert(string source, string destDirectory)
+        public bool CheckZipAndPe(string source)
         {
-            string strFileMime = string.Empty;
-            byte[] btFileData = new byte[MaxBufferSize];
-
-            using(FileStream stream = File.OpenRead(source))
+            bool result = OfficeExtractor.Controller.ExcuteCheckZip(source);
+            if (!result)
             {
-                stream.Read(btFileData, 0, MaxBufferSize);
-            }
-            strFileMime = MimeGuesser.GuessMimeType(btFileData);
-
-            if (strFileMime == "text/plain" || strFileMime == "application/x-dbt" || strFileMime == "application/x-dbf" || IsTXT(source))
-            {
-                string tempSource = Path.Combine(destDirectory,$"{Path.GetFileName(source)}.txt");
-                
-                bool result = OfficeExtractor.Controller.ExcuteCheckCert(source, tempSource);
-                if (!result)
-                    return false;
-                else
-                {
-                    using (FileStream stream = File.OpenRead(tempSource))
-                    {
-                        stream.Seek(0, SeekOrigin.Begin);
-                        btFileData = new byte[MaxBufferSize];
-                        stream.Read(btFileData, 0, MaxBufferSize);
-                    }
-                    strFileMime = MimeGuesser.GuessMimeType(btFileData);
-
-                    if (strFileMime == "text/plain" || strFileMime == "application/x-dbt" || strFileMime == "application/x-dbf")
-                    {
-                        return CheckBinaryCert(tempSource, destDirectory);
-                    }
-                    else if (strFileMime == "application/octet-stream" || strFileMime == "binary")
-                    {
-                        if (IsTXT(tempSource))
-                        {
-                            Log.Logger.Here().Information($"[CheckBinaryCert] CheckBinaryCert is OK (isTXT)");
-                            return false;
-                        }
-                        else if (IsDER(tempSource))
-                        {
-                            Log.Logger.Here().Information($"[CheckBinaryCert] CheckBinaryCert is OK (isDER)");
-                            return false;
-                        }
-                        else
-                        {
-                            Log.Logger.Here().Information($"[CheckBinaryCert] CheckBinaryCert is FAIL!!!!!");
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        return true;
-                    }
-                }
+                result = OfficeExtractor.Controller.ExcuteCheckPe(source);
+                if (result)
+                    Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck ExcuteCheckPe[{Path.GetFileName(source)}] ExcuteCheckPe[{result}]");
             }
             else
-                return false;
+            {
+                Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck ExcuteCheckZip[{Path.GetFileName(source)}] ExcuteCheckZip[{result}]");
+            }
+
+            return result;
+        }
+
+        public bool CheckBinaryCert(string source, string destDirectory)
+        {
+            bool checkZipAndPe = CheckZipAndPe(source);
+
+            if (checkZipAndPe)
+            {
+                Log.Logger.Here().Information($"[CheckBinaryCert] Detect ZipAndPe !!!!");
+                return checkZipAndPe;
+            }
+            else
+            {
+                string tempSource = Path.Combine(destDirectory, $"{Path.GetFileName(source)}.txt");
+                bool convertBase64 = OfficeExtractor.Controller.ExcuteCheckCert(source, tempSource);
+
+                if(convertBase64)
+                {
+                    return CheckBinaryCert(tempSource, destDirectory);
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
 
