@@ -2620,7 +2620,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                     byte[] btFileData = new byte[nCheckLen];
 
-                    for(int k = 0; k < 10; k++)
+                    for (int k = 0; k < 10; k++)
                     {
                         stream.Seek(nCheckPos * k, SeekOrigin.Begin);
                         stream.Read(btFileData, 0, (int)nCheckLen);
@@ -4649,7 +4649,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 long innerFileSize = 0;
 
                 enRet = ScanZipFile(currentFile, strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, nOption, 1, blWhite, strExtInfo, 0, hsStream.Type.ToUpper(),
-                    out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtract, ref innerFileCount, ref innerFileSize, bDenyPasswordZIP, isBinaryAppendCheck: isBinaryAppendCheck, isBinaryInnerCheck:isBinaryInnerCheck);
+                    out nTotalErrCount, out bIsApproveExt, strApproveExt, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount, documentExtract, ref innerFileCount, ref innerFileSize, bDenyPasswordZIP, isBinaryAppendCheck: isBinaryAppendCheck, isBinaryInnerCheck: isBinaryInnerCheck);
 
                 SetZipFileInnerInfo((stStream as FileStream).Name, (innerFileCount, innerFileSize));
 
@@ -5892,7 +5892,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             bool result = false;
 
-            if((currentFile.MimeType == "application/x-dosexec" || currentFile.MimeType == "application/x-msi"))
+            if ((currentFile.MimeType == "application/x-dosexec" || currentFile.MimeType == "application/x-msi"))
             {
                 //파일이 EXE , MSI 일 경우 Return
                 return false;
@@ -5900,8 +5900,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             else
             {
                 //먼저 CertUtil 사용유무 확인
-#if _WINDOWS
-                if(currentFile.MimeType == "text/plain" || IsTXT(source))
+                if (currentFile.MimeType == "text/plain" || IsTXT(source))
                 {
                     string tempDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Temp\\BinaryCheck");
 
@@ -5918,15 +5917,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     if (Directory.Exists(tempDirectory))
                         Directory.Delete(tempDirectory, true);
                 }
-#endif
-
-                if (!result)
+                else
                 {
                     result = OfficeExtractor.Controller.ExcuteCheckZip(source);
                     if (!result)
                     {
                         result = OfficeExtractor.Controller.ExcuteCheckPe(source);
-                        if(result)
+                        if (result)
                             Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck ExcuteCheckPe[{Path.GetFileName(source)}] ExcuteCheckPe[{result}]");
                     }
                     else
@@ -5934,18 +5931,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck ExcuteCheckZip[{Path.GetFileName(source)}] ExcuteCheckZip[{result}]");
                     }
                 }
-                else
-                {
-                    Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck CheckBinaryCert[{Path.GetFileName(source)}] CheckBinaryCert[{result}]");
-                }
             }
-            
+
             if (isReOpen)
                 hsStream.stream = File.OpenRead(source);
 
             Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck DocumentFile[{Path.GetFileName(source)}] binaryCheckResult[{result}]");
 
-            if (result)      
+            if (result)
             {
                 //오류 표시
                 currentFile.eErrType = eFileAddErr.eFAEXT; // 오류 타입 일단 확장자 제한
@@ -5955,64 +5948,45 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return result;
         }
 
-        public bool CheckBinaryCert(string source, string destDirectory)
+        public bool CheckZipAndPe(string source)
         {
-            string strFileMime = string.Empty;
-            byte[] btFileData = new byte[MaxBufferSize];
-
-            using(FileStream stream = File.OpenRead(source))
+            bool result = OfficeExtractor.Controller.ExcuteCheckZip(source);
+            if (!result)
             {
-                stream.Read(btFileData, 0, MaxBufferSize);
-            }
-            strFileMime = MimeGuesser.GuessMimeType(btFileData);
-
-            if (strFileMime == "text/plain" || strFileMime == "application/x-dbt" || strFileMime == "application/x-dbf" || IsTXT(source))
-            {
-                string tempSource = Path.Combine(destDirectory,$"{Path.GetFileName(source)}.txt");
-                
-                bool result = OfficeExtractor.Controller.ExcuteCheckCert(source, tempSource);
-                if (!result)
-                    return false;
-                else
-                {
-                    using (FileStream stream = File.OpenRead(tempSource))
-                    {
-                        stream.Seek(0, SeekOrigin.Begin);
-                        btFileData = new byte[MaxBufferSize];
-                        stream.Read(btFileData, 0, MaxBufferSize);
-                    }
-                    strFileMime = MimeGuesser.GuessMimeType(btFileData);
-
-                    if (strFileMime == "text/plain" || strFileMime == "application/x-dbt" || strFileMime == "application/x-dbf")
-                    {
-                        return CheckBinaryCert(tempSource, destDirectory);
-                    }
-                    else if (strFileMime == "application/octet-stream" || strFileMime == "binary")
-                    {
-                        if (IsTXT(tempSource))
-                        {
-                            Log.Logger.Here().Information($"[CheckBinaryCert] CheckBinaryCert is OK (isTXT)");
-                            return false;
-                        }
-                        else if (IsDER(tempSource))
-                        {
-                            Log.Logger.Here().Information($"[CheckBinaryCert] CheckBinaryCert is OK (isDER)");
-                            return false;
-                        }
-                        else
-                        {
-                            Log.Logger.Here().Information($"[CheckBinaryCert] CheckBinaryCert is FAIL!!!!!");
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        return true;
-                    }
-                }
+                result = OfficeExtractor.Controller.ExcuteCheckPe(source);
+                if (result)
+                    Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck ExcuteCheckPe[{Path.GetFileName(source)}] ExcuteCheckPe[{result}]");
             }
             else
-                return false;
+            {
+                Log.Logger.Here().Information($"[scanExcuteInnerCheck] ExcuteInnerCheck ExcuteCheckZip[{Path.GetFileName(source)}] ExcuteCheckZip[{result}]");
+            }
+
+            return result;
+        }
+        public bool CheckBinaryCert(string source, string destDirectory)
+        {
+            bool checkZipAndPe = CheckZipAndPe(source);
+
+            if (checkZipAndPe)
+            {
+                Log.Logger.Here().Information($"[CheckBinaryCert] Detect ZipAndPe !!!!");
+                return checkZipAndPe;
+            }
+            else
+            {
+                string tempSource = Path.Combine(destDirectory, $"{Path.GetFileName(source)}.txt");
+                bool convertBase64 = OfficeExtractor.Controller.ExcuteCheckCert(source, tempSource);
+
+                if (convertBase64)
+                {
+                    return CheckBinaryCert(tempSource, destDirectory);
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
 
@@ -6053,7 +6027,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             //OLE 마임리스트 테이블에 데이터가 없으면 파일 허용
             if (gOLEMimeTypeMap.Value.Count <= 0)
             {
-               // Log.Logger.Here().Information($"IsValidOLEMimeType, No Check OLE MimeType. There is no OLEMimeType List (File[{fileName}] FileMimeType[{mime}])");
+                // Log.Logger.Here().Information($"IsValidOLEMimeType, No Check OLE MimeType. There is no OLEMimeType List (File[{fileName}] FileMimeType[{mime}])");
                 return true;
             }
 
@@ -6096,33 +6070,33 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         strFileName = strFileName.Replace("\\", "/");
                     }
 
-                try
-                {
-                    byte[] bEncMimeInfo = System.IO.File.ReadAllBytes(strFileName);
-                    byte[] bMimeInfo = null;
-                    string strEncMimeInfo = Convert.ToBase64String(bEncMimeInfo);
+                    try
+                    {
+                        byte[] bEncMimeInfo = System.IO.File.ReadAllBytes(strFileName);
+                        byte[] bMimeInfo = null;
+                        string strEncMimeInfo = Convert.ToBase64String(bEncMimeInfo);
 
-                    string strMimeInfo = "";
-                    SGCrypto.AESDecrypt256WithDEK(bEncMimeInfo, ref bMimeInfo);  //sgRSACrypto.MimeConfDecrypt(strEncMimeInfo);
-                    strMimeInfo = Encoding.UTF8.GetString(bMimeInfo);
+                        string strMimeInfo = "";
+                        SGCrypto.AESDecrypt256WithDEK(bEncMimeInfo, ref bMimeInfo);  //sgRSACrypto.MimeConfDecrypt(strEncMimeInfo);
+                        strMimeInfo = Encoding.UTF8.GetString(bMimeInfo);
 
-                    if (strMimeInfo.Equals(""))
-                        return;
+                        if (strMimeInfo.Equals(""))
+                            return;
 
-                    //string strMimeSavedData = "";
-                    //bool bShowMimeLog = false;
-                    //if (dicMimeConfData.TryGetValue(groupID, out strMimeSavedData))
-                    //{
-                    //    if (strMimeSavedData != strEncMimeInfo)
-                    //    {
-                    //        if (dicMimeConfData.Remove(groupID))
-                    //            bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
-                    //}
+                        //string strMimeSavedData = "";
+                        //bool bShowMimeLog = false;
+                        //if (dicMimeConfData.TryGetValue(groupID, out strMimeSavedData))
+                        //{
+                        //    if (strMimeSavedData != strEncMimeInfo)
+                        //    {
+                        //        if (dicMimeConfData.Remove(groupID))
+                        //            bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
+                        //    }
+                        //}
+                        //else
+                        //{
+                        //    bShowMimeLog = dicMimeConfData.TryAdd(groupID, strEncMimeInfo);
+                        //}
 
                         //if (bShowMimeLog == false)
                         //    Log.Logger.Here().Information($"LoadMimeConf, GroupID:{groupID}, Skip MimeType Display");
@@ -6139,8 +6113,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             if (strSplit.Length < 2)
                                 continue;
 
-                        //if (bShowMimeLog)
-                        Log.Logger.Here().Debug($"LoadMimeConf, GroupID:{groupID}, Add MimeType : {(HsNetWork.UseHiddenLog ? strSplit[0] : "xxx")}, Ext : {(HsNetWork.UseHiddenLog ? strSplit[1] : "xxx")}");
+                            //if (bShowMimeLog)
+                            Log.Logger.Here().Debug($"LoadMimeConf, GroupID:{groupID}, Add MimeType : {(HsNetWork.UseHiddenLog ? strSplit[0] : "xxx")}, Ext : {(HsNetWork.UseHiddenLog ? strSplit[1] : "xxx")}");
 
                             MimeTypeMapAddOrUpdate(strSplit[0], strSplit[1]);
                         }
