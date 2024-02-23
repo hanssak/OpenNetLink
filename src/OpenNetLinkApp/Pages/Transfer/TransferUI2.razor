@@ -2852,8 +2852,12 @@
         if (sgLoginData == null)
             return;
 
-        bool bSystem = sgLoginData.GetSystemPosition();
-        string strConNetWork = sgLoginData.GetConnNetworkString();
+        SGReadyData sgReadyData = (SGReadyData)HSCmdCenter.GetReadyData(groupID);
+        if(sgReadyData == null)
+            return;
+
+        bool bSystem = sgReadyData.GetSystemPosition();
+        string strConNetWork = sgReadyData.GetSystemPositionString();
 
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
@@ -2885,8 +2889,12 @@
         if (sgLoginData == null)
             return;
 
-        bool bSystem = sgLoginData.GetSystemPosition();
-        string strConNetWork = sgLoginData.GetConnNetworkString();
+        SGReadyData sgReadyData = (SGReadyData)HSCmdCenter.GetReadyData(groupID);
+        if(sgReadyData == null)
+            return;
+
+        bool bSystem = sgReadyData.GetSystemPosition();
+        string strConNetWork = sgReadyData.GetSystemPositionString();
 
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);

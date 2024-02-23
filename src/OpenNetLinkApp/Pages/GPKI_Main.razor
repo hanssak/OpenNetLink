@@ -577,7 +577,7 @@
         bGetResponseGpkiCNatServer = true;
 
         SGData tmpData = null;
-        tmpData = HsCmdCenter.GetSGSvrData(groupID);
+        tmpData = HsCmdCenter.GetReadyData(groupID);
         if (tmpData != null)
         {
 
@@ -594,7 +594,10 @@
 
                 foreach (string strWordOne in words)
                 {
-
+                    //031이재혁002\x20\x1
+                    //  031이재혁002\x2
+                    //  0\x1
+                    //619유강희001\x21\x1";
                     string[] strCNreg = strWordOne.Split('\x2');
                     if (strCNreg.Length == 2 && Convert.ToInt32(strCNreg[1]) > 0)
                     {

@@ -8,7 +8,7 @@ using OpenNetLinkApp.Services;
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
     /// <summary>
-    /// (구 UserInfoEx)
+    /// (구 UserInfoEx) 삭제예정
     /// </summary>
     public class SGUserData : SGData
     {

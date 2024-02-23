@@ -1064,7 +1064,7 @@
             @*HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
                 SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정*@
 
-            GetNetOverModeData(groupID);
+    GetNetOverModeData(groupID);
 
             SetQuickMenuModify(groupID);
 
@@ -1124,8 +1124,12 @@
             nDayMaxFileSize = (int)nMaxSize;
         nDayMaxFileCount = sgLoginData.GetDayFileTransferLimitCount();
 
-        bool bSystem = sgLoginData.GetSystemPosition();
-        string strConNetWork = sgLoginData.GetConnNetworkString();
+        SGReadyData sgReadyData = (SGReadyData)HsCmdCenter.GetReadyData(groupID);
+        if(sgReadyData == null)
+            return;
+
+        bool bSystem = sgReadyData.GetSystemPosition();
+        string strConNetWork = sgReadyData.GetSystemPositionString();
 
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
@@ -1173,8 +1177,13 @@
             nDayMaxClipSize = (int)nMaxSize;
         nDayMaxClipCount = sgLoginData.GetDayClipboardLimitCount();
 
-        bool bSystem = sgLoginData.GetSystemPosition();
-        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGReadyData sgReadyData = (SGReadyData)HsCmdCenter.GetReadyData(groupID);
+        if(sgReadyData == null)
+            return;
+
+        bool bSystem = sgReadyData.GetSystemPosition();
+        string strConNetWork = sgReadyData.GetSystemPositionString();
 
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
@@ -2181,31 +2190,21 @@
     /// 패스워드 유효기간 표시할지 유무
     /// </summary>
     /// <returns></returns>
-    public bool GetUsePasswordUseDay()
+    public void GetUsePasswordUseDay()
     {
 
         int nGroupID = groupIDbyParam;
 
-        SGSvrData sgSvrData = null;
-        sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(nGroupID);
-        if (sgSvrData == null)
-            return false;
+        SGReadyData sgReadyData = null;
+        sgReadyData = (SGReadyData)HsCmdCenter.GetReadyData(nGroupID);
+        if (sgReadyData == null)
+            return;
 
-        //string strLoginType = sgSvrData.GetLoginType();
-        string strLoginType = sgSvrData.GetBasicTagData("LOGINTYPE");
-        eLoginType eData = eLoginType.eLOGINTYPE_ORIGIN;
-        bool bRet = false;
-
-        if (strLoginType.Length > 0)
-        {
-            eData = (eLoginType)Convert.ToInt32(strLoginType);
-            bRet = true;
-        }
+        eLoginType eData = sgReadyData.GetLoginType();
 
         bShowPasswordUseTime = (eData == eLoginType.eLOGINTYPE_ORIGIN);
         bShowPasswordUseTime = false;
-
-        return bRet;
+        return;
     }
 
 

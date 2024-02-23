@@ -470,8 +470,8 @@
 
         bURLRedirection = sgLoginData.GetURLRedirect();
 
-        SGUrlListData sgUrlData = null;
-        sgUrlData = (SGUrlListData)HSCmdCenter.GetURLlistData(groupID);
+        SGLoginData sgUrlData = null;
+        sgUrlData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgUrlData != null)
         {
             eUrlType eUType = sgUrlData.GetURLuseType();

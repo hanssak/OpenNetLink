@@ -1340,10 +1340,10 @@
 
     private string GetServerVersion()
     {
-        HsNetWorkSGData.SGData sgData = HsCmdCenter.GetSGSvrData(0);
+        HsNetWorkSGData.SGData sgData = HsCmdCenter.GetLoginData(0);
         if (sgData != null)
         {
-            string str = sgData.GetBasicTagData("SERVERVESION");
+            string str = sgData.GetTagData("toe_info", "solution");
             return str;
         }
         return "";
@@ -1351,10 +1351,10 @@
 
     private string GetNetLinkVersion()
     {
-        HsNetWorkSGData.SGData sgData = HsCmdCenter.GetSGSvrData(0);
+        HsNetWorkSGData.SGData sgData = HsCmdCenter.GetLoginData(0);
         if (sgData != null)
         {
-            string str = sgData.GetBasicTagData("NETLINKVERSION");
+            string str = sgData.GetTagData("toe_info", "agent");
             return str;
         }
         return "";

@@ -191,16 +191,6 @@ namespace OpenNetLinkApp.Services
 
                 hsNetwork.InitLib(strIP, port, apiVersion, false, bDo2FatorAuth, strModulePath, strDownPath, groupID.ToString(), notiType);    // basedir 정해진 후 설정 필요
 
-                /*if (strTlsVer.Equals("1.2"))
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
-                else if (strTlsVer.Equals("1.0"))
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
-                else
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요*/
-
-                //hsNetwork.SGSvr_EventReg(SGSvrRecv);
-                //hsNetwork.SGData_EventReg(SGDataRecv);
-
                 hsNetwork.SGData_EventRegAdvanced(SGDataRecvAdvanced);
 
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
@@ -219,11 +209,6 @@ namespace OpenNetLinkApp.Services
                 m_DicNetWork[groupID] = hsNetwork;
             }
         }
-
-        /*public void OnSessionDuplicate(int groupId, SgEventType sgEventType)
-        {
-            System.Diagnostics.Debug.WriteLine("SessionDuplicate...");
-        }*/
 
         /// <summary>
         /// 사용자ID폴더 사용여부에 따른 수신 경로 변경 (Mac만 적용)
@@ -251,10 +236,10 @@ namespace OpenNetLinkApp.Services
             return strDownPath;
         }
 
-        public SGData GetSGSvrData(int groupid)
+        public SGData GetReadyData(int groupid)
         {
             SGData data = null;
-            data = sgDicRecvData.GetSvrData(groupid);
+            data = sgDicRecvData.GetReadyData(groupid);
             return data;
         }
 
@@ -264,6 +249,7 @@ namespace OpenNetLinkApp.Services
             data = sgDicRecvData.GetLoginData(groupid);
             return data;
         }
+
         public int GetLoginDataCount()
         {
             return sgDicRecvData.GetLoginDataCount();
@@ -478,7 +464,7 @@ namespace OpenNetLinkApp.Services
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
                         {
-                            sgDicRecvData.SetUrlListData(hs, groupId, sgData);
+                            //sgDicRecvData.SetUrlListData(hs, groupId, sgData);
                             URLListAfterSend(nRet, groupId, sgData);
                         }
                         break;
@@ -513,7 +499,7 @@ namespace OpenNetLinkApp.Services
                         break;
 
                     case eCmdList.eSYSTEMRUNENV:                                                       // 시스템 환경정보 요청에 대한 응답.
-                        SystemRunAfterSend(nRet, groupId, sgData);
+                        //SystemRunAfterSend(nRet, groupId, sgData);
 
                         break;
 
@@ -980,7 +966,8 @@ namespace OpenNetLinkApp.Services
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
                         {
-                            sgDicRecvData.SetUrlListData(hs, groupId, sgData);
+                            //TODO 고도화 - LoginData에 있는 것 활용
+                            //sgDicRecvData.SetUrlListData(hs, groupId, sgData);
                             URLListAfterSend(nRet, groupId, sgData);
                         }
 
@@ -1327,105 +1314,84 @@ namespace OpenNetLinkApp.Services
 
         public void LoginAfterSend(int groupId, SGData sgData)
         {
-            sgData.GetRespose(out string result, out string reason);
+            sgData.GetRespose(out int resultCode, out string reason);
             string strMsg = "";
 
             HsNetWork hs = null;
-            if (m_DicNetWork.TryGetValue(groupId, out hs) == false && result == "OK")
+            if (m_DicNetWork.TryGetValue(groupId, out hs) == false && resultCode == 0)
             {
                 CLog.Here().Information($"LoginAfterSend - Login Success But - m_DicNetWork.TryGetValue return false");
                 return;
             }
 
-            if (result == "OK")
+            if (resultCode == 0)
             {
                 //hs = m_DicNetWork[groupId];
-                sgDicRecvData.SetLoginData(hs, groupId, sgData);
-                string apprLineValue = sgData.GetTagData("approve_line");
+                SGReadyData sgReadyData = (SGReadyData)sgDicRecvData.GetReadyData(groupId);
+                string systemPosition = sgReadyData?.GetSystemPositionString();
+
+                sgDicRecvData.SetLoginData(hs, groupId, sgData, systemPosition);
+                string apprLineValue = sgData.GetTagData("approve_line");   //ApprLineDta는 별도 저장
                 SGData apprLineData = new SGData();
                 apprLineData.m_DicTagData = JsonConvert.DeserializeObject<Dictionary<string, object>>(apprLineValue);
                 sgDicRecvData.SetApprLineData(hs, groupId, apprLineData);
                 
-                SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                Int64 nFilePartSize = sgLoginBind.GetFilePartSize();
-                Int64 nFileBandWidth = sgLoginBind.GetFileBandWidth();
+                SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                Int64 nFilePartSize = sgLoginData.GetFilePartSize();
+                Int64 nFileBandWidth = sgLoginData.GetFileBandWidth();
 
                 //TODO 고도화 - 환경설정 부분은 별도 암호화가 필요한지 확인 필요
-                SGLoginData sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                sgLoginDataSystemRun.AddRunSystemEnvData(sgData);
-
-
-                //int nLinkCheckTime = sgLoginBind.GetLinkCheckTime();
-                //nLinkCheckTime = (nLinkCheckTime * 2) / 3;
-                //bool bDummy = sgLoginBind.GetUseDummyPacket();
+                sgLoginData.AddRunSystemEnvData(sgData);
 
                 hs.SetNetworkInfo(nFilePartSize, nFileBandWidth);
-                hs.SetHszDefault(sgLoginBind.GetHszDefaultDec());
-                hs.SetManualDownLoad(sgLoginBind.GetManualDownload());
+                hs.SetHszDefault(sgLoginData.GetHszDefaultDec());
+                hs.SetManualDownLoad(sgLoginData.GetManualDownload());
 
                 //TODO 고도화 - OLE 정보 FilterType 정보 필요 OLEMimeRecvEvent oleMimeRecvEvent = sgPageEvent.GetOLEMimeRecvEvent();
                 OLEMimeRecvEvent oleMimeRecv_Event = sgPageEvent.GetOLEMimeRecvEvent();
                 List<string> oleList = sgData.GetTagDataList("mime_ole_url_info", "ole_mime", "list");
-                string oleFilterType = sgData.GetTagData("mime_ole_url_info", "ole_mime", "filterType");
+                string oleFileterType = sgData.GetTagData("mime_ole_url_info", "ole_mime", "filter_type");
                 if (oleMimeRecv_Event != null)
-                    oleMimeRecv_Event(groupId, oleFilterType, oleList);
+                    oleMimeRecv_Event(groupId, oleFileterType, oleList);
+
+                UrlListEvent urllistEvent = sgPageEvent.GetServerURLlistEvent(groupId);
+                if (urllistEvent != null)
+                {
+                    PageEventArgs args = new PageEventArgs() { result = resultCode };
+                    urllistEvent(groupId, args);
+                }
+
+                // 자동삭제 기능동작
+                Thread tr = null;
+                tr = new Thread(new ParameterizedThreadStart(RecvFileDeleteCycleThread));
+                tr.Start(this);
+
+                LoginEvent LoginResult_Event = null;
+                LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
+                if (LoginResult_Event != null)
+                {
+                    PageEventArgs e = new PageEventArgs();
+                    e.result = 0;
+                    e.strMsg = "";
+                    LoginResult_Event(groupId, e);
+                }
             }
             else
             {
-                int errResult = -1;
-                int.TryParse(result, out errResult);
                 LoginEvent LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
                 if (LoginResult_Event != null)
                 {
-                    strMsg = SGLoginData.LoginFailMessage(errResult);
+                    strMsg = SGLoginData.LoginFailMessage(resultCode);
                     PageEventArgs e = new PageEventArgs();
-                    e.result = errResult;
+                    e.result = resultCode;
                     e.strMsg = strMsg;
+                    if (int.TryParse(sgData.GetTagData("temporary_lock_minutes"), out int lockTime))
+                        e.count = lockTime;
                     LoginResult_Event(groupId, e);
                 }
             }
         }
 
-
-        private void SGSvrRecv(int groupId, int cmd, SGData sgData)
-        {
-            //lock(objSvrRecv)
-
-            SGData tmpData = GetSGSvrData(groupId);
-            if (tmpData == null)
-                tmpData = new SGData();
-
-            /*switch (cmd)
-            {
-                case 2005:                                                              // usertype, logintype, systemid, tlsversion
-                    tmpData.m_DicTagData["USERTYPE"] = sgData.m_DicTagData["USERTYPE"].Base64EncodingStr();
-                    tmpData.m_DicTagData["LOGINTYPE"] = sgData.m_DicTagData["LOGINTYPE"].Base64EncodingStr();
-                    tmpData.m_DicTagData["SYSTEMID"] = sgData.m_DicTagData["SYSTEMID"].Base64EncodingStr();
-                    tmpData.m_DicTagData["TLSVERSION"] = sgData.m_DicTagData["TLSVERSION"].Base64EncodingStr();
-                    tmpData.m_DicTagData["AUTHUSER"] = sgData.m_DicTagData["AUTHUSER"].Base64EncodingStr();
-                    tmpData.m_DicTagData["SERVERVESION"] = sgData.m_DicTagData["SERVERVESION"].Base64EncodingStr();
-                    tmpData.m_DicTagData["NETLINKVERSION"] = sgData.m_DicTagData["NETLINKVERSION"].Base64EncodingStr();
-
-                    RecvSvrAfterSend(groupId, sgData.m_DicTagData["LOGINTYPE"].ToString(), sgData.m_DicTagData["SYSTEMID"].ToString());
-                    //SGSvrData sgTmp = (SGSvrData)sgDicRecvData.GetSvrData(0);
-                    //eLoginType e = sgTmp.GetLoginType();
-                    break;
-                case 2102:                                                              // gpki_cn
-                    tmpData.m_DicTagData["GPKI_CN"] = sgData.m_DicTagData["GPKI_CN"].Base64EncodingStr();
-                    RecvSvrGPKIAfterSend(groupId);
-                    break;
-                case 2103:                                                              // filemime.conf
-                    FileMimeRecvEvent fileMimeRecvEvent = sgPageEvent.GetFileMimeRecvEvent();
-                    if (fileMimeRecvEvent != null)
-                    {
-                        fileMimeRecvEvent(groupId);
-                    }
-                    break;
-            }*/
-
-            sgDicRecvData.SetSvrData(groupId, tmpData);
-
-        }
         public void RecvSvrAfterSend(int groupId, string loginType, string systemID)
         {
             SvrEvent svEvent = sgPageEvent.GetSvrEvent(groupId);
@@ -1641,47 +1607,47 @@ namespace OpenNetLinkApp.Services
 
         }
 
-        public void SystemRunAfterSend(int nRet, int groupId, SGData sgData)
-        {
-            if (nRet == 0)
-            {
-                SGLoginData sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                sgLoginDataSystemRun.AddRunSystemEnvData(sgData);
-                HsNetWork hs = null;
-                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
-                {
-                    sgDicRecvData.SetLoginData(hs, groupId, sgLoginDataSystemRun);
-                    /*
-                    sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                    string strHszDefaultOption = sgLoginDataSystemRun.GetHszDefaultOption();
-                    int nHszOption = sgLoginDataSystemRun.GetHszDefaultDec();
-                    int nApproveTypeSFM = sgLoginDataSystemRun.GetApproveTypeSFM();
-                    string strInterLockEmail = sgLoginDataSystemRun.GetInterLockEmail();
-                    */
-                    hs = m_DicNetWork[groupId];
-                    int hszOpt = sgLoginDataSystemRun.GetHszDefaultDec();
-                    hs.SetHszDefault(hszOpt);
-                    hs.SetManualDownLoad(sgLoginDataSystemRun.GetManualDownload());
-                }
-                RequestUrlList(groupId, sgLoginDataSystemRun.GetUserID());
+        //public void SystemRunAfterSend(int nRet, int groupId, SGData sgData)
+        //{
+        //    if (nRet == 0)
+        //    {
+        //        SGLoginData sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+        //        sgLoginDataSystemRun.AddRunSystemEnvData(sgData);
+        //        HsNetWork hs = null;
+        //        if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+        //        {
+        //            sgDicRecvData.SetLoginData(hs, groupId, sgLoginDataSystemRun);
+        //            /*
+        //            sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+        //            string strHszDefaultOption = sgLoginDataSystemRun.GetHszDefaultOption();
+        //            int nHszOption = sgLoginDataSystemRun.GetHszDefaultDec();
+        //            int nApproveTypeSFM = sgLoginDataSystemRun.GetApproveTypeSFM();
+        //            string strInterLockEmail = sgLoginDataSystemRun.GetInterLockEmail();
+        //            */
+        //            hs = m_DicNetWork[groupId];
+        //            int hszOpt = sgLoginDataSystemRun.GetHszDefaultDec();
+        //            hs.SetHszDefault(hszOpt);
+        //            hs.SetManualDownLoad(sgLoginDataSystemRun.GetManualDownload());
+        //        }
+        //        RequestUrlList(groupId, sgLoginDataSystemRun.GetUserID());
 
 
-                // 자동삭제 기능동작
-                Thread tr = null;
-                tr = new Thread(new ParameterizedThreadStart(RecvFileDeleteCycleThread));
-                tr.Start(this);
+        //        // 자동삭제 기능동작
+        //        Thread tr = null;
+        //        tr = new Thread(new ParameterizedThreadStart(RecvFileDeleteCycleThread));
+        //        tr.Start(this);
 
-                LoginEvent LoginResult_Event = null;
-                LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
-                if (LoginResult_Event != null)
-                {
-                    PageEventArgs e = new PageEventArgs();
-                    e.result = 0;
-                    e.strMsg = "";
-                    LoginResult_Event(groupId, e);
-                }
-            }
-        }
+        //        LoginEvent LoginResult_Event = null;
+        //        LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
+        //        if (LoginResult_Event != null)
+        //        {
+        //            PageEventArgs e = new PageEventArgs();
+        //            e.result = 0;
+        //            e.strMsg = "";
+        //            LoginResult_Event(groupId, e);
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// 사용자의 결재정보라인 받은 정보를 SgDicRecvData 에 저장
@@ -3466,13 +3432,6 @@ namespace OpenNetLinkApp.Services
             {
                 svGpkiRegEvent(groupId);
             }
-        }
-
-        public SGData GetURLlistData(int groupid)
-        {
-            SGData data = null;
-            data = sgDicRecvData.GetUrlListData(groupid);
-            return data;
         }
 
         public int SendUrlData(int groupid, string strUserid, string strUrlData)

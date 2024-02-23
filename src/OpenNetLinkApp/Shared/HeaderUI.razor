@@ -524,8 +524,8 @@
     public bool isinUrlExceptionList(int nGroupID, string strUrlData)
     {
 
-        SGUrlListData sgUrlData = null;
-        sgUrlData = (SGUrlListData)HsCmdCenter.GetURLlistData(nGroupID);
+        SGLoginData sgUrlData = null;
+        sgUrlData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
         if (sgUrlData == null)
             return false;
 
@@ -641,8 +641,8 @@
             return false;
 
         bool bFound = false;
-        SGUrlListData sgUrlData = null;
-        sgUrlData = (SGUrlListData)HsCmdCenter.GetURLlistData(nGroupID);
+        SGLoginData sgUrlData = null;
+        sgUrlData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
         if (sgUrlData == null)
             return false;
 
@@ -688,8 +688,8 @@
         if (CheckIPAddr(nGroupID, strUrl))
             return true;
 
-        SGUrlListData sgUrlData = null;
-        sgUrlData = (SGUrlListData)HsCmdCenter.GetURLlistData(nGroupID);
+        SGLoginData sgUrlData = null;
+        sgUrlData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
         if (sgUrlData == null)
             return false;
 
@@ -760,8 +760,8 @@
 
         CLog.Here().Information($"groupID : {nGroupID} - isSendUrlList Check : {(HsNetWork.UseHiddenLog ? strUrlData : "xxx")}");
 
-        SGUrlListData sgUrlData = null;
-        sgUrlData = (SGUrlListData)HsCmdCenter.GetURLlistData(nGroupID);
+        SGLoginData sgUrlData = null;
+        sgUrlData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
         if (sgUrlData == null)
             return false;
 
@@ -886,21 +886,20 @@
             // Network에서 urllist Data를 받아옴
             if (GetUrlListfromNetLib)
             {
-                SGUrlListData sgUrlData = null;
-                sgUrlData = (SGUrlListData)HsCmdCenter.GetURLlistData(groupid);
-                if (sgUrlData == null)
+                SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+                if (sgLoginData == null)
                 {
                     CLog.Here().Information($"groupID : {groupid} - GetURLlistData Failed!");
                     return;
                 }
 
-                eUrlType eUType = sgUrlData.GetURLuseType();
+                eUrlType eUType = sgLoginData.GetURLuseType();
                 if (eUType == eUrlType.eNone)
                 {
                     CLog.Here().Information($"groupID : {groupid} - GetURLuseType Failed!");
                     return;
                 }
-
 
                 // WhiteList / BlackList 최신으로 적용
                 bool bWBpolicy = true;  // true : WhiteList, false : BlackList
@@ -920,7 +919,7 @@
 
                 // urlexceptionlist 최신으로 적용
                 List<string> listRecvUrlException = new List<string>();
-                if (sgUrlData.GetURLexceptionlist(ref listRecvUrlException))
+                if (sgLoginData.GetURLexceptionlist(ref listRecvUrlException))
                 {
 
                     List<string> listExistUrlException = null;
@@ -945,7 +944,7 @@
 
                 // urllist 최신으로 적용
                 List<string> listRecvUrl = new List<string>();
-                if (sgUrlData.GetURLlist(ref listRecvUrl))
+                if (sgLoginData.GetURLlist(ref listRecvUrl))
                 {
 
                     List<string> listExistUrl = null;
@@ -3330,9 +3329,13 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
+            
+        SGReadyData sgReadyData = (SGReadyData)HsCmdCenter.GetReadyData(groupID);
+        if(sgReadyData == null)
+            return;
 
-        bool bSystem = sgLoginData.GetSystemPosition();
-        string strConNetWork = sgLoginData.GetConnNetworkString();
+        bool bSystem = sgReadyData.GetSystemPosition();
+        string strConNetWork = sgReadyData.GetSystemPositionString();
 
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);

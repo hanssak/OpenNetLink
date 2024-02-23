@@ -187,8 +187,8 @@
         }
         string strUserID = sGLoginData.GetUserID();
 
-        SGSvrData sgSvrData = null;
-        sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(groupID);
+        SGReadyData sgSvrData = null;
+        sgSvrData = (SGReadyData)HsCmdCenter.GetReadyData(groupID);
         if (sgSvrData == null)
         {
             SetProtectedPW(string.Empty);

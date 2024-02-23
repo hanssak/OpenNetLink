@@ -837,8 +837,8 @@
 
             if (pageService.m_bMultiLoginDo)
             {
-                SGSvrData sgSvrData = null;
-                sgSvrData = (SGSvrData)HSCmdCenter.GetSGSvrData(nGroupID);
+                SGReadyData sgSvrData = null;
+                sgSvrData = (SGReadyData)HSCmdCenter.GetReadyData(nGroupID);
                 if (sgSvrData == null)
                 {
                     eLoginUITypeData = (eLoginType)pageService.m_nLoginType;
@@ -1737,16 +1737,10 @@
 
                 if (ret == 3) //일시적으로 계정 자금 시간 표시
                 {
-                    SGData sgDate = HSCmdCenter.GetSGSvrData(groupId);
-                    string authUser = sgDate.GetBasicTagData("AUTHUSER");
-                    List<string> list = authUser.Split(',').ToList();
                     int blockTime = 3;
-                    if (list != null && list.Count == 3)
-                    {
-                        blockTime = Convert.ToInt32(list[2]);
-                    }
-                    //3분 -> {n}분으로 메세지 변경
-                    e.strMsg = string.Format(XmlConf.GetWarnMsg("W_0299"), blockTime); //e.strMsg = String.Format(e.strMsg, blockTime);                  
+                    if(e.count > 0)
+                        blockTime  = e.count;  
+                    e.strMsg = string.Format(XmlConf.GetWarnMsg("W_0299"), blockTime);
                 }
 
                 strPopupMsg += e.strMsg;

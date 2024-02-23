@@ -1022,8 +1022,8 @@
 
             if (pageService.m_bMultiLoginDo)
             {
-                SGSvrData sgSvrData = null;
-                sgSvrData = (SGSvrData)HSCmdCenter.GetSGSvrData(refPopUpLogIn.nGroupID);
+                SGReadyData sgSvrData = null;
+                sgSvrData = (SGReadyData)HSCmdCenter.GetReadyData(refPopUpLogIn.nGroupID);
                 if (sgSvrData == null)
                     return;
 

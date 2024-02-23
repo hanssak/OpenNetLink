@@ -44,121 +44,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eBlackList = 2
     }
 
-    public class SGUrlListData : SGData
-    {
-        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGUrlListData>();
-
-        public SGUrlListData()
-        {
-
-        }
-
-        ~SGUrlListData()
-        {
-
-        }
-
-        override public void Copy(HsNetWork hs, SGData data)
-        {
-            SetProtectedSessionKey(hs.GetProtectedSeedKey());
-            m_DicTagData = new Dictionary<string, object>(data.m_DicTagData);
-            m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
-        }
-
-        /**
-		*@breif url redirection 사용 type 정보
-		*@return 0 : error, 1 : White, 2 : Black
-		 */
-        public eUrlType GetURLuseType()
-        {
-            string strData = GetBasicTagData("URLUSETYPE"); // GetBasicTagData - GetTagData - GetEncTagData
-            if (strData.Equals(""))
-                return eUrlType.eNone;
-
-            //int nType = Convert.ToInt32(strData);
-            strData = strData.ToUpper();
-
-            if (strData == "WHITE")
-                return eUrlType.eWhiteList;
-            else
-                return eUrlType.eBlackList;
-        }
-
-        /**
-		*@breif url redirection 사용 type 정보
-		*@return 0 : error, 1 : White, 2 : Black
-		 */
-        public int GetURLlistCount()
-        {
-            string strData = GetBasicTagData("URLLISTCOUNT");
-            if (strData.Equals(""))
-                return 0;
-            int nCount = Convert.ToInt32(strData);
-            return nCount;
-        }
-
-        /**
-		*@breif url redirection 사용 type 정보
-		*@return 0 : error, 1 : White, 2 : Black
-		 */
-        public bool GetURLlist(ref List<string> listUrlData)
-        {
-            int nCount = GetURLlistCount();
-            int nIdx = 0;
-            string strData = GetEncTagData("URLLIST");
-
-            String[] listurl = strData.Split("\r\n");
-
-            if (listurl == null)
-                return false;
-
-            listUrlData.Clear();
-            for (; nIdx < listurl.Count(); nIdx++)
-            {
-                listUrlData.Add(listurl[nIdx]);
-            }
-
-            return (listUrlData.Count > 0);
-        }
-
-        /**
-		*@breif url redirection 사용 type 정보
-		*@return 0 : error, 1 : White, 2 : Black
-		 */
-        public int GetURLexceptionlistCount()
-        {
-            string strData = GetBasicTagData("URL_EXCEPTION_LIST_COUNT");
-            if (strData.Equals(""))
-                return 0;
-            int nCount = Convert.ToInt32(strData);
-            return nCount;
-        }
-
-        /**
-		*@breif url redirection 사용 type 정보
-		*@return 0 : error, 1 : White, 2 : Black
-		 */
-        public bool GetURLexceptionlist(ref List<string> listUrlData)
-        {
-            //int nCount = GetURLexceptionlistCount();
-            int nIdx = 0;
-            string strData = GetEncTagData("URL_EXCEPTION_LIST");
-
-            String[] listurl = strData.Split("\r\n");
-
-            if (listurl == null)
-                return false;
-
-            listUrlData.Clear();
-            for (; nIdx < listurl.Count(); nIdx++)
-            {
-                listUrlData.Add(listurl[nIdx]);
-            }
-
-            return (listUrlData.Count > 0);
-        }
-
-    }
 
     public class SGNetOverData
     {
@@ -191,6 +76,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     public class SGLoginData : SGData
     {
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGLoginData>();
+        
+        /// <summary>
+        /// SGData 저장될 시, Ready에서 받아놨던, sg_net_type 내부  저장
+        /// </summary>
+        public string SgNetType = "";
 
         public SGLoginData()
         {
@@ -207,6 +97,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_DicTagData = new Dictionary<string, object>(data.m_DicTagData);
             m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
         }
+        /// <summary>
+        /// 현재 내부망에 접속되어 있는지 여부를 반환
+        /// <br/>LoginData 세팅 시, Ready의 값을 가지고 와서 저장
+        /// <br/>(SGReadyData의 동명의 함수와 동일한 값 반환)
+        /// </summary>
+        /// <returns>true 내부, false 외부</returns>
+        public bool GetSystemPosition() => (SgNetType == "IN");
 
         public static string LoginFailMessage(int nRet)
         {
@@ -274,28 +171,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strLoginFailMsg;
         }
 
-        /// <summary>
-        /// 접속망에대한 정보를 리턴한다.
-        /// </summary>
-        /// <returns>0:업무-인터넷망 1:운영-업무망</returns>
-        public int GetConnNetwork()
-        {
-            string strData = GetTagData("CONNNETWORK");
-            if (strData.Equals(""))
-                return 0;
-            int nSysID = Convert.ToInt32(strData);
-            return nSysID;
-        }
-
-        /// <summary>
-        /// 접속망에대한 정보를 문자열로 리턴한다.
-        /// </summary>
-        /// <returns>접속망에대한 정보</returns>
-        public string GetConnNetworkString()
-        {
-            string strData = GetTagData("CONNNETWORK");
-            return strData;
-        }
 
         /// <summary>
         /// 현재 내부망에 접속되어 있는지 여부를 문자열로 반환(GetSystemPosition 기반)
@@ -324,11 +199,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
         /**
 		 * @breif 수신파일 폴더 삭제 주기를 반환한다.
-		 * @return 일 단위
+		 * @return 시간 단위
 		 */
         public int GetFileRemoveCycle()
         {
-            string strData = GetTagData("DELETECYCLE");
+            string strData = GetTagData("user_policy", "file_delete_cycle");
             if (strData.Equals(""))
                 return 0;
             int size = Convert.ToInt32(strData);
@@ -554,7 +429,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>KB 단위</returns>
         public Int64 GetFilePartSize()
         {
-            string strData = GetTagData("user_policy","transfer_policy", "allowed_packet_size").ToString();
+            string strData = GetTagData("user_policy", "transfer_policy", "allowed_packet_size");
             if (strData.Equals(""))
                 return 0;
             Int64 size = Convert.ToInt64(strData);
@@ -589,41 +464,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             Int64 bandwidth = Convert.ToInt64(strData);
             return bandwidth;
         }
-
-        /// <summary>
-        /// 현재 내부망에 접속되어 있는지 여부를 반환
-        /// </summary>
-        /// <returns>true 내부, false 외부</returns>
-        public bool GetSystemPosition()
-        {
-            string strData = GetTagData("SYSTEMTYPE");
-            int nValue = 0;
-            if (!strData.Equals(""))
-                nValue = Convert.ToInt32(strData);
-            if (nValue == 1)
-                return true;
-            return false;
-        }
-
-        /// <summary>
-        /// URL 리다이렉션 사용 여부를 반환한다.
-        /// </summary>
-        /// <returns></returns>
-        public bool GetURLRedirect()
-        {
-            string strData = GetTagData("URLREDIRECTION");      //0: 미사용 1: 내부->외부 2: 외부->내부
-            bool bInner = GetSystemPosition();
-            int nValue = 0;
-            if (!strData.Equals(""))
-                nValue = Convert.ToInt32(strData);
-            if ((nValue == 1) && (bInner == true))
-                return true;
-            else if ((nValue == 2) && (bInner == false))
-                return true;
-            else
-                return false;
-        }
-
         /// <summary>
         /// 서버에 업데이트 대기 중인 Client Version 을 반환
         /// </summary>
@@ -709,7 +549,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool GetUseFileTransForTimeMode()
         {
             string strData = GetTagData("FILEUPLOADTIME");
-            if ( (strData?.Length ?? 0) > 0)
+            if ((strData?.Length ?? 0) > 0)
             {
                 strData = strData.Substring(0, 1);
                 if (strData == "1" || strData == "2")
@@ -737,7 +577,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     return Convert.ToInt32(strData);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 nRet = -2;
                 Log.Logger.Here().Information($"GetModeValueForFileTrans, Exception(MSG) : {ex.Message}");
@@ -845,7 +685,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                                 dicWeekData.TryAdd(iDx, strArrUseTime);
                                             }
 
-                                            
+
                                         }
                                         else
                                         {
@@ -861,13 +701,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             throw new Exception("FILEUPLOADTIME syntax Error");
                         }
                     }
-                    else if (nModeValue == 2)                    
+                    else if (nModeValue == 2)
                     {
 
                         // ex) 2/0|0|1|-1|2|-1|3|7~8.17~23|4|0|5|0~24|6|1~23|7|1~18
                         string[] strWeekData = strData.Split('|');
                         int nDx = 0;
-                        for(int iDx = 0; iDx < 16; )
+                        for (int iDx = 0; iDx < 16;)
                         {
                             if (dicWeekData.ContainsKey(nDx))
                                 dicWeekData.Remove(nDx);
@@ -945,7 +785,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                 if (string.IsNullOrEmpty(strTmpData) == false)
                                     strTmpData += ",";
 
-                                if ( (strTime?.Length ?? 0) > 1 && strTime[0]=='!') //  && nMode == 1
+                                if ((strTime?.Length ?? 0) > 1 && strTime[0] == '!') //  && nMode == 1
                                 {
                                     strTmpData2 = strTime.Substring(1);
                                     strTmpData2 += strTimeConvertMsg;
@@ -998,7 +838,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             //strPolicy = "2/0|0|1|7~8.17~23|2|-1|3|7~8.17~23|4|0|5|0~24|6|1~23|7|1~18";
             //strPolicy = "1/0,6/!9~20";
 
-            if ( (strPolicy?.Length ?? 0) == 0)
+            if ((strPolicy?.Length ?? 0) == 0)
             {
                 Log.Logger.Here().Error($"error - Tag : FILEUPLOADTIME, Value : empty! ");
                 return false;
@@ -1089,7 +929,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     {
                         Log.Logger.Here().Information($"IsFileTransTimeBy1, Day in Week Policy : {arrstrPolicy[1]}");
                         return true;
-                    }                        
+                    }
                 }
 
                 if ((arrstrPolicy?.Length ?? 0) > 2 && (arrstrPolicy[2]?.Length ?? 0) > 0)
@@ -1485,7 +1325,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetSystemPeriod()
         {
             string strPeriod = GetTagData("SYSTEMPERIOD");
-            return strPeriod; 
+            return strPeriod;
         }
 
         /// <summary>
@@ -2460,5 +2300,111 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             else
                 return Int32.Parse(strData);
         }
+
+        public bool GetURLRedirect()
+        {
+            //택 1: UNUSE:미사용, IN->EX:내부->외부, IN<-EX:내부<-외부
+            string strData = GetTagData("user_policy", "url_redirection");
+            if (strData == "UNUSE")
+                return false;
+            if (strData == "IN->EX" && SgNetType == "IN")
+                return true;
+            else if (strData == "EX->IN" && SgNetType == "EX")
+                return true;
+            else
+                return false;
+        }
+        /**
+      *@breif url redirection 사용 type 정보
+      *@return 0 : error, 1 : White, 2 : Black
+       */
+        public eUrlType GetURLuseType()
+        {
+            string strData = GetTagData("mime_ole_url_info", "redirection_url", "filter_type");
+            if (strData.Equals(""))
+                return eUrlType.eNone;
+
+            strData = strData.ToUpper();
+
+            if (strData == "WHITE")
+                return eUrlType.eWhiteList;
+            else
+                return eUrlType.eBlackList;
+        }
+
+        /**
+		*@breif url redirection 사용 type 정보
+		*@return 0 : error, 1 : White, 2 : Black
+		 */
+        public int GetURLlistCount()
+        {
+            string strData = GetBasicTagData("URLLISTCOUNT");
+            if (strData.Equals(""))
+                return 0;
+            int nCount = Convert.ToInt32(strData);
+            return nCount;
+        }
+
+        /**
+		*@breif url redirection 사용 type 정보
+		*@return 0 : error, 1 : White, 2 : Black
+		 */
+        public bool GetURLlist(ref List<string> listUrlData)
+        {
+            int nCount = GetURLlistCount();
+            int nIdx = 0;
+            string strData = GetEncTagData("URLLIST");
+
+            String[] listurl = strData.Split("\r\n");
+
+            if (listurl == null)
+                return false;
+
+            listUrlData.Clear();
+            for (; nIdx < listurl.Count(); nIdx++)
+            {
+                listUrlData.Add(listurl[nIdx]);
+            }
+
+            return (listUrlData.Count > 0);
+        }
+
+        /**
+		*@breif url redirection 사용 type 정보
+		*@return 0 : error, 1 : White, 2 : Black
+		 */
+        public int GetURLexceptionlistCount()
+        {
+            string strData = GetBasicTagData("URL_EXCEPTION_LIST_COUNT");
+            if (strData.Equals(""))
+                return 0;
+            int nCount = Convert.ToInt32(strData);
+            return nCount;
+        }
+
+        /**
+		*@breif url redirection 사용 type 정보
+		*@return 0 : error, 1 : White, 2 : Black
+		 */
+        public bool GetURLexceptionlist(ref List<string> listUrlData)
+        {
+            //int nCount = GetURLexceptionlistCount();
+            int nIdx = 0;
+            string strData = GetEncTagData("URL_EXCEPTION_LIST");
+
+            String[] listurl = strData.Split("\r\n");
+
+            if (listurl == null)
+                return false;
+
+            listUrlData.Clear();
+            for (; nIdx < listurl.Count(); nIdx++)
+            {
+                listUrlData.Add(listurl[nIdx]);
+            }
+
+            return (listUrlData.Count > 0);
+        }
+
     }
 }

@@ -11,7 +11,7 @@ namespace OpenNetLinkApp.Data.SGDicData
     public class SGDicRecvData
     {
         // Dictionary / ConcurrentDictionary
-        public ConcurrentDictionary<int, SGSvrData> m_DicSvrData;
+        public ConcurrentDictionary<int, SGReadyData> m_DicReadyData;
         public ConcurrentDictionary<int, SGLoginData> m_DicLoginData;
         //public ConcurrentDictionary<int, SGUserData> m_DicUserData;
         public ConcurrentDictionary<int, SGTransManageData> m_DicTransManageData;
@@ -24,12 +24,12 @@ namespace OpenNetLinkApp.Data.SGDicData
         public ConcurrentDictionary<int, SGData> m_DicFileRecvNoti;
         public ConcurrentDictionary<int, SGData> m_DicBoardNoti;
         public ConcurrentDictionary<int, SGData> m_DicGpkiData;
-        public ConcurrentDictionary<int, SGUrlListData> m_UrlListData;   // SGData
+        //public ConcurrentDictionary<int, SGUrlListData> m_UrlListData;   // SGData
         //public ConcurrentDictionary<int, SGData> m_DicSFMListData; // 자신이 지정된 대결재 정보 관리
 
         public SGDicRecvData()
         {
-            m_DicSvrData = new ConcurrentDictionary<int, SGSvrData>();
+            m_DicReadyData = new ConcurrentDictionary<int, SGReadyData>();
             m_DicLoginData = new ConcurrentDictionary<int, SGLoginData>();
             //m_DicUserData = new ConcurrentDictionary<int, SGUserData>();
             m_DicTransManageData = new ConcurrentDictionary<int, SGTransManageData>();
@@ -40,7 +40,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             m_DicFileRecvNoti = new ConcurrentDictionary<int, SGData>();
             m_DicBoardNoti = new ConcurrentDictionary<int, SGData>();
             m_DicGpkiData = new ConcurrentDictionary<int, SGData>();
-            m_UrlListData = new ConcurrentDictionary<int, SGUrlListData>();
+            //m_UrlListData = new ConcurrentDictionary<int, SGUrlListData>();
             //m_DicSFMListData = new ConcurrentDictionary<int, SGData>();
             m_DicDeptInfoData = new ConcurrentDictionary<int, SGDeptInfo>();
         }
@@ -60,7 +60,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                 return null;
             return m_DicLoginData[groupid];
         }
-        public void SetLoginData(HsNetWork hs, int groupid, SGData data)
+        public void SetLoginData(HsNetWork hs, int groupid, SGData data, string systemPosition)
         {
             SGLoginData tmpData = null;
             if (m_DicLoginData.TryGetValue(groupid, out tmpData) == true)
@@ -71,6 +71,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             }
             tmpData = new SGLoginData();
             tmpData.Copy(hs, data);
+            tmpData.SgNetType = systemPosition;    //Login 에서 SystemPosition을 많이 사용하므로, set 시 저장
             //m_DicLoginData[groupid]= tmpData;
             m_DicLoginData.TryAdd(groupid, tmpData);
         }
@@ -84,29 +85,6 @@ namespace OpenNetLinkApp.Data.SGDicData
                 //m_DicLoginData.Remove(groupid);
                 tmpData = null;
             }
-        }
-
-        public SGData GetReadyData(int groupid)
-        {
-            SGLoginData tmpData = null;
-            if (m_DicLoginData.TryGetValue(groupid, out tmpData) != true)
-                return null;
-            return m_DicLoginData[groupid];
-        }
-
-        public void SetReadyData(HsNetWork hs, int groupid, SGData data)
-        {
-            SGLoginData tmpData = null;
-            if (m_DicLoginData.TryGetValue(groupid, out tmpData) == true)
-            {
-                m_DicLoginData.TryRemove(groupid, out tmpData);
-                //m_DicLoginData.Remove(groupid);
-                tmpData = null;
-            }
-            tmpData = new SGLoginData();
-            tmpData.Copy(hs, data);
-            //m_DicLoginData[groupid]= tmpData;
-            m_DicLoginData.TryAdd(groupid, tmpData);
         }
 
         public void SetReadyDataEmpty(int groupid)
@@ -147,27 +125,27 @@ namespace OpenNetLinkApp.Data.SGDicData
             //m_DicUserData.TryAdd(groupid, tmpData);
         }
 
-        public SGData GetSvrData(int groupid)
+        public SGData GetReadyData(int groupid)
         {
-            SGSvrData tmpData = null;
-            if (m_DicSvrData.TryGetValue(groupid, out tmpData) != true)
+            SGReadyData tmpData = null;
+            if (m_DicReadyData.TryGetValue(groupid, out tmpData) != true)
                 return null;
-            return m_DicSvrData[groupid];
+            return m_DicReadyData[groupid];
         }
 
-        public void SetSvrData(int groupid, SGData data)
+        public void SetReadyData(int groupid, SGData data)
         {
-            SGSvrData tmpData = null;
-            if (m_DicSvrData.TryGetValue(groupid, out tmpData) == true)
+            SGReadyData tmpData = null;
+            if (m_DicReadyData.TryGetValue(groupid, out tmpData) == true)
             {
-                m_DicSvrData.TryRemove(groupid, out tmpData);
+                m_DicReadyData.TryRemove(groupid, out tmpData);
                 //m_DicSvrData.Remove(groupid);
                 tmpData = null;
             }
-            tmpData = new SGSvrData();
+            tmpData = new SGReadyData();
             tmpData.Copy(data);
 
-            m_DicSvrData.TryAdd(groupid, tmpData);
+            m_DicReadyData.TryAdd(groupid, tmpData);
             //m_DicSvrData[groupid] = tmpData;
         }
 
@@ -388,30 +366,6 @@ namespace OpenNetLinkApp.Data.SGDicData
 
             m_DicGpkiData.TryAdd(groupid, tmpData);
             //m_DicGpkiData[groupid] = tmpData;
-        }
-
-        public SGData GetUrlListData(int groupid)
-        {
-            SGUrlListData tmpData = null;
-            if (m_UrlListData.TryGetValue(groupid, out tmpData) != true)
-                return null;
-            return m_UrlListData[groupid];
-        }
-
-        public void SetUrlListData(HsNetWork hs, int groupid, SGData data)
-        {
-            SGUrlListData tmpData = null;
-            if (m_UrlListData.TryGetValue(groupid, out tmpData) == true)
-            {
-                m_UrlListData.TryRemove(groupid, out tmpData);
-                //m_UrlListData.Remove(groupid);
-                tmpData = null;
-            }
-            tmpData = new SGUrlListData();
-            tmpData.Copy(hs, data);
-
-            m_UrlListData.TryAdd(groupid, tmpData);
-            //m_UrlListData[groupid] = tmpData;
         }
 
         public SGData GetSFMListData(int groupId)
