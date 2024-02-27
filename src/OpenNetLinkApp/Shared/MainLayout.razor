@@ -226,6 +226,7 @@
         string stDuputyMode = sgLoginData.GetTagData("PRIVACYAPPROVEMOD");
         bool bSendFileContinue = false;
         bSendFileContinue = SGAppMgrSvc.OpConfigInfoService.GetUseDlpFoundSendContinue(groupid);
+        bool bSendFileBlock = SGAppMgrSvc.OpConfigInfoService.GetUseDlpFoundSendBlock(groupid);
 
         //VIP이면 개인정보 노출되어도 바로 전송
         if (stVIPMode == "0" && sgLoginData.IsVipUser() == true) //결재해야 하는데 VIP면 결재안함
@@ -233,7 +234,7 @@
             HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
             "1", "NONE", stNotiNetSystem);    //1 : 전송 진행
         }
-        else if (bSendFileContinue)
+        else if (bSendFileContinue && !bSendFileBlock)
         {
             CLog.Here().Information($"PrivacyNotifyResult, groupid : {groupid}, OpConfigIn : bDlpFoundSendContinue : {bSendFileContinue}");
             // DLP 검출되면, 정보보호 결재자 추가없이 전송진행
@@ -310,7 +311,7 @@
             }
         }
 
-        if(!isPopupAptScanTimeOut)
+        if (!isPopupAptScanTimeOut)
         {
             refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, BlockType);
 
@@ -395,14 +396,23 @@
         List<Dictionary<int, string>> listData = data.GetSvrRecordData("RECORD");
 
         if (listData == null || listData.Count == 0)
+        {
+            bDlpUse = false;
             return;
+        }
 
         string stDataType = listData[0][1];   //데이터타입
         string stTransSeq = listData[0][0];   //TransSeq
+        string srcSystemId = listData[0][listData[0].Count() - 3];
+        string destSystemId = listData[0][listData[0].Count() - 2];
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
         if (sgLoginData == null)
+        {
+            bDlpUse = false;
             return;
+        }
+
 
         string stPrivacy = sgLoginData.GetTagData("PRIVACYAPPROVE");
         string stVIPMode = sgLoginData.GetTagData("PRIVACYAPPROVEVIP");
@@ -461,13 +471,47 @@
             //개인정보 검출 시 전송 차단
             if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpFoundSendBlock(groupId))
             {
-                string msg = String.Format(XmlConf.GetWarnMsg("W_0307"));
-                if (!String.IsNullOrEmpty(sgLoginData.GetPrivacyComment()))
-                    msg += $"<br>{sgLoginData.GetPrivacyComment()}";
-                refSecurityPopUp.setDesc(String.Format(msg, stTitle));
-                refSecurityPopUp.listInfo = lstInfo;
-                await Task.Delay(1000);
-                await refSecurityPopUp.openPopUp();
+                string blockDest = SGAppMgrSvc.OpConfigInfoService.GetDlpFoundSendBlockDest(groupId);
+                if (String.IsNullOrEmpty(blockDest))
+                {
+                    string msg = String.Format(XmlConf.GetWarnMsg("W_0307"));
+                    if (!String.IsNullOrEmpty(sgLoginData.GetPrivacyComment()))
+                        msg += $"<br>{sgLoginData.GetPrivacyComment()}";
+                    refSecurityPopUp.setDesc(String.Format(msg, stTitle));
+                    refSecurityPopUp.listInfo = lstInfo;
+                    await Task.Delay(1000);
+                    await refSecurityPopUp.openPopUp();
+                }
+                else
+                {
+                    List<string> destArray = blockDest.Split(',').ToList();
+                    if (destArray.Contains(destSystemId))
+                    {
+                        string msg = String.Format(XmlConf.GetWarnMsg("W_0307"));
+                        if (!String.IsNullOrEmpty(sgLoginData.GetPrivacyComment()))
+                            msg += $"<br>{sgLoginData.GetPrivacyComment()}";
+                        refSecurityPopUp.setDesc(String.Format(msg, stTitle));
+                        refSecurityPopUp.listInfo = lstInfo;
+                        await Task.Delay(1000);
+                        await refSecurityPopUp.openPopUp();
+                    }
+                    else if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpFoundSendContinue(groupId))
+                    {
+                        HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupId), sgLoginData.GetUserID(), stTransSeq,
+                "1", "NONE", stNotiNetSystem);    //1 : 전송 진행, NONE
+                        bDlpUse = false;
+                    }
+                    else
+                    {
+                        string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
+
+                        refSecurityConfirm.listInfo = lstInfo;
+                        refSecurityConfirm.fileInfoDatas = mFileData;
+                        refSecurityConfirm.Refresh();
+                        await Task.Delay(1000);
+                        await refSecurityConfirm.openPopUp();
+                    }
+                }
             }
             else
             {

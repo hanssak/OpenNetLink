@@ -241,6 +241,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseDlpFoundSendContinue(int groupId);
         public bool GetUseDlpFoundSendBlock(int groupId);
+        public string GetDlpFoundSendBlockDest(int groupId);
 
         public string GetScrTimeoutLockType(int groupId);
 
@@ -1196,6 +1197,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseDlpFoundSendBlock(int groupId)
         {
             return AppConfigInfo[groupId].bDlpFoundSendBlock;
+        }
+        public string GetDlpFoundSendBlockDest(int groupId)
+        {
+            return AppConfigInfo[groupId].strDlpFoundSendBlockDest;
         }
 
         public string GetScrTimeoutLockType(int groupId)

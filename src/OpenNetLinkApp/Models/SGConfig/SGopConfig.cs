@@ -108,11 +108,11 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bHiddenLoginLogo { get; set; } = false;  // Main Login UI  좌측 로고 숨김 처리
         public int nTransferTemplate { get; set; } = 0;      //파일전송 UI 템플릿 지정
         public bool bUseAskFileSendAlert { get; set; } = false;       //파일리스트 추가 후 전송을 묻는 팝업표시 기능 활성화 (Default : false)
-
-        //클립보드
-
         public bool bDlpFoundSendContinue { get; set; } = false;  //  개인정보 검출 됐을때, 정보보호 결재자 없이 현재결재자에게 결재받고 송신되도록 할지 유무
         public bool bDlpFoundSendBlock { get; set; } = false;         // 개인정보 검출 됐을때, 전송 차단
+        public string strDlpFoundSendBlockDest { get; set; } = "";    // 개인정보 검출 시 차단되는 망
+
+        //클립보드
 
         public bool bUseClipBoard { get; set; } = true;                  // 클립보드 사용 여부
         public bool bUseClipCopyAndSend { get; set; } = false;    // 클립보드 복사 후 전송 사용 유무 ( 환경설정 체크박스 보이고 안보이고)
