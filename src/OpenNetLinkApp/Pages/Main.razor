@@ -2173,7 +2173,9 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     strPopupMsg += e.strMsg;
                     strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
                     ShowLoginFail(strPopupMsg);
-                    HSCmdCenter.SendLogOut(groupId, "");
+                    //HSCmdCenter.SendLogOut(groupId, "");
+                    HSCmdCenter.RestSendLogOut(groupId);   // Advanced
+
                     StateHasChanged();
                 }
 
@@ -2366,7 +2368,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
                 // SideBarUI 에서 nGroupIDfirst로 지정된 UI로 선택
                 MoveSiderBarFocusTogroupid(nGroupIDfirst);
-            
+
                 CLog.Here().Information($"LoginResultOnetoAll, LoginType : {(HsNetWork.UseHiddenLog ? pageService.GetGroupIDLoginType(groupId) : "xxx")}, GroupID : {groupId}, Saved-GroupID : {nGroupIDfirst}, END!");
 
                 if (!pageService.GetIsPolicyUpdate(groupId))

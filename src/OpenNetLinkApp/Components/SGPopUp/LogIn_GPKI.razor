@@ -1087,7 +1087,9 @@
             strPopupMsg += e.strMsg;
             strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
             ShowLoginFail(strPopupMsg);
-            HsCmdCenter.SendLogOut(groupId, "");
+
+            //HsCmdCenter.SendLogOut(groupId, "");
+            HsCmdCenter.RestSendLogOut(groupId);   // Advanced
 
             CLog.Here().Information($"Login_Gpki 인증 error-Msg: {strPopupMsg}");
 

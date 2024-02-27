@@ -598,7 +598,7 @@
 
             if(eLoginUITypeData == eLoginType.eLOGINTYPE_PW_OTP || eLoginUITypeData == eLoginType.eLOGINTYPE_OTP)
             {
-                 if (otp == null || otp.Length < 6)
+                if (otp == null || otp.Length < 6)
                 {
                     ShowLoginFail(XmlConf.GetTitle("T_OTP_GUIDE"));
                     SetProtectedPW(string.Empty);
@@ -606,7 +606,7 @@
                     return;
                 }
 
-                if(eLoginUITypeData == eLoginType.eLOGINTYPE_OTP) 
+                if(eLoginUITypeData == eLoginType.eLOGINTYPE_OTP)
                     protectedPw = SGCrypto.AESEncrypt256WithDEK(Encoding.UTF8.GetBytes(otp));
             }
 
@@ -705,7 +705,7 @@
                 else
                     HSCmdCenter.Login(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginUITypeData);
             }
-                
+
 
         }
         catch (Exception ex)
@@ -1272,18 +1272,18 @@
                 if (eLoginUITypeData != eLoginType.eLOGINTYPE_AD)
                 {
 
-            //if (siteConfig.GetUseAutoLogin(groupId) == true)  // json으로 설정이동
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
-            {
-                if (bAutoLoginCheck)
-                {
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    string strEncID = "";
-                    string strEncPW = "";
-                    if ((!id.Equals("")) & (id != null) & (!protectedPw.Equals("")) & (protectedPw != null))
+                    //if (siteConfig.GetUseAutoLogin(groupId) == true)  // json으로 설정이동
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
                     {
-                        sgRSACrypto?.ValueEncrypt(id, out strEncID);
-                        sgRSACrypto?.ValueEncrypt(protectedPw, out strEncPW);
+                        if (bAutoLoginCheck)
+                        {
+                            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                            string strEncID = "";
+                            string strEncPW = "";
+                            if ((!id.Equals("")) & (id != null) & (!protectedPw.Equals("")) & (protectedPw != null))
+                            {
+                                sgRSACrypto?.ValueEncrypt(id, out strEncID);
+                                sgRSACrypto?.ValueEncrypt(protectedPw, out strEncPW);
 
                                 sgSettingProc.SetSettingUID(groupId, strEncID);
                                 sgSettingProc.SetSettingUPW(groupId, strEncPW);
@@ -1335,8 +1335,8 @@
                                 return false;
                             }
 
-                    //pw = "";
-                    bAutoLoginCheck = false;
+                            //pw = "";
+                            bAutoLoginCheck = false;
 
                             if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
                             {
@@ -1393,21 +1393,21 @@
                             DateTime dtLocalTime = DateTime.Parse(strTime);
                             DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
 
-                    if (DateTime.Compare(dtLocalTime, svrDt) < 0)
-                    {
-                        eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                        goToPage.InvokeAsync(strInvokeSendParam);
-                        closePopUp();
-                        return false;
+                            if (DateTime.Compare(dtLocalTime, svrDt) < 0)
+                            {
+                                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                                goToPage.InvokeAsync(strInvokeSendParam);
+                                closePopUp();
+                                return false;
+                            }
+                        }
                     }
-                }
-            }
-            else
-            {
-                SetProtectedPW("");
-                bAutoLoginCheck = false;
-            }
+                    else
+                    {
+                        SetProtectedPW("");
+                        bAutoLoginCheck = false;
+                    }
 
                 }
                 else
@@ -1739,7 +1739,7 @@
                 {
                     int blockTime = 3;
                     if(e.count > 0)
-                        blockTime  = e.count;  
+                        blockTime  = e.count;
                     e.strMsg = string.Format(XmlConf.GetWarnMsg("W_0299"), blockTime);
                 }
 
@@ -1747,7 +1747,10 @@
 
                 strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
                 ShowLoginFail(strPopupMsg);
-                HSCmdCenter.SendLogOut(groupId, "");
+
+                //HSCmdCenter.SendLogOut(groupId, "");
+                HSCmdCenter.RestSendLogOut(groupId);  // Advanced
+
                 StateHasChanged();
             }
 

@@ -1124,7 +1124,9 @@
 
             strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
             ShowLoginFail(strPopupMsg);
-            HsCmdCenter.SendLogOut(groupId, "");
+            //HsCmdCenter.SendLogOut(groupId, "");
+            HsCmdCenter.RestSendLogOut(groupId);   // Advanced
+
             StateHasChanged();
         }
 

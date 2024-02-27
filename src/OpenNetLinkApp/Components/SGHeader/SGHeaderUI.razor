@@ -783,10 +783,12 @@
         if (sgLoginData == null)
             return;
 
-        string strUserID = sgLoginData.GetUserID();
+        /*string strUserID = sgLoginData.GetUserID();
+        if (pageService.GetConnectStatus(nGroupID))
+            HsCmdCenter.SendLogOut(nGroupID, strUserID);*/
 
         if (pageService.GetConnectStatus(nGroupID))
-            HsCmdCenter.SendLogOut(nGroupID, strUserID);
+            HsCmdCenter.RestSendLogOut(nGroupID);
 
         /*SGSvrData sgSvrData = null;
         sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(nGroupID);

@@ -2753,7 +2753,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
     {
         string navURI = "";
         try
-        {            
+        {
             if (list != null)
             {
                 IntPtr bUri = (IntPtr)list[0];
@@ -2796,7 +2796,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 KeyboardEventArgs eventArgs = new KeyboardEventArgs();
                 eventArgs.Key = "Enter";
 
-                ISGSideBarUI activeMenu = null;         
+                ISGSideBarUI activeMenu = null;
                 string path = $"/{strArray[1]}/{strArray[2]}";
                 activeMenu = SideBarUISvc.FindSubMenu(nGroupID, path);
 
@@ -3329,7 +3329,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
-            
+
         SGReadyData sgReadyData = (SGReadyData)HsCmdCenter.GetReadyData(groupID);
         if(sgReadyData == null)
             return;
@@ -3376,11 +3376,12 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         if (sgLoginData == null)
             return;
 
-        string strUserID = sgLoginData.GetUserID();
+        /*string strUserID = sgLoginData.GetUserID();
+        if (pageService.GetConnectStatus(groupID))
+            HsCmdCenter.SendLogOut(groupID, strUserID);*/
 
         if (pageService.GetConnectStatus(groupID))
-            HsCmdCenter.SendLogOut(groupID, strUserID);
-
+            HsCmdCenter.RestSendLogOut(groupID, SGEnums.eCmdReponseType.CallBackPosResponse);   // Advanced
 
         pageService.SetInitApprLine(groupID, false);
         pageService.SetLoadApprBaseLine(groupID, false);
@@ -3470,6 +3471,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         string strUserID = sgLoginData.GetUserID();
         HsCmdCenter.SendLogOut(groupID, strUserID);
+        HsCmdCenter.RestSendLogOut(groupID, SGEnums.eCmdReponseType.CallBackPosResponse);   // Advanced
 
         if (groupID == 0)
             MyNavigationManager.NavigateTo("/LogIn");*/
