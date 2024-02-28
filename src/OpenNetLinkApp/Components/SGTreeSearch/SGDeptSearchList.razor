@@ -111,16 +111,6 @@
         }
     }
 
-    SGUserData activeSGUserData
-    {
-        get
-        {
-            int gouprid = activedGroupID;
-            SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(gouprid);
-            return sgUserData;
-        }
-    }
-
     private ISGSideBarUIService SideBarUISvc;
 
     string strInputDept = "";

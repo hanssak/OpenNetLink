@@ -530,9 +530,6 @@
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-
         //Main일 경우 페이지를 정해서 이동
         string strNavigateWithGroupID = String.Empty;
         if (basicPageType == (int)Enums.EnumBasicPageType.Main)
@@ -540,7 +537,7 @@
             strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
             strNavigateWithGroupID += groupID.ToString();
 
-            if (sgLoginData == null || sgUserData == null)
+            if (sgLoginData == null)
             {
                 closePopUp();
 
@@ -569,7 +566,7 @@
         }
         else //SideBar일 경우 이미 바닥 페이지가 정해져 있기 때문에 따로 이동하지 않는다.
         {
-            if (sgLoginData == null || sgUserData == null)
+            if (sgLoginData == null)
             {
                 closePopUp();
                 HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
@@ -587,7 +584,7 @@
             sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);
 
         SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         string strTime = "";
         strTime = sgSettingProc.GetSettingDelayDspPw(groupID);
         strTime = sgPassWDData.LoaclPassWDDelaySaveString(strTime, strUserSeq, strDateTime);

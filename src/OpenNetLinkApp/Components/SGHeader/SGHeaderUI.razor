@@ -1873,9 +1873,8 @@
 
     public void LoginAfterHeaderUI(int groupid)
     {
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
-        if (sgUserData != null)
+        SGLoginData sgLoginData =  (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        if (sgLoginData != null)
         {
             //strUserSeq = sgUserData.GetUserSequence();
 
@@ -2093,9 +2092,9 @@
         //파일분기사이즈, 파일밴드범위, Link체크
         Int64 nFilePartSize = sgLoginData.GetFilePartSize();
         Int64 nFileBandWidth = sgLoginData.GetFileBandWidth();
-        int nLinkCheckTime = sgLoginData.GetLinkCheckTime();
-        nLinkCheckTime = (nLinkCheckTime * 2) / 3;
-        bool bDummy = sgLoginData.GetUseDummyPacket();
+        //int nLinkCheckTime = sgLoginData.GetLinkCheckTime();
+        //nLinkCheckTime = (nLinkCheckTime * 2) / 3;
+        //bool bDummy = sgLoginData.GetUseDummyPacket();
         @*hsNetWork.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);*@
     hsNetWork.SetNetworkInfo(nFilePartSize, nFileBandWidth);
 
@@ -2160,12 +2159,7 @@
         bool bSystem = sgReadyData.GetSystemPosition();
         string strConNetWork = sgReadyData.GetSystemPositionString();
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         string strDate = DateTime.Now.ToString("yyyyMMdd");
 
         string strUserID = sgLoginData.GetUserID();

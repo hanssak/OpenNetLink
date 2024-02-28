@@ -255,13 +255,6 @@ namespace OpenNetLinkApp.Services
             return sgDicRecvData.GetLoginDataCount();
         }
 
-        public SGData GetUserData(int groupid)
-        {
-            SGData data = null;
-            data = sgDicRecvData.GetUserData(groupid);
-            return data;
-        }
-
         public SGData GetTransManageData(int groupid)
         {
             SGData data = null;
@@ -1411,23 +1404,23 @@ namespace OpenNetLinkApp.Services
         }
         public void UserInfoAfterSend(int nRet, int groupId, SGData sgData)
         {
-            SGLoginData sgLoginUserInfo = null;
-            if (nRet == 0)
-            {
-                HsNetWork hs = null;
-                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
-                {
-                    hs = m_DicNetWork[groupId];
-                    sgDicRecvData.SetUserData(hs, groupId, sgData);
-                }
-            }
-            sgLoginUserInfo = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-            if (sgLoginUserInfo != null)
-            {
-                SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
-                SendUserSFMInfo(groupId, sgLoginUserInfo.GetUserID());
-                SendUserOLEMimeList(groupId, sgLoginUserInfo.GetUserID());
-            }
+            //SGLoginData sgLoginUserInfo = null;
+            //if (nRet == 0)
+            //{
+            //    HsNetWork hs = null;
+            //    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+            //    {
+            //        hs = m_DicNetWork[groupId];
+            //        sgDicRecvData.SetLoginData(hs, groupId, sgData);
+            //    }
+            //}
+            //sgLoginUserInfo = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+            //if (sgLoginUserInfo != null)
+            //{
+            //    SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
+            //    SendUserSFMInfo(groupId, sgLoginUserInfo.GetUserID());
+            //    SendUserOLEMimeList(groupId, sgLoginUserInfo.GetUserID());
+            //}
         }
 
         public void URLListAfterSend(int nRet, int groupId, SGData sgData)
@@ -3442,16 +3435,11 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public SGData GetSFMListData(int groupId)
-        {
-            SGData data = sgDicRecvData.GetSFMListData(groupId);
-            return data;
-        }
         public int SendUserSFMInfo(int groupId, string userId)
         {
-            SGUserData userData = (SGUserData)sgDicRecvData.GetUserData(groupId);
+            SGLoginData loginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
             ApproveProxy approveProxy = new ApproveProxy();
-            string strQuery = approveProxy.GetSFMApproverRight(userData.GetUserSequence());
+            string strQuery = approveProxy.GetSFMApproverRight(loginData.GetUserSequence());
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupId);
             if (hsNetWork != null)
@@ -3476,7 +3464,6 @@ namespace OpenNetLinkApp.Services
         /// <returns></returns>
         public int SendUserOLEMimeList(int groupId, string userId)
         {
-            SGUserData userData = (SGUserData)sgDicRecvData.GetUserData(groupId);
             string strQuery = SGQueryExtend.GetOLEMimeList();
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupId);

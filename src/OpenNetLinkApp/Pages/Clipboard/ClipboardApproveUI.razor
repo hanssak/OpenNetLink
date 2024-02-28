@@ -715,16 +715,16 @@
             HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);*/
 
 
-            SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-            if (sgUserData == null)
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
             {
-                CLog.Here().Error($"ApproveAction, HSCmdCenter.GetUserData = null");
+                CLog.Here().Error($"ApproveAction, HSCmdCenter.GetLoginData = null");
                 ShowMessage("error", XmlConf.GetErrMsg("E_0209"));
                 return;
             }
 
-            string strUserSeq = sgUserData.GetUserSequence();
+            string strUserSeq = sgLoginData.GetUserSequence();
             List<Int64> listApproveSeq = new List<Int64>();
             for (int i = 0; i < ListData.Count; i++)
             {
@@ -824,16 +824,16 @@
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);*/
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
         {
             CLog.Here().Error($"ApproveRejectSend, HSCmdCenter.GetUserData = null");
             ShowMessage("error", XmlConf.GetErrMsg(bisReject?"E_0210":"E_0209"));
             return;
         }
 
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         List<Int64> listApproveSeq = new List<Int64>();
         for (int i = 0; i < ListData.Count; i++)
         {
@@ -1440,14 +1440,11 @@
 
     public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgType eMType, string path, string body)
     {
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-        {
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
             return;
-        }
 
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         SGMsgData sgMsgData = null;
         sgMsgData = new SGMsgData();
         if (sgMsgData == null)

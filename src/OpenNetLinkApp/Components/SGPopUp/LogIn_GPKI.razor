@@ -902,17 +902,7 @@
                 return;
             }*/
 
-            SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupId);
-            SGData sfmData = HsCmdCenter.GetSFMListData(groupId);
-
-            while (true)
-            {
-                sfmData = HsCmdCenter.GetSFMListData(groupId);
-                if (sfmData != null)
-                    break;
-                Thread.Sleep(50);
-            }
-            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
+            sgUserSvr.SetUserInfo(groupId, sgLoginData);
             ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
             // CLIENT_ZIP_DEPTH 정보 가져옴
@@ -1020,11 +1010,7 @@
             if (hsNetWork != null)
             {
                 pageService.SetProtectedSessionKey(groupId, hsNetWork.GetProtectedSeedKey());
-
-                SGData tmpData = null;
-                // tmpData = HsCmdCenter.GetSGSvrData(groupId);
-                tmpData = HsCmdCenter.GetUserData(groupId);
-                if (tmpData != null)
+                if (sgLoginData != null)
                 {
                     // gpki_login때는 id 사용
                     //hsNetWork.SetUserPassword(sgLoginData.GetUserID());

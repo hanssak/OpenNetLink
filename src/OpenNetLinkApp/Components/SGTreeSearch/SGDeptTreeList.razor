@@ -138,16 +138,6 @@
         }
     }
 
-    SGUserData activeSGUserData
-    {
-        get
-        {
-            int gouprid = activedGroupID;
-            SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(gouprid);
-            return sgUserData;
-        }
-    }
-
     private ISGSideBarUIService SideBarUISvc;
     string strInputDept = "";
     string strInputName = "";
@@ -287,12 +277,8 @@
         {
             //IsApproverOnly = !activedSGLogin.GetApproveProxyRight();
             HsCmdCenter.SendDeptInfo(activedGroupID, activedSGLogin.GetUserID());
+            strSelectedDeptCode = activedSGLogin.GetTeamCode();
         }
-
-        if (activeSGUserData != null)
-            strSelectedDeptCode = activeSGUserData.GetTeamCode();
-
-        @*updateDeptApprLine(strSelectedDeptCode);*@
 
         timeInterval = DateTime.Now;
     }
@@ -326,8 +312,6 @@
         }
 
         if (activedSGLogin == null) return;
-        if (activeSGUserData == null) return;
-
 
         strSelectedDeptCode = "";
 
@@ -389,17 +373,15 @@
             StateHasChanged();
             return;
         }
-    ;
-
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
         {
             StateHasChanged();
             return;
         }
     ;
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
 
         int count = 1;
         foreach (var item in apprLinkedList)

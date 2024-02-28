@@ -25,7 +25,6 @@ namespace OpenNetLinkApp.Models.SGUserInfo
         //string Email { get; }             -> 사용자의 이메일 정보는 수신받지 않음.
         string Position { get; }            /* 직책 */
         string Rank { get; }                /* 직위 */
-        int ManOrSteff { get; }             /* 1: 팀원, 2: 팀장 */
         /// <summary>
         /// 0:일반사용자(결재를 받아야하는직원), 1:결재자, 2:전결자 */
         /// </summary>
@@ -58,10 +57,6 @@ namespace OpenNetLinkApp.Models.SGUserInfo
         //public string Email { get; set; } = String.Empty;         -> 사용자의 이메일 정보는 수신받지 않음.
         public string Position { get; set; } = String.Empty;    /* 직책 */
         public string Rank { get; set; } = String.Empty;        /* 직위 */
-        /// <summary>
-        /// 1: 팀원, 2: 팀장
-        /// </summary>
-        public int ManOrSteff { get; set; } = 1;  /* 1: 팀원, 2: 팀장 */
 
         /// <summary>
         ///  0:일반사용자(결재를 받아야하는직원), 1:결재자, 2:전결자

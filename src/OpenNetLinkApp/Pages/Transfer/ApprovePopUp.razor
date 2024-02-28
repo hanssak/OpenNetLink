@@ -992,16 +992,15 @@
 
             HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);*/
 
-            SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-            if (sgUserData == null)
+            SGLoginData sgLoginDatata = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
             {
                 CLog.Here().Error($"ApproveAction, HSCmdCenter.GetUserData = null");
                 ShowMessage("error", XmlConf.GetErrMsg("E_0209"));
                 return;
             }
 
-            string strUserSeq = sgUserData.GetUserSequence();
+            string strUserSeq = sgLoginData.GetUserSequence();
             List<Int64> listApproveSeq = new List<Int64>();
             listApproveSeq.Add(Convert.ToInt64(sgDetailData.GetApprSeq()));
 
@@ -1072,16 +1071,15 @@
 			return;
 		}
 
-		SGUserData sgUserData = null;
-		sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-		if (sgUserData == null)
+		SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+		if (sgLoginData == null)
 		{
 			CLog.Here().Error($"DetailApproveRejectSend, HSCmdCenter.GetUserData = null");
 			ShowMessage("error", XmlConf.GetErrMsg(bisReject?"E_0210":"E_0209"));
 			return;
 		}
 
-		string strUserSeq = sgUserData.GetUserSequence();
+		string strUserSeq = sgLoginData.GetUserSequence();
 		List<Int64> listApproveSeq = new List<Int64>();
 		listApproveSeq.Add(Convert.ToInt64(sgDetailData.GetApprSeq()));
 

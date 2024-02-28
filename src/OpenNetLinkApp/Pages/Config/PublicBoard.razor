@@ -275,11 +275,10 @@
         int count = HsCmdCenter.GetNetWorkCount();
         for (int i = 0; i < count; i++)
         {
-            SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HsCmdCenter.GetUserData(i);
-            if (sgUserData == null)
+            SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(i);
+            if (sgLoginData == null)
                 continue;
-            string strUserSeq = sgUserData.GetUserSequence();
+            string strUserSeq = sgLoginData.GetUserSequence();
             List<SGNotiData> listTemp = SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.SYSTEM, i, strUserSeq, 1000);
             listBoardData.AddRange(listTemp);
         }

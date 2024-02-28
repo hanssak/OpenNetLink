@@ -98,33 +98,6 @@ namespace OpenNetLinkApp.Data.SGDicData
             }
         }
 
-        public SGData GetUserData(int groupid)
-        {
-            //TODO 고도화 - SGLoginData 에서 GetApprLineData 처리 필요
-            if (m_DicLoginData.TryGetValue(groupid, out SGLoginData tmpData) != true)
-                return null;
-            return tmpData;
-            //SGUserData tmpData = null;
-            //if (m_DicUserData.TryGetValue(groupid, out tmpData) != true)
-            //    return null;
-            //return m_DicUserData[groupid];
-        }
-        public void SetUserData(HsNetWork hs, int groupid, SGData data)
-        {
-            //TODO 고도화 - SGLoginData 에서 GetApprLineData 처리 필요
-            //SGUserData tmpData = null;
-            //if (m_DicUserData.TryGetValue(groupid, out tmpData) == true)
-            //{
-            //    m_DicUserData.TryRemove(groupid, out tmpData);
-            //    //m_DicUserData.Remove(groupid);
-            //    tmpData = null;
-            //}
-            //tmpData = new SGUserData();
-            //tmpData.Copy(hs, data);
-            ////m_DicUserData[groupid]= tmpData;
-            //m_DicUserData.TryAdd(groupid, tmpData);
-        }
-
         public SGData GetReadyData(int groupid)
         {
             SGReadyData tmpData = null;
@@ -366,14 +339,6 @@ namespace OpenNetLinkApp.Data.SGDicData
 
             m_DicGpkiData.TryAdd(groupid, tmpData);
             //m_DicGpkiData[groupid] = tmpData;
-        }
-
-        public SGData GetSFMListData(int groupId)
-        {
-            //TODO 고도화 - SGLoginData 에서 처리 필요
-            if (m_DicLoginData.TryGetValue(groupId, out SGLoginData tmpData) != true)
-                return null;
-            return tmpData;
         }
 
         public void SetSFMListData(int groupId, SGData data)

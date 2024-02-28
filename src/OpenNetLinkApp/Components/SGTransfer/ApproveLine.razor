@@ -135,18 +135,8 @@ else
                         string strEncApprLine = sgSettingProc.GetSettingApprLine(groupID);
                         string strApprLine = "";
                         sgRSACrypto.ValueDecrypt(strEncApprLine, out strApprLine);
-
-                        SGUserData sgUserData = null;
-                        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-                        if (sgUserData == null)
-                        {
-                            ApproveLineChange();
-                            StateHasChanged();
-                            return;
-                        }
-
-                        string strUserSeq = sgUserData.GetUserSequence();
-
+                                               
+                        string strUserSeq = sgLoginData.GetUserSequence();
                         int approveStep = (sgLoginData != null) ? sgLoginData.GetApproveStep() : 0;
 
                         SGApprLineData sgApprLineData = null;
@@ -207,11 +197,6 @@ else
         int step = sgLoginData.GetApproveStep();
         m_step = step;
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
         ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
 
         approverList.Clear();
@@ -220,12 +205,12 @@ else
         sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
         if (sgApprLineData == null)
         {
-            string strApprLineName = sgUserData.GetUserName();
-            string strApprLineRank = sgUserData.GetRank();
-            string strApprLineDeptName = sgUserData.GetTeamName();
-            string strApprLineDeptSeq = sgUserData.GetTeamCode();
-            string strApprLineSeq = sgUserData.GetUserSequence();
-            string strApprLineID = sgUserData.GetUserID();
+            string strApprLineName = sgLoginData.GetUserName();
+            string strApprLineRank = sgLoginData.GetRank();
+            string strApprLineDeptName = sgLoginData.GetTeamName();
+            string strApprLineDeptSeq = sgLoginData.GetTeamCode();
+            string strApprLineSeq = sgLoginData.GetUserSequence();
+            string strApprLineID = sgLoginData.GetUserID();
 
             string strApprLineOrder = "0";
             approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder, strApprLineID));
@@ -345,30 +330,27 @@ else
         if (groupID < 0)
             return;
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
+        
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
+        
+        string strUserSeq = sgLoginData.GetUserSequence();
         int step = sgLoginData.GetApproveStep();
 
         ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupID);
 
         m_step = step;
 
-        string strApprLineName = sgUserData.GetUserName();
-        string strApprLineRank = sgUserData.GetRank();
-        string strApprLineDeptName = sgUserData.GetTeamName();
-        string strApprLineDeptSeq = sgUserData.GetTeamCode();
-        string strApprLineSeq = sgUserData.GetUserSequence();
+        string strApprLineName = sgLoginData.GetUserName();
+        string strApprLineRank = sgLoginData.GetRank();
+        string strApprLineDeptName = sgLoginData.GetTeamName();
+        string strApprLineDeptSeq = sgLoginData.GetTeamCode();
+        string strApprLineSeq = sgLoginData.GetUserSequence();
         string strApprLineOrder = "0";
-        string strApprLineID = sgUserData.GetUserID();
+        string strApprLineID = sgLoginData.GetUserID();
         approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder, strApprLineID));
 
 

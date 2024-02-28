@@ -1563,7 +1563,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         *@
 
 
-        // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
+    // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
         {
@@ -1772,18 +1772,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                             HSCmdCenter.SendPatchHistory(groupId, -2, string.Format(XmlConf.GetWarnMsg("W_0298"), localIP, patchTime));
                     }
 
-                    //CLog.Here().Information($"LoginResultOnetoAll, groupID : {groupId}, Get Sfm Data !!!");
-                    SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
-                    SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
-                    while (true)
-                    {
-                        sfmData = HSCmdCenter.GetSFMListData(groupId);
-                        if (sfmData != null)
-                            break;
-                        Thread.Sleep(50);
-                    }
-                    CLog.Here().Information($"LoginResultOnetoAll, groupID : {groupId}, Recved Sfm Data !!!");
-                    sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
+                    sgUserSvr.SetUserInfo(groupId, sgLoginData);
 
                     HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));
                     string recvPath = SetUserIDRecvDownLoad(groupId); //사용자별 수신 다운로드 설정
@@ -2244,10 +2233,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 // nGroupIDfirst : 로그인된 제일 첫번째 GroupID
                 CLog.Here().Information($"LoginResultOnetoAll, LoginType : {(HsNetWork.UseHiddenLog ? pageService.GetGroupIDLoginType(groupId) : "xxx")}, GroupID : {groupId}, Saved-GroupID : {nGroupIDfirst}, START!");
 
-                SGUserData sgUserData = null;
-                SGLoginData sgLoginData = null;
-                sgUserData = (SGUserData)HSCmdCenter.GetUserData(nGroupIDfirst);
-                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupIDfirst);
+                SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupIDfirst);
 
                 if (pageService.GetGroupIDLoginType(groupId) == eLoginType.eLOGINTYPE_ORIGIN)
                 {
@@ -2305,7 +2291,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                             }
 
                             SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
-                            string strUserSeq = sgUserData.GetUserSequence();
+                            string strUserSeq = sgLoginData.GetUserSequence();
                             strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
 
                             if (strTime.Equals(""))
@@ -2364,7 +2350,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 MyNavigationManager.NavigateTo(strNavigatePathnGroupID);
 
                 if (!pageService.GetIsPolicyUpdate(groupId))
-                    HSCmdCenter.SendNetLinkStatus(nGroupIDfirst, sgUserData.GetUserID());
+                    HSCmdCenter.SendNetLinkStatus(nGroupIDfirst, sgLoginData.GetUserID());
 
                 // SideBarUI 에서 nGroupIDfirst로 지정된 UI로 선택
                 MoveSiderBarFocusTogroupid(nGroupIDfirst);
@@ -2565,26 +2551,24 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 bActived = true;
             }
 
-            SGLoginData sgLoginData = null;
-            SGUserData sgUserData = null;
+            SGLoginData sgLoginData = null;            
             sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(i);
-            sgUserData = (SGUserData)HSCmdCenter.GetUserData(i);
 
-            if (sgLoginData != null && sgUserData != null)
+            if (sgLoginData != null)
             {
-                bHanssakOTP = sgLoginData.GetTagValue("OTP");
+                bHanssakOTP = sgLoginData.GetOTPPublishUse();
                 bFileTransMenuUse = sgLoginData.GetFileTrans();
 
                 //보안결재 사용여부
-                bSecurityApprMenuUse = sgLoginData.GetTagValue("PRIVACYAPPROVE");
+                bSecurityApprMenuUse = sgLoginData.GetExApprovalUse();
                 if (bSecurityApprMenuUse)
                 {
-                    if (sgUserData.GetUserPrivacyApprPos())
+                    if (sgLoginData.GetExApprovalUse())
                         bSecurityApprMenuUse = true;
                     else
                         bSecurityApprMenuUse = false;
                 }
-                nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY");
+                nApproveProxy = sgLoginData.GetApproveProxyInteger();
                 //if (sgLoginData.GetApprove() == true)
                 // 3망 정책고려한 결재사용유무 설정
                 if ((pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupid) == false) || SGAppMgrSvc.OpConfigInfoService.GetUseApproveManageUIForce(groupid)) // 결재관리 UI 않나오는 설정추가
@@ -2642,8 +2626,8 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
             string strNavigatePathWithGroupID = "";
             string strUserSeq = "";
-            if (sgUserData != null)
-                strUserSeq = sgUserData.GetUserSequence();
+            if (sgLoginData != null)
+                strUserSeq = sgLoginData.GetUserSequence();
 
             if (pageService.GetConnectStatus(i) == false)
             {

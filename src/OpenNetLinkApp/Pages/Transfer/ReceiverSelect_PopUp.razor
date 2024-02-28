@@ -289,17 +289,12 @@
         if (sgLoginData == null)
             return;
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
         string strSysID = sgLoginData.GetSysID();
         string strUserID = sgLoginData.GetUserID();
         string strUserName = strCurName;
         string strTeamName = strCurDept;
 
-        string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
+        string strTeamCode = (isInit) ? sgLoginData.GetTeamCode() : "";
         //if (strUserName == "" && strTeamName == "")
         //    strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
 

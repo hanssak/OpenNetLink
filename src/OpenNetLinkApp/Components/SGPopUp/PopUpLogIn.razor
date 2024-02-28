@@ -1051,7 +1051,6 @@
     {
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
-        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
 
         HsNetWork hsNetWork = null;
         hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
@@ -1124,7 +1123,7 @@
                 }
 
                 SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
-                string strUserSeq = sgUserData.GetUserSequence();
+                string strUserSeq = sgLoginData.GetUserSequence();
                 strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
 
                 if (strTime.Equals(""))
@@ -1242,7 +1241,6 @@
     {
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
-        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
 
         HsNetWork hsNetWork = null;
         hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
@@ -1379,7 +1377,7 @@
                             }
 
                             SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
-                            string strUserSeq = sgUserData.GetUserSequence();
+                            string strUserSeq = sgLoginData.GetUserSequence();
                             strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
                             if (strTime.Equals(""))
                             {
@@ -1518,18 +1516,8 @@
                 }
                 */
 
-                SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
-                SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
-
-                while (true)
-                {
-                    sfmData = HSCmdCenter.GetSFMListData(groupId);
-                    if (sfmData != null)
-                        break;
-                    Thread.Sleep(50);
-                }
                 CLog.Here().Information($"LoginResultOnetoAll, groupID : {groupId}, Recved Sfm Data !!!");
-                sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
+                sgUserSvr.SetUserInfo(groupId, sgLoginData);
 
 
                 HSCmdCenter.SetUseUserRecvDownPath(groupId, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupId));

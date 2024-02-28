@@ -735,12 +735,11 @@
         if (sgSettingData == null)
             return;
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+        SGLoginData sgLoginData= (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
             return;
 
-        strApprPos = sgUserData.GetUserApprposString();
+        strApprPos = sgLoginData.GetUserApprposString();
 
     }
 
@@ -784,11 +783,10 @@
             groupID = sgSideBar.GroupId;*/
         int groupID = groupIDbyParam;
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+        SGLoginData sgLoginData= (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
             return;
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
 
         recentList.Clear();
         noticeList.Clear();
@@ -967,13 +965,10 @@
     public bool SetQuickMenuModify(int groupID)
     {
         bApprMenuUse = false;
-        SGLoginData sgLoginData = null;
-        SGUserData sgUserData = null;
-        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);        
         ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupID);
 
-        if (sgLoginData != null && sgUserData != null)
+        if (sgLoginData != null)
         {
             if (nUseNetOverFileTrans < 0)
                 bFileTransMenuUse = sgLoginData.GetFileTrans();     // 3망 Mode가 아닐때는 기존 파일전송 권한으로 UI 구성
@@ -1131,15 +1126,7 @@
         bool bSystem = sgReadyData.GetSystemPosition();
         string strConNetWork = sgReadyData.GetSystemPositionString();
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-        {
-            SendDayClipInfo();
-            return;
-        }
-
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         string strDate = DateTime.Now.ToString("yyyyMMdd");
 
         string strUserID = sgLoginData.GetUserID();
@@ -1185,9 +1172,7 @@
         bool bSystem = sgReadyData.GetSystemPosition();
         string strConNetWork = sgReadyData.GetSystemPositionString();
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+        if (sgLoginData == null)
         {
 
             TransSearchData(1);
@@ -1197,7 +1182,7 @@
             return;
         }
 
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         string strDate = DateTime.Now.ToString("yyyyMMdd");
 
         string strUserID = sgLoginData.GetUserID();
@@ -1696,18 +1681,14 @@
         int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+        if (sgLoginData == null)
         {
             DashBoardApprInfoCount("1");    // 1 : 승인대기
             return;
         }
+        curUserID = sgLoginData.GetUserID();
 
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         SGQueryExtend sgQueryExtend = new SGQueryExtend();
         //string strToDate = DateTime.Now.ToString("yyyy");
         string strFromDate = "";
@@ -1890,16 +1871,7 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-        {
-            StateHasChanged();
-            //BoardNotifySearch();
-            return;
-        }
-
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         SGQueryExtend sgQueryExtend = new SGQueryExtend();
         string strQuery = sgQueryExtend.GetPasswdChgDay(strUserSeq);
         HsCmdCenter.SendPasswdChgDay(groupID, curUserID, strQuery);
@@ -1928,10 +1900,8 @@
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
-
-        if ((sgLoginData == null) || (sgUserData == null))
+        
+        if (sgLoginData == null)
         {
             StateHasChanged();
             //BoardNotifySearch();
@@ -1963,7 +1933,7 @@
 
         string strTime = sgSettingProc.GetSettingDelayDspPw(groupID);
         SGPassWDPeriodData sgPassWdPeriodData = new SGPassWDPeriodData();
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         DateTime LocalTime = sgPassWdPeriodData.GetLocalDBPassWDDelayTime(strTime, strUserSeq);
         string strStartDay = StartTime.ToString("yyyy-MM-dd");
 
@@ -2046,12 +2016,11 @@
     public void AlarmNotiAfter(int groupid)
     {
         alarmList.Clear();
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
-        if (sgUserData == null)
+        SGLoginData sgLoginData= (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        if (sgLoginData == null)
             return;
 
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         int count = 0;
         count = SQLiteDB.SelectAlarmInfoCount(groupid, strUserSeq);
         if (count <= 0)
@@ -2088,12 +2057,11 @@
     public void BoardNotiAfter(int groupid)
     {
         noticeList.Clear();
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
-        if (sgUserData == null)
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        if (sgLoginData == null)
             return;
 
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         int count = 0;
         count = SQLiteDB.SelectNotiInfoCount(NOTI_TYPE.SYSTEM, groupid, strUserSeq);
         if (count <= 0)
@@ -2379,13 +2347,11 @@
         int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = null;
-        SGUserData sgUserData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
 
         ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupID);
 
-        if (sgLoginData != null && sgUserData != null)
+        if (sgLoginData != null)
         {
             // if (sgLoginData.GetApprove() == true)                        // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
 

@@ -26,7 +26,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="userInfo"> 
         /// </param>
         /// <returns>void</returns>
-        void SetUserInfo(int groupID, SGLoginData sgLoginData, SGUserData sgUserData, SGData sfmData);
+        void SetUserInfo(int groupID, SGLoginData sgLoginData);
         //void SetUserInfo(ISGUserInfo userInfo);
 
         ISGUserInfo GetUserInfo(int groupID);
@@ -38,20 +38,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
 
         /* To Manage User Info State */
-        public ConcurrentDictionary <int, ISGUserInfo> DicUserInfo { get; set; } = new ConcurrentDictionary<int, ISGUserInfo>();
+        public ConcurrentDictionary<int, ISGUserInfo> DicUserInfo { get; set; } = new ConcurrentDictionary<int, ISGUserInfo>();
         public event Action OnChangeUserInfo;
         private void NotifyStateChangedUserInfo() => OnChangeUserInfo?.Invoke();
-        public void SetUserInfo(int groupID, SGLoginData sgLoginData, SGUserData sgUserData, SGData sfmData)
+        public void SetUserInfo(int groupID, SGLoginData sgLoginData)
         {
             SGUserInfo sgUser = new SGUserInfo();
             sgUser.UserId = sgLoginData.GetUserID();                // 사용자 ID
-            sgUser.UserName = sgUserData.GetUserName();             // 사용자 이름
-            sgUser.UserSeq = sgUserData.GetUserSequence();          // 사용자 SEQ
-            sgUser.DeptName = sgUserData.GetTeamName();             // 부서명
-            sgUser.Position = sgUserData.GetUserPosition();         // 직책
-            sgUser.Rank = sgUserData.GetRank();                     // 직위
-            sgUser.ManOrSteff = sgUserData.GetPartOwner();          // 팀원/팀장 여부 ( 팀원 : 1, 팀장 : 2)
-            sgUser.ApprPos = sgUserData.GetUserApprpos();           // 일반사용자, 결재자, 전결자
+            sgUser.UserName = sgLoginData.GetUserName();             // 사용자 이름
+            sgUser.UserSeq = sgLoginData.GetUserSequence();          // 사용자 SEQ
+            sgUser.DeptName = sgLoginData.GetTeamName();             // 부서명
+            sgUser.Position = sgLoginData.GetUserPosition();         // 직책
+            sgUser.Rank = sgLoginData.GetRank();                     // 직위
+            sgUser.ApprPos = sgLoginData.GetUserApprpos();           // 일반사용자, 결재자, 전결자
 
             SGUserInfoAdded sgUserAdd = new SGUserInfoAdded();
             sgUserAdd.FileFilterExt = sgLoginData.GetFileFilter();     // 파일 확장자 제한.
@@ -97,40 +96,36 @@ namespace OpenNetLinkApp.Services.SGAppManager
             sgUserAdd.MaxDownloadCount = count;
 
             //대결재자 관련 추가 부분
+
             bool isMySelfSFM = true;
             int sfmRight = 0;
-            string headUserName = sgUserData.GetUserName();
-            if (sfmData != null)
+            string headUserName = sgLoginData.GetUserName();
+            List<(string Name, string Rank, int Right)> listDicSfmdata = sgLoginData.GetApproverWhoGaveMeProxyList();
+            if (listDicSfmdata == null || listDicSfmdata.Count == 0)
             {
-                List<Dictionary<int, string>> listDicSfmdata = null;
-                listDicSfmdata = sfmData.GetSvrRecordData("RECORD");
-                if (listDicSfmdata == null || listDicSfmdata.Count == 0)
+                isMySelfSFM = true;
+                sfmRight = 0;
+            }
+            else
+            {
+                if (listDicSfmdata.Count > 1)
                 {
-                    isMySelfSFM = true;
-                    sfmRight = 0;
+                    headUserName = String.Format(CsFunction.XmlConf.GetTitle("T_PROXY_USERNAME_COUNT"), sgLoginData.GetUserName(), listDicSfmdata[0].Name, listDicSfmdata[0].Rank, listDicSfmdata.Count - 1);
                 }
                 else
                 {
-                    if(listDicSfmdata.Count > 1)
-                    {
-                        //headUserName = $"{sgUserData.GetUserName()}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재 외 {listDicSfmdata.Count - 1})";
-                        headUserName = String.Format(CsFunction.XmlConf.GetTitle("T_PROXY_USERNAME_COUNT"), sgUserData.GetUserName(), listDicSfmdata[0][3], listDicSfmdata[0][4], listDicSfmdata.Count - 1);
-                    }
-                    else
-                    {
-                        //headUserName = $"{sgUserData.GetUserName()}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재)";
-                        headUserName = String.Format(CsFunction.XmlConf.GetTitle("T_PROXY_USERNAME"), sgUserData.GetUserName(), listDicSfmdata[0][3], listDicSfmdata[0][4]);
-                    }
-
-                    foreach(Dictionary<int, string> value in listDicSfmdata)
-                    {
-                        if (sfmRight < Convert.ToInt32(value[0]))
-                            sfmRight = Convert.ToInt32(value[0]);
-                    }
-
-                    isMySelfSFM = false;
+                    headUserName = String.Format(CsFunction.XmlConf.GetTitle("T_PROXY_USERNAME"), sgLoginData.GetUserName(), listDicSfmdata[0].Name, listDicSfmdata[0].Rank);
                 }
+
+                foreach ((string Name, string Rank, int Right) value in listDicSfmdata)
+                {
+                    if (sfmRight < Convert.ToInt32(value.Rank))
+                        sfmRight = Convert.ToInt32(value.Rank);
+                }
+
+                isMySelfSFM = false;
             }
+
             sgUser.HeaderUserName = headUserName;
             sgUserAdd.IsMySelfSFM = isMySelfSFM;
             sgUserAdd.SFMRight = sfmRight;

@@ -286,11 +286,6 @@
         if (sgLoginData == null)
             return;
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
         stTitleApvRight = XmlConf.GetTitle("T_INFO_USER_APPROVE_RIGHT");
         stTitlePrivacyApvRight = XmlConf.GetTitle("T_INFO_USER_PRIVACY_APPROVE_RIGHT");
         stTitleTransDayLimit = XmlConf.GetTitle("T_INFO_ONEDAY_FILESEND");
@@ -302,8 +297,8 @@
         stTitleExtBlack = XmlConf.GetTitle("T_INFO_CHECK_EXTENSION_BLACK");
         stTitleURLAutoDedirect = XmlConf.GetTitle("T_INFO_URLREDIRECT_AUTO");
 
-        stViewApproveRight = sgUserData.GetUserApprposString();
-        stViewPrivacyUser = sgUserData.GetUserPrivacyApprPosString();
+        stViewApproveRight = sgLoginData.GetUserApprposString();
+        stViewPrivacyUser = sgLoginData.GetUserPrivacyApprPosString();
 
         int nCount = 0;
         Int64 nSize = 0;

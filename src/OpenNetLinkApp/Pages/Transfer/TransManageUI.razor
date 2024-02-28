@@ -505,12 +505,7 @@
         bool bSystem = sgReadyData.GetSystemPosition();
         string strConNetWork = sgReadyData.GetSystemPositionString();
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         string strDate = DateTime.Now.ToString("yyyyMMdd");
 
         string strUserID = sgLoginData.GetUserID();
@@ -815,7 +810,7 @@
         }
         //int groupID = 0;
 
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
         @*await GetDateTime();*@
@@ -1450,14 +1445,13 @@
     /// <param name="body"></param>
     public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgType eMType, string path, string body)
     {
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+        SGLoginData sgLoginData= (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
         {
             return;
         }
 
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         SGMsgData sgMsgData = null;
         sgMsgData = new SGMsgData();
         if (sgMsgData == null)

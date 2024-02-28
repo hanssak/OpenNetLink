@@ -38,9 +38,9 @@
                         @if (!String.IsNullOrEmpty(MenuItem.Path))
                         {
                             <a class="nav-link m-0 @(MenuItem.ActiveClass)"
-                               style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                               @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem, true))"
-                               @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem, true))">
+               style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
+              @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem, true))"
+@onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem, true))">
                                 <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
                                 <p style="font-size:1rem;" class="p-2">
                                     @(MenuItem.FromName /*Dashboard*/)
@@ -62,9 +62,9 @@
                         else
                         {
                             <a class="nav-link m-0 @(MenuItem.ActiveClass)"
-                               style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                               @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))"
-                               @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))">
+              style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
+              @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))"
+              @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))">
                                 <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
                                 <p style="font-size:1rem;" class="p-2">
                                     @(MenuItem.FromName /*Dashboard*/)
@@ -92,20 +92,20 @@
                                         @if (!String.IsNullOrEmpty(SubMenuList.Path))
                                         {
                                             <a class="nav-link"
-                                               @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))"
-                                               @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))">
+                     @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))"
+                     @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))">
                                                 <i class="nav-icon @(SubMenuList.Icon)"></i>
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (bViewSGSideBarUIBadge && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                 && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                     && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                         </span>
                                                     }
                                                     @if (bViewSGSideBarUIBadge && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                 && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                     && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -118,13 +118,13 @@
                                         else
                                         {
                                             <a class="nav-link"
-                                               @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))"
-                                               @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))">
+                     @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))"
+                    @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))">
                                                 <i class="nav-icon @(SubMenuList.Icon)"></i>
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (bViewSGSideBarUIBadge && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                 && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                     && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
@@ -133,7 +133,7 @@
                                                     }
 
                                                     @if (bViewSGSideBarUIBadge && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                 && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                     && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -152,8 +152,8 @@
                                                     @if (SubMenuItem.Path.IndexOf("POPUP") == -1)  //일반메뉴
                                                     {
                                                         <a class="nav-link @(SubMenuItem.ActiveClass)"
-                                                           @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))"
-                                                           @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))">
+                            @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))"
+                           @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))">
                                                             <span class="logo-xs ">&middot;</span>
                                                             <p style="padding-left: 10px;">
                                                                 &middot;&nbsp;&nbsp;  @(SubMenuItem.ToName)
@@ -168,8 +168,8 @@
                                                     else  //팝업메뉴
                                                     {
                                                         <a style="cursor:pointer;" class="nav-link @(SubMenuItem.ActiveClass)"
-                                                           @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))"
-                                                           @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))">
+                           @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))"
+                          @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))">
                                                             <span class="logo-xs ">&middot;</span>
                                                             <p style="padding-left: 10px;">
                                                                 &middot;&nbsp;&nbsp;  @(SubMenuItem.ToName)
@@ -190,13 +190,13 @@
                                 {
                                     <li class="nav-item">
                                         <a class="nav-link "
-                                           @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))"
-                                           @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))">
+                  @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))"
+                  @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))">
                                             <i class="nav-icon @(SubMenuList.Icon)"></i>
                                             <p>
                                                 @(GetDescription(SubMenuList.CategoryId))
                                                 @if (bViewSGSideBarUIBadge && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                             && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                 && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <!-- Badge -->
                                                     <span class="@(SubMenuList.BadgeType) ">
@@ -205,7 +205,7 @@
                                                 }
 
                                                 @if (bViewSGSideBarUIBadge && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                             && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                 && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <!-- Badge -->
                                                     <span class="badge badge-danger ">
@@ -228,9 +228,9 @@
                     /* Not Exist SubMenu */
                     <li class="nav-item">
                         <a class="nav-link m-0 @(MenuItem.ActiveClass)"
-                           style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                           @onclick="@(async eventArgs =>  await ChangeActiveMenuWrapPopup(eventArgs, MenuItem))"
-                           @onkeydown="@(async eventArgs => await ChangeActiveMenuWrapPopup(eventArgs, MenuItem))">
+      style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
+             @onclick="@(async eventArgs =>  await ChangeActiveMenuWrapPopup(eventArgs, MenuItem))"
+         @onkeydown="@(async eventArgs => await ChangeActiveMenuWrapPopup(eventArgs, MenuItem))">
                             <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/) text-md logo-xs mt-2"></i>
                             <p style="font-size:1rem;" class="p-2">
                                 @(MenuItem.FromName /*Dashboard*/)
@@ -260,12 +260,12 @@
 
 @code
 {
-        PopUpLogIn refPopUpLogIn;
-        LogIn_GPKI refPopUpGpkiLogIn;
-        PWChange refPWChange;
-        PWChangeDefaultPW refPWChangeDefaultPW;
-        HanssakOTP refHanssakOTP;
-        ProxyApprover_PopUp refProxyApprover_PopUp;
+    PopUpLogIn refPopUpLogIn;
+  LogIn_GPKI refPopUpGpkiLogIn;
+   PWChange refPWChange;
+  PWChangeDefaultPW refPWChangeDefaultPW;
+  HanssakOTP refHanssakOTP;
+  ProxyApprover_PopUp refProxyApprover_PopUp;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUI>();
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
@@ -320,10 +320,10 @@
 
         MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
-        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(nGroupID); ;
-        if (sgUserData != null)
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupID); ;
+        if (sgLoginData != null)
         {
-            HSCmdCenter.SendNetLinkStatus(nGroupID, sgUserData.GetUserID());
+            HSCmdCenter.SendNetLinkStatus(nGroupID, sgLoginData.GetUserID());
         }
 
     }
@@ -553,11 +553,11 @@
 
     public void LoginAfterSideBar(int groupid)
     {
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
-        if (sgUserData != null)
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        if (sgLoginData != null)
         {
-            strUserSeq = sgUserData.GetUserSequence();
+            strUserSeq = sgLoginData.GetUserSequence();
             StateHasChanged();
         }
     }
@@ -565,8 +565,8 @@
 
     public async void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu, bool isMainMenu = false)
     {
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(activeMenu.GroupId);
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(activeMenu.GroupId);
         // 이전 Page로 돌아갈 수 있도록(새로운 로그인 Page에서 Back Button 사용) 현재 page URL 저장해둠
         if (pageService.m_nCurViewPageGroupID != activeMenu.GroupId)
         {
@@ -581,15 +581,15 @@
         if (activeMenu.Path == "POPUP('OTP')")
         {
             refHanssakOTP.groupId = activeMenu.GroupId;
-            if (sgUserData != null)
-                refHanssakOTP.userId = sgUserData.GetUserID();
+            if (sgLoginData != null)
+                refHanssakOTP.userId = sgLoginData.GetUserID();
             await refHanssakOTP.openPopUp();
         }
         else if (activeMenu.Path == "POPUP('DEPUTY')")
         {
             refProxyApprover_PopUp.groupId = activeMenu.GroupId;
-            if (sgUserData != null)
-                refProxyApprover_PopUp.userId = sgUserData.GetUserID();
+            if (sgLoginData != null)
+                refProxyApprover_PopUp.userId = sgLoginData.GetUserID();
 
             refProxyApprover_PopUp.BindEvent();
             await refProxyApprover_PopUp.openPopUp();
@@ -653,10 +653,8 @@
     private void AddMenuAfterLogin(int groupId)
     {
 
-        SGLoginData sgLoginData = null;
-        SGUserData sgUserData = null;
-        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupId);
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
+
 
         bool bFileTransMenuUse = false;
         bool bApprMenuUse = false;
@@ -717,28 +715,32 @@
         }
 
         // SideBatUI 설정값 알아옴
-        if (sgLoginData != null && sgUserData != null)
+        if (sgLoginData != null)
         {
-            bHanssakOTP = sgLoginData.GetTagValue("OTP");
-            bSecurityApprMenuUse = sgLoginData.GetTagValue("PRIVACYAPPROVE");
-            if (bSecurityApprMenuUse)
+            SGReadyData sgReadyData = (SGReadyData)HsCmdCenter.GetReadyData(groupId);
+            if(sgReadyData != null)
             {
-                if (sgUserData.GetUserPrivacyApprPos())
-                    bSecurityApprMenuUse = true;
-                else
-                    bSecurityApprMenuUse = false;
+                bHanssakOTP = sgLoginData.GetOTPPublishUse();
+                    bSecurityApprMenuUse = sgReadyData.GetExApprovalUse();
+                    if (bSecurityApprMenuUse)
+                    {
+                        if (sgLoginData.GetExApprovalUse())
+                            bSecurityApprMenuUse = true;
+                        else
+                            bSecurityApprMenuUse = false;
+                    }
+                    nApproveProxy = (sgLoginData.GetDeputyApprove()) ? 1 : 0; //대결사용여부 1:사용, 2:결재자선택
+                    bFileTransMenuUse = sgLoginData.GetFileTrans();
+
+                    //if (sgLoginData.GetApprove() == true)
+
+                    // 3망 정책고려한 결재사용유무 설정
+                    if ((pageService.GetUseApproveNetOver(groupId, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupId) == false) || SGAppMgrSvc.OpConfigInfoService.GetUseApproveManageUIForce(groupId))
+                        if ((sgLoginData.GetApproveProxyRight()) || (nUserApprPos > 0))
+                            bApprMenuUse = true;
+
+                    bPCURLUse = sgLoginData.GetPCURLUse();
             }
-            nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY"); //대결사용여부 1:사용, 2:결재자선택
-            bFileTransMenuUse = sgLoginData.GetFileTrans();
-
-            //if (sgLoginData.GetApprove() == true)
-
-            // 3망 정책고려한 결재사용유무 설정
-            if ((pageService.GetUseApproveNetOver(groupId, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI(groupId) == false) || SGAppMgrSvc.OpConfigInfoService.GetUseApproveManageUIForce(groupId))
-                if ((sgLoginData.GetApproveProxyRight()) || (nUserApprPos > 0))
-                    bApprMenuUse = true;
-
-            bPCURLUse = sgLoginData.GetPCURLUse();
         }
 
         // 3망 상황 - 파일전송 UI view 설정 확인
@@ -777,8 +779,8 @@
         int nParentID = 0;
         string strNavigatePathWithGroupID = "";
         string strLoginUserSeq = "";
-        if (sgUserData != null)
-            strLoginUserSeq = sgUserData.GetUserSequence(); //  sgLoginData.GetUserID();
+        if (sgLoginData != null)
+            strLoginUserSeq = sgLoginData.GetUserSequence(); //  sgLoginData.GetUserID();
 
         // 파일전송 UI(0)
         if (bFileTransUse)

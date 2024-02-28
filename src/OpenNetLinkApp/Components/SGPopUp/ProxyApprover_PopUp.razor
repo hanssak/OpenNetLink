@@ -282,12 +282,10 @@
         }
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null) return false;
-        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null) return false;
 
         ApproveProxy approveProxy = new ApproveProxy();
 
-        string strQuery = approveProxy.GetSFMModify(sgUserData.GetUserSequence(), strFromDay, strToDay, ProxySelect);
+        string strQuery = approveProxy.GetSFMModify(sgLoginData.GetUserSequence(), strFromDay, strToDay, ProxySelect);
         HSCmdCenter.sgSendData.RequestInstApproveReg(HSCmdCenter.GetConnectNetWork(groupID), sgLoginData.GetUserID(), strQuery);
 
         return true;
@@ -325,11 +323,9 @@
         }
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null) return;
-        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null) return;
-
+        
         ApproveProxy approveProxy = new ApproveProxy();
-        string sql = approveProxy.GetSFMApprover(sgUserData.GetUserSequence());
+        string sql = approveProxy.GetSFMApprover(sgLoginData.GetUserSequence());
 
         int rtn = HSCmdCenter.SendListQuery(groupID, sgLoginData.GetUserID(), sql);
     }
@@ -344,11 +340,9 @@
         }
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null) return;
-        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null) return;
 
         ApproveProxy approveProxy = new ApproveProxy();
-        string sql = approveProxy.GetSFMDeptCount(sgUserData.GetUserSequence());
+        string sql = approveProxy.GetSFMDeptCount(sgLoginData.GetUserSequence());
 
         int rtn = HSCmdCenter.SendCountQuery(groupID, sgLoginData.GetUserID(), sql);
     }
@@ -398,17 +392,12 @@
         if (sgLoginData == null)
             return;
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
         bool bApproverOnly = !sgLoginData.GetApproveProxyRight();
         string strSysID = sgLoginData.GetSysID();
         string strUserID = sgLoginData.GetUserID();
         string strUserName = strCurName;
         string strTeamName = strCurDept;
-        string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
+        string strTeamCode = (isInit) ? sgLoginData.GetTeamCode() : "";
 
         SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
@@ -430,17 +419,14 @@
         //기본 결재자 검색
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprSearchResultProxy);
         //대결자 검색
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData != null)
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
         {
-            strCurDept = sgUserData.GetTeamName();
+            strCurDept = sgLoginData.GetTeamName();
         }
 
         HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, ProxySearchResult);
         HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, ResultPossibleCount);
-
-         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
          if(sgLoginData == null)
             return;
         
@@ -526,11 +512,10 @@
             if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
                 return;
 
-            SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-            if (sgUserData == null)
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
                 return;
-            string strUserSeq = sgUserData.GetUserSequence();
+            string strUserSeq = sgLoginData.GetUserSequence();
 
             int count = 1;
             foreach (var item in apprLinkedList)

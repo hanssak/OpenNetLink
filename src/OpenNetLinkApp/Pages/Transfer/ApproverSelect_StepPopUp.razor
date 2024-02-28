@@ -235,17 +235,11 @@
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
-
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
         string strSysID = sgLoginData.GetSysID();
         string strUserID = sgLoginData.GetUserID();
         string strUserName = strCurName;
         string strTeamName = strCurDept;
-        string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
+        string strTeamCode = (isInit) ? sgLoginData.GetTeamCode() : "";
 
         SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
@@ -286,17 +280,11 @@
             return;
         }
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
-
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
+        string strUserSeq = sgLoginData.GetUserSequence();
         int step = sgLoginData.GetApproveStep();    //결재유형 취득(무조건 AND+OR:2)
 
         int apvGrpOrder = -500;
@@ -355,12 +343,11 @@
         if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
             return;
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
             return;
 
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
 
         int count = 1;
         foreach (var item in apprLinkedList)
@@ -759,12 +746,11 @@
             if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
                 return;
 
-            SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-            if (sgUserData == null)
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
                 return;
 
-            string strUserSeq = sgUserData.GetUserSequence();
+            string strUserSeq = sgLoginData.GetUserSequence();
 
             int count = 1;
             foreach (var item in apprLinkedList)
@@ -838,12 +824,11 @@
                 strEncSaveApprLine = sgSettingProc.GetSettingApprLine(groupID);
                 sgRSACrypto.ValueDecrypt(strEncSaveApprLine, out strApprLine);
             }
-            SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-            if (sgUserData == null)
+
+            if (sgLoginData == null)
                 return;
 
-            string strUserSeq = sgUserData.GetUserSequence();
+            string strUserSeq = sgLoginData.GetUserSequence();
             int step = 0;
             if (sgLoginData != null)
                 step = sgLoginData.GetApproveStep();

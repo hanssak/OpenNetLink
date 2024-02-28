@@ -356,7 +356,7 @@
         string curAction = "2";
         string curReason = "사유";
 
-        SGData sgLoginData = HsCmdCenter.GetLoginData(groupid);
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
         string curUserID = "";
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();

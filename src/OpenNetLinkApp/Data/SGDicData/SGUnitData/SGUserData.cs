@@ -10,14 +10,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     /// <summary>
     /// (구 UserInfoEx) 삭제예정
     /// </summary>
-    public class SGUserData : SGData
+    public class _SGUserData : SGData
     {
         private readonly XmlConfService xconf = new XmlConfService();
-        public SGUserData()
+        public _SGUserData()
         {
 
         }
-        ~SGUserData()
+        ~_SGUserData()
         {
 
         }
@@ -28,15 +28,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
         }
 
-        /// <summary>
-        /// 사용자의 팀 이름을 반환한다..
-        /// </summary>
-        /// <returns></returns>
-        public string GetTeamName()
-        {
-            string strData = GetUserTagData("TEAMNAME");
-            return strData;
-        }
+        ///// <summary>
+        ///// 사용자의 팀 이름을 반환한다..
+        ///// </summary>
+        ///// <returns></returns>
+        //public string GetTeamName()
+        //{
+        //    string strData = GetUserTagData("TEAMNAME");
+        //    return strData;
+        //}
 
         /// <summary>
         /// 사용자의 실 결재권한 여부를 반환한다. (return 0 : 일반사용자, 1: 결재권자, 2: 전결자)

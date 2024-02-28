@@ -85,5 +85,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strLoginType = GetTagData("server_info", "login_type");
             return strLoginType.ToUpper();
         }
+
+        /// <summary>
+        /// 검사 결과 예외 처리 결재 추가 사용 여부
+        /// </summary>
+        /// <returns></returns>
+        public bool GetExApprovalUse()
+        {
+            string strData = GetTagData("server_info", "ex_approval_use");
+            return (strData == "true");
+        }
     }
 }

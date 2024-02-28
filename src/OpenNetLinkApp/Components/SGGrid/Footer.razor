@@ -498,12 +498,7 @@
         bool bSystem = sgReadyData.GetSystemPosition();
         string strConNetWork = sgReadyData.GetSystemPositionString();
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         string strDate = DateTime.Now.ToString("yyyyMMdd");
 
         string strUserID = sgLoginData.GetUserID();
@@ -537,12 +532,7 @@
         bool bSystem = sgReadyData.GetSystemPosition();
         string strConNetWork = sgReadyData.GetSystemPositionString();
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         string strDate = DateTime.Now.ToString("yyyyMMdd");
 
         string strUserID = sgLoginData.GetUserID();

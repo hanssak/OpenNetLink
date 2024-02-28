@@ -330,7 +330,7 @@
             if (nViewPageNo < 1)
                 nViewPageNo = 1;*@
 
-        nViewPageNo = pageNumber + 1;
+    nViewPageNo = pageNumber + 1;
 
         doSearch();
     }
@@ -371,12 +371,7 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strQueryCount = SGQueryExtend.GetSkipFileCount(sgUserData.GetUserSequence());
+        string strQueryCount = SGQueryExtend.GetSkipFileCount(sgLoginData.GetUserSequence());
         //    "SELECT COUNT(*) AS count FROM tbl_skip_file_list WHERE user_seq=" + sgUserData.GetUserSequence();
 
         HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
@@ -623,16 +618,13 @@
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         string curUserID = "";
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+        if (sgLoginData == null)
         {
             g_RequestProcessing = false;
             return;
         }
+        curUserID = sgLoginData.GetUserID();
+
 
         string systemid = (sgLoginData.GetSystemPosition() ? "I001" : "E001");
 
@@ -647,7 +639,7 @@
 
         string strsha384 = SHA384CheckSum(m_filePath);
 
-        string strSql = SGQueryExtend.GetSkipFileListSet(systemid, g_strFileName, lfileSize, strReasonData, sgUserData.GetUserSequence(), strsha384, g_ninterLockFlag);
+        string strSql = SGQueryExtend.GetSkipFileListSet(systemid, g_strFileName, lfileSize, strReasonData, sgLoginData.GetUserSequence(), strsha384, g_ninterLockFlag);
         @*string sql = string.Empty;
             sql = " select a.cnt1 + b.cnt2 AS CHKCNT FROM ";
             sql += " (select COUNT(*) AS cnt1 from tbl_skip_file_list ";
@@ -714,15 +706,10 @@
             if (sgLoginData != null)
                 curUserID = sgLoginData.GetUserID();
 
-            SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
-            if (sgUserData == null)
-                return;
-
             // Server에게 알림
             // HSCmdCenter.sgPageEvent.SetEvent(groupID, SendNotiCmdDoneResult);
             HSCmdCenter.sgPageEvent.SetGenericNotiType2EventAdd(groupId, SendNotiCmdDoneResult);
-            HSCmdCenter.SendGenericNotiType2(groupId, curUserID, sgUserData.GetUserName(), sgUserData.GetTeamName(), g_strFileName, g_ninterLockFlag.ToString());
+            HSCmdCenter.SendGenericNotiType2(groupId, curUserID, sgLoginData.GetUserName(), sgLoginData.GetTeamName(), g_strFileName, g_ninterLockFlag.ToString());
 
             // 선택한 파일정보 초기화
             clearReqInfo();
@@ -1014,11 +1001,6 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
         //LIST 요청응답
         HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchListResult);
 
@@ -1035,7 +1017,7 @@
         // (CASE WHEN APPR_RES_TIME IS NULL THEN '-' WHEN APPR_RES_TIME ='' THEN '-' WHEN APPR_RES_TIME =' ' THEN '-' ELSE APPR_RES_TIME END ) APPR_RES_TIME,
         // (CASE WHEN EXPIRED_DATE IS NULL THEN '-' WHEN EXPIRED_DATE ='' THEN '-' WHEN EXPIRED_DATE =' ' THEN '-' ELSE EXPIRED_DATE END ) EXPIRED_DATE,
 
-        string strQueryList = SGQueryExtend.GetSkipFileList(sgUserData.GetUserSequence(), nPageListCount, nViewPageNo);
+        string strQueryList = SGQueryExtend.GetSkipFileList(sgLoginData.GetUserSequence(), nPageListCount, nViewPageNo);
         HSCmdCenter.SendListQuery(groupID, curUserID, strQueryList);
 
     }
@@ -1106,12 +1088,11 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+        SGLoginData sgLoginData= (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
             return;
 
-        string strQuery = SGQueryExtend.GetFileExceptionCancel(sgUserData.GetUserSequence(), listCheckditem);
+        string strQuery = SGQueryExtend.GetFileExceptionCancel(sgLoginData.GetUserSequence(), listCheckditem);
         //string strQuery = $@"Hsck_Transaction:";
         //string strOneQuery = "";
 
@@ -1136,7 +1117,7 @@
         hsNetWork = HSCmdCenter.GetConnectNetWork(groupID);
         if (hsNetWork != null)
         {
-            HSCmdCenter.sgSendData.RequestCommonSendQuery(hsNetWork, eCmdList.eUPDATEQUERY, sgUserData.GetUserID(), strQuery);
+            HSCmdCenter.sgSendData.RequestCommonSendQuery(hsNetWork, eCmdList.eUPDATEQUERY, sgLoginData.GetUserID(), strQuery);
         }
 
         StateHasChanged();

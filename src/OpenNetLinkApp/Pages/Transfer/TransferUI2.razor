@@ -2008,11 +2008,6 @@
 
         m_apvStep = sgLoginData.GetApproveStep();
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
         //string strSysID = sgLoginData.GetSysID();
         //string strUserID = sgLoginData.GetUserID();
         //string strUserName = sgUserData.GetUserName();
@@ -2094,12 +2089,11 @@
             return;
         }
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+        SGLoginData sgLoginData= (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
             return;
 
-        string strCurTeamName = sgUserData.GetTeamName();
+        string strCurTeamName = sgLoginData.GetTeamName();
         //팝업 첫 화면은 해당 DEPT CODE 로 조회하여 해당 부서만 조회되도록 처리
         //refReceiverSelect_PopUp.SetInitDeptName(strCurTeamName);
         refReceiverSelect_PopUp.BindEvent();
@@ -2859,12 +2853,7 @@
         bool bSystem = sgReadyData.GetSystemPosition();
         string strConNetWork = sgReadyData.GetSystemPositionString();
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         string strDate = DateTime.Now.ToString("yyyyMMdd");
 
         string strUserID = sgLoginData.GetUserID();
@@ -2896,12 +2885,7 @@
         bool bSystem = sgReadyData.GetSystemPosition();
         string strConNetWork = sgReadyData.GetSystemPositionString();
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         string strDate = DateTime.Now.ToString("yyyyMMdd");
 
         string strUserID = sgLoginData.GetUserID();
@@ -3190,14 +3174,13 @@
 
     public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgType eMType, string path, string body)
     {
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+        SGLoginData sgLoginData= (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
         {
             return;
         }
 
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         SGMsgData sgMsgData = null;
         sgMsgData = new SGMsgData();
         if (sgMsgData == null)

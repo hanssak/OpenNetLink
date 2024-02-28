@@ -936,19 +936,7 @@
                 await refUpdate_PopUp.openPopUp();
                 return;
             }*/
-
-
-            SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupId);
-            SGData sfmData = HsCmdCenter.GetSFMListData(groupId);
-
-            while (true)
-            {
-                sfmData = HsCmdCenter.GetSFMListData(groupId);
-                if (sfmData != null)
-                    break;
-                Thread.Sleep(50);
-            }
-            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
+            sgUserSvr.SetUserInfo(groupId, sgLoginData);
 
             // CLIENT_ZIP_DEPTH 정보 가져옴
             SGQueryExtend sgQueryExtend = null;
@@ -1049,7 +1037,7 @@
 
                 SGData tmpData = null;
                 // tmpData = HsCmdCenter.GetSGSvrData(groupId);
-                tmpData = HsCmdCenter.GetUserData(groupId);
+                tmpData = HsCmdCenter.GetLoginData(groupId);
                 if (tmpData != null)
                 {
                     // gpki_login때는 id 사용
@@ -1204,12 +1192,12 @@
             }
 
             SGLoginData sgLoginData = null;
-            SGUserData sgUserData = null;
+            
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(i);
-            sgUserData = (SGUserData)HsCmdCenter.GetUserData(i);
+            
             ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupid);
 
-            if ((sgLoginData != null) && (sgUserData != null))
+            if (sgLoginData != null) 
             {
                 bFileTransMenuUse = sgLoginData.GetFileTrans();
 
@@ -1219,7 +1207,7 @@
                     if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupid)) > 0))
                         bApprMenuUse = true;
 
-                bSecurityApprMenuUse = sgUserData.GetUserPrivacyApprPos();
+                bSecurityApprMenuUse = sgLoginData.GetExApprovalUse();
                 bPCURLUse = sgLoginData.GetPCURLUse();
             }
 
@@ -1248,8 +1236,8 @@
 
             string strNavigatePathWithGroupID = "";
             string strUserSeq = "";
-            if (sgUserData != null)
-                strUserSeq = sgUserData.GetUserSequence();
+            if (sgLoginData != null)
+                strUserSeq = sgLoginData.GetUserSequence();
 
             strNavigatePathWithGroupID = strRootPath;
             strNavigatePathWithGroupID += gID.ToString();

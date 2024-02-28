@@ -8,6 +8,8 @@ using OpenNetLinkApp.Services;
 using System.Data;
 using Serilog;
 using AgLogManager;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -76,7 +78,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     public class SGLoginData : SGData
     {
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGLoginData>();
-        
+        private readonly XmlConfService xconf = new XmlConfService();
         /// <summary>
         /// SGData 저장될 시, Ready에서 받아놨던, sg_net_type 내부  저장
         /// </summary>
@@ -185,22 +187,118 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strSysID = (GetSystemPosition()) ? "I" : "E";
             return strSysID;
         }
-        /**
-		 * @breif Link Check Time 주기를 반환한다.
-		 * @return 초단위
-		 */
-        public int GetLinkCheckTime()
+
+        /// <summary>
+        /// 사용자의 이름을 반환한다.
+        /// </summary>
+        /// <returns></returns>
+        public string GetUserName()
         {
-            string strData = GetTagData("LINKCHECKTIME");
-            if (strData.Equals(""))
-                return 0;
-            int size = Convert.ToInt32(strData);
-            return size;
+            string strData = GetTagData("user_hr", "name");
+            return strData;
         }
-        /**
-		 * @breif 수신파일 폴더 삭제 주기를 반환한다.
-		 * @return 시간 단위
-		 */
+
+        /// <summary>
+        /// 사용자의 Sequence 정보를 반환한다.(return 사용자 Sequence)
+        /// </summary>
+        /// <returns></returns>
+        public string GetUserSequence()
+        {
+            string strData = GetTagData("user_hr", "user_seq");
+            return strData;
+        }
+        /// <summary>
+        /// 사용자의 ID 정보를 반환한다.
+        /// </summary>
+        /// <returns></returns>
+        public string GetUserID()
+        {
+            string strData = GetTagData("user_hr", "user_id");
+            return strData;
+        }
+
+        /// <summary>
+        /// 사용자의 팀 이름을 반환한다..
+        /// </summary>
+        /// <returns></returns>
+        public string GetTeamName()
+        {
+            string strData = GetTagData("user_hr", "dept_name");
+            return strData;
+        }
+        /// <summary>
+        /// 사용자의 팀 코드를 반환한다..
+        /// </summary>
+        /// <returns></returns>
+        public string GetTeamCode()
+        {
+            string strData = GetTagData("user_hr", "dept_seq");
+            return strData;
+        }
+
+        /// <summary>
+        /// 사용자의 Position 정보를 반환한다.
+        /// </summary>
+        /// <returns></returns>
+        public string GetUserPosition()
+        {
+            string strData = GetTagData("user_hr", "position");
+            return strData;
+        }
+
+        /// <summary>
+        /// 사용자의 Rank 정보를 반환한다.
+        /// </summary>
+        /// <returns></returns>
+        public string GetRank()
+        {
+            string strData = GetTagData("user_hr", "rank");
+            return strData;
+        }
+
+        /// <summary>
+        /// 사용자의 실 결재권한 여부를 반환한다. (return 0 : 일반사용자, 1: 결재권자, 2: 전결자)
+        ///<br>[주의] userInfo Service에 삽입시에만 사용</br> 
+        /// <br>(OpenNetLink의 동작 시 권한은 UserInfo의 GetUserApprPos 사용)</br>
+        /// </summary>
+        /// <returns></returns>
+        public int GetUserApprpos()
+        {
+            string strData = GetTagData("approver_type", "authority");
+            int nApprPos = Convert.ToInt32(strData);
+            return nApprPos;
+        }
+        /// <summary>
+        /// GetUserApprpos 확장함수로 문자열을 직접 제공한다
+        /// </summary>
+        /// <returns></returns>
+        public string GetUserApprposString() => GetUserApprpos() switch
+        {
+            0 => xconf.GetTitle("T_INFO_NORMAL_USER"),
+            1 => xconf.GetTitle("T_INFO_APPROVER_USER"),
+            2 => xconf.GetTitle("T_INFO_APPROVE_FREE_USER"),
+            _ => "",
+        };
+
+        /// <summary>
+        /// 사용자의 개인정보,보안결재권한 여부를 반환한다. (return true : 보안결재자)
+        /// </summary>
+        /// <returns>true: 보안결재자 / false : 일반사용자</returns>
+        public bool GetExApprovalUse()
+        {
+
+            string strData = GetTagData("approver_type", "dlp_authority");
+            return (strData == "1");
+        }
+        public string GetUserPrivacyApprPosString() => GetExApprovalUse() switch
+        {
+            true => xconf.GetTitle("T_APPROVE_PRIVACY"),
+            false => xconf.GetTitle("T_INFO_NORMAL_USER")
+        };
+        /// <summary>
+        /// 수신파일 폴더 삭제 주기를 반환한다.
+        /// </summary>
+        /// <returns>시간 단위</returns>
         public int GetFileRemoveCycle()
         {
             string strData = GetTagData("user_policy", "file_delete_cycle");
@@ -209,13 +307,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             int size = Convert.ToInt32(strData);
             return size;
         }
-        /**
-		 * @breif 한번에 전송가능한 파일의 최대 사이즈를 반환한다.
-		 * @return MB 단위
-		 */
+
+        /// <summary>
+        /// 한번에 전송가능한 파일의 최대 사이즈를 반환한다.
+        /// </summary>
+        /// <returns>MB 단위</returns>
         public Int64 GetFileLimitSize()
         {
-            string strData = GetTagData("FILELIMITSIZE");
+            string strData = GetTagData("user_policy", "transfer_policy", "allowed_one_time", "total_size");
             if (strData.Equals(""))
                 return 0;
             Int64 size = Convert.ToInt64(strData);
@@ -228,7 +327,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>전송가능한 파일의 최대 개수</returns>
         public int GetFileLimitCount()
         {
-            string strData = GetTagData("MAXFILETRANSFERCOUNT");
+            string strData = GetTagData("user_policy", "transfer_policy", "allowed_one_time", "total_count");
             if (strData.Equals(""))
                 return 0;
             int count = Convert.ToInt32(strData);
@@ -238,39 +337,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         /// <summary>
         /// 클립보드 사용 여부를 반환한다.
+        /// 0:금지, 1:전체허용, 2:반입 계속 가능, 3:반출 계속 가능"
         /// </summary>
         /// <returns>true  : 클립보드 전송 가능</returns>
         public bool GetClipboard()
         {
-            string strData = GetTagData("CLIPPOLICYFLAG");
-
+            string strData = GetTagData("user_login", "user_policy", "clip_policy_flag", "type");
             bool bInner = GetSystemPosition();
-            int nClipPolicyFlag = 0;
-            if (strData.Equals(""))
+
+            if (strData == "0") //금지
                 return false;
-            nClipPolicyFlag = Convert.ToInt32(strData);
-            bool bResult = false;
-            if (bInner == true)
-            {
-                if (nClipPolicyFlag == 1)
-                    bResult = false;
-                else if (nClipPolicyFlag == 2)
-                    bResult = true;
-            }
-            else
-            {
-                if (nClipPolicyFlag == 1)
-                    bResult = true;
-                else if (nClipPolicyFlag == 2)
-                    bResult = false;
-            }
+            if (strData == "1") //전체 허용
+                return true;
+            if(strData == "2")  //반입 가능
+                return (!bInner);
+            if (strData == "3") //반출 가능
+                return (bInner);
 
-            if (nClipPolicyFlag == 3)
-                bResult = true;
-            else if (nClipPolicyFlag == 4)
-                bResult = false;
-
-            return bResult;
+            return false;
         }
 
         /// <summary>
@@ -284,28 +368,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
+        /// OTP 발급불가/가능. 타망에서 OTP 로그인을 할 경우 사용. OTP 생성 메뉴 활성화
+        /// </summary>
+        /// <returns>true : OTP발급가능(발급 Popup 표시)</returns>
+        public bool GetOTPPublishUse()
+        {
+            string strData = GetTagData("user_policy", "manual_download_use");
+            return (strData.ToUpper() == "TRUE");
+        }
+
+        /// <summary>
         /// 결재 사용 여부를 반환한다. (3망연계 설정 사용시 3망연계 설정값도 반영함)
-        /// <para>서버 정책의 APPROVEUSETYPE 사용</para>
+        /// <para>서버 정책의 approve_use 사용</para>
         /// </summary>
         /// <returns>true : 결재 사용</returns>		
         public bool GetApprove()
         {
             bool bRet = true;
-            string strData = GetTagData("APPROVEUSETYPE");
-            int nValue = 0;
-            if (!strData.Equals(""))
-                nValue = Convert.ToInt32(strData);
-            if (nValue != 0)
-                bRet = true;
-            else
-                bRet = false;
-
-            return bRet;
+            string strData = GetTagData("user_policy", "approval_policy", "approve_use");
+            return (strData == "true");
         }
 
         /// <summary>
         /// 결재 사용 시 결재자 편집 사용 여부를 반환한다
-        /// <para>정책 APPROVEPROXY 사용</para>
+        /// <para>user_login.user_policy.approval_policy.action 사용</para>
         /// </summary>
         /// <returns>결재자 편집 사용</returns>
         public bool GetApproveAppend()
@@ -313,14 +399,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (GetApprove() == false)  // 3망연계정보 상관없음
                 return false;
 
-            string strData = GetTagData("APPROVEPROXY");
-            int nValue = 0;
-            if (!strData.Equals(""))
-                nValue = Convert.ToInt32(strData);
-            if ((nValue == 2) || (nValue == 3))
-                return true;
-            else
-                return false;
+            string strData = GetTagData("user_policy", "approval_policy","action");
+            return (strData == "all" || strData == "select");
         }
 
         /// <summary>
@@ -332,14 +412,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (GetApprove() == false)  // 3망연계정보 상관없음
                 return false;
 
-            string strData = GetTagData("APPROVEPROXY");
-            int nValue = 0;
-            if (!strData.Equals(""))
-                nValue = Convert.ToInt32(strData);
-            if ((nValue == 1) || (nValue == 3))
-                return true;
-            else
-                return false;
+            string strData = GetTagData("user_policy", "approval_policy", "action");
+            return (strData == "all" || strData == "fix");
+        }
+
+        /// <summary>
+        /// 결재 사용 시, 결재 대결재자/결재자 추가 정보 (과거 APPROVEPROXY)
+        /// </summary>
+        /// <returns>0:사용안함 / 1:고정결재(대결재) / 2:선택 결재 / 3: 1+2</returns>
+        public int GetApproveProxyInteger()
+        {
+            if (GetApprove() == false)  // 3망연계정보 상관없음
+                return -1;
+
+            string strData = GetTagData("user_policy", "approval_policy", "action");
+            if (strData == "unuse")
+                return 0;
+            if (strData == "fix")
+                return 1;
+            if (strData == "select")
+                return 2;
+            if (strData == "all")
+                return 3;
+
+            return 0;
         }
 
         /// <summary>
@@ -361,14 +457,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>파일확장자 정보</returns>
         public string GetFileFilter()
         {
-            string strData = GetTagData("FILEFILTER");
-            if ((strData.Equals("") == true) || (strData.Equals("HS_ALL_FILE") == true))
-            {
-                //SetTagData("FILEFILTER", ";".Base64EncodingStr());
-                return ";";
-            }
+            List<string> filterList = GetTagDataList("user_policy", "file_filter_list");
 
-            return strData;
+            if (filterList == null || filterList.Count <= 0)
+                return ";";
+            else
+                return string.Join(";", filterList);
         }
 
         /// <summary>
@@ -506,40 +600,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         /// <summary>
         /// 파일 전송 사용 여부를 확인한다..
+        /// 0:금지, 1:전체허용, 2:반입 계속 가능, 3:반출 계속 가능
         /// </summary>
         /// <returns>파일 전송 가능</returns>
         public bool GetFileTrans()
         {
-            string strData = GetTagData("POLICYFLAG");
+            string strData = GetTagData("user_policy","file_upload_time", "type");
             bool bInner = GetSystemPosition();
 
-            //1:반입허용, 2:반출허용, 3:전체허용, 4:전체금지
-            int nValue = 0;
-            if (!strData.Equals(""))
-                nValue = Convert.ToInt32(strData);
-            if (nValue == 3)
-                return true;
-            else if (nValue == 4)
+            if (strData == "0") //금지
                 return false;
+            if (strData == "1")  //전체 허용
+                return true;
+            if (strData == "2")  //반입 가능
+                return (!bInner);
+            if (strData == "3")   //반출 가능
+                return (bInner);
 
-            if (bInner == true)
-            {
-                if (nValue == 2)
-                    return true;
-                else if (nValue == 1)
-                    return false;
-                else
-                    return false;
-            }
-            else
-            {
-                if (nValue == 2)
-                    return false;
-                else if (nValue == 1)
-                    return true;
-                else
-                    return false;
-            }
+            return false;
         }
 
         /// <summary>
@@ -1150,7 +1228,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>파일 일일 전송 가능 최대 Size 제한 정보.</returns>
         public Int64 GetDayFileTransferLimitSize()
         {
-            string strData = GetTagData("DAYFILETRANSFERLIMITSIZE");
+            string strData = GetTagData("user_policy", "transfer_policy", "allowed_daily", "total_size");
             if (strData.Equals(""))
                 return 0;
             Int64 size = Convert.ToInt64(strData);
@@ -1163,7 +1241,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>파일 일일 전송 횟수 제한 정보</returns>
         public int GetDayFileTransferLimitCount()
         {
-            string strData = GetTagData("DAYFILETRANSFERLIMITCOUNT");
+            string strData = GetTagData("user_policy", "transfer_policy", "allowed_daily", "total_number");
             if (strData.Equals(""))
                 return 0;
             int Count = Convert.ToInt32(strData);
@@ -1176,7 +1254,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>클립보드 일일 전송 횟수 제한 정보</returns>
         public int GetDayClipboardLimitCount()
         {
-            string strData = GetTagData("DAYCLIPBOARDCOUNT");
+            string strData = GetTagData("user_policy", "transfer_policy", "allowed_daily", "clipboard_total_number");
             if (strData.Equals(""))
                 return 0;
             int Count = Convert.ToInt32(strData);
@@ -1189,7 +1267,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>클립보드 일일 전송 가능한 최대 SIZE 제한 정보</returns>
         public Int64 GetDayClipboardLimitSize()
         {
-            string strData = GetTagData("DAYCLIPBOARDSIZE");
+            string strData = GetTagData("user_policy", "transfer_policy", "allowed_daily", "clipboard_total_size");
             if (strData.Equals(""))
                 return 0;
             Int64 size = Convert.ToInt64(strData);
@@ -1202,7 +1280,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>한번에 전송 가능한 클립보드 최대 Size 제한 정보</returns>
         public Int64 GetClipboardLimitSize()
         {
-            string strData = GetTagData("CLIPBOARDSIZE");
+            string strData = GetTagData("user_policy", "transfer_policy", "allowed_one_time", "clipboard_total_size");
             if (strData.Equals(""))
                 return 0;
             Int64 size = Convert.ToInt64(strData);
@@ -1215,7 +1293,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>다운로드 가능한 횟수</returns>
         public int GetMaxDownCount()
         {
-            string strData = GetTagData("DOWNLIMITCOUNT");
+            string strData = GetTagData("user_policy", "download_limit_count");
             if (strData.Equals(""))
                 return 0;
             int count = 0;
@@ -1297,20 +1375,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// PCURL 사용 유무를 반환한다.
+        /// [사용안함] PCURL 사용 유무를 반환한다.
         /// </summary>
-        /// <returns>( true : 사용, false : 사용 안함 )</returns>
-        public bool GetPCURLUse()
-        {
-            string strData = GetTagData("PCTOURLUSE");
-            int nValue = 0;
-            if (strData.Equals(""))
-                return false;
-            nValue = Convert.ToInt32(strData);
-            if (nValue > 0)
-                return true;
-            return false;
-        }
+        /// <returns>false</returns>
+        public bool GetPCURLUse() => false;
 
         /// <summary>
         /// 서버 시간 정보를 반환한다.
@@ -1768,12 +1836,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>서버에 설정된 결재유형값(0:AND, 1:OR, 2:ANDOR)</returns>
         public int GetApproveStep()
         {
-            string strData = GetTagData("APPROVESTEP");
-            int nValue = 0;
-            if (strData.Equals(""))
-                return nValue;
-            nValue = Convert.ToInt32(strData);
-            return nValue;
+            string strData = GetTagData("user_policy","approval_policy", "approve_step");
+            if (strData == "and")
+                return 0;
+            if (strData == "or")
+                return 1;
+            if (strData == "andor")
+                return 2;
+            return 0;
         }
 
         /// <summary>
@@ -2406,5 +2476,34 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return (listUrlData.Count > 0);
         }
 
+        /// <summary>
+        /// 나를 대결재자로 부여한 사용자 목록
+        /// </summary>
+        /// <returns></returns>
+        public List<(string Name, string Rank, int Right)> GetApproverWhoGaveMeProxyList()
+        {
+            List<object> listData = GetTagDataObjectList("approve_line", "approver_who_gave_me_proxy_list");
+            List<(string name, string rank, int right)> ret = new List<(string name, string rank, int right)>();
+            if (listData == null || listData.Count <= 0)
+            {
+                return ret;
+            }
+            else
+            {
+                foreach (object item in listData)
+                {
+                    JObject jObjItem = (JObject)item;
+                    Dictionary<string, object> person = jObjItem.ToObject<Dictionary<string, object>>();
+                    string name = person.GetTagData("approver_hr", "name");
+                    string rank = person.GetTagData("approver_hr", "rank");
+                    int.TryParse(person.GetTagData("approver_type", "authority"), out int right);
+
+                    ret.Add((name, rank, right));
+                }
+                return ret;
+
+            }
+        }
     }
 }
+

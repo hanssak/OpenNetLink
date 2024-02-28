@@ -361,10 +361,10 @@
     void UpdateLogData()
     {
         transferLogData.Clear();
-        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupIDbyParam);
-        if (sgUserData != null)
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupIDbyParam);
+        if (sgLoginData != null)
         {
-            string strUserSeq = sgUserData.GetUserSequence();
+            string strUserSeq = sgLoginData.GetUserSequence();
             transferLogData = SGLogDBProc.Instance.SelectTransferLogDataList(groupIDbyParam, strUserSeq);
         }
         StateHasChanged();

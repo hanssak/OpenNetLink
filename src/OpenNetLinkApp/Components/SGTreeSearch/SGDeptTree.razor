@@ -68,16 +68,6 @@
         }
     }
 
-    SGUserData activeSGUserData
-    {
-        get
-        {
-            int gouprid = activedGroupID;
-            SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(gouprid);
-            return sgUserData;
-        }
-    }
-
     private ISGSideBarUIService SideBarUISvc;
 
     string strInputDept = "";
@@ -188,10 +178,10 @@
 
         HsCmdCenter.sgPageEvent.SetDeptInfoEventAdd(activedGroupID, setDeptTree);
         if (activedSGLogin != null)
+        {
             HsCmdCenter.SendDeptInfo(activedGroupID, activedSGLogin.GetUserID());
-
-        if (activeSGUserData != null)
-            strSelectedDeptCode = activeSGUserData.GetTeamCode();
+            strSelectedDeptCode = activedSGLogin.GetTeamCode();
+        }
     }
 
     /// <summary>

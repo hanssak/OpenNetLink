@@ -351,11 +351,6 @@
         if (sgLoginData == null)
             return;
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
         AgentBlockData iTemBlockData = new AgentBlockData();
         List<AgentBlockData> listAgentBlockData = new List<AgentBlockData>();
         for (int i = 0; i < listDenied.Count; i++)
@@ -467,12 +462,7 @@
         if (sgLoginData.GetSystemPosition())
             strSystemType = "I";
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
 
         List<string> listQuery = new List<string>();
         SGQueryExtend sgQuery = new SGQueryExtend();

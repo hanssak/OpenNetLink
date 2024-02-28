@@ -3337,12 +3337,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         bool bSystem = sgReadyData.GetSystemPosition();
         string strConNetWork = sgReadyData.GetSystemPositionString();
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         string strDate = DateTime.Now.ToString("yyyyMMdd");
 
         string strUserID = sgLoginData.GetUserID();
@@ -3735,11 +3730,11 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             return;
         }
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
-        if (sgUserData == null)
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        if (sgLoginData == null)
             return;
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
 
         CLog.Here().Information($"####### - BOARD_NOTIFY - groupid : {groupid}, strUserSeq : {strUserSeq}");
 
@@ -3820,14 +3815,13 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
     public void InsertAlarm(int groupID, LSIDEBAR menuCategory, eAlarmType eAlarmType, string path, string body)
     {
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+        SGLoginData sgLoginData= (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
         {
             return;
         }
 
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         SGMsgData sgMsgData = null;
         sgMsgData = new SGMsgData();
         if (sgMsgData == null)
@@ -3861,14 +3855,12 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
     public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgType eMsgType, string path, string body)
     {
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-        {
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
             return;
-        }
 
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgLoginData.GetUserSequence();
         SGMsgData sgMsgData = null;
         sgMsgData = new SGMsgData();
         if (sgMsgData == null)

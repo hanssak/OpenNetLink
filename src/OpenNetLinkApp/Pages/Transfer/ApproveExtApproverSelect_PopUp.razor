@@ -596,9 +596,7 @@
                 strEncSaveApprLine = sgSettingProc.GetSettingApprLine(groupID);
                 sgRSACrypto.ValueDecrypt(strEncSaveApprLine, out strApprLine);
             }
-            SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-            if (sgUserData == null)
+            if (sgLoginData == null)
                 return;
 
             int step = 0;
@@ -606,7 +604,7 @@
             if (sgLoginData != null)
                 step = sgLoginData.GetApproveStep();
 
-            string strUserSeq = sgUserData.GetUserSequence();
+            string strUserSeq = sgLoginData.GetUserSequence();
             strApprLine = SGApprLineData.LocalSaveANDApprLineData(ApproverSelect, strUserSeq, strApprLine, step);
             string strEncApprLine = "";
             sgRSACrypto.ValueEncrypt(strApprLine, out strEncApprLine);
@@ -677,21 +675,20 @@
 
         bEditDeptName = SGAppMgrSvc.OpConfigInfoService.GetUseApprDeptSearch(groupID);
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData != null)
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
         {
-            strTeamName = sgUserData.GetTeamName();
+            strTeamName = sgLoginData.GetTeamName();
             SetInitDeptName(strTeamName);
         }
 
 
         if (pageService.GetLoadApprBaseLine(groupID) == false)
         {
-            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
             int nApproveProxy = 0;
             if (sgLoginData != null)
-                nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY");
+                nApproveProxy = sgLoginData.GetApproveProxyInteger();
 
             bool bLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID); // siteConfig. json으로 이동
             if (bLocalSave && nApproveProxy > 1)
@@ -709,14 +706,14 @@
                     string strApprLine = "";
                     sgRSACrypto.ValueDecrypt(strEncApprLine, out strApprLine);
 
-                    if (sgUserData == null)
+                    if (sgLoginData == null)
                     {
                         InitApprLine();
                         StateHasChanged();
                         return;
                     }
 
-                    string strUserSeq = sgUserData.GetUserSequence();
+                    string strUserSeq = sgLoginData.GetUserSequence();
 
                     int approveStep = (sgLoginData != null) ? sgLoginData.GetApproveStep() : 0;
 
@@ -807,12 +804,12 @@
             if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
                 return;
 
-            SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-            if (sgUserData == null)
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
                 return;
 
-            string strUserSeq = sgUserData.GetUserSequence();
+            string strUserSeq = sgLoginData.GetUserSequence();
 
             int count = 1;
             foreach (var item in apprLinkedList)
@@ -894,17 +891,12 @@
             return;
         }
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
-
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
+        
+        string strUserSeq = sgLoginData.GetUserSequence();
         int step = sgLoginData.GetApproveStep();    //결재유형 취득
         m_step = step;
 
@@ -976,18 +968,13 @@
         if (sgLoginData == null)
             return;
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
         string strSysID = sgLoginData.GetSysID();
         string strUserID = sgLoginData.GetUserID();
         string strUserName = strCurName;
         string strTeamName = strCurDept;
 
         //strCurDept = strTeamName;
-        string strTeamCode = (isInit) ? sgUserData.GetUserTagData("TEAMCODE") : "";
+        string strTeamCode = (isInit) ? sgLoginData.GetTeamCode() : "";
 
         SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);

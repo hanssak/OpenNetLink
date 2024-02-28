@@ -628,7 +628,7 @@
             return;
         }
 
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
         @*await GetDateTime();*@
@@ -988,7 +988,7 @@
             ShowMessage("error", strMsg);
             return;
         }
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupId);
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
         string curUserID = "";
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
