@@ -9,6 +9,7 @@ using AgLogManager;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
+
     public class ApproverInfo
     {
         public string selectIndex { get; set; }
@@ -29,6 +30,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string APPR_USERNAME { get; set; }
         public string POSITION { get; set; }
         public string RANK { get; set; }
+
+        /// <summary>
+        /// false:일반사용자, true:추가 결재권자.
+        /// </summary>
+        public bool bOtherApproveUse { get; set; }
+
+        /// <summary>
+        /// false:일반사용자, true:vip사용자
+        /// </summary>
+        public bool bVip { get; set; }
+
+
 
         public int ORDER { get; set; } //대결재 순서....
         public ApproverInfo(int index, string name, string rank, string deptname, string deptseq, string seq, string apvorder, string id)
@@ -130,12 +143,161 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 APPR_USERID = this.APPR_USERID,
                 APPR_USERNAME = this.APPR_USERNAME,
                 POSITION = this.POSITION,
-                RANK = this.RANK
+                RANK = this.RANK,
+                bOtherApproveUse = this.bOtherApproveUse,
+                bVip = this.bVip
+            };
+
+            return CopyValue;
+        }
+
+
+        public ProxyApprover ToProxyApprover(string strUserSeq)
+        {
+            ProxyApprover CopyValue = new ProxyApprover();
+
+            try
+            {
+                CopyValue.ApproverHr.strDeptName = this.DeptName;
+                CopyValue.ApproverHr.deptSeq = Convert.ToInt64(this.DeptSeq);
+                CopyValue.ApproverHr.strName = this.Name;
+                CopyValue.ApproverHr.strRank = this.RANK;
+                CopyValue.ApproverHr.strPosition = this.POSITION;
+                CopyValue.User_Seq = Convert.ToInt64(strUserSeq);
+                CopyValue.Approver_Seq = Convert.ToInt64(this.UserSeq);
+
+                CopyValue.ApproverType.nAuthority = this.nApprPos;
+                CopyValue.ApproverType.nDlpAuthority = this.nDlpApprove;
+                CopyValue.ApproverType.bOtherUse = this.bOtherApproveUse;
+                CopyValue.ApproverType.bVip = this.bVip;
+
+                //CopyValue.strApproverType = this.GetDlpApprover() ? "security" : "common";
+                CopyValue.nApproverOrder = this.nApvOrder;
+                CopyValue.STARTDATE = this.STARTDATE;
+                CopyValue.ENDDATE = this.ENDDATE;
+            }
+            catch(Exception ex)
+            {
+                Log.Logger.Here().Error($"ToProxyApprover, Exception(MSG) : {ex.Message}");
+            }
+
+            return CopyValue;
+        }
+
+    }
+
+
+    public class UserApproveRightType
+    {
+        /// <summary>
+        /// 결재 권한 : 0:일반사용자, 1:결재자, 2:전결자
+        /// </summary>
+        public int nAuthority { get; set; }
+
+        /// <summary>
+        /// 0:일반사용자, 1:정보 보안 결재권자
+        /// </summary>
+        public int nDlpAuthority { get; set; }
+
+        /// <summary>
+        /// false:일반사용자, true:추가 결재권자.
+        /// </summary>
+        public bool bOtherUse { get; set; }
+
+        /// <summary>
+        /// false:일반사용자, true:vip사용자
+        /// </summary>
+        public bool bVip { get; set; }
+
+        public UserApproveRightType()
+        {
+            nAuthority = 0;
+            nDlpAuthority = 0;
+            bOtherUse = false;
+            bVip = false;
+        }
+
+
+
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class UserHRinfo
+    {
+        public string strName { get; set; }
+        public string strPosition { get; set; }
+
+        public string strRank { get; set; }
+        public Int64 deptSeq { get; set; }
+        public string strDeptName { get; set; }
+
+        public UserHRinfo()
+        {
+            strName = "";
+            strPosition = "";
+            strRank = "";
+            deptSeq = 0;
+            strDeptName = "";
+        }
+
+    }
+
+
+
+    public class ApproverUiData
+    {
+        public Int64 Approver_Seq { get; set; }
+        public UserHRinfo ApproverHr { get; set; }
+        public UserApproveRightType ApproverType { get; set; }
+
+    }
+
+    public class ProxyApprover
+    {
+
+        public Int64 User_Seq { get; set; }
+        public Int64 Approver_Seq { get; set; }
+        public UserHRinfo ApproverHr { get; set; }
+        public UserApproveRightType ApproverType { get; set; }
+
+        /// <summary>
+        /// 결재순서
+        /// </summary>
+        public int nApproverOrder { get; set; }
+
+        public string STARTDATE { get; set; }
+        public string ENDDATE { get; set; }
+
+
+        public ProxyApprover()
+        {
+            User_Seq = 0;
+            Approver_Seq = 0;
+            ApproverHr = new UserHRinfo();
+            ApproverType = new UserApproveRightType();
+            nApproverOrder = 0;
+            STARTDATE = ENDDATE = "";
+        }
+
+        public ProxyApprover Copy()
+        {
+            ProxyApprover CopyValue = new ProxyApprover()
+            {
+               
+                STARTDATE = this.STARTDATE,
+                ENDDATE = this.ENDDATE,
+                
             };
 
             return CopyValue;
         }
     }
+
+
+
     public class SGApprLineData : SGData
     {
 
@@ -802,4 +964,5 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
     }
+
 }

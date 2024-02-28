@@ -399,6 +399,7 @@ namespace OpenNetLinkApp.Services
             }
 
             svrTime = dt;
+
             if (timer == null)
             {
                 timer = new Timer();

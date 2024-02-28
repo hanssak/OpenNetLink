@@ -1303,10 +1303,10 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.RequestRest(args);
         }
 
-        public int RequestRestUserSearch(HsNetWork hsNet, string strApproverName, string strDeptSeq, string strDeptName, List<string> listApproveType)
+        public int RequestRestUserSearch(HsNetWork hsNet, string strApproverName, string strDeptSeq, string strDeptName, UserApproveRightType ApproveType)
         {
             Dictionary<string, object> dicBody = new Dictionary<string, object>();
-            dicBody["cond_approver_type_list"] = listApproveType.ToArray(); //"common", "security"
+            dicBody["approver_type"] = ApproveType;
             dicBody["dept_seq"] = ((strDeptSeq?.Length ?? 0) > 0) ? Convert.ToInt64(strDeptSeq) : 0;
             dicBody["dept_name"] = strDeptName;
             dicBody["approver_name"] = strApproverName;
@@ -1352,6 +1352,34 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostAgentBlocks, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.RequestRest(args);
         }
+
+        public int RequestRestInstApproveClear(HsNetWork hsNet)
+        {
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eDeleteProxyApprovers, null, null, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.RequestRest(args);
+        }
+
+        public int RequestRestInstApproveReg(HsNetWork hsNet, List<ProxyApprover> listProxyApprover)
+        {
+            if ((listProxyApprover?.Count ?? 0) < 1)
+                return -1;
+
+            Dictionary<string, object> dicBody = new Dictionary<string, object>();
+            dicBody["agent_block_list"] = listProxyApprover.ToArray();
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostProxyApproversChange, null, null, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.RequestRest(args);
+        }
+
+
+        public int RequestRestLogOut(HsNetWork hsNet, eCmdReponseType reponseType)
+        {
+            Dictionary<string, object> dicBody = new Dictionary<string, object>();
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostLogout, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey(), reponseType);
+            return hsNet.RequestRest(args);
+        }
+
+        
 
     }
 }

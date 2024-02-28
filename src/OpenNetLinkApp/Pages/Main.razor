@@ -1991,6 +1991,8 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
                     DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer(groupId)) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
                     pageService.SetSvrTime(groupId, dt, sgLoginData);
+
+
                     bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
                     bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
                     pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);

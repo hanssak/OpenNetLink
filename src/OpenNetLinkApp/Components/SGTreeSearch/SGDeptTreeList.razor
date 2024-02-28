@@ -321,11 +321,17 @@
         string strUserName = strCurrentInputName;    //입력한 부서명
         string strTeamName = strCurrentInputDept;    //입력한 이름
 
-        SGQueryExtend sgQuery = new SGQueryExtend();
-        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, "", IsApproverOnly);
-
         HsCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(activedGroupID, DeptApprLineSearchResult);
-        HsCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+
+        /*SGQueryExtend sgQuery = new SGQueryExtend();
+        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, "", IsApproverOnly);
+        HsCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);*/
+
+
+        UserApproveRightType approveType = new UserApproveRightType();
+        approveType.nAuthority = IsApproverOnly?1:0;
+        HsCmdCenter.RestUserSearch(groupID, strUserName, "", strTeamName, approveType);
+
     }
 
     /// <summary>
@@ -344,12 +350,17 @@
         string strUserID = activedSGLogin.GetUserID();
         string strTeamCode = getSelectedDeptSeq;
 
-        SGQueryExtend sgQuery = new SGQueryExtend();
+        /*SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, "", "", strTeamCode, IsApproverOnly);
+        HsCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);*/
 
         HsCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(activedGroupID, DeptApprLineSearchResult);
-        HsCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+
+        UserApproveRightType approveType = new UserApproveRightType();
+        approveType.nAuthority = IsApproverOnly?1:0;
+        HsCmdCenter.RestUserSearch(groupID, "", strTeamCode, strCurrentInputDept, approveType);
     }
+
     public void DeptApprLineSearchResult(int groupid, PageEventArgs e)
     {
         UserSearchList.Clear();
@@ -373,6 +384,7 @@
             StateHasChanged();
             return;
         }
+	
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
@@ -380,7 +392,7 @@
             StateHasChanged();
             return;
         }
-    ;
+
         string strUserSeq = sgLoginData.GetUserSequence();
 
         int count = 1;

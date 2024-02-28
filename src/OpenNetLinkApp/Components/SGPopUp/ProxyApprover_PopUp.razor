@@ -141,7 +141,7 @@
         //if (sgLoginData != null)
         //    bApproverOnly = !sgLoginData.GetApproveProxyRight();
 
-       
+
         base.OnAfterRender(firstRender);
     }
 
@@ -283,10 +283,35 @@
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null) return false;
 
+        // 예전
         ApproveProxy approveProxy = new ApproveProxy();
+
 
         string strQuery = approveProxy.GetSFMModify(sgLoginData.GetUserSequence(), strFromDay, strToDay, ProxySelect);
         HSCmdCenter.sgSendData.RequestInstApproveReg(HSCmdCenter.GetConnectNetWork(groupID), sgLoginData.GetUserID(), strQuery);
+
+
+        if (ProxySelect.Count > 0)
+        {
+
+            // 전체삭제
+            HSCmdCenter.RestInstApproveClear(groupID);
+
+            await Task.Delay(500);
+
+            // 한번에 등록
+            List<ProxyApprover> listProxyApprover = new List<ProxyApprover>();
+            foreach(ApproverInfo info in ProxySelect)
+            {
+                listProxyApprover.Add(info.ToProxyApprover(sgUserData.GetUserSequence()));
+            }
+            HSCmdCenter.RestInstApproveReg(groupID, listProxyApprover);
+        }
+        else
+        {
+            // 전체삭제
+            HSCmdCenter.RestInstApproveClear(groupID);
+        }
 
         return true;
     }
@@ -399,16 +424,24 @@
         string strTeamName = strCurDept;
         string strTeamCode = (isInit) ? sgLoginData.GetTeamCode() : "";
 
-        SGQueryExtend sgQuery = new SGQueryExtend();
+        /*SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
-        HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+        HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);*/
+
+
+        //List<string> listApproveType = new List<string>();
+        //listApproveType.Add("common");
+        UserApproveRightType approveType = new UserApproveRightType();
+        approveType.nAuthority = 1;
+        HSCmdCenter.RestUserSearch(groupID, strUserName, strTeamCode, strTeamName, approveType);
+
     }
 
     public void BindEvent()
     {
         int groupID = 0;
         groupID = SGAppMgrSvc.SideBarUIService.ActiveMenu.GroupId;
-        
+
         proxySearchType = SGAppMgrSvc.OpConfigInfoService.GetProxySearchType(groupID);
         useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInProxyTree(groupID);
         showUserId  = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
@@ -418,6 +451,7 @@
         //*****************************************************************
         //기본 결재자 검색
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprSearchResultProxy);
+
         //대결자 검색
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
@@ -429,8 +463,8 @@
         HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, ResultPossibleCount);
          if(sgLoginData == null)
             return;
-        
-         bool bApproverOnly = !sgLoginData.GetApproveProxyRight();
+
+        bool bApproverOnly = !sgLoginData.GetApproveProxyRight();
 
         if (proxySearchType == "TREE" && refSGDeptTreeList != null)
             refSGDeptTreeList.BindEvent(bApproverOnly);
@@ -492,23 +526,36 @@
         }
     }
 
+    /// <summary>
+    /// 조건에 맞는 결재자 검색결과 Result
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="e"></param>
     public void DeptApprSearchResultProxy(int groupid, PageEventArgs e)
     {
         try
         {
+            CLog.Here().Information($"DeptApprSearchResultProxy, result : {e.result}, Result-MSG : {e.strMsg} ");
             ProxySearch.Clear();
+
+            if (e.result != 0)
+                return;
+
             ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
                 groupID = sgSideBar.GroupId;
 
+            // Search 결과값 받아옴
             SGDeptApprLineSearchData sgDeptApprLine = null;
             sgDeptApprLine = (SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
             if (sgDeptApprLine == null)
                 return;
 
             LinkedList<ApproverInfo> apprLinkedList = null;
-            apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+            //apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+            apprLinkedList = sgDeptApprLine.GetDeptApproverInfoDataAdvanced();
+
             if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
                 return;
 

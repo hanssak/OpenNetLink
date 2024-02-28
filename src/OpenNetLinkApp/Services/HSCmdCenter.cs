@@ -3889,9 +3889,8 @@ namespace OpenNetLinkApp.Services
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-                if (hsNetWork == null)
-                    return -1;
+            if (hsNetWork == null)
+                return -1;
 
             int ret = -1;
 
@@ -3938,6 +3937,17 @@ namespace OpenNetLinkApp.Services
 
         }
 
+        public int SetHsNetWorkSvrTime(int groupid, DateTime dTime)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            hsNetWork.SetSvrTime(dTime);
+
+            return 0;
+        }
 
     }
 }
