@@ -318,6 +318,12 @@ namespace OpenNetLinkApp.PageEvent
     /// </summary>
     /// <param name="groupId"></param>
     public delegate void AuditOriRecvEvent(int groupId, SGData e);
+
+
+    //메일 본문 미리보기 정보 응답 이벤트 정의
+    public delegate void DashBoardDataEvent(int groupid, PageEventArgs e, SGData sgData);
+
+
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -508,6 +514,9 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, EmailPreviewInfoEvent> DicEmailPreviewInfoEvent = new Dictionary<int, EmailPreviewInfoEvent>(); //메일 본문 미리보기 정보 결과 노티
 
+
+        public Dictionary<int, DashBoardDataEvent> dicDashBoardEvent = new Dictionary<int, DashBoardDataEvent>(); // DashBoard Data 대부분 다주는 
+        
 
         public AuditOriRecvEvent auditOriEvent = null;
 
@@ -1776,6 +1785,25 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicEmailPreviewInfoEvent[groupid];
             return e;
         }
+
+        public void SetDashBoardDataEvent(int groupid, DashBoardDataEvent e)
+        {
+            DashBoardDataEvent temp = null;
+            if (dicDashBoardEvent.TryGetValue(groupid, out temp))
+                dicDashBoardEvent.Remove(groupid);
+            dicDashBoardEvent[groupid] = e;
+        }
+        public DashBoardDataEvent GetDashBoardDataEvent(int groupid)
+        {
+            DashBoardDataEvent e = null;
+            if (dicDashBoardEvent.TryGetValue(groupid, out e) == true)
+                e = dicDashBoardEvent[groupid];
+            return e;
+        }
+
+
+
+
         public void SetAuditOriEvent(AuditOriRecvEvent e) => auditOriEvent = e;
         public AuditOriRecvEvent GetAuditOriEvent() => auditOriEvent;
 

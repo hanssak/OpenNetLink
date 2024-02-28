@@ -1259,6 +1259,10 @@ namespace OpenNetLinkApp.Services
                     //    break;
 
 
+                    case eAdvancedCmdList.eGetDashboard:
+                        GetDashBoardafterSend(nRet, groupId, sgData);
+                        break;
+
                     case eAdvancedCmdList.ePostApproversRetrieval:
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
@@ -1276,7 +1280,6 @@ namespace OpenNetLinkApp.Services
                         break;
 
                     default:
-
                         throw new Exception("UnKnown CMD!");
                         break;
                 }
@@ -1876,6 +1879,31 @@ namespace OpenNetLinkApp.Services
             }
         }
 
+        public void GetDashBoardafterSend(int nRet, int groupId, SGData data)
+        {
+            if (data == null)
+            {
+                Log.Logger.Here().Information($"GetDashBoardfterSend, groupid : {groupId}, SGData is null !!!!!!!!!!!!!!!!!!!!!!!!");
+                return;
+            }
+
+            Log.Logger.Here().Information($"GetDashBoardfterSend, groupid : {groupId}, Ret-Code : {nRet}");
+
+            DashBoardDataEvent getDashBoardDataEvent = sgPageEvent.GetDashBoardDataEvent(groupId);
+            if (getDashBoardDataEvent != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                if (nRet != 0)
+                    strMsg = data.GetResponseReason();
+
+                e.strMsg = strMsg;
+                getDashBoardDataEvent(groupId, e, data);
+            }
+        }
+
+
         public void DeptApprLineReflashAfterSend(int nRet, int groupId)
         {
             DeptApprLineReflashEvent DeptApprLineReflashResult_Event = sgPageEvent.GetDeptApprLineReflashEvent(groupId);
@@ -2217,10 +2245,6 @@ namespace OpenNetLinkApp.Services
                 SCClear_Event(groupId, e);
             }
         }
-
-
-
-
 
         public void ZipDepthInfoSetting(int nRet, int groupId, SGData sgData)
         {
@@ -3937,17 +3961,9 @@ namespace OpenNetLinkApp.Services
 
         }
 
-        public int SetHsNetWorkSvrTime(int groupid, DateTime dTime)
-        {
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork == null)
-                return -1;
 
-            hsNetWork.SetSvrTime(dTime);
 
-            return 0;
-        }
+
 
     }
 }
