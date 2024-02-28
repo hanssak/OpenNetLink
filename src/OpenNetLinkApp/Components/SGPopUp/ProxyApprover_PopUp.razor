@@ -303,7 +303,7 @@
             List<ProxyApprover> listProxyApprover = new List<ProxyApprover>();
             foreach(ApproverInfo info in ProxySelect)
             {
-                listProxyApprover.Add(info.ToProxyApprover(sgUserData.GetUserSequence()));
+                listProxyApprover.Add(info.ToProxyApprover(sgLoginData.GetUserSequence()));
             }
             HSCmdCenter.RestInstApproveReg(groupID, listProxyApprover);
         }
