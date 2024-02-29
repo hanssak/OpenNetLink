@@ -674,7 +674,7 @@ namespace OpenNetLinkApp.Services
                         break;
 
                     case eCmdList.eZIPDEPTHINFO:                                                    // zip 파일 내부검사 설정 정보 조회.
-                        ZipDepthInfoSetting(nRet, groupId, sgData);
+                        //ZipDepthInfoSetting(nRet, groupId, sgData);
                         break;
 
                     case eCmdList.eCLIENTVERSION:                                                       // 업데이트 노티.
@@ -1379,7 +1379,7 @@ namespace OpenNetLinkApp.Services
                     PageEventArgs e = new PageEventArgs();
                     e.result = resultCode;
                     e.strMsg = strMsg;
-                    if (int.TryParse(sgData.GetTagData("temporary_lock_minutes"), out int lockTime))
+                    if (int.TryParse(sgData.GetTagData("user_policy","temporary_lock_minutes"), out int lockTime))
                         e.count = lockTime;
                     LoginResult_Event(groupId, e);
                 }
@@ -2243,33 +2243,6 @@ namespace OpenNetLinkApp.Services
                 e.result = nRet;
                 e.strMsg = data.GetBasicTagData("REASON");
                 SCClear_Event(groupId, e);
-            }
-        }
-
-        public void ZipDepthInfoSetting(int nRet, int groupId, SGData sgData)
-        {
-            SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-            if (sgLoginData == null)
-            {
-
-                return;
-            }
-
-            if (nRet == 0)
-            {
-                sgLoginData.AddZipDepthInfo(sgData);
-
-                UrlTypeForwardDataEvent eventUrlTypeForwardData = null;
-                eventUrlTypeForwardData = sgPageEvent.GetUrlTypeForwardData(groupId);
-                if (eventUrlTypeForwardData != null)
-                {
-                    eventUrlTypeForwardData(groupId);
-                }
-            }
-            else
-            {
-                sgLoginData.EncAdd("I_CLIENT_ZIP_DEPTH", "0/0");
-                sgLoginData.EncAdd("E_CLIENT_ZIP_DEPTH", "0/0");
             }
         }
 
@@ -3182,14 +3155,6 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int SendZipDepthInfo(int groupid, string strUserID, string strQuery)
-        {
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-                return sgSendData.RequestSendZipDepthInfo(hsNetWork, strUserID, strQuery);
-            return -1;
-        }
         public int SendDashBoardCount(int groupid, string strUserID, string strQuery)
         {
             HsNetWork hsNetWork = null;

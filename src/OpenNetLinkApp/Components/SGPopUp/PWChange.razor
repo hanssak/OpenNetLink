@@ -575,7 +575,8 @@
         }
 
 
-        DateTime time = sgLoginData.GetSvrTimeDayConvert();
+        @*DateTime time = sgLoginData.GetSvrTimeDayConvert();*@
+        DateTime time = pageService.GetAfterApprTime(groupID);
         time = time.AddDays(14);
         string strDateTime = time.ToString();
         SGSettingData sgSettingData = null;

@@ -1136,7 +1136,7 @@
                 }
 
                 DateTime dtLocalTime = DateTime.Parse(strTime);
-                DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
+                DateTime svrDt = pageService.GetAfterApprTime(groupId);
 
                 if (DateTime.Compare(dtLocalTime, svrDt) < 0)
                 {
@@ -1389,7 +1389,7 @@
                             }
 
                             DateTime dtLocalTime = DateTime.Parse(strTime);
-                            DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
+                            DateTime svrDt = pageService.GetAfterApprTime(groupId);
 
                             if (DateTime.Compare(dtLocalTime, svrDt) < 0)
                             {
@@ -1551,44 +1551,44 @@
                     }
                 }
 
-                // CLIENT_ZIP_DEPTH 정보 가져옴
-                SGQueryExtend sgQueryExtend = null;
-                sgQueryExtend = new SGQueryExtend();
-                if (sgQueryExtend != null)
-                {
-
-                    string strGetinfoTagName = "";
-                    strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
-                    strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
-                    strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
-                    strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_EXT'";
-                    // strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";     // Table 이름 따로 정해졌음
-                    strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
-                    strGetinfoTagName += ", 'FORWARD_AUTODOWN'";
-                    strGetinfoTagName += ", 'CLIENT_URL_FW_PAGE'";
-                    strGetinfoTagName += ", 'CLIENT_BINARY_CHECK'";
-                    strGetinfoTagName += ", 'CLIENT_BINARY_CHECK_EXT'";
-                    strGetinfoTagName += ", 'CLIENT_CHECK_PE'";
-                    strGetinfoTagName += ", 'CLIENT_PRIVACY_COMMENT'";
-
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupId))
-                    {
-                        strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
-                        strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
-                    }
-
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseMaxLengthTitleDesc(groupId))
-                    {
-                        strGetinfoTagName += ", 'CLIENT_TITLE_MAX_LENGTH'";
-                        strGetinfoTagName += ", 'CLIENT_DESC_MAX_LENGTH'";
-                    }
-
-                    string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
-                    HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
-
-                    // string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
-                    // HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
-                }
+                //// CLIENT_ZIP_DEPTH 정보 가져옴
+                //SGQueryExtend sgQueryExtend = null;
+                //sgQueryExtend = new SGQueryExtend();
+                //if (sgQueryExtend != null)
+                //{
+                //
+                //    string strGetinfoTagName = "";
+                //    strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
+                //    strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
+                //    strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
+                //    strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_EXT'";
+                //    // strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";     // Table 이름 따로 정해졌음
+                //    strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
+                //    strGetinfoTagName += ", 'FORWARD_AUTODOWN'";
+                //    strGetinfoTagName += ", 'CLIENT_URL_FW_PAGE'";
+                //    strGetinfoTagName += ", 'CLIENT_BINARY_CHECK'";
+                //    strGetinfoTagName += ", 'CLIENT_BINARY_CHECK_EXT'";
+                //    strGetinfoTagName += ", 'CLIENT_CHECK_PE'";
+                //    strGetinfoTagName += ", 'CLIENT_PRIVACY_COMMENT'";
+                //
+                //    if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupId))
+                //    {
+                //        strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
+                //        strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
+                //    }
+                //
+                //    if (SGAppMgrSvc.OpConfigInfoService.GetUseMaxLengthTitleDesc(groupId))
+                //    {
+                //        strGetinfoTagName += ", 'CLIENT_TITLE_MAX_LENGTH'";
+                //        strGetinfoTagName += ", 'CLIENT_DESC_MAX_LENGTH'";
+                //    }
+                //
+                //    string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
+                //    HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
+                //
+                //    // string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+                //    // HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
+                //}
 
 
                 bool bUseClipBoard = sgLoginData.GetClipboard();
@@ -1636,7 +1636,7 @@
 
                 DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer(groupId)) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
                 pageService.SetSvrTime(groupId, dt, sgLoginData);
-                bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+                bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide(dt);
                 bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
                 pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
                 pageService.SetAfterApprEnable(groupId, bAfterApprEnable);

@@ -938,14 +938,14 @@
             }*/
             sgUserSvr.SetUserInfo(groupId, sgLoginData);
 
-            // CLIENT_ZIP_DEPTH 정보 가져옴
-            SGQueryExtend sgQueryExtend = null;
-            sgQueryExtend = new SGQueryExtend();
-            if (sgQueryExtend != null)
-            {
-                string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
-                HsCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
-            }
+            //// CLIENT_ZIP_DEPTH 정보 가져옴
+            //SGQueryExtend sgQueryExtend = null;
+            //sgQueryExtend = new SGQueryExtend();
+            //if (sgQueryExtend != null)
+            //{
+            //    string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+            //    HsCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
+            //}
 
             InitSideMenu(groupId);
             // MyNavigationManager.NavigateTo("/Welcome");
@@ -989,7 +989,7 @@
 
             DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer(0)) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
             pageService.SetSvrTime(groupId, dt, sgLoginData);
-            bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+            bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide(dt);
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
             pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
             pageService.SetAfterApprEnable(groupId, bAfterApprEnable);

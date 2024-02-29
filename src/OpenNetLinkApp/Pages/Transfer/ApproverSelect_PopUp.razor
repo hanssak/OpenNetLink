@@ -479,7 +479,7 @@
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
             int nApproveProxy = 0;
             if (sgLoginData != null)
-                nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY");
+                nApproveProxy = sgLoginData.GetApproveProxyInteger();
 
             bool bLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID); // siteConfig. json으로 이동
             if (bLocalSave && nApproveProxy > 1)

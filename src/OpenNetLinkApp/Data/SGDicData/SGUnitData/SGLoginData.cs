@@ -189,6 +189,47 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
+        /// 수신받은 서버 시간 정보를 반환한다.
+        /// <br>주의:실시간 증가하는 시간이 아닌, 마지막 응답에 저장된 서버시간</br>
+        /// </summary>
+        /// <returns>서버 시간</returns>
+        public string GetSvrTime()
+        {
+            string strTime = GetTagData("server_policy", "time");
+            return strTime;
+        }
+
+        /// <summary>
+        /// 서버 시간정보를 얻는다(GetSvrTime을 내부적에서 사용)
+        /// <br>주의:실시간 증가하는 시간이 아닌, 마지막 응답에 저장된 서버시간</br>
+        /// </summary>
+        /// <returns></returns>
+        public DateTime GetSvrTimeConvert()
+        {
+            string strTime = GetSvrTime();
+            if (strTime.Equals(""))
+                return System.DateTime.Now;
+
+            string strD = strTime.Substring(0, 8);
+            string strT = strTime.Substring(8);
+
+
+            string strYear = strTime.Substring(0, 4);
+            string strMonth = strTime.Substring(4, 2);
+            string strDay = strTime.Substring(6, 2);
+            string strHour = strTime.Substring(8, 2);
+            string strMinute = strTime.Substring(10, 2);
+            string strSecond = strTime.Substring(12, 2);
+
+            string strConvertDay = String.Format("{0}/{1}/{2}", strYear, strMonth, strDay);
+            string strConvertTime = String.Format("{0}:{1}:{2}", strHour, strMinute, strSecond);
+
+            DateTime dt = Convert.ToDateTime(strConvertDay);
+            dt = Convert.ToDateTime(strConvertTime);
+            return dt;
+        }
+
+        /// <summary>
         /// 사용자의 이름을 반환한다.
         /// </summary>
         /// <returns></returns>
@@ -304,7 +345,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strData = GetTagData("user_policy", "file_delete_cycle");
             if (strData.Equals(""))
                 return 0;
-            int size = Convert.ToInt32(strData);
+            int.TryParse(strData, out int size);
             return size;
         }
 
@@ -317,7 +358,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strData = GetTagData("user_policy", "transfer_policy", "allowed_one_time", "total_size");
             if (strData.Equals(""))
                 return 0;
-            Int64 size = Convert.ToInt64(strData);
+            int.TryParse(strData, out int size);
             return size;
         }
 
@@ -330,7 +371,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strData = GetTagData("user_policy", "transfer_policy", "allowed_one_time", "total_count");
             if (strData.Equals(""))
                 return 0;
-            int count = Convert.ToInt32(strData);
+            int.TryParse(strData, out int count);
             return count;
         }
 
@@ -349,7 +390,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return false;
             if (strData == "1") //전체 허용
                 return true;
-            if(strData == "2")  //반입 가능
+            if (strData == "2")  //반입 가능
                 return (!bInner);
             if (strData == "3") //반출 가능
                 return (bInner);
@@ -399,7 +440,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (GetApprove() == false)  // 3망연계정보 상관없음
                 return false;
 
-            string strData = GetTagData("user_policy", "approval_policy","action");
+            string strData = GetTagData("user_policy", "approval_policy", "action");
             return (strData == "all" || strData == "select");
         }
 
@@ -444,8 +485,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns></returns>
         public bool GetFileFilterType()
         {
-            string strData = GetTagData("FILEFILTERTYPE");
-            if (strData.Equals("W"))
+            string strData = GetTagData("user_policy", "file_filter_type");
+            if (strData.Equals("w"))
                 return true;
             else
                 return false;
@@ -467,39 +508,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         /// <summary>
         /// VIP 권한을 갖고 있는 사용자인지 여부를 반환
-        /// <para>FILEFILTER =HS_ALL_FILE 인경우 VIP로 판단</para>
         /// </summary>
         /// <returns>true : VIP 사용자</returns>
         public bool IsVipUser()
         {
-            string strData = "";
-            strData = GetTagData("FILEFILTER");
-            if (strData.Equals("HS_ALL_FILE"))
-                return true;
-
-            return false;
+            string strData = GetTagData("approver_type", "vip");
+            return (strData == "true");
         }
-
-        /// <summary>
-        /// 서버명을 반환
-        /// </summary>
-        /// <returns>서버명</returns>
-        public string GetServName()
-        {
-            string strData = GetTagData("SERVERNAME");
-            return strData;
-        }
-
         /// <summary>
         /// 화면잠금 시간 정보를 반환
         /// </summary>
         /// <returns>분단위</returns>
         public int GetSCRLimit()
         {
-            string strData = GetTagData("SCRLOCK");
-            int nValue = 0;
-            if (!strData.Equals(""))
-                nValue = Convert.ToInt32(strData);
+            string strData = GetTagData("user_policy", "screen_lock_cycle");
+            int.TryParse(strData, out int nValue);
             return nValue;
         }
 
@@ -509,11 +532,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>true : 비밀번호 복잡도 사용</returns>
         public bool GetPasswordRule()
         {
-            string strData = GetTagData("AUTHUSER");
-            strData = strData.Substring(0, 1);
-            if (strData.Equals("Y") || strData.Equals("C"))
-                return true;
-            return false;
+            string strData = GetTagData("user_policy", "pw_complexity_check");
+            return (strData == "true");
         }
 
         /// <summary>
@@ -528,22 +548,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return 0;
             Int64 size = Convert.ToInt64(strData);
             return size;
-        }
-
-        /// <summary>
-        /// Dummy Packet 사용 여부를 반환
-        /// </summary>
-        /// <returns>true : Dummy Packet 사용</returns>
-        public bool GetUseDummyPacket()
-        {
-            string strData = GetTagData("DUMMYPACKETFLAG");
-            int nValue = 0;
-            if (!strData.Equals(""))
-                nValue = Convert.ToInt32(strData);
-            if (nValue == 1)
-                return true;
-            else
-                return false;
         }
 
         /// <summary>
@@ -564,6 +568,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>Client Version 정보. ( ex) NetLink 2.03 )</returns>
         public string GetServClientVersion()
         {
+            //TODO 고도화 - 업데이트 확인 체크 프로세스 변경 예정
             string strData = GetTagData("CLIENTVERSION");
             return strData;
         }
@@ -574,6 +579,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>true : Client 패치파일 존재</returns>
         public bool GetClientUpgrade()
         {
+            //TODO 고도화 - 업데이트 확인 체크 프로세스 변경 예정
             string strData = GetTagData("CLIENTUPGRADE");
             int nValue = 0;
             if (!strData.Equals(""))
@@ -584,18 +590,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// 일반 사용자도 대결재 권한 및 결재 권한이 있는지 여부를 반환한다.
+        /// 일반 사용자도 대결재 권한 및 결재 권한이 있는지 여부를 반환한다.(구 ApproveProxyRight)
         /// </summary>
         /// <returns>true : 대결재 권한 및 결재 권한 존재</returns>
         public bool GetApproveProxyRight()
         {
-            string strData = GetTagData("APPROVEPROXYRIGHT");
-            int nValue = 0;
-            if (!strData.Equals(""))
-                nValue = Convert.ToInt32(strData);
-            if (nValue == 2)
-                return true;
-            return false;
+            string strData = GetTagData("user_policy", "common_proxy_right_use");
+            return (strData == "true");
         }
 
         /// <summary>
@@ -605,7 +606,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>파일 전송 가능</returns>
         public bool GetFileTrans()
         {
-            string strData = GetTagData("user_policy","file_upload_time", "type");
+            string strData = GetTagData("user_policy", "file_upload_time", "type");
             bool bInner = GetSystemPosition();
 
             if (strData == "0") //금지
@@ -621,29 +622,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// 요일별 시간에 따른 자료전송 제약하는 기능 사용 유무
-        /// </summary>
-        /// <returns></returns>
-        public bool GetUseFileTransForTimeMode()
-        {
-            string strData = GetTagData("FILEUPLOADTIME");
-            if ((strData?.Length ?? 0) > 0)
-            {
-                strData = strData.Substring(0, 1);
-                if (strData == "1" || strData == "2")
-                    return true;
-            }
-
-            return false;
-        }
-
-
-        /// <summary>
         /// 파일전송 사용 Mode 값을 return (0,1,2)
         /// </summary>
         /// <returns></returns>
         public int GetModeValueForFileTrans()
         {
+            //TODO 고도화 - 프로세스 확인 필요
             string strData = GetTagData("FILEUPLOADTIME");
 
             int nRet = -1;
@@ -673,6 +657,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns></returns>
         public Dictionary<int, string[]> GetModeWeekDataForFileTrans()
         {
+            //TODO 고도화 - 프로세스 확인 필요
             Dictionary<int, string[]> dicWeekData = new Dictionary<int, string[]>();
 
             string strData = GetTagData("FILEUPLOADTIME");
@@ -722,7 +707,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                     dicWeekData.TryAdd(iDx, strArrUseNoOneDay);
                                 }
 
-                                dicWeekData.TryAdd(7, (GetHoliday() == "1") ? strArrUseOneDay : strArrUseNoOneDay);
+                                dicWeekData.TryAdd(7, (GetTodayIsHoliday()) ? strArrUseOneDay : strArrUseNoOneDay);
                             }
                             else
                             {
@@ -747,7 +732,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                                 }
 
                                 // 휴일설정
-                                dicWeekData.TryAdd(7, (GetHoliday() == "1") ? strArrUseOneDay : strArrUseNoOneDay);
+                                dicWeekData.TryAdd(7, (GetTodayIsHoliday()) ? strArrUseOneDay : strArrUseNoOneDay);
 
                                 // 시간별설정
                                 if (string.Compare(arrAfter[1], "none", true) != 0)
@@ -904,322 +889,60 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// 현재(서버시간 기준) 자료전송을 사용할 수 있는 시간대인지 유무를 확인하는 함수
         /// </summary>
         /// <returns></returns>
-        public bool GetUseFileTransForTime()
+        public bool GetUseFileTransForTime(DateTime nowTime)
         {
-            bool bRet = false;
-            string strPolicy = GetTagData("FILEUPLOADTIME");
-            string strHoliday = GetTagData("HOLIDAY");
-
-            Log.Logger.Here().Information($"FILEUPLOADTIME : {strPolicy}, HOLIDAY : {strHoliday}");
-
-            //Test)
-            //strPolicy = "2/0|0|1|7~8.17~23|2|-1|3|7~8.17~23|4|0|5|0~24|6|1~23|7|1~18";
-            //strPolicy = "1/0,6/!9~20";
-
-            if ((strPolicy?.Length ?? 0) == 0)
-            {
-                Log.Logger.Here().Error($"error - Tag : FILEUPLOADTIME, Value : empty! ");
-                return false;
-            }
-
-            strPolicy = strPolicy.ToLower();
-            string strData = strPolicy.Substring(0, 1);
-            if (strData != "0" && strData != "1" && strData != "2")
-            {
-                Log.Logger.Here().Error($"error - Tag : FILEUPLOADTIME, Value : {strData} ");
-                return false;
-            }
-
-            if (strData == "0")
-                return true;
-
-
-            DateTime dtNow = GetSvrTimeConvert();
-            // Test)
-            // dtNow = System.DateTime.Now;
-
-            if (strData == "1")
-            {
-                // ex) 1/all/all
-                if (strPolicy.Length < 4)
-                {
-                    Log.Logger.Here().Error($"error(data Type error : less than 4) - Tag : FILEUPLOADTIME, Value : {strPolicy} ");
-                    return false;
-                }
-
-                // ex) 1/none/none
-                bRet = IsFileTransTimeBy1(dtNow, strPolicy, strHoliday);
-
-            }
-            else if (strData == "2")
-            {
-
-                if (strPolicy.Length < 33)
-                {
-                    Log.Logger.Here().Error($"error(data Type error : less than 33) - Tag : FILEUPLOADTIME, Value : {strPolicy} ");
-                    return false;
-                }
-
-                // ex) 2/0|0|1|-1|2|-1|3|7~8.17~23|4|0|5|0~24|6|1~23|7|1~18
-                bRet = IsFileTransTimeBy2(dtNow, strPolicy, strHoliday);
-            }
-
-            return bRet;
-        }
-
-        /// <summary>
-        /// "1/none/none" 방식으로 파일전송 사용유무 확인하는 함수
-        /// </summary>
-        /// <param name="dtNow"></param>
-        /// <param name="strPolicy"></param>
-        /// <param name="strHoliday"></param>
-        /// <returns></returns>
-        bool IsFileTransTimeBy1(DateTime dtNow, string strPolicy, string strHoliday)
-        {
-
             try
             {
-                if ((strHoliday?.Length ?? 0) > 0 && strHoliday != "0")
-                {
-                    Log.Logger.Here().Information($"FILEUPLOADTIME, Type 1 - Found Holiday : {strHoliday}"); // Holiday 인지에 따라 계산
-                    return true;
-                }
+                bool todayIsHolidy = GetTodayIsHoliday(); //금일이 휴일(사내휴일&공휴일) 인지 여부
+                string dayOfWeekString = (todayIsHolidy) ? "holiday" : nowTime.DayOfWeek.ToString().ToLower();
 
-                int nPos = -1;
-                if ((nPos = strPolicy.IndexOf("/none/none")) > 0)
+                List<string> todayPolicy = GetTagDataList("user_policy", "file_upload_time", "schedule", dayOfWeekString);
+
+                if (todayPolicy == null || todayPolicy.Count < 1)
                 {
-                    Log.Logger.Here().Information($"FILEUPLOADTIME, Type 1 - Found /none/none"); // 초기값인지에 따라 계산
+                    Log.Logger.Here().Error($"Today file transfer time Policy is Empty! (Day of Week-{dayOfWeekString}");
                     return false;
                 }
 
-                if ((nPos = strPolicy.IndexOf("/all")) > 0)
-                {
-                    Log.Logger.Here().Information($"FILEUPLOADTIME, Type 1 - Found /all"); // 초기값인지에 따라 계산
+                Log.Logger.Here().Information($"File Upload Time: Day of Week-{dayOfWeekString}, Today Policy : {string.Join(", ", todayPolicy)}");
+
+                //type: array
+                //-1:사용 불가, 0:하루 종일 사용, A~B:A시부터 B시까지 사용
+                //[{9~12}, {13~18}]
+                if (todayPolicy.Contains("0"))  //하루 종일 사용
                     return true;
-                }
 
-                string stCurWeekDay = GetDay(dtNow);
-                string[] arrstrPolicy = strPolicy.Split("/");
+                if (todayPolicy.Contains("-1"))  //사용 불가
+                    return false;
 
-                if (string.IsNullOrEmpty(stCurWeekDay) == false && ((arrstrPolicy?.Length ?? 0) > 2 && arrstrPolicy[1].Length > 0))
+                string hourString = nowTime.ToString("HH");
+                int nowHour = int.Parse(hourString);
+
+                foreach (string timePeriod in todayPolicy)
                 {
-                    if (arrstrPolicy[1].Contains(stCurWeekDay))
-                    {
-                        Log.Logger.Here().Information($"IsFileTransTimeBy1, Day in Week Policy : {arrstrPolicy[1]}");
+                    //9~12
+                    //13~18
+                    if (!timePeriod.Contains("~"))
+                        continue;
+
+                    string start = timePeriod.Split("~")[0];
+                    string end = timePeriod.Split("~")[1];
+
+                    if (!int.TryParse(start, out int startHour))    //시작 시간 미기입되었다면 0시간부터
+                        startHour = 0;
+                    if (!int.TryParse(end, out int endHour))        //종료 시간 미기입되었다면 23시간까지
+                        endHour = 23;
+
+                    if (startHour <= nowHour && startHour >= nowHour)
                         return true;
-                    }
                 }
-
-                if ((arrstrPolicy?.Length ?? 0) > 2 && (arrstrPolicy[2]?.Length ?? 0) > 0)
-                {
-                    if (string.Compare(arrstrPolicy[2], "none", true) == 0)
-                        return false;
-
-                    string[] arrHours = arrstrPolicy[2].Split("~");
-                    bool bInclude = true;
-                    if (arrHours[0].IndexOf("!") > -1)
-                    {
-                        bInclude = false;
-                        arrHours[0] = arrHours[0].Replace("!", "");
-                    }
-                    if (arrHours[0] == "null" || arrHours[0].Length < 1 || arrHours[0].Length > 2)
-                        arrHours[0] = "0";
-                    if (arrHours[1] == "null" || arrHours[1].Length < 1 || arrHours[1].Length > 2)
-                        arrHours[1] = "23";
-
-                    int startTime = Int32.Parse(arrHours[0]);
-                    int endTime = Int32.Parse(arrHours[1]);
-                    int curTime = Int32.Parse(dtNow.ToString("HH"));
-
-                    Log.Logger.Here().Information($"IsFileTransTimeBy1, Hour in Day Policy : {arrstrPolicy[2]}, CurTime:{curTime}");
-
-                    if (bInclude)
-                    {
-                        if (curTime >= startTime && curTime < endTime)
-                            return true;
-                        else
-                            return false;
-                    }
-                    else
-                    {
-                        if (curTime >= startTime && curTime < endTime)
-                            return false;
-                        else
-                            return true;
-                    }
-
-                } // if ((arrstrPolicy?.Length ?? 0) > 2 && (arrstrPolicy[2]?.Length ?? 0) > 0)
-
+                return false;
             }
             catch (Exception ex)
             {
-                Log.Logger.Here().Error($"IsFileTransTimeBy1, Exception(MSG) : {ex.Message}");
+                Log.Logger.Here().Error($"GetUseFileTransForTime Exception - {ex.ToString()}");
                 return false;
             }
-
-            Log.Logger.Here().Error($"IsFileTransTimeBy1, UnDefined Policy syntax : {strPolicy}");
-            return false;
-        }
-
-
-        bool IsFileTransTimeBy2inOneDay(DateTime dtNow, string[] arrStrWeekData)
-        {
-
-            if ((arrStrWeekData?.Length ?? 0) < 1)
-            {
-                Log.Logger.Here().Information($"IsFileTransTimeBy2inOneDay, Day in Week Policy Data Empty");
-                return false;
-            }
-
-            if (arrStrWeekData[0] == "-1")
-            {
-                Log.Logger.Here().Information($"IsFileTransTimeBy2inOneDay, Day in Week, Policy Data Not Use!");
-                return false;
-            }
-            else if (arrStrWeekData[0] == "0")
-            {
-                Log.Logger.Here().Information($"IsFileTransTimeBy2inOneDay, Day in Week, Policy Data Use!");
-                return true;
-            }
-
-            // 요일체크
-            bool bInclude = true;
-            int curTime = Int32.Parse(dtNow.ToString("HH"));
-            foreach (string strUseTime in arrStrWeekData)
-            {
-                if (string.IsNullOrEmpty(strUseTime))
-                {
-                    Log.Logger.Here().Information($"IsFileTransTimeBy2inOneDay, Day in Week, Policy Empty");
-                    return false;
-                }
-
-                bInclude = true;
-                string[] arrHours = strUseTime.Split("~");
-                if (arrHours[0].IndexOf("!") > -1)
-                {
-                    bInclude = false;
-                    arrHours[0] = arrHours[0].Replace("!", "");
-                }
-
-                if (arrHours[0] == "null" || arrHours[0].Length < 1 || arrHours[0].Length > 2)
-                    arrHours[0] = "0";
-                if (arrHours[1] == "null" || arrHours[1].Length < 1 || arrHours[1].Length > 2)
-                    arrHours[1] = "23";
-
-                int startTime = Int32.Parse(arrHours[0]);
-                int endTime = Int32.Parse(arrHours[1]);
-
-                if (bInclude)
-                {
-                    if (curTime >= startTime && curTime < endTime)
-                    {
-                        Log.Logger.Here().Information($"IsFileTransTimeBy2inOneDay, Day in Week, Policy Time Data : {strUseTime}");
-                        return true;
-                    }
-                }
-                else
-                {
-                    if (curTime >= startTime && curTime < endTime)
-                    { }
-                    else
-                    {
-                        Log.Logger.Here().Information($"IsFileTransTimeBy2inOneDay, Day in Week, Policy Time Data : {strUseTime}");
-                        return true;
-                    }
-                }
-
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// ex) 2/0|0|1|-1|2|-1|3|7~8.17~23|4|0|5|0~24|6|1~23|7|1~18 <br></br>
-        /// 방식으로 파일전송 기능 사용유무 확인하는 함수
-        /// </summary>
-        /// <param name="dtNow"></param>
-        /// <param name="strPolicy"></param>
-        /// <param name="strHoliday"></param>
-        /// <returns></returns>
-        bool IsFileTransTimeBy2(DateTime dtNow, string strPolicy, string strHoliday)
-        {
-
-            bool bRet = false;
-
-            try
-            {
-                string stCurWeekDay = GetDay(dtNow);
-                string[] arrstrPolicy = strPolicy.Split("/");
-
-
-                if ((arrstrPolicy?.Length ?? 0) < 2 || (arrstrPolicy[1]?.Length ?? 0) < 1)
-                {
-                    Log.Logger.Here().Information($"IsFileTransTimeBy2, Day in Week Policy : {strPolicy}");
-                    return false;
-                }
-
-                if (string.IsNullOrEmpty(stCurWeekDay))
-                {
-                    Log.Logger.Here().Information($"IsFileTransTimeBy2, Day in Week Policy Empty!");
-                    return false;
-                }
-
-                Dictionary<int, string[]> dicWeekData = GetModeWeekDataForFileTrans();
-                if ((dicWeekData?.Count ?? 0) != 8)
-                {
-                    Log.Logger.Here().Information($"IsFileTransTimeBy2, Day in Week Policy Data Syntax Error : {strPolicy}");
-                    return false;
-                }
-
-                // 요일별 체크
-                string[] arrStrWeekData = null;
-                dicWeekData.TryGetValue(Convert.ToInt32(stCurWeekDay), out arrStrWeekData);
-                if (IsFileTransTimeBy2inOneDay(dtNow, arrStrWeekData))
-                {
-                    return true;
-                }
-
-                // 휴일체크
-                if (string.IsNullOrEmpty(strHoliday) == false && strHoliday != "0")
-                {
-                    string[] arrStrHoliDayData = null;
-                    dicWeekData.TryGetValue(7, out arrStrHoliDayData);
-
-                    if (IsFileTransTimeBy2inOneDay(dtNow, arrStrHoliDayData))
-                    {
-                        return true;
-                    }
-                }
-
-
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Here().Error($"IsFileTransTimeBy2, Exception(MSG) : {ex.Message}");
-                return false;
-            }
-
-            Log.Logger.Here().Error($"IsFileTransTimeBy2, fileTrans is Policy : {strPolicy}");
-            return false;
-        }
-
-
-        /// <summary>
-        /// OTP 번호 발급 가능 여부를 반환한다.
-        /// </summary>
-        /// <returns>true : OTP 번호 발급 가능</returns>
-        public bool GetCreateOtpNo()
-        {
-            string strData = GetTagData("OTP");
-            if (strData.Equals(""))
-                strData = GetTagData("OPT");
-
-            int nValue = 0;
-            if (!strData.Equals(""))
-                nValue = Convert.ToInt32(strData);
-            if (nValue == 1)
-                return true;
-            return false;
         }
 
         /// <summary>
@@ -1294,23 +1017,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public int GetMaxDownCount()
         {
             string strData = GetTagData("user_policy", "download_limit_count");
-            if (strData.Equals(""))
+            if (!int.TryParse(strData, out int count))
                 return 0;
-            int count = 0;
-            if (!strData.Equals(""))
-                count = Convert.ToInt32(strData);
-            return count;
+            else return count;
         }
-
-        ///// <summary>
-        ///// 환경변수 HSZDEFAULTOPTION 값을 반환
-        ///// </summary>
-        ///// <returns>환경변수 HSZDEFAULTOPTION 값</returns>
-        //public string GetHszDefaultOption()
-        //{
-        //    string strData = GetTagData("HSZDEFAULTOPTION");
-        //    return strData;
-        //}
 
         /// <summary>
         /// 환경변수 HSZDEFAULTOPTION 값을 10진수로 반환한다.
@@ -1334,28 +1044,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// 대결재 사용 방식에 대해 반환
+        /// 대결재 사용 방식에 대해 반환 (무조건 2반환)
         /// </summary>
-        /// <returns>대결재 방식(1:고정, 2:유동)</returns>
-        public int GetApproveTypeSFM()
-        {
-            string strData = GetTagData("APPROVETYPESFM");
-            int nValue = 1;
-            if (strData.Equals(""))
-                return nValue;
-            nValue = Convert.ToInt32(strData);
-            return nValue;
-        }
-
-        /// <summary>
-        /// 환경변수 INTERLOCKEMAIL 값을 반환한다.
-        /// </summary>
-        /// <returns>환경변수 INTERLOCKEMAIL 값</returns>
-        public string GetInterLockEmail()
-        {
-            string strData = GetTagData("INTERLOCKEMAIL");
-            return strData;
-        }
+        /// <returns>2</returns>
+        public int GetApproveTypeSFM() => 2;
 
         /// <summary>
         /// 서버에서 바이러스검사를 하는지 유무(INTERLOCKFLAG 값 받은걸로 확인)
@@ -1363,6 +1055,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns></returns>
         public bool GetServerVirusExam()
         {
+            //TODO 고도화 - UI에서 필요한지 프로세스 확인 필요
             string strData = GetTagData("INTERLOCKFLAG");
             int nValue = 0;
             if (!strData.Equals(""))
@@ -1380,445 +1073,83 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>false</returns>
         public bool GetPCURLUse() => false;
 
-        /// <summary>
-        /// 서버 시간 정보를 반환한다.
-        /// </summary>
-        /// <returns>서버 시간</returns>
-        public string GetSvrTime()
-        {
-            string strTime = GetTagData("SVRTIME");
-            return strTime;
-        }
-
         public string GetSystemPeriod()
         {
+            //TODO 고도화 - UI에서 필요한지 프로세스 확인 필요
             string strPeriod = GetTagData("SYSTEMPERIOD");
             return strPeriod;
         }
 
+
         /// <summary>
-        /// 
+        /// 현재 서버에서 설정한 휴일 인지 정보를 얻는다. (user_policy.holiday)
         /// </summary>
         /// <returns></returns>
-        public DateTime GetSvrTimeDayConvert()
+        public bool GetTodayIsHoliday()
         {
-            string strTime = GetSvrTime();
-            if (strTime.Equals(""))
-                return System.DateTime.Now;
-
-            string strD = strTime.Substring(0, 8);
-
-            string strYear = strTime.Substring(0, 4);
-            string strMonth = strTime.Substring(4, 2);
-            string strDay = strTime.Substring(6, 2);
-
-            string strConvertDay = String.Format("{0}/{1}/{2}", strYear, strMonth, strDay);
-
-            DateTime dt = Convert.ToDateTime(strConvertDay);
-            return dt;
-        }
-
-        /// <summary>
-        /// 서버 시간정보를 얻는다(GetSvrTime을 내부적에서 사용)
-        /// </summary>
-        /// <returns></returns>
-        public DateTime GetSvrTimeConvert()
-        {
-            string strTime = GetSvrTime();
-            if (strTime.Equals(""))
-                return System.DateTime.Now;
-
-            string strD = strTime.Substring(0, 8);
-            string strT = strTime.Substring(8);
-
-
-            string strYear = strTime.Substring(0, 4);
-            string strMonth = strTime.Substring(4, 2);
-            string strDay = strTime.Substring(6, 2);
-            string strHour = strTime.Substring(8, 2);
-            string strMinute = strTime.Substring(10, 2);
-            string strSecond = strTime.Substring(12);
-
-            string strConvertDay = String.Format("{0}/{1}/{2}", strYear, strMonth, strDay);
-            string strConvertTime = String.Format("{0}:{1}:{2}", strHour, strMinute, strSecond);
-
-            DateTime dt = Convert.ToDateTime(strConvertDay);
-            dt = Convert.ToDateTime(strConvertTime);
-            return dt;
-
-        }
-
-        /// <summary>
-        /// 현재 서버에서 설정한 휴일 인지 정보를 얻는다. (Link_Check로 휴일정보가 갱신되고 있어야 정상적으로 사용가능)
-        /// </summary>
-        /// <returns>"1" : 휴일, 나머지 : 휴일아님</returns>
-        public string GetHoliday()
-        {
-            string strHoliday = GetTagData("HOLIDAY");
-            return strHoliday;
-        }
-
-        /// <summary>
-        /// 서버에서 받은 사후결재 정책정보를 얻는다
-        /// </summary>
-        /// <returns>사후결재에 대한 정책정보</returns>
-        public string GetAfterApprove()
-        {
-            string strAfterApprove = GetTagData("AFTERAPPROVE");
-            return strAfterApprove;
+            string strHoliday = GetTagData("user_policy", "holiday");
+            return (strHoliday == "1");
         }
 
         /// <summary>
         /// 사후결재를 사용할 수 있는 상태(checkBox View)인지 유무(By:서버정책) 
         /// </summary>
         /// <returns>true : 사용못함, false : 사용함</returns>
-        public bool GetAfterChkHide()
+        public bool GetAfterChkHide(DateTime nowTime)
         {
-            bool bRet = false;
-            DateTime today = DateTime.Now;
-            string stCurWeekDay = GetDay(today);
-            string stCurHour = DateTime.Now.ToString("HH");
-            string strAfterApprove = GetAfterApprove();
-            strAfterApprove.Trim();
-            strAfterApprove.Replace('.', ',');
+            try
+            {
+                //string strPolicy = GetTagData("FILEUPLOADTIME");
+                bool todayIsHolidy = GetTodayIsHoliday(); //금일이 휴일(사내휴일&공휴일) 인지 여부
+                string dayOfWeekString = (todayIsHolidy) ? "holiday" : nowTime.DayOfWeek.ToString().ToLower();
 
-            if (strAfterApprove.Length < 1) return true;
+                List<string> todayPolicy = GetTagDataList("user_policy", "file_upload_time", "schedule", dayOfWeekString);
 
-            string[] arrAfter = strAfterApprove.Split("/");
-            if (strAfterApprove[0] == '0')  //사용안함
+                if (todayPolicy == null || todayPolicy.Count < 1)
+                {
+                    Log.Logger.Here().Error($"Today file transfer time Policy is Empty! (Day of Week-{dayOfWeekString}");
+                    return true;
+                }
+
+                Log.Logger.Here().Information($"File Upload Time: Day of Week-{dayOfWeekString}, Today Policy : {string.Join(", ", todayPolicy)}");
+
+                //type: array
+                //-1:사용 불가, 0:하루 종일 사용, A~B:A시부터 B시까지 사용
+                //[{9~12}, {13~18}]
+                if (todayPolicy.Contains("0"))  //하루 종일 사용
+                    return false;
+
+                if (todayPolicy.Contains("-1"))  //사용 불가
+                    return true;
+
+                string hourString = nowTime.ToString("HH");
+                int nowHour = int.Parse(hourString);
+
+                foreach (string timePeriod in todayPolicy)
+                {
+                    //9~12
+                    //13~18
+                    if (!timePeriod.Contains("~"))
+                        continue;
+
+                    string start = timePeriod.Split("~")[0];
+                    string end = timePeriod.Split("~")[1];
+
+                    if (!int.TryParse(start, out int startHour))    //시작 시간 미기입되었다면 0시간부터
+                        startHour = 0;
+                    if (!int.TryParse(end, out int endHour))        //종료 시간 미기입되었다면 23시간까지
+                        endHour = 23;
+
+                    if (startHour <= nowHour && startHour >= nowHour)
+                        return false;
+                }
                 return true;
-            else if (strAfterApprove[0] == '1') //구포멧
-            {
-#if _AFTER_APPROVE_AND_RULE_   // 사후결재 정책값을 AND 개념으로 사용
-				bool bDayHit = false;
-				bool bHourHit = false;
-				if (arrAfter[1].ToLower() == "none")
-					return true;
-				else if (arrAfter[1].ToLower() == "all" && arrAfter[2].ToLower() == "all")
-					return false;
-
-				if (arrAfter[1].ToLower() == "all")
-					bDayHit = true;
-				if(arrAfter[1].IndexOf(stCurWeekDay) > -1 )
-					bDayHit = true;
-				if (arrAfter[2].ToLower() == "all")
-					bHourHit = true;
-				else
-                {
-					if(arrAfter[2] == "none")
-                    {
-						bHourHit = true;
-					}
-					else
-					{ 
-						string[] arrHours = arrAfter[2].Split("~");
-						bool bInclude = true;
-						if (arrHours[0].IndexOf("!") > -1)
-						{ 
-							bInclude = false;
-							arrHours[0] = arrHours[0].Replace("!", "");
-						}
-						if (arrHours[0] == "null" || arrHours[0].Length < 1 || arrHours[0].Length > 2)
-							arrHours[0] = "0";
-						if (arrHours[1] == "null" || arrHours[1].Length < 1 || arrHours[1].Length > 2)
-							arrHours[1] = "23";
-
-						int startTime = Int32.Parse(arrHours[0]);
-						int endTime = Int32.Parse(arrHours[1]);
-						int curTime = Int32.Parse(stCurHour);
-						if(bInclude)
-						{ 
-							if (curTime >= startTime && curTime <= endTime)
-								bHourHit = true;
-						}
-						else
-						{
-							if (curTime >= startTime && curTime <= endTime)
-								bHourHit = false;
-							else
-								bHourHit = true;
-						}
-					}
-				}
-				if (bDayHit == true && bHourHit == true)
-					return false;
-				else
-					return true;
-
-#else                      // 사후결재 정책값을 OR 개념으로 사용
-
-
-                // Holyday 체크 - LinkCheck때에 HoliDay 값 사용할 수 있도록 개발되면 주석 해제해서 사용가능
-                if (GetHoliday() == "1")
-                    return false;
-
-                if (string.Compare(arrAfter[1], "none", true) == 0 &&
-                    string.Compare(arrAfter[2], "none", true) == 0)
-                    return true;
-                else if (string.Compare(arrAfter[1], "all", true) == 0 ||
-                         string.Compare(arrAfter[2], "all", true) == 0)
-                    return false;  // 요일이나 시간 전체사용
-
-                if (arrAfter[1].Contains(stCurWeekDay))
-                    return false;   // 요일 사용
-
-                if (string.Compare(arrAfter[2], "none", true) == 0)
-                    return true;   // 요일X, 시간사용X
-
-                string[] arrHours = arrAfter[2].Split("~");
-                bool bInclude = true;
-                if (arrHours[0].IndexOf("!") > -1)
-                {
-                    bInclude = false;
-                    arrHours[0] = arrHours[0].Replace("!", "");
-                }
-                if (arrHours[0] == "null" || arrHours[0].Length < 1 || arrHours[0].Length > 2)
-                    arrHours[0] = "0";
-                if (arrHours[1] == "null" || arrHours[1].Length < 1 || arrHours[1].Length > 2)
-                    arrHours[1] = "23";
-
-                int startTime = Int32.Parse(arrHours[0]);
-                int endTime = Int32.Parse(arrHours[1]);
-                int curTime = Int32.Parse(stCurHour);
-                if (bInclude)
-                {
-                    if (curTime >= startTime && curTime < endTime)
-                        return false;
-                    else
-                        return true;
-                }
-                else
-                {
-                    if (curTime >= startTime && curTime < endTime)
-                        return true;
-                    else
-                        return false;
-                }
-#endif
             }
-            else if (strAfterApprove[0] == '2') //신포멧
+            catch (Exception ex)
             {
-                string[] arrWeek = arrAfter[1].Split("|");
-                string stTimeValue = arrWeek[(Int32.Parse(GetDay(today)) * 2) + 1];
-
-                // Holyday 체크 - LinkCheck때에 HoliDay 값 사용할 수 있도록 개발되면 주석 해제해서 사용가능
-                // login할때 HoliDay이면 계속 HoliDay임
-                if (GetHoliday() == "1")
-                    stTimeValue = arrWeek[15];
-
-                if (stTimeValue == "0")
-                    return false;
-                if (stTimeValue == "-1")
-                    return true;
-                string[] arrHourSeries = stTimeValue.Split(",");
-                bool bHourHit = false;
-                int startTime = 0;
-                int endTime = 0;
-                int curTime = Int32.Parse(stCurHour);
-                for (int i = 0; i < arrHourSeries.Length; i++)
-                {
-                    string[] arrHour = arrHourSeries[i].Split("~");
-                    if (arrHour[0] == "null" || arrHour[0].Length < 1 || arrHour[0].Length > 2)
-                        arrHour[0] = "0";
-                    if (arrHour[1] == "null" || arrHour[1].Length < 1 || arrHour[1].Length > 2)
-                        arrHour[1] = "23";
-
-                    startTime = Int32.Parse(arrHour[0]);
-                    endTime = Int32.Parse(arrHour[1]);
-                    if (curTime >= startTime && curTime <= endTime)
-                    {
-                        bHourHit = true;
-                        break;
-                    }
-                }
-                if (bHourHit)
-                    return false;
-                else
-                    return true;
+                Log.Logger.Here().Error($"GetAfterChkHide Exception - {ex.ToString()}");
+                return true;
             }
-            return bRet;
-        }
-
-        /// <summary>
-        /// 특정날짜의 요일값을 반환한다.
-        /// </summary>
-        /// <param name="dt"></param>
-        /// <returns>특정날짜의 요일값. (0 : 일요일, 1:월요일, ... </returns>
-        private string GetDay(DateTime dt)
-        {
-            string strDay = "";
-            switch (dt.DayOfWeek)
-            {
-                case DayOfWeek.Monday:
-                    strDay = "1";
-                    break;
-
-                case DayOfWeek.Tuesday:
-                    strDay = "2";
-                    break;
-
-                case DayOfWeek.Wednesday:
-                    strDay = "3";
-                    break;
-
-                case DayOfWeek.Thursday:
-                    strDay = "4";
-                    break;
-
-                case DayOfWeek.Friday:
-                    strDay = "5";
-                    break;
-
-                case DayOfWeek.Saturday:
-                    strDay = "6";
-                    break;
-
-                case DayOfWeek.Sunday:
-                    strDay = "0";
-                    break;
-
-                default:
-                    strDay = "";
-                    break;
-
-            }
-            return strDay;
-        }
-
-        /// <summary>
-        /// 특정날짜의 요일(한글)값을 반환한다.
-        /// </summary>
-        /// <param name="strDay"></param>
-        /// <returns>특정날짜의 요일(한글)값.</returns>
-        private string GetDayConvertHangul(string strDay)
-        {
-            string strHanDay = "";
-            switch (strDay)
-            {
-                case "0":
-                    strHanDay = "일";
-                    break;
-
-                case "1":
-                    strHanDay = "월";
-                    break;
-
-                case "2":
-                    strHanDay = "화";
-                    break;
-
-                case "3":
-                    strHanDay = "수";
-                    break;
-
-                case "4":
-                    strHanDay = "목";
-                    break;
-
-                case "5":
-                    strHanDay = "금";
-                    break;
-
-                case "6":
-                    strHanDay = "토";
-                    break;
-
-                default:
-                    strHanDay = "";
-                    break;
-
-            }
-            return strHanDay;
-        }
-
-        /// <summary>
-        /// 사후결재 설정 요일 검사 후 사용 가능 여부를 반환한다.
-        /// </summary>
-        /// <param name="strWeek"></param>
-        /// <param name="dt"></param>
-        /// <returns>사후결재 사용 가능 여부(true : 사용 가능, false : 사용 불가능)</returns>
-        public bool GetWeekApprove(string strWeek, DateTime dt)
-        {
-            if (strWeek.Equals(""))
-                return false;
-
-            string[] strListWeek = strWeek.Split(",");
-
-            if (strListWeek.Length <= 0)
-                return false;
-
-            string strCurDay = GetDay(dt);
-            string strCurHanDay = GetDayConvertHangul(strCurDay);
-            for (int i = 0; i < strListWeek.Length; i++)
-            {
-                if ((strListWeek[i].Equals(strCurDay)) || (strListWeek[i].Equals(strCurDay)))
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 사후결재 설정 시각 검사 후 사용 가능 여부를 반환한다.
-        /// </summary>
-        /// <param name="strTime"></param>
-        /// <param name="dt"></param>
-        /// <returns>사후결재 사용 가능 여부(true : 사용 가능, false : 사용 불가능)</returns>
-        public bool GetTimeApprove(string strTime, DateTime dt)
-        {
-            bool bNot = false;
-            if (strTime[0] == '!')
-            {
-                strTime = strTime.Substring(1);
-                bNot = true;
-            }
-
-            int nCurHour = dt.Hour;
-            bool bRet = false;
-            if (strTime.Contains(","))
-            {
-                string[] strTime1 = strTime.Split(",");
-                for (int i = 0; i < strTime1.Length; i++)
-                {
-                    string[] strTime2 = strTime1[i].Split("~");
-                    int nStartTime = 0;
-                    int nEndTime = 0;
-                    if (!strTime2[0].Equals(""))
-                        nStartTime = Convert.ToInt32(strTime2[0]);
-                    if (!strTime2[1].Equals(""))
-                        nEndTime = Convert.ToInt32(strTime2[1]);
-
-                    if (nStartTime > nEndTime)
-                        nEndTime += 24;
-
-                    if ((nCurHour >= nStartTime) && (nCurHour <= nEndTime))
-                    {
-                        bRet = true;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                string[] strTime2 = strTime.Split("~");
-                int nStartTime = 0;
-                int nEndTime = 0;
-                if (!strTime2[0].Equals(""))
-                    nStartTime = Convert.ToInt32(strTime2[0]);
-                if (!strTime2[1].Equals(""))
-                    nEndTime = Convert.ToInt32(strTime2[1]);
-
-                if (nStartTime > nEndTime)
-                    nEndTime += 24;
-
-                if ((nCurHour >= nStartTime) && (nCurHour <= nEndTime))
-                {
-                    bRet = true;
-                }
-            }
-
-            if (bNot)
-                bRet = !bRet;
-            return bRet;
         }
 
         /// <summary>
@@ -1827,7 +1158,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         public bool GetUseAfterApprove(DateTime dt)
         {
-            return !GetAfterChkHide();
+            return !GetAfterChkHide(dt);
         }
 
         /// <summary>
@@ -1836,7 +1167,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>서버에 설정된 결재유형값(0:AND, 1:OR, 2:ANDOR)</returns>
         public int GetApproveStep()
         {
-            string strData = GetTagData("user_policy","approval_policy", "approve_step");
+            string strData = GetTagData("user_policy", "approval_policy", "approve_step");
             if (strData == "and")
                 return 0;
             if (strData == "or")
@@ -1847,32 +1178,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// PCURL PROXY 설정 정보를 반환한다.
-        /// </summary>
-        /// <returns>PCURL PROXY 설정 정보.</returns>
-        public string GetPCURLHTTPPROXY()
-        {
-            string strData = GetTagData("PCURLHTTPPROXY");
-            return strData;
-        }
-
-        /// <summary>
         /// 환경변수 HSZDEFAULTOPTION 값을 반환한다.
         /// </summary>
         /// <returns>환경변수 HSZDEFAULTOPTION 값</returns>
         public string GetPassWDExpiredDay()
         {
+            //TODO 고도화 - UI에서 필요한지 프로세스 확인 필요
             string strData = GetTagData("PASSWDEXPIREDDAYS");
-            return strData;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public string GetLoginType()
-        {
-            string strData = GetTagData("LOGINTYPE");
             return strData;
         }
 
@@ -1882,6 +1194,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="data"></param>
         public void AddRunSystemEnvData(SGData data)
         {
+            //TODO 고도화 - UI에서 필요한지 프로세스 확인 필요
             AddRunSystemData("HSZDEFAULTOPTION", data);          // 긴파일, 압축, 암호화 지원여부
             AddRunSystemData("INTERLOCKEMAIL", data);            // 이메일용 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
             AddRunSystemData("APPROVETYPESFM", data);            // 대결재 방식(1:고정, 2:유동)
@@ -1907,84 +1220,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// [사용중인곳 없음]
+        /// 압축파일 내부검사 Depth
         /// </summary>
-        /// <param name="data"></param>
-        public void AddSystemEnvData(SGData data)
+        /// <returns></returns>
+        public int GetZipDepthCount()
         {
-            AddSystemData("HSZDEFAULTOPTION", data);          // 긴파일, 압축, 암호화 지원여부
-            AddSystemData("INTERLOCKEMAIL", data);            // 이메일용 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
-            AddSystemData("APPROVETYPESFM", data);            // 대결재 방식(1:고정, 2:유동)
-            AddSystemData("PCURLHTTPPROXY", data);            // PCURLHTTPPROXY 설정 정보
-            AddSystemData("INTERLOCKFLAG", data);               // 서버 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
+            string count = GetTagData("user_policy", "zip_depth", "depth_count");
+
+            if (!int.TryParse(count, out int DepthCount))
+                return 3;
+            return DepthCount;
         }
 
         /// <summary>
-        /// [사용중인곳 없음]
+        /// 압축파일 내부검사가 모두 완료후에도 압축파일이 잔여할 경우, 처리 타입
         /// </summary>
-        /// <param name="strKey"></param>
-        /// <param name="data"></param>
-        public void AddSystemData(string strKey, SGData data)
+        /// <returns>0: 내부에 압축이 발견되면 차단 / 1: 허용</returns>
+        public int GetZipDepthRemainProcType()
         {
-            List<Dictionary<int, string>> listDicdata = data.GetRecordData("TAGRECORD");
-            if (listDicdata == null)
-                return;
-            int nTotalCount = listDicdata.Count;
-            for (int i = 0; i < nTotalCount; i++)                              // UI 에서 사용하기 위해 자기 자신을 포함하기 위해 i = 0 부터 시작.                  
-            {
-                Dictionary<int, string> dic = listDicdata[i];
-                string strTmpKey = "";
-                string strValue = "";
-                if (dic.TryGetValue(0, out strTmpKey) == true)
-                {
-                    strTmpKey = dic[0];
-                    if (strTmpKey.Equals(strKey))
-                    {
-                        if (dic.TryGetValue(1, out strValue) == true)
-                        {
-                            strValue = dic[1];
-                            EncAdd(strKey, strValue);
-                        }
-                    }
+            string procType = GetTagData("user_policy", "zip_depth", "reamaining_zip_proc_type");
 
-                }
-            }
+            if (!int.TryParse(procType, out int typeCode))
+                return 1;
+            return typeCode;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="data"></param>
-        public void AddZipDepthInfo(SGData data)
-        {
-            string strData = data.GetBasicTagData("RECORD");
-
-            char sep = (char)'\u0003';
-            string[] strList = strData.Split(sep);
-
-            for (int i = 0; i < strList.Length; i++)
-            {
-                char sep2 = (char)'\u0001';
-                string[] str = strList[i].Split(sep2);
-                EncAdd(str[0], str[1]);
-            }
-        }
-
-        /// <summary>
-        /// 서버로 부터 수신 받은 zip 파일 내부 검사 설정 정보를 반환한다.
-        /// </summary>
-        /// <param name="bSystem">( true : 내부, false : 외부)</param>
-        /// <returns>zip 파일 내부 검사 설정 정보.</returns>
-        public string GetZipDepthInfo(bool bSystem)
-        {
-            string strRet = "";
-            if (bSystem)
-                strRet = GetTagData("I_CLIENT_ZIP_DEPTH");
-            else
-                strRet = GetTagData("E_CLIENT_ZIP_DEPTH");
-            return strRet;
-        }
-
 
         /// <summary>
         /// 
@@ -2067,49 +1326,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             => (GetSystemPosition()) ? GetTagData("I_CLIENT_PRIVACY_COMMENT") : GetTagData("E_CLIENT_PRIVACY_COMMENT");
 
         /// <summary>
-        /// value 값을 암호화해서 sgData에 저장
-        /// </summary>
-        /// <param name="strKey"></param>
-        /// <param name="strValue"></param>
-        public void AddData(string strKey, string strValue)
-        {
-            EncAdd(strKey, strValue);
-        }
-
-        /// <summary>
         /// 패스워드 변경 유무 또는 변경 타입을 반환한다.
         /// </summary>
         /// <returns>패스워드 변경 유무 또는 변경 타입.</returns>
         public ePassWDChgType GetPasswordExpired()
         {
             ePassWDChgType ePassType = ePassWDChgType.eNone;
-            //ePassWDChgType ePassType = ePassWDChgType.eEnforce;
-            //ePassWDChgType ePassType = ePassWDChgType.eAfterward;
-            //return ePassType;
-            string strData = GetTagData("PASSWORDEXPIRED");
-
-            char sep = (char)',';
-            string[] strPassWordExpired = strData.Split(sep);
-            if (strPassWordExpired.Length <= 0)
-                return ePassType;
-
-            strData = strPassWordExpired[0];
-            int nValue = 0;
-            if (strData.Equals(""))
-                return ePassType;
-
-            nValue = Convert.ToInt32(strData);
-
-            switch (nValue)
+            string strData = GetTagData("user_policy", "pw_expire_noti_type");
+            switch (strData)
             {
-                case 0:
+                case "0":
                     ePassType = ePassWDChgType.eNone;
                     break;
-                case 1:
-                    ePassType = ePassWDChgType.eEnforce;
-                    break;
-                case 2:
+                case "1":
                     ePassType = ePassWDChgType.eAfterward;
+                    break;
+                case "2":
+                    ePassType = ePassWDChgType.eEnforce;
                     break;
                 default:
                     ePassType = ePassWDChgType.eNone;
@@ -2124,6 +1357,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>환경설정 변수(RUNTIME) 패스워드 변경 타입.</returns>
         public ePassWDChgType GetPasswordExpiredMethodSystemRunEnv()
         {
+            //TODO 고도화 - UI에서 필요한지 프로세스 확인 필요
             ePassWDChgType ePassType = ePassWDChgType.eNone;
             string strData = GetTagData("PASSWDEXPIREDMETHOD");
 
@@ -2155,20 +1389,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>패스워드 변경하지 않은 날짜 정보</returns>
         public int GetPasswordExpiredDay()
         {
-            string strData = GetTagData("PASSWORDEXPIRED");
-
-            char sep = (char)',';
-            string[] strPassWordExpired = strData.Split(sep);
-            if (strPassWordExpired.Length <= 1)
+            string strData = GetTagData("user_policy", "pw_not_changed_days");
+            if (!int.TryParse(strData, out int days))
                 return 0;
-
-            strData = strPassWordExpired[1];
-            int nValue = 0;
-            if (strData.Equals(""))
-                return nValue;
-
-            nValue = Convert.ToInt32(strData);
-            return nValue;
+            else
+                return days;
         }
 
 
@@ -2238,22 +1463,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns></returns>
         public bool GetUseOverNetwork2()
         {
-            string strData = GetTagData("NETOVERMODE");
-            //CLog.Here().Information("NETOVERMODE(Get from Server-###) : {0}", strData);
-            //strData = "0";	// (3중망연계,사용하지 않는다고 판단)
-            // strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// ex) (인터넷망, 파일/클립보드 사용안함)
-            //strData = "단말망,I001/업무망,E001,31/인터넷망,E101,31";  // ex) (인터넷망, 전부 사용)
-            if (strData == null || strData.Length == 0 || strData == "0")
+            List<string> strData = GetTagDataList("user_login", "user_policy", "net_over_mode_list");
+            if (strData?.Count >= 3)
+            {
+                CLog.Here().Information($"NETOVERMODE(Get from Server-###) : {string.Join(",", strData)}");
+                return true;
+            }
+            else
                 return false;
 
-            if (strData.Length < 6)
-                return false;
+            ////CLog.Here().Information("NETOVERMODE(Get from Server-###) : {0}", strData);
+            ////strData = "0";	// (3중망연계,사용하지 않는다고 판단)
+            //// strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// ex) (인터넷망, 파일/클립보드 사용안함)
+            ////strData = "단말망,I001/업무망,E001,31/인터넷망,E101,31";  // ex) (인터넷망, 전부 사용)
+            //if (strData == null || strData.Length == 0 || strData == "0")
+            //    return false;
 
-            String[] listNetOver2 = strData.Split("/");
-            if (listNetOver2.Count() < 3)
-                return false;
+            //if (strData.Length < 6)
+            //    return false;
 
-            return true;
+            //String[] listNetOver2 = strData.Split("/");
+            //if (listNetOver2.Count() < 3)
+            //    return false;
+
+            //return true;
         }
 
         /// <summary>
@@ -2264,16 +1497,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns></returns>
         public bool GetOverNetwork2Data(ref Dictionary<string, SGNetOverData> dicSysIdName, bool bIsMultiNetWork)
         {
-            string strData = GetTagData("NETOVERMODE");
-
-            CLog.Here().Information("NETOVERMODE(Get from Server-###) : {0}", strData);
-
-            // strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// (인터넷망, 파일/클립보드 사용안함)
-            //strData = "단말망,I001/업무망,E001,31/인터넷망,E101,31";	// (인터넷망, 전부 사용)
-            if (strData == null || strData.Length == 0 || strData == "0")
+            if (!GetUseOverNetwork2())
                 return false;
 
-            String[] listNetOver2 = strData.Split("/");
+            List<string> listNetOver2 = GetTagDataList("user_login", "user_policy", "net_over_mode_list");
             if (listNetOver2.Count() < 3)
                 return false;
 
@@ -2331,44 +1558,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns></returns>
         public string GetExceptionExt()
         {
-            string strData = GetTagData("EXCEPTIONEXT");
+            List<string> strData = GetTagDataList("user_policy", "exception_handling", "approve_policy", "ext_list");
 
-            if (strData.Equals(""))
-            {
-                return ";";
-            }
-
-            if (string.Compare(strData, "none", true) == 0)
+            if (strData == null || strData.Count < 1)
                 return ";";
             else
-                return strData;
-        }
-
-        /// 
-        /// </summary>
-        /// <param name="tag"></param>
-        /// <returns></returns>
-        public bool GetTagValue(string tag)
-        {
-            string strData = GetTagData(tag);
-            if (strData == "0")
-                return false;
-            else
-                return true;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="tag"></param>
-        /// <returns></returns>
-        public int GetTagValueInteger(string tag)
-        {
-            string strData = GetTagData(tag);
-            if (strData == null)
-                return -1;
-            else
-                return Int32.Parse(strData);
+                return string.Join(",", strData);
         }
 
         public bool GetURLRedirect()
@@ -2408,11 +1603,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		 */
         public int GetURLlistCount()
         {
-            string strData = GetBasicTagData("URLLISTCOUNT");
-            if (strData.Equals(""))
+            List<string> strData = GetTagDataList("mime_ole_url_info", "redirection_url", "list");
+
+            if (strData == null)
                 return 0;
-            int nCount = Convert.ToInt32(strData);
-            return nCount;
+            else
+                return strData.Count;
         }
 
         /**
@@ -2421,11 +1617,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		 */
         public bool GetURLlist(ref List<string> listUrlData)
         {
-            int nCount = GetURLlistCount();
             int nIdx = 0;
-            string strData = GetEncTagData("URLLIST");
-
-            String[] listurl = strData.Split("\r\n");
+            List<string> listurl = GetTagDataList("mime_ole_url_info", "redirection_url", "list");
 
             if (listurl == null)
                 return false;
@@ -2445,11 +1638,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		 */
         public int GetURLexceptionlistCount()
         {
-            string strData = GetBasicTagData("URL_EXCEPTION_LIST_COUNT");
-            if (strData.Equals(""))
+            List<string> strData = GetTagDataList("mime_ole_url_info", "redirection_url", "exception_list");
+
+            if (strData == null)
                 return 0;
-            int nCount = Convert.ToInt32(strData);
-            return nCount;
+            else
+                return strData.Count;
         }
 
         /**
@@ -2460,9 +1654,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             //int nCount = GetURLexceptionlistCount();
             int nIdx = 0;
-            string strData = GetEncTagData("URL_EXCEPTION_LIST");
-
-            String[] listurl = strData.Split("\r\n");
+            List<string> listurl = GetTagDataList("mime_ole_url_info", "redirection_url", "exception_list");
 
             if (listurl == null)
                 return false;

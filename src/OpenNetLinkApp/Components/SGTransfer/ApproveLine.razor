@@ -121,7 +121,7 @@ else
                     pageService.SetInitApprLine(groupID, true);
                     //base.OnInitialized();
                 }
-                int nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY");
+                int nApproveProxy = sgLoginData.GetApproveProxyInteger();
 
                 bool bLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID);  // siteConfig   json으로 설정이동
                 if (bLocalSave && nApproveProxy > 1)

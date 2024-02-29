@@ -821,12 +821,14 @@
         if (sgApprLineData == null)
             return;
 
+
         // 시간에 의한 파일전송 기능 사용 확인
         //bool bUseFileTrans = true; //sgLoginData.GetFileTrans();
+        DateTime nowDt = pageService.GetAfterApprTime(groupID);
 
         //if (sgLoginData.GetUseFileTransForTimeMode())     // KKW-Test
         {
-            if (sgLoginData.GetUseFileTransForTime() == false)
+            if (sgLoginData.GetUseFileTransForTime(nowDt) == false)
             {
                 // 자료전송이 허락된 시간이 아닙니다.
                 CLog.Here().Information($"FileTrans,  This is not the permitted time to transmit data!!!");
@@ -2564,7 +2566,8 @@
         if (sgUserData == null)
             return;
 
-        bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+
+        bAfterApprChkHIde = sgLoginData.GetAfterChkHide(dt);
 
         bool bAfterAppr = sgLoginData.GetUseAfterApprove(dt);
         pageService.SetAfterApprChkHIde(groupID, bAfterApprChkHIde);

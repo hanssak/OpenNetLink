@@ -324,11 +324,13 @@
 
         int groupID = groupIDbyParam;
 
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
 
+        SGReadyData sgReadyData = (SGReadyData)HSCmdCenter.GetReadyData(groupID);
+        if (sgReadyData == null)
+            return;
         string temp;
         int nTemp;
         Int64 nTemp64;
@@ -339,7 +341,7 @@
         strAppVersion = strAppVersion.Substring(0, find);
 
         strDataVersion = strAppVersion;
-        strDataNetWorkPos = sgLoginData.GetServName();                                                  // 내부시스템01 / 외부시스템01
+        strDataNetWorkPos = sgReadyData.GetServName();                                                  // 내부시스템01 / 외부시스템01
 
         // 한번에 전송 가능한 파일 크기
         temp = XmlConf.GetTitle("T_INFO_LIMMIT_SIZE");                                                 // {0} MB 까지 전송

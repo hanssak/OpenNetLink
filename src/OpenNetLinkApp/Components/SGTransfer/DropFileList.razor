@@ -2440,24 +2440,9 @@
         // 아직 지원 안됨 :  || (strExtType.Equals("ZIPX")) || (strExtType.Equals("LZH")) || (strExtType.Equals("TAR")) || (strExtType.Equals("RAR"))
 
         bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
-
-        string strZipDepthInfo = sgLoginData.GetZipDepthInfo(sgLoginData.GetSystemPosition());
-        string[] strTemp = strZipDepthInfo.Split('/');  //ZIP파일 내부 검사 [ Depth/옵션(1이상 검사/0: 차단, 1 허용)
-
-        int MaxDepth = 3;       //압축 파일 내부에 압축이 발견되면 n번까지 Depth 해제함
-        int Option = 1;         //0: 내부에 압축이 발견되면 차단 / 1: 허용
-        if ((strTemp != null) && (strTemp.Length >= 2))
-        {
-            if (!strTemp[0].Equals(""))
-            {
-                MaxDepth = Convert.ToInt32(strTemp[0]);
-            }
-            if (!strTemp[1].Equals(""))
-            {
-                Option = Convert.ToInt32(strTemp[1]);
-            }
-        }
-
+        int MaxDepth = sgLoginData.GetZipDepthCount();       //압축 파일 내부에 압축이 발견되면 n번까지 Depth 해제함
+        int Option = sgLoginData.GetZipDepthRemainProcType();         //0: 내부에 압축이 발견되면 차단 / 1: 허용
+       
         if (MaxDepth < 1)
         {
             CLog.Here().Information($"GetExamCheckZip Stop - ClientZipDepth : [{MaxDepth} / {Option}]");

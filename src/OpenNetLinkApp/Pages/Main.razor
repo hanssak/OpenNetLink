@@ -1748,11 +1748,14 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
                 if (ret == 0)
                 {
+                    
+                    
 
                     string strNavigatePathWithGroupID = "";
 
                     SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
-
+                    
+                 
                     //pageService.ConnectCountAdd(groupId);
                     pageService.SetConnectStatus(groupId, true);
                     pageService.SetLogoutStatus(groupId, false);
@@ -1808,42 +1811,42 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         }
                     }
 
-                    // CLIENT_ZIP_DEPTH, CS_EXCEPTION_EXT_REASON_TYPE
-                    // 정보 가져옴
-                    SGQueryExtend sgQueryExtend = null;
-                    sgQueryExtend = new SGQueryExtend();
-                    if (sgQueryExtend != null)
-                    {
-
-                        string strGetinfoTagName = "";
-                        strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
-                        strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
-                        strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
-                        strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_EXT'";
-                        // strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";     // Table 이름 따로 정해졌음
-                        strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
-                        strGetinfoTagName += ", 'FORWARD_AUTODOWN'";
-                        strGetinfoTagName += ", 'CLIENT_URL_FW_PAGE'";
-                        strGetinfoTagName += ", 'CLIENT_BINARY_CHECK'";
-                        strGetinfoTagName += ", 'CLIENT_BINARY_CHECK_EXT'";
-                        strGetinfoTagName += ", 'CLIENT_CHECK_PE'";
-                        strGetinfoTagName += ", 'CLIENT_PRIVACY_COMMENT'";
-
-                        if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupId))
-                        {
-                            strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
-                            strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
-                        }
-
-                        if (SGAppMgrSvc.OpConfigInfoService.GetUseMaxLengthTitleDesc(groupId))
-                        {
-                            strGetinfoTagName += ", 'CLIENT_TITLE_MAX_LENGTH'";
-                            strGetinfoTagName += ", 'CLIENT_DESC_MAX_LENGTH'";
-                        }
-
-                        string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
-                        HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
-                    }
+                    //// CLIENT_ZIP_DEPTH, CS_EXCEPTION_EXT_REASON_TYPE
+                    //// 정보 가져옴
+                    //SGQueryExtend sgQueryExtend = null;
+                    //sgQueryExtend = new SGQueryExtend();
+                    //if (sgQueryExtend != null)
+                    //{
+                    //
+                    //    string strGetinfoTagName = "";
+                    //    strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
+                    //    strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
+                    //    strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
+                    //    strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_EXT'";
+                    //    // strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";     // Table 이름 따로 정해졌음
+                    //    strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
+                    //    strGetinfoTagName += ", 'FORWARD_AUTODOWN'";
+                    //    strGetinfoTagName += ", 'CLIENT_URL_FW_PAGE'";
+                    //    strGetinfoTagName += ", 'CLIENT_BINARY_CHECK'";
+                    //    strGetinfoTagName += ", 'CLIENT_BINARY_CHECK_EXT'";
+                    //    strGetinfoTagName += ", 'CLIENT_CHECK_PE'";
+                    //    strGetinfoTagName += ", 'CLIENT_PRIVACY_COMMENT'";
+                    //
+                    //    if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupId))
+                    //    {
+                    //        strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
+                    //        strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
+                    //    }
+                    //
+                    //    if (SGAppMgrSvc.OpConfigInfoService.GetUseMaxLengthTitleDesc(groupId))
+                    //    {
+                    //        strGetinfoTagName += ", 'CLIENT_TITLE_MAX_LENGTH'";
+                    //        strGetinfoTagName += ", 'CLIENT_DESC_MAX_LENGTH'";
+                    //    }
+                    //
+                    //    string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
+                    //    HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
+                    //}
 
                     if (pageService.GetIsPolicyUpdate(groupId))
                     {
@@ -1988,12 +1991,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         }
 
                     } // if (bUseClipBoard)
-
                     DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer(groupId)) ? DateTime.Now : sgLoginData.GetSvrTimeConvert();
                     pageService.SetSvrTime(groupId, dt, sgLoginData);
 
-
-                    bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+                    bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide(dt);
                     bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
                     pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
                     pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
@@ -2305,7 +2306,8 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                             }
 
                             DateTime dtLocalTime = DateTime.Parse(strTime);
-                            DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
+                            @*DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();*@
+    DateTime svrDt = pageService.GetAfterApprTime(nGroupIDfirst);
 
                             if (DateTime.Compare(dtLocalTime, svrDt) < 0)
                             {
@@ -2680,18 +2682,19 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                             SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse, strUserSeq: strUserSeq);
                     }
 
-                    //파일검사 예외 신청(4)
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseFileCheckException(gID))
-                    {
-                        if (sgLoginData.GetServerVirusExam())
-                        {
-                            strNavigatePathWithGroupID = "/fileException/";
-                            strNavigatePathWithGroupID += gID.ToString();
-                            if (SideBarUISvc.FindSubMenu(gID, nParentID, 4) == null)
-                                SideBarUISvc.AddSubMenu(groupId: gID, Id: 4, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_FILE_EXCEPTION"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strUserSeq);              // 파일검사 예외 신청
-                        }
-                    }
-
+                    //SecureGate 4.0에서 예외 신청 기능 삭제 
+                    ////파일검사 예외 신청(4)
+                    //if (SGAppMgrSvc.OpConfigInfoService.GetUseFileCheckException(gID))
+                    //{
+                    //    if (sgLoginData.GetServerVirusExam())
+                    //    {
+                    //        strNavigatePathWithGroupID = "/fileException/";
+                    //        strNavigatePathWithGroupID += gID.ToString();
+                    //        if (SideBarUISvc.FindSubMenu(gID, nParentID, 4) == null)
+                    //            SideBarUISvc.AddSubMenu(groupId: gID, Id: 4, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_FILE_EXCEPTION"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strUserSeq);              // 파일검사 예외 신청
+                    //    }
+                    //}
+                    //
                     //대결재관리(5)
                     if (bDeputyApprove && bApprMenuUse && sgUserInfo.GetUserApprPos(true, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(gID)) > 0)      //일반사용자는 (대결재권한을 가져도) 대결재 관리 사용 불가
                     {

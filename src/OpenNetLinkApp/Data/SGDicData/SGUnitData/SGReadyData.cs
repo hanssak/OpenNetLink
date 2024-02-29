@@ -95,5 +95,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strData = GetTagData("server_info", "ex_approval_use");
             return (strData == "true");
         }
+
+        /// <summary>
+        /// 서버명을 반환
+        /// </summary>
+        /// <returns>서버명</returns>
+        public string GetServName()
+        {
+            string strData = GetTagData("server_info", "name");
+            return strData;
+        }
+
+
+
     }
 }

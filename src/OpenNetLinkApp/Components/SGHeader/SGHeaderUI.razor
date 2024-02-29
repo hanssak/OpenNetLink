@@ -2101,7 +2101,7 @@
         //pageService에 변경된 내용 갱신
         DateTime dt = sgLoginData.GetSvrTimeConvert();
         pageService.SetSvrTime(groupId, dt, sgLoginData);
-        bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+        bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide(dt);
         bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
         pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
         pageService.SetAfterApprEnable(groupId, bAfterApprEnable);

@@ -119,8 +119,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 foreach ((string Name, string Rank, int Right) value in listDicSfmdata)
                 {
-                    if (sfmRight < Convert.ToInt32(value.Rank))
-                        sfmRight = Convert.ToInt32(value.Rank);
+                    if (sfmRight < Convert.ToInt32(value.Right))
+                        sfmRight = Convert.ToInt32(value.Right);
                 }
 
                 isMySelfSFM = false;

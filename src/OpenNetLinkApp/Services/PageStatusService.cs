@@ -427,7 +427,7 @@ namespace OpenNetLinkApp.Services
                     PageStatusData pageStatus = notiData.AfterApprovePageStatusData;
 
                     //실시간 사후결재 체크 함수 호출 값을 GroupId 별로 m_bAfterApprCheckHide 갱신                    
-                    bool bAfterApprChkHIde = sgLogin.GetAfterChkHide();
+                    bool bAfterApprChkHIde = sgLogin.GetAfterChkHide(svrTime);
                     bool bAfterAppr = sgLogin.GetUseAfterApprove(svrTime);
                     pageStatus.SetAfterApprChkHIde(bAfterApprChkHIde);
                     pageStatus.SetAfterApprEnable(bAfterAppr);
@@ -474,6 +474,11 @@ namespace OpenNetLinkApp.Services
             PageStatusData.SNotiEvent = afterApprTime;
         }
 
+        /// <summary>
+        /// 서버에서 최초 받은 서버 시간 기준으로 Agent에서 돌아가고 있는 기준 시간
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
         public DateTime GetAfterApprTime(int groupID)
         {
             //PageStatusData tmpData = null;
