@@ -15,7 +15,11 @@
 @*@using HsNetWorkSGData*@
 @using System.Text.Json
 @using System.Runtime.InteropServices;
-@using HsNetWorkSGData 
+@using HsNetWorkSGData
+
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using System.Collections.Generic;
 
 @inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
@@ -737,7 +741,7 @@
         if (sgSettingData == null)
             return;
 
-        SGLoginData sgLoginData= (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
 
@@ -785,7 +789,7 @@
             groupID = sgSideBar.GroupId;*/
         int groupID = groupIDbyParam;
 
-        SGLoginData sgLoginData= (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
         string strUserSeq = sgLoginData.GetUserSequence();
@@ -967,7 +971,7 @@
     public bool SetQuickMenuModify(int groupID)
     {
         bApprMenuUse = false;
-        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);        
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         ISGUserInfo sgUserInfo = sgUserSvr.GetUserInfo(groupID);
 
         if (sgLoginData != null)
@@ -1000,8 +1004,8 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         int transferTemplate = SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam);
-        await JSRuntime.InvokeAsync<object>("exitLogIn",new object[] {transferTemplate});
-        await JSRuntime.InvokeAsync<object>("adJustWindowsize",new object[] {transferTemplate});
+        await JSRuntime.InvokeAsync<object>("exitLogIn", new object[] { transferTemplate });
+        await JSRuntime.InvokeAsync<object>("adJustWindowsize", new object[] { transferTemplate });
 
         if (nDiskFreeSize <= 0)
             nDiskFreeSize = 1;
@@ -1027,12 +1031,20 @@
         if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
             nDrawPageGroupID = groupIDbyParam;
+
+            // Advanced - Test용도
+            /*HsCmdCenter.sgPageEvent.SetDashBoardDataEvent(groupID, DashBoardDataResult);
+            HsCmdCenter.RestDashBoardData(0, "20231205-20231210", 5);*/
+
+
             //strCurrentSeedKey = HsCmdCenter.GetSeedKey(groupIDbyParam);
             SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupIDbyParam);
             if (sgLoginData == null) return;
 
             bUseClipBoard = sgLoginData.GetClipboard();
 
+            // 예전
+            /*
             HsCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
             HsCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
 
@@ -1050,16 +1062,20 @@
 
             HsCmdCenter.sgPageEvent.SetPasswdChgDayEventAdd(groupID, PasswdChgDaySearchResult);         // 패스워드 날짜 조회 결과.
                                                                                                         //HsCmdCenter.sgPageEvent.SetBoardNotiSearchEventAdd(groupID,BoardNotifyResult);                      // 공지사항 조회 결과.
+            */
+
+            // Advanced
+            HsCmdCenter.sgPageEvent.SetDashBoardDataEvent(groupID, DashBoardDataResult);
+            HsCmdCenter.RestDashBoardData(0, "20231205-20231210", 5);
 
             HsCmdCenter.sgPageEvent.SetBoardNotiAfterDashBoardEventAdd(groupID, BoardNotiAfter);                // 공지사항 데이터 수신 후 화면 갱신
-
             HsCmdCenter.sgPageEvent.SetAlarmNotiAfterDashBoardEventAdd(groupID, AlarmNotiAfter);                // 알람 노티 수신 후 화면 갱신.
 
             HsCmdCenter.SetFileRecvPossible(groupID, true);
 
             // 수신 경로 변경은 기본 Page가 바뀔수 있으므로 Main, PopupLogin 쪽으로 이전
-            @*HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
-                SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정*@
+            /*HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
+                SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정*/
 
             GetNetOverModeData(groupID);
 
@@ -1077,12 +1093,14 @@
             InitAdministrator();
             InitTransApprList();
 
-
             GetUsePasswordUseDay();
 
-            SendDayFileInfo();
+            // 예전
+            //SendDayFileInfo();
+            //TransSearchData(1);
 
-            TransSearchData(1);
+            // Advanced
+            HsCmdCenter.RestDashBoardData(groupID, "", 5);
 
             StateHasChanged();
 
@@ -1122,7 +1140,7 @@
         nDayMaxFileCount = sgLoginData.GetDayFileTransferLimitCount();
 
         SGReadyData sgReadyData = (SGReadyData)HsCmdCenter.GetReadyData(groupID);
-        if(sgReadyData == null)
+        if (sgReadyData == null)
             return;
 
         bool bSystem = sgReadyData.GetSystemPosition();
@@ -1168,7 +1186,7 @@
 
 
         SGReadyData sgReadyData = (SGReadyData)HsCmdCenter.GetReadyData(groupID);
-        if(sgReadyData == null)
+        if (sgReadyData == null)
             return;
 
         bool bSystem = sgReadyData.GetSystemPosition();
@@ -1486,7 +1504,7 @@
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
-        { 
+        {
             CLog.Here().Information($"ApproveSearchData, sgLoginData is null");
             return;
         }
@@ -1902,7 +1920,7 @@
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
-        
+
         if (sgLoginData == null)
         {
             StateHasChanged();
@@ -1951,8 +1969,8 @@
 
         StateHasChanged();
         //BoardNotifySearch();
-
     }
+
     /*
     public void BoardNotifySearch()
     {
@@ -2018,7 +2036,7 @@
     public void AlarmNotiAfter(int groupid)
     {
         alarmList.Clear();
-        SGLoginData sgLoginData= (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
         if (sgLoginData == null)
             return;
 
@@ -2116,7 +2134,7 @@
                     AllowTrailingCommas = true,
                     PropertyNameCaseInsensitive = true,
                 };
-                sgAdmin = JsonSerializer.Deserialize<Administrator>(strJsonElement, options);
+                sgAdmin = System.Text.Json.JsonSerializer.Deserialize<Administrator>(strJsonElement, options);
                 strAdminName = sgAdmin.Name;
                 strAdminPhone = sgAdmin.Phone;
                 strAdminEmail = sgAdmin.Email;
@@ -2157,7 +2175,7 @@
     }
 
     /// <summary>
-    /// 패스워드 유효기간 표시할지 유무
+    /// 패스워드 유효기간 표시할지 유무(Advanced)
     /// </summary>
     /// <returns></returns>
     public void GetUsePasswordUseDay()
@@ -2173,7 +2191,7 @@
         eLoginType eData = sgReadyData.GetLoginType();
 
         bShowPasswordUseTime = (eData == eLoginType.eLOGINTYPE_ORIGIN);
-        bShowPasswordUseTime = false;
+        //bShowPasswordUseTime = false;
         return;
     }
 
@@ -2372,12 +2390,17 @@
     /// </summary>
     private void DayInfoRefreshResult()
     {
-        @*int groupID = groupIDbyParam;
-            HsCmdCenter.RefreshBind(groupID);*@
-        @*
-            StateHasChanged();*@
+        /*int groupID = groupIDbyParam;
+            HsCmdCenter.RefreshBind(groupID);
+            StateHasChanged();*/
 
-        SendDayFileInfo();
+        // 예전
+        //SendDayFileInfo();
+
+
+        int groupID = groupIDbyParam;
+        if (groupID > -1)
+            HsCmdCenter.RestDashBoardData(groupID, "", 5);
     }
 
 
@@ -2418,6 +2441,218 @@
             apvType = transKind = requestorName = Title = reqDate;
         }
     }
+
+
+    /// <summary>
+    /// OpenApi 호출로 받은 결과값 출력
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
+    /// <param name="sgData"></param>
+    public void DashBoardDataResult(int groupId, PageEventArgs e, SGData sgData)
+    {
+
+        try
+        {
+
+            if (e.result != 0)
+            {
+                CLog.Here().Error($"DashBoardDataResult, groupid : {groupId}, Code : {e.result}, Msg : {e.strMsg}");
+                return;
+            }
+
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
+            if (sgLoginData == null)
+            {
+                CLog.Here().Error($"DashBoardDataResult, groupid : {groupId}, sgLoginData is NULL !");
+                return;
+            }
+
+            if (sgData == null)
+            {
+                CLog.Here().Error($"DashBoardDataResult, groupid : {groupId}, sgLoginData is NULL !");
+                return;
+            }
+
+
+            // Server에서 받은 data 사용
+
+            // 승인 정보 현황
+            strTransReqCount = sgData.GetTagData("trans_proc_status", "trans_req_count");                // 전송요청 카운트
+            strApprWaitCount = sgData.GetTagData("approval_proc_status", "approval_state_wait_count");                // 승인대기 카운트
+            strApprCofirmCount = sgData.GetTagData("approval_proc_status", "approval_state_confirm_count");              // 승인 카운트
+            strApprRejectCount = sgData.GetTagData("approval_proc_status", "approval_state_reject_count");              // 반려 카운트
+            long Size = 0;
+            int Count = 0;
+            Size = Convert.ToInt64(sgData.GetTagData("trans_proc_status", "file_size"));                // 파일전송 크기
+            Count = Convert.ToInt32(sgData.GetTagData("trans_proc_status", "file_count"));                // 파일전송 횟수
+
+            // 파일크기정보 설정
+            pageService.SetDayUseFile(groupId, Size, Count);
+            if (Size <= 0)
+                nDayUseFileSize = 0;
+            else
+            {
+                nDayUseFileSize = (int)(Size / 1024 / 1024);
+                if (nDayUseFileSize <= 0)
+                    nDayUseFileSize = 1;
+            }
+
+            if (Count <= 0)
+                nDayUseFileCount = 0;
+            else
+            {
+                nDayUseFileCount = Count;
+            }
+
+            // 클립보드정보 설정
+            Size = Convert.ToInt64(sgData.GetTagData("trans_proc_status", "clipboard_size"));                // 클립보드전송 크기
+            Count = Convert.ToInt32(sgData.GetTagData("trans_proc_status", "clipboard_count"));                // 클립보드전송 횟수
+            pageService.SetDayUseClip(groupId, Size, Count);
+            if (Size <= 0)
+                nDayUseClipSize = 0;
+            else
+            {
+                nDayUseClipSize = (int)(Size / 1024 / 1024);
+                if (nDayUseClipSize <= 0)
+                    nDayUseClipSize = 1;
+            }
+
+            if (Count <= 0)
+                nDayUseClipCount = 0;
+            else
+            {
+                nDayUseClipCount = Count;
+            }
+
+
+            // 요청현황 List
+
+
+            // JSON 데이터를 List<dynamic>으로 변환
+            string strData = sgData.GetTagData("trans_req_info_list");
+            var dataList = JsonConvert.DeserializeObject<List<dynamic>>(strData);
+
+            requestList.Clear();
+            int i = 0;
+            string strItemData = "";
+            foreach (var dataItem in dataList)
+            {
+
+                transItem tData = new transItem();
+                tData.dispNo = i + 1;
+                strItemData = Convert.ToString(dataItem);
+                JObject jO = JObject.Parse(strItemData);
+
+                tData.apvType = SGDatatoTxt.Instance.GetApprKind((string)jO["approval_proc_type"]);
+
+                strItemData = (string)jO["req_net_id"];
+                tData.transKind = SGDatatoTxt.Instance.GetTransKind(strItemData.Substring(0,1));
+
+                tData.approverStatus = SGDatatoTxt.Instance.GetApprStatus((string)jO["approval_state"]);         // 승인상태 (요청취소,승인대기,승인,반려)
+
+                tData.Title = (string)jO["title"];                         // 제목
+                tData.reqDate = (string)jO["req_datetime"];                // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+                if (!tData.reqDate.Equals(""))
+                    tData.reqDate = tData.reqDate.Substring(0, 10);
+
+                requestList.Add(tData);
+                i++;
+            }
+
+
+            // 결재현황 List //
+            strData = sgData.GetTagData("approval_info_waiting_list");
+            dataList = JsonConvert.DeserializeObject<List<dynamic>>(strData);
+            approveList.Clear();
+            i = 0;
+            strItemData = "";
+            foreach (var dataItem in dataList)
+            {
+                ApproveItem aData = new ApproveItem();
+                aData.dispNo = i + 1;
+                strItemData = Convert.ToString(dataItem);
+                JObject jO = JObject.Parse(strItemData);
+
+                strItemData = jO["trans_req"].ToString();
+                JObject jOdetail1 = JObject.Parse(strItemData);
+                //aData.requestorName = (string)jOdetail1["name"];
+
+                aData.apvType = SGDatatoTxt.Instance.GetApprKind((string)jOdetail1["approval_proc_type"]);
+                //aData.apvType = sgData.GetApprKind(dic);                       // 결재종류 (선결/후결)
+
+                strItemData = (string)jOdetail1["req_net_id"];
+                aData.transKind = SGDatatoTxt.Instance.GetTransKind(strItemData.Substring(0,1));
+                //aData.transKind = sgData.GetTransKind(dic);                 // 전송구분 (반출/반입)
+
+                strItemData = jOdetail1["req_user_hr"].ToString();
+                JObject jOdetail2 = JObject.Parse(strItemData);
+                aData.requestorName = (string)jOdetail2["name"];
+
+                aData.Title = (string)jOdetail1["title"];                            // 제목
+
+                aData.reqDate = (string)jOdetail1["req_datetime"];                // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+                if (!aData.reqDate.Equals(""))
+                    aData.reqDate = aData.reqDate.Substring(0, 10);
+
+                approveList.Add(aData);
+            }
+
+            // password 만료기한 설정 UI에 표기        
+            //if (bShowPasswordUseTime = true)
+            if (bShowPasswordUseTime)
+            {
+
+                bool bShowDayTime = true;
+                string strPasswdChgDay = sgData.GetTagData("pw_expired_date");  //"20241021";
+
+                DateTime StartTime = DateTime.Now;
+                DateTime EndTime;
+                if (string.IsNullOrEmpty(strPasswdChgDay) || strPasswdChgDay == "0")
+                {
+                    strPWChgDate = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");      // 사용 안함.
+                    bShowDayTime = false;
+                }
+
+                if (bShowDayTime)
+                {
+
+                    string strConvertDay = String.Format("{0}-{1}-{2} 23:59:59", strPasswdChgDay.Substring(0, 4), strPasswdChgDay.Substring(4, 2), strPasswdChgDay.Substring(6, 2));
+                    EndTime = Convert.ToDateTime(strConvertDay);
+
+                    string strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
+                    SGPassWDPeriodData sgPassWdPeriodData = new SGPassWDPeriodData();
+                    string strUserSeq = "202203041700000001"; //sgLoginData.GetUserSequence();
+                    DateTime LocalTime = sgPassWdPeriodData.GetLocalDBPassWDDelayTime(strTime, strUserSeq);
+                    string strStartDay = StartTime.ToString("yyyy-MM-dd");
+
+                    ePassWDChgType ePassChgType = ePassWDChgType.eEnforce; // sgLoginData.GetPasswordExpiredMethodSystemRunEnv();
+                    if (ePassChgType == ePassWDChgType.eAfterward)
+                    {
+                        if (LocalTime.CompareTo(EndTime) > 0)
+                            EndTime = LocalTime;
+                    }
+                    string strEndDay = EndTime.ToString("yyyy-MM-dd");
+
+                    strPWChgDate = String.Format("{0} ~ {1}", strStartDay, strEndDay);
+                }
+
+            }
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"DashBoardDataResult, Exception(MSG) : {ex.Message}");
+        }
+
+        bFileTransMenuUse = true;
+        bUseClipBoard = true;
+
+        StateHasChanged();
+
+    }
+
 
 
 }

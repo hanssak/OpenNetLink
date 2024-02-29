@@ -348,7 +348,7 @@
         }
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null) return;
-        
+
         ApproveProxy approveProxy = new ApproveProxy();
         string sql = approveProxy.GetSFMApprover(sgLoginData.GetUserSequence());
 
@@ -461,7 +461,7 @@
 
         HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, ProxySearchResult);
         HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, ResultPossibleCount);
-         if(sgLoginData == null)
+        if(sgLoginData == null)
             return;
 
         bool bApproverOnly = !sgLoginData.GetApproveProxyRight();
