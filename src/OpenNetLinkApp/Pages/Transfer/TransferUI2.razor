@@ -894,7 +894,28 @@
                 {
                     if (!tempResult)
                     {
-                        stApprLineSeq = "";
+                        string strDest = SGAppMgrSvc.OpConfigInfoService.GetApproveExtRegardlessApproveDest(groupID);
+                        if (String.IsNullOrEmpty(strDest))
+                            stApprLineSeq = "";
+                        else
+                        {
+                            List<string> listDest = strDest.Split(',').ToList();
+                            string destNetSysId = String.Empty;
+
+                            foreach (var item in dicDestSysPos)
+                            {
+                                if (item.Key == strDestNetWork) //사용자가 선택한 system_id로 전송
+                                {
+                                    destNetSysId = item.Value.strDestSysid;
+                                    break;
+                                }
+                            }
+
+                            if (listDest.Contains(destNetSysId))
+                            {
+                                stApprLineSeq = "";
+                            }
+                        }
                     }
                 }
                 else if (SGAppMgrSvc.OpConfigInfoService.GetMethodApproveExtRegardlessApprove(groupID) == (int)Enums.EnumMethodApproveExtRegardlessApprove.Method02)

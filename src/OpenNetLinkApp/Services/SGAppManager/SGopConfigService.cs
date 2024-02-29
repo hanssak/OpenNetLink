@@ -228,6 +228,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApproveExt(int groupId);
         public bool GetUseApproveExtRegardlessApprove(int groupId);
         public int GetMethodApproveExtRegardlessApprove(int groupId);
+        public string GetApproveExtRegardlessApproveDest(int groupId);
         public bool GetUseFileExceptionDescCheck(int groupId);
         public bool GetUsePKIsendRecv(int groupId);
         public bool GetPKIsendType(int groupId);
@@ -1138,6 +1139,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public int GetMethodApproveExtRegardlessApprove(int groupId)
         {
             return AppConfigInfo[groupId].nMethodApproveExtRegardlessApprove;
+        }
+        public string GetApproveExtRegardlessApproveDest(int groupId)
+        {
+            return AppConfigInfo[groupId].strApproveExtRegardlessApproveDest;
         }
         public bool GetUseFileExceptionDescCheck(int groupId)
         {

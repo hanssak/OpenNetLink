@@ -205,6 +205,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseApproveExt { get; set; }                           // 결재필수 확장자 결재하는 기능 사용유무
         public bool bUseApproveExtRegardlessApprove { get; set; }                         // 결재상관없이 결재 필수 확장자 검색
         public int nMethodApproveExtRegardlessApprove { get; set; }                       // 결재상관없이 결재 필수 확장자 검색되었을때 처리 방법
+        public string strApproveExtRegardlessApproveDest { get; set; }                   // 결재상관없이 결재 필수 확장자 검색되었을 경우 처리방법 적용할 Dest
         public bool bUseFileExceptionDescCheck { get; set; }                     // 파일 예외신청 설명정보 필수 기입여부
         public bool bUsePKIsendRecv { get; set; }           // 인증서 전송 사용 유무 (망별로) ( true : 사용, false : 미사용 )        
         public bool bUseToastInsteadOfOSNotification { get; set; }                        //레지스트리 차단으로 OS 노티 사용 불가한 Site에서 OS노티 대신 Toast 사용 (Default/false) 
