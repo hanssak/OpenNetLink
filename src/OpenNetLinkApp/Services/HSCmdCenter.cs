@@ -1292,6 +1292,7 @@ namespace OpenNetLinkApp.Services
 
         public void ReadyAfterSend(int groupId, SGData sgData)
         {
+            sgDicRecvData.SetReadyData(groupId, sgData);
             string ipAddr = sgData.GetTagData("server_info", "ip_addr");
             string loginTypeValue = sgData.GetTagData("server_info", "login_type");
             string sgNetType = sgData.GetTagData("server_info", "sg_net_type");

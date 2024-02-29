@@ -156,43 +156,46 @@
         pageService.m_approveMenuArray = new ISGSideBarUI[listNetWork.Count];
         pageService.m_approveMenuArray.Initialize();
 
-        //Ready 처리는 첫번째 Groupid만 구성
-        HsNetWork hsNetWork = HSCmdCenter.GetConnectNetWork(listNetWork[0].GroupID);
-        if (hsNetWork != null)
+        //모든 groupID의 Ready를 호출하여, main.razro나 popupLogin 시에는 UserLogin만 수행하도록 처리
+        foreach (ISGNetwork network in listNetWork)
         {
-            HSCmdCenter.RestReady(listNetWork[0].GroupID, "OpenNetLink", strCurCliVersion, strPlatform);
+            HsNetWork hsNetWork = HSCmdCenter.GetConnectNetWork(network.GroupID);
+            if (hsNetWork != null)
+            {
+                HSCmdCenter.RestReady(network.GroupID, "OpenNetLink", strCurCliVersion, strPlatform);
+            }
         }
 
-        // 서버에서 응답없으면 Connect 재시도
-        int interval = SGAppMgrSvc.OpConfigInfoService.GetLoginConnectDelaySecond(0) / SGAppMgrSvc.OpConfigInfoService.GetLoginConnectLimitCount(0);
-        currentConnectCount++;
-
-        conTimer.AutoReset = true;
-        conTimer.Interval = interval * 1000;
-        conTimer.Elapsed += new ElapsedEventHandler(dayTimer_Elapsed);
-        conTimer.Start();
+        //// 서버에서 응답없으면 Connect 재시도
+        //int interval = SGAppMgrSvc.OpConfigInfoService.GetLoginConnectDelaySecond(0) / SGAppMgrSvc.OpConfigInfoService.GetLoginConnectLimitCount(0);
+        //currentConnectCount++;
+        //
+        //conTimer.AutoReset = true;
+        //conTimer.Interval = interval * 1000;
+        //conTimer.Elapsed += new ElapsedEventHandler(dayTimer_Elapsed);
+        //conTimer.Start();
     }
 
-    private void dayTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-    {
-        CLog.Here().Information($@"{conTimer.Interval / 1000} sec after, Server Result Failed !!!");
-        currentConnectCount++;
-        if (currentConnectCount > SGAppMgrSvc.OpConfigInfoService.GetLoginConnectLimitCount(0))
-        {
-            _stateMessage = XmlConf.GetInfoMsg("I_0232");
-            bConnectServerTimeOut = true;
-            conTimer.Stop();
-        }
-        else
-        {
-            _stateMessage = XmlConf.GetInfoMsg("I_0248");
-            _stateMessage = String.Format(_stateMessage, currentConnectCount);
-            //서버접속 재시도
-            HSCmdCenter.Init();
-        }
-
-        StateHasChanged();
-    }
+    //private void dayTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    //{
+    //    CLog.Here().Information($@"{conTimer.Interval / 1000} sec after, Server Result Failed !!!");
+    //    currentConnectCount++;
+    //    if (currentConnectCount > SGAppMgrSvc.OpConfigInfoService.GetLoginConnectLimitCount(0))
+    //    {
+    //        _stateMessage = XmlConf.GetInfoMsg("I_0232");
+    //        bConnectServerTimeOut = true;
+    //        conTimer.Stop();
+    //    }
+    //    else
+    //    {
+    //        _stateMessage = XmlConf.GetInfoMsg("I_0248");
+    //        _stateMessage = String.Format(_stateMessage, currentConnectCount);
+    //        //서버접속 재시도
+    //        HSCmdCenter.Init();
+    //    }
+    //
+    //    StateHasChanged();
+    //}
 
     private void goLogIn(int loginType)
     {
@@ -349,12 +352,13 @@
     //public void ReadyResult(int groupId, string loginType, string systemID)
     public void ReadyResult(int groupId, int loginType, string sgNetType, string ipAddr)
     {
+
         //CLog.Here().Information($"SvrResult Init groupID : {groupId} LoginType : {loginType}");
         @*pageService.SetGroupIDLoginType(groupId, (eLoginType)Int32.Parse(loginType));
             CLog.Here().Information($"SvrResult ReSet groupID : {groupId}, LoginType : {(HsNetWork.UseHiddenLog ? loginType : "xxx")}");
             //pageService.m_DicGroupIDloginType[groupId] = (eLoginType)Int32.Parse(loginType);
         *@
-    //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
+        //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
         //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
         if (OpConfigSvc.GetUseAppLoginType(groupId))
         {
