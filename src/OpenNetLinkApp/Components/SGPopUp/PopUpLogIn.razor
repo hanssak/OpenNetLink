@@ -637,9 +637,6 @@
             {
                 strCurCliVersion = VersionConfigSvc.GetSWVersion();
                 strCurCliVersion = "OpenNetLink " + strCurCliVersion;
-                //strConfirmID = AppConfigSvc.GetSWCommitId();
-                //strCurCliVersion = "OpenNetLink " + strCurCliVersion + "+" + strConfirmID;
-
                 strPlatform = VersionConfigSvc.GetUpdatePlatform();
                 strCurCliVersion = strCurCliVersion + ":" + strPlatform;
                 //strCurCliVersion = strCurCliVersion + ":" + "debian";
@@ -659,7 +656,7 @@
             CLog.Here().Information($"doLogin, try Login Type : {(HsNetWork.UseHiddenLog ? eLoginUITypeData : "xxx")}");
 
             if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
-                HSCmdCenter.LoginAD(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginUITypeData);
+                HSCmdCenter.RestLogin(nGroupID, id, protectedPw, strCurCliVersion, (int)eLoginUITypeData, false);
             else if (eLoginUITypeData == eLoginType.eLOGINTYPE_CUSTOM)
             {
                 if (SGAppMgrSvc.OpConfigInfoService.GetCustomLoginType(nGroupID) == (int)Enums.EnumCustomLoginType.LoginTemplate01)
@@ -677,7 +674,7 @@
                         {
                             if (resultMsg.Item2 == "사용자가 존재하지 않습니다.")
                             {
-                                HSCmdCenter.Login(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginType.eLOGINTYPE_ORIGIN);
+                                HSCmdCenter.RestLogin(nGroupID, id, protectedPw, strCurCliVersion, (int)eLoginType.eLOGINTYPE_ORIGIN, true);
                                 return;
                             }
                             else
@@ -695,15 +692,15 @@
                         return;
                     }
 
-                    HSCmdCenter.LoginNotCheckPw(nGroupID, id, protectedPw, strCurCliVersion, otp, 0);
+                    HSCmdCenter.RestLogin(nGroupID, id, protectedPw, strCurCliVersion, 0, false);
                 }
             }
             else
             {
                 if(eLoginUITypeData == eLoginType.eLOGINTYPE_OTP)
-                    HSCmdCenter.LoginNotCheckPw(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginUITypeData);
+                    HSCmdCenter.RestLogin(nGroupID, id, protectedPw, strCurCliVersion, (int)eLoginUITypeData, false, hanssakOTP:otp);
                 else
-                    HSCmdCenter.Login(nGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginUITypeData);
+                    HSCmdCenter.RestLogin(nGroupID, id, protectedPw, strCurCliVersion, (int)eLoginUITypeData, true);
             }
 
 
@@ -769,7 +766,7 @@
             if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID))
                 bIDSaveCheck = true;
             CLog.Here().Information($"doNACLogin - ###### -  Do");
-            HSCmdCenter.LoginNotCheckPw(nGroupID, id, unUsePw, strCurCliVersion, otp, pageService.m_nLoginType);
+            HSCmdCenter.RestLogin(nGroupID, id, unUsePw, strCurCliVersion, pageService.m_nLoginType, false);
             pageService.SetGroupIDLoginType(nGroupID, (eLoginType)pageService.m_nLoginType);
 
             CLog.Here().Information($"doNACLogin - ###### -  End");

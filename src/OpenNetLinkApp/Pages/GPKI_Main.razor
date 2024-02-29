@@ -748,7 +748,7 @@
 
             CLog.Here().Information("Login Platform  : {0}", strPlatform);
             CLog.Here().Information("Login strCurCliVersion {0}", strCurCliVersion);
-            HsCmdCenter.LoginGpki(pageService.m_nCurViewPageGroupID, strID, strCurCliVersion);
+            HsCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, strID, strID, strCurCliVersion, 0, false);
             //HsCmdCenter.Login(0, id, pw, "NetLink 2.01");
         }
         catch (Exception ex)

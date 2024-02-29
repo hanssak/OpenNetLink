@@ -637,7 +637,11 @@
             }
 
             if (strCurCliVersion.Equals(""))
+            {
+                SetProtectedPW(string.Empty);
                 return;
+            }
+                
             
             CLog.Here().Information($"[Main] LogIn Type (######) : {(HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx")}, GroupIDLoginType : {(HsNetWork.UseHiddenLog ? pageService.GetGroupIDLoginType(groupid) : "xxx")}");            
             HSCmdCenter.SetCliVersion(strCurCliVersion);
@@ -653,18 +657,18 @@
                 foreach (ISGNetwork netlist in listNetWork)
                 {
                     CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
-                    
-                    if(pageService.m_nLoginType == 5)
-                        HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
+
+                    if (pageService.m_nLoginType == 5)
+                        HSCmdCenter.RestLogin(netlist.GroupID, id, protectedPw, strCurCliVersion, pageService.m_nLoginType, false, hanssakOTP: otp);
                     else
-                        HSCmdCenter.Login(netlist.GroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
+                        HSCmdCenter.RestLogin(netlist.GroupID, id, protectedPw, strCurCliVersion, pageService.m_nLoginType, true);
                     pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
                 }
             }
             else
             {
                 if(pageService.m_nLoginType == 5)
-                    HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
+                    HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, pageService.m_nLoginType, false, hanssakOTP: otp);
                 else
                     HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion,pageService.m_nLoginType, true);
                 pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
@@ -838,14 +842,14 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 foreach (ISGNetwork netlist in listNetWork)
                 {
                     CLog.Here().Information($"LoginAD - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
-                    HSCmdCenter.LoginAD(netlist.GroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
+                    HSCmdCenter.RestLogin(netlist.GroupID, id, protectedPw, strCurCliVersion, pageService.m_nLoginType, false);
                     pageService.SetGroupIDLoginType(netlist.GroupID, eLoginType.eLOGINTYPE_AD);
                 }
             }
             else
             {
                 CLog.Here().Information($"ADLogin - ###### -  Do");
-                HSCmdCenter.LoginAD(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
+                HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, pageService.m_nLoginType, false);
                 pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, eLoginType.eLOGINTYPE_AD);
             }
 
@@ -902,14 +906,14 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 foreach (ISGNetwork netlist in listNetWork)
                 {
                     //CLog.Here().Information($"doOKTALogin - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
-                    HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
+                    HSCmdCenter.RestLogin(netlist.GroupID, id, protectedPw, strCurCliVersion, pageService.m_nLoginType, false);
                     pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
                 }
             }
             else
             {
                 //CLog.Here().Information($"doOKTALogin - ###### -  Do");
-                HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
+                HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, pageService.m_nLoginType, false);
                 pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
             }
 
@@ -982,7 +986,8 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 {
                     if (resultMsg.Item2 == "사용자가 존재하지 않습니다.")
                     {
-                        HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginType.eLOGINTYPE_ORIGIN);
+                        HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, (int)eLoginType.eLOGINTYPE_ORIGIN, true);
+                        @*HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginType.eLOGINTYPE_ORIGIN);*@
                         pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, eLoginType.eLOGINTYPE_ORIGIN);
 
                         return;
@@ -1015,13 +1020,15 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 foreach (ISGNetwork netlist in listNetWork)
                 {
                     CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
-                    HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, protectedPw, strCurCliVersion, otp, 0);
+                    //HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, protectedPw, strCurCliVersion, otp, 0);
+                    HSCmdCenter.RestLogin(netlist.GroupID, id, protectedPw, strCurCliVersion, 0, false);
                     pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
                 }
             }
             else
             {
-                HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, 0);
+                HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, 0, false);
+                //HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, 0);
                 pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
             }
 
@@ -1094,7 +1101,8 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 {
                     if (resultMsg.Item2 == "사용자가 존재하지 않습니다.")
                     {
-                        HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginType.eLOGINTYPE_ORIGIN);
+                        HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw,strCurCliVersion, (int)eLoginType.eLOGINTYPE_ORIGIN, true);
+                        //HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginType.eLOGINTYPE_ORIGIN);
                         pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, eLoginType.eLOGINTYPE_ORIGIN);
 
                         return;
@@ -1127,13 +1135,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 foreach (ISGNetwork netlist in listNetWork)
                 {
                     CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
-                    HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id,  protectedPw, strCurCliVersion, otp, 0);
+                    HSCmdCenter.RestLogin(netlist.GroupID, id,  protectedPw, strCurCliVersion, 0, false);
                     pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
                 }
             }
             else
             {
-                HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, 0);
+                HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, 0, false);
                 pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
             }
 
@@ -1202,7 +1210,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                         bIDSaveCheck = true;
 
                     CLog.Here().Information($"doNACLogin - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
-                    HSCmdCenter.LoginNotCheckPw(netlist.GroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
+                    HSCmdCenter.RestLogin(netlist.GroupID, id, protectedPw, strCurCliVersion, pageService.m_nLoginType, false);
                     pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
                 }
             }
@@ -1212,7 +1220,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(pageService.m_nCurViewPageGroupID))
                     bIDSaveCheck = true;
                 CLog.Here().Information($"doNACLogin - ###### -  Do");
-                HSCmdCenter.LoginNotCheckPw(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, pageService.m_nLoginType);
+                HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, pageService.m_nLoginType, false);
                 pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
             }
 
