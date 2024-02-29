@@ -320,12 +320,6 @@
 
         MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupID); ;
-        if (sgLoginData != null)
-        {
-            HSCmdCenter.SendNetLinkStatus(nGroupID, sgLoginData.GetUserID());
-        }
-
     }
 
 

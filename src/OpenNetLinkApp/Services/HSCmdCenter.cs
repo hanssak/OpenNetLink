@@ -2698,15 +2698,6 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int SendNetLinkStatus(int groupid, string strUserID)
-        {
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-                return sgSendData.RequestNetLinkStatus(hsNetWork, groupid, strUserID);
-            return -1;
-        }
-
         public int SendFileTransInfo(int groupid, string strUserID, string strFromDate, string strToDate, string strTransKind, string strTransStatus, string strApprStatus, string strDlp, string strTitle, string strDataType)
         {
             HsNetWork hsNetWork = null;

@@ -2361,9 +2361,6 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
                 MyNavigationManager.NavigateTo(strNavigatePathnGroupID);
 
-                if (!pageService.GetIsPolicyUpdate(groupId))
-                    HSCmdCenter.SendNetLinkStatus(nGroupIDfirst, sgLoginData.GetUserID());
-
                 // SideBarUI 에서 nGroupIDfirst로 지정된 UI로 선택
                 MoveSiderBarFocusTogroupid(nGroupIDfirst);
 
