@@ -218,7 +218,7 @@
         bUIBtnDisable = false;
         bStartedLogin = false;
         refGoogleOTP.strUserOTP = "";
-
+        SetProtectedPW(string.Empty);
         closePopUp();
     }
 
@@ -228,20 +228,11 @@
 
         CLog.Here().Information($"SGCtrlSideUI, GoogleOtpConfirm - GroupID:{refGoogleOTP.nGroupID} - LogInType: {(HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx")}");
 
-        HsNetWork hsNetWork = null;
-        hsNetWork = HSCmdCenter.GetConnectNetWork(refGoogleOTP.nGroupID);
-        if (hsNetWork != null)
-        {
-            // 구글Otp 값 어느 Tag에 보낼것인지 협의후 동작
-            hsNetWork.SetGoogleOtp(refGoogleOTP.strUserOTP);
-
-            hsNetWork.SendSeedKeyBindFor2FactorAuth();
-        }
-
         // 다중망에 맞춰서 작업
         JSRuntime.InvokeAsync<object>("loginCursorChange");
         //bStartedLogin = true;
         //bLoginBtnDisable = true;
+        HSCmdCenter.RestLogin2Fa(refGoogleOTP.nGroupID, refGoogleOTP.strUserOTP);
 
         refGoogleOTP.strUserOTP = "";
     }
@@ -255,35 +246,33 @@
     /// <param name="e"></param>
     private async void Show2FactorAuth(int groupID, PageEventArgs e)
     {
-        if (e.strDummy == "google_otp")
-        {
+        if (e.strDummy != "google_otp" || e.strMsg == string.Empty)
+            return;
 
-            // Server에서 받아서 동작하도록 수정
-            string strSecureKey = "";
+        // Server에서 받아서 동작하도록 수정
+        string strSecureKey = "";
 
-            //if (QRcode.GenerateQRsecureKey())
-            //    strSecureKey = QRcode.strSecureKey; // "MARNVBMEK06VCXXK";
-            if (QRcode.GetSecureKeyFromOtpUrl(e.strMsg, out strSecureKey) == false)
-                CLog.Here().Information($"Show2FactorAuth, otpauth Type Error ################## : {e.strMsg}");
+        //if (QRcode.GenerateQRsecureKey())
+        //    strSecureKey = QRcode.strSecureKey; // "MARNVBMEK06VCXXK";
+        if (QRcode.GetSecureKeyFromOtpUrl(e.strMsg, out strSecureKey) == false)
+            CLog.Here().Information($"Show2FactorAuth, otpauth Type Error ################## : {e.strMsg}");
 
-            CLog.Here().Information($"Show2FactorAuth, Otp-Key : {strSecureKey}");
+        CLog.Here().Information($"Show2FactorAuth, Otp-Key : {strSecureKey}");
 
-            refGoogleOTP.strKeyMessage = strSecureKey;
-            refGoogleOTP.nGroupID = groupID;
-            //bool rWriteQRimg = QRcode.GenerateQRimg("SecureGate", id, strSecureKey);
-            bool rWriteQRimg = QRcode.GenerateQRimg(e.strMsg, true);  // Server에서 받은 Url로 바로 생성
-            Thread.Sleep(1000);
-            refGoogleOTP.RedrawUI();
+        refGoogleOTP.strKeyMessage = strSecureKey;
+        refGoogleOTP.nGroupID = groupID;
+        //bool rWriteQRimg = QRcode.GenerateQRimg("SecureGate", id, strSecureKey);
+        bool rWriteQRimg = QRcode.GenerateQRimg(e.strMsg, true);  // Server에서 받은 Url로 바로 생성
+        Thread.Sleep(1000);
+        refGoogleOTP.RedrawUI();
 
-            // login이 가능항 상태로 ui 변경
-            await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
-            //bStartedLogin = false;
-            //bUIBtnDisable = false;
-            StateHasChanged();
+        // login이 가능항 상태로 ui 변경
+        await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+        //bStartedLogin = false;
+        //bUIBtnDisable = false;
+        StateHasChanged();
 
-            await refGoogleOTP.openPopUp();
-        }
-
+        await refGoogleOTP.openPopUp();
     }
 
 
@@ -322,7 +311,7 @@
     /// </summary>
     private void SessionAlertCancelpopup()
     {
-        CLog.Here().Information($"[PopupLogin] SessionAlertCancelpopup - GroupID:{refSGloginDuplicate.groupId} - LogInType: {(HsNetWork.UseHiddenLog ? pageService.GetGroupIDLoginType(nGroupID).ToString() :"xxx")}");
+        CLog.Here().Information($"[PopupLogin] SessionAlertCancelpopup - GroupID:{refSGloginDuplicate.groupId} - LogInType: {(HsNetWork.UseHiddenLog ? pageService.GetGroupIDLoginType(nGroupID).ToString() : "xxx")}");
 
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
         bUIBtnDisable = false;
@@ -431,7 +420,7 @@
                 strPW = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 
 #if DEBUG
-            strPW = "HsckAD.com";
+        strPW = "HsckAD.com";
 #endif
 
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -533,20 +522,20 @@
         stRtn = web.RequestUsePostJson(strUrl, strJsonData, "application/json");
         if (stRtn == null || (1 > stRtn.Length))
         {
-            CLog.Here().Information($"Result - json, Data is null OR 0 Size");
-            ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
-            return false;
+        CLog.Here().Information($"Result - json, Data is null OR 0 Size");
+        ShowLoginFail(XmlConf.GetErrMsg("E_0257"));
+        return false;
         }
 
         // json으로 온 Data에서 실제 data 뽑아내는 동작
         using (JsonDocument document = JsonDocument.Parse(stRtn))
         {
-            JsonElement jroot = document.RootElement;
-            nCode = jroot.GetProperty("code").GetInt32();
-            strMsg = jroot.GetProperty("msg").GetString();
-            strData = jroot.GetProperty("data").GetString();
+        JsonElement jroot = document.RootElement;
+        nCode = jroot.GetProperty("code").GetInt32();
+        strMsg = jroot.GetProperty("msg").GetString();
+        strData = jroot.GetProperty("data").GetString();
         }
-#endif
+        #endif
 
         CLog.Here().Information($"Result - json, code : {nCode}, Server-msg : {strMsg}, data : {strData}");
 
@@ -596,7 +585,7 @@
                 return;
             }
 
-            if(eLoginUITypeData == eLoginType.eLOGINTYPE_PW_OTP || eLoginUITypeData == eLoginType.eLOGINTYPE_OTP)
+            if (eLoginUITypeData == eLoginType.eLOGINTYPE_PW_OTP || eLoginUITypeData == eLoginType.eLOGINTYPE_OTP)
             {
                 if (otp == null || otp.Length < 6)
                 {
@@ -606,7 +595,7 @@
                     return;
                 }
 
-                if(eLoginUITypeData == eLoginType.eLOGINTYPE_OTP)
+                if (eLoginUITypeData == eLoginType.eLOGINTYPE_OTP)
                     protectedPw = SGCrypto.AESEncrypt256WithDEK(Encoding.UTF8.GetBytes(otp));
             }
 
@@ -617,7 +606,7 @@
                 return;
             }
 
-            if(!id.ValidationSqlInjection())
+            if (!id.ValidationSqlInjection())
             {
                 ShowLoginFail(XmlConf.GetErrMsg("E_0119"));
                 SetProtectedPW(string.Empty);
@@ -697,8 +686,8 @@
             }
             else
             {
-                if(eLoginUITypeData == eLoginType.eLOGINTYPE_OTP)
-                    HSCmdCenter.RestLogin(nGroupID, id, protectedPw, strCurCliVersion, (int)eLoginUITypeData, false, hanssakOTP:otp);
+                if (eLoginUITypeData == eLoginType.eLOGINTYPE_OTP)
+                    HSCmdCenter.RestLogin(nGroupID, id, protectedPw, strCurCliVersion, (int)eLoginUITypeData, false, hanssakOTP: otp);
                 else
                     HSCmdCenter.RestLogin(nGroupID, id, protectedPw, strCurCliVersion, (int)eLoginUITypeData, true);
             }
@@ -969,7 +958,7 @@
                         originalPW = Encoding.UTF8.GetBytes(OSxCmdService.GetOSXADConfig("Active Directory Domain").ToLower());
 
 #if DEBUG
-                    originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
+                originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 #endif
 
                     CLog.Here().Information($"PopupLogin(nGroupID :{nGroupID}) - ADLogin - ###### - PWCheck : {(HsNetWork.UseHiddenLog ? Encoding.UTF8.GetString(originalPW) : "xxx")}");
@@ -1069,7 +1058,7 @@
             {
                 eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
                 pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
-                // goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);                
+                // goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
                 goToPage.InvokeAsync(strInvokeSendParam);
                 closePopUp();
                 return false;
@@ -1723,8 +1712,8 @@
                 if (ret == 3) //일시적으로 계정 자금 시간 표시
                 {
                     int blockTime = 3;
-                    if(e.count > 0)
-                        blockTime  = e.count;
+                    if (e.count > 0)
+                        blockTime = e.count;
                     e.strMsg = string.Format(XmlConf.GetWarnMsg("W_0299"), blockTime);
                 }
 

@@ -1188,7 +1188,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                 agent_info.Add("uuid", uuid);
                 agent_info.Add("hash", hsNet.GetAgentHash().Base64EncodingStr());
 
-                                //user_conn_info
+                //user_conn_info
                 SgExtFunc.GetLocalIpMacAddress(out string strIPdata, out string strMacdata);
                 //TODO 고도화 - LocalIP 사용해도 될지 검토 필요
                 user_conn_info.Add("ip_addr", strIPdata.Base64EncodingStr());
@@ -1196,7 +1196,7 @@ namespace OpenNetLinkApp.Data.SGDicData
 
                 if (hsNet.NotiConnType == NotifyConnectionType.WebSocket)
                     session_callback.Add("type", "WebSocket");
-                else if(hsNet.NotiConnType == NotifyConnectionType.CallBackURL)
+                else if (hsNet.NotiConnType == NotifyConnectionType.CallBackURL)
                 {
                     session_callback.Add("type", "URL");
                     session_callback.Add("root_url", notiRootURL);
@@ -1211,7 +1211,6 @@ namespace OpenNetLinkApp.Data.SGDicData
             }
             catch (Exception ex)
             {
-
                 throw;
             }
             finally
@@ -1222,6 +1221,27 @@ namespace OpenNetLinkApp.Data.SGDicData
         }
 
 
+        /// <summary>
+        /// Post-User/Login
+        /// </summary>
+        /// <param name="hsNet"></param>
+        /// <param name="loginType">택 1: origin, ad, ldap, pw_otp, otp, sso</param>
+        /// <param name="userId"></param>
+        /// <param name="protectedUserPassword">메모리 암호화된 비밀번호</param>
+        /// <param name="checkPassword"></param>
+        /// <param name="strVersion"></param>
+        /// <param name="notiType">Callback 방식. 택1: WebSocket, URL, None(Callback 미사용)</param>
+        /// <param name="notiRootURL">URL 사용 시, Callback Root URL</param>
+        /// <param name="hanssakOTP"></param>
+        /// <returns></returns>
+        public int RequestRestLogin2Fa(HsNetWork hsNet, string gotpAuthNumber)
+        {
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+            dic.Add("gotp_auth_number", gotpAuthNumber);
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostLogin2Factor, null, dic, hsNet.stCliMem.GetProtectedSeedKey()); // api-key 사용
+            return hsNet.RequestRest(args);
+        }
 
         public int RequestRestSendApproveBatch(HsNetWork hsNet, string strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<Int64> listSeqData)
         {
@@ -1369,7 +1389,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.RequestRest(args);
         }
 
-        
+
 
     }
 }

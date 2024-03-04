@@ -88,7 +88,7 @@
                             }
                             else if (SGAppMgrSvc.OpConfigInfoService.GetNACLoginType(0) == (int)Enums.enumNacLoginType.Genian && (srcLoc == "Logout" || !SGSystemService.IsStartedByNAC()))
                             {
-                                //Genian NAC은 NAC 인자에 의해 실행되지 않을때는 PW 표시
+                            //Genian NAC은 NAC 인자에 의해 실행되지 않을때는 PW 표시
                                 <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" onkeydown="KeyEventPW('btnLogin');" tabindex="2" autocomplete="off">
                             }
 
@@ -256,7 +256,7 @@
     Dictionary<string, SGNetOverData> dicSysIdName = null;
 
     public bool bStartedLogin = false;//중복으로 로그인버튼 클릭 방지에 사용하는 상태
-        
+
     object obj = new object();
     Dictionary<int, bool> dicLoginResult = new Dictionary<int, bool>(); // ConcurrentDictionary / Dictionary
     private static readonly AsyncLock s_lock = new AsyncLock();
@@ -275,11 +275,12 @@
     {
         QRcode.Dispose();
         CLog.Here().Information($"[Main] GoogleOtp, User Cancel - GroupID:{refGoogleOTP.nGroupID} - LogInType: {(HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx")}");
-        
+
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
         bStartedLogin = false;
         bLoginBtnDisable = false;
         refGoogleOTP.strUserOTP = "";
+        SetProtectedPW(string.Empty);
     }
 
     private void GoogleOtpConfirm()
@@ -288,23 +289,15 @@
 
         CLog.Here().Information($"[Main] GoogleOtp, User Confirm - GroupID:{refGoogleOTP.nGroupID} - LogInType: {(HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx")}");
 
-        HsNetWork hsNetWork = null;
-        hsNetWork = HSCmdCenter.GetConnectNetWork(refGoogleOTP.nGroupID);
-        if (hsNetWork != null)
-        {
-            // 구글Otp 값 어느 Tag에 보낼것인지 협의후 동작
-            //hsNetWork.stCliMem.GOTPNUMBER = refGoogleOTP.strUserOTP;
-            hsNetWork.SetGoogleOtp(refGoogleOTP.strUserOTP);
-
-            //GOTPNUMBER
-            hsNetWork.SendSeedKeyBindFor2FactorAuth();
-        }
-
         JSRuntime.InvokeAsync<object>("loginCursorChange");
         //bStartedLogin = true;
         //bLoginBtnDisable = true;
 
+        HSCmdCenter.RestLogin2Fa(refGoogleOTP.nGroupID, refGoogleOTP.strUserOTP);
+
         refGoogleOTP.strUserOTP = "";
+
+
     }
 
     /// <summary>
@@ -326,7 +319,7 @@
     private void SessionAlertConfirm()
     {
         HSCmdCenter.SetAllowSessionDuplicate(refSGAlert.groupId);
-    
+
         CLog.Here().Information($"[Main] SessionAlertConfirm - GroupID:{refSGAlert.groupId} -  LogInType: {(HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx")}");
         ShowMessage("info", XmlConf.GetInfoMsg("I_0237"));
 
@@ -407,7 +400,7 @@
             ShowLoginFail(XmlConf.GetWarnMsg("W_0039"));
             await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
             bStartedLogin = false;
-            bLoginBtnDisable = false;            
+            bLoginBtnDisable = false;
             StateHasChanged();
             return;
         }
@@ -430,37 +423,31 @@
     /// <param name="e"></param>
     private async void Show2FactorAuth(int groupID, PageEventArgs e)
     {
+        if (e.strDummy != "google_otp" || e.strMsg == string.Empty)
+            return;
 
+        // Server에서 받아서 동작하도록 수정
+        string strSecureKey = "";
 
-        if (e.strDummy == "google_otp")
-        {
+        if (QRcode.GetSecureKeyFromOtpUrl(e.strMsg, out strSecureKey) == false)
+            CLog.Here().Information($"Show2FactorAuth, otpauth Type Error ################## : {e.strMsg}");
 
-            // Server에서 받아서 동작하도록 수정
-            string strSecureKey = "";
+        CLog.Here().Debug($"Show2FactorAuth, Otp-Key : {(HsNetWork.UseHiddenLog ? strSecureKey : "xxx")}");
 
-            //if (QRcode.GenerateQRsecureKey())
-            //    strSecureKey = QRcode.strSecureKey; // "MARNVBMEK06VCXXK";
-            if (QRcode.GetSecureKeyFromOtpUrl(e.strMsg, out strSecureKey) == false)
-                CLog.Here().Information($"Show2FactorAuth, otpauth Type Error ################## : {e.strMsg}");
+        refGoogleOTP.strKeyMessage = strSecureKey;
+        refGoogleOTP.nGroupID = groupID;
+        //bool rWriteQRimg = QRcode.GenerateQRimg("SecureGate", id, strSecureKey);
+        bool rWriteQRimg = QRcode.GenerateQRimg(e.strMsg, true);  // Server에서 받은 Url로 바로 생성
+        Thread.Sleep(1000);
+        refGoogleOTP.RedrawUI();
 
-            CLog.Here().Debug($"Show2FactorAuth, Otp-Key : {(HsNetWork.UseHiddenLog ? strSecureKey : "xxx")}");
+        // login이 가능항 상태로 ui 변경
+        await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+        //bStartedLogin = false;
+        //bLoginBtnDisable = false;
+        StateHasChanged();
 
-            refGoogleOTP.strKeyMessage = strSecureKey;
-            refGoogleOTP.nGroupID = groupID;
-            //bool rWriteQRimg = QRcode.GenerateQRimg("SecureGate", id, strSecureKey);
-            bool rWriteQRimg = QRcode.GenerateQRimg(e.strMsg, true);  // Server에서 받은 Url로 바로 생성
-            Thread.Sleep(1000);
-            refGoogleOTP.RedrawUI();
-
-            // login이 가능항 상태로 ui 변경
-            await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
-            //bStartedLogin = false;
-            //bLoginBtnDisable = false;
-            StateHasChanged();
-
-            await refGoogleOTP.openPopUp();
-        }
-
+        await refGoogleOTP.openPopUp();
     }
 
     /// <summary>
@@ -500,7 +487,7 @@
             Show2FactorAuth(0, e);
             return;*@
 
-    int groupid = pageService.m_nCurViewPageGroupID;
+        int groupid = pageService.m_nCurViewPageGroupID;
 
         CLog.Here().Information($"ClickdoLogin - login - groupid : {groupid} (bLoginBtnDisable:{bLoginBtnDisable})");
         if (bLoginBtnDisable)   //버튼이 비활성화 되어 있다면, 이후 처리 불가(js에서 호출되는 경우에 체크 필요)
@@ -533,7 +520,7 @@
                 doCustomLogin01();
             }
             else if (SGAppMgrSvc.OpConfigInfoService.GetCustomLoginType(groupid) == (int)Enums.EnumCustomLoginType.LoginTemplate02)
-            { 
+            {
                 doCustomLogin02();
             }
         }
@@ -588,7 +575,7 @@
                 return;
             }
 
-               //VAlidation Check  PW_OTP(4), OTP(5)
+            //VAlidation Check  PW_OTP(4), OTP(5)
             if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5)
             {
                 if (otp == null || otp.Length < 6)
@@ -599,7 +586,7 @@
                     return;
                 }
 
-                if(pageService.m_nLoginType == 5) 
+                if (pageService.m_nLoginType == 5)
                     protectedPw = SGCrypto.AESEncrypt256WithDEK(Encoding.UTF8.GetBytes(otp));
             }
 
@@ -641,9 +628,9 @@
                 SetProtectedPW(string.Empty);
                 return;
             }
-                
-            
-            CLog.Here().Information($"[Main] LogIn Type (######) : {(HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx")}, GroupIDLoginType : {(HsNetWork.UseHiddenLog ? pageService.GetGroupIDLoginType(groupid) : "xxx")}");            
+
+
+            CLog.Here().Information($"[Main] LogIn Type (######) : {(HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx")}, GroupIDLoginType : {(HsNetWork.UseHiddenLog ? pageService.GetGroupIDLoginType(groupid) : "xxx")}");
             HSCmdCenter.SetCliVersion(strCurCliVersion);
 
 
@@ -667,10 +654,10 @@
             }
             else
             {
-                if(pageService.m_nLoginType == 5)
+                if (pageService.m_nLoginType == 5)
                     HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, pageService.m_nLoginType, false, hanssakOTP: otp);
                 else
-                    HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion,pageService.m_nLoginType, true);
+                    HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, pageService.m_nLoginType, true);
                 pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, (eLoginType)pageService.m_nLoginType);
             }
 
@@ -831,9 +818,9 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
             if (strCurCliVersion.Equals(""))
                 return;
-                
+
             CLog.Here().Information("[Main] LogIn Type:" + (HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx"));
-            
+
             HSCmdCenter.SetCliVersion(strCurCliVersion);
 
             if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
@@ -894,10 +881,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
             if (strCurCliVersion.Equals(""))
                 return;
-             
-             CLog.Here().Information("[Main] LogIn Type:" + (HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx"));
-            
-             HSCmdCenter.SetCliVersion(strCurCliVersion);
+
+            CLog.Here().Information("[Main] LogIn Type:" + (HsNetWork.UseHiddenLog ? pageService.m_nLoginType.ToString() : "xxx"));
+
+            HSCmdCenter.SetCliVersion(strCurCliVersion);
 
 
             if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin(0))
@@ -1101,7 +1088,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 {
                     if (resultMsg.Item2 == "사용자가 존재하지 않습니다.")
                     {
-                        HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw,strCurCliVersion, (int)eLoginType.eLOGINTYPE_ORIGIN, true);
+                        HSCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, (int)eLoginType.eLOGINTYPE_ORIGIN, true);
                         //HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, protectedPw, strCurCliVersion, otp, (int)eLoginType.eLOGINTYPE_ORIGIN);
                         pageService.SetGroupIDLoginType(pageService.m_nCurViewPageGroupID, eLoginType.eLOGINTYPE_ORIGIN);
 
@@ -1135,7 +1122,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 foreach (ISGNetwork netlist in listNetWork)
                 {
                     CLog.Here().Information($"doLogIn - UseOneToMultiLogin - GroupID : {netlist.GroupID}");
-                    HSCmdCenter.RestLogin(netlist.GroupID, id,  protectedPw, strCurCliVersion, 0, false);
+                    HSCmdCenter.RestLogin(netlist.GroupID, id, protectedPw, strCurCliVersion, 0, false);
                     pageService.SetGroupIDLoginType(netlist.GroupID, (eLoginType)pageService.m_nLoginType);
                 }
             }
@@ -1169,10 +1156,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
             JSRuntime.InvokeAsync<object>("loginCursorChange");
 
             id = nacUserId;
-            
+
             originalPW = Encoding.UTF8.GetBytes(nacUserId);
             SetProtectedPW(SGCrypto.AESEncrypt256WithDEK(originalPW));
-            
+
             if ((id?.Length ?? 0) < 1)
             {
                 Window.MoveTrayToWebWindow();
@@ -1475,7 +1462,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         if (srcLoc == "Logout")
         {
 
-            pageService.SetStatusSideMenuReBuildTime(groupid, true);            
+            pageService.SetStatusSideMenuReBuildTime(groupid, true);
 
             if (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer(0) && NetWorkSvc.NetWorkInfo.Count > 1)
                 MyNavigationManager.NavigateTo("/SelectNet");
@@ -1571,7 +1558,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         *@
 
 
-    // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
+        // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
         {
@@ -1751,19 +1738,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
             lock (obj)
             {
-
                 CLog.Here().Information($"LoginResultOnetoAll(#######) - GroupID : {groupId}, Ret : {ret}, LockAsync - START!");
 
                 if (ret == 0)
                 {
-                    
-                    
-
                     string strNavigatePathWithGroupID = "";
 
                     SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
-                    
-                 
                     //pageService.ConnectCountAdd(groupId);
                     pageService.SetConnectStatus(groupId, true);
                     pageService.SetLogoutStatus(groupId, false);
@@ -1818,43 +1799,6 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                             }
                         }
                     }
-
-                    //// CLIENT_ZIP_DEPTH, CS_EXCEPTION_EXT_REASON_TYPE
-                    //// 정보 가져옴
-                    //SGQueryExtend sgQueryExtend = null;
-                    //sgQueryExtend = new SGQueryExtend();
-                    //if (sgQueryExtend != null)
-                    //{
-                    //
-                    //    string strGetinfoTagName = "";
-                    //    strGetinfoTagName = "'CLIENT_ZIP_DEPTH'";
-                    //    strGetinfoTagName += ", 'CS_EXCEPTION_EXT_REASON_TYPE'";
-                    //    strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT'";
-                    //    strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_EXT'";
-                    //    // strGetinfoTagName += ", 'CLIENT_OLE_EXTRACT_MTYPE'";     // Table 이름 따로 정해졌음
-                    //    strGetinfoTagName += ", 'CLIENT_PREVIEW_VIEWER_EXT'";
-                    //    strGetinfoTagName += ", 'FORWARD_AUTODOWN'";
-                    //    strGetinfoTagName += ", 'CLIENT_URL_FW_PAGE'";
-                    //    strGetinfoTagName += ", 'CLIENT_BINARY_CHECK'";
-                    //    strGetinfoTagName += ", 'CLIENT_BINARY_CHECK_EXT'";
-                    //    strGetinfoTagName += ", 'CLIENT_CHECK_PE'";
-                    //    strGetinfoTagName += ", 'CLIENT_PRIVACY_COMMENT'";
-                    //
-                    //    if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupId))
-                    //    {
-                    //        strGetinfoTagName += ", 'CLIENT_TITLE_MIN_LENGTH'";
-                    //        strGetinfoTagName += ", 'CLIENT_DESC_MIN_LENGTH'";
-                    //    }
-                    //
-                    //    if (SGAppMgrSvc.OpConfigInfoService.GetUseMaxLengthTitleDesc(groupId))
-                    //    {
-                    //        strGetinfoTagName += ", 'CLIENT_TITLE_MAX_LENGTH'";
-                    //        strGetinfoTagName += ", 'CLIENT_DESC_MAX_LENGTH'";
-                    //    }
-                    //
-                    //    string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
-                    //    HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
-                    //}
 
                     if (pageService.GetIsPolicyUpdate(groupId))
                     {
@@ -1976,7 +1920,6 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                                                                 listModKey[(int)HOTKEY_MOD.SHIFT],
                                                                 chVKey);
                             }
-
                         }
 
                         // clipboard 선택전송기능 사용유무설정
@@ -2133,7 +2076,6 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 }
                 else
                 {
-
                     // sessionCheck 동작하게 적용
                     HsNetWork hsNetWork = null;
                     hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
@@ -2165,10 +2107,10 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     if (ret == 3) //일시적으로 계정 자금 시간 표시
                     {
                         int blockTime = 3;
-                        if(e.count > 0)
+                        if (e.count > 0)
                             blockTime = e.count;
                         //3분 -> {n}분으로 메세지 변경
-                        e.strMsg = string.Format(XmlConf.GetWarnMsg("W_0299"), blockTime); //e.strMsg = String.Format(e.strMsg, blockTime);                        
+                        e.strMsg = string.Format(XmlConf.GetWarnMsg("W_0299"), blockTime); //e.strMsg = String.Format(e.strMsg, blockTime);
                     }
                     strPopupMsg += e.strMsg;
                     strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
@@ -2253,7 +2195,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     refPWChange.Init();
 
                     // 초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거 시작 2021/07/05 YKH
-                    //패스워드 변경 유무에 따라 패스워드 체크 가능 여부 확인                    
+                    //패스워드 변경 유무에 따라 패스워드 체크 가능 여부 확인
 
                     if (SGAppMgrSvc.OpConfigInfoService.GetUseUserPWChange(groupId) && pageService.GetStatusSideMenuReBuildTime(groupId))
                     {
@@ -2315,7 +2257,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
 
                             DateTime dtLocalTime = DateTime.Parse(strTime);
                             @*DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();*@
-    DateTime svrDt = pageService.GetAfterApprTime(nGroupIDfirst);
+                            DateTime svrDt = pageService.GetAfterApprTime(nGroupIDfirst);
 
                             if (DateTime.Compare(dtLocalTime, svrDt) < 0)
                             {
@@ -2560,7 +2502,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                 bActived = true;
             }
 
-            SGLoginData sgLoginData = null;            
+            SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(i);
 
             if (sgLoginData != null)
@@ -2687,7 +2629,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                             SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse, strUserSeq: strUserSeq);
                     }
 
-                    //SecureGate 4.0에서 예외 신청 기능 삭제 
+                    //SecureGate 4.0에서 예외 신청 기능 삭제
                     ////파일검사 예외 신청(4)
                     //if (SGAppMgrSvc.OpConfigInfoService.GetUseFileCheckException(gID))
                     //{
@@ -2958,13 +2900,13 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-                                                                        {
-                                                                            return true;
-                                                                                }
-                                                                                    else
-                                                                                        return false;
-
+                                                                                    {
+                                                                                        return true;
                                                                                             }
+                                                                                                else
+                                                                                                    return false;
+
+                                                                                                        }
     */
 
 }

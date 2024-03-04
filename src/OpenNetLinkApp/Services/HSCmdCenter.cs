@@ -336,18 +336,18 @@ namespace OpenNetLinkApp.Services
                     }
                     System.Diagnostics.Debug.WriteLine("HsNetWork Session Duplicate Exception Received..");
                     break;
-                case SgEventType.SG_2FACTOR_AUTH:
-                    Session2FactorAuthEvent seEvent2Fact = sgPageEvent.Get2FactorAuthEventAdd(groupId);
-                    if (seEvent2Fact != null)
-                    {
-                        PageEventArgs e = new PageEventArgs();
-                        e.result = 0;
-                        e.strMsg = "";
-                        e.strDummy = "google_otp";
-                        seEvent2Fact(groupId, e);
-                    }
-                    System.Diagnostics.Debug.WriteLine("HsNetWork Session 2Factor Auth Do.. Now Default Google Otp");
-                    break;
+                //case SgEventType.SG_2FACTOR_AUTH:
+                //    Session2FactorAuthEvent seEvent2Fact = sgPageEvent.Get2FactorAuthEventAdd(groupId);
+                //    if (seEvent2Fact != null)
+                //    {
+                //        PageEventArgs e = new PageEventArgs();
+                //        e.result = 0;
+                //        e.strMsg = "";
+                //        e.strDummy = "google_otp";
+                //        seEvent2Fact(groupId, e);
+                //    }
+                //    System.Diagnostics.Debug.WriteLine("HsNetWork Session 2Factor Auth Do.. Now Default Google Otp");
+                //    break;
                 default:
                     break;
             }
@@ -384,25 +384,25 @@ namespace OpenNetLinkApp.Services
                     }
                     System.Diagnostics.Debug.WriteLine("HsNetWork Session Duplicate Exception Received..");
                     break;
-                case SgEventType.SG_2FACTOR_AUTH:
-                    Session2FactorAuthEvent seEvent2Fact = sgPageEvent.Get2FactorAuthEventAdd(groupId);
-                    if (seEvent2Fact != null)
-                    {
-                        PageEventArgs e = new PageEventArgs();
-                        e.result = 0;
-                        e.strMsg = "none";
+                //case SgEventType.SG_2FACTOR_AUTH:
+                //    Session2FactorAuthEvent seEvent2Fact = sgPageEvent.Get2FactorAuthEventAdd(groupId);
+                //    if (seEvent2Fact != null)
+                //    {
+                //        PageEventArgs e = new PageEventArgs();
+                //        e.result = 0;
+                //        e.strMsg = "none";
 
-                        string strData = "";
-                        if (sgEventType.MsgRecode.TryGetValue("GOTPCODE", out strData))
-                        {
-                            e.strDummy = "google_otp";
-                            //strData = SgMsg.getTagDecString(sgEventType.MsgRecode["GOTPCODE"], MainCtl.Base64Seedkey);
-                            e.strMsg = sgEventType.strDataType;
-                        }
-                        seEvent2Fact(groupId, e);
-                    }
-                    System.Diagnostics.Debug.WriteLine("HsNetWork Session 2Factor Auth Do.. Now Default Google Otp");
-                    break;
+                //        string strData = "";
+                //        if (sgEventType.MsgRecode.TryGetValue("GOTPCODE", out strData))
+                //        {
+                //            e.strDummy = "google_otp";
+                //            //strData = SgMsg.getTagDecString(sgEventType.MsgRecode["GOTPCODE"], MainCtl.Base64Seedkey);
+                //            e.strMsg = sgEventType.strDataType;
+                //        }
+                //        seEvent2Fact(groupId, e);
+                //    }
+                //    System.Diagnostics.Debug.WriteLine("HsNetWork Session 2Factor Auth Do.. Now Default Google Otp");
+                //    break;
                 default:
                     break;
             }
@@ -932,18 +932,11 @@ namespace OpenNetLinkApp.Services
                     case eAdvancedCmdList.ePostLogin:
                         //LoginAfterSend
                         LoginAfterSend(groupId, sgData);
-
-                        ////eCmdList.eBIND:                                                  // BIND_ACK : user bind(connect) 인증 응답
-                        //BindAfterSend(nRet, groupId, sgData);
-
-                        ////eCmdList.eZIPDEPTHINFO:                                                    // zip 파일 내부검사 설정 정보 조회.
-                        //ZipDepthInfoSetting(nRet, groupId, sgData);
-
-                        ////eCmdList.eCLIENTVERSION:                                                       // 업데이트 노티.
-                        //UpgradeNotiAfterSend(nRet, groupId, sgData);
-
-
                         break;
+                    case eAdvancedCmdList.ePostLogin2Factor:
+                        Login2FactorAfterSend(groupId, sgData);
+                        break;
+
                     case eAdvancedCmdList.eNotiPolicy:
                         //eAdvancedCmdList.eNotiPolicy:
                         //eCmdList.eUPDATEPOLICY:
@@ -1051,7 +1044,7 @@ namespace OpenNetLinkApp.Services
                         break;
 
                     case eAdvancedCmdList.ePostApprovalsConfirmation:  // 일괄결재(모든결재) 응답
-                        { 
+                        {
                             string strDataType = sgData.GetTagData("approval_proc_result", "data_type");
                             if (string.IsNullOrEmpty(strDataType))
                             {
@@ -1097,7 +1090,7 @@ namespace OpenNetLinkApp.Services
 
                     case eAdvancedCmdList.eNotiURLRedirection:
                         //eCmdList.eSUBDATANOTIFY:                                                    // 클립보드 데이터 Recv(서버에서)
-                        UrlServerRecvNotiAfterSend(nRet, groupId, sgData);                        
+                        UrlServerRecvNotiAfterSend(nRet, groupId, sgData);
                         break;
 
                     case eAdvancedCmdList.eRMOUSEFILEADD:
@@ -1274,7 +1267,7 @@ namespace OpenNetLinkApp.Services
                     case eAdvancedCmdList.ePostAnnouncementsReadDone:
                     case eAdvancedCmdList.ePostAgentBlocks:
                     case eAdvancedCmdList.eDeleteProxyApprovers:
-                    //case eAdvancedCmdList.ePostProxyApproversChange:
+                        //case eAdvancedCmdList.ePostProxyApproversChange:
                         Log.Logger.Here().Error($"CMD : {cmd}, groupid : {groupId}, GetResponseResult : {nRet}, reason:{strResponseReason}");
                         // Action 없음
                         break;
@@ -1330,7 +1323,7 @@ namespace OpenNetLinkApp.Services
                 SGData apprLineData = new SGData();
                 apprLineData.m_DicTagData = JsonConvert.DeserializeObject<Dictionary<string, object>>(apprLineValue);
                 sgDicRecvData.SetApprLineData(hs, groupId, apprLineData);
-                
+
                 SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
                 Int64 nFilePartSize = sgLoginData.GetFilePartSize();
                 Int64 nFileBandWidth = sgLoginData.GetFileBandWidth();
@@ -1361,8 +1354,64 @@ namespace OpenNetLinkApp.Services
                 tr = new Thread(new ParameterizedThreadStart(RecvFileDeleteCycleThread));
                 tr.Start(this);
 
-                LoginEvent LoginResult_Event = null;
-                LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
+
+                string gotp = sgData.GetTagData("two_factor", "gotp_image");
+                if (string.IsNullOrEmpty(gotp.Trim()) == false)
+                {
+                    //Google_otp로 2Factor 인증
+                    Session2FactorAuthEvent twoFactor_Event = sgPageEvent.Get2FactorAuthEventAdd(groupId);
+                    if (twoFactor_Event != null)
+                    {
+                        PageEventArgs e = new PageEventArgs();
+                        e.result = 0;
+                        e.strDummy = "google_otp";
+                        e.strMsg = gotp.Trim();
+                        twoFactor_Event(groupId, e);
+                    }
+                }
+                else
+                {
+                    //일반 인증
+                    LoginEvent LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
+                    if (LoginResult_Event != null)
+                    {
+                        PageEventArgs e = new PageEventArgs();
+                        e.result = 0;
+                        e.strMsg = "";
+                        LoginResult_Event(groupId, e);
+                    }
+                }
+            }
+            else
+            {
+                LoginEvent LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
+                if (LoginResult_Event != null)
+                {
+                    strMsg = SGLoginData.LoginFailMessage(resultCode);
+                    PageEventArgs e = new PageEventArgs();
+                    e.result = resultCode;
+                    e.strMsg = strMsg;
+                    if (int.TryParse(sgData.GetTagData("user_policy", "temporary_lock_minutes"), out int lockTime))
+                        e.count = lockTime;
+                    LoginResult_Event(groupId, e);
+                }
+            }
+        }
+        public void Login2FactorAfterSend(int groupId, SGData sgData)
+        {
+            sgData.GetRespose(out int resultCode, out string reason);
+            string strMsg = "";
+
+            HsNetWork hs = null;
+            if (m_DicNetWork.TryGetValue(groupId, out hs) == false && resultCode == 0)
+            {
+                CLog.Here().Information($"Login2FactorAfterSend - Login Success But - m_DicNetWork.TryGetValue return false");
+                return;
+            }
+
+            if (resultCode == 0)
+            {
+                LoginEvent LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
                 if (LoginResult_Event != null)
                 {
                     PageEventArgs e = new PageEventArgs();
@@ -1380,13 +1429,10 @@ namespace OpenNetLinkApp.Services
                     PageEventArgs e = new PageEventArgs();
                     e.result = resultCode;
                     e.strMsg = strMsg;
-                    if (int.TryParse(sgData.GetTagData("user_policy","temporary_lock_minutes"), out int lockTime))
-                        e.count = lockTime;
                     LoginResult_Event(groupId, e);
                 }
             }
         }
-
         public void RecvSvrAfterSend(int groupId, string loginType, string systemID)
         {
             SvrEvent svEvent = sgPageEvent.GetSvrEvent(groupId);
@@ -1820,7 +1866,7 @@ namespace OpenNetLinkApp.Services
 
             string strProcID = data.GetTagData("approval_proc_result", "approval_action");
             Log.Logger.Here().Information($"ApproveBatchAfterSendAdvanced, groupid : {groupId}, approval_proc_result, data_type:Not Email ALL , approval_action : {strProcID}");
-            strProcID = (strProcID== "reject" ? "R" : "A");
+            strProcID = (strProcID == "reject" ? "R" : "A");
 
             ApprBatchEvent ApprBatchResult_Event = sgPageEvent.GetApprBatchEvent(groupId);
             if (ApprBatchResult_Event != null)
@@ -3475,7 +3521,7 @@ namespace OpenNetLinkApp.Services
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.Here().Error($"Ready-Task-Exception : {ex.Message}");
+                    Log.Logger.Here().Error($"RestReady-Task-Exception : {ex.Message}");
                 }
 
             });
@@ -3498,7 +3544,29 @@ namespace OpenNetLinkApp.Services
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.Here().Error($"Ready-Task-Exception : {ex.Message}");
+                    Log.Logger.Here().Error($"RestLogin-Task-Exception : {ex.Message}");
+                }
+
+            });
+            return 0;
+        }
+
+        public int RestLogin2Fa(int groupid, string gotpAuthNumber)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestLogin2Fa(hsNetWork, gotpAuthNumber);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestLogin2Fa-Task-Exception : {ex.Message}");
                 }
 
             });
