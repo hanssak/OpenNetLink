@@ -207,7 +207,7 @@
 
         // RandomKey 요청
         if (nGroupID > 0)
-            HsCmdCenter.SendSVRGPKIRandomKey(nGroupID, objUserSelectedGpki.m_strUserID);
+            HsCmdCenter.RestGpkiRandom(nGroupID, objUserSelectedGpki.m_strUserID);
 
         bGpkiBtnDisable = true;
     }
@@ -414,11 +414,13 @@
             nDrawPageGroupID = nGroupID;
             CLog.Here().Information("Login_GPKI - OnAfterRenderAsync - GroupID : {0}", nGroupID);
 
-            HsCmdCenter.sgPageEvent.SetSvrGPKIEventAdd(nGroupID, GPKIInfoResult);              // gpki 등록여부 확인
-            HsCmdCenter.sgPageEvent.SetSvrGPKIRandomEventAdd(nGroupID, GPKIRandomKeyResult);   // gpki Random Key 요청
-            HsCmdCenter.sgPageEvent.SetSvrGPKICertEventAdd(nGroupID, GPKICertResult);          // gpki 인증 결과 확인
-            HsCmdCenter.sgPageEvent.SetSvrGPKIRegEventAdd(nGroupID, GPKIRegChangeResult);          // gpki 등록요청 결과 확인
+            HsCmdCenter.sgPageEvent.SetGPKICnListEventAdd(nGroupID, GPKIInfoResult);      // gpki 등록여부 확인
+            HsCmdCenter.sgPageEvent.SetGPKIRandomEventAdd(nGroupID, GPKIRandomKeyResult);   // gpki Random Key 요청
+            HsCmdCenter.sgPageEvent.SetGPKILoginEventAdd(nGroupID, GPKICertResult);          // gpki 인증 결과 확인
             HsCmdCenter.sgPageEvent.SetLoginEventAdd(nGroupID, GpkiLoginResult);
+
+            HsCmdCenter.sgPageEvent.SetSvrGPKIRegEventAdd(nGroupID, GPKIRegChangeResult);          // gpki 등록요청 결과 확인
+            
             // nGroupID 정상적으로 지정되고 나서 최초 확인
             GetRegisteredGpkiCNdata();
         }
@@ -492,14 +494,14 @@
         if (listViewGpkiFileList.Count > 0)
         {
 
-            string strGpkiCnRegisterFind = "";
+            List<string> GpkiCnRegisterFindList = new List<string>();
 
             foreach (GPKIFileInfo item in listViewGpkiFileList)
             {
                 if (item.m_strUserID.Length > 0)
                 {
-                    strGpkiCnRegisterFind += item.m_strUserID;
-                    strGpkiCnRegisterFind += "\x2";
+                    GpkiCnRegisterFindList.Add(item.m_strUserID);
+                    
                 }
             }
 
@@ -509,7 +511,7 @@
             bIsGpkiCNatServer = false;
 
             if (nGroupID > 0)
-                HsCmdCenter.SendSVRGPKIRegInfo(nGroupID, strGpkiCnRegisterFind);
+                HsCmdCenter.RestGpkiCnList(nGroupID, GpkiCnRegisterFindList);
 
 
             return true;
@@ -559,29 +561,21 @@
     ///
     /// </summary>
     /// <param name="groupID"></param>
-    public void GPKIInfoResult(int groupID)
+    public void GPKIInfoResult(int groupID, SGData data)
     {
 
         bIsGpkiCNatServer = false;
         bGetResponseGpkiCNatServer = true;
 
-        SGData tmpData = null;
-        tmpData = HsCmdCenter.GetReadyData(nGroupID);
-        if (tmpData != null)
+        if (data != null)
         {
+            List<string> canUseCnList = data.GetTagDataList("gpki_cn_list");
 
-            string strGpkiCN = tmpData.GetBasicTagData("GPKI_CN");
-
-            if (strGpkiCN.Length > 0)
+            if (canUseCnList?.Count > 0)
             {
-
                 // ex)
                 // strGpkiCN = "031이재혁002\x20\x1619유강희001\x21\x1";
-
-                string[] words = strGpkiCN.Split('\x1');
-
-
-                foreach (string strWordOne in words)
+                foreach (string strWordOne in canUseCnList)
                 {
 
                     string[] strCNreg = strWordOne.Split('\x2');
@@ -629,16 +623,13 @@
     public void GPKIRandomKeyResult(int groupID)
     {
 
-        CLog.Here().Information("$GPKI_RANDOM_ACK - Result!!");
+        CLog.Here().Information("GPKIRandomKeyResult - Result!!");
 
-        SGData tmpData = null;
-        tmpData = HsCmdCenter.GetSGGpkiData(groupID);
+        SGData tmpData = HsCmdCenter.GetSGGpkiData(groupID);
         if (tmpData != null)
         {
-            string strResult = tmpData.GetBasicTagData("RESULT");
-            string strReason = tmpData.GetBasicTagData("REASON");
-            string strSessionKey = tmpData.GetBasicTagData("SESSIONKEY");
-            string strRandomKey = tmpData.GetBasicTagData("RANDOM");
+            tmpData.GetResponse(out string strResult, out string strReason);            
+            string strRandomKey = tmpData.GetBasicTagData("random_key");
 
             if (strResult == "2")
             {
@@ -657,18 +648,12 @@
             }
 
             byte[] pSignedData = null;
-
-            //pSignedData.hsClear();
-            // string strSignedData = "";
-
             string strLog = "";
 
             // Log로 확인
             strLog = "RESULT: " + strResult;
             CLog.Here().Information(strLog);
             strLog = "REASON: " + strReason;
-            CLog.Here().Information(strLog);
-            strLog = "SESSIONKEY: " + strSessionKey;
             CLog.Here().Information(strLog);
             strLog = "RANDOM: " + strRandomKey;
             CLog.Here().Information(strLog);
@@ -688,18 +673,11 @@
             CLog.Information(strLog);
             strLog = "REASON: " + strReason;
             CLog.Information(strLog);
-            strLog = "SESSIONKEY: " + strSessionKey;
-            CLog.Information(strLog);
             strLog = "RANDOM: " + strRandomKey;
             CLog.Information(strLog);
 
-            HsCmdCenter.SendSVRGPKICert(groupID, objUserSelectedGpki.m_strUserID, strSessionKey, pSignedData);
-
+            HsCmdCenter.RestGpkiLogin(groupID, pSignedData);
         }
-
-
-
-
     }
 
 
@@ -766,9 +744,8 @@
         tmpData = HsCmdCenter.GetSGGpkiData(nGroupID);
         if (tmpData != null)
         {
-            string strResult = tmpData.GetBasicTagData("RESULT");
-            string strReason = tmpData.GetBasicTagData("REASON");
-            string strUserID = tmpData.GetBasicTagData("USERID");
+            tmpData.GetResponse(out string strResult, out string strReason);            
+            string strUserID = tmpData.GetTagData("user_id");
             string strLog = "";
 
             // Log로 확인

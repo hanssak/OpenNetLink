@@ -714,24 +714,6 @@ namespace OpenNetLinkApp.Services
                         }
                         break;
 
-                    case eCmdList.eGPKIRANDOM:                                   // Gpki_Random 결과 
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
-                            RecvSvrGPKIRandomAfterSend(groupId);
-                        }
-                        break;
-
-                    case eCmdList.eGPKICERT:                                   // Gpki_Cert 결과 
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
-                            RecvSvrGPKICertAfterSend(groupId);
-                        }
-                        break;
-
                     case eCmdList.eCHANGEGPKICN:                                   // CHANGEGPKI_CN 결과 
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
@@ -927,6 +909,35 @@ namespace OpenNetLinkApp.Services
                     case eAdvancedCmdList.ePostReady:                                        //접속 정보 요청
                         //eCmdList.eSESSIONCOUNT:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
                         ReadyAfterSend(groupId, sgData);
+                        break;
+                    case eAdvancedCmdList.eGetGpkiCnList:
+                        GpkiCnListAfterSend(groupId, sgData);                               //현재 PC의 인증서 중 사용가능한 Cn List 목록
+                        break;
+                    case eAdvancedCmdList.ePostGPKIRandom:                              // Gpki_Random 결과                         
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
+                            GpkiRandomAfterSend(groupId);
+                        }
+                        break;
+                    case eAdvancedCmdList.ePostGPKILogin:                           // Gpki_Cert 결과  (GPKI 인증ID 요청)
+                        //eCmdList.eGPKICERT:                                   
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
+                            GpkiLoginAfterSend(groupId);
+                        }
+                        break;
+                    case eAdvancedCmdList.ePatchGPKICN:
+                        //eCmdList.eCHANGEGPKICN:                                   // CHANGEGPKI_CN 결과 
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
+                            RecvSvrGPKIRegAfterSend(groupId);
+                        }
                         break;
 
                     case eAdvancedCmdList.ePostLogin:
@@ -1179,32 +1190,7 @@ namespace OpenNetLinkApp.Services
                         }
                         break;
 
-                    case eAdvancedCmdList.ePostGPKIRandom:
-                        //eCmdList.eGPKIRANDOM:                                   // Gpki_Random 결과 
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
-                            RecvSvrGPKIRandomAfterSend(groupId);
-                        }
-                        //eCmdList.eGPKICERT:                                   // Gpki_Cert 결과 
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
-                            RecvSvrGPKICertAfterSend(groupId);
-                        }
-                        break;
-
-                    case eAdvancedCmdList.ePatchGPKICN:
-                        //eCmdList.eCHANGEGPKICN:                                   // CHANGEGPKI_CN 결과 
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
-                            RecvSvrGPKIRegAfterSend(groupId);
-                        }
-                        break;
+                   
 
 
                     case eAdvancedCmdList.eNotiRequestDownload:
@@ -3222,31 +3208,6 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendBoardNotiConfirm(hsNetWork, strUserID, strQuery);
             return -1;
         }
-
-        public void SendSVRGPKIRegInfo(int groupid, string strGPKIList)
-        {
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-                sgSendData.RequestSendSVRGPKIRegInfo(hsNetWork, strGPKIList);
-        }
-
-        public void SendSVRGPKIRandomKey(int groupid, string strGPKIuID)
-        {
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-                sgSendData.RequestSendSVRGPKIRandom(hsNetWork, strGPKIuID);
-        }
-
-        public void SendSVRGPKICert(int groupid, string strUserID, string sessionKey, byte[] byteSignedDataHex)
-        {
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-                sgSendData.RequestSendSVRGPKICert(hsNetWork, strUserID, sessionKey, byteSignedDataHex);
-        }
-
         public void SendSVRGPKIRegChange(int groupid, string strUserID, string strGpkiCn)
         {
             HsNetWork hsNetWork = null;
@@ -3373,34 +3334,34 @@ namespace OpenNetLinkApp.Services
             }
         }
 
-        public void RecvSvrGPKIAfterSend(int groupId)
+        public void GpkiCnListAfterSend(int groupId, SGData data)
         {
-            SvrGPKIEvent svGpkiEvent = sgPageEvent.GetSvrGPKIEvent(groupId);
-            if (svGpkiEvent != null)
+            GPKICNListRecvEvent gpkiCnListEvent = sgPageEvent.GetGPKICnListEvent(groupId);
+            if (gpkiCnListEvent != null)
             {
-                svGpkiEvent(groupId);
+                gpkiCnListEvent(groupId, data);
             }
         }
 
 
-        public void RecvSvrGPKIRandomAfterSend(int groupId)
+        public void GpkiRandomAfterSend(int groupId)
         {
             // Random
-            SvrGPKIRandomKeyEvent svGpkiRandomEvent = sgPageEvent.GetSvrGPKIRandomEvent(groupId);
+            GPKIRandomKeyEvent svGpkiRandomEvent = sgPageEvent.GetGPKIRandomEvent(groupId);
             if (svGpkiRandomEvent != null)
             {
                 svGpkiRandomEvent(groupId);
             }
         }
+       
 
-
-        public void RecvSvrGPKICertAfterSend(int groupId)
+        public void GpkiLoginAfterSend(int groupId)
         {
             // Cert
-            SvrGPKICertEvent svGpkiCertEvent = sgPageEvent.GetSvrGPKICertEvent(groupId);
-            if (svGpkiCertEvent != null)
+            GPKILoginEvent gpkiLoginEvent = sgPageEvent.GetGPKILoginEvent(groupId);
+            if (gpkiLoginEvent != null)
             {
-                svGpkiCertEvent(groupId);
+                gpkiLoginEvent(groupId);
             }
         }
 
@@ -3545,6 +3506,71 @@ namespace OpenNetLinkApp.Services
                 catch (Exception ex)
                 {
                     Log.Logger.Here().Error($"RestLogin-Task-Exception : {ex.Message}");
+                }
+
+            });
+            return 0;
+        }
+
+        public int RestGpkiCnList(int groupid, List<string> userGpkiCnList)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestGpkiCnList(hsNetWork, userGpkiCnList);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestGpkiCnList-Task-Exception : {ex.Message}");
+                }
+
+            });
+            return 0;
+        }
+
+        public int RestGpkiRandom(int groupid, string strGPKIuID)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestGpkiRandom(hsNetWork, strGPKIuID);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestGpkiRandom-Task-Exception : {ex.Message}");
+                }
+
+            });
+            return 0;
+        }
+        public int RestGpkiLogin(int groupid, byte[] byteSignedDataHex)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestGPKILogin(hsNetWork, byteSignedDataHex);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestGpkiLogin-Task-Exception : {ex.Message}");
                 }
 
             });
