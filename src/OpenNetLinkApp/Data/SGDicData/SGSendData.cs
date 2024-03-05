@@ -1369,9 +1369,9 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.RequestRest(args);
         }
 
-        public int RequestRestInstApproveClear(HsNetWork hsNet)
+        public int RequestRestInstApproveClear(HsNetWork hsNet, eCmdReponseType reponseType)
         {
-            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eDeleteProxyApprovers, null, null, hsNet.stCliMem.GetProtectedSeedKey());
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eDeleteProxyApprovers, null, null, hsNet.stCliMem.GetProtectedSeedKey(), reponseType);
             return hsNet.RequestRest(args);
         }
 
@@ -1381,12 +1381,17 @@ namespace OpenNetLinkApp.Data.SGDicData
                 return -1;
 
             Dictionary<string, object> dicBody = new Dictionary<string, object>();
-            dicBody["agent_block_list"] = listProxyApprover.ToArray();
+            dicBody["proxy_approver_list"] = listProxyApprover.ToArray();
 
             SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostProxyApproversChange, null, null, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.RequestRest(args);
         }
 
+        public int RequestRestInstApproveListGet(HsNetWork hsNet)
+        {
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eGetProxyApprovers, null, null, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.RequestRest(args);
+        }
 
         public int RequestRestLogOut(HsNetWork hsNet, eCmdReponseType reponseType)
         {
@@ -1396,6 +1401,11 @@ namespace OpenNetLinkApp.Data.SGDicData
         }
 
 
+        public int RequestRestSendDeptInfo(HsNetWork hsNet)
+        {
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eGetDepts, null, null, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.RequestRest(args);
+        }
 
     }
 }

@@ -984,21 +984,7 @@ namespace OpenNetLinkApp.Services
                     case eAdvancedCmdList.ePatchSessionPW://eCmdList.eCHANGEPASSWD:                                                  // 비밀번호 변경 요청 응답.
                         ChgPassWDAfterSend(nRet, groupId);
                         break;
-                    case eAdvancedCmdList.eGetDepts://eCmdList.eDEPTINFO:                                                  // 부서정보 조회 요청 응답.
-                        DeptInfoAfterSend(nRet, groupId, sgData);
-                        {
-                            int result = sgData.GetResult();
-                            sgData.GetRecordData("DeptCount");
-                        }
-                        break;
-                    case eAdvancedCmdList.eGetProxyApprovers://eCmdList.eAPPRINSTCUR:                                                  // 현재 등록된 대결재자 정보 요청 응답.
-                        ApprInstAfterSend(nRet, groupId, sgData);
-                        break;
-                    case eAdvancedCmdList.ePostProxyApproversChange:
-                        //eCmdList.eAPPRINSTCLEAR:                                       //대결자삭제
-                        //eCmdList.eAPPRINSTREG:                                         //대결자등록
-                        CommonResultAfterSend(nRet, groupId, sgData);
-                        break;
+
                     case eAdvancedCmdList.ePostTransferRequestRetrieval:
                         //eCmdList.eFILETRANSLIST:                                                  // 전송관리 조회 리스트 데이터 요청 응답.
                         hs = GetConnectNetWork(groupId);
@@ -1230,11 +1216,15 @@ namespace OpenNetLinkApp.Services
                     //    break;
 
 
-                    case eAdvancedCmdList.eGetDashboard:
+                    case eAdvancedCmdList.eGetDashboard:				// DashBoard 화면 data
                         GetDashBoardafterSend(nRet, groupId, sgData);
                         break;
 
-                    case eAdvancedCmdList.ePostApproversRetrieval:
+                    case eAdvancedCmdList.eGetProxyApprovers:           //현재 대결재자 정보
+                        ApprInstAfterSend(nRet, groupId, sgData);
+                        break;
+
+                    case eAdvancedCmdList.ePostApproversRetrieval:      // 조건별 결재자 검색
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
                         {
@@ -1242,10 +1232,15 @@ namespace OpenNetLinkApp.Services
                             DeptApprLineSearchAfterSend(nRet, groupId);
                         }
                         break;
-                    case eAdvancedCmdList.ePostAnnouncementsReadDone:
-                    case eAdvancedCmdList.ePostAgentBlocks:
-                    case eAdvancedCmdList.eDeleteProxyApprovers:
-                        //case eAdvancedCmdList.ePostProxyApproversChange:
+
+                    case eAdvancedCmdList.eGetDepts:                    // 부서정보 조회
+                        DeptInfoAfterSend(nRet, groupId, sgData);
+                        break;
+
+                    case eAdvancedCmdList.ePostAnnouncementsReadDone:	
+                    case eAdvancedCmdList.ePostAgentBlocks:				// agent 파일첨부차단 정보 송신결과
+                    case eAdvancedCmdList.eDeleteProxyApprovers:		// 등록된 대결재자 삭제
+                    case eAdvancedCmdList.ePostProxyApproversChange:	// 대결재자 변경 저장
                         Log.Logger.Here().Error($"CMD : {cmd}, groupid : {groupId}, GetResponseResult : {nRet}, reason:{strResponseReason}");
                         // Action 없음
                         break;
@@ -3858,35 +3853,68 @@ namespace OpenNetLinkApp.Services
         }
 
 
-        public int RestInstApproveClear(int groupid)
+        /// <summary>
+        /// 등록된 대결재자들 한번에 삭제
+        /// </summary>
+        /// <param name="groupid"></param>
+        /// <returns></returns>
+        public int RestInstApproveClear(int groupid, eCmdReponseType reponseType = eCmdReponseType.CallBackPosResponse)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork == null)
                 return -1;
 
-            Task.Run(() =>
-            {
-                int ret = 0;
-                try
-                {
-                    ret = sgSendData.RequestRestInstApproveClear(hsNetWork);
-                    if (ret < 0)
-                    {
-                        Log.Logger.Here().Error($"RestInstApproveClear-Task-Ret : {ret}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Logger.Here().Error($"RestInstApproveClear-Task-Exception : {ex.Message}");
-                }
+            int ret = 0;
 
-            });
+            if (reponseType == eCmdReponseType.CallPosReponse)
+            {
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        ret = sgSendData.RequestRestInstApproveClear(hsNetWork, reponseType);
+                        if (ret < 0)
+                        {
+                            Log.Logger.Here().Error($"RestInstApproveClear-Task-Ret : {ret}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Logger.Here().Error($"RestInstApproveClear-Task-Exception : {ex.Message}");
+                    }
+
+                }).Wait();
+            }
+            else
+            {
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        ret = sgSendData.RequestRestInstApproveClear(hsNetWork, reponseType);
+                        if (ret < 0)
+                        {
+                            Log.Logger.Here().Error($"RestInstApproveClear-Task-Ret : {ret}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Logger.Here().Error($"RestInstApproveClear-Task-Exception : {ex.Message}");
+                    }
+
+                });
+            }
 
             return 0;
-
         }
 
+        /// <summary>
+        /// 대결재자들 한번에 등록 명령
+        /// </summary>
+        /// <param name="groupid"></param>
+        /// <param name="listProxyApprover"></param>
+        /// <returns></returns>
         public int RestInstApproveReg(int groupid, List<ProxyApprover> listProxyApprover)
         {
             HsNetWork hsNetWork = null;
@@ -3908,6 +3936,71 @@ namespace OpenNetLinkApp.Services
                 catch (Exception ex)
                 {
                     Log.Logger.Here().Error($"RequestRestInstApproveReg-Task-Exception : {ex.Message}");
+                }
+
+            });
+
+            return 0;
+
+        }
+
+
+        /// <summary>
+        /// 등록된 대결재자 List 얻음
+        /// </summary>
+        /// <param name="groupid"></param>
+        /// <returns></returns>
+        public int RestInstApproveListGet(int groupid)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestInstApproveListGet(hsNetWork);
+                    if (ret < 0)
+                    {
+                        Log.Logger.Here().Error($"RequestRestInstApproveListGet-Task-Ret : {ret}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RequestRestInstApproveListGet-Task-Exception : {ex.Message}");
+                }
+
+            });
+
+            return 0;
+
+        }
+
+
+        public int RestSendDeptInfo(int groupid)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestSendDeptInfo(hsNetWork);
+                    if (ret < 0)
+                    {
+                        Log.Logger.Here().Error($"RequestRestSendDeptInfo-Task-Ret : {ret}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RequestRestSendDeptInfo-Task-Exception : {ex.Message}");
                 }
 
             });

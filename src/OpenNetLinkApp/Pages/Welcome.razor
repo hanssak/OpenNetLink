@@ -1065,8 +1065,7 @@
             */
 
             // Advanced
-            HsCmdCenter.sgPageEvent.SetDashBoardDataEvent(groupID, DashBoardDataResult);
-            HsCmdCenter.RestDashBoardData(0, "20231205-20231210", 5);
+            HsCmdCenter.sgPageEvent.SetDashBoardDataEvent(groupID, DashBoardDataResult);            
 
             HsCmdCenter.sgPageEvent.SetBoardNotiAfterDashBoardEventAdd(groupID, BoardNotiAfter);                // 공지사항 데이터 수신 후 화면 갱신
             HsCmdCenter.sgPageEvent.SetAlarmNotiAfterDashBoardEventAdd(groupID, AlarmNotiAfter);                // 알람 노티 수신 후 화면 갱신.
@@ -1114,14 +1113,15 @@
     /// <summary>
     /// 1일 파일전송 사용 최대값 알아냄. 용량 / 건수  정보알아내는 query Server로 전달
     /// </summary>
+    /*
     public void SendDayFileInfo()
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
 
-        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*/
+        //ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        //int groupID = 0;
+        //if (sgSideBar != null)
+        //    groupID = sgSideBar.GroupId;
         int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = null;
@@ -1152,18 +1152,19 @@
         string strUserID = sgLoginData.GetUserID();
         string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
         HsCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
-    }
+    }*/
 
     /// <summary>
     /// 1일 클립보드 사용 최대값 알아냄. 용량 / 건수  정보알아내는 query Server로 전달
     /// </summary>
+    /*
     public void SendDayClipInfo()
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
-        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*/
+        //ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        //int groupID = 0;
+        //if (sgSideBar != null)
+        //    groupID = sgSideBar.GroupId;
         int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = null;
@@ -1208,13 +1209,14 @@
         string strUserID = sgLoginData.GetUserID();
         string strQuery = sgQuery.GetDayClipboardInfo(bSystem, strUserSeq, strDate, strConNetWork);
         HsCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
-    }
+    }*/
 
     /// <summary>
     /// 1일 파일전송 사용한 용량 / 건수  정보 서버에서 받음, 연이어 클립보드 사용량 정보서버에요청함
     /// </summary>
     /// <param name="groupID"></param>
     /// <param name="e"></param>
+    /*
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
         CLog.Here().Information($"FileTrans - ### - USED size({e.Size}), count({e.Count}) info recv (groupID : {groupID})! ");
@@ -1237,7 +1239,7 @@
         }
 
         SendDayClipInfo();
-    }
+    }*/
 
 
     /// <summary>
@@ -1245,7 +1247,7 @@
     /// </summary>
     /// <param name="groupID"></param>
     /// <param name="e"></param>
-    public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
+    /*public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
         CLog.Here().Information($"FileTrans - ### - use size recv (groupID : {groupID})! ");
 
@@ -1270,18 +1272,19 @@
 
         // Query개수 줄여봄
         // TransSearchCount();
-    }
+    }*/
 
 
     /// <summary>
     /// 파일전송 요청현황 List 항목 개수 정보를 서버에 Query
     /// </summary>
+    /*
     public void TransSearchCount()
     {
-        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*/
+        //ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        //int groupID = 0;
+        //if (sgSideBar != null)
+        //    groupID = sgSideBar.GroupId;
         int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = null;
@@ -1309,19 +1312,19 @@
         string strQueryCount = dao.TotalCount(param, true);   // 쿼리 데이터 카운트
                                                               //string str = dao.List(param, true);                  // 확인용
         HsCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
-    }
+    }*/
 
 
     /// <summary>
     /// 파일전송 요청현황 List 를 서버에 Query
     /// </summary>
     /// <param name="pageNum"></param>
-    public void TransSearchData(int pageNum)
+    /*public void TransSearchData(int pageNum)
     {
-        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*/
+        //ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        //int groupID = 0;
+        //if (sgSideBar != null)
+        //    groupID = sgSideBar.GroupId;
         int groupID = groupIDbyParam;
 
         //string strYear = DateTime.Now.ToString("yyyy");
@@ -1351,7 +1354,7 @@
         TransferDao dao = new TransferDao();
         string strQuery = dao.List(param, true);
         HsCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
-    }
+    }*/
 
 
     /// <summary>
@@ -1359,6 +1362,7 @@
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
+    /*
     public void TransSearchCount(int groupId, PageEventArgs e)
     {
         string strMsg = e.strMsg;
@@ -1369,14 +1373,14 @@
             return;
         }
         TransSearchData(1);
-    }
+    }*/
 
     /// <summary>
     /// 파일전송 요청현황 List 를 서버에서 받음
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
-    public void TransSearchResult(int groupId, PageEventArgs e)
+    /*public void TransSearchResult(int groupId, PageEventArgs e)
     {
 
         int ret = e.result;
@@ -1437,17 +1441,17 @@
         // Query개수 줄여봄
         // ApproveSearchCount();
     }
-
+    */
 
     /// <summary>
     /// 결재요청 받은 개수 정보 서버에 Query
     /// </summary>
-    public void ApproveSearchCount()
+    /*public void ApproveSearchCount()
     {
-        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*/
+        //ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        //int groupID = 0;
+        //if (sgSideBar != null)
+        //    groupID = sgSideBar.GroupId;
 
         int groupID = groupIDbyParam;
 
@@ -1476,19 +1480,19 @@
         ApproveDao dao = new ApproveDao();
         string strCountQuery = dao.TotalCount(param, true);
         HsCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
-    }
+    }*/
 
 
     /// <summary>
     /// 결재요청 받은 List 정보서버에 Query
     /// </summary>
     /// <param name="pageNum"></param>
-    public void ApproveSearchData(int pageNum)
+    /*public void ApproveSearchData(int pageNum)
     {
-        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*/
+        //ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        //int groupID = 0;
+        //if (sgSideBar != null)
+        //    groupID = sgSideBar.GroupId;
 
         int groupID = groupIDbyParam;
 
@@ -1523,7 +1527,7 @@
         ApproveDao dao = new ApproveDao();
         string strQuery = dao.List(param, true);
         HsCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
-    }
+    }*/
 
 
     /// <summary>
@@ -1531,7 +1535,7 @@
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
-    public void ApprSearchCount(int groupId, PageEventArgs e)
+    /*public void ApprSearchCount(int groupId, PageEventArgs e)
     {
         if (e.count <= 0)
         {
@@ -1543,7 +1547,7 @@
         }
 
         ApproveSearchData(1);
-    }
+    }*/
 
 
     /// <summary>
@@ -1551,7 +1555,7 @@
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
-    public void ApprSearchResult(int groupId, PageEventArgs e)
+    /*public void ApprSearchResult(int groupId, PageEventArgs e)
     {
         int ret = e.result;
         if (ret != 0)
@@ -1607,7 +1611,7 @@
         DashBoardTransReqCount();
         //DashBoardSearchCount();
         //StateHasChanged();
-    }
+    }*/
 
 
     ///// <summary>
@@ -1647,7 +1651,7 @@
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
-    public void DashBoardCountResult(int groupId, PageEventArgs e)
+    /*public void DashBoardCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
         {
@@ -1686,18 +1690,18 @@
             PasswdChgDaySearch();
 
         //StateHasChanged();
-    }
+    }*/
 
 
     /// <summary>
     /// 최근 3개월 전송요청 개수 정보 Query
     /// </summary>
-    public void DashBoardTransReqCount()
+    /*public void DashBoardTransReqCount()
     {
-        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*/
+        //ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        //int groupID = 0;
+        //if (sgSideBar != null)
+        //    groupID = sgSideBar.GroupId;
         int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -1718,7 +1722,7 @@
 
         string strQuery = sgQueryExtend.GetDashboardTransReqCountQuery(strUserSeq, strFromDate, strToDate);
         HsCmdCenter.SendDashBoardTransReqCount(groupID, curUserID, strQuery);
-    }
+    }*/
 
 
     /// <summary>
@@ -1726,7 +1730,7 @@
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
-    public void DashBoardTransReqCountResult(int groupId, PageEventArgs e)
+    /*public void DashBoardTransReqCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
         {
@@ -1736,19 +1740,19 @@
 
         strTransReqCount = e.strMsg;
         DashBoardApprInfoCount("1");      // 1 : 승인대기
-    }
+    }*/
 
 
     /// <summary>
     /// 최근 3개월 승인대기 / 승인 / 반려 개수 정보 Query 결과 ( 1: 승인대기, 2:승인, 3:반려 )
     /// </summary>
     /// <param name="strApprStatus"></param>
-    public void DashBoardApprInfoCount(string strApprStatus)
+    /*public void DashBoardApprInfoCount(string strApprStatus)
     {
-        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*/
+        //ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        //int groupID = 0;
+        //if (sgSideBar != null)
+        //    groupID = sgSideBar.GroupId;
         int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -1802,7 +1806,7 @@
             else
                 PasswdChgDaySearch();
         }
-    }
+    }*/
 
 
     /// <summary>
@@ -1810,6 +1814,7 @@
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
+    /*
     public void DashBoardApprWaitCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1820,13 +1825,14 @@
 
         strApprWaitCount = e.strMsg;
         DashBoardApprInfoCount("2");      // 2 : 승인
-    }
+    }*/
 
     /// <summary>
     /// 최근 3개월 승인 Query 결과
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
+    /*
     public void DashBoardApprConfirmCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1837,13 +1843,14 @@
 
         strApprCofirmCount = e.strMsg;
         DashBoardApprInfoCount("3");      // 3 : 반려
-    }
+    }*/
 
     /// <summary>
     /// 최근 3개월 반려 Query 결과
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
+    /*
     public void DashBoardApprRejectCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1867,12 +1874,12 @@
 
         PasswdChgDaySearch();
     }
-
+    */
 
     /// <summary>
     /// password 검색 유효기간 서버에 Query
     /// </summary>
-    public void PasswdChgDaySearch()
+    /*public void PasswdChgDaySearch()
     {
 
         if (bShowPasswordUseTime == false)
@@ -1881,10 +1888,10 @@
             return;
         }
 
-        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*/
+        //ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        //int groupID = 0;
+        //if (sgSideBar != null)
+        //    groupID = sgSideBar.GroupId;
         int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -1895,13 +1902,14 @@
         SGQueryExtend sgQueryExtend = new SGQueryExtend();
         string strQuery = sgQueryExtend.GetPasswdChgDay(strUserSeq);
         HsCmdCenter.SendPasswdChgDay(groupID, curUserID, strQuery);
-    }
+    }*/
 
     /// <summary>
     /// password 검색 유효기간 정보 서버서 받은 결과
     /// </summary>
     /// <param name="groupid"></param>
     /// <param name="e"></param>
+    /*
     public void PasswdChgDaySearchResult(int groupid, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1911,10 +1919,10 @@
             return;
         }
 
-        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*/
+        //ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        //int groupID = 0;
+        //if (sgSideBar != null)
+        //    groupID = sgSideBar.GroupId;
         int groupID = groupIDbyParam;
 
 
@@ -1970,6 +1978,7 @@
         StateHasChanged();
         //BoardNotifySearch();
     }
+    */
 
     /*
     public void BoardNotifySearch()
@@ -2162,7 +2171,7 @@
         }
     }
 
-    public void GetDatePeriod(out string strFromDate, out string strToDate)
+    /*public void GetDatePeriod(out string strFromDate, out string strToDate)
     {
         DateTime dateTo = DateTime.Now;
         DateTime dateFrom = dateTo.AddMonths(-3);       // 최근 3개월
@@ -2172,7 +2181,7 @@
 
         strToDate = strToDate.Replace("-", "") + "235959";
         strFromDate = strFromDate.Replace("-", "") + "000000";
-    }
+    }*/
 
     /// <summary>
     /// 패스워드 유효기간 표시할지 유무(Advanced)
@@ -2218,7 +2227,7 @@
     ///
     /// </summary>
     /// <param name="navURI"></param>
-    public void SelectSideBar(string navURI)
+    /*public void SelectSideBar(string navURI)
     {
 
         int nGroupID = 0;
@@ -2356,7 +2365,7 @@
             CLog.Here().Information("Welcome-MoveSideBar Forcus-Click-Exception(Msg) : {0}", e.Message);
         }
 
-    }
+    }*/
 
     /// <summary>
     /// 결재 Tab UI가 나와야 하는지 유무를 알려줌
