@@ -276,7 +276,13 @@
         if (activedSGLogin != null)
         {
             //IsApproverOnly = !activedSGLogin.GetApproveProxyRight();
-            HsCmdCenter.SendDeptInfo(activedGroupID, activedSGLogin.GetUserID());
+
+            // 예전
+            //HsCmdCenter.SendDeptInfo(activedGroupID, activedSGLogin.GetUserID());
+
+            // Advanced
+            HsCmdCenter.RestSendDeptInfo(activedGroupID);
+
             strSelectedDeptCode = activedSGLogin.GetTeamCode();
         }
 
