@@ -341,6 +341,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, GPKIRandomKeyEvent> DicGPKIRandomKeyEvent = new Dictionary<int, GPKIRandomKeyEvent>();         // GPKI Random Key 이벤트
         public Dictionary<int, GPKILoginEvent> DicGPKILoginEvent = new Dictionary<int, GPKILoginEvent>();         // GPKI Cert 이벤트
         public Dictionary<int, GPKIRegEvent> DicGPKIRegEvent = new Dictionary<int, GPKIRegEvent>();         // GPKI Reg 이벤트
+        public Dictionary<int, ResponseEvent> DicMakeOTPEvent = new Dictionary<int, ResponseEvent>();         // Patch/Session/OTP
 
 
         public Dictionary<int, GPKICNListRecvEvent> DicGPKICNListEvent = new Dictionary<int, GPKICNListRecvEvent>();    //현재 사용가능한 CN List 이벤트
@@ -701,6 +702,19 @@ namespace OpenNetLinkApp.PageEvent
             GPKIRegEvent e = null;
             if (DicGPKIRegEvent.TryGetValue(groupid, out e) == true)
                 e = DicGPKIRegEvent[groupid];
+            return e;
+        }
+
+        public void SetMakeOTPEventAdd(int groupid, ResponseEvent e)
+        {
+            DicMakeOTPEvent[groupid] = e;
+        }
+
+        public ResponseEvent GetMakeOTPEvent(int groupid)
+        {
+            ResponseEvent e = null;
+            if (DicMakeOTPEvent.TryGetValue(groupid, out e) == true)
+                e = DicMakeOTPEvent[groupid];
             return e;
         }
 

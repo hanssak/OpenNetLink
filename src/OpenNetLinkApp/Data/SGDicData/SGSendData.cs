@@ -154,16 +154,6 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.SendMessage(args);
         }
 
-        public int RequestOTPRegist(HsNetWork hsNet, int groupid, string strUserID, string otpNumber)
-        {
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            dic["APPID"] = "0x00000000";
-            dic["CLIENTID"] = strUserID;
-            dic["OTP"] = otpNumber;
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_OTP", dic, hsNet.stCliMem.GetProtectedSeedKey());
-            return hsNet.SendMessage(args);
-        }
-
         public int RequestDeptInfo(HsNetWork hsNet, int groupid, string strUserID)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
@@ -1248,6 +1238,17 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostLogin2Factor, null, dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.RequestRest(args);
         }
+
+
+        public int RequestRestOTPRegist(HsNetWork hsNet, int groupid, string strUserID, string otpNumber)
+        {
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+            dic.Add("hs_otp_auth_number", otpNumber);
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePatchSessionOTP, null, dic, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.SendMessage(args);
+        }
+
 
         public int RequestRestSendApproveBatch(HsNetWork hsNet, string strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<Int64> listSeqData)
         {

@@ -931,7 +931,15 @@ namespace OpenNetLinkApp.Services
                             GpkiCnRegAfterSend(groupId);
                         }
                         break;
-
+                    case eAdvancedCmdList.ePatchSessionOTP:                       // hanssakOTP 등록 및 변경
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            SGData tmpData = new SGData();
+                            tmpData.Copy(hs, sgData);
+                            MakeOtpAfterSend(groupId, tmpData);
+                        }                        
+                        break;
                     case eAdvancedCmdList.ePostLogin:
                         //LoginAfterSend
                         LoginAfterSend(groupId, sgData);
@@ -1168,9 +1176,6 @@ namespace OpenNetLinkApp.Services
                         }
                         break;
 
-                   
-
-
                     case eAdvancedCmdList.eNotiRequestDownload:
                         //eCmdList.eFILEMAXLENGTH:
                         hs = GetConnectNetWork(groupId);
@@ -1237,7 +1242,7 @@ namespace OpenNetLinkApp.Services
                         DeptInfoAfterSend(nRet, groupId, sgData);
                         break;
 
-                    case eAdvancedCmdList.ePostAnnouncementsReadDone:	
+                    case eAdvancedCmdList.ePostAnnouncementsReadDone:
                     case eAdvancedCmdList.ePostAgentBlocks:				// agent 파일첨부차단 정보 송신결과
                     case eAdvancedCmdList.eDeleteProxyApprovers:		// 등록된 대결재자 삭제
                     case eAdvancedCmdList.ePostProxyApproversChange:	// 대결재자 변경 저장
@@ -2699,14 +2704,6 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestChangePasswd(hsNetWork, groupid, strUserID, strProtectedOldPasswd, strProtectedNewPasswd);
             return -1;
         }
-        public int SendOTPNumber(int groupid, string strUserID, string otpNumber)
-        {
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-                return sgSendData.RequestOTPRegist(hsNetWork, groupid, strUserID, otpNumber);
-            return -1;
-        }
 
         public int SendDeptInfo(int groupid, string strUserID)
         {
@@ -3333,7 +3330,7 @@ namespace OpenNetLinkApp.Services
                 svGpkiRandomEvent(groupId);
             }
         }
-       
+
 
         public void GpkiLoginAfterSend(int groupId)
         {
@@ -3345,7 +3342,6 @@ namespace OpenNetLinkApp.Services
             }
         }
 
-
         public void GpkiCnRegAfterSend(int groupId)
         {
             // Reg
@@ -3355,6 +3351,17 @@ namespace OpenNetLinkApp.Services
                 GpkiRegEvent(groupId);
             }
         }
+
+        public void MakeOtpAfterSend(int groupId, SGData sgData)
+        {
+            // Reg
+            ResponseEvent MakeOTPEvent = sgPageEvent.GetMakeOTPEvent(groupId);
+            if (MakeOTPEvent != null)
+            {
+                MakeOTPEvent(groupId, sgData);
+            }
+        }
+
 
         public int SendUrlData(int groupid, string strUserid, string strUrlData)
         {
@@ -3557,12 +3564,26 @@ namespace OpenNetLinkApp.Services
             return 0;
         }
 
-        public void RestGpkiCnChange(int groupid, string strUserID, string strGpkiCn)
+        public int RestGpkiCnChange(int groupid, string strUserID, string strGpkiCn)
         {
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-                sgSendData.RequestRestGpkiCnChange(hsNetWork, strUserID, strGpkiCn);
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestGpkiCnChange(hsNetWork, strUserID, strGpkiCn);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestLogin2Fa-Task-Exception : {ex.Message}");
+                }
+
+            });
+            return 0;
         }
 
         public int RestLogin2Fa(int groupid, string gotpAuthNumber)
@@ -3577,6 +3598,30 @@ namespace OpenNetLinkApp.Services
                 try
                 {
                     ret = sgSendData.RequestRestLogin2Fa(hsNetWork, gotpAuthNumber);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestLogin2Fa-Task-Exception : {ex.Message}");
+                }
+
+            });
+            return 0;
+        }
+
+
+
+        public int RestOTPNumber(int groupid, string strUserID, string otpNumber)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestOTPRegist(hsNetWork, groupid, strUserID, otpNumber);
                 }
                 catch (Exception ex)
                 {

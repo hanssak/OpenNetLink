@@ -1,4 +1,6 @@
 @using System.Timers
+@using AgLogManager
+@using HsNetWorkSGData
 @inject IJSRuntime JSRuntime
 @inject XmlConfService xmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -34,14 +36,44 @@
 </div>
 
 @code {
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<HanssakOTP>();
     private Timer refreshTime = null;
     private int nValidTime = 180; //초단위 설정
     private int validMinute = 3;
     private int validSecond = 0;
     private string validMessage = "";
     private string m_otpNum = "";
-    public int groupId = 0;
+    public int groupId = -1;
     public string userId = "";
+    public int nDrawPageGroupID = -1;               // Draw하는 GroupID
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+        }
+
+        if ((nDrawPageGroupID < 0 || nDrawPageGroupID != groupId) && groupId > -1)
+        {
+            nDrawPageGroupID = groupId;
+            CLog.Here().Information("HanssakOTP - OnAfterRenderAsync - GroupID : {0}", groupId);
+
+            HSCmdCenter.sgPageEvent.SetMakeOTPEventAdd(groupId, MakeOTPResult);      // HanssakOTP 번호 등록 응답            
+        }
+    }
+    
+    public void MakeOTPResult(int groupId, SGData e)
+    {
+        CLog.Here().Information("MakeOTPResult - Result!!");
+        e.GetResponse(out string strResult, out string strReason);            
+
+        if(strResult != "0")
+        {
+            CLog.Here().Error($"MakeOTPResult - Error code[{strResult}] / reason[{strReason}]");
+            ShowMessage("error", xmlConf.GetTitle("T_COMMON_OTP"), xmlConf.GetWarnMsg("W_0311"));
+        }
+    }
     public void refreshOTP()
     {
         nValidTime = 180;
@@ -57,6 +89,7 @@
         object[] param = { "hanssak-otp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
 
+        StateHasChanged();
         m_otpNum = MakeOTPNumber();
 
         if (refreshTime == null)
@@ -73,7 +106,7 @@
         validSecond = nValidTime % 60;
         if (validMinute <= 0 && validSecond <= 0)
         {
-            validMessage = "유효시간 만료";
+            validMessage = xmlConf.GetTitle("T_ETC_OTP_NUMBER_TIME_OUT"); //  "OTP 유효시간 만료";
             refreshTime.Stop();
         }
         else
@@ -91,18 +124,34 @@
 
     private string MakeOTPNumber()
     {
-        string otpNum = "";
-        int n1, n2, n3, n4, n5, n6 = 0;
-        Random rand = new Random();
-        n1 = rand.Next(1, 10);
-        n2 = rand.Next(1, 10);
-        n3 = rand.Next(1, 10);
-        n4 = rand.Next(1, 10);
-        n5 = rand.Next(1, 10);
-        n6 = rand.Next(1, 10);
-        otpNum = n1.ToString() + n2.ToString() + n3.ToString() + n4.ToString() + n5.ToString() + n6.ToString();
-        //서버전송
-        HSCmdCenter.SendOTPNumber(groupId, userId, otpNum);
-        return otpNum;
+        try
+        {
+            string otpNum = "";
+            int n1, n2, n3, n4, n5, n6 = 0;
+            Random rand = new Random();
+            n1 = rand.Next(1, 10);
+            n2 = rand.Next(1, 10);
+            n3 = rand.Next(1, 10);
+            n4 = rand.Next(1, 10);
+            n5 = rand.Next(1, 10);
+            n6 = rand.Next(1, 10);
+            otpNum = n1.ToString() + n2.ToString() + n3.ToString() + n4.ToString() + n5.ToString() + n6.ToString();
+
+            //서버전송
+            HSCmdCenter.RestOTPNumber(groupId, userId, otpNum);
+            return otpNum;
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"MakeOTPNumber Exception - {ex.ToString()}");
+            ShowMessage("error", xmlConf.GetTitle("T_COMMON_OTP"), xmlConf.GetWarnMsg("W_0063"));
+            return string.Empty;
+        }
+    }
+
+     private void ShowMessage(string strType, string strTitle, string strMsg)
+    {
+        object[] param = { strType, strTitle, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 }

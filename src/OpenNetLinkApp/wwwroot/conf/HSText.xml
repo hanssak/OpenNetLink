@@ -3288,10 +3288,10 @@
 
 
     <T_OTP_GUIDE>
-      <KR>생생된 OTP번호를 로그인 화면에 등록하세요.</KR>
-      <JP>생생된 OTP번호를 로그인 화면에 등록하세요.</JP>
+      <KR>생성된 OTP번호를 로그인 화면에 등록하세요.</KR>
+      <JP>생성된 OTP번호를 로그인 화면에 등록하세요.</JP>
       <EN>Register the vivid OTP number on the login screen.</EN>
-      <CN>생생된 OTP번호를 로그인 화면에 등록하세요.</CN>
+      <CN>생성된 OTP번호를 로그인 화면에 등록하세요.</CN>
     </T_OTP_GUIDE>
 
     <!-- ********************************************* [END] ETC (T_GOOGLE_OTP_0000) ********************************************* -->
@@ -3713,7 +3713,12 @@
       <EN>OTP number</EN>
       <CN>OTP口令</CN>
     </T_ETC_LOGIN_OTP_NUMBER>
-
+	<T_ETC_OTP_NUMBER_TIME_OUT>
+        <KR>OTP 유효시간 만료</KR>
+		<JP></JP>
+		<EN>OTP timeOut</EN>
+		<CN></CN>
+	</T_ETC_OTP_NUMBER_TIME_OUT>
     <T_ETC_CONNTCTINFO_TITLE>
       <KR>접속환경</KR>
       <JP>接続環境</JP>
@@ -5790,6 +5795,7 @@
       <EN>APT scan timeOut</EN>
       <CN></CN>
     </T_APT_TIME_OUT>
+	  
   </TITLE>
 
   <INFO>
@@ -9630,7 +9636,20 @@
       <CN></CN>
     </W_0309>
 
-  </WARNING>
+    <W_0310>
+      <KR>통합로그인으로 실행하십시오.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </W_0310>
+
+	<W_0311>
+      <KR>OTP 등록에 실패하였습니다.</KR>
+      <JP></JP>
+	  <EN>OTP registration failed.</EN>
+	  <CN></CN>|
+	</W_0311>
+</WARNING>
 
 
 

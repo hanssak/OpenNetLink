@@ -1056,14 +1056,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool GetServerVirusExam()
         {
             //TODO 고도화 - UI에서 필요한지 프로세스 확인 필요
-            string strData = GetTagData("INTERLOCKFLAG");
-            int nValue = 0;
-            if (!strData.Equals(""))
-                nValue = Convert.ToInt32(strData);
+            //string strData = GetTagData("INTERLOCKFLAG");
+            //int nValue = 0;
+            //if (!strData.Equals(""))
+            //    nValue = Convert.ToInt32(strData);
 
-            if ((nValue & 2) > 0)
-                return true;
-            else
+            //if ((nValue & 2) > 0)
+            //    return true;
+            //else
                 return false;
         }
 

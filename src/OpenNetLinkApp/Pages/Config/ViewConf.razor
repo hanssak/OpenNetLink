@@ -336,11 +336,16 @@
         Int64 nTemp64;
 
         // 버전정보
+        //TODO 고도화 - 업데이트 대기 중인 버전을 표시해야 할지, 현재 Agent 표시할지 확인 필요
         string strAppVersion = sgLoginData.GetServClientVersion();
-        int find = strAppVersion.IndexOf(':');
-        strAppVersion = strAppVersion.Substring(0, find);
-
-        strDataVersion = strAppVersion;
+        if(!string.IsNullOrEmpty(strAppVersion))
+        {
+            int find = strAppVersion.IndexOf(':');
+            strAppVersion = strAppVersion.Substring(0, find);
+            strDataVersion = strAppVersion;
+            
+        }
+        
         strDataNetWorkPos = sgReadyData.GetServName();                                                  // 내부시스템01 / 외부시스템01
 
         // 한번에 전송 가능한 파일 크기
