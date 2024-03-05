@@ -1118,6 +1118,7 @@ namespace OpenNetLinkApp.Services
                             PrivacyNotiEvent privacyNotiEvent = sgPageEvent.GetPrivacyNotiEvent(groupId);
                             if (privacyNotiEvent != null) privacyNotiEvent(groupId, sgData);
                         }
+                        break;
 
                     case eAdvancedCmdList.eNotiAnnouncements:
                         //eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
