@@ -994,17 +994,6 @@ namespace OpenNetLinkApp.Data.SGDicData
             hsNet.getgpki(strGPKIList);
         }
 
-       
-        public int RequestSendSVRGPKIRegChange(HsNetWork hsNet, string strUserID, string strGpkiCN)
-        {
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            dic["APPID"] = "0x00000000";
-            dic["CLIENTID"] = strUserID;
-            dic["GPKI_CN"] = strGpkiCN;
-
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_CHANGEGPKI_CN", dic, hsNet.stCliMem.GetProtectedSeedKey());
-            return hsNet.SendMessage(args);
-        }
         public int RequestSend_PRIVACY_CONTINUE(HsNetWork hsNet, string strUserID, string transSeq, string dlpApprove, string privacyConfirmSeq, string NetType)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
@@ -1229,6 +1218,15 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.RequestRest(args);
         }
 
+        public int RequestRestGpkiCnChange(HsNetWork hsNet, string strUserID, string strGpkiCn)
+        {
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+            dic.Add("gpki_cn", strGpkiCn);
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePatchGPKICN, null, dic, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.SendMessage(args);
+        }
+
         /// <summary>
         /// Post-User/Login
         /// </summary>
@@ -1247,7 +1245,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             Dictionary<string, object> dic = new Dictionary<string, object>();
             dic.Add("gotp_auth_number", gotpAuthNumber);
 
-            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostLogin2Factor, null, dic, hsNet.stCliMem.GetProtectedSeedKey()); // api-key 사용
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostLogin2Factor, null, dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.RequestRest(args);
         }
 

@@ -419,7 +419,7 @@
             HsCmdCenter.sgPageEvent.SetGPKILoginEventAdd(nGroupID, GPKICertResult);          // gpki 인증 결과 확인
             HsCmdCenter.sgPageEvent.SetLoginEventAdd(nGroupID, GpkiLoginResult);
 
-            HsCmdCenter.sgPageEvent.SetSvrGPKIRegEventAdd(nGroupID, GPKIRegChangeResult);          // gpki 등록요청 결과 확인
+            HsCmdCenter.sgPageEvent.SetGPKIRegEventAdd(nGroupID, GPKIRegChangeResult);          // gpki 등록요청 결과 확인
             
             // nGroupID 정상적으로 지정되고 나서 최초 확인
             GetRegisteredGpkiCNdata();
@@ -737,11 +737,10 @@
     public void GPKICertResult(int groupID)
     {
 
-        CLog.Information("$GPKI_CERT_ACK - Result!!");
+        CLog.Information("GPKICertResult - Result!!");
 
 
-        SGData tmpData = null;
-        tmpData = HsCmdCenter.GetSGGpkiData(nGroupID);
+        SGData tmpData = HsCmdCenter.GetSGGpkiData(nGroupID);
         if (tmpData != null)
         {
             tmpData.GetResponse(out string strResult, out string strReason);            
@@ -781,12 +780,12 @@
 
 
     /// <summary>
-    /// GPKI Cert 인증 결과 확인 / 처리
+    /// GPKI 사용자 CN 변경 요청
     /// </summary>
     /// <returns></returns>
     public bool RequestGpkiCNregisterNchange()
     {
-        CLog.Information("$CHANGEGPKI_CN - Request!!");
+        CLog.Information("RequestGpkiCNregisterNchange - Request!!");
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
         string curUserID = "";
@@ -797,13 +796,13 @@
             return false;
 
         if (nGroupID > 0)
-            HsCmdCenter.SendSVRGPKIRegChange(nGroupID, curUserID, objUserSelectedGpki.m_strUserID);
+            HsCmdCenter.RestGpkiCnChange(nGroupID, curUserID, objUserSelectedGpki.m_strUserID);
         return true;
     }
 
 
     /// <summary>
-    /// GPKI Cert 인증 결과 확인 / 처리
+    /// GPKI 사용자 CN 변경 요청
     /// </summary>
     /// <param name="groupID"></param>
     public void GPKIRegChangeResult(int groupID)
@@ -812,14 +811,12 @@
         CLog.Information("CHANGEGPKI_CN_ACK - Result!!");
 
 
-        SGData tmpData = null;
-        tmpData = HsCmdCenter.GetSGGpkiData(groupID);
+        SGData tmpData = HsCmdCenter.GetSGGpkiData(groupID);
         bGpkiBtnDisable = false;
 
         if (tmpData != null)
         {
-            string strResult = tmpData.GetBasicTagData("RESULT");
-            string strReason = tmpData.GetBasicTagData("REASON");
+            tmpData.GetResponse(out string strResult, out string strReason);    
             string strLog = "";
 
             // Log로 확인
@@ -837,12 +834,10 @@
 
             CLog.Information("Register_GPKI - 실행!!");
             ShowMessage("info", XmlConf.GetErrMsg("E_0232"));
-
         }
 
         // 종료 처리
         closePopUp();
-
     }
 
 

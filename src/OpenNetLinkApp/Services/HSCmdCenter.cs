@@ -714,14 +714,6 @@ namespace OpenNetLinkApp.Services
                         }
                         break;
 
-                    case eCmdList.eCHANGEGPKICN:                                   // CHANGEGPKI_CN 결과 
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            sgDicRecvData.SetGpkiData(hs, groupId, sgData);
-                            RecvSvrGPKIRegAfterSend(groupId);
-                        }
-                        break;
                     case eCmdList.ePRIVACYNOTIFY:                                     //개인정보 Noti
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
@@ -936,7 +928,7 @@ namespace OpenNetLinkApp.Services
                         if (hs != null)
                         {
                             sgDicRecvData.SetGpkiData(hs, groupId, sgData);
-                            RecvSvrGPKIRegAfterSend(groupId);
+                            GpkiCnRegAfterSend(groupId);
                         }
                         break;
 
@@ -3208,13 +3200,6 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendBoardNotiConfirm(hsNetWork, strUserID, strQuery);
             return -1;
         }
-        public void SendSVRGPKIRegChange(int groupid, string strUserID, string strGpkiCn)
-        {
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-                sgSendData.RequestSendSVRGPKIRegChange(hsNetWork, strUserID, strGpkiCn);
-        }
 
         public void Send_PRIVACY_CONTINUE(int groupid, string strUserID, string transSeq, string dlpApprove, string privacyConfirmSeq, string NetType)
         {
@@ -3366,13 +3351,13 @@ namespace OpenNetLinkApp.Services
         }
 
 
-        public void RecvSvrGPKIRegAfterSend(int groupId)
+        public void GpkiCnRegAfterSend(int groupId)
         {
             // Reg
-            SvrGPKIRegEvent svGpkiRegEvent = sgPageEvent.GetSvrGPKIRegEvent(groupId);
-            if (svGpkiRegEvent != null)
+            GPKIRegEvent GpkiRegEvent = sgPageEvent.GetGPKIRegEvent(groupId);
+            if (GpkiRegEvent != null)
             {
-                svGpkiRegEvent(groupId);
+                GpkiRegEvent(groupId);
             }
         }
 
@@ -3575,6 +3560,14 @@ namespace OpenNetLinkApp.Services
 
             });
             return 0;
+        }
+
+        public void RestGpkiCnChange(int groupid, string strUserID, string strGpkiCn)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestRestGpkiCnChange(hsNetWork, strUserID, strGpkiCn);
         }
 
         public int RestLogin2Fa(int groupid, string gotpAuthNumber)

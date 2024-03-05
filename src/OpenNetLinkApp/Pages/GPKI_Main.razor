@@ -527,7 +527,7 @@
         HsCmdCenter.sgPageEvent.SetGPKILoginEventAdd(pageService.m_nCurViewPageGroupID, GPKICertResult);
         HsCmdCenter.sgPageEvent.SetLoginEventAdd(pageService.m_nCurViewPageGroupID, GpkiLoginResult);                       // gpki 로그인 결과 확인
 
-        HsCmdCenter.sgPageEvent.SetSvrGPKIRegEventAdd(pageService.m_nCurViewPageGroupID, GPKIRegChangeResult);          // gpki 등록요청 결과 확인
+        HsCmdCenter.sgPageEvent.SetGPKIRegEventAdd(pageService.m_nCurViewPageGroupID, GPKIRegChangeResult);          // gpki 등록요청 결과 확인
         
 
         if (pageService.m_nCurViewPageGroupID > 0)
@@ -745,12 +745,9 @@
     /// <param name="groupID"></param>
     public void GPKICertResult(int groupID)
     {
+        CLog.Here().Information("GPKICertResult - Result!!");
 
-        CLog.Here().Information("$GPKI_CERT_ACK - Result!!");
-
-
-        SGData tmpData = null;
-        tmpData = HsCmdCenter.GetSGGpkiData(groupID);
+        SGData tmpData = HsCmdCenter.GetSGGpkiData(groupID);
 
         if (tmpData != null)
         {
@@ -765,7 +762,6 @@
             CLog.Here().Information(strLog);
             strLog = "USERID: " + strUserID;
             CLog.Here().Information(strLog);
-
 
             if (strResult != "0")
             {
@@ -783,20 +779,16 @@
                 ShowMessage("error", XmlConf.GetErrMsg("E_0230") + "(1)");
                 return;
             }
-
         }
-
-
     }
 
-
     /// <summary>
-    /// GPKI Cert 인증 결과 확인 / 처리
+    /// GPKI 사용자 CN 변경 요청
     /// </summary>
     /// <returns></returns>
     public bool RequestGpkiCNregisterNchange()
     {
-        CLog.Here().Information("$CHANGEGPKI_CN - Request!!");
+        CLog.Here().Information("RequestGpkiCNregisterNchange - Request!!");
 
         int groupID = pageService.m_nCurViewPageGroupID;
 
@@ -808,29 +800,25 @@
         if (curUserID.Length < 1)
             return false;
 
-        HsCmdCenter.SendSVRGPKIRegChange(groupID, curUserID, objUserSelectedGpki.m_strUserID);
+        HsCmdCenter.RestGpkiCnChange(groupID, curUserID, objUserSelectedGpki.m_strUserID);
         return true;
     }
 
 
     /// <summary>
-    /// GPKI Cert 인증 결과 확인 / 처리
+    /// GPKI 사용자 CN 변경 요청
     /// </summary>
     /// <param name="groupID"></param>
     public void GPKIRegChangeResult(int groupID)
     {
+        CLog.Here().Information("GPKIRegChangeResult - Result!!");
 
-        CLog.Here().Information("CHANGEGPKI_CN_ACK - Result!!");
-
-
-        SGData tmpData = null;
-        tmpData = HsCmdCenter.GetSGGpkiData(groupID);
+        SGData tmpData = HsCmdCenter.GetSGGpkiData(groupID);
         bGpkiBtnDisable = false;
 
         if (tmpData != null)
         {
-            string strResult = tmpData.GetBasicTagData("RESULT");
-            string strReason = tmpData.GetBasicTagData("REASON");
+            tmpData.GetResponse(out string strResult, out string strReason);    
             string strLog = "";
 
             // Log로 확인
@@ -855,12 +843,8 @@
             if (changeActiveMenuEvent != null)
                 changeActiveMenuEvent(groupID, strNavigateWithGroupID);
             MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-
         }
-
-
     }
-
 
     /// <summary>
     /// Reconnect 동작할 수 있게 설정변경

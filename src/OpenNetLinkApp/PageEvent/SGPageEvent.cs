@@ -81,8 +81,8 @@ namespace OpenNetLinkApp.PageEvent
     
     public delegate void GPKIRandomKeyEvent(int groupid);
     public delegate void GPKILoginEvent(int groupid);
+    public delegate void GPKIRegEvent(int groupid);
 
-    public delegate void SvrGPKIRegEvent(int groupid);
     public delegate void SideBarEvent(int groupid, PageEventArgs e);
     // 로그인
     public delegate void LoginEvent(int groupid, PageEventArgs e);
@@ -340,7 +340,7 @@ namespace OpenNetLinkApp.PageEvent
         //public Dictionary<int, SvrGPKIEvent> DicSvrGPKIEvent = new Dictionary<int, SvrGPKIEvent>();         // 3436 이벤트 노티
         public Dictionary<int, GPKIRandomKeyEvent> DicGPKIRandomKeyEvent = new Dictionary<int, GPKIRandomKeyEvent>();         // GPKI Random Key 이벤트
         public Dictionary<int, GPKILoginEvent> DicGPKILoginEvent = new Dictionary<int, GPKILoginEvent>();         // GPKI Cert 이벤트
-        public Dictionary<int, SvrGPKIRegEvent> DicSvrGPKIRegEvent = new Dictionary<int, SvrGPKIRegEvent>();         // GPKI Reg 이벤트
+        public Dictionary<int, GPKIRegEvent> DicGPKIRegEvent = new Dictionary<int, GPKIRegEvent>();         // GPKI Reg 이벤트
 
 
         public Dictionary<int, GPKICNListRecvEvent> DicGPKICNListEvent = new Dictionary<int, GPKICNListRecvEvent>();    //현재 사용가능한 CN List 이벤트
@@ -690,18 +690,20 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicGPKILoginEvent[groupid];
             return e;
         }
-        public void SetSvrGPKIRegEventAdd(int groupid, SvrGPKIRegEvent e)
+
+        public void SetGPKIRegEventAdd(int groupid, GPKIRegEvent e)
         {
-            DicSvrGPKIRegEvent[groupid] = e;
+            DicGPKIRegEvent[groupid] = e;
         }
 
-        public SvrGPKIRegEvent GetSvrGPKIRegEvent(int groupid)
+        public GPKIRegEvent GetGPKIRegEvent(int groupid)
         {
-            SvrGPKIRegEvent e = null;
-            if (DicSvrGPKIRegEvent.TryGetValue(groupid, out e) == true)
-                e = DicSvrGPKIRegEvent[groupid];
+            GPKIRegEvent e = null;
+            if (DicGPKIRegEvent.TryGetValue(groupid, out e) == true)
+                e = DicGPKIRegEvent[groupid];
             return e;
         }
+
         //세션중복 이벤트 설정
         public void SetSessionDuplicateEventAdd(int groupid, SessionDuplicateEvent e)
         {
