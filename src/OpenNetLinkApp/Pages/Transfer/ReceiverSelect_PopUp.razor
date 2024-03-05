@@ -9,6 +9,7 @@
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
+@using AgLogManager
 
 <div class="modal fade" id="ReceiverSelect_PopUp" data-backdrop="static">
     <div class="modal-dialog modal-dialog">
@@ -26,12 +27,12 @@
                         @if (receiverSearchType == "SEARCH")
                         {   //Search
                             <SGDeptSearchList UseInputSearch="@useInputInTree" ShowUserID="@showUserId" Height="359" UserDataSource="@ReceiverSearch" ColumnIndexVisible="false"
-                                          OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(approve) => AssignApprover(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
+                                              OnSearchClick="(searchArg)=> sgDeptSearch_SearchClick(searchArg[0], searchArg[1])" OnItemClick="(approve) => AssignApprover(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                         else //Tree
                         {
                             <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" ShowUserID="@showUserId" Height="359" TreeHeight="170" UserSearchList="@ReceiverSearch"
-                                        OnItemClick="(approve) => AssignApprover(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
+                                            OnItemClick="(approve) => AssignApprover(approve.UserSeq)" OnItemDoubleClick="(item) => search_OnItemDoubleClick(item)" />
                         }
                     </div>
                     <!--e table -->
@@ -75,7 +76,7 @@
     <!-- /.modal-dialog -->
 </div>
 @code {
-
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<ReceiverSelect_PopUp>();
     private LinkedList<ApproverInfo> ReceiverSearch = new LinkedList<ApproverInfo>();
     private LinkedList<ApproverInfo> ReceiverSelect = new LinkedList<ApproverInfo>();
     private string stSelectApprover = "";
@@ -218,10 +219,74 @@
         ReceiverSelect.Clear();
     }
 
+    public void DeptApprSearchResultProxy(int groupid, PageEventArgs e)
+    {
+        try
+        {
+            CLog.Here().Information($"DeptApprSearchResultProxy, result : {e.result}, Result-MSG : {e.strMsg} ");
+            ReceiverSelect.Clear();
+
+            if (e.result != 0)
+                return;
+
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            // Search 결과값 받아옴
+            SGDeptApprLineSearchData sgDeptApprLine = null;
+            sgDeptApprLine = (SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
+            if (sgDeptApprLine == null)
+                return;
+
+            LinkedList<ApproverInfo> apprLinkedList = null;
+            //apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+            apprLinkedList = sgDeptApprLine.GetDeptApproverInfoDataAdvanced();
+
+            if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
+                return;
+
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+                return;
+
+            string strUserSeq = sgLoginData.GetUserSequence();
+
+            int count = 1;
+            foreach (var item in apprLinkedList)
+            {
+                if (strUserSeq.Equals(item.UserSeq))
+                    continue;
+                item.Index = String.Format("{0,2}", count.ToString());
+                //strCurDept = item.DeptName;
+                ReceiverSelect.AddLast(item);
+                count++;
+            }
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error("DeptApprSearchResultProxy - Exception " + ex.ToString());
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
     public async Task openPopUp()
     {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprSearchResultProxy);
+
         object[] param = { "ReceiverSelect_PopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
+
     }
 
     public void SelectOK()
@@ -253,8 +318,8 @@
         actionTargetSelect = SelectTarget;
         receiverSearchType = SGAppMgrSvc.OpConfigInfoService.GetReceiverSearchType(groupID);
         useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInReceiverTree(groupID);
-        showUserId  = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
-        InitText();     
+        showUserId = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
+        InitText();
     }
 
     public void SetInitDeptName(string strDeptName)
@@ -301,16 +366,27 @@
         //결재자만검색, 모두 검색 구분자
         //int nSelectAll = sgLoginData.GetTagValueInteger("APPROVEPROXYRIGHT");
 
+        // 예전
+        /*
         HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, DeptApprLineResult);
-
         SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetReceiverSearchQuery(strUserID, strUserName, strTeamName, strTeamCode);
         //HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
-        HSCmdCenter.SendListQuery(groupID, strUserID, strQuery);
+        HSCmdCenter.SendListQuery(groupID, strUserID, strQuery);*/
+
+        // Advanced
+        UserApproveRightType approveType = new UserApproveRightType();
+        approveType.nAuthority = 0;
+        HSCmdCenter.RestUserSearch(groupID, strUserName, strTeamCode, strTeamName, approveType);
+
     }
+
+    // 예전
+    /*
     public void DeptApprLineResult(int groupid, SGData e)
     {
         ReceiverSearch.Clear();
+
         string result = e.GetTagData("RESULT");
         string reason = e.GetTagData("REASON");
         int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
@@ -330,8 +406,10 @@
             cnt++;
         }
 
+        // Advanced
+
         StateHasChanged();
-    }
+    }*/
 
     public void BindEvent()
     {
@@ -348,7 +426,7 @@
 
         receiverSearchType = SGAppMgrSvc.OpConfigInfoService.GetReceiverSearchType(groupID);
         useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInReceiverTree(groupID);
-        showUserId  = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
+        showUserId = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
     }
     // [JSInvokable("ReceiverTargetSelect")]
     // public static void ReceiverTargetSelect(string value)

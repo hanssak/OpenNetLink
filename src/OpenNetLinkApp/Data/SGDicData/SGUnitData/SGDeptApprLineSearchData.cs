@@ -54,7 +54,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strMsg;
         }
 
-        public LinkedList<ApproverInfo> GetDeptApproverInfoData()
+        /*public LinkedList<ApproverInfo> GetDeptApproverInfoData()
         {
             List<Dictionary<int, string>> listDicdata = null;
             //listDicdata = GetSvrRecordData("VALUE");
@@ -136,7 +136,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 
             return ApproverSearch;
-        }
+        }*/
 
 
         public LinkedList<ApproverInfo> GetDeptApproverInfoDataAdvanced()

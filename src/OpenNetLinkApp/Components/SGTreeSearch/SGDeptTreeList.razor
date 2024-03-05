@@ -333,7 +333,7 @@
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, "", IsApproverOnly);
         HsCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);*/
 
-
+        // Advanced
         UserApproveRightType approveType = new UserApproveRightType();
         approveType.nAuthority = IsApproverOnly?1:0;
         HsCmdCenter.RestUserSearch(groupID, strUserName, "", strTeamName, approveType);
@@ -384,7 +384,12 @@
         }
 
         LinkedList<ApproverInfo> apprLinkedList = null;
-        apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+        
+        // 예전
+        // apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+
+        // Advanced
+        apprLinkedList = sgDeptApprLine.GetDeptApproverInfoDataAdvanced();
         if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
         {
             StateHasChanged();

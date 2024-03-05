@@ -6,10 +6,12 @@
 @using OpenNetLinkApp.Models.SGSettings
 @using OpenNetLinkApp.Components.SGTreeSearch
 @using HsNetWorkSG
-@using HsNetWorkSGData;
-@using System.Reflection;
-@using OpenNetLinkApp.Common;
-@using AgLogManager;
+@using HsNetWorkSGData
+@using System.Reflection
+@using OpenNetLinkApp.Common
+@using AgLogManager
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
 
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
@@ -57,7 +59,7 @@
                             <span class="float-left p-1">-</span>
                             <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly="readonly" value="@strToDay">
                         </div>
-                        <SGDeptSearchList UseInputSearch="false"  ShowUserID="@showUserId" Height="392" ColumnIndexVisible="false" UserDataSource="@ProxySelect" OnItemClick="(target)=> SelectTarget(target.UserSeq)" OnItemDoubleClick="target_OnItemDoubleClick" />
+                        <SGDeptSearchList UseInputSearch="false" ShowUserID="@showUserId" Height="392" ColumnIndexVisible="false" UserDataSource="@ProxySelect" OnItemClick="(target)=> SelectTarget(target.UserSeq)" OnItemDoubleClick="target_OnItemDoubleClick" />
                     </div>
                     <!--e table -->
                 </div>
@@ -104,7 +106,7 @@
     private int nActionType = -1;  //1:삭제, 2:등록
 
     ///// <summary>
-    ///// true 결재자만 검색 / false 모두 검색 
+    ///// true 결재자만 검색 / false 모두 검색
     ///// /// </br>(대결재자의 '일반사용자 조회 여부' 와 통일)
     ///// </summary>
     //private bool bApproverOnly = true;
@@ -130,14 +132,14 @@
             string[] dayNameMin = XmlConf.GetDayMinNamesGroup();
             string[] dayName = XmlConf.GetDayNamesGroup();
 
-            object[] param = { "datepicker", "datepicker2",monthNames, dayNameMin, dayName };
+            object[] param = { "datepicker", "datepicker2", monthNames, dayNameMin, dayName };
             jsRuntime.InvokeAsync<object>("initDatePicker", param);
         }
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = (sgSideBar != null) ? sgSideBar.GroupId : 0;
 
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);*/
         //if (sgLoginData != null)
         //    bApproverOnly = !sgLoginData.GetApproveProxyRight();
 
@@ -284,28 +286,31 @@
         if (sgLoginData == null) return false;
 
         // 예전
-        ApproveProxy approveProxy = new ApproveProxy();
-
-
+        /*ApproveProxy approveProxy = new ApproveProxy();
         string strQuery = approveProxy.GetSFMModify(sgLoginData.GetUserSequence(), strFromDay, strToDay, ProxySelect);
-        HSCmdCenter.sgSendData.RequestInstApproveReg(HSCmdCenter.GetConnectNetWork(groupID), sgLoginData.GetUserID(), strQuery);
+        HSCmdCenter.sgSendData.RequestInstApproveReg(HSCmdCenter.GetConnectNetWork(groupID), sgLoginData.GetUserID(), strQuery);*/
 
-
+        // Advanced
         if (ProxySelect.Count > 0)
         {
 
             // 전체삭제
-            HSCmdCenter.RestInstApproveClear(groupID);
-
-            await Task.Delay(500);
-
-            // 한번에 등록
-            List<ProxyApprover> listProxyApprover = new List<ProxyApprover>();
-            foreach(ApproverInfo info in ProxySelect)
+            int nRet = HSCmdCenter.RestInstApproveClear(groupID, SGEnums.eCmdReponseType.CallPosReponse);
+            if (nRet == 0)
             {
-                listProxyApprover.Add(info.ToProxyApprover(sgLoginData.GetUserSequence()));
+                // 한번에 등록
+                List<ProxyApprover> listProxyApprover = new List<ProxyApprover>();
+                foreach (ApproverInfo info in ProxySelect)
+                {
+                    listProxyApprover.Add(info.ToProxyApprover(sgLoginData.GetUserSequence()));
+                }
+                HSCmdCenter.RestInstApproveReg(groupID, listProxyApprover);
             }
-            HSCmdCenter.RestInstApproveReg(groupID, listProxyApprover);
+            else
+            {
+                CLog.Here().Error($"ModifyApprover, RestInstApproveClear - Error - Ret : {nRet}");
+                return false;
+            }
         }
         else
         {
@@ -320,7 +325,7 @@
     public async Task openPopUp()
     {
         RequestProxyInfo();
-        RequestPossibleCount();
+        //RequestPossibleCount();
         object[] param = { "ProxyApprover" };
         await jsRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -349,13 +354,16 @@
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null) return;
 
-        ApproveProxy approveProxy = new ApproveProxy();
+        /*ApproveProxy approveProxy = new ApproveProxy();
         string sql = approveProxy.GetSFMApprover(sgLoginData.GetUserSequence());
+        int rtn = HSCmdCenter.SendListQuery(groupID, sgLoginData.GetUserID(), sql);*/
 
-        int rtn = HSCmdCenter.SendListQuery(groupID, sgLoginData.GetUserID(), sql);
+        // advanced - 등록된 대결재자 목록
+        HSCmdCenter.sgPageEvent.SetProxySearchEvent(groupID, ProxySearchResult);
+        HSCmdCenter.RestInstApproveListGet(groupID);
     }
 
-    public void RequestPossibleCount()
+    /*public void RequestPossibleCount()
     {
         int groupID = SideBarUISvc.ActiveMenu.GroupId;
         if (pageService.GetConnectStatus(groupID) == false)
@@ -388,7 +396,7 @@
         {
             ShowMessage("error", reason);
         }
-    }
+    }*/
 
     private void sgDeptSearch_SearchClick(string getInputDeptName, string getInputUserName)
     {
@@ -432,7 +440,7 @@
         //List<string> listApproveType = new List<string>();
         //listApproveType.Add("common");
         UserApproveRightType approveType = new UserApproveRightType();
-        approveType.nAuthority = 1;
+        approveType.nAuthority = bApproverOnly?1:0;
         HSCmdCenter.RestUserSearch(groupID, strUserName, strTeamCode, strTeamName, approveType);
 
     }
@@ -444,7 +452,7 @@
 
         proxySearchType = SGAppMgrSvc.OpConfigInfoService.GetProxySearchType(groupID);
         useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInProxyTree(groupID);
-        showUserId  = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
+        showUserId = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
 
         //*****************************************************************
         //EventBinding : EventBinding DeptApprLine -> DeptApprLineResult
@@ -459,9 +467,15 @@
             strCurDept = sgLoginData.GetTeamName();
         }
 
-        HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, ProxySearchResult);
-        HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, ResultPossibleCount);
-        if(sgLoginData == null)
+        // 예전
+        //HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, ProxySearchResult);
+        //HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, ResultPossibleCount);
+
+        // advanced
+        HSCmdCenter.sgPageEvent.SetProxySearchEvent(groupID, ProxySearchResult);
+        HSCmdCenter.RestInstApproveListGet(groupID);
+
+        if (sgLoginData == null)
             return;
 
         bool bApproverOnly = !sgLoginData.GetApproveProxyRight();
@@ -474,7 +488,9 @@
 
     public void ProxySearchResult(int groupid, SGData data)
     {
-        if (data.GetBasicTagData("RESULT") == "0")
+
+        //if (data.GetBasicTagData("RESULT") == "0")
+        if (data.GetResponseCode() == 0)
         {
             this.BindApproveList(data);
         }
@@ -486,12 +502,16 @@
         StateHasChanged();
     }
 
+
     public void BindApproveList(SGData data)
     {
+
+        // 예전 style
+        /*
+        ProxySelect.Clear();
+
         List<Dictionary<int, string>> listDicdata = null;
         listDicdata = data.GetSvrRecordData("RECORD");
-
-        ProxySelect.Clear();
 
         int i = 1;
         foreach (Dictionary<int, string> value in listDicdata)
@@ -523,8 +543,103 @@
         {
             strFromDay = $"{listDicdata[0][0].Substring(0, 4)}-{listDicdata[0][0].Substring(4, 2)}-{listDicdata[0][0].Substring(6, 2)}";
             strToDay = $"{listDicdata[0][1].Substring(0, 4)}-{listDicdata[0][1].Substring(4, 2)}-{listDicdata[0][1].Substring(6, 2)}";
+        }*/
+
+        // Advanced
+        try
+        {
+
+            ProxySelect.Clear();
+
+            string strData = data.GetTagData("proxy_approver_count_limit");
+
+            CLog.Here().Information($"BindApproveList, proxy_approver_count_limit : {strData}");
+
+            if ((strData?.Length ?? 0) > 0)
+                possibleApproverCount = Convert.ToInt32(strData);
+            else
+                possibleApproverCount = 3;  // default = 3
+
+            strData = data.GetTagData("proxy_approver_reg_list");
+            var dataList = JsonConvert.DeserializeObject<List<dynamic>>(strData);
+
+            if ((dataList?.Count ?? 0) < 1)
+            {
+                CLog.Here().Information($"BindApproveList, Search List - approver_list : 0 !");
+                return;
+            }
+
+            CLog.Here().Information($"BindApproveList, Search User - Count : {(dataList?.Count ?? 0)}");
+
+            int i = 1;
+            string strStartDay = "";
+            string strEndDay = "";
+
+            string strItemData = "";
+            string strApproverHr = "";
+            string strApproverType = "";
+            foreach (var dataItem in dataList)
+            {
+                ApproverInfo approver = new ApproverInfo();
+
+                strItemData = Convert.ToString(dataItem);
+                JObject jO = JObject.Parse(strItemData);
+
+                CLog.Here().Information($"GetDeptApproverInfoDataAdvanced, Message : Get approver_hr Info!");
+                approver.ORDER = Convert.ToInt32((string)jO["approver_order"]);
+
+                strApproverHr = Convert.ToString(jO["approver_hr"]); // jO["approver_hr"];
+                JObject jOapproverHr = JObject.Parse(strApproverHr);
+
+                CLog.Here().Information($"GetDeptApproverInfoDataAdvanced, Message : Get approver_type Info!");
+
+                strApproverType = Convert.ToString(jO["approver_type"]);
+                JObject jOapproverType = JObject.Parse(strApproverType);
+
+
+                approver.STARTDATE = (string)jO["start_date"];
+                approver.ENDDATE = (string)jO["end_date"];
+                if (i == 1)
+                {
+                    strStartDay = approver.STARTDATE;
+                    strEndDay = approver.ENDDATE;
+                }
+
+                approver.APPR_TEAMCODE = (string)jOapproverHr["dept_seq"];
+                approver.APPR_TEAMNAME = (string)jOapproverHr["dept_name"];
+                approver.APPR_USERID = (string)jOapproverHr["user_id"];
+                approver.APPR_USERNAME = (string)jOapproverHr["name"];
+                approver.POSITION = (string)jOapproverHr["position"];
+                approver.RANK = (string)jOapproverHr["rank"];
+                approver.UserSeq = (string)jOapproverHr["user_seq"];
+
+                //UI 바인딩을 위한 값 설정
+                approver.DeptName = approver.APPR_TEAMNAME;
+                approver.Name = approver.APPR_USERNAME;
+                approver.Grade = approver.RANK;
+
+                //approver.Index = approver.ORDER.ToString();
+                approver.Index = (string)jO["approver_order"];
+
+                ProxySelect.Add(approver);
+
+                i++;
+            }
+
+            if (string.IsNullOrEmpty(strStartDay) == false && string.IsNullOrEmpty(strEndDay) == false)
+            {
+                strFromDay = $"{strStartDay.Substring(0, 4)}-{strStartDay.Substring(4, 2)}-{strStartDay.Substring(6, 2)}";
+                strToDay = $"{strEndDay.Substring(0, 4)}-{strEndDay.Substring(4, 2)}-{strEndDay.Substring(6, 2)}";
+            }
+
         }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"BindApproveList, Exception(MSG) : {ex.Message}");
+        }
+
     }
+
 
     /// <summary>
     /// 조건에 맞는 결재자 검색결과 Result

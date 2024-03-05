@@ -241,10 +241,16 @@
         string strTeamName = strCurDept;
         string strTeamCode = (isInit) ? sgLoginData.GetTeamCode() : "";
 
-        SGQueryExtend sgQuery = new SGQueryExtend();
+        /*SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
-        HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+        HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);*/
+
+        // Advanced
+        UserApproveRightType approveType = new UserApproveRightType();
+        approveType.nAuthority = 1;
+        HSCmdCenter.RestUserSearch(groupID, strUserName, strTeamCode, strTeamName, approveType);
     }
+
     public void DeptApprLineResultStep(int groupid, PageEventArgs e)
     {
         if (e.result != 0)
@@ -339,7 +345,10 @@
             return;
 
         LinkedList<ApproverInfo> apprLinkedList = null;
-        apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();      //유저 조회
+        //apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();      //유저 조회
+
+        // Advanced
+        apprLinkedList = sgDeptApprLine.GetDeptApproverInfoDataAdvanced();
         if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
             return;
 
@@ -578,10 +587,10 @@
     }
 
     @*  [JSInvokable("ApproverSearchSelect3")]
-        public static void ApproverSearchSelect3(string value)
-        {
+    public static void ApproverSearchSelect3(string value)
+    {
         actionAssign.Invoke(value);
-        }*@
+    }*@
 
     private void AssignApprover(string value)
     {
@@ -742,7 +751,12 @@
                 return;
 
             LinkedList<ApproverInfo> apprLinkedList = null;
-            apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+
+            // 예전
+            //apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+
+            // Advanced
+            apprLinkedList = sgDeptApprLine.GetDeptApproverInfoDataAdvanced();
             if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
                 return;
 

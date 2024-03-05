@@ -543,7 +543,7 @@
 
         if(!strBindTitle.ValidationSqlInjection())
         {
-             ShowMessage("warning", XmlConf.GetWarnMsg("W_0294"));
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0294"));
             return;
         }
 
@@ -800,7 +800,12 @@
                 return;
 
             LinkedList<ApproverInfo> apprLinkedList = null;
-            apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+
+            // 예전
+            // apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+
+            // Advanced
+            apprLinkedList = sgDeptApprLine.GetDeptApproverInfoDataAdvanced();
             if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
                 return;
 
@@ -895,7 +900,7 @@
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
-        
+
         string strUserSeq = sgLoginData.GetUserSequence();
         int step = sgLoginData.GetApproveStep();    //결재유형 취득
         m_step = step;
@@ -976,9 +981,16 @@
         //strCurDept = strTeamName;
         string strTeamCode = (isInit) ? sgLoginData.GetTeamCode() : "";
 
-        SGQueryExtend sgQuery = new SGQueryExtend();
+        // 예전방식
+        /*SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
-        HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+        HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);*/
+
+        // Advanced
+        UserApproveRightType approveType = new UserApproveRightType();
+        approveType.nAuthority = 1;
+        HSCmdCenter.RestUserSearch(groupID, strUserName, strTeamCode, strTeamName, approveType);
+
     }
 
     /// <summary>

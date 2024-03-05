@@ -1119,15 +1119,6 @@ namespace OpenNetLinkApp.Services
                             if (privacyNotiEvent != null) privacyNotiEvent(groupId, sgData);
                         }
 
-                        //eCmdList.eSECURITYAPPROVERQUERY:
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            SecurityApproverSearchEvent securityApproverSearchEvent = sgPageEvent.GetSecurityApproverSearchEvent(groupId);
-                            if (securityApproverSearchEvent != null) securityApproverSearchEvent(groupId, sgData);
-                        }
-                        break;
-
                     case eAdvancedCmdList.eNotiAnnouncements:
                         //eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
                         BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
@@ -1237,6 +1228,16 @@ namespace OpenNetLinkApp.Services
                             DeptApprLineSearchAfterSend(nRet, groupId);
                         }
                         break;
+
+                        //eCmdList.eSECURITYAPPROVERQUERY:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            SecurityApproverSearchEvent securityApproverSearchEvent = sgPageEvent.GetSecurityApproverSearchEvent(groupId);
+                            if (securityApproverSearchEvent != null) securityApproverSearchEvent(groupId, sgData);
+                        }
+                        break;
+
 
                     case eAdvancedCmdList.eGetDepts:                    // 부서정보 조회
                         DeptInfoAfterSend(nRet, groupId, sgData);
