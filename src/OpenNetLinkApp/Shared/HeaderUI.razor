@@ -37,7 +37,7 @@
 
 <SelectReceiveFolder @ref="refSelectReceiveFolder"></SelectReceiveFolder>
 <ClipBoardTypeSelect @ref="refClipBoardTypeSelect" OnClipTypeSelect="ClipBoardTypeSelectResult"></ClipBoardTypeSelect>
-<SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" OnClickDropItemToPath="@NavigateToPath"/>
+<SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" OnClickDropItemToPath="@NavigateToPath" />
 <SGAlert @ref="refSGAlertApproveAfter" OnConfirm="ApproveAfterTransFile" Guid="HeaderUIApporveAfterAlert"></SGAlert>
 <SGAlert @ref="refSGAlertApproveAfterMyCount" OnConfirm="ApproveAfterPageMove" OnCancel="ApproveAfterCancel" Guid="HeaderUIApporveAfterMyCountAlert"></SGAlert>
 <SGAlert @ref="refSGAlertUpdateStart" Guid="HeaderUIUpdateStartAlert"></SGAlert>
@@ -443,7 +443,7 @@
 
         /*if (HsCmdCenter.SendUrlData(groupid, strUserID, strUrlData) < 0)
             return false;*/
-        
+
         if (HsCmdCenter.RestSendUrlRedirection(groupid, 1, 1, 1, strUrlData) < 0)
             return false;
 
@@ -980,7 +980,7 @@
                     @*            HSCmdCenter.sgPageEvent.SetSvrEventAdd(listNetWork[i].GroupID, SvrResult);
                         pageService.SetLogoutStatus(listNetWork[i].GroupID, true);*@
 
-                    // HsNetWork GetConnectNetWork
+    // HsNetWork GetConnectNetWork
 
                     if (listNetWork[i].GroupID == groupid)
                     {
@@ -1203,72 +1203,77 @@
 
         try
         {
-            string result = e.GetSvrRecordTagData("RESULT");
+            //Lib에서 추가된 오류 확인
+            string strReason = e.GetTagData("lib_error", "reason");
+            CLog.Here().Information($"RecvFileErrInfo (#####) - groupID : {groupid} - RESULT : {strReason} ");
 
-            CLog.Here().Information($"RecvFileErrInfo (#####) - groupID : {groupid} - RESULT : {result} ");
-
-            if (result == "1")
-            {
-                string strReason = "";
-                string strMsg = "";
-                string strTransSeq;
-                string strPushType;
-
-                List<Dictionary<int, string>> detailData = e.GetSvrRecordData2("RECORD");
-                detailData[0].TryGetValue(0, out strTransSeq);
-                detailData[0].TryGetValue(4, out strPushType);
-                strReason = e.GetSvrRecordTagData("REASON");
-
-                if (strReason == "저장소 용량 확인")
-                {
-                    long nFileSize = 0;
-                    if (e.GetSvrRecordTagData("FILESIZE") != null && e.GetSvrRecordTagData("FILESIZE") != "")
-                    {
-                        nFileSize = long.Parse(e.GetSvrRecordTagData("FILESIZE"));  // 결과레코드수
-                    }
-
-                    if (nFileSize == 0)
-                        strMsg = XmlConf.GetWarnMsg("W_0256");           // 파일수신 디스크용량 부족/r/n/r/n수신 디스크를 정리하여 용량을 확보해 주십시오.
-                    else
-                    {
-
-                        string strFileSize = GetSizeStr(nFileSize);
-                        strMsg = XmlConf.GetWarnMsg("W_0058");           // 파일수신 디스크용량 부족/r/n/r/n수신 디스크를 정리하여 용량을 확보해 주십시오./r/n/r/n필요한 디스크 용량크기 : {0}
-                        strMsg = String.Format(strMsg, strFileSize, nFileSize);
-                    }
-
-                    strMsg = strMsg.Replace("/r/n", "<br>");
-                    ShowMessage("error", strMsg);
-                }
-
-                else if (strReason == "파일경로 길이 초과")
-                {
-                    if (HsCmdCenter.GetFileRecving(groupid))
-                        return;
-
-                    // 전송파일 길이가 시스템 길이({0})보다 길어서 파일 및 폴더를 생성할 수 없습니다.<![CDATA[<br>]]>파일 수신폴더를 재설정해 주십시오.(1회적용)
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        strMsg = string.Format(XmlConf.GetWarnMsg("W_0210"), HsCmdCenter.GetReceiveFilePathLengthMax(groupid));
-                    //해당 OS에서는 전송파일길이가 시스템 길이({0}자)보다 길어 파일 및 폴더를 생성할 수 없습니다.<![CDATA[<br>]]>Window에서 수신하여 주세요
-                    else
-                        strMsg = string.Format(XmlConf.GetWarnMsg("W_0259"), HsCmdCenter.GetReceiveFilePathLengthMax(groupid));
-
-                    refSelectReceiveFolder.setDesc(strMsg);
-
-                    List<string> lstInfo = new List<string>();
-
-                    lstInfo.Add(groupid.ToString());
-                    lstInfo.Add(strTransSeq);
-                    lstInfo.Add(strPushType);
-                    refSelectReceiveFolder.lstInfo = lstInfo;
-
-                    Task.Run(async () => { await refSelectReceiveFolder.openPopUp(groupid, AppConfigSvc.GetRecvDownPath(groupid)); });
-                }
-
-                // HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);
-                HsCmdCenter.sgPageEvent.SetFileRecvProgressMasterEventAdd(FileRecvProgress);
+            if (string.IsNullOrEmpty(strReason))
                 return;
+
+            string strMsg = "";
+
+            if (strReason == "저장소 용량 확인")
+            {
+                string errFileSize = e.GetTagData("lib_error", "file_size");
+                long nFileSize = 0;
+                if (errFileSize != "")
+                {
+                    nFileSize = long.Parse(errFileSize);  // 결과레코드수
+                }
+
+                if (nFileSize == 0)
+                    strMsg = XmlConf.GetWarnMsg("W_0256");           // 파일수신 디스크용량 부족/r/n/r/n수신 디스크를 정리하여 용량을 확보해 주십시오.
+                else
+                {
+
+                    string strFileSize = GetSizeStr(nFileSize);
+                    strMsg = XmlConf.GetWarnMsg("W_0058");           // 파일수신 디스크용량 부족/r/n/r/n수신 디스크를 정리하여 용량을 확보해 주십시오./r/n/r/n필요한 디스크 용량크기 : {0}
+                    strMsg = String.Format(strMsg, strFileSize, nFileSize);
+                }
+
+                strMsg = strMsg.Replace("/r/n", "<br>");
+                ShowMessage("error", strMsg);
             }
+            else if (strReason == "파일경로 길이 초과")
+            {
+                if (HsCmdCenter.GetFileRecving(groupid))
+                    return;
+
+                // 전송파일 길이가 시스템 길이({0})보다 길어서 파일 및 폴더를 생성할 수 없습니다.<![CDATA[<br>]]>파일 수신폴더를 재설정해 주십시오.(1회적용)
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    strMsg = string.Format(XmlConf.GetWarnMsg("W_0210"), HsCmdCenter.GetReceiveFilePathLengthMax(groupid));
+                //해당 OS에서는 전송파일길이가 시스템 길이({0}자)보다 길어 파일 및 폴더를 생성할 수 없습니다.<![CDATA[<br>]]>Window에서 수신하여 주세요
+                else
+                    strMsg = string.Format(XmlConf.GetWarnMsg("W_0259"), HsCmdCenter.GetReceiveFilePathLengthMax(groupid));
+
+                refSelectReceiveFolder.setDesc(strMsg);
+
+                List<string> lstInfo = new List<string>();
+
+                lstInfo.Add(groupid.ToString());
+                lstInfo.Add(e.GetTagData("trans_req", "trans_seq"));
+
+                //포워드 여부 (1:전달Noti / 0:수신Noti)
+                List<string> forwardList = e.GetTagDataList("forward_user_seq_list");
+                ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupid);
+                if (sgUserData == null)
+                {
+                    CLog.Here().Error($"RecvFileErrInfo UserInfoSvc.GetUserInfo is null -  groupID : {groupid} - RESULT : {strReason} ");    
+                    return;
+                }
+                if(forwardList.Contains(sgUserData.UserSeq))
+                    lstInfo.Add("1");
+                else 
+                    lstInfo.Add("0");
+                refSelectReceiveFolder.lstInfo = lstInfo;
+
+                Task.Run(async () => { await refSelectReceiveFolder.openPopUp(groupid, AppConfigSvc.GetRecvDownPath(groupid)); });
+            }
+
+            // HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);
+            HsCmdCenter.sgPageEvent.SetFileRecvProgressMasterEventAdd(FileRecvProgress);
+            return;
+
 
         }
         catch (Exception ex)
@@ -1293,21 +1298,21 @@
 
     try
     {
-        if (e.strUrlData != null && e.strUrlData.Length > 0)
+    if (e.strUrlData != null && e.strUrlData.Length > 0)
+    {
+    string url = $"\"{e.strUrlData}\"";
+    System.Diagnostics.Process.Start(
+        new System.Diagnostics.ProcessStartInfo
         {
-            string url = $"\"{e.strUrlData}\"";
-            System.Diagnostics.Process.Start(
-                new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = url,
-                    UseShellExecute = true
-                });
-            //System.Diagnostics.Process.Start("explorer", url); // 260자 제한됨
-        }
+            FileName = url,
+            UseShellExecute = true
+        });
+    //System.Diagnostics.Process.Start("explorer", url); // 260자 제한됨
+    }
     }
     catch (Exception ex)
     {
-        CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+    CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
     }
 
 #elif _LINUX
@@ -1945,7 +1950,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         return bSendPkiResult;
     }
-       
+
 
     public void ResultApproveAfter(int groupId, object[] e)
     {
@@ -3331,7 +3336,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             return;
 
         SGReadyData sgReadyData = (SGReadyData)HsCmdCenter.GetReadyData(groupID);
-        if(sgReadyData == null)
+        if (sgReadyData == null)
             return;
 
         bool bSystem = sgReadyData.GetSystemPosition();
@@ -3417,7 +3422,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             hsNetWork.SetReconnectStop();
         }
 
-        // Reconnect, 메뉴 재생성동작하게 
+        // Reconnect, 메뉴 재생성동작하게
         pageService.SetStatusSideMenuReBuildTime(groupID, true);
 
         // Page 이동
@@ -3815,7 +3820,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
     public void InsertAlarm(int groupID, LSIDEBAR menuCategory, eAlarmType eAlarmType, string path, string body)
     {
-        SGLoginData sgLoginData= (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
         {
             return;

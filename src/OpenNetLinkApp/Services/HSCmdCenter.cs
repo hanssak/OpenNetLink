@@ -938,7 +938,7 @@ namespace OpenNetLinkApp.Services
                             SGData tmpData = new SGData();
                             tmpData.Copy(hs, sgData);
                             MakeOtpAfterSend(groupId, tmpData);
-                        }                        
+                        }
                         break;
                     case eAdvancedCmdList.ePostLogin:
                         //LoginAfterSend
@@ -948,6 +948,26 @@ namespace OpenNetLinkApp.Services
                         Login2FactorAfterSend(groupId, sgData);
                         break;
 
+                    case eAdvancedCmdList.eNotiRequestDownload: //(구 //eCmdList.eFILEMAXLENGTH:)
+                        //오류발생시에만 UI에 오류 메세지 처리
+
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            //Serilog.Log.Logger.Error("HsCmdCenter - eCmdList.eFILEMAXLENGTH - ########## - ");
+                            FileRecvErrInfoEvent filerecvErrEvent = sgPageEvent.GetAddFIleRecvErrEvent(groupId);
+                            if (filerecvErrEvent != null) filerecvErrEvent(groupId, sgData);
+                        }
+                        //eCmdList.eFORWARDFILEINFO:
+                        //hs = GetConnectNetWork(groupId);
+                        //if (hs != null)
+                        //{
+                        //    FileForwardEvent fileforwardEvent = sgPageEvent.GetFileForwardNotifyEventAdd(groupId);
+                        //    if (fileforwardEvent != null) fileforwardEvent(groupId, sgData);
+                        //}
+                        
+
+                        break;
                     case eAdvancedCmdList.eNotiPolicy:
                         //eAdvancedCmdList.eNotiPolicy:
                         //eCmdList.eUPDATEPOLICY:
@@ -1165,24 +1185,6 @@ namespace OpenNetLinkApp.Services
                         {
                             sgDicRecvData.SetBoardNoti(hs, groupId, sgData);
                             BoardNotiSearchAfterSend(nRet, groupId);
-                        }
-                        break;
-
-                    case eAdvancedCmdList.eNotiRequestDownload:
-                        //eCmdList.eFILEMAXLENGTH:
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            //Serilog.Log.Logger.Error("HsCmdCenter - eCmdList.eFILEMAXLENGTH - ########## - ");
-                            FileRecvErrInfoEvent filerecvErrEvent = sgPageEvent.GetAddFIleRecvErrEvent(groupId);
-                            if (filerecvErrEvent != null) filerecvErrEvent(groupId, sgData);
-                        }
-                        //eCmdList.eFORWARDFILEINFO:
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            FileForwardEvent fileforwardEvent = sgPageEvent.GetFileForwardNotifyEventAdd(groupId);
-                            if (fileforwardEvent != null) fileforwardEvent(groupId, sgData);
                         }
                         break;
 
