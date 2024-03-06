@@ -1216,7 +1216,9 @@ namespace OpenNetLinkApp.Services
                     case eAdvancedCmdList.eGetDashboard:				// DashBoard 화면 data
                         GetDashBoardafterSend(nRet, groupId, sgData);
                         break;
-
+                    case eAdvancedCmdList.ePostApproversValidation:     // 결재자 검증 data
+                        GetApproverValidationAfterSend(nRet, groupId, sgData);
+                        break;
                     case eAdvancedCmdList.eGetProxyApprovers:           //현재 대결재자 정보
                         ApprInstAfterSend(nRet, groupId, sgData);
                         break;
@@ -1917,6 +1919,31 @@ namespace OpenNetLinkApp.Services
             Log.Logger.Here().Information($"GetDashBoardfterSend, groupid : {groupId}, Ret-Code : {nRet}");
 
             DashBoardDataEvent getDashBoardDataEvent = sgPageEvent.GetDashBoardDataEvent(groupId);
+            if (getDashBoardDataEvent != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                if (nRet != 0)
+                    strMsg = data.GetResponseReason();
+
+                e.strMsg = strMsg;
+                getDashBoardDataEvent(groupId, e, data);
+            }
+        }
+
+
+        public void GetApproverValidationAfterSend(int nRet, int groupId, SGData data)
+        {
+            if (data == null)
+            {
+                Log.Logger.Here().Information($"GetApproverValidationAfterSend, groupid : {groupId}, SGData is null !!!!!!!!!!!!!!!!!!!!!!!!");
+                return;
+            }
+
+            Log.Logger.Here().Information($"GetApproverValidationAfterSend, groupid : {groupId}, Ret-Code : {nRet}");
+
+            ApproverValidationEvent getDashBoardDataEvent = sgPageEvent.GetApproverValidationEvent(groupId);
             if (getDashBoardDataEvent != null)
             {
                 PageEventArgs e = new PageEventArgs();
@@ -4109,6 +4136,57 @@ namespace OpenNetLinkApp.Services
         }
 
 
+        public int RestSendApproverValidation(int groupid, List<ApproverCheckInfo> listApprover, eCmdReponseType reponseType = eCmdReponseType.CallPosReponse)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            int ret = -1;
+
+            if (reponseType == eCmdReponseType.CallPosReponse)
+            {
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        ret = sgSendData.RequestRestSendApproverValidation(hsNetWork, listApprover, reponseType);
+                        if (ret < 0)
+                        {
+                            Log.Logger.Here().Error($"RestSendApproverValidation-Task-Ret : {ret}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Logger.Here().Error($"RestSendApproverValidation-Task-Exception : {ex.Message}");
+                    }
+
+                }).Wait();
+            }
+            else
+            {
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        ret = sgSendData.RequestRestSendApproverValidation(hsNetWork, listApprover, reponseType);
+                        if (ret < 0)
+                        {
+                            Log.Logger.Here().Error($"RestSendApproverValidation-Task-Ret : {ret}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Logger.Here().Error($"RestSendApproverValidation-Task-Exception : {ex.Message}");
+                    }
+
+                });
+            }
+
+            return ret;
+
+        }
 
 
 

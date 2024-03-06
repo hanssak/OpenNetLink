@@ -1408,5 +1408,21 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.RequestRest(args);
         }
 
+        public int RequestRestSendApproverValidation(HsNetWork hsNet, List<ApproverCheckInfo> listApprover, eCmdReponseType reponseType)
+        {
+            if ((listApprover?.Count ?? 0) < 1)
+                return -1;
+
+            Dictionary<string, object> dicBody = new Dictionary<string, object>();
+            dicBody["cond_approver_list"] = listApprover.ToArray();
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostApproversValidation, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey(), reponseType);
+            return hsNet.RequestRest(args);
+        }
+
+        
+
+
+
     }
 }

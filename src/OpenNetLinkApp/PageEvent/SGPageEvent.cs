@@ -321,9 +321,21 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void AuditOriRecvEvent(int groupId, SGData e);
 
 
-    //메일 본문 미리보기 정보 응답 이벤트 정의
+    /// <summary>
+    /// DashBoard 결과값 받아서처리하는 event Type
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="e"></param>
+    /// <param name="sgData"></param>
     public delegate void DashBoardDataEvent(int groupid, PageEventArgs e, SGData sgData);
 
+    /// <summary>
+    /// 결재자 검증 결과값 받아서 알려주는 event Type
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="e"></param>
+    /// <param name="sgData"></param>
+    public delegate void ApproverValidationEvent(int groupid, PageEventArgs e, SGData sgData);
 
 }
 
@@ -521,7 +533,9 @@ namespace OpenNetLinkApp.PageEvent
 
 
         public Dictionary<int, DashBoardDataEvent> dicDashBoardEvent = new Dictionary<int, DashBoardDataEvent>(); // DashBoard Data 대부분 다주는 
-        
+
+        public Dictionary<int, ApproverValidationEvent> dicApproverValidationEvent = new Dictionary<int, ApproverValidationEvent>(); // 결재자 검증
+
 
         public AuditOriRecvEvent auditOriEvent = null;
 
@@ -1833,7 +1847,24 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
+        public void SetApproverValidationEvent(int groupid, ApproverValidationEvent e)
+        {
+            ApproverValidationEvent temp = null;
+            if (dicApproverValidationEvent.TryGetValue(groupid, out temp))
+                dicApproverValidationEvent.Remove(groupid);
+            dicApproverValidationEvent[groupid] = e;
+        }
+        public ApproverValidationEvent GetApproverValidationEvent(int groupid)
+        {
+            ApproverValidationEvent e = null;
+            if (dicApproverValidationEvent.TryGetValue(groupid, out e) == true)
+                e = dicApproverValidationEvent[groupid];
+            return e;
+        }
 
+
+
+        
 
 
         public void SetAuditOriEvent(AuditOriRecvEvent e) => auditOriEvent = e;
