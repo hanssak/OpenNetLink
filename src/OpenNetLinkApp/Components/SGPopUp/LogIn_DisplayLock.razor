@@ -199,8 +199,13 @@
         string strLoginType = sgSvrData.GetLoginTypeStr();
 
         CLog.Here().Information("[LogIn_DisplayLock] PageSvcLogIn Type:{0}, SvrDataLogIn Type:{1}", pageService.m_nLoginType.ToString(), strLoginType);
-        HsCmdCenter.SendScreenLockClear(groupID, strUserID, protectedPw, strLoginType);
+
+        // 예전
+        // HsCmdCenter.SendScreenLockClear(groupID, strUserID, protectedPw, strLoginType);
         //HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW, pageService.m_nLoginType.ToString());
+
+        // Advanced
+        HsCmdCenter.RestSendScreenLockClear(groupID, protectedPw, strLoginType);
     }
 
     public void ProgramExit()

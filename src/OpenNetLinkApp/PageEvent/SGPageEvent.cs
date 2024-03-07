@@ -7,6 +7,7 @@ using System.Text;
 using HsNetWorkSGData;
 using System.Threading.Tasks;
 using OpenNetLinkApp.Common;
+using static HsNetWorkSG.SGEnums;
 
 namespace OpenNetLinkApp.PageEvent
 {
@@ -152,14 +153,19 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void UrlListEvent(int groupid, PageEventArgs e);
     // 마우스 우클릭 파일 추가 이벤트
     public delegate void RMouseFileAddEvent(int groupid);
+
     // 공통 서버 노티 이벤트.
     public delegate void ServerNotiEvent(int groupid, eCmdList cmd, PageEventArgs e);
+    public delegate void ServerNotiEventAdvanced(int groupid, eAdvancedCmdList cmd, PageEventArgs e);
+
     // 바이러스 또는 APT 노티 이벤트.
     public delegate void APTAndVirusNotiEvent(int groupid, eCmdList cmd, AptAndVirusEventArgs e);
     // 바이러스 또는 APT 노티 DB Insert 이벤트
     public delegate void APTAndVirusNotiDBInsert(int groupid, eCmdList cmd, AptAndVirusEventArgs e);
     // 사용사 결재완료 노티 이벤트
     public delegate void ApproveActionNotiEvent(int groupid, eCmdList cmd, ApproveActionEventArgs e);
+    public delegate void ApproveActionNotiAdvancedEvent(int groupid, eAdvancedCmdList cmd, ApproveActionEventArgs e);
+
     // 사용된 일일 파일 전송량 노티
     public delegate void UseDayFileNotiEvent(int groupid, FileAndClipDayArgs e);
     // 사용된 일일 클립보드 전송량 노티
@@ -426,11 +432,13 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, RMouseFileAddEvent> DicRMFileAddEvent = new Dictionary<int, RMouseFileAddEvent>();                                   //  마우스 우클릭 파일 추가 이벤트.
 
         public ServerNotiEvent SNotiEvent;                                                                                                          // 공통 서버 노티 이벤트
+        public ServerNotiEventAdvanced SNotiEventAdvanced;                                                                                                          // 공통 서버 노티 이벤트
 
         public APTAndVirusNotiEvent AptAndVirusEvent;                                                                                               // 바이러스 노티 이벤트
         public APTAndVirusNotiDBInsert AptAndVirusDBInsertEvent;                                                                                    // 바이러스 또는 APT 노티 DB Insert 이벤트
 
         public ApproveActionNotiEvent ApprActionEvent;
+        public ApproveActionNotiAdvancedEvent ApprActionAdvancedEvent;
 
         public Dictionary<int, UseDayFileNotiEvent> DicUseDayFileEvent = new Dictionary<int, UseDayFileNotiEvent>();                                   // 사용된 일일 파일 전송량 노티 이벤트
         public Dictionary<int, UseDayClipNotiEvent> DicUseDayClipEvent = new Dictionary<int, UseDayClipNotiEvent>();                                   // 사용된 일일 클립보드 전송량 노티 이벤트
@@ -1234,6 +1242,18 @@ namespace OpenNetLinkApp.PageEvent
         {
             SNotiEvent = svrNoti;
         }
+
+        public ServerNotiEventAdvanced GetServerNotiEventAdvanced()
+        {
+            return SNotiEventAdvanced;
+        }
+
+        public void SetServerNotiEventAdvanced(ServerNotiEventAdvanced svrNoti)
+        {
+            SNotiEventAdvanced = svrNoti;
+        }
+
+
         public void SetAPTAndVirusNotiEventAdd(APTAndVirusNotiEvent e)
         {
             AptAndVirusEvent = e;
@@ -1258,9 +1278,19 @@ namespace OpenNetLinkApp.PageEvent
             return ApprActionEvent;
         }
 
-        public void SetApproveActionNotiEvent(ApproveActionNotiEvent apprActionNoti)
+        /*public void SetApproveActionNotiEvent(ApproveActionNotiEvent apprActionNoti)
         {
             ApprActionEvent = apprActionNoti;
+        }*/
+
+        public ApproveActionNotiAdvancedEvent GetApproveActionNotiEventAdvanced()
+        {
+            return ApprActionAdvancedEvent;
+        }
+
+        public void SetApproveActionNotiEventAdvanced(ApproveActionNotiAdvancedEvent apprActionNoti)
+        {
+            ApprActionAdvancedEvent = apprActionNoti;
         }
 
 

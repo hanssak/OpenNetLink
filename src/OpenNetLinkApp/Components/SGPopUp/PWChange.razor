@@ -435,13 +435,21 @@
             List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
             foreach (ISGNetwork Net in listNetWork)
             {
+                // 예전
+                //if (pageService.GetConnectStatus(Net.GroupID))
+                //    HSCmdCenter.SendChangePasswd(Net.GroupID, userID, protectedPWCurrent, protectedPWNew);
+
+                // Advanced
                 if (pageService.GetConnectStatus(Net.GroupID))
-                    HSCmdCenter.SendChangePasswd(Net.GroupID, userID, protectedPWCurrent, protectedPWNew);
+                    HSCmdCenter.RestSendChangePasswd(Net.GroupID, protectedPWCurrent, protectedPWNew);
             }
         }
         else
         {
-            HSCmdCenter.SendChangePasswd(groupID, userID, protectedPWCurrent, protectedPWNew);
+            // 예전
+            //HSCmdCenter.SendChangePasswd(groupID, userID, protectedPWCurrent, protectedPWNew);
+            // Advanced
+            HSCmdCenter.RestSendChangePasswd(groupID, protectedPWCurrent, protectedPWNew);
         }
 
     }

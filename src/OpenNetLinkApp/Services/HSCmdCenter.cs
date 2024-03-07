@@ -31,6 +31,7 @@ using AgLogManager;
 using HsNetWorkSG.RestApi;
 using Newtonsoft.Json;
 using static HsNetWorkSG.SGEnums;
+using Newtonsoft.Json.Linq;
 
 namespace OpenNetLinkApp.Services
 {
@@ -1009,7 +1010,9 @@ namespace OpenNetLinkApp.Services
                             if (downloadCountEvent != null) downloadCountEvent(groupId, sgData);
                         }
                         break;
-                    case eAdvancedCmdList.ePatchSessionPW://eCmdList.eCHANGEPASSWD:                                                  // 비밀번호 변경 요청 응답.
+
+                    case eAdvancedCmdList.ePatchSessionPW:
+                        //eCmdList.eCHANGEPASSWD:                                                  // 비밀번호 변경 요청 응답.
                         ChgPassWDAfterSend(nRet, groupId);
                         break;
 
@@ -1142,19 +1145,12 @@ namespace OpenNetLinkApp.Services
 
                     case eAdvancedCmdList.eNotiAnnouncements:
                         //eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
-                        BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
+                        //BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
+                        BoardNotiAfterSendAdvanced(nRet, eAdvancedCmdList.eNotiAnnouncements, groupId, sgData);
                         break;
-                    case eAdvancedCmdList.eNotiApprovalTermination:
-                        //eCmdList.eAPPROVEACTIONNOTIFY:                                         // 사용자 결재 완료(승인/반려)노티.
-                        ApproveActionNotiAfterSend(nRet, eCmdList.eAPPROVEACTIONNOTIFY, groupId, sgData);
-
-                        //eCmdList.eSKIPFILENOTI:
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            SkipFileNotiEvent eventData = sgPageEvent.GetSkipFileNotiEventAdd();
-                            if (eventData != null) eventData(groupId, sgData);
-                        }
+                    case eAdvancedCmdList.eNotiApprovalTermination:                             // 사용자 결재 완료(승인/반려)노티.
+                        // eCmdList.eAPPROVEACTIONNOTIFY:                                         // 사용자 결재 완료(승인/반려)노티.
+                        ApproveActionNotiAfterSendAdvanced(nRet, eAdvancedCmdList.eNotiApprovalTermination, groupId, sgData);
                         break;
 
                     case eAdvancedCmdList.ePostLogout:
@@ -2197,6 +2193,21 @@ namespace OpenNetLinkApp.Services
                 sNotiEvent(groupId, cmd, e);
             }
         }
+
+        public void BoardNotiAfterSendAdvanced(int nRet, eAdvancedCmdList cmd, int groupId, SGData data)
+        {
+            ServerNotiEventAdvanced sNotiEvent = sgPageEvent.GetServerNotiEventAdvanced();
+            if (sNotiEvent != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.count = 0;
+                e.strMsg = data.GetBasicTagData("BOARDHASH");
+                sNotiEvent(groupId, cmd, e);
+            }
+        }
+
+
         public void ApproveActionNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData sgData)
         {
             ApproveActionNotiEvent ApprActionEvent = sgPageEvent.GetApproveActionNotiEvent();
@@ -2222,6 +2233,63 @@ namespace OpenNetLinkApp.Services
                 ApprActionEvent(groupId, cmd, e);
             }
         }
+
+        public void ApproveActionNotiAfterSendAdvanced(int nRet, eAdvancedCmdList cmd, int groupId, SGData sgData)
+        {
+            ApproveActionNotiAdvancedEvent ApprActionEvent = sgPageEvent.GetApproveActionNotiEventAdvanced();
+            if (ApprActionEvent != null)
+            {
+                ApproveActionEventArgs e = new ApproveActionEventArgs();
+                e.result = nRet;
+
+                string strData = sgData.GetTagData("trans_req_info_list");
+                if (string.IsNullOrEmpty(strData))
+                {
+                    Log.Logger.Here().Error($"ApproveActionNotiAfterSendAdvanced, Msg Data Empty : trans_req_info_list");
+                    return;
+                }
+
+                var dataList = JsonConvert.DeserializeObject<List<dynamic>>(strData);
+                int i = 0;
+                string strItemData = "";
+                foreach (var dataItem in dataList)
+                {
+
+                    strItemData = Convert.ToString(dataItem);
+                    JObject jO = JObject.Parse(strItemData);
+
+                    e.strTransSeq = (string)jO["trans_seq"];
+                    e.strTitle = (string)jO["title"];
+                    string strAction = (string)jO["approval_state"];
+                    if (string.Compare(strAction, "confirm") == 0)
+                        e.Action = 1;
+                    else
+                        e.Action = 2;
+
+                    break;
+                }
+
+                /*
+                e.strTransSeq = sgData.GetBasicTagData("TRANSSEQ");
+                e.strTitle = sgData.GetBasicTagData("TITLE");
+
+                string strAction = sgData.GetBasicTagData("ACTION");
+                if (!strAction.Equals(""))
+                    e.Action = Convert.ToInt32(strAction);
+
+                string strApprKind = sgData.GetBasicTagData("APPROVEKIND");
+                if (!strApprKind.Equals(""))
+                    e.ApproveKind = Convert.ToInt32(strApprKind);
+
+                string strApprUserKind = sgData.GetBasicTagData("APPROVEUSERKIND");
+                if (!strApprUserKind.Equals(""))
+                    e.ApproveUserKind = Convert.ToInt32(strApprUserKind);
+                */
+
+                ApprActionEvent(groupId, cmd, e);
+            }
+        }
+
 
         public void UseDayFileInfoNotiAfterSend(int nRet, int groupId, SGData sgData)
         {
@@ -4190,7 +4258,52 @@ namespace OpenNetLinkApp.Services
 
         }
 
+        public int RestSendChangePasswd(int groupid, string strProtectedOldPasswd, string strProtectedNewPasswd)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestRestSendChangePasswd(hsNetWork, strProtectedOldPasswd, strProtectedNewPasswd);
+            return -1;
+        }
 
+        public int RestSendScreenLockClear(int groupid, string strProtectedPasswd, string strLoginType)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendScreenLockClear(hsNetWork, strProtectedPasswd, strLoginType);
+            return -1;
+        }
+
+        public int RestSendTest(int groupid, eAdvancedCmdList eCmd)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            int ret = -1;
+            Task.Run(() =>
+            {
+                try
+                {
+                    ret = sgSendData.RequestRestTest(hsNetWork, eCmd);
+                    if (ret < 0)
+                    {
+                        Log.Logger.Here().Error($"RestSendTest-Task-Ret : {ret}, CmdList : {eCmd}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestSendTest-Task-Exception : {ex.Message}, CmdList : {eCmd}");
+                }
+
+            });
+
+            return ret;
+
+        }
 
     }
 }

@@ -1420,9 +1420,29 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.RequestRest(args);
         }
 
-        
+        public int RequestRestSendChangePasswd(HsNetWork hsNet, string strOldPassWD, string strNewPassWD)
+        {
+            Dictionary<string, object> dicBody = new Dictionary<string, object>();
+            dicBody["OLDPASSWORD"] = strOldPassWD;
+            dicBody["NEWPASSWORD"] = strNewPassWD;
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePatchSessionPW, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.RequestRest(args);
+        }
 
+        public int RequestSendScreenLockClear(HsNetWork hsNet, string strProtectedPasswd, string strLoginType)
+        {
+            Dictionary<string, object> dicBody = new Dictionary<string, object>();
+            dicBody["user_password"] = strProtectedPasswd;
+            dicBody["login_type"] = strLoginType;
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePatchSessionUnlock, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.RequestRest(args);
+        }
 
+        public int RequestRestTest(HsNetWork hsNet, eAdvancedCmdList eCmd)
+        {
+            SGEventArgs args = sendParser.RequestRestCmd(eCmd, null, null, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.RequestRest(args);
+        }
 
     }
 }

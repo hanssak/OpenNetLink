@@ -420,13 +420,19 @@
             {
                 if (pageService.GetConnectStatus(Net.GroupID))
                 {
-                    HSCmdCenter.SendChangePasswd(Net.GroupID, userID, protectedPWCurrent, protectedPWNew);
+                    //예전
+                    //HSCmdCenter.SendChangePasswd(Net.GroupID, userID, protectedPWCurrent, protectedPWNew);
+                    // Advanced
+                    HSCmdCenter.RestSendChangePasswd(Net.GroupID, protectedPWCurrent, protectedPWNew);
                 }
             }
         }
         else
         {
-            HSCmdCenter.SendChangePasswd(groupID, userID, protectedPWCurrent, protectedPWNew);
+            // 예전
+            //HSCmdCenter.SendChangePasswd(groupID, userID, protectedPWCurrent, protectedPWNew);
+            // Advanced
+            HSCmdCenter.RestSendChangePasswd(groupID, protectedPWCurrent, protectedPWNew);
         }
 
     }
@@ -525,18 +531,18 @@
             //else
             //    strNavigateWithGroupID = "/Transfer/";
 
-        string strNavigateWithGroupID = String.Empty;
-        if (basicPageType == (int)Enums.EnumBasicPageType.Main)
-        {
-            strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
-            strNavigateWithGroupID += groupID.ToString();
+            string strNavigateWithGroupID = String.Empty;
+            if (basicPageType == (int)Enums.EnumBasicPageType.Main)
+            {
+                strNavigateWithGroupID = SGAppMgrSvc.AppConfigInfoService.GetMainPage() + "/";
+                strNavigateWithGroupID += groupID.ToString();
 
-            ChangeActiveMenuEvent changeActiveMenuEvent = HSCmdCenter.sgPageEvent.GetChangeActiveMenu();
-            if (changeActiveMenuEvent != null)
-                changeActiveMenuEvent(groupID, strNavigateWithGroupID);
+                ChangeActiveMenuEvent changeActiveMenuEvent = HSCmdCenter.sgPageEvent.GetChangeActiveMenu();
+                if (changeActiveMenuEvent != null)
+                    changeActiveMenuEvent(groupID, strNavigateWithGroupID);
 
-            MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-        }
+                MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+            }
 
             MoveSiderBarFocusTogroupid();
 
@@ -561,41 +567,41 @@
                     sgSettingProc.SetSettingUPW(groupID, strEncPW);
                 }
 
-            //if (AppConfigSvc.GetStartTrayMove())
-            if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray(groupID))
-            {
-                if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
+                //if (AppConfigSvc.GetStartTrayMove())
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginAfterTray(groupID))
                 {
+                    if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
+                    {
 
-                    string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                    string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
-                    if (SGAppMgrSvc.OpConfigInfoService.GetUseHideToastPopup(groupID) == false)
-                        HSCmdCenter.sgPageEvent.OSNotification(groupID,OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                        string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                        string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseHideToastPopup(groupID) == false)
+                            HSCmdCenter.sgPageEvent.OSNotification(groupID,OS_NOTI.ONLINE, strTitle, strInfoMsg);
 
-                    Window.MoveWebWindowToTray();
+                        Window.MoveWebWindowToTray();
+                    }
+                    else
+                        HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
                 }
                 else
-                    HSCmdCenter.sgPageEvent.OSNotification(groupID, OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                {
+                    HSCmdCenter.sgPageEvent.OSNotification(groupID,OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                }
             }
             else
             {
-                HSCmdCenter.sgPageEvent.OSNotification(groupID,OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-            }
-        }
-        else
-        {
-            if (eLoginProcessType == eLoginType.eLOGINTYPE_GPKI)
-            {
-                //if (siteConfig.GetUseAutoLogin(groupID) == true)
-                if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID))
+                if (eLoginProcessType == eLoginType.eLOGINTYPE_GPKI)
                 {
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    string strEncPW = "";
-                    sgRSACrypto?.ValueEncrypt(protectedPWNew, out strEncPW);
-                    SGSettingData sgSettingData = null;
-                    sgSettingData = sgSettingProc.SelectSettingData(groupID);
-                    if (sgSettingData == null)
-                        sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);    // groupID
+                    //if (siteConfig.GetUseAutoLogin(groupID) == true)
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID))
+                    {
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        string strEncPW = "";
+                        sgRSACrypto?.ValueEncrypt(protectedPWNew, out strEncPW);
+                        SGSettingData sgSettingData = null;
+                        sgSettingData = sgSettingProc.SelectSettingData(groupID);
+                        if (sgSettingData == null)
+                            sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);    // groupID
 
                         sgSettingProc.SetSettingUPW(groupID, strEncPW);
                     }

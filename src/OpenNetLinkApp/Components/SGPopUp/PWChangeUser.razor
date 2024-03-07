@@ -378,7 +378,11 @@
         //Debug.WriteLine("confirm PW:" + stNewPWConfirm);
         //closePopUp();
 
-        HSCmdCenter.SendChangePasswd(groupID, userID, protectedPWCurrent, protectedPWNew);
+        // 예전
+        //HSCmdCenter.SendChangePasswd(groupID, userID, protectedPWCurrent, protectedPWNew);
+        // Advanced
+        HSCmdCenter.RestSendChangePasswd(groupID, protectedPWCurrent, protectedPWNew);
+
     }
 
 

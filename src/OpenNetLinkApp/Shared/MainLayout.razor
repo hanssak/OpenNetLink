@@ -125,7 +125,8 @@
             string title = lstInfo[3];
             string msg = String.Format(XmlConf.GetInfoMsg("I_0221"), title);
             refSecurityAproverSelectPopUp.setDesc(msg);
-            refSecurityAproverSelectPopUp.deputyMod = stDuputyMode;
+            // 사용안함
+            //refSecurityAproverSelectPopUp.deputyMod = stDuputyMode;
             refSecurityAproverSelectPopUp.lstInfo = lstInfo;
             refSecurityAproverSelectPopUp.BindEvent();
             refSecurityAproverSelectPopUp.openPopUp();
