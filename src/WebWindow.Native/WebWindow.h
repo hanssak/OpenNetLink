@@ -201,6 +201,7 @@ public:
 	void SetTitle(AutoString title);
 	void Show();
 	void WaitForExit();
+	void SetTrayText(AutoString tooltip, AutoString show, AutoString hide, AutoString exit, AutoString hyphen);
 	void ShowMessage(AutoString title, AutoString body, unsigned int type);
 	void Invoke(ACTION callback);
 	void NavigateToUrl(AutoString url);

@@ -189,6 +189,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_dtor(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern IntPtr WebWindow_getHwnd_win32(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetTitle(IntPtr instance, string title);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetTrayText(IntPtr instance, string tooltip, string show, string hide, string exit, string hyphen);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_Show(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_WaitForExit(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_Invoke(IntPtr instance, InvokeCallback callback);
@@ -810,6 +811,7 @@ namespace WebWindows
             Invoke(() => winClip.UnRegHotKeyNetOver(groupID, nIdx));
         }
 
+        public void SetTrayText(string toolTip, string show, string hide, string exit, string hyphen) => WebWindow_SetTrayText(_nativeWebWindow, toolTip, show, hide, exit, hyphen);
         public void FolderOpen(string strFileDownPath) => WebWindow_FolderOpen(_nativeWebWindow, strFileDownPath);
         public void OpenFolder(string strFileDownPath)
         {

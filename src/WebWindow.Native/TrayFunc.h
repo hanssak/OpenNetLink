@@ -37,7 +37,7 @@ static struct tray tray;
 static void toggle_show(struct tray_menu *item) {
 	if(!item->checked) {
 		NTLog(SelfThis, Info, "Called : OpenNetLink Hide (value: %s)", item->text);
-		item->text = (char*)"Show";
+		item->text = g_trayShow;
 #if TRAY_APPINDICATOR
 		gtk_widget_hide(_g_window);
 #elif TRAY_APPKIT
@@ -49,7 +49,7 @@ static void toggle_show(struct tray_menu *item) {
 	}
 	else if(item->checked) {
 		NTLog(SelfThis, Info, "Called : OpenNetLink Show (value: %s)", item->text);
-		item->text = (char*)"Hide";
+		item->text = g_trayHide;
 		g_bStartTray = false;
 #if TRAY_APPINDICATOR
 		gtk_widget_show_all(_g_window);
@@ -72,7 +72,7 @@ static void toggle_show_force(struct tray_menu* item, bool bShow)
 
 	if (bShow){
 		NTLog(SelfThis, Info, "Called : OpenNetLink Show (value: %s)", item->text);
-		item->text = (char*)"Hide";
+		item->text = g_trayHide;
 		g_bStartTray = false;
 
 #if TRAY_APPINDICATOR
@@ -92,7 +92,7 @@ static void toggle_show_force(struct tray_menu* item, bool bShow)
 	else
 	{
 		NTLog(SelfThis, Info, "Called : OpenNetLink Hide (value: %s)", item->text);
-		item->text = (char*)"Show";
+		item->text = g_trayShow;
 #if TRAY_APPINDICATOR
 		gtk_widget_hide(_g_window);
 #elif TRAY_APPKIT
@@ -109,11 +109,11 @@ static void toggle_show_force(struct tray_menu* item, bool bShow)
 static void toggle_minimize(struct tray_menu *item) {
 	if(!item->checked) {
 		NTLog(SelfThis, Info, "Called : OpenNetLink Minimize Change State Hide -> Show (value: %s)", item->text);
-		item->text = (char*)"Show";
+		item->text = g_trayShow;
 	}
 	else if(item->checked) {
 		NTLog(SelfThis, Info, "Called : OpenNetLink Minimize Change State Show -> Hide (value: %s)", item->text);
-		item->text = (char*)"Hide";
+		item->text = g_trayHide;
 	}
 	item->checked = !item->checked;
 	tray_update(&tray);

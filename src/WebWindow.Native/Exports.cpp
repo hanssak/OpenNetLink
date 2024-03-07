@@ -195,6 +195,10 @@ extern "C"
 	{
 		instance->FolderOpen(strFileDownPath);
 	}
+	EXPORTED void WebWindow_SetTrayText(WebWindow* instance, AutoString tooltip, AutoString show, AutoString hide, AutoString exit, AutoString hyphen)
+	{
+		instance->SetTrayText(tooltip, show, hide, exit, hyphen);
+	}
 	EXPORTED void WebWindow_OnHotKey(WebWindow* instance, int groupID)
 	{
 		instance->OnHotKey(groupID);

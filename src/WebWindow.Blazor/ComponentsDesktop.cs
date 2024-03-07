@@ -116,6 +116,7 @@ namespace WebWindows.Blazor
                     WebWindow.SetUseHttpUrl(false);
                     WebWindow.SetTrayStartUse((bool)arg[1]);
                     WebWindow.NavigateToUrl(BlazorAppScheme + "://app/");
+                    WebWindow.SetTrayText(arg[2].ToString(), arg[3].ToString(), arg[4].ToString(), arg[5].ToString(), arg[6].ToString());
                     WebWindow.WaitForExit();
                 }
                 finally

@@ -101,9 +101,14 @@ namespace OpenNetLinkApp
                 //SP1 테스트를 위해 처리
                 //SGFileCrypto.Instance.EncryptSettingFiles("wwwroot/conf/SP1_DEBUG");
 
-                object[] arg = new object[2];
+                object[] arg = new object[7];
                 arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
                 arg[1] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartTrayMove;
+                arg[2] = Common.CsFunction.XmlConf.GetTitle("T_TRAY_TOOLTIP_TITLE");
+                arg[3] = Common.CsFunction.XmlConf.GetTitle("T_TRAY_TOOLTIP_SHOW");
+                arg[4] = Common.CsFunction.XmlConf.GetTitle("T_TRAY_TOOLTIP_HIDE");
+                arg[5] = Common.CsFunction.XmlConf.GetTitle("T_TRAY_TOOLTIP_EXIT");
+                arg[6] = Common.CsFunction.XmlConf.GetTitle("T_TRAY_TOOLTIP_HYPHEN");
 
                 string hiddenFlagFile = Path.Combine("wwwroot/Log", "UseHiddenLog");
                 if (File.Exists(hiddenFlagFile))
@@ -150,9 +155,14 @@ namespace OpenNetLinkApp
 
                     if (args?.Length > 0) CLog.Information($"args : {string.Join(',', args)}");
 
-                    object[] arg = new object[2];
+                    object[] arg = new object[7];
                     arg[0] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartProgramReg;
                     arg[1] = Services.SGAppManager.SGAppConfigService.AppConfigInfo.bStartTrayMove;
+                    arg[2] = Common.CsFunction.XmlConf.GetTitle("T_TRAY_TOOLTIP_TITLE");
+                    arg[3] = Common.CsFunction.XmlConf.GetTitle("T_TRAY_TOOLTIP_SHOW");
+                    arg[4] = Common.CsFunction.XmlConf.GetTitle("T_TRAY_TOOLTIP_HIDE");
+                    arg[5] = Common.CsFunction.XmlConf.GetTitle("T_TRAY_TOOLTIP_EXIT");
+                    arg[6] = Common.CsFunction.XmlConf.GetTitle("T_TRAY_TOOLTIP_HYPHEN");
 
                     string hiddenFlagFile = Path.Combine("wwwroot/Log", "UseHiddenLog");
                     if (File.Exists(hiddenFlagFile))

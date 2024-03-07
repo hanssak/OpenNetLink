@@ -308,9 +308,9 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 
 	//tray.menu[0] = { (char*)"About",0,0,0,hello_cb,NULL,NULL };
 	//tray.menu[1] = { (char*)"-",0,0,0,NULL,NULL,NULL };
-	tray.menu[0] = { (char*)(g_bStartTray ? "Show" : "Hide"),0,g_bStartTray ? 1 : 0,0,toggle_show,NULL,NULL };
-	tray.menu[1] = { (char*)"-",0,0,0,NULL,NULL,NULL };
-	tray.menu[2] = { (char*)"Quit",0,0,0,quit_cb,NULL,NULL };
+	tray.menu[0] = { g_bStartTray ? g_trayShow : g_trayHide, 0,g_bStartTray ? 1 : 0,0,toggle_show,NULL,NULL };
+	tray.menu[1] = { g_trayHyphen,0,0,0,NULL,NULL,NULL };
+	tray.menu[2] = { g_trayExit,0,0,0,quit_cb,NULL,NULL };
 	tray.menu[3] = { NULL,0,0,0,NULL,NULL,NULL };
 
 	/*
@@ -354,8 +354,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				struct tray_menu* item = tray.menu;
 				do
 				{
-					if (strcmp(item->text, "Hide") == 0 ||
-						strcmp(item->text, "Show") == 0) {
+					if (wcscmp(item->text, g_trayHide) == 0 ||
+						wcscmp(item->text, g_trayShow) == 0) {
 						toggle_minimize(item);
 						break;
 					}
@@ -427,8 +427,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				struct tray_menu* item = tray.menu;
 				do
 				{
-					if (strcmp(item->text, "Hide") == 0 ||
-						strcmp(item->text, "Show") == 0)
+					if (wcscmp(item->text, g_trayHide) == 0 ||
+						wcscmp(item->text, g_trayShow) == 0)
 					{
 						item->checked = false;
 						toggle_show(item);
@@ -523,8 +523,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			do
 			{
-				if (strcmp(item->text, "Hide") == 0 ||
-					strcmp(item->text, "Show") == 0) {
+				if (wcscmp(item->text, g_trayHide) == 0 ||
+					wcscmp(item->text, g_trayShow) == 0) {
 					toggle_show_force(item, true);
 					// toggle_minimize(item);
 					break;
@@ -603,6 +603,11 @@ void WebWindow::SetTitle(AutoString title)
 	SetWindowText(_hWnd, title);
 }
 
+void WebWindow::SetTrayText(AutoString tooltip, AutoString show, AutoString hide, AutoString exit, AutoString hyphen)
+{
+	tray_text(tooltip, show, hide, exit, hyphen);
+}
+
 void WebWindow::Show()
 {
 
@@ -632,7 +637,6 @@ void WebWindow::WaitForExit()
 		DispatchMessage(&msg);
 	}
 #else
-
 
 	if (tray_init(&tray) < 0)
 	{
@@ -2158,7 +2162,7 @@ void WebWindow::MoveWebWindowToTray()
 	struct tray_menu* item = tray.menu;
 	do
 	{
-		if (strcmp(item->text, "Hide") == 0) {
+		if (wcscmp(item->text, g_trayHide) == 0) {
 			toggle_show(item);
 			break;
 		}
@@ -2171,7 +2175,7 @@ void WebWindow::MoveTrayToWebWindow()
 	struct tray_menu* item = tray.menu;
 	do
 	{
-		if (strcmp(item->text, "Show") == 0) {
+		if (wcscmp(item->text, g_trayShow) == 0) {
 			toggle_show(item);
 			break;
 		}
@@ -2183,7 +2187,7 @@ void WebWindow::MinimizeWebWindow()
 	struct tray_menu* item = tray.menu;
 	do
 	{
-		if (strcmp(item->text, "Hide") == 0) {
+		if (wcscmp(item->text, g_trayHide) == 0) {
 			toggle_minimize(item);
 			break;
 		}
@@ -2226,10 +2230,10 @@ void WebWindow::SetTrayStartUse(bool bUseStartTray)
 		struct tray_menu* item = tray.menu;
 		do
 		{
-			if (strcmp(item->text, "Hide") == 0 ||
-				strcmp(item->text, "Show") == 0)
+			if (wcscmp(item->text, g_trayHide) == 0 ||
+				wcscmp(item->text, g_trayShow) == 0)
 			{
-				item->text = (char*)(g_bStartTray ? "Show" : "Hide");
+				item->text = g_bStartTray ? g_trayShow : g_trayHide;
 				item->checked = g_bStartTray;
 				tray_update(&tray);
 				break;
@@ -2250,10 +2254,10 @@ void WebWindow::SetTrayStatus(bool bSetTextShowNchecked)
 	struct tray_menu* item = tray.menu;
 	do
 	{
-		if (strcmp(item->text, "Hide") == 0 ||
-			strcmp(item->text, "Show") == 0)
+		if (wcscmp(item->text, g_trayHide) == 0 ||
+			wcscmp(item->text, g_trayShow) == 0)
 		{
-			item->text = (char*)(bSetTextShowNchecked ? "Show" : "Hide");
+			item->text = bSetTextShowNchecked ? g_trayShow : g_trayHide;
 			item->checked = bSetTextShowNchecked;
 			tray_update(&tray);
 			break;
