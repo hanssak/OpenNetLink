@@ -21,7 +21,10 @@
 @using BlazorInputFile
 @using OpenNetLinkApp.Common
 @using OfficeExtractor
-@using Data.SGDicData.SGAlz;
+@using Data.SGDicData.SGAlz
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+
 
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
@@ -193,6 +196,7 @@
 
 @code
 {
+
     [Parameter]
     public int groupIDbyParam { get; set; }
 
@@ -271,6 +275,8 @@
     ISGSideBarUIService SideBarUISvc;
     ISGAppConfigService AppConfigSvc;
     ISGopConfigService OpConfigSvc;
+
+    SGData sgDataApproverValidation = new SGData();
 
     /// <summary>
     /// VIP 이거나, 전결자 이거나, 결제 사용하지 못하거나, 결제자 편집 권한이 없으면 숨김처리(true)
@@ -407,7 +413,7 @@
                 }
             }
 
-            if(!strBindTitle.ValidationSqlInjection())
+            if (!strBindTitle.ValidationSqlInjection())
             {
                 string strMsg = XmlConf.GetWarnMsg("W_0292");                //제목에 사용할 수 없는 문자가 입력되었습니다.\r\n제목을 다시 입력해 주십시요.
                 ShowMessage("warn", strMsg);
@@ -417,7 +423,7 @@
                 return;
             }
 
-            if(!strBindDesc.ValidationSqlInjection())
+            if (!strBindDesc.ValidationSqlInjection())
             {
                 string strMsg = XmlConf.GetWarnMsg("W_0293");            //설명에 사용할 수 없는 문자가 입력되었습니다.\r\n설명을 다시 입력해 주십시요.
                 ShowMessage("warn", strMsg);
@@ -427,7 +433,7 @@
                 return;
             }
 
-	        // 최소길이 체크 동작
+            // 최소길이 체크 동작
             if (SGAppMgrSvc.OpConfigInfoService.GetUseMinLengthTitleDesc(groupID))
             {
                 SGLoginData sgLoginData = null;
@@ -641,7 +647,10 @@
     }
 
 
-
+    /// <summary>
+    /// 파일보내기
+    /// </summary>
+    /// <returns></returns>
     private async Task CheckApprLine()
     {
         if (SGAppMgrSvc.OpConfigInfoService.GetTransferTemplate(groupIDbyParam) == 0)
@@ -662,7 +671,13 @@
         cntRecvQuery = 0;
 
         int groupID = groupIDbyParam;
-        HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑
+
+        // 예전
+        //HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑
+
+        // Advanced
+        sgDataApproverValidation.Clear();
+        HSCmdCenter.sgPageEvent.SetApproverValidationEvent(groupID, ApproversValidationResultAdvanced);
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -722,6 +737,8 @@
                 string strUserID = sgLoginData.GetUserID();
                 LinkedList<ApproverInfo> apprLinkedList = sgApprLineData.GetApprAndLineData();
 
+                List<ApproverCheckInfo> approverList = new List<ApproverCheckInfo>();
+
                 foreach (var item in apprLinkedList)
                 {
                     strApprLineUserSeq = item.UserSeq;
@@ -738,22 +755,37 @@
                     //if (strApprLineDeptSeq.Length == 18)    // Dept - seq 일때에만 검색함.
 
 
-                    @*if (CsSeqFunc.isDeptSeq(strApprLineDeptSeq))
-                        {
-                        SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
-                        cntSendQuery++;
-                        }*@
+                    //if (CsSeqFunc.isDeptSeq(strApprLineDeptSeq))
+                    //    {
+                    //    SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
+                    //    cntSendQuery++;
+                    //    }
 
                     // 부서 Seq 알수 없는 고정결재 일때에는 UserSeq만 확인
-                    SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "", sgLoginData.GetApproveProxyRight());
+
+                    // 예전
+                    //SendQuery(groupID, strUserID, strApprLineUserSeq, CsSeqFunc.isDeptSeq(strApprLineDeptSeq) ? strApprLineDeptSeq : "", sgLoginData.GetApproveProxyRight());
+
+                    // Advanced
+                    approverList.Add(new ApproverCheckInfo(strApprLineUserSeq, strApprLineDeptSeq));
+
                     cntSendQuery++;
                 }
+
+                // Advanced
+                if (approverList.Count > 0)
+                {
+                    CLog.Here().Information($"CheckApprLine, ApprLine Check !!!");
+                    HSCmdCenter.RestSendApproverValidation(groupID, approverList);
+                }
+
             }
 
         }
 
         if (cntSendQuery == 0)
         {
+            CLog.Here().Information($"CheckApprLine, ApprLine No Check, UploadFiles Call !!!");
             await UploadFiles();
         }
     }
@@ -771,6 +803,80 @@
         string strQuery = sgQuery.GetUserConfirm(userSeq, deptSeq, approveProxyRight);
         HSCmdCenter.SendDetailQuery(groupID, strUserID, strQuery);
     }
+
+    public void ApproversValidationResultAdvanced(int groupId, PageEventArgs args, SGData sgData)
+    {
+
+        if (args.result != 0)
+        {
+            CLog.Here().Error($"ApproversValidationResultAdvanced, Groupid : {groupId}, Result : {args.result}, Reason : {args.strMsg}");
+            ShowMessage("warn", XmlConf.GetInfoMsg("I_0233"));
+            return;
+        }
+
+        try
+        {
+            HsNetWork hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
+            if (hsNetWork == null)
+            {
+                CLog.Here().Error($"ApproversValidationResultAdvanced, HsNetWork = NULL, !!!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0251"));
+                return;
+            }
+
+            sgDataApproverValidation.Clear();
+            sgDataApproverValidation.Copy(hsNetWork, sgData);
+
+            string strData = sgDataApproverValidation.GetTagData("validation_result_list");
+            if (string.IsNullOrEmpty(strData))
+            {
+                CLog.Here().Error($"ApproversValidationResultAdvanced, Approver validation_result_list Empty, !!!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0251"));
+                return;
+            }
+
+            var dataList = JsonConvert.DeserializeObject<List<dynamic>>(strData);
+            string strItemData = "";
+            string strItemDataTmp1 = "";
+            foreach (var dataItem in dataList)
+            {
+                strItemData = Convert.ToString(dataItem);
+                JObject jO = JObject.Parse(strItemData);
+
+                strItemDataTmp1 = (string)jO["result"];
+
+                if (string.Compare(strItemDataTmp1, "available", true) != 0)
+                {
+                    CLog.Here().Error($"ApproversValidationResultAdvanced, Approver is NOT available (result : {strItemDataTmp1}) !!!");
+
+                    bool bApprEdit = false;
+                    SGLoginData sgLoginData = null;
+                    sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+                    if (sgLoginData != null)
+                        bApprEdit = sgLoginData.GetApproveAppend();                             //결제자 편집 사용 여부
+
+                    string strMsg = XmlConf.GetInfoMsg(bApprEdit ? "I_0220" : "I_0233");
+                    ShowMessage("warn", strMsg);
+
+                    strItemData = (string)jO["approver_hr"];
+                    JObject jOhr = JObject.Parse(strItemData);
+
+                    CLog.Here().Error($"ApproversValidationResultAdvanced, result : {strItemDataTmp1}, Name : {Convert.ToString(jOhr["name"])}, dept_name : {Convert.ToString(jOhr["dept_name"])}, position : {Convert.ToString(jOhr["position"])}, rank : {Convert.ToString(jOhr["rank"])}");
+                    return;
+                }
+            }
+
+            CLog.Here().Information($"ApproversValidationResultAdvanced, UploadFiles, Start!!!");
+            Task.Run(async () => { await UploadFiles(); });
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"ApproversValidationResultAdvanced, Exception(MSG) : {ex.Message}");
+        }
+
+    }
+
 
     public void DetailResult(int groupId, SGData e)
     {
@@ -1315,11 +1421,13 @@
         if (!String.IsNullOrEmpty(stApprLineSeq) && bAfterApprove)
         {
             //사후 결재일때 결재자 사후 결재 카운트 체크
-            SGQueryExtend sGQueryExtend = new SGQueryExtend();
+            /*SGQueryExtend sGQueryExtend = new SGQueryExtend();
             string sql = sGQueryExtend.GetApproveAfterCount(stApprLineSeq, Common.Enums.EnumApproveTime.After);
 
             HSCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eAPPROVEAFTERCOUNT, ResultApproveAfter);
-            HSCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERCOUNT, groupID, sgLoginData.GetUserID(), sql);
+            HSCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERCOUNT, groupID, sgLoginData.GetUserID(), sql);*/
+
+            await ResultApproveAfterAdvanced(groupID);
         }
         else
         {
@@ -1377,8 +1485,182 @@
     }
 
 
+    /// <summary>
+    /// 사후결재, 누적건수 UI에 표현할 data 만 SGData에서 뽑아내는 함수<br></br>
+    /// return : true - 정상적으로 뽑아낸 data가 있음
+    /// </summary>
+    /// <param name="ListApproverApproveData"></param>
+    /// <returns></returns>
+    bool GetAfterApproveData(List<ApproverApproveDataCheckInfo> ListApproverApproveData, SGData sgData)
+    {
 
-    public async void ResultApproveAfter(int groupId, object[] e)
+        if (sgData == null)
+        {
+            CLog.Here().Error($"GetAfterApproveData, SGData NULL !!!");
+            return false;
+        }
+
+        try
+        {
+            string strData = sgData.GetTagData("validation_result_list");
+            if (string.IsNullOrEmpty(strData))
+            {
+                CLog.Here().Error($"GetAfterApproveData, Approver validation_result_list Empty, !!!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0251"));
+                return false;
+            }
+
+            var dataList = JsonConvert.DeserializeObject<List<dynamic>>(strData);
+            if ((dataList?.Count ?? 0) < 1)
+            {
+                CLog.Here().Error($"GetAfterApproveData, Approver validation_result_list Parsing Error, !!!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0251"));
+                return false;
+            }
+
+            CLog.Here().Error($"GetAfterApproveData, Get validation_result_list Data!!!");
+            ApproverApproveDataCheckInfo[] arrData = new ApproverApproveDataCheckInfo[dataList.Count];
+
+            string strItemData = "";
+            int nIdx = 0;
+            foreach (var dataItem in dataList)
+            {
+                strItemData = Convert.ToString(dataItem);
+                JObject jO = JObject.Parse(strItemData);
+
+                strItemData = Convert.ToString(jO["approver_hr"]);
+                JObject jO_hr = JObject.Parse(strItemData);
+
+                arrData[nIdx] = new ApproverApproveDataCheckInfo();
+                arrData[nIdx].strUserName = (string)jO_hr["name"];
+                arrData[nIdx].strUserRank = Convert.ToString(jO_hr["rank"]);
+
+                nIdx++;
+            }
+
+            strData = sgData.GetTagData("approver_waiting_status_list");
+            if (string.IsNullOrEmpty(strData))
+            {
+                CLog.Here().Error($"GetAfterApproveData, approver_waiting_status_list Empty, !!!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0251"));
+                return false;
+            }
+
+            dataList = JsonConvert.DeserializeObject<List<dynamic>>(strData);
+            if ((dataList?.Count ?? 0) < 1)
+            {
+                CLog.Here().Error($"GetAfterApproveData, approver_waiting_status_list Parsing Error, !!!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0251"));
+                return false;
+            }
+
+            CLog.Here().Error($"GetAfterApproveData, Get approver_waiting_status_list Data!!!");
+
+            nIdx = 0;
+            foreach (var dataItem in dataList)
+            {
+                strItemData = Convert.ToString(dataItem);
+                JObject jO = JObject.Parse(strItemData);
+
+                strItemData = Convert.ToString(jO["post_status"]);
+                JObject jOpostStatus = JObject.Parse(strItemData);
+
+                if (arrData[nIdx] != null)
+                {
+                    arrData[nIdx].strWaitingTotalCount = Convert.ToString(jOpostStatus["waiting_total_count"]);
+                    arrData[nIdx].strBlockPeriodOverCount = Convert.ToString(jOpostStatus["block_period_over_count"]);
+                    arrData[nIdx].strWarningPeriodOverCount = Convert.ToString(jOpostStatus["warning_period_over_count"]);
+                    arrData[nIdx].strBlockPeriod = Convert.ToString(jOpostStatus["block_period"]);
+                    arrData[nIdx].strWarningPeriod = Convert.ToString(jOpostStatus["warning_period"]);
+
+                    ListApproverApproveData.Add(arrData[nIdx]);
+                }
+
+                nIdx++;
+            }
+
+            CLog.Here().Error($"GetAfterApproveData, Get post_status Data!!!");
+
+            return (ListApproverApproveData.Count > 0);
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"GetAfterApproveData, Exception(MSG) : {ex.Message}");
+        }
+
+        return false;
+    }
+
+    private async Task ResultApproveAfterAdvanced(int groupId)
+    {
+
+        try
+        {
+
+            if (sgDataApproverValidation.m_DicTagData.Count > 0)
+            {
+                string strData = "";
+                List <ApproverApproveDataCheckInfo> ListApproverApproveData = new List<ApproverApproveDataCheckInfo>();
+                //if (GetAfterApproveData(ListApproverApproveData, sgDataApproverValidation) == false)
+                if (CsFunction.GetAfterApproveData(ListApproverApproveData, sgDataApproverValidation, out strData) == false)
+                {
+                    CLog.Here().Error($"ResultApproveAfterAdvanced, GetAfterApproveData - Error!");
+                    ShowMessage("error", strData);
+                    return;
+                }
+                
+                bool checkWarring = false;
+                bool checkLimit = false;
+
+                int nDx = 0;
+                string message = String.Empty;
+                foreach (ApproverApproveDataCheckInfo item in ListApproverApproveData)
+                {
+                    if (nDx == 0)
+                        message = String.Format(XmlConf.GetWarnMsg("W_0275"), item.strBlockPeriod); // 결재자의 사후결재 승인 대기건의 승인제한 일({0}일)이 얼마 남지 않았습니다.
+                    message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{item.strUserName} {item.strUserRank}", item.strWaitingTotalCount); // {0}님의 사후결재 승인 대기건수 : {1} 건
+
+                    if (string.IsNullOrEmpty(item.strWarningPeriodOverCount) == false && item.strWarningPeriodOverCount != "0")
+                    {
+                        checkWarring = true;
+                        message += String.Format(XmlConf.GetWarnMsg("W_0277"), item.strWarningPeriodOverCount); // 사후결재 승인대기 기간경고 건수 : {0} 건
+                    }
+                    if (string.IsNullOrEmpty(item.strBlockPeriodOverCount) == false  && item.strBlockPeriodOverCount != "0")
+                    {
+                        checkLimit = true;
+                        message += String.Format(XmlConf.GetWarnMsg("W_0278"), item.strBlockPeriodOverCount); // 사후결재 승인대기 기간제한 건수 : {0} 건
+                    }
+                    nDx++;
+                }
+
+                if (checkLimit)
+                {
+                    await refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "2");
+                    return;
+                }
+
+                if (checkWarring)
+                {
+                    await refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "1");
+                    return;
+                }
+            }
+
+            FileTrans();
+            //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+            await stopClick();
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"ResultApproveAfterAdvanced, Exception(MSG) : {ex.Message}");
+        }
+    }
+
+
+    // 예전
+    /*public async void ResultApproveAfter(int groupId, object[] e)
     {
         SGData sgData = e[0] as SGData;
 
@@ -1425,7 +1707,7 @@
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         await stopClick();
 
-    }
+    }*/
 
 
     public async Task ApproveAfterTransFile(string arg)
@@ -1438,10 +1720,12 @@
         }
     }
 
-    /**
-    * @breif 사용자가 선택한 목적망에 대한 3망 전송 정책값을 설정(전체망포함)
-    * @return false : 파일 전송 Error 처리
-*/
+    /// <summary>
+    /// 사용자가 선택한 목적망에 대한 3망 전송 정책값을 설정(전체망포함) <br></br>
+    /// return false : 파일 전송 Error 처리
+    /// </summary>
+    /// <param name="strDestNetOverData"></param>
+    /// <returns></returns>
     public bool GetNetOverDataPolicy(ref string strDestNetOverData)
     {
 
@@ -1924,6 +2208,8 @@
                 refForwardLine.Refresh();
             }
 
+            HSCmdCenter.sgPageEvent.SetApproverValidationEvent(groupID, ApproversValidationResultAdvanced);
+
             //dropFile._groupId = groupIDbyParam;
             dropFile.Refresh();
             StateHasChanged();
@@ -2091,7 +2377,7 @@
             return;
         }
 
-        SGLoginData sgLoginData= (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
 
@@ -2850,7 +3136,7 @@
             return;
 
         SGReadyData sgReadyData = (SGReadyData)HSCmdCenter.GetReadyData(groupID);
-        if(sgReadyData == null)
+        if (sgReadyData == null)
             return;
 
         bool bSystem = sgReadyData.GetSystemPosition();
@@ -2882,7 +3168,7 @@
             return;
 
         SGReadyData sgReadyData = (SGReadyData)HSCmdCenter.GetReadyData(groupID);
-        if(sgReadyData == null)
+        if (sgReadyData == null)
             return;
 
         bool bSystem = sgReadyData.GetSystemPosition();
@@ -3177,7 +3463,7 @@
 
     public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgType eMType, string path, string body)
     {
-        SGLoginData sgLoginData= (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
         {
             return;

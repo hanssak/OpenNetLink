@@ -24,6 +24,8 @@
 @using OpenNetLinkApp.Common
 @using System.Text
 @using static HsNetWorkSG.SGEnums
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject ISGAppUpdaterService SGAppUpdaterSvc
@@ -983,7 +985,7 @@
                     @*            HSCmdCenter.sgPageEvent.SetSvrEventAdd(listNetWork[i].GroupID, SvrResult);
                         pageService.SetLogoutStatus(listNetWork[i].GroupID, true);*@
 
-    // HsNetWork GetConnectNetWork
+                    // HsNetWork GetConnectNetWork
 
                     if (listNetWork[i].GroupID == groupid)
                     {
@@ -1261,12 +1263,12 @@
                 ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupid);
                 if (sgUserData == null)
                 {
-                    CLog.Here().Error($"RecvFileErrInfo UserInfoSvc.GetUserInfo is null -  groupID : {groupid} - RESULT : {strReason} ");    
+                    CLog.Here().Error($"RecvFileErrInfo UserInfoSvc.GetUserInfo is null -  groupID : {groupid} - RESULT : {strReason} ");
                     return;
                 }
-                if(forwardList.Contains(sgUserData.UserSeq))
+                if (forwardList.Contains(sgUserData.UserSeq))
                     lstInfo.Add("1");
-                else 
+                else
                     lstInfo.Add("0");
                 refSelectReceiveFolder.lstInfo = lstInfo;
 
@@ -1955,6 +1957,91 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
     }
 
 
+    public void ResultApproveAfterAdvanced(int groupId, PageEventArgs args, SGData sgData)
+    {
+
+        CLog.Here().Information($"ResultApproveAfterAdvanced, Approver Validation Data Recved !!!");
+
+        if (args.result != 0)
+        {
+            CLog.Here().Error($"ResultApproveAfterAdvanced, Groupid : {groupId}, Result : {args.result}, Reason : {args.strMsg}");
+            ShowMessage("warn", XmlConf.GetInfoMsg("I_0233"));
+            return;
+        }
+
+        bool checkWarring = false;
+        bool checkLimit = false;
+
+        try
+        {
+
+            if (sgData != null && sgData.m_DicTagData.Count > 0)
+            {
+                string strData = "";
+                List<ApproverApproveDataCheckInfo> ListApproverApproveData = new List<ApproverApproveDataCheckInfo>();
+                if (CsFunction.GetAfterApproveData(ListApproverApproveData, sgData, out strData) == false)
+                {
+                    CLog.Here().Error($"ResultApproveAfterAdvanced, GetAfterApproveData - Error!");
+                    ShowMessage("error", strData);
+                    return;
+                }
+
+                int nDx = 0;
+                string message = String.Empty;
+                foreach (ApproverApproveDataCheckInfo item in ListApproverApproveData)
+                {
+                    if (nDx == 0)
+                        message = String.Format(XmlConf.GetWarnMsg("W_0275"), item.strBlockPeriod); // 결재자의 사후결재 승인 대기건의 승인제한 일({0}일)이 얼마 남지 않았습니다.
+                    message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{item.strUserName} {item.strUserRank}", item.strWaitingTotalCount); // {0}님의 사후결재 승인 대기건수 : {1} 건
+
+                    if (string.IsNullOrEmpty(item.strWarningPeriodOverCount) == false && item.strWarningPeriodOverCount != "0")
+                    {
+                        checkWarring = true;
+                        message += String.Format(XmlConf.GetWarnMsg("W_0277"), item.strWarningPeriodOverCount); // 사후결재 승인대기 기간경고 건수 : {0} 건
+                    }
+                    if (string.IsNullOrEmpty(item.strBlockPeriodOverCount) == false && item.strBlockPeriodOverCount != "0")
+                    {
+                        checkLimit = true;
+                        message += String.Format(XmlConf.GetWarnMsg("W_0278"), item.strBlockPeriodOverCount); // 사후결재 승인대기 기간제한 건수 : {0} 건
+                    }
+                    nDx++;
+                }
+
+                if (checkLimit)
+                {
+                    Task.Run(async () => { await refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "2"); });
+                    return;
+                }
+
+                if (checkWarring)
+                {
+                    Task.Run(async () => { await refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "1"); });
+
+                    return;
+                }
+
+            }
+
+            CLog.Here().Information($"ResultApproveAfterAdvanced, FileTrans, Start!!!");
+
+            if (!String.IsNullOrEmpty(_curFileName))
+            {
+                FileTrans(_curGroupId, MakeStream(_curFileName));
+            }
+
+            // Native에 할당된 Memory 제거
+            Window.ClipDataFree(_curGroupId);
+            Task.Delay(1000).Wait(); //서버에서 클립보드 테이블에 언제 Insert 하는지 몰라서 Delay를 주고 조회
+            SendDayClipInfo(_curGroupId);
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"ResultApproveAfterAdvanced, Exception(MSG) : {ex.Message}");
+        }
+
+    }
+
     public void ResultApproveAfter(int groupId, object[] e)
     {
         SGData sgData = e[0] as SGData;
@@ -2045,7 +2132,85 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         return;
     }
 
-    public void ResultApproveAfterMyCount(int groupId, object[] e)
+
+
+    public void ResultApproveAfterMyCountAdvanced(int groupId, PageEventArgs args, SGData sgData)
+    {
+
+        CLog.Here().Information($"ResultApproveAfterMyCountAdvanced, User Self After Approve Validation Data Recved !!!");
+
+        if (args.result != 0)
+        {
+            pageService.SetApproveAfterMyCountChecking(false);
+            CLog.Here().Error($"ResultApproveAfterMyCountAdvanced, Groupid : {groupId}, Result : {args.result}, Reason : {args.strMsg}");
+            ShowMessage("warn", XmlConf.GetInfoMsg("I_0233"));
+            return;
+        }
+
+        bool checkWarring = false;
+        bool checkLimit = false;
+
+        try
+        {
+
+            if (sgData != null && sgData.m_DicTagData.Count > 0)
+            {
+                string strData = "";
+                List<ApproverApproveDataCheckInfo> ListApproverApproveData = new List<ApproverApproveDataCheckInfo>();
+                if (CsFunction.GetAfterApproveData(ListApproverApproveData, sgData, out strData) == false)
+                {
+                    CLog.Here().Error($"ResultApproveAfterAdvanced, GetAfterApproveData - Error!");
+                    pageService.SetApproveAfterMyCountChecking(false);
+                    ShowMessage("error", strData);
+                    return;
+                }
+                
+                string message = String.Empty;
+                foreach (ApproverApproveDataCheckInfo item in ListApproverApproveData)
+                {
+                    message = String.Format(XmlConf.GetWarnMsg("W_0275"), item.strBlockPeriod); // 결재자의 사후결재 승인 대기건의 승인제한 일({0}일)이 얼마 남지 않았습니다.
+                    message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{item.strUserName} {item.strUserRank}", item.strWaitingTotalCount); // {0}님의 사후결재 승인 대기건수 : {1} 건
+
+                    if (string.IsNullOrEmpty(item.strWarningPeriodOverCount) == false && item.strWarningPeriodOverCount != "0")
+                    {
+                        checkWarring = true;
+                        message += String.Format(XmlConf.GetWarnMsg("W_0277"), item.strWarningPeriodOverCount); // 사후결재 승인대기 기간경고 건수 : {0} 건
+                    }
+                    if (string.IsNullOrEmpty(item.strBlockPeriodOverCount) == false && item.strBlockPeriodOverCount != "0")
+                    {
+                        checkLimit = true;
+                        message += String.Format(XmlConf.GetWarnMsg("W_0278"), item.strBlockPeriodOverCount); // 사후결재 승인대기 기간제한 건수 : {0} 건
+                    }
+                    break;
+                }
+
+                if (checkLimit || checkWarring)
+                {
+
+                    if (pageService.GetLogoutStatus(groupId))
+                    {
+                        pageService.SetApproveAfterMyCountChecking(false);
+                        return;
+                    }
+
+                    refSGAlertApproveAfterMyCount.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 2, groupId, groupId.ToString(), XmlConf.GetTitle("T_APPROVE_PAGE_MOVE"));
+                    return;
+                }
+
+            }
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Error($"ResultApproveAfterAdvanced, Exception(MSG) : {ex.Message}");
+        }
+
+        pageService.SetApproveAfterMyCountChecking(false);
+
+    }
+
+
+    /*public void ResultApproveAfterMyCount(int groupId, object[] e)
     {
         SGData sgData = e[0] as SGData;
 
@@ -2106,7 +2271,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         return;
 
-    }
+    }*/
 
     /// <summary>
     /// WinClipboardLibrary 에서 등록한 키 누르면 실제 실행되는 함수(WebWindow.Native에서 클립보드 데이타를 추출 후 ClipBoardHandler 이벤트 호출된다)
@@ -2601,16 +2766,33 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         if (sgLoginData.IsVipUser() || nUserApprPos > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
             bAfterApprove = false;
 
+        bool bSendData = true;
         if (!String.IsNullOrEmpty(stApprLineSeq) && bAfterApprove)
         {
-            //사후 결재일때 결재자 사후 결재 카운트 체크
-            SGQueryExtend sGQueryExtend = new SGQueryExtend();
-            string sql = sGQueryExtend.GetApproveAfterCount(stApprLineSeq, Common.Enums.EnumApproveTime.After);
+            bSendData = false;
+            LinkedList<ApproverInfo> apprLinkedList = sgApprLineData.GetApprAndLineData();
+            List<ApproverCheckInfo> approverList = new List<ApproverCheckInfo>();
 
-            HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eAPPROVEAFTERCOUNT, ResultApproveAfter);
-            HsCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERCOUNT, groupID, sgLoginData.GetUserID(), sql);
+            foreach (var item in apprLinkedList)
+            {
+                //사용자 유효성 검사 시, 로그인한 본인은 제외하고 확인한다.
+                if (item.UserSeq == strUserSeq)
+                    continue;
+
+                approverList.Add(new ApproverCheckInfo(item.UserSeq, item.DeptSeq));
+            }
+
+            HsCmdCenter.sgPageEvent.SetApproverValidationEvent(groupID, ResultApproveAfterAdvanced);
+            if (approverList.Count > 0)
+            {
+                CLog.Here().Information($"CheckApproveAfterLimit, Approver Validation Check !!!");
+                HsCmdCenter.RestSendApproverValidation(groupID, approverList);
+            }
+            else
+                bSendData = true;
         }
-        else
+
+        if (bSendData)
         {
             if (!String.IsNullOrEmpty(_curFileName))
             {
@@ -3018,11 +3200,21 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                             pageService.SetApproveAfterMyCountChecking(false);
                             return;
                         }
-                        SGQueryExtend sGQueryExtend = new SGQueryExtend();
+
+                        // 예전
+                        /*SGQueryExtend sGQueryExtend = new SGQueryExtend();
                         string sql = sGQueryExtend.GetApproveAfterCount(sgUserData.UserSeq, Common.Enums.EnumApproveTime.After);
 
                         HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eAPPROVEAFTERMYCOUNT, ResultApproveAfterMyCount);
-                        HsCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERMYCOUNT, groupID, sgLoginData.GetUserID(), sql);
+                        HsCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERMYCOUNT, groupID, sgLoginData.GetUserID(), sql);*/
+
+                        // Advanced
+                        List<ApproverCheckInfo> approverList = new List<ApproverCheckInfo>();
+                        approverList.Add(new ApproverCheckInfo(sgLoginData.GetUserSequence(), sgLoginData.GetTeamCode()));
+                        HsCmdCenter.sgPageEvent.SetApproverValidationEvent(groupID, ResultApproveAfterMyCountAdvanced);
+                        CLog.Here().Information($"RecvServerNoti, UserSelf Approve After Count Check !!!");
+                        HsCmdCenter.RestSendApproverValidation(groupID, approverList);
+
                     }
                 }
             }
@@ -3169,11 +3361,20 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                             pageService.SetApproveAfterMyCountChecking(false);
                             return;
                         }
-                        SGQueryExtend sGQueryExtend = new SGQueryExtend();
-                        string sql = sGQueryExtend.GetApproveAfterCount(sgUserData.UserSeq, Common.Enums.EnumApproveTime.After);
 
+                        // 예전
+                        /*SGQueryExtend sGQueryExtend = new SGQueryExtend();
+                        string sql = sGQueryExtend.GetApproveAfterCount(sgUserData.UserSeq, Common.Enums.EnumApproveTime.After);
                         HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eAPPROVEAFTERMYCOUNT, ResultApproveAfterMyCount);
-                        HsCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERMYCOUNT, groupID, sgLoginData.GetUserID(), sql);
+                        HsCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERMYCOUNT, groupID, sgLoginData.GetUserID(), sql);*/
+
+                        // Advanced
+                        List<ApproverCheckInfo> approverList = new List<ApproverCheckInfo>();
+                        approverList.Add(new ApproverCheckInfo(sgLoginData.GetUserSequence(), sgLoginData.GetTeamCode()));
+                        HsCmdCenter.sgPageEvent.SetApproverValidationEvent(groupID, ResultApproveAfterMyCountAdvanced);
+                        CLog.Here().Information($"RecvServerNoti, UserSelf Approve After Count Check !!!");
+                        HsCmdCenter.RestSendApproverValidation(groupID, approverList);
+
                     }
                 }
             }

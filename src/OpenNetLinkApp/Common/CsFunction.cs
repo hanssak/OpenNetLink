@@ -26,6 +26,9 @@ using QRCoder;
 using System.Security.Cryptography;
 using Google.Authenticator;
 using Net.Codecrete.QrCodeGenerator;
+using HsNetWorkSGData;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace OpenNetLinkApp.Common
 {
@@ -384,6 +387,121 @@ namespace OpenNetLinkApp.Common
 #endif
             return ret;
         }
+
+
+        /// <summary>
+        /// 사후결재, 누적건수 UI에 표현할 data 만 SGData에서 뽑아내는 함수<br></br>
+        /// return : true - 정상적으로 뽑아낸 data가 있음
+        /// </summary>
+        /// <param name="ListApproverApproveData"></param>
+        /// <param name="sgData"></param>
+        /// <param name="strMsgData"></param>
+        /// <returns></returns>
+        public static bool GetAfterApproveData(List<ApproverApproveDataCheckInfo> ListApproverApproveData, SGData sgData, out string strMsgData)
+        {
+
+            strMsgData = "";
+
+            if (sgData == null)
+            {
+                Log.Logger.Here().Error($"GetAfterApproveData, SGData NULL !!!");
+                strMsgData = "GetAfterApproveData, SGData NULL !!!";
+                return false;
+            }
+
+            try
+            {
+                string strData = sgData.GetTagData("validation_result_list");
+                if (string.IsNullOrEmpty(strData))
+                {
+                    Log.Logger.Here().Error($"GetAfterApproveData, Approver validation_result_list Empty, !!!");
+                    strMsgData = XmlConf.GetErrMsg("E_0251");
+                    return false;
+                }
+
+                var dataList = JsonConvert.DeserializeObject<List<dynamic>>(strData);
+                if ((dataList?.Count ?? 0) < 1)
+                {
+                    Log.Logger.Here().Error($"GetAfterApproveData, Approver validation_result_list Parsing Error, !!!");
+                    strMsgData = XmlConf.GetErrMsg("E_0251");
+                    return false;
+                }
+
+                Log.Logger.Here().Error($"GetAfterApproveData, Get validation_result_list Data!!!");
+                ApproverApproveDataCheckInfo[] arrData = new ApproverApproveDataCheckInfo[dataList.Count];
+
+                string strItemData = "";
+                int nIdx = 0;
+                foreach (var dataItem in dataList)
+                {
+                    strItemData = Convert.ToString(dataItem);
+                    JObject jO = JObject.Parse(strItemData);
+
+                    strItemData = Convert.ToString(jO["approver_hr"]);
+                    JObject jO_hr = JObject.Parse(strItemData);
+
+                    arrData[nIdx] = new ApproverApproveDataCheckInfo();
+                    arrData[nIdx].strUserName = (string)jO_hr["name"];
+                    arrData[nIdx].strUserRank = Convert.ToString(jO_hr["rank"]);
+
+                    nIdx++;
+                }
+
+                strData = sgData.GetTagData("approver_waiting_status_list");
+                if (string.IsNullOrEmpty(strData))
+                {
+                    Log.Logger.Here().Error($"GetAfterApproveData, approver_waiting_status_list Empty, !!!");
+                    strMsgData = XmlConf.GetErrMsg("E_0251");
+                    return false;
+                }
+
+                dataList = JsonConvert.DeserializeObject<List<dynamic>>(strData);
+                if ((dataList?.Count ?? 0) < 1)
+                {
+                    Log.Logger.Here().Error($"GetAfterApproveData, approver_waiting_status_list Parsing Error, !!!");
+                    strMsgData = XmlConf.GetErrMsg("E_0251");
+                    return false;
+                }
+
+                Log.Logger.Here().Error($"GetAfterApproveData, Get approver_waiting_status_list Data!!!");
+
+                nIdx = 0;
+                foreach (var dataItem in dataList)
+                {
+                    strItemData = Convert.ToString(dataItem);
+                    JObject jO = JObject.Parse(strItemData);
+
+                    strItemData = Convert.ToString(jO["post_status"]);
+                    JObject jOpostStatus = JObject.Parse(strItemData);
+
+                    if (arrData[nIdx] != null)
+                    {
+                        arrData[nIdx].strWaitingTotalCount = Convert.ToString(jOpostStatus["waiting_total_count"]);
+                        arrData[nIdx].strBlockPeriodOverCount = Convert.ToString(jOpostStatus["block_period_over_count"]);
+                        arrData[nIdx].strWarningPeriodOverCount = Convert.ToString(jOpostStatus["warning_period_over_count"]);
+                        arrData[nIdx].strBlockPeriod = Convert.ToString(jOpostStatus["block_period"]);
+                        arrData[nIdx].strWarningPeriod = Convert.ToString(jOpostStatus["warning_period"]);
+
+                        ListApproverApproveData.Add(arrData[nIdx]);
+                    }
+
+                    nIdx++;
+                }
+
+                Log.Logger.Here().Error($"GetAfterApproveData, Get post_status Data!!!");
+                return (ListApproverApproveData.Count > 0);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"GetAfterApproveData, Exception(MSG) : {ex.Message}");
+                strMsgData = $"GetAfterApproveData, Exception";
+            }
+
+            return false;
+        }
+
+
+
     }
 
     public class CsSeqFunc

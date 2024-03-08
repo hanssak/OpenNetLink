@@ -4206,7 +4206,7 @@ namespace OpenNetLinkApp.Services
         }
 
 
-        public int RestSendApproverValidation(int groupid, List<ApproverCheckInfo> listApprover, eCmdReponseType reponseType = eCmdReponseType.CallPosReponse)
+        public int RestSendApproverValidation(int groupid, List<ApproverCheckInfo> listApprover, eCmdReponseType reponseType = eCmdReponseType.CallBackPosResponse)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
