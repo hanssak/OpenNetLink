@@ -322,46 +322,65 @@
         </div>
     </li>
     <!-- Notifications Dropdown Menu -->
-
-
-    <li class="nav-item dropdown">
-        <a class="nav-link white_font" data-toggle="dropdown" title=@xmlConf.GetTitle("T_INFO_ALARM")>
-            <!--<i class="fas fa-bell"></i>-->
-            <i class="@GetAlarmIcon() "></i>
-            @if ((nAlarmCount = GetAlarmAllNetSum(GetUserInfo()?.UserSeq)) > 0)
-            {
-                //<span class="badge badge-warning navbar-badge">15</span>
-                <span class="@GetAlarmBadge() navbar-badge">@(nAlarmCount)</span>
-            }
-        </a>
-
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            @*<span class="dropdown-item dropdown-header">@nAlarmCount Notifications</span>*@
-            @if (nAlarmCount > 0)@foreach (var AlarmItem in GetAlarmInfoList(GetUserInfo()?.UserSeq, 5))
+    <!-- Alram -->
+    @if (!SGAppMgrSvc.OpConfigInfoService.GetHideHeaderAlram(0))
+    {
+        <li class="nav-item dropdown">
+            <a class="nav-link white_font" data-toggle="dropdown" title=@xmlConf.GetTitle("T_INFO_ALARM")>
+                <!--<i class="fas fa-bell"></i>-->
+                <i class="@GetAlarmIcon() "></i>
+                @if ((nAlarmCount = GetAlarmAllNetSum(GetUserInfo()?.UserSeq)) > 0)
                 {
-                    <div class="dropdown-divider"></div>
-                    @if (AlarmItem.Head.Length > 20)
-                    {
-                        AlarmViewHead = AlarmItem.Head.Substring(0, 20) + "...";
-                    }
-                    else
-                    {
-                        AlarmViewHead = AlarmItem.Head;
-                    }
-                    @if (AlarmItem.Body.Length > 20)
-                    {
-                        AlarmViewBody = AlarmItem.Body.Substring(0, 20) + "...";
-                    }
-                    else
-                    {
-                        AlarmViewBody = AlarmItem.Body;
-                    }
-                    @if (String.IsNullOrEmpty(AlarmItem.Path))
-                    {
+                    //<span class="badge badge-warning navbar-badge">15</span>
+                    <span class="@GetAlarmBadge() navbar-badge">@(nAlarmCount)</span>
+                }
+            </a>
 
-                        <a class="dropdown-item">
-                            <!-- Notification Start -->
-                            <div class="media p-2">
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                @*<span class="dropdown-item dropdown-header">@nAlarmCount Notifications</span>*@
+                @if (nAlarmCount > 0)@foreach (var AlarmItem in GetAlarmInfoList(GetUserInfo()?.UserSeq, 5))
+                {
+                        <div class="dropdown-divider"></div>
+                        @if (AlarmItem.Head.Length > 20)
+                        {
+                            AlarmViewHead = AlarmItem.Head.Substring(0, 20) + "...";
+                        }
+                        else
+                        {
+                            AlarmViewHead = AlarmItem.Head;
+                        }
+                        @if (AlarmItem.Body.Length > 20)
+                        {
+                            AlarmViewBody = AlarmItem.Body.Substring(0, 20) + "...";
+                        }
+                        else
+                        {
+                            AlarmViewBody = AlarmItem.Body;
+                        }
+                        @if (String.IsNullOrEmpty(AlarmItem.Path))
+                        {
+
+                            <a class="dropdown-item">
+                                <!-- Notification Start -->
+                                <div class="media p-2">
+                                    <div class="media-body">
+                                        <h3 class="dropdown-item-title font-weight-bold mb-2">
+                                            <span class="float-left"><i class="fas fa-bell"></i></span>&nbsp;
+                                            @AlarmViewHead
+                                            <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))" style="cursor:pointer"><i class="fas fa-times fa-lg"></i></a></span>
+                                        </h3>
+                                        <p class="text-xs">@AlarmViewBody</p>
+                                        <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</p>
+                                    </div>
+                                </div>
+                                <!-- Notification End -->
+                            </a>
+
+                        }
+                        else
+                        {
+                            <a @onclick="@(() => ItemClickToNavigate(AlarmItem.Path))" class="dropdown-item p-2" style="cursor:pointer">
+                                <!-- Notification Start -->
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title font-weight-bold mb-2">
                                         <span class="float-left"><i class="fas fa-bell"></i></span>&nbsp;
@@ -371,60 +390,44 @@
                                     <p class="text-xs">@AlarmViewBody</p>
                                     <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</p>
                                 </div>
-                            </div>
-                            <!-- Notification End -->
-                        </a>
-
+                                <!-- Notification End -->
+                                @*                          <span class="float-right text-muted text-sm"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
+                                    <i class="fas fa-bell mr-2"></i>@AlarmViewHead
+                                    <p class="text-sm">@AlarmViewBody</p>
+                                    <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</span>*@
+                            </a>
+                        }
+                        <div class="dropdown-divider"></div>
                     }
-                    else
-                    {
-                        <a @onclick="@(()=> ItemClickToNavigate(AlarmItem.Path))" class="dropdown-item p-2" style="cursor:pointer">
-                            <!-- Notification Start -->
-                            <div class="media-body">
-                                <h3 class="dropdown-item-title font-weight-bold mb-2">
-                                    <span class="float-left"><i class="fas fa-bell"></i></span>&nbsp;
-                                    @AlarmViewHead
-                                    <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))" style="cursor:pointer"><i class="fas fa-times fa-lg"></i></a></span>
-                                </h3>
-                                <p class="text-xs">@AlarmViewBody</p>
-                                <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</p>
-                            </div>
-                            <!-- Notification End -->
-                            @*                          <span class="float-right text-muted text-sm"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
-                                <i class="fas fa-bell mr-2"></i>@AlarmViewHead
-                                <p class="text-sm">@AlarmViewBody</p>
-                                <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</span>*@
-                        </a>
-                    }
-                    <div class="dropdown-divider"></div>
-                }
 
-            @if (String.IsNullOrEmpty(GetAlarmPath()))
-            {
-                //<a class="dropdown-item dropdown-footer">전체 알림 보기</a>
-                <a @onclick="@(()=> ItemClickToNavigate("/alarmList"))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
-            }
-            else
-            {
-                //<a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>
-                <a @onclick="@(()=> ItemClickToNavigate("/alarmList"))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
-            }
-
-            @if (bViewAlarmNotiAllDelMenu)
-            {
-                <div class="dropdown-divider"></div>
                 @if (String.IsNullOrEmpty(GetAlarmPath()))
                 {
-                    <a @onclick="@(async () => DelAllNotiInfo(GetUserInfo()?.UserSeq))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMDELETE")</a> <!--전체 알림 삭제-->
+                    //<a class="dropdown-item dropdown-footer">전체 알림 보기</a>
+                    <a @onclick="@(() => ItemClickToNavigate("/alarmList"))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
                 }
                 else
                 {
-                    <a @onclick="@(async () => DelAllNotiInfo(GetUserInfo()?.UserSeq))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMDELETE")</a> <!--전체 알림 삭제-->
+                    //<a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>
+                    <a @onclick="@(() => ItemClickToNavigate("/alarmList"))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
                 }
-            }
-        </div>
 
-    </li>
+                @if (bViewAlarmNotiAllDelMenu)
+                {
+                    <div class="dropdown-divider"></div>
+                    @if (String.IsNullOrEmpty(GetAlarmPath()))
+                    {
+                        <a @onclick="@(async () => DelAllNotiInfo(GetUserInfo()?.UserSeq))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMDELETE")</a> <!--전체 알림 삭제-->
+                    }
+                    else
+                    {
+                        <a @onclick="@(async () => DelAllNotiInfo(GetUserInfo()?.UserSeq))" class="nav-link dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMDELETE")</a> <!--전체 알림 삭제-->
+                    }
+                }
+            </div>
+
+        </li>
+    }
+
     @if (SGAppMgrSvc.OpConfigInfoService.GetVisiblePolicyUpdateButton(0))
     {
         <li class="nav-item">

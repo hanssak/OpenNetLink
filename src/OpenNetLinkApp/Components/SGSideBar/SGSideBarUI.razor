@@ -22,8 +22,6 @@
         with font-awesome or any other icon font library -->
         @if (SideBarUISvc.MenuList?.Count > 0)
         {
-
-
             // Exist Menu
             @foreach (var MenuItem in SideBarUISvc.MenuList)
             {
@@ -43,9 +41,20 @@
                                @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem, true))">
                                 <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
                                 <p style="font-size:1rem;" class="p-2">
-                                    @(MenuItem.FromName /*Dashboard*/)
-                                    <i class="fas fa-long-arrow-alt-right p-1"></i>
-                                    @(MenuItem.ToName /*Dashboard*/)
+                                    @if (bViewOnlyFromName)
+                                    {
+                                        @(MenuItem.FromName)
+                                    }
+                                    @if (bViewOnlyToName)
+                                    {
+                                        @(MenuItem.ToName)
+                                    }
+                                    @if (bViewToNameFromName)
+                                    {
+                                        @(MenuItem.FromName)
+                                        <i class="fas fa-long-arrow-alt-right p-1"></i>
+                                        @(MenuItem.ToName)
+                                    }
                                     <!--<i class="right fas fa-angle-left mt-1"></i>-->
                                     <!-- Badge -->
                                     @if (bViewSGSideBarUIBadge)
@@ -67,9 +76,20 @@
                                @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))">
                                 <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
                                 <p style="font-size:1rem;" class="p-2">
-                                    @(MenuItem.FromName /*Dashboard*/)
-                                    <i class="fas fa-long-arrow-alt-right p-1"></i>
-                                    @(MenuItem.ToName /*Dashboard*/)
+                                    @if (bViewOnlyFromName)
+                                    {
+                                        @(MenuItem.FromName)
+                                    }
+                                    @if (bViewOnlyToName)
+                                    {
+                                        @(MenuItem.ToName)
+                                    }
+                                    @if (bViewToNameFromName)
+                                    {
+                                        @(MenuItem.FromName)
+                                        <i class="fas fa-long-arrow-alt-right p-1"></i>
+                                        @(MenuItem.ToName)
+                                    }
                                     <!-- <i class="right fas fa-angle-left mt-1"></i> -->
                                     <!-- Badge -->
                                     @if (bViewSGSideBarUIBadge)
@@ -88,7 +108,7 @@
                                 @if (SubMenuList.Actived) SideBarUISvc.ActiveMenu = SubMenuList;
                                 @if (SubMenuList.Child?.Count > 0)
                                 {
-                                    <li class="nav-item has-treeview pt-2 @SubMenuList.MenuOpenClass">
+                                    <li class="nav-item has-treeview pt-2 @(bUseAllMenuExpand? menuOpenClass : SubMenuList.MenuOpenClass)">
                                         @if (!String.IsNullOrEmpty(SubMenuList.Path))
                                         {
                                             <a class="nav-link"
@@ -111,7 +131,10 @@
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
                                                         </span>
                                                     }
+                                                    @if (!bUseAllMenuExpand)
+                                                    {
                                                     <i class="right fas fa-angle-left"></i>
+                                                    }
                                                 </p>
                                             </a>
                                         }
@@ -124,7 +147,7 @@
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (bViewSGSideBarUIBadge && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                               && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
@@ -133,13 +156,16 @@
                                                     }
 
                                                     @if (bViewSGSideBarUIBadge && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                               && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
                                                         </span>
                                                     }
-                                                    <i class="right fas fa-angle-left"></i>
+                                                    @if (!bUseAllMenuExpand)
+                                                    {
+                                                        <i class="right fas fa-angle-left"></i>
+                                                    }
                                                 </p>
                                             </a>
                                         }
@@ -196,7 +222,7 @@
                                             <p>
                                                 @(GetDescription(SubMenuList.CategoryId))
                                                 @if (bViewSGSideBarUIBadge && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                            && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                           && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <!-- Badge -->
                                                     <span class="@(SubMenuList.BadgeType) ">
@@ -205,14 +231,17 @@
                                                 }
 
                                                 @if (bViewSGSideBarUIBadge && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                            && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                           && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <!-- Badge -->
                                                     <span class="badge badge-danger ">
                                                         @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
                                                     </span>
                                                 }
-                                                <i class="right fas fa-angle-left"></i>
+                                                @if (!bUseAllMenuExpand)
+                                                {
+                                                    <i class="right fas fa-angle-left"></i>
+                                                }
                                             </p>
                                         </a>
                                     </li>
@@ -233,9 +262,20 @@
                            @onkeydown="@(async eventArgs => await ChangeActiveMenuWrapPopup(eventArgs, MenuItem))">
                             <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/) text-md logo-xs mt-2"></i>
                             <p style="font-size:1rem;" class="p-2">
-                                @(MenuItem.FromName /*Dashboard*/)
-                                <i class="fas fa-long-arrow-alt-right p-1"></i>
-                                @(MenuItem.ToName /*Dashboard*/)
+                                @if (bViewOnlyFromName)
+                                {
+                                    @(MenuItem.FromName)
+                                }
+                                @if (bViewOnlyToName)
+                                {
+                                    @(MenuItem.ToName)
+                                }
+                                @if (bViewToNameFromName)
+                                {
+                                    @(MenuItem.FromName)
+                                    <i class="fas fa-long-arrow-alt-right p-1"></i>
+                                    @(MenuItem.ToName)
+                                }
                             </p>
                         </a>
                     </li>
@@ -283,6 +323,13 @@
     bool bViewSGSideBarUIBadge = false;                   // 메뉴에 Badge 나오게할지 유무
 
     bool bFileTransUse = false;
+
+    bool bUseAllMenuExpand = false;
+    string menuOpenClass = "menu-open";
+
+    bool bViewOnlyToName = false;
+    bool bViewOnlyFromName = false;
+    bool bViewToNameFromName = false;
 
 
     /// <summary>
@@ -522,7 +569,12 @@
         }
 
         bViewSGSideBarUIBadge = SGAppMgrSvc.OpConfigInfoService.GetViewSGSideBarUIBadge(0);
+        bUseAllMenuExpand = SGAppMgrSvc.OpConfigInfoService.GetUseAllMenuExpand(0);
+        bViewOnlyToName = SGAppMgrSvc.OpConfigInfoService.GetViewOnlyToName(0);
+        bViewOnlyFromName = SGAppMgrSvc.OpConfigInfoService.GetViewOnlyFromName(0);
 
+        if (!bViewOnlyToName && !bViewOnlyFromName)
+            bViewToNameFromName = true;
     }
 
     private string GetDescription(LSIDEBAR Id)
@@ -688,16 +740,16 @@
 
             //if (sgLoginData.GetUseOverNetwork2())
             //{
-                if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName))
-                {
-                    pageService.SetTargetSystemList(groupId, dicSysIdName);
+            if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName))
+            {
+                pageService.SetTargetSystemList(groupId, dicSysIdName);
 
-                    // 3중망이상일때, 왼쪽Sidebar 포함 도착망이름 변경
-                    if (dicSysIdName != null && dicSysIdName.Count > 2)
-                    {
-                        ChangeNetOverTitle(groupId, dicSysIdName);
-                    }
+                // 3중망이상일때, 왼쪽Sidebar 포함 도착망이름 변경
+                if (dicSysIdName != null && dicSysIdName.Count > 2)
+                {
+                    ChangeNetOverTitle(groupId, dicSysIdName);
                 }
+            }
             //}
 
             bFileTransMenuUse = pageService.GetUseFileTransNetOver(groupId, sgLoginData);

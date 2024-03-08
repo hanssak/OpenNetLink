@@ -161,6 +161,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseInitMessagePerDay { get; set; }                     // 일일 이전 날짜 메세지 자동 삭제
 
         //부가 기능 (Tray, 자동 실행 등)
+        public bool bViewOnlyToName { get; set; }                                  //왼쪽 사이드 바 망이름 From -> To 인데 To만 나오게 수정
+        public bool bViewOnlyFromName { get; set; }                                  //왼쪽 사이드 바 망이름 From -> To 인데 From만 나오게 수정
+        public bool bUseAllMenuExpand { get; set; }                                //왼쪽 사이드 바 전부 확장 사용 유무
         public bool bUseMainPageType { get; set; }                                 // 메인화면 사용 여부(환경설정)
         //public PAGE_TYPE enMainPageType { get; set; }                               // 메인페이지(0 : DASHBOARD, 1 : TRANSFER)
         public bool bUseCloseTrayMove { get; set; }                              // 종료 시 트레이 사용 유무.(환경설정)
@@ -264,5 +267,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseAptTimeOutMsg { get; set; }                    //APT 타임아웃 났을때 문구 VirusReport로 보내지 않고 알림으로 사용
 
         public bool bHideApproveRejectButtonInApproveUI { get; set; }  //결재관리 화면에서 승인, 반려 버튼 숨김처리 여부 - 기본 false - 보여준다.
+
+        public bool bHideHeaderAlram { get; set; }                    //우측 상단 Header의 아이콘에서 알람 Hide 여부 - 기본 false - 보여준다.
     }
 }
