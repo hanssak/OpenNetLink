@@ -16,6 +16,7 @@
 void *SelfThis = nullptr;
 #include "NativeLog.h"
 #include "TrayFunc.h"
+#include "Tray.h"
 
 #include "TextEncDetect.h"
 
@@ -689,6 +690,11 @@ void WebWindow::FolderOpen(AutoString strDownPath)
     else NTLog(this, Info, "Can't Finder Open Folder: %s", strDownPath);
 }
 
+void WebWindow::SetTrayText(AutoString tooltip, AutoString show, AutoString hide, AutoString exit, AutoString hyphen)
+{
+	tray_text(tooltip, show, hide, exit, hyphen);
+}
+
 void WebWindow::SetClipBoard(int groupID, int nType, int nClipSize, void* data)
 {
 	/* TEXT = 1, IMAGE = 2, OBJECT = 3 */
@@ -772,7 +778,7 @@ void WebWindow::MoveWebWindowToTray()
         struct tray_menu *item = tray.menu;
         do
         {
-            if (strcmp(item->text, "Hide") == 0) {
+            if (strcmp(item->text, g_trayHide) == 0) {
                 toggle_show(item);
                 break;
             }
@@ -788,7 +794,7 @@ void WebWindow::MoveTrayToWebWindow()
         struct tray_menu* item = tray.menu;
         do
 	    {
-		if (strcmp(item->text, "Show") == 0) {
+		if (strcmp(item->text, g_trayShow) == 0) {
 			toggle_show(item);
 			break;
 		}
@@ -802,7 +808,7 @@ void WebWindow::MinimizeWebWindow()
 	struct tray_menu *item = tray.menu;
 	do
 	{
-		if (strcmp(item->text, "Hide") == 0) {
+		if (strcmp(item->text, g_trayHide) == 0) {
 			toggle_minimize(item);
 			break;
 		}

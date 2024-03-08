@@ -24,9 +24,9 @@ static struct tray tray = {
     .menu 		= (struct tray_menu[]) {
           		  //{.text = (char *)"About",   .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb,	.context = NULL, .submenu = NULL},
           		  //{.text = (char *)"-",       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, 		.context = NULL, .submenu = NULL},
-          		  {.text = (char *)"Show",    .disabled = 0, .checked = 1, .usedCheck = 0, .cb = toggle_show, .context = NULL, .submenu = NULL},
-          		  {.text = (char *)"-",       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL,		.context = NULL, .submenu = NULL},
-          		  {.text = (char *)"Quit",    .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb,		.context = NULL, .submenu = NULL},
+          		  {.text = g_trayShow,    .disabled = 0, .checked = 1, .usedCheck = 0, .cb = toggle_show, .context = NULL, .submenu = NULL},
+          		  {.text = g_trayHyphen,       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL,		.context = NULL, .submenu = NULL},
+          		  {.text = g_trayExit,    .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb,		.context = NULL, .submenu = NULL},
           		  {.text = NULL,              .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL,		.context = NULL, .submenu = NULL}
     }
 };

@@ -26,7 +26,6 @@
 #define TRAY_ICON3 "wwwroot/SecureGate.ico"
 #endif
 
-typedef const wchar_t* AutoString;
 struct tray_menu;
 
 struct tray {
@@ -34,7 +33,19 @@ struct tray {
 	char* dark_icon;
 	struct tray_menu* menu;
 };
+#if TRAY_APPKIT
+struct tray_menu {
+	char* text;
+	int disabled;
+	int checked;
+	int usedCheck;
 
+	void (*cb)(struct tray_menu*);
+	void* context;
+
+	struct tray_menu* submenu;
+};
+#elif TRAY_WINAPI
 struct tray_menu {
 	wchar_t* text;
 	int disabled;
@@ -46,6 +57,19 @@ struct tray_menu {
 
 	struct tray_menu* submenu;
 };
+#elif TRAY_APPINDICATOR
+struct tray_menu {
+	char* text;
+	int disabled;
+	int checked;
+	int usedCheck;
+
+	void (*cb)(struct tray_menu*);
+	void* context;
+
+	struct tray_menu* submenu;
+};
+#endif
 
 static void tray_update(struct tray* tray);
 
@@ -174,6 +198,7 @@ static void tray_exit() { loop_result = -1; }
 #include <string.h>
 #include <objc/NSObjCRuntime.h>
 #include "NativeLog.h"
+#include "wchar.h"
 
 static id app;
 static id icon;
@@ -183,13 +208,19 @@ static id statusItem;
 static id statusBarButton;
 static id SelfId;
 
+static char g_tooltipTitle[512];
+static char g_trayShow[512];
+static char g_trayHide[512];
+static char g_trayExit[512];
+static char g_trayHyphen[512];
+
 static id _tray_menu(struct tray_menu* m) {
 	id menu = ((id(*)(id, SEL))objc_msgSend)((id)objc_getClass("NSMenu"), sel_registerName("new"));
 	((void(*)(id, SEL))objc_msgSend)(menu, sel_registerName("autorelease"));
 	((void(*)(id, SEL, bool))objc_msgSend)(menu, sel_registerName("setAutoenablesItems:"), false);
 
 	for (; m != NULL && m->text != NULL; m++) {
-		if (strcmp(m->text, "-") == 0) {
+		if (strcmp(m->text, g_trayHyphen) == 0) {
 			((void(*)(id, SEL, id))objc_msgSend)(menu, sel_registerName("addItem:"),
 				((id(*)(id, SEL))objc_msgSend)((id)objc_getClass("NSMenuItem"), sel_registerName("separatorItem")));
 		}
@@ -382,6 +413,17 @@ static int tray_loop(int blocking) {
 	return 0;
 }
 
+static int tray_text(AutoString tooltip, AutoString show, AutoString hide, AutoString exit, AutoString hyphen)
+{
+	strcpy(g_tooltipTitle, tooltip);
+	strcpy(g_trayShow, show);
+	strcpy(g_trayHide, hide);
+	strcpy(g_trayExit, exit);
+	strcpy(g_trayHyphen, hyphen);
+	
+	return 0;
+}
+
 static void tray_update(struct tray* tray) {
 	((void(*)(id, SEL, id))objc_msgSend)(statusBarButton, sel_registerName("setImage:"), icon);
 	((void(*)(id, SEL, id))objc_msgSend)(statusItem, sel_registerName("setMenu:"), _tray_menu(tray->menu));
@@ -399,6 +441,7 @@ static void tray_exit() { ((void(*)(id, SEL, id))objc_msgSend)(app, sel_register
 #define WC_TRAY_CLASS_NAME L"TRAY"
 #define ID_TRAY_FIRST 1000
 
+typedef const wchar_t* AutoString;
 static WNDCLASSEX wc;
 static NOTIFYICONDATA nid;
 static HWND hwnd;
@@ -458,7 +501,7 @@ static LRESULT CALLBACK _tray_wnd_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARA
 static HMENU _tray_menu(struct tray_menu* m, UINT* id) {
 	HMENU hmenu = CreatePopupMenu();
 	for (; m != NULL && m->text != NULL; m++, (*id)++) {
-		if (wcscmp(m->text, L"-") == 0) {
+		if (wcscmp(m->text, g_trayHyphen) == 0) {
 			InsertMenu(hmenu, *id, MF_SEPARATOR, TRUE, L"");
 		}
 		else {
