@@ -1239,7 +1239,6 @@ namespace OpenNetLinkApp.Services
                         }
                         break;
 
-
                     case eAdvancedCmdList.eGetDepts:                    // 부서정보 조회
                         DeptInfoAfterSend(nRet, groupId, sgData);
                         break;
@@ -1248,12 +1247,9 @@ namespace OpenNetLinkApp.Services
                     case eAdvancedCmdList.ePostAgentBlocks:				// agent 파일첨부차단 정보 송신결과
                     case eAdvancedCmdList.eDeleteProxyApprovers:		// 등록된 대결재자 삭제
                     case eAdvancedCmdList.ePostProxyApproversChange:	// 대결재자 변경 저장
-                        Log.Logger.Here().Error($"CMD : {cmd}, groupid : {groupId}, GetResponseResult : {nRet}, reason:{strResponseReason}");
-                        // Action 없음
-                        break;
-
                     default:
-                        throw new Exception("UnKnown CMD!");
+                        Log.Logger.Here().Warning($"Undefined HSCmdCenter Action - CMD : {cmd}, groupid : {groupId}, GetResponseResult : {nRet}, reason:{strResponseReason}");
+                        // Action 없음
                         break;
                 }
             }
