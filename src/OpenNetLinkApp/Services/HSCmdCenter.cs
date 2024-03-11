@@ -32,6 +32,7 @@ using HsNetWorkSG.RestApi;
 using Newtonsoft.Json;
 using static HsNetWorkSG.SGEnums;
 using Newtonsoft.Json.Linq;
+using static OpenNetLinkApp.Common.Enums;
 
 namespace OpenNetLinkApp.Services
 {
@@ -1122,12 +1123,27 @@ namespace OpenNetLinkApp.Services
                         EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
                         break;
                     case eAdvancedCmdList.eNoti3rdPartyResult:
+                        {
+                            Dictionary<PreworkTypeEx, List<FileRecord>> listcmdData = new Dictionary<PreworkTypeEx, List<FileRecord>>();
+                            if (Noti3rdPartyUnionHaveBlockData(nRet, groupId, sgData, listcmdData))
+                            {
+
+                            }
+                            else
+                            {
+                                // Prework 결재요청 동작
+                            }
+
+                        }
                         //eCmdList.ePRIVACYAPPROVENOTIFY:
                         PrivacyApproveCountNotiAfterSend(nRet, eCmdList.ePRIVACYAPPROVENOTIFY, groupId, sgData);
+
                         //eCmdList.eVIRUSSCAN:                                                   // 바이러스 검출 노티.
                         VirusScanNotiAfterSend(nRet, eCmdList.eVIRUSSCAN, groupId, sgData);
+
                         //eCmdList.eAPTSCAN:                                                     // APT 노티.
                         VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
+
                         //eCmdList.eDrmBlockNoti:                                                     // DRM Noti
                         VirusScanNotiAfterSend(nRet, eCmdList.eDrmBlockNoti, groupId, sgData);
 
@@ -2125,6 +2141,94 @@ namespace OpenNetLinkApp.Services
                 AptAndVirusEvent(groupId, cmd, e);
             }
         }
+
+        public bool Noti3rdPartyUnionHaveBlockData(int nRet, int groupId, SGData sgData, Dictionary<PreworkTypeEx, List<FileRecord>> DicDetectFileData)
+        {
+            if (sgData == null)
+            {
+                Log.Logger.Here().Error($"Noti3rdPartyUnionHaveBlockData, Ret : {nRet}, groupid : {groupId}, sgData = NULL!");
+                return false;
+            }
+
+            if (DicDetectFileData == null)
+            {
+                Log.Logger.Here().Error($"Noti3rdPartyUnionHaveBlockData, Ret : {nRet}, groupid : {groupId}, DicDetectFileData = NULL!");
+                return false;
+            }
+
+            string strData = "";
+            string strTransSeq = "";
+
+            try
+            {
+                strTransSeq = sgData.GetTagData("trans_seq");
+                if (string.IsNullOrEmpty(strTransSeq))
+                {
+                    Log.Logger.Here().Error($"Noti3rdPartyUnionHaveBlockData, Ret : {nRet}, groupid : {groupId}, trans_seq : Empty!");
+                    return false;
+                }
+
+                strData = sgData.GetTagData("prework_list");
+                if (string.IsNullOrEmpty(strData))
+                {
+                    Log.Logger.Here().Error($"Noti3rdPartyUnionHaveBlockData, Ret : {nRet}, groupid : {groupId}, trans_Seq : {strTransSeq}, prework_list : Empty!");
+                    return false;
+                }
+
+                var dataList = JsonConvert.DeserializeObject<List<dynamic>>(strData);
+                DicDetectFileData.Clear();
+
+
+                PreworkTypeEx eBlockData;
+                string strItemData = "";
+                foreach (var dataItem in dataList)
+                {
+
+                    FileRecord tData = new FileRecord();
+                    strItemData = Convert.ToString(dataItem);
+                    JObject jO_prework = JObject.Parse(strItemData);
+
+                    strItemData = Convert.ToString(jO_prework["ex_approval_policy"]);
+                    JObject jO_ex_approval_policy = JObject.Parse(strItemData);
+
+                    strItemData = Convert.ToString(jO_ex_approval_policy["action"]);
+                    if (string.Compare(strItemData, "unuse", true) == 0)
+                    {
+                        strItemData = Convert.ToString(jO_prework["scan"]);
+                        JObject jO_type = JObject.Parse(strItemData);
+                        strItemData = Convert.ToString(jO_type["type"]);
+
+                        if (string.Compare(strItemData, "drm") == 0)
+                            eBlockData = PreworkTypeEx.DRM_SCAN;
+                        else if (string.Compare(strItemData, "Anti-virus") == 0)
+                            eBlockData = PreworkTypeEx.VIRUS_SCAN;
+                        else if (string.Compare(strItemData, "apt") == 0)
+                            eBlockData = PreworkTypeEx.APT_SCAN;
+                        else if (string.Compare(strItemData, "APTPost") == 0)
+                            eBlockData = PreworkTypeEx.APT_SCAN;
+                        else if (string.Compare(strItemData, "dlp") == 0)
+                            eBlockData = PreworkTypeEx.DLP_SCAN;
+                        else if (string.Compare(strItemData, "cdr") == 0)
+                            eBlockData = PreworkTypeEx.CDR_SCAN;
+
+
+                        List<FileRecord> fileData = new List<FileRecord>();
+                        //DicDetectFileData.TryAdd((PreworkTypeEx)eBlockData, fileData);
+
+                    }
+
+                    
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"Noti3rdPartyUnionHaveBlockData, Exception(MSG) : {ex.Message}");
+            }
+
+            return true;
+        }
+
         public void EmailApproveNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData data)
         {
             ServerNotiEvent sNotiEvent = sgPageEvent.GetServerNotiEvent();
@@ -4225,6 +4329,32 @@ namespace OpenNetLinkApp.Services
             if (hsNetWork != null)
                 return sgSendData.RequestSendScreenLockClear(hsNetWork, strProtectedPasswd, strLoginType);
             return -1;
+        }
+
+        public int RestSendFileTrans(int groupid, string strUserID, string strMid, string strPolicyFlag, string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep, string ApprLineSeq, List<HsStream> FileList, string strNetOver3info, string receiver, string strinterlockflagConfirmId = "")
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            int nRet = -1;
+            if (hsNetWork != null)
+                nRet = sgSendData.RequestRestSendFileTrans(hsNetWork, groupid, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList, strNetOver3info, receiver, strinterlockflagConfirmId);
+
+            if (nRet == -2)
+                SendFileTransCancel();
+            return nRet;
+        }
+
+        public int RestContinueSendFileTrans(int groupid, Dictionary<string, string> values, string strNetOver3info, string hszFileName, int currentFileSize)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            int nRet = -1;
+            if (hsNetWork != null)
+                nRet = sgSendData.RequestRestContinueSendFileTrans(hsNetWork, groupid, values, strNetOver3info, hszFileName, currentFileSize);
+
+            if (nRet == -2)
+                SendFileTransCancel();
+            return nRet;
         }
 
         public int RestSendTest(int groupid, eAdvancedCmdList eCmd)

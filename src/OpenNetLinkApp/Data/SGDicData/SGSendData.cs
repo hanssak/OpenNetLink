@@ -1294,7 +1294,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dicDoDelete["tseqs"] = strTransSeq;
             //dicDoDelete["data_type"] = strDataType;   // Server와 협의후 사용
 
-            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eDeleteTransferRequest, dicDoDelete, null, hsNet.stCliMem.GetProtectedSeedKey());
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eDeleteTransferRequest, null, null, hsNet.stCliMem.GetProtectedSeedKey(), eCmdReponseType.CallBackPosResponse, dicDoDelete);
             return hsNet.RequestRest(args);
         }
 
@@ -1303,7 +1303,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             Dictionary<string, string> dicDoDelete = new Dictionary<string, string>();
             dicDoDelete["tseq"] = strTransSeq;
 
-            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eDeleteTransferRequestForward, dicDoDelete, null, hsNet.stCliMem.GetProtectedSeedKey());
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eDeleteTransferRequestForward, null, null, hsNet.stCliMem.GetProtectedSeedKey(), eCmdReponseType.CallBackPosResponse, dicDoDelete);
             return hsNet.RequestRest(args);
         }
 
@@ -1437,6 +1437,153 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePatchSessionUnlock, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.RequestRest(args);
         }
+
+
+        public int RequestRestSendFileTrans(HsNetWork hsNet, int groupid, string strUserID, string strMid, string strPolicyFlag,
+            string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos,
+            string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep,
+            string ApprLineSeq, List<HsStream> FileList, string strNetOver3info, string receiver, string strinterlockflagConfirmId = "")
+        {
+
+            Dictionary<string, object> dicBody = new Dictionary<string, object>();
+            dicBody["trans_req"] = strMid;
+            dicBody["file_info"] = strPolicyFlag;
+            dicBody["destination"] = strTitle;
+            dicBody["approval_step_list"] = strContents;
+            dicBody["forward_user_seq_list"] = strContents;
+
+
+            /*if (bApprSendMail)
+                dic["EMAIL"] = "Y";
+            else
+                dic["EMAIL"] = "N";
+            if (bAfterApprove)
+                dic["APPROVEKIND"] = "1";
+            else
+                dic["APPROVEKIND"] = "0";
+
+            dic["DLP"] = nDlp.ToString();
+
+            dic["FILEKEY"] = "-";
+            dic["FILEMD5"] = "-";
+            dic["FILESIZE"] = "-";
+            dic["FILEDATE"] = "-";
+
+            if (ApprLineSeq == null)
+                dic["CONFIRMID"] = "";
+            else
+            {
+                dic["CONFIRMID"] = ApprLineSeq;
+            }
+
+            dic["RECVPOS"] = strRecvPos;
+            dic["ZIPPASSWD"] = strZipPasswd;
+
+            if (bPrivachApprove)
+                dic["PRIVACYAPPROVE"] = "1";
+            else
+                dic["PRIVACYAPPROVE"] = "0";
+
+            dic["SECURESTRING"] = strSecureString;
+
+            if (strNetOver3info.Length > 0)
+                dic["NETOVERDATA"] = "-";       // strNetOver3info
+
+            dic["FILECOUNT"] = "-";
+            dic["FILERECORD"] = "-";
+
+            if ((receiver?.Length ?? 0) > 0)
+                dic["FORWARDUSERID"] = receiver;
+
+            dic["DATATYPE"] = strDataType;
+            if ((strinterlockflagConfirmId?.Length ?? 0) > 0)
+            {
+                strinterlockflagConfirmId = strinterlockflagConfirmId.Replace('|', '\u0002');
+                dic["INTERLOCKFLAGCONFIRMID"] = strinterlockflagConfirmId;
+            }
+            dic["GROUPID"] = groupid.ToString();*/
+
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostFiles, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
+
+            // 통신에서 transreq를 보낼때, '/' 문자로 나누어서 망개수 만큼 보냄 
+            if (strNetOver3info.Length > 0)
+            {
+                args.errListParm = new List<string>();
+
+                int nPos = -1;
+                nPos = strNetOver3info.IndexOf("/");
+                if (nPos < 0)
+                    args.errListParm.Add(strNetOver3info);
+                else
+                {
+                    String[] listOneNet = strNetOver3info.Split("/");
+                    if (listOneNet.Count() > 1)
+                    {
+                        int nJdx = 0;
+                        for (; nJdx < listOneNet.Count(); nJdx++)
+                        {
+                            args.errListParm.Add(listOneNet[nJdx]);
+                        }
+                    }
+                }
+            }
+
+            src = new CancellationTokenSource();
+            token = src.Token;
+
+            return hsNet.SendMessage(args, FileList, token, null);
+            // return -2;
+
+            /*Dictionary<string, object> dicBody = new Dictionary<string, object>();
+            dicBody["user_password"] = strProtectedPasswd;
+            dicBody["login_type"] = strLoginType;
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePatchSessionUnlock, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.RequestRest(args);*/
+
+        }
+
+
+        public int RequestRestContinueSendFileTrans(HsNetWork hsNet, int groupid, Dictionary<string, string> values, string strNetOver3info, string hszFileName, int currentFileSize)
+        {
+            string FILEMD5 = values["FILEMD5"];
+            string FILERECORD = values["FILERECORD"];
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", values, hsNet.stCliMem.GetProtectedSeedKey());
+            args.MsgRecode["FILEMD5"] = FILEMD5;
+            args.MsgRecode["FILERECORD"] = FILERECORD;
+
+            FileStream fileStream = File.OpenRead(hszFileName);
+
+            // 통신에서 transreq를 보낼때, '/' 문자로 나누어서 망개수 만큼 보냄 
+            if (strNetOver3info.Length > 0)
+            {
+                args.errListParm = new List<string>();
+
+                int nPos = -1;
+                nPos = strNetOver3info.IndexOf("/");
+                if (nPos < 0)
+                    args.errListParm.Add(strNetOver3info);
+                else
+                {
+                    String[] listOneNet = strNetOver3info.Split("/");
+                    if (listOneNet.Count() > 1)
+                    {
+                        int nJdx = 0;
+                        for (; nJdx < listOneNet.Count(); nJdx++)
+                        {
+                            args.errListParm.Add(listOneNet[nJdx]);
+                        }
+                    }
+                }
+            }
+
+            src = new CancellationTokenSource();
+            token = src.Token;
+
+            return hsNet.ContinueSendFile(args, fileStream, token, currentFileSize, null);
+            // return -2;
+        }
+
 
         public int RequestRestTest(HsNetWork hsNet, eAdvancedCmdList eCmd)
         {

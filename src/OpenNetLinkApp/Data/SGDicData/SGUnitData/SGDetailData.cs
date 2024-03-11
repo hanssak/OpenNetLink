@@ -15,6 +15,27 @@ using AgLogManager;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
+
+    /// <summary>
+    /// prework_list 등에서 사용
+    /// </summary>
+    public class FileRecord
+    {
+        public Int64 nFileSeq = 0;
+        public string strFileName = "";
+        public string strFileType = "";
+        public Int64 strFileSize = 0;
+        public string strFileDate = "";
+        public string strDlpState = "";
+        public string strDlpContents = "";
+
+        public FileRecord()
+        {
+
+        }
+    }
+
+
     public class FileInfoData
     {
         public string strFileName = "";                 // 파일 이름

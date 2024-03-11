@@ -108,6 +108,31 @@ namespace OpenNetLinkApp.Common
             [Description("개인정보 검사")]
             PERSONAL_DATA_SCAN = 8,
         }
+
+        /// <summary>
+        /// 검사한 3rd-Party 솔루선 및 검사된 형태 종류, interlockFlag 등과 무관
+        /// </summary>
+        [Flags]
+        public enum PreworkTypeEx : Int32
+        {
+            [Description("초기값")]
+            BLOCK_NONE = 0,
+            [Description("APT 검사")]
+            APT_SCAN = 1,
+            [Description("APT 사후 검사")]
+            APTpost_SCAN,
+            [Description("바이러스 검사")]
+            VIRUS_SCAN,
+            [Description("DRM 검사")]
+            DRM_SCAN,
+            [Description("DLP 검사")]
+            DLP_SCAN,
+            [Description("CDR 검사")]
+            CDR_SCAN
+        }
+
+
+
         /// <summary>
         /// 문서파일 첨부파일 검사 타입
         /// <para>OLEOBJECT_EXTRACT : OLE 개체 검사 (문서 편집기 내)</para>
