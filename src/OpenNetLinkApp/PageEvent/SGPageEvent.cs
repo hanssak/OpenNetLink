@@ -218,8 +218,10 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void DashBoardApprRejectCountEvent(int groupid, PageEventArgs e);
     // 패스워드 변경 날짜 조회 결과 노티.
     public delegate void PasswdChgDayEvent(int groupid, PageEventArgs e);
+
+
     // 공지사항 내용 조회 결과 노티.
-    public delegate void BoardNotiSearchEvent(int groupid, PageEventArgs e);
+    public delegate void NotiAnnouncementEvent(int groupid, PageEventArgs e);
     // 공지사항 내용 조회 후 대쉬보드 화면 갱신 노티
     public delegate void BoardNotiAfterDashBoardEvent(int groupid);
     // 공지사항 내용 조회 후 전체 공지사항 보기 화면 갱신 노티
@@ -479,7 +481,7 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, PasswdChgDayEvent> DicPasswdChgDayEvent = new Dictionary<int, PasswdChgDayEvent>();                                        // 패스워드 변경 날짜 조회 결과 노티.
 
-        public BoardNotiSearchEvent boardSearchEvent;                                                                                                           // 공지사항 내용 조회 결과 노티.
+        public NotiAnnouncementEvent NotiAnnouncementEvent;                                                                                                           // 공지사항 내용 조회 결과 노티.
 
         public Dictionary<int, BoardNotiAfterDashBoardEvent> DicBoardNotiAfterDashBoardEvent = new Dictionary<int, BoardNotiAfterDashBoardEvent>();            // 공지사항 내용 조회 후 대쉬보드 화면 갱신 노티
         //public Dictionary<int, BoardNotiAfterTotalBoardEvent> DicBoardNotiAfterTotalBoardEvent = new Dictionary<int, BoardNotiAfterTotalBoardEvent>();           // 공지사항 내용 조회 후 전체 공지사항 보기 화면 갱신 노티
@@ -1660,13 +1662,14 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicPasswdChgDayEvent[groupid];
             return e;
         }
-        public void SetBoardNotiSearchEventAdd(BoardNotiSearchEvent e)
+
+        public void SetNotiAnnouncementEventAdd(NotiAnnouncementEvent e)
         {
-            boardSearchEvent = e;
+            NotiAnnouncementEvent = e;
         }
-        public BoardNotiSearchEvent GetBoardNotiSearchEvent()
+        public NotiAnnouncementEvent GetNotiAnnouncementEvent()
         {
-            return boardSearchEvent;
+            return NotiAnnouncementEvent;
         }
         public void SetBoardNotiAfterDashBoardEventAdd(int groupid, BoardNotiAfterDashBoardEvent e)
         {

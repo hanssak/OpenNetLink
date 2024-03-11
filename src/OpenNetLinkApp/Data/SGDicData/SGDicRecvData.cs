@@ -22,7 +22,7 @@ namespace OpenNetLinkApp.Data.SGDicData
         public ConcurrentDictionary<int, SGDeptInfo> m_DicDeptInfoData; //부서정보
 
         public ConcurrentDictionary<int, SGData> m_DicFileRecvNoti;
-        public ConcurrentDictionary<int, SGData> m_DicBoardNoti;
+        public ConcurrentDictionary<int, SGData> m_DicAnnouncementNoti;
         public ConcurrentDictionary<int, SGData> m_DicGpkiData;
         //public ConcurrentDictionary<int, SGUrlListData> m_UrlListData;   // SGData
         //public ConcurrentDictionary<int, SGData> m_DicSFMListData; // 자신이 지정된 대결재 정보 관리
@@ -38,7 +38,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             m_DicApprLineData = new ConcurrentDictionary<int, SGApprLineData>();
             m_DicDeptApprLineSearchData = new ConcurrentDictionary<int, SGDeptApprLineSearchData>();
             m_DicFileRecvNoti = new ConcurrentDictionary<int, SGData>();
-            m_DicBoardNoti = new ConcurrentDictionary<int, SGData>();
+            m_DicAnnouncementNoti = new ConcurrentDictionary<int, SGData>();
             m_DicGpkiData = new ConcurrentDictionary<int, SGData>();
             //m_UrlListData = new ConcurrentDictionary<int, SGUrlListData>();
             //m_DicSFMListData = new ConcurrentDictionary<int, SGData>();
@@ -293,27 +293,27 @@ namespace OpenNetLinkApp.Data.SGDicData
             m_DicFileRecvNoti.TryAdd(groupid, tmpData);
             //m_DicFileRecvNoti[groupid] = tmpData;
         }
-        public SGData GetBoardNoti(int groupid)
+        public SGData GetAnnouncementNoti(int groupid)
         {
             SGData tmpData = null;
-            if (m_DicBoardNoti.TryGetValue(groupid, out tmpData) != true)
+            if (m_DicAnnouncementNoti.TryGetValue(groupid, out tmpData) != true)
                 return null;
-            return m_DicBoardNoti[groupid];
+            return m_DicAnnouncementNoti[groupid];
         }
 
-        public void SetBoardNoti(HsNetWork hs, int groupid, SGData data)
+        public void SetAnnouncementNoti(HsNetWork hs, int groupid, SGData data)
         {
             SGData tmpData = null;
-            if (m_DicBoardNoti.TryGetValue(groupid, out tmpData) == true)
+            if (m_DicAnnouncementNoti.TryGetValue(groupid, out tmpData) == true)
             {
-                m_DicBoardNoti.TryRemove(groupid, out tmpData);
+                m_DicAnnouncementNoti.TryRemove(groupid, out tmpData);
                 //m_DicBoardNoti.Remove(groupid);
                 tmpData = null;
             }
             tmpData = new SGData();
             tmpData.Copy(hs, data);
 
-            m_DicBoardNoti.TryAdd(groupid, tmpData);
+            m_DicAnnouncementNoti.TryAdd(groupid, tmpData);
             //m_DicBoardNoti[groupid] = tmpData;
         }
 

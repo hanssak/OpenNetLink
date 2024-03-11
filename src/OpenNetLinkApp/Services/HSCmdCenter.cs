@@ -296,10 +296,10 @@ namespace OpenNetLinkApp.Services
             data = sgDicRecvData.GetDeptApprLineSearchData(groupid);
             return data;
         }
-        public SGData GetBoardNoti(int groupid)
+        public SGData GetAnnouncementNoti(int groupid)
         {
             SGData data = null;
-            data = sgDicRecvData.GetBoardNoti(groupid);
+            data = sgDicRecvData.GetAnnouncementNoti(groupid);
             return data;
         }
         public SGData GetSGGpkiData(int groupid)
@@ -651,9 +651,9 @@ namespace OpenNetLinkApp.Services
                     case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
                         EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
                         break;
-                    case eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
-                        BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
-                        break;
+                    //case eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
+                    //    BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
+                    //    break;
                     case eCmdList.eAPPROVEACTIONNOTIFY:                                         // 사용자 결재 완료(승인/반려)노티.
                         ApproveActionNotiAfterSend(nRet, eCmdList.eAPPROVEACTIONNOTIFY, groupId, sgData);
                         break;
@@ -704,15 +704,6 @@ namespace OpenNetLinkApp.Services
 
                     case eCmdList.ePASSWDCHGDAY:                                        // 패스워드 변경날짜 조회.
                         PasswdChgDayAfterSend(nRet, groupId, sgData);
-                        break;
-
-                    case eCmdList.eBOARDNOTIFYSEARCH:                                   // 공지사항 조회 결과 
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            sgDicRecvData.SetBoardNoti(hs, groupId, sgData);
-                            BoardNotiSearchAfterSend(nRet, groupId);
-                        }
                         break;
 
                     case eCmdList.ePRIVACYNOTIFY:                                     //개인정보 Noti
@@ -903,7 +894,7 @@ namespace OpenNetLinkApp.Services
                         //eCmdList.eSESSIONCOUNT:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
                         ReadyAfterSend(groupId, sgData);
                         break;
-                    case eAdvancedCmdList.eGetGpkiCnList:
+                    case eAdvancedCmdList.ePostGpkiCnValidation:
                         GpkiCnListAfterSend(groupId, sgData);                               //현재 PC의 인증서 중 사용가능한 Cn List 목록
                         break;
                     case eAdvancedCmdList.ePostGPKIRandom:                              // Gpki_Random 결과                         
@@ -966,8 +957,14 @@ namespace OpenNetLinkApp.Services
                         //    FileForwardEvent fileforwardEvent = sgPageEvent.GetFileForwardNotifyEventAdd(groupId);
                         //    if (fileforwardEvent != null) fileforwardEvent(groupId, sgData);
                         //}
-
-
+                        break;
+                    case eAdvancedCmdList.eNotiAnnouncements:
+                        hs = GetConnectNetWork(groupId);
+                        if (hs != null)
+                        {
+                            sgDicRecvData.SetAnnouncementNoti(hs, groupId, sgData);
+                            NotiAnnouncementsAfterSend(nRet, groupId);
+                        }
                         break;
                     case eAdvancedCmdList.eNotiPolicy:
                         //eAdvancedCmdList.eNotiPolicy:
@@ -1143,11 +1140,6 @@ namespace OpenNetLinkApp.Services
                         }
                         break;
 
-                    case eAdvancedCmdList.eNotiAnnouncements:
-                        //eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
-                        //BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
-                        BoardNotiAfterSendAdvanced(nRet, eAdvancedCmdList.eNotiAnnouncements, groupId, sgData);
-                        break;
                     case eAdvancedCmdList.eNotiApprovalTermination:                             // 사용자 결재 완료(승인/반려)노티.
                         // eCmdList.eAPPROVEACTIONNOTIFY:                                         // 사용자 결재 완료(승인/반려)노티.
                         ApproveActionNotiAfterSendAdvanced(nRet, eAdvancedCmdList.eNotiApprovalTermination, groupId, sgData);
@@ -1161,27 +1153,6 @@ namespace OpenNetLinkApp.Services
                     case eAdvancedCmdList.ePatchSessionUnlock:
                         //eCmdList.eCLIENTUNLOCK:                                                      // 화면잠금 해제
                         ScreenLockClearAfterSend(nRet, groupId, sgData);
-                        break;
-
-
-                    case eAdvancedCmdList.eGetAnnouncements:
-                        //eCmdList.eDASHBOARDCOUNT:                                  // 대쉬보드 조회 쿼리 데이터.
-                        DashBoardCountAfterSend(nRet, groupId, sgData);
-                        //eCmdList.eDASHBOARDTRANSREQCOUNT:                              // 대쉬보드 전송요청 Count 쿼리
-                        DashBoardTransReqCountAfterSend(nRet, groupId, sgData);
-                        //eCmdList.eDASHBOARDAPPRWAITCOUNT:                              // 대쉬보드 승인대기 Count 쿼리
-                        DashBoardApprWaitCountAfterSend(nRet, groupId, sgData);
-                        //eCmdList.eDASHBOARDAPPRCONFIRMCOUNT:                              // 대쉬보드 승인 Count 쿼리
-                        DashBoardApprConfirmCountAfterSend(nRet, groupId, sgData);
-                        //eCmdList.eDASHBOARDAPPRREJECTCOUNT:                              // 대쉬보드 반려 Count 쿼리
-                        DashBoardApprRejectCountAfterSend(nRet, groupId, sgData);
-                        //eCmdList.eBOARDNOTIFYSEARCH:                                   // 공지사항 조회 결과 
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            sgDicRecvData.SetBoardNoti(hs, groupId, sgData);
-                            BoardNotiSearchAfterSend(nRet, groupId);
-                        }
                         break;
 
                     //case eCmdList.eAUDITORI:
@@ -2176,34 +2147,6 @@ namespace OpenNetLinkApp.Services
                 sNotiEvent(groupId, cmd, e);
             }
         }
-
-        public void BoardNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData data)
-        {
-            ServerNotiEvent sNotiEvent = sgPageEvent.GetServerNotiEvent();
-            if (sNotiEvent != null)
-            {
-                PageEventArgs e = new PageEventArgs();
-                e.result = nRet;
-                e.count = 0;
-                e.strMsg = data.GetBasicTagData("BOARDHASH");
-                sNotiEvent(groupId, cmd, e);
-            }
-        }
-
-        public void BoardNotiAfterSendAdvanced(int nRet, eAdvancedCmdList cmd, int groupId, SGData data)
-        {
-            ServerNotiEventAdvanced sNotiEvent = sgPageEvent.GetServerNotiEventAdvanced();
-            if (sNotiEvent != null)
-            {
-                PageEventArgs e = new PageEventArgs();
-                e.result = nRet;
-                e.count = 0;
-                e.strMsg = data.GetBasicTagData("BOARDHASH");
-                sNotiEvent(groupId, cmd, e);
-            }
-        }
-
-
         public void ApproveActionNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData sgData)
         {
             ApproveActionNotiEvent ApprActionEvent = sgPageEvent.GetApproveActionNotiEvent();
@@ -2456,10 +2399,10 @@ namespace OpenNetLinkApp.Services
             }
         }
 
-        public void BoardNotiSearchAfterSend(int nRet, int groupID)
+        public void NotiAnnouncementsAfterSend(int nRet, int groupID)
         {
-            BoardNotiSearchEvent boardNotiSearch = null;
-            boardNotiSearch = sgPageEvent.GetBoardNotiSearchEvent();
+            NotiAnnouncementEvent boardNotiSearch = null;
+            boardNotiSearch = sgPageEvent.GetNotiAnnouncementEvent();
             if (boardNotiSearch != null)
             {
                 PageEventArgs e = new PageEventArgs();
@@ -2467,7 +2410,6 @@ namespace OpenNetLinkApp.Services
                 boardNotiSearch(groupID, e);
             }
         }
-
 
         public void DeptInfoAfterSend(int nRet, int groupId, SGData sgData)
         {
@@ -3271,14 +3213,6 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendPasswdChgDayQuery(hsNetWork, strUserID, strQuery);
             return -1;
         }
-        public int SendBoardNotiSearch(int groupid, string strUserID, string strQuery)
-        {
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-                return sgSendData.RequestSendBoardNotiSearch(hsNetWork, strUserID, strQuery);
-            return -1;
-        }
         public int SendBoardNotiConfirm(int groupid, string strUserID, string strQuery)
         {
             HsNetWork hsNetWork = null;
@@ -3594,7 +3528,7 @@ namespace OpenNetLinkApp.Services
             return 0;
         }
 
-        public int RestGpkiCnList(int groupid, List<string> userGpkiCnList)
+        public int RestGpkiCnValidation(int groupid, List<string> userGpkiCnList)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork == null)
@@ -3605,7 +3539,7 @@ namespace OpenNetLinkApp.Services
                 int ret = 0;
                 try
                 {
-                    ret = sgSendData.RequestRestGpkiCnList(hsNetWork, userGpkiCnList);
+                    ret = sgSendData.RequestRestGpkiCnValidation(hsNetWork, userGpkiCnList);
                 }
                 catch (Exception ex)
                 {

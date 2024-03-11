@@ -961,15 +961,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_PASSWDCHGDAY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
-        public int RequestSendBoardNotiSearch(HsNetWork hsNet, string strUserID, string strQuery)
-        {
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            dic["APPID"] = "0x00000000";
-            dic["CLIENTID"] = strUserID;
-            dic["QUERY"] = strQuery;
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_BOARDNOTIFYSEARCH", dic, hsNet.stCliMem.GetProtectedSeedKey());
-            return hsNet.SendMessage(args);
-        }
+        
         public int RequestSendBoardNotiConfirm(HsNetWork hsNet, string strUserID, string strQuery)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
@@ -1178,12 +1170,12 @@ namespace OpenNetLinkApp.Data.SGDicData
         /// Agent PC에 저장된 GPKI 리스트 기반으로 사용할 수 있는 GPKI 목록 요청
         /// </summary>
         /// <returns></returns>
-        public int RequestRestGpkiCnList(HsNetWork hsNet, List<string> gpkiCNPCList)
+        public int RequestRestGpkiCnValidation(HsNetWork hsNet, List<string> gpkiCNPCList)
         {
             Dictionary<string, object> dic = new Dictionary<string, object>();
             dic.Add("gpki_cn_list", gpkiCNPCList);
 
-            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eGetGpkiCnList, null, dic, hsNet.stCliMem.GetProtectedSeedKey()); // api-key 사용
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostGpkiCnValidation, null, dic, hsNet.stCliMem.GetProtectedSeedKey()); // api-key 사용
             return hsNet.RequestRest(args);
         }
 

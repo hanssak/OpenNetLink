@@ -123,7 +123,7 @@
         // HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
         HsCmdCenter.sgPageEvent.SetAddRMHeaderEventAdd(RMHeaderNoti);
 
-        HsCmdCenter.sgPageEvent.SetBoardNotiSearchEventAdd(BoardNotifyResult);                      // 공지사항 조회 결과.
+        HsCmdCenter.sgPageEvent.SetNotiAnnouncementEventAdd(AnnouncementNotifyResult);                      // 공지사항 조회 결과.
         HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiDBInsertEventAdd(AptAndVirusDBInsert);
 
         //HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);
@@ -1301,24 +1301,24 @@
 
 #if _WINDOWS
 
-        try
+    try
+    {
+        if (e.strUrlData != null && e.strUrlData.Length > 0)
         {
-            if (e.strUrlData != null && e.strUrlData.Length > 0)
-            {
-                string url = $"\"{e.strUrlData}\"";
-                System.Diagnostics.Process.Start(
-                    new System.Diagnostics.ProcessStartInfo
-                    {
-                        FileName = url,
-                        UseShellExecute = true
-                    });
-                //System.Diagnostics.Process.Start("explorer", url); // 260자 제한됨
-            }
+            string url = $"\"{e.strUrlData}\"";
+            System.Diagnostics.Process.Start(
+                new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true
+                });
+            //System.Diagnostics.Process.Start("explorer", url); // 260자 제한됨
         }
-        catch (Exception ex)
-        {
-            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-        }
+    }
+    catch (Exception ex)
+    {
+        CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+    }
 
 #elif _LINUX
 
@@ -2164,7 +2164,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     ShowMessage("error", strData);
                     return;
                 }
-                
+
                 string message = String.Empty;
                 foreach (ApproverApproveDataCheckInfo item in ListApproverApproveData)
                 {
@@ -3267,14 +3267,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         }
         else if (os_noti == OS_NOTI.NOTICE)
         {
-            string strBoardHash = e.strMsg;
-            string strPrevBoardHash = pageService.GetBoardHash(groupID);
-            if (!strBoardHash.Equals(""))
-            {
-                pageService.SetBoardHash(groupID, strBoardHash);
-                BoardNotifySearch();
-                return;
-            }
+        //    BoardNotifySearch();
+            return;
         }
 
         string strTitle = XmlConf.GetNetworkTitle(groupID);
@@ -3427,14 +3421,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         }
         else if (os_noti == OS_NOTI.NOTICE)
         {
-            string strBoardHash = e.strMsg;
-            string strPrevBoardHash = pageService.GetBoardHash(groupID);
-            if (!strBoardHash.Equals(""))
-            {
-                pageService.SetBoardHash(groupID, strBoardHash);
-                BoardNotifySearch();
-                return;
-            }
+            return;
         }
 
         string strTitle = XmlConf.GetNetworkTitle(groupID);
@@ -4214,29 +4201,10 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         }
     }
 
-    public void BoardNotifySearch()
-    {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
-        {
-            return;
-        }
-        string strUserID = sgLoginData.GetUserID();
-        SGQueryExtend sgQueryExtend = new SGQueryExtend();
-        string strQuery = sgQueryExtend.GetSGNotify(strUserID);
-        HsCmdCenter.SendBoardNotiSearch(groupID, strUserID, strQuery);
-    }
-
-    public void BoardNotifyResult(int groupid, PageEventArgs e)
+    public void AnnouncementNotifyResult(int groupid, PageEventArgs e)
     {
         SGData sgData = null;
-        sgData = HsCmdCenter.GetBoardNoti(groupid);
+        sgData = HsCmdCenter.GetAnnouncementNoti(groupid);
         if (sgData == null)
         {
             return;
@@ -4254,25 +4222,26 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         SGMsgData sgMsgData = new SGMsgData();
 
-        string strResultData = sgData.GetBasicTagData("RECORD");
+        List<object> strResultData = sgData.GetTagDataObjectList("board_list");
 
-        if (strResultData.Equals(""))
+        if (strResultData?.Count < 1)
         {
             CLog.Here().Information($"BoardNotifyResult, RECORD - EMPTY, groupid : {groupid}, strUserSeq : {strUserSeq}");
             return;
         }
-        string[] strResult = strResultData.Split('\u0003');
 
-        for (int i = 0; i < strResult.Length; i++)
+        foreach (object announce in strResultData)
         {
-            string[] strSubResult = strResult[i].Split('\u0001');
+            JObject jObjAnnounce = (JObject)announce;
+            Dictionary<string, object> ann = jObjAnnounce.ToObject<Dictionary<string, object>>();
 
-            string strNotiSeq = strSubResult[0];                        // 공지사항 Seq.
-            string strHead = strSubResult[1];                           // 공지사항 제목.
-            string strNotiContent = strSubResult[2].Replace("%13%10", "\n");                    // 공지사항 내용.
+            string strNotiSeq = ann.GetTagData("board_info", "board_seq");                        // 공지사항 Seq.
+            string strHead = ann.GetTagData("board_info", "title");                           // 공지사항 제목.
+            string strNotiContent = ann.GetTagData("board_info", "title").Replace("%13%10", "\n");                    // 공지사항 내용.
             SQLiteDB.InsertNotiInfo(NOTI_TYPE.SYSTEM, groupid, strUserSeq, strNotiSeq, LSIDEBAR.MENU_CATE_ROOT, "", "", strHead, strNotiContent);
             CLog.Here().Information($"####### - BOARD_NOTIFY - groupid : {groupid}, NotiSeq : {strNotiSeq}, Head : {strHead}, strNotiContent : {strNotiContent}");
         }
+
         LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
         loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
         if (loginAfterSGHeaderUI != null)

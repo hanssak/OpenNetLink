@@ -780,14 +780,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             m_bLogout = bLogout;
         }
-        public void SetBoardHash(string strHash)
-        {
-            m_strBoardHash = strHash;
-        }
-        public string GetBoardHash()
-        {
-            return m_strBoardHash;
-        }
+        //public void SetBoardHash(string strHash)
+        //{
+        //    m_strBoardHash = strHash;
+        //}
+        //public string GetBoardHash()
+        //{
+        //    return m_strBoardHash;
+        //}
 
         public string GetFileTransPage()
         {
