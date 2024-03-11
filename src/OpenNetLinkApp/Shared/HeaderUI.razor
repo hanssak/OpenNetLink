@@ -1272,7 +1272,7 @@
                     lstInfo.Add("0");
                 refSelectReceiveFolder.lstInfo = lstInfo;
 
-                Task.Run(async () => { await refSelectReceiveFolder.openPopUp(groupid, AppConfigSvc.GetRecvDownPath(groupid)); });
+                Task.Run(async () => { await refSelectReceiveFolder.openPopUp(groupid, AppConfigSvc.GetRecvDownPath(groupid), e); });
             }
 
             // HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);

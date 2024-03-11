@@ -966,7 +966,7 @@ namespace OpenNetLinkApp.Services
                         //    FileForwardEvent fileforwardEvent = sgPageEvent.GetFileForwardNotifyEventAdd(groupId);
                         //    if (fileforwardEvent != null) fileforwardEvent(groupId, sgData);
                         //}
-                        
+
 
                         break;
                     case eAdvancedCmdList.eNotiPolicy:
@@ -2897,22 +2897,22 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestForwardCancel(hsNetWork, groupid, strUserID, strTransSeq);
             return -1;
         }
-        public int RequestAutoDownload(int groupid, string strUserID, string strTransSeq)
-        {
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-                return sgSendData.RequestAutoDownload(hsNetWork, groupid, strUserID, strTransSeq);
-            return -1;
-        }
-        public int RequestManualDownload(int groupid, string strUserID, string strTransSeq)
-        {
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork != null)
-                return sgSendData.RequestManualDownload(hsNetWork, groupid, strUserID, strTransSeq);
-            return -1;
-        }
+        //public int RequestAutoDownload(int groupid, string strUserID, string strTransSeq)
+        //{
+        //    HsNetWork hsNetWork = null;
+        //    hsNetWork = GetConnectNetWork(groupid);
+        //    if (hsNetWork != null)
+        //        return sgSendData.RequestAutoDownload(hsNetWork, groupid, strUserID, strTransSeq);
+        //    return -1;
+        //}
+        //public int RequestManualDownload(int groupid, string strUserID, string strTransSeq)
+        //{
+        //    HsNetWork hsNetWork = null;
+        //    hsNetWork = GetConnectNetWork(groupid);
+        //    if (hsNetWork != null)
+        //        return sgSendData.RequestManualDownload(hsNetWork, groupid, strUserID, strTransSeq);
+        //    return -1;
+        //}
 
         public int RequestEmailPreviewInfo(int groupid, string strUserID, string strEmailSeq)
         {
@@ -3723,6 +3723,27 @@ namespace OpenNetLinkApp.Services
                     Log.Logger.Here().Error($"RestLogin2Fa-Task-Exception : {ex.Message}");
                 }
 
+            });
+            return 0;
+        }
+
+        public int RestGetHszFileDownload(int groupid, string trans_seq, string dType, bool NoZip, string file_Key, string file_MD5, long trans_Size)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {                
+                int ret = 0;
+                try
+                {
+                    hsNetWork.GetHszFileDown(trans_seq, dType, NoZip, file_Key, file_MD5, trans_Size);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestLogin2Fa-Task-Exception : {ex.Message}");
+                }
             });
             return 0;
         }

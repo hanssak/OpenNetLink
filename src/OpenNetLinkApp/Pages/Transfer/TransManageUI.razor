@@ -1525,46 +1525,59 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
-        HSCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eMANUALDOWNLOAD, ManualDownloadResult);
+        //HSCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eMANUALDOWNLOAD, ManualDownloadResult);
         HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
         ShowProgress(groupID, 1, 0, "DOWNLOAD");
-        HSCmdCenter.RequestManualDownload(groupID, curUserID, transData.TransSeq);
+
+        //다운받을 전송건의 SGData 데이터
+        SGData sgData = new SGData();
+        string trans_seq = sgData.GetTagData("trans_req", "trans_seq");
+        string dType = sgData.GetTagData("trans_req", "data_type");
+        bool isNozip = true;
+        string file_Key = sgData.GetTagData("file_info", "file_key");
+        string file_md5 = sgData.GetTagData("file_info", "file_hash");
+        long.TryParse(sgData.GetTagData("file_info", "file_size"), out long trans_size);
+
+        //TODO 고도화 해당 Seq의 로 Notify 요청 (반대망에 있는 파일을 수신하는 FLow 재검토)
+        HSCmdCenter.RestGetHszFileDownload(groupID, trans_seq, dType, isNozip, file_Key, file_md5, trans_size);
+        
+        @*HSCmdCenter.RequestManualDownload(groupID, curUserID, transData.TransSeq);*@
         return;
     }
 
-    public void ManualDownloadResult(int groupId, object[] e)
-    {
-        try
-        {
-            if (e == null || e.Length < 1)
-            {
-                CLog.Here().Error($"ManualDownloadResult - Fail SGData is Null");
-                string strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
-                ShowMessage("error", strMsg);
-                ShowProgress(groupId, 4, 100, string.Empty);
-                UpdateData();       // 완료 또는 오류 발생 시, 리스트 갱신
-                return;
-            }
-
-            SGData sgdata = e[0] as SGData;
-
-            string result = sgdata.GetTagData("RESULT");
-            string reason = sgdata.GetTagData("REASON");
-
-            if (result == null || result != "0")
-            {
-                CLog.Here().Error($"ManualDownloadResult - Fail result : {result}, reason : {reason}");
-                string strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
-                ShowMessage("error", strMsg);
-                ShowProgress(groupId, 4, 100, string.Empty);
-                UpdateData();       // 완료 또는 오류 발생 시, 리스트 갱신
-            }
-        }
-        catch (Exception ex)
-        {
-            CLog.Here().Error($"ManualDownloadResult - Exception : {ex.ToString()}");
-        }
-    }
+    //public void ManualDownloadResult(int groupId, object[] e)
+    //{
+    //    try
+    //    {
+    //        if (e == null || e.Length < 1)
+    //        {
+    //            CLog.Here().Error($"ManualDownloadResult - Fail SGData is Null");
+    //            string strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+    //            ShowMessage("error", strMsg);
+    //            ShowProgress(groupId, 4, 100, string.Empty);
+    //            UpdateData();       // 완료 또는 오류 발생 시, 리스트 갱신
+    //            return;
+    //        }
+    //
+    //        SGData sgdata = e[0] as SGData;
+    //
+    //        string result = sgdata.GetTagData("RESULT");
+    //        string reason = sgdata.GetTagData("REASON");
+    //
+    //        if (result == null || result != "0")
+    //        {
+    //            CLog.Here().Error($"ManualDownloadResult - Fail result : {result}, reason : {reason}");
+    //            string strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+    //            ShowMessage("error", strMsg);
+    //            ShowProgress(groupId, 4, 100, string.Empty);
+    //            UpdateData();       // 완료 또는 오류 발생 시, 리스트 갱신
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        CLog.Here().Error($"ManualDownloadResult - Exception : {ex.ToString()}");
+    //    }
+    //}
 
     public void FileDownloadProgressNoti(int groupID, PageEventArgs e)
     {

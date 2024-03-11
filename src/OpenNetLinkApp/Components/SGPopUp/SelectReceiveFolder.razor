@@ -1,3 +1,4 @@
+@using HsNetWorkSG
 @using Radzen
 @using Radzen.Blazor
 @using System.Diagnostics
@@ -157,6 +158,11 @@
         }
     }
 
+    /// <summary>
+    /// 수신Notify 로 인해, 파일 경로 문제로 해당 Popup이 발생하므로, Noti에 대한 SG데이터 (이후, 다운로드 요청 시 활용)
+    /// </summary>
+    private SGData sgData = null;
+
     private static Action<string> actionPopUpLoadFileList;
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
 
@@ -207,9 +213,9 @@
             return;
         }
 
-        if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            if(stDisplayPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.Windows)))
+            if (stDisplayPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.Windows)))
             {
                 string strMsg = String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString());
                 ShowMessage("warn", strMsg);
@@ -334,16 +340,25 @@
         HsCmdCenter.SetDownLoadPath(groupid, stDisplayPath);
         ShowProgress(groupid, 1, 0, "DOWNLOAD");
 
-        if (curPushType.Equals("1"))
-        {
-            CLog.Here().Information($"SelectReceiveFolder RequestManualDownload path : {stDisplayPath} TransSeq : {curTransSeq} pushType : {curPushType}");
-            HsCmdCenter.RequestManualDownload(groupid, curUserID, curTransSeq);
-        }
-        else
-        {
-            CLog.Here().Information($"SelectReceiveFolder RequestAutoDownload path : {stDisplayPath} TransSeq : {curTransSeq} pushType : {curPushType}");
-            HsCmdCenter.RequestAutoDownload(groupid, curUserID, curTransSeq);
-        }
+        string trans_seq = sgData.GetTagData("trans_req", "trans_seq");
+        string dType = sgData.GetTagData("trans_req", "data_type");
+        bool isNozip = true;
+        string file_Key = sgData.GetTagData("file_info", "file_key");
+        string file_md5 = sgData.GetTagData("file_info", "file_hash");
+        
+        long.TryParse(sgData.GetTagData("file_info", "file_size"), out long trans_size);
+        HsCmdCenter.RestGetHszFileDownload(groupid, trans_seq, dType, isNozip, file_Key, file_md5, trans_size);
+
+    //if (curPushType.Equals("1"))
+    //{
+    //    CLog.Here().Information($"SelectReceiveFolder RequestManualDownload path : {stDisplayPath} TransSeq : {curTransSeq} pushType : {curPushType}");
+    //    HsCmdCenter.RequestManualDownload(groupid, curUserID, curTransSeq);
+    //}
+    //else
+    //{
+    //    CLog.Here().Information($"SelectReceiveFolder RequestAutoDownload path : {stDisplayPath} TransSeq : {curTransSeq} pushType : {curPushType}");
+    //    HsCmdCenter.RequestAutoDownload(groupid, curUserID, curTransSeq);
+    //}
 
         closePopUp();
     }
@@ -380,10 +395,20 @@
         closePopUp();
     }
 
-    public async Task openPopUp(int Idx, string dir)
+    public async Task openPopUp(int Idx, string dir, SGData getSgData)
     {
         HsCmdCenter.SetFileRecving(Idx, true);
         stOriginPath = dir;
+
+
+        HsNetWork hs = null;
+        hs = HsCmdCenter.GetConnectNetWork(Idx);
+
+
+        if (hs == null)
+            return;
+
+        getSgData.Copy(hs, sgData);
 
         if (dir != null && dir.Length > 0)
         {

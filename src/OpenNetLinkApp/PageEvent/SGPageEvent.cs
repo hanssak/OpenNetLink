@@ -1113,10 +1113,10 @@ namespace OpenNetLinkApp.PageEvent
             fileRecvProgressMasterEvent = e;
             fileRecvProgressEvent = e;
         }
-        public FileRecvProgressEvent GetFileRecvProgressMasterEvent()
-        {
-            return fileRecvProgressMasterEvent;
-        }
+        //public FileRecvProgressEvent GetFileRecvProgressMasterEvent()
+        //{
+        //    return fileRecvProgressMasterEvent;
+        //}
 
         public void SetFilePrevProgressEventAdd(int groupid, FilePrevProgressEvent e)
         {

@@ -1249,6 +1249,14 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.SendMessage(args);
         }
 
+        public int RequestRestManualDownload(HsNetWork hsNet, int groupid, string transSeq)
+        {
+            Dictionary<string, string> pathDic = new Dictionary<string, string>();
+            pathDic.Add("tseq", transSeq);
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eGetFilesManualDownload, null, null, hsNet.stCliMem.GetProtectedSeedKey(), dicPathParam:pathDic);
+            return hsNet.SendMessage(args);
+        }
 
         public int RequestRestSendApproveBatch(HsNetWork hsNet, string strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<Int64> listSeqData)
         {
