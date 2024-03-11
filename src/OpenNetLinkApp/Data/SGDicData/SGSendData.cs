@@ -961,7 +961,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_PASSWDCHGDAY", dic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
-        
+
         public int RequestSendBoardNotiConfirm(HsNetWork hsNet, string strUserID, string strQuery)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
@@ -1246,7 +1246,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             Dictionary<string, string> pathDic = new Dictionary<string, string>();
             pathDic.Add("tseq", transSeq);
 
-            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eGetFilesManualDownload, null, null, hsNet.stCliMem.GetProtectedSeedKey(), dicPathParam:pathDic);
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eGetFilesManualDownload, null, null, hsNet.stCliMem.GetProtectedSeedKey(), dicPathParam: pathDic);
             return hsNet.SendMessage(args);
         }
 
@@ -1316,7 +1316,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dicBody["dept_seq"] = "";
             dicBody["read_again"] = false;
 
-            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostAnnouncementsReadDone, dicGetParamQuery, dicBody, hsNet.stCliMem.GetProtectedSeedKey());
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostAnnouncementsReadDone, null, dicBody, hsNet.stCliMem.GetProtectedSeedKey(), dicPathParam: dicGetParamQuery);
             return hsNet.RequestRest(args);
         }
 
