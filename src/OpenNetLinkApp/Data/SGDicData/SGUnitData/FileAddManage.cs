@@ -4374,7 +4374,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             ["image/x-xpixmap"] = "xpm",
             ["image/x-xpmi"] = "xpm",
             ["image/x-xwindowdump"] = "xwd",
-            ["message/news"] = "news",
+            ["message/news"] = "news txt",
             ["message/rfc822"] = "eml mail art hdf mime",
             ["model/iges"] = "iges igs",
             ["model/mesh"] = "mesh msh silo",
