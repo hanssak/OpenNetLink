@@ -2614,7 +2614,7 @@
             {
 
                 bool bShowDayTime = true;
-                string strPasswdChgDay = sgData.GetTagData("pw_expired_date");  //"20241021";
+                string strPasswdChgDay = sgLoginData.GetTagData("user_policy","pw_valid_period");  //"20241021";
 
                 DateTime StartTime = DateTime.Now;
                 DateTime EndTime;
@@ -2632,7 +2632,7 @@
 
                     string strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
                     SGPassWDPeriodData sgPassWdPeriodData = new SGPassWDPeriodData();
-                    string strUserSeq = "202203041700000001"; //sgLoginData.GetUserSequence();
+                    string strUserSeq = sgLoginData.GetUserSequence();
                     DateTime LocalTime = sgPassWdPeriodData.GetLocalDBPassWDDelayTime(strTime, strUserSeq);
                     string strStartDay = StartTime.ToString("yyyy-MM-dd");
 
