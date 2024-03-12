@@ -59,49 +59,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_DicTagData = new Dictionary<string, object>(data.m_DicTagData);
             m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
         }
-
-        bool GetDeptinfoNodeData(string strData)
-        {
-
-            if (string.IsNullOrEmpty(strData))
-                return false;
-
-            if (deptTreeInfoValues == null)
-                return false;
-
-            bool bRet = false;
-
-            try
-            {
-
-                var dataList = JsonConvert.DeserializeObject<List<dynamic>>(strData);
-                string strItemData = "";
-                bRet = (dataList?.Count ?? 0) > 0;
-                foreach (var dataItem in dataList)
-                {
-                    strItemData = Convert.ToString(dataItem);
-                    JObject jO = JObject.Parse(strItemData);
-
-                    string strTmpData = jO.ContainsKey("parent_dept_seq") ? (string)jO["parent_dept_seq"] : "0";
-                    deptTreeInfoValues.Add(new DeptTreeInfo((string)jO["dept_seq"], (string)jO["dept_name"], strTmpData));
-
-                    Log.Logger.Here().Error($"GetDeptinfoNodeData, Dept-Name : {(string)jO["dept_name"]}, Dept-Seq : {(string)jO["dept_seq"]}, parent_dept_seq : {strTmpData}, sub_dept : {(jO.ContainsKey("sub_dept_list") ? "O" : "X")}");
-
-                    if (jO.ContainsKey("sub_dept_list"))
-                    {
-                        GetDeptinfoNodeData(Convert.ToString(jO["sub_dept_list"]));
-                    }
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Here().Error($"GetDeptinfoNodeData, Exception(MSG) : {ex.Message}");
-            }
-
-            return bRet;
-        }
-
         /// <summary>
         /// Tree 컨트롤에 사용하기 위한 List 객체 별도 생성
         /// </summary>
@@ -115,15 +72,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             deptTreeInfoValues.Clear();
 
             // 예전
-            /*List<Dictionary<int, string>> listRecord = GetRecordData("DEPTRECORD");
-            foreach (Dictionary<int, string> record in listRecord)
+            //[0] 부서 Seq / [1] 부서명  [2] 상위부서 Seq
+            List<object> listRecord = GetTagDataObjectList("dept_list");
+            foreach (object record in listRecord)
             {
-                deptTreeInfoValues.Add(new DeptTreeInfo(record[0], record[1], record[2]));
-            }*/
+                JObject dept = (JObject)record;
+                string deptSeq = dept["dept_seq"].ToString();
+                string deptName = dept["dept_name"].ToString();
+                string parentDeptSeq = dept.ContainsKey("dept_name") ? dept["dept_name"].ToString() : "0";
 
-            // Advanced
-            GetDeptinfoNodeData(GetTagData("dept_list"));
-
+                deptTreeInfoValues.Add(new DeptTreeInfo(deptSeq, deptName, parentDeptSeq));
+            }
 
             List<DeptTreeInfo> topTree = deptTreeInfoValues.FindAll(dept => dept.ParentDeptSeq == "0"); //Top Tree
             foreach (DeptTreeInfo top in topTree)
