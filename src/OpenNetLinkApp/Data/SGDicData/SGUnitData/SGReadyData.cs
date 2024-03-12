@@ -93,7 +93,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool GetExApprovalUse()
         {
             string strData = GetTagData("server_info", "ex_approval_use");
-            return (strData == "true");
+            return (strData.ToUpper() == "TRUE");
         }
 
         /// <summary>

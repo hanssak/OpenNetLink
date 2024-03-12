@@ -427,7 +427,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             bool bRet = true;
             string strData = GetTagData("user_policy", "approval_policy", "approve_use");
-            return (strData == "true");
+            return (strData.ToUpper() == "TRUE");
         }
 
         /// <summary>
@@ -513,7 +513,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool IsVipUser()
         {
             string strData = GetTagData("approver_type", "vip");
-            return (strData == "true");
+            return (strData.ToUpper() == "TRUE");
         }
         /// <summary>
         /// 화면잠금 시간 정보를 반환
@@ -533,7 +533,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool GetPasswordRule()
         {
             string strData = GetTagData("user_policy", "pw_complexity_check");
-            return (strData == "true");
+            return (strData.ToUpper() == "TRUE");
         }
 
         /// <summary>
@@ -596,7 +596,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool GetApproveProxyRight()
         {
             string strData = GetTagData("user_policy", "common_proxy_right_use");
-            return (strData == "true");
+            return (strData.ToUpper() == "TRUE");
         }
 
         /// <summary>

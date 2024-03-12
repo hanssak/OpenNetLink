@@ -3954,7 +3954,7 @@ namespace OpenNetLinkApp.Services
 
 
         /// <summary>
-        /// 대결재자 조회 함수
+        /// 결재자 조회 함수
         /// </summary>
         /// <param name="groupid"></param>
         /// <param name="strApproverName"></param>

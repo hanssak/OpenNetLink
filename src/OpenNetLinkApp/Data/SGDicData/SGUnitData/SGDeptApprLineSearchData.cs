@@ -150,8 +150,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 ApproverSearch.Clear();
                 //List<string> liststrData = GetTagDataList("approver_list");
-                string strData = GetTagData("approver_list");
-                var dataList = JsonConvert.DeserializeObject<List<dynamic>>(strData);
 
                 //string strData = GetTagData("approver_list", "approver_seq");
                 /*List<Dictionary<int, string>> listDicdata = null;
@@ -162,13 +160,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 GetTagData("approver_list");*/
 
-                if ((dataList?.Count ?? 0) < 1)
-                {
-                    Log.Logger.Here().Information($"GetDeptApproverInfoDataAdvanced, Search List - approver_list : 0 !");
-                    return ApproverSearch;
-                }
+                //string strData = GetTagData("approver_list");
+                //var dataList = JsonConvert.DeserializeObject<List<dynamic>>(strData);
 
-                Log.Logger.Here().Information($"GetDeptApproverInfoDataAdvanced, Search User - Count : {(dataList?.Count ?? 0)}");
+                List<object> dataList =GetTagDataObjectList("approver_list");
+                Log.Logger.Here().Information($"GetDeptApproverInfoDataAdvanced, Search User - Count : {dataList?.Count}");
+
+                if (dataList?.Count < 1)
+                    return ApproverSearch;
 
                 ApproverInfo apprInfo = null;
                 string strItemData = "";
@@ -176,51 +175,32 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 string strApproverType = "";
                 int i = 0;
 
-                foreach (var dataItem in dataList)
+                foreach (object dataItem in dataList)
                 {
-
-                    strItemData = Convert.ToString(dataItem);
-                    JObject jO = JObject.Parse(strItemData);
+                    JObject jO = (JObject)dataItem;
 
                     apprInfo = new ApproverInfo();
-
                     apprInfo.Index = String.Format("{0,3}", i + 1);                     // Index
-
-
-                    Log.Logger.Here().Information($"GetDeptApproverInfoDataAdvanced, Message : Get approver_hr Info!");
-
-                    strApproverHr = Convert.ToString(jO["approver_hr"]); // jO["approver_hr"];
-                    JObject jOapproverHr = JObject.Parse(strApproverHr);
-
-                    Log.Logger.Here().Information($"GetDeptApproverInfoDataAdvanced, Message : Get approver_type Info!");
-
-                    strApproverType = Convert.ToString(jO["approver_type"]);
-                    JObject jOapproverType = JObject.Parse(strApproverType);
-
-                    apprInfo.APPR_USERID = (string)jOapproverHr["user_id"];             // ID
-                    apprInfo.Name = (string)jOapproverHr["name"];                       // 이름
-                    apprInfo.APPR_TEAMCODE = apprInfo.DeptSeq = (string)jOapproverHr["dept_seq"];          // 부서Code
-                    apprInfo.DeptName = (string)jOapproverHr["dept_name"]; //           // 부서이름
-                    apprInfo.Grade = (string)jOapproverHr["rank"];                      // 직위
-                    apprInfo.nApprPos = Convert.ToInt32((string)jOapproverType["authority"]);  // ApprovePos
-                    apprInfo.UserSeq = (string)jOapproverHr["user_seq"];                       // userSeq
-                    apprInfo.nDlpApprove = Convert.ToInt32((string)jOapproverType["dlp_authority"]);                              // 보안결재자 여부
+                    apprInfo.APPR_USERID = dataItem.GetTagDataObject(new List<string>() { "approver_hr", "approver_id" }).ToString();
+                    apprInfo.Name = dataItem.GetTagDataObject(new List<string>() { "approver_hr", "name" }).ToString();                       // 이름
+                    apprInfo.APPR_TEAMCODE = dataItem.GetTagDataObject(new List<string>() { "approver_hr", "dept_seq" }).ToString();    // 부서Code
+                    apprInfo.DeptName = dataItem.GetTagDataObject(new List<string>() { "approver_hr", "dept_name" }).ToString();    // 부서이름
+                    apprInfo.Grade = dataItem.GetTagDataObject(new List<string>() { "approver_hr", "rank" }).ToString();   // 직위
+                    apprInfo.nApprPos = int.Parse(dataItem.GetTagDataObject(new List<string>() { "approver_type", "authority" }).ToString());// ApprovePos
+                    apprInfo.UserSeq = dataItem.GetTagDataObject(new List<string>() { "approver_seq"}).ToString();                   // userSeq
+                    apprInfo.nDlpApprove = int.Parse(dataItem.GetTagDataObject(new List<string>() { "approver_type", "dlp_authority" }).ToString());                              // 보안결재자 여부
 
                     ApproverSearch.AddLast(apprInfo);
                     i++;
 
                     Log.Logger.Here().Information($"GetDeptApproverInfoDataAdvanced, Search User - Index : {i}");
                 }
-
-
             }
             catch (Exception ex)
             {
                 Log.Logger.Here().Information($"GetDeptApproverInfoDataAdvanced, Exception(MSG) : {ex.Message}");
             }
-
             return ApproverSearch;
-
         }
 
 
