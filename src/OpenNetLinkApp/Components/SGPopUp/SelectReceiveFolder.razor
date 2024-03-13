@@ -342,12 +342,11 @@
 
         string trans_seq = sgData.GetTagData("trans_req", "trans_seq");
         string dType = sgData.GetTagData("trans_req", "data_type");
-        bool isNozip = true;
         string file_Key = sgData.GetTagData("file_info", "file_key");
         string file_md5 = sgData.GetTagData("file_info", "file_hash");
         
         long.TryParse(sgData.GetTagData("file_info", "file_size"), out long trans_size);
-        HsCmdCenter.RestGetHszFileDownload(groupid, trans_seq, dType, isNozip, file_Key, file_md5, trans_size);
+        HsCmdCenter.RestGetHszFileDownload(groupid, trans_seq, dType, file_Key, file_md5, trans_size);
 
     //if (curPushType.Equals("1"))
     //{

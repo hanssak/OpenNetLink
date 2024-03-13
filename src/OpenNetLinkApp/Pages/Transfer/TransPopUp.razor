@@ -422,19 +422,7 @@
         string curTransSeq = sgDetailData.GetTransSeq();
         ShowProgress(groupID, 1, 0, "DOWNLOAD");
          
-        //다운받을 전송건의 SGData 데이터
-        SGData sgData = new SGData();
-        string trans_seq = sgData.GetTagData("trans_req", "trans_seq");
-        string dType = sgData.GetTagData("trans_req", "data_type");
-        bool isNozip = true;
-        string file_Key = sgData.GetTagData("file_info", "file_key");
-        string file_md5 = sgData.GetTagData("file_info", "file_hash");
-        long.TryParse(sgData.GetTagData("file_info", "file_size"), out long trans_size);
-
-        //TODO 고도화 해당 Seq의 로 Notify 요청 (반대망에 있는 파일을 수신하는 FLow 재검토)
-        HSCmdCenter.RestGetHszFileDownload(groupID, trans_seq, dType, isNozip, file_Key, file_md5, trans_size);
-        
-        //HSCmdCenter.RequestManualDownload(groupID, curUserID, curTransSeq);
+        HSCmdCenter.RestManualDownload(groupID, sgDetailData.GetTransSeq());
         return;
     }
 

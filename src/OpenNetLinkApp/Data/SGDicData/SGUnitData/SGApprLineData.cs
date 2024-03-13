@@ -317,7 +317,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     }
 
     /// <summary>
-    /// default_approver_reg_list
+    /// approver_line
     /// </summary>
     public class SGApprLineData : SGData
     {

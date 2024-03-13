@@ -3787,7 +3787,7 @@ namespace OpenNetLinkApp.Services
             return 0;
         }
 
-        public int RestGetHszFileDownload(int groupid, string trans_seq, string dType, bool NoZip, string file_Key, string file_MD5, long trans_Size)
+        public int RestManualDownload(int groupid, string transSeq)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork == null)
@@ -3798,7 +3798,28 @@ namespace OpenNetLinkApp.Services
                 int ret = 0;
                 try
                 {
-                    hsNetWork.GetHszFileDown(trans_seq, dType, NoZip, file_Key, file_MD5, trans_Size);
+                    ret = sgSendData.RequestRestManualDownload(hsNetWork, groupid, transSeq);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestLogin2Fa-Task-Exception : {ex.Message}");
+                }
+            });
+            return 0;
+        }
+
+        public int RestGetHszFileDownload(int groupid, string trans_seq, string dType, string file_Key, string file_MD5, long trans_Size)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    hsNetWork.GetHszFileDown(trans_seq, dType, file_Key, file_MD5, trans_Size);
                 }
                 catch (Exception ex)
                 {
