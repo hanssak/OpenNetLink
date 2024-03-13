@@ -9,6 +9,8 @@ using System.Runtime.InteropServices;
 using OpenNetLinkApp.Data.SGNotify;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using Serilog;
+using AgLogManager;
 
 namespace OpenNetLinkApp.Data.SGDicData
 {
@@ -566,6 +568,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             {
                 strinterlockflagConfirmId = strinterlockflagConfirmId.Replace('|', '\u0002');
                 dic["INTERLOCKFLAGCONFIRMID"] = strinterlockflagConfirmId;
+                Log.Logger.Here().Information($"RequestSendFileTrans, INTERLOCKFLAGCONFIRMID data Send!");
             }
             dic["GROUPID"] = groupid.ToString();
 
