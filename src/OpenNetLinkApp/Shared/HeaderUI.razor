@@ -2525,7 +2525,15 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         string stReceiver = "";
         string strDestNetOverData = "";
         pageService.SetClipboardSending(true);
-        int ret = HsCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strTitle, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
+
+        string strInterLockFlagConfirmId = "";
+        if (bAfterApprove && ((stApprLineSeq?.Length ?? 0) > 0) && SGAppMgrSvc.OpConfigInfoService.GetUseDlpAfterApproveToNormal(groupID))
+        {
+            // interlockflag | 0(사전전환) or 1(사후전환) | 결재자정보
+            strInterLockFlagConfirmId = "8|0|" + stApprLineSeq;
+        }
+
+        int ret = HsCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strTitle, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver, strInterLockFlagConfirmId);
         if (ret == -2)
         {
             string strMsg = XmlConf.GetErrMsg("E_0162");
