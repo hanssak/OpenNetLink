@@ -39,9 +39,9 @@
                 }
                 <div>
                     <div class="card-body table-responsive p-0" style="height:@((securityApproverSearchType =="SEARCH") ? "331px" : "160px" ); border:1px solid #ddd; background-color:#fff;">
-                    @if (listApvdata != null && listApvdata.Count > 0)
-                    {
-                        
+                        @if (listApvdata != null && listApvdata.Count > 0)
+                        {
+
                             <table class="table table-head-fixed">
 
                                 <thead>
@@ -49,11 +49,11 @@
                                         <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_DEPT") </th>        <!--부서-->
                                     <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_NAME") </th>        <!--이름-->
                                     <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_RANK") </th>        <!--직급-->
-                                    @if(showUserId)
-                                    {   
-                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_ID") </th>    <!--아이디-->                        
-                                    }
-                                    <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_SELECT2")</th>        <!--선택-->                                    
+                                        @if (showUserId)
+                                        {
+                                            <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_ID") </th>    <!--아이디-->
+                                        }
+                                        <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_SELECT2")</th>        <!--선택-->
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -61,28 +61,28 @@
                                     {
                                         if (item.Count < 3) return;
                                         <tr name="trItem" draggable="false" data-draggable="tritem" aria-grabbed="false">
-                                            <td style="text-align: center; vertical-align: middle;">@item[3]</td>
-                                            <td style="text-align: center; vertical-align: middle;">@item[1]</td>
-                                            <td style="text-align: center; vertical-align: middle;">@item[4]</td>
+                                            <td style="text-align: center; vertical-align: middle;">@item["dept_name"]</td>
+                                            <td style="text-align: center; vertical-align: middle;">@item["name"]</td>
+                                            <td style="text-align: center; vertical-align: middle;">@item["rank"]</td>
                                             @if (showUserId)
                                             {
-                                                <td style="text-align: center; vertical-align: middle;">@item[0]</td>
+                                                <td style="text-align: center; vertical-align: middle;">@item["approver_id"]</td>
                                             }
                                             <td style="text-align: center; vertical-align: middle;">
-                                                <button @onclick="e => doOk(item[8])" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-user-plus"></i>@XmlConf.GetTitle("T_COMMON_SELECT")</button>
+                                                <button @onclick="@(e => doOk(item["approver_seq"]))" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-user-plus"></i>@XmlConf.GetTitle("T_COMMON_SELECT")</button>
                                             </td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
-                        
 
 
-                    }
-                    else
-                    {
-                        <table><tr><td>@XmlConf.GetErrMsg("E_0153")</td></tr></table>
-                    }
+
+                        }
+                        else
+                        {
+                            <table><tr><td>@XmlConf.GetErrMsg("E_0153")</td></tr></table>
+                        }
                     </div>
                 </div>
             </div>
@@ -111,7 +111,7 @@
     public string strCurName = "";
     private string stDesc { get; set; }
     public List<string> lstInfo = new List<string>();   //자료전송 정보
-    List<Dictionary<int, string>> listApvdata = null;   //보안결재자 목록
+    List<Dictionary<string, string>> listApvdata = null;   //보안결재자 목록
     public string deputyMod { get; set; }
 
     public void setDesc(string desc)
@@ -136,7 +136,7 @@
 
         securityApproverSearchType = SGAppMgrSvc.OpConfigInfoService.GetSecurityApproverSearchType(groupID);
         useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInSecurityApproverTree(groupID);
-        showUserId  = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
+        showUserId = SGAppMgrSvc.OpConfigInfoService.GetUserLineShowNameAndID(groupID);
 
         //대결자 검색
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -168,7 +168,24 @@
     }
     public void SearchResult(int groupid, SGData sgData)
     {
-        listApvdata = sgData.GetSvrRecordData("RECORD");
+        if (listApvdata == null)
+            listApvdata = new List<Dictionary<string, string>>();
+        else
+            listApvdata.Clear();
+
+        List<object> approverList = sgData.GetTagDataObjectList("approver_list");
+        foreach (object appr in approverList)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["dept_name"] = appr.GetTagDataObject("approver_hr", "dept_name").ToString();
+
+            dic["approver_id"] = appr.GetTagDataObject("approver_hr", "approver_id").ToString();
+            dic["approver_seq"] = appr.GetTagDataObject("approver_seq").ToString();
+            dic["name"] = appr.GetTagDataObject("approver_hr", "name").ToString();
+            dic["rank"] = appr.GetTagDataObject("approver_hr", "rank").ToString();
+            listApvdata.Add(dic);
+        }
+
         StateHasChanged();
     }
 
@@ -198,14 +215,14 @@
             ShowMessage("error", strMsg);
             return;
         }
-        
-        if(!strCurName.ValidationSqlInjection())
+
+        if (!strCurName.ValidationSqlInjection())
         {
             ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
             return;
         }
 
-        if(!strCurDept.ValidationSqlInjection())
+        if (!strCurDept.ValidationSqlInjection())
         {
             ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
             return;
@@ -221,19 +238,22 @@
 
         string strUserName = strCurName;
         string strDeptName = strCurDept;
+        UserApproveRightType approveType = new UserApproveRightType();
+        approveType.nDlpAuthority = 1;
+        HSCmdCenter.RestUserSearch(groupID, strUserName, "", strDeptName, approveType);
 
-        SGQueryExtend sgQuery = new SGQueryExtend();
-        string strQuery = "";
-        bool isProxyUse = false;
-
-        if (deputyMod == "0")
-            isProxyUse = false;
-        else
-            isProxyUse = true;
-
-        strQuery = sgQuery.GetSecurityApprover(isProxyUse, strUserSeq, SGAppMgrSvc.OpConfigInfoService.GetViewDlpApproverMyDept(groupID), strDeptName, strUserName);
-
-        HSCmdCenter.SendSecurityApproverQuery(groupID, sgLoginData.GetUserID(), strQuery);
+        //SGQueryExtend sgQuery = new SGQueryExtend();
+        //string strQuery = "";
+        //bool isProxyUse = false;
+        //
+        //if (deputyMod == "0")
+        //    isProxyUse = false;
+        //else
+        //    isProxyUse = true;
+        //
+        //strQuery = sgQuery.GetSecurityApprover(isProxyUse, strUserSeq, SGAppMgrSvc.OpConfigInfoService.GetViewDlpApproverMyDept(groupID), strDeptName, strUserName);
+        //
+        //HSCmdCenter.SendSecurityApproverQuery(groupID, sgLoginData.GetUserID(), strQuery);
     }
 
     private void ShowMessage(string strType, string strMsg)

@@ -163,7 +163,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 //string strData = GetTagData("approver_list");
                 //var dataList = JsonConvert.DeserializeObject<List<dynamic>>(strData);
 
-                List<object> dataList =GetTagDataObjectList("approver_list");
+                List<object> dataList = GetTagDataObjectList("approver_list");
                 Log.Logger.Here().Information($"GetDeptApproverInfoDataAdvanced, Search User - Count : {dataList?.Count}");
 
                 if (dataList?.Count < 1)
@@ -177,18 +177,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 foreach (object dataItem in dataList)
                 {
-                    JObject jO = (JObject)dataItem;
-
                     apprInfo = new ApproverInfo();
                     apprInfo.Index = String.Format("{0,3}", i + 1);                     // Index
-                    apprInfo.APPR_USERID = dataItem.GetTagDataObject(new List<string>() { "approver_hr", "approver_id" }).ToString();
-                    apprInfo.Name = dataItem.GetTagDataObject(new List<string>() { "approver_hr", "name" }).ToString();                       // 이름
-                    apprInfo.APPR_TEAMCODE = dataItem.GetTagDataObject(new List<string>() { "approver_hr", "dept_seq" }).ToString();    // 부서Code
-                    apprInfo.DeptName = dataItem.GetTagDataObject(new List<string>() { "approver_hr", "dept_name" }).ToString();    // 부서이름
-                    apprInfo.Grade = dataItem.GetTagDataObject(new List<string>() { "approver_hr", "rank" }).ToString();   // 직위
-                    apprInfo.nApprPos = int.Parse(dataItem.GetTagDataObject(new List<string>() { "approver_type", "authority" }).ToString());// ApprovePos
-                    apprInfo.UserSeq = dataItem.GetTagDataObject(new List<string>() { "approver_seq"}).ToString();                   // userSeq
-                    apprInfo.nDlpApprove = int.Parse(dataItem.GetTagDataObject(new List<string>() { "approver_type", "dlp_authority" }).ToString());                              // 보안결재자 여부
+                    apprInfo.APPR_USERID = dataItem.GetTagDataObject("approver_hr", "approver_id").ToString();
+                    apprInfo.Name = dataItem.GetTagDataObject("approver_hr", "name").ToString();                       // 이름
+                    apprInfo.APPR_TEAMCODE = dataItem.GetTagDataObject("approver_hr", "dept_seq").ToString();    // 부서Code
+                    apprInfo.DeptName = dataItem.GetTagDataObject("approver_hr", "dept_name").ToString();    // 부서이름
+                    apprInfo.Grade = dataItem.GetTagDataObject("approver_hr", "rank").ToString();   // 직위
+                    apprInfo.nApprPos = int.Parse(dataItem.GetTagDataObject("approver_type", "authority").ToString());// ApprovePos
+                    apprInfo.UserSeq = dataItem.GetTagDataObject("approver_seq").ToString();                   // userSeq
+                    apprInfo.nDlpApprove = int.Parse(dataItem.GetTagDataObject("approver_type", "dlp_authority").ToString());                              // 보안결재자 여부
 
                     ApproverSearch.AddLast(apprInfo);
                     i++;

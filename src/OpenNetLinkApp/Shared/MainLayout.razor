@@ -441,7 +441,7 @@
         {
             if (stPrivacy == "0")
             {
-                string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
+                string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);  //선택지 있음
                 refSecurityConfirm.listInfo = lstInfo;
                 refSecurityConfirm.fileInfoDatas = mFileData;
                 refSecurityConfirm.Refresh();
@@ -450,7 +450,7 @@
             }
             else
             {
-                string msg = String.Format(XmlConf.GetWarnMsg("W_0258"));
+                string msg = String.Format(XmlConf.GetWarnMsg("W_0258"));       //선택지 없음
                 refSecurityPopUp.setDesc(String.Format(msg, stTitle));
                 refSecurityPopUp.listInfo = lstInfo;
                 await Task.Delay(1000);

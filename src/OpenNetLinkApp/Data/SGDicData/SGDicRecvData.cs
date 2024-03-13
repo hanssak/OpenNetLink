@@ -217,7 +217,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             return m_DicApprLineData[groupid];
         }
 
-        public void SetApprLineData(HsNetWork hs, int groupid, SGData data)
+        public void SetApprLineData(HsNetWork hs, int groupid, SGData data, UserHRinfo userHr)
         {
             SGApprLineData tmpData = null;
             if (m_DicApprLineData.TryGetValue(groupid, out tmpData) == true)
@@ -228,7 +228,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             }
 
             tmpData = new SGApprLineData();
-            tmpData.Copy(hs, data);
+            tmpData.Copy(hs, data, userHr); //결재라인 표시 시, 사용자도 함께 표시하므로 Hr 함께 저장
 
             m_DicApprLineData.TryAdd(groupid, tmpData);
             //m_DicApprLineData[groupid] = tmpData;

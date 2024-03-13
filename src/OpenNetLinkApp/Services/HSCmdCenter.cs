@@ -1216,14 +1216,10 @@ namespace OpenNetLinkApp.Services
                             DeptApprLineSearchAfterSend(nRet, groupId);
                         }
                         break;
-
-                        //eCmdList.eSECURITYAPPROVERQUERY:
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            SecurityApproverSearchEvent securityApproverSearchEvent = sgPageEvent.GetSecurityApproverSearchEvent(groupId);
-                            if (securityApproverSearchEvent != null) securityApproverSearchEvent(groupId, sgData);
-                        }
+                    case eAdvancedCmdList.ePostSecurityApproversRetrieval:  //(보안결재자) 결재자 검색
+                        SecurityApproverSearchEvent securityApproverSearchEvent = sgPageEvent.GetSecurityApproverSearchEvent(groupId);
+                        if (securityApproverSearchEvent != null)
+                            securityApproverSearchEvent(groupId, sgData);
                         break;
 
                     case eAdvancedCmdList.eGetDepts:                    // 부서정보 조회
@@ -1282,10 +1278,23 @@ namespace OpenNetLinkApp.Services
                 string systemPosition = sgReadyData?.GetSystemPositionString();
 
                 sgDicRecvData.SetLoginData(hs, groupId, sgData, systemPosition);
-                string apprLineValue = sgData.GetTagData("approve_line");   //ApprLineDta는 별도 저장
+
+
+                JObject apprLineValue = (JObject)sgData.GetTagDataObject("approve_line");   //ApprLineDta는 별도 저장
+                UserHRinfo userHr = new UserHRinfo()
+                {
+                    strId = sgData.GetTagData("user_hr", "user_id"),
+                    strSeq = sgData.GetTagData("user_hr", "user_seq"),
+                    strName = sgData.GetTagData("user_hr", "name"),
+                    strRank = sgData.GetTagData("user_hr", "rank"),
+                    strDeptName = sgData.GetTagData("user_hr", "dept_name"),
+                    deptSeq = sgData.GetTagData("user_hr", "dept_seq"),
+                    strPosition = sgData.GetTagData("user_hr", "position")
+                };
+
                 SGData apprLineData = new SGData();
-                apprLineData.m_DicTagData = JsonConvert.DeserializeObject<Dictionary<string, object>>(apprLineValue);
-                sgDicRecvData.SetApprLineData(hs, groupId, apprLineData);
+                apprLineData.m_DicTagData = apprLineValue.ToObject<Dictionary<string, object>>();
+                sgDicRecvData.SetApprLineData(hs, groupId, apprLineData, userHr);
 
                 SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
                 Int64 nFilePartSize = sgLoginData.GetFilePartSize();
@@ -1666,13 +1675,27 @@ namespace OpenNetLinkApp.Services
 
             try
             {
+                SGLoginData sgLoginDataApproveDefault = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                strUserID = sgLoginDataApproveDefault.GetUserID();
+
+                UserHRinfo userHr = new UserHRinfo()
+                {
+                    strId = sgLoginDataApproveDefault.GetUserID(),
+                    strSeq = sgLoginDataApproveDefault.GetUserSequence(),
+                    strName = sgLoginDataApproveDefault.GetUserName(),
+                    strRank = sgLoginDataApproveDefault.GetRank(),
+                    strDeptName = sgLoginDataApproveDefault.GetTeamName(),
+                    deptSeq = sgLoginDataApproveDefault.GetTeamCode(),
+                    strPosition = sgLoginDataApproveDefault.GetUserPosition()                    
+                };
+
                 if (nRet == 0)
                 {
                     HsNetWork hs = null;
                     if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
                     {
                         hs = m_DicNetWork[groupId];
-                        sgDicRecvData.SetApprLineData(hs, groupId, sgData);
+                        sgDicRecvData.SetApprLineData(hs, groupId, sgData, userHr);
                     }
                 }
                 /*
@@ -1684,8 +1707,7 @@ namespace OpenNetLinkApp.Services
                 // SGUserData sgUserData = (SGUserData)sgDicRecvData.GetUserData(groupId);
                 // string strTeamCode = sgUserData.GetTeamCode();
 
-                SGLoginData sgLoginDataApproveDefault = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                strUserID = sgLoginDataApproveDefault.GetUserID();
+
 
             }
             catch (Exception ex)
@@ -2217,7 +2239,7 @@ namespace OpenNetLinkApp.Services
 
                     }
 
-                    
+
                 }
 
             }
@@ -3772,7 +3794,7 @@ namespace OpenNetLinkApp.Services
                 return -1;
 
             Task.Run(() =>
-            {                
+            {
                 int ret = 0;
                 try
                 {
