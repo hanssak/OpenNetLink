@@ -981,7 +981,7 @@
             strNavigatePathWithGroupID = "/hanssakOTP/";    //안씀
             strNavigatePathWithGroupID += gID.ToString();
             if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
-                SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_COMMON_OTP"), icon: "fas fa-cog", path: "POPUP('OTP')", badgeType: "right badge badge-warning", bUse: bBasicConf, strUserSeq: strUserSeq);
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_COMMON_OTP"), icon: "fas fa-cog", path: "POPUP('OTP')", badgeType: "right badge badge-warning", bUse: true, strUserSeq: strUserSeq);
         }
 
         StateHasChanged();
