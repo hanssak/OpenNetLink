@@ -62,7 +62,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public emailApproveData()
         {
             bCheckDisable = bCheck = false;
-            TransSeq = ApvType = TransferType = TransStatusCode = ApvStatus = IsFile = Title = RequestTime = "";
+            TransSeq = ApvType = TransferType = TransStatusCode = ApvStatus = Title = RequestTime = "";
             strDestNet = "";
             strSender = "";
             strReceiver = "";
@@ -75,7 +75,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             TransferType = transfertype;
             TransStatusCode = transferstatus;
             ApvStatus = apvstatus;
-            IsFile = isfile;
+            //IsFile = isfile;
             Title = title;
             RequestTime = reqtime;
             TransStatusCode = strTransStatusCode;

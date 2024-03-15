@@ -10,6 +10,7 @@ using OpenNetLinkApp.Data.SGNotify;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using static HsNetWorkSG.SGEnums;
+using OpenNetLinkApp.Data.SGQuery;
 
 namespace OpenNetLinkApp.Data.SGDicData
 {
@@ -1250,16 +1251,66 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.SendMessage(args);
         }
 
-        public int RequestRestSendApproveBatch(HsNetWork hsNet, string strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<Int64> listSeqData)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hsNet"></param>
+        /// <param name="approvalType">결재 종류. 택1: common(일반결재), security(보안결재), proxy(대결재)</param>
+        /// <param name="approveParam"></param>
+        /// <returns></returns>
+        public int RequestRestApprovalSearch(HsNetWork hsNet, string approvalType, ApproveParam approveParam)
+        {
+            Dictionary<string, object> bodyDic = new Dictionary<string, object>();
+            Dictionary<string, object> pagingDic = new Dictionary<string, object>();
+            bodyDic["period_date"] = $"{approveParam.SearchFromDay}-{approveParam.SearchToDay}";
+            bodyDic["data_type_list"] = approveParam.DataType;
+            bodyDic["net_type_list"] = approveParam.TransKind;
+            bodyDic["approval_type"] = approvalType;
+            bodyDic["approval_proc_type_list"] = approveParam.ApprKind;
+            bodyDic["approval_state_list"] = approveParam.ApprStatus;
+            bodyDic["paging"] = pagingDic;
+
+            pagingDic["number"] = approveParam.ViewPageNo;
+            pagingDic["max_list_count"] = approveParam.PageListCount;
+
+            //TODO 고도화 - 3망에 대한 Dest 정보 필요
+
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostApprovalsRetrieval, null, bodyDic, hsNet.stCliMem.GetProtectedSeedKey());
+            return hsNet.SendMessage(args);
+
+            /*
+             period_date: 20231205-20231210
+            trans_type:
+                - "toIN"
+                - "toEX"
+            approval_type: '결재 종류. 택1: common(일반결재), security(보안결재), proxy(대결재), vip, ex_handling'
+            approval_proc_type_list: 
+                - 'pre'
+                - 'post'
+            approval_state_list: 
+                - "pre"
+                - "wait"
+                - "confirm"
+                - "reject"
+                - "cancel"
+                - "skip"
+            paging:
+                number: 1
+                max_list_count: 10
+             */
+        }
+
+
+        public int RequestRestSendApproveBatch(HsNetWork hsNet, Int64 nUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<Int64> listTransSeqData)
         {
 
-            if ((strUserSeq?.Length ?? 0) < 1)
+            if (nUserSeq < 1)
             {
                 return -1;
             }
 
             Dictionary<string, object> dicApproveProcinfo = new Dictionary<string, object>();
-            dicApproveProcinfo["approver_seq"] = Convert.ToInt64(strUserSeq);
+            dicApproveProcinfo["approver_seq"] = nUserSeq;
             dicApproveProcinfo["approval_type"] = strApproveType;
             dicApproveProcinfo["data_type"] = strDataType;
             dicApproveProcinfo["approval_action"] = strApproveAction;
@@ -1268,7 +1319,7 @@ namespace OpenNetLinkApp.Data.SGDicData
 
             Dictionary<string, object> dicApproveItem = new Dictionary<string, object>();
             dicApproveItem["approval_proc_info"] = dicApproveProcinfo;
-            dicApproveItem["trans_seq_list"] = listSeqData.ToArray();
+            dicApproveItem["trans_seq_list"] = listTransSeqData;
 
             SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostApprovalsConfirmation, null, dicApproveItem, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.RequestRest(args);

@@ -522,7 +522,7 @@
             List<Int64> listApproveSeq = new List<Int64>();
             listApproveSeq.Add(Convert.ToInt64(stEmailSeq));
 
-            HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, bIsPrivacyApproveDetail?"security":"common", "mail", "confirm", "Approve", listApproveSeq);
+            HSCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), bIsPrivacyApproveDetail?"security":"common", "mail", "confirm", "Approve", listApproveSeq);
 
             closePopUp();
         }
@@ -606,7 +606,7 @@
         List<Int64> listApproveSeq = new List<Int64>();
         listApproveSeq.Add(Convert.ToInt64(stEmailSeq));
 
-        HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, bIsPrivacyApproveDetail?"security":"common", "mail", (bisReject ? "reject" : "confirm"), strReason, listApproveSeq);
+        HSCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), bIsPrivacyApproveDetail?"security":"common", "mail", (bisReject ? "reject" : "confirm"), strReason, listApproveSeq);
 
         closePopUp();
     }

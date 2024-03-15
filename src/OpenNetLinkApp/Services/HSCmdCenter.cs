@@ -533,20 +533,20 @@ namespace OpenNetLinkApp.Services
                         //RMouseFileAddNotiAfterSend(nRet, groupId);
                         break;
 
-                    case eCmdList.eFILEAPPRLISTQUERYCOUNT:                                           // 결재관리 조회 리스트 데이터 Count 요청 응답. (쿼리 방식) 
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            string sCount = sgData.GetSvrRecordTagData("RECORD");
-                            int cnt = 0;
-                            if (!sCount.Equals(""))
-                            {
-                                sCount = sCount.Replace("\u0001", "");
-                                cnt = Convert.ToInt32(sCount);
-                            }
-                            ApprSearchCountAfterSend(nRet, groupId, cnt);
-                        }
-                        break;
+                    //case eCmdList.eFILEAPPRLISTQUERYCOUNT:                                           // 결재관리 조회 리스트 데이터 Count 요청 응답. (쿼리 방식) 
+                    //    hs = GetConnectNetWork(groupId);
+                    //    if (hs != null)
+                    //    {
+                    //        string sCount = sgData.GetSvrRecordTagData("RECORD");
+                    //        int cnt = 0;
+                    //        if (!sCount.Equals(""))
+                    //        {
+                    //            sCount = sCount.Replace("\u0001", "");
+                    //            cnt = Convert.ToInt32(sCount);
+                    //        }
+                    //        ApprSearchCountAfterSend(nRet, groupId, cnt);
+                    //    }
+                    //    break;
 
                     case eCmdList.eFILEAPPRLISTQUERY:                                           // 결재관리 조회 리스트 요청 응답. (쿼리 방식) 
                         hs = GetConnectNetWork(groupId);
@@ -1077,7 +1077,7 @@ namespace OpenNetLinkApp.Services
                             {
                                 // file / clip
                                 //eCmdList.eAPPROVEBATCH:                                               
-                                ApproveBatchAfterSendAdvanced(nRet, groupId, sgData);
+                                ApproveBatchAfterSend(nRet, groupId, sgData);
                             }
                         }
                         break;
@@ -1281,6 +1281,7 @@ namespace OpenNetLinkApp.Services
 
 
                 JObject apprLineValue = (JObject)sgData.GetTagDataObject("approve_line");   //ApprLineDta는 별도 저장
+
                 UserHRinfo userHr = new UserHRinfo()
                 {
                     strId = sgData.GetTagData("user_hr", "user_id"),
@@ -1297,13 +1298,15 @@ namespace OpenNetLinkApp.Services
                 sgDicRecvData.SetApprLineData(hs, groupId, apprLineData, userHr);
 
                 SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                Int64 nFilePartSize = sgLoginData.GetFilePartSize();
-                Int64 nFileBandWidth = sgLoginData.GetFileBandWidth();
-
                 //TODO 고도화 - 환경설정 부분은 별도 암호화가 필요한지 확인 필요
                 sgLoginData.AddRunSystemEnvData(sgData);
 
-                hs.SetNetworkInfo(nFilePartSize, nFileBandWidth);
+                Int64 nFilePartSize = sgLoginData.GetFilePartSize();
+                Int64 nFileBandWidth = sgLoginData.GetFileBandWidth();
+                JObject userHrJObj = (JObject)sgData.GetTagDataObject("user_hr");
+                Dictionary<string, object> userHrDic = (userHrJObj != null) ? userHrJObj.ToObject<Dictionary<string, object>>() : new Dictionary<string, object>();
+
+                hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, userHrDic);
                 hs.SetHszDefault(sgLoginData.GetHszDefaultDec());
                 hs.SetManualDownLoad(sgLoginData.GetManualDownload());
 
@@ -1686,7 +1689,7 @@ namespace OpenNetLinkApp.Services
                     strRank = sgLoginDataApproveDefault.GetRank(),
                     strDeptName = sgLoginDataApproveDefault.GetTeamName(),
                     deptSeq = sgLoginDataApproveDefault.GetTeamCode(),
-                    strPosition = sgLoginDataApproveDefault.GetUserPosition()                    
+                    strPosition = sgLoginDataApproveDefault.GetUserPosition()
                 };
 
                 if (nRet == 0)
@@ -1775,23 +1778,23 @@ namespace OpenNetLinkApp.Services
             }
         }
 
-        public void ApprSearchCountAfterSend(int nRet, int groupId, int count)
-        {
-            ApprSearchCountEvent ApprSearchCountResult_Event = sgPageEvent.GetApprSearchCountEvent(groupId);
-            if (ApprSearchCountResult_Event != null)
-            {
-                PageEventArgs e = new PageEventArgs();
-                e.result = nRet;
-                string strMsg = "";
-                if (nRet != 0)
-                    strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eSearchError);
-                else
-                    strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eNotData);
-                e.strMsg = strMsg;
-                e.count = count;
-                ApprSearchCountResult_Event(groupId, e);
-            }
-        }
+        //public void ApprSearchCountAfterSend(int nRet, int groupId, int count)
+        //{
+        //    ApprSearchCountEvent ApprSearchCountResult_Event = sgPageEvent.GetApprSearchCountEvent(groupId);
+        //    if (ApprSearchCountResult_Event != null)
+        //    {
+        //        PageEventArgs e = new PageEventArgs();
+        //        e.result = nRet;
+        //        string strMsg = "";
+        //        if (nRet != 0)
+        //            strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eSearchError);
+        //        else
+        //            strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eNotData);
+        //        e.strMsg = strMsg;
+        //        e.count = count;
+        //        ApprSearchCountResult_Event(groupId, e);
+        //    }
+        //}
 
         public void TransCancelAfterSend(int nRet, int groupId)
         {
@@ -1811,37 +1814,8 @@ namespace OpenNetLinkApp.Services
             }
         }
 
+
         public void ApproveBatchAfterSend(int nRet, int groupId, SGData data)
-        {
-
-            if (data == null)
-                return;
-            string strProcID = data.GetBasicTagData("PROCID");
-            ApprBatchEvent ApprBatchResult_Event = sgPageEvent.GetApprBatchEvent(groupId);
-            if (ApprBatchResult_Event != null)
-            {
-                PageEventArgs e = new PageEventArgs();
-                e.result = nRet;
-                string strMsg = "";
-                if (nRet != 0)
-                    strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchError);
-                else
-                {
-                    if (strProcID.Equals("A"))                                                       // 승인 
-                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
-                    else if (strProcID.Equals("R"))                                                       // 반려 
-                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchRejectSuccess);
-                    else
-                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
-                }
-
-                e.strDummy = strProcID;
-                e.strMsg = strMsg;
-                ApprBatchResult_Event(groupId, e);
-            }
-        }
-
-        public void ApproveBatchAfterSendAdvanced(int nRet, int groupId, SGData data)
         {
             if (data == null)
             {
@@ -3780,7 +3754,7 @@ namespace OpenNetLinkApp.Services
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.Here().Error($"RestLogin2Fa-Task-Exception : {ex.Message}");
+                    Log.Logger.Here().Error($"RestOTPNumber-Task-Exception : {ex.Message}");
                 }
 
             });
@@ -3802,7 +3776,7 @@ namespace OpenNetLinkApp.Services
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.Here().Error($"RestLogin2Fa-Task-Exception : {ex.Message}");
+                    Log.Logger.Here().Error($"RestManualDownload-Task-Exception : {ex.Message}");
                 }
             });
             return 0;
@@ -3823,12 +3797,34 @@ namespace OpenNetLinkApp.Services
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.Here().Error($"RestLogin2Fa-Task-Exception : {ex.Message}");
+                    Log.Logger.Here().Error($"RestGetHszFileDownload-Task-Exception : {ex.Message}");
                 }
             });
             return 0;
         }
 
+
+        public int RestApprovalSearch(int groupid, string approvalType, ApproveParam approveParam)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestApprovalSearch(hsNetWork, approvalType, approveParam);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestApprovalSearch-Task-Exception : {ex.Message}");
+                }
+            });
+            return 0;
+
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -3840,13 +3836,12 @@ namespace OpenNetLinkApp.Services
         /// <param name="strstrDescription"></param>
         /// <param name="listSeqData"></param>
         /// <returns></returns>
-        public int RestSendApproveBatch(int groupid, string strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<Int64> listSeqData)
+        public int RestSendApproveBatch(int groupid, Int64 strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<Int64> listSeqData)
         {
 
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork == null)
                 return -1;
-
 
             Task.Run(() =>
             {

@@ -1004,7 +1004,7 @@
             List<Int64> listApproveSeq = new List<Int64>();
             listApproveSeq.Add(Convert.ToInt64(sgDetailData.GetApprSeq()));
 
-            HsCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "file", "confirm", "Approve", listApproveSeq);
+            HsCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "common", "file", "confirm", "Approve", listApproveSeq);
 
             closePopUp();
         }
@@ -1083,7 +1083,7 @@
 		List<Int64> listApproveSeq = new List<Int64>();
 		listApproveSeq.Add(Convert.ToInt64(sgDetailData.GetApprSeq()));
 
-		HsCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "file", (bisReject?"reject":"confirm"), "Approve", listApproveSeq);
+		HsCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "common", "file", (bisReject?"reject":"confirm"), "Approve", listApproveSeq);
 
         closePopUp();
     }

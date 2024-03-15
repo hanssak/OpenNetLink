@@ -23,7 +23,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             xmlConf = new XmlConfService();
         }
-        
+
         ~SGApprManageData()
         {
 
@@ -76,6 +76,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return listDicdata;
         }
 
+        /// <summary>
+        /// 삭제예정
+        /// </summary>
+        /// <returns></returns>
         public List<Dictionary<int, string>> GetQuerySearchData()
         {
             List<Dictionary<int, string>> listDicdata = null;
@@ -89,129 +93,94 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return listDicdata;
         }
 
-        /**
-		 * @breif 결재 정보를 반환한다.
-		 * @return 결재 정보(선결,후결)
-		 */
-        public string GetApprKind(Dictionary<int, string> dic)
+        /// <summary>
+        /// 결재 정보(선결,후결)
+        /// <para>"trans_req", "approval_proc_type"</para>
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetApprKind(Dictionary<string, object> dic)
         {
-            string strApprKind = "";
-            if (dic.TryGetValue(8, out strApprKind) != true)
-                return strApprKind;
-            strApprKind = dic[8];
-
-            int nIndex = 0;
-            if (!strApprKind.Equals(""))
-                nIndex = Convert.ToInt32(strApprKind);
-
-            switch (nIndex)
-            {
-                case 0:
-                    strApprKind = xmlConf.GetTitle("T_COMMON_APPROVE_BEFORE");        // 선결
-                    break;
-                case 1:
-                    strApprKind = xmlConf.GetTitle("T_COMMON_APPROVE_AFTER");        // 후결
-                    break;
-                default:
-                    break;
-            }
-
-            return strApprKind;
+            string processType = dic.GetTagData("trans_req", "approval_proc_type");
+            if (processType == "pre")    //사전
+                return xmlConf.GetTitle("T_COMMON_APPROVE_BEFORE");        // 선결
+            else if (processType == "post")
+                return xmlConf.GetTitle("T_COMMON_APPROVE_AFTER");        // 후결
+            else
+                return "-";
         }
         /**
+         * 
 		 * @breif 개인정보 검출 상태 정보를 반환한다.
 		 * @return 개인정보 검출 상태 (미사용,포함,미포함,검출불가)
 		 */
-        public string GetDlp(Dictionary<int, string> dic)
+        public string GetDlp(Dictionary<string, object> dic)
         {
-            string strDlp = "";
-            if (dic.TryGetValue(2, out strDlp) != true)
-                return strDlp;
-            strDlp = dic[2];
+            //Todo 고도화 - 개인정보 검출(또는 검사결과에 대한 정보) 필요함.
+            return "검사결과";
 
-            int nIndex = 0;
-            if (!strDlp.Equals(""))
-                nIndex = Convert.ToInt32(strDlp);
+            //string strDlp = "";
+            //if (dic.TryGetValue(2, out strDlp) != true)
+            //    return strDlp;
+            //strDlp = dic[2];
 
-            switch (nIndex)
-            {
-                case 0:
-                    strDlp = xmlConf.GetTitle("T_COMMON_DLP_UNUSE");            // 미사용
-                    break;
-                case 1:
-                    strDlp = xmlConf.GetTitle("T_COMMON_DLP_INCLUSION");            // 포함
-                    break;
-                case 2:
-                    strDlp = xmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION");            // 미포함
-                    break;
-                case 3:
-                    strDlp = xmlConf.GetTitle("T_COMMON_DLP_UNKNOWN");            // 검출불가
-                    break;
-                default:
-                    strDlp = "0";
-                    break;
-            }
-            return strDlp;
-        }
-        /**
-		 * @breif 전송구분 정보를 반환한다.
-		 * @return 전송구분 정보(반출/반입)
-		 */
-        public string GetTransKind(Dictionary<int, string> dic)
-        {
-            string strTransKind = "";
-            if (dic.TryGetValue(6, out strTransKind) != true)
-                return strTransKind;
+            //int nIndex = 0;
+            //if (!strDlp.Equals(""))
+            //    nIndex = Convert.ToInt32(strDlp);
 
-            strTransKind = dic[6];
-
-            int nIndex = 0;
-            if (!strTransKind.Equals(""))
-                nIndex = Convert.ToInt32(strTransKind);
-
-            switch (nIndex)
-            {
-                case 1:
-                    strTransKind = xmlConf.GetTitle("T_COMMON_EXPORT");          // 반출
-                    break;
-                case 2:
-                    strTransKind = xmlConf.GetTitle("T_COMMON_IMPORT");          // 반입
-                    break;
-                default:
-                    strTransKind = "-";
-                    break;
-            }
-
-            return strTransKind;
+            //switch (nIndex)
+            //{
+            //    case 0:
+            //        strDlp = xmlConf.GetTitle("T_COMMON_DLP_UNUSE");            // 미사용
+            //        break;
+            //    case 1:
+            //        strDlp = xmlConf.GetTitle("T_COMMON_DLP_INCLUSION");            // 포함
+            //        break;
+            //    case 2:
+            //        strDlp = xmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION");            // 미포함
+            //        break;
+            //    case 3:
+            //        strDlp = xmlConf.GetTitle("T_COMMON_DLP_UNKNOWN");            // 검출불가
+            //        break;
+            //    default:
+            //        strDlp = "0";
+            //        break;
+            //}
+            //return strDlp;
         }
 
-        /**
-		 * @breif 결재요청자 정보를 반환한다.
-		 * @return 결재요청자 정보
-		 */
-        public string GetApproveReqUser(Dictionary<int, string> dic)
+        /// <summary>
+        /// 반입/반출
+        /// <para>"trans_req", "net_type"</para>
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetTransKind(Dictionary<string, object> dic)
         {
-            string strApproveReqUser = "";
-            if (dic.TryGetValue(4, out strApproveReqUser) != true)
-                return strApproveReqUser;
-
-            strApproveReqUser = dic[4];
-            return strApproveReqUser;
+            string netType = dic.GetTagData("trans_req", "net_type");
+            if (netType == "I")
+                return xmlConf.GetTitle("T_COMMON_IMPORT");         //반입
+            else if (netType == "E")
+                return xmlConf.GetTitle("T_COMMON_EXPORT");          // 반출
+            else 
+                return "-";
         }
 
-        /**
-		 * @breif TransSequence 정보를 반환한다.
-		 * @return TransSequence 정보
-		 */
-        public string GetTransSeq(Dictionary<int, string> dic)
-        {
-            string strTransSeq = "";
-            if (dic.TryGetValue(0, out strTransSeq) != true)
-                return strTransSeq;
-            strTransSeq = dic[0];
-            return strTransSeq;
-        }
+        /// <summary>
+        /// 결재 요청자
+        /// <para>"trans_req", "req_user_seq"</para>
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetApproveReqUser(Dictionary<string, object> dic) => dic.GetTagData("trans_req", "req_user_seq");
 
+        /// <summary>
+        /// trans_req"."trans_seq
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetTransSeq(Dictionary<string, object> dic) => dic.GetTagData("trans_req", "trans_seq");
+    
         /**
 		 * @breif ApproveSequence 정보를 반환한다.
 		 * @return ApproveSequence 정보
@@ -224,71 +193,88 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             strApproveSeq = dic[1];
             return strApproveSeq;
         }
-        /**
-		 * @breif 승인대기 상태가 요청취소로 변경 할지 여부를 판단하기 위한 값을 반환한다.
-		 * @return 요청취소 판단 값. (0 : 요청취소 조건 아님, 1: 사용자가 전송취소 한 경우, 2: 이전 결재자가 반려한 경우
-		 */
-        public int GetRequestCancelChk(Dictionary<int, string> dic)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strApprStatus">
+        /// <para>scanning 검사중</para>
+        /// <para>wait 전송대기</para>
+        /// <para>cancel 전송취소</para>
+        /// <para>received PC수신완료</para>
+        /// <para>fail 전송실패</para>
+        /// </param>
+        /// <param name="strTransStatus">
+        /// <para></para>
+        /// </param>
+        /// <returns>요청취소 판단 값. (0 : 요청취소 조건 아님, 1: 사용자가 전송취소 한 경우, 2: 이전 결재자가 반려한 경우</returns>
+        public int GetRequestCancelChk(Dictionary<string, object> dic)
         {
-            string strTransStatus = "";
-            string strApprStatus = "";
-            string strApprDataPos = "";
-            if(
-                (dic.TryGetValue(7, out strTransStatus)!=true)
-                || (dic.TryGetValue(9, out strApprStatus) != true)
-                || (dic.TryGetValue(13, out strApprDataPos) != true)
-                )
-            {
+            string strTransStatus = dic.GetTagData("trans_req", "trans_state");
+            string strApprStatus = dic.GetTagData("trans_req", "approval_state");
+
+            if (string.IsNullOrEmpty(strApprStatus) || string.IsNullOrEmpty(strTransStatus))
                 return 0;
-            }
-
-            strTransStatus = dic[7];                            // 전송상태 (W:전송대기,C:전송취소,P:전송완료,F:전송실패,V:검사중)
-            strApprStatus = dic[9];                             // 결재상태 (1:승인대기,2:승인,3:반려)
-            strApprDataPos = dic[13];                           // 결재 데이터 위치 (C:결재테이블, H:결재 이력 테이블)
-
-            if((strTransStatus.Equals("C") == true) && (strApprStatus.Equals("1") == true))     // 전송상태가 전송취소이면서 결재상태가 승인대기일때
+            /*
+            - "scanning 검사중"
+            - "wait 전송대기"
+            - "cancel 전송취소"
+            - "received PC수신완료"
+            - "fail 전송실패"
+            ------------------------------
+             pre(이전 단계 진행중), wait(결재 대기), confirm(승인), reject(반려), cancel(취소), skip(결재 스킵)
+            - "pre 이전 단계 진행중"
+            - "wait 결재 대기"
+            - "confirm 승인"
+            - "reject 반려"
+            - "cancel 취소"
+            - "skip 결재스킵(타 결재자 처리)"
+            */
+            if (strTransStatus == "cancel" && strApprStatus == "wait")     // 전송상태가 전송취소이면서 결재상태가 승인대기일때
                 return 1;
 
-            if (
-                (strTransStatus.Equals("W") == true)
-                && (strApprStatus.Equals("1") == true)
-                && (strApprDataPos.Equals("H") == true)
-                )                                                                               // 전송상태가 전송대기이고 결재상태가 승인대기 일때 결재 데이터 위치가 결재 이력 테이블에 존재하면
+            if (strTransStatus == "wait" && strApprStatus == "reject")      //전송대기 이면서, 반려상태인 경우
                 return 2;
 
             return 0;
         }
-        /**
-		 * @breif 전송상태 원본데이터 정보를 반환한다.
-		 * @return 전송상태 원본데이터(C : 전송취소, W : 전송대기, S : 수신완료, F : 전송실패, V : 검사중)
-		 */
-        public string GetTransStatusCode(Dictionary<int, string> dic)
+        //     /**
+        //* @breif 전송상태 원본데이터 정보를 반환한다.
+        //* @return 전송상태 원본데이터(C : 전송취소, W : 전송대기, S : 수신완료, F : 전송실패, V : 검사중)
+        //*/
+
+        public string GetTransStatusCode(Dictionary<string, object> dic) => dic.GetTagData("trans_req", "trans_state");
+        public string GetTransStatusName(Dictionary<string, object> dic)
         {
-            string strTransStatusCode = "";
-            if (dic.TryGetValue(7, out strTransStatusCode) != true)
-                return strTransStatusCode;
-
-            strTransStatusCode = dic[7];            // 전송상태
-
-            return strTransStatusCode;
+            string strTransState = dic.GetTagData("trans_req", "trans_state");
+            switch(strTransState)
+            {
+                case "scanning":
+                    return xmlConf.GetTitle("T_COMMON_TRANSCHECKING");  //검사중
+                case "wait":
+                    return xmlConf.GetTitle("T_COMMON_TRANSWAIT");  //전송대기
+                case "cancel":
+                    return xmlConf.GetTitle("T_COMMON_TRANSCANCLE");  //전송취소
+                case "received":
+                    return xmlConf.GetTitle("T_TRANS_COMPLETE");  //PC수신완료
+                case "fail":
+                    return xmlConf.GetTitle("T_TRANS_COMPLETE");  //전송실패
+                default:
+                    return "-";
+            }
         }
-        /**
-		 * @breif 결재상태 원본 데이터 정보를 반환한다.
-		 * @return 결재상태 원본 데이터(1: 승인대기, 2:승인, 3: 반려)
-		 */
-        public string GetApprStausCode(Dictionary<int, string> dic)
-        {
-            string strApprStatusCode = "";
-            if (dic.TryGetValue(9, out strApprStatusCode) != true)
-                return strApprStatusCode;
+        //     /**
+        //* @breif 결재상태 원본 데이터 정보를 반환한다.
+        //* @return 결재상태 원본 데이터(1: 승인대기, 2:승인, 3: 반려)
+        //*/
 
-            strApprStatusCode = dic[9];             // 승인상태
-
-            int nIndex = 0;
-            if (!strApprStatusCode.Equals(""))
-                nIndex = Convert.ToInt32(strApprStatusCode);
-            return strApprStatusCode;
-        }
+        /// <summary>
+        /// 결재상태 원본 ("trans_req", "approval_state")
+        /// <para>pre, wait, confirm, rejcet, skip</para>
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetApprStausCode(Dictionary<string, object> dic) => dic.GetTagData("trans_req", "approval_state");
 
         /**
 		 * @breif 결재 테이블 위치 정보를 반환한다.
@@ -343,59 +329,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		 * @breif 결재상태 정보를 반환한다.
 		 * @return 결재상태 정보(요청취소,승인대기,승인,반려)
 		 */
-        public string GetApprStaus(Dictionary<int, string> dic)
+        public string GetApprStaus(Dictionary<string, object> dic)
         {
-            string strTempApprStatus = "";
             if (GetRequestCancelChk(dic) != 0)
             {
-                strTempApprStatus=xmlConf.GetTitle("T_COMMON_REQUESTCANCEL");       // 요청취소
-                return strTempApprStatus;
+                //전송취소 이면서 승인대기
+                //전송대기 이지만 반려
+                return xmlConf.GetTitle("T_COMMON_REQUESTCANCEL");       // 요청취소
             }
 
-            string strApprStatus = "-";
-            string strApprStepStatus = "";
-            if ( (dic.TryGetValue(9, out strApprStatus) != true) || (dic.TryGetValue(15, out strApprStepStatus) != true) )
-                return strApprStatus;
-
-            strApprStatus = dic[9];           // 1: 승인 대기, 2: 승인, 3: 반려
-            strApprStepStatus = dic[15];      // 1: 승인 가능 상태, 2 : 승인 불가능한 상태.
-            strTempApprStatus = strApprStatus;
-
-            if (
-                (strApprStatus.Equals("1") == true)
-                && (strApprStepStatus.Equals("2") == true)
-                && (strTempApprStatus.Equals("4") != true)
-                )
+            string strApproStatus = dic.GetTagData("trans_req", "approval_state");
+            switch (strApproStatus)
             {
-                strTempApprStatus = xmlConf.GetTitle("T_COMMON_REQUESTCANCEL");       // 요청취소
-                return strTempApprStatus;
+                case "pre":
+                case "wait":
+                    return xmlConf.GetTitle("T_COMMON_APPROVE_WAIT");              // 승인대기
+                case "confirm":
+                    return xmlConf.GetTitle("T_COMMON_APPROVE");                   // 승인
+                case "reject":
+                    return xmlConf.GetTitle("T_COMMON_REJECTION");                   // 반려
+                case "skip":
+                    return xmlConf.GetTitle("T_COMMON_REQUESTCANCEL");                   // 요청취소
+                default:
+                    return "-";
             }
-            else
-            {
-                int nIndex = 0;
-                if (!strApprStatus.Equals(""))
-                    nIndex = Convert.ToInt32(strApprStatus);
-
-                switch (nIndex)
-                {
-                    case 1:
-                        strApprStatus = xmlConf.GetTitle("T_COMMON_APPROVE_WAIT");              // 승인대기
-                        break;
-                    case 2:
-                        strApprStatus = xmlConf.GetTitle("T_COMMON_APPROVE");                   // 승인
-                        break;
-                    case 3:
-                        strApprStatus = xmlConf.GetTitle("T_COMMON_REJECTION");                   // 반려
-                        break;
-                    case 4:
-                        strApprStatus = xmlConf.GetTitle("T_COMMON_REQUESTCANCEL");                   // 요청취소
-                        break;
-                    default:
-                        strApprStatus = "-";
-                        break;
-                }
-            }
-            return strApprStatus;
         }
 
         /**
@@ -464,18 +421,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             return strRecvPos;
         }
-        /**
-		 * @breif 사용자가 파일 전송 시 입력한 제목을 반환한다.
-		 * @return 제목
-		 */
-        public string GetTitle(Dictionary<int, string> dic)
-        {
-            string strTitle = "";
-            if (dic.TryGetValue(10, out strTitle) != true)
-                return strTitle;
-            strTitle = dic[10];
-            return strTitle;
-        }
+
+
+        public string GetTitle(Dictionary<string, object> dic) => dic.GetTagData("trans_req", "title");
         /**
 		 * @breif 전송요청일 정보를 반환한다.
 		 * @return 전송요청일(type : YYYY-MM-DD hh:mm:ss)
@@ -518,67 +466,101 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             strApprDay = String.Format("{0}-{1}-{2} {3}:{4}:{5}", strYear, strMonth, strDay, strHour, strMinute, strSecond);
             return strApprDay;
         }
-        /**
-		 * @breif 전송요청일 정보를 반환한다.
-		 * @return 전송요청일(type : YYYY-MM-DD hh:mm:ss)
-		 */
-        public string GetQueryTransReqDay(Dictionary<int, string> dic)
-        {
-            string strTransReqDay = "";
-            if (dic.TryGetValue(11, out strTransReqDay) != true)
-                return strTransReqDay;
-
-            strTransReqDay = dic[11];
-            return strTransReqDay;
-        }
+        //     /**
+        //* @breif 전송요청일 정보를 반환한다.
+        //* @return 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+        //*/
+        /// <summary>
+        /// 전송요청일 (type : YYYY-MM-DD hh:mm:ss)
+        /// <para>"trans_req", "req_datetime"</para>
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetQueryTransReqDay(Dictionary<string, object> dic) => dic.GetTagData("trans_req", "req_datetime");
         /**
 		 * @breif 결재일 정보를 반환한다.
 		 * @return 결재일(type : YYYY-MM-DD hh:mm:ss)
 		 */
-        public string GetQueryApprDay(Dictionary<int, string> dic)
+        public string GetQueryApprDay(Dictionary<string, object> dic)
         {
-            string strApprDay = "";
-            if (dic.TryGetValue(12, out strApprDay) != true)
+            string strTransStatus = dic.GetTagData("trans_req", "trans_state");
+            string strApproStatus = dic.GetTagData("trans_req", "approval_state");
+            if (GetRequestCancelChk(dic) != 0)
                 return "-";
-
-            strApprDay = dic[12];
-
-            if (GetRequestCancelChk(dic) !=0)
-                return "-";
-
 
             string strApprStatus = GetApprStaus(dic);
             string strTempApprStatus1 = xmlConf.GetTitle("T_COMMON_APPROVE");               // 승인
             string strTempApprStatus2 = xmlConf.GetTitle("T_COMMON_REJECTION");             // 반려
 
             if ((strApprStatus.Equals(strTempApprStatus1)) || (strApprStatus.Equals(strTempApprStatus2)))
-                return strApprDay;
+            {
+                List<object> approvalStepStatusList = dic.GetTagDataObjectList("approval_step_status_list");
+                if (approvalStepStatusList?.Count <= 0)
+                    return "-";
+
+                int lastApprOrder = 0;
+                string lastApprovalRespTime = "-";
+                foreach (object status in approvalStepStatusList)
+                {
+                    string apprStat = status.GetTagDataObject("approval_state").ToString();
+                    if (apprStat != "confirm" && apprStat != "reject")
+                        continue;
+
+                    string apprOrderString = status.GetTagDataObject("approval_step", "approval_order").ToString();
+                    int.TryParse(apprOrderString, out int apprOrder);
+
+                    if (lastApprOrder < apprOrder)
+                    {
+                        lastApprOrder = apprOrder;
+                        lastApprovalRespTime = status.GetTagDataObject("resp_datetime").ToString();
+                    }
+                }
+                return lastApprovalRespTime;    //마지막 결재자가 결재한 시간 반환
+            }
             else
                 return "-";
         }
 
-        /**
-		 * @breif 결재자 정보를 반환한다.
-		 * @return 결재자
-		 */
-        public string GetQueryApprName(Dictionary<int, string> dic)
+        /// <summary>
+        /// 결재자 정보 반환 (결재한 마지막 승인/반려 결재자 반환)
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetQueryApprName(Dictionary<string, object> dic)
         {
-            string strApprName = "";
-            if (!dic.ContainsKey(19))
-                return "-";
-
-            strApprName = dic[19];
-
             if (GetRequestCancelChk(dic) != 0)
                 return "-";
-
 
             string strApprStatus = GetApprStaus(dic);
             string strTempApprStatus1 = xmlConf.GetTitle("T_COMMON_APPROVE");               // 승인
             string strTempApprStatus2 = xmlConf.GetTitle("T_COMMON_REJECTION");             // 반려
 
+            
             if ((strApprStatus.Equals(strTempApprStatus1)) || (strApprStatus.Equals(strTempApprStatus2)))
-                return strApprName;
+            {
+                List<object> approvalStepStatusList = dic.GetTagDataObjectList("approval_step_status_list");
+                if (approvalStepStatusList?.Count <= 0)
+                    return "-";
+
+                int lastApprOrder =0;
+                string lastApprovalName = "-";
+                foreach (object status in approvalStepStatusList)
+                {
+                    string apprStat = status.GetTagDataObject("approval_state").ToString();
+                    if (apprStat != "confirm" && apprStat != "reject")
+                        continue;
+
+                    string apprOrderString = status.GetTagDataObject("approval_step", "approval_order").ToString();
+                    int.TryParse(apprOrderString, out int apprOrder);
+
+                    if(lastApprOrder < apprOrder)
+                    {
+                        lastApprOrder = apprOrder;
+                        lastApprovalName = status.GetTagDataObject("approval_step", "approval_name").ToString();
+                    }   
+                }
+                return lastApprovalName;    //마지막 결재자 반환
+            }
             else
                 return "-";
         }
@@ -587,28 +569,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="dic"></param>
         /// <returns></returns>
-        public string GetDataType(Dictionary<int, string> dic)
+        public string GetDataType(Dictionary<string, object> dic)
         {
-            string strDataType = String.Empty;
-            string resultValue = String.Empty;
-
-            if (!dic.ContainsKey(20))
-                return "";
-
-            strDataType = dic[20];
-            
+            string strDataType = dic.GetTagData("trans_req", "data_type");         
             switch (strDataType)
             {
-                case "1":
-                    resultValue = xmlConf.GetTitle("T_DATA_TYPE_TEXT");
-                    break;
-                case "2":
-                    resultValue = xmlConf.GetTitle("T_DATA_TYPE_IMAGE");
-                    break;
+                case "cliptxt":
+                    return xmlConf.GetTitle("T_DATA_TYPE_TEXT");
+                case "clipimg":
+                    return xmlConf.GetTitle("T_DATA_TYPE_IMAGE");
                 default:
-                    break;
+                    return "";
             }
-            return resultValue;
         }
 
         /**
@@ -684,50 +656,47 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         * @breif 리스트 아이템의 결재 가능 여부를 판별한다.
         * @return 결재 가능 여부( true : 가능, false : 불가능)
         */
-        public bool GetApprEnableChk(Dictionary<int, string> dic)
+        public bool GetApprEnableChk(string userSeq,  Dictionary<string, object> dic)
         {
+            /*
+             * [trans_state]
+              - "scanning 검사중"
+              - "wait 전송대기"
+              - "cancel 전송취소"
+              - "received PC수신완료"
+              - "fail 전송실패"
+              ------------------------------
+               [approval_state]
+              - "pre 이전 단계 진행중"
+              - "wait 결재 대기"
+              - "confirm 승인"
+              - "reject 반려"
+              - "cancel 취소"
+              - "skip 결재스킵(타 결재자 처리)"
+              */
+            
             if (GetRequestCancelChk(dic) != 0)
                 return false;
 
-            string strTransStatusCode = "";
-            string strApprStatusCode = "";
-            string strApprPossible = "";
-            string strApprStepStatus = "";
-            if (
-                (dic.TryGetValue(7, out strTransStatusCode) != true)
-                || (dic.TryGetValue(9, out strApprStatusCode) != true)
-                || (dic.TryGetValue(14, out strApprPossible) != true)
-                || (dic.TryGetValue(15, out strApprStepStatus) != true)
-                )
+            string strApproStatus = dic.GetTagData("trans_req", "approval_state");
+            if (strApproStatus != "wait")
                 return false;
 
-            strTransStatusCode = dic[7];                // 전송상태  ( W : 전송대기, C : 전송취소, S : 전송완료, F : 전송실패, V : 검사중 )
-            strApprStatusCode = dic[9];                 // 결재상태  ( 1 : 승인대기, 2 : 승인, 3: 반려 )
-            strApprPossible = dic[14];              // 결재 가능/불가능 
-            strApprStepStatus = dic[15];            // 결재단계가 포함된 결재 가능 /불가능 ( 1 : 승인가능 , 2 : 승인 불가능 )
-
-            if (strApprStatusCode.Equals("1"))                           // 승인대기
-            {
-                if (strApprPossible.Equals("0"))                         // 승인불가능
-                    return false;
-                else if (strTransStatusCode.Equals("V") == true)
-                {
-                    return false;
-                }
-                else
-                {
-                    if ((strApprStatusCode.Equals("1") == true) && (strApprStepStatus.Equals("2") == true))         // 승인대기 이지만 strApprStepStatus 값이 결재 불가능일 때
-                        return false;
-                    else
-                    {
-                        return true;
-                    }
-                }
-            }
-            else
-            {
+            //승인대기 이지만, Step 계산 시, 해당 결재자가 결재할 단계가 아닌 경우, False
+            List<object> approvalStepStatusList = dic.GetTagDataObjectList("approval_step_status_list");
+            if (approvalStepStatusList?.Count <= 0)
                 return false;
+            
+            foreach(object status in approvalStepStatusList)
+            {
+                if(status.GetTagDataObject("approval_state").ToString() == "wait" && 
+                    status.GetTagDataObject("approval_step", "approval_seq").ToString() == userSeq)
+                {
+                    //UserSeq가 현재 결재해야할 order에 포함되어 있는지 여부
+                    return true;
+                }
             }
+            return false;
         }
 
         /**
@@ -776,33 +745,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return;
         }
 
-
-        /**
-		 * @breif 목적지망 정보를 반환한다.
-		 * @return 목적지망 정보
-		 */
-        public string GetDestNetworkName(Dictionary<int, string> dic, Dictionary<string, SGNetOverData> dicDestSysPos)
-        {
-            string strDestNetwork = "";
-            if (dic.TryGetValue(18, out strDestNetwork) != true)
-                return strDestNetwork;
-
-            strDestNetwork = dic[18];
-
-            if (strDestNetwork.Length < 1 || dicDestSysPos == null || dicDestSysPos.Count < 1)
-                return strDestNetwork;
-
-            // 해당망 이름을 return;
-            foreach (var item in dicDestSysPos)
-            {
-                if (item.Value.strDestSysid == strDestNetwork)
-                {
-                    return item.Key;
-                }
-            }
-
-            return strDestNetwork;
-        }
+        /// <summary>
+        /// 목적지망 정보 ("trans_req", "destination_name")
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetDestNetworkName(Dictionary<string, object> dic) => dic.GetTagData("trans_req", "destination_name");
 
     }
 }

@@ -3,6 +3,7 @@
 @page "/clipBoardApprove/{groupIDbyParam:int}/{menuMode:int}"
 
 @using HsNetWorkSG
+@using Newtonsoft.Json.Linq
 @using OpenNetLinkApp.Services
 @using HsNetWorkSGData;
 @using OpenNetLinkApp.Models.SGNetwork
@@ -67,7 +68,7 @@
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
                                             @foreach (string str in Common.CsFunction.GetOptionValue("TransKind"))
                                             {
-                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransKindValue, str, ApproveSearchCount))">@str</button>
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransKindValue, str, ApproveSearchData))">@str</button>
                                             }
                                         </div>
                                     </div>
@@ -82,7 +83,7 @@
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
                                             @foreach (string str in Common.CsFunction.GetOptionValue("ApproveStatus"))
                                             {
-                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strApprStatusValue, str, ApproveSearchCount))">@str</button>
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strApprStatusValue, str, ApproveSearchData))">@str</button>
                                             }
                                         </div>
                                     </div>
@@ -97,7 +98,7 @@
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
                                             @foreach (string str in Common.CsFunction.GetOptionValue("DataType"))
                                             {
-                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDataTypeValue, str, ApproveSearchCount))">@str</button>
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDataTypeValue, str, ApproveSearchData))">@str</button>
                                             }
                                         </div>
                                     </div>
@@ -122,12 +123,12 @@
                                             <div class="dropdown-menu" aria-labelledby="dropdownMenu5">
                                                 @foreach (string str in Common.CsFunction.GetOptionValue("DestNetwork", dicDestSysPos))
                                                 {
-                                                    <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDestNetWork, str, ApproveSearchCount))">@str</button>
+                                                    <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDestNetWork, str, ApproveSearchData))">@str</button>
                                                 }
                                             </div>
                                         </div>
                                         <!--<button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>-->
-                                    </td>
+                                </td>
                                 }
                             </tr>
                         </table>
@@ -140,7 +141,7 @@
             <div class="col-md-12">
                 <div class="col-sm-12 text-right">
                     <!--<button type="button" class="btn btn-md btn-navy" @onclick="OpenProxyApprover"><i class="fas fa-user-plus"></i>@XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE")</button>-->
-                    <button type="button" class="btn btn-md btn-black" @onclick="@ApproveSearchCount"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
+                    <button type="button" class="btn btn-md btn-black" @onclick="@ApproveSearchData"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
                     <button type="button" class="btn btn-md btn-blue" @onclick="ApproveAction"><i class="fas fa-check-circle"></i>@strBtnApprove</button>
                     <button type="button" class="btn btn-md btn-red" @onclick="ApproveReject"><i class="fas fa-times-circle"></i>@strBtnReject</button>
                 </div>
@@ -161,11 +162,7 @@
                                     <th style="text-align:center; vertical-align:middle;width:7%">@strApproveKind</th>                             <!--결재종류-->
                                     <th style="text-align: center; vertical-align:middle;width:7%">@strTransKind</th>                             <!--전송구분-->
                                     <th style="text-align: center; vertical-align:middle;width:8%">@strReqApprover</th>                            <!--승인요청자-->
-                                    @if (approveTypesfm == 2)
-                                    {
-                                        <th style="text-align: center; vertical-align:middle;width:8%">@strApprover</th>
-                                        <!--승인자-->
-                                    }
+                                    <th style="text-align: center; vertical-align:middle;width:8%">@strApprover</th>                        <!--승인자-->
                                     <th style="text-align: center; vertical-align:middle;width:8%">@strApproveStatus</th>                             <!--승인상태-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                     {
@@ -195,12 +192,8 @@
                                         <td style="text-align: center; vertical-align:middle">@item.ApvType</td>
                                         <td style="text-align: center; vertical-align:middle">@item.TransferType</td>
                                         <td style="text-align: center; vertical-align:middle">@item.RequesterName</td>
-                                        @if (approveTypesfm == 2)
-                                        {
-                                            <td style="text-align: center; vertical-align:middle">@item.ApproverName</td>
-                                            <!--승인자 이름-->
-                                        }
-                                        <td style="text-align: center; vertical-align:middle">@item.ApvStatus</td>
+                                        <td style="text-align: center; vertical-align:middle">@item.ApproverName</td>                           <!--승인자 이름-->
+                                    <td style="text-align: center; vertical-align:middle">@item.ApvStatus</td>
                                         <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
                                         @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                         {
@@ -360,7 +353,7 @@
         set
         {
             strDestNetWork = value;
-            Task.Run(async () => { await ApproveSearchCount(); });
+            Task.Run(async () => { await ApproveSearchData(); });
         }
     }
 
@@ -368,7 +361,7 @@
     {
         if (e.Key == "Enter")
         {
-            Task.Run(async () => { await ApproveSearchCount(); });
+            Task.Run(async () => { await ApproveSearchData(); });
         }
     }
 
@@ -379,7 +372,7 @@
         set
         {
             strTransKindValue = value;
-            Task.Run(async () => { await ApproveSearchCount(); });
+            Task.Run(async () => { await ApproveSearchData(); });
         }
     }
 
@@ -390,7 +383,7 @@
         set
         {
             strApprKindValue = value;
-            Task.Run(async () => { await ApproveSearchCount(); });
+            Task.Run(async () => { await ApproveSearchData(); });
         }
     }
 
@@ -401,7 +394,7 @@
         set
         {
             strApprStatusValue = value;
-            Task.Run(async () => { await ApproveSearchCount(); });
+            Task.Run(async () => { await ApproveSearchData(); });
         }
     }
 
@@ -412,7 +405,7 @@
         set
         {
             strDataTypeValue = value;
-            Task.Run(async () => { await ApproveSearchCount(); });
+            Task.Run(async () => { await ApproveSearchData(); });
         }
     }
 
@@ -445,26 +438,15 @@
         if (nViewPageNo != (pageNumber + 1))
         {
             nViewPageNo = pageNumber + 1;
-            UpdateData();
-            return;
-        }
-        else
-        {
-            nViewPageNo = pageNumber;
-            //mData = ListData.Skip(pageNumber * nPageListCount).Take(nPageListCount).ToList();
-            mData = ListData.Take(nPageListCount).ToList();
+            ApproveSearchData();
         }
     }
+
     private void UpdateInitList(int updatePageNum)
     {
         nViewPageNo = updatePageNum;
         mData = ListData.Take(nPageListCount).ToList();
     }
-    private void UpdateData()
-    {
-        ApproveSearchData(nViewPageNo);
-    }
-
     //원데이타라고 가정함
     public List<SGApproveData> ListData = new List<SGApproveData>();
 
@@ -523,8 +505,11 @@
         if (tData != null)
         {
             string sTransSeq = tData.TransSeq;
-            string sApprSeq = tData.ApprSeq;
-            int nDataForwarded = GetForwarded(tData.IsFile);
+
+            //TODO 고도화 - 상세 조회 건에 대한 데이터  정의 후 수정
+            string sApprSeq = "";//tData.ApprSeq;
+            int nDataForwarded = 0;// GetForwarded(tData.IsFile);
+
             bool bTransCancel = false;
             bool bApprove = !(tData.bCheckDisable);
             bool bReject = false;
@@ -584,11 +569,10 @@
             nDrawPageGroupID = groupIDbyParam;
 
             HSCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupID, SearchResult);
-            HSCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, SearchCount);
             HSCmdCenter.sgPageEvent.SetApprBatchEvent(groupID, ApproveBatchResult);
 
             // 데이터 리프레쉬 등록
-            HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI, UpdateData);
+            HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI, (() => { ApproveSearchData(); } ));
 
             strDestNetWork = strTotal;
 
@@ -611,7 +595,7 @@
                 strApprStatusValue = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
             }
 
-            await ApproveSearchCount();
+            await ApproveSearchData();
 
             StateHasChanged();
         }
@@ -730,11 +714,11 @@
             {
                 if (ListData[i].bCheck)
                 {
-                    listApproveSeq.Add(Convert.ToInt64(ListData[i].ApprSeq));
+                    listApproveSeq.Add(Convert.ToInt64(ListData[i].TransSeq));
                 }
             }
 
-            HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "clip", "confirm", "Approve", listApproveSeq);
+            HSCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "common", "clip", "confirm", "Approve", listApproveSeq);
 
         }
         else
@@ -829,7 +813,7 @@
         if (sgLoginData == null)
         {
             CLog.Here().Error($"ApproveRejectSend, HSCmdCenter.GetUserData = null");
-            ShowMessage("error", XmlConf.GetErrMsg(bisReject?"E_0210":"E_0209"));
+            ShowMessage("error", XmlConf.GetErrMsg(bisReject ? "E_0210" : "E_0209"));
             return;
         }
 
@@ -839,11 +823,11 @@
         {
             if (ListData[i].bCheck)
             {
-                listApproveSeq.Add(Convert.ToInt64(ListData[i].ApprSeq));
+                listApproveSeq.Add(Convert.ToInt64(ListData[i].TransSeq));
             }
         }
 
-        HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "clip", (bisReject ? "reject" : "confirm"), strReason, listApproveSeq);
+        HSCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "common", "clip", (bisReject ? "reject" : "confirm"), strReason, listApproveSeq);
 
     }
 
@@ -902,8 +886,7 @@
         return bRejectPossible;
     }
 
-
-    public async Task ApproveSearchCount()
+    public async Task ApproveSearchData()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -919,114 +902,9 @@
             return;
         }
 
-        if(!strReqUserValue.ValidationSqlInjection())
+        if (!strReqUserValue.ValidationSqlInjection())
         {
             ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
-            return;
-        }
-
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-
-        // await GetDateTime();
-        curApprKind = GetApprKind();
-        curTransKind = GetTransKind();
-        curApprStatus = GetApprStatus();
-        curDataType = GetDataType();
-
-        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-            curDestNetWork = GetDestNetWorkSysID();
-
-        curReqUserName = strReqUserValue;
-        curTitle = strTitleValue;
-
-        nViewPageNo = 1;
-
-        await refPeriodDatePicker.RetriveDateFromJS();
-        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
-        string curToDay = refPeriodDatePicker.ToDateSearchValue;
-
-        ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
-        if (sgLoginData.GetSystemPosition())
-            param.SystemId = "I001";
-        else
-            param.SystemId = "E001";
-
-        int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
-        param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
-
-        string strCountQuery = "";
-        param.Src_system_id = "";
-        param.Dest_system_id = "";
-
-        // 3망상황일때
-        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-        {
-
-            foreach (var item in dicDestSysPos)
-            {
-                // src
-                if (item.Value.nIdx == 0)
-                {
-                    param.Src_system_id = item.Value.strDestSysid;
-                }
-
-                // Dest
-                if (item.Key == strDestNetWork)
-                {
-                    param.Dest_system_id = item.Value.strDestSysid;
-                    if (param.Src_system_id == param.Dest_system_id)    // 현재망으로 수신된 경우만 검색
-                        param.Src_system_id = "";
-                }
-
-            }
-
-            ApproveDao dao = new ApproveDao();
-            param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
-            param.IsSecurity = false;
-
-            if (String.IsNullOrEmpty(curDataType))
-            {
-                strCountQuery = dao.TotalCount(param, false);   // 쿼리 데이터 TotalCount
-            }
-            else
-            {
-                strCountQuery = dao.TotalCount(param, false, new string[] { curDataType });   // 쿼리 데이터 TotalCount
-            }
-        }
-        else
-        {
-            ApproveDao dao = new ApproveDao();
-            param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
-            param.IsSecurity = false;
-            if (String.IsNullOrEmpty(curDataType))
-            {
-                strCountQuery = dao.TotalCount(param, false);   // 쿼리 데이터 TotalCount
-            }
-            else
-            {
-                strCountQuery = dao.TotalCount(param, false, new string[] { curDataType });   // 쿼리 데이터 TotalCount
-            }
-        }
-
-        HSCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
-    }
-
-
-    public void ApproveSearchData(int pageNum)
-    {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        string strMsg = "";
-        if (pageService.GetConnectStatus(groupID) == false)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
             return;
         }
 
@@ -1039,16 +917,23 @@
         string curFromDay = refPeriodDatePicker.FromDateSearchValue;
         string curToDay = refPeriodDatePicker.ToDateSearchValue;
 
-        ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
-        if (sgLoginData.GetSystemPosition())
-            param.SystemId = "I001";
+        ApproveParam param = new ApproveParam(curFromDay, curToDay, strApprKindValue, strTransKindValue, strApprStatusValue, strReqUserValue, "", sgLoginData.GetUserID(), nPageListCount, nViewPageNo, XmlConf);
+        if (strApprKindValue == strDataTypeText) //TEXT
+            param.DataType = new List<string>() { "cliptxt" };
+        else if (strApprKindValue == strDataTypeImage) //IMAGE
+            param.DataType = new List<string>() { "clipimg" };
         else
-            param.SystemId = "E001";
+            param.DataType = new List<string>() { "cliptxt", "clipimg" };
 
-        int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
-        param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
+        //if (sgLoginData.GetSystemPosition())
+        //    param.SystemId = "I001";
+        //else
+        //    param.SystemId = "E001";
+        //
+        //int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
+        //param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
 
-        string strQuery = "";
+        //string strQuery = "";
         param.Src_system_id = "";
         param.Dest_system_id = "";
 
@@ -1071,85 +956,11 @@
                     if (param.Src_system_id == param.Dest_system_id)    // 현재망으로 수신된 경우만 검색
                         param.Src_system_id = "";
                 }
-
             }
-
-            ApproveDao dao = new ApproveDao();
-            param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
-            param.IsSecurity = false;
-
-            if (String.IsNullOrEmpty(curDataType))
-                strQuery = dao.List(param, false);   // 쿼리 데이터 리스트
-            else
-                strQuery = dao.List(param, false, new string[] { curDataType });   // 쿼리 데이터 리스트
-        }
-        else
-        {
-            ApproveDao dao = new ApproveDao();
-            param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
-            param.IsSecurity = false;
-
-            if (String.IsNullOrEmpty(curDataType))
-                strQuery = dao.List(param, false);   // 쿼리 데이터 리스트
-            else
-                strQuery = dao.List(param, false, new string[] { curDataType });   // 쿼리 데이터 리스트
         }
 
-        HSCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
+        HSCmdCenter.RestApprovalSearch(groupID, "common", param);
     }
-    @*
-        public void GetInitDateTime(out string fromDate, out string toDate)
-        {
-        toDate = DateTime.Now.ToString("yyyy-MM-dd");
-        string year = DateTime.Now.ToString("yyyy");
-        string month = DateTime.Now.ToString("MM");
-        string day = DateTime.Now.ToString("dd");
-        int nYear = Convert.ToInt32(year);
-        int nMonth = Convert.ToInt32(month);
-        int nDay = Convert.ToInt32(day);
-        System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
-        fromDate = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
-        }
-
-        private async Task RetriveDateFromJS()
-        {
-        object[] param = { "datepicker5" };
-        string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
-        if (vStr != null && vStr.Length > 0)
-        strFromDay = vStr;
-        object[] param2 = { "datepicker6" };
-        string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
-        if (vStr2 != null && vStr2.Length > 0)
-        strToDay = vStr2;
-        }
-
-        public async Task GetDateTime()
-        {
-        await RetriveDateFromJS();
-
-        char sep = '-';
-        string[] splitFrom = strFromDay.Split(sep);
-        curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
-        string[] splitTo = strToDay.Split(sep);
-        curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
-        }
-    *@
-    public string GetApprKind()
-    {
-        string strValue = "";
-
-        if (strApprKindValue.Equals(strTotal))                         // 전체
-            strValue = "";
-        else if (strApprKindValue.Equals(strPreAppr))                  // 선결
-            strValue = "0";
-        else if (strApprKindValue.Equals(strAfterAppr))                // 후결
-            strValue = "1";
-        else
-            strValue = "";
-
-        return strValue;
-    }
-
     public string GetDataType()
     {
         string strValue = "";
@@ -1162,42 +973,6 @@
             strValue = "2";
         else
             strValue = "";
-
-        return strValue;
-    }
-
-
-    public string GetTransKind()
-    {
-        string strValue = "";
-
-        if (strTransKindValue.Equals(strTotal))                         // 전체
-            strValue = "";
-        else if (strTransKindValue.Equals(strCarryOut))                 // 반출
-            strValue = "1";
-        else if (strTransKindValue.Equals(strCarryIn))                  // 반입
-            strValue = "2";
-        else
-            strValue = "";
-
-        return strValue;
-    }
-
-
-    public string GetApprStatus()
-    {
-        string strValue = "";
-
-        if (strApprStatusValue.Equals(strTotal))                        // 전체
-            strValue = "";
-        else if (strApprStatusValue.Equals(strApproveWait))             // 승인대기
-            strValue = "1";
-        else if (strApprStatusValue.Equals(strApprove))                 // 승인
-            strValue = "2";
-        else if (strApprStatusValue.Equals(strReject))                  // 반려
-            strValue = "3";
-        else if (strApprStatusValue.Equals(strApproveCancle))           // 요청취소
-            strValue = "4";
 
         return strValue;
     }
@@ -1232,39 +1007,6 @@
         return strValue;
     }
 
-
-    /// <summary>
-    /// ApproveSearchCount 결과 이벤트 함수
-    /// </summary>
-    /// <param name="groupId"></param>
-    /// <param name="e"></param>
-    public void SearchCount(int groupId, PageEventArgs e)
-    {
-
-        string strMsg = e.strMsg;
-        if (e.result != 0)
-        {
-            ShowMessage("error", strMsg);
-            return;
-        }
-
-        if (e.count <= 0)
-        {
-            ShowMessage("warn", strMsg);            // 검색결과가 존재하지 않습니다.
-            ListData.Clear();
-
-
-            UpdateList(0);
-            SetPageinfo(e.count);
-            StateHasChanged();
-            return;
-        }
-
-        SetPageinfo(e.count);    // 페이징 계산
-        UpdateData();
-    }
-
-
     /// <summary>
     /// ApproveSearchData 의 결과 이벤트 함수
     /// </summary>
@@ -1275,50 +1017,60 @@
         int ret = e.result;
         if (ret != 0)
         {
+            ShowMessage("error", e.strMsg);
             return;
         }
 
         ListData.Clear();
+
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+        if (sgLoginData == null)
+            return;
 
         SGApprManageData sgData = null;
         sgData = (SGApprManageData)HSCmdCenter.GetApprManageData(groupId);
         if (sgData == null)
             return;
 
-        List<Dictionary<int, string>> ApprSearchList = null;
-        ApprSearchList = sgData.GetQuerySearchData();
-        int nCount = ApprSearchList.Count;
-
-        for (int i = 0; i < nCount; i++)
+        List<object> approvalInfoList = sgData.GetTagDataObjectList("approval_info_list");
+        if (approvalInfoList?.Count <= 0)
         {
-            Dictionary<int, string> dic = ApprSearchList[i];
+            ListData.Clear();
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
+            return;
+        }
+
+        string strUserSeq = sgLoginData.GetUserSequence();
+
+        string totalPage = sgData.GetTagData("total_page");
+        if (int.TryParse(totalPage, out nTotalPages) == false)
+            nTotalPages = 1;
+        foreach (object approvalInfo in approvalInfoList)
+        {
+            JObject info = (JObject)approvalInfo;
+
+            Dictionary<string, object> dic = info?.ToObject<Dictionary<string, object>>();
             if (dic == null)
                 continue;
 
-            string tmpStr = "";
-            if (dic.TryGetValue(0, out tmpStr) != true)
-            {
-                if (tmpStr.Equals(""))
-                    continue;
-            }
-
             SGApproveData aData = new SGApproveData();
-            aData.bCheckDisable = !(sgData.GetApprEnableChk(dic));             // 결재 가능/불가능
+            aData.bCheckDisable = !(sgData.GetApprEnableChk(strUserSeq, dic));             // 결재 가능/불가능
             aData.bCheck = false;
             aData.TransSeq = sgData.GetTransSeq(dic);                      // TransSeq;
-            aData.ApprSeq = sgData.GetApproveSeq(dic);                     // ApprSeq;
+                                                                           //aData.ApprSeq = sgData.GetApproveSeq(dic);                     // ApprSeq;
             aData.ApvType = sgData.GetApprKind(dic);                       // 결재종류 (선결/후결)
             aData.TransferType = sgData.GetTransKind(dic);                 // 전송구분 (반출/반입)
             aData.RequesterName = sgData.GetApproveReqUser(dic);           // 승인요청자
 
             aData.ApproverName = sgData.GetQueryApprName(dic);             // 승인자
             aData.ApvStatus = sgData.GetApprStaus(dic);                    // 승인상태 (요청취소,승인대기,승인,반려)
-            aData.IsFile = sgData.GetUseFileForward(dic);                  // 파일전달.
+                                                                           //aData.IsFile = sgData.GetUseFileForward(dic);                  // 파일전달.
             aData.stDLP = sgData.GetDlp(dic);                              // 개인정보 결과값
             aData.DataType = sgData.GetDataType(dic);                      // 클립보드 데이타 타입
 
             if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
+                aData.strDestNet = sgData.GetDestNetworkName(dic);          // 목적지 값
 
             aData.Title = sgData.GetTitle(dic);                            // 제목
             FileAddManage fileAddManage = new FileAddManage();
@@ -1329,43 +1081,15 @@
             aData.ApvTime = sgData.GetQueryApprDay(dic);                        // 승인일
             aData.TransStatusCode = sgData.GetTransStatusCode(dic);        // 전송상태 원본 코드( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
             aData.ApprStatusCode = sgData.GetApprStausCode(dic);           // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
-            aData.ApprTablePos = sgData.GetApprDataPos(dic);               // 결재 테이블 위치 정보(C : 결재 테이블, H : 결재 이력테이블)
-            aData.ApprPossible = sgData.GetApprPossible(dic);              // 결재 가능 여부(0: 결재불가능, 1:결재가능)
-            aData.ApprStepStatus = sgData.GetApprStepPossible(dic);        // 결재자가 포함된 결재단계의 결재상태 정보(0: 결재불가능, 1:결재가능)
+                                                                           //aData.ApprTablePos = sgData.GetApprDataPos(dic);               // 결재 테이블 위치 정보(C : 결재 테이블, H : 결재 이력테이블)
+                                                                           //aData.ApprPossible = sgData.GetApprPossible(dic);              // 결재 가능 여부(0: 결재불가능, 1:결재가능)
+                                                                           //aData.ApprStepStatus = sgData.GetApprStepPossible(dic);        // 결재자가 포함된 결재단계의 결재상태 정보(0: 결재불가능, 1:결재가능)
 
             ListData.Add(aData);
         }
-
-        UpdateInitList(nViewPageNo);
-
-        /*
-        TotalCount = ListData.Count;
-        UpdateList(0);
-        //페이징 계산
-        dispLimit = 1;
-        nTotalPages = (int)TotalCount / nPageListCount;
-        if (TotalCount % nPageListCount > 0)
-            nTotalPages++;
-        nStartPage = nViewPageNo - (int)viewPageCount / 2;
-        if (nStartPage < 1)
-            nStartPage = 1;
-        */
-
         bAllCheck = false;
 
         StateHasChanged();
-    }
-
-    public void SetPageinfo(int nDataCount)
-    {
-        nTotalPages = (int)nDataCount / nPageListCount;
-        if (nDataCount % nPageListCount > 0)
-            nTotalPages++;
-        //nStartPage = nViewPageNo - (int)viewPageCount / 2;
-        //if (nStartPage < 1)
-        if (nTotalPages <= 0)
-            nTotalPages = 1;
-        nViewPageNo = nStartPage = 1;
     }
 
     public void AllCheckStateUpdate()
@@ -1403,7 +1127,6 @@
             }
         }
         StateHasChanged();
-
     }
 
     public void ApproveBatchResult(int groupid, PageEventArgs e)
@@ -1427,7 +1150,7 @@
             InsertMessage(NOTI_TYPE.USER, groupid, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgApprReject, "", strMsg);
         }
         //bAllCheck = true;
-        UpdateData();
+        ApproveSearchData();
     }
     private void ShowMessage(string strType, string strMsg)
     {
@@ -1476,7 +1199,6 @@
             NotiAfterMsg();
     }
 
-
     private void HomeMove()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1491,14 +1213,6 @@
             changeActiveMenuEvent(groupID, strNavigateWithGroupID);
 
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-        //foreach (var MenuItem in SideBarUISvc.MenuList)
-        //{
-        //    if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
-        //    {
-        //        SideBarUISvc.ActiveMenu = MenuItem;
-        //        break;
-        //    }
-        //}
     }
 
 }

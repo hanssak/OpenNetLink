@@ -922,7 +922,7 @@ using (Process proc = Process.Start(startInfo))
 		    List<Int64> listApproveSeq = new List<Int64>();
 		    listApproveSeq.Add(Convert.ToInt64(sgDetailData.GetApprSeq()));
 
-		    HsCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "clip", "confirm", "Approve", listApproveSeq);
+		    HsCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "common", "clip", "confirm", "Approve", listApproveSeq);
 
             closePopUp();
         }
@@ -1001,7 +1001,7 @@ using (Process proc = Process.Start(startInfo))
 		List<Int64> listApproveSeq = new List<Int64>();
 		listApproveSeq.Add(Convert.ToInt64(sgDetailData.GetApprSeq()));
 
-		HsCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "clip", (bisReject?"reject":"confirm"), "Approve", listApproveSeq);
+		HsCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "common", "clip", (bisReject?"reject":"confirm"), "Approve", listApproveSeq);
 
         closePopUp();
     }

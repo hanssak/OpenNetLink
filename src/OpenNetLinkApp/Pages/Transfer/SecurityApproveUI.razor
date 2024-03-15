@@ -98,7 +98,6 @@
                             <tr>
                                 <th class="p-2 pt-2"> @strTitle </th>              <!--제목-->
                                 <td class="pt-2" colspan="1"><input type="text" class="form-control col-md-11" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>    <!--제목을 입력하여 주십시요.-->
-
                                 @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                 {
                                     <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
@@ -115,7 +114,7 @@
                                             </div>
                                         </div>
                                         <!--<button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>-->
-                                    </td>
+                                </td>
                                 }
                                 <th class="p-2" style="width:80px;"> @strReqApprover </th>             <!--승인요청자-->
                                 <td>
@@ -443,8 +442,8 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
 
-        await jsRuntime.InvokeAsync<object>("exitLogIn", new object[] {""});
-        await jsRuntime.InvokeAsync<object>("adJustWindowsize", new object[] {""});
+        await jsRuntime.InvokeAsync<object>("exitLogIn", new object[] { "" });
+        await jsRuntime.InvokeAsync<object>("adJustWindowsize", new object[] { "" });
 
         int groupID = groupIDbyParam;
         CLog.Here().Information($"securityApprove - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
@@ -455,7 +454,7 @@
             nDrawPageGroupID = groupIDbyParam;
 
             HSCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupID, SearchResult);
-            HSCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, SearchCount);
+            //HSCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, SearchCount);
             HSCmdCenter.sgPageEvent.SetApprBatchEvent(groupID, ApproveBatchResult);
 
             // 데이터 리프레쉬 등록
@@ -689,7 +688,7 @@
 
             HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);*/
 
-            SGLoginData sgLoginData= (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
             if (sgLoginData == null)
             {
                 CLog.Here().Error($"ApproveAction, HSCmdCenter.GetLoginData = null");
@@ -707,7 +706,7 @@
                 }
             }
 
-            HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "security", "file", "confirm", "Approve", listApproveSeq);
+            HSCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "security", "file", "confirm", "Approve", listApproveSeq);
 
         }
         else
@@ -798,7 +797,7 @@
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);*/
 
-        SGLoginData sgLoginData= (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
         {
             CLog.Here().Error($"ApproveRejectSend, HSCmdCenter.GetLoginData = null");
@@ -816,7 +815,7 @@
             }
         }
 
-        HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "security", "file", (bisReject ? "reject" : "confirm"), strReason, listApproveSeq);
+        HSCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "security", "file", (bisReject ? "reject" : "confirm"), strReason, listApproveSeq);
 
     }
 
@@ -872,13 +871,13 @@
             return;
         }
 
-        if(!strReqUserValue.ValidationSqlInjection())
+        if (!strReqUserValue.ValidationSqlInjection())
         {
             ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
             return;
         }
 
-        if(!strTitleValue.ValidationSqlInjection())
+        if (!strTitleValue.ValidationSqlInjection())
         {
             ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
             return;
@@ -904,7 +903,7 @@
         string curFromDay = refPeriodDatePicker.FromDateSearchValue;
         string curToDay = refPeriodDatePicker.ToDateSearchValue;
 
-        ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
+        ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo, XmlConf);
         if (sgLoginData.GetSystemPosition())
             param.SystemId = "I001";
         else
@@ -981,7 +980,7 @@
         string curFromDay = refPeriodDatePicker.FromDateSearchValue;
         string curToDay = refPeriodDatePicker.ToDateSearchValue;
 
-        ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
+        ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo, XmlConf);
         if (sgLoginData.GetSystemPosition())
             param.SystemId = "I001";
         else
@@ -1041,13 +1040,13 @@
         return strValue;            // 전체만 검색되게 강제
 
         @*if (strApprKindValue.Equals(strTotal))                         // 전체
-                strValue = "";
+            strValue = "";
             else if (strApprKindValue.Equals(strPreAppr))                  // 선결
-                strValue = "0";
+            strValue = "0";
             else if (strApprKindValue.Equals(strAfterAppr))                // 후결
-                strValue = "1";
+            strValue = "1";
             else
-                strValue = "";
+            strValue = "";
 
             return strValue;*@
     }
@@ -1157,6 +1156,11 @@
 
         ListData.Clear();
 
+         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+        if (sgLoginData == null)
+            return;
+
+
         SGApprManageData sgData = null;
         sgData = (SGApprManageData)HSCmdCenter.GetApprManageData(groupId);
         if (sgData == null)
@@ -1168,36 +1172,41 @@
 
         for (int i = 0; i < nCount; i++)
         {
-            Dictionary<int, string> dic = ApprSearchList[i];
-            if (dic == null)
+
+            Dictionary<string, object> dic = null;
+            @*
+                Dictionary<int, string> dic = ApprSearchList[i];
+                if (dic == null)
                 continue;
 
-            string tmpStr = "";
-            if (dic.TryGetValue(0, out tmpStr) != true)
-            {
+                string tmpStr = "";
+                if (dic.TryGetValue(0, out tmpStr) != true)
+                {
                 if (tmpStr.Equals(""))
-                    continue;
-            }
-
+                continue;
+                }*@
+            
+                string strUserSeq = sgLoginData.GetUserSequence();
             approveData aData = new approveData();
-            aData.bCheckDisable = !(sgData.GetApprEnableChk(dic));             // 결재 가능/불가능
+            aData.bCheckDisable = !(sgData.GetApprEnableChk(strUserSeq, dic));             // 결재 가능/불가능
             aData.bCheck = false;
             aData.TransSeq = sgData.GetTransSeq(dic);                      // TransSeq;
-            aData.ApprSeq = sgData.GetApproveSeq(dic);                     // ApprSeq;
+            //aData.ApprSeq = sgData.GetApproveSeq(dic);                     // ApprSeq;
 
             aData.ApvType = sgData.GetApprKind(dic);                       // 결재종류 (선결/후결)
 
             @*if (aData.ApvType == XmlConf.GetTitle("T_COMMON_APPROVE_AFTER"))
-                aData.ApvType = "후선결";*@// 후결인거 보기용도
+                aData.ApvType = "후선결";*@
+            // 후결인거 보기용도
             aData.ApvType = XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE");    // 보안결재는 "선결"만 나오도록 처리
 
             aData.TransferType = sgData.GetTransKind(dic);                 // 전송구분 (반출/반입)
             aData.RequesterName = sgData.GetApproveReqUser(dic);           // 승인요청자
             aData.ApvStatus = sgData.GetApprStaus(dic);                    // 승인상태 (요청취소,승인대기,승인,반려)
-            aData.IsFile = sgData.GetUseFileForward(dic);                  // 파일전달.
+            //aData.IsFile = sgData.GetUseFileForward(dic);                  // 파일전달.
 
             if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
+                aData.strDestNet = sgData.GetDestNetworkName(dic);          // 목적지 값
 
             aData.Title = sgData.GetTitle(dic);                            // 제목
             FileAddManage fileAddManage = new FileAddManage();
@@ -1208,9 +1217,9 @@
             aData.ApvTime = sgData.GetQueryApprDay(dic);                        // 승인일
             aData.TransStatusCode = sgData.GetTransStatusCode(dic);        // 전송상태 원본 코드( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
             aData.ApprStatusCode = sgData.GetApprStausCode(dic);           // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
-            aData.ApprTablePos = sgData.GetApprDataPos(dic);               // 결재 테이블 위치 정보(C : 결재 테이블, H : 결재 이력테이블)
-            aData.ApprPossible = sgData.GetApprPossible(dic);              // 결재 가능 여부(0: 결재불가능, 1:결재가능)
-            aData.ApprStepStatus = sgData.GetApprStepPossible(dic);        // 결재자가 포함된 결재단계의 결재상태 정보(0: 결재불가능, 1:결재가능)
+            //aData.ApprTablePos = sgData.GetApprDataPos(dic);               // 결재 테이블 위치 정보(C : 결재 테이블, H : 결재 이력테이블)
+            //aData.ApprPossible = sgData.GetApprPossible(dic);              // 결재 가능 여부(0: 결재불가능, 1:결재가능)
+            //aData.ApprStepStatus = sgData.GetApprStepPossible(dic);        // 결재자가 포함된 결재단계의 결재상태 정보(0: 결재불가능, 1:결재가능)
 
             ListData.Add(aData);
         }

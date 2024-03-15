@@ -571,11 +571,11 @@
             {
                 if (ListData[i].bCheck)
                 {
-                    listApproveSeq.Add(Convert.ToInt64(ListData[i].ApprSeq));
+                    listApproveSeq.Add(Convert.ToInt64(ListData[i].TransSeq));
                 }
             }
 
-            HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "mail", "confirm", "Approve", listApproveSeq);
+            HSCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "common", "mail", "confirm", "Approve", listApproveSeq);
 
         }
         else
@@ -673,11 +673,11 @@
         {
             if (ListData[i].bCheck)
             {
-                listApproveSeq.Add(Convert.ToInt64(ListData[i].ApprSeq));
+                listApproveSeq.Add(Convert.ToInt64(ListData[i].TransSeq));
             }
         }
 
-        HSCmdCenter.RestSendApproveBatch(groupID, strUserSeq, "common", "mail", (bisReject ? "reject" : "confirm"), strReason, listApproveSeq);
+        HSCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "common", "mail", (bisReject ? "reject" : "confirm"), strReason, listApproveSeq);
 
     }
 
@@ -986,7 +986,7 @@
 
                 tData.bCheck = false;
                 tData.TransSeq = sgData.GetEmailSeq(dic);
-                tData.ApprSeq = sgData.GetApproveSeq(dic);
+                //tData.ApprSeq = sgData.GetApproveSeq(dic);
                 tData.ApvType = sgData.GetApprKind(dic);                            // 결재종류 (선결/후결)
                 tData.bIsAfterApprove = (sgData.GetApprKindRawData(dic) == "1");    // 결재종류 (후결:true, 선결:false)
                 tData.TransferType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)

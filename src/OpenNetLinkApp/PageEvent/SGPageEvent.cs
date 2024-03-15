@@ -120,7 +120,7 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void TransDetailCancelEvent(int groupid, PageEventArgs e);
     // 결재관리
     public delegate void ApprSearchEvent(int groupid, PageEventArgs e);
-    public delegate void ApprSearchCountEvent(int groupid, PageEventArgs e);
+    //public delegate void ApprSearchCountEvent(int groupid, PageEventArgs e);
     public delegate void ApprBatchEvent(int groupid, PageEventArgs e);
 
     //공통 응답 이벤트(통합해서 하나만 쓰게 수정해야 할듯) 2021/05/14 YKH
@@ -402,7 +402,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, TransDetailCancelEvent> DicTransDetailCancelEvent = new Dictionary<int, TransDetailCancelEvent>(); // 전송상세보기 전송취소.
 
         public Dictionary<int, ApprSearchEvent> DicApprSearchEvent = new Dictionary<int, ApprSearchEvent>();         // 결재관리 조회
-        public Dictionary<int, ApprSearchCountEvent> DicApprSearchCountEvent = new Dictionary<int, ApprSearchCountEvent>();         // 결재관리 조회 데이터 Count.
+        //public Dictionary<int, ApprSearchCountEvent> DicApprSearchCountEvent = new Dictionary<int, ApprSearchCountEvent>();         // 결재관리 조회 데이터 Count.
         public Dictionary<int, ApprBatchEvent> DicApprBatchEvent = new Dictionary<int, ApprBatchEvent>();      // 일괄 결재관리 (승인/반려)
         //공통으로 통일 하려고 설정 
         public Dictionary<int, ResponseEvent> DicEmailApprBatchEvent = new Dictionary<int, ResponseEvent>(); //이메일 일괄 결재 응답 이벤트 
@@ -966,17 +966,6 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
-        public void SetApprSearchCountEventAdd(int groupid, ApprSearchCountEvent e)
-        {
-            DicApprSearchCountEvent[groupid] = e;
-        }
-        public ApprSearchCountEvent GetApprSearchCountEvent(int groupid)
-        {
-            ApprSearchCountEvent e = null;
-            if (DicApprSearchCountEvent.TryGetValue(groupid, out e) == true)
-                e = DicApprSearchCountEvent[groupid];
-            return e;
-        }
         public DownloadCountEvent GetDownloadCountEvent(int groupid)
         {
             DownloadCountEvent e = null;

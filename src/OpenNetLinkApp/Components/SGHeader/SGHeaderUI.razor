@@ -2096,7 +2096,7 @@
         //nLinkCheckTime = (nLinkCheckTime * 2) / 3;
         //bool bDummy = sgLoginData.GetUseDummyPacket();
         @*hsNetWork.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);*@
-    hsNetWork.SetNetworkInfo(nFilePartSize, nFileBandWidth);
+        hsNetWork.SetNetworkInfo(nFilePartSize, nFileBandWidth, null);
 
         //pageService에 변경된 내용 갱신
         DateTime dt = sgLoginData.GetSvrTimeConvert();
