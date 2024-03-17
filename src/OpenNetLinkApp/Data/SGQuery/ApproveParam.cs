@@ -1,3 +1,4 @@
+using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 using OpenNetLinkApp.Services;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace OpenNetLinkApp.Data.SGQuery
         /// <param name="userid"></param>
         /// <param name="listcount"></param>
         /// <param name="viewno"></param>
-        public ApproveParam(string fromday, string today, string ApprKindValue, string TransKindValue, string  ApprStatusValue, string reqname, string title, string userid, int listcount, int viewno, XmlConfService xmlConf)
+        public ApproveParam(string fromday, string today, string ApprKindValue, string TransKindValue, string ApprStatusValue, string reqname, string title, string userid, int listcount, int viewno, XmlConfService xmlConf)
         {
             XmlConf = xmlConf;
             strTotal = XmlConf.GetTitle("T_COMMON_ALL");
@@ -35,7 +36,7 @@ namespace OpenNetLinkApp.Data.SGQuery
             TransKind = GetTransKind(TransKindValue);
             ApprStatus = GetApprStatus(ApprStatusValue);
             ReqUserName = reqname;
-            Title = title;            
+            Title = title;
             UserID = userid;
             this.NetWorkType = EnumNetWorkType.Single;
             this.IsSecurity = false;
@@ -69,8 +70,18 @@ namespace OpenNetLinkApp.Data.SGQuery
         /// (file, email, cliptxt, clipbmp, npki, pcurl)
         /// </summary>
         public List<string> DataType { get; set; }
-        public string Src_system_id { get; set; }
-        public string Dest_system_id { get; set; }
+
+        /// <summary>
+        /// 전송 시작점
+        /// </summary>
+        public string SrcSGNetType { get; set; }    //전송 시작점
+        /// <summary>
+        /// 전송 목적지
+        /// </summary>
+        public List<string> DestSGNetType { get; set; } //전송 목적지
+
+        //public string Src_system_id { get; set; }
+        //public string Dest_system_id { get; set; }
 
         public EnumNetWorkType NetWorkType { get; set; } //단일망, 다중망
 
@@ -143,6 +154,27 @@ namespace OpenNetLinkApp.Data.SGQuery
             else if (strApprStatusValue.Equals(XmlConf.GetTitle("T_COMMON_REQUESTCANCEL")))           // 요청취소
                 strValue.Add("cancel");
 
+            return strValue;
+        }
+
+        /// <summary>
+        /// 선택된 망 명칭을 기준으로 전송건 조회 중 목적지 조건 추가
+        /// </summary>
+        /// <param name="strDestinationValue"></param>
+        /// <param name="DestInfo"></param>
+        /// <returns></returns>
+        public List<string> GetDestination(string strDestinationValue, Dictionary<string, SGNetOverData> DestInfo)
+        {
+            List<string> strValue = new List<string>();
+            foreach (SGNetOverData Dest in DestInfo?.Values)
+            {
+                if (DestInfo?.Count == 1)
+                    strValue.Add(Dest.strDestSysid);
+                else if (strDestinationValue == strTotal)
+                    strValue.Add(Dest.strDestSysid);
+                else if (strDestinationValue == Dest.strDestSysName)
+                    strValue.Add(Dest.strDestSysid);
+            }
             return strValue;
         }
     }

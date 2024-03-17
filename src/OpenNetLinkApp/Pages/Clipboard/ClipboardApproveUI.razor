@@ -112,7 +112,7 @@
                                 <td class="pt-2" colspan="1">
                                     <input type="text" class="form-control col-md-11" placeholder=@strReqApprover @bind="strReqUserValue" @onkeyup="HandleKeyEvent">  <!--승인요청자-->
                                 </td>
-                                @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                @if (dicDestSysPos?.Count > 1)
                                 {
                                     <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                     <td>
@@ -164,7 +164,7 @@
                                     <th style="text-align: center; vertical-align:middle;width:8%">@strReqApprover</th>                            <!--승인요청자-->
                                     <th style="text-align: center; vertical-align:middle;width:8%">@strApprover</th>                        <!--승인자-->
                                     <th style="text-align: center; vertical-align:middle;width:8%">@strApproveStatus</th>                             <!--승인상태-->
-                                    @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                    @if (dicDestSysPos != null && dicDestSysPos.Count > 1)
                                     {
                                         <th style="text-align:center; vertical-align:middle;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                         <!--목적지-->
@@ -195,7 +195,7 @@
                                         <td style="text-align: center; vertical-align:middle">@item.ApproverName</td>                           <!--승인자 이름-->
                                     <td style="text-align: center; vertical-align:middle">@item.ApvStatus</td>
                                         <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
-                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 1)
                                         {
                                             <th style="text-align:center; vertical-align:middle;width:11%;">@item.strDestNet</th>
                                         }
@@ -353,7 +353,7 @@
         set
         {
             strDestNetWork = value;
-            Task.Run(async () => { await ApproveSearchData(); });
+            Task.Run(() => { ApproveSearchData(); }).Wait();
         }
     }
 
@@ -361,7 +361,7 @@
     {
         if (e.Key == "Enter")
         {
-            Task.Run(async () => { await ApproveSearchData(); });
+            Task.Run(() => { ApproveSearchData(); }).Wait();
         }
     }
 
@@ -372,7 +372,7 @@
         set
         {
             strTransKindValue = value;
-            Task.Run(async () => { await ApproveSearchData(); });
+            Task.Run(() => { ApproveSearchData(); }).Wait();
         }
     }
 
@@ -383,7 +383,7 @@
         set
         {
             strApprKindValue = value;
-            Task.Run(async () => { await ApproveSearchData(); });
+            Task.Run(() => { ApproveSearchData(); }).Wait();
         }
     }
 
@@ -394,7 +394,7 @@
         set
         {
             strApprStatusValue = value;
-            Task.Run(async () => { await ApproveSearchData(); });
+            Task.Run(() => { ApproveSearchData(); }).Wait();
         }
     }
 
@@ -405,7 +405,7 @@
         set
         {
             strDataTypeValue = value;
-            Task.Run(async () => { await ApproveSearchData(); });
+            Task.Run(() => { ApproveSearchData(); }).Wait();
         }
     }
 
@@ -440,12 +440,6 @@
             nViewPageNo = pageNumber + 1;
             ApproveSearchData();
         }
-    }
-
-    private void UpdateInitList(int updatePageNum)
-    {
-        nViewPageNo = updatePageNum;
-        mData = ListData.Take(nPageListCount).ToList();
     }
     //원데이타라고 가정함
     public List<SGApproveData> ListData = new List<SGApproveData>();
@@ -529,18 +523,6 @@
         }
     }
 
-    public int GetForwarded(string strIsFile)
-    {
-        if (strIsFile.Equals("-"))
-            return 0;
-        else if (strIsFile.Equals("발송"))
-            return 1;
-        else if (strIsFile.Equals("수신"))
-            return 2;
-        else
-            return 0;
-    }
-
     protected override async Task OnInitializedAsync()
     {
         InitText();
@@ -548,8 +530,6 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
-
-        // GetInitDateTime(out strFromDay, out strToDay);
 
         base.OnInitialized();
     }
@@ -572,22 +552,20 @@
             HSCmdCenter.sgPageEvent.SetApprBatchEvent(groupID, ApproveBatchResult);
 
             // 데이터 리프레쉬 등록
-            HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI, (() => { ApproveSearchData(); } ));
+            HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI, (() => { ApproveSearchData(); }));
 
             strDestNetWork = strTotal;
 
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sgLoginData.GetUseOverNetwork2())
-            {
-                dicDestSysPos = pageService.GetTargetSystemList(groupID);
-            }
+
+           dicDestSysPos = pageService.GetTargetSystemList(groupID);
 
             approveTypesfm = sgLoginData.GetApproveTypeSFM();
 
             bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
 
-            jsRuntime.InvokeAsync<object>("initApproveUIPosition");
-            jsRuntime.InvokeAsync<object>("initPageLeft");
+            await jsRuntime.InvokeAsync<object>("initApproveUIPosition");
+            await jsRuntime.InvokeAsync<object>("initPageLeft");
 
             if (menuMode == 1)
             {
@@ -595,7 +573,7 @@
                 strApprStatusValue = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
             }
 
-            await ApproveSearchData();
+            ApproveSearchData();
 
             StateHasChanged();
         }
@@ -677,28 +655,6 @@
         if (!SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason(groupID))
         {
 
-            /*SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-            string strUserID = "";
-            if (sgLoginData != null)
-                strUserID = sgLoginData.GetUserID();
-
-            string strProcID = "A";
-            string strReason = "Approve";
-            string strApproveSeqs = "";
-            for (int i = 0; i < ListData.Count; i++)
-            {
-                if (ListData[i].bCheck == true)
-                {
-                    string temp = (ListData[i].ApprSeq + '\u0002');
-                    strApproveSeqs += temp;
-                }
-            }
-            string strApprover = "1";
-            string strApproveUserKind = "0";
-
-            HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);*/
-
-
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
             if (sgLoginData == null)
@@ -719,7 +675,6 @@
             }
 
             HSCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "common", "clip", "confirm", "Approve", listApproveSeq);
-
         }
         else
         {
@@ -729,28 +684,6 @@
             await refSGReject.openPopUp();
         }
     }
-
-    /*public void ApproveSend(int groupID, string strReason)
-    {
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        string strUserID = "";
-        if (sgLoginData != null)
-            strUserID = sgLoginData.GetUserID();
-        string strProcID = "A";
-        string strApproveSeqs = "";
-        for (int i = 0; i < ListData.Count; i++)
-        {
-            if (ListData[i].bCheck == true)
-            {
-                string temp = (ListData[i].ApprSeq + '\u0002');
-                strApproveSeqs += temp;
-            }
-        }
-        string strApprover = "1";
-        string strApproveUserKind = "0";
-
-        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
-    }*/
 
     private async Task ApproveReject()
     {
@@ -789,25 +722,6 @@
 
     public void ApproveRejectSend(int groupID, string strReason, bool bisReject)
     {
-        /*SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        string strUserID = "";
-        if (sgLoginData != null)
-            strUserID = sgLoginData.GetUserID();
-        string strProcID = "R";
-        string strApproveSeqs = "";
-        for (int i = 0; i < ListData.Count; i++)
-        {
-            if (ListData[i].bCheck == true)
-            {
-                string temp = (ListData[i].ApprSeq + '\u0002');
-                strApproveSeqs += temp;
-            }
-        }
-        string strApprover = "1";
-        string strApproveUserKind = "0";
-
-        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);*/
-
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
@@ -886,7 +800,7 @@
         return bRejectPossible;
     }
 
-    public async Task ApproveSearchData()
+    public void ApproveSearchData()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -912,6 +826,10 @@
             nViewPageNo = 1;
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null) return;
+
+        SGReadyData sgReadyData = (SGReadyData)HSCmdCenter.GetReadyData(groupID);
+        if (sgReadyData == null) return;
 
         Task.Run(async () => { await refPeriodDatePicker.RetriveDateFromJS(); });
         string curFromDay = refPeriodDatePicker.FromDateSearchValue;
@@ -924,87 +842,10 @@
             param.DataType = new List<string>() { "clipimg" };
         else
             param.DataType = new List<string>() { "cliptxt", "clipimg" };
-
-        //if (sgLoginData.GetSystemPosition())
-        //    param.SystemId = "I001";
-        //else
-        //    param.SystemId = "E001";
-        //
-        //int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
-        //param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
-
-        //string strQuery = "";
-        param.Src_system_id = "";
-        param.Dest_system_id = "";
-
-        // 3망상황일때
-        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-        {
-
-            foreach (var item in dicDestSysPos)
-            {
-                // src - 소스가 분명히 분리되어 계산될 대에만 사용
-                if (item.Value.nIdx == 0)
-                {
-                    param.Src_system_id = item.Value.strDestSysid;
-                }
-
-                // Dest
-                if (item.Key == strDestNetWork)
-                {
-                    param.Dest_system_id = item.Value.strDestSysid;
-                    if (param.Src_system_id == param.Dest_system_id)    // 현재망으로 수신된 경우만 검색
-                        param.Src_system_id = "";
-                }
-            }
-        }
+        param.SrcSGNetType = sgReadyData.GetSgNetType();
+        param.DestSGNetType = param.GetDestination(strDestNetWork, dicDestSysPos);
 
         HSCmdCenter.RestApprovalSearch(groupID, "common", param);
-    }
-    public string GetDataType()
-    {
-        string strValue = "";
-
-        if (strApprKindValue.Equals(strTotal))                         // 전체
-            strValue = "";
-        else if (strApprKindValue.Equals(strDataTypeText))                  // TEXT
-            strValue = "1";
-        else if (strApprKindValue.Equals(strDataTypeImage))                // IMAGE
-            strValue = "2";
-        else
-            strValue = "";
-
-        return strValue;
-    }
-
-
-    /// <summary>
-    /// 목적지(망)에서 선택한 망의 system_ID 값을 넘겨준다. 전체를 선택했을때에는 "" 공백리턴
-    /// </summary>
-    /// <returns></returns>
-    public string GetDestNetWorkSysID()
-    {
-        string strValue = "";
-
-        if (strDestNetWork.Equals(strTotal))                                // 전체
-        {
-            strValue = "";
-            return strValue;
-        }
-
-        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-        {
-            foreach (var item in dicDestSysPos)
-            {
-                if (item.Key == strDestNetWork)
-                {
-                    strValue = item.Value.strDestSysid;
-                    break;
-                }
-            }
-        }
-
-        return strValue;
     }
 
     /// <summary>
@@ -1033,6 +874,9 @@
         if (sgData == null)
             return;
 
+        nTotalPages = sgData.GetTotalPageCount();
+        string strUserSeq = sgLoginData.GetUserSequence();
+
         List<object> approvalInfoList = sgData.GetTagDataObjectList("approval_info_list");
         if (approvalInfoList?.Count <= 0)
         {
@@ -1041,11 +885,6 @@
             return;
         }
 
-        string strUserSeq = sgLoginData.GetUserSequence();
-
-        string totalPage = sgData.GetTagData("total_page");
-        if (int.TryParse(totalPage, out nTotalPages) == false)
-            nTotalPages = 1;
         foreach (object approvalInfo in approvalInfoList)
         {
             JObject info = (JObject)approvalInfo;
@@ -1068,9 +907,7 @@
                                                                            //aData.IsFile = sgData.GetUseFileForward(dic);                  // 파일전달.
             aData.stDLP = sgData.GetDlp(dic);                              // 개인정보 결과값
             aData.DataType = sgData.GetDataType(dic);                      // 클립보드 데이타 타입
-
-            if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                aData.strDestNet = sgData.GetDestNetworkName(dic);          // 목적지 값
+            aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
 
             aData.Title = sgData.GetTitle(dic);                            // 제목
             FileAddManage fileAddManage = new FileAddManage();

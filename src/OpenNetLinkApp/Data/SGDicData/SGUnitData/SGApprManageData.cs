@@ -93,6 +93,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return listDicdata;
         }
 
+        public int GetTotalPageCount()
+        {
+            string page = GetTagData("total_page_count");
+            if (int. TryParse(page, out int retValue) == false)
+                return 1;
+            else 
+                return retValue;
+        }
+
+
         /// <summary>
         /// 결재 정보(선결,후결)
         /// <para>"trans_req", "approval_proc_type"</para>
@@ -119,6 +129,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             //Todo 고도화 - 개인정보 검출(또는 검사결과에 대한 정보) 필요함.
             return "검사결과";
 
+            #region [사용안함] 고도화 이전 소스
             //string strDlp = "";
             //if (dic.TryGetValue(2, out strDlp) != true)
             //    return strDlp;
@@ -146,7 +157,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             //        strDlp = "0";
             //        break;
             //}
-            //return strDlp;
+            //return strDlp; 
+            #endregion
         }
 
         /// <summary>
@@ -746,11 +758,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// 목적지망 정보 ("trans_req", "destination_name")
+        /// 목적지망 정보 ("destination", "destination", "sg_net_type_list")
         /// </summary>
         /// <param name="dic"></param>
         /// <returns></returns>
-        public string GetDestNetworkName(Dictionary<string, object> dic) => dic.GetTagData("trans_req", "destination_name");
+        public string GetDestNetworkName(Dictionary<string, object> dic, Dictionary<string, SGNetOverData> destInfo)
+        {
+            List<string> retValue = new List<string>();
+            List<string> TransferDest = dic.GetTagDataList("destination", "destination", "sg_net_type_list");
+
+            foreach(SGNetOverData dest in destInfo?.Values)
+            {
+                if (TransferDest.Contains(dest.strDestSysid))
+                    retValue.Add(dest.strDestSysName);
+            }
+
+            return string.Join(",", retValue);            
+        }
+        
 
     }
 }

@@ -138,7 +138,12 @@ namespace OpenNetLinkApp.Common
 
             Task.Run(async () => { await function(); });
         }
+        public static void SetFilterString(ref string str, string value, Action function)
+        {
+            str = value;
 
+            Task.Run(() => { function(); }).Wait();
+        }
         public static List<string> GetOptionValue(string option, Dictionary<string, SGNetOverData> dic = null)
         {
             List<string> values = new List<string>();

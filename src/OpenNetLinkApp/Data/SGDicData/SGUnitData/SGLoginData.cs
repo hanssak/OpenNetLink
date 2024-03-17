@@ -49,8 +49,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
     public class SGNetOverData
     {
-
+        /// <summary>
+        /// SGNetType
+        /// (SecureGate 망 종류. (ex) I(내부), E(외부), IA(내부 A망), ...)
+        /// </summary>
         public string strDestSysid = "";
+
+        /// <summary>
+        /// SGNetName
+        /// (망 명칭 (ex) 내부망, 외부망, 내부 A망, ...)
+        /// </summary>
+        public string strDestSysName = "";
+
         public string strPolicy = "";
         public int nIdx = 0;
         public bool bUseFileTrans = false;
@@ -82,7 +92,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <summary>
         /// SGData 저장될 시, Ready에서 받아놨던, sg_net_type 내부  저장
         /// </summary>
-        public string SgNetType = "";
+        public string MySgNetType = "";
 
         public SGLoginData()
         {
@@ -100,12 +110,50 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
         }
         /// <summary>
-        /// 현재 내부망에 접속되어 있는지 여부를 반환
+        /// MySgNetType - 현재 내부망에 접속되어 있는지 여부를 반환
         /// <br/>LoginData 세팅 시, Ready의 값을 가지고 와서 저장
         /// <br/>(SGReadyData의 동명의 함수와 동일한 값 반환)
         /// </summary>
         /// <returns>true 내부, false 외부</returns>
-        public bool GetSystemPosition() => (SgNetType == "IN");
+        public bool GetSystemPosition() => MySgNetType.StartsWith("I");
+
+        /// <summary>
+        /// 목적지에 대한 Net 정보 반환
+        /// ("server_policy", "destination_sg_net_list")
+        /// </summary>
+        /// <param name="exceptMe">true:현재 접속중인 서버의 정보는 제외</param>
+        /// <returns></returns>
+        public List<SGNetOverData> GetDestinationInfo(bool exceptMe = true)
+        {
+            List<SGNetOverData> retValue = new List<SGNetOverData>();
+            List<object> sgNetList = GetTagDataObjectList("user_policy", "server_policy", "destination_sg_net_list");
+
+
+            int idx = 0;
+            foreach (object destSgNet in sgNetList)
+            {
+                SGNetOverData dest = new SGNetOverData();
+                dest.nIdx = idx;
+                dest.strDestSysid = destSgNet.GetTagDataObject("type").ToString();
+                dest.strDestSysName = destSgNet.GetTagDataObject("name").ToString();
+
+                List<object> destPolicy = destSgNet.GetTagDataObjectList("policy_list");
+                dest.bUseFileTrans = destPolicy.Contains("file");
+                dest.bUseClipTrans = destPolicy.Contains("clip");
+                dest.bUseUrlTrans = destPolicy.Contains("url");
+                dest.bUseApprove = destPolicy.Contains("approval");
+                dest.bUseinterlock = destPolicy.Contains("interlock");
+
+                if (dest.strDestSysid == MySgNetType)
+                {
+                    if (exceptMe == false) retValue.Add(dest);
+                }
+                else retValue.Add(dest);
+
+                idx++;
+            }
+            return retValue;
+        }
 
         public static string LoginFailMessage(int nRet)
         {
@@ -195,7 +243,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>서버 시간</returns>
         public string GetSvrTime()
         {
-            string strTime = GetTagData("server_policy", "time");
+            string strTime = GetTagData("user_policy", "server_policy", "time");
             return strTime;
         }
 
@@ -532,7 +580,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>true : 비밀번호 복잡도 사용</returns>
         public bool GetPasswordRule()
         {
-            string strData = GetTagData("user_policy", "pw_complexity_check");
+            string strData = GetTagData("user_policy", "server_policy", "pw_complexity_check");
             return (strData.ToUpper() == "TRUE");
         }
 
@@ -595,7 +643,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>true : 대결재 권한 및 결재 권한 존재</returns>
         public bool GetApproveProxyRight()
         {
-            string strData = GetTagData("user_policy", "common_proxy_right_use");
+            string strData = GetTagData("user_policy", "server_policy", "common_proxy_right_use");
             return (strData.ToUpper() == "TRUE");
         }
 
@@ -1064,7 +1112,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             //if ((nValue & 2) > 0)
             //    return true;
             //else
-                return false;
+            return false;
         }
 
         /// <summary>
@@ -1490,65 +1538,26 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /// <summary>
-        /// 3망 관련 정책정보를 받아오는 함수
+        /// 목적지망 정보를 가지고 오는 함수
         /// </summary>
         /// <param name="dicSysIdName">망이름, 망정책정보  형태의 Dic Data 받아옴</param>
         /// <param name="bIsMultiNetWork"></param>
         /// <returns></returns>
-        public bool GetOverNetwork2Data(ref Dictionary<string, SGNetOverData> dicSysIdName, bool bIsMultiNetWork)
+        public Dictionary<string, SGNetOverData> GetOverNetwork2Data(bool exceptMe = true)
         {
-            if (!GetUseOverNetwork2())
-                return false;
-
-            List<string> listNetOver2 = GetTagDataList("user_login", "user_policy", "net_over_mode_list");
-            if (listNetOver2.Count() < 3)
-                return false;
-
-            int nIdx = 0;
-
+            Dictionary<string, SGNetOverData> retValue = new Dictionary<string, SGNetOverData>();
             try
             {
-
-                for (; nIdx < listNetOver2.Count(); nIdx++)
+                foreach (SGNetOverData dest in GetDestinationInfo(exceptMe))
                 {
-
-                    // 다중망 접속일때에는 3번째 망 정보는 현재 접속한쪽 반대망이 아니므로 넣지 않음.(dicSysIdName)
-                    // if (nIdx <= 1 || (bIsMultiNetWork == false && nIdx > 1))
-                    {
-
-                        String[] listOneNet = listNetOver2[nIdx].Split(",");
-                        if (listOneNet.Count() > 1)     // 첫번째 - 자신 제외한 타망들 정보 넣음
-                        {
-                            SGNetOverData DataNet = new SGNetOverData();
-
-                            DataNet.nIdx = nIdx;
-                            int nJdx = 1;
-                            for (; nJdx < listOneNet.Count(); nJdx++)
-                            {
-                                if (nJdx == 1)
-                                    DataNet.strDestSysid = listOneNet[nJdx];
-                                else if (nJdx == 2)
-                                {
-                                    DataNet.strPolicy = listOneNet[nJdx];
-                                    SetPolicyDataWithParsing(ref DataNet);
-                                }
-                            }
-
-                            dicSysIdName.Add(listOneNet[0], DataNet);
-                        }
-
-                    }
-
+                    retValue.Add(dest.strDestSysName, dest);
                 }
-
             }
             catch (Exception e)
             {
                 CLog.Here().Information("GetOverNetwork2Data-Exception(Msg) : {0}", e.Message);
-                return false;
             }
-
-            return true;
+            return retValue;
         }
 
 
@@ -1572,9 +1581,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strData = GetTagData("user_policy", "url_redirection");
             if (strData == "UNUSE")
                 return false;
-            if (strData == "IN->EX" && SgNetType == "IN")
+            if (strData == "IN->EX" && MySgNetType == "IN")
                 return true;
-            else if (strData == "EX->IN" && SgNetType == "EX")
+            else if (strData == "EX->IN" && MySgNetType == "EX")
                 return true;
             else
                 return false;
@@ -1698,4 +1707,5 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
     }
 }
+
 

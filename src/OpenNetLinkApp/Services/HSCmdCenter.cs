@@ -1275,9 +1275,9 @@ namespace OpenNetLinkApp.Services
             {
                 //hs = m_DicNetWork[groupId];
                 SGReadyData sgReadyData = (SGReadyData)sgDicRecvData.GetReadyData(groupId);
-                string systemPosition = sgReadyData?.GetSystemPositionString();
+                string MySgNetType = sgReadyData?.GetSgNetType();
 
-                sgDicRecvData.SetLoginData(hs, groupId, sgData, systemPosition);
+                sgDicRecvData.SetLoginData(hs, groupId, sgData, MySgNetType);
 
 
                 JObject apprLineValue = (JObject)sgData.GetTagDataObject("approve_line");   //ApprLineDta는 별도 저장
@@ -1366,7 +1366,7 @@ namespace OpenNetLinkApp.Services
                     PageEventArgs e = new PageEventArgs();
                     e.result = resultCode;
                     e.strMsg = strMsg;
-                    if (int.TryParse(sgData.GetTagData("user_policy", "temporary_lock_minutes"), out int lockTime))
+                    if (int.TryParse(sgData.GetTagData("user_policy", "server_policy", "temporary_lock_minutes"), out int lockTime))
                         e.count = lockTime;
                     LoginResult_Event(groupId, e);
                 }

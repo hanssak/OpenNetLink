@@ -667,7 +667,7 @@
         int nUseNetOverFileTrans = -1;  // -1 : 3망상황아님, 0 : 3망상황에서 파일전송 모든곳에 미사용, 1 : 3망상황에서 파일전송 1곳에서라도 사용
         int nApproveProxy = 1; //대결재사용여부 1:고장결재자,대결사용  2:결재자선택
                                // 3중망 정보 적용
-        dicSysIdName = new Dictionary<string, SGNetOverData>();
+        
 
         ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupId);
         bool bSFMManageUse = false;
@@ -678,20 +678,9 @@
             nUserApprPos = sgUserInfo.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupId)); //화면 메뉴를 구성하는 항목의 권한
         }
 
-        if (sgLoginData != null && sgLoginData.GetUseOverNetwork2())
-        {
-            if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName, pageService.m_bIsMultiNetWork))
-            {
-                pageService.SetTargetSystemList(groupId, dicSysIdName);
-
-                // 3중망이상일때, 왼쪽Sidebar 포함 도착망이름 변경
-                if (dicSysIdName != null && dicSysIdName.Count > 1)
-                {
-                    ChangeNetOverTitle(groupId, dicSysIdName);
-                }
-            }
-        }
-
+        dicSysIdName = sgLoginData.GetOverNetwork2Data();
+        pageService.SetTargetSystemList(groupId, dicSysIdName);
+       
         // 파일전송 사용권한 확인
         if (dicSysIdName != null && dicSysIdName.Count > 1)
         {

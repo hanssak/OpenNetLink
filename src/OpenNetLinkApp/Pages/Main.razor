@@ -1558,7 +1558,7 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
         *@
 
 
-        // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
+    // 접속하는 망 정보는 NetWork.json 의 string 사용으로 일원화
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
         {
@@ -1783,22 +1783,8 @@ originalPW = Encoding.UTF8.GetBytes("HsckAD.com".ToLower());
                     }
 
                     // 3중망 정보 적용
-                    dicSysIdName = new Dictionary<string, SGNetOverData>();
-
-                    if (sgLoginData.GetUseOverNetwork2())
-                    {
-
-                        if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName, pageService.m_bIsMultiNetWork))
-                        {
-                            pageService.SetTargetSystemList(groupId, dicSysIdName);
-
-                            // 3중망이상일때, 왼쪽Sidebar 포함 도착망이름 변경
-                            if (dicSysIdName != null && dicSysIdName.Count > 1)
-                            {
-                                ChangeNetOverTitle(groupId, dicSysIdName);
-                            }
-                        }
-                    }
+                    dicSysIdName = sgLoginData.GetOverNetwork2Data();
+                    pageService.SetTargetSystemList(groupId, dicSysIdName);
 
                     if (pageService.GetIsPolicyUpdate(groupId))
                     {

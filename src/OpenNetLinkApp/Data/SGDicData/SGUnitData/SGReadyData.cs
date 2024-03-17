@@ -42,7 +42,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// 서버에서 처리하는 망 종류. 택1: IN(내부), EX(외부).
         /// </summary>
         /// <returns>true 내부, false 외부</returns>
-        public string GetSystemPositionString() => GetTagData("server_info", "sg_net_type");
+        public string GetSystemPositionString() => GetTagData("server_info", "sg_net", "type");
+
+        /// <summary>
+        /// 접속된 서버의 SgNetType
+        /// <para>"server_info", "sg_net", "type"</para>
+        /// </summary>
+        /// <returns></returns>
+        public string GetSgNetType() => GetTagData("server_info", "sg_net", "type");
         /// <summary>
         /// 현재 내부망에 접속되어 있는지 여부를 반환
         /// </summary>
@@ -51,25 +58,27 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             //서버에서 처리하는 망 종류. 택1: IN(내부), EX(외부).
             string strData = GetSystemPositionString();
-            return (strData == "IN");
+            return strData.StartsWith("I");
         }
 
+
+
         public eLoginType GetLoginType()
-        {   
+        {
             switch (GetLoginTypeStr())
             {
 
                 case "ORIGIN": return eLoginType.eLOGINTYPE_ORIGIN;
-                case "AD":return eLoginType.eLOGINTYPE_AD;
+                case "AD": return eLoginType.eLOGINTYPE_AD;
                 case "AD_LDAP": return eLoginType.eLOGINTYPE_AD_LDAP;
                 case "LDAP": return eLoginType.eLOGINTYPE_LDAP;
-                case "PW_OTP":return eLoginType.eLOGINTYPE_PW_OTP;
-                case "OTP":return eLoginType.eLOGINTYPE_OTP;
-                case "SSO":return eLoginType.eLOGINTYPE_SSO;
-                case "NAC":return eLoginType.eLOGINTYPE_NAC;
-                case "SSO2":return eLoginType.eLOGINTYPE_SSO2;
-                case "GPKI":return eLoginType.eLOGINTYPE_GPKI;
-                case "GOOGLE_OTP":return eLoginType.eLOGINTYPE_GOOGLE_OTP;
+                case "PW_OTP": return eLoginType.eLOGINTYPE_PW_OTP;
+                case "OTP": return eLoginType.eLOGINTYPE_OTP;
+                case "SSO": return eLoginType.eLOGINTYPE_SSO;
+                case "NAC": return eLoginType.eLOGINTYPE_NAC;
+                case "SSO2": return eLoginType.eLOGINTYPE_SSO2;
+                case "GPKI": return eLoginType.eLOGINTYPE_GPKI;
+                case "GOOGLE_OTP": return eLoginType.eLOGINTYPE_GOOGLE_OTP;
                 case "CUSTOM": return eLoginType.eLOGINTYPE_CUSTOM;
                 default: return eLoginType.eLOGINTYPE_ORIGIN;
             }

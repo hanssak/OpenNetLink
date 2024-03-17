@@ -60,7 +60,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                 return null;
             return m_DicLoginData[groupid];
         }
-        public void SetLoginData(HsNetWork hs, int groupid, SGData data, string systemPosition)
+        public void SetLoginData(HsNetWork hs, int groupid, SGData data, string mySgNetType)
         {
             SGLoginData tmpData = null;
             if (m_DicLoginData.TryGetValue(groupid, out tmpData) == true)
@@ -71,7 +71,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             }
             tmpData = new SGLoginData();
             tmpData.Copy(hs, data);
-            tmpData.SgNetType = systemPosition;    //Login 에서 SystemPosition을 많이 사용하므로, set 시 저장
+            tmpData.MySgNetType = mySgNetType;    //Login 에서 SgNetType 많이 사용하므로, set 시 저장
             //m_DicLoginData[groupid]= tmpData;
             m_DicLoginData.TryAdd(groupid, tmpData);
         }
