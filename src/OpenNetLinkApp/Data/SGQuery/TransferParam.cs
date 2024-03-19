@@ -8,7 +8,7 @@ using static OpenNetLinkApp.Common.Enums;
 
 namespace OpenNetLinkApp.Data.SGQuery
 {
-    class TransferParam : BaseParam
+    public class TransferParam : BaseParam
     {
         public XmlConfService XmlConf = null;  //초기설정 필요
         public IJSRuntime jsRuntime = null;    //초기설정 필요
@@ -62,7 +62,7 @@ namespace OpenNetLinkApp.Data.SGQuery
             TransKind = kind;
             TransStatus = tstatus;
             ApprStatus = astatus;
-            DataType = Convert.ToInt32(dtype);
+            DataType = dtype;
             Title = title;
             SearchFromDay = fday;
             SearchToDay = eday;
@@ -80,7 +80,7 @@ namespace OpenNetLinkApp.Data.SGQuery
         public string SearchFromDay { get; set; }
         public string SearchToDay { get; set; }
         public string UserID { get; set; }
-        public int DataType { get; set; }
+        public string DataType { get; set; }
         public string Src_system_id { get; set; }
         public string Dest_system_id { get; set; }
 

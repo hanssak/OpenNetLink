@@ -497,7 +497,7 @@
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
-            
+
         SGReadyData sgReadyData = (SGReadyData)HSCmdCenter.GetReadyData(groupID);
         if(sgReadyData == null)
             return;
@@ -561,7 +561,6 @@
 
         HSCmdCenter.SendTransDetail(groupID, strUserID, transSeq);
     }
-
     /// <summary>
     ///
     /// </summary>
@@ -1014,26 +1013,51 @@
     ///
     /// </summary>
     /// <returns></returns>
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public string GetTransStatus()
     {
         string strValue = "";
 
         if (strTransStatusValue.Equals(strTotal))                                 // 전체
-            strValue = "";
+            strValue = "all";
         else if (strTransStatusValue.Equals(strTransComplete))                      // PC수신완료
-            strValue = "S";
+            strValue = "received";
         else if (strTransStatusValue.Equals(strTransWait))                          // 전송대기
-            strValue = "W";
+            strValue = "wait";
         else if (strTransStatusValue.Equals(strTransCancle))                        // 전송취소
-            strValue = "C";
+            strValue = "cancel";
         else if (strTransStatusValue.Equals(strTransFail))                        // 전송실패
-            strValue = "F";
+            strValue = "fail";
         else if (strTransStatusValue.Equals(strTransInspect))                      // 검사중
-            strValue = "V";
+            strValue = "scanning";
         else
             strValue = "";
 
         return strValue;
+    }
+
+    public Dictionary<string, object> GetAdTransferParam(TransferParam param)
+    {
+        string periodDate = $"{param.SearchFromDay}-{param.SearchToDay}";
+        string transStatue = param.TransStatus;
+        string title = param.Title;
+        string dataType = param.DataType;
+        string approveStatus = param.ApprStatus;
+        int pageNo = param.ViewPageNo;
+        int pageListCount = param.PageListCount;
+
+        Dictionary<string, object> dicParam = new Dictionary<string, object>();
+        dicParam.Add("period_date", periodDate);
+        dicParam.Add("trans_state", transStatue);
+        dicParam.Add("title", title);
+        dicParam.Add("data_type", dataType);
+        //dicParam.Add("period_date", approveStatus);
+        dicParam.Add("page_info", new Dictionary<string, object>() { { "page_no", pageNo },{ "page_limit", pageListCount} });
+
+        return dicParam;
     }
 
     /// <summary>
@@ -1045,15 +1069,15 @@
         string strValue = "";
 
         if (strApprStatusValue.Equals(strTotal))                                // 전체
-            strValue = "";
+            strValue = "all";
         else if (strApprStatusValue.Equals(strApprWait))                        // 승인대기
-            strValue = "1";
+            strValue = "wait";
         else if (strApprStatusValue.Equals(strApprove))                         // 승인
-            strValue = "2";
+            strValue = "confirm";
         else if (strApprStatusValue.Equals(strReject))                          // 반려
-            strValue = "3";
+            strValue = "reject";
         else if (strApprStatusValue.Equals(strApprCancle))                      // 요청취소
-            strValue = "4";
+            strValue = "cancel";
 
         return strValue;
     }
