@@ -354,12 +354,12 @@
                 string strReason = deniedValue.GetFileAddErrContent(strFileName, errType, strMIMEType: deniedValue.MimeType, strParentFileName: deniedValue.ParentFileName);
 
                 // WebManager에서 값이 표현이 되도록 적당히 변경해서 올림(NetLink에 맞춤)
-                if (nType < 100 && useAgentBlockValueChange)
+                /*if (nType < 100 && useAgentBlockValueChange)
                 {
                     if (errType == eFileAddErr.eFAZIP
                     || (errType > eFileAddErr.eFADLPERR && errType != eFileAddErr.eFADAYCOUNTOVER && errType != eFileAddErr.eFADAYSIZEOVER))
                         nType = 4;
-                }
+                }*/
 
                 string strUnitQuery = sgQuery.GetAgentBlock(strUserSeq, strSystemType, nType.ToString(), strReason);
                 listQuery.Add(strUnitQuery);

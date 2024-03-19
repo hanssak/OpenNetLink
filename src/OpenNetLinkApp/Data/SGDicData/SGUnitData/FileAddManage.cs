@@ -27,7 +27,7 @@ using OpenNetLinkApp.Common;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
-    public enum eFileAddErr
+/*    public enum eFileAddErr
     {
         eFANone = 0,        // None
         eFAREG,             // 등록된 파일
@@ -166,6 +166,212 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         #endregion
     }
+*/
+
+
+    public enum eFileAddErr
+    {
+        eFANone = 0,        // None
+        eFAREG,             // 등록된 파일
+        eFADRM,             // DRM
+        eFADLP,             // DLP
+        /// <summary>
+        /// 확장자제한
+        /// </summary>
+        eFAEXT,             // 확장자제한
+        eFAZIP,             // zip파일내 확장자
+        eFACHG,             // 파일변경
+        eFAVIRUS,           // 바이러스검출
+        /// <summary>
+        /// 1회 전송가능 파일 사이즈
+        /// </summary>
+        eFAFileSize,        // 파일사이즈
+        eFANotFound,        // 파일 찾기 실패
+        eFAHidden,          // 숨김파일
+
+        /// <summary>
+        /// zip 파일 비번 있을 때
+        /// </summary>
+        eFAZipPW,           // zip 파일 비번 있을 때
+        eFAZipNotPW,        // zip 파일 비번 없을 때
+        eFAZipError,        // zip 파일 손상 또는 zip 파일이 아닌경우
+        eFAEMPTY,           // 빈파일
+        /// <summary>
+        /// 알수없는파일형식
+        /// </summary>
+        eFAUNKNOWN,         // 알수없는파일형식
+        eFAEML,             // EML파일과 다른파일을 함께 등록할 경우
+        eFAEMPTY_ATTACH,    // 빈파일(첨부파일)
+        eFAUNKNOWN_ATTACH,  // 알수없는파일형식(첨부파일)
+        eFACHG_ATTACH,      // 파일변경(첨부파일)
+        eFAEXT_ATTACH,      // 확장자제한(첨부파일)
+        eFAZIP_ATTACH,      // zip파일내 확장자(첨부파일)
+        eFAEML_ONLYONE,     // EML 파일등록 2건이상일때
+        eFAEMLTOPDF_ERROR,  // EML to PDF 변환오류
+
+        eFAOfficeSizeError,     // Office > pdf 변환하려는 파일이 설정되크기보다 클 경우
+        eFAOfficeNoinstalled,   // Office 설치않되어있음. 파일변환기능사용. Office파일 전송하려할 경우
+
+        eFADLPERR,              // 개인정보 검출에러
+        eFAUnZipOutOfSpace,     //UnZip Disk용량부족
+        eFAUnZipLengthOver,     //UnZip Length Over
+        eFAUnZipCheckStop,      //UnZip 체크 중단
+
+
+        /// <summary>
+        /// 1회 전송가능 파일 개수 - NetLink에 없음
+        /// </summary>
+        eFAFileCount,       // 1회 전송가능 파일 개수
+
+        /// <summary>
+        /// 파일읽기 권한오류 - NetLink에 없음
+        /// </summary>
+        eFA_FILE_READ_ERROR,    //파일읽기 권한오류 - @@@ NetLink에 없는거(1)
+
+        /// <summary>
+        /// 파일이름 윈도우에 지원하지 않는 문자 - NetLink에 없음
+        /// </summary>
+        eFA_FILE_NAME_ERROR,    // 파일이름 윈도우에 지원하지 않는 문자 - @@@ NetLink에 없는거(2)
+
+        /// <summary>
+        /// 일일 전송 횟수 제한
+        /// </summary>
+        eFADAYCOUNTOVER = 51,   // 일일 전송횟수 제한.
+        /// <summary>
+        /// (일일)전송가능 파일 사이즈
+        /// </summary>
+        eFADAYSIZEOVER,         // 일일 전송사이즈 제한.
+
+        // - @@@ NetLink에 없는거(아래쭉~)
+
+        /// <summary>
+        /// zip파일 내부의 zip Open 실패
+        /// </summary>
+        eUnZipInnerZipOpenFail = 60,            // zip파일 내부의 zip Open 실패
+
+        /// <summary>
+        /// zip파일에 내부의 zip 비밀번호 사용 중
+        /// </summary>
+        eUnZipInnerZipPassword,                 // zip파일에 내부의 zip 비밀번호 사용 중
+
+        /// <summary>
+        /// zip파일에 내부의 zip 확장자 제한 파일 포함
+        /// </summary>
+        eUnZipInnerExt,                         // zip파일에 내부의 zip 확장자 제한 파일 포함
+
+        /// <summary>
+        /// zip파일에 내부의 zip 위변조 파일 포함
+        /// </summary>
+        eUnZipInnerExtChange,                   // zip파일에 내부의 zip 위변조 파일 포함
+
+        /// <summary>
+        /// zip파일에 내부의 zip 알수 없는 파일형식 포함
+        /// </summary>
+        eUnZipInnerExtUnknown,                  // zip파일에 내부의 zip 알수 없는 파일형식 포함
+
+        /// <summary>
+        /// zip파일에 내부의 zip 비어있는 파일
+        /// </summary>
+        eUnZipInnerFileEmpty,                   // zip파일에 내부의 zip 비어있는 파일
+
+        /// <summary>
+        /// zip파일에 내부의 zip Length Over
+        /// </summary>
+        eUnZipInnerLengthOver,                  // zip파일에 내부의 zip Length Over
+
+        /// <summary>
+        /// zip파일에 파일이름 윈도우에 지원하지 않는 문자
+        /// </summary>
+        eUnZipInnerFileName,                    // zip파일에 파일이름 윈도우에 지원하지 않는 문자 - @@@ NetLink에 없는거(3)
+
+        /// <summary>
+        /// zip파일검사 후 남아 있는 zip포함
+        /// </summary>
+        eUnZipInnerLeftZip,                     // zip파일검사 후 남아 있는 zip포함
+
+        /// <summary>
+        /// zip파일에 내부의 DRM 파일
+        /// </summary>
+        eUnZipInnerDRM,                         // zip파일에 내부의 DRM 파일
+
+        /// <summary>
+        /// OS에서 지원하는 최대 전송 길이를 초과(윈:250, 기타:90)
+        /// </summary>
+        eFA_LONG_PATH = 70,                     // OS에서 지원하는 최대 전송 길이를 초과(윈:250, 기타:90)
+
+        /// <summary>
+        /// 전체경로중 각 단계별 Folder 의 길이 초과(윈:250, 기타:90)
+        /// </summary>
+        eFA_LONG_PATH_PARENT,                   // 전체경로중 각 단계별 Folder 의 길이 초과(윈:250, 기타:90)
+
+        /// <summary>
+        /// 전송되는 파일 및 폴더의 이름 길이초과(윈:250, 기타:90)
+        /// </summary>
+        eFA_LONG_PATH_FILEORPATH,                // 전송되는 파일 및 폴더의 이름 길이초과(윈:250, 기타:90)
+
+        #region 문서 파일 검사 오류 목록
+        /// <summary>
+        /// OLE 추출 실패
+        /// <para>101</para>
+        /// </summary>
+        eFADOC_EXTRACT_COMMONE = 101,
+        /// <summary>
+        /// 비밀번호 설정된 문서
+        /// <para>102</para>
+        /// </summary>
+        eFADOC_EXTRACT_PASSWORD = 102,
+        /// <summary>
+        /// 압축형식으로 고의로 추가한 파일
+        /// </summary>
+        eFADOC_EXTRACT_FILE_ADD_ONPURPOSE = 103,
+        /// <summary>
+        /// OLE 검사 결과 -> 마임검사 실패
+        /// <para>104</para>
+        /// </summary>
+        eFADOC_EXTRACT_MIME = 104,
+        ///// <summary>
+        ///// OLE 검사 결과 -> 확장자 제한
+        ///// <para>104</para>
+        ///// </summary>
+        //eFADOC_EXTRACT_OLE_EXTENSION,
+        ///// <summary>
+        ///// 압축형식 검사 결과 -> 확장자 제한
+        ///// <para>106</para>
+        ///// </summary>
+        //eFADOC_EXTRACT_COMPRESS_EXTENSION,
+
+
+        /// <summary>
+        /// OLE 확장자 제한 (filefilter 차단)
+        /// </summary>
+        eFADOC_EXTRACT_FILEFILTER = 106,
+
+        /// <summary>
+        /// OLE 확장자 제한 (위변조 제한)
+        /// <para>107</para>
+        /// </summary>
+        eFADOC_EXTRACT_CHANGE = 107,
+        ///// <summary>
+        ///// 검출 직후에도 남겨진 파일 (엑셀 내 추출된 파일)
+        ///// <para>120</para>
+        ///// </summary>
+        //eFADOC_EXTRACT_FILES,
+
+        #endregion
+
+        #region Binary Check
+        /// <summary>
+        /// BINARY  COMMON ERROR : 다른 파일 추가 확인 검사 실패
+        /// <para>101</para>
+        /// </summary>
+        eFABINARY_APPEND_COMMONE = 201,
+        /// <summary>
+        /// 파일 Append  : 다른 파일이 추가 된 파일
+        /// </summary>
+        eFABINARY_APPEND_FILE_ADD_ONPURPOSE = 202,
+        #endregion
+    }
+
 
     public class FileAddErr
     {
