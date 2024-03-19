@@ -47,7 +47,7 @@ if [ $# -ne 4 ]; then
 fi;
 
 echo "$@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-echo "Notarize (CMD-identify) : $0 $1 $2 $3
+echo "Notarize (CMD-identify) : $0 $1 $2 $3"
 echo "$@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 
 version=$1
