@@ -931,9 +931,40 @@ Task("MakeInstaller")
 	if(AppProps.Platform == "windows")
 	{
 
-		if (isSilentShowAll.ToString().ToUpper() == "TRUE")
+		if (isPatchInstaller.ToString().ToUpper() == "TRUE")
 		{
-			Information("Package windows: Silent Mode !");
+			Information("================================================");
+			Information("Package windows: !!! Make Patch File EXE !!!");
+			Information("================================================");
+			MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
+				Defines = new Dictionary<string, string>{
+					{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
+					{"IS_PATCH", "TRUE"},
+					{"IS_LIGHT_PATCH", isLightPatch.ToString().ToUpper()},						
+					{"NETWORK_FLAG", networkFlag.ToUpper()},
+					{"CUSTOM_NAME", customName.ToUpper()},
+					{"OUTPUT_DIRECTORY", PackageDirPath},
+					{"DELETE_NETLINK", deleteNetLink.ToString().ToUpper()},
+					{"IS_SILENT", "TRUE"},
+					{"STARTAUTO", "TRUE"},
+					{"STORAGE_NAME", storageName.ToUpper()},
+					{"UPDATECHECK", isUpdateCheck.ToString().ToUpper()},
+					{"REG_CRX", regCrxForce.ToString().ToUpper()},
+					{"FORCE_REG_CRX", regPolicyCrxForce.ToString().ToUpper()},
+					{"PATCH_APPENV", patchAppEnv.ToString().ToUpper()},
+					{"INK_NAME", $"\"{inkFileName}\""},
+					{"NAC_LOGIN_TYPE", nacLoginType.ToString()},
+					{"NAC_LOGIN_ENCRYPTKEY", nacLoginEncryptKey.ToString()},
+					{"DISABLE_CERT_AUTOUPDATE", disableCertAutoUpdate.ToString().ToUpper()},
+					{"REG_STARTPROGRAM", regStartProgram.ToString().ToUpper()},
+					{"REG_AGENT_IN_NAC", regAgentInNAC.ToString().ToUpper()},
+					{"PRODUCT_NAME", productName.ToString()},
+				}
+			});
+		}
+		else if (isSilentShowAll.ToString().ToUpper() == "TRUE")
+		{
+			Information("Package windows: Silent Mode, Make Installer !");
 			MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
 				Defines = new Dictionary<string, string>{
 					{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
@@ -960,7 +991,7 @@ Task("MakeInstaller")
 				}
 			});			
 
-			Information("Package windows: Show Mode!");
+			Information("Package windows: Show Mode, Make Installer !");
 			MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
 				Defines = new Dictionary<string, string>{
 					{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
@@ -989,6 +1020,7 @@ Task("MakeInstaller")
 		}
 		else
 		{
+
 			MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
 				Defines = new Dictionary<string, string>{
 					{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
