@@ -1,6 +1,7 @@
 @using Newtonsoft.Json.Linq
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGDicData.Approve
 @using OpenNetLinkApp.Components.SGPopUp
 @using System.Security.Cryptography
 @using System.Diagnostics
@@ -96,9 +97,9 @@
                                                     <thead>
                                                         <tr>
                                                             <th style="text-align:center;width:7%;">@strUserName</th>                         <!--이름-->
-                                                    <th style="text-align:center;width:7%;">@strUserPosition</th>                         <!--직급-->
-                                                    <th style="text-align:center;width:8%;">@strUserDept</th>                        <!--부서-->
-                                                </tr>
+                                                            <th style="text-align:center;width:7%;">@strUserPosition</th>                         <!--직급-->
+                                                            <th style="text-align:center;width:8%;">@strUserDept</th>                        <!--부서-->
+                                                        </tr>
                                                     </thead>
                                                     <tbody>
                                                         @foreach ((string Name, string Position, string DeptName) forward in listForwaredUserInfo)
@@ -378,32 +379,32 @@
 
 #if _WINDOWS
 
-    //string strArguments = "";
-    //
-    //if (!SGAppMgrSvc.OpConfigInfoService.GetUseWebLinkPreviewer(groupID))
-    //{
-    ////기존 뷰어 Param
-    //strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-    //strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
-    //}
-    //else
-    //{
-    ////웹링크쪽 뷰어 Param
-    //string webLinkURL = SGAppMgrSvc.OpConfigInfoService.GetWebLinkPreviewerURL(groupID);
-    //string webLinkParam = makeParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
-    //
-    ////특수 문자 중 브라우저에 상이하게 인식되는 항목 변경
-    //webLinkParam = webLinkParam.Replace("+", "%2B").Replace("/","%2F");
-    //
-    //strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
-    //strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
-    //}
-    ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil.exe");
+        //string strArguments = "";
+        //
+        //if (!SGAppMgrSvc.OpConfigInfoService.GetUseWebLinkPreviewer(groupID))
+        //{
+        ////기존 뷰어 Param
+        //strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+        //strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+        //}
+        //else
+        //{
+        ////웹링크쪽 뷰어 Param
+        //string webLinkURL = SGAppMgrSvc.OpConfigInfoService.GetWebLinkPreviewerURL(groupID);
+        //string webLinkParam = makeParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
+        //
+        ////특수 문자 중 브라우저에 상이하게 인식되는 항목 변경
+        //webLinkParam = webLinkParam.Replace("+", "%2B").Replace("/","%2F");
+        //
+        //strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
+        //strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+        //}
+        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil.exe");
 #else
 
-        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
-        //startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-        //startInfo.WindowStyle = ProcessWindowStyle.Normal;
+    ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+    //startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+    //startInfo.WindowStyle = ProcessWindowStyle.Normal;
 #endif
 
         try
@@ -700,50 +701,50 @@
         bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupID);
         bHideApproveRejectButton = SGAppMgrSvc.OpConfigInfoService.GetHideApproveRejectButtonInApproveUI(groupID);
     }
-@*
-    /// <summary>
-    /// 전송구분 정보를 반환(반출/반입)
-    /// </summary>
-    /// <returns></returns>
-    public string GetTransKind(Dictionary<string, object> transferData)
-    {
-        string netType = GetTagData("trans_req", "net_type");
-        if (netType == "I")
-            return XmlConf.GetTitle("T_COMMON_IMPORT");         //반입
-        else if (netType == "E")
-            return XmlConf.GetTitle("T_COMMON_EXPORT");          // 반출
-        else
-            return "-";
-    }
-
-    /// <summary>
-    /// 전송상태 정보를 반환(전송취소,전송대기,수신완료,전송실패,검사중)
-    /// </summary>
-    /// <returns></returns>
-    public string GetTransStatus(Dictionary<string, object> transferData)
-    {
-        string strTransState = transferData.GetTagData("trans_req", "trans_state");
-        switch (strTransState)
+    @*
+        /// <summary>
+        /// 전송구분 정보를 반환(반출/반입)
+        /// </summary>
+        /// <returns></returns>
+        public string GetTransKind(Dictionary<string, object> transferData)
         {
-            case "scanning":
-                return XmlConf.GetTitle("T_COMMON_TRANSCHECKING");  //검사중
-            case "wait":
-                return XmlConf.GetTitle("T_COMMON_TRANSWAIT");  //전송대기
-            case "cancel":
-                return XmlConf.GetTitle("T_COMMON_TRANSCANCLE");  //전송취소
-            case "received":
-                return XmlConf.GetTitle("T_TRANS_COMPLETE");  //PC수신완료
-            case "fail":
-                return XmlConf.GetTitle("T_TRANS_COMPLETE");  //전송실패
-            default:
+            string netType = GetTagData("trans_req", "net_type");
+            if (netType == "I")
+                return XmlConf.GetTitle("T_COMMON_IMPORT");         //반입
+            else if (netType == "E")
+                return XmlConf.GetTitle("T_COMMON_EXPORT");          // 반출
+            else
                 return "-";
         }
-    }
-*@
+
+        /// <summary>
+        /// 전송상태 정보를 반환(전송취소,전송대기,수신완료,전송실패,검사중)
+        /// </summary>
+        /// <returns></returns>
+        public string GetTransStatus(Dictionary<string, object> transferData)
+        {
+            string strTransState = transferData.GetTagData("trans_req", "trans_state");
+            switch (strTransState)
+            {
+                case "scanning":
+                    return XmlConf.GetTitle("T_COMMON_TRANSCHECKING");  //검사중
+                case "wait":
+                    return XmlConf.GetTitle("T_COMMON_TRANSWAIT");  //전송대기
+                case "cancel":
+                    return XmlConf.GetTitle("T_COMMON_TRANSCANCLE");  //전송취소
+                case "received":
+                    return XmlConf.GetTitle("T_TRANS_COMPLETE");  //PC수신완료
+                case "fail":
+                    return XmlConf.GetTitle("T_TRANS_COMPLETE");  //전송실패
+                default:
+                    return "-";
+            }
+        }
+    *@
 
 
-    public void SetBindingData(SGApproveUIData getDataConv,  object ApproveInfo)//, string approverName, string apvStatus, string apvTime)
-    {        
+    public void SetBindingData(SGApproveUIData getDataConv, object ApproveInfo)//, string approverName, string apvStatus, string apvTime)
+    {
         ApprDataConverter = getDataConv;
         SelectedInfo = ApproveInfo;
 
@@ -762,7 +763,7 @@
         //sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
         if (ApproveInfo == null)
             return;
-     
+
         strDataTransKind = ApprDataConverter.GetTransKind(ApproveInfo);                                     // 전송구분
         strDataTransStatus = ApprDataConverter.GetTransStatusName(ApproveInfo);                                 // 전송상태
 
@@ -772,9 +773,9 @@
         strDataApprStatus = ApprDataConverter.GetApprStatus(ApproveInfo);                                   // 승인상태
         strDataApprReqUser = ApprDataConverter.GetReqUser(ApproveInfo);                                     // 승인요청자
         strDataApprReqDay = ApprDataConverter.GetApprReqDay(ApproveInfo);                                   // 승인요청일
-        
+
         FileAddManage fileAddManage = new FileAddManage();
-        strDataTitle = ApprDataConverter.GetTitle(ApproveInfo);                                             // 제목        
+        strDataTitle = ApprDataConverter.GetTitle(ApproveInfo);                                             // 제목
         strDataTitle = fileAddManage.GetConvertTitleDesc(false, strDataTitle);
         strDataDesc = ApprDataConverter.GetDesc(ApproveInfo);                                              // 설명
         strDataDesc = fileAddManage.GetConvertTitleDesc(false, strDataDesc);
@@ -812,16 +813,16 @@
         }
         else
         {
-            SGApproveUIData.ApprovalInfo MyApproveInfo = ApprDataConverter.GetApprovalInfo(ApproveInfo, userSeq);
+            ApprovalInfo MyApproveInfo = ApprDataConverter.GetApprovalInfo(ApproveInfo, userSeq);
             strDataLastApprStatus = MyApproveInfo.ApproveStatusName;
-            strDataLastApprName = MyApproveInfo.UserName;            
+            strDataLastApprName = MyApproveInfo.UserName;
             strDataLastApprDay = MyApproveInfo.ApproveTime;
             strDataLastApprRejectReason = MyApproveInfo.ApproveReason;
             if (strDataLastApprRejectReason.Length > 100)
                 strDataLastApprRejectReason = strDataLastApprRejectReason.Substring(0, 100) + "\n" + strDataLastApprRejectReason.Substring(101);
 
             //ApproverHist apprHist = sgDetailData.GetApprLastApproverHistData(isVisibleFileApproveReason);
-            if (apprListHist?.Count >0)
+            if (apprListHist?.Count > 0)
             {
                 apprHList.Clear();
                 foreach (ApproverHist data in apprListHist)
@@ -851,10 +852,10 @@
         }
 
         listForwaredUserInfo = ApprDataConverter.GetForwardUserInfo(ApproveInfo);
-        if(listForwaredUserInfo?.Count == 1)
+        if (listForwaredUserInfo?.Count == 1)
             strDataForwardReciver = $"{listForwaredUserInfo[0].Name} {listForwaredUserInfo[0].Position}";
-        else if(listForwaredUserInfo?.Count > 1)
-           strDataForwardReciver = String.Format(XmlConf.GetInfoMsg("I_0083"), listForwaredUserInfo[0].Name, (listForwaredUserInfo.Count - 1).ToString());
+        else if (listForwaredUserInfo?.Count > 1)
+            strDataForwardReciver = String.Format(XmlConf.GetInfoMsg("I_0083"), listForwaredUserInfo[0].Name, (listForwaredUserInfo.Count - 1).ToString());
 
         StateHasChanged();
     }
@@ -970,7 +971,7 @@
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
-       
+
         if (SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID))
         {
             refSGDetailReject.ResetReason(Common.Enums.EnumApproveType.Approve);
@@ -1050,7 +1051,7 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-    
+
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
