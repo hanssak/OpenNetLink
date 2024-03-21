@@ -5,7 +5,8 @@
 
 
 REG_CRX=0
-START_AUTO=1
+START_AUTO=0
+PATCH_APPENV=1
 NAME_CRX="gbbehmiepgfmmnifjbnknjaebgmnpbam.json"
 
 WHOAREYOU=`last | head -1 | awk -F' ' '{ print $1 }'`
@@ -25,7 +26,13 @@ fi
 
 APPENV_FILE="/tmp/AppEnvSetting.json"
 if [ -e $APPENV_FILE ]; then
-    cp /tmp/AppEnvSetting.json /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
+
+    if [ $PATCH_APPENV -eq 0 ]; then
+        cp /tmp/AppEnvSetting.json /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
+    fi
+
+    # cp /tmp/AppEnvSetting.json /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
+
     rm -rf /tmp/AppEnvSetting.json
 fi
 

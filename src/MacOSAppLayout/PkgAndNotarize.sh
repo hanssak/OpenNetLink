@@ -41,13 +41,13 @@ dev_keychain_label="pfth-pvpn-mhut-arrc"
 profile_name="hanssakSG"
 
 # put your project's information into these variables
-if [ $# -ne 9 ]; then
-    echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {isupdatecheck} $6 {startauto} $7 {storagename} $8 {regcrxforce} $9"
+if [ $# -ne 10 ]; then
+    echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName} $4 {outputPath} $5 {isupdatecheck} $6 {startauto} $7 {storagename} $8 {regcrxforce} $9 {patchappenv} $10"
     exit -1
 fi;
 
 echo "$@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-echo "Notarize (CMD-identify) : $0 $1 $2 $3 $4 $5 $6 $7"
+echo "Notarize (CMD-identify) : $0 $1 $2 $3 $4 $5 $6 $7 $8 $9 $10"
 echo "$@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 
 version=$1
@@ -61,6 +61,7 @@ isupdatecheck=$6
 startauto=$7
 storagename=$8
 regcrxforce=$9
+patchappenv=$10
 
 # code starts here
 projectdir=$(dirname $0)
@@ -323,6 +324,14 @@ if [[ $regcrxforce == "FALSE" ]]; then
 else
     # echo "Check regcrxforce : TRUE"
     sed -i '' -e 's/REG_CRX=0/REG_CRX=1/g' $filepostinstall
+fi
+
+if [[ $patchappenv == "FALSE" ]]; then 
+    echo "Check patchappenv (##########) : FALSE"
+    sed -i '' -e 's/PATCH_APPENV=1/PATCH_APPENV=0/g' $filepostinstall
+else
+    echo "Check patchappenv (##########) : TRUE"
+    sed -i '' -e 's/PATCH_APPENV=0/PATCH_APPENV=1/g' $filepostinstall
 fi
 
 if [[ $isupdatecheck == "FALSE" ]]; then 

@@ -704,7 +704,7 @@ Task("PkgCrossflatform")
 
 		//설치파일 생성
 		if(isFull.ToString().ToUpper() == "TRUE")
-		// if(false)
+		// if(false) // patch 만들고 싶을대 사용
 		{
 		
 			foreach(var agentUnit in System.IO.Directory.GetDirectories(storageUnit))
@@ -1101,7 +1101,8 @@ Task("MakeInstaller")
 													.Append(isUpdateCheck.ToString().ToUpper())	//$6
 													.Append(startAuto.ToString().ToUpper())//$7
 													.Append(storageName.ToUpper())//$8
-													.Append(regCrxForce.ToString().ToUpper())//$9													
+													.Append(regCrxForce.ToString().ToUpper())//$9
+													.Append(patchAppEnv.ToString().ToUpper())//$10													
 													})
 		)
 		{
