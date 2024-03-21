@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using Serilog;
 using OpenNetLinkApp.Common;
 using AgLogManager;
+using OpenNetLinkApp.Data.SGDicData.Approve;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -49,10 +50,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string stDLP = "";
         public string stDLPDesc = "";
         public string stVirusFlag = "0";
+        public long fileSizeValue = 0;
 
         public FileInfoData()
         {
             strFileName = strFileType = strFileSize = strVirusHistory = strVirusExamDay = "";
+        }
+        public FileInfoData(string FileName, string FileType, string FileSize, string VirusHistory, string VirusExamDay, string fileno, string dlp, string dlpdesc, string strVirusFlag, long fileSizeValue)
+        {
+            strFileName = FileName;                     // 파일 이름
+            strFileType = FileType;                     // 파일 유형
+            strFileSize = FileSize;                     // 파일 크기
+            strVirusHistory = VirusHistory;             // 바이러스 내역
+            strVirusExamDay = VirusExamDay;             // 바이러스 검사일
+            fileNo = fileno;
+            stDLP = dlp;                                //DLP 여부
+            stDLPDesc = dlpdesc;                        //DLP 상세 
+            stVirusFlag = strVirusFlag;                 // VirusFlag(0:정상파일, 1: 바이러스 검출, 2: 파일위변조 검출, 5: DRM차단)
+            this.fileSizeValue = fileSizeValue;
         }
 
         public FileInfoData(string FileName, string FileType, string FileSize, string VirusHistory, string VirusExamDay, string fileno, string dlp, string dlpdesc, string strVirusFlag)
@@ -1275,6 +1290,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string IsFile { get; set; }                  //파일전달
         public string strDestNet { get; set; }                  //목적지 (목적망)
         public string Title { get; set; }                   //제목
+        public string Desc { get; set; }                    //설명
         public string RequestTime { get; set; }             //전송요청일
         public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
         public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
@@ -1283,10 +1299,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public string expiredDate { get; set; }             //파일만료일
 
+        public string requestUserName { get; set; }         //요청자 이름
+
         public bool isPossibleDownload { get; set; }        //파일 다운로드 가능 여부
 
         public int isPossibleDownloadCount { get; set; }   //파일 다운로드 가능 Count
         public string DataType { get; set; }                // data Type ( 0 : , 1 : , 2 : ) 
+
+        public List<object> scanList { get; set; }                // 파일 검사 결과
+
+        public List<FileInfoData> fileInfoList { get; set; }      //파일 정보 리스트
+
+        public List<ApproverHist> apprHisList { get; set; }       //결재정보 리스트
+
+        public ApprovalInfo lastApprovalInfo { get; set; }       //마지막 결재자 정보
 
         public transData()
         {
