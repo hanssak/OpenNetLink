@@ -10,6 +10,7 @@ using OpenNetLinkApp.Common;
 using System.Runtime.InteropServices;
 using Serilog;
 using AgLogManager;
+using OpenNetLinkApp.Data.SGDicData.Approve;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -29,29 +30,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             Mail,
             MailSeciurity,
         
-        }
-
-
-        public class ApprovalInfo
-        {
-            public ApprovalInfo(string userSeq, string userID, string userName, string approveStatusCode, string approveStatusName, string approveReason, string approveTime)
-            {
-                UserSeq = userSeq;
-                UserID = userID;
-                UserName = userName;
-                ApproveStatusCode = approveStatusCode;
-                ApproveStatusName = approveStatusName;
-                ApproveReason = approveReason;
-                ApproveTime = approveTime;
-            }
-
-            public string UserSeq { get; set; }
-            public string UserID { get; set; }
-            public string UserName { get; set; }
-            public string ApproveStatusCode { get; set; }
-            public string ApproveStatusName { get; set; }
-            public string ApproveReason { get; set; }
-            public string ApproveTime { get; set; }
         }
 
         XmlConfService xmlConf;
@@ -648,8 +626,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         retValue.ApproveStatusCode = apprStat;
                         retValue.ApproveStatusName = GetApprStatusName(apprStat);
                         retValue.UserID = status.GetTagDataString("approver_hr", "approver_id");
-                        retValue.UserName = status.GetTagDataString("approval_step", "approval_name");
-                        retValue.UserSeq = status.GetTagDataString("approval_step", "approver_seq");
+                        retValue.UserName = status.GetTagDataString("approver_hr", "name");
+                        retValue.UserSeq = status.GetTagDataString("approver_hr", "approver_seq");
                         retValue.ApproveReason = status.GetTagDataString("description");
                         retValue.ApproveTime = status.GetTagDataString("resp_datetime");
                     }
