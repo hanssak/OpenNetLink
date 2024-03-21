@@ -1300,17 +1300,33 @@ namespace OpenNetLinkApp.Data.SGDicData
              */
         }
 
-
-        public int RequestRestSendApproveBatch(HsNetWork hsNet, Int64 nUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<Int64> listTransSeqData)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hsNet"></param>
+        /// <param name="approvalType">결재 종류. 택1: common(일반결재), security(보안결재), proxy(대결재)</param>
+        /// <param name="approveParam"></param>
+        /// <returns></returns>
+        public int RequestRestApprovalDetailSearch(HsNetWork hsNet, string tseq)
         {
 
-            if (nUserSeq < 1)
+            Dictionary<string, string> pathParam = new Dictionary<string, string>();
+            pathParam["tseq"] = tseq;
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eGetTransferRequestsDetail, null, null, hsNet.stCliMem.GetProtectedSeedKey(), dicPathParam:pathParam);
+            return hsNet.SendMessage(args);
+        }
+
+
+        public int RequestRestSendApproveBatch(HsNetWork hsNet, Int64 nApprovalUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<Int64> listTransSeqData)
+        {
+
+            if (nApprovalUserSeq < 1)
             {
                 return -1;
             }
 
             Dictionary<string, object> dicApproveProcinfo = new Dictionary<string, object>();
-            dicApproveProcinfo["approver_seq"] = nUserSeq;
+            dicApproveProcinfo["approver_seq"] = nApprovalUserSeq;
             dicApproveProcinfo["approval_type"] = strApproveType;
             dicApproveProcinfo["data_type"] = strDataType;
             dicApproveProcinfo["approval_action"] = strApproveAction;

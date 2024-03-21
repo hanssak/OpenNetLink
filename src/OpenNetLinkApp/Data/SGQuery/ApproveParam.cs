@@ -60,6 +60,25 @@ namespace OpenNetLinkApp.Data.SGQuery
         /// pre(이전 단계 진행중), wait(결재 대기), confirm(승인), reject(반려), cancel(취소), skip(결재 스킵)"
         /// </summary>
         public List<string> ApprStatus { get; set; }
+
+        /// <summary>
+        /// 발송상태
+        /// </summary>
+        public List<string> MailDeliveryStatus { get; set; }
+
+        /// <summary>
+        /// 수신자
+        /// </summary>
+        public string MailReceiver { get; set; }
+
+        /// <summary>
+        /// 개인정보 검출 여부
+        /// </summary>
+        public List<string> PrivacyDetectFlag { get; set; }
+
+        /// <summary>
+        /// 승인요청자 OR 발신자
+        /// </summary>
         public string ReqUserName { get; set; }
         public string Title { get; set; }
         public string UserID { get; set; }
@@ -87,6 +106,11 @@ namespace OpenNetLinkApp.Data.SGQuery
 
         public bool IsSecurity { get; set; }
 
+        /// <summary>
+        /// 선결/후결
+        /// </summary>
+        /// <param name="strApprKindValue"></param>
+        /// <returns></returns>
         public List<string> GetApprKind(string strApprKindValue)
         {
             List<string> strValue = new List<string>();
@@ -104,6 +128,11 @@ namespace OpenNetLinkApp.Data.SGQuery
             return strValue;
         }
 
+        /// <summary>
+        /// 반입/반출
+        /// </summary>
+        /// <param name="strTransKindValue"></param>
+        /// <returns></returns>
         public List<string> GetTransKind(string strTransKindValue)
         {
             List<string> strValue = new List<string>();
@@ -122,7 +151,7 @@ namespace OpenNetLinkApp.Data.SGQuery
         }
 
         /// <summary>
-        /// approval_state
+        /// approval_state (승인대기,승인...
         /// </summary>
         /// <returns></returns>
         public List<string> GetApprStatus(string strApprStatusValue)
@@ -175,6 +204,58 @@ namespace OpenNetLinkApp.Data.SGQuery
                 else if (strDestinationValue == Dest.strDestSysName)
                     strValue.Add(Dest.strDestSysid);
             }
+            return strValue;
+        }
+
+        /// <summary>
+        /// 메일 발송상태 조건 추가
+        /// </summary>
+        /// <param name="strStatusText">전체, 발송대기, 발송취소 등등</param>
+        public void SetMailDeliveryStatus(string strStatusText) => MailDeliveryStatus = GetMailDeliveryStatus(strStatusText);
+        public List<string> GetMailDeliveryStatus(string strStatusText)
+        {
+            //TODO 고도화 - 메일 결재 조회 시, 발송상태를 조회 조건에 추가 
+            List<string> strValue = new List<string>();
+
+            if (strStatusText == XmlConf.GetTitle("T_MAIL_TRANSWAIT")) //발송대기
+                strValue.Add("발송대기");
+            else if (strStatusText == XmlConf.GetTitle("T_MAIL_TRANSCANCLE")) //발송취소
+                strValue.Add("발송취소");
+            else if (strStatusText == XmlConf.GetTitle("T_MAIL_TRANS_SUCCESS")) //발송완료
+                strValue.Add("발송완료");
+            else if (strStatusText == XmlConf.GetTitle("T_MAIL_TRANSFRFAILED")) //발송실패 
+                strValue.Add("발송실패");
+            else if (strStatusText == XmlConf.GetTitle("T_MAIL_INSPECT")) //검사중
+                strValue.Add("검사중");
+            else
+                strValue.Add("전체");
+
+            return strValue;
+        }
+
+        /// <summary>
+        /// 개인정보 검출 여부 추가
+        /// </summary>
+        /// <param name="strStatusTest">전체, 미포함, 포함, 검출불가</param>
+        public void SetPrivacyDetectFlag(string strStatusTest) => PrivacyDetectFlag = GetPrivacyDetectFlag(strStatusTest);
+        /// <summary>
+        /// 개인정보 검출 여부 조건 추가
+        /// </summary>
+        /// <param name="strDlpValue">전체, 미포함, 포함, 검출불가</param>
+        public List<string> GetPrivacyDetectFlag(string strDlpStatusText)
+        {
+            //TODO 고도화 - 메일 결재 조회 시, 개인정보 검출 여부를 조회 조건에 추가 
+            List<string> strValue = new List<string>();
+
+            if (strDlpStatusText == XmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION")) //미포함
+                strValue.Add("미포함");
+            else if (strDlpStatusText == XmlConf.GetTitle("T_COMMON_DLP_INCLUSION")) //포함
+                strValue.Add("포함");
+            else if (strDlpStatusText == XmlConf.GetTitle("T_COMMON_DLP_UNKNOWN")) //검출불가
+                strValue.Add("검출불가");
+            else
+                strValue.Add("전체");
+
             return strValue;
         }
     }

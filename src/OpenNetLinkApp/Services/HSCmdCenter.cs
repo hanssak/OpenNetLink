@@ -1083,7 +1083,6 @@ namespace OpenNetLinkApp.Services
                         break;
 
                     case eAdvancedCmdList.eGetTransferRequestsDetail:
-                        //eCmdList.eTRANSDETAIL:
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
                         {
@@ -3803,7 +3802,13 @@ namespace OpenNetLinkApp.Services
             return 0;
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupid"></param>
+        /// <param name="approvalType">결재 종류. 택1: common(일반결재), security(보안결재), proxy(대결재)</param>
+        /// <param name="approveParam"></param>
+        /// <returns></returns>
         public int RestApprovalSearch(int groupid, string approvalType, ApproveParam approveParam)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
@@ -3825,18 +3830,42 @@ namespace OpenNetLinkApp.Services
             return 0;
 
         }
+
+        public int RestApprovalDetailSearch(int groupid, string tseq)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestApprovalDetailSearch(hsNetWork, tseq);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestApprovalSearch-Task-Exception : {ex.Message}");
+                }
+            });
+            return 0;
+
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="groupid"></param>
-        /// <param name="strUserSeq"></param>
+        /// <param name="strApprovalUserSeq"></param>
         /// <param name="strApproveType"></param>
         /// <param name="strDataType"></param>
         /// <param name="strApproveAction"></param>
         /// <param name="strstrDescription"></param>
         /// <param name="listSeqData"></param>
         /// <returns></returns>
-        public int RestSendApproveBatch(int groupid, Int64 strUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<Int64> listSeqData)
+        public int RestSendApproveBatch(int groupid, Int64 strApprovalUserSeq, string strApproveType, string strDataType, string strApproveAction, string strstrDescription, List<Int64> listSeqData)
         {
 
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
@@ -3848,7 +3877,7 @@ namespace OpenNetLinkApp.Services
                 int ret = 0;
                 try
                 {
-                    ret = sgSendData.RequestRestSendApproveBatch(hsNetWork, strUserSeq, strApproveType, strDataType, strApproveAction, strstrDescription, listSeqData);
+                    ret = sgSendData.RequestRestSendApproveBatch(hsNetWork, strApprovalUserSeq, strApproveType, strDataType, strApproveAction, strstrDescription, listSeqData);
                     if (ret < 0)
                     {
                         Log.Logger.Here().Error($"RestSendApproveBatch-Task-Ret : {ret}");

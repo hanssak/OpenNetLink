@@ -281,6 +281,8 @@
     SGCustomSelect refSGCustomSelect;
     PeriodDatePicker refPeriodDatePicker;
 
+    public SGApproveUIData ApprDataConverter = new SGApproveUIData(SGApproveUIData.UIType.Security);
+
     public int TotalCount { get; set; }
     public List<SGApproveData> mData = new List<SGApproveData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -480,62 +482,80 @@
             return;
         }
 
-        HSCmdCenter.sgPageEvent.SetDetailSearchEventAdd(groupID, ApprDetailSearchResult);           // 상세보기 조회 결과
+         SGApprManageData sgData = (SGApprManageData)HSCmdCenter.GetApprManageData(groupID);
+        if (sgData == null)
+        { return; }
 
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
+        List<object> approvalInfoList = sgData.GetTagDataObjectList("approval_info_list");
+        if (approvalInfoList?.Count <= 0)
             return;
-
-        string strUserID = sgLoginData.GetUserID();
-
-        HSCmdCenter.SendTransDetail(groupID, strUserID, transSeq);
-    }
-
-    public void ApprDetailSearchResult(int groupId, PageEventArgs e)
-    {
-        int nRet = e.result;
-        string strMsg = e.strMsg;
-        if (nRet != 0)
+        
+        foreach (object approvalInfo in approvalInfoList)
         {
-            ShowMessage("error", strMsg);
-            return;
-        }
-
-        SGDetailData sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupId);
-        if (sgDetailData == null)
-            return;
-
-        SGApproveData tData = null;
-        tData = GetApprListData(strMsg);
-        if (tData != null)
-        {
-            string sTransSeq = tData.TransSeq;
-            string sApprSeq = tData.ApprSeq;
-            int nDataForwarded = 0;
-            bool bTransCancel = false;
-            bool bApprove = !(tData.bCheckDisable);
-            bool bReject = false;
-            string strTemp = XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE");                      // 후결
-
-            tData.ApvType = XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE");        // 보안결재는 "선결"로 강제
-
-            if (bApprove)
+            string seq = approvalInfo.GetTagDataString("trans_req", "trans_seq").ToString();
+            if (transSeq == seq)
             {
-                bReject = true;
-                if (tData.ApvType.Equals(strTemp))
-                    bReject = false;
+               refApprovePopUp.SetBindingData(ApprDataConverter, approvalInfo);//   , tData.ApproverName, tData.ApvStatus, tData.ApvTime);
+               OpenDetail(transSeq).Wait();
+                break;
             }
-
-
-            sgDetailData.SetInit(true, sTransSeq, sApprSeq, nDataForwarded, bTransCancel, bApprove, bReject);
-
-            HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
-
-            refApprovePopUp.SetBindingData(tData.ApproverName, tData.ApvStatus, tData.ApvTime);
-            OpenDetail(sTransSeq).Wait();
         }
+        //HSCmdCenter.sgPageEvent.SetDetailSearchEventAdd(groupID, ApprDetailSearchResult);           // 상세보기 조회 결과
+        //
+        //SGLoginData sgLoginData = null;
+        //sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        //if (sgLoginData == null)
+        //    return;
+        //
+        //string strUserID = sgLoginData.GetUserID();
+        //
+        //HSCmdCenter.SendTransDetail(groupID, strUserID, transSeq);
     }
+
+    //public void ApprDetailSearchResult(int groupId, PageEventArgs e)
+    //{
+    //    int nRet = e.result;
+    //    string strMsg = e.strMsg;
+    //    if (nRet != 0)
+    //    {
+    //        ShowMessage("error", strMsg);
+    //        return;
+    //    }
+    //
+    //    SGDetailData sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupId);
+    //    if (sgDetailData == null)
+    //        return;
+    //
+    //    SGApproveData tData = null;
+    //    tData = GetApprListData(strMsg);
+    //    if (tData != null)
+    //    {
+    //        string sTransSeq = tData.TransSeq;
+    //        string sApprSeq = tData.ApprSeq;
+    //        int nDataForwarded = 0;
+    //        bool bTransCancel = false;
+    //        bool bApprove = !(tData.bCheckDisable);
+    //        bool bReject = false;
+    //        string strTemp = XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE");                      // 후결
+    //
+    //        tData.ApvType = XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE");        // 보안결재는 "선결"로 강제
+    //
+    //        if (bApprove)
+    //        {
+    //            bReject = true;
+    //            if (tData.ApvType.Equals(strTemp))
+    //                bReject = false;
+    //        }
+    //
+    //
+    //        sgDetailData.SetInit(true, sTransSeq, sApprSeq, nDataForwarded, bTransCancel, bApprove, bReject);
+    //
+    //        HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
+    //
+    //        refApprovePopUp.SetBindingData(tData.ApproverName, tData.ApvStatus, tData.ApvTime);
+    //        OpenDetail(sTransSeq).Wait();
+    //    }
+    //}
 
 
     public int GetForwarded(string strIsFile)
@@ -621,35 +641,16 @@
             return;
         }
 
-        if (!SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID))
-        {
-            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sgLoginData == null)
-            {
-                CLog.Here().Error($"ApproveAction, HSCmdCenter.GetLoginData = null");
-                ShowMessage("error", XmlConf.GetErrMsg("E_0209"));
-                return;
-            }
-
-            string strUserSeq = sgLoginData.GetUserSequence();
-            List<Int64> listApproveSeq = new List<Int64>();
-            for (int i = 0; i < ListData.Count; i++)
-            {
-                if (ListData[i].bCheck)
-                {
-                    listApproveSeq.Add(Convert.ToInt64(ListData[i].ApprSeq));
-                }
-            }
-
-            HSCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "security", "file", "confirm", "Approve", listApproveSeq);
-
-        }
-        else
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID))
         {
             refSGSecureReject.ResetReason(Common.Enums.EnumApproveType.Approve);
             refSGSecureReject.SetGroupID(groupID);
             refSGSecureReject.SetApprRejectEvent(ApproveRejectSend);
             await refSGSecureReject.openPopUp();
+        }
+        else
+        {
+            ApproveRejectSend(groupID, "Approve", false);
         }
     }
     private async Task ApproveReject()
@@ -709,7 +710,6 @@
         }
 
         HSCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "security", "file", (bisReject ? "reject" : "confirm"), strReason, listApproveSeq);
-
     }
 
     public string GetCheckApprSeq()
@@ -813,8 +813,8 @@
         string searchApprKind = strTotal;// 전체만 검색되게 강제
 
         ApproveParam param = new ApproveParam(curFromDay, curToDay, searchApprKind, strTransKindValue, strApprStatusValue, strReqUserValue, strTitleValue, sgLoginData.GetUserID(), nPageListCount, nViewPageNo, XmlConf);
-        //TODO 고도화 - 보안결재자(Prework)에 대한 결재 조회 시, API 정의 필요
-        param.DataType = new List<string>() {"prework"};
+        
+        param.DataType = new List<string>() { "file" };
        param.SrcSGNetType = sgReadyData.GetSgNetType();
         param.DestSGNetType = param.GetDestination(strDestNetWork, dicDestSysPos);
         
@@ -853,31 +853,34 @@
 
         foreach (object approvalInfo in approvalInfoList)
         {
-            JObject info = (JObject)approvalInfo;
-            Dictionary<string, object> dic = info?.ToObject<Dictionary<string, object>>();
-            if (dic == null)
+            if (approvalInfo == null)
                 continue;
 
             SGApproveData aData = new SGApproveData();
-            aData.bCheckDisable = !(sgData.GetApprEnableChk(strUserSeq, dic));             // 결재 가능/불가능
+            aData.bCheckDisable = !(ApprDataConverter.GetApprEnableChk(strUserSeq, approvalInfo));             // 결재 가능/불가능
             aData.bCheck = false;
-            aData.TransSeq = sgData.GetTransSeq(dic);                      // TransSeq;
+            aData.TransSeq = ApprDataConverter.GetTransSeq(approvalInfo);                      // TransSeq;
             //aData.ApprSeq = sgData.GetApproveSeq(dic);                     // ApprSeq;
 
             aData.ApvType =  XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE");   //결재종류 (선결/후결) => // 보안결재는 "선결"만 나오도록 처리
-            aData.TransferType = sgData.GetTransKind(dic);                 // 전송구분 (반출/반입)
-            aData.RequesterName = sgData.GetApproveReqUser(dic);           // 승인요청자
-            aData.ApproverName = sgData.GetQueryApprName(dic);             // 승인자
-            aData.ApvStatus = sgData.GetApprStaus(dic);                    // 승인상태 (요청취소,승인대기,승인,반려)
-            aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
+            aData.TransferType = ApprDataConverter.GetTransKind(approvalInfo);                 // 전송구분 (반출/반입)
+            aData.RequesterName = ApprDataConverter.GetApproveReqUser(approvalInfo);           // 승인요청자
 
-            aData.Title = sgData.GetTitle(dic);                            // 제목
+            SGApproveUIData.ApprovalInfo MyApproveInfo = ApprDataConverter.GetApprovalInfo(approvalInfo,strUserSeq);
+            aData.ApproverName = MyApproveInfo.UserName;             // 승인자
+            aData.ApproverSeq = MyApproveInfo.UserSeq;
+            aData.ApvStatus = MyApproveInfo.ApproveStatusName;                    // 승인상태 (요청취소,승인대기,승인,반려)
+            
+            aData.strDestNet = ApprDataConverter.GetDestNetworkName(approvalInfo, dicDestSysPos);          // 목적지 값
+
+            aData.Title = ApprDataConverter.GetTitle(approvalInfo);                            // 제목
             FileAddManage fileAddManage = new FileAddManage();
             aData.Title = fileAddManage.GetConvertTitleDesc(false, aData.Title);
             //aData.RequestTime = sgData.GetTransReqDay(dic);                // 승인요청일(type : YYYY-MM-DD hh:mm:ss)
-            aData.RequestTime = sgData.GetQueryTransReqDay(dic);                  // 승인요청일(type : YYYY-MM-DD hh:mm:ss)
+            aData.RequestTime = ApprDataConverter.GetQueryTransReqDay(approvalInfo);                  // 승인요청일(type : YYYY-MM-DD hh:mm:ss)
                                                                                   //aData.ApvTime = sgData.GetApprDay(dic);                        // 승인일
-            aData.ApvTime = sgData.GetQueryApprDay(dic);                        // 승인일
+            aData.ApvTime = ApprDataConverter.GetQueryApprDay(approvalInfo);                        // 승인일
+
             //aData.TransStatusCode = sgData.GetTransStatusCode(dic);        // 전송상태 원본 코드( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
             //aData.ApprStatusCode = sgData.GetApprStausCode(dic);           // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
             //aData.ApprTablePos = sgData.GetApprDataPos(dic);               // 결재 테이블 위치 정보(C : 결재 테이블, H : 결재 이력테이블)
