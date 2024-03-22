@@ -294,7 +294,7 @@
 
         DateTime time = sgLoginData.GetSvrTimeDayConvert();
         time = time.AddDays(14);
-        string strDateTime = time.ToString();
+        string strDateTime = time.ToString("yyyy-MM-dd HH:mm:ss");
         SGSettingData sgSettingData = null;
         sgSettingData = sgSettingProc.SelectSettingData(groupID);
         if (sgSettingData == null)
