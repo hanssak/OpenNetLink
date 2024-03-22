@@ -767,7 +767,17 @@
                     return false;
                 }
 
-                DateTime dtLocalTime = DateTime.Parse(strTime);
+                //DateTime dtLocalTime = DateTime.Parse(strTime);
+                DateTime dtLocalTime = DateTime.Now;
+                try
+                {
+                    dtLocalTime = DateTime.Parse(strTime);
+                }
+                catch (Exception ex_s1)
+                {
+                    CLog.Here().Error($"DateTime.Parse, Exception(MSG) : {ex_s1.Message}");
+                }
+
                 DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
 
                 if (DateTime.Compare(dtLocalTime, svrDt) < 0)
@@ -1001,7 +1011,17 @@
                         return false;
                     }
 
-                    DateTime dtLocalTime = DateTime.Parse(strTime);
+                    //DateTime dtLocalTime = DateTime.Parse(strTime);
+                    DateTime dtLocalTime = DateTime.Now;
+                    try
+                    {
+                        dtLocalTime = DateTime.Parse(strTime);
+                    }
+                    catch (Exception ex_s1)
+                    {
+                        CLog.Here().Error($"DateTime.Parse, Exception(MSG) : {ex_s1.Message}");
+                    }
+
                     DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
 
                     if (DateTime.Compare(dtLocalTime, svrDt) < 0)

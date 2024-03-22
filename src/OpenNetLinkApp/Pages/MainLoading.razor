@@ -61,7 +61,8 @@
 
     protected override void OnInitialized()
     {
-
+        
+        //dtLocalTime = DateTime.Parse("2024-04-04 (목) 오전 12:00:00"); // Exception
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
