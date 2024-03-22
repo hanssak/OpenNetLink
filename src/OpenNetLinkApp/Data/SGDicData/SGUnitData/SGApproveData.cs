@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
+    /// <summary>
+    /// 각종 조회화면에서, 조회결과 리스트를 UI에 표시하기 위한 객체
+    /// </summary>
     public class SGApproveData
     {
         public bool bCheckDisable { get; set; }           // 체크 가능 불가능
@@ -26,7 +29,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         public string TransferType { get; set; }          // 전송 구분 (반출/반입)
         //public string TransStatus { get; set; }           // 전송 상태 (전송대기, 전송취소, 전송실패)
+        /// <summary>
+        /// 승인요청자 또는 발신자
+        /// </summary>
         public string RequesterName { get; set; }         // 승인요청자
+
+        /// <summary>
+        /// 포워드 사용자 또는 메일 수신자
+        /// </summary>
+        public List<(string Name, string Position, string DeptName)> ForwardInfo { get; set; }
+
+        /// <summary>
+        /// 포워드 사용자 또는 수신자
+        /// </summary>
+        public string ForwardName { get; set; }
 
         /// <summary>
         /// 승인자
@@ -44,6 +60,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         //public string IsFile { get; set; }                // 파일 전달 유무
         public string strDestNet { get; set; }            // 전송하고자하는 목적지 망이름
         public string Title { get; set; }                 // 제목
+        /// <summary>
+        /// 전송요청일 또는 발신일
+        /// </summary>
         public string RequestTime { get; set; }           // 전송요청일
         public string ApvTime { get; set; }               // 승인일
 
@@ -52,6 +71,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// 전송대기, 전송취소 등등
         /// </summary>
         public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
+
+        /// <summary>
+        /// 전송대기, 전송취소 등등
+        /// </summary>
+        public string TransStatusName { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
         /// <summary>
         /// 승인상태 원본
         /// <para>pre, wait, confirm, rejcet, skip</para>
@@ -63,6 +87,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         
         
         public string stDLP { get; set; }           //개인정보 
+
+
+        /// <summary>
+        /// 메일에서 첨부파일 포함 여부
+        /// </summary>
+        public bool ExistMailAttachedFile { get; set; } //첨부파일 유무
 
         public SGApproveData()
         {

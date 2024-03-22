@@ -1,8 +1,6 @@
 using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 using OpenNetLinkApp.Services;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using static OpenNetLinkApp.Common.Enums;
 
 namespace OpenNetLinkApp.Data.SGQuery
@@ -62,9 +60,10 @@ namespace OpenNetLinkApp.Data.SGQuery
         public List<string> ApprStatus { get; set; }
 
         /// <summary>
-        /// 발송상태
+        /// 전송상태 (발송상태)
+        /// <para>scanning(검사중), sending(반대편으로 전송 중), cancel(전송취소), wait(PC수신대기), downloaded(PC수신완료), fail(전송실패)</para>
         /// </summary>
-        public List<string> MailDeliveryStatus { get; set; }
+        public List<string> TransStatus { get; set; }
 
         /// <summary>
         /// 수신자
@@ -208,27 +207,50 @@ namespace OpenNetLinkApp.Data.SGQuery
         }
 
         /// <summary>
-        /// 메일 발송상태 조건 추가
+        /// 메일 발송상태 조건 추가 (전송상태와 함께 사용)
         /// </summary>
         /// <param name="strStatusText">전체, 발송대기, 발송취소 등등</param>
-        public void SetMailDeliveryStatus(string strStatusText) => MailDeliveryStatus = GetMailDeliveryStatus(strStatusText);
-        public List<string> GetMailDeliveryStatus(string strStatusText)
+        public void SetTransStatus(string strStatusText) => TransStatus = GetTransStatus(strStatusText);
+        public List<string> GetTransStatus(string strStatusText)
         {
             //TODO 고도화 - 메일 결재 조회 시, 발송상태를 조회 조건에 추가 
             List<string> strValue = new List<string>();
+            /*
+            trans_state:
+              description: "전송 상태"
+              type: string
+              enum:
+                - "scanning"   # 검사 중
+                - "sending"    # 반대편 망으로 전송 중
+                - "cancel"     # 전송 요청 취소
+                - "wait"       # PC 수신 대기
+                - "downloaded" # PC 수신 완료
+                - "fail"       # 전송 실패 
+             */
 
-            if (strStatusText == XmlConf.GetTitle("T_MAIL_TRANSWAIT")) //발송대기
-                strValue.Add("발송대기");
-            else if (strStatusText == XmlConf.GetTitle("T_MAIL_TRANSCANCLE")) //발송취소
-                strValue.Add("발송취소");
-            else if (strStatusText == XmlConf.GetTitle("T_MAIL_TRANS_SUCCESS")) //발송완료
-                strValue.Add("발송완료");
-            else if (strStatusText == XmlConf.GetTitle("T_MAIL_TRANSFRFAILED")) //발송실패 
-                strValue.Add("발송실패");
+            //메일 Text
+            if (strStatusText == strTotal)// 전체
+            {
+                //strValue.Add("scanning");
+                //strValue.Add("sending");
+                //strValue.Add("cancel");
+                //strValue.Add("wait");
+                //strValue.Add("downloaded");
+                //strValue.Add("fail");
+            }
             else if (strStatusText == XmlConf.GetTitle("T_MAIL_INSPECT")) //검사중
-                strValue.Add("검사중");
-            else
-                strValue.Add("전체");
+                strValue.Add("scanning");
+            else if (strStatusText == XmlConf.GetTitle("T_MAIL_TRANSWAIT")) //발송대기
+                strValue.Add("sending");
+            else if (strStatusText == XmlConf.GetTitle("T_MAIL_TRANSCANCLE")) //발송취소
+                strValue.Add("cancel");
+            else if (strStatusText == XmlConf.GetTitle("T_MAIL_TRANS_SUCCESS")) //발송완료
+            {
+                strValue.Add("wait");
+                strValue.Add("downloaded");
+            }
+            else if (strStatusText == XmlConf.GetTitle("T_MAIL_TRANSFRFAILED")) //발송실패 
+                strValue.Add("fail");
 
             return strValue;
         }

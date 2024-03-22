@@ -1265,6 +1265,15 @@ namespace OpenNetLinkApp.Data.SGDicData
             bodyDic["period_date"] = $"{approveParam.SearchFromDay}-{approveParam.SearchToDay}";
             bodyDic["data_type_list"] = approveParam.DataType;
             bodyDic["net_type_list"] = approveParam.TransKind;
+
+            bodyDic["source_sg_net_type"] = approveParam.SrcSGNetType;
+            
+            if(approveParam.DestSGNetType?.Count > 0)
+                bodyDic["destination_sg_net_type_list"] = approveParam.DestSGNetType;
+
+            if (approveParam.TransStatus?.Count > 0)
+                bodyDic["trans_state_list"] = approveParam.TransStatus;
+
             bodyDic["approval_type"] = approvalType;
             bodyDic["approval_proc_type_list"] = approveParam.ApprKind;
             bodyDic["approval_state_list"] = approveParam.ApprStatus;
