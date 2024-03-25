@@ -11,6 +11,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.Data.SGDicData.Approve
 @using AgLogManager
 
 @inject IJSRuntime jsRuntime
@@ -919,7 +920,7 @@
             aData.TransferType = ApprDataConverter.GetTransKind(approvalInfo);                 // 전송구분 (반출/반입)
             aData.RequesterName = ApprDataConverter.GetApproveReqUser(approvalInfo);           // 승인요청자
 
-            SGApproveUIData.ApprovalInfo MyApproveInfo = ApprDataConverter.GetApprovalInfo(approvalInfo,strUserSeq);
+            ApprovalInfo MyApproveInfo = ApprDataConverter.GetApprovalInfo(approvalInfo,strUserSeq);
             aData.ApproverName = MyApproveInfo.UserName;             // 승인자
             aData.ApproverSeq = MyApproveInfo.UserSeq; // 승인자
             aData.ApvStatus = MyApproveInfo.ApproveStatusName; // 승인상태 (요청취소,승인대기,승인,반려)

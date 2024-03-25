@@ -4,6 +4,9 @@ using System.Text;
 using HsNetWorkSGData;
 using HsNetWorkSG;
 using OpenNetLinkApp.Services;
+using OpenNetLinkApp.Common;
+using System.Runtime.InteropServices;
+using OpenNetLinkApp.Data.SGDicData.Approve;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -82,16 +85,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
 
-        public List<Dictionary<int, string>> GetQuerySearchData()
+        public List<object> GetQuerySearchData()
         {
-            List<Dictionary<int, string>> listDicdata = GetSvrRecordData("RECORD");
-
-            int dataCount = 0;
-            if (listDicdata != null)
-                dataCount = listDicdata.Count;
-
-            if (dataCount <= 0)
-                return null;
+            List<object> listDicdata = m_DicTagData.GetTagDataObjectList("trans_req_list");
 
             return listDicdata;
         }
@@ -129,24 +125,22 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="dic"></param>
         /// <returns></returns>
-        public string GetTransKind(Dictionary<int, string> dic)
+        public string GetTransKind(object obj)
         {
             string strTransKind = "";
-            if (dic.TryGetValue(2, out strTransKind) != true)
-                return strTransKind;
+            string reqNetId = obj.GetTagDataString("req_net_id");
 
-            strTransKind = dic[2];
+            if (String.IsNullOrEmpty(reqNetId))
+                strTransKind = "-";
 
-            int nIndex = 0;
-            if (!strTransKind.Equals(""))
-                nIndex = Convert.ToInt32(strTransKind);
+            string strIE = reqNetId.Substring(0, 1);
 
-            switch (nIndex)
+            switch (strIE)
             {
-                case 1:
+                case "I":
                     strTransKind = xmlConf.GetTitle("T_COMMON_EXPORT");          // 반출
                     break;
-                case 2:
+                case "E":
                     strTransKind = xmlConf.GetTitle("T_COMMON_IMPORT");          // 반입
                     break;
                 default:
@@ -193,15 +187,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="dic"></param>
         /// <returns></returns>
-        public string GetTransStatusCode(Dictionary<int, string> dic)
+        public string GetTransStatusCode(object obj)
         {
-            string strTransStatus = "";
-            if (dic.TryGetValue(3, out strTransStatus) != true)
-                return strTransStatus;
-
-            strTransStatus = dic[3];            // 전송상태
-
-            return strTransStatus;
+            return obj.GetTagDataString("trans_state");
         }
 
         /// <summary>
@@ -210,7 +198,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="dic"></param>
         /// <returns></returns>
-        public string GetApprStaus(object obj)
+        public string GetApprStatus(object obj)
         {
             string strTransStatus = obj.GetTagDataString("trans_state"); //전송상태
             string strApprStatus = obj.GetTagDataString("approval_state"); //승인상태
@@ -242,18 +230,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="dic"></param>
         /// <returns></returns>
-        public string GetApprStausCode(Dictionary<int, string> dic)
+        public string GetApprStatusCode(object obj)
         {
-            string strApprStatus = "";
-            if (dic.TryGetValue(5, out strApprStatus) != true)
-                return strApprStatus;
-
-            strApprStatus = dic[5];             // 승인상태
-
-            int nIndex = 0;
-            if (!strApprStatus.Equals(""))
-                nIndex = Convert.ToInt32(strApprStatus);
-            return strApprStatus;
+            return obj.GetTagDataString("approval_state");
         }
 
         /// <summary>
@@ -265,6 +244,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetTitle(object obj)
         {
             return obj.GetTagDataString("title");
+        }
+        public string GetDesc(object obj)
+        {
+            return obj.GetTagDataString("description");
         }
 
         /// <summary>
@@ -287,6 +270,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strTransReqDay;
         }
 
+        public string GetDataTypeCode(object obj)
+        {
+            return obj.GetTagDataString("data_type");
+        }
+
         /// <summary>
         /// 전송요청일 정보를 반환한다.<br></br>
         /// return : 전송요청일(type : YYYY-MM-DD hh:mm:ss)
@@ -304,13 +292,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="dic"></param>
         /// <returns></returns>
-        public string GetDownloadCount(Dictionary<int, string> dic)
+        public string GetDownloadCount(object obj)
         {
             string strDownloadCount = "";
-            if (dic.TryGetValue(12, out strDownloadCount) != true)
-                return strDownloadCount;
-            strDownloadCount = dic[12];
-            return strDownloadCount;
+            //download_count 임시로 설정
+
+            return obj.GetTagDataString("download_count");
         }
 
         /// <summary>
@@ -336,6 +323,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetExpiredDate(object obj)
         {
             return obj.GetTagDataString("expiration_datetime");
+        }
+
+        public string GetRequestUserName(object obj)
+        {
+            return obj.GetTagDataString("req_user_hr", "name");
         }
 
         /// <summary>
@@ -388,51 +380,31 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// </summary>
         /// <param name="dic"></param>
         /// <returns></returns>
-        public string GetFileForwardKind(Dictionary<int, string> dic)
+        public string GetFileForwardKind(List<object> objList, string userSeq)
         {
             string strFileForwardKind = "";
-            if (dic.TryGetValue(13, out strFileForwardKind) != true)
-                return strFileForwardKind;
-            strFileForwardKind = dic[13];
+            bool isReceive = false;
 
-            int nIndex = 0;
-            if (!strFileForwardKind.Equals(""))
-                nIndex = Convert.ToInt32(strFileForwardKind);
-
-            switch (nIndex)
+            if (objList == null || objList.Count == 0)
             {
-                case 0:
-                    strFileForwardKind = "-";
-                    break;
-                case 1:
-                    strFileForwardKind = xmlConf.GetTitle("T_FILE_FORWARD_SEND");            // 발송
-                    break;
-                case 2:
-                    strFileForwardKind = xmlConf.GetTitle("T_FILE_FORWARD_RECV");            // 수신
-                    break;
-                default:
-                    strFileForwardKind = "-";
-                    break;
+                return "-";
             }
+
+            foreach (object obj in objList)
+            {
+                string objSeq = obj.GetTagDataString("user_seq");
+                if (objSeq == userSeq)
+                {
+                    isReceive = true;
+                }
+            }
+
+            if (isReceive)
+                strFileForwardKind = xmlConf.GetTitle("T_FILE_FORWARD_RECV");            // 수신
+            else
+                strFileForwardKind = xmlConf.GetTitle("T_FILE_FORWARD_SEND");            // 발송
+
             return strFileForwardKind;
-        }
-
-        /// <summary>
-        /// 송신망 정보를 반환한다.<br></br>
-        /// return : 송신망 정보
-        /// </summary>
-        /// <param name="dic"></param>
-        /// <returns></returns>
-        public string GetSrcNetworkName(Dictionary<int, string> dic)
-        {
-
-            string strSrcNetwork = "";
-            if (dic.TryGetValue(17, out strSrcNetwork) != true)
-                return strSrcNetwork;
-
-            strSrcNetwork = dic[17];
-
-            return strSrcNetwork;
         }
 
         /// <summary>
@@ -442,25 +414,29 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="dic"></param>
         /// <param name="dicDestSysPos"></param>
         /// <returns></returns>
-        public string GetDestNetworkName(Dictionary<int, string> dic, Dictionary<string, SGNetOverData> dicDestSysPos)
+        public string GetDestNetworkName(object obj, List<SGNetOverData> destinationInfoList)
         {
             string strDestNetwork = "";
-            if (dic.TryGetValue(19, out strDestNetwork) != true)        // 전송관리 error 확인
+
+            List<object> idList = obj.GetTagDataObjectList("net_id_list");
+
+            if (idList == null || idList.Count == 0)
                 return strDestNetwork;
 
-            strDestNetwork = dic[19];
-
-            if (strDestNetwork.Length < 1 || dicDestSysPos == null || dicDestSysPos.Count < 1)
-                return strDestNetwork;
-
-            // 해당망 이름을 return;
-            foreach (var item in dicDestSysPos)
+            foreach (object netId in idList)
             {
-                if (item.Value.strDestSysid == strDestNetwork)
+                foreach (SGNetOverData sgNetOverData in destinationInfoList)
                 {
-                    return item.Key;
+                    if (netId.ToString() == sgNetOverData.strDestSysid)
+                    {
+                        strDestNetwork += $"{sgNetOverData.strDestSysName},";
+                        break;
+                    }
                 }
             }
+
+            if (strDestNetwork.Length > 0)
+                strDestNetwork = strDestNetwork.Substring(0, strDestNetwork.Length - 1);
 
             return strDestNetwork;
         }
@@ -607,6 +583,368 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return false;
         }
 
+        public void GetFileInfo(object selectedInfo, out List<FileInfoData> fileListInfo)
+        {
+            //List<Dictionary<int, string>> listDicdata = GetRecordData("FILERECORD");
+            List<object> fileRecordList = selectedInfo.GetTagDataObjectList("file_info", "file_record_list");
+            List<object> scanResultList = selectedInfo.GetTagDataObjectList("scan_result");
 
+            if (fileRecordList == null)
+            {
+                fileListInfo = null;
+                HsLog.err($"GetFileInfo, FILERECORD null !");
+                return;
+            }
+            if (fileRecordList.Count <= 0)
+            {
+                fileListInfo = null;
+                return;
+            }
+            string strFileName = "-";
+            string strFileType = "-";
+            string strFileSize = "-";
+            string strVirus = "-";
+            string strVirusExamDay = "-";
+            string stDLP = "";
+            string stDLPDesc = "";
+            string strVirusFlag = "";
+
+            List<FileInfoData> m_ListData = new List<FileInfoData>();
+            foreach (object record in fileRecordList)
+            {
+                //TODO 고도화 - DLP 및 Prework에 대한 정의 필요
+                //DLP 포함여부(1:포함)
+                stDLP = record.GetTagDataObject("dlp").ToString();
+
+                //DLP DESC
+                stDLPDesc = GetScanFileDescription(selectedInfo, "DLP", record.GetTagDataString("file_seq"));
+                if (string.IsNullOrEmpty(stDLPDesc))
+                    stDLPDesc = "-";
+
+                // 파일이름 
+                strFileName = record.GetTagDataObject("file_name").ToString();
+                if (string.IsNullOrEmpty(strFileName))
+                    strFileName = "-";
+                else
+                    strFileName = GetFileRename(false, strFileName);
+
+                // 파일 유형 
+                strFileType = record.GetTagDataObject("file_type").ToString(); // NetLink호환 : 언어별로 다 찾아서 넣어줘야함, dir이라는걸 알 수 있는 값이 없음
+                if (string.IsNullOrEmpty(strFileType.Trim()))
+                    strFileType = "-";
+
+                if (strFileType.ToUpper().Equals("DIR"))
+                {
+                    int index = -1;
+                    index = strFileName.LastIndexOf("\\");
+                    if (index >= 0)
+                    {
+                        string strTemp = strFileName.Substring(0, index + 1);
+                        string strTemp2 = strFileName.Replace(strTemp, "");
+                        if (!strFileName.Equals("\\"))
+                            strFileName = strFileName.Replace(strTemp, "");
+                    }
+                }
+                else
+                {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        strFileName = strFileName.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        strFileName = strFileName.Replace("\\", "/");
+                    }
+                    strFileName = System.IO.Path.GetFileName(strFileName);
+                }
+
+                // 파일 Size
+                strFileSize = record.GetTagDataObject("file_size").ToString();
+                if (string.IsNullOrEmpty(strFileSize))
+                    strFileSize = "-";
+                else
+                {
+                    Int64 nSize = Convert.ToInt64(strFileSize);
+                    strFileSize = GetSizeStr(nSize);
+                }
+
+                // 바이러스 내역
+                //TODO 고도화 - scan_record_list 확립 후 수정
+                strVirus = "";
+
+                // 바이러스 검사일 
+                strVirusExamDay = "-";
+
+                // VIRUSFLAG : VIRUS 및 파일 위변조 검출여부
+                strVirusFlag = "0";
+
+                string strFileSeq = record.GetTagDataObject("file_seq").ToString();
+                m_ListData.Add(new FileInfoData(strFileName, strFileType, strFileSize, strVirus, strVirusExamDay, strFileSeq, stDLP, stDLPDesc, strVirusFlag));
+            }
+            fileListInfo = m_ListData;
+            return;
+        }
+
+        public List<ApproverHist> GetApproverInfoHist(object selectedInfo, bool isVisibleApproveReason)
+        {
+            List<ApproverHist> approverHist = new List<ApproverHist>();
+            ApproverHist tmpApprover;
+
+            List<object> apprStepList = selectedInfo.GetTagDataObjectList("approval_step_status_list");
+            if (apprStepList == null)
+                return null;
+
+            if (apprStepList.Count <= 0)
+                return null;
+
+            string strApprUserID = "";                // 결재자 ID
+            string strApprName = "";                // 결재자 이름 
+            string strApprPos = "";                 // 결재자 직급 및 직위
+            string strApprDate = "";                // 결재일 
+            string strApprStatus = "";              // 결재 상태
+            string strApprReason = "";              // 반려사유
+            string strApprStep = "";                 // 결재 Step
+            string strPrivacyAppr = "";             // 보안결재자 여부.
+
+            string strPreApprStatusCode = "";           // 이전 결재상태
+            string strApprStatusCode = "";              // 결재 상태 원본코드
+            foreach (object apprStep in apprStepList)
+            {
+                // 결재자 ID 
+                strApprUserID = apprStep.GetTagDataObject("approver_hr", "approver_id").ToString();
+                if (string.IsNullOrEmpty(strApprUserID))
+                    strApprUserID = "-";
+
+
+                // 결재자 이름
+                strApprName = apprStep.GetTagDataObject("approver_hr", "name").ToString();
+                if (string.IsNullOrEmpty(strApprName))
+                    strApprName = "-";
+
+
+                // 결재자 직급 및 직위
+                strApprPos = apprStep.GetTagDataObject("approver_hr", "rank").ToString();
+                if (string.IsNullOrEmpty(strApprPos))
+                    strApprPos = "-";
+
+                // 결재일
+                strApprDate = apprStep.GetTagDataObject("resp_datetime").ToString();
+                if (string.IsNullOrEmpty(strApprDate))
+                    strApprDate = "-";
+
+                // 결재 상태
+                strApprStatus = apprStep.GetTagDataObject("approval_state").ToString();
+                if (string.IsNullOrEmpty(strApprStatus))
+                    strApprStatus = "-";
+
+                // 반려 사유
+                strApprReason = apprStep.GetTagDataObject("description").ToString();
+                if (string.IsNullOrEmpty(strApprReason))
+                    strApprReason = "-";
+
+                // 결재 Step
+                strApprStep = apprStep.GetTagDataObject("approval_step", "approval_order").ToString();
+                if (string.IsNullOrEmpty(strApprStep))
+                    strApprStep = "-";
+
+                // 승인자 정보 (이름 + 직위)
+                strApprName = strApprName + " " + strApprPos;        // 승인자 정보 (이름 + 직위)                
+
+
+                //보안결재에 대한 계산 여부 불필요
+                //if (Dictemp.TryGetValue(7, out strPrivacyAppr))      // 보안결재자 여부.
+                //    strPrivacyAppr = Dictemp[7];
+                //else
+                strPrivacyAppr = "-";
+
+                switch (strApprStatus)
+                {
+                    case "pre":
+                    case "wait":
+                        strApprStatus = xmlConf.GetTitle("T_COMMON_APPROVE_WAIT");              // 승인대기
+                        break;
+                    case "confirm":
+                        strApprStatus = xmlConf.GetTitle("T_COMMON_APPROVE");                   // 승인
+                        break;
+                    case "reject":
+                        strApprStatus = xmlConf.GetTitle("T_COMMON_REJECTION");                 // 반려
+                        break;
+                    case "skip":
+                        strApprStatus = xmlConf.GetTitle("T_COMMON_REQUESTCANCEL");             //요청 취소
+                        break;
+                    default:
+                        strApprStatus = "-";
+                        break;
+                }
+
+
+                tmpApprover = new ApproverHist();
+                tmpApprover.SetData(strApprUserID, strApprName, strApprStatus, strApprDate, strApprReason, strApprStep);
+                if (strApprStep != "-")
+                    tmpApprover.m_nApprStep = int.Parse(strApprStep);
+                else
+                    tmpApprover.m_nApprStep = 0;
+                approverHist.Add(tmpApprover);
+            }
+
+            return approverHist;
+        }
+
+        public string GetFileRename(bool bMode, string strFileName) => SgExtFunc.hsFileRename(bMode, strFileName);
+        /// <summary>
+        /// 숫자를 입력받아 파일크기를 문자열로 줌
+        /// </summary>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        public string GetSizeStr(long size)
+        {
+            string rtn = "";
+            if (size == 0)
+            {
+                rtn = "0 KB";
+                return rtn;
+            }
+
+            rtn = CsFunction.GetSizeStr(size);
+            return rtn;
+        }
+
+        public string GetScanFileDescription(object selectedInfo, string scanType, string fileSeq)
+        {
+            List<object> scanList = selectedInfo.GetTagDataObjectList("scan_list");
+            if (scanList?.Count < 1)
+                return "-";
+
+            foreach (object scan in scanList)
+            {
+                //해당 scanType 종류 검색
+                if (scan.GetTagDataString("type").ToUpper() != scanType.ToUpper())
+                    continue;
+
+                //해당 파일 검출 내용 검색
+                List<object> scanFiles = scan.GetTagDataObjectList("result", "scan_record_list");
+                foreach (object file in scanFiles)
+                {
+                    if (file.GetTagDataString("file_seq") == fileSeq)
+                        return file.GetTagDataString("description");
+                }
+            }
+
+            return "-";
+        }
+
+        public ApprovalInfo GetLastApprInfo(object selectedInfo, bool isVisibleFileApproveReason)
+        {
+            ApprovalInfo retValue = new ApprovalInfo("-", "-", "-", "-", "-", "-", "-");
+
+            //if (GetRequestCancelChk(selectedInfo) != 0)
+            //    return retValue;
+
+            string strApprStatus = GetApprStatus(selectedInfo);
+            string strTempApprStatus1 = xmlConf.GetTitle("T_COMMON_APPROVE");               // 승인
+            string strTempApprStatus2 = xmlConf.GetTitle("T_COMMON_REJECTION");             // 반려
+
+            //TODO 고도화 - 대결재자인 경우, 원결재자를 반환하도록 처리 필요
+            List<object> approvalStepStatusList = selectedInfo.GetTagDataObjectList("approval_step_status_list");
+            if (approvalStepStatusList?.Count <= 0)
+                return retValue;
+
+            int lastApprOrder = 0;
+            foreach (object status in approvalStepStatusList)
+            {
+                string apprStat = status.GetTagDataString("approval_state");
+                if (apprStat != "confirm" && apprStat != "reject")
+                    continue;
+
+                if(apprStat == "reject")
+                {
+                    retValue.ApproveStatusCode = apprStat;
+                    retValue.ApproveStatusName = GetApprStatusName(apprStat);
+                    retValue.UserID = status.GetTagDataString("approver_hr", "approver_id");
+                    retValue.UserName = status.GetTagDataString("approver_hr", "name");
+                    retValue.UserSeq = status.GetTagDataString("approver_hr", "approver_seq");
+
+                    if(isVisibleFileApproveReason)
+                        retValue.ApproveReason = status.GetTagDataString("description");
+                    else
+                        retValue.ApproveReason = "-";
+                    retValue.ApproveTime = status.GetTagDataString("resp_datetime");
+                    break;
+                }
+                
+                string apprOrderString = status.GetTagDataString("approval_step", "approval_order");
+                int.TryParse(apprOrderString, out int apprOrder);
+
+                if (lastApprOrder < apprOrder)
+                {
+                    lastApprOrder = apprOrder;
+                    retValue.ApproveStatusCode = apprStat;
+                    retValue.ApproveStatusName = GetApprStatusName(apprStat);
+                    retValue.UserID = status.GetTagDataString("approver_hr", "approver_id");
+                    retValue.UserName = status.GetTagDataString("approver_hr", "name");
+                    retValue.UserSeq = status.GetTagDataString("approver_hr", "approver_seq");
+                    if (isVisibleFileApproveReason)
+                        retValue.ApproveReason = status.GetTagDataString("description");
+                    else
+                        retValue.ApproveReason = "-";
+                    retValue.ApproveTime = status.GetTagDataString("resp_datetime");
+                }
+            }
+            return retValue;    //마지막 결재자 반환
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strApprStatus">
+        /// <para>scanning 검사중</para>
+        /// <para>wait 전송대기</para>
+        /// <para>cancel 전송취소</para>
+        /// <para>received PC수신완료</para>
+        /// <para>fail 전송실패</para>
+        /// </param>
+        /// <param name="strTransStatus">
+        /// <para></para>
+        /// </param>
+        /// <returns>요청취소 판단 값. (0 : 요청취소 조건 아님, 1: 사용자가 전송취소 한 경우, 2: 이전 결재자가 반려한 경우</returns>
+        public int GetRequestCancelChk(object selectedInfo)
+        {
+            string strTransStatus = selectedInfo.GetTagDataString("trans_req", "trans_state");
+            string strApprStatus = selectedInfo.GetTagDataString("trans_req", "approval_state");
+
+            if (string.IsNullOrEmpty(strApprStatus) || string.IsNullOrEmpty(strTransStatus))
+                return 0;
+            /*
+            - "scanning 검사중"
+            - "wait 전송대기"
+            - "cancel 전송취소"
+            - "received PC수신완료"
+            - "fail 전송실패"
+            ------------------------------
+             pre(이전 단계 진행중), wait(결재 대기), confirm(승인), reject(반려), cancel(취소), skip(결재 스킵)
+            - "pre 이전 단계 진행중"
+            - "wait 결재 대기"
+            - "confirm 승인"
+            - "reject 반려"
+            - "cancel 취소"
+            - "skip 결재스킵(타 결재자 처리)"
+            */
+            if (strTransStatus == "cancel" && strApprStatus == "wait")     // 전송상태가 전송취소이면서, 결재상태가 승인대기일때
+                return 1;
+
+            if (strTransStatus == "wait" && strApprStatus == "reject")      //전송상태가 전송대기이면서, 결재상태가 반려인 경우
+                return 2;
+
+            return 0;
+        }
+        public string GetApprStatusName(string ApprStatusCode) => ApprStatusCode switch
+        {
+            "pre" or "wait" => xmlConf.GetTitle("T_COMMON_APPROVE_WAIT"),              // 승인대기
+            "confirm" => xmlConf.GetTitle("T_COMMON_APPROVE"),                   // 승인
+            "reject" => xmlConf.GetTitle("T_COMMON_REJECTION"),                   // 반려
+            "skip" => xmlConf.GetTitle("T_COMMON_REQUESTCANCEL"),                   // 요청취소
+            _ => "-"
+        };
     }
 }

@@ -164,20 +164,9 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.SendMessage(args);
         }
 
-        public int RequestFileTransList(HsNetWork hsNet, int groupid, string strUserID, string strFromDate, string strToDate, string strTransKind, string strTransStatus, string strApprStatus, string strDlp, string strTitle, string strDataType)
+        public int RequestFileTransList(HsNetWork hsNet, Dictionary<string,object> body)
         {
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            dic["APPID"] = "0x00000000";
-            dic["CLIENTID"] = strUserID;
-            dic["FROMDATE"] = strFromDate;
-            dic["TODATE"] = strToDate;
-            dic["TRANSKIND"] = strTransKind;
-            dic["TRANSSTATUS"] = strTransStatus;
-            dic["APPROVESTATUS"] = strApprStatus;
-            dic["DLP"] = strDlp;
-            dic["TITLE"] = strTitle;
-            dic["DATATYPE"] = strDataType;
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_FILE_TRANSLIST", dic, hsNet.stCliMem.GetProtectedSeedKey());
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostTransferRequestRetrieval,null, body, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);
         }
 

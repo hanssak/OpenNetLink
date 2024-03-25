@@ -1,6 +1,7 @@
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Components.SGPopUp
+@using OpenNetLinkApp.Data.SGDicData.Approve
 @using System.Security.Cryptography
 @using System.Diagnostics
 @using System.Text
@@ -702,7 +703,7 @@ using (Process proc = Process.Start(startInfo))
         }
         else
         {
-            SGApproveUIData.ApprovalInfo MyApproveInfo = ApprDataConverter.GetApprovalInfo(ApproveInfo, userSeq);
+            ApprovalInfo MyApproveInfo = ApprDataConverter.GetApprovalInfo(ApproveInfo, userSeq);
             strDataLastApprStatus = MyApproveInfo.ApproveStatusName;
             strDataLastApprName = MyApproveInfo.UserName;            
             strDataLastApprDay = MyApproveInfo.ApproveTime;

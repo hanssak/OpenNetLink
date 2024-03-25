@@ -4,6 +4,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using HsNetWorkSGData
 @using System.Diagnostics
+@using HsNetWorkSG
 @using OpenNetLinkApp.Models.SGSideBar
 @using OpenNetLinkApp.Services.SGAppManager
 @using OpenNetLinkApp.PageEvent
@@ -179,7 +180,7 @@
                                             {
                                                 <td style="text-align:center; vertical-align:middle">@item.stDLP</td>
                                             }
-                                            <td style="text-align:center; vertical-align:middle"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                            <td style="text-align:center; vertical-align:middle"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item))"><i class="fas fa-search"></i></button></td>
                                         </tr>
                                     }
                                 </tbody>
@@ -414,7 +415,7 @@
     /// </summary>
     private void UpdateData()
     {
-        TransSearchData(nViewPageNo);
+        TransSearchData(nViewPageNo).Wait();
     }
 
     //원데이타라고 가정함
@@ -424,83 +425,10 @@
     ///
     /// </summary>
     /// <param name="transSeq"></param>
-    /// <returns></returns>
-    public async Task OpenDetailPopup(string transSeq)
+    public void DetailSearch(transData data)
     {
-        Console.WriteLine("Open Detail Start" + transSeq);
-        long ltransSeq = Convert.ToInt64(transSeq);
-        refClipboardManagePopUp.bUseDlpDataView = bUseDlpDataView;
-        await refClipboardManagePopUp.openPopUp(ltransSeq);
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="transSeq"></param>
-    public void DetailSearch(string transSeq)
-    {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        if (pageService.GetConnectStatus(groupID) == false)
-        {
-            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
-
-        HSCmdCenter.sgPageEvent.SetDetailSearchEventAdd(groupID, DetailSearchResult);           // 상세보기 조회 결과
-
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
-            return;
-
-        string strUserID = sgLoginData.GetUserID();
-
-        HSCmdCenter.SendTransDetail(groupID, strUserID, transSeq);
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="groupId"></param>
-    /// <param name="e"></param>
-    public void DetailSearchResult(int groupId, PageEventArgs e)
-    {
-        int nRet = e.result;
-        string strMsg = e.strMsg;
-        if (nRet != 0)
-        {
-            ShowMessage("error", strMsg);
-            return;
-        }
-
-        SGDetailData sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupId);
-        if (sgDetailData == null)
-            return;
-
-        transData tData = null;
-        tData = GetTransListData(strMsg);
-        if (tData != null)
-        {
-            string sTransSeq = tData.TransSeq;
-            string sApprSeq = "";
-            int nDataForwarded = 0; //GetForwarded(tData.IsFile);
-            bool bTransCancel = !tData.bCheckDisable;
-            bool bApprove = false;
-            bool bReject = false;
-
-            sgDetailData.SetInit(false, sTransSeq, sApprSeq, nDataForwarded, bTransCancel, bApprove, bReject);
-            HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
-
-            refClipboardManagePopUp.m_downloadCount = 0; //m_currentDownloadCount;
-            refClipboardManagePopUp.SetBindingData(tData.DataType);
-            OpenDetailPopup(sTransSeq).Wait();
-        }
+        refClipboardManagePopUp.data = data;
+        refClipboardManagePopUp.openPopUp().Wait();
     }
 
     /// <summary>
@@ -546,7 +474,7 @@
 
             // 전송관리 처럼
             HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
-            HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
+                                                                                                    //HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
             HSCmdCenter.sgPageEvent.SetTransCancelEventAdd(groupID, TransCancelResult);             // 전송 취소 결과.
 
             strDestNetWork = strTotal;
@@ -614,6 +542,11 @@
 
     public async Task TransSearchCount()
     {
+        await TransSearchData(1);
+    }
+
+    public async Task TransSearchData(int pageNum)
+    {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -628,6 +561,13 @@
             return;
         }
 
+        if (!strTitleValue.ValidationSqlInjection())
+        {
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
+            return;
+        }
+        //int groupID = 0;
+
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
@@ -636,7 +576,6 @@
         curTransStatus = GetTransStatus();
         curApprStatus = GetApprStatus();
         curDataType = GetDataTypeCode();
-        string[] strArrClipDataType = curDataType.Equals("3") ? null : new string[] { curDataType };
 
         if (dicDestSysPos != null && dicDestSysPos.Count > 0)
             curDestNetWork = GetDestNetWorkSysID();
@@ -645,14 +584,12 @@
         byte[] temp = Encoding.Default.GetBytes(curTitle);
         curTitle = Encoding.UTF8.GetString(temp);
 
-        nViewPageNo = 1;
-
         await refPeriodDatePicker.RetriveDateFromJS();
         string curFromDay = refPeriodDatePicker.FromDateSearchValue;
         string curToDay = refPeriodDatePicker.ToDateSearchValue;
 
-        TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
-        string strQueryCount = "";
+
+        TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curDataType, curTitle, curFromDay, curToDay, curUserID, nPageListCount, pageNum);
 
         param.Src_system_id = "";
         param.Dest_system_id = "";
@@ -660,6 +597,7 @@
         // 3망상황일때
         if (dicDestSysPos != null && dicDestSysPos.Count > 0)
         {
+
             foreach (var item in dicDestSysPos)
             {
                 // src - 소스가 분명히 분리되어 계산될 대에만 사용
@@ -676,125 +614,13 @@
                         param.Src_system_id = "";
                 }
             }
-
-            TransferDao dao = new TransferDao();
-            param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
-            strQueryCount = dao.TotalCount(param, false);   // 쿼리 데이터 카운트
-        }
-        else
-        {
-            TransferDao dao = new TransferDao();
-            param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
-            strQueryCount = dao.TotalCount(param, false, strArrClipDataType);   // 쿼리 데이터 카운트
-            
         }
 
-        // 조회방식 변경
-        //HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
-        HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
+        Dictionary<string, object> dicTransListParams = GetAdTransferParam(param);
+
+        HSCmdCenter.SendFileTransInfo(groupID, dicTransListParams);
     }
 
-    public void TransSearchData(int pageNum)
-    {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        if (pageService.GetConnectStatus(groupID) == false)
-        {
-            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
-
-        Task.Run(async () => { await refPeriodDatePicker.RetriveDateFromJS(); });
-        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
-        string curToDay = refPeriodDatePicker.ToDateSearchValue;
-
-        TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, pageNum);
-        string strQuery = "";
-        param.Src_system_id = "";
-        param.Dest_system_id = "";
-        string[] strArrClipDataType = curDataType.Equals("3") ? null : new string[] { curDataType };
-
-
-        // 3망상황일때
-        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-        {
-
-            foreach (var item in dicDestSysPos)
-            {
-                // src
-                if (item.Value.nIdx == 0)
-                {
-                    param.Src_system_id = item.Value.strDestSysid;
-                }
-
-                // Dest
-                if (item.Key == strDestNetWork)
-                {
-                    param.Dest_system_id = item.Value.strDestSysid;
-                    if (param.Src_system_id == param.Dest_system_id)    // 현재망으로 수신된 경우만 검색
-                        param.Src_system_id = "";
-                }
-
-            }
-
-            TransferDao dao = new TransferDao();
-            param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
-            strQuery = dao.List(param, false);   // 쿼리 데이터 리스트
-        }
-        else
-        {
-            TransferDao dao = new TransferDao();
-            param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
-            strQuery = dao.List(param, false, strArrClipDataType);   // 쿼리 데이터 리스트
-        }
-
-        // 조회방식 변경
-        //HSCmdCenter.SendListQuery(groupID, curUserID, strQuery);
-        HSCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
-    }
-    @*
-
-        public void GetInitDateTime()
-        {
-        strToDay = DateTime.Now.ToString("yyyy-MM-dd");
-        string year = DateTime.Now.ToString("yyyy");
-        string month = DateTime.Now.ToString("MM");
-        string day = DateTime.Now.ToString("dd");
-        int nYear = Convert.ToInt32(year);
-        int nMonth = Convert.ToInt32(month);
-        int nDay = Convert.ToInt32(day);
-        System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
-        strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
-        }
-
-        private async Task RetriveDateFromJS()
-        {
-        object[] param = { "datepicker13" };
-        string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
-        if (vStr != null && vStr.Length > 0)
-        strFromDay = vStr;
-        object[] param2 = { "datepicker14" };
-        string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
-        if (vStr2 != null && vStr2.Length > 0)
-        strToDay = vStr2;
-        }
-
-        public async Task GetDateTime()
-        {
-        await RetriveDateFromJS();
-
-        char sep = '-';
-        string[] splitFrom = strFromDay.Split(sep);
-        curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
-        string[] splitTo = strToDay.Split(sep);
-        curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
-        }
-    *@
     /// <summary>
     /// 전송구분 가져오기
     /// </summary>
@@ -815,6 +641,27 @@
         return strValue;
     }
 
+    public Dictionary<string, object> GetAdTransferParam(TransferParam param)
+    {
+        string periodDate = $"{param.SearchFromDay}-{param.SearchToDay}";
+        string transStatue = param.TransStatus;
+        string title = param.Title;
+        string dataType = param.DataType;
+        string approveStatus = param.ApprStatus;
+        int pageNo = param.ViewPageNo;
+        int pageListCount = param.PageListCount;
+
+        Dictionary<string, object> dicParam = new Dictionary<string, object>();
+        dicParam.Add("period_date", periodDate);
+        dicParam.Add("trans_state", transStatue);
+        dicParam.Add("title", title);
+        dicParam.Add("data_type", dataType);
+        //dicParam.Add("period_date", approveStatus);
+        dicParam.Add("page_info", new Dictionary<string, object>() { { "page_no", pageNo }, { "page_limit", pageListCount } });
+
+        return dicParam;
+    }
+
     /// <summary>
     /// 전송상태 가져오기
     /// </summary>
@@ -824,17 +671,17 @@
         string strValue = "";
 
         if (strTransStatusValue.Equals(strTotal))                                 // 전체
-            strValue = "";
+            strValue = "all";
         else if (strTransStatusValue.Equals(strTransComplete))                      // PC수신완료
-            strValue = "S";
+            strValue = "received";
         else if (strTransStatusValue.Equals(strTransWait))                          // 전송대기
-            strValue = "W";
+            strValue = "wait";
         else if (strTransStatusValue.Equals(strTransCancle))                        // 전송취소
-            strValue = "C";
+            strValue = "cancel";
         else if (strTransStatusValue.Equals(strTransFail))                        // 전송실패
-            strValue = "F";
+            strValue = "fail";
         else if (strTransStatusValue.Equals(strTransInspect))                      // 검사중
-            strValue = "V";
+            strValue = "scanning";
         else
             strValue = "";
 
@@ -850,15 +697,15 @@
         string strValue = "";
 
         if (strApprStatusValue.Equals(strTotal))                                // 전체
-            strValue = "";
+            strValue = "all";
         else if (strApprStatusValue.Equals(strApprWait))                        // 승인대기
-            strValue = "1";
+            strValue = "wait";
         else if (strApprStatusValue.Equals(strApprove))                         // 승인
-            strValue = "2";
+            strValue = "confirm";
         else if (strApprStatusValue.Equals(strReject))                          // 반려
-            strValue = "3";
+            strValue = "reject";
         else if (strApprStatusValue.Equals(strApprCancle))                      // 요청취소
-            strValue = "4";
+            strValue = "cancel";
 
         return strValue;
     }
@@ -901,39 +748,30 @@
         string strValue = "";
 
         if (strDataTypeValue == XmlConf.GetTitle("T_DATA_TYPE_TEXT"))   //텍스트
-            strValue = "1";
+            strValue = "cliptxt";
         else if (strDataTypeValue == XmlConf.GetTitle("T_DATA_TYPE_IMAGE")) // 이미지
-            strValue = "2";
+            strValue = "clipimg";
         else
-            strValue = "3";
+            strValue = "clip";
 
         return strValue;
     }
 
-
-    public void SearchCount(int groupId, PageEventArgs e)
+    public void SearchCount(int count)
     {
-        string strMsg = e.strMsg;
-        if (e.result != 0)
+        if (count <= 0)
         {
-            ShowMessage("error", strMsg);
-            return;
-        }
-
-        if (e.count <= 0)
-        {
-            ShowMessage("warn", strMsg);            // 검색결과가 존재하지 않습니다.
+            ShowMessage("warn", "검색결과가 존재하지 않습니다.");            // 검색결과가 존재하지 않습니다.
             ListData.Clear();
 
 
             UpdateList(0);
-            SetPageinfo(e.count);
+            SetPageinfo(count);
             StateHasChanged();
             return;
         }
 
-        SetPageinfo(e.count);    // 페이징 계산
-        UpdateData();
+        SetPageinfo(count);    // 페이징 계산
     }
 
 
@@ -989,10 +827,14 @@
             return;
         }
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+        SGUserInfo sgUserInfo = (SGUserInfo)SGAppMgrSvc.UserInfoService.GetUserInfo(groupId);
+        List<SGNetOverData> destinationInfoList = sgLoginData.GetDestinationInfo(false);
+
         string curUserID = "";
+        string curUserSeq = sgUserInfo.UserSeq;
+
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
-
 
         ListData.Clear();
 
@@ -1001,48 +843,57 @@
         if (sgData == null)
             return;
 
+        int totalCount = sgData.GetSearchResultCount();
+        SearchCount(totalCount);
 
-        List<Dictionary<int, string>> TransSearchList = null;
+        List<object> TransSearchList = null;
+        //string strSelTransStatus = GetTransStatus();
+        //string strSelApprStatus = GetApprStatus();
+        //TransSearchList = sgData.GetSearchData(strSelTransStatus, strSelApprStatus);
         TransSearchList = sgData.GetQuerySearchData();
         int nCount = TransSearchList.Count;
 
-        for (int i = 0; i < nCount; i++)
+        int nowDate = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
+        foreach (object value in TransSearchList)
         {
-            Dictionary<int, string> dic = TransSearchList[i];
-            if (dic == null)
-                continue;
-
-            string tmpStr = "";
-            if (dic.TryGetValue(0, out tmpStr) != true)
-            {
-                if (tmpStr.Equals(""))
-                    continue;
-            }
-
-
+            object transReq = value.GetTagDataObject("trans_req");
+            List<object> forwordList = value.GetTagDataObjectList("forward_user_list");
+            object destinationInfo = value.GetTagDataObject("destination");
+            List<object> scanList = value.GetTagDataObjectList("scan_list");
             transData tData = new transData();
             tData.bCheck = false;
-            tData.bCheckDisable = !(sgData.GetTransCancelEnableChk(curUserID, dic));
-            tData.TransSeq = sgData.GetTransSeq(dic);                   // TransSeq;
-            tData.ApvType = sgData.GetApprKind(dic);                    // 결재종류 (선결/후결)
-            tData.TransferType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
-            tData.TransferStatus = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
-            tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
-            tData.IsFile = sgData.GetFileForwardKind(dic);              // 파일전달.
+            tData.bCheckDisable = !(sgData.GetTransCancelEnableChk(curUserSeq, transReq));
+            tData.TransSeq = sgData.GetTransSeq(transReq);                   // TransSeq;
+            tData.ApvType = sgData.GetApprKind(transReq);                    // 결재종류 (선결/후결)
+            tData.TransferType = sgData.GetTransKind(transReq);              // 전송구분 (반출/반입)
+            tData.TransferStatus = sgData.GetTransStatus(transReq);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
+            tData.ApvStatus = sgData.GetApprStatus(transReq);                 // 승인상태 (요청취소,승인대기,승인,반려)
+            tData.IsFile = sgData.GetFileForwardKind(forwordList, curUserSeq);              // 파일전달.
 
 
-            if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                tData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
+            if (destinationInfoList != null && destinationInfoList.Count > 0)
+                tData.strDestNet = sgData.GetDestNetworkName(destinationInfo, destinationInfoList);          // 목적지 값
 
-            tData.DataType = sgData.GetDataType(dic);
-            tData.Title = sgData.GetTitle(dic);                         // 제목
+            tData.Title = sgData.GetTitle(transReq);                         // 제목
             FileAddManage fileAddManage = new FileAddManage();
             tData.Title = fileAddManage.GetConvertTitleDesc(false, tData.Title);
-            tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
-            tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
-            tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
-            tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
-            tData.stDLP = sgData.GetDlp(dic);
+            tData.RequestTime = sgData.GetQueryTransReqDay(transReq);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+            tData.TransStatusCode = sgData.GetTransStatusCode(transReq);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
+            tData.ApprStatusCode = sgData.GetApprStatusCode(transReq);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
+            tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(transReq));  //다운로드 카운트
+            tData.expiredDate = sgData.GetExpiredDate(transReq);             //파일저장 만료일
+            tData.stDLP = sgData.GetDlp(transReq);
+            tData.requestUserName = sgData.GetRequestUserName(transReq);
+            tData.Desc = sgData.GetDesc(transReq);
+            tData.scanList = scanList;
+            List<FileInfoData> fileInfoList = new List<FileInfoData>();
+            sgData.GetFileInfo(value, out fileInfoList);
+            tData.fileInfoList = fileInfoList;
+            bool isVisibleFileApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupId);
+            tData.apprHisList = sgData.GetApproverInfoHist(value, isVisibleFileApproveReason);
+            tData.lastApprovalInfo = sgData.GetLastApprInfo(value, isVisibleFileApproveReason);
+            tData.forwordList = forwordList;
+            tData.DataType = sgData.GetDataType(value);
 
             ListData.Add(tData);
         }
@@ -1050,73 +901,6 @@
         UpdateInitList(nViewPageNo);
         StateHasChanged();
     }
-
-    @*public void SearchResult(int groupId, SGData e)
-        {
-        string result = e.GetTagData("RESULT");
-        string reason = e.GetTagData("REASON");
-        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
-        listData = e.GetSvrRecordData2("RECORD");
-
-        if (result != "0")
-        {
-        ShowMessage("error", XmlConf.GetWarnMsg("W_0242"));
-        return;
-        }
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupId);
-        string curUserID = "";
-        if (sgLoginData != null)
-        curUserID = sgLoginData.GetUserID();
-
-        ListData.Clear();
-
-        SGTransManageData sgData = null;
-        sgData = (SGTransManageData)HSCmdCenter.GetTransManageData(groupId);
-        //sgData = (SGTransManageData)e;
-
-        if (sgData == null)
-        return;
-
-        int nCount = listData.Count;
-
-        for (int i = 0; i < nCount; i++)
-        {
-        Dictionary<int, string> dic = listData[i];
-        if (dic == null)
-        continue;
-
-        string tmpStr = "";
-        if (dic.TryGetValue(0, out tmpStr) != true)
-        {
-        if (tmpStr.Equals(""))
-        continue;
-        }
-
-        clipBoardData tData = new clipBoardData();
-        tData.TransSeq = sgData.GetTransSeq(dic);                   // TransSeq;
-        tData.ApvType = sgData.GetApprKind(dic);                    // 결재종류 (선결/후결)
-        tData.TransType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
-        tData.TransStatus = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
-        tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
-
-        //if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-        //    tData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
-
-        tData.Title = sgData.GetTitle(dic);                         // 제목
-        FileAddManage fileAddManage = new FileAddManage();
-        tData.Title = fileAddManage.GetConvertTitleDesc(false, tData.Title);
-        tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
-        tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
-        tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
-        tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
-        tData.stDLP = sgData.GetDlp(dic);
-        tData.DataType = sgData.GetDataType(dic);   //데이터타입
-        ListData.Add(tData);
-        }
-
-        UpdateInitList(nViewPageNo);
-        StateHasChanged();
-        }*@
 
     public void SetPageinfo(int nDataCount)
     {
@@ -1153,49 +937,6 @@
             }
         }
         return tdata;
-    }
-
-    public class clipBoardData
-    {
-
-        public bool bCheckDisable { get; set; }           //체크 가능 불가능
-        public bool bCheck { get; set; }                  //체크 상태
-
-        public string TransSeq { get; set; }
-        public string ApvType { get; set; }
-        public string TransType { get; set; }
-        public string TransStatus { get; set; }
-        public string ApvStatus { get; set; }
-        public string DataType { get; set; }
-        public string Title { get; set; }                   //제목
-        public string RequestTime { get; set; }
-        public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
-        public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
-        public int downloadCount { get; set; }              //다운로드 카운트
-        public string stDLP { get; set; }                   //개인정보 포함여부
-
-
-        public clipBoardData()
-        {
-            bCheckDisable = bCheck = false;
-            TransSeq = ApvType = TransType = TransStatus = ApvStatus = Title = RequestTime = "";
-            //strDestNet = "";
-        }
-
-        public clipBoardData(string seq, string apvtype, string transtype, string transstatus, string apvstatus, string datatype, string title, string requesttime, string strTransStatusCode, string strApprStatusCode, string strDestNetData)
-        {
-            TransSeq = seq;
-            ApvType = apvtype;
-            TransType = transtype;
-            TransStatus = transstatus;
-            ApvStatus = apvstatus;
-            DataType = datatype;
-            Title = title;
-            RequestTime = requesttime;
-            TransStatusCode = strTransStatusCode;
-            ApprStatusCode = strApprStatusCode;
-            // strDestNet = strDestNetData;
-        }
     }
 
     private void HomeMove()

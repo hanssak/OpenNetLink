@@ -2849,13 +2849,13 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestDeptInfo(hsNetWork, groupid, strUserID);
             return -1;
         }
-
-        public int SendFileTransInfo(int groupid, string strUserID, string strFromDate, string strToDate, string strTransKind, string strTransStatus, string strApprStatus, string strDlp, string strTitle, string strDataType)
+        //전송 리스트 조회
+        public int SendFileTransInfo(int groupid, Dictionary<string, object> body)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestFileTransList(hsNetWork, groupid, strUserID, strFromDate, strToDate, strTransKind, strTransStatus, strApprStatus, strDlp, strTitle, strDataType);
+                return sgSendData.RequestFileTransList(hsNetWork, body);
             return -1;
         }
         public int SendFileApprInfo(int groupid, string strUserID, string strFromDate, string strToDate, string strApprKind, string strTransKind, string strApprStatus, string strReqUserName, string strDlp, string strTitle, string strDlpApprove, string strApprover, string strDataType)

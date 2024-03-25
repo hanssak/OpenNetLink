@@ -4,6 +4,8 @@
 @using System.Diagnostics
 @using OpenNetLinkApp.PageEvent
 @using HsNetWorkSGData
+@using OpenNetLinkApp.Data.SGDicData.Approve
+@using HsNetWorkSG
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -269,7 +271,7 @@
     public string strPreworkStep = "";                        //검사단계표시
 
     public bool m_bTransCancel;                             // 전송취소 가능 상태 여부
-    public long m_transSeq = 0;
+    public string m_transSeq = "";
 
     const string preworkCompleteBackColor = "#58BBF0";           //검사단계 완료인 항목 배경색
     const string preworkScanningBackColor = "#BFE8FA";           //검사단계 검사 중인 항목 배경색
@@ -291,26 +293,13 @@
     ISGAppConfigService sgAppConfig;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<ClipboardManagePopUp>();
 
+    public transData data = null;
+
     public bool bUseDlpDataView = true;
 
 
-    public async Task openPopUp(long seq)
+    public async Task openPopUp()
     {
-        m_transSeq = seq;
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
-            return;
-        string strUserID = sgLoginData.GetUserID();
-
-        // 파일다운로드할때만 사용해야함
-        //HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
-
         object[] param = { "ClipboardManagePopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -339,6 +328,7 @@
 
     public void SetBindingData(string dataType)
     {
+        bApprHistHidden = false;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -349,18 +339,13 @@
         if (sgDetailData == null)
             return;
 
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
-            return;
-
-        strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
-        strDataTransStatus = sgDetailData.GetTransStatus();
-
-        //검사단계표시 설정
-        SetPreworkInfo(sgDetailData.GetPreworkStep(), sgDetailData.GetBasicTagData("TRANSSTATUS"));
+        m_transSeq = data.TransSeq;
+        strDataTransKind = data.TransferType;                                     // 전송구분
+                                                                                  //검사단계표시 설정
+        SetPreworkInfo(data.scanList, data.TransferStatus);
 
         Dictionary<string, SGNetOverData> dicDestSysPos = null;
-
+        //파일위치
         dicDestSysPos = pageService.GetTargetSystemList(groupID);
         if (dicDestSysPos != null && dicDestSysPos.Count > 1)  // && strFromServerNetOver.Length > 0 && strDestServerNetOver.Length > 0)
             strDataFilePos = sgDetailData.GetFilePosNetOver(dicDestSysPos); // 파일위치(3망연계상황)
@@ -368,27 +353,23 @@
             strDataFilePos = sgDetailData.GetFilePosByRealName(groupID);
         //strDataFilePos = sgDetailData.GetFilePos();                                     // 파일위치
 
-        strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
-        strDataApprStatus = sgDetailData.GetApprStatus();
-        strDataApprReqUser = sgDetailData.GetReqUser();                                     // 승인요청자
-        strDataApprStatusCode = sgDetailData.GetApprStatusCode();                           // 승인상태
-        strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
-        strDataTitle = sgDetailData.GetTitle();                                             // 제목
+        strDataApprKind = data.ApvType;                                       // 승인구분
+        strDataApprStatus = data.ApvStatus;                                        //승인상태
+        strDataApprReqUser = data.requestUserName;                                      // 승인요청자
+        strDataApprStatusCode = data.ApprStatusCode;                             // 승인상태 코드
+        strDataApprReqDay = data.RequestTime;                                   // 승인요청일
+        strDataTitle = data.Title;                                             // 제목
         FileAddManage fileAddManage = new FileAddManage();
         strDataTitle = fileAddManage.GetConvertTitleDesc(false, strDataTitle);
-        strDataDesc = sgDetailData.GetDesc();                                              // 설명
+        strDataDesc = data.Desc;                                              // 설명
         strDataDesc = fileAddManage.GetConvertTitleDesc(false, strDataDesc);
-        strDLP = sgDetailData.GetDLP(); //개인정보
-        strDataDataType = dataType; //데이타 타입
-        int DataApproveStep = sgLoginData.GetApproveStep(); //결재유형(AND,OR,ANDOR)
-
-        sgDetailData.GetFileInfo(out mFileData);
-        if (mFileData == null)
-            return;
+        strDLP = data.stDLP;                                                  //개인정보
+        mFileData = data.fileInfoList;
+        strDataDataType = data.DataType;
 
         List<ApproverHist> apprListHist = null;
-        bool isVisibleClipBoardApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason(groupID);
-        apprListHist = sgDetailData.GetApproverInfoHist(isVisibleClipBoardApproveReason);
+        bool isVisibleFileApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID);
+        apprListHist = data.apprHisList;
         if ((apprListHist == null) || (apprListHist.Count <= 1))
         {
             bApprHistHidden = true;
@@ -399,58 +380,17 @@
         }
         else
         {
-            ApproverHist apprHist = null;
-            apprHist = sgDetailData.GetTransLastApproverHistData(apprHist, DataApproveStep, strDataApprStatusCode, isVisibleClipBoardApproveReason);
-            if (apprHist == null)
-                strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
-            else
-            {
-                strDataLastApprName = apprHist.m_strApproverName;
-                strDataLastApprStatus = apprHist.m_strApprStatus;
-                strDataLastApprDay = apprHist.m_strApprDay;
-                if ((!strDataLastApprDay.Equals("")) && (!strDataLastApprDay.Equals("-")))
-                    strDataLastApprDay = sgDetailData.GetConvertDay(strDataLastApprDay);
-                strDataLastApprRejectReason = apprHist.m_strRejectReason;
-            }
-        }
 
-        //OR 결재 승인상태 교정 시작 2021/06/28 YKH
-        //같은 결재 단계에 여러명이 존재하고 그중 한명이 승인상태라면 승인상태 제외한 나머지는 요청취소로 승인상태문구를 변경해준다.
-        //최종 스탭 결정
-        if (apprListHist != null && apprListHist.Count > 0)
-        {
-            int nMaxStep = 1;
-            foreach (ApproverHist data in apprListHist)
-            {
-                if (nMaxStep < data.m_nApprStep)
-                    nMaxStep = data.m_nApprStep;
-            }
-            //각 스텝별 승인여부 확인
-            for (int i = 1; i <= nMaxStep; i++)
-            {
-                bool bApproveFlag = false;
-                for (int j = 0; j < apprListHist.Count; j++)
-                {
-                    ApproverHist appr = apprListHist[j];
-                    if (appr.m_nApprStep != i)
-                        continue;
-                    if (appr.m_strApprStatus == XmlConf.GetTitle("T_COMMON_APPROVE"))
-                        bApproveFlag = true;
-                }
-                if (bApproveFlag == true)
-                {
-                    for (int j = 0; j < apprListHist.Count; j++)
-                    {
-                        ApproverHist appr = apprListHist[j];
-                        if (appr.m_nApprStep != i)
-                            continue;
-                        if (appr.m_strApprStatus != XmlConf.GetTitle("T_COMMON_APPROVE"))
-                            appr.m_strApprStatus = XmlConf.GetTitle("T_COMMON_WORKCOMPLETE");
-                    }
-                }
-            }
+            ApprovalInfo lastApprovalInfo = data.lastApprovalInfo;
+
+            strDataLastApprStatus = lastApprovalInfo.ApproveStatusName;
+            strDataLastApprName = lastApprovalInfo.UserName;
+            strDataLastApprDay = lastApprovalInfo.ApproveTime;
+            strDataLastApprRejectReason = lastApprovalInfo.ApproveReason;
+            if (strDataLastApprRejectReason.Length > 100)
+                strDataLastApprRejectReason = strDataLastApprRejectReason.Substring(0, 100) + "\n" + strDataLastApprRejectReason.Substring(101);
+
         }
-        //OR 결재 승인 상태 교정 종료
 
         if (apprListHist != null)
         {
@@ -465,7 +405,7 @@
             }
         }
 
-        m_bTransCancel = !(sgDetailData.GetTransCancelEnable());
+        m_bTransCancel = !data.bCheckDisable;
         StateHasChanged();
     }
 
@@ -635,7 +575,7 @@
                 return;
             string strUserID = sgLoginData.GetUserID();
 
-            HSCmdCenter.SendDownloadCount(groupID, strUserID, m_transSeq.ToString());
+            HSCmdCenter.SendDownloadCount(groupID, strUserID, m_transSeq);
         }
     }
 
@@ -652,36 +592,64 @@
     /// </summary>
     /// <param name="getPreworkStep"></param>
     /// <param name="getTransStatusFlag"></param>
-    public void SetPreworkInfo(string getPreworkStep, string getTransStatusFlag)
+    public void SetPreworkInfo(List<object> scanList, string getTransStatusFlag)
     {
         listPreworkInfo.Clear();
 
-        if (getTransStatusFlag != "V")         //검사상태 진행 표시는 해당 전송항목의 전송상태가 '검사중' 일때만 표시
-            return;
-        if (string.IsNullOrEmpty(getPreworkStep) || !getPreworkStep.Contains('/'))
+        if (getTransStatusFlag != "scanning")         //검사상태 진행 표시는 해당 전송항목의 전송상태가 '검사중' 일때만 표시
             return;
 
-        string scanList = getPreworkStep.Split('/')[0];
-        string scanningValue = getPreworkStep.Split('/')[1];
         bool isSetScanning = false;
-        foreach (char scan in scanList)
+        foreach (object scan in scanList)
         {
+            string scanType = scan.GetTagDataString("scan_type");
+
+            object scanResult = scan.GetTagDataObject("scan_result");
+            string scanStatus = scanResult.GetTagDataString("scan_state");
+
             string preworkName = XmlConf.GetTitle($"T_ETC_PREWORK_INTERLOCKFLAG_{scan}");
 
-            if (scanningValue == "0")      // 모두 검사완료된 상태 (모두 '완료' 로 표시)
+            if (scanStatus == "scanning")
             {
-                listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_END"), preworkCompleteBackColor));
+                listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_ING"), preworkScanningBackColor));
+                isSetScanning = true;
             }
-            else if (isSetScanning)          //검사중인 prework를 이미 찾은 상태 (이후 항목은 모두 '대기'로 표시)
+            else
             {
-                listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_WAIT"), preworkWaitBackColor));
-            }
-            else                            // 검사중인 prework 확인 (일치하면 '검사 중'으로 표시, 일치하지 않으면 이전 항목들이므로 '완료'로 표시)
-            {
-                listPreworkInfo.Add((scan.ToString() == scanningValue) ? new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_ING"), preworkScanningBackColor)
-                                                                        : new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_END"), preworkCompleteBackColor));
+                if (isSetScanning)
+                {
+                    listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_WAIT"), preworkWaitBackColor));
+                }
+                else
+                {
+                    listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_END"), preworkCompleteBackColor));
+                }
             }
         }
+
+
+        //string preworkName = XmlConf.GetTitle($"T_ETC_PREWORK_INTERLOCKFLAG_{scan}");
+
+        //if (scanningValue == "0")      // 모두 검사완료된 상태 (모두 '완료' 로 표시)
+        //{
+        //    listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_END"), preworkCompleteBackColor));
+        //}
+        //else if (isSetScanning)          //검사중인 prework를 이미 찾은 상태 (이후 항목은 모두 '대기'로 표시)
+        //{
+        //    listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_WAIT"), preworkWaitBackColor));
+        //}
+        //else                            // 검사중인 prework 확인 (일치하면 '검사 중'으로 표시, 일치하지 않으면 이전 항목들이므로 '완료'로 표시)
+        //{
+        //    if (scan.ToString() == scanningValue)
+        //    {
+        //        listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_ING"), preworkScanningBackColor));
+        //        isSetScanning = true;
+        //    }
+        //    else
+        //    {
+        //        listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_END"), preworkCompleteBackColor));
+        //    }
+        //}
     }
 
     public void DetailTransCancel()

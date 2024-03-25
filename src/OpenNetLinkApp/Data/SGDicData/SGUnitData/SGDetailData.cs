@@ -1308,6 +1308,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public List<object> scanList { get; set; }                // 파일 검사 결과
 
+        public List<object> forwordList { get; set; }              //포워드 리스트
+
         public List<FileInfoData> fileInfoList { get; set; }      //파일 정보 리스트
 
         public List<ApproverHist> apprHisList { get; set; }       //결재정보 리스트

@@ -1,10 +1,13 @@
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGDicData.Approve
 @using System.Runtime.InteropServices
 @using System.Diagnostics
 @using OpenNetLinkApp.PageEvent
 @using HsNetWorkSGData
 @using AgLogManager
+@using HsNetWorkSG
+
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -164,7 +167,7 @@
                                 @if (bUseDlpDataView)
                                 {
                                     <th style="text-align:center;width:15%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
- <!--개인정보 내역-->
+                                    <!--개인정보 내역-->
                                 }
 
                             </tr>
@@ -372,6 +375,8 @@
     public string m_downMaxCurr = "";
     private bool m_bFileDownloading = false;
     public int m_nDataForwarded = -1;
+
+    public transData data = null;
     ISGAppConfigService sgAppConfig;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransPopUp>();
 
@@ -383,27 +388,14 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        string curUserID = "";
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-
-        SGDetailData sgDetailData = null;
-        sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
-        if (sgDetailData == null)
-            return;
-
-        HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
-        string curTransSeq = sgDetailData.GetTransSeq();
         ShowProgress(groupID, 1, 0, "DOWNLOAD");
-         
-        HSCmdCenter.RestManualDownload(groupID, sgDetailData.GetTransSeq());
+
+        HSCmdCenter.RestManualDownload(groupID, data.TransSeq);
         return;
     }
 
     public void FileDownloadProgressNoti(int groupID, PageEventArgs e)
     {
-
         CLog.Here().Information($"TransPopUp - FileDownloadProgressNoti - groupID : {groupID} - (#####)");
 
         string strMsg = "";
@@ -553,25 +545,8 @@
             HSCmdCenter.SendDownloadCount(groupID, strUserID, m_transSeq.ToString());
         }
     }
-    public async Task openPopUp(long seq)
+    public async Task openPopUp()
     {
-        m_transSeq = seq;
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
-            return;
-        string strUserID = sgLoginData.GetUserID();
-
-        HSCmdCenter.sgPageEvent.SetDownloadCountEventAdd(groupID, ReceiveDownloadCount);
-        HSCmdCenter.SendDownloadCount(groupID, strUserID, seq.ToString());
-
-        await Task.Delay(300);  // download개수 정보 필요
-
         object[] param = { "TransPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -679,124 +654,13 @@
         if (sgDetailData == null)
             return;
 
-        strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
-        //strDataTransStatus = sgDetailData.GetTransStatus();                                 // 전송상태
-
-        //검사단계표시 설정
-        SetPreworkInfo(sgDetailData.GetPreworkStep(), sgDetailData.GetBasicTagData("TRANSSTATUS"));
-
-        CLog.Here().Information($"DetailData- ##### - TranSeq : {sgDetailData.GetTransSeq()}");
-
-        //*************************************************************************************************************************
-        //수동다운로드 가능여부 판단 2021/05/24 YKH 시작
-        //수동다운로드를 위해 전송완료되서 다운로드 할 위치 접근한것인지 확인
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        bool isManualDownLoad = sgLoginData.GetManualDownload();
-        bool isForwardAutoDown = sgLoginData.GetForwardAutoDown() == "1" ? true : false;
-
-        bool bInner = false;
-
-        if (sgLoginData != null)
-            bInner = sgLoginData.GetSystemPosition();   // 망구분 true : 내부, false : 외부
-
-        if (!bInner && strDataTransKind == XmlConf.GetTitle("T_COMMON_EXPORT"))
-            m_bNetDownloadable = true;
-        else if (bInner && strDataTransKind == XmlConf.GetTitle("T_COMMON_IMPORT"))
-            m_bNetDownloadable = true;
-
-        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (IN/EX : {bInner.ToString()}, IN/EX Title : {strDataTransKind})");
-
-
-        //수동다운로드는 요청자가 PC수신완료 됐을 경우에만 다운로드 가능 (!!!승인여부가 아닌 요청자 PC수신여부!!!)
-        //하지만 사용자 옵션으로 요청자 PC미수신시에도 다운가능하도록 변경하면 다운로드 버튼 보여짐
-        //bFileDownloadBeforeReciving  true : 요청자 PC미수신시에도 다운로드 가능   false : 요청자 PC미수신 시 다운로드 불가
-        if (m_bNetDownloadable)
-        {
-            //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
-            //if (sgAppConfig.GetFileDownloadBeforeReciving())
-            // GetUseFileForwardDownBeforeRecv
-            if (sgDetailData.m_nDataForwarded == 2)
-            {
-                if (!isForwardAutoDown)
-                {
-                    if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || strDataTransStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
-                        m_bNetDownloadable = true;
-                    else
-                        m_bNetDownloadable = false;
-                }
-                else
-                {
-                    //수동다운로드 이므로 PC수신완료 건만 다운가능
-                    if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
-                        m_bNetDownloadable = true;
-                    else
-                        m_bNetDownloadable = false;
-                }
-            }
-            else
-            {
-                if (isManualDownLoad)
-                {
-                    if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || strDataTransStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
-                        m_bNetDownloadable = true;
-                    else
-                        m_bNetDownloadable = false;
-                }
-                else
-                {
-                    //수동다운로드 이므로 PC수신완료 건만 다운가능
-                    if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
-                        m_bNetDownloadable = true;
-                    else
-                        m_bNetDownloadable = false;
-                }
-            }
-        }
-
-        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataTransStatus : {strDataTransStatus})");
-        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileDownloadBeforeReciving : {SGAppMgrSvc.OpConfigInfoService.GetFileDownloadBeforeReciving(groupID).ToString()})");
-        //CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileDownloadBeforeReciving : {sgAppConfig.GetFileDownloadBeforeReciving().ToString()})");
-
-        int expireDate = Int32.Parse(sgDetailData.GetExpiredDay());
-        int nowDate = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
-        if (m_bNetDownloadable)
-        {
-            if (expireDate >= nowDate)
-                m_bNetDownloadable = true;
-            else
-                m_bNetDownloadable = false;
-        }
-
-        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (expireDate : {expireDate.ToString()}, nowDate : {nowDate})");
-
-        //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
-        int maxDownCount = 0;
-        if (sgDetailData.m_nDataForwarded == 2)
-            maxDownCount = 1;
-        else
-            maxDownCount = sgLoginData.GetMaxDownCount();
-
-        m_downMaxCurr = $"{XmlConf.GetTitle("T_ETC_DOWNLOADCOUNT")} : {m_downloadCount} / {maxDownCount}";
-
-        if (maxDownCount == 0)
-            m_bNetDownloadable = false;
-
-        if (m_bNetDownloadable && maxDownCount > 0)
-        {
-            if (m_downloadCount < maxDownCount)
-                m_bNetDownloadable = true;
-            else
-                m_bNetDownloadable = false;
-        }
-
-        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (NowDownload-Count:{m_downloadCount}, MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
-
-        //수동다운로드 가능여부 판단 2021/05/24 YKH 종료
-        //*************************************************************************************************************************
-
+        strDataTransKind = data.TransferType;                                     // 전송구분
+                                                                                  //검사단계표시 설정
+        SetPreworkInfo(data.scanList, data.TransferStatus);
+        m_bNetDownloadable = data.isPossibleDownload;
 
         Dictionary<string, SGNetOverData> dicDestSysPos = null;
-
+        //파일위치
         dicDestSysPos = pageService.GetTargetSystemList(groupID);
         if (dicDestSysPos != null && dicDestSysPos.Count > 1)  // && strFromServerNetOver.Length > 0 && strDestServerNetOver.Length > 0)
             strDataFilePos = sgDetailData.GetFilePosNetOver(dicDestSysPos); // 파일위치(3망연계상황)
@@ -804,35 +668,22 @@
             strDataFilePos = sgDetailData.GetFilePosByRealName(groupID);
         //strDataFilePos = sgDetailData.GetFilePos();                                     // 파일위치
 
-        strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
-        strDataApprStatus = sgDetailData.GetApprStatus();
-        strDataApprReqUser = sgDetailData.GetReqUser();                                     // 승인요청자
-        strDataApprStatusCode = sgDetailData.GetApprStatusCode();                           // 승인상태
-        strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
-        strDataTitle = sgDetailData.GetTitle();                                             // 제목
+        strDataApprKind = data.ApvType;                                       // 승인구분
+        strDataApprStatus = data.ApvStatus;                                        //승인상태
+        strDataApprReqUser = data.requestUserName;                                      // 승인요청자
+        strDataApprStatusCode = data.ApprStatusCode;                             // 승인상태 코드
+        strDataApprReqDay = data.RequestTime;                                   // 승인요청일
+        strDataTitle = data.Title;                                             // 제목
         FileAddManage fileAddManage = new FileAddManage();
         strDataTitle = fileAddManage.GetConvertTitleDesc(false, strDataTitle);
-        strDataDesc = sgDetailData.GetDesc();                                              // 설명
+        strDataDesc = data.Desc;                                              // 설명
         strDataDesc = fileAddManage.GetConvertTitleDesc(false, strDataDesc);
-        strDLP = sgDetailData.GetDLP(); //개인정보
-        int DataApproveStep = sgLoginData.GetApproveStep(); //결재유형(AND,OR,ANDOR)
-
-        //APPROVESTATUS (결재상태) :   1 : 승인대기(결재대기)   2 : 승인(결재완료)    3 : 거부(반려)  값없음 : 전체
-        //승인이 되기 전에는 서버로부터 다운로드 불가하므로 다운로드 버튼도 보이지 않게 처리
-        if (m_bNetDownloadable && (strDataApprStatusCode != "2" || strDataApprStatusCode == ""))
-        {
-            m_bNetDownloadable = false;
-        }
-
-        CLog.Here().Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataApprStatus : {strDataApprStatus}, strDataApprStatusCode : {strDataApprStatusCode})");
-
-        sgDetailData.GetFileInfo(out mFileData);
-        if (mFileData == null)
-            return;
+        strDLP = data.stDLP;                                                  //개인정보
+        mFileData = data.fileInfoList;
 
         List<ApproverHist> apprListHist = null;
         bool isVisibleFileApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID);
-        apprListHist = sgDetailData.GetApproverInfoHist(isVisibleFileApproveReason);
+        apprListHist = data.apprHisList;
         if ((apprListHist == null) || (apprListHist.Count <= 1))
         {
             bApprHistHidden = true;
@@ -843,58 +694,17 @@
         }
         else
         {
-            ApproverHist apprHist = null;
-            apprHist = sgDetailData.GetTransLastApproverHistData(apprHist, DataApproveStep, strDataApprStatusCode, isVisibleFileApproveReason);
-            if (apprHist == null)
-                strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
-            else
-            {
-                strDataLastApprName = apprHist.m_strApproverName;
-                strDataLastApprStatus = apprHist.m_strApprStatus;
-                strDataLastApprDay = apprHist.m_strApprDay;
-                if ((!strDataLastApprDay.Equals("")) && (!strDataLastApprDay.Equals("-")))
-                    strDataLastApprDay = sgDetailData.GetConvertDay(strDataLastApprDay);
-                strDataLastApprRejectReason = apprHist.m_strRejectReason;
-            }
-        }
 
-        //OR 결재 승인상태 교정 시작 2021/06/28 YKH
-        //같은 결재 단계에 여러명이 존재하고 그중 한명이 승인상태라면 승인상태 제외한 나머지는 요청취소로 승인상태문구를 변경해준다.
-        //최종 스탭 결정
-        if (apprListHist != null && apprListHist.Count > 0)
-        {
-            int nMaxStep = 1;
-            foreach (ApproverHist data in apprListHist)
-            {
-                if (nMaxStep < data.m_nApprStep)
-                    nMaxStep = data.m_nApprStep;
-            }
-            //각 스텝별 승인여부 확인
-            for (int i = 1; i <= nMaxStep; i++)
-            {
-                bool bApproveFlag = false;
-                for (int j = 0; j < apprListHist.Count; j++)
-                {
-                    ApproverHist appr = apprListHist[j];
-                    if (appr.m_nApprStep != i)
-                        continue;
-                    if (appr.m_strApprStatus == XmlConf.GetTitle("T_COMMON_APPROVE"))
-                        bApproveFlag = true;
-                }
-                if (bApproveFlag == true)
-                {
-                    for (int j = 0; j < apprListHist.Count; j++)
-                    {
-                        ApproverHist appr = apprListHist[j];
-                        if (appr.m_nApprStep != i)
-                            continue;
-                        if (appr.m_strApprStatus != XmlConf.GetTitle("T_COMMON_APPROVE"))
-                            appr.m_strApprStatus = XmlConf.GetTitle("T_COMMON_WORKCOMPLETE");
-                    }
-                }
-            }
+            ApprovalInfo lastApprovalInfo = data.lastApprovalInfo;
+
+            strDataLastApprStatus = lastApprovalInfo.ApproveStatusName;
+            strDataLastApprName = lastApprovalInfo.UserName;
+            strDataLastApprDay = lastApprovalInfo.ApproveTime;
+            strDataLastApprRejectReason = lastApprovalInfo.ApproveReason;
+            if (strDataLastApprRejectReason.Length > 100)
+                strDataLastApprRejectReason = strDataLastApprRejectReason.Substring(0, 100) + "\n" + strDataLastApprRejectReason.Substring(101);
+
         }
-        //OR 결재 승인 상태 교정 종료
 
         if (apprListHist != null)
         {
@@ -909,9 +719,31 @@
             }
         }
 
-        m_bTransCancel = (!sgDetailData.GetTransCancelEnable());
+        m_bTransCancel = !data.bCheckDisable;
+        //송신자, 수신자
+        if (data.IsFile == "수신")
+        {
+            m_nDataForwarded = 2;
+            strDataForwardReciver = data.requestUserName;
+            strReciver = XmlConf.GetTitle("T_ETC_FORWARDSEND"); // 전송자
+        }
+        else
+        {
+            if (data.forwordList.Count > 0)
+            {
+                if (data.forwordList.Count > 1)
+                {
+                    strDataForwardReciver = String.Format(XmlConf.GetInfoMsg("I_0083"), data.forwordList[0].GetTagDataString("name"), data.forwordList.Count - 1);
+                }
+                else
+                {
+                    strDataForwardReciver = $"{data.forwordList[0].GetTagDataString("name")} {data.forwordList[0].GetTagDataString("position")}";
+                }
+                m_nDataForwarded = 1;
+                strReciver = XmlConf.GetTitle("T_ETC_RECIVER"); // 수신자
+            }
+        }
 
-        SetForwardInfo(sgDetailData);
         StateHasChanged();
     }
 
@@ -953,49 +785,38 @@
         strPreworkStep = XmlConf.GetTitle("T_ETC_PREWORK_STATUS");                          //검사상태
     }
 
-    public void SetForwardInfo(SGDetailData sgDetailData)
-    {
-        listForwaredUserInfo = sgDetailData.GetForwardUserInfo();
-        m_nDataForwarded = sgDetailData.m_nDataForwarded;
-        strDataForwardReciver = GetForwardList(listForwaredUserInfo);  //파일 포워딩 수신자 리스트
-        strReciver = sgDetailData.GetFowardTitle();
-    }
-
     /// <summary>
     /// 해당 전송 데이터의 전송상태가 '검사중' 일때, 검사단계 표시 (검사중이 아니면 표시 안함)
     /// </summary>
     /// <param name="getPreworkStep"></param>
     /// <param name="getTransStatusFlag"></param>
-    public void SetPreworkInfo(string getPreworkStep, string getTransStatusFlag)
+    public void SetPreworkInfo(List<object> scanList, string getTransStatusFlag)
     {
         listPreworkInfo.Clear();
 
-        if (getTransStatusFlag != "V")         //검사상태 진행 표시는 해당 전송항목의 전송상태가 '검사중' 일때만 표시
-            return;
-        if (string.IsNullOrEmpty(getPreworkStep) || !getPreworkStep.Contains('/'))
+        if (getTransStatusFlag != "scanning")         //검사상태 진행 표시는 해당 전송항목의 전송상태가 '검사중' 일때만 표시
             return;
 
-        string scanList = getPreworkStep.Split('/')[0];
-        string scanningValue = getPreworkStep.Split('/')[1];
         bool isSetScanning = false;
-        foreach (char scan in scanList)
+        foreach (object scan in scanList)
         {
+            string scanType = scan.GetTagDataString("scan_type");
+
+            object scanResult = scan.GetTagDataObject("scan_result");
+            string scanStatus = scanResult.GetTagDataString("scan_state");
+
             string preworkName = XmlConf.GetTitle($"T_ETC_PREWORK_INTERLOCKFLAG_{scan}");
 
-            if (scanningValue == "0")      // 모두 검사완료된 상태 (모두 '완료' 로 표시)
+            if (scanStatus == "scanning")
             {
-                listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_END"), preworkCompleteBackColor));
+                listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_ING"), preworkScanningBackColor));
+                isSetScanning = true;
             }
-            else if (isSetScanning)          //검사중인 prework를 이미 찾은 상태 (이후 항목은 모두 '대기'로 표시)
+            else
             {
-                listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_WAIT"), preworkWaitBackColor));
-            }
-            else                            // 검사중인 prework 확인 (일치하면 '검사 중'으로 표시, 일치하지 않으면 이전 항목들이므로 '완료'로 표시)
-            {
-                if(scan.ToString() == scanningValue)
+                if (isSetScanning)
                 {
-                    listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_ING"), preworkScanningBackColor));
-                    isSetScanning = true;
+                    listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_WAIT"), preworkWaitBackColor));
                 }
                 else
                 {
@@ -1003,6 +824,30 @@
                 }
             }
         }
+
+
+        //string preworkName = XmlConf.GetTitle($"T_ETC_PREWORK_INTERLOCKFLAG_{scan}");
+
+        //if (scanningValue == "0")      // 모두 검사완료된 상태 (모두 '완료' 로 표시)
+        //{
+        //    listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_END"), preworkCompleteBackColor));
+        //}
+        //else if (isSetScanning)          //검사중인 prework를 이미 찾은 상태 (이후 항목은 모두 '대기'로 표시)
+        //{
+        //    listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_WAIT"), preworkWaitBackColor));
+        //}
+        //else                            // 검사중인 prework 확인 (일치하면 '검사 중'으로 표시, 일치하지 않으면 이전 항목들이므로 '완료'로 표시)
+        //{
+        //    if (scan.ToString() == scanningValue)
+        //    {
+        //        listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_ING"), preworkScanningBackColor));
+        //        isSetScanning = true;
+        //    }
+        //    else
+        //    {
+        //        listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_END"), preworkCompleteBackColor));
+        //    }
+        //}
     }
 
     public void DetailTransCancel()
@@ -1021,12 +866,9 @@
             return;
         }
 
-        SGDetailData sgDetailData = null;
-        sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
-        if (sgDetailData == null)
-            return;
 
-        string curTransSeq = sgDetailData.GetTransSeq();
+
+        string curTransSeq = data.TransSeq;
 
         /*SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         string curUserID = "";
@@ -1038,6 +880,7 @@
         HSCmdCenter.SendTransCancel(groupID, curUserID, curTransSeq, curAction, curReason);*/
 
         HSCmdCenter.RestSendTransCancel(groupID, curTransSeq, "file");
+        data.bCheckDisable = true;
 
         closePopUp();
     }
@@ -1048,39 +891,5 @@
         string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
-    }
-
-    private string GetForwardList(List<Dictionary<int, string>> listForwaredUsers)
-    {
-        string strFirstName = "";
-        string strPostion = "";
-        string strText = "";
-        strDataForwardReciver = "";
-        listForwaredUserInfo = listForwaredUsers;
-
-        if (listForwaredUserInfo == null)
-            return "";
-
-        listForwaredUserInfo[0].TryGetValue(0, out strFirstName);
-        listForwaredUserInfo[0].TryGetValue(1, out strPostion);
-
-        //데이터 포워딩 여부  0 : 포워딩한 사용자가 없음, 1 : 포워딩한 사용자가 있음. 2 : 포워딩받은 사용자.
-        if (m_nDataForwarded == 1)
-        {
-            if (listForwaredUserInfo.Count > 1)
-            {
-                strText = String.Format(XmlConf.GetInfoMsg("I_0083"), strFirstName, (listForwaredUserInfo.Count - 1).ToString());
-            }
-            else if (listForwaredUserInfo.Count == 1)
-            {
-                strText = $"{strFirstName} {strPostion}";
-            }
-        }
-        else if (m_nDataForwarded == 2)
-        {
-            strText = strDataApprReqUser;
-        }
-
-        return strText;
     }
 }
