@@ -54,11 +54,12 @@
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<MainLoading>(); //PopUpLogIn
 
     Timer conTimer = new Timer();
-    object svr1005obj = new object();
 
     private bool bConnectServerTimeOut = false;
     private int currentConnectCount = 0;
     private string _stateMessage = "";
+
+    
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -166,36 +167,57 @@
             }
         }
 
-        //// 서버에서 응답없으면 Connect 재시도
-        //int interval = SGAppMgrSvc.OpConfigInfoService.GetLoginConnectDelaySecond(0) / SGAppMgrSvc.OpConfigInfoService.GetLoginConnectLimitCount(0);
-        //currentConnectCount++;
-        //
-        //conTimer.AutoReset = true;
-        //conTimer.Interval = interval * 1000;
-        //conTimer.Elapsed += new ElapsedEventHandler(dayTimer_Elapsed);
-        //conTimer.Start();
+        // 서버에서 응답없으면 Connect 재시도
+        int interval = SGAppMgrSvc.OpConfigInfoService.GetLoginConnectDelaySecond(0) / SGAppMgrSvc.OpConfigInfoService.GetLoginConnectLimitCount(0);
+
+        Console.WriteLine($"Interval - {interval}");
+        currentConnectCount++;
+        
+        conTimer.AutoReset = true;
+        conTimer.Interval = interval * 1000;
+        conTimer.Elapsed += new ElapsedEventHandler(dayTimer_Elapsed);
+        conTimer.Start();
     }
 
-    //private void dayTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-    //{
-    //    CLog.Here().Information($@"{conTimer.Interval / 1000} sec after, Server Result Failed !!!");
-    //    currentConnectCount++;
-    //    if (currentConnectCount > SGAppMgrSvc.OpConfigInfoService.GetLoginConnectLimitCount(0))
-    //    {
-    //        _stateMessage = XmlConf.GetInfoMsg("I_0232");
-    //        bConnectServerTimeOut = true;
-    //        conTimer.Stop();
-    //    }
-    //    else
-    //    {
-    //        _stateMessage = XmlConf.GetInfoMsg("I_0248");
-    //        _stateMessage = String.Format(_stateMessage, currentConnectCount);
-    //        //서버접속 재시도
-    //        HSCmdCenter.Init();
-    //    }
-    //
-    //    StateHasChanged();
-    //}
+    private void dayTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        CLog.Here().Information($@"{conTimer.Interval / 1000} sec after, Server Result Failed !!!");
+        Console.WriteLine($"Time - {currentConnectCount}");
+        currentConnectCount++;
+        if (currentConnectCount > SGAppMgrSvc.OpConfigInfoService.GetLoginConnectLimitCount(0))
+        {
+            _stateMessage = XmlConf.GetInfoMsg("I_0232");
+            bConnectServerTimeOut = true;
+            conTimer.Stop();
+        }
+        else
+        {
+            _stateMessage = XmlConf.GetInfoMsg("I_0248");
+            _stateMessage = String.Format(_stateMessage, currentConnectCount);
+            //서버접속 재시도
+            //HSCmdCenter.Init();
+            //모든 groupID의 Ready를 호출하여, main.razro나 popupLogin 시에는 UserLogin만 수행하도록 처리
+            
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
+            string strCurCliVersion = "";
+            string strPlatform = "";
+            if (VersionConfigSvc != null)
+            {
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
+            }
+            List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+            foreach (ISGNetwork network in listNetWork)
+            {
+                HsNetWork hsNetWork = HSCmdCenter.GetConnectNetWork(network.GroupID);
+                if (hsNetWork != null)
+                {
+                    HSCmdCenter.RestReady(network.GroupID, "OpenNetLink", strCurCliVersion, strPlatform);
+                }
+            }
+        }    
+        StateHasChanged();
+    }
 
     private void goLogIn(int loginType)
     {
@@ -209,142 +231,6 @@
         else
         {
             MyNavigationManager.NavigateTo("/Login_OKTA");
-        }
-
-    }
-
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="groupId"></param>
-    /// <param name="loginType"></param>
-    /// <param name="systemID"></param>
-    public void Svr1105Result(int groupId, PageEventArgs e)
-    {
-
-        CLog.Here().Information($"Svr1105Result, groupId : {groupId}");
-
-        try
-        {
-            int ret = e.result;
-
-            if (ret == 0 && (e.strMsg?.Length ?? 0) > 0)
-            {
-
-                lock (svr1005obj)
-                {
-
-                    // NetPos Get
-                    string strNetPos = "";
-                    List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-                    for (int i = 0; i < listNetWork.Count; i++)
-                    {
-                        if (listNetWork[i].GroupID == groupId)
-                        {
-                            strNetPos = listNetWork[i].NetPos;
-                            break;
-                        }
-                    }
-
-                    if ((strNetPos?.Length ?? 0) < 1)
-                    {
-                        CLog.Here().Information($"Svr1105Result, groupId : {groupId}, NetPos : Empty!!! , No Change OpConfig.json");
-                        return;
-                    }
-
-
-                    List<string> listVerinfo = new List<string>();
-                    using (JsonDocument document = JsonDocument.Parse(e.strMsg))
-                    {
-                        JsonElement root = document.RootElement;
-                        JsonElement configsElement = root.GetProperty("configs");
-
-                        string strClientSWver = "";
-                        strClientSWver = SGAppMgrSvc.VersionConfigInfoService.GetSWVersion();
-                        //strClientSWver = "1.0.0.2";
-                        listVerinfo.Clear();
-
-                        // 적용할 Ver 찾음
-                        foreach (JsonElement config in configsElement.EnumerateArray())
-                        {
-
-                            if (config.TryGetProperty("version", out JsonElement versionElement))
-                            {
-                                string strJsonVer = "";
-                                strJsonVer = versionElement.GetString();
-                                CLog.Here().Information($"Svr1105Result, groupId : {groupId}, Get Svr Json Config Ver :{strJsonVer}");
-                                listVerinfo.Add(strJsonVer);
-                            }
-                            else
-                            {
-                                CLog.Here().Information($"Svr1105Result, groupId : {groupId}, Version Property Empty!");
-                            }
-
-                        }
-
-                        if (listVerinfo.Count < 1)
-                        {
-                            CLog.Here().Information($"Svr1105Result, groupId : {groupId}, Svr Json Config Empty!");
-                            return;
-                        }
-
-                        string strApplyVer = "";
-                        strApplyVer = CsVersionFunc.GetTopVerString(strClientSWver, listVerinfo.ToArray());
-                        listVerinfo.Clear();
-                        CLog.Here().Information($"Svr1105Result, groupId : {groupId}, CurClientVer :{strClientSWver},  apply SvrJsonVer :{strApplyVer}");
-
-                        foreach (JsonElement config in configsElement.EnumerateArray())
-                        {
-
-                            if (config.TryGetProperty("version", out JsonElement versionElement))
-                            {
-                                string strJsonVer = "";
-                                strJsonVer = versionElement.GetString();
-                                if (string.Compare(strApplyVer, strJsonVer) == 0)
-                                {
-
-                                    // 찾은 Ver에 적용
-                                    CLog.Here().Information($"==========================================================================");
-                                    foreach (JsonProperty property in config.EnumerateObject())
-                                    {
-                                        if (string.Compare(property.Name, "version") != 0)
-                                        {
-                                            // Memory 변경
-                                            bool bResult = SGAppMgrSvc.OpConfigInfoService.SetPropertyVal(groupId, property.Name, (object)property.Value.GetRawText()); // (object)property.Value
-                                            CLog.Here().Information($"Svr1105Result, groupId : {groupId}, Apply Op Json property : {property.Name}, Value : {property.Value}, {(bResult ? "Success!" : "Failed!")}");
-                                        }
-                                    }
-
-                                    CLog.Here().Information($"==========================================================================");
-                                    CLog.Here().Information($"Svr1105Result, groupId : {groupId}, CurClientVer :{strClientSWver},  apply SvrJsonVer :{strApplyVer}, DONE!!!");
-
-                                    // Memory 변경된 값들 저장 json
-                                    CLog.Here().Information($"==========================================================================");
-                                    CLog.Here().Information($"Svr1105Result, groupId : {groupId}, Apply SvrJsonVer :{strApplyVer}, To File Save !!!");
-
-                                    SGAppMgrSvc.OpConfigInfoService.SavePropertyToFile(groupId, strNetPos);
-
-                                    break;
-                                }
-                            }
-                        }
-
-
-                    } // using (JsonDocument document = JsonDocument.Parse(e.strMsg))
-
-                } // lock (svr1005obj)
-
-            }
-            else
-            {
-                CLog.Here().Information($"Svr1105Result, groupId : {groupId}, result : {ret}, json data : {e.strMsg}");
-            }
-
-        }
-        catch (Exception ex)
-        {
-            CLog.Here().Error($"Svr1105Result, groupId : {groupId}, Exception-MSG : {ex.Message}");
         }
 
     }
@@ -370,12 +256,12 @@
             {
                 if (String.IsNullOrEmpty(NetWorkSvc.NetWorkInfo[groupId].FromName))
                 {
-                    if (sgNetType == "IN")//내부
+                    if (sgNetType.StartsWith("I"))//내부
                     {
                         NetWorkSvc.NetWorkInfo[groupId].FromName = XmlConf.GetTitle("T_COMMON_LOGININNER");
                         NetWorkSvc.NetWorkInfo[groupId].ToName = XmlConf.GetTitle("T_COMMON_LOGINOUTER");
                     }
-                    else if (sgNetType == "EX")//외부
+                    else if (sgNetType.StartsWith("E"))//외부
                     {
                         NetWorkSvc.NetWorkInfo[groupId].FromName = XmlConf.GetTitle("T_COMMON_LOGINOUTER");
                         NetWorkSvc.NetWorkInfo[groupId].ToName = XmlConf.GetTitle("T_COMMON_LOGININNER");
@@ -384,14 +270,13 @@
             }
         }
 
-        conTimer.Stop();
-
         //groupId 별로 AppUpdaterServie 관리
         string RipNPort = ipAddr + ":3439";
         SGAppUpdaterSvc.Init(groupId, RipNPort, SGAppMgrSvc.VersionConfigInfoService.GetUpdatePlatform(), HSCmdCenter);
 
         if (groupId == 0)
         {
+            conTimer.Stop();
             if (SGCrypto.ValidationResult)
                 goLogIn(loginType);
         }

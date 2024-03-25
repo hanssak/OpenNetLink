@@ -1056,10 +1056,10 @@ namespace OpenNetLinkApp.Data.SGDicData
 
 
         //
-        public int RequestRestReady(HsNetWork hsNet, string strAgentName, string strVersion, string strOSType, List<string> listGpkiCnList = null)
+        public int RequestRestReady(HsNetWork hsNet, string strAgentName, string strVersion, string strOSType)
         {
             Dictionary<string, object> dic = new Dictionary<string, object>();
-            dic["gpki_cn_list"] = (listGpkiCnList == null ? new List<string>() : listGpkiCnList);
+            //dic["gpki_cn_list"] = (listGpkiCnList == null ? new List<string>() : listGpkiCnList);
             dic["agent_name"] = strAgentName;
             dic["version"] = strVersion;
             dic["os_type"] = strOSType;
@@ -1281,8 +1281,6 @@ namespace OpenNetLinkApp.Data.SGDicData
 
             pagingDic["number"] = approveParam.ViewPageNo;
             pagingDic["max_list_count"] = approveParam.PageListCount;
-
-            //TODO 고도화 - 3망에 대한 Dest 정보 필요
 
             SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostApprovalsRetrieval, null, bodyDic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);

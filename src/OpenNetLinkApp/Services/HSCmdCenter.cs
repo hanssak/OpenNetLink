@@ -1246,7 +1246,7 @@ namespace OpenNetLinkApp.Services
             sgDicRecvData.SetReadyData(groupId, sgData);
             string ipAddr = sgData.GetTagData("server_info", "ip_addr");
             string loginTypeValue = sgData.GetTagData("server_info", "login_type");
-            string sgNetType = sgData.GetTagData("server_info", "sg_net_type");
+            string sgNetType = sgData.GetTagData("server_info", "sg_net", "type");
 
             Enum.TryParse(loginTypeValue.ToUpper(), out HsLoginType hsLoginType);
             int loginType = (int)hsLoginType;
@@ -3575,7 +3575,7 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int RestReady(int groupid, string strAgentName, string strVersion, string strOSType, List<string> listGpkiCnList = null)
+        public int RestReady(int groupid, string strAgentName, string strVersion, string strOSType)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork == null)
@@ -3586,7 +3586,7 @@ namespace OpenNetLinkApp.Services
                 int ret = 0;
                 try
                 {
-                    ret = sgSendData.RequestRestReady(hsNetWork, strAgentName, strVersion, strOSType, listGpkiCnList);
+                    ret = sgSendData.RequestRestReady(hsNetWork, strAgentName, strVersion, strOSType);
                     CLog.Here().Information($"RequestReady, Ret : {ret}");
 
                     // gsdata 받아서, sgReadyData 쪽에 Set 동작
