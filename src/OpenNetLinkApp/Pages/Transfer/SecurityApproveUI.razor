@@ -4,6 +4,7 @@
 
 @using HsNetWorkSG
 @using Newtonsoft.Json.Linq
+@using OpenNetLinkApp.Data.SGDicData.Approve
 @using OpenNetLinkApp.Services
 @using HsNetWorkSGData;
 @using OpenNetLinkApp.Models.SGNetwork
@@ -11,7 +12,6 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGQuery
-@using OpenNetLinkApp.Data.SGDicData.Approve
 @using AgLogManager
 
 @inject IJSRuntime jsRuntime
@@ -282,7 +282,7 @@
     SGCustomSelect refSGCustomSelect;
     PeriodDatePicker refPeriodDatePicker;
 
-    public SGApproveUIData ApprDataConverter = new SGApproveUIData(SGApproveUIData.UIType.Security);
+    public SGApproveUIData ApprDataConverter = new SGApproveUIData();
 
     public int TotalCount { get; set; }
     public List<SGApproveData> mData = new List<SGApproveData>();
@@ -475,6 +475,14 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
+        SGReadyData sgReadyData = (SGReadyData)HSCmdCenter.GetReadyData(groupID);
+        if (sgReadyData == null)
+            return;
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        string UserSeq = sgLoginData.GetUserSequence();
         if (pageService.GetConnectStatus(groupID) == false)
         {
             string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
@@ -496,7 +504,60 @@
             string seq = approvalInfo.GetTagDataString("trans_req", "trans_seq").ToString();
             if (transSeq == seq)
             {
-               refApprovePopUp.SetBindingData(ApprDataConverter, approvalInfo);//   , tData.ApproverName, tData.ApvStatus, tData.ApvTime);
+                SGApproveUIData.ApproveDetailData DetailData = new SGApproveUIData.ApproveDetailData();
+
+                DetailData.TransSeq = ApprDataConverter.GetTransSeq(approvalInfo);
+
+                DetailData.TransKindCode = ApprDataConverter.GetTransKindCode(approvalInfo);
+                DetailData.TransKindName = ApprDataConverter.GetTransKind(approvalInfo);
+
+                DetailData.TransStatusCode = ApprDataConverter.GetTransStatusCode(approvalInfo);
+                DetailData.TransStatusName = ApprDataConverter.GetTransStatusName(approvalInfo, SGApproveUIData.UIType.Clipboard);
+
+                DetailData.DataTypeCode = ApprDataConverter.GetDataTypeCode(approvalInfo);
+                DetailData.DataTypeName = ApprDataConverter.GetDataTypeName(approvalInfo);
+
+                DetailData.FilePosName = ApprDataConverter.GetFilePos(approvalInfo, sgLoginData.GetDestinationInfo(false));
+
+                DetailData.ApprKindCode = ApprDataConverter.GetApprKindCode(approvalInfo);
+                DetailData.ApprKindName = ApprDataConverter.GetApprKind(approvalInfo);
+
+                DetailData.ApprStatusCode = ApprDataConverter.GetApprStatusCode(approvalInfo);
+                DetailData.ApprStatusName = ApprDataConverter.GetApprStatusName(approvalInfo);
+
+                DetailData.ReqUserName = ApprDataConverter.GetReqUser(approvalInfo);
+                DetailData.ApprReqDay = ApprDataConverter.GetApprReqDay(approvalInfo);
+
+                FileAddManage fileAddManage = new FileAddManage();
+                DetailData.Title = ApprDataConverter.GetTitle(approvalInfo);
+                DetailData.Title = fileAddManage.GetConvertTitleDesc(true, DetailData.Title);
+                DetailData.Desc = ApprDataConverter.GetDesc(approvalInfo);
+                DetailData.Desc = fileAddManage.GetConvertTitleDesc(false, DetailData.Desc);
+
+                DetailData.FileKey = ApprDataConverter.GetFileKey(approvalInfo);
+
+                DetailData.DLPStatusName = ApprDataConverter.GetDLP(approvalInfo);
+
+                string mySgNetType = sgReadyData.GetSgNetType();
+                DetailData.FilePrevEnable = ApprDataConverter.GetFilePrevEnable(UserSeq, mySgNetType, approvalInfo);
+
+                DetailData.FileData = ApprDataConverter.GetFileInfo(approvalInfo);
+
+                bool isVisibleFileApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID);
+                DetailData.ApproverInfoHist = ApprDataConverter.GetApproverInfoHist(approvalInfo, isVisibleFileApproveReason);
+
+                DetailData.ApprConfirmEnable = ApprDataConverter.GetApprEnableChk(UserSeq, approvalInfo);
+                DetailData.ApprRejectEnable = (DetailData.ApprConfirmEnable && ApprDataConverter.GetApprKindCode(approvalInfo) == "pre");    //결재 가능 && 선결인 경우, 반려 가능
+
+                DetailData.MyApproveInfo = ApprDataConverter.GetApprovalInfo(approvalInfo, UserSeq, SGApproveUIData.UIType.Security);
+                DetailData.ForwardInfo = ApprDataConverter.GetForwardUserInfo(approvalInfo);
+
+                if (DetailData.ForwardInfo?.Count == 1)
+                    DetailData.ForwardReceiver = $"{DetailData.ForwardInfo[0].Name} {DetailData.ForwardInfo[0].Position}";
+                else if (DetailData.ForwardInfo?.Count > 1)
+                    DetailData.ForwardReceiver = String.Format(XmlConf.GetInfoMsg("I_0083"), DetailData.ForwardInfo[0].Name, (DetailData.ForwardInfo.Count - 1).ToString());
+
+               refApprovePopUp.SetBindingData(DetailData);//   , tData.ApproverName, tData.ApvStatus, tData.ApvTime);
                OpenDetail(transSeq).Wait();
                 break;
             }
@@ -867,7 +928,7 @@
             aData.TransferType = ApprDataConverter.GetTransKind(approvalInfo);                 // 전송구분 (반출/반입)
             aData.RequesterName = ApprDataConverter.GetApproveReqUser(approvalInfo);           // 승인요청자
 
-            ApprovalInfo MyApproveInfo = ApprDataConverter.GetApprovalInfo(approvalInfo,strUserSeq);
+            ApprovalInfo MyApproveInfo = ApprDataConverter.GetApprovalInfo(approvalInfo,strUserSeq, SGApproveUIData.UIType.Security);
             aData.ApproverName = MyApproveInfo.UserName;             // 승인자
             aData.ApproverSeq = MyApproveInfo.UserSeq;
             aData.ApvStatus = MyApproveInfo.ApproveStatusName;                    // 승인상태 (요청취소,승인대기,승인,반려)

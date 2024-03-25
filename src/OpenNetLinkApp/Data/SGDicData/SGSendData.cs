@@ -1045,10 +1045,10 @@ namespace OpenNetLinkApp.Data.SGDicData
 
 
         //
-        public int RequestRestReady(HsNetWork hsNet, string strAgentName, string strVersion, string strOSType, List<string> listGpkiCnList = null)
+        public int RequestRestReady(HsNetWork hsNet, string strAgentName, string strVersion, string strOSType)
         {
             Dictionary<string, object> dic = new Dictionary<string, object>();
-            dic["gpki_cn_list"] = (listGpkiCnList == null ? new List<string>() : listGpkiCnList);
+            //dic["gpki_cn_list"] = (listGpkiCnList == null ? new List<string>() : listGpkiCnList);
             dic["agent_name"] = strAgentName;
             dic["version"] = strVersion;
             dic["os_type"] = strOSType;
@@ -1254,6 +1254,15 @@ namespace OpenNetLinkApp.Data.SGDicData
             bodyDic["period_date"] = $"{approveParam.SearchFromDay}-{approveParam.SearchToDay}";
             bodyDic["data_type_list"] = approveParam.DataType;
             bodyDic["net_type_list"] = approveParam.TransKind;
+
+            bodyDic["source_sg_net_type"] = approveParam.SrcSGNetType;
+            
+            if(approveParam.DestSGNetType?.Count > 0)
+                bodyDic["destination_sg_net_type_list"] = approveParam.DestSGNetType;
+
+            if (approveParam.TransStatus?.Count > 0)
+                bodyDic["trans_state_list"] = approveParam.TransStatus;
+
             bodyDic["approval_type"] = approvalType;
             bodyDic["approval_proc_type_list"] = approveParam.ApprKind;
             bodyDic["approval_state_list"] = approveParam.ApprStatus;
@@ -1261,8 +1270,6 @@ namespace OpenNetLinkApp.Data.SGDicData
 
             pagingDic["number"] = approveParam.ViewPageNo;
             pagingDic["max_list_count"] = approveParam.PageListCount;
-
-            //TODO 고도화 - 3망에 대한 Dest 정보 필요
 
             SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostApprovalsRetrieval, null, bodyDic, hsNet.stCliMem.GetProtectedSeedKey());
             return hsNet.SendMessage(args);

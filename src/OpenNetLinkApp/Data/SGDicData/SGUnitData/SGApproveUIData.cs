@@ -29,21 +29,203 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             //Clipboard_PopUp,            
             Mail,
             MailSeciurity,
-        
+
         }
 
-        XmlConfService xmlConf;
-        UIType DisplayUIType;
+        public class ApproveDetailData
+        {
+            public string TransSeq { get; set; }
+            public long TransSeqValue
+            {
+                get { return Convert.ToInt64(TransSeq); }
+            }
 
-        private SGApproveUIData() { }
+            /// <summary>
+            /// 반입/반출
+            /// </summary>
+            public string TransKindCode { get; set; }
+            /// <summary>
+            /// 반입/반출
+            /// </summary>
+            public string TransKindName { get; set; }
+
+            /// <summary>
+            /// 전송상태      
+            /// <br>scanning    (검사중)</br>
+            /// <br>sending     (반대망으로 전송 중 / 발송대기)</br>
+            /// <br>cancel      (전송취소 / 발송취소)</br>
+            /// <br>wait        (PC수신대기 / 발송대기)</br>
+            /// <br>downloaded  (PC수신완료 / 발송완료)</br>
+            /// <br>fail        (전송실패 / 발송 실패)</br>
+            /// </summary>
+            public string TransStatusCode { get; set; }
+
+            /// <summary>
+            /// 전송상태      (발송상태)
+            /// <br>scanning    (검사중)</br>
+            /// <br>sending     (반대망으로 전송 중 / 발송대기)</br>
+            /// <br>cancel      (전송취소 / 발송취소)</br>
+            /// <br>wait        (PC수신대기 / 발송대기)</br>
+            /// <br>downloaded  (PC수신완료 / 발송완료)</br>
+            /// <br>fail        (전송실패 / 발송 실패)</br>
+            /// </summary>
+            public string TransStatusName { get; set; }
+
+
+            /// <summary>
+            /// 전송상태에 따라 해당 Transfer건의 서버 위치 Name 반환
+            /// </summary>
+            public string FilePosName { get; set; }
+
+            /// <summary>
+            /// 결재 정보(선결,후결)
+            /// </summary>
+            public string ApprKindCode { get; set; }
+            /// <summary>
+            /// 결재 정보(선결,후결)
+            /// </summary>
+            public string ApprKindName { get; set; }
+
+            /// <summary>
+            /// 결재상태 정보
+            /// <br>pre (이전단계 진행 중)</br>
+            /// <br>wait (결재대기)</br>
+            /// <br>confirm (승인)</br>
+            /// <br>reject (반려)</br>
+            /// <br>cancel (취소)</br>
+            /// <br>skip (결재스킵)</br>
+            /// </summary>
+            public string ApprStatusCode { get; set; }
+            /// <summary>
+            /// 결재상태 정보
+            /// <br>pre (이전단계 진행 중)</br>
+            /// <br>wait (결재대기)</br>
+            /// <br>confirm (승인)</br>
+            /// <br>reject (반려)</br>
+            /// <br>cancel (취소)</br>
+            /// <br>skip (결재스킵)</br>
+            /// </summary>
+            public string ApprStatusName { get; set; }
+
+            /// <summary>
+            /// 결재 승인 가능 여부를 반환
+            /// <para>전송 건에 대한 결재 가능 상태 + userSeq의 순서가 모두 적합하면 true 반환</para>
+            /// </summary>
+            public bool ApprConfirmEnable { get; set; }
+
+            /// <summary>
+            /// 결재 리젝 가능 여부를 반환
+            /// <para>결재 가능 And 선결인 경우, 반려 가능</para>
+            /// </summary>
+            public bool ApprRejectEnable { get; set; }
+            /// <summary>
+            /// 승인요청자 또는 발신자 정보
+            /// </summary>
+            public string ReqUserName { get; set; }
+
+            /// <summary>
+            /// 승인요청일 또는 발신일 정보를 반환 (2024-01-15 12:03:30)
+            /// </summary>
+            public string ApprReqDay { get; set; }
+
+            public string Title { get; set; }
+
+            public string Desc { get; set; }
+
+            /// <summary>
+            ///데이터 타입 
+            ///<br>"file"</br>
+            ///<br>"email"</br>
+            ///<br>"cliptxt"</br>
+            ///<br>"clipimg"</br>
+            ///<br>"npki"</br>
+            ///<br>"pcurl"</br>
+            /// </summary>
+            public string DataTypeCode { get; set; }
+
+
+            /// <summary>
+            ///데이터 타입 
+            ///<br>"file"</br>
+            ///<br>"email"</br>
+            ///<br>"cliptxt"</br>
+            ///<br>"clipimg"</br>
+            ///<br>"npki"</br>
+            ///<br>"pcurl"</br>
+            /// </summary>
+            public string DataTypeName { get; set; }
+
+            public string FileKey { get; set; }
+
+            /// <summary>
+            /// 개인정보 검출 상태
+            /// <br>done (미포함)</br>
+            /// <br>detected (포함)</br>
+            /// <br>미사용</br>
+            /// </summary>
+            public string DLPStatusName { get; set; }
+
+            /// <summary>
+            /// 파일미리보기 가능 여부를 반환한다.
+            /// <para>미리보기할 결재자가 결재할 순서이고,</para>
+            /// <para>해당 trans의 source_sg_net_type이 접속 서버의 sg_net_type과 동일 여부</para>
+            /// </summary>
+            public bool FilePrevEnable { get; set; }
+
+            public List<FileInfoData> FileData { get; set; }
+
+            public List<ApproverHist> ApproverInfoHist { get; set; }
+
+            /// <summary>
+            /// 해당 UserSeq의 결재자에 대한 정보 반환
+            /// <para>승인/반려는 해당 결재에 대한 정보 반환</para>
+            /// <para>그 외 결재상태는 상태만 반환</para>
+            /// </summary>
+            public ApprovalInfo MyApproveInfo { get; set; }
+
+            /// <summary>
+            /// 포워드 사용자 또는 메일 수신자
+            /// </summary>
+            public List<(string Name, string Position, string DeptName)> ForwardInfo { get; set; }
+
+            /// <summary>
+            /// 메일 참조자
+            /// </summary>
+            public List<(string Name, string Position, string DeptName)> ForwardCCInfo { get; set; }
+
+            /// <summary>
+            /// 숨은 참조자
+            /// </summary>
+            public List<(string Name, string Position, string DeptName)> ForwardHiddenCCInfo { get; set; }
+
+
+            /// <summary>
+            /// 포워드 사용자 (또는 수신자)
+            /// <para>이름 + 직급 (메일에선, '메일주소'만 사용)</para>
+            /// <para>이름 외 N명 (메일에선, '메일주소 외 N명'만 사용)</para>
+            /// </summary>
+            public string ForwardReceiver { get; set; }
+
+            /// <summary>
+            /// 메일 수신 참조
+            /// </summary>
+            public string ForwardCCReceiver { get; set; }
+
+            /// <summary>
+            /// 메일 수신 숨은 참조
+            /// </summary>
+            public string ForwardHiddenCCReceiver { get; set; }
+        }
+
+
+        XmlConfService xmlConf;
+
         /// <summary>
         /// 각 결재 화면 별, 전송 건에 대한 정보를 Name 등으로 Converting 하여 표시하는 Class
         /// </summary>
-        /// <param name="getUIType"></param>
-        public SGApproveUIData(UIType getUIType)
+        public SGApproveUIData()
         {
             xmlConf = new XmlConfService();
-            DisplayUIType = getUIType;
         }
 
         /// <summary>
@@ -62,7 +244,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns></returns>
         public string GetApprKind(object selectedInfo)
         {
-            string processType = selectedInfo.GetTagDataString("trans_req", "approval_proc_type");
+            string processType = GetApprKindCode(selectedInfo);
             if (processType == "pre")    //사전
                 return xmlConf.GetTitle("T_COMMON_APPROVE_BEFORE");        // 선결
             else if (processType == "post")
@@ -70,6 +252,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             else
                 return "-";
         }
+
         /**
          * 
 		 * @breif 개인정보 검출 상태 정보를 반환한다.
@@ -154,6 +337,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return "-";
         }
 
+        public string GetTransKindCode(object selectedInfo) => selectedInfo.GetTagDataString("trans_req", "net_type");
         /// <summary>
         /// 반입/반출
         /// <para>"trans_req", "net_type"</para>
@@ -162,7 +346,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns></returns>
         public string GetTransKind(object selectedInfo)
         {
-            string netType = selectedInfo.GetTagDataString("trans_req", "net_type");
+            string netType = GetTransKindCode(selectedInfo);
             if (netType == "I")
                 return xmlConf.GetTitle("T_COMMON_IMPORT");         //반입
             else if (netType == "E")
@@ -222,11 +406,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (string.IsNullOrEmpty(strApprStatus) || string.IsNullOrEmpty(strTransStatus))
                 return 0;
             /*
-            - "scanning 검사중"
-            - "wait 전송대기"
-            - "cancel 전송취소"
-            - "received PC수신완료"
-            - "fail 전송실패"
+            - "scanning"   # 검사 중
+            - "sending"    # 반대편 망으로 전송 중
+            - "cancel"     # 전송 요청 취소
+            - "wait"       # PC 수신 대기
+            - "downloaded" # PC 수신 완료
+            - "fail"       # 전송 실패
             ------------------------------
              pre(이전 단계 진행중), wait(결재 대기), confirm(승인), reject(반려), cancel(취소), skip(결재 스킵)
             - "pre 이전 단계 진행중"
@@ -239,7 +424,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (strTransStatus == "cancel" && strApprStatus == "wait")     // 전송상태가 전송취소이면서, 결재상태가 승인대기일때
                 return 1;
 
-            if (strTransStatus == "wait" && strApprStatus == "reject")      //전송상태가 전송대기이면서, 결재상태가 반려인 경우
+            if (strTransStatus == "sending" && strApprStatus == "reject")      //전송상태가 전송대기이면서, 결재상태가 반려인 경우
                 return 2;
 
             return 0;
@@ -247,23 +432,53 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 
         public string GetTransStatusCode(object selectedInfo) => selectedInfo.GetTagDataString("trans_req", "trans_state");
-        public string GetTransStatusName(object selectedInfo)
+        public string GetTransStatusName(object selectedInfo, UIType uIType)
         {
-            string strTransState = selectedInfo.GetTagDataString("trans_req", "trans_state");
-            switch (strTransState)
+            string strTransState = GetTransStatusCode(selectedInfo);
+            
+            // scanning    (검사중)</br>
+            // sending     (반대망으로 전송 중 / 발송대기)</br>
+            // cancel      (전송취소 / 발송취소)</br>
+            // wait        (PC수신대기 / 발송대기)</br>
+            // downloaded  (PC수신완료 / 발송완료)</br>
+            // fail        (전송실패 / 발송 실패)</br>
+            if (uIType != UIType.Mail && uIType != UIType.MailSeciurity)
             {
-                case "scanning":
-                    return xmlConf.GetTitle("T_COMMON_TRANSCHECKING");  //검사중
-                case "wait":
-                    return xmlConf.GetTitle("T_COMMON_TRANSWAIT");  //전송대기
-                case "cancel":
-                    return xmlConf.GetTitle("T_COMMON_TRANSCANCLE");  //전송취소
-                case "received":
-                    return xmlConf.GetTitle("T_TRANS_COMPLETE");  //PC수신완료
-                case "fail":
-                    return xmlConf.GetTitle("T_TRANS_COMPLETE");  //전송실패
-                default:
-                    return "-";
+                switch (strTransState)
+                {
+                    case "scanning":
+                        return xmlConf.GetTitle("T_COMMON_TRANSCHECKING");  //검사중
+                    case "sending":
+                    case "wait":
+                        return xmlConf.GetTitle("T_COMMON_TRANSWAIT");  //전송대기
+                    case "cancel":
+                        return xmlConf.GetTitle("T_COMMON_TRANSCANCLE");  //전송취소
+                    case "downloaded":
+                        return xmlConf.GetTitle("T_TRANS_COMPLETE");  //PC수신완료
+                    case "fail":
+                        return xmlConf.GetTitle("T_TRANS_COMPLETE");  //전송실패
+                    default:
+                        return "-";
+                }
+            }
+            else
+            {
+                switch (strTransState)
+                {
+                    case "scanning":
+                        return xmlConf.GetTitle("T_MAIL_INSPECT");  //검사중
+                    case "sending":
+                    case "wait":
+                        return xmlConf.GetTitle("T_MAIL_TRANSWAIT");  //발송대기
+                    case "cancel":
+                        return xmlConf.GetTitle("T_MAIL_TRANSCANCLE");  //발송취소
+                    case "downloaded":
+                        return xmlConf.GetTitle("T_MAIL_TRANS_SUCCESS");  //발송완료
+                    case "fail":
+                        return xmlConf.GetTitle("T_MAIL_TRANSFRFAILED");  //발송실패
+                    default:
+                        return "-";
+                }
             }
         }
 
@@ -326,25 +541,32 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strApprStepPossible;
         }
 
+
+        public string GetApprStatusCode(object selectedInfo) => selectedInfo.GetTagDataString("trans_req", "approval_state");
         /**
 		 * @breif 결재상태 정보를 반환한다.
 		 * @return 결재상태 정보(요청취소,승인대기,승인,반려)
-		 */
-        public string GetApprStatus(object selectedInfo)
+		 //*/
+        //     public string GetApprStatus(object selectedInfo)
+        //     {
+        //         //고도화때는, 승인상태와 전송상태가 따로 가지 않기 때문에 해당 조건 불필요
+        //         //if (GetRequestCancelChk(dic) != 0)
+        //         //{
+        //         //    //전송취소 이면서 승인대기
+        //         //    //전송대기 이지만 반려
+        //         //    return xmlConf.GetTitle("T_COMMON_REQUESTCANCEL");       // 요청취소
+        //         //}
+
+        //         string strApproStatus = GetApprStatusCode(selectedInfo);
+        //         return GetApprStatusName(strApproStatus);
+        //     }
+
+        public string GetApprStatusName(object selectedInfo)
         {
-            //고도화때는, 승인상태와 전송상태가 따로 가지 않기 때문에 해당 조건 불필요
-            //if (GetRequestCancelChk(dic) != 0)
-            //{
-            //    //전송취소 이면서 승인대기
-            //    //전송대기 이지만 반려
-            //    return xmlConf.GetTitle("T_COMMON_REQUESTCANCEL");       // 요청취소
-            //}
-
-            string strApproStatus = selectedInfo.GetTagDataString("trans_req", "approval_state");
-            return GetApprStatusName(strApproStatus);
+            string ApprStatusCode = GetApprStatusCode(selectedInfo);
+            return GetApprStatusConvert(ApprStatusCode);
         }
-
-        public string GetApprStatusName(string ApprStatusCode) => ApprStatusCode switch
+        public string GetApprStatusConvert(string ApprStatusCode) => ApprStatusCode switch
         {
             "pre" or "wait" => xmlConf.GetTitle("T_COMMON_APPROVE_WAIT"),              // 승인대기
             "confirm" => xmlConf.GetTitle("T_COMMON_APPROVE"),                   // 승인
@@ -353,11 +575,28 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             _ => "-"
         };
 
+        //{
+        //    string ApprStatusCode = GetApprStatusCode(selectedInfo);
+        //    switch (ApprStatusCode)
+        //    {
+        //        case "pre":
+        //        case "wait": // 승인대기
+        //            return xmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
+        //        case "confirm":                   // 승인
+        //            return xmlConf.GetTitle("T_COMMON_APPROVE");
+        //        case "reject":
+        //            return xmlConf.GetTitle("T_COMMON_REJECTION");                   // 반려
+        //        case "skip":
+        //            return xmlConf.GetTitle("T_COMMON_REQUESTCANCEL");                   // 요청취소
 
-        /**
-		 * @breif 파일 포워딩 사용 여부를 반환한다.
-		 * @return 파일 포워딩 사용 여부 (사용, 미사용)
-		 */
+        //    };
+        //    return "-";
+        //}
+
+        /*
+         * @breif 파일 포워딩 사용 여부를 반환한다.
+         * @return 파일 포워딩 사용 여부 (사용, 미사용)
+         */
         public string GetUseFileForward(Dictionary<int, string> dic)
         {
             string strUseFileForward = "-";
@@ -433,9 +672,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetDesc(object selectedInfo) => selectedInfo.GetTagDataString("trans_req", "description");
 
         /**
-		 * @breif 전송요청일 정보를 반환한다.
-		 * @return 전송요청일(type : YYYY-MM-DD hh:mm:ss)
-		 */
+         * @breif 전송요청일 정보를 반환한다.
+         * @return 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+         */
         public string GetTransReqDay(Dictionary<int, string> dic)
         {
             string strTransReqDay = "";
@@ -454,9 +693,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strTransReqDay;
         }
         /**
-		 * @breif 결재일 정보를 반환한다.
-		 * @return 결재일(type : YYYY-MM-DD hh:mm:ss)
-		 */
+         * @breif 결재일 정보를 반환한다.
+         * @return 결재일(type : YYYY-MM-DD hh:mm:ss)
+         */
         public string GetApprDay(Dictionary<int, string> dic)
         {
             string strApprDay = "";
@@ -486,9 +725,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns></returns>
         public string GetQueryTransReqDay(object selectedInfo) => selectedInfo.GetTagDataString("trans_req", "req_datetime");
         /**
-		 * @breif 결재일 정보를 반환한다.
-		 * @return 결재일(type : YYYY-MM-DD hh:mm:ss)
-		 */
+         * @breif 결재일 정보를 반환한다.
+         * @return 결재일(type : YYYY-MM-DD hh:mm:ss)
+         */
         public string GetQueryApprDay(object selectedInfo)
         {
             string strTransStatus = selectedInfo.GetTagDataString("trans_req", "trans_state");
@@ -496,7 +735,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (GetRequestCancelChk(selectedInfo) != 0)
                 return "-";
 
-            string strApprStatus = GetApprStatus(selectedInfo);
+            string strApprStatus = GetApprStatusName(selectedInfo);
             string strTempApprStatus1 = xmlConf.GetTitle("T_COMMON_APPROVE");               // 승인
             string strTempApprStatus2 = xmlConf.GetTitle("T_COMMON_REJECTION");             // 반려
 
@@ -537,7 +776,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="selectedInfo"></param>
         /// <param name="approvalUserSeq"></param>
         /// <returns></returns>
-        public ApprovalInfo GetApprovalInfo(object selectedInfo, string approvalUserSeq)
+        public ApprovalInfo GetApprovalInfo(object selectedInfo, string approvalUserSeq, UIType DisplayUIType)
         {
             ApprovalInfo retValue = new ApprovalInfo("-", "-", "-", "-", "-", "-", "-");
 
@@ -554,10 +793,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if (approvalUserSeq != apprSeq)
                     continue;
 
-                if (DisplayUIType == UIType.Common && apprType != "common" )    //결재라인 중, 일반 결재타입의 사용자 중 조회
+                if (DisplayUIType == UIType.Common && apprType != "common")    //결재라인 중, 일반 결재타입의 사용자 중 조회
                     continue;
 
-                if (DisplayUIType == UIType.Clipboard&& apprType != "common")    //결재라인 중, 일반 결재타입의 사용자 중 조회
+                if (DisplayUIType == UIType.Clipboard && apprType != "common")    //결재라인 중, 일반 결재타입의 사용자 중 조회
                     continue;
 
                 if (DisplayUIType == UIType.Security && apprType != "security")    //결재라인 중, 보안 결재타입의 사용자 중 조회
@@ -570,7 +809,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     retValue.UserID = status.GetTagDataString("approver_hr", "approver_id");
                     retValue.UserName = status.GetTagDataString("approval_step", "approval_name");
                     retValue.ApproveStatusCode = apprStat;
-                    retValue.ApproveStatusName = GetApprStatusName(apprStat);
+                    retValue.ApproveStatusName = GetApprStatusConvert(apprStat);
                     retValue.ApproveReason = status.GetTagDataString("description");
                     retValue.ApproveTime = status.GetTagDataString("resp_datetime");
                     return retValue;
@@ -578,7 +817,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 else
                 {
                     retValue.ApproveStatusCode = apprStat;
-                    retValue.ApproveStatusName = GetApprStatusName(apprStat);
+                    retValue.ApproveStatusName = GetApprStatusConvert(apprStat);
                     return retValue;
                 }
 
@@ -599,7 +838,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (GetRequestCancelChk(selectedInfo) != 0)
                 return retValue;
 
-            string strApprStatus = GetApprStatus(selectedInfo);
+            string strApprStatus = GetApprStatusName(selectedInfo);
             string strTempApprStatus1 = xmlConf.GetTitle("T_COMMON_APPROVE");               // 승인
             string strTempApprStatus2 = xmlConf.GetTitle("T_COMMON_REJECTION");             // 반려
 
@@ -624,7 +863,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     {
                         lastApprOrder = apprOrder;
                         retValue.ApproveStatusCode = apprStat;
-                        retValue.ApproveStatusName = GetApprStatusName(apprStat);
+                        retValue.ApproveStatusName = GetApprStatusConvert(apprStat);
                         retValue.UserID = status.GetTagDataString("approver_hr", "approver_id");
                         retValue.UserName = status.GetTagDataString("approver_hr", "name");
                         retValue.UserSeq = status.GetTagDataString("approver_hr", "approver_seq");
@@ -648,7 +887,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (GetRequestCancelChk(selectedInfo) != 0)
                 return "-";
 
-            string strApprStatus = GetApprStatus(selectedInfo);
+            string strApprStatus = GetApprStatusName(selectedInfo);
             string strTempApprStatus1 = xmlConf.GetTitle("T_COMMON_APPROVE");               // 승인
             string strTempApprStatus2 = xmlConf.GetTitle("T_COMMON_REJECTION");             // 반려
 
@@ -681,14 +920,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             else
                 return "-";
         }
+        public string GetDataTypeCode(object selectedInfo) => selectedInfo.GetTagDataString("trans_req", "data_type");
+
         /// <summary>
         /// 데이타 타입 결과 리턴
         /// </summary>
         /// <param name="selectedInfo"></param>
         /// <returns></returns>
-        public string GetDataType(object selectedInfo)
+        public string GetDataTypeName(object selectedInfo)
         {
-            string strDataType = selectedInfo.GetTagDataString("trans_req", "data_type");
+            string strDataType = GetDataTypeCode(selectedInfo);
             switch (strDataType)
             {
                 case "cliptxt":
@@ -901,12 +1142,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             /*
              사후결재 - 
-	            검사중 Src 서버
-	            PC수신대기중 Dest 서버
-	            PC수신완료 Dest 서버
+                검사중 Src 서버
+                PC수신대기중 Dest 서버
+                PC수신완료 Dest 서버
             사전결재 - 
-	            ~승인대기 Src 서버
-	            ~ Dest 서버             
+                ~승인대기 Src 서버
+                ~ Dest 서버             
              */
             string ProcessType = selectedInfo.GetTagDataString("trans_req", "approval_proc_type"); //pre,post
             string TransStatus = selectedInfo.GetTagDataString("trans_req", "trans_state"); //scanning,wait,cancel,ready_to_receive, received,fail
@@ -916,16 +1157,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             List<string> position = new List<string>();   //src, dest[]
             if (ProcessType == "pre")    //사전
             {
+                /*
+                    - "scanning"   # 검사 중
+                    - "sending"    # 반대편 망으로 전송 중
+                    - "cancel"     # 전송 요청 취소
+                    - "wait"       # PC 수신 대기
+                    - "downloaded" # PC 수신 완료
+                    - "fail"       # 전송 실패
+                 */
                 switch (TransStatus)
                 {
                     case "scanning":            //검사중
-                    case "wait":                //전송대기
+                    case "sending":                //전송대기
                     case "cancel":              //전송취소
                     case "fail":                //전송실패
                         position.Add(SrcNetType);
                         break;
-                    case "ready_to_receive":    //PC수신대기
-                    case "received":            //PC수신완료
+                    case "wait":    //PC수신대기
+                    case "downloaded":            //PC수신완료
                         position.AddRange(DestNetType.Select(i => i.ToString()));
                         break;
                 }
@@ -939,9 +1188,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     case "fail":                //전송실패
                         position.Add(SrcNetType);
                         break;
-                    case "wait":                //전송대기
-                    case "ready_to_receive":    //PC수신대기
-                    case "received":            //PC수신완료
+                    case "sending":                //전송대기
+                    case "wait":    //PC수신대기
+                    case "downloaded":            //PC수신완료
                         position.AddRange(DestNetType.Select(i => i.ToString()));
                         break;
                 }
@@ -989,7 +1238,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetFileKey(object selectedInfo) => selectedInfo.GetTagDataString("file_info", "file_key");
 
         /// <summary>
-        /// 파일미리보기 가능 여부를 반환한다.(해당 trans의 source_sg_net_type이 접속 서버의 sg_net_type과 동일 여부)
+        /// 파일미리보기 가능 여부를 반환한다.
+        /// <para>미리보기할 결재자가 결재할 순서이고,</para>
+        /// <para>해당 trans의 source_sg_net_type이 접속 서버의 sg_net_type과 동일 여부</para>
         /// </summary>
         /// <param name="bInner"></param>
         /// <returns></returns>
@@ -1011,7 +1262,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
 
-        public void GetFileInfo(object selectedInfo, out List<FileInfoData> fileListInfo)
+        public List<FileInfoData> GetFileInfo(object selectedInfo)
         {
             //List<Dictionary<int, string>> listDicdata = GetRecordData("FILERECORD");
             List<object> fileRecordList = selectedInfo.GetTagDataObjectList("file_info", "file_record_list");
@@ -1019,18 +1270,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             if (fileRecordList == null)
             {
-                fileListInfo = null;
                 HsLog.err($"GetFileInfo, FILERECORD null !");
-                return;
+                return null;
             }
             if (fileRecordList.Count <= 0)
             {
-                fileListInfo = null;
-                return;
+                return null;
             }
             string strFileName = "-";
             string strFileType = "-";
             string strFileSize = "-";
+            long FileSizeValue = 0;
             string strVirus = "-";
             string strVirusExamDay = "-";
             string stDLP = "";
@@ -1088,6 +1338,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 // 파일 Size
                 strFileSize = record.GetTagDataObject("file_size").ToString();
+                FileSizeValue = Convert.ToInt64(strFileSize);
                 if (string.IsNullOrEmpty(strFileSize))
                     strFileSize = "-";
                 else
@@ -1107,10 +1358,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 strVirusFlag = "0";
 
                 string strFileSeq = record.GetTagDataObject("file_seq").ToString();
-                m_ListData.Add(new FileInfoData(strFileName, strFileType, strFileSize, strVirus, strVirusExamDay, strFileSeq, stDLP, stDLPDesc, strVirusFlag));
+                m_ListData.Add(new FileInfoData(strFileName, strFileType, strFileSize, strVirus, strVirusExamDay, strFileSeq, stDLP, stDLPDesc, strVirusFlag, FileSizeValue));
             }
-            fileListInfo = m_ListData;
-            return;
+            return m_ListData;
         }
 
         public string GetFileRename(bool bMode, string strFileName) => SgExtFunc.hsFileRename(bMode, strFileName);
@@ -1272,6 +1522,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return approverHist;
         }
 
+        /// <summary>
+        /// 포워드 사용자 또는 메일 수신자
+        /// </summary>
+        /// <param name="selectedInfo"></param>
+        /// <returns></returns>
         public List<(string Name, string Position, string DeptName)> GetForwardUserInfo(object selectedInfo)
         {
             List<(string Name, string Position, string DeptName)> retValue = new List<(string Name, string Position, string DeptName)>();
@@ -1288,6 +1543,43 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 retValue.Add((name, position, dept));
             }
             return retValue;
+        }
+
+        /// <summary>
+        /// 메일 수신 참조자
+        /// </summary>
+        /// <param name="selectedInfo"></param>
+        /// <returns></returns>
+        public List<(string Name, string Position, string DeptName)> GetForwardCCUserInfo(object selectedInfo)
+        {
+            //TODO 고도화 - 메일 수신 참조자 리스트 별도 구현
+            List<(string Name, string Position, string DeptName)> retValue = new List<(string Name, string Position, string DeptName)>();
+            retValue.Add(("-", "-", "-"));
+            return retValue;
+        }
+
+        /// <summary>
+        /// 메일 수신 숨은참조자
+        /// </summary>
+        /// <param name="selectedInfo"></param>
+        /// <returns></returns>
+        public List<(string Name, string Position, string DeptName)> GetForwardHiddenCCUserInfo(object selectedInfo)
+        {
+            //TODO 고도화 - 메일 수신 참조자 리스트 별도 구현
+            List<(string Name, string Position, string DeptName)> retValue = new List<(string Name, string Position, string DeptName)>();
+            retValue.Add(("-", "-", "-"));
+            return retValue;
+        }
+
+        /// <summary>
+        /// (본문을 제외한) 첨부파일 존재 유무
+        /// </summary>
+        /// <param name="selectedInfo"></param>
+        /// <returns></returns>
+        public bool GetExistMailAttachedFile(object selectedInfo)
+        {
+            //TODO 고도화 - 메일 Flow 확정 시 필요
+            return true;
         }
 
     }

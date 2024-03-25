@@ -2,6 +2,8 @@
 @page "/mailSecurityApprove/{groupIDbyParam:int}"
 @page "/mailSecurityApprove/{groupIDbyParam:int}/{menuMode:int}"
 
+@using HsNetWorkSG
+@using OpenNetLinkApp.Data.SGDicData.Approve
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.Models.SGNetwork
 @using HsNetWorkSGData;
@@ -87,7 +89,7 @@
                                     <!--<button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransTypeText<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
 
-                                @if (false) // 보안결재 에는 모두 개인정보가 있음
+                                @*@if (false) // 보안결재 에는 모두 개인정보가 있음
                                 {
                                     <th class="p-2" style="width:80px;"> @XmlConf.GetTitle("T_COMMON_PRIVACY") </th>
                                     <!--개인정보-->
@@ -104,8 +106,8 @@
                                             </div>
                                         </div>
                                         <!--<button type="button" @onclick="@(()=>openCustomSelect("DlpValue"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDlpValue<i class="fas fa-angle-down pl-2"></i></button>-->
-                                    </td>
-                                }
+                                </td>
+                                }*@
 
                                 <th class="p-2" style="text-align: right; vertical-align: middle; width: 80px;"> @XmlConf.GetTitle("T_EMAIL_STATUS") </th>  <!--발송상태-->
                                 <td>
@@ -192,7 +194,6 @@
                                         </th>
                                         <th style="text-align:center; vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_COMMON_APPROVE_KIND")</th>     <!--결재종류-->
                                         <th style="text-align:center; vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_COMMON_EMAILTRANSKIND")</th>     <!--발송구분-->
-
                                         @if (false)@* bUseDlpDataView *@
                                         {
                                             <th style="text-align:center; vertical-align:middle;width:6%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
@@ -211,7 +212,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (emailApproveData item in mData)
+                                    @foreach (SGApproveData item in ListData)
                                     {
 
                                         <tr>
@@ -224,15 +225,15 @@
                                             {
                                                 <td style="text-align: center; vertical-align: middle">@item.stDLP</td>
                                             }
-                                            <td style="text-align: center; vertical-align: middle">@item.strIsFileAdd</td>
-                                            <td style="text-align: center; vertical-align: middle">@item.TransStatusCode</td>
+                                            <td style="text-align: center; vertical-align: middle">@item.ExistMailAttachedFile</td>
+                                            <td style="text-align: center; vertical-align: middle">@item.TransStatusName</td>
                                             <td style="text-align: center; vertical-align: middle">@item.ApvStatus</td>
-                                            <td style="text-align: center; vertical-align: middle">@item.strSender</td>
-                                            <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; ">@item.strReceiver</td>
+                                            <td style="text-align: center; vertical-align: middle">@item.RequesterName</td>
+                                            <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; ">@item.ForwardName</td>
                                             <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                             <td style="text-align: center; vertical-align: middle">@item.RequestTime</td>
                                             <td style="text-align: center; vertical-align: middle">@item.ApvTime</td>
-                                            <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq, item.ApprSeq, item.bCanApproveReject?"true":"false", item.bIsAfterApprove, item.bIsCanFilePreview))"><i class="fas fa-search"></i></button></td>
+                                            <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                         </tr>
 
                                     }
@@ -294,6 +295,8 @@
     Footer refFooter;
     PeriodDatePicker refPeriodDatePicker;
 
+    public SGApproveUIData ApprDataConverter = new SGApproveUIData();
+
     public bool bUseDlpDataView = true;
 
     @*public string strFromDay = "";
@@ -316,7 +319,7 @@
     /// <summary>
     /// 조회해서 받은 원본data data
     /// </summary>
-    public List<emailApproveData> ListData = new List<emailApproveData>();
+    public List<SGApproveData> ListData = new List<SGApproveData>();
 
 
     /// <summary>
@@ -331,12 +334,15 @@
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<MailSecurityApproveUI>();
     int nDrawPageGroupID = -1;
 
-    public void CheckStateUpdate(emailApproveData item)
+    // 목적지 Data
+    Dictionary<string, SGNetOverData> dicDestSysPos = null;
+
+    public void CheckStateUpdate(SGApproveData item)
     {
         int nCount = ListData.Count;
         for (int i = 0; i < nCount; i++)
         {
-            emailApproveData temp = ListData[i];
+            SGApproveData temp = ListData[i];
             if (temp.TransSeq.Equals(item.TransSeq))
             {
                 temp.bCheck = !temp.bCheck;
@@ -456,34 +462,6 @@
     private int dispLimit = 1;
     ISGSideBarUIService SideBarUISvc;
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="groupID"></param>
-    /// <param name="strReason"></param>
-    /*public void ApproveSend(int groupID, string strReason)
-    {
-
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        string strUserID = "";
-        if (sgLoginData != null)
-            strUserID = sgLoginData.GetUserID();
-
-        string strApproveSeqs = "";
-
-        for (int i = 0; i < ListData.Count; i++)
-        {
-            if (ListData[i].bCheck == true)
-            {
-                string temp = (ListData[i].ApprSeq + '\u0002');  // 제일마지막에 '\u0002' 하나 더 붙어야 정상동작
-                strApproveSeqs += temp;
-            }
-        }
-
-        HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupID, ApproveBatchResult);
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, strApproveSeqs, false, true);
-    }*/
-
     public async Task ApproveAction()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -509,70 +487,21 @@
         }
 
         HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupID, ApproveBatchResult);
-        if (!SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID))
-        {
-            /*SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-            string strUserID = "";
-            if (sgLoginData != null)
-                strUserID = sgLoginData.GetUserID();
-
-            string strReason = "Approve";
-            string strApproveSeqs = "";
-
-            for (int i = 0; i < ListData.Count; i++)
-            {
-                if (ListData[i].bCheck == true)
-                {
-                    string temp = (ListData[i].ApprSeq + '\u0002');  // 제일마지막에 '\u0002' 하나 더 붙어야 정상동작
-                    strApproveSeqs += temp;
-                }
-            }
-
-            HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "A", strReason, strApproveSeqs, false, true);*/
-
-            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sgLoginData == null)
-            {
-                CLog.Here().Error($"ApproveAction, HSCmdCenter.GetLoginData = null");
-                ShowMessage("error", XmlConf.GetErrMsg("E_0209"));
-                return;
-            }
-
-            string strUserSeq = sgLoginData.GetUserSequence();
-            List<Int64> listApproveSeq = new List<Int64>();
-            for (int i = 0; i < ListData.Count; i++)
-            {
-                if (ListData[i].bCheck)
-                {
-                    listApproveSeq.Add(Convert.ToInt64(ListData[i].TransSeq));
-                }
-            }
-
-            HSCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "security", "mail", "confirm", "Approve", listApproveSeq);
-
-        }
-        else
+        
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID))
         {
             refSGReject.ResetReason(Common.Enums.EnumApproveType.Approve);
             refSGReject.SetGroupID(groupID);
             refSGReject.SetApprRejectEvent(ApproveRejectSend);
             await refSGReject.openPopUp();
         }
+        else
+            ApproveRejectSend(groupID, "Approve", false);
     }
 
 
     private async Task ApproveReject()
     {
-
-        // For Test
-        /*
-        PageDataRefreshEvent pgRefreshEvent = null;
-        pgRefreshEvent = HSCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.MailSecurityApproveWaitUI);
-        if (pgRefreshEvent != null)
-        {
-            pgRefreshEvent();
-            return;
-        }*/
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -613,30 +542,11 @@
     /// <param name="strReason"></param>
     public void ApproveRejectSend(int groupID, string strReason, bool bisReject)
     {
-        /*SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        string strUserID = "";
-        if (sgLoginData != null)
-            strUserID = sgLoginData.GetUserID();
-
-        string strApproveSeqs = "";
-
-        for (int i = 0; i < ListData.Count; i++)
-        {
-            if (ListData[i].bCheck == true)
-            {
-                string temp = (ListData[i].ApprSeq + '\u0002'); // 제일마지막에 '\u0002' 하나 더 붙어야 정상동작
-                strApproveSeqs += temp;
-            }
-        }
-
-        HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupID, RejectBatchResult);
-        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, "R", strReason, strApproveSeqs, false, true);*/
-
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
         {
             CLog.Here().Error($"ApproveRejectSend, HSCmdCenter.GetLoginData = null");
-            ShowMessage("error", XmlConf.GetErrMsg(bisReject?"E_0210":"E_0209"));
+            ShowMessage("error", XmlConf.GetErrMsg(bisReject ? "E_0210" : "E_0209"));
             return;
         }
 
@@ -662,7 +572,7 @@
         int nCount = ListData.Count;
         for (int i = 0; i < nCount; i++)
         {
-            emailApproveData temp = ListData[i];
+            SGApproveData temp = ListData[i];
             if (temp.bCheck == true)
             {
                 strApprKind = temp.ApvType;
@@ -683,7 +593,7 @@
         int nCount = ListData.Count;
         for (int i = 0; i < nCount; i++)
         {
-            emailApproveData temp = ListData[i];
+            SGApproveData temp = ListData[i];
             if (temp.bCheck)
             {
                 strApprSeq = temp.TransSeq;
@@ -696,7 +606,7 @@
     {
         if (e.Key == "Enter")
         {
-            Task.Run(async () => { await doSearch(); });
+            Task.Run(() => { doSearch(); }).Wait();
         }
     }
 
@@ -737,84 +647,19 @@
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
-    /// <summary>
-    /// 개수검색 Query 결과로 호출되는 event
-    /// </summary>
-    /// <param name="groupId"></param>
-    /// <param name="e"></param>
-    public void SearchCountResult(int groupId, SGData e)
-    {
-        string result = e.GetSvrRecordTagData("RESULT");
-        int count = Int32.Parse(e.GetSvrRecordTagData("COUNT"));  //결과레코드수
-        string reason = e.GetSvrRecordTagData("REASON");
-        List<Dictionary<int, string>> listCnt = null;
-        listCnt = e.GetSvrRecordData("RECORD");
-        if (listCnt == null || listCnt.Count < 1 || count <= 0)
-        {
-            CLog.Here().Information("SearchCount - RECORD - empty!");
-
-            ListData.Clear();
-            mData.Clear();
-            StateHasChanged();
-
-            ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
-
-            return;
-        }
-
-        string cnt = "";                        //총 레코드 카운트
-        listCnt[0].TryGetValue(0, out cnt);
-        int totalCnt = Int32.Parse(cnt);
-
-        if (result != "0")
-        {
-            CLog.Here().Information($"SearchCountResult - Result : {result}, reason : {reason}");
-            ListData.Clear();
-            mData.Clear();
-            StateHasChanged();
-
-            ShowMessage("error", reason);
-            return;
-        }
-
-        CLog.Here().Information($"SearchCountResult - COUNT : {totalCnt}, reason : {reason}");
-
-        if (totalCnt <= 0)
-        {
-            if (listCnt != null) listCnt.Clear();
-            SetPageinfo(totalCnt);
-            ListData.Clear();
-            mData.Clear();
-
-            StateHasChanged();
-
-            ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
-            return;
-        }
-
-        SetPageinfo(totalCnt);
-        //리스트 쿼리 호출
-        UpdateData();
-
-    }
 
 
     /// <summary>
     /// Count 개수를 고려한 List 검색
     /// </summary>
     /// <param name="pageNum"></param>
-    public void ApproveSearchData(int pageNum)
+    public void ApproveSearchData()
     {
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        string curUserID = "";
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
 
         string strMsg = "";
         if (pageService.GetConnectStatus(groupID) == false)
@@ -825,62 +670,55 @@
             return;
         }
 
-        //LIST 요청응답
-        HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchListResult);
-
-        mailParam.UserID = curUserID;
-
-        Task.Run(async () =>
+        if (!strSearchSender.ValidationSqlInjection())
         {
-            await refPeriodDatePicker.RetriveDateFromJS();
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
+            return;
+        }
 
-            string curFromDay = refPeriodDatePicker.FromDateSearchValue;
-            string curToDay = refPeriodDatePicker.ToDateSearchValue;
-            curFromDay = curFromDay.Substring(0, 8);
-            curToDay = curToDay.Substring(0, 8);
+        if (!strSearchReceiver.ValidationSqlInjection())
+        {
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
+            return;
+        }
 
-        // Test용도
-        //curFromDay = "20220101";
-        //curToDay = "20221231";
+        if (!strSearchTitle.ValidationSqlInjection())
+        {
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0295"));
+            return;
+        }
 
-        // 실제사용 - UI상에 설정된 값 안나옴
-        mailParam.SetSearchStartDate(curFromDay);
-            mailParam.SetSearchEndDate(curToDay);
+        if (nViewPageNo == 0)
+            nViewPageNo = 1;
 
-            string systemid = (sgLoginData.GetSystemPosition() ? "I" : "E");
-            mailParam.PageListCount = nPageListCount;
-            mailParam.APPROVE_TYPE_SFM = sgLoginData.GetApproveTypeSFM().ToString();    //대결재 방식 지정
-        mailParam.UserID = curUserID;
-            mailParam.SystemId = systemid;
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+        SGReadyData sgReadyData = (SGReadyData)HSCmdCenter.GetReadyData(groupID);
+        if (sgReadyData == null) return;
 
-            mailParam.Sender = strSearchSender;
-            mailParam.Receiver = strSearchReceiver;
-            mailParam.Title = strSearchTitle;
+        Task.Run(async () => { await refPeriodDatePicker.RetriveDateFromJS(); });
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
+        curFromDay = curFromDay.Substring(0, 8);
+        curToDay = curToDay.Substring(0, 8);
 
-            mailParam.SetApprKindCode(strApproveKind);
-            mailParam.SetTransKindCode(strTransTypeText);
 
-            mailParam.SetTransStatusCode(strTransFlag);
+        @* 후결없음 - "전체"만 사용 *@
+    string strTotal = XmlConf.GetTitle("T_COMMON_ALL");
+        ApproveParam param = new ApproveParam(curFromDay, curToDay, strTotal, strTransTypeText, strSearchApproveStatus, strSearchSender, strSearchTitle, sgLoginData.GetUserID(), nPageListCount, nViewPageNo, XmlConf);
+        param.DataType = new List<string>() { "email" };
+        param.SrcSGNetType = sgReadyData.GetSgNetType();
+        param.DestSGNetType = param.GetDestination(strTotal, dicDestSysPos);
 
-        // SetTransStatusCode 이후에 SetApprStatusCode 사용해야함(꼭)
-        mailParam.SetApprStatusCode(strSearchApproveStatus);
-
-            mailParam.SetDlpValue(XmlConf.GetTitle("T_COMMON_DLP_INCLUSION"));
-
-            mailParam.SetSender(strSearchSender);
-            mailParam.SetReceiver(strSearchReceiver);
-            mailParam.SetTitle(strSearchTitle);
-
-            mailParam.ViewPageNo = nViewPageNo;
-            mailParam.PageListCount = nPageListCount;
-            mailParam.bIsDlpPrivacyApprove = true;
-
-            MailApproveDao dao = new MailApproveDao();
-            string strQuery = dao.ListDbFunc(mailParam);
-            CLog.Here().Information($"QueryLIST-@@@@@@@@@@ : {strQuery}");
-
-            HSCmdCenter.SendListQuery(groupID, curUserID, strQuery);
-        });
+         //TODO 고도화 - 메일 결재에 조회 조건 추가 항목 필요
+        //발송상태 [전체/발송대기/발송취소/발송완료/발송실패/검사중] 항목 필요
+        param.SetTransStatus(strTransFlag);
+        //수신자 항목필요
+        param.MailReceiver = strSearchReceiver;
+        //발신자 항목필요
+        HSCmdCenter.RestApprovalSearch(groupID, "security", param);
 
     }
 
@@ -890,104 +728,75 @@
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
-    public void SearchListResult(int groupId, SGData e)
+    public void ApproveSearchData(int groupId, PageEventArgs e)
     {
-
         try
         {
-
-            string result = e.GetTagData("RESULT");
-            string reason = e.GetTagData("REASON");
-            int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
-            listTempData = e.GetSvrRecordData2("RECORD");
-
-            if (listTempData == null || listTempData.Count < 1)
+            ListData?.Clear();
+             int ret = e.result;
+            if (ret != 0)
             {
-                CLog.Here().Information("SearchListResult - RECORD - empty!");
-
-                ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
-                ListData.Clear();
-                mData.Clear();
-
-                StateHasChanged();
-                return;
-            }
-
-            CLog.Here().Information($"SearchListResult - Result : {result}, reason : {reason}");
-
-            if (result != "0")
-            {
-                ShowMessage("error", reason);
+                ShowMessage("error", e.strMsg);
                 return;
             }
 
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
-            string curUserID = "";
-            //int maxDownloadCount = 0;
-            bool isInner = false;
-            if (sgLoginData != null)
-            {
-                curUserID = sgLoginData.GetUserID();
-                //maxDownloadCount = sgLoginData.GetMaxDownCount();
-                isInner = sgLoginData.GetSystemPosition();
-            }
-            else
+            if (sgLoginData == null)
                 return;
 
-            ListData.Clear();
+            SGApprManageData sgData = (SGApprManageData)HSCmdCenter.GetApprManageData(groupId);
+            if (sgData == null)
+                return;
 
-            SGeMailApproveManageData sgData = new SGeMailApproveManageData();
-            sgData.Copy(HSCmdCenter.GetConnectNetWork(groupId), e);
+            nTotalPages = sgData.GetTotalPageCount();
+            string strUserSeq = sgLoginData.GetUserSequence();
 
-            int nCount = listTempData.Count;
-            int nowDate = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));   // Server Time으로 가져올 것
-
-
-            for (int i = 0; i < nCount; i++)
+            List<object> approvalInfoList = sgData.GetTagDataObjectList("approval_info_list");
+            if (approvalInfoList?.Count <= 0)
             {
-                Dictionary<int, string> dic = listTempData[i];
-                if (dic == null)
+                ListData.Clear();
+                ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
+                return;
+            }
+            
+            foreach (object approvalInfo in approvalInfoList)
+            {
+                if (approvalInfo == null)
                     continue;
 
-                string tmpStr = "";
-                if (dic.TryGetValue(0, out tmpStr) != true)
-                {
-                    if (tmpStr.Equals(""))
-                        continue;
-                }
+                SGApproveData aData = new SGApproveData();
+                aData.bCheckDisable = !(ApprDataConverter.GetApprEnableChk(strUserSeq, approvalInfo));        // 결재 가능/불가능
+                aData.bCheck = false;
+                aData.TransSeq = ApprDataConverter.GetTransSeq(approvalInfo);
+                
+                aData.ApvType = ApprDataConverter.GetApprKind(approvalInfo);                            // 결재종류 (선결/후결)
+                aData.TransferType = ApprDataConverter.GetTransKind(approvalInfo);              // 전송구분 (반출/반입)
 
-                emailApproveData tData = new emailApproveData();
-                tData.bCheckDisable = !(sgData.GetApprEnableChk(dic));             // 결재 가능/불가능
+                aData.stDLP = ApprDataConverter.GetDLP(approvalInfo);
 
-                tData.bCheck = false;
-                tData.TransSeq = sgData.GetEmailSeq(dic);
-                //tData.ApprSeq = sgData.GetApproveSeq(dic);
-                tData.ApvType = sgData.GetApprKind(dic);                            // 결재종류 (선결/후결)
-                tData.bIsAfterApprove = (sgData.GetApprKindRawData(dic) == "1");    // 결재종류 (후결:true, 선결:false)
-                tData.TransferType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
+                aData.ExistMailAttachedFile = ApprDataConverter.GetExistMailAttachedFile(approvalInfo); // 파일첨부유무
+                
+                aData.TransStatusCode = ApprDataConverter.GetTransStatusCode(approvalInfo); // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
+                aData.TransStatusName = ApprDataConverter.GetTransStatusName(approvalInfo, SGApproveUIData.UIType.MailSeciurity);
+                
+                ApprovalInfo MyApproveInfo = ApprDataConverter.GetApprovalInfo(approvalInfo, strUserSeq, SGApproveUIData.UIType.MailSeciurity);
+                aData.ApproverName = MyApproveInfo.UserName;             // 승인자
+                aData.ApproverSeq = MyApproveInfo.UserSeq; // 승인자
+                aData.ApvStatus = MyApproveInfo.ApproveStatusName;                 // 승인상태 (요청취소,승인대기,승인,반려)
+                
+                aData.RequesterName = ApprDataConverter.GetApproveReqUser(approvalInfo); //송신자
+                aData.ForwardInfo = ApprDataConverter.GetForwardUserInfo(approvalInfo); //발신자(수신자)
 
-                tData.stDLP = sgData.GetDlp(dic);                           // 개인정보 포함여부
-                tData.strIsFileAdd = sgData.GetFileAdd(dic);                // 파일첨부유무
-                tData.TransStatusCode = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
-                tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
-                tData.strSender = sgData.GetMailSender(dic);                // 송신자
-                tData.strReceiver = sgData.GetRecvUser(dic);                // 수산자
-
-                tData.bCanApproveReject = (sgData.GetApproveCanDo(dic) && sgData.GetApprEnableChk(dic));         // 승인대기 상태 인지 유무 값 (true : 승인/반려가능, false:불가능)
-                tData.bIsCanFilePreview = ((isInner && sgData.GetTransKindRawData(dic) == "1") || (isInner == false && sgData.GetTransKindRawData(dic) == "2"));
-
-                tData.Title = sgData.GetTitle(dic);                         // 제목
+                aData.Title = ApprDataConverter.GetTitle(approvalInfo);                            // 제목
                 FileAddManage fileAddManage = new FileAddManage();
-                tData.Title = fileAddManage.GetConvertTitleDesc(false, tData.Title);
-                tData.RequestTime = sgData.GetTransReqDay(dic);             // 발신일(type : YYYY-MM-DD hh:mm:ss)
-                tData.ApvTime = sgData.GetApproveDay(dic);                 // 승인일(type : YYYY-MM-DD hh:mm:ss)
-                tData.strDestNet = "";
+                aData.Title = fileAddManage.GetConvertTitleDesc(false, aData.Title);
 
-                ListData.Add(tData);
-
-            }// for (int i = 0; i < nCount; i++)
-
-            UpdateInitList(nViewPageNo);
+                aData.RequestTime = ApprDataConverter.GetQueryTransReqDay(approvalInfo);// 발신일(type : YYYY-MM-DD hh:mm:ss)
+                aData.ApvTime = ApprDataConverter.GetQueryApprDay(approvalInfo);                        // 승인일
+                
+                ListData.Add(aData);
+            }
+            bAllCheck = false;
             StateHasChanged();
 
         }
@@ -1003,114 +812,19 @@
     /// 조회시작 함수
     /// </summary>
     /// <returns></returns>
-    private async Task doSearch()
+    private void doSearch()
     {
-
         using (Mutex mutex = new Mutex(true, "MailSecurityApproveUI", out bool isNewInstance))
         {
             if (isNewInstance)
             {
-
-                ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-                int groupID = 0;
-                if (sgSideBar != null)
-                    groupID = sgSideBar.GroupId;
-
-                string strMsg = "";
-                if (pageService.GetConnectStatus(groupID) == false)
-                {
-                    strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-                    strMsg = strMsg.Replace("/r/n", "<br>");
-                    ShowMessage("error", strMsg);
-                    return;
-                }
-
-                //LIST 요청응답
-                HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchListResult);
-                //COUNT 요청응답
-                HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCountResult);
-
-                SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-                string curUserID = "";
-                if (sgLoginData != null)
-                    curUserID = sgLoginData.GetUserID();
-
-                //await mailParam.SetSearchStartDate("datepicker11");
-                //await mailParam.SetSearchEndDate("datepickoer12");
-                await refPeriodDatePicker.RetriveDateFromJS();
-
-                string curFromDay = refPeriodDatePicker.FromDateSearchValue;
-                string curToDay = refPeriodDatePicker.ToDateSearchValue;
-                curFromDay = curFromDay.Substring(0, 8);
-                curToDay = curToDay.Substring(0, 8);
-
-                // Test용도
-                //curFromDay = "20220101";
-                //curToDay = "20221231";
-
-                mailParam.SetSearchStartDate(curFromDay);
-                mailParam.SetSearchEndDate(curToDay);
-
-                string systemid = (sgLoginData.GetSystemPosition() ? "I" : "E");
-                mailParam.PageListCount = nPageListCount;
-                mailParam.APPROVE_TYPE_SFM = sgLoginData.GetApproveTypeSFM().ToString();    //대결재 방식 지정
-                mailParam.UserID = curUserID;
-                mailParam.SystemId = systemid;
-
-                mailParam.Sender = strSearchSender;
-                mailParam.Receiver = strSearchReceiver;
-                mailParam.Title = strSearchTitle;
-
-                mailParam.SetApprKindCode(strApproveKind);
-                mailParam.SetTransKindCode(strTransTypeText);
-
-                mailParam.SetTransStatusCode(strTransFlag);
-                // SetTransStatusCode 이후에 SetApprStatusCode 사용해야함(꼭)
-                mailParam.SetApprStatusCode(strSearchApproveStatus);
-
-                mailParam.SetDlpValue(XmlConf.GetTitle("T_COMMON_DLP_INCLUSION"));
-
-                mailParam.SetSender(strSearchSender);
-                mailParam.SetReceiver(strSearchReceiver);
-                mailParam.SetTitle(strSearchTitle);
-
-                mailParam.ViewPageNo = nViewPageNo;
-                mailParam.PageListCount = nPageListCount;
-                mailParam.bIsDlpPrivacyApprove = true;
-
-                MailApproveDao dao = new MailApproveDao();
-                // HSCmdCenter.SendCountQuery(groupID, curUserID, dao.TotalCount(mailParam));
-
-                string strQueryCount = dao.TotalCountDbFunc(mailParam);
-                CLog.Here().Information($"Query Approve Count-########## : {strQueryCount}");
-
-                HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
-
+                ApproveSearchData();
             }
             else
             {
                 CLog.Here().Information($"MailSecurityApproveUI - doSearch, Doing ~");
             }
         }
-
-
-
-    }
-
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="updatePageNum"></param>
-    private void UpdateInitList(int updatePageNum)
-    {
-        nViewPageNo = updatePageNum;
-        mData = ListData.Take(nPageListCount).ToList();
-    }
-
-    private void UpdateData()
-    {
-        ApproveSearchData(nViewPageNo);
     }
 
     private void UpdateList(int pageNumber)
@@ -1119,18 +833,121 @@
         if (nViewPageNo != (pageNumber + 1))
         {
             nViewPageNo = pageNumber + 1;
-            UpdateData();
-            return;
-        }
-        else
-        {
-            nViewPageNo = pageNumber;
-            //mData = ListData.Skip((pageNumber - 1) * nPageListCount).Take(nPageListCount).ToList();
-            mData = ListData.Take(nPageListCount).ToList();
+            ApproveSearchData();
+         
         }
     }
+     public void ApprDetailSearch(string transSeq)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
 
-    public async Task OpenDetail(string transSeq, string apvseq, string apvenable, bool bIsAfterApprove, bool bIsCanFilePreview)
+        SGReadyData sgReadyData = (SGReadyData)HSCmdCenter.GetReadyData(groupID);
+        if (sgReadyData == null)
+            return;
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        string UserSeq = sgLoginData.GetUserSequence();
+
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        SGApprManageData sgData = (SGApprManageData)HSCmdCenter.GetApprManageData(groupID);
+        if (sgData == null)
+        { return; }
+
+        List<object> approvalInfoList = sgData.GetTagDataObjectList("approval_info_list");
+        if (approvalInfoList?.Count <= 0)
+            return;
+
+        foreach (object approvalInfo in approvalInfoList)
+        {
+            string seq = approvalInfo.GetTagDataString("trans_req", "trans_seq").ToString();
+            if (transSeq == seq)
+            {
+                SGApproveUIData.ApproveDetailData DetailData = new SGApproveUIData.ApproveDetailData();
+                
+                DetailData.TransSeq = ApprDataConverter.GetTransSeq(approvalInfo);
+
+                DetailData.TransKindCode = ApprDataConverter.GetTransKindCode(approvalInfo);
+                DetailData.TransKindName = ApprDataConverter.GetTransKind(approvalInfo);
+
+                DetailData.TransStatusCode = ApprDataConverter.GetTransStatusCode(approvalInfo);
+                DetailData.TransStatusName = ApprDataConverter.GetTransStatusName(approvalInfo, SGApproveUIData.UIType.Mail);
+
+                DetailData.DataTypeCode = ApprDataConverter.GetDataTypeCode(approvalInfo);
+                DetailData.DataTypeName = ApprDataConverter.GetDataTypeName(approvalInfo);
+
+                //DetailData.FilePosName = ApprDataConverter.GetFilePos(approvalInfo, sgLoginData.GetDestinationInfo(false));
+
+                DetailData.ApprKindCode = ApprDataConverter.GetApprKindCode(approvalInfo);
+                DetailData.ApprKindName = ApprDataConverter.GetApprKind(approvalInfo);
+
+                DetailData.ApprStatusCode = ApprDataConverter.GetApprStatusCode(approvalInfo);
+                DetailData.ApprStatusName = ApprDataConverter.GetApprStatusName(approvalInfo);
+
+                DetailData.ReqUserName = ApprDataConverter.GetReqUser(approvalInfo);
+                DetailData.ApprReqDay = ApprDataConverter.GetApprReqDay(approvalInfo);
+
+                FileAddManage fileAddManage = new FileAddManage();
+                DetailData.Title = ApprDataConverter.GetTitle(approvalInfo);
+                DetailData.Title = fileAddManage.GetConvertTitleDesc(true, DetailData.Title);
+
+                //DetailData.FileKey = ApprDataConverter.GetFileKey(approvalInfo);
+                
+                //DetailData.DLPStatusName = ApprDataConverter.GetDLP(approvalInfo);
+
+                string mySgNetType = sgReadyData.GetSgNetType();
+                DetailData.FilePrevEnable = ApprDataConverter.GetFilePrevEnable(UserSeq, mySgNetType, approvalInfo);
+
+                DetailData.FileData = ApprDataConverter.GetFileInfo(approvalInfo);
+
+                bool isVisibleFileApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseFileApproveReason(groupID);
+                DetailData.ApproverInfoHist = ApprDataConverter.GetApproverInfoHist(approvalInfo, isVisibleFileApproveReason);
+
+                DetailData.ApprConfirmEnable = ApprDataConverter.GetApprEnableChk(UserSeq, approvalInfo);
+                DetailData.ApprRejectEnable = (DetailData.ApprConfirmEnable && ApprDataConverter.GetApprKindCode(approvalInfo) == "pre");    //결재 가능 && 선결인 경우, 반려 가능
+
+
+                
+                DetailData.MyApproveInfo = ApprDataConverter.GetApprovalInfo(approvalInfo, UserSeq, SGApproveUIData.UIType.Common);
+                DetailData.ForwardInfo = ApprDataConverter.GetForwardUserInfo(approvalInfo);
+
+                if(DetailData.ForwardInfo?.Count == 1)
+                    DetailData.ForwardReceiver = DetailData.ForwardInfo[0].Name;
+                else if(DetailData.ForwardInfo?.Count > 1)
+                    DetailData.ForwardReceiver = String.Format(XmlConf.GetInfoMsg("I_0083"), DetailData.ForwardInfo[0].Name, (DetailData.ForwardInfo.Count - 1).ToString());
+
+                DetailData.ForwardCCInfo = ApprDataConverter.GetForwardCCUserInfo(approvalInfo);
+                
+                if(DetailData.ForwardCCInfo?.Count == 1)
+                    DetailData.ForwardCCReceiver = DetailData.ForwardCCInfo[0].Name;
+                else if(DetailData.ForwardCCInfo?.Count > 1)
+                    DetailData.ForwardCCReceiver = String.Format(XmlConf.GetInfoMsg("I_0083"), DetailData.ForwardCCInfo[0].Name, (DetailData.ForwardCCInfo.Count - 1).ToString());
+
+                if(DetailData.ForwardHiddenCCInfo?.Count == 1)
+                    DetailData.ForwardHiddenCCReceiver = DetailData.ForwardHiddenCCInfo[0].Name;
+                else if(DetailData.ForwardHiddenCCInfo?.Count > 1)
+                    DetailData.ForwardHiddenCCReceiver = String.Format(XmlConf.GetInfoMsg("I_0083"), DetailData.ForwardHiddenCCInfo[0].Name, (DetailData.ForwardHiddenCCInfo.Count - 1).ToString());
+
+                refMailApprovePopUp.SetBindingData(DetailData);
+                refMailApprovePreviewPopUp.SetBindingData(DetailData);
+                OpenDetail(transSeq).Wait();
+                break;
+            }
+        }
+
+    }
+    public async Task OpenDetail(string transSeq)
     {
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1147,8 +964,6 @@
         {
             refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
             refMailApprovePopUp.bIsPrivacyApproveDetail = true;
-            //apvenable = "true";
-            refMailApprovePopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
             await refMailApprovePopUp.openPopUp();
             return;
         }
@@ -1160,11 +975,9 @@
 
             refMailApprovePopUp.bUseDlpDataView = bUseDlpDataView;
             refMailApprovePopUp.bIsPrivacyApproveDetail = true;
-            refMailApprovePopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
 
             refMailApprovePreviewPopUp.bUseDlpDataView = bUseDlpDataView;
             refMailApprovePreviewPopUp.bIsPrivacyApproveDetail = true;
-            refMailApprovePreviewPopUp.SetParam(transSeq, apvseq, apvenable, bIsAfterApprove, bIsCanFilePreview);
             return;
         }
         //await refMailApprovePopUp.openPopUp();
@@ -1225,10 +1038,13 @@
             //Email 배치 승인,반려 요청에 응답 이벤트
 
             bUseDlpDataView = SGAppMgrSvc.OpConfigInfoService.GetUseUIdlpData(groupIDbyParam);
-
+            
+            HSCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupID, ApproveSearchData);
             HSCmdCenter.sgPageEvent.SetEmailApprBatchEvent(groupIDbyParam, ApproveBatchResult);
-            HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailSecurityApproveUI, UpdateData);
+            HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailSecurityApproveUI, ApproveSearchData);
             HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.MailSecurityApproveWaitUI, ApproveWaitSearch);
+            
+            dicDestSysPos = pageService.GetTargetSystemList(groupID);
 
             jsRuntime.InvokeAsync<object>("initPageLeft");
 
@@ -1238,7 +1054,7 @@
                 strSearchApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT"); //"승인대기"
             }
 
-            await doSearch();
+            doSearch();
 
             StateHasChanged();
         }
@@ -1274,7 +1090,7 @@
         strTransFlag = XmlConf.GetTitle("T_COMMON_ALL");
         strSearchApproveStatus = XmlConf.GetTitle(bSearchApprWait ? "T_COMMON_APPROVE_WAIT" : "T_COMMON_ALL"); //"승인대기"
 
-        Task.Run(async () => { await doSearch(); });
+        Task.Run(() => { doSearch(); }).Wait();
     }
 
     public void InitText()
@@ -1298,10 +1114,6 @@
         string result = e.GetResponseCode().ToString();
         CLog.Here().Information($"ApproveBatchResult - groupID : {groupid}, RESULT : {result}");
 
-        /*string result = e.GetTagData("RESULT");
-        string reason = e.GetTagData("REASON");
-        CLog.Here().Information($"ApproveBatchResult - RESULT : {result}, reason : {reason}");*/
-
         if (result != "0")
         {
             //ShowMessage("error", reason);
@@ -1309,7 +1121,7 @@
             return;
         }
         ShowMessage("info", XmlConf.GetTitle("T_EMAIL_APPROVE_DONE"));
-        Task.Run(async () => { await doSearch(); });
+        Task.Run(() => { doSearch(); }).Wait();
     }
 
     /// <summary>
@@ -1332,7 +1144,7 @@
 
         //ShowMessage("info", reason);
         ShowMessage("info", XmlConf.GetTitle("T_EMAIL_REJECT_DONE"));
-        Task.Run(async () => { await doSearch(); });
+        Task.Run(() => { doSearch(); }).Wait();
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -1349,10 +1161,10 @@
             else
             {
                 CLog.Here().Information($"OnAfterRender, 4 ############################ !!!!!!!!!!!!!!!!!!!!!!!");
-                Task.Run(async () => { await doSearch(); });
+                Task.Run(() => { doSearch(); }).Wait();
             }
 
-            Task.Run(async () => { await doSearch(); });
+            Task.Run(() => { doSearch(); }).Wait();;
         }
         @*pageService.SetDayInfoRefreshEvent(groupIDbyParam, DayInfoRefreshResult);*@
         base.OnAfterRender(firstRender);

@@ -193,6 +193,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgNet.NetPos = "IN";
                 //sgNet.TlsVersion = "1.2";
                 sgNet.APIVersion = "1.0";
+                sgNet.APIAddress = new List<string>();
                 listNetworks.Add(sgNet);
             }
 

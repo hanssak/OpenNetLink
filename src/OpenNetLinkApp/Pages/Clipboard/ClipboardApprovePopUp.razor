@@ -1,7 +1,6 @@
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Components.SGPopUp
-@using OpenNetLinkApp.Data.SGDicData.Approve
 @using System.Security.Cryptography
 @using System.Diagnostics
 @using System.Text
@@ -53,7 +52,6 @@
                                 <th>@strFilePos</th>  <!--파일위치-->
                                 <td style="text-align:center;">@strDataFilePos</td>
                                 <!--<th>@strReciver</th> -->   <!--수신자-->
-
                                 @if (bUseDlpDataView)
                                 {
                                     <th>@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
@@ -117,7 +115,6 @@
                                 <th style="text-align: center; width: 7%;">@strFileSize </th>             <!--크기-->
                                 <th style="text-align: center;">@strVirusHist </th>         <!--바이러스내역-->
                                 <th style="text-align: center;">@strVirusCheckDate </th>     <!--바이러스검사-->
-
                                 @if (bUseDlpDataView)
                                 {
                                     <th style="text-align: center;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>
@@ -243,8 +240,7 @@
 
 @code
 {
-    private SGApproveUIData ApprDataConverter;
-    private object SelectedInfo;
+    private SGApproveUIData.ApproveDetailData DetailData;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<ClipboardApprovePopUp>();
     ISGNetworkService NetWorkSvc;
@@ -304,52 +300,52 @@
         if (sgLoginData == null)
             return;
 
-        
+
         //TODO 고도화 - 뷰어를 위한, IP 정보에 대해 논의 필요
         string strIP = "";//sgDetailData.GetFilePreviewIP();
         string param = makeParamOfServerViewer();
 
 #if _WINDOWS
 
-        string strArguments = "";
+    string strArguments = "";
 
-        if (!SGAppMgrSvc.OpConfigInfoService.GetUseWebLinkPreviewer(groupID))
-        {
-            // 확인후 적용!
-            strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-            strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
-        }
-        else
-        {
-            //웹링크쪽 뷰어 Param
-            string webLinkURL = SGAppMgrSvc.OpConfigInfoService.GetWebLinkPreviewerURL(groupID);
-            string webLinkParam = makeViewerParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
+    if (!SGAppMgrSvc.OpConfigInfoService.GetUseWebLinkPreviewer(groupID))
+    {
+        // 확인후 적용!
+        strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+        strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+    }
+    else
+    {
+        //웹링크쪽 뷰어 Param
+        string webLinkURL = SGAppMgrSvc.OpConfigInfoService.GetWebLinkPreviewerURL(groupID);
+        string webLinkParam = makeViewerParamOfWebLinkViewer(sgLoginData.GetSysID(), sgLoginData.GetUserID());
 
-            strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
-            strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
-        }
+        strArguments = $"https://{webLinkURL}/weblink/AP001_Docs_Viewer.do?" + webLinkParam;
+        strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+    }
 
 #else
 
-ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
-startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-startInfo.WindowStyle = ProcessWindowStyle.Normal;
+        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+        startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+        startInfo.WindowStyle = ProcessWindowStyle.Normal;
 #endif
 
         try
         {
 #if _WINDOWS
 
-            [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-            static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
-            ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
+        [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
+        ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
 #else
 
-// Run the external process & wait for it to finish
-using (Process proc = Process.Start(startInfo))
-{
-//proc.WaitForExit();
-}
+            // Run the external process & wait for it to finish
+            using (Process proc = Process.Start(startInfo))
+            {
+                //proc.WaitForExit();
+            }
 #endif
 
         }
@@ -633,10 +629,11 @@ using (Process proc = Process.Start(startInfo))
     }
 
 
-    public void SetBindingData(SGApproveUIData getDataConv, object ApproveInfo)
+    public void SetBindingData(SGApproveUIData.ApproveDetailData getDetailData)
     {
-        ApprDataConverter = getDataConv;
-        SelectedInfo = ApproveInfo;
+        apprHList.Clear();
+
+        DetailData = getDetailData;
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -647,38 +644,36 @@ using (Process proc = Process.Start(startInfo))
         if (sgLoginData == null)
             return;
 
-        string userSeq = sgLoginData.GetUserSequence();
+        strDataTransKind = DetailData.TransKindName;// 전송구분
+        strDataTransStatus = DetailData.TransStatusName;// 전송상태
+        strDataDataType = DetailData.DataTypeName;
 
-        if (ApproveInfo == null)
-            return;
-        strDataTransKind = ApprDataConverter.GetTransKind(ApproveInfo);                                     // 전송구분
-        strDataTransStatus = ApprDataConverter.GetTransStatusName(ApproveInfo);                                 // 전송상태
-        strDataDataType = ApprDataConverter.GetDataType(ApproveInfo);
+        strDataFilePos = DetailData.FilePosName;    //파일위치
 
-        strDataFilePos = ApprDataConverter.GetFilePos(ApproveInfo, sgLoginData.GetDestinationInfo(false));
-
-        strDataApprKind = ApprDataConverter.GetApprKind(ApproveInfo);                                     // 승인구분
-        strDataApprStatus = ApprDataConverter.GetApprStatus(ApproveInfo);                                   // 승인상태
-        strDataApprReqUser = ApprDataConverter.GetReqUser(ApproveInfo);                                     // 승인요청자
-        strDataApprReqDay = ApprDataConverter.GetApprReqDay(ApproveInfo);                                   // 승인요청일
+        strDataApprKind = DetailData.ApprKindName;// 승인구분
+        strDataApprStatus = DetailData.ApprStatusName;// 승인상태
+        strDataApprReqUser = DetailData.ReqUserName;// 승인요청자
+        strDataApprReqDay = DetailData.ApprReqDay;// 승인요청일
 
         //클립보드는 제목과 설명 없음
         //FileAddManage fileAddManage = new FileAddManage();
-        //strDataTitle = ApprDataConverter.GetTitle(ApproveInfo);                                             // 제목        
+        //strDataTitle = ApprDataConverter.GetTitle(ApproveInfo);                                             // 제목
         //strDataTitle = fileAddManage.GetConvertTitleDesc(false, strDataTitle);
         //strDataDesc = ApprDataConverter.GetDesc(ApproveInfo);                                              // 설명
         //strDataDesc = fileAddManage.GetConvertTitleDesc(false, strDataDesc);
 
-        stSelectedEncKey = ApprDataConverter.GetFileKey(ApproveInfo);
-        stDLP = ApprDataConverter.GetDLP(ApproveInfo);
+        stSelectedEncKey = DetailData.FileKey;
+        stDLP = DetailData.DLPStatusName;
 
-        SGReadyData sgReadyData = (SGReadyData)HsCmdCenter.GetReadyData(groupID);
-        string mySgNetType = (sgReadyData == null) ? "" : sgReadyData.GetSgNetType();
-        m_bFilePrevDisable = !(ApprDataConverter.GetFilePrevEnable(userSeq, mySgNetType, ApproveInfo));
-        
-        ApprDataConverter.GetFileInfo(ApproveInfo, out mFileData);
+
+        m_bFilePrevDisable = !DetailData.FilePrevEnable;
+
+        mFileData = DetailData.FileData;
         if (mFileData == null)
             return;
+
+        m_bApprove = DetailData.ApprConfirmEnable;
+        m_bReject = DetailData.ApprRejectEnable;
 
         for (int i = 0; i < mFileData.Count; i++)
         {
@@ -687,48 +682,35 @@ using (Process proc = Process.Start(startInfo))
                 mFileData[i].bCheck = false;
         }
 
-        
-        bool isVisibleClipBoardApproveReason = SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardApproveReason(groupID);
-        List<ApproverHist> apprListHist = ApprDataConverter.GetApproverInfoHist(ApproveInfo, isVisibleClipBoardApproveReason);
+        List<ApproverHist> apprListHist = DetailData.ApproverInfoHist;
 
-
-        if ((apprListHist == null) || (apprListHist.Count <= 1))
-        {
+        if (apprListHist?.Count <= 1)
             bApprHistHidden = true;
-        }
 
-        if ((apprListHist == null) || (apprListHist.Count <= 0))
-        {
+        if (apprListHist?.Count <= 0)
             strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
-        }
         else
         {
-            ApprovalInfo MyApproveInfo = ApprDataConverter.GetApprovalInfo(ApproveInfo, userSeq);
-            strDataLastApprStatus = MyApproveInfo.ApproveStatusName;
-            strDataLastApprName = MyApproveInfo.UserName;            
-            strDataLastApprDay = MyApproveInfo.ApproveTime;
-            strDataLastApprRejectReason = MyApproveInfo.ApproveReason;
+            strDataLastApprStatus = DetailData.MyApproveInfo?.ApproveStatusName;
+            strDataLastApprName = DetailData.MyApproveInfo?.UserName;
+            strDataLastApprDay = DetailData.MyApproveInfo?.ApproveTime;
+            strDataLastApprRejectReason = DetailData.MyApproveInfo?.ApproveReason;
             if (strDataLastApprRejectReason.Length > 100)
                 strDataLastApprRejectReason = strDataLastApprRejectReason.Substring(0, 100) + "\n" + strDataLastApprRejectReason.Substring(101);
 
-        }
-        m_bApprove = ApprDataConverter.GetApprEnableChk(userSeq, ApproveInfo);
-        m_bReject = (m_bApprove && ApprDataConverter.GetApprKindCode(ApproveInfo) == "pre");
-
-
-        if (apprListHist != null)
-        {
-            apprHList.Clear();
-            foreach (ApproverHist data in apprListHist)
+            if (apprListHist?.Count>0)
             {
-                string sName = data.m_strApproverName;
-                string sApprStatus = data.m_strApprStatus;
-                string sApprDay = data.m_strApprDay;
-                string sRejectReason = data.m_strRejectReason;
-                apprHList.Add(new ApprHist(sName, sApprStatus, sApprDay, sRejectReason));
+                apprHList.Clear();
+                foreach (ApproverHist data in apprListHist)
+                {
+                    string sName = data.m_strApproverName;
+                    string sApprStatus = data.m_strApprStatus;
+                    string sApprDay = data.m_strApprDay;
+                    string sRejectReason = data.m_strRejectReason;
+                    apprHList.Add(new ApprHist(sName, sApprStatus, sApprDay, sRejectReason));
+                }
             }
         }
-
         StateHasChanged();
     }
 
@@ -882,21 +864,21 @@ using (Process proc = Process.Start(startInfo))
 
     public void DetailApproveRejectSend(int groupID, string strReason, bool bisReject)
     {
-		SGLoginData sgLoginData = null;
-		sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-		if (sgLoginData == null) 
-		{
-			CLog.Here().Error($"DetailApproveRejectSend, HsCmdCenter.GetUserData = null");
-			ShowMessage("error", XmlConf.GetErrMsg(bisReject?"E_0210":"E_0209"));
-			return;
-		}
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+        {
+            CLog.Here().Error($"DetailApproveRejectSend, HsCmdCenter.GetUserData = null");
+            ShowMessage("error", XmlConf.GetErrMsg(bisReject ? "E_0210" : "E_0209"));
+            return;
+        }
 
-		string strUserSeq = sgLoginData.GetUserSequence();
-		List<Int64> listApproveSeq = new List<Int64>();
-		listApproveSeq.Add(Convert.ToInt64(ApprDataConverter.GetTransSeq(SelectedInfo)));
+        string strUserSeq = sgLoginData.GetUserSequence();
+        List<Int64> listApproveSeq = new List<Int64>();
+        listApproveSeq.Add(DetailData.TransSeqValue);
 
         string action = (bisReject ? "reject" : "confirm");
-		HsCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "common", "clip", action, strReason, listApproveSeq);
+        HsCmdCenter.RestSendApproveBatch(groupID, Convert.ToInt64(strUserSeq), "common", "clip", action, strReason, listApproveSeq);
 
         closePopUp();
     }
@@ -916,7 +898,7 @@ using (Process proc = Process.Start(startInfo))
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-      
+
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
@@ -925,7 +907,17 @@ using (Process proc = Process.Start(startInfo))
         // 0kb 인지 확인 및 Msg 처리
         string strFileSeq = stSelectedFileNo;
 
-        if (ApprDataConverter.GetFileSizeEmpty(SelectedInfo, strFileSeq))
+        long FileSize= 0;
+        foreach (FileInfoData file in DetailData.FileData)
+        {
+            if(file.fileNo  == strFileSeq)
+            {
+                FileSize = file.fileSizeValue;
+                break;
+            }
+        }
+
+        if (FileSize <= 0)
         {
             ShowMessage("error", XmlConf.GetErrMsg("E_0243"));
             return false;
@@ -972,7 +964,7 @@ break;
         {
             // Web으로 preview 안하는 파일 down해서 띄워줌
             string strUserID = sgLoginData.GetUserID();
-            string strTransSeq = ApprDataConverter.GetTransSeq(SelectedInfo);
+            string strTransSeq = DetailData.TransSeq;
             sFileName = Path.GetFileName(sFileName);
 
             string strFilePath = Path.Combine("wapprove", sFileName);
@@ -997,7 +989,7 @@ break;
                 File.Delete(strFilePath);
             }
 
-            string strFileKey = ApprDataConverter.GetFileKey(SelectedInfo);
+            string strFileKey = DetailData.FileKey;
 
             pageService.SetFilePrevRecving(true);
             ShowProgress(groupID, 1, 0, sFileName);

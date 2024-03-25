@@ -15,6 +15,7 @@ namespace OpenNetLinkApp.Models.SGNetwork
         //public string TlsVersion { get; set; }              // TLSVersion 정보
         //public string ClientVersion { get; set; }           // ClientVersion 정보
         public string APIVersion { get; set; }                  //RestAPI 서비스 정보
+        public List<string> APIAddress { get; set; }            //RestAPI IP 주소
         public string NetPos { get; set; }                  // 네트워크 위치
         public List<string> ADDomain { get; set; }                // AD 로그인때 사용하는 Domain정보(암호화된)
     }
