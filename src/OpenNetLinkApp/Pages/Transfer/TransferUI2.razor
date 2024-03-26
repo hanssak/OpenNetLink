@@ -1601,7 +1601,7 @@
             if (sgDataApproverValidation.m_DicTagData.Count > 0)
             {
                 string strData = "";
-                List <ApproverApproveDataCheckInfo> ListApproverApproveData = new List<ApproverApproveDataCheckInfo>();
+                List<ApproverApproveDataCheckInfo> ListApproverApproveData = new List<ApproverApproveDataCheckInfo>();
                 //if (GetAfterApproveData(ListApproverApproveData, sgDataApproverValidation) == false)
                 if (CsFunction.GetAfterApproveData(ListApproverApproveData, sgDataApproverValidation, out strData) == false)
                 {
@@ -1609,7 +1609,7 @@
                     ShowMessage("error", strData);
                     return;
                 }
-                
+
                 bool checkWarring = false;
                 bool checkLimit = false;
 
@@ -1626,7 +1626,7 @@
                         checkWarring = true;
                         message += String.Format(XmlConf.GetWarnMsg("W_0277"), item.strWarningPeriodOverCount); // 사후결재 승인대기 기간경고 건수 : {0} 건
                     }
-                    if (string.IsNullOrEmpty(item.strBlockPeriodOverCount) == false  && item.strBlockPeriodOverCount != "0")
+                    if (string.IsNullOrEmpty(item.strBlockPeriodOverCount) == false && item.strBlockPeriodOverCount != "0")
                     {
                         checkLimit = true;
                         message += String.Format(XmlConf.GetWarnMsg("W_0278"), item.strBlockPeriodOverCount); // 사후결재 승인대기 기간제한 건수 : {0} 건
@@ -3360,10 +3360,10 @@
         long fileSize = Convert.ToInt64(values["FILESIZE"]);
         int nTotalPart = (int)(fileSize / hsNetPartSize) + 1;
 
+        ContinueFileUploadRev(groupId);
+        //HSCmdCenter.sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eFILEUPLOADINFO, ContinueFileUploadRev);
 
-        HSCmdCenter.sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eFILEUPLOADINFO, ContinueFileUploadRev);
-
-        HSCmdCenter.SendFileUploadInfo(groupId, userInfo.UserId, values["MID"], nTotalPart.ToString(), fileSize.ToString());
+        //HSCmdCenter.SendFileUploadInfo(groupId, userInfo.UserId, values["MID"], nTotalPart.ToString(), fileSize.ToString());
 
     }
 
@@ -3382,7 +3382,7 @@
         return;
     }
 
-    private void ContinueFileUploadRev(int groupId, object[] e)
+    private void ContinueFileUploadRev(int groupId)
     {
         if (pageService.GetConnectStatus(groupIDbyParam) == false)
         {
@@ -3428,17 +3428,12 @@
         if (sgReSendData == null)
             return;
 
-        SGData sgData = e[0] as SGData;
-        string reason = sgData.GetBasicTagData("REASON");
-        string str = sgData.GetEncTagData("RESULT");
         int recvFileSize = 0;
-        if (!String.IsNullOrEmpty(sgData.GetBasicTagData("RECVFILESIZE")))
-            recvFileSize = Convert.ToInt32(sgData.GetBasicTagData("RECVFILESIZE"));
-
 
         Dictionary<string, string> sendValues = CsFunction.ByteArrayToObject(sgReSendData.TRANSINFO as byte[]) as Dictionary<string, string>;
 
         sendValues["CLIENTID"] = sgUserData.UserId;
+        recvFileSize = Convert.ToInt32(sendValues["SENDSIZE"].Base64DecodingStr());
 
         HSCmdCenter.ContinueSendFileTrans(groupId, sendValues, strDestNetOverData, sgReSendData.HSZNAME, recvFileSize);
     }

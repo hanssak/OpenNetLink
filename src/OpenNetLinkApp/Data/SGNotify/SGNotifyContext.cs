@@ -290,6 +290,25 @@ namespace OpenNetLinkApp.Data.SGNotify
             mut.ReleaseMutex();
             return true;
         }
+        public bool UpdateReSendInfo(int groupId, string userSeq, object transInfo)
+        {
+            mut.WaitOne();
+            SGReSendData reSendData;
+            // Read
+
+            reSendData = DBCtx.ReSend
+                    .Where(x => x.GROUPID == groupId && x.USERSEQ == userSeq && x.ISEND == false)
+                    .OrderByDescending(x => x.RESENDID).FirstOrDefault();
+
+            if (reSendData != null)
+                reSendData.TRANSINFO = transInfo;
+
+            DBCtx.SaveChanges();
+
+            Log.Logger.Here().Information("Update ReSendInfo");
+            mut.ReleaseMutex();
+            return true;
+        }
 
         public bool DeleteReSendInfo(int groupId, string userSeq)
         {
