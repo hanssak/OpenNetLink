@@ -117,6 +117,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>true 내부, false 외부</returns>
         public bool GetSystemPosition() => MySgNetType.StartsWith("I");
 
+        public List<object> GetDestinationSgNetList() => GetTagDataObjectList("user_policy", "server_policy", "destination_sg_net_list");
+
         /// <summary>
         /// 목적지에 대한 Net 정보 반환
         /// ("server_policy", "destination_sg_net_list")
@@ -126,8 +128,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public List<SGNetOverData> GetDestinationInfo(bool exceptMe = true)
         {
             List<SGNetOverData> retValue = new List<SGNetOverData>();
-            List<object> sgNetList = GetTagDataObjectList("user_policy", "server_policy", "destination_sg_net_list");
-
+            List<object> sgNetList = GetDestinationSgNetList();
 
             int idx = 0;
             foreach (object destSgNet in sgNetList)
@@ -153,6 +154,28 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 idx++;
             }
             return retValue;
+        }
+
+        public Dictionary<string, object> GetUserHRDic()
+        {
+            JObject userHrJObj = (JObject)GetTagDataObject("user_hr");
+            Dictionary<string, object> userHrDic = (userHrJObj != null) ? userHrJObj.ToObject<Dictionary<string, object>>() : new Dictionary<string, object>();
+            return userHrDic;
+        }
+
+        public UserHRinfo GetUserHRInfo()
+        {
+            UserHRinfo userHr = new UserHRinfo()
+            {
+                strId = GetTagData("user_hr", "user_id"),
+                strSeq = GetTagData("user_hr", "user_seq"),
+                strName = GetTagData("user_hr", "name"),
+                strRank = GetTagData("user_hr", "rank"),
+                strDeptName = GetTagData("user_hr", "dept_name"),
+                deptSeq = GetTagData("user_hr", "dept_seq"),
+                strPosition = GetTagData("user_hr", "position")
+            };
+            return userHr;
         }
 
         public static string LoginFailMessage(int nRet)
@@ -462,7 +485,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <returns>true : OTP발급가능(발급 Popup 표시)</returns>
         public bool GetOTPPublishUse()
         {
-            string strData = GetTagData("user_policy", "manual_download_use");
+            string strData = GetTagData("user_policy", "otp_publishing_use");
             return (strData.ToUpper() == "TRUE");
         }
 
@@ -996,7 +1019,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <summary>
         /// 파일 일일 전송 가능 최대 Size 제한 정보를 반환한다.
         /// </summary>
-        /// <returns>파일 일일 전송 가능 최대 Size 제한 정보.</returns>
+        /// <returns>파일 일일 전송 가능 최대 Size 제한 정보.(MB 단위)</returns>
         public Int64 GetDayFileTransferLimitSize()
         {
             string strData = GetTagData("user_policy", "transfer_policy", "allowed_daily", "total_size");
@@ -1035,7 +1058,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <summary>
         /// 클립보드 일일 전송 가능한 최대 SIZE 제한 정보를 반환한다.
         /// </summary>
-        /// <returns>클립보드 일일 전송 가능한 최대 SIZE 제한 정보</returns>
+        /// <returns>클립보드 일일 전송 가능한 최대 SIZE 제한 정보(MB 단위)</returns>
         public Int64 GetDayClipboardLimitSize()
         {
             string strData = GetTagData("user_policy", "transfer_policy", "allowed_daily", "clipboard_total_size");
@@ -1048,7 +1071,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <summary>
         /// 한번에 전송 가능한 클립보드 최대 Size 제한 정보를 반환
         /// </summary>
-        /// <returns>한번에 전송 가능한 클립보드 최대 Size 제한 정보</returns>
+        /// <returns>한번에 전송 가능한 클립보드 최대 Size 제한 정보(MB 단위)</returns>
         public Int64 GetClipboardLimitSize()
         {
             string strData = GetTagData("user_policy", "transfer_policy", "allowed_one_time", "clipboard_total_size");
@@ -1058,10 +1081,64 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return size;
         }
 
+
         /// <summary>
-        /// 다운로드 가능한 횟수를 반환(여러번 다운로드에서 사용)
+        /// 파일 일일 이미 전송한 Size 정보를 반환한다. 
         /// </summary>
-        /// <returns>다운로드 가능한 횟수</returns>
+        /// <returns>MB 단위</returns>
+        public Int64 GetDayFileTransferUsedSize()
+        {
+            string strData = GetTagData("used_transfer", "used_daily", "total_size");
+            if (strData.Equals(""))
+                return 0;
+            Int64 size = Convert.ToInt64(strData);
+            return size;
+        }
+
+        /// <summary>
+        /// 파일 일일 이미 전송한 횟수 정보를 반환
+        /// </summary>
+        /// <returns>MB 단위</returns>
+        public int GetDayFileTransferUsedCount()
+        {
+            string strData = GetTagData("used_transfer", "used_daily", "total_number");
+            if (strData.Equals(""))
+                return 0;
+            int Count = Convert.ToInt32(strData);
+            return Count;
+        }
+
+        
+
+        /// <summary>
+        /// 클립보드 일일 이미 전송한 SIZE 정보를 반환한다.
+        /// </summary>
+        /// <returns>(MB 단위)</returns>
+        public Int64 GetDayClipboardUsedSize()
+        {
+            string strData = GetTagData("used_transfer", "used_daily", "clipboard_total_size");
+            if (strData.Equals(""))
+                return 0;
+            Int64 size = Convert.ToInt64(strData);
+            return size;
+        }
+
+        /// <summary>
+        /// 클립보드 일일 이미 전송한 횟수 정보를 반환
+        /// </summary>
+        /// <returns>MB 단위</returns>
+        public int GetDayClipboardUsedCount()
+        {
+            string strData = GetTagData("used_transfer", "used_daily", "clipboard_total_number");
+            if (strData.Equals(""))
+                return 0;
+            int Count = Convert.ToInt32(strData);
+            return Count;
+        }
+        /// <summary>
+         /// 다운로드 가능한 횟수를 반환(여러번 다운로드에서 사용)
+         /// </summary>
+         /// <returns>다운로드 가능한 횟수</returns>
         public int GetMaxDownCount()
         {
             string strData = GetTagData("user_policy", "download_limit_count");
@@ -1704,6 +1781,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return ret;
 
             }
+        }
+
+        public void SetNewUserPolicy(SGData newPolicy)
+        {
+            //정책 업데이트 갱신
+            m_DicTagData["user_policy"] = newPolicy.m_DicTagData["user_policy"];
+            m_DicTagData["mime_ole_url_info"] = newPolicy.m_DicTagData["mime_ole_url_info"];
+            m_DicTagData["agent_patch_policy"] = newPolicy.m_DicTagData["agent_patch_policy"];
+            m_DicTagData["approve_line"] = newPolicy.m_DicTagData["approve_line"];
         }
     }
 }

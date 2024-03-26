@@ -23,6 +23,8 @@ namespace OpenNetLinkApp.PageEvent
         public string user_id { get; set; }
         public Int64 Size { get; set; }
         public int Count { get; set; }
+        public Int64 ClipSize { get; set; }
+        public int ClipCount { get; set; }
     }
     public class ApproveActionEventArgs : EventArgs
     {
@@ -249,6 +251,8 @@ namespace OpenNetLinkApp.PageEvent
     /// </summary>
     /// <param name="groupId"></param>
     public delegate void NotiUpdatePolicyEvent(int groupId);
+
+    public delegate void UserPolicyEvent(int groupid, SGData e);
     /// <summary>
     /// FileMime 정보 갱신 Event
     /// </summary>
@@ -519,6 +523,8 @@ namespace OpenNetLinkApp.PageEvent
 
         public NotiUpdatePolicyEvent notiUpdatePolicyEvent = null;
 
+        public UserPolicyEvent userPolicyEvent = null;
+
         public FileMimeRecvEvent fileMimeRecvEvent = null;
 
         public OLEMimeRecvEvent oleMimeRecvEvent = null;
@@ -593,6 +599,12 @@ namespace OpenNetLinkApp.PageEvent
         {
             notiUpdatePolicyEvent = e;
         }
+
+
+        public UserPolicyEvent GetUserPolicyEvent() => userPolicyEvent;
+
+        public void SetUserPolicyEvent(UserPolicyEvent e) => userPolicyEvent = e;
+
 
         public NotiRequestExitEvent GetNotiRequestExitEvent() => notiRequestExitEvent;
         public void SetNotiRequestExitEvent(NotiRequestExitEvent e) => notiRequestExitEvent = e;

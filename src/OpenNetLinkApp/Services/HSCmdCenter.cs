@@ -977,38 +977,45 @@ namespace OpenNetLinkApp.Services
                             if (updatePolicyEvent != null) updatePolicyEvent(groupId);
                         }
 
-                        //eCmdList.eLINKCHK:
-                        SetHoliday(groupId, sgData);
+                        ////eCmdList.eLINKCHK:
+                        //SetHoliday(groupId, sgData);
 
-                        //eCmdList.eURLLIST:                                                  // URL 자동전환 리스트 요청 응답.
+                        ////eCmdList.eURLLIST:                                                  // URL 자동전환 리스트 요청 응답.
+                        //hs = GetConnectNetWork(groupId);
+                        //if (hs != null)
+                        //{
+                        //    //TODO 고도화 - LoginData에 있는 것 활용
+                        //    //sgDicRecvData.SetUrlListData(hs, groupId, sgData);
+                        //    URLListAfterSend(nRet, groupId, sgData);
+                        //}
+
+                        ////eCmdList.eUSERINFOEX:                                                  // USERINFOEX : 사용자 정보 응답.
+                        //UserInfoAfterSend(nRet, groupId, sgData);
+
+                        ////eCmdList.eUSEDAYFILETRANS:                                             // 사용된 일일 파일 전송 사용량 및 횟수 데이터.
+                        //UseDayFileInfoNotiAfterSend(nRet, groupId, sgData);
+
+
+                        ////eCmdList.eUSEDAYCLIPTRANS:                                             // 사용된 일일 클립보드 전송 사용량 및 횟수 데이터.
+                        //UseDayClipInfoNotiAfterSend(nRet, groupId, sgData);
+
+
+                        ////eCmdList.eDOWNLOADCOUNT:
+                        //hs = GetConnectNetWork(groupId);
+                        //if (hs != null)
+                        //{
+                        //    DownloadCountEvent downloadCountEvent = sgPageEvent.GetDownloadCountEvent(groupId);
+                        //    if (downloadCountEvent != null) downloadCountEvent(groupId, sgData);
+                        //}
+                        break;
+                    case eAdvancedCmdList.eGetPolicy:
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
                         {
-                            //TODO 고도화 - LoginData에 있는 것 활용
-                            //sgDicRecvData.SetUrlListData(hs, groupId, sgData);
-                            URLListAfterSend(nRet, groupId, sgData);
-                        }
-
-                        //eCmdList.eUSERINFOEX:                                                  // USERINFOEX : 사용자 정보 응답.
-                        UserInfoAfterSend(nRet, groupId, sgData);
-
-                        //eCmdList.eUSEDAYFILETRANS:                                             // 사용된 일일 파일 전송 사용량 및 횟수 데이터.
-                        UseDayFileInfoNotiAfterSend(nRet, groupId, sgData);
-
-
-                        //eCmdList.eUSEDAYCLIPTRANS:                                             // 사용된 일일 클립보드 전송 사용량 및 횟수 데이터.
-                        UseDayClipInfoNotiAfterSend(nRet, groupId, sgData);
-
-
-                        //eCmdList.eDOWNLOADCOUNT:
-                        hs = GetConnectNetWork(groupId);
-                        if (hs != null)
-                        {
-                            DownloadCountEvent downloadCountEvent = sgPageEvent.GetDownloadCountEvent(groupId);
-                            if (downloadCountEvent != null) downloadCountEvent(groupId, sgData);
+                            UserPolicyEvent userPolicyEvnet = sgPageEvent.GetUserPolicyEvent();
+                            if (userPolicyEvnet != null) userPolicyEvnet(groupId, sgData);
                         }
                         break;
-
                     case eAdvancedCmdList.ePatchSessionPW:
                         //eCmdList.eCHANGEPASSWD:                                                  // 비밀번호 변경 요청 응답.
                         ChgPassWDAfterSend(nRet, groupId);
@@ -1277,39 +1284,26 @@ namespace OpenNetLinkApp.Services
                 string MySgNetType = sgReadyData?.GetSgNetType();
 
                 sgDicRecvData.SetLoginData(hs, groupId, sgData, MySgNetType);
-
+                SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                UserHRinfo userHr = sgLoginData.GetUserHRInfo();
 
                 JObject apprLineValue = (JObject)sgData.GetTagDataObject("approve_line");   //ApprLineDta는 별도 저장
-
-                UserHRinfo userHr = new UserHRinfo()
-                {
-                    strId = sgData.GetTagData("user_hr", "user_id"),
-                    strSeq = sgData.GetTagData("user_hr", "user_seq"),
-                    strName = sgData.GetTagData("user_hr", "name"),
-                    strRank = sgData.GetTagData("user_hr", "rank"),
-                    strDeptName = sgData.GetTagData("user_hr", "dept_name"),
-                    deptSeq = sgData.GetTagData("user_hr", "dept_seq"),
-                    strPosition = sgData.GetTagData("user_hr", "position")
-                };
-
                 SGData apprLineData = new SGData();
                 apprLineData.m_DicTagData = apprLineValue.ToObject<Dictionary<string, object>>();
                 sgDicRecvData.SetApprLineData(hs, groupId, apprLineData, userHr);
 
-                SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+
                 //TODO 고도화 - 환경설정 부분은 별도 암호화가 필요한지 확인 필요
                 sgLoginData.AddRunSystemEnvData(sgData);
 
                 Int64 nFilePartSize = sgLoginData.GetFilePartSize();
                 Int64 nFileBandWidth = sgLoginData.GetFileBandWidth();
-                JObject userHrJObj = (JObject)sgData.GetTagDataObject("user_hr");
-                Dictionary<string, object> userHrDic = (userHrJObj != null) ? userHrJObj.ToObject<Dictionary<string, object>>() : new Dictionary<string, object>();
+                Dictionary<string, object> userHrDic = sgLoginData.GetUserHRDic();
 
                 hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, userHrDic);
                 hs.SetHszDefault(sgLoginData.GetHszDefaultDec());
                 hs.SetManualDownLoad(sgLoginData.GetManualDownload());
 
-                //TODO 고도화 - OLE 정보 FilterType 정보 필요 OLEMimeRecvEvent oleMimeRecvEvent = sgPageEvent.GetOLEMimeRecvEvent();
                 OLEMimeRecvEvent oleMimeRecv_Event = sgPageEvent.GetOLEMimeRecvEvent();
                 List<string> oleList = sgData.GetTagDataList("mime_ole_url_info", "ole_mime", "list");
                 string oleFileterType = sgData.GetTagData("mime_ole_url_info", "ole_mime", "filter_type");
@@ -1323,11 +1317,18 @@ namespace OpenNetLinkApp.Services
                     urllistEvent(groupId, args);
                 }
 
+                UseDayFileNotiEvent useDayFileEvent = sgPageEvent.GetUseDayFileNotiEvent(groupId);
+                FileAndClipDayArgs arg = new FileAndClipDayArgs();
+                arg.Size = sgLoginData.GetDayFileTransferUsedSize();
+                arg.Count = sgLoginData.GetDayFileTransferUsedCount();
+                arg.ClipSize = sgLoginData.GetDayClipboardUsedSize();
+                arg.ClipCount = sgLoginData.GetDayClipboardUsedCount();
+                useDayFileEvent(groupId, arg);
+
                 // 자동삭제 기능동작
                 Thread tr = null;
                 tr = new Thread(new ParameterizedThreadStart(RecvFileDeleteCycleThread));
                 tr.Start(this);
-
 
                 string gotp = sgData.GetTagData("two_factor", "gotp_image");
                 if (string.IsNullOrEmpty(gotp.Trim()) == false)
@@ -3501,26 +3502,21 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int SendUserSFMInfo(int groupId, string userId)
-        {
-            SGLoginData loginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-            ApproveProxy approveProxy = new ApproveProxy();
-            string strQuery = approveProxy.GetSFMApproverRight(loginData.GetUserSequence());
-            HsNetWork hsNetWork = null;
-            hsNetWork = GetConnectNetWork(groupId);
-            if (hsNetWork != null)
-            {
-                sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eSFMIINFOQUERY, SFMInfoAfterSend);
-                return sgSendData.RequestCommonSendQuery(hsNetWork, eCmdList.eSFMIINFOQUERY, userId, strQuery);
-            }
+        //public int SendUserSFMInfo(int groupId, string userId)
+        //{
+        //    SGLoginData loginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+        //    ApproveProxy approveProxy = new ApproveProxy();
+        //    string strQuery = approveProxy.GetSFMApproverRight(loginData.GetUserSequence());
+        //    HsNetWork hsNetWork = null;
+        //    hsNetWork = GetConnectNetWork(groupId);
+        //    if (hsNetWork != null)
+        //    {
+        //        sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eSFMIINFOQUERY, SFMInfoAfterSend);
+        //        return sgSendData.RequestCommonSendQuery(hsNetWork, eCmdList.eSFMIINFOQUERY, userId, strQuery);
+        //    }
 
-            return -1;
-        }
-
-        public void SFMInfoAfterSend(int groupId, object[] e)
-        {
-            sgDicRecvData.SetSFMListData(groupId, e[0] as SGData);
-        }
+        //    return -1;
+        //}
 
         /// <summary>
         /// OLE마임리스트 정보 요청 (from tbl_ole_mimetype)
@@ -4424,6 +4420,28 @@ namespace OpenNetLinkApp.Services
             return nRet;
         }
 
+        public int RestGetPolicy(int groupid)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
+
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestGetPolicy(hsNetWork);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestLogin-Task-Exception : {ex.Message}");
+                }
+
+            });
+            return 0;
+        }
+
         public int RestSendTest(int groupid, eAdvancedCmdList eCmd)
         {
             HsNetWork hsNetWork = null;
@@ -4450,8 +4468,6 @@ namespace OpenNetLinkApp.Services
             });
 
             return ret;
-
         }
-
     }
 }

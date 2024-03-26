@@ -3881,7 +3881,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         pageService.SetLoadApprBaseLine(groupID, false);
         pageService.SetConnectStatus(groupID, false);
         pageService.SetLogoutStatus(groupID, true);
-        HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
+        //HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
         HsCmdCenter.sgDicRecvData.SetLoginDataEmpty(groupID);
 
         HsCmdCenter.SetAllowSessionDuplicate(groupID, (SGAppMgrSvc.OpConfigInfoService.GetSessionDuplicateBlock(groupID) == 1));
@@ -4015,7 +4015,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         pageService.SetConnectStatus(groupID, false);
         pageService.SetLogoutStatus(groupID, true);
-        HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
+        //HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
 
         CLog.Here().Information($"groupID : {groupID} - Offline Noti from NetworkLib, UrlRedirection LogOut State ReSet !!!");
         HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);

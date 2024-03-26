@@ -86,8 +86,8 @@
 
         strURLAuto = XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO");                       // URL 자동전환 사용
 
-        HsCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
-        HsCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
+        HsCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);   //파일,클립보드 통일
+        //HsCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult); 파일과 통일
 
         if (pageService.GetLoginComplete(groupID) != true)
             SendDayFileInfo();
@@ -380,11 +380,12 @@
     */
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
-        CLog.Here().Information($"FileTrans - ### - USED size({e.Size}), count({e.Count}) info recv (groupID : {groupID})! ");
+        CLog.Here().Information($"FileTrans - ### - USED size({e.Size}), count({e.Count}), Clip size({e.ClipSize}), Clip count({e.ClipCount}) info recv (groupID : {groupID})! ");
 
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
+        pageService.SetDayUseClip(groupID, e.ClipSize, e.ClipCount);
 
-        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+    @*    SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
 
@@ -434,7 +435,7 @@
                 DayInfoChange();
                 return;
             }
-        }
+        }*@
         UseDayInfoDisplay();
     }
 

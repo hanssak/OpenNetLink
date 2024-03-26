@@ -341,23 +341,6 @@ namespace OpenNetLinkApp.Data.SGDicData
             //m_DicGpkiData[groupid] = tmpData;
         }
 
-        public void SetSFMListData(int groupId, SGData data)
-        {
-            //TODO 고도화 - SGLoginData 에서 처리 필요
-            //if (m_DicSFMListData.ContainsKey(groupId))
-            //{
-            //    SGData tmpData = null;
-            //    if (m_DicSFMListData.TryRemove(groupId, out tmpData))
-            //        m_DicSFMListData.TryAdd(groupId, data);
-            //    //m_DicSFMListData[groupId] = data;
-            //}
-            //else
-            //{
-            //    m_DicSFMListData.TryAdd(groupId, data);
-            //    //m_DicSFMListData.Add(groupId, data);
-            //}
-        }
-
         public SGData GetDeptInfoData(int groupid)
         {
             SGDeptInfo tmpData = null;
