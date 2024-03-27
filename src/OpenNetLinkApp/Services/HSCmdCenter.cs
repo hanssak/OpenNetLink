@@ -33,6 +33,7 @@ using Newtonsoft.Json;
 using static HsNetWorkSG.SGEnums;
 using Newtonsoft.Json.Linq;
 using static OpenNetLinkApp.Common.Enums;
+using OpenNetLinkApp.Common;
 
 namespace OpenNetLinkApp.Services
 {
@@ -153,6 +154,17 @@ namespace OpenNetLinkApp.Services
                     IPAddress[] addresses = Dns.GetHostAddresses(strIP);
                     strIP = addresses[0].ToString();
                 }
+                List<string> APIAddress = new List<string>();
+                foreach (string ipAddress in listNetworks[i].APIAddress)
+                {
+                    string temp = ipAddress;
+                    if (IPAddress.TryParse(ipAddress, out address) == false)
+                    {
+                        IPAddress[] addresses = Dns.GetHostAddresses(ipAddress);
+                        temp = addresses[0].ToString();
+                    }
+                    APIAddress.Add(temp);
+                }
                 int port = listNetworks[i].Port;
                 string apiVersion = listNetworks[i].APIVersion;
 
@@ -191,7 +203,7 @@ namespace OpenNetLinkApp.Services
 
                 bool bDo2FatorAuth = dicOpConfig[groupID].bUseGoogleOtp2FactorAuth;
 
-                hsNetwork.InitLib(strIP, port, apiVersion, false, bDo2FatorAuth, strModulePath, strDownPath, groupID.ToString(), notiType);    // basedir 정해진 후 설정 필요
+                hsNetwork.InitLib(strIP, port, APIAddress, apiVersion, false, bDo2FatorAuth, strModulePath, strDownPath, groupID.ToString(), notiType);    // basedir 정해진 후 설정 필요
 
                 hsNetwork.SGData_EventRegAdvanced(SGDataRecvAdvanced);
 
@@ -3540,13 +3552,6 @@ namespace OpenNetLinkApp.Services
 
             return -1;
         }
-
-
-        //public SGData GetOLEMimeListData(int groupId)
-        //{
-        //    SGData data = sgDicRecvData.GetOLEMimeListData(groupId);
-        //    return data;
-        //}
 
         public int CommonSendQuery(eCmdList eCmd, int groupid, string strUserID, string strQuery)
         {

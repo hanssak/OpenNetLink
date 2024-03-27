@@ -59,7 +59,7 @@
     private int currentConnectCount = 0;
     private string _stateMessage = "";
 
-    
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -163,6 +163,7 @@
             HsNetWork hsNetWork = HSCmdCenter.GetConnectNetWork(network.GroupID);
             if (hsNetWork != null)
             {
+                hsNetWork.SetIp(false);
                 HSCmdCenter.RestReady(network.GroupID, "OpenNetLink", strCurCliVersion, strPlatform);
             }
         }
@@ -172,7 +173,7 @@
 
         Console.WriteLine($"Interval - {interval}");
         currentConnectCount++;
-        
+
         conTimer.AutoReset = true;
         conTimer.Interval = interval * 1000;
         conTimer.Elapsed += new ElapsedEventHandler(dayTimer_Elapsed);
@@ -197,7 +198,7 @@
             //서버접속 재시도
             //HSCmdCenter.Init();
             //모든 groupID의 Ready를 호출하여, main.razro나 popupLogin 시에는 UserLogin만 수행하도록 처리
-            
+
             ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";
             string strPlatform = "";
@@ -212,10 +213,11 @@
                 HsNetWork hsNetWork = HSCmdCenter.GetConnectNetWork(network.GroupID);
                 if (hsNetWork != null)
                 {
+                    hsNetWork.SetIp(true);
                     HSCmdCenter.RestReady(network.GroupID, "OpenNetLink", strCurCliVersion, strPlatform);
                 }
             }
-        }    
+        }
         StateHasChanged();
     }
 
