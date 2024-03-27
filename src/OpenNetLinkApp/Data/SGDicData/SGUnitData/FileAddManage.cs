@@ -1653,18 +1653,36 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             string strNotSupportCharData = "";
 
-            string[] ListParsedData = strFileNamePath.Split("/");
-            if ((ListParsedData?.Count() ?? 0) > 0)
+            try
             {
-                int nCount = ListParsedData.Count();
-                foreach (string strItem in ListParsedData)
+                string[] ListParsedData = strFileNamePath.Split("/");
+                if ((ListParsedData?.Count() ?? 0) > 0)
                 {
-                    if (CsFileFunc.isSupportFileName(strItem, out strNotSupportCharData, false) == false)
+                    int nCount = ListParsedData.Count();
+                    //foreach (string strItem in ListParsedData)
+                    for(int nDx = 0; nDx < nCount; nDx++)
                     {
-                        Log.Logger.Here().Information($"GetFileNameEnable(#####), Not Support Char : {strNotSupportCharData}, in FileName : {strItem}");
-                        return false;
+
+                        // 예외 동작
+                        if (nCount > 1 && nDx == 0 && ListParsedData[nDx] == ".")
+                        {
+                            Log.Logger.Here().Information($"GetFileNameEnable(#####), Not Support Char : [.], But first Char !!!");
+                            continue;
+                        }
+
+                        if (CsFileFunc.isSupportFileName(ListParsedData[nDx], out strNotSupportCharData, false) == false)
+                        {
+                            Log.Logger.Here().Information($"GetFileNameEnable(#####), Not Support Char : {strNotSupportCharData}, in FileName : {ListParsedData[nDx]}");
+                            return false;
+                        }
                     }
                 }
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"GetFileNameEnable, Exception(MSG) : {ex.Message}");
+                return false;
             }
 
             return true;
@@ -1927,7 +1945,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             eFileAddErr enRet;
             string strExt = Path.GetExtension(hsStream.FileName);
-            (eFileAddErr, string) validResult = await IsValidFileExt(hsStream.stream, strExt, bAllowDRM);
+            string strFileName = Path.GetFileName(hsStream.FileName);
+            (eFileAddErr, string) validResult = await IsValidFileExt(hsStream.stream, strFileName, strExt, bAllowDRM);
             return validResult;
             //if (enRet != eFileAddErr.eFANone)
             //{
@@ -3283,11 +3302,39 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return false;
         }
 
-        public static bool CheckExtForFileByteData(byte[] btFileData, string strExt)
+        private static bool IsMac_OSX_Meta(byte[] btFileData)
+        {
+            byte[] btHeader = new byte[] { 0x00, 0x05, 0x16, 0x07, 0x00, 0x02, 0x00, 0x00, 0x4D, 0x61, 0x63, 0x20, 0x4F, 0x53, 0x20, 0x58, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x00, 0x02, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x32, 0x00, 0x00 };
+            if (ByteArrayCompare(btFileData, btHeader) == true) return true;
+
+            return false;
+        }
+
+        private static bool IsDS_Store(byte[] btFileData)
+        {
+            byte[] btHeader = new byte[] { 0x00, 0x00, 0x00, 0x01, 0x42, 0x75, 0x64, 0x31, 0x00 };
+            if (ByteArrayCompare(btFileData, btHeader) == true) return true;
+
+            return false;
+        }
+
+        public static bool CheckExtForFileByteData(byte[] btFileData, string strFileName, string strExt)
         {
             Log.Debug("[CheckExtForFileByteData] Check hex data for File");
             try
             {
+
+                //if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                if (true)
+                {
+                    // Mac OSX Meta File
+                    if (IsMac_OSX_Meta(btFileData)) return ((strFileName?.Length ?? 0) > 2 && strFileName.Substring(0, 2) == "._");
+
+                    // DS_Store
+                    if (String.Compare(strFileName, ".DS_Store", true) == 0) return IsDS_Store(btFileData);
+                }
+
+
                 if (String.Compare(strExt, "egg", true) == 0) return IsEGG(btFileData, strExt);
 
                 if (String.Compare(strExt, "doc", true) == 0 || String.Compare(strExt, "docx", true) == 0)
@@ -3361,13 +3408,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if (String.Compare(strExt, "sas7bdat", true) == 0) return IsSAS7BDAT(btFileData, strExt);
                 if (String.Compare(strExt, "alz", true) == 0) return IsALZ(btFileData, strExt);  // 알집
                 if (String.Compare(strExt, "pst", true) == 0) return IsPST(btFileData, strExt);
+
+                if (String.Compare(strExt, "pst", true) == 0) return IsPST(btFileData, strExt);
+
             }
             catch (System.Exception err)
             {
                 Log.Warning("[CheckExtForFileByteData] Err[{0}-{1}]", err.Message, err.GetType().FullName);
             }
             return false;
-        }
+         }
         public static bool IsDRMFilePath(string path)
         {
             using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
@@ -3491,7 +3541,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// <param name="strExt"></param>
         /// <param name="blAllowDRM"></param>
         /// <returns></returns>
-        public async Task<(eFileAddErr, string)> IsValidFileExt(Stream stFile, string strExt, bool blAllowDRM)
+        public async Task<(eFileAddErr, string)> IsValidFileExt(Stream stFile, string strFileName, string strExt, bool blAllowDRM)
         {
             string strFileMime = string.Empty;
             byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
@@ -3520,7 +3570,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             strExt = strExt.Replace(".", "");
             btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize2);
 
-            bool bIsExtForFileByteData = CheckExtForFileByteData(btFileData, strExt);
+            bool bIsExtForFileByteData = CheckExtForFileByteData(btFileData, strFileName, strExt);
 
             Log.Logger.Here().Information($"[IsValidFileExt] CheckExtForFileByteData, Ext : {strExt}, EXT isChanged : {!bIsExtForFileByteData}");
 
@@ -3566,7 +3616,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             fsStream.Close();
 
             Log.Debug("[IsValidFileExtInnerZip] Unknown file signature");
-            if (CheckExtForFileByteData(btFileData, strExt) == true) return eFileAddErr.eFANone;
+            string strFileName = Path.GetFileName(strFile);
+            if (CheckExtForFileByteData(btFileData, strFileName, strExt) == true) return eFileAddErr.eFANone;
 
             return eFileAddErr.eUnZipInnerExtChange;
         }
@@ -4455,7 +4506,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             ["text/x-setext"] = "etx",
             ["text/x-sfv"] = "sfv",
             ["text/x-shell"] = "sh",
-            ["text/x-shellscript"] = "sh cell r cpg prj sas",
+            ["text/x-shellscript"] = "sh cell r cpg prj sas war",
             ["text/x-tcl"] = "tcl cell r cpg prj",
             ["text/x-tex"] = "tex ltx sty cls log txt xml texi html cell r cpg prj sas",
             ["text/x-texinfo"] = "texi cell r cpg prj sas",
@@ -5845,7 +5896,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         {
                             oleFileStream.CopyTo(oleValidStream);
                             //위변조 제한, 0KB 체크
-                            (eFileAddErr, string) validResult = await IsValidFileExt(oleValidStream, oleExtension, bAllowDRM);
+                            (eFileAddErr, string) validResult = await IsValidFileExt(oleValidStream, extractFile.Name, oleExtension, bAllowDRM);
                             oleFileMime = validResult.Item2;
                             if (validResult.Item1 != eFileAddErr.eFANone)//(!IsValidFileExtOfOLEObject(oleFileStream, oleExtension))
                             {
