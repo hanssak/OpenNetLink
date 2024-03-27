@@ -2155,6 +2155,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetPrivacyComment()
             => (GetSystemPosition()) ? GetTagData("I_CLIENT_PRIVACY_COMMENT") : GetTagData("E_CLIENT_PRIVACY_COMMENT");
 
+        public string GetDrmEncFileExt()
+            => (GetSystemPosition()) ? GetTagData("I_DRM_ENC_EXT") : GetTagData("E_DRM_ENC_EXT");
+
+
         /// <summary>
         /// value 값을 암호화해서 sgData에 저장
         /// </summary>

@@ -3418,6 +3418,81 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             return false;
          }
+
+
+        /// <summary>
+        /// 입력된 Path에 있는 파일의 확장자가 DRM 암호화 대상 확장자인지 확인하는 함수</br>
+        /// path : drm 대상인지 확인할 파일의 경로
+        /// strEncExtList : server tbl_system_env에서 받은 DRM_ENC_EXT 값, EXT list
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="strEncExtList"></param>
+        /// <returns></returns>
+        public static bool IsDRMEncFileExt(string path, string strEncExtList)
+        {
+
+            bool bIsWhiteList = true;
+
+            try
+            {
+                if (string.IsNullOrEmpty(path))
+                {
+                    Log.Logger.Here().Information($"IsDRMEncExt, Enc File Target Empty!");
+                    return false;
+                }
+
+                if (File.Exists(path)== false)
+                {
+                    Log.Logger.Here().Information($"IsDRMEncExt, File Not Exist : {path}");
+                    return false;
+                }
+
+                if (string.IsNullOrEmpty(strEncExtList))
+                {
+                    Log.Logger.Here().Information($"IsDRMEncExt, Enc File Ext List Empty : Enc All File!");
+                    return true;
+                }
+
+                if (strEncExtList == ";" || strEncExtList == "!" || strEncExtList == "\u0002")
+                {
+                    Log.Logger.Here().Information($"IsDRMEncExt, Enc File Ext [{strEncExtList}] : Enc All File!");
+                    return true;
+                }
+
+                if (strEncExtList.Substring(0, 1) == "!")
+                    bIsWhiteList = false;
+
+                string strExt = "";
+                strExt = Path.GetExtension(path);
+                if (string.IsNullOrEmpty(strExt) || strExt==".")
+                    strExt = "($empty)";
+
+                if (strExt.Length > 1 && strExt.Substring(0, 1) == ".")
+                    strExt = strExt.Substring(1);
+
+                strExt = strExt.ToLower();
+                strEncExtList = strEncExtList.ToLower();
+
+                if (strEncExtList.IndexOf(strExt) > -1)
+                {
+                    Log.Logger.Here().Information($"IsDRMEncExt, Ext : [{strExt}], in [{strEncExtList}], Enc : [{(bIsWhiteList?"Do!":"Do NOT!")}]");
+                    return (bIsWhiteList?true:false);
+                }
+                else
+                {
+                    Log.Logger.Here().Information($"IsDRMEncExt, Ext : [{strExt}], Not in [{strEncExtList}], Enc : [{(bIsWhiteList ? "Do NOT!":"Do!")}]");
+                    return (bIsWhiteList ? false : true);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Here().Error($"IsDRMEncExt, Exception(MSG) : {ex.Message}, Enc : Do!");
+            }
+
+            return true;
+        }
+
         public static bool IsDRMFilePath(string path)
         {
             using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read))

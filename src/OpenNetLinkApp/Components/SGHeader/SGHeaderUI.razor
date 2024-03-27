@@ -568,7 +568,7 @@
         strParameter += "+";
         strParameter += chVKey;
 
-        @*System.Diagnostics.ProcessStartInfo pri = new System.Diagnostics.ProcessStartInfo();
+        /*System.Diagnostics.ProcessStartInfo pri = new System.Diagnostics.ProcessStartInfo();
             System.Diagnostics.Process pro = new System.Diagnostics.Process();
             pri.FileName = "xdotool";
 
@@ -581,7 +581,7 @@
 
             pro.StartInfo = pri;
             pro.Start();
-        *@
+        */
 
         try
         {
@@ -1774,9 +1774,11 @@
     }
 
 
-    /**
-    *@brief 화면잠금 시간값 변경 및 재동작
-*/
+    /// <summary>
+    /// 화면잠금 시간값 변경 및 재동작
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
     public void ScreenLockTimeInitNoti(int groupID, ConfigArgs e)
     {
         //int time = e.ScreenTime;
@@ -2015,14 +2017,14 @@
             return;
 
         List<string> listReLoginTagName = new List<string>(){
-    "POLICYFLAG", "APPROVEPROXYRIGHT",
-    "APPROVEUSETYPE", "CLIPPOLICYFLAG", "OTP", "MANUALDOWNLOAD"
-    };
+        "POLICYFLAG", "APPROVEPROXYRIGHT",
+        "APPROVEUSETYPE", "CLIPPOLICYFLAG", "OTP", "MANUALDOWNLOAD"
+        };
         List<string> listSetTagName = new List<string>(){
-    "FILEFILTER", "FILELIMITSIZE", "FILEFILTERTYPE", "DAYFILETRANSFERLIMITSIZE", "DAYFILETRANSFERLIMITCOUNT", "DAYCLIPBOARDCOUNT",
-    "DAYCLIPBOARDSIZE", "CLIPBOARDSIZE", "MAXFILETRANSFERCOUNT", "AFTERAPPROVE", "DELETECYCLE", "FILEPARTSIZE", "FILEBANDWIDTH",
-    "SCRLOCK","HOLIDAY", "EXCEPTIONEXT"
-    };
+        "FILEFILTER", "FILELIMITSIZE", "FILEFILTERTYPE", "DAYFILETRANSFERLIMITSIZE", "DAYFILETRANSFERLIMITCOUNT", "DAYCLIPBOARDCOUNT",
+        "DAYCLIPBOARDSIZE", "CLIPBOARDSIZE", "MAXFILETRANSFERCOUNT", "AFTERAPPROVE", "DELETECYCLE", "FILEPARTSIZE", "FILEBANDWIDTH",
+        "SCRLOCK","HOLIDAY", "EXCEPTIONEXT"
+        };
 
         //ReLoginTagName 해당하는 데이터가 수정됬을 경우 ReLogin 필요
         foreach (string str in listReLoginTagName)
@@ -2278,45 +2280,60 @@
             if (e.strDataType == ((int)FrameType.File).ToString() ||
                 (e.strDataType == null || e.strDataType == "" || e.strDataType == ((int)FrameType.Dir).ToString()))
             {
-                if (SGAppMgrSvc.OpConfigInfoService.GetUseDrmAfterFileReceive(Convert.ToInt32(e.NetWorkID)))
+
+                int nGroupid = Convert.ToInt32(e.NetWorkID);
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseDrmAfterFileReceive(nGroupid))
                 {
-                    switch (SGAppMgrSvc.OpConfigInfoService.GetDrmType(Convert.ToInt32(e.NetWorkID)))
+                    switch (SGAppMgrSvc.OpConfigInfoService.GetDrmType(nGroupid))
                     {
                         case (int)Enums.EnumDrmType.SoftCamp:
                             {
                                 SGSoftCampDRM lib = new SGSoftCampDRM();
-                                string grade = SGAppMgrSvc.OpConfigInfoService.GetSoftCampGrade(Convert.ToInt32(e.NetWorkID));
-                                int nMode = SGAppMgrSvc.OpConfigInfoService.GetSoftCampEncMode(Convert.ToInt32(e.NetWorkID));
-                                int nGuide = SGAppMgrSvc.OpConfigInfoService.GetSoftCampEncGuide(Convert.ToInt32(e.NetWorkID));
-                                string strSoftCampDAC = SGAppMgrSvc.OpConfigInfoService.GetSoftCampEncDAC(Convert.ToInt32(e.NetWorkID));
+                                string grade = SGAppMgrSvc.OpConfigInfoService.GetSoftCampGrade(nGroupid);
+                                int nMode = SGAppMgrSvc.OpConfigInfoService.GetSoftCampEncMode(nGroupid);
+                                int nGuide = SGAppMgrSvc.OpConfigInfoService.GetSoftCampEncGuide(nGroupid);
+                                string strSoftCampDAC = SGAppMgrSvc.OpConfigInfoService.GetSoftCampEncDAC(nGroupid);
+
+                                SGLoginData sgloginData = null;
+                                sgloginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupid);
+                                string strDrmEncExtList = "";
+                                strDrmEncExtList = sgloginData.GetDrmEncFileExt();
 
                                 foreach (string key in e.MsgRecode.Keys)
                                 {
-                                    if (!FileAddManage.IsDRMFilePath(key))
+
+                                    if (FileAddManage.IsDRMEncFileExt(key, strDrmEncExtList))
                                     {
-                                        //DRM 걸기
-                                        int ret = 0;
-
-                                        if (nMode == 1)
-                                            ret = lib.DrmEncrypt(key, grade);
-                                        else if (nMode == 2)
+                                        if (!FileAddManage.IsDRMFilePath(key))
                                         {
-                                            if (string.IsNullOrEmpty(strSoftCampDAC) == false && nGuide > 0)
-                                            { 
-                                                lib.DrmAddDac(nGuide, strSoftCampDAC);
-                                                lib.DrmEncryptUsingDac(key);
-                                            }
-                                            else
-                                            {
-                                                CLog.Here().Information($"DownCompleteEvent, DRM Encrpty Mode 2, But DAC CONFIG is Wrong, Guide : {nGuide}, DAC : {strSoftCampDAC}");
-                                            }
-                                        }
+                                            //DRM 걸기
+                                            int ret = 0;
 
-                                        CLog.Here().Information($"{key} DRM Result  : {ret}");
+                                            if (nMode == 1)
+                                                ret = lib.DrmEncrypt(key, grade);
+                                            else if (nMode == 2)
+                                            {
+                                                if (string.IsNullOrEmpty(strSoftCampDAC) == false && nGuide > 0)
+                                                {
+                                                    lib.DrmAddDac(nGuide, strSoftCampDAC);
+                                                    lib.DrmEncryptUsingDac(key);
+                                                }
+                                                else
+                                                {
+                                                    CLog.Here().Information($"DownCompleteEvent, DRM Encrpty Mode 2, But DAC CONFIG is Wrong, Guide : {nGuide}, DAC : {strSoftCampDAC}");
+                                                }
+                                            }
+
+                                            CLog.Here().Information($"{key} DRM Result  : {ret}");
+                                        }
+                                        else
+                                        {
+                                            CLog.Here().Information($"Recved File is DRM already!!!(Skip) : {key}");
+                                        }
                                     }
                                     else
                                     {
-                                        CLog.Here().Information($"{key} is DRM already!!!");
+                                        CLog.Here().Information($"Recved File is Not DRM Ext(Skip) : {key}");
                                     }
                                 }
                             }

@@ -1726,6 +1726,11 @@
                             strGetinfoTagName += ", 'CLIENT_DESC_MAX_LENGTH'";
                         }
 
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseDrmAfterFileReceive(groupId))
+                        {
+                            strGetinfoTagName += ", 'DRM_ENC_EXT'";
+                        }
+
                         string strQuery = sgQueryExtend.GetsystemEnvDataS(strGetinfoTagName); // sgQueryExtend.GetZipDepthSQLsystemEnv : CLIENT_ZIP_DEPTH 값만구할때 사용
                         HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
                     }
