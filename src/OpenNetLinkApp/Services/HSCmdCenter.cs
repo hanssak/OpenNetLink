@@ -633,24 +633,24 @@ namespace OpenNetLinkApp.Services
                         break;
 
                     case eCmdList.eAPPROVECOUNT:                                                // 승인대기 노티.
-                        ApproveCountNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId, sgData);
+                       // ApproveCountNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId, sgData);
                         break;
                     case eCmdList.ePRIVACYAPPROVENOTIFY:
-                        PrivacyApproveCountNotiAfterSend(nRet, eCmdList.ePRIVACYAPPROVENOTIFY, groupId, sgData);
+                        //PrivacyApproveCountNotiAfterSend(nRet, eCmdList.ePRIVACYAPPROVENOTIFY, groupId, sgData);
                         break;
                     case eCmdList.eVIRUSSCAN:                                                   // 바이러스 검출 노티.
-                        VirusScanNotiAfterSend(nRet, eCmdList.eVIRUSSCAN, groupId, sgData);
+                        //VirusScanNotiAfterSend(nRet, eCmdList.eVIRUSSCAN, groupId, sgData);
                         break;
                     case eCmdList.eAPTSCAN:                                                     // APT 노티.
-                        VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
+                        //VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
                         break;
                     case eCmdList.eDrmBlockNoti:                                                     // DRM Noti
-                        VirusScanNotiAfterSend(nRet, eCmdList.eDrmBlockNoti, groupId, sgData);
+                        //VirusScanNotiAfterSend(nRet, eCmdList.eDrmBlockNoti, groupId, sgData);
                         break;
                     case eCmdList.eNetLinkStatus:
                         break;
                     case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
-                        EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
+                        //EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
                         break;
                     //case eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
                     //    BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
@@ -1124,9 +1124,9 @@ namespace OpenNetLinkApp.Services
 
                     case eAdvancedCmdList.eNotiApprovalWaiting:
                         // eCmdList.eAPPROVECOUNT:                                                // 승인대기 노티.
-                        ApproveCountNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId, sgData);
+                        ApproveCountNotiAfterSend(nRet, cmd, groupId, sgData);
                         //eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
-                        EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
+                        //EmailApproveNotiAfterSend(nRet, eCmdList.eEMAILAPPROVENOTIFY, groupId, sgData);
                         break;
                     case eAdvancedCmdList.eNoti3rdPartyResult:
                         {
@@ -1142,16 +1142,16 @@ namespace OpenNetLinkApp.Services
 
                         }
                         //eCmdList.ePRIVACYAPPROVENOTIFY:
-                        PrivacyApproveCountNotiAfterSend(nRet, eCmdList.ePRIVACYAPPROVENOTIFY, groupId, sgData);
+                        //PrivacyApproveCountNotiAfterSend(nRet, eCmdList.ePRIVACYAPPROVENOTIFY, groupId, sgData);
 
                         //eCmdList.eVIRUSSCAN:                                                   // 바이러스 검출 노티.
-                        VirusScanNotiAfterSend(nRet, eCmdList.eVIRUSSCAN, groupId, sgData);
+                        //VirusScanNotiAfterSend(nRet, eCmdList.eVIRUSSCAN, groupId, sgData);
 
                         //eCmdList.eAPTSCAN:                                                     // APT 노티.
-                        VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
+                        //VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
 
                         //eCmdList.eDrmBlockNoti:                                                     // DRM Noti
-                        VirusScanNotiAfterSend(nRet, eCmdList.eDrmBlockNoti, groupId, sgData);
+                        //VirusScanNotiAfterSend(nRet, eCmdList.eDrmBlockNoti, groupId, sgData);
 
                         //eCmdList.ePRIVACYNOTIFY:                                     //개인정보 Noti
                         hs = GetConnectNetWork(groupId);
@@ -2095,48 +2095,42 @@ namespace OpenNetLinkApp.Services
             }
             */
         }
-        public void ApproveCountNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData data)
+        public void ApproveCountNotiAfterSend(int nRet, eAdvancedCmdList cmd, int groupId, SGData data)
         {
-            ServerNotiEvent sNotiEvent = sgPageEvent.GetServerNotiEvent();
+            ApproveWaitNotiEvent sNotiEvent = sgPageEvent.GetApproveWaitNotiEvent();
             if (sNotiEvent != null)
             {
-                PageEventArgs e = new PageEventArgs();
-                e.result = nRet;
-                e.strMsg = "";
-                e.count = Convert.ToInt32(data.GetBasicTagData("APPROVECOUNT"));
-                e.strDummy = data.GetBasicTagData("APPROVEUSERKIND");
+                sNotiEvent(groupId, cmd, data);
+            }
+        }
+        //public void PrivacyApproveCountNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData data)
+        //{
+        //    ServerNotiEvent sNotiEvent = sgPageEvent.GetServerNotiEvent();
+        //    if (sNotiEvent != null)
+        //    {
+        //        PageEventArgs e = new PageEventArgs();
+        //        e.result = nRet;
+        //        e.strMsg = "";
+        //        e.count = Convert.ToInt32(data.GetBasicTagData("PRIVACYAPPROVECOUNT"));
+        //        e.strDummy = "1";
 
-                sNotiEvent(groupId, cmd, e);
-            }
-        }
-        public void PrivacyApproveCountNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData data)
-        {
-            ServerNotiEvent sNotiEvent = sgPageEvent.GetServerNotiEvent();
-            if (sNotiEvent != null)
-            {
-                PageEventArgs e = new PageEventArgs();
-                e.result = nRet;
-                e.strMsg = "";
-                e.count = Convert.ToInt32(data.GetBasicTagData("PRIVACYAPPROVECOUNT"));
-                e.strDummy = "1";
-
-                sNotiEvent(groupId, cmd, e);
-            }
-        }
-        public void VirusScanNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData sgData)
-        {
-            //APTAndVirusNotiEvent AptAndVirusEvent = sgPageEvent.GetAPTAndVirusNotiEvent(groupId);
-            APTAndVirusNotiEvent AptAndVirusEvent = sgPageEvent.GetAPTAndVirusNotiEvent();
-            if (AptAndVirusEvent != null)
-            {
-                AptAndVirusEventArgs e = new AptAndVirusEventArgs();
-                e.result = nRet;
-                e.strTransSeq = sgData.GetBasicTagData("TRANSSEQ");
-                e.strTitle = sgData.GetBasicTagData("TITLE");
-                e.strMsg = sgData.GetBasicTagData("VIRUS_MSG");
-                AptAndVirusEvent(groupId, cmd, e);
-            }
-        }
+        //        sNotiEvent(groupId, cmd, e);
+        //    }
+        //}
+        //public void VirusScanNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData sgData)
+        //{
+        //    //APTAndVirusNotiEvent AptAndVirusEvent = sgPageEvent.GetAPTAndVirusNotiEvent(groupId);
+        //    APTAndVirusNotiEvent AptAndVirusEvent = sgPageEvent.GetAPTAndVirusNotiEvent();
+        //    if (AptAndVirusEvent != null)
+        //    {
+        //        AptAndVirusEventArgs e = new AptAndVirusEventArgs();
+        //        e.result = nRet;
+        //        e.strTransSeq = sgData.GetBasicTagData("TRANSSEQ");
+        //        e.strTitle = sgData.GetBasicTagData("TITLE");
+        //        e.strMsg = sgData.GetBasicTagData("VIRUS_MSG");
+        //        AptAndVirusEvent(groupId, cmd, e);
+        //    }
+        //}
 
         public bool Noti3rdPartyUnionHaveBlockData(int nRet, int groupId, SGData sgData, Dictionary<PreworkTypeEx, List<FileRecord>> DicDetectFileData)
         {
@@ -2225,28 +2219,6 @@ namespace OpenNetLinkApp.Services
             return true;
         }
 
-        public void EmailApproveNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData data)
-        {
-            ServerNotiEvent sNotiEvent = sgPageEvent.GetServerNotiEvent();
-            if (sNotiEvent != null)
-            {
-                PageEventArgs e = new PageEventArgs();
-                e.result = nRet;
-                e.count = 0;
-                string strCount = data.GetBasicTagData("EMAILAPPROVECOUNT");
-                if (!strCount.Equals(""))
-                    e.count = Convert.ToInt32(strCount);
-                e.strMsg = "";
-
-                strCount = data.GetBasicTagData("APPROVEUSERKIND");
-                if (strCount == "1")
-                    e.strDummy = "5";   // UI기준
-                else
-                    e.strDummy = "4";
-
-                sNotiEvent(groupId, cmd, e);
-            }
-        }
         public void ApproveActionNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData sgData)
         {
             ApproveActionNotiEvent ApprActionEvent = sgPageEvent.GetApproveActionNotiEvent();

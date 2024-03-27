@@ -157,8 +157,10 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void RMouseFileAddEvent(int groupid);
 
     // 공통 서버 노티 이벤트.
-    public delegate void ServerNotiEvent(int groupid, eCmdList cmd, PageEventArgs e);
-    public delegate void ServerNotiEventAdvanced(int groupid, eAdvancedCmdList cmd, PageEventArgs e);
+    public delegate void ServerNotiEvent(int groupid, eAdvancedCmdList cmd, PageEventArgs e);
+
+    // 결재 대기 노티
+    public delegate void ApproveWaitNotiEvent(int groupid, eAdvancedCmdList cmd, SGData sgData);
 
     // 바이러스 또는 APT 노티 이벤트.
     public delegate void APTAndVirusNotiEvent(int groupid, eCmdList cmd, AptAndVirusEventArgs e);
@@ -437,8 +439,7 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, RMouseFileAddEvent> DicRMFileAddEvent = new Dictionary<int, RMouseFileAddEvent>();                                   //  마우스 우클릭 파일 추가 이벤트.
 
-        public ServerNotiEvent SNotiEvent;                                                                                                          // 공통 서버 노티 이벤트
-        public ServerNotiEventAdvanced SNotiEventAdvanced;                                                                                                          // 공통 서버 노티 이벤트
+        public ApproveWaitNotiEvent ApproveWaitEvent;
 
         public APTAndVirusNotiEvent AptAndVirusEvent;                                                                                               // 바이러스 노티 이벤트
         public APTAndVirusNotiDBInsert AptAndVirusDBInsertEvent;                                                                                    // 바이러스 또는 APT 노티 DB Insert 이벤트
@@ -1236,26 +1237,10 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
-        public ServerNotiEvent GetServerNotiEvent()
-        {
-            return SNotiEvent;
-        }
+        public ApproveWaitNotiEvent GetApproveWaitNotiEvent() => ApproveWaitEvent;
 
-        public void SetServerNotiEvent(ServerNotiEvent svrNoti)
-        {
-            SNotiEvent = svrNoti;
-        }
-
-        public ServerNotiEventAdvanced GetServerNotiEventAdvanced()
-        {
-            return SNotiEventAdvanced;
-        }
-
-        public void SetServerNotiEventAdvanced(ServerNotiEventAdvanced svrNoti)
-        {
-            SNotiEventAdvanced = svrNoti;
-        }
-
+        public void SetApproveWaitNotiEvent(ApproveWaitNotiEvent svrNoti) => ApproveWaitEvent = svrNoti;
+    
 
         public void SetAPTAndVirusNotiEventAdd(APTAndVirusNotiEvent e)
         {

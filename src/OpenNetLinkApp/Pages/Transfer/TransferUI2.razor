@@ -687,16 +687,7 @@
         //bool bUseApprove = sgLoginData.GetApprove();
         bool bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
         bool bApprEdit = sgLoginData.GetApproveAppend();
-
-        if (!pageService.GetSFMChecking())
-        {
-            SFMRefreshEvent sfmRefreshEvent = HSCmdCenter.sgPageEvent.GetSFMRefreshEvent();
-            if (sfmRefreshEvent != null)
-            {
-                int check = await sfmRefreshEvent(groupID);
-            }
-        }
-
+        
         ISGUserInfo userInfoService = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
         int nApprovePos = userInfoService.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupID)); //sgUserData.GetUserApprpos();
         SGApprLineData sgApprLineData = null;

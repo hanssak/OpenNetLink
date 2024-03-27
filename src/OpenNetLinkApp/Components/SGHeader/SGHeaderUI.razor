@@ -804,7 +804,7 @@
         pageService.SetConnectStatus(nGroupID, false);
         pageService.SetLogoutStatus(nGroupID, true);
         //HsCmdCenter.sgDicRecvData.SetSFMListData(nGroupID, null);
-        pageService.SetSFMChecking(false);
+        //pageService.SetSFMChecking(false);
         pageService.SetApproveAfterMyCountChecking(false);
         HsCmdCenter.sgDicRecvData.SetLoginDataEmpty(nGroupID);
 
@@ -939,7 +939,7 @@
         if (String.IsNullOrEmpty(arg) == false)
             LogOut(Convert.ToInt32(arg));
 
-        pageService.SetSFMChecking(false);
+        //pageService.SetSFMChecking(false);
     }
 
     private void UpdatPolicyLogOut(string arg)
@@ -1149,7 +1149,7 @@
         }
     }
 
-    public async Task<int> SendUserSFMInfo(int groupId)
+    @*public async Task<int> SendUserSFMInfo(int groupId)
     {
         int result = 0;
         try
@@ -1194,7 +1194,6 @@
             return result;
         }
     }
-
     public void SFMInfoAfterSend(int groupId, object[] e)
     {
         SGData sgData = e[0] as SGData;
@@ -1326,7 +1325,7 @@
             pageService.SetSFMLogOut(false);
             pageService.SetSFMChecking(false);
         }
-    }
+    }*@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -1793,7 +1792,7 @@
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         listNetWorkData = NetWorkSvc.NetWorkInfo;
         nGroupID = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
-        HsCmdCenter.sgPageEvent.SetSFMRefreshEvent(SendUserSFMInfo);
+        //HsCmdCenter.sgPageEvent.SetSFMRefreshEvent(SendUserSFMInfo);
         HsCmdCenter.sgPageEvent.SetUpdatePolicyEvent(UpdatePolicy);
         HsCmdCenter.sgPageEvent.SetFileMimeRecvEvent(FileMimeRecvEvent);
         HsCmdCenter.sgPageEvent.SetOLEMimeRecvEvent(OLEMimeRecvEvent);
