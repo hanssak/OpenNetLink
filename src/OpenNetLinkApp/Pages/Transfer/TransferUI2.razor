@@ -687,16 +687,7 @@
         //bool bUseApprove = sgLoginData.GetApprove();
         bool bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
         bool bApprEdit = sgLoginData.GetApproveAppend();
-
-        if (!pageService.GetSFMChecking())
-        {
-            SFMRefreshEvent sfmRefreshEvent = HSCmdCenter.sgPageEvent.GetSFMRefreshEvent();
-            if (sfmRefreshEvent != null)
-            {
-                int check = await sfmRefreshEvent(groupID);
-            }
-        }
-
+        
         ISGUserInfo userInfoService = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
         int nApprovePos = userInfoService.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupID)); //sgUserData.GetUserApprpos();
         SGApprLineData sgApprLineData = null;
@@ -2080,8 +2071,8 @@
         HSCmdCenter.sgPageEvent.SetAddFileRMEventAdd(groupID, RMouseFileAdd);
         //HSCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(groupID, AptAndVirusNoti);
 
-        HSCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
-        HSCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
+        HSCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);   //파일,클립보드 통일
+        //HSCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
 
         HSCmdCenter.sgPageEvent.SetDayFileChangeNotiEventAdd(groupID, DayInfoFileChangeEvent);
         HSCmdCenter.sgPageEvent.SetDayClipChangeNotiEventAdd(groupID, DayInfoClipChangeEvent);
@@ -2926,11 +2917,12 @@
 
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
+        CLog.Here().Information($"FileTrans - ### - USED size({e.Size}), count({e.Count}), Clip size({e.ClipSize}), Clip count({e.ClipCount}) info recv (groupID : {groupID})! ");
+        
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
+        pageService.SetDayUseClip(groupID, e.ClipSize, e.ClipCount);
 
-        CLog.Here().Information($"FileTrans - ### - USED size({e.Size}), count({e.Count}) info recv (groupID : {groupID})! ");
-
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+  @*      SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
 
@@ -2980,7 +2972,7 @@
                 DayInfoChange();
                 return;
             }
-        }
+        }*@
         UseDayInfoDisplay();
         StateHasChanged();
     }

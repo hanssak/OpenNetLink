@@ -1647,6 +1647,24 @@ namespace OpenNetLinkApp.Data.SGDicData
             // return -2;
         }
 
+        /// <summary>
+        /// eGetPolicy
+        /// </summary>
+        /// <param name="hsNet"></param>
+        /// <returns></returns>
+        public int RequestRestGetPolicy(HsNetWork hsNet)
+        {
+          
+            try
+            {
+                SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eGetPolicy, null, null, hsNet.stCliMem.GetProtectedSeedKey()); // api-key 사용
+                return hsNet.RequestRest(args);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
 
         public int RequestRestTest(HsNetWork hsNet, eAdvancedCmdList eCmd)
         {

@@ -26,7 +26,7 @@ namespace OpenNetLinkApp.Services
         public bool m_bFileSending = false;
         public bool m_bFilePrevRecving = false;
         public bool m_bFileExaming = false;
-        public bool m_bSFMChecking = false;                             // SFM 체크중
+        //public bool m_bSFMChecking = false;                             // SFM 체크중
         public bool m_bApproveAfterMyCountChecking = false;             // 자신의 사후결재 카운트 조회중 
         public bool m_bSFMLogOut = false;                               // SFM 체크로 인한 로그아웃 여부
 
@@ -1077,15 +1077,15 @@ namespace OpenNetLinkApp.Services
             return m_bFileExaming;
         }
 
-        public void SetSFMChecking(bool bSFMChecking)
-        {
-            this.m_bSFMChecking = bSFMChecking;
-        }
+        //public void SetSFMChecking(bool bSFMChecking)
+        //{
+        //    this.m_bSFMChecking = bSFMChecking;
+        //}
 
-        public bool GetSFMChecking()
-        {
-            return this.m_bSFMChecking;
-        }
+        //public bool GetSFMChecking()
+        //{
+        //    return this.m_bSFMChecking;
+        //}
 
         public void SetSFMLogOut(bool bSFMLogOut)
         {
