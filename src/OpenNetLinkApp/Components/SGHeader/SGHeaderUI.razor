@@ -1150,59 +1150,59 @@
     }
 
     @*public async Task<int> SendUserSFMInfo(int groupId)
-    {
+        {
         int result = 0;
         try
         {
-            if (pageService.GetSFMChecking())
-                return 0;
+        if (pageService.GetSFMChecking())
+        return 0;
 
-            List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+        List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
 
-            if (pageService.GetConnectStatus(groupId))
-            {
-                SGUserInfo userData = (SGUserInfo)SGAppMgrSvc.UserInfoService.GetUserInfo(groupId);
-                ApproveProxy approveProxy = new ApproveProxy();
-                string strQuery = approveProxy.GetSFMApproverRight(userData.UserSeq);
-                HsNetWork hsNetWork = null;
-                hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
-                if (hsNetWork != null)
-                {
-                    pageService.SetSFMChecking(true);
-                    HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eSFMIINFOQUERY, SFMInfoAfterSend);
-                    HsCmdCenter.sgSendData.RequestCommonSendQuery(hsNetWork, eCmdList.eSFMIINFOQUERY, userData.UserId, strQuery);
-                }
-            }
+        if (pageService.GetConnectStatus(groupId))
+        {
+        SGUserInfo userData = (SGUserInfo)SGAppMgrSvc.UserInfoService.GetUserInfo(groupId);
+        ApproveProxy approveProxy = new ApproveProxy();
+        string strQuery = approveProxy.GetSFMApproverRight(userData.UserSeq);
+        HsNetWork hsNetWork = null;
+        hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
+        if (hsNetWork != null)
+        {
+        pageService.SetSFMChecking(true);
+        HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eSFMIINFOQUERY, SFMInfoAfterSend);
+        HsCmdCenter.sgSendData.RequestCommonSendQuery(hsNetWork, eCmdList.eSFMIINFOQUERY, userData.UserId, strQuery);
+        }
+        }
 
-            while (true)
-            {
-                if (!pageService.GetSFMChecking())
-                    break;
+        while (true)
+        {
+        if (!pageService.GetSFMChecking())
+        break;
 
-                System.Threading.Thread.Sleep(50);
-            }
+        System.Threading.Thread.Sleep(50);
+        }
 
-            if (pageService.GetSFMLogOut())
-                return 1;
-            else
-                return 0;
+        if (pageService.GetSFMLogOut())
+        return 1;
+        else
+        return 0;
 
         }
         catch (Exception ex)
         {
-            pageService.SetSFMChecking(false);
-            return result;
+        pageService.SetSFMChecking(false);
+        return result;
         }
-    }
-    public void SFMInfoAfterSend(int groupId, object[] e)
-    {
+        }
+        public void SFMInfoAfterSend(int groupId, object[] e)
+        {
         SGData sgData = e[0] as SGData;
         SGUserInfo userInfo = (SGUserInfo)SGAppMgrSvc.UserInfoService.GetUserInfo(groupId);
         if (userInfo == null)
         {
-            pageService.SetSFMChecking(false);
-            pageService.SetSFMLogOut(false);
-            return;
+        pageService.SetSFMChecking(false);
+        pageService.SetSFMLogOut(false);
+        return;
         }
         //HsCmdCenter.sgDicRecvData.SetSFMListData(groupId, e[0] as SGData);
         //대결재자 관련 추가 부분
@@ -1212,120 +1212,120 @@
 
         if (sgData != null)
         {
-            List<Dictionary<int, string>> listDicSfmdata = null;
-            listDicSfmdata = sgData.GetSvrRecordData("RECORD");
-            if (listDicSfmdata == null || listDicSfmdata.Count == 0)
-            {
-                isMySelfSFM = true;
-                sfmRight = 0;
-            }
-            else
-            {
-                if (listDicSfmdata.Count > 1)
-                {
-                    //headUserName = $"{userInfo.UserName}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재 외 {listDicSfmdata.Count - 1})";
-                    headUserName = String.Format(xmlConf.GetTitle("T_PROXY_USERNAME_COUNT"), userInfo.UserName, listDicSfmdata[0][3], listDicSfmdata[0][4], listDicSfmdata.Count - 1);
-                }
-                else
-                {
-                    //headUserName = $"{userInfo.UserName}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재)";
-                    headUserName = String.Format(xmlConf.GetTitle("T_PROXY_USERNAME"), userInfo.UserName, listDicSfmdata[0][3], listDicSfmdata[0][4]);
-                }
+        List<Dictionary<int, string>> listDicSfmdata = null;
+        listDicSfmdata = sgData.GetSvrRecordData("RECORD");
+        if (listDicSfmdata == null || listDicSfmdata.Count == 0)
+        {
+        isMySelfSFM = true;
+        sfmRight = 0;
+        }
+        else
+        {
+        if (listDicSfmdata.Count > 1)
+        {
+        //headUserName = $"{userInfo.UserName}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재 외 {listDicSfmdata.Count - 1})";
+        headUserName = String.Format(xmlConf.GetTitle("T_PROXY_USERNAME_COUNT"), userInfo.UserName, listDicSfmdata[0][3], listDicSfmdata[0][4], listDicSfmdata.Count - 1);
+        }
+        else
+        {
+        //headUserName = $"{userInfo.UserName}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재)";
+        headUserName = String.Format(xmlConf.GetTitle("T_PROXY_USERNAME"), userInfo.UserName, listDicSfmdata[0][3], listDicSfmdata[0][4]);
+        }
 
-                foreach (Dictionary<int, string> value in listDicSfmdata)
-                {
-                    if (sfmRight < Convert.ToInt32(value[0]))
-                        sfmRight = Convert.ToInt32(value[0]);
-                }
+        foreach (Dictionary<int, string> value in listDicSfmdata)
+        {
+        if (sfmRight < Convert.ToInt32(value[0]))
+        sfmRight = Convert.ToInt32(value[0]);
+        }
 
-                isMySelfSFM = false;
-            }
+        isMySelfSFM = false;
+        }
         }
 
         if (pageService.GetFileRecving() && !pageService.GetFileSending()! && !pageService.GetFilePrevRecving())
         {
-            pageService.SetSFMLogOut(false);
-            pageService.SetSFMChecking(false);
-            return;
+        pageService.SetSFMLogOut(false);
+        pageService.SetSFMChecking(false);
+        return;
         }
 
         if (userInfo.HeaderUserName != headUserName)
         {
-            if (userInfo.GetUserApprPos(true, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupId)) < sfmRight)
-            {
-                pageService.SetSFMLogOut(true);
-                pageService.SetSFMChecking(false);
+        if (userInfo.GetUserApprPos(true, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupId)) < sfmRight)
+        {
+        pageService.SetSFMLogOut(true);
+        pageService.SetSFMChecking(false);
 
-                List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
 
-                string str = String.Empty;
-                foreach (ISGNetwork netWork in listNetWork)
-                {
-                    if (netWork.GroupID == groupId)
-                    {
-                        str = netWork.FromName;
-                    }
-                }
-                str += xmlConf.GetTitle("T_PROXY_USERNAME_LOGOUT"); //" 을 대결재권한 변경으로 로그아웃 하겠습니다.";
+        string str = String.Empty;
+        foreach (ISGNetwork netWork in listNetWork)
+        {
+        if (netWork.GroupID == groupId)
+        {
+        str = netWork.FromName;
+        }
+        }
+        str += xmlConf.GetTitle("T_PROXY_USERNAME_LOGOUT"); //" 을 대결재권한 변경으로 로그아웃 하겠습니다.";
 
-                if (pageService.GetLogoutStatus(groupId))
-                {
-                    pageService.SetSFMLogOut(true);
-                    pageService.SetSFMChecking(false);
-                }
-                refSGAlert.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), str, 1, groupId, groupId.ToString());
-            }
-            else
-            {
-                pageService.SetSFMLogOut(false);
-                pageService.SetSFMChecking(false);
-
-                userInfo.UserInfoAdded.IsMySelfSFM = isMySelfSFM;
-                userInfo.HeaderUserName = headUserName;
-                userInfo.UserInfoAdded.SFMRight = sfmRight;
-
-                ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-                int curGroupId = 0;
-                if (sgSideBar != null)
-                    curGroupId = sgSideBar.GroupId;
-
-                if (groupId == curGroupId)
-                {
-                    StateHasChanged();
-                    PageDataRefreshEvent pgRefreshEvent = null;
-                    if (sgSideBar.Path.Contains("transferApprove"))
-                    {
-                        pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
-                    }
-                    else if (sgSideBar.Path.Contains("securityApprove"))
-                    {
-                        pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.SecurityApproveUI);
-                    }
-                    else if (sgSideBar.Path.Contains("clipBoardApprove"))
-                    {
-                        pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
-                    }
-                    else if (sgSideBar.Path.Contains("mailApprove"))
-                    {
-                        pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveUI);
-                    }
-                    else if (sgSideBar.Path.Contains("mailSecurityApprove"))
-                    {
-                        pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.MailSecurityApproveUI);
-                    }
-
-                    if (pgRefreshEvent != null)
-                        pgRefreshEvent();
-
-                }
-            }
+        if (pageService.GetLogoutStatus(groupId))
+        {
+        pageService.SetSFMLogOut(true);
+        pageService.SetSFMChecking(false);
+        }
+        refSGAlert.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), str, 1, groupId, groupId.ToString());
         }
         else
         {
-            pageService.SetSFMLogOut(false);
-            pageService.SetSFMChecking(false);
+        pageService.SetSFMLogOut(false);
+        pageService.SetSFMChecking(false);
+
+        userInfo.UserInfoAdded.IsMySelfSFM = isMySelfSFM;
+        userInfo.HeaderUserName = headUserName;
+        userInfo.UserInfoAdded.SFMRight = sfmRight;
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int curGroupId = 0;
+        if (sgSideBar != null)
+        curGroupId = sgSideBar.GroupId;
+
+        if (groupId == curGroupId)
+        {
+        StateHasChanged();
+        PageDataRefreshEvent pgRefreshEvent = null;
+        if (sgSideBar.Path.Contains("transferApprove"))
+        {
+        pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
         }
-    }*@
+        else if (sgSideBar.Path.Contains("securityApprove"))
+        {
+        pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.SecurityApproveUI);
+        }
+        else if (sgSideBar.Path.Contains("clipBoardApprove"))
+        {
+        pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
+        }
+        else if (sgSideBar.Path.Contains("mailApprove"))
+        {
+        pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.MailApproveUI);
+        }
+        else if (sgSideBar.Path.Contains("mailSecurityApprove"))
+        {
+        pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.MailSecurityApproveUI);
+        }
+
+        if (pgRefreshEvent != null)
+        pgRefreshEvent();
+
+        }
+        }
+        }
+        else
+        {
+        pageService.SetSFMLogOut(false);
+        pageService.SetSFMChecking(false);
+        }
+        }*@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -2130,13 +2130,17 @@
 
         //SendDayFileInfo(groupId);
         UseDayFileNotiEvent useDayFileEvent = HsCmdCenter.sgPageEvent.GetUseDayFileNotiEvent(groupId);
-        FileAndClipDayArgs arg = new FileAndClipDayArgs();
-        arg.Size = sgLoginData.GetDayFileTransferUsedSize();
-        arg.Count = sgLoginData.GetDayFileTransferUsedCount();
-        arg.ClipSize = sgLoginData.GetDayClipboardUsedSize();
-        arg.ClipCount = sgLoginData.GetDayClipboardUsedCount();
-        useDayFileEvent(groupId, arg);
+        if (useDayFileEvent != null)
+        {
 
+
+            FileAndClipDayArgs arg = new FileAndClipDayArgs();
+            arg.Size = sgLoginData.GetDayFileTransferUsedSize();
+            arg.Count = sgLoginData.GetDayFileTransferUsedCount();
+            arg.ClipSize = sgLoginData.GetDayClipboardUsedSize();
+            arg.ClipCount = sgLoginData.GetDayClipboardUsedCount();
+            useDayFileEvent(groupId, arg);
+        }
         SGAppMgrSvc.UserInfoService.SetUserInfo(groupId, sgLoginData);
 
         string strMsg = xmlConf.GetInfoMsg("I_0234");

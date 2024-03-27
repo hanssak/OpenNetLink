@@ -1330,12 +1330,15 @@ namespace OpenNetLinkApp.Services
                 }
 
                 UseDayFileNotiEvent useDayFileEvent = sgPageEvent.GetUseDayFileNotiEvent(groupId);
-                FileAndClipDayArgs arg = new FileAndClipDayArgs();
-                arg.Size = sgLoginData.GetDayFileTransferUsedSize();
-                arg.Count = sgLoginData.GetDayFileTransferUsedCount();
-                arg.ClipSize = sgLoginData.GetDayClipboardUsedSize();
-                arg.ClipCount = sgLoginData.GetDayClipboardUsedCount();
-                useDayFileEvent(groupId, arg);
+                if(useDayFileEvent != null)
+                {
+                    FileAndClipDayArgs arg = new FileAndClipDayArgs();
+                    arg.Size = sgLoginData.GetDayFileTransferUsedSize();
+                    arg.Count = sgLoginData.GetDayFileTransferUsedCount();
+                    arg.ClipSize = sgLoginData.GetDayClipboardUsedSize();
+                    arg.ClipCount = sgLoginData.GetDayClipboardUsedCount();
+                    useDayFileEvent(groupId, arg);
+                }
 
                 // 자동삭제 기능동작
                 Thread tr = null;

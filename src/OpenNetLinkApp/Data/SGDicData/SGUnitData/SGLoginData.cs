@@ -377,7 +377,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public int GetUserApprpos()
         {
             string strData = GetTagData("approver_type", "authority");
-            int nApprPos = Convert.ToInt32(strData);
+            int.TryParse(strData, out int nApprPos);
             return nApprPos;
         }
         /// <summary>
