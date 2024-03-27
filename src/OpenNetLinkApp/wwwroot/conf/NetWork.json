@@ -5,10 +5,12 @@
       "FROMNAME": "VDI망",
       "TONAME": "개인정보존",
       "IPADDRESS": "192.168.2.151",
-      "PORT": 3435,
+      "PORT": 8080,
       "CONNECTTYPE": 1,
       "TLSVERSION": "1.2",
       "APIVERSION": "1.2",
+      "APIAddress": [ "192.168.20.121" ],
+
       "NETPOS": "IN",
       "ADDomain": [
         "IpIeACsMrMfzCyTt9WRFUQ==",

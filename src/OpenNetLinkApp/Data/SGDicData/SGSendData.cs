@@ -1052,7 +1052,9 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["agent_name"] = strAgentName;
             dic["version"] = strVersion;
             dic["os_type"] = strOSType;
-            dic["rsa_public_key"] = SGCrypto.GetRSAPublicKey_Base64Enc(hsNet.GetGroupID().ToString());
+            //test용 ->삭제 예정
+            dic["rsa_public_key"] = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3CPoVJIbQO6d8ru6LgusEXVNmTpJ3gZ1rEReGxYc9mFVHnHtBjHAovTbRokY2zcHfzHYjkyLVh36E/vbkH0cLhamdC5oEkfqBaDcZcICml48X9ZyatKqIWFPBsD8om6TWZKncVgKM1jbx7NT6P4Hyq0g3+RrzlZiwapnJ//gp7CqKO/G8L0NyHjjmbXfs5yRokm68/TgISrW7FvkS/FJoNQuKIgSV2vfftfwPZvUju7y/BlGtTBSnw7HVRgnkMtFkIbIDiAoWI9ewfASmh9WIw8zrd2Ktn25ZG+DB8tbBYhl2tVogehWaG3ZZ1tsxGxZOc1skmkNLi9euAluqF1lDwIDAQAB";
+                //SGCrypto.GetRSAPublicKey_Base64Enc(hsNet.GetGroupID().ToString());
 
             SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostReady, null, dic, hsNet.stCliMem.GetProtectedSeedKey()); // api-key 사용
             return hsNet.RequestRest(args);
@@ -1075,7 +1077,7 @@ namespace OpenNetLinkApp.Data.SGDicData
         /// <param name="notiRootURL">URL 사용 시, Callback Root URL</param>
         /// <param name="hanssakOTP"></param>
         /// <returns></returns>
-        public int RequestRestLogin(HsNetWork hsNet, int loginType, string userId, string protectedUserPassword, bool checkPassword, string strVersion, string notiRootURL, string hanssakOTP = "")
+        public int RequestRestLogin(HsNetWork hsNet, string aggregateID, int loginType, string userId, string protectedUserPassword, bool checkPassword, string strVersion, string notiRootURL, string hanssakOTP = "")
         {
             byte[] pw = null;
             byte[] pwTag = null;
@@ -1093,6 +1095,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                 Dictionary<string, object> user_conn_info = new Dictionary<string, object>();
                 Dictionary<string, object> session_callback = new Dictionary<string, object>();
 
+                dic.Add("aggregate_id", aggregateID);
                 dic.Add("hs_otp", hanssakOTP);
                 dic.Add("auth_info", auth_info);
                 dic.Add("agent_info", agent_info);

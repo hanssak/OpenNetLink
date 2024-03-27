@@ -38,6 +38,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_DicTagData = new Dictionary<string, object>(data.m_DicTagData);
             m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
         }
+
+        public string GetAggregateID() => GetTagData("aggregate_id");
+
         /// <summary>
         /// 서버에서 처리하는 망 종류. 택1: IN(내부), EX(외부).
         /// </summary>

@@ -3578,7 +3578,7 @@ namespace OpenNetLinkApp.Services
             return 0;
         }
 
-        public int RestLogin(int groupid, string strID, string strPW, string strCurCliVersion, int loginType, bool passwordCheck, string notiRootURL = "", string hanssakOTP = "")
+        public int RestLogin(int groupid, string aggregateID, string strID, string strPW, string strCurCliVersion, int loginType, bool passwordCheck, string notiRootURL = "", string hanssakOTP = "")
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork == null)
@@ -3589,7 +3589,7 @@ namespace OpenNetLinkApp.Services
                 int ret = 0;
                 try
                 {
-                    ret = sgSendData.RequestRestLogin(hsNetWork, loginType, strID, strPW, passwordCheck, strCurCliVersion, notiRootURL, hanssakOTP);
+                    ret = sgSendData.RequestRestLogin(hsNetWork, aggregateID, loginType, strID, strPW, passwordCheck, strCurCliVersion, notiRootURL, hanssakOTP);
                 }
                 catch (Exception ex)
                 {

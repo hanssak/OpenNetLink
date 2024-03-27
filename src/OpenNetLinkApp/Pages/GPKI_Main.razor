@@ -702,6 +702,10 @@
         try
         {
             ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
+            SGReadyData sgReadyData = (SGReadyData)HsCmdCenter.GetReadyData(pageService.m_nCurViewPageGroupID);
+            if(sgReadyData == null)
+                return false;
+            string aggregateId = sgReadyData.GetAggregateID();
             string strCurCliVersion = "";
             string strPlatform = "";
             if (VersionConfigSvc != null)
@@ -723,7 +727,7 @@
 
             CLog.Here().Information("Login Platform  : {0}", strPlatform);
             CLog.Here().Information("Login strCurCliVersion {0}", strCurCliVersion);
-            HsCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, strID, strID, strCurCliVersion, 0, false);
+            HsCmdCenter.RestLogin(pageService.m_nCurViewPageGroupID, aggregateId, strID, strID, strCurCliVersion, 0, false);
             //HsCmdCenter.Login(0, id, pw, "NetLink 2.01");
         }
         catch (Exception ex)
