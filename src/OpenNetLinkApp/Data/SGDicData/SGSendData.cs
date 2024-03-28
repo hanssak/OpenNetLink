@@ -1669,6 +1669,25 @@ namespace OpenNetLinkApp.Data.SGDicData
             }
         }
 
+        /// <summary>
+        /// eGetDefaultApprovers
+        /// </summary>
+        /// <param name="hsNet"></param>
+        /// <returns></returns>
+        public int RequestRestGetDefaultApproveLine(HsNetWork hsNet)
+        {
+
+            try
+            {
+                SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.eGetDefaultApprovers, null, null, hsNet.stCliMem.GetProtectedSeedKey()); // api-key 사용
+                return hsNet.RequestRest(args);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
         public int RequestRestTest(HsNetWork hsNet, eAdvancedCmdList eCmd)
         {
             SGEventArgs args = sendParser.RequestRestCmd(eCmd, null, null, hsNet.stCliMem.GetProtectedSeedKey());

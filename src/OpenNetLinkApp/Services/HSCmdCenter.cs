@@ -516,10 +516,6 @@ namespace OpenNetLinkApp.Services
                         //BindAfterSend(nRet, groupId, sgData);
                         break;
 
-                    case eCmdList.eAPPROVEDEFAULT:                                                  // 사용자기본결재정보조회 요청 응답.
-                        ApprLineAfterSend(nRet, groupId, sgData);
-                        break;
-
                     case eCmdList.eFILETRANSLISTQUERYCOUNT:                                                  // 전송관리 조회 리스트 데이터 Count 요청 응답.
                         hs = GetConnectNetWork(groupId);
                         if (hs != null)
@@ -1053,8 +1049,7 @@ namespace OpenNetLinkApp.Services
                         }
                         break;
 
-                    case eAdvancedCmdList.eGetDefaultApprovers:
-                        //eCmdList.eAPPROVEDEFAULT:                                                  // 사용자기본결재정보조회 요청 응답.
+                    case eAdvancedCmdList.eGetDefaultApprovers: //정책 업데이트 시, 별도 호출됨          // 사용자기본결재정보조회 요청 응답.
                         ApprLineAfterSend(nRet, groupId, sgData);
                         break;
 
@@ -1689,53 +1684,9 @@ namespace OpenNetLinkApp.Services
 
         public void ApprLineAfterSend(int nRet, int groupId, SGData sgData)
         {
-            string strUserID = "";
-
-            try
-            {
-                SGLoginData sgLoginDataApproveDefault = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                strUserID = sgLoginDataApproveDefault.GetUserID();
-
-                UserHRinfo userHr = new UserHRinfo()
-                {
-                    strId = sgLoginDataApproveDefault.GetUserID(),
-                    strSeq = sgLoginDataApproveDefault.GetUserSequence(),
-                    strName = sgLoginDataApproveDefault.GetUserName(),
-                    strRank = sgLoginDataApproveDefault.GetRank(),
-                    strDeptName = sgLoginDataApproveDefault.GetTeamName(),
-                    deptSeq = sgLoginDataApproveDefault.GetTeamCode(),
-                    strPosition = sgLoginDataApproveDefault.GetUserPosition()
-                };
-
-                if (nRet == 0)
-                {
-                    HsNetWork hs = null;
-                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
-                    {
-                        hs = m_DicNetWork[groupId];
-                        sgDicRecvData.SetApprLineData(hs, groupId, sgData, userHr);
-                    }
-                }
-                /*
-                SGApprLineData sgApprLineData = (SGApprLineData)sgDicRecvData.GetApprLineData(groupId);
-                List<string> strListName = sgApprLineData.GetApprAndLineName();
-                List<string> strListSeq = sgApprLineData.GetApprAndLineSeq();
-                */
-
-                // SGUserData sgUserData = (SGUserData)sgDicRecvData.GetUserData(groupId);
-                // string strTeamCode = sgUserData.GetTeamCode();
-
-
-
-            }
-            catch (Exception ex)
-            {
-                HsLog.err($"ApprLineAfterSend - Exception(MSG) : {ex.Message}");
-            }
-
-            //SendInstApprove(groupId, strUserID, strTeamCode);
-            if (groupId > -1 && strUserID.Length > 0)
-                SendSystemRunEnv(groupId, strUserID);
+            ApproveLineEvent ApprLine_Event = sgPageEvent.GetApproveLineEvent();
+            if(ApprLine_Event != null)
+                ApprLine_Event(groupId, sgData);
         }
 
         public void TransSearchAfterSend(int nRet, int groupId)
@@ -4415,13 +4366,33 @@ namespace OpenNetLinkApp.Services
                 }
                 catch (Exception ex)
                 {
-                    Log.Logger.Here().Error($"RestLogin-Task-Exception : {ex.Message}");
+                    Log.Logger.Here().Error($"RestGetPolicy-Task-Exception : {ex.Message}");
                 }
 
             });
             return 0;
         }
+        public int RestGetDefaultApproveLine(int groupid)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork == null)
+                return -1;
 
+            Task.Run(() =>
+            {
+                int ret = 0;
+                try
+                {
+                    ret = sgSendData.RequestRestGetDefaultApproveLine(hsNetWork);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Here().Error($"RestGetDefaultApproveLine-Task-Exception : {ex.Message}");
+                }
+
+            });
+            return 0;
+        }
         public int RestSendTest(int groupid, eAdvancedCmdList eCmd)
         {
             HsNetWork hsNetWork = null;
