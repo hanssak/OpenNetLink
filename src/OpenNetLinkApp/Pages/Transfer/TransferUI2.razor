@@ -687,7 +687,7 @@
         //bool bUseApprove = sgLoginData.GetApprove();
         bool bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
         bool bApprEdit = sgLoginData.GetApproveAppend();
-        
+
         ISGUserInfo userInfoService = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
         int nApprovePos = userInfoService.GetUserApprPos(false, SGAppMgrSvc.OpConfigInfoService.GetUseAllProxyAuthority(groupID)); //sgUserData.GetUserApprpos();
         SGApprLineData sgApprLineData = null;
@@ -913,31 +913,38 @@
         if (sgUserData == null)
             return;
 
+        SGReadyData sgReadyData = (SGReadyData)HSCmdCenter.GetReadyData(groupID);
+        if (sgReadyData == null)
+            return;
+
+        string strConNetWork = sgReadyData.GetSystemPositionString();
+
         SGApprLineData sgApprLineData = null;
         sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
         if (sgApprLineData == null)
             return;
 
-
+        Dictionary<string, object> userHr = sgLoginData.GetUserHRDic();
         // 시간에 의한 파일전송 기능 사용 확인
         //bool bUseFileTrans = true; //sgLoginData.GetFileTrans();
         DateTime nowDt = pageService.GetAfterApprTime(groupID);
 
-        //if (sgLoginData.GetUseFileTransForTimeMode())     // KKW-Test
-        {
-            if (sgLoginData.GetUseFileTransForTime(nowDt) == false)
-            {
-                // 자료전송이 허락된 시간이 아닙니다.
-                CLog.Here().Information($"FileTrans,  This is not the permitted time to transmit data!!!");
-                ShowMessage("warning", XmlConf.GetWarnMsg("W_0300"));
-                return;
-            }
-        }
+
+
+        //if (sgLoginData.GetUseFileTransForTime(nowDt) == false)
+        //{
+        //    // 자료전송이 허락된 시간이 아닙니다.
+        //    CLog.Here().Information($"FileTrans,  This is not the permitted time to transmit data!!!");
+        //    ShowMessage("warning", XmlConf.GetWarnMsg("W_0300"));
+        //    return;
+        //}
+
 
 
         string strUserID = sgLoginData.GetUserID();
         string strMid = sgLoginData.GetTagData("MID");
         string strPolicyFlag = sgLoginData.GetTagData("POLICYFLAG");
+        List<SGNetOverData> destinationList = sgLoginData.GetDestinationInfo();
         string strTitle = strBindTitle;
         string strContents = strBindDesc;
         //string strTitle = strCurTitle;
@@ -1130,6 +1137,8 @@
 
         CLog.Here().Information("NETOVERDATA(Send To Server-###) : {0}", strDestNetOverData);
 
+
+
         //
         refTransProgress.SetProgressText(true, true);
         refTransProgress.ChangeProgress(0);
@@ -1273,7 +1282,19 @@
         }
 
         dropFile.SetLogDB(groupID, strUserSeq, string.Format(XmlConf.GetTitle("T_LOG_DB_FILETRANSFER"), FileList.Count)); //$"파일 전송 ({FileList.Count} 건)");
-        int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver, strInterLockFlagConfirmId);
+
+        string approveProcType = "";
+        if (bAfterApprove)
+            approveProcType = "post";
+        else
+            approveProcType = "pre";
+
+        List<string> destination = new List<string>();
+        destination.Add("E0");
+
+        Dictionary<string, object> reqInfo = SendFileTransReqInfo(strTitle, strContents, "file", strUserSeq, userHr, "I0", approveProcType, bApprSendMail, strSecureString, stApprLineSeq, stReceiver, FileList, destination, strRecvPos); ;
+        //int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver, strInterLockFlagConfirmId);
+        int ret = HSCmdCenter.SendFileTrans(groupID, reqInfo, FileList);
 
         if (SGAppMgrSvc.OpConfigInfoService.GetUseApproveExt(groupID))
         {
@@ -1304,8 +1325,60 @@
             refTransProgress.CancelClosePopUp();
             return;
         }
+    }
 
+    public Dictionary<string, object> SendFileTransReqInfo(string title, string desc, string dataType, string userSeq, object userHr, string sourceType, string approveProcType, bool isEmail, string secureString,  string apprLineSeq, string forwardLineSeq, List<HsStream> list, List<string> destination, string recvPos)
+    {
+        Dictionary<string, object> dic_trans_req = new Dictionary<string, object>();
+        Dictionary<string, object> dic_file_info = new Dictionary<string, object>();
+        Dictionary<string, object> dic_destination = new Dictionary<string, object>();
+        List<Dictionary<string, object>> dic_approval_step_list = new List<Dictionary<string, object>>();
+        List<object> list_forward_user_seq = new List<object>();
 
+        //trans_req 정보 넣기
+        dic_trans_req.Add("trans_seq", "");
+        dic_trans_req.Add("trans_state", "uploaded");
+        dic_trans_req.Add("title", title);
+        dic_trans_req.Add("description", desc);
+        dic_trans_req.Add("data_type", dataType);
+        dic_trans_req.Add("req_user_seq", Convert.ToInt64(userSeq)); //userSeq 필요
+        dic_trans_req.Add("req_user_hr", userHr); //user 부서 정보 필요
+        dic_trans_req.Add("sg_net_type", sourceType);
+        dic_trans_req.Add("approval_proc_type", approveProcType); //사전, 사후
+
+        //추가 알림 정보
+        List<string> notificationList = new List<string>();
+        if (isEmail)
+            notificationList.Add("email");
+        dic_trans_req.Add("add_notification_list", notificationList);
+        dic_trans_req.Add("secure_string", secureString);
+
+        //파일정보
+        dic_file_info.Add("file_key", "");
+        dic_file_info.Add("file_hash", "");
+        dic_file_info.Add("file_size", "");
+        dic_file_info.Add("zip_password", "");
+
+        //파일 리스트 
+        dic_file_info.Add("file_record_list", CsFunction.GetFileRecord(list));
+
+        //결재자 정보 리스트
+        apprLineSeq = "2022031015000100";
+        dic_approval_step_list = CsFunction.GetApprovalStepList(apprLineSeq, "common");
+        //포워드 정보 리스트
+        forwardLineSeq = "202203101500001000";
+        list_forward_user_seq = CsFunction.GetForwardUserSeqList(forwardLineSeq);
+        //목적지 정보 리스트
+        dic_destination = CsFunction.GetDestination(destination, recvPos);
+
+        Dictionary<string, object> dicTransReqInfo = new Dictionary<string, object>();
+        dicTransReqInfo.Add("trans_req", dic_trans_req);
+        dicTransReqInfo.Add("file_info", dic_file_info);
+        dicTransReqInfo.Add("destination", dic_destination);
+        dicTransReqInfo.Add("approval_step_list", dic_approval_step_list);
+        dicTransReqInfo.Add("forward_user_seq_list", list_forward_user_seq);
+
+        return dicTransReqInfo;
     }
 
 

@@ -678,6 +678,15 @@ namespace OpenNetLinkApp.Data.SGDicData
             // return -2;
         }
 
+        public int RequestSendFileTrans(HsNetWork hsNet, Dictionary<string, object> dicParams, List<HsStream> FileList)
+        {
+            SGEventArgs args = sendParser.RequestRestCmd(eAdvancedCmdList.ePostTransferRequests, null, dicParams, hsNet.stCliMem.GetProtectedSeedKey());
+
+            src = new CancellationTokenSource();
+            token = src.Token;
+            return hsNet.SendMessage(args, FileList, token, null);
+            // return -2;
+        }
         public void RequestSendFileTransCancel()
         {
             src.Cancel();

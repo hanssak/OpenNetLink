@@ -952,7 +952,15 @@ namespace OpenNetLinkApp.Services
                     case eAdvancedCmdList.ePostLogin2Factor:
                         Login2FactorAfterSend(groupId, sgData);
                         break;
-
+                    case eAdvancedCmdList.eFileSendProgressNoti:
+                        FileSendProgressNotiAfterSend(nRet, groupId, sgData);
+                        break;
+                    case eAdvancedCmdList.eFileRecvProgressNoti:
+                        FileRecvProgressNotiAfterSend(nRet, groupId, sgData);
+                        break;
+                    case eAdvancedCmdList.eFilePrevProgressNoti:                                        // 파일 미리보기 수신 진행률 노티.
+                        FilePrevProgressNotiAfterSend(nRet, groupId, sgData);
+                        break;
                     case eAdvancedCmdList.eNotiRequestDownload: //(구 //eCmdList.eFILEMAXLENGTH:)
                         //오류발생시에만 UI에 오류 메세지 처리
 
@@ -1111,19 +1119,6 @@ namespace OpenNetLinkApp.Services
                         }
                         break;
 
-                    case eAdvancedCmdList.eFileSendProgressNoti:
-                        //eCmdList.eFILESENDPROGRESSNOTI:
-                        FileSendProgressNotiAfterSend(nRet, groupId, sgData);
-                        break;
-                    case eAdvancedCmdList.eFileRecvProgressNoti:
-                        //eCmdList.eFILERECVPROGRESSNOTI:
-                        FileRecvProgressNotiAfterSend(nRet, groupId, sgData);
-                        break;
-                    case eAdvancedCmdList.eFilePrevProgressNoti:
-                        //eCmdList.eFILEPREVPROGRESSNOTI:                                        // 파일 미리보기 수신 진행률 노티.
-                        FilePrevProgressNotiAfterSend(nRet, groupId, sgData);
-                        break;
-
                     case eAdvancedCmdList.eNotiURLRedirection:
                         //eCmdList.eSUBDATANOTIFY:                                                    // 클립보드 데이터 Recv(서버에서)
                         UrlServerRecvNotiAfterSend(nRet, groupId, sgData);
@@ -1258,6 +1253,7 @@ namespace OpenNetLinkApp.Services
             {
                 Log.Logger.Here().Error($"SGDataRecvAdvanced, CMD : {cmd}, groupid : {groupId}, Exception(MSG) : {ex.Message}, GetResponseResult : {nRet}, reason:{strResponseReason}");
             }
+
         }
 
         public void ReadyAfterSend(int groupId, SGData sgData)
@@ -1311,6 +1307,8 @@ namespace OpenNetLinkApp.Services
                 Int64 nFilePartSize = sgLoginData.GetFilePartSize();
                 Int64 nFileBandWidth = sgLoginData.GetFileBandWidth();
                 Dictionary<string, object> userHrDic = sgLoginData.GetUserHRDic();
+
+                nFilePartSize = 1024 * 1024 * 32;
 
                 hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, userHrDic);
                 hs.SetHszDefault(sgLoginData.GetHszDefaultDec());
@@ -3097,6 +3095,18 @@ namespace OpenNetLinkApp.Services
             int nRet = -1;
             if (hsNetWork != null)
                 nRet = sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList, strNetOver3info, receiver, strinterlockflagConfirmId);
+
+            if (nRet == -2)
+                SendFileTransCancel();
+            return nRet;
+        }
+        public int SendFileTrans(int groupid, Dictionary<string, object> dicParams, List<HsStream> fileList)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            int nRet = -1;
+            if (hsNetWork != null)
+                nRet = sgSendData.RequestSendFileTrans(hsNetWork, dicParams, fileList);
 
             if (nRet == -2)
                 SendFileTransCancel();

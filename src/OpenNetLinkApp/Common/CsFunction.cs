@@ -506,7 +506,202 @@ namespace OpenNetLinkApp.Common
             return false;
         }
 
+        public static string ConvertDataType(string type)
+        {
+            string result = "";
+            switch (type)
+            {
+                case "0":
+                    result = "file";
+                    break;
+                case "1":
+                    result = "cliptxt";
+                    break;
+                case "2":
+                    result = "clipimg";
+                    break;
+                default:
+                    result = "file";
+                    break;
+            }
+            return result;
+        }
+        public static string ConvertApprovalProcType(string type)
+        {
+            string result = "";
+            switch (type)
+            {
+                case "0":
+                    result = "pre";
+                    break;
+                case "1":
+                    result = "post";
+                    break;
+                default:
+                    result = "pre";
+                    break;
+            }
+            return result;
+        }
+        public static string ConvertApprovalType(string type)
+        {
+            string result = "";
+            switch (type)
+            {
+                case "0":
+                    result = "common";
+                    break;
+                case "1":
+                    result = "security";
+                    break;
+                default:
+                    result = "common";
+                    break;
+            }
+            return result;
+        }
+        public static string ConvertDlpType(string type)
+        {
+            string result = "";
+            switch (type)
+            {
+                case "0":
+                    result = "unuse";
+                    break;
+                case "1":
+                    result = "detected";
+                    break;
+                case "2":
+                    result = "none";
+                    break;
+                case "3":
+                    result = "undetectable";
+                    break;
+                default:
+                    result = "unuse";
+                    break;
+            }
+            return result;
+        }
 
+        public static List<Dictionary<string, object>> GetFileRecord(string fileRecord)
+        {
+            List<Dictionary<string, object>> listFileRecord = new List<Dictionary<string, object>>();
+
+            string[] list = fileRecord.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            foreach (string str in list)
+            {
+                int index = 0;
+                Dictionary<string, object> fileInfo = new Dictionary<string, object>();
+                string[] values = str.Split('\x2');
+
+                fileInfo.Add("file_seq", index);
+                fileInfo.Add("file_name", values[0]);
+                fileInfo.Add("file_type", values[1]);
+                fileInfo.Add("file_size", Convert.ToInt64(values[2]));
+                fileInfo.Add("file_date", values[3]);
+                fileInfo.Add("dlp", values[4]);
+                if (values.Count() == 5)
+                    fileInfo.Add("dlp_contents", ConvertDlpType(values[4]));
+                else
+                    fileInfo.Add("dlp_contents", "");
+
+                index++;
+            }
+
+            return listFileRecord;
+        }
+        public static List<Dictionary<string, object>> GetFileRecord(List<HsStream> fileRecord)
+        {
+            List<Dictionary<string, object>> listFileRecord = new List<Dictionary<string, object>>();
+
+            //string[] list = fileRecord.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            foreach (HsStream stream in fileRecord)
+            {
+                int index = 0;
+                Dictionary<string, object> fileInfo = new Dictionary<string, object>();
+
+                fileInfo.Add("file_seq", index);
+                fileInfo.Add("file_name", stream.FileName);
+                fileInfo.Add("file_type", stream.Type);
+                fileInfo.Add("file_size", stream.Size);
+                fileInfo.Add("file_date", stream.ModifyTime.ToString("yyyyMMddHHmmss")); //추후에 yyyy-MM-dd HH:mm:ss 로 변경해야함 20240328 구상민
+                fileInfo.Add("dlp", ConvertDlpType(stream.DlpCheck.ToString()));
+                fileInfo.Add("dlp_contents", stream.DlpContent);
+                listFileRecord.Add(fileInfo);
+
+                index++;
+            }
+
+            return listFileRecord;
+        }
+        public static List<Dictionary<string, object>> GetApprovalStepList(string confirmId, string approvalType)
+        {
+            List<Dictionary<string, object>> listApprovalStep = new List<Dictionary<string, object>>();
+
+            if (String.IsNullOrEmpty(confirmId))
+                return listApprovalStep;
+
+
+            string[] andList = confirmId.Split('\u0002');
+            int order = 100;
+            foreach (string and in andList)
+            {
+                string[] orList = and.Split('|');
+                foreach (string or in orList)
+                {
+                    Dictionary<string, object> approval = new Dictionary<string, object>();
+                    approval.Add("approval_order", order);
+                    approval.Add("approver_seq", Convert.ToInt64(or));
+                    approval.Add("approval_type", approvalType);
+                    //approval.Add("arbitrary", false);
+                    listApprovalStep.Add(approval);
+                }
+                order++;
+            }
+
+            return listApprovalStep;
+        }
+        public static List<object> GetForwardUserSeqList(string forwardUserId)
+        {
+            List<object> listForwardUserId = new List<object>();
+
+            if (String.IsNullOrEmpty(forwardUserId))
+                return listForwardUserId;
+
+            string[] list = forwardUserId.Split('\u0002');
+            foreach (string forward in list)
+            {
+                listForwardUserId.Add(Convert.ToInt64(forward));
+            }
+
+            return listForwardUserId;
+        }
+
+        //public List<string> GetDestination(string strDestinationValue, Dictionary<string, SGNetOverData> DestInfo)
+        //{
+        //    List<string> strValue = new List<string>();
+        //    foreach (SGNetOverData Dest in DestInfo?.Values)
+        //    {
+        //        if (DestInfo?.Count == 1)
+        //            strValue.Add(Dest.strDestSysid);
+        //        else if (strDestinationValue == strTotal)
+        //            strValue.Add(Dest.strDestSysid);
+        //        else if (strDestinationValue == Dest.strDestSysName)
+        //            strValue.Add(Dest.strDestSysid);
+        //    }
+        //    return strValue;
+        //}
+        public static Dictionary<string, object> GetDestination(List<string> destination, string recvPos)
+        {
+            Dictionary<string, object> dicDestination = new Dictionary<string, object>();
+            List<string> listNetId = new List<string>();
+
+            dicDestination.Add("sg_net_type_list", destination);
+            dicDestination.Add("recv_pos", recvPos);
+
+            return dicDestination;
+        }
 
     }
 
