@@ -680,6 +680,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strData = GetTagData("user_policy", "file_upload_time", "type");
             bool bInner = GetSystemPosition();
 
+            //Test용 -> 삭제 예정
+            return true;
             if (strData == "0") //금지
                 return false;
             if (strData == "1")  //전체 허용
