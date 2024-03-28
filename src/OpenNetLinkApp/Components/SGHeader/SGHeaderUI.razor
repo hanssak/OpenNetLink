@@ -2033,6 +2033,7 @@
         //URL List Data 요청
         //HsCmdCenter.RequestUrlList(groupId, sgUserData.UserId);
 
+        //GetUserPolicy 이후, 결재라인 최신화 처리
         pageService.SetIsPolicyUpdate(groupId, true);
 
         //UserInfo 재요청 - 결재라인 정보, SFM 정보, 시스템 환경설정정보 갱신
@@ -2066,14 +2067,7 @@
 
         //UserinfoCheck에서 받은 정보를 LoginData에 갱신
         sgLoginData.SetNewUserPolicy(sgData);
-        UserHRinfo userHr = sgLoginData.GetUserHRInfo();
-
-        JObject apprLineValue = (JObject)sgData.GetTagDataObject("approve_line");   //ApprLineDta는 별도 저장
-        SGData apprLineData = new SGData();
-        apprLineData.m_DicTagData = apprLineValue.ToObject<Dictionary<string, object>>();
-        HsCmdCenter.sgDicRecvData.SetApprLineData(hsNetWork, groupId, apprLineData, userHr);
-
-
+        
         //파일분기사이즈, 파일밴드범위, Link체크
         Int64 nFilePartSize = sgLoginData.GetFilePartSize();
         Int64 nFileBandWidth = sgLoginData.GetFileBandWidth();
@@ -2143,9 +2137,67 @@
         }
         SGAppMgrSvc.UserInfoService.SetUserInfo(groupId, sgLoginData);
 
+        //기본 결재라인 갱신
+        HsCmdCenter.sgPageEvent.SetApproveLineEvent(ApproveLineResult);
+        HsCmdCenter.RestGetDefaultApproveLine(groupId);
+
         string strMsg = xmlConf.GetInfoMsg("I_0234");
         ShowMessage("info", strMsg);
 
+        return;
+    }
+
+    public void ApproveLineResult(int groupId, SGData sgData)
+    {
+        HsNetWork hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
+
+        if (hsNetWork == null)
+            return;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
+        if (sgLoginData == null)
+            return;
+        
+        List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+        string str = String.Empty;
+        foreach (ISGNetwork netWork in listNetWork)
+        {
+            if (netWork.GroupID == groupId)
+            {
+                str = netWork.FromName;
+                str += xmlConf.GetTitle("T_PROXY_USERNAME_LOGOUT"); //" 을 대결재권한 변경으로 로그아웃 하겠습니다.";
+                break;
+            }
+        }
+
+        //ReLoginTagName 해당하는 데이터가 수정됬을 경우 ReLogin 필요
+        string oldSfm = sgLoginData.GetTagDataObject("approve_line", "approver_who_gave_me_proxy_list").ToString();
+        string newSfm = sgData.GetTagDataObject("approve_line", "approver_who_gave_me_proxy_list").ToString();
+        //대결재 자격 부여/박탈 비교
+        if (oldSfm != newSfm)
+        {
+            //로그아웃 화면 보여주기
+            refSGAlertUpdatePolicy.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), str, 1, groupId, groupId.ToString());
+            return;
+        }
+        
+        //결재라인 갱신
+        sgLoginData.SetNewUserPolicy(sgData);
+        
+        UserHRinfo userHr = sgLoginData.GetUserHRInfo();
+        JObject apprLineValue = (JObject)sgData.GetTagDataObject("approve_line");   //ApprLineDta는 별도 저장
+        SGData apprLineData = new SGData();
+        apprLineData.m_DicTagData = apprLineValue.ToObject<Dictionary<string, object>>();
+        HsCmdCenter.sgDicRecvData.SetApprLineData(hsNetWork, groupId, apprLineData, userHr);
+
+        LoginEvent LoginResult_Event = HsCmdCenter.sgPageEvent.GetLoginEvent(groupId);
+        if (LoginResult_Event != null)
+        {
+            PageEventArgs e = new PageEventArgs();
+            e.result = 0;
+            e.strMsg = "";
+            LoginResult_Event(groupId, e);
+        }
         return;
     }
     /// <summary>
@@ -2214,16 +2266,6 @@
 
         //MANUALDOWNLOAD 비교
         if (sgLoginData.GetTagData("user_policy", "manual_download_use") != sgData.GetTagData("user_policy", "manual_download_use"))
-        {
-            //로그아웃 화면 보여주기
-            refSGAlertUpdatePolicy.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), str, 1, groupId, groupId.ToString());
-            return true;
-        }
-
-        string oldSfm = sgLoginData.GetTagDataObject("approve_line", "approver_who_gave_me_proxy_list").ToString();
-        string newSfm = sgData.GetTagDataObject("approve_line", "approver_who_gave_me_proxy_list").ToString();
-        //대결재 자격 부여/박탈 비교
-        if (oldSfm != newSfm)
         {
             //로그아웃 화면 보여주기
             refSGAlertUpdatePolicy.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), str, 1, groupId, groupId.ToString());

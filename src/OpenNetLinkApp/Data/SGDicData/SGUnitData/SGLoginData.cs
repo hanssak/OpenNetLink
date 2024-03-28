@@ -1791,7 +1791,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_DicTagData["user_policy"] = newPolicy.m_DicTagData["user_policy"];
             m_DicTagData["mime_ole_url_info"] = newPolicy.m_DicTagData["mime_ole_url_info"];
             m_DicTagData["agent_patch_policy"] = newPolicy.m_DicTagData["agent_patch_policy"];
-            m_DicTagData["approve_line"] = newPolicy.m_DicTagData["approve_line"];
+            //m_DicTagData["approve_line"] = newPolicy.m_DicTagData["approve_line"];
         }
     }
 }

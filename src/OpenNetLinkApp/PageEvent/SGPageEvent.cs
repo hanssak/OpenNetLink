@@ -255,6 +255,13 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void NotiUpdatePolicyEvent(int groupId);
 
     public delegate void UserPolicyEvent(int groupid, SGData e);
+
+    /// <summary>
+    /// 결재라인 최신 정보 결과
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
+    public delegate void ApproveLineEvent(int groupId, SGData e);
     /// <summary>
     /// FileMime 정보 갱신 Event
     /// </summary>
@@ -526,6 +533,8 @@ namespace OpenNetLinkApp.PageEvent
 
         public UserPolicyEvent userPolicyEvent = null;
 
+        public ApproveLineEvent approveLineEvent = null;
+
         public FileMimeRecvEvent fileMimeRecvEvent = null;
 
         public OLEMimeRecvEvent oleMimeRecvEvent = null;
@@ -605,6 +614,10 @@ namespace OpenNetLinkApp.PageEvent
         public UserPolicyEvent GetUserPolicyEvent() => userPolicyEvent;
 
         public void SetUserPolicyEvent(UserPolicyEvent e) => userPolicyEvent = e;
+
+        public ApproveLineEvent GetApproveLineEvent() => approveLineEvent;
+
+        public void SetApproveLineEvent(ApproveLineEvent e) => approveLineEvent = e;
 
 
         public NotiRequestExitEvent GetNotiRequestExitEvent() => notiRequestExitEvent;
