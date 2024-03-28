@@ -32,6 +32,7 @@ var isUpdateCheck = Argument<bool>("isUpdateCheck", false);				//false 하면 �
 var useMakeConfig = Argument<bool>("useMakeConfig", false);		//Json 형식으로된 MakeConfig.json을 로드하여 지정된 속성을 처리
 var productName = Argument("productName", "OpenNetLink");           //PRODUCT_NAME 입력
 
+var isSilentTmp = false;
 var isPatchInstaller = false;
 var nacLoginType ="0" ;		//0:none / 1:Genian NAC
 var nacLoginEncryptKey ="";	//NAC 사용 시 전달되는 인증정보 암호화에 사용하는 Key 
@@ -898,6 +899,7 @@ Task("PkgCrossflatform")
 			nacLoginType ="0";
 			disableCertAutoUpdate = false;
 			isPatchInstaller=true;
+			isSilentTmp = isSilent;
 			isSilent= isPatchSilent;			
 			// 패치는 시작프로그램 등 설정하지 않으므로 제외
 			// if(useMakeConfig == true)
@@ -919,6 +921,10 @@ Task("PkgCrossflatform")
 					Information("================================================");
 				}
 			}
+
+			// 입력한 설정값 원복
+			isPatchInstaller=false;
+			isSilent = isSilentTmp;
 
 		}
 	}
