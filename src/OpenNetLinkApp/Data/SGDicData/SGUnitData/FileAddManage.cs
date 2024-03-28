@@ -5127,6 +5127,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 string fileName = Path.GetFileName(fileFullName);
                 string extType = Path.GetExtension(fileFullName).Substring(1).ToUpper();
+                                
+                #region [Mac OSX Meta file Skip]
+                if (true)
+                {
+                    FileStream fsStream = new FileStream(fileFullName, FileMode.Open, FileAccess.Read);
+                    byte[] btFileData = StreamToByteArray(fsStream, MaxBufferSize2);
+                    fsStream.Close();
+
+                    if (IsMac_OSX_Meta(btFileData) && ((fileName?.Length ?? 0) > 2 && fileName.Substring(0, 2) == "._"))
+                    {
+                        Log.Logger.Here().Information($"unzipFile, Mac OSX Meta File, Do Not Extract : {fileFullName}");
+                        return (eFileAddErr.eFANone, "");
+                    }
+                }
+                #endregion
 
                 switch (extType)
                 {
@@ -5360,6 +5375,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 string fileName = Path.GetFileName(fileFullName);
                 string extType = Path.GetExtension(fileFullName).Substring(1).ToUpper();
+
+                #region [Mac OSX Meta file Skip]
+                if (true)
+                {
+                    FileStream fsStream = new FileStream(fileFullName, FileMode.Open, FileAccess.Read);
+                    byte[] btFileData = StreamToByteArray(fsStream, MaxBufferSize2);
+                    fsStream.Close();
+
+                    if (IsMac_OSX_Meta(btFileData) && ((fileName?.Length ?? 0) > 2 && fileName.Substring(0, 2) == "._"))
+                    {
+                        Log.Logger.Here().Information($"unzipFile, Mac OSX Meta File, Do Not Extract : {fileFullName}");
+                        return true;
+                    }
+                }
+                #endregion
 
                 switch (extType)
                 {
